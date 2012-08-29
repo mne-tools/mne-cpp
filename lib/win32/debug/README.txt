@@ -1,0 +1,1 @@
+win32 debug lib output
