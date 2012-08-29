@@ -10,3 +10,11 @@
 *.lai
 *.la
 *.a
+/MNELibraries-build-desktop-Qt_5_0_0__qt-everywhere-opensource-src-5_0_0__Release
+/MNE/MNELibraries.pro.user
+/bin/win32/debug/*.dll
+/lib/win32/debug/*.dll
+/lib/win32/debug/*.exp
+/lib/win32/debug/*.ilk
+/lib/win32/debug/*.lib
+/lib/win32/debug/*.pdb
