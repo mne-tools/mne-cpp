@@ -18,3 +18,17 @@
 /lib/win32/debug/*.ilk
 /lib/win32/debug/*.lib
 /lib/win32/debug/*.pdb
+/bin/MNE-sample-data/MEG
+/bin/MNE-sample-data/subjects
+/bin/MNE-sample-data/._.DS_Store
+/bin/MNE-sample-data/._run_anatomy_tutorial.sh
+/bin/MNE-sample-data/._run_meg_tutorial.sh
+/bin/MNE-sample-data/.DS_Store
+/bin/MNE-sample-data/.xdebug_tkmedit
+/*.user
+/bin/win32/debug/*.exe
+/bin/win32/debug/*.ilk
+/bin/win32/debug/*.pdb
+/examples/readFwd/interfaces/IFiff.h.bak
+/examples/readFwd/interfaces/IMNE.h.bak
+/examples/readFwd/interfaces/IPlugin.h.bak
