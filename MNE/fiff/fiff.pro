@@ -44,13 +44,13 @@ CONFIG(debug, debug|release) {
     TARGET = fiffd
     unix:DESTDIR = $$PWD/../../lib/unix/debug
     win32:DESTDIR = $$PWD/../../lib/win32/debug
-    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\lib\\win32\\debug\\fiffd.dll" "..\\..\\bin\\win32\\debug\\"
+    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\..\\mne-cpp\\lib\\win32\\debug\\fiffd.dll" "..\\..\\..\\mne-cpp\\bin\\win32\\debug\\"
 }
 else {
     TARGET = fiff
     unix:DESTDIR = $$PWD/../../lib/unix/release
     win32:DESTDIR = $$PWD/../../lib/win32/release
-    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\lib\\win32\\release\\fiff.dll" "..\\..\\bin\\win32\\release\\"
+    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\..\\mne-cpp\\lib\\win32\\release\\fiff.dll" "..\\..\\..\\mne-cpp\\bin\\win32\\release\\"
 }
 
 
