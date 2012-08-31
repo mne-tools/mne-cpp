@@ -49,7 +49,7 @@ CONFIG(debug, debug|release) {
     win32:LIBS += -L$$PWD/../../lib/win32/debug/ -lfiffd
     unix: LIBS += -L$$PWD/../../lib/unix/debug/ -lmned
     win32:LIBS += -L$$PWD/../../lib/win32/debug/ -lmned
-    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\lib\\win32\\debug\\dispd.dll" "..\\..\\bin\\win32\\debug\\"
+    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\..\\mne-cpp\\lib\\win32\\debug\\dispd.dll" "..\\..\\..\\mne-cpp\\bin\\win32\\debug\\"
 }
 else {
     TARGET = disp
@@ -59,7 +59,7 @@ else {
     win32:LIBS += -L$$PWD/../../lib/win32/release/ -lfiff
     unix: LIBS += -L$$PWD/../../lib/unix/release/ -lmne
     win32:LIBS += -L$$PWD/../../lib/win32/release/ -lmne
-    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\lib\\win32\\release\\disp.dll" "..\\..\\bin\\win32\\release\\"
+    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\..\\mne-cpp\\lib\\win32\\release\\disp.dll" "..\\..\\..\\mne-cpp\\bin\\win32\\release\\"
 }
 
 

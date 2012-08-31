@@ -32,3 +32,10 @@
 /examples/readFwd/interfaces/IFiff.h.bak
 /examples/readFwd/interfaces/IMNE.h.bak
 /examples/readFwd/interfaces/IPlugin.h.bak
+/bin/win32/release/*.dll
+/bin/win32/release/*.exe
+/bin/win32/release/*.manifest
+/lib/win32/release/*.dll
+/lib/win32/release/*.manifest
+/lib/win32/release/*.exp
+/lib/win32/release/*.lib

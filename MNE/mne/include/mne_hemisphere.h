@@ -68,7 +68,7 @@
 
 #include <QList>
 
-#include <QGeometryData>
+#include <QGeometryData> //ToDo: This has to be excluded otherwise, always qt3d is needed
 
 
 //*************************************************************************************************************

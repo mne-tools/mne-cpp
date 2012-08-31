@@ -38,12 +38,14 @@ TEMPLATE = app
 
 QT += core
 QT -= gui
+QT += 3d
+
 
 CONFIG   += console
 CONFIG   -= app_bundle
 
 CONFIG(debug, debug|release) {
-    TARGET = testSourceLabd
+    TARGET = readFwdd
     unix: LIBS += -L$$PWD/../../lib/unix/debug/ -lmned
     win32:LIBS += -L$$PWD/../../lib/win32/debug/ -lmned
     unix: LIBS += -L$$PWD/../../lib/unix/debug/ -lfiffd
@@ -52,7 +54,7 @@ CONFIG(debug, debug|release) {
     win32:DESTDIR = $$PWD/../../bin/win32/debug
 }
 else {
-    TARGET = testSourceLab
+    TARGET = readFwd
     unix: LIBS += -L$$PWD/../../lib/unix/release/ -lmne
     win32:LIBS += -L$$PWD/../../lib/win32/release/ -lmne
     unix: LIBS += -L$$PWD/../../lib/unix/release/ -lfiff
