@@ -37,7 +37,7 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    examples \
-    MNE
+    MNE \
+    examples
 
 CONFIG += ordered
