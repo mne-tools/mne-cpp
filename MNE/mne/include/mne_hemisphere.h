@@ -68,7 +68,7 @@
 
 #include <QList>
 
-#include <QGeometryData> //ToDo: This has to be excluded otherwise, always qt3d is needed
+//#include <QGeometryData> //ToDo: This has to be excluded otherwise, always qt3d is needed
 
 
 //*************************************************************************************************************
@@ -138,7 +138,7 @@ public:
     /**
     * Qt 3d geometry information. Data are generated within first call.
     */
-    QGeometryData* getGeometryData(float p_fScaling = 1.0f);
+    //QGeometryData* getGeometryData(float p_fScaling = 1.0f);
 
 public:
     // MNE Suite
@@ -172,7 +172,7 @@ private:
     // Newly added
     MatrixXf* m_pTriCoords; /**< Holds the rr tri Matrix transformed to geometry data. */
 
-    QGeometryData* m_pGeometryData;
+    //QGeometryData* m_pGeometryData;
 
 
 };

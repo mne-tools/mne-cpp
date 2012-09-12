@@ -36,7 +36,6 @@
 TEMPLATE = lib
 
 QT       += core
-QT       += 3d
 QT       -= gui
 
 DEFINES += MNE_LIBRARY
