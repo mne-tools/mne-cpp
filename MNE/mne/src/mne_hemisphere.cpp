@@ -80,7 +80,7 @@ MNEHemisphere::MNEHemisphere()
 , use_tri_nn(MatrixX3f::Zero(0,3))
 , use_tri_area(VectorXf::Zero(0))
 , m_pTriCoords(NULL)
-, m_pGeometryData(NULL)
+//, m_pGeometryData(NULL)
 {
 }
 
@@ -114,7 +114,7 @@ MNEHemisphere::MNEHemisphere(MNEHemisphere* p_pMNEHemisphere)
 {
     *m_pTriCoords = *p_pMNEHemisphere->m_pTriCoords;
 
-    *m_pGeometryData = *p_pMNEHemisphere->m_pGeometryData;
+    //*m_pGeometryData = *p_pMNEHemisphere->m_pGeometryData;
 }
 
 
@@ -126,8 +126,8 @@ MNEHemisphere::~MNEHemisphere()
     if(m_pTriCoords)
         delete m_pTriCoords;
 
-    if(m_pGeometryData)
-        delete m_pGeometryData;
+//    if(m_pGeometryData)
+//        delete m_pGeometryData;
 
 }
 
@@ -187,18 +187,18 @@ MatrixXf* MNEHemisphere::getTriCoords(float p_fScaling)
 
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-QGeometryData* MNEHemisphere::getGeometryData(float p_fScaling)
-{
-    if(m_pGeometryData == NULL)
-    {
-        m_pGeometryData = new QGeometryData();
+//QGeometryData* MNEHemisphere::getGeometryData(float p_fScaling)
+//{
+//    if(m_pGeometryData == NULL)
+//    {
+//        m_pGeometryData = new QGeometryData();
 
-        MatrixXf* triCoords = getTriCoords(p_fScaling);
+//        MatrixXf* triCoords = getTriCoords(p_fScaling);
 
-        m_pGeometryData->appendVertexArray(QArray<QVector3D>::fromRawData( reinterpret_cast<const QVector3D*>(triCoords->data()), triCoords->cols() ));
-    }
+//        m_pGeometryData->appendVertexArray(QArray<QVector3D>::fromRawData( reinterpret_cast<const QVector3D*>(triCoords->data()), triCoords->cols() ));
+//    }
 
-    return m_pGeometryData;
-}
+//    return m_pGeometryData;
+//}
