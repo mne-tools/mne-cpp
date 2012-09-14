@@ -112,10 +112,17 @@ public:
     * ### MNE toolbox root function ###
     *
     * Wrapper for the FiffDirTree dir_tree_find member function
+    *
+    * Find nodes of the given kind from a directory tree structure
+    *
+    * @param[in] tree the directory tree structure
+    * @param[in] kind the given kind
+    *
+    * @return the found nodes
     */
-    static inline QList<FiffDirTree*> dir_tree_find(FiffDirTree* node, fiff_int_t kind)
+    static inline QList<FiffDirTree*> dir_tree_find(FiffDirTree* tree, fiff_int_t kind)
     {
-        return node->dir_tree_find(kind);
+        return tree->dir_tree_find(kind);
     }
 
 

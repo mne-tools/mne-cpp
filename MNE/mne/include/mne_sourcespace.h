@@ -127,15 +127,37 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Implementation of the mne_read_source_spaces function
-    */
-    static bool read_source_spaces(QFile*& p_pFile, bool add_geom, FiffDirTree*& p_pTree, MNESourceSpace*& p_pSourceSpace);
-
-    //=========================================================================================================
-    /**
     * ### MNE toolbox root function ###: Implementation of the mne_find_source_space_hemi function
     */
     static qint32 find_source_space_hemi(MNEHemisphere* p_pHemisphere);
+
+    //=========================================================================================================
+    /**
+    * ### MNE toolbox root function ###: Implementation of the mne_patch_info function
+    *
+    * Generate the patch information from the 'nearest' vector in a source space
+    *
+    * @param [in] nearest   The nearest vector of the source space.
+    * @param [out] pinfo    The requested patch information.
+    *
+    * @return true if succeeded, false otherwise
+    */
+    static bool patch_info(VectorXi& nearest, QList<VectorXi>& pinfo);
+
+    //=========================================================================================================
+    /**
+    * ### MNE toolbox root function ###: Implementation of the mne_read_source_spaces function
+    *
+    * Reads source spaces from a fif file
+    *
+    * @param [in] p_pFile   The opened fif file
+    * @param [in] add_geom  Add geometry information to the source spaces
+    * @param [in] p_pTree   Search for the source spaces here
+    * @param [out] p_pSourceSpace   the read source spaces
+    *
+    * @return true if succeeded, false otherwise
+    */
+    static bool read_source_spaces(QFile*& p_pFile, bool add_geom, FiffDirTree*& p_pTree, MNESourceSpace*& p_pSourceSpace);
 
     //=========================================================================================================
     /**
@@ -146,17 +168,17 @@ public:
 private:
     //=========================================================================================================
     /**
-    * Implementation of the read_source_space function in e.g. mne_read_source_spaces, mne_read_bem_surfaces.m
+    * Implementation of the read_source_space function in e.g. mne_read_source_spaces.m, mne_read_bem_surfaces.m
+    *
+    * Reads a single source space (hemisphere)
+    *
+    * @param [in] p_pFile           The opened fif file
+    * @param [in] p_pTree           Search for the source space here
+    * @param [out] p_pHemisphere    The read source space (hemisphere)
+    *
+    * @return true if succeeded, false otherwise
     */
     static bool read_source_space(QFile* p_pFile, FiffDirTree* p_pTree, MNEHemisphere*& p_pHemisphere);
-
-
-    //=========================================================================================================
-    /**
-    * Generate the patch information from the 'nearest' vector in a source space
-    *
-    */
-    static bool patch_info(VectorXi& nearest, QList<VectorXi>& pinfo);
 
 
     //=========================================================================================================
@@ -164,6 +186,15 @@ private:
 
 
     //=========================================================================================================
+    /**
+    * Implementation of the complete_source_space_info function in e.g. mne_read_source_spaces.m, mne_read_bem_surfaces.m
+    *
+    * Completes triangulation info
+    *
+    * @param [in, out] p_pHemisphere   Hemisphere to be completed
+    *
+    * @return true if succeeded, false otherwise
+    */
     static bool complete_source_space_info(MNEHemisphere* p_pHemisphere);
 
 public:
