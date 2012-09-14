@@ -95,7 +95,8 @@ bool MNESourceSpace::read_source_spaces(QFile*& p_pFile, bool add_geom, FiffDirT
     if (!p_pFile->isOpen())
     {
         QList<fiff_dir_entry_t>* t_pDir = NULL;
-        Fiff::open(p_pFile->fileName(), p_pFile, p_pTree, t_pDir);
+        QString t_sFileName = p_pFile->fileName();
+        Fiff::open(t_sFileName, p_pFile, p_pTree, t_pDir);
         open_here = true;
         delete t_pDir;
     }
@@ -311,7 +312,7 @@ bool MNESourceSpace::read_source_space(QFile* p_pFile, FiffDirTree* p_pTree, MNE
     {
         p_pHemisphere->nuse   = 0;
         p_pHemisphere->inuse  = VectorXi::Zero(p_pHemisphere->nuse);
-        VectorXi p_defaultVector(0);
+        VectorXi p_defaultVector;
         p_pHemisphere->vertno = p_defaultVector;
     }
     else
@@ -368,9 +369,9 @@ bool MNESourceSpace::read_source_space(QFile* p_pFile, FiffDirTree* p_pTree, MNE
     //
     if(!p_pTree->find_tag(p_pFile, FIFF_MNE_SOURCE_SPACE_NEAREST, t_pTag1) || !p_pTree->find_tag(p_pFile, FIFF_MNE_SOURCE_SPACE_NEAREST_DIST, t_pTag2))
     {
-        VectorXi p_defaultVector(0);
+        VectorXi p_defaultVector;
         p_pHemisphere->nearest = p_defaultVector;
-        VectorXf p_defaultFloatVector(0);
+        VectorXf p_defaultFloatVector;
         p_pHemisphere->nearest_dist = p_defaultFloatVector;
     }
     else
