@@ -39,4 +39,3 @@
 /lib/win32/release/*.manifest
 /lib/win32/release/*.exp
 /lib/win32/release/*.lib
-/doc/html
