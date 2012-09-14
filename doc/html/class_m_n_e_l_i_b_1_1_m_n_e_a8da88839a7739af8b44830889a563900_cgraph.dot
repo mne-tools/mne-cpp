@@ -1,0 +1,9 @@
+digraph "MNELIB::MNE::patch_info"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="MNELIB::MNE::patch_info",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="MNELIB::MNESourceSpace\l::patch_info",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#af0d09b5ec4c55b41ad33ceaabe8f86f6"];
+}

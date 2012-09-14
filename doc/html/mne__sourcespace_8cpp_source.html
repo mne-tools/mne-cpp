@@ -435,7 +435,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;       p_pHemisphere-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a131139897f551606c0f88b639851c485">nearest_dist</a> = VectorXf(Map&lt;VectorXf&gt;(t_pTag2-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#aa36b1845c6f83d65fb73f60205c02849">toFloat</a>(), t_pTag1-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a3250cfa33c102f55a98091c19976b412">size</a>/4, 1));<span class="comment">//use copy constructor, for the sake of easy memory management</span></div>
 <div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;    }</div>
 <div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;    patch_info(p_pHemisphere-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ac5480868a444c31d040a123f926d537f">nearest</a>, p_pHemisphere-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a4abab64cbb6ff88af3b693a0b98d410d">pinfo</a>);</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#af0d09b5ec4c55b41ad33ceaabe8f86f6">patch_info</a>(p_pHemisphere-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ac5480868a444c31d040a123f926d537f">nearest</a>, p_pHemisphere-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a4abab64cbb6ff88af3b693a0b98d410d">pinfo</a>);</div>
 <div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;    <span class="keywordflow">if</span> (p_pHemisphere-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a4abab64cbb6ff88af3b693a0b98d410d">pinfo</a>.length() &gt; 0)</div>
 <div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;    {</div>
 <div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;       printf(<span class="stringliteral">&quot;\tPatch information added...&quot;</span>);</div>
@@ -471,7 +471,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;</div>
 <div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;</div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;<span class="keywordtype">bool</span> MNESourceSpace::patch_info(VectorXi&amp; nearest, QList&lt;VectorXi&gt;&amp; pinfo)</div>
+<div class="line"><a name="l00419"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#af0d09b5ec4c55b41ad33ceaabe8f86f6">  419</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#af0d09b5ec4c55b41ad33ceaabe8f86f6">MNESourceSpace::patch_info</a>(VectorXi&amp; nearest, QList&lt;VectorXi&gt;&amp; pinfo)</div>
 <div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;{</div>
 <div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;    <span class="keywordflow">if</span> (nearest.rows() == 0)</div>
 <div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;    {</div>
@@ -644,7 +644,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Sep 13 2012 22:28:39 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Sep 14 2012 17:41:17 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

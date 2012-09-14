@@ -143,6 +143,24 @@ public:
 
     //=========================================================================================================
     /**
+    * mne_patch_info
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the MNESourceSpace::patch_info static function
+    *
+    * @param [in] nearest   The nearest vector of the source space.
+    * @param [out] pinfo    The requested patch information.
+    *
+    * @return true if succeeded, false otherwise
+    */
+    static bool patch_info(VectorXi& nearest, QList<VectorXi>& pinfo)
+    {
+        return MNESourceSpace::patch_info(nearest, pinfo);
+    }
+
+    //=========================================================================================================
+    /**
     * mne_read_forward_solution
     *
     * ### MNE toolbox root function ###
@@ -172,6 +190,16 @@ public:
     * ### MNE toolbox root function ###
     *
     * Wrapper for the MNESourceSpace::read_source_spaces static function
+    *
+    * Reads source spaces from a fif file
+    *
+    * @param [in] p_pFile   The open fiff file
+    * @param [in] add_geom  Add geometry information to the source spaces
+    * @param [in] p_pTree   Search for the source spaces here
+    *
+    * @param [out] p_pSourceSpace     The read source spaces
+    *
+    * @return true if succeeded, false otherwise
     */
     static bool read_source_spaces(QFile*& p_pFile, bool add_geom, FiffDirTree*& p_pTree, MNESourceSpace*& p_pSourceSpace)
     {

@@ -61,7 +61,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
-      <li><a href="inherits.html"><span>Class&#160;Hierarchy</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -111,10 +111,12 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a11223fff767c717f6a55e5d38b33251c"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a11223fff767c717f6a55e5d38b33251c">read_source_spaces</a> (QFile *&amp;p_pFile, bool add_geom, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *&amp;p_pTree, <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html">MNESourceSpace</a> *&amp;p_pSourceSpace)</td></tr>
-<tr class="separator:a11223fff767c717f6a55e5d38b33251c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a73b850bc44b6c1903e5fdac82f9e5189"><td class="memItemLeft" align="right" valign="top">static qint32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a73b850bc44b6c1903e5fdac82f9e5189">find_source_space_hemi</a> (<a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a> *p_pHemisphere)</td></tr>
 <tr class="separator:a73b850bc44b6c1903e5fdac82f9e5189"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0d09b5ec4c55b41ad33ceaabe8f86f6"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#af0d09b5ec4c55b41ad33ceaabe8f86f6">patch_info</a> (VectorXi &amp;nearest, QList&lt; VectorXi &gt; &amp;pinfo)</td></tr>
+<tr class="separator:af0d09b5ec4c55b41ad33ceaabe8f86f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a11223fff767c717f6a55e5d38b33251c"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a11223fff767c717f6a55e5d38b33251c">read_source_spaces</a> (QFile *&amp;p_pFile, bool add_geom, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *&amp;p_pTree, <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html">MNESourceSpace</a> *&amp;p_pSourceSpace)</td></tr>
+<tr class="separator:a11223fff767c717f6a55e5d38b33251c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -191,14 +193,51 @@ QList&lt; <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHe
 
 <p>Definition at line <a class="el" href="mne__sourcespace_8cpp_source.html#l00139">139</a> of file <a class="el" href="mne__sourcespace_8cpp_source.html">mne_sourcespace.cpp</a>.</p>
 
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_m_n_e_l_i_b_1_1_m_n_e_source_space_a73b850bc44b6c1903e5fdac82f9e5189_icgraph.png" border="0" usemap="#class_m_n_e_l_i_b_1_1_m_n_e_source_space_a73b850bc44b6c1903e5fdac82f9e5189_icgraph" alt=""/></div>
-<map name="class_m_n_e_l_i_b_1_1_m_n_e_source_space_a73b850bc44b6c1903e5fdac82f9e5189_icgraph" id="class_m_n_e_l_i_b_1_1_m_n_e_source_space_a73b850bc44b6c1903e5fdac82f9e5189_icgraph">
-</map>
 </div>
-</p>
+</div>
+<a class="anchor" id="af0d09b5ec4c55b41ad33ceaabe8f86f6"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool MNESourceSpace::patch_info </td>
+          <td>(</td>
+          <td class="paramtype">VectorXi &amp;&#160;</td>
+          <td class="paramname"><em>nearest</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QList&lt; VectorXi &gt; &amp;&#160;</td>
+          <td class="paramname"><em>pinfo</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<h3><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> toolbox root function ###: Implementation of the mne_patch_info function</h3>
+<p>Generate the patch information from the 'nearest' vector in a source space</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">nearest</td><td>The nearest vector of the source space. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">pinfo</td><td>The requested patch information.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
+
+<p>Definition at line <a class="el" href="mne__sourcespace_8cpp_source.html#l00419">419</a> of file <a class="el" href="mne__sourcespace_8cpp_source.html">mne_sourcespace.cpp</a>.</p>
 
 </div>
 </div>
@@ -246,26 +285,19 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 <h3><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> toolbox root function ###: Implementation of the mne_read_source_spaces function</h3>
+<p>Reads source spaces from a fif file</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>The opened fif file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">add_geom</td><td>Add geometry information to the source spaces </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pTree</td><td>Search for the source spaces here </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">p_pSourceSpace</td><td>the read source spaces</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
 <p>Definition at line <a class="el" href="mne__sourcespace_8cpp_source.html#l00084">84</a> of file <a class="el" href="mne__sourcespace_8cpp_source.html">mne_sourcespace.cpp</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_m_n_e_l_i_b_1_1_m_n_e_source_space_a11223fff767c717f6a55e5d38b33251c_cgraph.png" border="0" usemap="#class_m_n_e_l_i_b_1_1_m_n_e_source_space_a11223fff767c717f6a55e5d38b33251c_cgraph" alt=""/></div>
-<map name="class_m_n_e_l_i_b_1_1_m_n_e_source_space_a11223fff767c717f6a55e5d38b33251c_cgraph" id="class_m_n_e_l_i_b_1_1_m_n_e_source_space_a11223fff767c717f6a55e5d38b33251c_cgraph">
-</map>
-</div>
-</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_m_n_e_l_i_b_1_1_m_n_e_source_space_a11223fff767c717f6a55e5d38b33251c_icgraph.png" border="0" usemap="#class_m_n_e_l_i_b_1_1_m_n_e_source_space_a11223fff767c717f6a55e5d38b33251c_icgraph" alt=""/></div>
-<map name="class_m_n_e_l_i_b_1_1_m_n_e_source_space_a11223fff767c717f6a55e5d38b33251c_icgraph" id="class_m_n_e_l_i_b_1_1_m_n_e_source_space_a11223fff767c717f6a55e5d38b33251c_icgraph">
-</map>
-</div>
-</p>
 
 </div>
 </div>
@@ -296,15 +328,6 @@ Here is the caller graph for this function:</div>
 
 <p>Definition at line <a class="el" href="mne__sourcespace_8cpp_source.html#l00155">155</a> of file <a class="el" href="mne__sourcespace_8cpp_source.html">mne_sourcespace.cpp</a>.</p>
 
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_m_n_e_l_i_b_1_1_m_n_e_source_space_ab6edd0ccf2a7aa3855b0c0281e48049b_icgraph.png" border="0" usemap="#class_m_n_e_l_i_b_1_1_m_n_e_source_space_ab6edd0ccf2a7aa3855b0c0281e48049b_icgraph" alt=""/></div>
-<map name="class_m_n_e_l_i_b_1_1_m_n_e_source_space_ab6edd0ccf2a7aa3855b0c0281e48049b_icgraph" id="class_m_n_e_l_i_b_1_1_m_n_e_source_space_ab6edd0ccf2a7aa3855b0c0281e48049b_icgraph">
-</map>
-</div>
-</p>
-
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
@@ -314,7 +337,7 @@ Here is the caller graph for this function:</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Sep 13 2012 22:28:39 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Sep 14 2012 17:41:17 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

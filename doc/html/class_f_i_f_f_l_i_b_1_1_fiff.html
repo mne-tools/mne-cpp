@@ -61,7 +61,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
-      <li><a href="inherits.html"><span>Class&#160;Hierarchy</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -108,8 +108,8 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:adfd106fb05826b213a38a608bc90216c"><td class="memItemLeft" align="right" valign="top">static QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#adfd106fb05826b213a38a608bc90216c">dir_tree_find</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *node, fiff_int_t kind)</td></tr>
-<tr class="separator:adfd106fb05826b213a38a608bc90216c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae7163b1c6de9c9b1d3bc1ddd8e07c54b"><td class="memItemLeft" align="right" valign="top">static QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#ae7163b1c6de9c9b1d3bc1ddd8e07c54b">dir_tree_find</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *tree, fiff_int_t kind)</td></tr>
+<tr class="separator:ae7163b1c6de9c9b1d3bc1ddd8e07c54b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1af55497cb97a24e81b002202c6592fd"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a1af55497cb97a24e81b002202c6592fd">invert_transform</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html">FiffCoordTrans</a> *p_pTransform)</td></tr>
 <tr class="separator:a1af55497cb97a24e81b002202c6592fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a714641f617f19554f0bd204c5c7315e2"><td class="memItemLeft" align="right" valign="top">static qint32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a714641f617f19554f0bd204c5c7315e2">make_dir_tree</a> (QFile *p_pFile, QList&lt; <a class="el" href="struct_f_i_f_f_l_i_b_1_1__fiff_dir_entry_rec.html">fiff_dir_entry_t</a> &gt; *p_pDir, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *&amp;p_pTree, qint32 start=0)</td></tr>
@@ -178,7 +178,7 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="adfd106fb05826b213a38a608bc90216c"></a>
+<a class="anchor" id="ae7163b1c6de9c9b1d3bc1ddd8e07c54b"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -189,7 +189,7 @@ Static Public Member Functions</h2></td></tr>
           <td class="memname">static QList&lt;<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a>*&gt; FIFFLIB::Fiff::dir_tree_find </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *&#160;</td>
-          <td class="paramname"><em>node</em>, </td>
+          <td class="paramname"><em>tree</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -211,18 +211,18 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_dir_tree_find</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="The Fiff class provides...">FiffDirTree</a> dir_tree_find member function </p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="The Fiff class provides...">FiffDirTree</a> dir_tree_find member function</p>
+<p>Find nodes of the given kind from a directory tree structure</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">tree</td><td>the directory tree structure </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">kind</td><td>the given kind</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the found nodes </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00116">116</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_f_i_f_f_l_i_b_1_1_fiff_adfd106fb05826b213a38a608bc90216c_cgraph.png" border="0" usemap="#class_f_i_f_f_l_i_b_1_1_fiff_adfd106fb05826b213a38a608bc90216c_cgraph" alt=""/></div>
-<map name="class_f_i_f_f_l_i_b_1_1_fiff_adfd106fb05826b213a38a608bc90216c_cgraph" id="class_f_i_f_f_l_i_b_1_1_fiff_adfd106fb05826b213a38a608bc90216c_cgraph">
-</map>
-</div>
-</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00123">123</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -251,16 +251,7 @@ Here is the call graph for this function:</div>
 <h3>MNE toolbox root function</h3>
 <p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#afc1b8e7d1f6c5b9819124670b85446bc">FiffCoordTrans::invert_transform</a> static function </p>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00130">130</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_f_i_f_f_l_i_b_1_1_fiff_a1af55497cb97a24e81b002202c6592fd_cgraph.png" border="0" usemap="#class_f_i_f_f_l_i_b_1_1_fiff_a1af55497cb97a24e81b002202c6592fd_cgraph" alt=""/></div>
-<map name="class_f_i_f_f_l_i_b_1_1_fiff_a1af55497cb97a24e81b002202c6592fd_cgraph" id="class_f_i_f_f_l_i_b_1_1_fiff_a1af55497cb97a24e81b002202c6592fd_cgraph">
-</map>
-</div>
-</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00137">137</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -311,16 +302,7 @@ Here is the call graph for this function:</div>
 <h3>MNE toolbox root function</h3>
 <p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#afc1b8e7d1f6c5b9819124670b85446bc">FiffCoordTrans::invert_transform</a> static function </p>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00143">143</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_f_i_f_f_l_i_b_1_1_fiff_a714641f617f19554f0bd204c5c7315e2_cgraph.png" border="0" usemap="#class_f_i_f_f_l_i_b_1_1_fiff_a714641f617f19554f0bd204c5c7315e2_cgraph" alt=""/></div>
-<map name="class_f_i_f_f_l_i_b_1_1_fiff_a714641f617f19554f0bd204c5c7315e2_cgraph" id="class_f_i_f_f_l_i_b_1_1_fiff_a714641f617f19554f0bd204c5c7315e2_cgraph">
-</map>
-</div>
-</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00150">150</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -383,24 +365,6 @@ Here is the call graph for this function:</div>
 
 <p>Definition at line <a class="el" href="fiff_8cpp_source.html#l00065">65</a> of file <a class="el" href="fiff_8cpp_source.html">fiff.cpp</a>.</p>
 
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_f_i_f_f_l_i_b_1_1_fiff_a948db983da423aa579ff9e1f3987a0d4_cgraph.png" border="0" usemap="#class_f_i_f_f_l_i_b_1_1_fiff_a948db983da423aa579ff9e1f3987a0d4_cgraph" alt=""/></div>
-<map name="class_f_i_f_f_l_i_b_1_1_fiff_a948db983da423aa579ff9e1f3987a0d4_cgraph" id="class_f_i_f_f_l_i_b_1_1_fiff_a948db983da423aa579ff9e1f3987a0d4_cgraph">
-</map>
-</div>
-</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_f_i_f_f_l_i_b_1_1_fiff_a948db983da423aa579ff9e1f3987a0d4_icgraph.png" border="0" usemap="#class_f_i_f_f_l_i_b_1_1_fiff_a948db983da423aa579ff9e1f3987a0d4_icgraph" alt=""/></div>
-<map name="class_f_i_f_f_l_i_b_1_1_fiff_a948db983da423aa579ff9e1f3987a0d4_icgraph" id="class_f_i_f_f_l_i_b_1_1_fiff_a948db983da423aa579ff9e1f3987a0d4_icgraph">
-</map>
-</div>
-</p>
-
 </div>
 </div>
 <a class="anchor" id="ace68c1280bcc07e1201fcdb6bdd3f9e8"></a>
@@ -438,24 +402,6 @@ Here is the caller graph for this function:</div>
 <h3>MNE toolbox root function</h3>
 
 <p>Definition at line <a class="el" href="fiff_8cpp_source.html#l00168">168</a> of file <a class="el" href="fiff_8cpp_source.html">fiff.cpp</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_f_i_f_f_l_i_b_1_1_fiff_ace68c1280bcc07e1201fcdb6bdd3f9e8_cgraph.png" border="0" usemap="#class_f_i_f_f_l_i_b_1_1_fiff_ace68c1280bcc07e1201fcdb6bdd3f9e8_cgraph" alt=""/></div>
-<map name="class_f_i_f_f_l_i_b_1_1_fiff_ace68c1280bcc07e1201fcdb6bdd3f9e8_cgraph" id="class_f_i_f_f_l_i_b_1_1_fiff_ace68c1280bcc07e1201fcdb6bdd3f9e8_cgraph">
-</map>
-</div>
-</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_f_i_f_f_l_i_b_1_1_fiff_ace68c1280bcc07e1201fcdb6bdd3f9e8_icgraph.png" border="0" usemap="#class_f_i_f_f_l_i_b_1_1_fiff_ace68c1280bcc07e1201fcdb6bdd3f9e8_icgraph" alt=""/></div>
-<map name="class_f_i_f_f_l_i_b_1_1_fiff_ace68c1280bcc07e1201fcdb6bdd3f9e8_icgraph" id="class_f_i_f_f_l_i_b_1_1_fiff_ace68c1280bcc07e1201fcdb6bdd3f9e8_icgraph">
-</map>
-</div>
-</p>
 
 </div>
 </div>
@@ -506,15 +452,6 @@ Here is the caller graph for this function:</div>
 <h3>MNE toolbox root function</h3>
 
 <p>Definition at line <a class="el" href="fiff_8cpp_source.html#l00185">185</a> of file <a class="el" href="fiff_8cpp_source.html">fiff.cpp</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_f_i_f_f_l_i_b_1_1_fiff_a351e50d8a4fa6ca98902bc58e1d6444c_cgraph.png" border="0" usemap="#class_f_i_f_f_l_i_b_1_1_fiff_a351e50d8a4fa6ca98902bc58e1d6444c_cgraph" alt=""/></div>
-<map name="class_f_i_f_f_l_i_b_1_1_fiff_a351e50d8a4fa6ca98902bc58e1d6444c_cgraph" id="class_f_i_f_f_l_i_b_1_1_fiff_a351e50d8a4fa6ca98902bc58e1d6444c_cgraph">
-</map>
-</div>
-</p>
 
 </div>
 </div>
@@ -569,16 +506,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00209">209</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_f_i_f_f_l_i_b_1_1_fiff_a2b82dd657853d18b66d8372164ce3648_cgraph.png" border="0" usemap="#class_f_i_f_f_l_i_b_1_1_fiff_a2b82dd657853d18b66d8372164ce3648_cgraph" alt=""/></div>
-<map name="class_f_i_f_f_l_i_b_1_1_fiff_a2b82dd657853d18b66d8372164ce3648_cgraph" id="class_f_i_f_f_l_i_b_1_1_fiff_a2b82dd657853d18b66d8372164ce3648_cgraph">
-</map>
-</div>
-</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00216">216</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -626,16 +554,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00230">230</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_f_i_f_f_l_i_b_1_1_fiff_a4243dedf47022207a80af19937a9cb21_cgraph.png" border="0" usemap="#class_f_i_f_f_l_i_b_1_1_fiff_a4243dedf47022207a80af19937a9cb21_cgraph" alt=""/></div>
-<map name="class_f_i_f_f_l_i_b_1_1_fiff_a4243dedf47022207a80af19937a9cb21_cgraph" id="class_f_i_f_f_l_i_b_1_1_fiff_a4243dedf47022207a80af19937a9cb21_cgraph">
-</map>
-</div>
-</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00237">237</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -665,15 +584,6 @@ Here is the call graph for this function:</div>
 
 <p>Definition at line <a class="el" href="fiff_8cpp_source.html#l00160">160</a> of file <a class="el" href="fiff_8cpp_source.html">fiff.cpp</a>.</p>
 
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_f_i_f_f_l_i_b_1_1_fiff_aae3f7b4fbd63e21d1daab0d93bfc76b6_icgraph.png" border="0" usemap="#class_f_i_f_f_l_i_b_1_1_fiff_aae3f7b4fbd63e21d1daab0d93bfc76b6_icgraph" alt=""/></div>
-<map name="class_f_i_f_f_l_i_b_1_1_fiff_aae3f7b4fbd63e21d1daab0d93bfc76b6_icgraph" id="class_f_i_f_f_l_i_b_1_1_fiff_aae3f7b4fbd63e21d1daab0d93bfc76b6_icgraph">
-</map>
-</div>
-</p>
-
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
@@ -683,7 +593,7 @@ Here is the caller graph for this function:</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Sep 13 2012 22:28:39 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Sep 14 2012 17:41:17 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

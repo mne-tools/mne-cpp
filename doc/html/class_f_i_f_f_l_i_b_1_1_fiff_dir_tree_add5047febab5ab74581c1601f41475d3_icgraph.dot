@@ -11,7 +11,7 @@ digraph "FIFFLIB::FiffDirTree::dir_tree_find"
   Node3 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
   Node4 [label="MNELIB::MNE::read_forward\l_solution",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_m_n_e_l_i_b_1_1_m_n_e.html#aa0f464cac279f4bf33eb96eb247c13d4"];
   Node1 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node5 [label="FIFFLIB::Fiff::dir\l_tree_find",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_f_i_f_f_l_i_b_1_1_fiff.html#adfd106fb05826b213a38a608bc90216c"];
+  Node5 [label="FIFFLIB::Fiff::dir\l_tree_find",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_f_i_f_f_l_i_b_1_1_fiff.html#ae7163b1c6de9c9b1d3bc1ddd8e07c54b"];
   Node1 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
   Node1 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
   Node6 [label="MNELIB::MNESourceSpace\l::read_source_spaces",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a11223fff767c717f6a55e5d38b33251c"];
