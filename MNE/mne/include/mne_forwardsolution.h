@@ -132,6 +132,17 @@ public:
     //=========================================================================================================
     /**
     * ### MNE toolbox root function ###: Implementation of the mne_read_forward_solution function
+    *
+    * Reads a forward solution from a fif file
+    *
+    * @param [in] p_sFile       The name of the file
+    * @param [out] fwd A forward solution from a fif file
+    * @param [in] force_fixed   Force fixed source orientation mode? (optional)
+    * @param [in] surf_ori      Use surface based source coordinate system? (optional)
+    * @param [in] include       Include these channels (optional)
+    * @param [in] exclude       Exclude these channels (optional)
+    *
+    * @return true if succeeded, false otherwise
     */
     static bool read_forward_solution(QString& p_sFile, MNEForwardSolution*& fwd, bool force_fixed = false, bool surf_ori = false, QStringList& include = QStringList(), QStringList& exclude = QStringList());
 

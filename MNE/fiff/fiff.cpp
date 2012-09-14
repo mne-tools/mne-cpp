@@ -62,7 +62,7 @@ Fiff::Fiff()
 
 //*************************************************************************************************************
 
-bool Fiff::open(QString& p_sFileName, QFile*& p_pFile, QList<fiff_dir_entry_t>*& p_pDir, FiffDirTree*& p_pTree)
+bool Fiff::open(QString& p_sFileName, QFile*& p_pFile, FiffDirTree*& p_pTree, QList<fiff_dir_entry_t>*& p_pDir)
 {
     if (p_pFile)
     {
