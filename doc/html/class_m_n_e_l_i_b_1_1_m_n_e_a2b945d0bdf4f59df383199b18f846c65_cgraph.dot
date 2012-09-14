@@ -1,0 +1,38 @@
+digraph "MNELIB::MNE::read_source_spaces"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="MNELIB::MNE::read_source\l_spaces",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="MNELIB::MNESourceSpace\l::read_source_spaces",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a11223fff767c717f6a55e5d38b33251c"];
+  Node2 -> Node3 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="FIFFLIB::Fiff::open",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_f_i_f_f_l_i_b_1_1_fiff.html#a948db983da423aa579ff9e1f3987a0d4"];
+  Node3 -> Node4 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="FIFFLIB::FiffTag::read\l_tag_info",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a5aadee620ef276f4d965b7ed0049c7b7"];
+  Node4 -> Node5 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="FIFFLIB::FiffTag::FiffTag",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_f_i_f_f_l_i_b_1_1_fiff_tag.html#ac69c9131fa8d307bac69034785079407"];
+  Node3 -> Node6 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="FIFFLIB::FiffTag::read_tag",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_f_i_f_f_l_i_b_1_1_fiff_tag.html#ae8f4a9b90e5be861bc05b26431319386"];
+  Node6 -> Node5 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 -> Node7 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="FIFFLIB::FiffTag::fiff\l_convert_tag_data",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a74afedb25fa2bcc8a6458e6c77d5b693"];
+  Node7 -> Node8 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node8 [label="FIFFLIB::FiffTag::convert\l_ch_pos",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_f_i_f_f_l_i_b_1_1_fiff_tag.html#aef0eabea76b7358119cbec42d2bddc83"];
+  Node7 -> Node9 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node9 [label="FIFFLIB::FiffCoordTrans\l::size",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a7312b478ea86b28e283b7e02cd5e579d"];
+  Node3 -> Node10 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node10 [label="FIFFLIB::FiffTag::toInt",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a88f8094d1f3b876708bd3d5779a30a49"];
+  Node3 -> Node11 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node11 [label="FIFFLIB::FiffTag::toDirEntry",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a90aaec3b5b428b80fac66df151057d42"];
+  Node3 -> Node12 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node12 [label="FIFFLIB::FiffDirTree\l::make_dir_tree",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a0401a359c1d7f0dbd07c486cb2378983"];
+  Node12 -> Node13 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node13 [label="FIFFLIB::FiffDirTree\l::FiffDirTree",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a2a5fde08f450de997f5eae02b925c864"];
+  Node12 -> Node6 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node12 -> Node10 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node12 -> Node14 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node14 [label="FIFFLIB::FiffTag::toFiffID",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a6e27a435596e2d309863e5d57e7a8248"];
+  Node2 -> Node15 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node15 [label="FIFFLIB::FiffDirTree\l::dir_tree_find",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#add5047febab5ab74581c1601f41475d3"];
+}

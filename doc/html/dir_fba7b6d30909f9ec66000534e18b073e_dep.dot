@@ -1,0 +1,14 @@
+digraph "MNE" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  subgraph clusterdir_fba7b6d30909f9ec66000534e18b073e {
+    graph [ bgcolor="#eeeeff", pencolor="black", label="" URL="dir_fba7b6d30909f9ec66000534e18b073e.html"];
+    dir_fba7b6d30909f9ec66000534e18b073e [shape=plaintext label="MNE"];
+    dir_3724822b9604f2d84f3a550bba2b646c [shape=box label="disp" color="black" fillcolor="white" style="filled" URL="dir_3724822b9604f2d84f3a550bba2b646c.html"];
+    dir_02d6b00d369dfdccb62582dcf5f74964 [shape=box label="fiff" color="red" fillcolor="white" style="filled" URL="dir_02d6b00d369dfdccb62582dcf5f74964.html"];
+    dir_2818de1e5b67557da8c9b7d659dc1661 [shape=box label="mne" color="red" fillcolor="white" style="filled" URL="dir_2818de1e5b67557da8c9b7d659dc1661.html"];
+  }
+  dir_2818de1e5b67557da8c9b7d659dc1661->dir_02d6b00d369dfdccb62582dcf5f74964 [headlabel="10", labeldistance=1.5 headhref="dir_000005_000002.html"];
+  dir_3724822b9604f2d84f3a550bba2b646c->dir_2818de1e5b67557da8c9b7d659dc1661 [headlabel="1", labeldistance=1.5 headhref="dir_000001_000005.html"];
+}

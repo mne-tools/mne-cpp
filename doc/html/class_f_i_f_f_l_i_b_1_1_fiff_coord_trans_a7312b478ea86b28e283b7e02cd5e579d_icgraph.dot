@@ -1,0 +1,33 @@
+digraph "FIFFLIB::FiffCoordTrans::size"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="FIFFLIB::FiffCoordTrans\l::size",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="FIFFLIB::FiffTag::fiff\l_convert_tag_data",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a74afedb25fa2bcc8a6458e6c77d5b693"];
+  Node2 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="FIFFLIB::FiffTag::read_tag",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_f_i_f_f_l_i_b_1_1_fiff_tag.html#ae8f4a9b90e5be861bc05b26431319386"];
+  Node3 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="FIFFLIB::Fiff::open",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_f_i_f_f_l_i_b_1_1_fiff.html#a948db983da423aa579ff9e1f3987a0d4"];
+  Node4 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="MNELIB::MNEForwardSolution\l::read_forward_solution",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ae90f24d6b33ef9be71b6d048d9a9e1d2"];
+  Node5 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="MNELIB::MNE::read_forward\l_solution",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_m_n_e_l_i_b_1_1_m_n_e.html#aa0f464cac279f4bf33eb96eb247c13d4"];
+  Node4 -> Node7 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="MNELIB::MNESourceSpace\l::read_source_spaces",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a11223fff767c717f6a55e5d38b33251c"];
+  Node7 -> Node8 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node8 [label="MNELIB::MNE::read_source\l_spaces",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_m_n_e_l_i_b_1_1_m_n_e.html#a2b945d0bdf4f59df383199b18f846c65"];
+  Node7 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 -> Node9 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node9 [label="FIFFLIB::Fiff::read_tag",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_f_i_f_f_l_i_b_1_1_fiff.html#a2b82dd657853d18b66d8372164ce3648"];
+  Node3 -> Node10 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node10 [label="FIFFLIB::FiffDirTree\l::make_dir_tree",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a0401a359c1d7f0dbd07c486cb2378983"];
+  Node10 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node10 -> Node11 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node11 [label="FIFFLIB::Fiff::make\l_dir_tree",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_f_i_f_f_l_i_b_1_1_fiff.html#a714641f617f19554f0bd204c5c7315e2"];
+  Node3 -> Node12 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node12 [label="FIFFLIB::FiffDirTree\l::find_tag",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#acdbb6c8e784338091e86321127d3888f"];
+  Node12 -> Node13 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node13 [label="FIFFLIB::Fiff::read\l_named_matrix",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_f_i_f_f_l_i_b_1_1_fiff.html#a351e50d8a4fa6ca98902bc58e1d6444c"];
+}

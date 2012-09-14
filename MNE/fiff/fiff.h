@@ -196,6 +196,15 @@ public:
     * ### MNE toolbox root function ###
     *
     * Wrapper for the FiffTag::read_tag function
+    *
+    * Read one tag from a fif file.
+    * if pos is not provided, reading starts from the current file position
+    *
+    * @param[in] p_pFile opened fif file
+    * @param[out] p_pTag the read tag
+    * @param[in] pos position of the tag inside the fif file
+    *
+    * @return true if succeeded, false otherwise
     */
     static inline bool read_tag(QFile* p_pFile, FiffTag*& p_pTag, qint64 pos = -1)
     {
@@ -209,6 +218,14 @@ public:
     * ### MNE toolbox root function ###
     *
     * Wrapper for the FiffTag::read_tag_info function
+    *
+    * Read tag information of one tag from a fif file.
+    * if pos is not provided, reading starts from the current file position
+    *
+    * @param[in] p_pFile opened fif file
+    * @param[out] p_pTag the read tag info
+    *
+    * @return true if succeeded, false otherwise
     */
     static inline bool read_tag_info(QFile* p_pFile, FiffTag*& p_pTag)
     {

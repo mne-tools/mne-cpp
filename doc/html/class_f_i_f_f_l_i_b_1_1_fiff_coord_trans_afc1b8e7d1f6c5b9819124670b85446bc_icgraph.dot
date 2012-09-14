@@ -1,0 +1,15 @@
+digraph "FIFFLIB::FiffCoordTrans::invert_transform"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="FIFFLIB::FiffCoordTrans\l::invert_transform",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="FIFFLIB::Fiff::invert\l_transform",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_f_i_f_f_l_i_b_1_1_fiff.html#a1af55497cb97a24e81b002202c6592fd"];
+  Node1 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="MNELIB::MNEForwardSolution\l::read_forward_solution",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ae90f24d6b33ef9be71b6d048d9a9e1d2"];
+  Node3 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="MNELIB::MNE::read_forward\l_solution",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_m_n_e_l_i_b_1_1_m_n_e.html#aa0f464cac279f4bf33eb96eb247c13d4"];
+  Node1 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="MNELIB::MNEHemisphere\l::transform_hemisphere_to",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a0668a83d396e9b1b3d7ce63dd45e2bad"];
+}

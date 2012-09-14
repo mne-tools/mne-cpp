@@ -1,0 +1,9 @@
+digraph "MNELIB::MNE::transform_source_space_to"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="MNELIB::MNE::transform\l_source_space_to",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="MNELIB::MNESourceSpace\l::transform_source_space_to",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#ab6edd0ccf2a7aa3855b0c0281e48049b"];
+}

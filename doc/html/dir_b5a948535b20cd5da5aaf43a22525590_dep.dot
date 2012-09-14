@@ -1,0 +1,11 @@
+digraph "MNE/fiff/src" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  subgraph clusterdir_02d6b00d369dfdccb62582dcf5f74964 {
+    graph [ bgcolor="#ddddee", pencolor="black", label="fiff" fontname="Helvetica", fontsize="10", URL="dir_02d6b00d369dfdccb62582dcf5f74964.html"]
+  dir_b5a948535b20cd5da5aaf43a22525590 [shape=box, label="src", style="filled", fillcolor="#eeeeff", pencolor="black", URL="dir_b5a948535b20cd5da5aaf43a22525590.html"];
+  }
+  dir_0ba33dc38080c2c89dbe23e2c43c648c [shape=box label="include" URL="dir_0ba33dc38080c2c89dbe23e2c43c648c.html"];
+  dir_b5a948535b20cd5da5aaf43a22525590->dir_0ba33dc38080c2c89dbe23e2c43c648c [headlabel="3", labeldistance=1.5 headhref="dir_000004_000003.html"];
+}

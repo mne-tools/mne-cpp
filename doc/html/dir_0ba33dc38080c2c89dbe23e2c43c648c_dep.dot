@@ -1,0 +1,9 @@
+digraph "MNE/fiff/include" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  subgraph clusterdir_02d6b00d369dfdccb62582dcf5f74964 {
+    graph [ bgcolor="#ddddee", pencolor="black", label="fiff" fontname="Helvetica", fontsize="10", URL="dir_02d6b00d369dfdccb62582dcf5f74964.html"]
+  dir_0ba33dc38080c2c89dbe23e2c43c648c [shape=box, label="include", style="filled", fillcolor="#eeeeff", pencolor="black", URL="dir_0ba33dc38080c2c89dbe23e2c43c648c.html"];
+  }
+}
