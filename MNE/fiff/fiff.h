@@ -151,13 +151,16 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * @param[in] p_sFileName file name to open
-    * @param[out] p_pFile file which is openened
-    * @param[out] p_pDataStream binär data stream of the openend file
+    * Opens a fif file and provides the directory of tags
     *
-    * @return true when successfull opened
+    * @param[in] p_sFileName file name of the file to open
+    * @param[out] p_pFile file which is openened
+    * @param[out] p_pTree tag directory organized into a tree
+    * @param[out] p_pDir the sequential tag directory
+    *
+    * @return true if succeeded, false otherwise
     */
-    static bool open(QString& p_sFileName, QFile*& p_pFile, QList<fiff_dir_entry_t>*& p_pDir, FiffDirTree*& p_pTree);
+    static bool open(QString& p_sFileName, QFile*& p_pFile, FiffDirTree*& p_pTree, QList<fiff_dir_entry_t>*& p_pDir);
 
     //=========================================================================================================
     /**
