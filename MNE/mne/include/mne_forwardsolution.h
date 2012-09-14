@@ -92,6 +92,8 @@
 namespace MNELIB
 {
 
+static QStringList defaultQStringList = QStringList();
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -144,7 +146,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_forward_solution(QString& p_sFile, MNEForwardSolution*& fwd, bool force_fixed = false, bool surf_ori = false, QStringList& include = QStringList(), QStringList& exclude = QStringList());
+    static bool read_forward_solution(QString& p_sFile, MNEForwardSolution*& fwd, bool force_fixed = false, bool surf_ori = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
 
     //=========================================================================================================
     /**
