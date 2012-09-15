@@ -29,7 +29,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ToDo Documentation...
+* @brief    Contains the MNE class declaration, which provides static wrapper functions to stay consistent with
+*           mne matlab toolbox
 *
 */
 
