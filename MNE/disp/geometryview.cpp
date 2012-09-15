@@ -77,7 +77,7 @@ GeometryView::GeometryView(QWindow *parent)
     , hemisphere(0)
     , scene(0)
 {
-    QString t_sFile = "../../MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
+    QString t_sFile = "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
     MNE::read_forward_solution(t_sFile, t_ForwardSolution);
 
     hemisphereFrontalCamera = new QGLCamera(this);

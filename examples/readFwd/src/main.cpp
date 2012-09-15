@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
 
 //                qDebug() << t_pMNE->getName() << " plugin loaded";
 
-//                t_pMNE->read_source_spaces(QString("../../MNE-sample-data/MEG/sample/sample_audvis-eeg-oct-6-fwd.fif"));
+//                t_pMNE->read_source_spaces(QString("./MNE-sample-data/MEG/sample/sample_audvis-eeg-oct-6-fwd.fif"));
 //            }
 
 //            if(dynamic_cast<IFiff*>(pPlugin))
@@ -109,9 +109,8 @@ int main(int argc, char *argv[])
 
     MNEForwardSolution* t_ForwardSolution = NULL;
 
-//    MNE::read_forward_solution(QString("C:/Users/Christoph/Documents/SourceLab/sl_MATLAB/Data/MEG/ernie/sef-oct-6p-src-fwd.fif"));
-//    MNE::read_forward_solution(QString("../../MNE-sample-data/MEG/sample/sample_audvis-eeg-oct-6-fwd.fif"));
-    QString t_sFile = "../../MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
+//    QString t_sFile = "./MNE-sample-data/MEG/sample/sample_audvis-eeg-oct-6-fwd.fif";
+    QString t_sFile = "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
     MNE::read_forward_solution(t_sFile, t_ForwardSolution);
 
     std::cout << std::endl << t_ForwardSolution->sol->data.block(0,0,10,10) << std::endl;

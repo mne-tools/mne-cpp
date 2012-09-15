@@ -46,21 +46,15 @@ CONFIG   -= app_bundle
 
 CONFIG(debug, debug|release) {
     TARGET = readFwdd
-    unix: LIBS += -L$$PWD/../../lib/unix/debug/ -lmned
-    win32:LIBS += -L$$PWD/../../lib/win32/debug/ -lmned
-    unix: LIBS += -L$$PWD/../../lib/unix/debug/ -lfiffd
-    win32:LIBS += -L$$PWD/../../lib/win32/debug/ -lfiffd
-    unix:DESTDIR = $$PWD/../../bin/unix/debug
-    win32:DESTDIR = $$PWD/../../bin/win32/debug
+    LIBS += -L$$PWD/../../lib/ -lmned
+    LIBS += -L$$PWD/../../lib/ -lfiffd
+    DESTDIR = $$PWD/../../bin
 }
 else {
     TARGET = readFwd
-    unix: LIBS += -L$$PWD/../../lib/unix/release/ -lmne
-    win32:LIBS += -L$$PWD/../../lib/win32/release/ -lmne
-    unix: LIBS += -L$$PWD/../../lib/unix/release/ -lfiff
-    win32:LIBS += -L$$PWD/../../lib/win32/release/ -lfiff
-    unix:DESTDIR = $$PWD/../../bin/unix/release
-    win32:DESTDIR = $$PWD/../../bin/win32/release
+    LIBS += -L$$PWD/../../lib/ -lmne
+    LIBS += -L$$PWD/../../lib/ -lfiff
+    DESTDIR = $$PWD/../../bin
 }
 
 SOURCES += \

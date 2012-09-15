@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    ToDo Documentation...
+# @brief    This project file builds the display library.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -43,23 +43,17 @@ DEFINES += DISP_LIBRARY
 
 CONFIG(debug, debug|release) {
     TARGET = dispd
-    unix:DESTDIR = $$PWD/../../lib/unix/debug
-    win32:DESTDIR = $$PWD/../../lib/win32/debug
-    unix: LIBS += -L$$PWD/../../lib/unix/debug/ -lfiffd
-    win32:LIBS += -L$$PWD/../../lib/win32/debug/ -lfiffd
-    unix: LIBS += -L$$PWD/../../lib/unix/debug/ -lmned
-    win32:LIBS += -L$$PWD/../../lib/win32/debug/ -lmned
-    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\..\\mne-cpp\\lib\\win32\\debug\\dispd.dll" "..\\..\\..\\mne-cpp\\bin\\win32\\debug\\"
+    DESTDIR = $$PWD/../../lib
+    LIBS += -L$$PWD/../../lib/ -lfiffd
+    LIBS += -L$$PWD/../../lib/ -lmned
+    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\..\\mne-cpp\\lib\\dispd.dll" "..\\..\\..\\mne-cpp\\bin\\"
 }
 else {
     TARGET = disp
-    unix:DESTDIR = $$PWD/../../lib/unix/release
-    win32:DESTDIR = $$PWD/../../lib/win32/release
-    unix: LIBS += -L$$PWD/../../lib/unix/release/ -lfiff
-    win32:LIBS += -L$$PWD/../../lib/win32/release/ -lfiff
-    unix: LIBS += -L$$PWD/../../lib/unix/release/ -lmne
-    win32:LIBS += -L$$PWD/../../lib/win32/release/ -lmne
-    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\..\\mne-cpp\\lib\\win32\\release\\disp.dll" "..\\..\\..\\mne-cpp\\bin\\win32\\release\\"
+    DESTDIR = $$PWD/../../lib
+    LIBS += -L$$PWD/../../lib/ -lfiff
+    LIBS += -L$$PWD/../../lib/ -lmne
+    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\..\\mne-cpp\\lib\\disp.dll" "..\\..\\..\\mne-cpp\\bin\\"
 }
 
 
@@ -68,23 +62,3 @@ SOURCES += \
 
 HEADERS += disp_global.h \
     geometryview.h
-
-
-symbian {
-    MMP_RULES += EXPORTUNFROZEN
-    TARGET.UID3 = 0xE05B73F1
-    TARGET.CAPABILITY = 
-    TARGET.EPOCALLOWDLLDATA = 1
-    addFiles.sources = mne.dll
-    addFiles.path = !:/sys/bin
-    DEPLOYMENT += addFiles
-}
-
-unix:!symbian {
-    maemo5 {
-        target.path = /opt/usr/lib
-    } else {
-        target.path = /usr/lib
-    }
-    INSTALLS += target
-}
