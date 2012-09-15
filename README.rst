@@ -28,7 +28,7 @@ Generate the Makefiles using qmake:
 
     qmake -recursive
 
-Make the libraries and examples running:
+Make the libraries and examples by running:
 
     make
 
