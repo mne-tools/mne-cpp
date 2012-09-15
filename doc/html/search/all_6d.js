@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['mne_2dcpp_20documentation',['MNE-CPP Documentation',['../index.html',1,'']]],
   ['machid',['machid',['../struct_f_i_f_f_l_i_b_1_1__fiff_id_rec.html#a4e717f4e4f814135a0045371f38f7c5a',1,'FIFFLIB::_fiffIdRec']]],
   ['make_5fblock_5fdiag',['make_block_diag',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#afb312e7470c29a6c0e94a302174cb811',1,'MNELIB::MNEForwardSolution::make_block_diag()'],['../class_m_n_e_l_i_b_1_1_m_n_e.html#a86678bef8ed1448392954fbf8a778720',1,'MNELIB::MNE::make_block_diag()']]],
   ['make_5fdir_5ftree',['make_dir_tree',['../class_f_i_f_f_l_i_b_1_1_fiff.html#a714641f617f19554f0bd204c5c7315e2',1,'FIFFLIB::Fiff::make_dir_tree()'],['../class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a0401a359c1d7f0dbd07c486cb2378983',1,'FIFFLIB::FiffDirTree::make_dir_tree()']]],

@@ -70,7 +70,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -114,8 +114,8 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:aeb29bbc5770f5a6b24dce376ef7c0285"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8da88839a7739af8b44830889a563900"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html#a8da88839a7739af8b44830889a563900">patch_info</a> (VectorXi &amp;nearest, QList&lt; VectorXi &gt; &amp;pinfo)</td></tr>
 <tr class="separator:a8da88839a7739af8b44830889a563900"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa0f464cac279f4bf33eb96eb247c13d4"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html#aa0f464cac279f4bf33eb96eb247c13d4">read_forward_solution</a> (QString &amp;p_sFile, <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">MNEForwardSolution</a> *&amp;fwd, bool force_fixed=false, bool surf_ori=false, QStringList &amp;include=QStringList(), QStringList &amp;exclude=QStringList())</td></tr>
-<tr class="separator:aa0f464cac279f4bf33eb96eb247c13d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac01dbe27feb9a706b28d7f493d9e6ba4"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html#ac01dbe27feb9a706b28d7f493d9e6ba4">read_forward_solution</a> (QString &amp;p_sFile, <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">MNEForwardSolution</a> *&amp;fwd, bool force_fixed=false, bool surf_ori=false, QStringList &amp;include=defaultQStringList, QStringList &amp;exclude=defaultQStringList)</td></tr>
+<tr class="separator:ac01dbe27feb9a706b28d7f493d9e6ba4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2b945d0bdf4f59df383199b18f846c65"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html#a2b945d0bdf4f59df383199b18f846c65">read_source_spaces</a> (QFile *&amp;p_pFile, bool add_geom, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *&amp;p_pTree, <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html">MNESourceSpace</a> *&amp;p_pSourceSpace)</td></tr>
 <tr class="separator:a2b945d0bdf4f59df383199b18f846c65"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1b7cefb798199742979ce479e079def2"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html#a1b7cefb798199742979ce479e079def2">transform_source_space_to</a> (<a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html">MNESourceSpace</a> *p_pMNESourceSpace, fiff_int_t dest, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html">FiffCoordTrans</a> *trans)</td></tr>
@@ -127,7 +127,7 @@ Static Public Member Functions</h2></td></tr>
 <div class="textblock"><p>The <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> class provides wrapper functions to stay consistent with mne matlab toolbox. </p>
 <p>DECLARE <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> WRAPPER CLASS </p>
 
-<p>Definition at line <a class="el" href="mne_8h_source.html#l00089">89</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
+<p>Definition at line <a class="el" href="mne_8h_source.html#l00090">90</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a0606ad94bb4ccc8a35a3d1d7f2265877"></a>
 <div class="memitem">
@@ -169,7 +169,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>dtor </p>
 
-<p>Definition at line <a class="el" href="mne_8h_source.html#l00103">103</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
+<p>Definition at line <a class="el" href="mne_8h_source.html#l00104">104</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
 
 </div>
 </div>
@@ -199,7 +199,7 @@ Static Public Member Functions</h2></td></tr>
 <h3><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> toolbox root function</h3>
 <p>Wrapper for the <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a73b850bc44b6c1903e5fdac82f9e5189">MNESourceSpace::find_source_space_hemi</a> static function </p>
 
-<p>Definition at line <a class="el" href="mne_8h_source.html#l00139">139</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
+<p>Definition at line <a class="el" href="mne_8h_source.html#l00140">140</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
 
 </div>
 </div>
@@ -240,7 +240,7 @@ Static Public Member Functions</h2></td></tr>
 <h3><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> toolbox root function</h3>
 <p>Wrapper for the <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#afb312e7470c29a6c0e94a302174cb811">MNEForwardSolution::make_block_diag</a> static function </p>
 
-<p>Definition at line <a class="el" href="mne_8h_source.html#l00125">125</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
+<p>Definition at line <a class="el" href="mne_8h_source.html#l00126">126</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
 
 </div>
 </div>
@@ -287,11 +287,11 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="mne_8h_source.html#l00157">157</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
+<p>Definition at line <a class="el" href="mne_8h_source.html#l00158">158</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="aa0f464cac279f4bf33eb96eb247c13d4"></a>
+<a class="anchor" id="ac01dbe27feb9a706b28d7f493d9e6ba4"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -326,13 +326,13 @@ Static Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">QStringList &amp;&#160;</td>
-          <td class="paramname"><em>include</em> = <code>QStringList()</code>, </td>
+          <td class="paramname"><em>include</em> = <code>defaultQStringList</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">QStringList &amp;&#160;</td>
-          <td class="paramname"><em>exclude</em> = <code>QStringList()</code>&#160;</td>
+          <td class="paramname"><em>exclude</em> = <code>defaultQStringList</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -348,7 +348,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>mne_read_forward_solution</p>
 <h3><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ae90f24d6b33ef9be71b6d048d9a9e1d2">MNEForwardSolution::read_forward_solution</a> static function</p>
+<p>Wrapper for the <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a0f10a4b6a06806e6200bb36d1fa385e2">MNEForwardSolution::read_forward_solution</a> static function</p>
 <p>Reads a forward solution from a fif file</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -363,7 +363,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="mne_8h_source.html#l00181">181</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
+<p>Definition at line <a class="el" href="mne_8h_source.html#l00182">182</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
 
 </div>
 </div>
@@ -425,7 +425,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="mne_8h_source.html#l00204">204</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
+<p>Definition at line <a class="el" href="mne_8h_source.html#l00205">205</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
 
 </div>
 </div>
@@ -470,7 +470,7 @@ Static Public Member Functions</h2></td></tr>
 <h3><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> toolbox root function</h3>
 <p>Wrapper for the <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html" title="The SourceSpace class provides.">MNESourceSpace</a> transform_source_space_to member function </p>
 
-<p>Definition at line <a class="el" href="mne_8h_source.html#l00217">217</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
+<p>Definition at line <a class="el" href="mne_8h_source.html#l00218">218</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
 
 </div>
 </div>
@@ -499,18 +499,18 @@ Static Public Member Functions</h2></td></tr>
 <h3><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> toolbox root function</h3>
 <p>Wrapper for the <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a71beab65f1c08a56c4ce5993ce81a26b">MNEForwardSolution::transpose_named_matrix</a> static function </p>
 
-<p>Definition at line <a class="el" href="mne_8h_source.html#l00230">230</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
+<p>Definition at line <a class="el" href="mne_8h_source.html#l00231">231</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>MNE/mne/<a class="el" href="mne_8h_source.html">mne.h</a></li>
-<li>MNE/mne/<a class="el" href="mne_8cpp_source.html">mne.cpp</a></li>
+<li>D:/Users/Christoph/Documents/GitHub/mne-cpp/MNE/mne/<a class="el" href="mne_8h_source.html">mne.h</a></li>
+<li>D:/Users/Christoph/Documents/GitHub/mne-cpp/MNE/mne/<a class="el" href="mne_8cpp_source.html">mne.cpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Sep 14 2012 17:41:17 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Sep 15 2012 19:15:41 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>mne-cpp: Main Page</title>
+<title>mne-cpp: MNE-CPP Documentation</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -63,7 +63,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -74,13 +74,53 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div class="header">
   <div class="headertitle">
-<div class="title">mne-cpp Documentation</div>  </div>
+<div class="title">MNE-CPP Documentation </div>  </div>
 </div><!--header-->
 <div class="contents">
-</div><!-- contents -->
+<div class="textblock"><h1><a class="anchor" id="intro_sec"></a>
+Introduction</h1>
+<p>Fast MNE Qt 5 based C++ library (pre-alpha state)</p>
+<h1><a class="anchor" id="get_the_code_sec"></a>
+Getting the latest code</h1>
+<p>To get the latest code using git, simply type:</p>
+<p>git clone git://github.com/mne-tools/mne-cpp.git</p>
+<p>If you don't have git installed, you can download a zip or tarball of the latest code: <a href="http://github.com/mne-tools/mne-cpp/archives/master"><b>http://github.com/mne-tools/mne-cpp/archives/master</b></a></p>
+<h1><a class="anchor" id="building_sec"></a>
+Building</h1>
+<p>To build the mne libraries <a href="http://releases.qt-project.org/qt5.0/beta1/"><b>Qt5 beta</b></a> is required.</p>
+<p>Build and install Qt5.</p>
+<p>To build the whole mne-cpp librarie, do the following steps: Generate the Makefiles using qmake: qmake -recursive Make the libraries and examples by running: make</p>
+<p>Tip: It's convinient to use the Qt Creator of the <a href="http://qt.nokia.com/downloads/"><b>QtSDK</b></a> to build the libraries.</p>
+<h1><a class="anchor" id="dependencies_sec"></a>
+Dependencies</h1>
+<p><a href="http://releases.qt-project.org/qt5.0/beta1/"><b>Qt5 beta</b></a></p>
+<h1><a class="anchor" id="mailing_list_sec"></a>
+Mailing list</h1>
+<p><a href="http://releases.qt-project.org/qt5.0/beta1/"><b>http://mail.nmr.mgh.harvard.edu/mailman/listinfo/mne_analysis</b></a></p>
+<h1><a class="anchor" id="workflow_contribute_sec"></a>
+Workflow to contribute</h1>
+<p>To contribute to MNE-cpp, first create an account on <a href="http://github.com"><b>github</b></a>. Once this is done, fork the <a href="http://github.com/mne-tools/mne-cpp"><b>mne-cpp repository</b></a> to have you own repository, clone it using 'git clone' on the computers where you want to work. Make your changes in your clone, push them to your github account, test them on several computer, and when you are happy with them, send a pull request to the main repository.</p>
+<h1><a class="anchor" id="licensing_sec"></a>
+Licensing</h1>
+<p>MNE-cpp is <em>BSD-licenced</em> (3 clause):</p>
+<p>This software is OSI Certified Open Source Software. OSI Certified is a certification mark of the Open Source Initiative.</p>
+<p>Copyright (c) 2011, Christoph Dinh, Matti Hamalainen. All rights reserved.</p>
+<p>Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:</p>
+<ul>
+<li>Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.</li>
+</ul>
+<ul>
+<li>Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.</li>
+</ul>
+<ul>
+<li>Neither the names of MNE-Python authors nor the names of any contributors may be used to endorse or promote products derived from this software without specific prior written permission.</li>
+</ul>
+<p><em>This software is provided by the copyright holders and contributors "as is" and any express or implied warranties, including, but not limited to, the implied warranties of merchantability and fitness for a particular purpose are disclaimed. In no event shall the copyright owner or contributors be liable for any direct, indirect, incidental, special, exemplary, or consequential damages (including, but not limited to, procurement of substitute goods or services; loss of use, data, or profits; or business interruption) however caused and on any theory of liability, whether in contract, strict liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, even if advised of the possibility of such damage.</em></p>
+<p>This code is licensed under the BSD 3-clause. See LICENSE.txt </p>
+</div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Sep 14 2012 17:41:17 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Sep 15 2012 19:15:41 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

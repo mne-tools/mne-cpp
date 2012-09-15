@@ -1,9 +1,0 @@
-digraph "FIFFLIB::Fiff::dir_tree_find"
-{
-  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
-  node [fontname="Helvetica",fontsize="10",shape=record];
-  rankdir="LR";
-  Node1 [label="FIFFLIB::Fiff::dir\l_tree_find",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
-  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node2 [label="FIFFLIB::FiffDirTree\l::dir_tree_find",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#add5047febab5ab74581c1601f41475d3"];
-}

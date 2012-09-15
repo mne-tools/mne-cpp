@@ -1,7 +1,0 @@
-digraph "Graphical Class Hierarchy"
-{
-  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
-  node [fontname="Helvetica",fontsize="10",shape=record];
-  rankdir="LR";
-  Node1 [label="FIFFLIB::FiffCoordTrans",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html",tooltip="The FiffCoordTrans class provides..."];
-}

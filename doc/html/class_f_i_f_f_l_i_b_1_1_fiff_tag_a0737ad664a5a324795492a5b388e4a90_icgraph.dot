@@ -1,9 +1,0 @@
-digraph "FIFFLIB::FiffTag::toFloatMatrix"
-{
-  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
-  node [fontname="Helvetica",fontsize="10",shape=record];
-  rankdir="LR";
-  Node1 [label="FIFFLIB::FiffTag::toFloat\lMatrix",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
-  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node2 [label="FIFFLIB::Fiff::read\l_named_matrix",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_f_i_f_f_l_i_b_1_1_fiff.html#a351e50d8a4fa6ca98902bc58e1d6444c"];
-}

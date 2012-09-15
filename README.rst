@@ -67,7 +67,7 @@ MNE-cpp is **BSD-licenced** (3 clause):
     This software is OSI Certified Open Source Software.
     OSI Certified is a certification mark of the Open Source Initiative.
 
-    Copyright (c) 2011, authors of MNE-Python.
+    Copyright (c) 2011, authors of MNE-cpp.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -96,10 +96,3 @@ MNE-cpp is **BSD-licenced** (3 clause):
     (including negligence or otherwise) arising in any way out of the use
     of this software, even if advised of the possibility of such
     damage.**
-
-
-
-
-
-
-This code is licensed under the BSD 3-clause. See LICENSE.txt
