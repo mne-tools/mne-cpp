@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    ToDo Documentation...
+# @brief    This project file builds all libraries and examples of the mne-cpp project.
 #
 #--------------------------------------------------------------------------------------------------------------
 

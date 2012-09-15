@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    ToDo Documentation...
+# @brief    This project file builds the mne library.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -42,19 +42,15 @@ DEFINES += MNE_LIBRARY
 
 CONFIG(debug, debug|release) {
     TARGET = mned
-    unix:DESTDIR = $$PWD/../../lib/unix/debug
-    win32:DESTDIR = $$PWD/../../lib/win32/debug
-    unix: LIBS += -L$$PWD/../../lib/unix/debug/ -lfiffd
-    win32:LIBS += -L$$PWD/../../lib/win32/debug/ -lfiffd
-    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\..\\mne-cpp\\lib\\win32\\debug\\mned.dll" "..\\..\\..\\mne-cpp\\bin\\win32\\debug\\"
+    DESTDIR = $$PWD/../../lib
+    LIBS += -L$$PWD/../../lib/ -lfiffd
+    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\..\\mne-cpp\\lib\\mned.dll" "..\\..\\..\\mne-cpp\\bin\\"
 }
 else {
     TARGET = mne
-    unix:DESTDIR = $$PWD/../../lib/unix/release
-    win32:DESTDIR = $$PWD/../../lib/win32/release
-    unix: LIBS += -L$$PWD/../../lib/unix/release/ -lfiff
-    win32:LIBS += -L$$PWD/../../lib/win32/release/ -lfiff
-    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\..\\mne-cpp\\lib\\win32\\release\\mne.dll" "..\\..\\..\\mne-cpp\\bin\\win32\\release\\"
+    DESTDIR = $$PWD/../../lib
+    LIBS += -L$$PWD/../../lib -lfiff
+    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\..\\mne-cpp\\lib\\mne.dll" "..\\..\\..\\mne-cpp\\bin\\"
 }
 
 
@@ -69,22 +65,3 @@ HEADERS += mne.h\
     include/mne_sourcespace.h \
     include/mne_hemisphere.h \
     include/mne_forwardsolution.h
-
-symbian {
-    MMP_RULES += EXPORTUNFROZEN
-    TARGET.UID3 = 0xE05B73F1
-    TARGET.CAPABILITY = 
-    TARGET.EPOCALLOWDLLDATA = 1
-    addFiles.sources = mne.dll
-    addFiles.path = !:/sys/bin
-    DEPLOYMENT += addFiles
-}
-
-unix:!symbian {
-    maemo5 {
-        target.path = /opt/usr/lib
-    } else {
-        target.path = /usr/lib
-    }
-    INSTALLS += target
-}

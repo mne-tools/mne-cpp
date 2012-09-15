@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    ToDo Documentation...
+# @brief    This project file builds the fiff library.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -42,15 +42,13 @@ DEFINES += FIFF_LIBRARY
 
 CONFIG(debug, debug|release) {
     TARGET = fiffd
-    unix:DESTDIR = $$PWD/../../lib/unix/debug
-    win32:DESTDIR = $$PWD/../../lib/win32/debug
-    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\..\\mne-cpp\\lib\\win32\\debug\\fiffd.dll" "..\\..\\..\\mne-cpp\\bin\\win32\\debug\\"
+    DESTDIR = $$PWD/../../lib
+    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\..\\mne-cpp\\lib\\fiffd.dll" "..\\..\\..\\mne-cpp\\bin\\"
 }
 else {
     TARGET = fiff
-    unix:DESTDIR = $$PWD/../../lib/unix/release
-    win32:DESTDIR = $$PWD/../../lib/win32/release
-    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\..\\mne-cpp\\lib\\win32\\release\\fiff.dll" "..\\..\\..\\mne-cpp\\bin\\win32\\release\\"
+    DESTDIR = $$PWD/../../lib
+    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\..\\mne-cpp\\lib\\fiff.dll" "..\\..\\..\\mne-cpp\\bin\\"
 }
 
 
@@ -73,22 +71,3 @@ HEADERS += fiff.h \
     include/fiff_dir_tree.h \
     include/fiff_solution.h \
     include/fiff_coord_trans.h
-
-symbian {
-    MMP_RULES += EXPORTUNFROZEN
-    TARGET.UID3 = 0xE05B73F1
-    TARGET.CAPABILITY = 
-    TARGET.EPOCALLOWDLLDATA = 1
-    addFiles.sources = fiff.dll
-    addFiles.path = !:/sys/bin
-    DEPLOYMENT += addFiles
-}
-
-unix:!symbian {
-    maemo5 {
-        target.path = /opt/usr/lib
-    } else {
-        target.path = /usr/lib
-    }
-    INSTALLS += target
-}

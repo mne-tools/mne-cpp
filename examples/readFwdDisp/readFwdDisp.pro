@@ -44,25 +44,17 @@ CONFIG   -= app_bundle
 
 CONFIG(debug, debug|release) {
     TARGET = readFwdDispd
-    unix: LIBS += -L$$PWD/../../lib/unix/debug/ -lfiffd
-    win32:LIBS += -L$$PWD/../../lib/win32/debug/ -lfiffd
-    unix: LIBS += -L$$PWD/../../lib/unix/debug/ -lmned
-    win32:LIBS += -L$$PWD/../../lib/win32/debug/ -lmned
-    unix: LIBS += -L$$PWD/../../lib/unix/debug/ -ldispd
-    win32:LIBS += -L$$PWD/../../lib/win32/debug/ -ldispd
-    unix:DESTDIR = $$PWD/../../bin/unix/debug
-    win32:DESTDIR = $$PWD/../../bin/win32/debug
+    LIBS += -L$$PWD/../../lib/ -lfiffd
+    LIBS += -L$$PWD/../../lib/ -lmned
+    LIBS += -L$$PWD/../../lib/ -ldispd
+    DESTDIR = $$PWD/../../bin
 }
 else {
     TARGET = readFwdDisp
-    unix: LIBS += -L$$PWD/../../lib/unix/release/ -lfiff
-    win32:LIBS += -L$$PWD/../../lib/win32/release/ -lfiff
-    unix: LIBS += -L$$PWD/../../lib/unix/release/ -lmne
-    win32:LIBS += -L$$PWD/../../lib/win32/release/ -lmne
-    unix: LIBS += -L$$PWD/../../lib/unix/release/ -ldisp
-    win32:LIBS += -L$$PWD/../../lib/win32/release/ -ldisp
-    unix:DESTDIR = $$PWD/../../bin/unix/release
-    win32:DESTDIR = $$PWD/../../bin/win32/release
+    LIBS += -L$$PWD/../../lib/ -lfiff
+    LIBS += -L$$PWD/../../lib/ -lmne
+    LIBS += -L$$PWD/../../lib/ -ldisp
+    DESTDIR = $$PWD/../../bin
 }
 
 TEMPLATE = app
