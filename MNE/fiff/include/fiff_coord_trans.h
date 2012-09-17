@@ -109,7 +109,13 @@ public:
     //=========================================================================================================
     /**
     * ### MNE toolbox root function ###: implementation of the fiff_invert_transform function
-    * actual obsolete - cause trans and inverse are both stored
+    *
+    * Invert a coordinate transformation
+    * (actual obsolete - cause trans and inverse are both stored)
+    *
+    * @param[in] p_pTransform the transformation which should be inverted
+    *
+    * @return true if succeeded, false otherwise
     */
     static bool invert_transform(FiffCoordTrans* p_pTransform);
 

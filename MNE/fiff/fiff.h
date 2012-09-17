@@ -134,6 +134,12 @@ public:
     * ### MNE toolbox root function ###
     *
     * Wrapper for the FiffCoordTrans::invert_transform static function
+    *
+    * Invert a coordinate transformation
+    *
+    * @param[in] p_pTransform the transformation which should be inverted
+    *
+    * @return true if succeeded, false otherwise
     */
     static inline bool invert_transform(FiffCoordTrans* p_pTransform)
     {
@@ -153,6 +159,7 @@ public:
         return FiffDirTree::make_dir_tree(p_pFile, p_pDir, p_pTree, start);
     }
 
+
     //=========================================================================================================
     /**
     * fiff_open
@@ -170,22 +177,26 @@ public:
     */
     static bool open(QString& p_sFileName, QFile*& p_pFile, FiffDirTree*& p_pTree, QList<fiff_dir_entry_t>*& p_pDir);
 
-    //=========================================================================================================
-    /**
-    * fiff_split_name_list
-    *
-    * ### MNE toolbox root function ###
-    */
-    static QStringList split_name_list(QString p_sNameList);
-
 
     //=========================================================================================================
     /**
     * fiff_read_bad_channels
     *
     * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffDirTree read_bad_channels member function
+    *
+    * Reads the bad channel list from a node if it exists
+    *
+    * @param[in] p_pFile The opened fif file to read from
+    * @param[in] p_pTree The node of interest
+    *
+    * @return the bad channel list
     */
-    static QStringList read_bad_channels(QFile* p_pFile, FiffDirTree* p_pTree);
+    static QStringList read_bad_channels(QFile* p_pFile, FiffDirTree* p_pTree)
+    {
+        return p_pTree->read_bad_channels(p_pFile);
+    }
 
 
     //=========================================================================================================
@@ -238,6 +249,20 @@ public:
     static inline bool read_tag_info(QFile* p_pFile, FiffTag*& p_pTag)
     {
         return FiffTag::read_tag_info(p_pFile, p_pTag);
+    }
+
+
+    //=========================================================================================================
+    /**
+    * fiff_split_name_list
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffDirTree::split_name_list static function
+    */
+    static QStringList split_name_list(QString p_sNameList)
+    {
+        return FiffDirTree::split_name_list(p_sNameList);
     }
 };
 

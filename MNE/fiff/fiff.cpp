@@ -157,31 +157,6 @@ bool Fiff::open(QString& p_sFileName, QFile*& p_pFile, FiffDirTree*& p_pTree, QL
 
 //*************************************************************************************************************
 
-QStringList Fiff::split_name_list(QString p_sNameList)
-{
-    return p_sNameList.split(":");
-}
-
-
-//*************************************************************************************************************
-
-QStringList Fiff::read_bad_channels(QFile* p_pFile, FiffDirTree* p_pTree)
-{
-    QList<FiffDirTree*> node = p_pTree->dir_tree_find(FIFFB_MNE_BAD_CHANNELS);
-    FIFFLIB::FiffTag* t_pTag = NULL;
-
-    QStringList bads;
-
-    if (node.size() > 0)
-        if(node.at(0)->find_tag(p_pFile, FIFF_MNE_CH_NAME_LIST, t_pTag))
-            bads = Fiff::split_name_list(t_pTag->toString());
-
-    return bads;
-}
-
-
-//*************************************************************************************************************
-
 bool Fiff::read_named_matrix(QFile* p_pFile, FiffDirTree* node, fiff_int_t matkind, FiffSolution*& mat)
 {
     if (mat != NULL)

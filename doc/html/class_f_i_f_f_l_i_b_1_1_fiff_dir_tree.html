@@ -112,11 +112,15 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:acdbb6c8e784338091e86321127d3888f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ace0a94dbb1d7d86bbf5099ec78ec2e0c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ace0a94dbb1d7d86bbf5099ec78ec2e0c">has_tag</a> (fiff_int_t findkind)</td></tr>
 <tr class="separator:ace0a94dbb1d7d86bbf5099ec78ec2e0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ea0a1775983b40829bba6a174971a1c"><td class="memItemLeft" align="right" valign="top">QStringList&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a4ea0a1775983b40829bba6a174971a1c">read_bad_channels</a> (QFile *p_pFile)</td></tr>
+<tr class="separator:a4ea0a1775983b40829bba6a174971a1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a0401a359c1d7f0dbd07c486cb2378983"><td class="memItemLeft" align="right" valign="top">static qint32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a0401a359c1d7f0dbd07c486cb2378983">make_dir_tree</a> (QFile *p_pFile, QList&lt; <a class="el" href="struct_f_i_f_f_l_i_b_1_1__fiff_dir_entry_rec.html">fiff_dir_entry_t</a> &gt; *p_pDir, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *&amp;p_pTree, qint32 start=0)</td></tr>
 <tr class="separator:a0401a359c1d7f0dbd07c486cb2378983"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad700c42e7c3966fe8005994e06e65667"><td class="memItemLeft" align="right" valign="top">static QStringList&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ad700c42e7c3966fe8005994e06e65667">split_name_list</a> (QString p_sNameList)</td></tr>
+<tr class="separator:ad700c42e7c3966fe8005994e06e65667"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -142,7 +146,7 @@ Public Attributes</h2></td></tr>
 <p>DECLARE CLASS <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html" title="The Fiff class provides...">Fiff</a> FIFF data tag</p>
 <p>Tags are used in front of data items to tell what they are. </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00081">81</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00082">82</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a2a5fde08f450de997f5eae02b925c864"></a>
 <div class="memitem">
@@ -195,6 +199,14 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <h3>MNE toolbox root function ###: implementation of the fiff_dir_tree_find function</h3>
+<p>Find nodes of the given kind from a directory tree structure</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">kind</td><td>the given kind</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>list of the found nodes </dd></dl>
 
 <p>Definition at line <a class="el" href="fiff__dir__tree_8cpp_source.html#l00175">175</a> of file <a class="el" href="fiff__dir__tree_8cpp_source.html">fiff_dir_tree.cpp</a>.</p>
 
@@ -229,7 +241,17 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Implementation of the find_tag function in various files e.g. fiff_read_named_matrix.m </p>
+<p>Implementation of the find_tag function in various files e.g. fiff_read_named_matrix.m</p>
+<p>Founds a tag of a given kind within a tree, and reeds it from file. Note: In difference to mne-matlab this is not a static function. This is a method of the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="The Fiff class provides...">FiffDirTree</a> class, that's why a tree object doesn't need to be handed to the function.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>the opened fif file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">findkind</td><td>the kind which should be found </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">p_pTag</td><td>the found tag</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if found, false otherwise </dd></dl>
 
 <p>Definition at line <a class="el" href="fiff__dir__tree_8cpp_source.html#l00191">191</a> of file <a class="el" href="fiff__dir__tree_8cpp_source.html">fiff_dir_tree.cpp</a>.</p>
 
@@ -303,6 +325,62 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a4ea0a1775983b40829bba6a174971a1c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QStringList FiffDirTree::read_bad_channels </td>
+          <td>(</td>
+          <td class="paramtype">QFile *&#160;</td>
+          <td class="paramname"><em>p_pFile</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>fiff_read_bad_channels</p>
+<h3>MNE toolbox root function</h3>
+<p>Reads the bad channel list from a node if it exists Note: In difference to mne-matlab this is not a static function. This is a method of the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="The Fiff class provides...">FiffDirTree</a> class, that's why a tree object doesn't need to be handed to the function.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>The opened fif file to read from</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the bad channel list </dd></dl>
+
+<p>Definition at line <a class="el" href="fiff__dir__tree_8cpp_source.html#l00218">218</a> of file <a class="el" href="fiff__dir__tree_8cpp_source.html">fiff_dir_tree.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ad700c42e7c3966fe8005994e06e65667"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QStringList FiffDirTree::split_name_list </td>
+          <td>(</td>
+          <td class="paramtype">QString&#160;</td>
+          <td class="paramname"><em>p_sNameList</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>fiff_split_name_list</p>
+<h3>MNE toolbox root function</h3>
+
+<p>Definition at line <a class="el" href="fiff__dir__tree_8cpp_source.html#l00235">235</a> of file <a class="el" href="fiff__dir__tree_8cpp_source.html">fiff_dir_tree.cpp</a>.</p>
+
+</div>
+</div>
 <h2 class="groupheader">Member Data Documentation</h2>
 <a class="anchor" id="a98b39a03371c2c816d0d6fcb5da97a31"></a>
 <div class="memitem">
@@ -315,7 +393,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Block type for this directory </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00121">121</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00166">166</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -330,7 +408,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Child nodes </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00127">127</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00172">172</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -345,7 +423,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Directory of tags in this node </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00124">124</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00169">169</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -360,7 +438,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Id of this block if any </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00122">122</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00167">167</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -375,7 +453,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Number of child nodes </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00128">128</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00173">173</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -390,7 +468,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Number of entries in this node </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00125">125</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00170">170</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -405,7 +483,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Number of entries in the directory tree node </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00126">126</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00171">171</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -420,7 +498,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Newly added to stay consistent with MATLAB implementation </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00123">123</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00168">168</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -431,7 +509,7 @@ Public Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Sep 15 2012 19:15:41 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Sep 17 2012 19:08:46 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

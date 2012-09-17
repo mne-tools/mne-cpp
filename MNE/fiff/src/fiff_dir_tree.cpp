@@ -211,3 +211,28 @@ bool FiffDirTree::has_tag(fiff_int_t findkind)
             return true;
    return false;
 }
+
+
+//*************************************************************************************************************
+
+QStringList FiffDirTree::read_bad_channels(QFile* p_pFile)
+{
+    QList<FiffDirTree*> node = this->dir_tree_find(FIFFB_MNE_BAD_CHANNELS);
+    FIFFLIB::FiffTag* t_pTag = NULL;
+
+    QStringList bads;
+
+    if (node.size() > 0)
+        if(node.at(0)->find_tag(p_pFile, FIFF_MNE_CH_NAME_LIST, t_pTag))
+            bads = FiffDirTree::split_name_list(t_pTag->toString());
+
+    return bads;
+}
+
+
+//*************************************************************************************************************
+
+QStringList FiffDirTree::split_name_list(QString p_sNameList)
+{
+    return p_sNameList.split(":");
+}

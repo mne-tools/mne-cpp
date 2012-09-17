@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ToDo Documentation...
+* @brief    Contains the FiffDirTree class declaration, which provides fiff dir tree processing methods.
 *
 */
 
@@ -52,8 +52,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QList>
 #include <QFile>
+#include <QList>
+#include <QStringList>
 #include <QDebug>
 
 
@@ -102,12 +103,28 @@ public:
     //=========================================================================================================
     /**
     * ### MNE toolbox root function ###: implementation of the fiff_dir_tree_find function
+    *
+    * Find nodes of the given kind from a directory tree structure
+    *
+    * @param[in] kind the given kind
+    *
+    * @return list of the found nodes
     */
     QList<FiffDirTree*> dir_tree_find(fiff_int_t kind);
 
     //=========================================================================================================
     /**
     * Implementation of the find_tag function in various files e.g. fiff_read_named_matrix.m
+    *
+    * Founds a tag of a given kind within a tree, and reeds it from file.
+    * Note: In difference to mne-matlab this is not a static function. This is a method of the FiffDirTree
+    *       class, that's why a tree object doesn't need to be handed to the function.
+    *
+    * @param[in] p_pFile the opened fif file
+    * @param[in] findkind the kind which should be found
+    * @param[out] p_pTag the found tag
+    *
+    * @return true if found, false otherwise
     */
     bool find_tag(QFile* p_pFile, fiff_int_t findkind, FiffTag*& p_pTag);
 
@@ -116,6 +133,34 @@ public:
     * Implementation of the has_tag function in fiff_read_named_matrix.m
     */
     bool has_tag(fiff_int_t findkind);
+
+
+    //=========================================================================================================
+    /**
+    * fiff_read_bad_channels
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Reads the bad channel list from a node if it exists
+    * Note: In difference to mne-matlab this is not a static function. This is a method of the FiffDirTree
+    *       class, that's why a tree object doesn't need to be handed to the function.
+    *
+    *
+    * @param[in] p_pFile The opened fif file to read from
+    *
+    * @return the bad channel list
+    */
+    QStringList read_bad_channels(QFile* p_pFile);
+
+
+    //=========================================================================================================
+    /**
+    * fiff_split_name_list
+    *
+    * ### MNE toolbox root function ###
+    */
+    static QStringList split_name_list(QString p_sNameList);
+
 
 public:
     qint32                  block;      /**< Block type for this directory */

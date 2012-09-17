@@ -29,7 +29,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ToDo Documentation...
+* @brief    Contains the MNEForwardSolution class declaration, which provides the forward solution including
+*           the source space (MNESourceSpace).
 *
 */
 
@@ -137,7 +138,7 @@ public:
     *
     * Reads a forward solution from a fif file
     *
-    * @param [in] p_sFile       The name of the file
+    * @param [in] p_sFile       The name of the fif file
     * @param [out] fwd A forward solution from a fif file
     * @param [in] force_fixed   Force fixed source orientation mode? (optional)
     * @param [in] surf_ori      Use surface based source coordinate system? (optional)
@@ -157,12 +158,27 @@ public:
     //=========================================================================================================
     /**
     * ### MNE toolbox root function ###: Implementation of the mne_block_diag function - encoding part
+    *
+    * Make a sparse block diagonal matrix
+    *
+    * Returns a sparse block diagonal, diagonalized from the elements in "A". "A" is ma x na, comprising
+    * bdn=(na/"n") blocks of submatrices. Each submatrix is ma x "n", and these submatrices are placed down
+    * the diagonal of the matrix.
+    *
+    * @param[in, out] A Matrix which should be diagonlized
+    * @param[in, out] n Columns of the submatrices
+    *
+    * @return A sparse block diagonal, diagonalized from the elements in "A".
     */
     static inline SparseMatrix<float> make_block_diag(MatrixXf& A, qint32 n);
 
     //=========================================================================================================
     /**
     * ### MNE toolbox root function ###: Implementation of the mne_transpose_named_matrix function
+    *
+    * Transpose a named matrix (FiffSolution)
+    *
+    * @param[in, out] mat FiffSolution which shoul be transposed.
     */
     static void transpose_named_matrix(FiffSolution*& mat);
 
@@ -170,6 +186,14 @@ private:
     //=========================================================================================================
     /**
     * Implementation of the read_one function in mne_read_forward_solution.m
+    *
+    * Reads all interesting stuff for one forward solution
+    *
+    * @param[in] p_pFile The opened fif file to read from
+    * @param[in] node The forward solution node
+    * @param[out] one The read forward solution
+    *
+    * @return True if succeeded, false otherwise
     */
     static bool read_one(QFile* p_pFile, FiffDirTree* node, MNEForwardSolution*& one);
 

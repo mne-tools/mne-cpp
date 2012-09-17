@@ -155,7 +155,7 @@ MatrixX3f&#160;</td><td class="memItemRight" valign="bottom"><b>source_nn</b></t
 <div class="textblock"><p>The SourceSpace class provides. </p>
 <p>DECLARE CLASS SourceSpace </p>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00113">113</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00114">114</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a2de172fb859cda6d067d0e931c696fe2"></a>
 <div class="memitem">
@@ -246,6 +246,16 @@ MatrixX3f&#160;</td><td class="memItemRight" valign="bottom"><b>source_nn</b></t
 </div><div class="memdoc">
 <h3><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> toolbox root function ###: Implementation of the mne_block_diag function - decoding part</h3>
 <h3><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> toolbox root function ###: Implementation of the mne_block_diag function - encoding part</h3>
+<p>Make a sparse block diagonal matrix</p>
+<p>Returns a sparse block diagonal, diagonalized from the elements in "A". "A" is ma x na, comprising bdn=(na/"n") blocks of submatrices. Each submatrix is ma x "n", and these submatrices are placed down the diagonal of the matrix.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">A</td><td>Matrix which should be diagonlized </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">n</td><td>Columns of the submatrices</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A sparse block diagonal, diagonalized from the elements in "A". </dd></dl>
 
 <p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00654">654</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
 
@@ -310,7 +320,7 @@ MatrixX3f&#160;</td><td class="memItemRight" valign="bottom"><b>source_nn</b></t
 <p>Reads a forward solution from a fif file</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_sFile</td><td>The name of the file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_sFile</td><td>The name of the fif file </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">fwd</td><td>A forward solution from a fif file </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">force_fixed</td><td>Force fixed source orientation mode? (optional) </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">surf_ori</td><td>Use surface based source coordinate system? (optional) </td></tr>
@@ -347,6 +357,13 @@ MatrixX3f&#160;</td><td class="memItemRight" valign="bottom"><b>source_nn</b></t
 </table>
 </div><div class="memdoc">
 <h3><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> toolbox root function ###: Implementation of the mne_transpose_named_matrix function</h3>
+<p>Transpose a named matrix (FiffSolution)</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">mat</td><td>FiffSolution which shoul be transposed. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00783">783</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
 
@@ -359,7 +376,7 @@ MatrixX3f&#160;</td><td class="memItemRight" valign="bottom"><b>source_nn</b></t
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Sep 15 2012 19:15:41 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Sep 17 2012 19:08:46 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

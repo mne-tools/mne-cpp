@@ -61,6 +61,7 @@ var searchData=
   ['fiff_5fmne_5fsource_5fspace_5fuse_5ftriangles',['FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES',['../fiff__constants_8h.html#a495a26c6267a963486f70f3a549acce0',1,'fiff_constants.h']]],
   ['fiff_5fmne_5fsource_5fspace_5fvoxel_5fdims',['FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS',['../fiff__constants_8h.html#a2a990d075f7098869bd840f2a426cb51',1,'fiff_constants.h']]],
   ['fiff_5fsolution_2ecpp',['fiff_solution.cpp',['../fiff__solution_8cpp.html',1,'']]],
+  ['fiff_5fsolution_2eh',['fiff_solution.h',['../fiff__solution_8h.html',1,'']]],
   ['fiff_5ftag_2ecpp',['fiff_tag.cpp',['../fiff__tag_8cpp.html',1,'']]],
   ['fiff_5ftag_2eh',['fiff_tag.h',['../fiff__tag_8h.html',1,'']]],
   ['fiff_5ftypes_2eh',['fiff_types.h',['../fiff__types_8h.html',1,'']]],

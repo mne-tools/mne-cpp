@@ -197,9 +197,17 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>mne_find_source_space_hemi</p>
 <h3><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a73b850bc44b6c1903e5fdac82f9e5189">MNESourceSpace::find_source_space_hemi</a> static function </p>
+<p>Wrapper for the <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a73b850bc44b6c1903e5fdac82f9e5189">MNESourceSpace::find_source_space_hemi</a> static function</p>
+<p>Returns the hemisphere id (FIFFV_MNE_SURF_LEFT_HEMI or FIFFV_MNE_SURF_RIGHT_HEMI) for a source space.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pHemisphere</td><td>the hemisphere to investigate</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the deduced hemisphere id </dd></dl>
 
-<p>Definition at line <a class="el" href="mne_8h_source.html#l00140">140</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
+<p>Definition at line <a class="el" href="mne_8h_source.html#l00157">157</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
 
 </div>
 </div>
@@ -238,9 +246,19 @@ Static Public Member Functions</h2></td></tr>
 <h3><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> toolbox root function</h3>
 <p>Wrapper for the MNEForwardSolution::extract_block_diag static function mne_block_diag - encoding part</p>
 <h3><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#afb312e7470c29a6c0e94a302174cb811">MNEForwardSolution::make_block_diag</a> static function </p>
+<p>Wrapper for the <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#afb312e7470c29a6c0e94a302174cb811">MNEForwardSolution::make_block_diag</a> static function</p>
+<p>Make a sparse block diagonal matrix</p>
+<p>Returns a sparse block diagonal, diagonalized from the elements in "A". "A" is ma x na, comprising bdn=(na/"n") blocks of submatrices. Each submatrix is ma x "n", and these submatrices are placed down the diagonal of the matrix.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">A</td><td>Matrix which should be diagonlized </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">n</td><td>Columns of the submatrices</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A sparse block diagonal, diagonalized from the elements in "A". </dd></dl>
 
-<p>Definition at line <a class="el" href="mne_8h_source.html#l00126">126</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
+<p>Definition at line <a class="el" href="mne_8h_source.html#l00137">137</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
 
 </div>
 </div>
@@ -287,7 +305,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="mne_8h_source.html#l00158">158</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
+<p>Definition at line <a class="el" href="mne_8h_source.html#l00175">175</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
 
 </div>
 </div>
@@ -363,7 +381,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="mne_8h_source.html#l00182">182</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
+<p>Definition at line <a class="el" href="mne_8h_source.html#l00199">199</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
 
 </div>
 </div>
@@ -425,7 +443,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="mne_8h_source.html#l00205">205</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
+<p>Definition at line <a class="el" href="mne_8h_source.html#l00222">222</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
 
 </div>
 </div>
@@ -468,9 +486,18 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>mne_transform_source_space_to</p>
 <h3><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html" title="The SourceSpace class provides.">MNESourceSpace</a> transform_source_space_to member function </p>
+<p>Wrapper for the <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html" title="The SourceSpace class provides.">MNESourceSpace</a> transform_source_space_to member function</p>
+<p>Transforms source space data to the desired coordinate system</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">p_pMNESourceSpace</td><td>the source space which is should be transformed </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dest</td><td>destination check code </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">trans</td><td>transformation information </td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p>Definition at line <a class="el" href="mne_8h_source.html#l00218">218</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
+<p>Definition at line <a class="el" href="mne_8h_source.html#l00241">241</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
 
 </div>
 </div>
@@ -497,9 +524,16 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>mne_transpose_named_matrix</p>
 <h3><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a71beab65f1c08a56c4ce5993ce81a26b">MNEForwardSolution::transpose_named_matrix</a> static function </p>
+<p>Wrapper for the <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a71beab65f1c08a56c4ce5993ce81a26b">MNEForwardSolution::transpose_named_matrix</a> static function</p>
+<p>Transpose a named matrix (FiffSolution)</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">mat</td><td>FiffSolution which shoul be transposed. </td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p>Definition at line <a class="el" href="mne_8h_source.html#l00231">231</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
+<p>Definition at line <a class="el" href="mne_8h_source.html#l00259">259</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
 
 </div>
 </div>
@@ -510,7 +544,7 @@ Static Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Sep 15 2012 19:15:41 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Sep 17 2012 19:08:46 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>
