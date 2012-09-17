@@ -128,6 +128,12 @@ public:
     //=========================================================================================================
     /**
     * ### MNE toolbox root function ###: Implementation of the mne_find_source_space_hemi function
+    *
+    * Returns the hemisphere id ( FIFFV_MNE_SURF_LEFT_HEMI or FIFFV_MNE_SURF_RIGHT_HEMI) for a source space.
+    *
+    * @param[in] p_pHemisphere the hemisphere to investigate
+    *
+    * @return the deduced hemisphere id
     */
     static qint32 find_source_space_hemi(MNEHemisphere* p_pHemisphere);
 
@@ -162,6 +168,15 @@ public:
     //=========================================================================================================
     /**
     * ### MNE toolbox root function ###: Implementation of the mne_transform_source_space_to function
+    * Wrapper for the MNESourceSpace transform_source_space_to member function
+    *
+    * Note: In difference to mne-matlab this is not a static function. This is a method of the MNESourceSpace
+    *       class, that's why a tree object doesn't need to be handed to the function.
+    *
+    * Transforms source space data to the desired coordinate system
+    *
+    * @param [in] dest destination check code
+    * @param [in] trans transformation information
     */
     void transform_source_space_to(fiff_int_t dest, FiffCoordTrans* trans);
 

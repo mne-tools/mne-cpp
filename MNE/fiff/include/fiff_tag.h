@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ToDo Documentation...
+* @brief    Contains the FiffTag class declaration, which provides fiff tag I/O and processing methods.
 *
 */
 

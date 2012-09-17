@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ToDo Documentation...
+* @brief    Contains the mne library export/import macros.
 *
 */
 

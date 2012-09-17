@@ -122,6 +122,17 @@ public:
     * ### MNE toolbox root function ###
     *
     * Wrapper for the MNEForwardSolution::make_block_diag static function
+    *
+    * Make a sparse block diagonal matrix
+    *
+    * Returns a sparse block diagonal, diagonalized from the elements in "A". "A" is ma x na, comprising
+    * bdn=(na/"n") blocks of submatrices. Each submatrix is ma x "n", and these submatrices are placed down
+    * the diagonal of the matrix.
+    *
+    * @param[in, out] A Matrix which should be diagonlized
+    * @param[in, out] n Columns of the submatrices
+    *
+    * @return A sparse block diagonal, diagonalized from the elements in "A".
     */
     static inline SparseMatrix<float> make_block_diag(MatrixXf& A, qint32 n)
     {
@@ -136,6 +147,12 @@ public:
     * ### MNE toolbox root function ###
     *
     * Wrapper for the MNESourceSpace::find_source_space_hemi static function
+    *
+    * Returns the hemisphere id (FIFFV_MNE_SURF_LEFT_HEMI or FIFFV_MNE_SURF_RIGHT_HEMI) for a source space.
+    *
+    * @param[in] p_pHemisphere the hemisphere to investigate
+    *
+    * @return the deduced hemisphere id
     */
     static qint32 find_source_space_hemi(MNEHemisphere* p_pHemisphere)
     {
@@ -214,6 +231,12 @@ public:
     * ### MNE toolbox root function ###
     *
     * Wrapper for the MNESourceSpace transform_source_space_to member function
+    *
+    * Transforms source space data to the desired coordinate system
+    *
+    * @param [in, out] p_pMNESourceSpace the source space which is should be transformed
+    * @param [in] dest destination check code
+    * @param [in] trans transformation information
     */
     static inline void transform_source_space_to(MNESourceSpace* p_pMNESourceSpace, fiff_int_t dest, FiffCoordTrans* trans)
     {
@@ -227,6 +250,11 @@ public:
     * ### MNE toolbox root function ###
     *
     * Wrapper for the MNEForwardSolution::transpose_named_matrix static function
+    *
+    * Transpose a named matrix (FiffSolution)
+    *
+    * @param[in, out] mat FiffSolution which shoul be transposed.
+    *
     */
     static inline void transpose_named_matrix(FiffSolution*& mat)
     {
