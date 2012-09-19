@@ -63,7 +63,6 @@ FiffDirTree::FiffDirTree()
 
 FiffDirTree::~FiffDirTree()
 {
-    qDebug() << "Destructor dir tree";
     QList<FiffDirTree*>::iterator i;
     for (i = this->children.begin(); i != this->children.end(); ++i)
         if (*i != NULL)

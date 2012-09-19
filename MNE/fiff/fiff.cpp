@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ToDo Documentation...
+* @brief    Contains the implementation of the FIFF Wrapper Class.
 *
 */
 
@@ -108,7 +108,7 @@ bool Fiff::open(QString& p_sFileName, QFile*& p_pFile, FiffDirTree*& p_pTree, QL
     //
     //   Read or create the directory tree
     //
-//    qDebug() << "\nCreating tag directory for "<< p_sFileName << "...";
+    printf("\nCreating tag directory for %s...", p_sFileName.toUtf8().constData());
 
 
     if (p_pDir)

@@ -64,10 +64,11 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 FiffTag::FiffTag()
+: data(NULL)
+, m_pComplexFloatData(NULL)
+, m_pComplexDoubleData(NULL)
 {
-    this->data = NULL;
-    this->m_pComplexFloatData = NULL;
-    this->m_pComplexDoubleData = NULL;
+
 }
 
 
@@ -75,11 +76,11 @@ FiffTag::FiffTag()
 
 FiffTag::~FiffTag()
 {
-    if(this->data != NULL)
+    if(this->data)
         free(this->data);
-    if(this->m_pComplexFloatData != NULL)
+    if(this->m_pComplexFloatData)
         delete this->m_pComplexFloatData;
-    if(this->m_pComplexDoubleData != NULL)
+    if(this->m_pComplexDoubleData)
         delete this->m_pComplexDoubleData;
 }
 
