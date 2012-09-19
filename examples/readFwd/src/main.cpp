@@ -111,16 +111,12 @@ int main(int argc, char *argv[])
 
 //    QString t_sFile = "./MNE-sample-data/MEG/sample/sample_audvis-eeg-oct-6-fwd.fif";
     QString t_sFile = "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
-    MNE::read_forward_solution(t_sFile, t_ForwardSolution);
+    if(MNE::read_forward_solution(t_sFile, t_ForwardSolution))
+    {
+        std::cout << std::endl << t_ForwardSolution->sol->data.block(0,0,10,10) << std::endl;
+        std::cout << std::endl << t_ForwardSolution->source_rr.block(0,0,10,3) << std::endl ;
+    }
 
-    std::cout << std::endl << t_ForwardSolution->sol->data.block(0,0,10,10) << std::endl;
-    std::cout << std::endl << t_ForwardSolution->source_rr.block(0,0,10,3) << std::endl ;
-
-
-
-
-
-    
     return a.exec();
 }
 

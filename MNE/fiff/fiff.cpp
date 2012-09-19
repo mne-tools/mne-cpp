@@ -73,7 +73,7 @@ bool Fiff::open(QString& p_sFileName, QFile*& p_pFile, FiffDirTree*& p_pTree, QL
 
     if (!p_pFile->open(QIODevice::ReadOnly))
     {
-        printf("Cannot open file %s", p_pFile->fileName().toUtf8().constData());//consider throw
+        printf("Cannot open file %s\n", p_pFile->fileName().toUtf8().constData());//consider throw
         return false;
     }
 

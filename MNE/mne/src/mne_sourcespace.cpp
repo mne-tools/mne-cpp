@@ -96,9 +96,11 @@ bool MNESourceSpace::read_source_spaces(QFile*& p_pFile, bool add_geom, FiffDirT
     {
         QList<fiff_dir_entry_t>* t_pDir = NULL;
         QString t_sFileName = p_pFile->fileName();
-        Fiff::open(t_sFileName, p_pFile, p_pTree, t_pDir);
+        if(!Fiff::open(t_sFileName, p_pFile, p_pTree, t_pDir))
+            return false;
         open_here = true;
-        delete t_pDir;
+        if(t_pDir)
+            delete t_pDir;
     }
     //
     //   Find all source spaces

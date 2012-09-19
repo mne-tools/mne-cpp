@@ -78,7 +78,14 @@ GeometryView::GeometryView(QWindow *parent)
 , scene(0)
 {
     QString t_sFile = "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
-    MNE::read_forward_solution(t_sFile, t_ForwardSolution);
+
+    if(!MNE::read_forward_solution(t_sFile, t_ForwardSolution))
+    {
+        if( t_ForwardSolution )
+            delete t_ForwardSolution;
+
+        t_ForwardSolution = NULL;
+    }
 
     hemisphereFrontalCamera = new QGLCamera(this);
     hemisphereFrontalCamera->setAdjustForAspectRatio(false);
@@ -96,73 +103,77 @@ GeometryView::~GeometryView()
 
 void GeometryView::initializeGL(QGLPainter *painter)
 {
-    // in the constructor construct a builder on the stack
-    QGLBuilder builder;
-
-    float fac = 10.0f;
-
-    builder << QGL::Faceted;
-    hemisphere = builder.currentNode();
-    builder.pushNode();
-    QGLSceneNode *leftHemisphere = builder.newNode();
+    if(t_ForwardSolution)
     {
-        QGeometryData tri;
+        // in the constructor construct a builder on the stack
+        QGLBuilder builder;
 
-        MatrixXf* triCoords = t_ForwardSolution->src->hemispheres.at(0)->getTriCoords(fac);
+        float fac = 10.0f;
 
-        tri.appendVertexArray(QArray<QVector3D>::fromRawData( reinterpret_cast<const QVector3D*>(triCoords->data()), triCoords->cols() ));
+        builder << QGL::Faceted;
+        hemisphere = builder.currentNode();
+        builder.pushNode();
+        QGLSceneNode *leftHemisphere = builder.newNode();
+        {
+            QGeometryData tri;
 
-        //builder << *(t_ForwardSolution->src->hemispheres.at(0)->getGeometryData(fac));
-        //builder.addTriangles(*t_ForwardSolution->src->hemispheres.at(0)->getGeometry(fac));
-        builder.addTriangles(tri);// << tri;
+            MatrixXf* triCoords = t_ForwardSolution->src->hemispheres.at(0)->getTriCoords(fac);
+
+            tri.appendVertexArray(QArray<QVector3D>::fromRawData( reinterpret_cast<const QVector3D*>(triCoords->data()), triCoords->cols() ));
+
+            //builder << *(t_ForwardSolution->src->hemispheres.at(0)->getGeometryData(fac));
+            //builder.addTriangles(*t_ForwardSolution->src->hemispheres.at(0)->getGeometry(fac));
+            builder.addTriangles(tri);// << tri;
+        }
+
+        QGLSceneNode *rightHemisphere = builder.newNode();
+        {
+            QGeometryData tri;
+
+            MatrixXf* triCoords = t_ForwardSolution->src->hemispheres.at(1)->getTriCoords(fac);
+
+            tri.appendVertexArray(QArray<QVector3D>::fromRawData( reinterpret_cast<const QVector3D*>(triCoords->data()), triCoords->cols()));
+
+            builder.addTriangles(tri);// << tri;
+        }
+        builder.popNode();
+
+
+
+        int index;
+        QSharedPointer<QGLMaterialCollection> palette = builder.sceneNode()->palette();
+
+        QGLMaterial *matLH = new QGLMaterial();
+        matLH->setDiffuseColor(Qt::white);
+        index = palette->addMaterial(matLH);
+        leftHemisphere->setMaterialIndex(index);
+
+        QGLMaterial *matRH = new QGLMaterial();
+        matRH->setDiffuseColor(Qt::yellow);
+        index = palette->addMaterial(matRH);
+        rightHemisphere->setMaterialIndex(index);
+
+        scene = builder.finalizedSceneNode();
+
+        scene->setParent(this);
+
+        hemisphereLightModel = new QGLLightModel(this);
+        hemisphereLightModel->setAmbientSceneColor(Qt::white);
+        hemisphereLightModel->setViewerPosition(QGLLightModel::LocalViewer);
+
+        hemisphereLightModel = new QGLLightModel(this);
+
+        lightParameters = new QGLLightParameters(this);
+        lightParameters->setPosition(QVector3D(0.0f, 0.0f, 3.0f));
+        painter->setMainLight(lightParameters);
+
+    //    if (stereo) {
+            this->setStereoType(QGLView::RedCyanAnaglyph);
+            camera()->setEyeSeparation(0.4f);
+            hemisphereFrontalCamera->setEyeSeparation(0.1f);
+    //    }
+
     }
-
-    QGLSceneNode *rightHemisphere = builder.newNode();
-    {
-        QGeometryData tri;
-
-        MatrixXf* triCoords = t_ForwardSolution->src->hemispheres.at(1)->getTriCoords(fac);
-
-        tri.appendVertexArray(QArray<QVector3D>::fromRawData( reinterpret_cast<const QVector3D*>(triCoords->data()), triCoords->cols()));
-
-        builder.addTriangles(tri);// << tri;
-    }
-    builder.popNode();
-
-
-
-    int index;
-    QSharedPointer<QGLMaterialCollection> palette = builder.sceneNode()->palette();
-
-    QGLMaterial *matLH = new QGLMaterial();
-    matLH->setDiffuseColor(Qt::white);
-    index = palette->addMaterial(matLH);
-    leftHemisphere->setMaterialIndex(index);
-
-    QGLMaterial *matRH = new QGLMaterial();
-    matRH->setDiffuseColor(Qt::yellow);
-    index = palette->addMaterial(matRH);
-    rightHemisphere->setMaterialIndex(index);
-
-    scene = builder.finalizedSceneNode();
-
-    scene->setParent(this);
-
-    hemisphereLightModel = new QGLLightModel(this);
-    hemisphereLightModel->setAmbientSceneColor(Qt::white);
-    hemisphereLightModel->setViewerPosition(QGLLightModel::LocalViewer);
-
-    hemisphereLightModel = new QGLLightModel(this);
-
-    lightParameters = new QGLLightParameters(this);
-    lightParameters->setPosition(QVector3D(0.0f, 0.0f, 3.0f));
-    painter->setMainLight(lightParameters);
-
-//    if (stereo) {
-        this->setStereoType(QGLView::RedCyanAnaglyph);
-        camera()->setEyeSeparation(0.4f);
-        hemisphereFrontalCamera->setEyeSeparation(0.1f);
-//    }
 
 }
 
@@ -170,17 +181,20 @@ void GeometryView::initializeGL(QGLPainter *painter)
 
 void GeometryView::paintGL(QGLPainter *painter)
 {
-//    painter->modelViewMatrix().rotate(45.0f, 1.0f, 1.0f, 1.0f);
+    if(t_ForwardSolution)
+    {
+    //    painter->modelViewMatrix().rotate(45.0f, 1.0f, 1.0f, 1.0f);
 
-    painter->modelViewMatrix().push();
-    painter->projectionMatrix().push();
+        painter->modelViewMatrix().push();
+        painter->projectionMatrix().push();
 
-    painter->setStandardEffect(QGL::LitMaterial);
-//    painter->setCamera(hemisphereFrontalCamera);
-    painter->setLightModel(hemisphereLightModel);
+        painter->setStandardEffect(QGL::LitMaterial);
+    //    painter->setCamera(hemisphereFrontalCamera);
+        painter->setLightModel(hemisphereLightModel);
 
-    hemisphere->draw(painter);
+        hemisphere->draw(painter);
 
-    painter->modelViewMatrix().pop();
-    painter->projectionMatrix().pop();
+        painter->modelViewMatrix().pop();
+        painter->projectionMatrix().pop();
+    }
 }
