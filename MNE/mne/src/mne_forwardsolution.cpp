@@ -108,7 +108,8 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFile, MNEForwardSolut
     FiffDirTree* t_pTree = NULL;
 
     printf("Reading forward solution from %s...\n", p_sFile.toUtf8().constData());
-    FIFFLIB::Fiff::open(p_sFile, t_pFile, t_pTree, t_pDir);
+    if(!FIFFLIB::Fiff::open(p_sFile, t_pFile, t_pTree, t_pDir))
+        return false;
 
     //
     //   Find all forward solutions
