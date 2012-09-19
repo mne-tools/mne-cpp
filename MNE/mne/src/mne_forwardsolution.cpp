@@ -92,10 +92,12 @@ MNEForwardSolution::MNEForwardSolution(MNEForwardSolution* p_pMNEForwardSolution
 
 MNEForwardSolution::~MNEForwardSolution()
 {
-    qDebug() << "Destructor MNEForwardSolution";
-    delete sol;
-    delete sol_grad;
-    delete src;
+    if(sol)
+        delete sol;
+    if(sol_grad)
+        delete sol_grad;
+    if(src)
+        delete src;
 }
 
 
@@ -121,9 +123,12 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFile, MNEForwardSolut
         t_pFile->close();
         std::cout << "No forward solutions in " << p_sFile.toUtf8().constData(); // ToDo throw error
         //garbage collecting
-        delete t_pDir;
-        delete t_pTree;
-        delete t_pFile;
+        if(t_pDir)
+            delete t_pDir;
+        if(t_pTree)
+            delete t_pTree;
+        if(t_pFile)
+            delete t_pFile;
         return false;
     }
     //
@@ -134,9 +139,13 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFile, MNEForwardSolut
     {
         t_pFile->close();
         std::cout << "No parent MRI information in " << p_sFile.toUtf8().constData(); // ToDo throw error
-        delete t_pDir;
-        delete t_pTree;
-        delete t_pFile;
+        //garbage collecting
+        if(t_pDir)
+            delete t_pDir;
+        if(t_pTree)
+            delete t_pTree;
+        if(t_pFile)
+            delete t_pFile;
         return false;
     }
 
@@ -146,10 +155,15 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFile, MNEForwardSolut
         t_pFile->close();
         std::cout << "Could not read the source spaces\n"; // ToDo throw error
         //ToDo error(me,'Could not read the source spaces (%s)',mne_omit_first_line(lasterr));
-        delete t_pDir;
-        delete t_pTree;
-        delete t_pFile;
-        delete t_pSourceSpace;
+        //garbage collecting
+        if(t_pDir)
+            delete t_pDir;
+        if(t_pTree)
+            delete t_pTree;
+        if(t_pFile)
+            delete t_pFile;
+        if(t_pSourceSpace)
+            delete t_pSourceSpace;
         return false;
     }
 
@@ -175,20 +189,25 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFile, MNEForwardSolut
         {
             t_pFile->close();
             std::cout << "Methods not listed for one of the forward solutions\n"; // ToDo throw error
-            delete t_pDir;
-            delete t_pTree;
-            delete t_pFile;
-            delete t_pSourceSpace;
+            //garbage collecting
+            if(t_pDir)
+                delete t_pDir;
+            if(t_pTree)
+                delete t_pTree;
+            if(t_pFile)
+                delete t_pFile;
+            if(t_pSourceSpace)
+                delete t_pSourceSpace;
             return false;
         }
         if (*t_pTag->toInt() == FIFFV_MNE_MEG)
         {
-            qDebug() << "MEG solution found";
+            printf("MEG solution found\n");
             megnode = fwds.at(k);
         }
         else if(*t_pTag->toInt() == FIFFV_MNE_EEG)
         {
-            qDebug() << "EEG solution found";
+            printf("EEG solution found\n");
             eegnode = fwds.at(k);
         }
     }
@@ -229,10 +248,15 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFile, MNEForwardSolut
         {
             t_pFile->close();
             std::cout << "The MEG and EEG forward solutions do not match\n"; // ToDo throw error
-            delete t_pDir;
-            delete t_pTree;
-            delete t_pFile;
-            delete t_pSourceSpace;
+            //garbage collecting
+            if(t_pDir)
+                delete t_pDir;
+            if(t_pTree)
+                delete t_pTree;
+            if(t_pFile)
+                delete t_pFile;
+            if(t_pSourceSpace)
+                delete t_pSourceSpace;
             return false;
         }
 
@@ -258,9 +282,9 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFile, MNEForwardSolut
         printf("\tMEG and EEG forward solutions combined\n");
     }
     else if (megfwd)
-        fwd = new MNEForwardSolution(megfwd);
+        fwd = megfwd; //new MNEForwardSolution(megfwd);//not copied for the sake of speed
     else
-        fwd = new MNEForwardSolution(eegfwd);
+        fwd = eegfwd; //new MNEForwardSolution(eegfwd);//not copied for the sake of speed
 
     //
     //   Get the MRI <-> head coordinate transformation
@@ -269,11 +293,17 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFile, MNEForwardSolut
     {
         t_pFile->close();
         std::cout << "MRI/head coordinate transformation not found\n"; // ToDo throw error
-        delete t_pDir;
-        delete t_pTree;
-        delete t_pFile;
-        delete t_pSourceSpace;
-        delete t_pTag;
+        //garbage collecting
+        if(t_pDir)
+            delete t_pDir;
+        if(t_pTree)
+            delete t_pTree;
+        if(t_pFile)
+            delete t_pFile;
+        if(t_pSourceSpace)
+            delete t_pSourceSpace;
+        if(t_pTag)
+            delete t_pTag;
         return false;
     }
     else
@@ -293,21 +323,23 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFile, MNEForwardSolut
             {
                 t_pFile->close();
                 std::cout << "MRI/head coordinate transformation not found\n"; // ToDo throw error
-                delete t_pDir;
-                delete t_pTree;
-                delete t_pFile;
-                delete t_pSourceSpace;
-                delete t_pTag;
+                //garbage collecting
+                if(t_pDir)
+                    delete t_pDir;
+                if(t_pTree)
+                    delete t_pTree;
+                if(t_pFile)
+                    delete t_pFile;
+                if(t_pSourceSpace)
+                    delete t_pSourceSpace;
+                if(t_pTag)
+                    delete t_pTag;
                 return false;
             }
         }
     }
     t_pFile->close();
-//        delete t_pDir; // something is going wrong here
-//        delete t_pTree;
-//        delete t_pFile;
-//        delete t_pSourceSpace;
-//        delete t_pTag;
+
     //
     //   Transform the source spaces to the correct coordinate frame
     //   if necessary
@@ -328,7 +360,7 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFile, MNEForwardSolut
         throw("Source spaces do not match the forward solution.\n");
 
     printf("\tSource spaces transformed to the forward solution coordinate frame\n");
-    fwd->src = t_pSourceSpace;
+    fwd->src = t_pSourceSpace; //not new MNESourceSpace(t_pSourceSpace); for sake of speed
     //
     //   Handle the source locations and orientations
     //
@@ -573,16 +605,23 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFile, MNEForwardSolut
     }
 
     //garbage collecting
-//        delete megfwd;
-//        delete eegfwd;
-
-//        delete t_pTag;
-//        delete t_pSourceSpace;
-
     t_pFile->close();
-//        delete t_pDir;
-//        delete t_pTree;
-//        delete t_pFile;
+
+    //garbage collecting
+//    if (megfwd)
+//        delete megfwd; // don't delete the megfwd because fwd->src is pointing to source space (not copied for the sake of speed)
+//    if (eegfwd)
+//        delete eegfwd; // don't delete the eegfwd because fwd->src is pointing to source space (not copied for the sake of speed)
+    if(t_pDir)
+        delete t_pDir;
+    if(t_pTree)
+        delete t_pTree;
+    if(t_pFile)
+        delete t_pFile;
+//    if(t_pSourceSpace)
+//        delete t_pSourceSpace; // don't delete the SourceSpace because fwd->src is pointing to source space (not copied for the sake of speed)
+    if(t_pTag)
+        delete t_pTag;
 
     return true;
 }

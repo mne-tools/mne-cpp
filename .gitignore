@@ -33,3 +33,7 @@
 /examples/readFwd/interfaces/IPlugin.h.bak
 /bin/*.manifest
 /lib/*.manifest
+/bin/*.rc
+/bin/*.res
+/lib/*.rc
+/lib/*.res
