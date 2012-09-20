@@ -529,7 +529,6 @@ void FiffTag::swap_doublep(double *source)
 //*************************************************************************************************************
 
 void FiffTag::convert_ch_pos(fiffChPos pos)
-
 {
     int k;
     pos->coil_type  = swap_int(pos->coil_type);
@@ -718,6 +717,7 @@ void FiffTag::fiff_convert_tag_data(FiffTag* tag, int from_endian, int to_endian
 {
     int            np;
     int            k,r;//,c;
+    int            offset = 0;
     fiff_int_t     *ithis;
     fiff_short_t   *sthis;
     fiff_long_t    *lthis;
@@ -725,7 +725,7 @@ void FiffTag::fiff_convert_tag_data(FiffTag* tag, int from_endian, int to_endian
     double         *dthis;
     fiffDirEntry   dethis;
     fiffId         idthis;
-    fiffChInfoRec* chthis;//fiffChInfo     chthis;
+//    fiffChInfoRec* chthis;//FiffChInfo*     chthis;//ToDo adapt parsing to the new class
     fiffChPos      cpthis;
 //    fiffCoordTrans ctthis;
     fiffDigPoint   dpthis;
@@ -825,17 +825,36 @@ void FiffTag::fiff_convert_tag_data(FiffTag* tag, int from_endian, int to_endian
         break;
 
     case FIFFT_CH_INFO_STRUCT :
-        np = tag->size/sizeof(fiffChInfoRec);
-        for (chthis = (fiffChInfoRec*)tag->data, k = 0; k < np; k++, chthis++) {
-            chthis->scanNo    = swap_int(chthis->scanNo);
-            chthis->logNo     = swap_int(chthis->logNo);
-            chthis->kind      = swap_int(chthis->kind);
-            swap_floatp(&chthis->range);
-            swap_floatp(&chthis->cal);
-            chthis->unit      = swap_int(chthis->unit);
-            chthis->unit_mul  = swap_int(chthis->unit_mul);
-            convert_ch_pos(&(chthis->chpos));
+//        np = tag->size/sizeof(fiffChInfoRec);
+//        for (chthis = (fiffChInfoRec*)tag->data, k = 0; k < np; k++, chthis++) {
+//            chthis->scanNo    = swap_int(chthis->scanNo);
+//            chthis->logNo     = swap_int(chthis->logNo);
+//            chthis->kind      = swap_int(chthis->kind);
+//            swap_floatp(&chthis->range);
+//            swap_floatp(&chthis->cal);
+//            chthis->unit      = swap_int(chthis->unit);
+//            chthis->unit_mul  = swap_int(chthis->unit_mul);
+//            convert_ch_pos(&(chthis->chpos));
+//        }
+
+        ithis = static_cast< fiff_int_t* >(tag->data);
+        fthis = static_cast< float* >(tag->data);
+        np = tag->size/FiffChInfo::size();
+        for (k = 0; k < np; k++) {
+            offset = k*FiffChInfo::size();
+
+            ithis[0+offset] = swap_int(ithis[0+offset]);//scanno
+            ithis[1+offset] = swap_int(ithis[1+offset]);//logno
+            ithis[2+offset] = swap_int(ithis[2+offset]); //kind
+            swap_floatp(&fthis[3+offset]); //range
+            swap_floatp(&fthis[4+offset]); //cal
+            ithis[5+offset] = swap_int(ithis[5+offset]); //coil_type
+            for (r = 0; r < 12; ++r)
+                swap_floatp(&fthis[6+r+offset]); //loc
+            ithis[18+offset] = swap_int(ithis[18+offset]); //unit
+            ithis[19+offset] = swap_int(ithis[19+offset]); //unit_mul
         }
+
         break;
 
     case FIFFT_CH_POS_STRUCT :

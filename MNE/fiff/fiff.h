@@ -251,47 +251,50 @@ public:
         fiff_int_t meas_date_first = -1;
         fiff_int_t meas_date_second = -1;
 
+        fiff_int_t kind = -1;
+        fiff_int_t pos = -1;
+
         for (qint32 k = 0; k < meas_info.at(0)->nent; ++k)
         {
-            fiff_int_t kind = meas_info.at(0)->dir.at(k).kind;
-            fiff_int_t pos  = meas_info.at(0)->dir.at(k).pos;
+            kind = meas_info.at(0)->dir.at(k).kind;
+            pos  = meas_info.at(0)->dir.at(k).pos;
             switch (kind)
             {
                 case FIFF_NCHAN:
                     FiffTag::read_tag(p_pFile, t_pTag, pos);
-                    qDebug() << "FIFF_NCHAN" << t_pTag->getType();
+                    //qDebug() << "FIFF_NCHAN" << t_pTag->getType();
                     nchan = *t_pTag->toInt();
                     break;
                 case FIFF_SFREQ:
                     FiffTag::read_tag(p_pFile, t_pTag, pos);
-                    qDebug() << "FIFF_SFREQ" << t_pTag->getType();
+                    //qDebug() << "FIFF_SFREQ" << t_pTag->getType();
                     sfreq = *t_pTag->toFloat();
                     break;
                 case FIFF_CH_INFO:
                     FiffTag::read_tag(p_pFile, t_pTag, pos);
-                    qDebug() << "FIFF_CH_INFO" << t_pTag->getType();
+                    //qDebug() << "FIFF_CH_INFO" << t_pTag->getType();
                     chs.append( t_pTag->toChInfo() );
                     break;
                 case FIFF_LOWPASS:
                     FiffTag::read_tag(p_pFile, t_pTag, pos);
-                    qDebug() << "FIFF_LOWPASS" << t_pTag->getType();
+                    //qDebug() << "FIFF_LOWPASS" << t_pTag->getType();
                     lowpass = *t_pTag->toFloat();
                     break;
                 case FIFF_HIGHPASS:
                     FiffTag::read_tag(p_pFile, t_pTag, pos);
-                    qDebug() << "FIFF_HIGHPASS" << t_pTag->getType();
+                    //qDebug() << "FIFF_HIGHPASS" << t_pTag->getType();
                     highpass = *t_pTag->toFloat();
                     break;
                 case FIFF_MEAS_DATE:
                     FiffTag::read_tag(p_pFile, t_pTag, pos);
-                    qDebug() << "FIFF_MEAS_DATE" << t_pTag->getType();
+                    //qDebug() << "FIFF_MEAS_DATE" << t_pTag->getType();
                     meas_date_first = t_pTag->toInt()[0];
                     meas_date_second = t_pTag->toInt()[1];
                     break;
                 case FIFF_COORD_TRANS:
                     //This has to be debugged!!
                     FiffTag::read_tag(p_pFile, t_pTag, pos);
-                    qDebug() << "FIFF_COORD_TRANS" << t_pTag->getType();
+                    //qDebug() << "FIFF_COORD_TRANS" << t_pTag->getType();
                     cand = t_pTag->toCoordTrans();
                     if(cand.from == FIFFV_COORD_DEVICE && cand.to == FIFFV_COORD_HEAD)
                         dev_head_t = cand;
@@ -303,108 +306,128 @@ public:
         //
         //   Check that we have everything we need
         //
-//        if (nchan < 0)
-//        {
-//            printf('Number of channels in not defined\n');
-//            return false;
-//        }
-//        if (sfreq < 0)
-//        {
-//            printf('Sampling frequency is not defined\n');
-//            return false;
-//        }
-//        if (chs.size() == 0)
-//        {
-//            printf('Channel information not defined\n');
-//            return false;
-//        }
-//        if (chs.size() != nchan)
-//        {
-//            printf('Incorrect number of channel definitions found\n');
-//            return false;
-//        }
+        if (nchan < 0)
+        {
+            printf("Number of channels in not defined\n");
+            return false;
+        }
+        if (sfreq < 0)
+        {
+            printf("Sampling frequency is not defined\n");
+            return false;
+        }
+        if (chs.size() == 0)
+        {
+            printf("Channel information not defined\n");
+            return false;
+        }
+        if (chs.size() != nchan)
+        {
+            printf("Incorrect number of channel definitions found\n");
+            return false;
+        }
 
 
-//        if isempty(dev_head_t) || isempty(ctf_head_t)
-//            hpi_result = fiff_dir_tree_find(meas_info,FIFF.FIFFB_HPI_RESULT);
-//            if length(hpi_result) == 1
-//                for k = 1:hpi_result.nent
-//                    kind = hpi_result.dir(k).kind;
-//                    pos  = hpi_result.dir(k).pos;
-//                    if kind == FIFF.FIFF_COORD_TRANS
-//                        tag = fiff_read_tag(fid,pos);
-//                        cand = tag.data;
-//                        if cand.from == FIFF.FIFFV_COORD_DEVICE && ...
-//                                cand.to == FIFF.FIFFV_COORD_HEAD
-//                            dev_head_t = cand;
-//                        elseif cand.from == FIFF.FIFFV_MNE_COORD_CTF_HEAD && ...
-//                                cand.to == FIFF.FIFFV_COORD_HEAD
-//                            ctf_head_t = cand;
-//                        end
-//                    end
-//                end
-//            end
-//        end
-//        %
-//        %   Locate the Polhemus data
-//        %
-//        isotrak = fiff_dir_tree_find(meas_info,FIFF.FIFFB_ISOTRAK);
+        if ((dev_head_t.from == -1) || (ctf_head_t.from == -1)) //if isempty(dev_head_t) || isempty(ctf_head_t)
+        {
+            QList<FiffDirTree*> hpi_result = meas_info.at(0)->dir_tree_find(FIFFB_HPI_RESULT);
+            if (hpi_result.size() == 1)
+            {
+                for( qint32 k = 0; k < hpi_result.at(0)->nent; ++k)
+                {
+                    kind = hpi_result.at(0)->dir.at(k).kind;
+                    pos  = hpi_result.at(0)->dir.at(k).pos;
+                    if (kind == FIFF_COORD_TRANS)
+                    {
+                        FiffTag::read_tag(p_pFile, t_pTag, pos);
+                        cand = t_pTag->toCoordTrans();
+                        if (cand.from == FIFFV_COORD_DEVICE && cand.to == FIFFV_COORD_HEAD)
+                            dev_head_t = cand;
+                        else if (cand.from == FIFFV_MNE_COORD_CTF_HEAD && cand.to == FIFFV_COORD_HEAD)
+                            ctf_head_t = cand;
+                    }
+                }
+            }
+        }
+        //
+        //   Locate the Polhemus data
+        //
+        QList<FiffDirTree*> isotrak = meas_info.at(0)->dir_tree_find(FIFFB_ISOTRAK);
 
-//        dig=struct('kind',{},'ident',{},'r',{},'coord_frame',{});
-//        coord_frame = FIFF.FIFFV_COORD_HEAD;
-//        if length(isotrak) == 1
-//            p = 0;
-//            for k = 1:isotrak.nent
-//                kind = isotrak.dir(k).kind;
-//                pos  = isotrak.dir(k).pos;
-//                if kind == FIFF.FIFF_DIG_POINT
-//                    p = p + 1;
-//                    tag = fiff_read_tag(fid,pos);
-//                    dig(p) = tag.data;
-//                else
-//                    if kind == FIFF.FIFF_MNE_COORD_FRAME
-//                        tag = fiff_read_tag(fid,pos);
-//                        coord_frame = tag.data;
-//                    elseif kind == FIFF.FIFF_COORD_TRANS
-//                        tag = fiff_read_tag(fid,pos);
-//                        dig_trans = tag.data;
-//                    end
-//                end
-//            end
-//        end
-//        for k = 1:length(dig)
-//            dig(k).coord_frame = coord_frame;
-//        end
+        QList<fiff_dig_point_t> dig;// = struct('kind',{},'ident',{},'r',{},'coord_frame',{});
+        fiff_int_t coord_frame = FIFFV_COORD_HEAD;
+        FiffCoordTrans dig_trans;
+        qint32 k = 0;
 
-//        if exist('dig_trans','var')
-//            if (dig_trans.from ~= coord_frame && dig_trans.to ~= coord_frame)
-//                clear('dig_trans');
-//            end
-//        end
-//        %
-//        %   Locate the acquisition information
-//        %
-//        acqpars = fiff_dir_tree_find(meas_info,FIFF.FIFFB_DACQ_PARS);
-//        acq_pars = [];
-//        acq_stim = [];
-//        if length(acqpars) == 1
-//            for k = 1:acqpars.nent
-//                kind = acqpars.dir(k).kind;
-//                pos  = acqpars.dir(k).pos;
-//                if kind == FIFF.FIFF_DACQ_PARS
-//                    tag = fiff_read_tag(fid,pos);
-//                    acq_pars = tag.data;
-//                else if kind == FIFF.FIFF_DACQ_STIM
-//                        tag = fiff_read_tag(fid,pos);
-//                        acq_stim = tag.data;
-//                    end
-//                end
-//            end
-//        end
-//        %
-//        %   Load the SSP data
-//        %
-//        projs = fiff_read_proj(fid,meas_info);
+        if (isotrak.size() == 1)
+        {
+            for (k = 0; k < isotrak.at(0)->nent; ++k)
+            {
+                kind = isotrak.at(0)->dir.at(k).kind;
+                pos  = isotrak.at(0)->dir.at(k).pos;
+                if (kind == FIFF_DIG_POINT)
+                {
+                    FiffTag::read_tag(p_pFile, t_pTag, pos);
+                    dig.append(t_pTag->toDigPoint());
+                }
+                else
+                {
+                    if (kind == FIFF_MNE_COORD_FRAME)
+                    {
+                        FiffTag::read_tag(p_pFile, t_pTag, pos);
+                        qDebug() << "NEEDS To BE DEBBUGED: FIFF_MNE_COORD_FRAME" << t_pTag->getType();
+                        coord_frame = *t_pTag->toInt();
+                    }
+                    else if (kind == FIFF_COORD_TRANS)
+                    {
+                        FiffTag::read_tag(p_pFile, t_pTag, pos);
+                        qDebug() << "NEEDS To BE DEBBUGED: FIFF_COORD_TRANS" << t_pTag->getType();
+                        dig_trans = t_pTag->toCoordTrans();
+                    }
+                }
+            }
+        }
+        for(k = 0; k < dig.size(); ++k)
+            dig[k].coord_frame = coord_frame;
+
+        if (dig_trans.from != -1) //if exist('dig_trans','var')
+        {
+            if (dig_trans.from != coord_frame && dig_trans.to != coord_frame)
+            {
+                FiffCoordTrans tmpEmptyTrans;
+                dig_trans = tmpEmptyTrans; //clear('dig_trans');
+
+            }
+        }
+
+        //
+        //   Locate the acquisition information
+        //
+        QList<FiffDirTree*> acqpars = meas_info.at(0)->dir_tree_find(FIFFB_DACQ_PARS);
+        QString acq_pars;
+        QString acq_stim;
+        if (acqpars.size() == 1)
+        {
+            for( k = 0; k < acqpars.at(0)->nent; ++k)
+            {
+                kind = acqpars.at(0)->dir.at(k).kind;
+                pos  = acqpars.at(0)->dir.at(k).pos;
+                if (kind == FIFF_DACQ_PARS)
+                {
+                    FiffTag::read_tag(p_pFile, t_pTag, pos);
+                    acq_pars = t_pTag->toString();
+                }
+                else if (kind == FIFF_DACQ_STIM)
+                {
+                    FiffTag::read_tag(p_pFile, t_pTag, pos);
+                    acq_stim = t_pTag->toString();
+                }
+            }
+        }
+        //
+        //   Load the SSP data
+        //
+        bool projs = Fiff::read_proj(p_pFile,meas_info.at(0));
 //        %
 //        %   Load the CTF compensation data
 //        %
@@ -512,6 +535,140 @@ public:
     * ### MNE toolbox root function ###
     */
     static bool read_named_matrix(QFile* p_pFile, FiffDirTree* node, fiff_int_t matkind, FiffSolution*& mat);
+
+
+    //=========================================================================================================
+    /**
+    *
+    * ToDo make this member of FiffDirTree
+    * ### MNE toolbox root function ###
+    *
+    * [ projdata ] = fiff_read_proj(fid,node)
+    *
+    * Read the SSP data under a given directory node
+    *
+    */
+    static bool read_proj(QFile* p_pFile, FiffDirTree* node)
+    {
+//        projdata = struct('kind',{},'active',{},'desc',{},'data',{});
+        //
+        //   Locate the projection data
+        //
+        QList<FiffDirTree*> nodes = node->dir_tree_find(FIFFB_PROJ);
+        if ( nodes.size() == 0 )
+            return false;
+
+
+        FIFFLIB::FiffTag* t_pTag = NULL;
+        nodes.at(0)->find_tag(p_pFile, FIFF_NCHAN, t_pTag);
+        fiff_int_t global_nchan;
+        if (t_pTag)
+            global_nchan = *t_pTag->toInt();
+
+
+        fiff_int_t nchan;
+        QList<FiffDirTree*> items = nodes.at(0)->dir_tree_find(FIFFB_PROJ_ITEM);
+        for ( qint32 i = 0; i < items.size(); ++i)
+        {
+            //
+            //   Find all desired tags in one item
+            //
+            FiffDirTree* item = items[i];
+            item->find_tag(p_pFile, FIFF_NCHAN, t_pTag);
+            if (t_pTag)
+                nchan = *t_pTag->toInt();
+            else
+                nchan = global_nchan;
+
+            item->find_tag(p_pFile, FIFF_DESCRIPTION, t_pTag);
+//            if (t_pTag)
+//                desc = tag.data;
+//            else
+//                tag = find_tag(item,FIFF.FIFF_NAME);
+//                if ~isempty(tag)
+//                    desc = tag.data;
+//                else
+//                    error(me,'Projection item description missing');
+//                end
+//            end
+//            tag = find_tag(item,FIFF.FIFF_PROJ_ITEM_CH_NAME_LIST);
+//            if ~isempty(tag)
+//                namelist = tag.data;
+//            else
+//                error(me,'Projection item channel list missing');
+//            end
+//            tag = find_tag(item,FIFF.FIFF_PROJ_ITEM_KIND);
+//            if ~isempty(tag)
+//                kind = tag.data;
+//            else
+//                error(me,'Projection item kind missing');
+//            end
+//            tag = find_tag(item,FIFF.FIFF_PROJ_ITEM_NVEC);
+//            if ~isempty(tag)
+//                nvec = tag.data;
+//            else
+//                error(me,'Number of projection vectors not specified');
+//            end
+//            tag = find_tag(item,FIFF.FIFF_PROJ_ITEM_CH_NAME_LIST);
+//            if ~isempty(tag)
+//                names = fiff_split_name_list(tag.data);
+//            else
+//                error(me,'Projection item channel list missing');
+//            end
+//            tag = find_tag(item,FIFF.FIFF_PROJ_ITEM_VECTORS);
+//            if ~isempty(tag)
+//                data = tag.data;
+//            else
+//                error(me,'Projection item data missing');
+//            end
+//            tag = find_tag(item,FIFF.FIFF_MNE_PROJ_ITEM_ACTIVE);
+//            if ~isempty(tag)
+//                active = tag.data;
+//            else
+//                active = false;
+//            end
+//            if size(data,2) ~= length(names)
+//                error(me,'Number of channel names does not match the size of data matrix');
+//            end
+//            one.kind           = kind;
+//            one.active         = active;
+//            one.desc           = desc;
+//            %
+//            %   Use exactly the same fields in data as in a named matrix
+//            %
+//            one.data.nrow      = nvec;
+//            one.data.ncol      = nchan;
+//            one.data.row_names = [];
+//            one.data.col_names = names;
+//            one.data.data      = data;
+//            %
+//            projdata(i) = one;
+        }
+
+//        if length(projdata) > 0
+//            fprintf(1,'\tRead a total of %d projection items:\n', ...
+//                length(projdata));
+//            for k = 1:length(projdata)
+//                fprintf(1,'\t\t%s (%d x %d)',projdata(k).desc, ...
+//                    projdata(k).data.nrow,projdata(k).data.ncol);
+//                if projdata(k).active
+//                    fprintf(1,' active\n');
+//                else
+//                    fprintf(1,' idle\n');
+//                end
+//            end
+//        end
+
+
+        return true;
+    }
+
+
+
+
+
+
+
 
 
     //=========================================================================================================

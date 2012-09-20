@@ -55,8 +55,8 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 FiffCoordTrans::FiffCoordTrans()
-: from(0)
-, to(0)
+: from(-1)
+, to(-1)
 , trans(MatrixXf::Identity(4,4))
 , invtrans(MatrixXf::Identity(4,4))
 {
