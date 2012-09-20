@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiff_coord_trans.cpp
+* @file     fiff_ch_info.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the FiffCoordTrans Class.
+* @brief    Contains the implementation of the FiffChInfo Class.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../include/fiff_coord_trans.h"
+#include "../include/fiff_ch_info.h"
 
 
 //*************************************************************************************************************
@@ -54,35 +54,27 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FiffCoordTrans::FiffCoordTrans()
-: from(0)
-, to(0)
-, trans(MatrixXf::Identity(4,4))
-, invtrans(MatrixXf::Identity(4,4))
+FiffChInfo::FiffChInfo()
+: scanno(0)
+, logno(0)
+, kind(0)
+, range(0.0f)
+, cal(0.0f)
+, coil_type(0)
+, coord_frame(FIFFV_COORD_UNKNOWN)
+, unit(0)
+, unit_mul(0)
+, ch_name(QString(""))
 {
+    loc.setZero();
+    coil_trans.setZero();
+    eeg_loc.setZero();
 }
 
 
 //*************************************************************************************************************
 
-FiffCoordTrans::~FiffCoordTrans()
+FiffChInfo::~FiffChInfo()
 {
 
-}
-
-
-//*************************************************************************************************************
-
-bool FiffCoordTrans::invert_transform(FiffCoordTrans* p_pTransform)
-{
-    if (p_pTransform == NULL)
-        return false;
-
-    fiff_int_t from_new = p_pTransform->to;
-    p_pTransform->to    = p_pTransform->from;
-    p_pTransform->from  = from_new;
-    p_pTransform->trans = p_pTransform->trans.inverse();
-    p_pTransform->invtrans = p_pTransform->invtrans.inverse();
-
-    return true;
 }

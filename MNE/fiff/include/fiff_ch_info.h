@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiff_coord_trans.h
+* @file     fiff_ch_info_rec.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the FiffCoordTrans class declaration.
+* @brief    Contains the FiffChInfoRec class declaration.
 *
 */
 
-#ifndef FIFF_COORD_TRANS_H
-#define FIFF_COORD_TRANS_H
+#ifndef FIFF_CH_INFO_H
+#define FIFF_CH_INFO_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -51,7 +51,6 @@
 //=============================================================================================================
 
 #include "../../../include/3rdParty/Eigen/Core"
-#include "../../../include/3rdParty/Eigen/LU"
 
 
 //*************************************************************************************************************
@@ -72,73 +71,74 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FiffCoordTrans, replaces fiffCoordTransRec which had a size of 104
+* DECLARE CLASS FiffChInfo, replaces fiffChInfoRec which had a size of ...
 *
-* Coordinate transformation descriptor
+* Channel Info descriptor
 *
-*typedef struct _fiffCoordTransRec {
-* fiff_int_t   from;                    /< Source coordinate system. /
-* fiff_int_t   to;                      /< Destination coordinate system. /
-* fiff_float_t rot[3][3];               /< The forward transform (rotation part) /
-* fiff_float_t move[3];                 /< The forward transform (translation part) /
-* fiff_float_t invrot[3][3];            /< The inverse transform (rotation part) /
-* fiff_float_t invmove[3];              /< The inverse transform (translation part) /
-*} *fiffCoordTrans, fiffCoordTransRec;  /< Coordinate transformation descriptor /
+* typedef struct _fiffChInfoRec {
+*     fiff_int_t    scanNo;		/**< Scanning order number *
+*     fiff_int_t    logNo;		/**< Logical channel # *
+*     fiff_int_t    kind;			/**< Kind of channel *
+*     fiff_float_t  range;		/**< Voltmeter range (-1 = auto ranging) *
+*     fiff_float_t  cal;			/**< Calibration from volts to units used *
+*     fiff_ch_pos_t chpos;		/**< Channel location *
+*     fiff_int_t    unit;			/**< Unit of measurement *
+*     fiff_int_t    unit_mul;		/**< Unit multiplier exponent *
+*     fiff_char_t   ch_name[16];	/**< Descriptive name for the channel *
+* } fiffChInfoRec,*fiffChInfo;	/**< Description of one channel *
 *
-* typedef fiffCoordTransRec fiff_coord_trans_t;
+* /** Alias for fiffChInfoRec *
+* typedef fiffChInfoRec fiff_ch_info_t;
 *
-* @brief The FiffCoordTrans class provides the coordinate transformation description
+* @brief The FiffChInfo class provides the channel info descriptor
 */
-class FIFFSHARED_EXPORT FiffCoordTrans {
+class FIFFSHARED_EXPORT FiffChInfo {
 
 public:
     //=========================================================================================================
     /**
     * ctor
     */
-    FiffCoordTrans();
+    FiffChInfo();
 
 
     //=========================================================================================================
     /**
-    * Destroys the fiffTag.
+    * Destroys the FiffChInfoRec.
     */
-    ~FiffCoordTrans();
-
-
-    //=========================================================================================================
-    /**
-    * ### MNE toolbox root function ###: implementation of the fiff_invert_transform function
-    *
-    * Invert a coordinate transformation
-    * (actual obsolete - cause trans and inverse are both stored)
-    *
-    * @param[in] p_pTransform the transformation which should be inverted
-    *
-    * @return true if succeeded, false otherwise
-    */
-    static bool invert_transform(FiffCoordTrans* p_pTransform);
-
+    ~FiffChInfo();
 
     //=========================================================================================================
     /**
-    * Size of the old struct (fiffCoordTransRec) 26*int = 26*4 = 104
+    * Size of the old struct (fiffChInfoRec) 20*int + 16 = 20*4 + 16 = 96
     *
-    * @return the size of the old struct fiffCoordTransRec.
+    * @return the size of the old struct fiffChInfoRec.
     */
     inline static qint32 size()
     {
-        return 104;
+        return 96;
     }
 
 public:
-    fiff_int_t  from;   /**< Source coordinate system. */
-    fiff_int_t  to;     /**< Destination coordinate system. */
-    Matrix<float, 4,4>    trans;  /**< The forward transform */
-    Matrix<float, 4,4>    invtrans; /**< The inverse transform */
+    fiff_int_t    scanno;       /**< Scanning order number 1*/
+    fiff_int_t    logno;        /**< Logical channel # 1*/
+    fiff_int_t    kind;         /**< Kind of channel 1*/
+    fiff_float_t  range;        /**< Voltmeter range (-1 = auto ranging) 1*/
+    fiff_float_t  cal;          /**< Calibration from volts to units used 1*/
 
+    fiff_int_t coil_type;       /**< Which kind of coil. */
+
+    Matrix<float,12,1>  loc;
+    Matrix<float,4,4>   coil_trans;  /**< Channel location */
+    Matrix<float,3,2>   eeg_loc;
+    fiff_int_t          coord_frame;
+
+    //    fiff_ch_pos_t chpos;        /**< Channel location 15*/
+    fiff_int_t    unit;         /**< Unit of measurement 1*/
+    fiff_int_t    unit_mul;     /**< Unit multiplier exponent 1*/
+    QString       ch_name;      /**< Descriptive name for the channel 16*/
 };
 
 } // NAMESPACE
 
-#endif // FIFF_COORD_TRANS_H
+#endif // FIFF_CH_INFO_H

@@ -138,8 +138,8 @@ public:
     *
     * Reads a forward solution from a fif file
     *
-    * @param [in] p_sFile       The name of the fif file
-    * @param [out] fwd A forward solution from a fif file
+    * @param [in] p_sFileName   The name of the fif file
+    * @param [out] fwd          A forward solution from a fif file
     * @param [in] force_fixed   Force fixed source orientation mode? (optional)
     * @param [in] surf_ori      Use surface based source coordinate system? (optional)
     * @param [in] include       Include these channels (optional)
@@ -147,7 +147,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_forward_solution(QString& p_sFile, MNEForwardSolution*& fwd, bool force_fixed = false, bool surf_ori = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
+    static bool read_forward_solution(QString& p_sFileName, MNEForwardSolution*& fwd, bool force_fixed = false, bool surf_ori = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
 
     //=========================================================================================================
     /**

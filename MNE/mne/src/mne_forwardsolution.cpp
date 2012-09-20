@@ -103,14 +103,14 @@ MNEForwardSolution::~MNEForwardSolution()
 
 //*************************************************************************************************************
 
-bool MNEForwardSolution::read_forward_solution(QString& p_sFile, MNEForwardSolution*& fwd, bool force_fixed, bool surf_ori, QStringList& include, QStringList& exclude)
+bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardSolution*& fwd, bool force_fixed, bool surf_ori, QStringList& include, QStringList& exclude)
 {
     QFile* t_pFile = NULL;
-    QList<fiff_dir_entry_t>* t_pDir = NULL;
     FiffDirTree* t_pTree = NULL;
+    QList<fiff_dir_entry_t>* t_pDir = NULL;
 
-    printf("Reading forward solution from %s...\n", p_sFile.toUtf8().constData());
-    if(!FIFFLIB::Fiff::open(p_sFile, t_pFile, t_pTree, t_pDir))
+    printf("Reading forward solution from %s...\n", p_sFileName.toUtf8().constData());
+    if(!FIFFLIB::Fiff::open(p_sFileName, t_pFile, t_pTree, t_pDir))
         return false;
 
     //
@@ -121,7 +121,7 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFile, MNEForwardSolut
     if (fwds.size() == 0)
     {
         t_pFile->close();
-        std::cout << "No forward solutions in " << p_sFile.toUtf8().constData(); // ToDo throw error
+        std::cout << "No forward solutions in " << p_sFileName.toUtf8().constData(); // ToDo throw error
         //garbage collecting
         if(t_pDir)
             delete t_pDir;
@@ -138,7 +138,7 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFile, MNEForwardSolut
     if (parent_mri.size() == 0)
     {
         t_pFile->close();
-        std::cout << "No parent MRI information in " << p_sFile.toUtf8().constData(); // ToDo throw error
+        std::cout << "No parent MRI information in " << p_sFileName.toUtf8().constData(); // ToDo throw error
         //garbage collecting
         if(t_pDir)
             delete t_pDir;

@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     readFwd.pro
+# @file     readRaw.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -38,20 +38,19 @@ TEMPLATE = app
 
 QT += core
 QT -= gui
-QT += 3d
 
 
 CONFIG   += console
 CONFIG   -= app_bundle
 
 CONFIG(debug, debug|release) {
-    TARGET = readFwdd
+    TARGET = readRawd
     LIBS += -L$$PWD/../../lib/ -lmned
     LIBS += -L$$PWD/../../lib/ -lfiffd
     DESTDIR = $$PWD/../../bin
 }
 else {
-    TARGET = readFwd
+    TARGET = readRaw
     LIBS += -L$$PWD/../../lib/ -lmne
     LIBS += -L$$PWD/../../lib/ -lfiff
     DESTDIR = $$PWD/../../bin
