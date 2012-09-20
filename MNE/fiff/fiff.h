@@ -236,21 +236,21 @@ public:
         //
         FIFFLIB::FiffTag* t_pTag = NULL;
 
-        fiff_int_t nchan = 0;
-        float sfreq = 0.0f;
+        fiff_int_t nchan = -1;
+        float sfreq = -1.0f;
         QList<FiffChInfo> chs;
         float lowpass = 0.0f;
         float highpass = 0.0f;
 
-        fiff_int_t meas_date_first = 0;
-        fiff_int_t meas_date_second = 0;
+        FiffChInfo t_chInfo;
 
-        FiffChInfo test;
+        FiffCoordTrans cand;
+        FiffCoordTrans dev_head_t;
+        FiffCoordTrans ctf_head_t;
 
-//        dev_head_t=[];
-//        ctf_head_t=[];
-//        meas_date=[];
-        fiff_int_t p = 0;
+        fiff_int_t meas_date_first = -1;
+        fiff_int_t meas_date_second = -1;
+
         for (qint32 k = 0; k < meas_info.at(0)->nent; ++k)
         {
             fiff_int_t kind = meas_info.at(0)->dir.at(k).kind;
@@ -268,11 +268,9 @@ public:
                     sfreq = *t_pTag->toFloat();
                     break;
                 case FIFF_CH_INFO:
-                    ++p;
                     FiffTag::read_tag(p_pFile, t_pTag, pos);
                     qDebug() << "FIFF_CH_INFO" << t_pTag->getType();
-                    test = t_pTag->toChInfo();
-                    //chs.append( test );
+                    chs.append( t_pTag->toChInfo() );
                     break;
                 case FIFF_LOWPASS:
                     FiffTag::read_tag(p_pFile, t_pTag, pos);
@@ -291,43 +289,40 @@ public:
                     meas_date_second = t_pTag->toInt()[1];
                     break;
                 case FIFF_COORD_TRANS:
+                    //This has to be debugged!!
                     FiffTag::read_tag(p_pFile, t_pTag, pos);
                     qDebug() << "FIFF_COORD_TRANS" << t_pTag->getType();
-//                    cand = tag.data;
-//                    if(cand.from == FIFF.FIFFV_COORD_DEVICE && cand.to == FIFF.FIFFV_COORD_HEAD)
-//                        dev_head_t = cand;
-//                    else if (cand.from == FIFF.FIFFV_MNE_COORD_CTF_HEAD && cand.to == FIFF.FIFFV_COORD_HEAD)
-//                        ctf_head_t = cand;
+                    cand = t_pTag->toCoordTrans();
+                    if(cand.from == FIFFV_COORD_DEVICE && cand.to == FIFFV_COORD_HEAD)
+                        dev_head_t = cand;
+                    else if (cand.from == FIFFV_MNE_COORD_CTF_HEAD && cand.to == FIFFV_COORD_HEAD)
+                        ctf_head_t = cand;
                     break;
             }
         }
-//        %
-//        %   Check that we have everything we need
-//        %
-//        if ~exist('nchan','var')
-//            if open_here
-//                fclose(fid);
-//            end
-//            error(me,'Number of channels in not defined');
-//        end
-//        if ~exist('sfreq','var')
-//            if open_here
-//                fclose(fid);
-//            end
-//            error(me,'Sampling frequency is not defined');
-//        end
-//        if ~exist('chs','var')
-//            if open_here
-//                fclose(fid);
-//            end
-//            error(me,'Channel information not defined');
-//        end
-//        if length(chs) ~= nchan
-//            if open_here
-//                fclose(fid);
-//            end
-//            error(me,'Incorrect number of channel definitions found');
-//        end
+        //
+        //   Check that we have everything we need
+        //
+//        if (nchan < 0)
+//        {
+//            printf('Number of channels in not defined\n');
+//            return false;
+//        }
+//        if (sfreq < 0)
+//        {
+//            printf('Sampling frequency is not defined\n');
+//            return false;
+//        }
+//        if (chs.size() == 0)
+//        {
+//            printf('Channel information not defined\n');
+//            return false;
+//        }
+//        if (chs.size() != nchan)
+//        {
+//            printf('Incorrect number of channel definitions found\n');
+//            return false;
+//        }
 
 
 //        if isempty(dev_head_t) || isempty(ctf_head_t)

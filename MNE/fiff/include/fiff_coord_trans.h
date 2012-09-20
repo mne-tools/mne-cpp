@@ -132,10 +132,11 @@ public:
     }
 
 public:
+    //EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     fiff_int_t  from;   /**< Source coordinate system. */
     fiff_int_t  to;     /**< Destination coordinate system. */
-    Matrix<float, 4,4>    trans;  /**< The forward transform */
-    Matrix<float, 4,4>    invtrans; /**< The inverse transform */
+    Matrix<float, 4,4, DontAlign>    trans;  /**< The forward transform */
+    Matrix<float, 4,4, DontAlign>    invtrans; /**< The inverse transform */
 
 };
 

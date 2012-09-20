@@ -120,6 +120,7 @@ public:
     }
 
 public:
+    //EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     fiff_int_t    scanno;       /**< Scanning order number 1*/
     fiff_int_t    logno;        /**< Logical channel # 1*/
     fiff_int_t    kind;         /**< Kind of channel 1*/
@@ -128,9 +129,9 @@ public:
 
     fiff_int_t coil_type;       /**< Which kind of coil. */
 
-    Matrix<float,12,1>  loc;
-    Matrix<float,4,4>   coil_trans;  /**< Channel location */
-    Matrix<float,3,2>   eeg_loc;
+    Matrix<float,12,1, DontAlign>  loc;
+    Matrix<float,4,4, DontAlign>   coil_trans;  /**< Channel location */
+    Matrix<float,3,2, DontAlign>   eeg_loc;
     fiff_int_t          coord_frame;
 
     //    fiff_ch_pos_t chpos;        /**< Channel location 15*/
