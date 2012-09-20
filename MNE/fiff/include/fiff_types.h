@@ -124,23 +124,6 @@ typedef struct _fiffChPosRec {
 
 typedef fiffChPosRec fiff_ch_pos_t;
 
-/** Description of one channel */
-
-typedef struct _fiffChInfoRec {
-    fiff_int_t    scanNo;		/**< Scanning order number */
-    fiff_int_t    logNo;		/**< Logical channel # */
-    fiff_int_t    kind;			/**< Kind of channel */
-    fiff_float_t  range;		/**< Voltmeter range (-1 = auto ranging) */
-    fiff_float_t  cal;			/**< Calibration from volts to units used */
-    fiff_ch_pos_t chpos;		/**< Channel location */
-    fiff_int_t    unit;			/**< Unit of measurement */
-    fiff_int_t    unit_mul;		/**< Unit multiplier exponent */
-    fiff_char_t   ch_name[16];	/**< Descriptive name for the channel */
-} fiffChInfoRec,*fiffChInfo;	/**< Description of one channel */
-
-/** Alias for fiffChInfoRec */
-typedef fiffChInfoRec fiff_ch_info_t;
-
 /** Directories are composed of these structures. */
 
 typedef struct _fiffDirEntryRec {
