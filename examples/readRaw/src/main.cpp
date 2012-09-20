@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
-* @author   Christoph Dinh <christoph.dinh@live.de>;
-* @version  1.0
-* @date     September, 2012
+* @file		main.cpp
+* @author	Christoph Dinh <christoph.dinh@live.de>;
+* @version	1.0
+* @date		October, 2010
 *
-* @section  LICENSE
+* @section	LICENSE
 *
 * Copyright (C) 2010 Christoph Dinh. All rights reserved.
 *
@@ -14,7 +14,7 @@
 * prior written consent of the author.
 *
 *
-* @brief    Implements the main() application function.
+* @brief	Implements the main() application function.
 *
 */
 
@@ -27,25 +27,23 @@
 #include <iostream>
 #include <vector>
 
-#include "../../../MNE/mne/mne.h"
+#include "../../../MNE/fiff/fiff.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-//#include <QDebug>
-//#include <QDir>
-//#include <QPluginLoader>
 
 #include <QtCore/QCoreApplication>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -66,13 +64,13 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    MNEForwardSolution* t_ForwardSolution = NULL;
+    QString t_sFile = "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
 
-    QString t_sFile = "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
-    if(MNE::read_forward_solution(t_sFile, t_ForwardSolution))
+//        raw = fiff_setup_read_raw(infile);
+
+    if(Fiff::setup_read_raw(t_sFile))
     {
-        std::cout << std::endl << "first 10 rows and columns of the Gain Matrix:" << std::endl << t_ForwardSolution->sol->data.block(0,0,10,10) << std::endl;
-        std::cout << std::endl << "first 10 dipole coordinates:" << std::endl << t_ForwardSolution->source_rr.block(0,0,10,3) << std::endl ;
+        std::cout << std::endl << "Fif raw read" << std::endl;
     }
 
     return a.exec();
