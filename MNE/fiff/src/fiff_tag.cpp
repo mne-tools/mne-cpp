@@ -155,7 +155,9 @@ bool FiffTag::read_tag(QFile* p_pFile, FiffTag*& p_pTag, qint64 pos)
             p_pTag->data = realloc(p_pTag->data,p_pTag->size + ((p_pTag->type == FIFFT_STRING) ? 1 : 0));
 
         if (p_pTag->data == NULL) {
-            printf("fiff_read_tag: memory allocation failed.");//consider throw
+            printf("fiff_read_tag: memory allocation failed.\n");//consider throw
+            delete p_pTag;
+            p_pTag = NULL;
             return false;
         }
         char *t_pCharData = static_cast< char* >(p_pTag->data);

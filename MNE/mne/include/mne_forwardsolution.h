@@ -176,11 +176,11 @@ public:
     /**
     * ### MNE toolbox root function ###: Implementation of the mne_transpose_named_matrix function
     *
-    * Transpose a named matrix (FiffSolution)
+    * Transpose a named matrix (FiffNamedMatrix)
     *
-    * @param[in, out] mat FiffSolution which shoul be transposed.
+    * @param[in, out] mat FiffNamedMatrix which shoul be transposed.
     */
-    static void transpose_named_matrix(FiffSolution*& mat);
+    static void transpose_named_matrix(FiffNamedMatrix*& mat);
 
 private:
     //=========================================================================================================
@@ -202,8 +202,8 @@ public:
     fiff_int_t coord_frame;
     fiff_int_t nsource;
     fiff_int_t nchan;
-    FiffSolution* sol;
-    FiffSolution* sol_grad;
+    FiffNamedMatrix* sol;
+    FiffNamedMatrix* sol_grad;
     FiffCoordTrans mri_head_t;
     MNESourceSpace* src;
     MatrixX3f source_rr;

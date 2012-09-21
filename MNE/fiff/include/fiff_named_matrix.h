@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiff_solution.h
+* @file     fiff_named_matrix.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the FiffSolution class declaration.
+* @brief    Contains the FiffNamedMatrix class declaration.
 *
 */
 
-#ifndef FIFF_SOLUTION_H
-#define FIFF_SOLUTION_H
+#ifndef FIFF_NAMED_MATRIX_H
+#define FIFF_NAMED_MATRIX_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -77,9 +77,9 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FiffSolution
+* DECLARE CLASS FiffNamedMatrix
 *
-* @brief The FiffSolution class provides...
+* @brief The FiffNamedMatrix class provides a named matrix
 */
 
 /**
@@ -87,37 +87,40 @@ using namespace Eigen;
 *
 *
 */
-class FIFFSHARED_EXPORT FiffSolution {
+class FIFFSHARED_EXPORT FiffNamedMatrix {
 
 public:
     //=========================================================================================================
     /**
     * ctor
     */
-    FiffSolution();
+    FiffNamedMatrix();
+
+    //=========================================================================================================
+    /**
+    * ctor
+    */
+    FiffNamedMatrix(    fiff_int_t p_nrow,
+                        fiff_int_t p_ncol,
+                        QStringList& p_row_names,
+                        QStringList& p_col_names,
+                        MatrixXf& p_data);
 
     //=========================================================================================================
     /**
     * Copy ctor
     */
-    FiffSolution(const FiffSolution* p_pFiffSolution)
-    {
-        nrow = p_pFiffSolution->nrow;
-        ncol = p_pFiffSolution->ncol;
-        row_names = p_pFiffSolution->row_names;
-        col_names = p_pFiffSolution->col_names;
-        data = MatrixXf(p_pFiffSolution->data);
-    }
+    FiffNamedMatrix(const FiffNamedMatrix* p_pFiffNamedMatrix);
 
     //=========================================================================================================
     /**
     * Destroys the fiffTag.
     */
-    ~FiffSolution();
+    ~FiffNamedMatrix();
 
 public:
-    qint32  nrow;
-    qint32  ncol;
+    fiff_int_t nrow;
+    fiff_int_t  ncol;
     QStringList row_names;
     QStringList col_names;
     MatrixXf data;

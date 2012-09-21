@@ -157,11 +157,11 @@ bool Fiff::open(QString& p_sFileName, QFile*& p_pFile, FiffDirTree*& p_pTree, QL
 
 //*************************************************************************************************************
 
-bool Fiff::read_named_matrix(QFile* p_pFile, FiffDirTree* node, fiff_int_t matkind, FiffSolution*& mat)
+bool Fiff::read_named_matrix(QFile* p_pFile, FiffDirTree* node, fiff_int_t matkind, FiffNamedMatrix*& mat)
 {
     if (mat != NULL)
         delete mat;
-    mat = new FiffSolution();
+    mat = new FiffNamedMatrix();
     //
     //   Descend one level if necessary
     //

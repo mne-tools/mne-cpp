@@ -47,9 +47,10 @@
 #include "include/fiff_constants.h"
 #include "include/fiff_coord_trans.h"
 #include "include/fiff_dir_tree.h"
-#include "include/fiff_solution.h"
+#include "include/fiff_named_matrix.h"
 #include "include/fiff_tag.h"
 #include "include/fiff_types.h"
+#include "include/fiff_proj.h"
 
 
 
@@ -427,7 +428,7 @@ public:
         //
         //   Load the SSP data
         //
-        bool projs = Fiff::read_proj(p_pFile,meas_info.at(0));
+        QList<FiffProj*> projs = Fiff::read_proj(p_pFile,meas_info.at(0));
 //        %
 //        %   Load the CTF compensation data
 //        %
@@ -522,19 +523,13 @@ public:
         return true;
     }
 
-
-
-
-
-
-
     //=========================================================================================================
     /**
     * fiff_read_named_matrix
     *
     * ### MNE toolbox root function ###
     */
-    static bool read_named_matrix(QFile* p_pFile, FiffDirTree* node, fiff_int_t matkind, FiffSolution*& mat);
+    static bool read_named_matrix(QFile* p_pFile, FiffDirTree* node, fiff_int_t matkind, FiffNamedMatrix*& mat);
 
 
     //=========================================================================================================
@@ -548,119 +543,152 @@ public:
     * Read the SSP data under a given directory node
     *
     */
-    static bool read_proj(QFile* p_pFile, FiffDirTree* node)
+    static inline QList<FiffProj*> read_proj(QFile* p_pFile, FiffDirTree* p_pListNode)
     {
-//        projdata = struct('kind',{},'active',{},'desc',{},'data',{});
+        QList<FiffProj*> projdata;// = struct('kind',{},'active',{},'desc',{},'data',{});
         //
         //   Locate the projection data
         //
-        QList<FiffDirTree*> nodes = node->dir_tree_find(FIFFB_PROJ);
-        if ( nodes.size() == 0 )
-            return false;
+        QList<FiffDirTree*> t_qListNodes = p_pListNode->dir_tree_find(FIFFB_PROJ);
+        if ( t_qListNodes.size() == 0 )
+            return projdata;
 
 
         FIFFLIB::FiffTag* t_pTag = NULL;
-        nodes.at(0)->find_tag(p_pFile, FIFF_NCHAN, t_pTag);
+        t_qListNodes.at(0)->find_tag(p_pFile, FIFF_NCHAN, t_pTag);
         fiff_int_t global_nchan;
         if (t_pTag)
             global_nchan = *t_pTag->toInt();
 
 
         fiff_int_t nchan;
-        QList<FiffDirTree*> items = nodes.at(0)->dir_tree_find(FIFFB_PROJ_ITEM);
-        for ( qint32 i = 0; i < items.size(); ++i)
+        QList<FiffDirTree*> t_qListItems = t_qListNodes.at(0)->dir_tree_find(FIFFB_PROJ_ITEM);
+        for ( qint32 i = 0; i < t_qListItems.size(); ++i)
         {
             //
             //   Find all desired tags in one item
             //
-            FiffDirTree* item = items[i];
-            item->find_tag(p_pFile, FIFF_NCHAN, t_pTag);
+            FiffDirTree* t_pFiffDirTreeItem = t_qListItems[i];
+            t_pFiffDirTreeItem->find_tag(p_pFile, FIFF_NCHAN, t_pTag);
             if (t_pTag)
                 nchan = *t_pTag->toInt();
             else
                 nchan = global_nchan;
 
-            item->find_tag(p_pFile, FIFF_DESCRIPTION, t_pTag);
+            t_pFiffDirTreeItem->find_tag(p_pFile, FIFF_DESCRIPTION, t_pTag);
+            QString desc; // maybe, in some cases this has to be a struct.
+            if (t_pTag)
+            {
+                qDebug() << "read_proj: this has to be debugged";
+                desc = t_pTag->toString();
+            }
+            else
+            {
+                t_pFiffDirTreeItem->find_tag(p_pFile, FIFF_NAME, t_pTag);
+                if (t_pTag)
+                    desc = t_pTag->toString();
+                else
+                {
+                    printf("Projection item description missing\n");
+                    return projdata;
+                }
+            }
+//            t_pFiffDirTreeItem->find_tag(p_pFile, FIFF_PROJ_ITEM_CH_NAME_LIST, t_pTag);
+//            QString namelist;
 //            if (t_pTag)
-//                desc = tag.data;
+//            {
+//                namelist = t_pTag->toString();
+//            }
 //            else
-//                tag = find_tag(item,FIFF.FIFF_NAME);
-//                if ~isempty(tag)
-//                    desc = tag.data;
-//                else
-//                    error(me,'Projection item description missing');
-//                end
-//            end
-//            tag = find_tag(item,FIFF.FIFF_PROJ_ITEM_CH_NAME_LIST);
-//            if ~isempty(tag)
-//                namelist = tag.data;
-//            else
-//                error(me,'Projection item channel list missing');
-//            end
-//            tag = find_tag(item,FIFF.FIFF_PROJ_ITEM_KIND);
-//            if ~isempty(tag)
-//                kind = tag.data;
-//            else
-//                error(me,'Projection item kind missing');
-//            end
-//            tag = find_tag(item,FIFF.FIFF_PROJ_ITEM_NVEC);
-//            if ~isempty(tag)
-//                nvec = tag.data;
-//            else
-//                error(me,'Number of projection vectors not specified');
-//            end
-//            tag = find_tag(item,FIFF.FIFF_PROJ_ITEM_CH_NAME_LIST);
-//            if ~isempty(tag)
-//                names = fiff_split_name_list(tag.data);
-//            else
-//                error(me,'Projection item channel list missing');
-//            end
-//            tag = find_tag(item,FIFF.FIFF_PROJ_ITEM_VECTORS);
-//            if ~isempty(tag)
-//                data = tag.data;
-//            else
-//                error(me,'Projection item data missing');
-//            end
-//            tag = find_tag(item,FIFF.FIFF_MNE_PROJ_ITEM_ACTIVE);
-//            if ~isempty(tag)
-//                active = tag.data;
-//            else
-//                active = false;
-//            end
-//            if size(data,2) ~= length(names)
-//                error(me,'Number of channel names does not match the size of data matrix');
-//            end
-//            one.kind           = kind;
-//            one.active         = active;
-//            one.desc           = desc;
-//            %
-//            %   Use exactly the same fields in data as in a named matrix
-//            %
-//            one.data.nrow      = nvec;
-//            one.data.ncol      = nchan;
-//            one.data.row_names = [];
-//            one.data.col_names = names;
-//            one.data.data      = data;
-//            %
-//            projdata(i) = one;
+//            {
+//                printf("Projection item channel list missing\n");
+//                return projdata;
+//            }
+            t_pFiffDirTreeItem->find_tag(p_pFile, FIFF_PROJ_ITEM_KIND, t_pTag);
+            fiff_int_t kind;
+            if (t_pTag)
+            {
+                kind = *t_pTag->toInt();
+            }
+            else
+            {
+                printf("Projection item kind missing");
+                return projdata;
+            }
+            t_pFiffDirTreeItem->find_tag(p_pFile, FIFF_PROJ_ITEM_NVEC, t_pTag);
+            fiff_int_t nvec;
+            if (t_pTag)
+            {
+                nvec = *t_pTag->toInt();
+            }
+            else
+            {
+                printf("Number of projection vectors not specified\n");
+                return projdata;
+            }
+            t_pFiffDirTreeItem->find_tag(p_pFile, FIFF_PROJ_ITEM_CH_NAME_LIST, t_pTag);
+            QStringList names;
+            if (t_pTag)
+            {
+                names = split_name_list(t_pTag->toString());
+            }
+            else
+            {
+                printf("Projection item channel list missing\n");
+                return projdata;
+            }
+            t_pFiffDirTreeItem->find_tag(p_pFile, FIFF_PROJ_ITEM_VECTORS, t_pTag);
+            MatrixXf data;
+            if (t_pTag)
+            {
+                data = t_pTag->toFloatMatrix().transpose();
+            }
+            else
+            {
+                printf("Projection item data missing\n");
+                return projdata;
+            }
+            t_pFiffDirTreeItem->find_tag(p_pFile, FIFF_MNE_PROJ_ITEM_ACTIVE, t_pTag);
+            bool active;
+            if (t_pTag)
+                active = *t_pTag->toByte(); //this has to be debugged.
+            else
+                active = false;
+
+            if (data.cols() != names.size())
+            {
+                printf("Number of channel names does not match the size of data matrix\n");
+                return projdata;
+            }
+
+
+
+            //
+            //   create a named matrix for the data
+            //
+            QStringList defaultList;
+            FiffNamedMatrix* t_fiffNamedMatrix = new FiffNamedMatrix(nvec, nchan, defaultList, names, data);
+
+            FiffProj* one = new FiffProj(kind, active, desc, t_fiffNamedMatrix);
+            //
+            projdata.append(one);
         }
 
-//        if length(projdata) > 0
-//            fprintf(1,'\tRead a total of %d projection items:\n', ...
-//                length(projdata));
-//            for k = 1:length(projdata)
-//                fprintf(1,'\t\t%s (%d x %d)',projdata(k).desc, ...
-//                    projdata(k).data.nrow,projdata(k).data.ncol);
-//                if projdata(k).active
-//                    fprintf(1,' active\n');
-//                else
-//                    fprintf(1,' idle\n');
-//                end
-//            end
-//        end
+        if (projdata.size() > 0)
+        {
+            printf("\tRead a total of %d projection items:\n", projdata.size());
+            for(qint32 k = 0; k < projdata.size(); ++k)
+            {
+                printf("\t\t%s (%d x %d)",projdata.at(k)->desc.toUtf8().constData(), projdata.at(k)->data->nrow, projdata.at(k)->data->ncol);
+                if (projdata.at(k)->active)
+                    printf(" active\n");
+                else
+                    printf(" idle\n");
+            }
+        }
 
 
-        return true;
+        return projdata;
     }
 
 
