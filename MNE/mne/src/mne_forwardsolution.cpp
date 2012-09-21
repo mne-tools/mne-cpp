@@ -77,8 +77,8 @@ MNEForwardSolution::MNEForwardSolution(MNEForwardSolution* p_pMNEForwardSolution
 , coord_frame(p_pMNEForwardSolution->coord_frame)
 , nsource(p_pMNEForwardSolution->nsource)
 , nchan(p_pMNEForwardSolution->nchan)
-, sol(p_pMNEForwardSolution->sol ? new FiffSolution(p_pMNEForwardSolution->sol) : NULL)
-, sol_grad(p_pMNEForwardSolution->sol_grad ? new FiffSolution(p_pMNEForwardSolution->sol_grad) : NULL)
+, sol(p_pMNEForwardSolution->sol ? new FiffNamedMatrix(p_pMNEForwardSolution->sol) : NULL)
+, sol_grad(p_pMNEForwardSolution->sol_grad ? new FiffNamedMatrix(p_pMNEForwardSolution->sol_grad) : NULL)
 , mri_head_t( p_pMNEForwardSolution->mri_head_t)
 , src(p_pMNEForwardSolution->src ? new MNESourceSpace(p_pMNEForwardSolution->src) : NULL)
 , source_rr(MatrixX3f(p_pMNEForwardSolution->source_rr))
@@ -813,14 +813,15 @@ bool MNEForwardSolution::read_one(QFile* p_pFile, FiffDirTree* node, MNEForwardS
             //error(me,'Forward solution gradient matrix has wrong dimensions');
         }
     }
-    delete t_pTag;
+    if (t_pTag)
+        delete t_pTag;
     return true;
 }
 
 
 //*************************************************************************************************************
 
-void MNEForwardSolution::transpose_named_matrix(FiffSolution*& mat)
+void MNEForwardSolution::transpose_named_matrix(FiffNamedMatrix*& mat)
 {
     QStringList col_names_old = mat->col_names;
     mat->col_names = mat->row_names;

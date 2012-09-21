@@ -197,6 +197,11 @@ bool FiffDirTree::find_tag(QFile* p_pFile, fiff_int_t findkind, FiffTag*& p_pTag
           return true;
        }
     }
+    if (p_pTag != NULL)
+    {
+        delete p_pTag;
+        p_pTag = NULL;
+    }
     return false;
 }
 

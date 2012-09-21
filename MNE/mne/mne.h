@@ -251,12 +251,12 @@ public:
     *
     * Wrapper for the MNEForwardSolution::transpose_named_matrix static function
     *
-    * Transpose a named matrix (FiffSolution)
+    * Transpose a named matrix (FiffNamedMatrix)
     *
-    * @param[in, out] mat FiffSolution which shoul be transposed.
+    * @param[in, out] mat FiffNamedMatrix which shoul be transposed.
     *
     */
-    static inline void transpose_named_matrix(FiffSolution*& mat)
+    static inline void transpose_named_matrix(FiffNamedMatrix*& mat)
     {
         return MNEForwardSolution::transpose_named_matrix(mat);
     }
