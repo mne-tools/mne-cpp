@@ -85,6 +85,7 @@
 #include "../../../include/3rdParty/Eigen/Core"
 #include "fiff_constants.h"
 #include "fiff_types.h"
+#include "fiff_id.h"
 #include "fiff_coord_trans.h"
 #include "fiff_ch_info.h"
 
@@ -304,7 +305,7 @@ public:
     /**
     * to fiff ID Struct
     */
-    inline fiff_id_t toFiffID() const;
+    inline FiffId toFiffID() const;
 
     //=========================================================================================================
     /**
@@ -595,23 +596,23 @@ inline std::complex<double>* FiffTag::toComplexDouble()
 //
 //*************************************************************************************************************
 
-inline fiff_id_t FiffTag::toFiffID() const
+inline FiffId FiffTag::toFiffID() const
 {
-    fiff_id_t t_fiffID;
+    FiffId p_fiffID;
     if(this->isMatrix() || this->getType() != FIFFT_ID_STRUCT || this->data == NULL)
-        return t_fiffID;
+        return p_fiffID;
     else
     {
         qint32* t_pInt32 = static_cast< qint32* >(this->data);
 //            memcpy (&t_fiffID,this->data,this->size);
 
-        t_fiffID.version = t_pInt32[0];
-        t_fiffID.machid[0] = t_pInt32[1];
-        t_fiffID.machid[1] = t_pInt32[2];
-        t_fiffID.time.secs = t_pInt32[3];
-        t_fiffID.time.usecs = t_pInt32[4];
+        p_fiffID.version = t_pInt32[0];
+        p_fiffID.machid[0] = t_pInt32[1];
+        p_fiffID.machid[1] = t_pInt32[2];
+        p_fiffID.time.secs = t_pInt32[3];
+        p_fiffID.time.usecs = t_pInt32[4];
 
-        return t_fiffID;
+        return p_fiffID;
     }
 }
 
