@@ -44,14 +44,17 @@
 #include "../fiff_global.h"
 #include "fiff_types.h"
 #include "fiff_id.h"
+#include "fiff_ch_info.h"
+#include "fiff_ctf_comp.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include "../../../include/3rdParty/Eigen/Core"
+#include <QList>
+#include <QStringList>
 
 
 //*************************************************************************************************************
@@ -103,7 +106,23 @@ public:
 public:
     FiffId      file_id;
     FiffId      meas_id;
-
+    fiff_int_t  meas_date[2];
+    fiff_int_t nchan;
+    float sfreq;
+    float highpass;
+    float lowpass;
+    QList<FiffChInfo> chs;
+    QStringList ch_names;
+    FiffCoordTrans dev_head_t;
+    FiffCoordTrans ctf_head_t;
+    FiffCoordTrans dev_ctf_t;
+    QList<fiff_dig_point_t> dig;
+    FiffCoordTrans dig_trans;
+    QStringList bads;
+    QList<FiffProj*> projs;
+    QList<FiffCtfComp*> comps;
+    QString acq_pars;
+    QString acq_stim;
 };
 
 } // NAMESPACE

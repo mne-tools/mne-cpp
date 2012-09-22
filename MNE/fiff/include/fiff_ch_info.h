@@ -129,10 +129,10 @@ public:
 
     fiff_int_t coil_type;       /**< Which kind of coil. */
 
-    Matrix<float,12,1, DontAlign>  loc;
-    Matrix<float,4,4, DontAlign>   coil_trans;  /**< Channel location */
-    Matrix<float,3,2, DontAlign>   eeg_loc;
-    fiff_int_t          coord_frame;
+    Matrix<float,12,1, DontAlign>   loc;
+    Matrix<float,4,4, DontAlign>    coil_trans;  /**< Channel location */
+    Matrix<float,3,2, DontAlign>    eeg_loc;
+    fiff_int_t                      coord_frame;
 
     //    fiff_ch_pos_t chpos;        /**< Channel location 15*/
     fiff_int_t    unit;         /**< Unit of measurement 1*/
