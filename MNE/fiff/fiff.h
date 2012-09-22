@@ -433,8 +433,8 @@ public:
         fiff_int_t nchan = -1;
         float sfreq = -1.0f;
         QList<FiffChInfo> chs;
-        float lowpass = 0.0f;
-        float highpass = 0.0f;
+        float lowpass = -1.0f;
+        float highpass = -1.0f;
 
         FiffChInfo t_chInfo;
 
@@ -442,8 +442,9 @@ public:
         FiffCoordTrans dev_head_t;
         FiffCoordTrans ctf_head_t;
 
-        fiff_int_t meas_date_first = -1;
-        fiff_int_t meas_date_second = -1;
+        fiff_int_t meas_date[2];
+        meas_date[0] = -1;
+        meas_date[1] = -1;
 
         fiff_int_t kind = -1;
         fiff_int_t pos = -1;
@@ -482,8 +483,8 @@ public:
                 case FIFF_MEAS_DATE:
                     FiffTag::read_tag(p_pFile, t_pTag, pos);
                     //qDebug() << "FIFF_MEAS_DATE" << t_pTag->getType();
-                    meas_date_first = t_pTag->toInt()[0];
-                    meas_date_second = t_pTag->toInt()[1];
+                    meas_date[0] = t_pTag->toInt()[0];
+                    meas_date[1] = t_pTag->toInt()[1];
                     break;
                 case FIFF_COORD_TRANS:
                     //This has to be debugged!!
@@ -662,60 +663,63 @@ public:
         else
             info.meas_id = meas_info.at(0)->parent_id;
 
-//        if isempty(meas_date)
-//            info.meas_date = [ info.meas_id.secs info.meas_id.usecs ];
-//        else
-//            info.meas_date = meas_date;
-//        end
-//        info.nchan     = nchan;
-//        info.sfreq     = sfreq;
-//        if exist('highpass','var')
-//            info.highpass = highpass;
-//        else
-//            info.highpass = 0;
-//        end
-//        if exist('lowpass','var')
-//            info.lowpass = lowpass;
-//        else
-//            info.lowpass = info.sfreq/2.0;
-//        end
-//        %
-//        %   Add the channel information and make a list of channel names
-//        %   for convenience
-//        %
-//        info.chs = chs;
-//        for c = 1:info.nchan
-//            info.ch_names{c} = info.chs(c).ch_name;
-//        end
-//        %
-//        %  Add the coordinate transformations
-//        %
-//        info.dev_head_t = dev_head_t;
-//        info.ctf_head_t = ctf_head_t;
-//        if ~isempty(info.dev_head_t) && ~isempty(info.ctf_head_t)
-//            info.dev_ctf_t    = info.dev_head_t;
-//            info.dev_ctf_t.to = info.ctf_head_t.from;
-//            info.dev_ctf_t.trans = inv(ctf_head_t.trans)*info.dev_ctf_t.trans;
-//        else
-//            info.dev_ctf_t = [];
-//        end
-//        %
-//        %   All kinds of auxliary stuff
-//        %
-//        info.dig   = dig;
-//        if exist('dig_trans','var')
-//            info.dig_trans = dig_trans;
-//        end
-//        info.bads  = bads;
-//        info.projs = projs;
-//        info.comps = comps;
-//        info.acq_pars = acq_pars;
-//        info.acq_stim = acq_stim;
+        if (meas_date[0] == -1)
+        {
+            info.meas_date[0] = info.meas_id.time.secs;
+            info.meas_date[1] = info.meas_id.time.usecs;
+        }
+        else
+        {
+            info.meas_date[0] = meas_date[0];
+            info.meas_date[1] = meas_date[1];
+        }
 
-//        if open_here
-//            fclose(fid);
-//        end
+        info.nchan  = nchan;
+        info.sfreq  = sfreq;
+        if (highpass != -1.0f)
+            info.highpass = highpass;
+        else
+            info.highpass = 0.0f;
 
+        if (lowpass != -1.0f)
+            info.lowpass = lowpass;
+        else
+            info.lowpass = info.sfreq/2.0;
+
+        //
+        //   Add the channel information and make a list of channel names
+        //   for convenience
+        //
+        info.chs = chs;
+        for (qint32 c = 0; c < info.nchan; ++c)
+            info.ch_names << info.chs.at(c).ch_name;
+
+        //
+        //  Add the coordinate transformations
+        //
+        info.dev_head_t = dev_head_t;
+        info.ctf_head_t = ctf_head_t;
+        if ((info.dev_head_t.from != -1) && (info.ctf_head_t.from != -1)) //~isempty(info.dev_head_t) && ~isempty(info.ctf_head_t)
+        {
+            info.dev_ctf_t    = info.dev_head_t;
+            info.dev_ctf_t.to = info.ctf_head_t.from;
+            info.dev_ctf_t.trans = ctf_head_t.trans.inverse()*info.dev_ctf_t.trans;
+        }
+        else
+            info.dev_ctf_t.from = -1;
+
+        //
+        //   All kinds of auxliary stuff
+        //
+        info.dig   = dig;
+        if (dig_trans.from != -1)
+            info.dig_trans = dig_trans;
+
+        info.bads  = bads;
+        info.projs = projs;
+        info.comps = comps;
+        info.acq_pars = acq_pars;
+        info.acq_stim = acq_stim;
 
         return true;
     }
