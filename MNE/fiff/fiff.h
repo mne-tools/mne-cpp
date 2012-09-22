@@ -53,6 +53,8 @@
 #include "include/fiff_proj.h"
 #include "include/fiff_ctf_comp.h"
 #include "include/fiff_info.h"
+#include "include/fiff_raw_data.h"
+#include "include/fiff_raw_dir.h"
 
 
 //*************************************************************************************************************
@@ -403,27 +405,29 @@ public:
     * meas output argument should not be specified.
     *
     */
-    static bool read_meas_info(QFile* p_pFile, FiffDirTree* p_pTree)
+    static FiffDirTree* read_meas_info(QFile* p_pFile, FiffDirTree* p_pTree, FiffInfo*& info)
     {
+
+        if (info)
+            delete info;
+        info = NULL;
         //
         //   Find the desired blocks
         //
-
-//        meas = fiff_dir_tree_find(tree,FIFF.FIFFB_MEAS);
-
         QList<FiffDirTree*> meas = p_pTree->dir_tree_find(FIFFB_MEAS);
 
         if (meas.size() == 0)
         {
             printf("Could not find measurement data\n");
-            return false;
+            return NULL;
         }
         //
         QList<FiffDirTree*> meas_info = meas.at(0)->dir_tree_find(FIFFB_MEAS_INFO);
         if (meas_info.count() == 0)
         {
             printf("Could not find measurement info\n");
-            return false;
+            delete meas[0];
+            return NULL;
         }
         //
         //   Read measurement info
@@ -504,22 +508,26 @@ public:
         if (nchan < 0)
         {
             printf("Number of channels in not defined\n");
-            return false;
+            delete meas[0];
+            return NULL;
         }
         if (sfreq < 0)
         {
             printf("Sampling frequency is not defined\n");
-            return false;
+            delete meas[0];
+            return NULL;
         }
         if (chs.size() == 0)
         {
             printf("Channel information not defined\n");
-            return false;
+            delete meas[0];
+            return NULL;
         }
         if (chs.size() != nchan)
         {
             printf("Incorrect number of channel definitions found\n");
-            return false;
+            delete meas[0];
+            return NULL;
         }
 
 
@@ -634,11 +642,11 @@ public:
         //
         //   Put the data together
         //
-        FiffInfo info;
+        info = new FiffInfo();
         if (p_pTree->id.version != -1)
-            info.file_id = p_pTree->id;
+            info->file_id = p_pTree->id;
         else
-            info.file_id.version = -1;
+            info->file_id.version = -1;
 
         //
         //  Make the most appropriate selection for the measurement id
@@ -650,78 +658,78 @@ public:
                 if (meas.at(0)->id.version == -1)
                 {
                     if (meas.at(0)->parent_id.version == -1)
-                        info.meas_id = info.file_id;
+                        info->meas_id = info->file_id;
                     else
-                        info.meas_id = meas.at(0)->parent_id;
+                        info->meas_id = meas.at(0)->parent_id;
                 }
                 else
-                    info.meas_id = meas.at(0)->id;
+                    info->meas_id = meas.at(0)->id;
             }
             else
-                info.meas_id = meas_info.at(0)->id;
+                info->meas_id = meas_info.at(0)->id;
         }
         else
-            info.meas_id = meas_info.at(0)->parent_id;
+            info->meas_id = meas_info.at(0)->parent_id;
 
         if (meas_date[0] == -1)
         {
-            info.meas_date[0] = info.meas_id.time.secs;
-            info.meas_date[1] = info.meas_id.time.usecs;
+            info->meas_date[0] = info->meas_id.time.secs;
+            info->meas_date[1] = info->meas_id.time.usecs;
         }
         else
         {
-            info.meas_date[0] = meas_date[0];
-            info.meas_date[1] = meas_date[1];
+            info->meas_date[0] = meas_date[0];
+            info->meas_date[1] = meas_date[1];
         }
 
-        info.nchan  = nchan;
-        info.sfreq  = sfreq;
+        info->nchan  = nchan;
+        info->sfreq  = sfreq;
         if (highpass != -1.0f)
-            info.highpass = highpass;
+            info->highpass = highpass;
         else
-            info.highpass = 0.0f;
+            info->highpass = 0.0f;
 
         if (lowpass != -1.0f)
-            info.lowpass = lowpass;
+            info->lowpass = lowpass;
         else
-            info.lowpass = info.sfreq/2.0;
+            info->lowpass = info->sfreq/2.0;
 
         //
         //   Add the channel information and make a list of channel names
         //   for convenience
         //
-        info.chs = chs;
-        for (qint32 c = 0; c < info.nchan; ++c)
-            info.ch_names << info.chs.at(c).ch_name;
+        info->chs = chs;
+        for (qint32 c = 0; c < info->nchan; ++c)
+            info->ch_names << info->chs.at(c).ch_name;
 
         //
         //  Add the coordinate transformations
         //
-        info.dev_head_t = dev_head_t;
-        info.ctf_head_t = ctf_head_t;
-        if ((info.dev_head_t.from != -1) && (info.ctf_head_t.from != -1)) //~isempty(info.dev_head_t) && ~isempty(info.ctf_head_t)
+        info->dev_head_t = dev_head_t;
+        info->ctf_head_t = ctf_head_t;
+        if ((info->dev_head_t.from != -1) && (info->ctf_head_t.from != -1)) //~isempty(info.dev_head_t) && ~isempty(info.ctf_head_t)
         {
-            info.dev_ctf_t    = info.dev_head_t;
-            info.dev_ctf_t.to = info.ctf_head_t.from;
-            info.dev_ctf_t.trans = ctf_head_t.trans.inverse()*info.dev_ctf_t.trans;
+            info->dev_ctf_t    = info->dev_head_t;
+            info->dev_ctf_t.to = info->ctf_head_t.from;
+            info->dev_ctf_t.trans = ctf_head_t.trans.inverse()*info->dev_ctf_t.trans;
         }
         else
-            info.dev_ctf_t.from = -1;
+            info->dev_ctf_t.from = -1;
 
         //
         //   All kinds of auxliary stuff
         //
-        info.dig   = dig;
+        info->dig   = dig;
         if (dig_trans.from != -1)
-            info.dig_trans = dig_trans;
+            info->dig_trans = dig_trans;
 
-        info.bads  = bads;
-        info.projs = projs;
-        info.comps = comps;
-        info.acq_pars = acq_pars;
-        info.acq_stim = acq_stim;
+        info->bads  = bads;
+        info->projs = projs;
+        info->comps = comps;
+        info->acq_pars = acq_pars;
+        info->acq_stim = acq_stim;
 
-        return true;
+        return meas[0];
     }
 
     //=========================================================================================================
@@ -965,156 +973,188 @@ public:
         //
         printf("Opening raw data file %s...\n",t_sFileName.toUtf8().constData());
 
-        QFile* t_pFile = NULL;
+        QFile* p_pFile = NULL;
         FiffDirTree* t_pTree = NULL;
         QList<fiff_dir_entry_t>* t_pDir = NULL;
 
-        if(!Fiff::open(t_sFileName, t_pFile, t_pTree, t_pDir))
+        if(!Fiff::open(t_sFileName, p_pFile, t_pTree, t_pDir))
             return false;
         //
         //   Read the measurement info
         //
 //        [ info, meas ] = fiff_read_meas_info(fid,tree);
+        FiffInfo* info = NULL;
+        FiffDirTree* meas = read_meas_info(p_pFile,t_pTree, info);
 
-        read_meas_info(t_pFile,t_pTree);
+        if (!meas)
+            return false; //ToDo garbage collecting
 
+        //
+        //   Locate the data of interest
+        //
+        QList<FiffDirTree*> raw = meas->dir_tree_find(FIFFB_RAW_DATA);
+        if (raw.size() == 0)
+        {
+            raw = meas->dir_tree_find(FIFFB_CONTINUOUS_DATA);
+            if(allow_maxshield)
+            {
+                for (qint32 i = 0; i < raw.size(); ++i)
+                    if(raw[i])
+                        delete raw[i];
+                raw = meas->dir_tree_find(FIFFB_SMSH_RAW_DATA);
+                if (raw.size() == 0)
+                {
+                    printf("No raw data in %s\n", t_sFileName.toUtf8().constData());
+                    return false;
+                }
+            }
+            else
+            {
+                if (raw.size() == 0)
+                {
+                    printf("No raw data in %s\n", t_sFileName.toUtf8().constData());
+                    return false;
+                }
+            }
+        }
 
-//        //
-//        //   Locate the data of interest
-//        //
-//        raw = fiff_dir_tree_find(meas,FIFF.FIFFB_RAW_DATA);
-//        if isempty(raw)
-//            raw = fiff_dir_tree_find(meas,FIFF.FIFFB_CONTINUOUS_DATA);
-//            if allow_maxshield
-//                raw = fiff_dir_tree_find(meas,FIFF.FIFFB_SMSH_RAW_DATA);
-//                if isempty(raw)
-//                    error(me,'No raw data in %s',fname);
-//                end
-//            else
-//                if isempty(raw)
-//                    error(me,'No raw data in %s',fname);
-//                end
-//            end
-//        end
-//        %
-//        %   Set up the output structure
-//        %
-//        info.filename   = fname;
-//        data.fid        = fid;
-//        data.info       = info;
-//        data.first_samp = 0;
-//        data.last_samp  = 0;
-//        %
-//        %   Process the directory
-//        %
-//        dir          = raw.dir;
-//        nent         = raw.nent;
-//        nchan        = info.nchan;
-//        first        = 1;
-//        first_samp   = 0;
-//        first_skip   = 0;
-//        %
-//        %  Get first sample tag if it is there
-//        %
-//        if dir(first).kind == FIFF.FIFF_FIRST_SAMPLE
-//            tag = fiff_read_tag(fid,dir(first).pos);
-//            first_samp = tag.data;
-//            first = first + 1;
-//        end
-//        %
-//        %  Omit initial skip
-//        %
-//        if dir(first).kind == FIFF.FIFF_DATA_SKIP
-//            %
-//            %  This first skip can be applied only after we know the buffer size
-//            %
-//            tag = fiff_read_tag(fid,dir(first).pos);
-//            first_skip = tag.data;
-//            first = first + 1;
-//        end
-//        data.first_samp = first_samp;
-//        %
-//        %   Go through the remaining tags in the directory
-//        %
+        //
+        //   Set up the output structure
+        //
+        info->filename   = t_sFileName;
+
+        FiffRawData* data = new FiffRawData();
+        data->m_pFile = p_pFile;// fid;
+        data->info       = info;
+        data->first_samp = 0;
+        data->last_samp  = 0;
+        //
+        //   Process the directory
+        //
+        QList<fiff_dir_entry_t> dir = raw.at(0)->dir;
+        fiff_int_t nent = raw.at(0)->nent;
+        fiff_int_t nchan = info->nchan;
+        fiff_int_t first = 0;
+        fiff_int_t first_samp = 0;
+        fiff_int_t first_skip   = 0;
+        //
+        //  Get first sample tag if it is there
+        //
+        FiffTag* t_pTag = NULL;
+        if (dir.at(first).kind == FIFF_FIRST_SAMPLE)
+        {
+            FiffTag::read_tag(p_pFile, t_pTag, dir.at(first).pos);
+            first_samp = *t_pTag->toInt();
+            ++first;
+        }
+        //
+        //  Omit initial skip
+        //
+        if (dir.at(first).kind == FIFF_DATA_SKIP)
+        {
+            //
+            //  This first skip can be applied only after we know the buffer size
+            //
+            FiffTag::read_tag(p_pFile, t_pTag, dir.at(first).pos);
+            first_skip = *t_pTag->toInt();
+            ++first;
+        }
+        data->first_samp = first_samp;
+        //
+        //   Go through the remaining tags in the directory
+        //
+        QList<FiffRawDir> rawdir;
 //        rawdir = struct('ent',{},'first',{},'last',{},'nsamp',{});
-//        nskip = 0;
-//        ndir  = 0;
-//        for k = first:nent
-//            ent = dir(k);
-//            if ent.kind == FIFF.FIFF_DATA_SKIP
-//                tag = fiff_read_tag(fid,ent.pos);
-//                nskip = tag.data;
-//            elseif ent.kind == FIFF.FIFF_DATA_BUFFER
-//                %
-//                %   Figure out the number of samples in this buffer
-//                %
-//                switch ent.type
-//                    case FIFF.FIFFT_DAU_PACK16
-//                        nsamp = ent.size/(2*nchan);
-//                    case FIFF.FIFFT_SHORT
-//                        nsamp = ent.size/(2*nchan);
-//                    case FIFF.FIFFT_FLOAT
-//                        nsamp = ent.size/(4*nchan);
-//                    case FIFF.FIFFT_INT
-//                        nsamp = ent.size/(4*nchan);
-//                    otherwise
-//                        fclose(fid);
-//                        error(me,'Cannot handle data buffers of type %d',ent.type);
-//                end
-//                %
-//                %  Do we have an initial skip pending?
-//                %
-//                if first_skip > 0
-//                    first_samp = first_samp + nsamp*first_skip;
-//                    data.first_samp = first_samp;
-//                    first_skip = 0;
-//                end
-//                %
-//                %  Do we have a skip pending?
-//                %
-//                if nskip > 0
-//                    ndir        = ndir+1;
-//                    rawdir(ndir).ent   = [];
-//                    rawdir(ndir).first = first_samp;
-//                    rawdir(ndir).last  = first_samp + nskip*nsamp - 1;
-//                    rawdir(ndir).nsamp = nskip*nsamp;
-//                    first_samp = first_samp + nskip*nsamp;
-//                    nskip = 0;
-//                end
-//                %
-//                %  Add a data buffer
-//                %
-//                ndir               = ndir+1;
-//                rawdir(ndir).ent   = ent;
-//                rawdir(ndir).first = first_samp;
-//                rawdir(ndir).last  = first_samp + nsamp - 1;
-//                rawdir(ndir).nsamp = nsamp;
-//                first_samp = first_samp + nsamp;
-//            end
-//        end
-//        data.last_samp  = first_samp - 1;
-//        %
-//        %   Add the calibration factors
-//        %
-//        cals = zeros(1,data.info.nchan);
-//        for k = 1:data.info.nchan
-//            cals(k) = data.info.chs(k).range*data.info.chs(k).cal;
-//        end
-//        %
-//        data.cals       = cals;
-//        data.rawdir     = rawdir;
-//        data.proj       = [];
-//        data.comp       = [];
-//        %
-//        fprintf(1,'\tRange : %d ... %d  =  %9.3f ... %9.3f secs\n',...
-//            data.first_samp,data.last_samp,...
-//            double(data.first_samp)/data.info.sfreq,...
-//            double(data.last_samp)/data.info.sfreq);
-//        fprintf(1,'Ready.\n');
-//        fclose(data.fid);
-//        data.fid = -1;
-
-
+        fiff_int_t nskip = 0;
+        fiff_int_t ndir  = 0;
+        fiff_int_t nsamp = 0;
+        for (qint32 k = first; k < nent; ++k)
+        {
+            fiff_dir_entry_t ent = dir.at(k);
+            if (ent.kind == FIFF_DATA_SKIP)
+            {
+                FiffTag::read_tag(p_pFile, t_pTag, ent.pos);
+                nskip = *t_pTag->toInt();
+            }
+            else if(ent.kind == FIFF_DATA_BUFFER)
+            {
+                //
+                //   Figure out the number of samples in this buffer
+                //
+                switch(ent.type)
+                {
+                    case FIFFT_DAU_PACK16:
+                        nsamp = ent.size/(2*nchan);
+                        break;
+                    case FIFFT_SHORT:
+                        nsamp = ent.size/(2*nchan);
+                        break;
+                    case FIFFT_FLOAT:
+                        nsamp = ent.size/(4*nchan);
+                        break;
+                    case FIFFT_INT:
+                        nsamp = ent.size/(4*nchan);
+                        break;
+                    default:
+                        printf("Cannot handle data buffers of type %d\n",ent.type);
+                        return false;
+                }
+                //
+                //  Do we have an initial skip pending?
+                //
+                if (first_skip > 0)
+                {
+                    first_samp += nsamp*first_skip;
+                    data->first_samp = first_samp;
+                    first_skip = 0;
+                }
+                //
+                //  Do we have a skip pending?
+                //
+                if (nskip > 0)
+                {
+                    FiffRawDir t_RawDir;
+                    t_RawDir.first = first_samp;
+                    t_RawDir.last  = first_samp + nskip*nsamp - 1;//ToDo -1 right or is that MATLAB syntax
+                    t_RawDir.nsamp = nskip*nsamp;
+                    rawdir.append(t_RawDir);
+                    first_samp = first_samp + nskip*nsamp;
+                    nskip = 0;
+                    ++ndir;
+                }
+                //
+                //  Add a data buffer
+                //
+                FiffRawDir t_RawDir;
+                t_RawDir.ent   = ent;
+                t_RawDir.first = first_samp;
+                t_RawDir.last  = first_samp + nsamp - 1;//ToDo -1 right or is that MATLAB syntax
+                t_RawDir.nsamp = nsamp;
+                rawdir.append(t_RawDir);
+                first_samp += nsamp;
+                ++ndir;
+            }
+        }
+        data->last_samp  = first_samp - 1;//ToDo -1 right or is that MATLAB syntax
+        //
+        //   Add the calibration factors
+        //
+        MatrixXf cals(1,data->info->nchan);
+        cals.setZero();
+        for (int k = 0; k < data->info->nchan; ++k)
+            cals(0,k) = data->info->chs.at(k).range*data->info->chs.at(k).cal;
+        //
+        data->cals       = cals;
+        data->rawdir     = rawdir;
+        //data->proj       = [];
+        //data.comp       = [];
+        //
+        printf("\tRange : %d ... %d  =  %9.3f ... %9.3f secs\n",
+               data->first_samp,data->last_samp,
+               (double)data->first_samp/data->info->sfreq,
+               (double)data->last_samp/data->info->sfreq);
+        printf("Ready.\n");
+        data->m_pFile->close();
         return true;
     }
 

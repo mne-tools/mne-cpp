@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiff_info.h
+* @file     fiff_raw_dir.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -18,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
@@ -29,12 +29,13 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the FiffInfo class declaration.
+* @brief    Contains the FiffRawDir class declaration.
 *
 */
 
-#ifndef FIFF_INFO_H
-#define FIFF_INFO_H
+#ifndef FIFF_RAW_DIR_H
+#define FIFF_RAW_DIR_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -43,18 +44,6 @@
 
 #include "../fiff_global.h"
 #include "fiff_types.h"
-#include "fiff_id.h"
-#include "fiff_ch_info.h"
-#include "fiff_ctf_comp.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QList>
-#include <QStringList>
 
 
 //*************************************************************************************************************
@@ -70,67 +59,44 @@ namespace FIFFLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
+//using namespace Eigen;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FiffCtfComp
+* DECLARE CLASS FiffRawDir
 *
-* CTF software compensation data
 *
-* @brief The FiffCtfComp class provides CTF software compensation data
+* @brief The FiffRawDir class provides...
 */
-class FIFFSHARED_EXPORT FiffInfo {
+class FIFFSHARED_EXPORT FiffRawDir {
 
 public:
     //=========================================================================================================
     /**
     * ctor
     */
-    FiffInfo()
+    FiffRawDir()
     {
     }
 
 
     //=========================================================================================================
     /**
-    * Destroys the FiffInfo.
+    * Destroys the FiffCtfComp.
     */
-    ~FiffInfo()
+    ~FiffRawDir()
     {
-        qint32 i;
-        for (i = 0; i < projs.size(); ++i)
-            if(projs[i])
-                delete projs[i];
-        for (i = 0; i < comps.size(); ++i)
-            if(comps[i])
-                delete comps[i];
+
     }
 
 public:
-    FiffId      file_id;
-    FiffId      meas_id;
-    fiff_int_t  meas_date[2];
-    fiff_int_t  nchan;
-    float sfreq;
-    float highpass;
-    float lowpass;
-    QList<FiffChInfo> chs;
-    QStringList ch_names;
-    FiffCoordTrans dev_head_t;
-    FiffCoordTrans ctf_head_t;
-    FiffCoordTrans dev_ctf_t;
-    QList<fiff_dig_point_t> dig;
-    FiffCoordTrans dig_trans;
-    QStringList bads;
-    QList<FiffProj*> projs;
-    QList<FiffCtfComp*> comps;
-    QString acq_pars;
-    QString acq_stim;
-    QString filename;
+    fiff_dir_entry_t    ent;
+    fiff_int_t  first;
+    fiff_int_t  last;
+    fiff_int_t  nsamp;
 };
 
 } // NAMESPACE
 
-#endif // FIFF_INFO_H
+#endif // FIFF_RAW_DIR_H

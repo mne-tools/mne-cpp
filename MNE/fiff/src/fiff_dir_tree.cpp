@@ -69,7 +69,7 @@ FiffDirTree::~FiffDirTree()
 {
     QList<FiffDirTree*>::iterator i;
     for (i = this->children.begin(); i != this->children.end(); ++i)
-        if (*i != NULL)
+        if (*i)
             delete *i;
 }
 

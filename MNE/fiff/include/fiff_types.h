@@ -124,7 +124,7 @@ typedef struct _fiffChPosRec {
 typedef fiffChPosRec fiff_ch_pos_t;
 
 /** Directories are composed of these structures. */
-
+//ToDo replace this bis a class fiff_dir_entry.h;
 typedef struct _fiffDirEntryRec {
  fiff_int_t  kind;		/**< Tag number */
  fiff_int_t  type;		/**< Data type */

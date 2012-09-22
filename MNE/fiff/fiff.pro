@@ -73,4 +73,7 @@ HEADERS += fiff.h \
     include/fiff_proj.h \
     include/fiff_named_matrix.h \
     include/fiff_ctf_comp.h \
-    include/fiff_info.h
+    include/fiff_info.h \
+    include/fiff_raw_data.h \
+    include/fiff_dir_entry.h \
+    include/fiff_raw_dir.h
