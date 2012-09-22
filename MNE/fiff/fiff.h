@@ -51,7 +51,16 @@
 #include "include/fiff_tag.h"
 #include "include/fiff_types.h"
 #include "include/fiff_proj.h"
+#include "include/fiff_ctf_comp.h"
+#include "include/fiff_info.h"
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include "../../include/3rdParty/Eigen/Core"
 
 
 //*************************************************************************************************************
@@ -82,6 +91,14 @@
 
 namespace FIFFLIB
 {
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace Eigen;
+
 
 //=============================================================================================================
 /**
@@ -200,7 +217,183 @@ public:
     }
 
 
+
+
+
     /*
+    * ToDo make this member of FiffDirTree
+    *
+    *
+    * [ compdata ] = fiff_read_ctf_comp(fid,node,chs)
+    *
+    * Read the CTF software compensation data from the given node
+    *
+    */
+    static inline QList<FiffCtfComp*> read_ctf_comp(QFile* p_pFile, FiffDirTree* p_pNode, QList<FiffChInfo>& chs)
+    {
+        QList<FiffCtfComp*> compdata;
+        QList<FiffDirTree*> t_qListComps = p_pNode->dir_tree_find(FIFFB_MNE_CTF_COMP_DATA);
+
+        qint32 i, k, p, col, row;
+        fiff_int_t kind, pos;
+        FiffTag* t_pTag = NULL;
+        for (k = 0; k < t_qListComps.size(); ++k)
+        {
+            qDebug() << "read_ctf_comp haven't been verified jet!";
+            FiffDirTree* node = t_qListComps.at(k);
+            //
+            //   Read the data we need
+            //
+            FiffNamedMatrix* mat;
+            Fiff::read_named_matrix(p_pFile, node, FIFF_MNE_CTF_COMP_DATA, mat);
+            for(p = 0; p < node->nent; ++p)
+            {
+                kind = node->dir.at(p).kind;
+                pos  = node->dir.at(p).pos;
+                if (kind == FIFF_MNE_CTF_COMP_KIND)
+                {
+                    FiffTag::read_tag(p_pFile, t_pTag, pos);
+                    break;
+                }
+            }
+            if (!t_pTag)
+            {
+                printf("Compensation type not found\n");
+                return compdata;
+            }
+            //
+            //   Get the compensation kind and map it to a simple number
+            //
+            FiffCtfComp* one = new FiffCtfComp();
+            one->ctfkind = *t_pTag->toInt();
+            delete t_pTag;
+            t_pTag = NULL;
+
+            one->kind   = -1;
+            if (one->ctfkind == 1194410578) //hex2dec('47314252')
+                one->kind = 1;
+            else if (one->ctfkind == 1194476114) //hex2dec('47324252')
+                one->kind = 2;
+            else if (one->ctfkind == 1194541650) //hex2dec('47334252')
+                one->kind = 3;
+            else
+                one->kind = one->ctfkind;
+
+            for (p = 0; p < node->nent; ++p)
+            {
+                kind = node->dir.at(p).kind;
+                pos  = node->dir.at(p).pos;
+                if (kind == FIFF_MNE_CTF_COMP_CALIBRATED)
+                {
+                    FiffTag::read_tag(p_pFile, t_pTag, pos);
+                    break;
+                }
+            }
+            bool calibrated;
+            if (!t_pTag)
+                calibrated = false;
+            else
+                calibrated = *t_pTag->toByte();
+
+            one->save_calibrated = calibrated;
+            one->rowcals = MatrixXf::Ones(1,mat->data.rows());//ones(1,size(mat.data,1));
+            one->colcals = MatrixXf::Ones(1,mat->data.cols());//ones(1,size(mat.data,2));
+            if (!calibrated)
+            {
+                //
+                //   Calibrate...
+                //
+                //
+                //   Do the columns first
+                //
+                QStringList ch_names;
+                for (p  = 0; p < chs.size(); ++p)
+                    ch_names.append(chs.at(p).ch_name);
+
+                MatrixXi vCol(mat->data.cols(), 1);
+                MatrixXf col_cals(mat->data.cols(), 1);
+                for (col = 0; col < mat->data.cols(); ++col)
+                {
+                    vCol.setZero();
+                    for (i = 0; i < ch_names.size(); ++i)
+                    {
+                        if (QString::compare(mat->col_names.at(col),ch_names.at(i)))
+                        {
+                            vCol(i,0) = 1;
+                            p = i;
+                        }
+                        else
+                            vCol(i,0) = 0;
+                    }
+
+                    if (vCol.sum() == 0)
+                    {
+                        printf("Channel %s is not available in data",mat->col_names.at(col).toUtf8().constData());
+                        delete t_pTag;
+                        return compdata;
+                    }
+                    else if (vCol.sum() > 1)
+                    {
+                        printf("Ambiguous channel %s",mat->col_names.at(col).toUtf8().constData());
+                        delete t_pTag;
+                        return compdata;
+                    }
+                    col_cals(col,0) = 1.0f/(chs.at(p).range*chs.at(p).cal);
+                }
+                //
+                //    Then the rows
+                //
+                MatrixXi vRow(mat->data.rows(), 1);
+                MatrixXf row_cals(mat->data.rows(), 1);
+                for (row = 0; row < mat->data.rows(); ++row)
+                {
+                    vRow.setZero();
+                    for (i = 0; i < ch_names.size(); ++i)
+                    {
+                        if (QString::compare(mat->row_names.at(row),ch_names.at(i)))
+                        {
+                            vRow(i,0) = 1;
+                            p = i;
+                        }
+                        else
+                            vRow(i,0) = 0;
+                    }
+
+                    if (vRow.sum() == 0)
+                    {
+                        printf("Channel %s is not available in data",mat->row_names.at(row).toUtf8().constData());
+                        delete t_pTag;
+                        return compdata;
+                    }
+                    else if (vRow.sum() > 1)
+                    {
+                        printf("Ambiguous channel %s",mat->row_names.at(row).toUtf8().constData());
+                        delete t_pTag;
+                        return compdata;
+                    }
+
+
+                    row_cals(row) = chs.at(p).range*chs.at(p).cal;
+                }
+                mat->data            = row_cals.asDiagonal()*mat->data*col_cals.asDiagonal();
+                one->rowcals         = row_cals;
+                one->colcals         = col_cals;
+            }
+            one->data       = mat;
+            compdata.append(one);
+        }
+
+        if (compdata.size() > 0)
+            printf("\tRead %d compensation matrices\n",compdata.size());
+
+        if(t_pTag)
+            delete t_pTag;
+        return compdata;
+    }
+
+    /*
+    * ToDo make this member of FiffDirTree
+    *
     * [info,meas] = fiff_read_meas_info(source,tree)
     *
     * Read the measurement info
@@ -235,7 +428,7 @@ public:
         //
         //   Read measurement info
         //
-        FIFFLIB::FiffTag* t_pTag = NULL;
+        FiffTag* t_pTag = NULL;
 
         fiff_int_t nchan = -1;
         float sfreq = -1.0f;
@@ -428,43 +621,47 @@ public:
         //
         //   Load the SSP data
         //
-        QList<FiffProj*> projs = Fiff::read_proj(p_pFile,meas_info.at(0));
-//        %
-//        %   Load the CTF compensation data
-//        %
-//        comps = fiff_read_ctf_comp(fid,meas_info,chs);
-//        %
-//        %   Load the bad channel list
-//        %
-//        bads = fiff_read_bad_channels(fid,meas_info);
-//        %
-//        %   Put the data together
-//        %
-//        if ~isempty(tree.id)
-//            info.file_id = tree.id;
-//        else
-//            info.file_id = [];
-//        end
-//        %
-//        %  Make the most appropriate selection for the measurement id
-//        %
-//        if isempty(meas_info.parent_id)
-//            if isempty(meas_info.id)
-//                if isempty(meas.id)
-//                    if isempty(meas.parent_id)
-//                        info.meas_id = info.file_id;
-//                    else
-//                        info.meas_id = meas.parent_id;
-//                    end
-//                else
-//                    info.meas_id = meas.id;
-//                end
-//            else
-//                info.meas_id = meas_info.id;
-//            end
-//        else
-//            info.meas_id = meas_info.parent_id;
-//        end
+        QList<FiffProj*> projs = Fiff::read_proj(p_pFile, meas_info.at(0));//ToDo Member Function
+        //
+        //   Load the CTF compensation data
+        //
+        QList<FiffCtfComp*> comps = Fiff::read_ctf_comp(p_pFile, meas_info.at(0), chs);//ToDo Member Function
+        //
+        //   Load the bad channel list
+        //
+        QStringList bads = p_pTree->read_bad_channels(p_pFile);
+        //
+        //   Put the data together
+        //
+        FiffInfo info;
+        if (p_pTree->id.version != -1)
+            info.file_id = p_pTree->id;
+        else
+            info.file_id.version = -1;
+
+        //
+        //  Make the most appropriate selection for the measurement id
+        //
+        if (meas_info.at(0)->parent_id.version == -1)
+        {
+            if (meas_info.at(0)->id.version == -1)
+            {
+                if (meas.at(0)->id.version == -1)
+                {
+                    if (meas.at(0)->parent_id.version == -1)
+                        info.meas_id = info.file_id;
+                    else
+                        info.meas_id = meas.at(0)->parent_id;
+                }
+                else
+                    info.meas_id = meas.at(0)->id;
+            }
+            else
+                info.meas_id = meas_info.at(0)->id;
+        }
+        else
+            info.meas_id = meas_info.at(0)->parent_id;
+
 //        if isempty(meas_date)
 //            info.meas_date = [ info.meas_id.secs info.meas_id.usecs ];
 //        else
@@ -525,6 +722,8 @@ public:
 
     //=========================================================================================================
     /**
+    * ToDo make this member of FiffDirTree
+    *
     * fiff_read_named_matrix
     *
     * ### MNE toolbox root function ###
@@ -543,13 +742,13 @@ public:
     * Read the SSP data under a given directory node
     *
     */
-    static inline QList<FiffProj*> read_proj(QFile* p_pFile, FiffDirTree* p_pListNode)
+    static inline QList<FiffProj*> read_proj(QFile* p_pFile, FiffDirTree* p_pNode)
     {
         QList<FiffProj*> projdata;// = struct('kind',{},'active',{},'desc',{},'data',{});
         //
         //   Locate the projection data
         //
-        QList<FiffDirTree*> t_qListNodes = p_pListNode->dir_tree_find(FIFFB_PROJ);
+        QList<FiffDirTree*> t_qListNodes = p_pNode->dir_tree_find(FIFFB_PROJ);
         if ( t_qListNodes.size() == 0 )
             return projdata;
 
@@ -687,6 +886,8 @@ public:
             }
         }
 
+        if (t_pTag)
+            delete t_pTag;
 
         return projdata;
     }

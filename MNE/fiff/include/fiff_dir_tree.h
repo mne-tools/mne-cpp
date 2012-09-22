@@ -182,14 +182,14 @@ public:
 
 
 public:
-    qint32                  block;      /**< Block type for this directory */
-    fiff_id_t               id;         /**< Id of this block if any */
-    fiff_id_t               parent_id;  /**< Newly added to stay consistent with MATLAB implementation */
+    fiff_int_t              block;      /**< Block type for this directory */
+    FiffId                  id;         /**< Id of this block if any */
+    FiffId                  parent_id;  /**< Newly added to stay consistent with MATLAB implementation */
     QList<fiff_dir_entry_t> dir;        /**< Directory of tags in this node */
-    qint32                  nent;       /**< Number of entries in this node */
-    qint32                  nent_tree;  /**< Number of entries in the directory tree node */
+    fiff_int_t              nent;       /**< Number of entries in this node */
+    fiff_int_t              nent_tree;  /**< Number of entries in the directory tree node */
     QList<FiffDirTree*>     children;   /**< Child nodes */
-    qint32                  nchild;     /**< Number of child nodes */
+    fiff_int_t              nchild;     /**< Number of child nodes */
 
 };
 

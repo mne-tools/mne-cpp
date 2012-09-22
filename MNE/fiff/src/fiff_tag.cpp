@@ -726,7 +726,7 @@ void FiffTag::fiff_convert_tag_data(FiffTag* tag, int from_endian, int to_endian
     float          *fthis;
     double         *dthis;
     fiffDirEntry   dethis;
-    fiffId         idthis;
+//    fiffId         idthis;
 //    fiffChInfoRec* chthis;//FiffChInfo*     chthis;//ToDo adapt parsing to the new class
     fiffChPos      cpthis;
 //    fiffCoordTrans ctthis;
@@ -816,13 +816,23 @@ void FiffTag::fiff_convert_tag_data(FiffTag* tag, int from_endian, int to_endian
         break;
 
     case FIFFT_ID_STRUCT :
-        np = tag->size/sizeof(fiffIdRec);
-        for (idthis = (fiffId)tag->data, k = 0; k < np; k++, idthis++) {
-            idthis->version = swap_int(idthis->version);
-            idthis->machid[0] = swap_int(idthis->machid[0]);
-            idthis->machid[1] = swap_int(idthis->machid[1]);
-            idthis->time.secs  = swap_int(idthis->time.secs);
-            idthis->time.usecs = swap_int(idthis->time.usecs);
+//        np = tag->size/sizeof(fiffIdRec);
+//        for (idthis = (fiffId)tag->data, k = 0; k < np; k++, idthis++) {
+//            idthis->version = swap_int(idthis->version);
+//            idthis->machid[0] = swap_int(idthis->machid[0]);
+//            idthis->machid[1] = swap_int(idthis->machid[1]);
+//            idthis->time.secs  = swap_int(idthis->time.secs);
+//            idthis->time.usecs = swap_int(idthis->time.usecs);
+//        }
+        np = tag->size/FiffId::size();
+        ithis = static_cast< fiff_int_t* >(tag->data);
+        for (k = 0; k < np; k++) {
+            offset = k*FiffId::size();
+            ithis[0+offset] = swap_int(ithis[0+offset]);//version
+            ithis[1+offset] = swap_int(ithis[1+offset]);//machid[0]
+            ithis[2+offset] = swap_int(ithis[2+offset]);//machid[1]
+            ithis[3+offset] = swap_int(ithis[3+offset]);//time.secs
+            ithis[4+offset] = swap_int(ithis[4+offset]);//time.usecs
         }
         break;
 

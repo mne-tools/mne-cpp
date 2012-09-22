@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiff_proj.cpp
+* @file     fiff_id.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,51 +29,110 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the FiffProj Class.
+* @brief    Contains the FiffId class declaration.
 *
 */
+
+#ifndef FIFF_ID_H
+#define FIFF_ID_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../include/fiff_proj.h"
+#include "../fiff_global.h"
+#include "fiff_types.h"
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include "../../../include/3rdParty/Eigen/Core"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE FIFFLIB
+//=============================================================================================================
+
+namespace FIFFLIB
+{
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace Eigen;
 
 
-//*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
+/**
+* DECLARE CLASS FiffId, replaces fiffIdRec which had a size of 5*4 = 20
+*
+* A file ID.
+*
+* These universially unique identifiers are also
+* used to identify blocks within the files.
+*
+* typedef struct _fiffIdRec {
+*  fiff_int_t version;     /**< File version *
+*  fiff_int_t machid[2];   /**< Unique machine ID *
+*  fiffTimeRec time;       /**< Time of the ID creation *
+*} fiffIdRec,*fiffId;     /**< This is the file identifier *
+*
+* typedef fiffIdRec fiff_id_t;
+*
+* @brief The FiffId class provides the fiff file id description
+**/
 
-FiffProj::FiffProj()
-{
+class FIFFSHARED_EXPORT FiffId {
 
-}
+public:
+    //=========================================================================================================
+    /**
+    * ctor
+    */
+    FiffId()
+    : version(-1)
+    {
+        machid[0] = -1;
+        machid[1] = -1;
+        time.secs = -1;
+        time.usecs = -1;
+    }
 
 
-FiffProj::FiffProj( fiff_int_t p_kind, bool p_active, QString p_desc, FiffNamedMatrix* p_data)
-: kind(p_kind)
-, active(p_active)
-, desc(p_desc)
-, data(p_data)
-{
+    //=========================================================================================================
+    /**
+    * Destroys the FiffInfo.
+    */
+    ~FiffId()
+    {
 
-}
+    }
+
+    //=========================================================================================================
+    /**
+    * Size of the old struct (fiffIdRec) 5*int = 5*4 = 20
+    *
+    * @return the size of the old struct fiffIdRec.
+    */
+    inline static qint32 size()
+    {
+        return 20;
+    }
 
 
-//*************************************************************************************************************
+public:
+    fiff_int_t version;     /**< File version */
+    fiff_int_t machid[2];   /**< Unique machine ID */
+    fiffTimeRec time;       /**< Time of the ID creation */
+};
 
-FiffProj::~FiffProj()
-{
-    if(data)
-        delete data;
-}
+} // NAMESPACE
+
+#endif // FIFF_ID_H

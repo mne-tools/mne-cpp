@@ -64,14 +64,13 @@ SOURCES += fiff.cpp \
 HEADERS += fiff.h \
         fiff_global.h \
     include/fiff_types.h \
-#    include/fiff_parser.h \
-#    include/fiff_file.h \
-#    include/allocs.h \
-#    include/dot.h \
+    include/fiff_id.h \
     include/fiff_constants.h \
     include/fiff_tag.h \
     include/fiff_dir_tree.h \
     include/fiff_coord_trans.h \
     include/fiff_ch_info.h \
     include/fiff_proj.h \
-    include/fiff_named_matrix.h
+    include/fiff_named_matrix.h \
+    include/fiff_ctf_comp.h \
+    include/fiff_info.h
