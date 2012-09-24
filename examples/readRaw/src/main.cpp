@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    QString t_sFile = "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
+    QString t_sFile = "./MNE-sample-data/test_ctf_raw.fif";//"./MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
 
 //        raw = fiff_setup_read_raw(infile);
 
