@@ -64,14 +64,33 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    QString t_sFile = "./MNE-sample-data/test_ctf_raw.fif";//"./MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
+    QString t_sFile = "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif";//"./MNE-sample-data/test_ctf_raw.fif";
 
-//        raw = fiff_setup_read_raw(infile);
-
-    if(Fiff::setup_read_raw(t_sFile))
+    //
+    //   Setup for reading the raw data
+    //
+    FiffRawData* data = NULL;
+    if(!Fiff::setup_read_raw(t_sFile, data))
     {
-        std::cout << std::endl << "Fif raw read" << std::endl;
+        printf("Error during fiff setup raw read");
+        return 0;
     }
+    //
+    //   Set up pick list: MEG + STI 014 - bad channels
+    //
+    //
+    bool want_meg   = true;
+    bool want_eeg   = false;
+    bool want_stim  = false;
+    QStringList include;
+    include << "STI 014";
+
+
+
+
+
+
+
 
     return a.exec();
 }

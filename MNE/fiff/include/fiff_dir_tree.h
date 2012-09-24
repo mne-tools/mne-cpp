@@ -45,6 +45,9 @@
 #include "fiff_constants.h"
 #include "fiff_types.h"
 #include "fiff_tag.h"
+#include "fiff_ctf_comp.h"
+#include "fiff_proj.h"
+#include "fiff_info.h"
 
 
 //*************************************************************************************************************
@@ -153,7 +156,6 @@ public:
     */
     bool has_tag(fiff_int_t findkind);
 
-
     //=========================================================================================================
     /**
     * fiff_read_bad_channels
@@ -171,6 +173,56 @@ public:
     */
     QStringList read_bad_channels(QFile* p_pFile);
 
+    //=========================================================================================================
+    /**
+    * fiff_read_ctf_comp
+    *
+    * ### MNE toolbox root function ###
+    *
+    * [ compdata ] = fiff_read_ctf_comp(fid,node,chs)
+    *
+    * Read the CTF software compensation data from the given node
+    *
+    */
+    QList<FiffCtfComp*> read_ctf_comp(QFile* p_pFile, QList<FiffChInfo>& chs);
+
+    //=========================================================================================================
+    /**
+    * fiff_read_meas_info
+    *
+    * ### MNE toolbox root function ###
+    *
+    * [info,meas] = fiff_read_meas_info(source,tree)
+    *
+    * Read the measurement info
+    *
+    * If tree is specified, source is assumed to be an open file id,
+    * otherwise a the name of the file to read. If tree is missing, the
+    * meas output argument should not be specified.
+    *
+    */
+    FiffDirTree* read_meas_info(QFile* p_pFile, FiffInfo*& info);
+
+    //=========================================================================================================
+    /**
+    * fiff_read_named_matrix
+    *
+    * ### MNE toolbox root function ###
+    */
+    bool read_named_matrix(QFile* p_pFile, fiff_int_t matkind, FiffNamedMatrix*& mat);
+
+    //=========================================================================================================
+    /**
+    * fiff_read_proj
+    *
+    * ### MNE toolbox root function ###
+    *
+    * [ projdata ] = fiff_read_proj(fid,node)
+    *
+    * Read the SSP data under a given directory node
+    *
+    */
+    QList<FiffProj*> read_proj(QFile* p_pFile);
 
     //=========================================================================================================
     /**
@@ -179,7 +231,6 @@ public:
     * ### MNE toolbox root function ###
     */
     static QStringList split_name_list(QString p_sNameList);
-
 
 public:
     fiff_int_t              block;      /**< Block type for this directory */
