@@ -241,12 +241,11 @@ public:
         FiffTag* t_pTag = NULL;
         for (k = 0; k < t_qListComps.size(); ++k)
         {
-            qDebug() << "read_ctf_comp haven't been verified jet!";
             FiffDirTree* node = t_qListComps.at(k);
             //
             //   Read the data we need
             //
-            FiffNamedMatrix* mat;
+            FiffNamedMatrix* mat = NULL;
             Fiff::read_named_matrix(p_pFile, node, FIFF_MNE_CTF_COMP_DATA, mat);
             for(p = 0; p < node->nent; ++p)
             {
@@ -295,7 +294,7 @@ public:
             if (!t_pTag)
                 calibrated = false;
             else
-                calibrated = *t_pTag->toByte();
+                calibrated = (bool)*t_pTag->toInt();
 
             one->save_calibrated = calibrated;
             one->rowcals = MatrixXf::Ones(1,mat->data.rows());//ones(1,size(mat.data,1));
@@ -312,29 +311,27 @@ public:
                 for (p  = 0; p < chs.size(); ++p)
                     ch_names.append(chs.at(p).ch_name);
 
-                MatrixXi vCol(mat->data.cols(), 1);
+                qint32 count;
                 MatrixXf col_cals(mat->data.cols(), 1);
+                col_cals.setZero();
                 for (col = 0; col < mat->data.cols(); ++col)
                 {
-                    vCol.setZero();
+                    count = 0;
                     for (i = 0; i < ch_names.size(); ++i)
                     {
-                        if (QString::compare(mat->col_names.at(col),ch_names.at(i)))
+                        if (QString::compare(mat->col_names.at(col),ch_names.at(i)) == 0)
                         {
-                            vCol(i,0) = 1;
+                            count += 1;
                             p = i;
                         }
-                        else
-                            vCol(i,0) = 0;
                     }
-
-                    if (vCol.sum() == 0)
+                    if (count == 0)
                     {
                         printf("Channel %s is not available in data",mat->col_names.at(col).toUtf8().constData());
                         delete t_pTag;
                         return compdata;
                     }
-                    else if (vCol.sum() > 1)
+                    else if (count > 1)
                     {
                         printf("Ambiguous channel %s",mat->col_names.at(col).toUtf8().constData());
                         delete t_pTag;
@@ -345,37 +342,34 @@ public:
                 //
                 //    Then the rows
                 //
-                MatrixXi vRow(mat->data.rows(), 1);
                 MatrixXf row_cals(mat->data.rows(), 1);
+                row_cals.setZero();
                 for (row = 0; row < mat->data.rows(); ++row)
                 {
-                    vRow.setZero();
+                    count = 0;
                     for (i = 0; i < ch_names.size(); ++i)
                     {
-                        if (QString::compare(mat->row_names.at(row),ch_names.at(i)))
+                        if (QString::compare(mat->row_names.at(row),ch_names.at(i)) == 0)
                         {
-                            vRow(i,0) = 1;
+                            count += 1;
                             p = i;
                         }
-                        else
-                            vRow(i,0) = 0;
                     }
 
-                    if (vRow.sum() == 0)
+                    if (count == 0)
                     {
                         printf("Channel %s is not available in data",mat->row_names.at(row).toUtf8().constData());
                         delete t_pTag;
                         return compdata;
                     }
-                    else if (vRow.sum() > 1)
+                    else if (count > 1)
                     {
                         printf("Ambiguous channel %s",mat->row_names.at(row).toUtf8().constData());
                         delete t_pTag;
                         return compdata;
                     }
 
-
-                    row_cals(row) = chs.at(p).range*chs.at(p).cal;
+                    row_cals(row, 0) = chs.at(p).range*chs.at(p).cal;
                 }
                 mat->data            = row_cals.asDiagonal()*mat->data*col_cals.asDiagonal();
                 one->rowcals         = row_cals;
