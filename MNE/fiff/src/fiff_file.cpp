@@ -1,6 +1,7 @@
+
 //=============================================================================================================
 /**
-* @file     fiff_raw_data.h
+* @file     fiff_file.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,90 +30,135 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the FiffRawData class declaration.
+* @brief    Contains the implementation of the FiffFile Class.
 *
 */
 
-#ifndef FIFF_RAW_DATA_H
-#define FIFF_RAW_DATA_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../fiff_global.h"
-#include "fiff_types.h"
-#include "fiff_info.h"
-#include "fiff_proj.h"
-#include "fiff_ctf_comp.h"
-#include "fiff_raw_dir.h"
-#include "fiff_file.h"
+#include "../include/fiff_file.h"
+#include "../include/fiff_tag.h"
+#include "../include/fiff_dir_tree.h"
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QFile>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
-//=============================================================================================================
-
-namespace FIFFLIB
-{
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-//using namespace Eigen;
+using namespace FIFFLIB;
 
 
+//*************************************************************************************************************
 //=============================================================================================================
-/**
-* DECLARE CLASS FiffRawData
-*
-*
-*
-* @brief The FiffRawData class provides
-*/
-class FIFFSHARED_EXPORT FiffRawData {
+// DEFINE MEMBER METHODS
+//=============================================================================================================
 
-public:
-    //=========================================================================================================
-    /**
-    * ctor
-    */
-    FiffRawData()
+FiffFile::FiffFile(QString& p_sFilename)
+: QFile(p_sFilename)
+{
+
+}
+
+
+//*************************************************************************************************************
+
+FiffFile::~FiffFile()
+{
+    if(this->isOpen())
     {
+        this->close();
+    }
+}
+
+
+//*************************************************************************************************************
+
+bool FiffFile::open(FiffDirTree*& p_pTree, QList<fiff_dir_entry_t>*& p_pDir)
+{
+
+    if (!this->open(QIODevice::ReadOnly))
+    {
+        printf("Cannot open file %s\n", this->fileName().toUtf8().constData());//consider throw
+        return false;
     }
 
-    //=========================================================================================================
-    /**
-    * Destroys the FiffInfo.
-    */
-    ~FiffRawData()
-    {
+    FIFFLIB::FiffTag* t_pTag = NULL;
+    FiffTag::read_tag_info(this, t_pTag);
 
+    if (t_pTag->kind != FIFF_FILE_ID)
+    {
+        printf("Fiff::open: file does not start with a file id tag");//consider throw
+        return false;
     }
 
-public:
-    FiffFile* m_pFile;//replaces fid
-    FiffInfo* info;
-    fiff_int_t first_samp;
-    fiff_int_t last_samp;
-    MatrixXf cals;
-    QList<FiffRawDir> rawdir;
-    FiffProj proj;
-    FiffCtfComp comp;
-};
+    if (t_pTag->type != FIFFT_ID_STRUCT)
+    {
+        printf("Fiff::open: file does not start with a file id tag");//consider throw
+        return false;
+    }
+    if (t_pTag->size != 20)
+    {
+        printf("Fiff::open: file does not start with a file id tag");//consider throw
+        return false;
+    }
 
-} // NAMESPACE
+    FiffTag::read_tag(this, t_pTag);
 
-#endif // FIFF_RAW_DATA_H
+    if (t_pTag->kind != FIFF_DIR_POINTER)
+    {
+        printf("Fiff::open: file does have a directory pointer");//consider throw
+        return false;
+    }
+
+    //
+    //   Read or create the directory tree
+    //
+    printf("\nCreating tag directory for %s...\n", this->fileName().toUtf8().constData());
+
+    if (p_pDir)
+        delete p_pDir;
+    p_pDir = new QList<fiff_dir_entry_t>;
+
+    qint32 dirpos = *t_pTag->toInt();
+    if (dirpos > 0)
+    {
+        FiffTag::read_tag(this, t_pTag, dirpos);
+        *p_pDir = t_pTag->toDirEntry();
+    }
+    else
+    {
+        int k = 0;
+        this->seek(0);//fseek(fid,0,'bof');
+        //dir = struct('kind',{},'type',{},'size',{},'pos',{});
+        fiff_dir_entry_t t_fiffDirEntry;
+        while (t_pTag->next >= 0)
+        {
+            t_fiffDirEntry.pos = this->pos();//pos = ftell(fid);
+            FiffTag::read_tag_info(this, t_pTag);
+            ++k;
+            t_fiffDirEntry.kind = t_pTag->kind;
+            t_fiffDirEntry.type = t_pTag->type;
+            t_fiffDirEntry.size = t_pTag->size;
+            p_pDir->append(t_fiffDirEntry);
+        }
+    }
+    delete t_pTag;
+    //
+    //   Create the directory tree structure
+    //
+
+    FiffDirTree::make_dir_tree(this, p_pDir, p_pTree);
+
+//    qDebug() << "[done]\n";
+
+    //
+    //   Back to the beginning
+    //
+    this->seek(0); //fseek(fid,0,'bof');
+    return true;
+}

@@ -48,6 +48,7 @@
 #include "fiff_ctf_comp.h"
 #include "fiff_proj.h"
 #include "fiff_info.h"
+#include "fiff_file.h"
 
 
 //*************************************************************************************************************
@@ -68,6 +69,8 @@
 
 namespace FIFFLIB
 {
+
+class FiffFile;
 
 
 //=============================================================================================================
@@ -120,7 +123,7 @@ public:
     /**
     * ### MNE toolbox root function ###: Implementation of the fiff_dir_tree_find function
     */
-    static qint32 make_dir_tree(QFile* p_pFile, QList<fiff_dir_entry_t>* p_pDir, FiffDirTree*& p_pTree, qint32 start = 0);
+    static qint32 make_dir_tree(FiffFile* p_pFile, QList<fiff_dir_entry_t>* p_pDir, FiffDirTree*& p_pTree, qint32 start = 0);
 
     //=========================================================================================================
     /**
@@ -148,7 +151,7 @@ public:
     *
     * @return true if found, false otherwise
     */
-    bool find_tag(QFile* p_pFile, fiff_int_t findkind, FiffTag*& p_pTag);
+    bool find_tag(FiffFile* p_pFile, fiff_int_t findkind, FiffTag*& p_pTag);
 
     //=========================================================================================================
     /**
@@ -171,7 +174,7 @@ public:
     *
     * @return the bad channel list
     */
-    QStringList read_bad_channels(QFile* p_pFile);
+    QStringList read_bad_channels(FiffFile* p_pFile);
 
     //=========================================================================================================
     /**
@@ -184,7 +187,7 @@ public:
     * Read the CTF software compensation data from the given node
     *
     */
-    QList<FiffCtfComp*> read_ctf_comp(QFile* p_pFile, QList<FiffChInfo>& chs);
+    QList<FiffCtfComp*> read_ctf_comp(FiffFile* p_pFile, QList<FiffChInfo>& chs);
 
     //=========================================================================================================
     /**
@@ -201,7 +204,7 @@ public:
     * meas output argument should not be specified.
     *
     */
-    FiffDirTree* read_meas_info(QFile* p_pFile, FiffInfo*& info);
+    FiffDirTree* read_meas_info(FiffFile* p_pFile, FiffInfo*& info);
 
     //=========================================================================================================
     /**
@@ -209,7 +212,7 @@ public:
     *
     * ### MNE toolbox root function ###
     */
-    bool read_named_matrix(QFile* p_pFile, fiff_int_t matkind, FiffNamedMatrix*& mat);
+    bool read_named_matrix(FiffFile* p_pFile, fiff_int_t matkind, FiffNamedMatrix*& mat);
 
     //=========================================================================================================
     /**
@@ -222,7 +225,7 @@ public:
     * Read the SSP data under a given directory node
     *
     */
-    QList<FiffProj*> read_proj(QFile* p_pFile);
+    QList<FiffProj*> read_proj(FiffFile* p_pFile);
 
     //=========================================================================================================
     /**

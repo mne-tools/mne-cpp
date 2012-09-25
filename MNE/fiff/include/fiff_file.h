@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiff_raw_data.h
+* @file     fiff_file.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the FiffRawData class declaration.
+* @brief    Contains the FiffFile class declaration.
 *
 */
 
-#ifndef FIFF_RAW_DATA_H
-#define FIFF_RAW_DATA_H
+#ifndef FIFF_FILE_H
+#define FIFF_FILE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -43,16 +43,11 @@
 
 #include "../fiff_global.h"
 #include "fiff_types.h"
-#include "fiff_info.h"
-#include "fiff_proj.h"
-#include "fiff_ctf_comp.h"
-#include "fiff_raw_dir.h"
-#include "fiff_file.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// INCLUDES
 //=============================================================================================================
 
 #include <QFile>
@@ -66,53 +61,69 @@
 namespace FIFFLIB
 {
 
+class FiffDirTree;
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-//using namespace Eigen;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FiffRawData
+* DECLARE CLASS FiffFile
 *
 *
-*
-* @brief The FiffRawData class provides
-*/
-class FIFFSHARED_EXPORT FiffRawData {
+* @brief The FiffFile class provides...
+**/
+
+class FIFFSHARED_EXPORT FiffFile : public QFile {
 
 public:
     //=========================================================================================================
     /**
     * ctor
+    *
+    * @param[in] p_sFileName file name of the file to open
     */
-    FiffRawData()
-    {
-    }
+    FiffFile(QString& p_sFilename);
 
     //=========================================================================================================
     /**
     * Destroys the FiffInfo.
     */
-    ~FiffRawData()
-    {
+    ~FiffFile();
 
-    }
+    //=========================================================================================================
+    /**
+    * QFile::open
+    *
+    * unmask base class open function
+    */
+    using QFile::open;
+
+    //=========================================================================================================
+    /**
+    * fiff_open
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Opens a fif file and provides the directory of tags
+    *
+    * @param[out] p_pTree tag directory organized into a tree
+    * @param[out] p_pDir the sequential tag directory
+    *
+    * @return true if succeeded, false otherwise
+    */
+    bool open(FiffDirTree*& p_pTree, QList<fiff_dir_entry_t>*& p_pDir);
+
 
 public:
-    FiffFile* m_pFile;//replaces fid
-    FiffInfo* info;
-    fiff_int_t first_samp;
-    fiff_int_t last_samp;
-    MatrixXf cals;
-    QList<FiffRawDir> rawdir;
-    FiffProj proj;
-    FiffCtfComp comp;
+
 };
 
 } // NAMESPACE
 
-#endif // FIFF_RAW_DATA_H
+#endif // FIFF_FILE_H

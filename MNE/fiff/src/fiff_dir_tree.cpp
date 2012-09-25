@@ -76,7 +76,7 @@ FiffDirTree::~FiffDirTree()
 
 //*************************************************************************************************************
 
-qint32 FiffDirTree::make_dir_tree(QFile* p_pFile, QList<fiff_dir_entry_t>* p_pDir, FiffDirTree*& p_pTree, qint32 start)
+qint32 FiffDirTree::make_dir_tree(FiffFile* p_pFile, QList<fiff_dir_entry_t>* p_pDir, FiffDirTree*& p_pTree, qint32 start)
 {
 //    qDebug() << "Size Dir: " << p_pDir->size();
 
@@ -191,7 +191,7 @@ QList<FiffDirTree*> FiffDirTree::dir_tree_find(fiff_int_t kind)
 
 //*************************************************************************************************************
 
-bool FiffDirTree::find_tag(QFile* p_pFile, fiff_int_t findkind, FiffTag*& p_pTag)
+bool FiffDirTree::find_tag(FiffFile* p_pFile, fiff_int_t findkind, FiffTag*& p_pTag)
 {
     for (int p = 0; p < this->nent; ++p)
     {
@@ -223,7 +223,7 @@ bool FiffDirTree::has_tag(fiff_int_t findkind)
 
 //*************************************************************************************************************
 
-QStringList FiffDirTree::read_bad_channels(QFile* p_pFile)
+QStringList FiffDirTree::read_bad_channels(FiffFile* p_pFile)
 {
     QList<FiffDirTree*> node = this->dir_tree_find(FIFFB_MNE_BAD_CHANNELS);
     FIFFLIB::FiffTag* t_pTag = NULL;
@@ -240,7 +240,7 @@ QStringList FiffDirTree::read_bad_channels(QFile* p_pFile)
 
 //*************************************************************************************************************
 
-QList<FiffCtfComp*> FiffDirTree::read_ctf_comp(QFile* p_pFile, QList<FiffChInfo>& chs)
+QList<FiffCtfComp*> FiffDirTree::read_ctf_comp(FiffFile* p_pFile, QList<FiffChInfo>& chs)
 {
     FiffDirTree* p_pNode = this;
 
@@ -409,7 +409,7 @@ QStringList FiffDirTree::split_name_list(QString p_sNameList)
 
 //*************************************************************************************************************
 
-FiffDirTree* FiffDirTree::read_meas_info(QFile* p_pFile, FiffInfo*& info)
+FiffDirTree* FiffDirTree::read_meas_info(FiffFile* p_pFile, FiffInfo*& info)
 {
     FiffDirTree* p_pTree = this;
 
@@ -740,7 +740,7 @@ FiffDirTree* FiffDirTree::read_meas_info(QFile* p_pFile, FiffInfo*& info)
 
 //*************************************************************************************************************
 
-bool FiffDirTree::read_named_matrix(QFile* p_pFile, fiff_int_t matkind, FiffNamedMatrix*& mat)
+bool FiffDirTree::read_named_matrix(FiffFile* p_pFile, fiff_int_t matkind, FiffNamedMatrix*& mat)
 {
     if (mat != NULL)
         delete mat;
@@ -834,7 +834,7 @@ bool FiffDirTree::read_named_matrix(QFile* p_pFile, fiff_int_t matkind, FiffName
 
 //*************************************************************************************************************
 
-QList<FiffProj*> FiffDirTree::read_proj(QFile* p_pFile)
+QList<FiffProj*> FiffDirTree::read_proj(FiffFile* p_pFile)
 {
     FiffDirTree* p_pNode = this;
 

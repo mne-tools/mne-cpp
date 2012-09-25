@@ -55,6 +55,7 @@
 #include "include/fiff_info.h"
 #include "include/fiff_raw_data.h"
 #include "include/fiff_raw_dir.h"
+#include "include/fiff_file.h"
 
 
 //*************************************************************************************************************
@@ -95,6 +96,7 @@ namespace FIFFLIB
 {
 
 static QStringList defaultQStringList = QStringList();
+static MatrixXi defaultMatrixXi(0,0);
 
 
 //*************************************************************************************************************
@@ -176,7 +178,7 @@ public:
     *
     * Wrapper for the FiffCoordTrans::invert_transform static function
     */
-    static inline qint32 make_dir_tree(QFile* p_pFile, QList<fiff_dir_entry_t>* p_pDir, FiffDirTree*& p_pTree, qint32 start = 0)
+    static inline qint32 make_dir_tree(FiffFile* p_pFile, QList<fiff_dir_entry_t>* p_pDir, FiffDirTree*& p_pTree, qint32 start = 0)
     {
         return FiffDirTree::make_dir_tree(p_pFile, p_pDir, p_pTree, start);
     }
@@ -187,6 +189,8 @@ public:
     *
     * ### MNE toolbox root function ###
     *
+    * Wrapper for the FiffFile open member function
+    *
     * Opens a fif file and provides the directory of tags
     *
     * @param[in] p_sFileName file name of the file to open
@@ -196,7 +200,15 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool open(QString& p_sFileName, QFile*& p_pFile, FiffDirTree*& p_pTree, QList<fiff_dir_entry_t>*& p_pDir);
+    static bool open(QString& p_sFileName, FiffFile*& p_pFile, FiffDirTree*& p_pTree, QList<fiff_dir_entry_t>*& p_pDir)
+    {
+        if(p_pFile)
+            delete p_pFile;
+
+        p_pFile = new FiffFile(p_sFileName);
+
+        return p_pFile->open(p_pTree, p_pDir);
+    }
 
 
     //=========================================================================================================
@@ -250,7 +262,7 @@ public:
     *
     * @return the bad channel list
     */
-    static inline QStringList read_bad_channels(QFile* p_pFile, FiffDirTree* p_pTree)
+    static inline QStringList read_bad_channels(FiffFile* p_pFile, FiffDirTree* p_pTree)
     {
         return p_pTree->read_bad_channels(p_pFile);
     }
@@ -268,7 +280,7 @@ public:
     * Read the CTF software compensation data from the given node
     *
     */
-    static inline QList<FiffCtfComp*> read_ctf_comp(QFile* p_pFile, FiffDirTree* p_pNode, QList<FiffChInfo>& chs)
+    static inline QList<FiffCtfComp*> read_ctf_comp(FiffFile* p_pFile, FiffDirTree* p_pNode, QList<FiffChInfo>& chs)
     {
         return p_pNode->read_ctf_comp(p_pFile, chs);
     }
@@ -288,7 +300,7 @@ public:
     * meas output argument should not be specified.
     *
     */
-    static inline FiffDirTree* read_meas_info(QFile* p_pFile, FiffDirTree* p_pTree, FiffInfo*& info)
+    static inline FiffDirTree* read_meas_info(FiffFile* p_pFile, FiffDirTree* p_pTree, FiffInfo*& info)
     {
         return p_pTree->read_meas_info(p_pFile, info);
     }
@@ -303,7 +315,7 @@ public:
     *
     * ToDo
     */
-    static inline bool read_named_matrix(QFile* p_pFile, FiffDirTree* node, fiff_int_t matkind, FiffNamedMatrix*& mat)
+    static inline bool read_named_matrix(FiffFile* p_pFile, FiffDirTree* node, fiff_int_t matkind, FiffNamedMatrix*& mat)
     {
         return node->read_named_matrix(p_pFile, matkind, mat);
     }
@@ -320,7 +332,7 @@ public:
     *
     * ToDo
     */
-    static inline QList<FiffProj*> read_proj(QFile* p_pFile, FiffDirTree* p_pNode)
+    static inline QList<FiffProj*> read_proj(FiffFile* p_pFile, FiffDirTree* p_pNode)
     {
         return p_pNode-> read_proj(p_pFile);
     }
@@ -342,7 +354,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static inline bool read_tag(QFile* p_pFile, FiffTag*& p_pTag, qint64 pos = -1)
+    static inline bool read_tag(FiffFile* p_pFile, FiffTag*& p_pTag, qint64 pos = -1)
     {
         return FiffTag::read_tag(p_pFile, p_pTag, pos);
     }
@@ -363,7 +375,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static inline bool read_tag_info(QFile* p_pFile, FiffTag*& p_pTag)
+    static inline bool read_tag_info(FiffFile* p_pFile, FiffTag*& p_pTag)
     {
         return FiffTag::read_tag_info(p_pFile, p_pTag);
     }
@@ -395,6 +407,212 @@ public:
     {
         return FiffDirTree::split_name_list(p_sNameList);
     }
+
+
+    //=========================================================================================================
+    /**
+    * consider class fiff_file
+    *
+    * fiff_start_file
+    *
+    * ### MNE toolbox root function ###
+    *
+    * [fid] = fiff_start_file(name)
+    *
+    * Opens a fiff file for writing and writes the compulsory header tags
+    *
+    *     name           The name of the file to open. It is recommended
+    *                    that the name ends with .fif
+    *
+    */
+    static bool start_file(QString& p_sFileName, FiffFile*& p_pFile)
+    {
+        if (p_pFile)
+        {
+            p_pFile->close();
+            delete p_pFile;
+        }
+        p_pFile = new FiffFile(p_sFileName);
+
+        if(!p_pFile->open(QIODevice::WriteOnly))
+        {
+            printf("Cannot write to %s\n", p_pFile->fileName().toUtf8().constData());//consider throw
+            return false;
+        }
+        //
+        //   Write the compulsory items
+        //
+        //FIFF_FILE_ID = 100;
+        //FIFF_DIR_POINTER=101;
+        //FIFF_FREE_LIST=106;
+
+//        fiff_write_id(fid,FIFF_FILE_ID);
+//        fiff_write_int(fid,FIFF_DIR_POINTER,-1);
+//        fiff_write_int(fid,FIFF_FREE_LIST,-1);
+//        //
+        //   Ready for more
+        //
+        return true;
+    }
+
+
+    //=========================================================================================================
+    /**
+    * fiff_start_writing_raw
+    *
+    * ### MNE toolbox root function ###
+    *
+    * function [fid,cals] = fiff_start_writing_raw(name,info,sel)
+    *
+    * name       filename
+    * info       The measurement info block of the source file
+    * sel        Which channels will be included in the output file (optional)
+    *
+    */
+    static bool start_writing_raw(QString& p_sFileName, FiffInfo* info, MatrixXi sel = defaultMatrixXi)
+    {
+        //
+        //   We will always write floats
+        //
+        fiff_int_t data_type = 4;
+        qint32 k;
+
+        if(sel.cols() == 0)
+        {
+            sel.resize(1,info->nchan);
+            for (k = 0; k < info->nchan; ++k)
+                sel(0, k) = k; //+1 when MATLAB notation
+        }
+
+        QList<FiffChInfo> chs;
+
+        for(k = 0; k < sel.cols(); ++k)
+            chs << info->chs.at(sel(0,k));
+
+        fiff_int_t nchan = chs.size();
+        //
+        //  Create the file and save the essentials
+        //
+//        QFile* fid = Fiff::start_file(p_sFileName);
+//        fiff_start_block(fid,FIFF.FIFFB_MEAS);
+//        fiff_write_id(fid,FIFF.FIFF_BLOCK_ID);
+//        if ~isempty(info.meas_id)
+//            fiff_write_id(fid,FIFF.FIFF_PARENT_BLOCK_ID,info.meas_id);
+//        end
+//        %
+//        %
+//        %    Measurement info
+//        %
+//        fiff_start_block(fid,FIFF.FIFFB_MEAS_INFO);
+//        %
+//        %    Blocks from the original
+//        %
+//        blocks = [ FIFF.FIFFB_SUBJECT FIFF.FIFFB_HPI_MEAS FIFF.FIFFB_HPI_RESULT FIFF.FIFFB_ISOTRAK FIFF.FIFFB_PROCESSING_HISTORY ];
+//        have_hpi_result = false;
+//        have_isotrak    = false;
+//        if length(blocks) > 0 && isfield(info,'filename') && ~isempty(info.filename)
+//            [ fid2, tree ] = fiff_open(info.filename);
+//            for k = 1:length(blocks)
+//                nodes = fiff_dir_tree_find(tree,blocks(k));
+//                fiff_copy_tree(fid2,tree.id,nodes,fid);
+//                if blocks(k) == FIFF.FIFFB_HPI_RESULT && length(nodes) > 0
+//                    have_hpi_result = true;
+//                end
+//                if blocks(k) == FIFF.FIFFB_ISOTRAK && length(nodes) > 0
+//                    have_isotrak = true;
+//                end
+//            end
+//            fclose(fid2);
+//        end
+//        %
+//        %    megacq parameters
+//        %
+//        if ~isempty(info.acq_pars) || ~isempty(info.acq_stim)
+//            fiff_start_block(fid,FIFF.FIFFB_DACQ_PARS);
+//            if ~isempty(info.acq_pars)
+//                fiff_write_string(fid,FIFF.FIFF_DACQ_PARS, ...
+//                    info.acq_pars);
+//            end
+//            if ~isempty(info.acq_stim)
+//                fiff_write_string(fid,FIFF.FIFF_DACQ_STIM, ...
+//                    info.acq_stim);
+//            end
+//            fiff_end_block(fid,FIFF.FIFFB_DACQ_PARS);
+//        end
+//        %
+//        %    Coordinate transformations if the HPI result block was not there
+//        %
+//        if ~have_hpi_result
+//            if ~isempty(info.dev_head_t)
+//                fiff_write_coord_trans(fid,info.dev_head_t);
+//            end
+//            if ~isempty(info.ctf_head_t)
+//                fiff_write_coord_trans(fid,info.ctf_head_t);
+//            end
+//        end
+//        %
+//        %    Polhemus data
+//        %
+//        if ~isempty(info.dig) && ~have_isotrak
+//            fiff_start_block(fid,FIFF.FIFFB_ISOTRAK);
+//            for k = 1:length(info.dig)
+//                fiff_write_dig_point(fid,info.dig(k))
+//            end
+//            fiff_end_block(fid,FIFF.FIFFB_ISOTRAK);
+//        end
+//        %
+//        %    Projectors
+//        %
+//        fiff_write_proj(fid,info.projs);
+//        %
+//        %    CTF compensation info
+//        %
+//        fiff_write_ctf_comp(fid,info.comps);
+//        %
+//        %    Bad channels
+//        %
+//        if length(info.bads) > 0
+//            fiff_start_block(fid,FIFF.FIFFB_MNE_BAD_CHANNELS);
+//            fiff_write_name_list(fid,FIFF.FIFF_MNE_CH_NAME_LIST,info.bads);
+//            fiff_end_block(fid,FIFF.FIFFB_MNE_BAD_CHANNELS);
+//        end
+//        %
+//        %    General
+//        %
+//        fiff_write_float(fid,FIFF.FIFF_SFREQ,info.sfreq);
+//        fiff_write_float(fid,FIFF.FIFF_HIGHPASS,info.highpass);
+//        fiff_write_float(fid,FIFF.FIFF_LOWPASS,info.lowpass);
+//        fiff_write_int(fid,FIFF.FIFF_NCHAN,nchan);
+//        fiff_write_int(fid,FIFF.FIFF_DATA_PACK,data_type);
+//        if [ ~isempty(info.meas_date) ]
+//            fiff_write_int(fid,FIFF.FIFF_MEAS_DATE,info.meas_date);
+//        end
+//        %
+//        %    Channel info
+//        %
+//        for k = 1:nchan
+//            %
+//            %   Scan numbers may have been messed up
+//            %
+//            chs(k).scanno = k;
+//            chs(k).range  = 1.0;
+//            cals(k) = chs(k).cal;
+//            fiff_write_ch_info(fid,chs(k));
+//        end
+//        %
+//        %
+//        fiff_end_block(fid,FIFF.FIFFB_MEAS_INFO);
+//        %
+//        % Start the raw data
+//        %
+//        fiff_start_block(fid,FIFF.FIFFB_RAW_DATA);
+
+        return true;
+    }
+
+
+
+
 };
 
 //*************************************************************************************************************

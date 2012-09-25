@@ -163,7 +163,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_source_spaces(QFile*& p_pFile, bool add_geom, FiffDirTree*& p_pTree, MNESourceSpace*& p_pSourceSpace);
+    static bool read_source_spaces(FiffFile*& p_pFile, bool add_geom, FiffDirTree*& p_pTree, MNESourceSpace*& p_pSourceSpace);
 
     //=========================================================================================================
     /**
@@ -193,7 +193,7 @@ private:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_source_space(QFile* p_pFile, FiffDirTree* p_pTree, MNEHemisphere*& p_pHemisphere);
+    static bool read_source_space(FiffFile* p_pFile, FiffDirTree* p_pTree, MNEHemisphere*& p_pHemisphere);
 
 
     //=========================================================================================================

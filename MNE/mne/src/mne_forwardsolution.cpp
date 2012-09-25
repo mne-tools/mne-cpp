@@ -105,12 +105,12 @@ MNEForwardSolution::~MNEForwardSolution()
 
 bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardSolution*& fwd, bool force_fixed, bool surf_ori, QStringList& include, QStringList& exclude)
 {
-    QFile* t_pFile = NULL;
+    FiffFile* t_pFile = new FiffFile(p_sFileName);
     FiffDirTree* t_pTree = NULL;
     QList<fiff_dir_entry_t>* t_pDir = NULL;
 
     printf("Reading forward solution from %s...\n", p_sFileName.toUtf8().constData());
-    if(!FIFFLIB::Fiff::open(p_sFileName, t_pFile, t_pTree, t_pDir))
+    if(!t_pFile->open(t_pTree, t_pDir))
         return false;
 
     //
@@ -723,7 +723,7 @@ inline SparseMatrix<float> MNEForwardSolution::make_block_diag(MatrixXf& A, qint
 
 //*************************************************************************************************************
 
-bool MNEForwardSolution::read_one(QFile* p_pFile, FiffDirTree* node, MNEForwardSolution*& one)
+bool MNEForwardSolution::read_one(FiffFile* p_pFile, FiffDirTree* node, MNEForwardSolution*& one)
 {
     if (one != NULL)
         delete one;

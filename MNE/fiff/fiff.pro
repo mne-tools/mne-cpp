@@ -59,7 +59,8 @@ SOURCES += fiff.cpp \
     src/fiff_coord_trans.cpp \
     src/fiff_ch_info.cpp \
     src/fiff_proj.cpp \
-    src/fiff_named_matrix.cpp
+    src/fiff_named_matrix.cpp \
+    src/fiff_file.cpp
 
 HEADERS += fiff.h \
         fiff_global.h \
@@ -76,4 +77,5 @@ HEADERS += fiff.h \
     include/fiff_info.h \
     include/fiff_raw_data.h \
     include/fiff_dir_entry.h \
-    include/fiff_raw_dir.h
+    include/fiff_raw_dir.h \
+    include/fiff_file.h
