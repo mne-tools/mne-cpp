@@ -195,7 +195,7 @@ private:
     *
     * @return True if succeeded, false otherwise
     */
-    static bool read_one(QFile* p_pFile, FiffDirTree* node, MNEForwardSolution*& one);
+    static bool read_one(FiffFile* p_pFile, FiffDirTree* node, MNEForwardSolution*& one);
 
 public:
     fiff_int_t source_ori;

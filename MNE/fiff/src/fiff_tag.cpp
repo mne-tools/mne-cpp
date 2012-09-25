@@ -87,7 +87,7 @@ FiffTag::~FiffTag()
 
 //*************************************************************************************************************
 
-bool FiffTag::read_tag_info(QFile* p_pFile, FiffTag*& p_pTag)
+bool FiffTag::read_tag_info(FiffFile* p_pFile, FiffTag*& p_pTag)
 {
     QDataStream t_DataStream(p_pFile);
 
@@ -125,7 +125,7 @@ bool FiffTag::read_tag_info(QFile* p_pFile, FiffTag*& p_pTag)
 
 //*************************************************************************************************************
 
-bool FiffTag::read_tag(QFile* p_pFile, FiffTag*& p_pTag, qint64 pos)
+bool FiffTag::read_tag(FiffFile* p_pFile, FiffTag*& p_pTag, qint64 pos)
 {
     if (pos > 0)
     {

@@ -88,6 +88,7 @@
 #include "fiff_id.h"
 #include "fiff_coord_trans.h"
 #include "fiff_ch_info.h"
+#include "fiff_file.h"
 
 
 //*************************************************************************************************************
@@ -182,7 +183,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_tag_info(QFile* p_pFile, FiffTag*& p_pTag);
+    static bool read_tag_info(FiffFile* p_pFile, FiffTag*& p_pTag);
 
     //=========================================================================================================
     /**
@@ -197,7 +198,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_tag(QFile* p_pFile, FiffTag*& p_pTag, qint64 pos = -1);
+    static bool read_tag(FiffFile* p_pFile, FiffTag*& p_pTag, qint64 pos = -1);
 
     //=========================================================================================================
     /**

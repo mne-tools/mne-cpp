@@ -62,100 +62,6 @@ Fiff::Fiff()
 
 //*************************************************************************************************************
 
-bool Fiff::open(QString& p_sFileName, QFile*& p_pFile, FiffDirTree*& p_pTree, QList<fiff_dir_entry_t>*& p_pDir)
-{
-    if (p_pFile)
-    {
-        p_pFile->close();
-        delete p_pFile;
-    }
-    p_pFile = new QFile(p_sFileName);
-
-    if (!p_pFile->open(QIODevice::ReadOnly))
-    {
-        printf("Cannot open file %s\n", p_pFile->fileName().toUtf8().constData());//consider throw
-        return false;
-    }
-
-    FIFFLIB::FiffTag* t_pTag = NULL;
-    FiffTag::read_tag_info(p_pFile, t_pTag);
-
-    if (t_pTag->kind != FIFF_FILE_ID)
-    {
-        printf("Fiff::open: file does not start with a file id tag");//consider throw
-        return false;
-    }
-
-    if (t_pTag->type != FIFFT_ID_STRUCT)
-    {
-        printf("Fiff::open: file does not start with a file id tag");//consider throw
-        return false;
-    }
-    if (t_pTag->size != 20)
-    {
-        printf("Fiff::open: file does not start with a file id tag");//consider throw
-        return false;
-    }
-
-    FiffTag::read_tag(p_pFile, t_pTag);
-
-    if (t_pTag->kind != FIFF_DIR_POINTER)
-    {
-        printf("Fiff::open: file does have a directory pointer");//consider throw
-        return false;
-    }
-
-    //
-    //   Read or create the directory tree
-    //
-    printf("\nCreating tag directory for %s...\n", p_sFileName.toUtf8().constData());
-
-    if (p_pDir)
-        delete p_pDir;
-    p_pDir = new QList<fiff_dir_entry_t>;
-
-    qint32 dirpos = *t_pTag->toInt();
-    if (dirpos > 0)
-    {
-        FiffTag::read_tag(p_pFile, t_pTag, dirpos);
-        *p_pDir = t_pTag->toDirEntry();
-    }
-    else
-    {
-        int k = 0;
-        p_pFile->seek(0);//fseek(fid,0,'bof');
-        //dir = struct('kind',{},'type',{},'size',{},'pos',{});
-        fiff_dir_entry_t t_fiffDirEntry;
-        while (t_pTag->next >= 0)
-        {
-            t_fiffDirEntry.pos = p_pFile->pos();//pos = ftell(fid);
-            FiffTag::read_tag_info(p_pFile, t_pTag);
-            ++k;
-            t_fiffDirEntry.kind = t_pTag->kind;
-            t_fiffDirEntry.type = t_pTag->type;
-            t_fiffDirEntry.size = t_pTag->size;
-            p_pDir->append(t_fiffDirEntry);
-        }
-    }
-    delete t_pTag;
-    //
-    //   Create the directory tree structure
-    //
-
-    FiffDirTree::make_dir_tree(p_pFile, p_pDir, p_pTree);
-
-//    qDebug() << "[done]\n";
-
-    //
-    //   Back to the beginning
-    //
-    p_pFile->seek(0); //fseek(fid,0,'bof');
-    return true;
-}
-
-
-//*************************************************************************************************************
-
 MatrixXi Fiff::pick_channels(QStringList& ch_names, QStringList& include, QStringList& exclude)
 {
     qint32 nchan = ch_names.size();
@@ -353,12 +259,21 @@ bool Fiff::setup_read_raw(QString t_sFileName, FiffRawData*& data, bool allow_ma
     //
     printf("Opening raw data file %s...\n",t_sFileName.toUtf8().constData());
 
-    QFile* p_pFile = NULL;
+    FiffFile* p_pFile = new FiffFile(t_sFileName);
     FiffDirTree* t_pTree = NULL;
     QList<fiff_dir_entry_t>* t_pDir = NULL;
 
-    if(!Fiff::open(t_sFileName, p_pFile, t_pTree, t_pDir))
+    if(!p_pFile->open(t_pTree, t_pDir))
+    {
+        if(t_pTree)
+            delete t_pTree;
+
+        if(t_pDir)
+            delete t_pDir;
+
         return false;
+    }
+
     //
     //   Read the measurement info
     //

@@ -81,7 +81,7 @@ MNESourceSpace::~MNESourceSpace()
 
 //*************************************************************************************************************
 
-bool MNESourceSpace::read_source_spaces(QFile*& p_pFile, bool add_geom, FiffDirTree*& p_pTree, MNESourceSpace*& p_pSourceSpace)
+bool MNESourceSpace::read_source_spaces(FiffFile*& p_pFile, bool add_geom, FiffDirTree*& p_pTree, MNESourceSpace*& p_pSourceSpace)
 {
     if (p_pSourceSpace != NULL)
         delete p_pSourceSpace;
@@ -96,7 +96,11 @@ bool MNESourceSpace::read_source_spaces(QFile*& p_pFile, bool add_geom, FiffDirT
     {
         QList<fiff_dir_entry_t>* t_pDir = NULL;
         QString t_sFileName = p_pFile->fileName();
-        if(!Fiff::open(t_sFileName, p_pFile, p_pTree, t_pDir))
+
+        if(p_pFile)
+            delete p_pFile;
+        p_pFile = new FiffFile(t_sFileName);
+        if(!p_pFile->open(p_pTree, t_pDir))
             return false;
         open_here = true;
         if(t_pDir)
@@ -174,7 +178,7 @@ void MNESourceSpace::transform_source_space_to(fiff_int_t dest, FiffCoordTrans* 
 
 //*************************************************************************************************************
 
-bool MNESourceSpace::read_source_space(QFile* p_pFile, FiffDirTree* p_pTree, MNEHemisphere*& p_pHemisphere)
+bool MNESourceSpace::read_source_space(FiffFile* p_pFile, FiffDirTree* p_pTree, MNEHemisphere*& p_pHemisphere)
 {
     if (p_pHemisphere != NULL)
         delete p_pHemisphere;

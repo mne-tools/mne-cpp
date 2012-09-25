@@ -66,6 +66,11 @@ int main(int argc, char *argv[])
 
     QString t_sFile = "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif";//"./MNE-sample-data/test_ctf_raw.fif";
 
+
+    QString t_sOutFile = "./MNE-sample-data/MEG/test_output.fif";//"./MNE-sample-data/test_ctf_raw.fif";
+
+
+
     //
     //   Setup for reading the raw data
     //
@@ -90,9 +95,19 @@ int main(int argc, char *argv[])
     {
         include.clear();
         include << "STI101" << "STI201" << "STI301";
+        picks = Fiff::pick_types(raw->info, want_meg, want_eeg, want_stim, include, raw->info->bads);
+        if(picks.cols() == 0)
+        {
+            printf("channel list may need modification\n");
+            return 0;
+        }
     }
 
-
+    //
+    Fiff::start_writing_raw(t_sOutFile,raw->info);//,picks);
+    //
+    //   Set up the reading parameters
+    //
 
 
 
