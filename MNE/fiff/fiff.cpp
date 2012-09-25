@@ -156,6 +156,192 @@ bool Fiff::open(QString& p_sFileName, QFile*& p_pFile, FiffDirTree*& p_pTree, QL
 
 //*************************************************************************************************************
 
+MatrixXi Fiff::pick_channels(QStringList& ch_names, QStringList& include, QStringList& exclude)
+{
+    qint32 nchan = ch_names.size();
+    MatrixXi sel(1, nchan);
+    qint32 i, k, p, c, count, nzero;
+    if (include.size() == 0 && exclude.size() == 0)
+    {
+        sel.setOnes();
+        for(k = 0; k < nchan; ++k)
+            sel(0, k) = k;//+1 using MATLAB notation
+        return sel;
+    }
+
+    if (include.size() == 0)
+    {
+        //
+        //   Include all initially
+        //
+        sel.setZero();
+        for (k = 0; k < nchan; ++k)
+            sel(0, k) = k;//+1 using MATLAB notation
+
+        qint32 nzero = 0;
+        for(k = 0; k < exclude.size(); ++k)
+        {
+            count = 0;
+            for (i = ch_names.size()-1; i >= 0 ; --i)
+            {
+                if (QString::compare(exclude.at(k),ch_names.at(i)) == 0)
+                {
+                    count += 1;
+                    c = i;
+                }
+            }
+            nzero = 0;//does this make sense? - its here because its in the MATLAB file
+            if(count > 0)
+            {
+                sel(0, c) = 0;
+                ++nzero;
+            }
+        }
+        //
+        //  Check for exclusions
+        //
+        if(nzero > 0)
+        {
+            MatrixXi newsel(1,nchan-nzero);
+            newsel.setZero();
+            p = 0;
+            for(k = 0; k < nchan; ++k)
+            {
+                if (sel(0, k) > 0)
+                {
+                    newsel(0, p) = sel(0, k);
+                    ++p;
+                }
+            }
+            sel = newsel;
+        }
+    }
+    else
+    {
+        //
+        //   First do the channels to be included
+        //
+        sel.resize(1,include.size());
+        sel.setZero();
+        nzero = 0;
+        for(k = 0; k < include.size(); ++k)
+        {
+            count = 0;
+            for (i = ch_names.size()-1; i >= 0 ; --i)
+            {
+                if (QString::compare(include.at(k),ch_names.at(i)) == 0)
+                {
+                    count += 1;
+                    c = i;
+                }
+            }
+            if (count == 0)
+                printf("Missing channel %s\n",include.at(k).toUtf8().constData());
+            else if (count > 1)
+                printf("Ambiguous channel, taking first occurence: %s",include.at(k).toUtf8().constData());
+
+            //
+            //  Is this channel in the exclusion list?
+            //
+            sel(0,k) = c;//+1 using MATLAB notation
+            if (exclude.size() > 0)
+            {
+
+                count = 0;
+                for (i = exclude.size()-1; i >= 0 ; --i)
+                {
+                    if (QString::compare(include.at(k),exclude.at(i)) == 0)
+                        count += 1;
+                }
+                if (count > 0)
+                {
+                    sel(0, k) = 0;
+                    ++nzero;
+                }
+            }
+        }
+        //
+        //    Check whether some channels were excluded
+        //
+        if (nzero > 0)
+        {
+            MatrixXi newsel(1,include.size()-nzero);
+            newsel.setZero();
+
+            p = 0;
+            for(k = 0; k < include.size(); ++k)
+            {
+                if (sel(0,k) > 0)
+                {
+                    newsel(0,p) = sel(0,k);
+                    ++p;
+                }
+            }
+            sel.resize(newsel.rows(), newsel.cols());
+            sel = newsel;
+        }
+    }
+    return sel;
+}
+
+
+
+//*************************************************************************************************************
+
+MatrixXi Fiff::pick_types(FiffInfo* info, bool meg, bool eeg, bool stim, QStringList& include, QStringList& exclude)
+{
+    MatrixXi pick(1, info->nchan);
+    pick.setZero();
+
+    fiff_int_t kind;
+    qint32 k;
+    for(k = 0; k < info->nchan; ++k)
+    {
+        kind = info->chs.at(k).kind;
+        if ((kind == FIFFV_MEG_CH || kind == FIFFV_REF_MEG_CH) && meg)
+            pick(0, k) = true;
+        else if (kind == FIFFV_EEG_CH && eeg)
+            pick(0, k) = true;
+        else if ((kind == FIFFV_STIM_CH) && stim)
+            pick(0, k) = true;
+    }
+
+    qint32 p = 0;
+    QStringList myinclude;
+    for(k = 0; k < info->nchan; ++k)
+    {
+        if (pick(0, k))
+        {
+            myinclude << info->ch_names.at(k);
+            ++p;
+        }
+    }
+
+//        qDebug() << "Size: " << myinclude.size();
+//        qDebug() << myinclude;
+
+    if (include.size() > 0)
+    {
+        for (k = 0; k < include.size(); ++k)
+        {
+            myinclude << include.at(k);
+            ++p;
+        }
+    }
+
+//        qDebug() << "Size: " << myinclude.size();
+//        qDebug() << myinclude;
+
+    MatrixXi sel;
+    if (p != 0)
+        sel = Fiff::pick_channels(info->ch_names, myinclude, exclude);
+
+    return sel;
+}
+
+
+//*************************************************************************************************************
+
 bool Fiff::setup_read_raw(QString t_sFileName, FiffRawData*& data, bool allow_maxshield)
 {
     if(data)

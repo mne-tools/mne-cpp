@@ -94,6 +94,9 @@
 namespace FIFFLIB
 {
 
+static QStringList defaultQStringList = QStringList();
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -146,7 +149,6 @@ public:
         return tree->dir_tree_find(kind);
     }
 
-
     //=========================================================================================================
     /**
     * fiff_invert_transform
@@ -179,7 +181,6 @@ public:
         return FiffDirTree::make_dir_tree(p_pFile, p_pDir, p_pTree, start);
     }
 
-
     //=========================================================================================================
     /**
     * fiff_open
@@ -198,8 +199,40 @@ public:
     static bool open(QString& p_sFileName, QFile*& p_pFile, FiffDirTree*& p_pTree, QList<fiff_dir_entry_t>*& p_pDir);
 
 
-    //fiff_pick_types(raw.info,want_meg,want_eeg,want_stim,include,raw.info.bads);
+    //=========================================================================================================
+    /**
+    * fiff_pick_channels
+    *
+    * function [sel] = fiff_pick_channels(ch_names,include,exclude)
+    *
+    * [sel] = fiff_pick_channels(ch_names,include,exclude)
+    *
+    * Make a selector to pick desired channels from data
+    *
+    * ch_names  - The channel name list to consult
+    * include   - Channels to include (if empty, include all available)
+    * exclude   - Channels to exclude (if empty, do not exclude any)
+    *
+    */
+    static MatrixXi pick_channels(QStringList& ch_names, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
 
+
+    //=========================================================================================================
+    /**
+    * [sel] = fiff_pick_types(info,meg,eeg,stim,exclude)
+    *
+    * Create a selector to pick desired channel types from data
+    *
+    * info      - The measurement info
+    * meg       - Include MEG channels
+    * eeg       - Include EEG channels
+    * stim      - Include stimulus channels
+    * include   - Additional channels to include (if empty, do not add any)
+    * exclude   - Channels to exclude (if empty, do not exclude any)
+    *
+    */
+    //fiff_pick_types(raw.info,want_meg,want_eeg,want_stim,include,raw.info.bads)
+    static MatrixXi pick_types(FiffInfo* info, bool meg, bool eeg = false, bool stim = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
 
 
     //=========================================================================================================
@@ -217,11 +250,10 @@ public:
     *
     * @return the bad channel list
     */
-    static QStringList read_bad_channels(QFile* p_pFile, FiffDirTree* p_pTree)
+    static inline QStringList read_bad_channels(QFile* p_pFile, FiffDirTree* p_pTree)
     {
         return p_pTree->read_bad_channels(p_pFile);
     }
-
 
     //=========================================================================================================
     /**
@@ -241,7 +273,6 @@ public:
         return p_pNode->read_ctf_comp(p_pFile, chs);
     }
 
-
     //=========================================================================================================
     /**
     * fiff_read_meas_info
@@ -257,11 +288,10 @@ public:
     * meas output argument should not be specified.
     *
     */
-    static FiffDirTree* read_meas_info(QFile* p_pFile, FiffDirTree* p_pTree, FiffInfo*& info)
+    static inline FiffDirTree* read_meas_info(QFile* p_pFile, FiffDirTree* p_pTree, FiffInfo*& info)
     {
         return p_pTree->read_meas_info(p_pFile, info);
     }
-
 
     //=========================================================================================================
     /**
@@ -273,11 +303,10 @@ public:
     *
     * ToDo
     */
-    static bool read_named_matrix(QFile* p_pFile, FiffDirTree* node, fiff_int_t matkind, FiffNamedMatrix*& mat)
+    static inline bool read_named_matrix(QFile* p_pFile, FiffDirTree* node, fiff_int_t matkind, FiffNamedMatrix*& mat)
     {
         return node->read_named_matrix(p_pFile, matkind, mat);
     }
-
 
     //=========================================================================================================
     /**
@@ -318,7 +347,6 @@ public:
         return FiffTag::read_tag(p_pFile, p_pTag, pos);
     }
 
-
     //=========================================================================================================
     /**
     * fiff_read_tag_info
@@ -340,7 +368,6 @@ public:
         return FiffTag::read_tag_info(p_pFile, p_pTag);
     }
 
-
     //=========================================================================================================
     /**
     * fiff_setup_read_raw
@@ -356,7 +383,6 @@ public:
     */
     static bool setup_read_raw(QString t_sFileName, FiffRawData*& data, bool allow_maxshield = false);
 
-
     //=========================================================================================================
     /**
     * fiff_split_name_list
@@ -365,7 +391,7 @@ public:
     *
     * Wrapper for the FiffDirTree::split_name_list static function
     */
-    static QStringList split_name_list(QString p_sNameList)
+    static inline QStringList split_name_list(QString p_sNameList)
     {
         return FiffDirTree::split_name_list(p_sNameList);
     }
