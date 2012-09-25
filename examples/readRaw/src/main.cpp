@@ -69,8 +69,8 @@ int main(int argc, char *argv[])
     //
     //   Setup for reading the raw data
     //
-    FiffRawData* data = NULL;
-    if(!Fiff::setup_read_raw(t_sFile, data))
+    FiffRawData* raw = NULL;
+    if(!Fiff::setup_read_raw(t_sFile, raw))
     {
         printf("Error during fiff setup raw read");
         return 0;
@@ -85,7 +85,12 @@ int main(int argc, char *argv[])
     QStringList include;
     include << "STI 014";
 
-
+    MatrixXi picks = Fiff::pick_types(raw->info, want_meg, want_eeg, want_stim, include, raw->info->bads);
+    if(picks.cols() == 0)
+    {
+        include.clear();
+        include << "STI101" << "STI201" << "STI301";
+    }
 
 
 
