@@ -44,6 +44,9 @@
 #include "../fiff_global.h"
 #include "fiff_types.h"
 #include "fiff_id.h"
+#include "fiff_coord_trans.h"
+#include "fiff_proj.h"
+#include "fiff_ctf_comp.h"
 
 
 //*************************************************************************************************************
@@ -114,6 +117,23 @@ public:
 
     //=========================================================================================================
     /**
+    * fiff_end_block
+    *
+    * fiff_end_block(fid, kind)
+    *
+    * Writes a FIFF_BLOCK_END tag
+    *
+    *     fid           An open fif file descriptor
+    *     kind          The block kind to end
+    *
+    */
+    void end_block(fiff_int_t kind)
+    {
+        this->write_int(FIFF_BLOCK_END,&kind);
+    }
+
+    //=========================================================================================================
+    /**
     * QFile::open
     *
     * unmask base class open function
@@ -136,10 +156,27 @@ public:
     bool open(FiffDirTree*& p_pTree, QList<fiff_dir_entry_t>*& p_pDir);
 
 
+
+
     //=========================================================================================================
     /**
-    * ToDo make this part of the FiffFile classs
+    * fiff_start_block
     *
+    * fiff_start_block(fid,kind)
+    *
+    * Writes a FIFF_BLOCK_START tag
+    *
+    *     fid           An open fif file descriptor
+    *     kind          The block kind to start
+    *
+    */
+    void start_block(fiff_int_t kind)
+    {
+        this->write_int(FIFF_BLOCK_START,&kind);
+    }
+
+    //=========================================================================================================
+    /**
     * fiff_start_file
     *
     * ### MNE toolbox root function ###
@@ -152,138 +189,211 @@ public:
     *                    that the name ends with .fif
     *
     */
-    bool start_file()
+    static FiffFile* start_file(QString& p_sFilename);
+
+    //=========================================================================================================
+    /**
+    * fiff_write_coord_trans
+    *
+    * ### MNE toolbox root function ###
+    *
+    * fiff_write_coord_trans(fid,trans)
+    *
+    * Writes a coordinate transformation structure
+    *
+    *     fid           An open fif file descriptor
+    *     trans         The coordinate transfomation structure
+    *
+    */
+    void write_coord_trans(FiffCoordTrans& trans);
+
+
+
+    //=========================================================================================================
+    /**
+    * fiff_write_ctf_comp
+    *
+    * ### MNE toolbox root function ###
+    *
+    * fiff_write_ctf_comp(fid,comps)
+    *
+    * Writes the CTF compensation data into a fif file
+    *
+    *     fid           An open fif file descriptor
+    *     comps         The compensation data to write
+    *
+    */
+    void write_ctf_comp(QList<FiffCtfComp*>& comps)
     {
-        if(!this->open(QIODevice::WriteOnly))
+        if (comps.size() <= 0)
+            return;
+        //
+        //  This is very simple in fact
+        //
+        this->start_block(FIFFB_MNE_CTF_COMP);
+        for(qint32 k = 0; k < comps.size(); ++k)
         {
-            printf("Cannot write to %s\n", this->fileName().toUtf8().constData());//consider throw
-            return false;
+            FiffCtfComp* comp = new FiffCtfComp(comps[k]);
+            this->start_block(FIFFB_MNE_CTF_COMP_DATA);
+            //
+            //    Write the compensation kind
+            //
+            this->write_int(FIFF_MNE_CTF_COMP_KIND, &comp->ctfkind);
+            qint32 save_calibrated = comp->save_calibrated;
+            this->write_int(FIFF_MNE_CTF_COMP_CALIBRATED, &save_calibrated);
+            //
+            //    Write an uncalibrated or calibrated matrix
+            //
+            comp->data->data = (comp->rowcals.diagonal()).inverse()*comp->data->data*(comp->colcals.diagonal()).inverse();
+//ToDo            this->write_named_matrix(FIFF_MNE_CTF_COMP_DATA,comp->data);
+            this->end_block(FIFFB_MNE_CTF_COMP_DATA);
+
+            delete comp;
         }
+        this->end_block(FIFFB_MNE_CTF_COMP);
 
-        //
-        //   Write the compulsory items
-        //
-        //FIFF_FILE_ID = 100;
-        //FIFF_DIR_POINTER=101;
-        //FIFF_FREE_LIST=106;
+        return;
 
-        this->write_id(FIFF_FILE_ID);
-//        fiff_write_int(fid,FIFF_DIR_POINTER,-1);
-//        fiff_write_int(fid,FIFF_FREE_LIST,-1);
-//        //
-        //   Ready for more
-        //
-        return true;
-    }
-
-
-
-
-    //
-    // fiff_write_id(fid,kind,id)
-    //
-    // Writes fiff id
-    //
-    //     fid           An open fif file descriptor
-    //     kind          The tag kind
-    //     id            The id to write
-    //
-    // If the id argument is missing it will be generated here
-    //
-
-    void write_id(fiff_int_t kind, FiffId& id = defaultFiffId)
-    {
-        if(id.version == -1)
-        {
-            /* initialize random seed: */
-            srand ( time(NULL) );
-            double rand_1 = (double)(rand() % 100);rand_1 /= 100;
-            double rand_2 = (double)(rand() % 100);rand_2 /= 100;
-
-            time_t seconds;
-            seconds = time (NULL);
-
-            //fiff_int_t timezone = 5;      //   Matlab does not know the timezone
-            id.version   = (1 << 16) | 2;   //   Version (1 << 16) | 2
-            id.machid[0] = 65536*rand_1;    //   Machine id is random for now
-            id.machid[1] = 65536*rand_2;    //   Machine id is random for now
-            id.time.secs = (int)seconds;    //seconds since January 1, 1970 //3600*(24*(now-datenum(1970,1,1,0,0,0))+timezone);
-            id.time.usecs = 0;              //   Do not know how we could get this
-        }
-
-        //
-        //
-        fiff_int_t datasize = 5*4;                       //   The id comprises five integers
-
-        QDataStream out(this);   // we will serialize the data into the file
-        out.setByteOrder(QDataStream::BigEndian);
-
-        out << (qint32)kind;
-//        count = fwrite(fid,int32(kind),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-
-        out << (qint32)FIFFT_ID_STRUCT;
-//        count = fwrite(fid,int32(FIFFT_ID_STRUCT),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-
-        out << (qint32)datasize;
-//        count = fwrite(fid,int32(datasize),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-
-        out << (qint32)FIFFV_NEXT_SEQ;
-//        count = fwrite(fid,int32(FIFFV_NEXT_SEQ),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-        //
-        // Collect the bits together for one write
-        //
-        qint32 data[5];
-        data[0] = id.version;
-        data[1] = id.machid[0];
-        data[2] = id.machid[1];
-        data[3] = id.time.secs;
-        data[4] = id.time.usecs;
-
-        for(qint32 i = 0; i < 5; ++i)
-            out << data[i];
-//        count = fwrite(fid,int32(data),'int32');
-//        if count ~= 5
-//            error(me,'write failed');
-//        end
-
-
-//        //DEBUG
-//        this->close();
-//        this->open(QIODevice::ReadOnly);
-//        QDataStream in(this);    // read the data serialized from the file
-
-//        qint32 a;
-//        for(int i = 0; i < 9; ++i)
-//        {
-//            in >> a;           // extract "the answer is" and 42
-//            qDebug() << a;
-//        }
-//        //DEBUG
     }
 
 
 
 
 
+    //=========================================================================================================
+    /**
+    * fiff_write_dig_point
+    *
+    * ### MNE toolbox root function ###
+    *
+    * fiff_write_dig_point(fid,dig)
+    *
+    * Writes a digitizer data point into a fif file
+    *
+    *     fid           An open fif file descriptor
+    *     dig           The point to write
+    *
+    */
+    void write_dig_point(fiff_dig_point_t& dig);
+
+    //=========================================================================================================
+    /**
+    * fiff_write_id
+    *
+    * ### MNE toolbox root function ###
+    *
+    * fiff_write_id(fid,kind,id)
+    *
+    * Writes fiff id
+    *
+    *     fid           An open fif file descriptor
+    *     kind          The tag kind
+    *     id            The id to write
+    *
+    * If the id argument is missing it will be generated here
+    *
+    */
+    void write_id(fiff_int_t kind, FiffId& id = defaultFiffId);
+
+    //=========================================================================================================
+    /**
+    * fiff_write_int
+    *
+    * ### MNE toolbox root function ###
+    *
+    * fiff_write_int(fid,kind,data)
+    *
+    * Writes a 32-bit integer tag to a fif file
+    *
+    *     fid           An open fif file descriptor
+    *     kind          Tag kind
+    *     data          The integers to use as data
+    *     nel           Zahl an Elementen in der data size
+    */
+    void write_int(fiff_int_t kind, fiff_int_t* data, fiff_int_t nel = 1);
+
+    //=========================================================================================================
+    /**
+    * fiff_write_float
+    *
+    * ### MNE toolbox root function ###
+    *
+    * fiff_write_float(fid,kind,data)
+    *
+    * Writes a single-precision floating point tag to a fif file
+    *
+    *     fid           An open fif file descriptor
+    *     kind          Tag kind
+    *     data          The data
+    *
+    */
+    void write_float(fiff_int_t kind, float* data, fiff_int_t nel = 1);
+
+    //=========================================================================================================
+    /**
+    * fiff_write_float_matrix
+    *
+    * ### MNE toolbox root function ###
+    *
+    * fiff_write_float_matrix(fid,kind,mat)
+    *
+    * Writes a single-precision floating-point matrix tag
+    *
+    *     fid           An open fif file descriptor
+    *     kind          The tag kind
+    *     mat           The data matrix
+    *
+    */
+    void write_float_matrix(fiff_int_t kind, MatrixXf& mat);
+
+    //=========================================================================================================
+    /**
+    * fiff_write_name_list
+    *
+    * ### MNE toolbox root function ###
+    *
+    * fiff_write_name_list(fid,kind,mat)
+    *
+    * Writes a colon-separated list of names
+    *
+    *     fid           An open fif file descriptor
+    *     kind          The tag kind
+    *     data          An array of names to create the list from
+    *
+    */
+    void write_name_list(fiff_int_t kind,QStringList& data);
+
+    //=========================================================================================================
+    /**
+    * fiff_write_proj
+    *
+    * ### MNE toolbox root function ###
+    *
+    * fiff_write_proj(fid,projs)
+    *
+    * Writes the projection data into a fif file
+    *
+    *     fid           An open fif file descriptor
+    *     projs         The compensation data to write
+    */
+    void write_proj(QList<FiffProj*>& projs);
 
 
-
-
-
-
-public:
+    //=========================================================================================================
+    /**
+    * fiff_write_string
+    *
+    * ### MNE toolbox root function ###
+    *
+    * fiff_write_string(fid,kind,data)
+    *
+    * Writes a string tag
+    *
+    *     fid           An open fif file descriptor
+    *     kind          The tag kind
+    *     data          The string data to write
+    */
+    void write_string(fiff_int_t kind, QString& data);
 
 };
 

@@ -408,6 +408,22 @@ public:
         return FiffDirTree::split_name_list(p_sNameList);
     }
 
+    //=========================================================================================================
+    /**
+    * fiff_start_block
+    *
+    * fiff_start_block(fid,kind)
+    *
+    * Writes a FIFF_BLOCK_START tag
+    *
+    *     fid           An open fif file descriptor
+    *     kind          The block kind to start
+    *
+    */
+    static void start_block(FiffFile* p_pFile, fiff_int_t kind)
+    {
+        p_pFile->write_int(FIFF_BLOCK_START,&kind);
+    }
 
     //=========================================================================================================
     /**
@@ -427,9 +443,7 @@ public:
     */
     static FiffFile* start_file(QString& p_sFileName)
     {
-        FiffFile* p_pFile = new FiffFile(p_sFileName);
-        p_pFile->start_file();
-        return p_pFile;
+        return FiffFile::start_file(p_sFileName);
     }
 
 
@@ -471,81 +485,93 @@ public:
         //  Create the file and save the essentials
         //
 
-        FiffFile* fid = Fiff::start_file(p_sFileName);
-//        fiff_start_block(fid,FIFF.FIFFB_MEAS);
-//        fiff_write_id(fid,FIFF.FIFF_BLOCK_ID);
-//        if ~isempty(info.meas_id)
-//            fiff_write_id(fid,FIFF.FIFF_PARENT_BLOCK_ID,info.meas_id);
-//        end
-//        %
-//        %
-//        %    Measurement info
-//        %
-//        fiff_start_block(fid,FIFF.FIFFB_MEAS_INFO);
-//        %
-//        %    Blocks from the original
-//        %
-//        blocks = [ FIFF.FIFFB_SUBJECT FIFF.FIFFB_HPI_MEAS FIFF.FIFFB_HPI_RESULT FIFF.FIFFB_ISOTRAK FIFF.FIFFB_PROCESSING_HISTORY ];
-//        have_hpi_result = false;
-//        have_isotrak    = false;
-//        if length(blocks) > 0 && isfield(info,'filename') && ~isempty(info.filename)
-//            [ fid2, tree ] = fiff_open(info.filename);
-//            for k = 1:length(blocks)
-//                nodes = fiff_dir_tree_find(tree,blocks(k));
-//                fiff_copy_tree(fid2,tree.id,nodes,fid);
-//                if blocks(k) == FIFF.FIFFB_HPI_RESULT && length(nodes) > 0
-//                    have_hpi_result = true;
-//                end
-//                if blocks(k) == FIFF.FIFFB_ISOTRAK && length(nodes) > 0
-//                    have_isotrak = true;
-//                end
-//            end
-//            fclose(fid2);
-//        end
-//        %
-//        %    megacq parameters
-//        %
-//        if ~isempty(info.acq_pars) || ~isempty(info.acq_stim)
-//            fiff_start_block(fid,FIFF.FIFFB_DACQ_PARS);
-//            if ~isempty(info.acq_pars)
-//                fiff_write_string(fid,FIFF.FIFF_DACQ_PARS, ...
-//                    info.acq_pars);
-//            end
-//            if ~isempty(info.acq_stim)
-//                fiff_write_string(fid,FIFF.FIFF_DACQ_STIM, ...
-//                    info.acq_stim);
-//            end
-//            fiff_end_block(fid,FIFF.FIFFB_DACQ_PARS);
-//        end
-//        %
-//        %    Coordinate transformations if the HPI result block was not there
-//        %
-//        if ~have_hpi_result
-//            if ~isempty(info.dev_head_t)
-//                fiff_write_coord_trans(fid,info.dev_head_t);
-//            end
-//            if ~isempty(info.ctf_head_t)
-//                fiff_write_coord_trans(fid,info.ctf_head_t);
-//            end
-//        end
-//        %
-//        %    Polhemus data
-//        %
-//        if ~isempty(info.dig) && ~have_isotrak
-//            fiff_start_block(fid,FIFF.FIFFB_ISOTRAK);
-//            for k = 1:length(info.dig)
-//                fiff_write_dig_point(fid,info.dig(k))
-//            end
-//            fiff_end_block(fid,FIFF.FIFFB_ISOTRAK);
-//        end
-//        %
-//        %    Projectors
-//        %
-//        fiff_write_proj(fid,info.projs);
-//        %
-//        %    CTF compensation info
-//        %
-//        fiff_write_ctf_comp(fid,info.comps);
+        FiffFile* t_pFile = Fiff::start_file(p_sFileName);
+        t_pFile->start_block(FIFFB_MEAS);
+        t_pFile->write_id(FIFF_BLOCK_ID);
+        if(info->meas_id.version != -1)
+        {
+            t_pFile->write_id(FIFF_PARENT_BLOCK_ID,info->meas_id);
+        }
+        //
+        //
+        //    Measurement info
+        //
+        t_pFile->start_block(FIFFB_MEAS_INFO);
+        //
+        //    Blocks from the original
+        //
+        QList<fiff_int_t> blocks;
+        blocks << FIFFB_SUBJECT << FIFFB_HPI_MEAS << FIFFB_HPI_RESULT << FIFFB_ISOTRAK << FIFFB_PROCESSING_HISTORY;
+        bool have_hpi_result = false;
+        bool have_isotrak    = false;
+        if (blocks.size() > 0 && !info->filename.isEmpty())
+        {
+            FiffFile* t_pFile2 = new FiffFile(info->filename);
+
+            FiffDirTree* t_pTree = NULL;
+            QList<fiff_dir_entry_t>* t_pDir = NULL;
+            t_pFile2->open(t_pTree, t_pDir);
+
+            for(qint32 k = 0; k < blocks.size(); ++k)
+            {
+                QList<FiffDirTree*> nodes = t_pTree->dir_tree_find(blocks.at(k));
+                FiffDirTree::copy_tree(t_pFile2,t_pTree->id,nodes,t_pFile);
+                if(blocks[k] == FIFFB_HPI_RESULT && nodes.size() > 0)
+                    have_hpi_result = true;
+
+                if(blocks[k] == FIFFB_ISOTRAK && nodes.size() > 0)
+                    have_isotrak = true;
+            }
+
+            delete t_pDir;
+            delete t_pTree;
+            delete t_pFile2;
+            t_pFile2 = NULL;
+        }
+        //
+        //    megacq parameters
+        //
+        if (!info->acq_pars.isEmpty() || !info->acq_stim.isEmpty())
+        {
+            t_pFile->start_block(FIFFB_DACQ_PARS);
+            if (!info->acq_pars.isEmpty())
+                t_pFile->write_string(FIFF_DACQ_PARS, info->acq_pars);
+
+            if (!info->acq_stim.isEmpty())
+                t_pFile->write_string(FIFF_DACQ_STIM, info->acq_stim);
+
+            t_pFile->end_block(FIFFB_DACQ_PARS);
+        }
+        //
+        //    Coordinate transformations if the HPI result block was not there
+        //
+        if (!have_hpi_result)
+        {
+            if (info->dev_head_t.from != -1)
+                t_pFile->write_coord_trans(info->dev_head_t);
+
+            if (info->ctf_head_t.from != -1)
+                t_pFile->write_coord_trans(info->ctf_head_t);
+        }
+        //
+        //    Polhemus data
+        //
+        if (info->dig.size() > 0 && !have_isotrak)
+        {
+            t_pFile->start_block(FIFFB_ISOTRAK);
+            for (qint32 k = 0; k < info->dig.size(); ++k)
+                t_pFile->write_dig_point(info->dig[k]);
+
+            t_pFile->end_block(FIFFB_ISOTRAK);
+        }
+        //
+        //    Projectors
+        //
+        t_pFile->write_proj(info->projs);
+        //
+        //    CTF compensation info
+        //
+        t_pFile->write_ctf_comp(info->comps);
 //        %
 //        %    Bad channels
 //        %
@@ -588,7 +614,48 @@ public:
         return true;
     }
 
+    //=========================================================================================================
+    /**
+    * fiff_write_id
+    *
+    * ### MNE toolbox root function ###
+    *
+    * fiff_write_id(fid,kind,id)
+    *
+    * Writes fiff id
+    *
+    *     fid           An open fif file descriptor
+    *     kind          The tag kind
+    *     id            The id to write
+    *
+    * If the id argument is missing it will be generated here
+    *
+    */
+    static void write_id(FiffFile* p_pFile, fiff_int_t kind, FiffId& id = defaultFiffId)
+    {
+        p_pFile->write_id(kind, id);
+    }
 
+
+    //=========================================================================================================
+    /**
+    * fiff_write_int
+    *
+    * ### MNE toolbox root function ###
+    *
+    * fiff_write_int(fid,kind,data)
+    *
+    * Writes a 32-bit integer tag to a fif file
+    *
+    *     fid           An open fif file descriptor
+    *     kind          Tag kind
+    *     data          The integers to use as data
+    *     nel           Zahl an Elementen in der data size
+    */
+    static void write_int(FiffFile* p_pFile, fiff_int_t kind, fiff_int_t* data, fiff_int_t nel = 1)
+    {
+        p_pFile->write_int(kind, data, nel);
+    }
 
 
 };

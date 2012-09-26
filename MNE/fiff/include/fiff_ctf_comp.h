@@ -93,6 +93,19 @@ public:
     {
     }
 
+    //=========================================================================================================
+    /**
+    * copy ctor
+    */
+    FiffCtfComp(FiffCtfComp* comp)
+    : ctfkind(comp->ctfkind)
+    , kind (comp->ctfkind)
+    , save_calibrated(comp->save_calibrated)
+    , rowcals(comp->rowcals)
+    , colcals(comp->colcals)
+    , data (new FiffNamedMatrix(comp->data))
+    {
+    }
 
     //=========================================================================================================
     /**
