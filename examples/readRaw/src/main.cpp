@@ -102,7 +102,6 @@ int main(int argc, char *argv[])
             return 0;
         }
     }
-
     //
     Fiff::start_writing_raw(t_sOutFile,raw->info);//,picks);
     //

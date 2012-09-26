@@ -411,7 +411,7 @@ public:
 
     //=========================================================================================================
     /**
-    * consider class fiff_file
+    * ToDo make this part of the FiffFile classs
     *
     * fiff_start_file
     *
@@ -425,34 +425,11 @@ public:
     *                    that the name ends with .fif
     *
     */
-    static bool start_file(QString& p_sFileName, FiffFile*& p_pFile)
+    static FiffFile* start_file(QString& p_sFileName)
     {
-        if (p_pFile)
-        {
-            p_pFile->close();
-            delete p_pFile;
-        }
-        p_pFile = new FiffFile(p_sFileName);
-
-        if(!p_pFile->open(QIODevice::WriteOnly))
-        {
-            printf("Cannot write to %s\n", p_pFile->fileName().toUtf8().constData());//consider throw
-            return false;
-        }
-        //
-        //   Write the compulsory items
-        //
-        //FIFF_FILE_ID = 100;
-        //FIFF_DIR_POINTER=101;
-        //FIFF_FREE_LIST=106;
-
-//        fiff_write_id(fid,FIFF_FILE_ID);
-//        fiff_write_int(fid,FIFF_DIR_POINTER,-1);
-//        fiff_write_int(fid,FIFF_FREE_LIST,-1);
-//        //
-        //   Ready for more
-        //
-        return true;
+        FiffFile* p_pFile = new FiffFile(p_sFileName);
+        p_pFile->start_file();
+        return p_pFile;
     }
 
 
@@ -493,7 +470,8 @@ public:
         //
         //  Create the file and save the essentials
         //
-//        QFile* fid = Fiff::start_file(p_sFileName);
+
+        FiffFile* fid = Fiff::start_file(p_sFileName);
 //        fiff_start_block(fid,FIFF.FIFFB_MEAS);
 //        fiff_write_id(fid,FIFF.FIFF_BLOCK_ID);
 //        if ~isempty(info.meas_id)
