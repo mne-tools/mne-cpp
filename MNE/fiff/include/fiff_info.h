@@ -89,6 +89,9 @@ public:
     * ctor
     */
     FiffInfo()
+    : acq_pars("")
+    , acq_stim("")
+    , filename("")
     {
     }
 

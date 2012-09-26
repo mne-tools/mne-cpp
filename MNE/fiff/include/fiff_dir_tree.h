@@ -119,6 +119,131 @@ public:
     */
     ~FiffDirTree();
 
+
+    //=========================================================================================================
+    /**
+    *    fiff_copy_tree(fidin, in_id, nodes, fidout)
+    *
+    *    Copies directory subtrees from fidin to fidout
+    */
+    static bool copy_tree(FiffFile* fidin, FiffId& in_id, QList<FiffDirTree*>& nodes, FiffFile* fidout)
+    {
+        if(nodes.size() <= 0)
+            return false;
+
+        qint32 k, p;
+
+        for(k = 0; k < nodes.size(); ++k)
+        {
+            fidout->start_block(nodes[k]->block);
+            if (nodes[k]->id.version != -1)
+            {
+                if (in_id.version != -1)
+                    fidout->write_id(FIFF_PARENT_FILE_ID, in_id);
+
+                fidout->write_id(FIFF_BLOCK_ID);
+                fidout->write_id(FIFF_PARENT_BLOCK_ID, nodes[k]->id);
+            }
+            for (p = 0; p < nodes[k]->nent; ++p)
+            {
+                //
+                //   Do not copy these tags
+                //
+                if(nodes[k]->dir[p].kind == FIFF_BLOCK_ID || nodes[k]->dir[p].kind == FIFF_PARENT_BLOCK_ID || nodes[k]->dir[p].kind == FIFF_PARENT_FILE_ID)
+                    continue;
+
+                //
+                //   Read and write tags, pass data through transparently
+                //
+                if (!fidin->seek(nodes[k]->dir[p].pos)) //fseek(fidin, nodes(k).dir(p).pos, 'bof') == -1
+                {
+                    printf("Could not seek to the tag\n");
+                    return false;
+                }
+
+                FiffTag tag;
+
+                QDataStream in(fidin);
+                in.setByteOrder(QDataStream::BigEndian);
+
+                in >> tag.kind;// = fread(fidin, 1, 'int32');
+                in >> tag.type;// = fread(fidin, 1, 'uint32');
+                in >> tag.size;// = fread(fidin, 1, 'int32');
+                in >> tag.next;// = fread(fidin, 1, 'int32');
+
+
+                if (tag.size > 0)
+                {
+                    if (tag.data == NULL)
+                        tag.data = malloc(tag.size + ((tag.type == FIFFT_STRING) ? 1 : 0));
+                    else
+                        tag.data = realloc(tag.data,tag.size + ((tag.type == FIFFT_STRING) ? 1 : 0));
+
+                    if (tag.data == NULL) {
+                        printf("fiff_read_tag: memory allocation failed.\n");//consider throw
+                        return false;
+                    }
+                    char *t_pCharData = static_cast< char* >(tag.data);
+                    in.readRawData(t_pCharData, tag.size);
+                    if (tag.type == FIFFT_STRING)
+                        t_pCharData[tag.size] = NULL;//make sure that char ends with NULL
+                    FiffTag::fiff_convert_tag_data(&tag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
+                } //tag.data = fread(fidin, tag.size, 'uchar');
+
+
+                QDataStream out(fidout);
+                out.setByteOrder(QDataStream::BigEndian);
+
+                out << (qint32)tag.kind;
+                out << (qint32)tag.type;
+                out << (qint32)tag.size;
+                out << (qint32)FIFFV_NEXT_SEQ;
+                char* data = static_cast< char* >(tag.data);
+                for(qint32 i = 0; i < tag.size; ++i)
+                    out << data[i];
+
+//                count = fwrite(fidout, tag.kind, 'int32');
+//                if count ~= 1
+//                    error(me, 'write failed.');
+//                end
+//                count = fwrite(fidout, tag.type, 'int32');
+//                if count ~= 1
+//                    error(me, 'write failed.');
+//                end
+//                count = fwrite(fidout, tag.size, 'int32');
+//                if count ~= 1
+//                    error(me, 'write failed');
+//                end
+//                count = fwrite(fidout, int32(FIFFV_NEXT_SEQ), 'int32');
+//                if count ~= 1
+//                    error(me, 'write failed');
+//                end
+//                count = fwrite(fidout, tag.data, 'uchar');
+//                if count ~= tag.size
+//                    error(me, 'write failed');
+//                end
+            }
+            for(p = 0; p < nodes[k]->nchild; ++p)
+            {
+                QList<FiffDirTree*> childList;
+                childList << nodes[k]->children[p];
+                FiffDirTree::copy_tree(fidin, in_id, childList, fidout);
+            }
+
+            fidout->end_block(nodes[k]->block);
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
     //=========================================================================================================
     /**
     * ### MNE toolbox root function ###: Implementation of the fiff_dir_tree_find function
