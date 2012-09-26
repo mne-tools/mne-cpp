@@ -32,7 +32,7 @@ Make the libraries and examples by running:
 
     make
 
-Tip: It's convinient to use the Qt Creator of the `QtSDK <http://qt.nokia.com/downloads>`_ to build the libraries.
+Tip: It's convinient to use the Qt Creator of the `QtSDK <http://qt-project.org/downloads>`_ to build the libraries.
 
 
 Dependencies
