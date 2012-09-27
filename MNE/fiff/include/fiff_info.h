@@ -93,6 +93,7 @@ public:
     , acq_stim("")
     , filename("")
     {
+        meas_date[0] = -1;
     }
 
 

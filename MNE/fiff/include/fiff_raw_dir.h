@@ -78,6 +78,7 @@ public:
     */
     FiffRawDir()
     {
+        ent.kind = -1;
     }
 
 

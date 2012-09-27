@@ -26,6 +26,8 @@
 
 #include <iostream>
 #include <vector>
+#include <math.h>
+
 
 #include "../../../MNE/fiff/fiff.h"
 
@@ -66,6 +68,7 @@ int main(int argc, char *argv[])
 
     QString t_sFile = "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif";//"./MNE-sample-data/test_ctf_raw.fif";
 
+//    QString t_sFile = "./MNE-sample-data/MEG/test_input.fif";
 
     QString t_sOutFile = "./MNE-sample-data/MEG/test_output.fif";//"./MNE-sample-data/test_ctf_raw.fif";
 
@@ -103,13 +106,57 @@ int main(int argc, char *argv[])
         }
     }
     //
-    Fiff::start_writing_raw(t_sOutFile,raw->info);//,picks);
+    MatrixXf* cals = NULL;
+
+    FiffFile* outfid = Fiff::start_writing_raw(t_sOutFile,raw->info, cals, picks);
     //
     //   Set up the reading parameters
     //
+    fiff_int_t from = raw->first_samp;
+    fiff_int_t to = raw->last_samp;
+    float quantum_sec = 10.0f;
+    fiff_int_t quantum = ceil(quantum_sec*raw->info->sfreq);
+    //
+    //   To read the whole file at once set
+    //
+    //quantum     = to - from + 1;
+    //
+    //
+    //   Read and write all the data
+    //
+    bool first_buffer = true;
 
+    fiff_int_t first, last;
+    MatrixXf* data = NULL;
+    MatrixXf* times = NULL;
+    for(first = from; first < to; first+=quantum)
+    {
+        last = first+quantum-1;
+        if (last > to)
+        {
+            last = to;
+        }
+            //[ data, times ] =
 
-
+        if (!Fiff::read_raw_segment(raw,data,times,first,last,picks))
+        {
+//                fclose(raw.fid);
+//                fclose(outfid);
+//                error(me,'%s',mne_omit_first_line(lasterr));
+        }
+        //
+        //   You can add your own miracle here
+        //
+        printf("Writing...\n");
+        if (first_buffer)
+        {
+           if (first > 0)
+               outfid->write_int(FIFF_FIRST_SAMPLE,&first);
+           first_buffer = false;
+        }
+//        outfid->write_raw_buffer(data,cals);
+        printf("[done]\n");
+    }
 
     return a.exec();
 }
