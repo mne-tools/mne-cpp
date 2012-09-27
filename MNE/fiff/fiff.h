@@ -99,6 +99,9 @@ static QStringList defaultQStringList = QStringList();
 static MatrixXi defaultMatrixXi(0,0);
 
 
+typedef Matrix<qint16, Dynamic, Dynamic> MatrixDau16;
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -337,6 +340,306 @@ public:
         return p_pNode-> read_proj(p_pFile);
     }
 
+
+
+
+    //=========================================================================================================
+    /**
+    * ToDo make this part of FiffRawData
+    *
+    * fiff_read_raw_segment
+    *
+    * [data,times] = fiff_read_raw_segment(raw,from,to,sel)
+    *
+    * Read a specific raw data segment
+    *
+    * raw    - structure returned by fiff_setup_read_raw
+    * from   - first sample to include. If omitted, defaults to the
+    *          first sample in data
+    * to     - last sample to include. If omitted, defaults to the last
+    *          sample in data
+    * sel    - optional channel selection vector
+    *
+    * data   - returns the data matrix (channels x samples)
+    * times  - returns the time values corresponding to the samples (optional)
+    *
+    */
+    //function [data,times] =
+    static bool read_raw_segment(FiffRawData* raw, MatrixXf*& data, MatrixXf*& times, fiff_int_t from = -1, fiff_int_t to = -1, MatrixXi sel = defaultMatrixXi)
+    {
+        if(from == -1)
+            from = raw->first_samp;
+        if(to == -1)
+            to = raw->last_samp;
+        //
+        //  Initial checks
+        //
+        if(from < raw->first_samp)
+            from = raw->first_samp;
+        if(to > raw->last_samp)
+            to = raw->last_samp;
+        //
+        if(from > to)
+        {
+            printf("No data in this range\n");
+            return false;
+        }
+        printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, ((float)from)/raw->info->sfreq, ((float)to)/raw->info->sfreq);
+        //
+        //  Initialize the data and calibration vector
+        //
+        qint32 nchan = raw->info->nchan;
+        qint32 dest  = 1;
+        qint32 i, k, r, c;
+        MatrixXf cal(nchan,nchan);
+        cal.setZero();
+        for(i = 0; i < nchan; ++i)
+            cal(i,i) = raw->cals(0,i);
+
+        MatrixXf mult;
+        //
+        if (sel.cols() == 0)
+        {
+            if(data)
+                delete data;
+            data = new MatrixXf(nchan, to-from+1);
+//            data->setZero();
+            if (raw->proj.kind != -1 || raw->comp.kind != -1)
+            {
+                if (raw->proj.kind == -1)
+                    mult = raw->comp.data->data*cal;
+                else if (raw->comp.kind == -1)
+                    mult = raw->proj.data->data*cal;
+                else
+                    mult = raw->proj.data->data*raw->comp.data->data*cal;
+            }
+        }
+        else
+        {
+            if(data)
+                delete data;
+            data = new MatrixXf(sel.cols(),to-from+1);
+//            data->setZero();
+
+            MatrixXf selVect(sel.cols(), sel.cols());
+
+            selVect.setZero();
+
+            if (raw->proj.kind == -1 && raw->comp.kind == -1)
+            {
+                for( i = 0; i  < sel.cols(); ++i)
+                    selVect(i,i) = raw->cals(0,sel(0,i));
+
+                cal  = selVect;
+            }
+            else
+            {
+                if (raw->proj.kind == -1)
+                {
+                    qDebug() << "This has to be debugged!";
+                    for( i = 0; i  < sel.cols(); ++i)
+                        selVect(i,i) = raw->comp.data->data(0,sel(0,i));
+                    mult = selVect*cal;
+                }
+                else if (raw->comp.kind == -1)
+                {
+                    qDebug() << "This has to be debugged!";
+                    for( i = 0; i  < sel.cols(); ++i)
+                        selVect(i,i) = raw->proj.data->data(0,sel(0,i));
+                    mult = selVect*cal;
+                }
+                else
+                {
+                    qDebug() << "This has to be debugged!";
+                    for( i = 0; i  < sel.cols(); ++i)
+                        selVect(i,i) = raw->proj.data->data(0,sel(0,i));
+                    mult = selVect*raw->comp.data->data*cal;
+                }
+            }
+        }
+        bool do_debug = false;
+//        if ~isempty(cal)
+//            cal = sparse(cal);
+//        end
+//        if ~isempty(mult)
+//            mult = sparse(mult);
+//        end
+
+        FiffFile* fid = NULL;
+        if (!raw->m_pFile->isOpen())
+        {
+            if (!raw->m_pFile->open(QIODevice::ReadOnly))
+            {
+                printf("Cannot open file %s",raw->info->filename.toUtf8().constData());
+            }
+            fid = raw->m_pFile;
+        }
+        else
+        {
+            fid = raw->m_pFile;
+        }
+
+        MatrixXf one;
+        bool doing_whole;
+        fiff_int_t first_pick, last_pick, picksamp;
+        for(k = 0; k < raw->rawdir.size(); ++k)
+        {
+            if(k == 269)
+                qDebug() << "HERE";
+            FiffRawDir thisRawDir = raw->rawdir[k];
+            //
+            //  Do we need this buffer
+            //
+            if (thisRawDir.last > from)
+            {
+                if (thisRawDir.ent.kind == -1)
+                {
+                    //
+                    //  Take the easy route: skip is translated to zeros
+                    //
+                    if(do_debug)
+                        printf("S");
+                    doing_whole = false;
+                    if (sel.cols() <= 0)
+                        one.resize(nchan,thisRawDir.nsamp);
+                    else
+                        one.resize(sel.cols(),thisRawDir.nsamp);
+
+                    one.setZero();
+                }
+                else
+                {
+                    FIFFLIB::FiffTag* t_pTag = NULL;
+                    FiffTag::read_tag(fid, t_pTag, thisRawDir.ent.pos);
+                    //
+                    //   Depending on the state of the projection and selection
+                    //   we proceed a little bit differently
+                    //
+                    if (mult.cols() == 0)
+                    {
+                        if (sel.cols() == 0)
+                        {
+                            MatrixXf data(Map<MatrixXf>( static_cast< float* >(t_pTag->data),nchan, thisRawDir.nsamp));
+                            one = cal*data;
+                        }
+                        else
+                        {
+                            MatrixXf newData(sel.cols(), thisRawDir.nsamp);
+
+                            if (t_pTag->type == FIFFT_DAU_PACK16)
+                            {
+                                MatrixDau16 data = (Map< MatrixDau16 >( t_pTag->toDauPack16(),nchan, thisRawDir.nsamp));
+
+                                for(r = 0; r < sel.cols(); ++r)
+                                    for(c = 0; c < thisRawDir.nsamp; ++c)
+                                        newData(r, c) = data(sel(0,r), c);
+                            }
+                            else
+                            {
+                                printf("Data Storage Format not known jet!!");
+                            }
+
+                            one = cal*newData;
+                        }
+                    }
+                    else
+                    {
+                        MatrixXf data(Map<MatrixXf>( static_cast< float* >(t_pTag->data),nchan, thisRawDir.nsamp));
+                        one = mult*data;
+                    }
+                }
+                //
+                //  The picking logic is a bit complicated
+                //
+                if (to >= thisRawDir.last && from <= thisRawDir.first)
+                {
+                    //
+                    //  We need the whole buffer
+                    //
+                    first_pick = 1;
+                    last_pick  = thisRawDir.nsamp;
+                    if (do_debug)
+                        printf("W");
+                }
+                else if (from > thisRawDir.first)
+                {
+                    first_pick = from - thisRawDir.first + 1;
+                    if(to < thisRawDir.last)
+                    {
+                        //
+                        //  Something from the middle
+                        //
+                        last_pick = thisRawDir.nsamp + to - thisRawDir.last;
+                        if (do_debug)
+                            printf("M");
+                    }
+                    else
+                    {
+                        //
+                        //  From the middle to the end
+                        //
+                        last_pick = thisRawDir.nsamp;
+                        if (do_debug)
+                            printf("E");
+                    }
+                }
+                else
+                {
+                    //
+                    //  From the beginning to the middle
+                    //
+                    first_pick = 1;
+                    last_pick  = to - thisRawDir.first + 1;
+                    if (do_debug)
+                        printf("B");
+                }
+                //
+                //  Now we are ready to pick
+                //
+                picksamp = last_pick - first_pick + 1;
+                if (picksamp > 0)
+                {
+                    for(r = 0; r < data->rows(); ++r)
+                        for(c = 0; c < picksamp; ++c)
+                            (*data)(r,dest + c) = one(r,first_pick + c);
+                    dest += picksamp;
+                }
+            }
+            //
+            //  Done?
+            //
+            if (thisRawDir.last >= to)
+            {
+                printf(" [done]\n");
+                break;
+            }
+        }
+
+//        fclose(fid);
+
+
+        if(times)
+            delete times;
+
+        times = new MatrixXf(1, to-from+1);
+
+
+        for (i = from; i < to; ++i)
+            (*times)(0, i) = ((float)i) / raw->info->sfreq;
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
     //=========================================================================================================
     /**
     * fiff_read_tag
@@ -460,7 +763,7 @@ public:
     * sel        Which channels will be included in the output file (optional)
     *
     */
-    static bool start_writing_raw(QString& p_sFileName, FiffInfo* info, MatrixXi sel = defaultMatrixXi)
+    static FiffFile* start_writing_raw(QString& p_sFileName, FiffInfo* info, MatrixXf*& cals, MatrixXi sel = defaultMatrixXi)
     {
         //
         //   We will always write floats
@@ -572,46 +875,51 @@ public:
         //    CTF compensation info
         //
         t_pFile->write_ctf_comp(info->comps);
-//        %
-//        %    Bad channels
-//        %
-//        if length(info.bads) > 0
-//            fiff_start_block(fid,FIFF.FIFFB_MNE_BAD_CHANNELS);
-//            fiff_write_name_list(fid,FIFF.FIFF_MNE_CH_NAME_LIST,info.bads);
-//            fiff_end_block(fid,FIFF.FIFFB_MNE_BAD_CHANNELS);
-//        end
-//        %
-//        %    General
-//        %
-//        fiff_write_float(fid,FIFF.FIFF_SFREQ,info.sfreq);
-//        fiff_write_float(fid,FIFF.FIFF_HIGHPASS,info.highpass);
-//        fiff_write_float(fid,FIFF.FIFF_LOWPASS,info.lowpass);
-//        fiff_write_int(fid,FIFF.FIFF_NCHAN,nchan);
-//        fiff_write_int(fid,FIFF.FIFF_DATA_PACK,data_type);
-//        if [ ~isempty(info.meas_date) ]
-//            fiff_write_int(fid,FIFF.FIFF_MEAS_DATE,info.meas_date);
-//        end
-//        %
-//        %    Channel info
-//        %
-//        for k = 1:nchan
-//            %
-//            %   Scan numbers may have been messed up
-//            %
-//            chs(k).scanno = k;
-//            chs(k).range  = 1.0;
-//            cals(k) = chs(k).cal;
-//            fiff_write_ch_info(fid,chs(k));
-//        end
-//        %
-//        %
-//        fiff_end_block(fid,FIFF.FIFFB_MEAS_INFO);
-//        %
-//        % Start the raw data
-//        %
-//        fiff_start_block(fid,FIFF.FIFFB_RAW_DATA);
+        //
+        //    Bad channels
+        //
+        if (info->bads.size() > 0)
+        {
+            t_pFile->start_block(FIFFB_MNE_BAD_CHANNELS);
+            t_pFile->write_name_list(FIFF_MNE_CH_NAME_LIST,info->bads);
+            t_pFile->end_block(FIFFB_MNE_BAD_CHANNELS);
+        }
+        //
+        //    General
+        //
+        t_pFile->write_float(FIFF_SFREQ,&info->sfreq);
+        t_pFile->write_float(FIFF_HIGHPASS,&info->highpass);
+        t_pFile->write_float(FIFF_LOWPASS,&info->lowpass);
+        t_pFile->write_int(FIFF_NCHAN,&nchan);
+        t_pFile->write_int(FIFF_DATA_PACK,&data_type);
+        if (info->meas_date[0] != -1)
+            t_pFile->write_int(FIFF_MEAS_DATE,info->meas_date, 2);
+        //
+        //    Channel info
+        //
+        if (cals)
+            delete cals;
+        cals = new MatrixXf(1,nchan);
 
-        return true;
+        for(k = 0; k < nchan; ++k)
+        {
+            //
+            //    Scan numbers may have been messed up
+            //
+            chs[k].scanno = k+1;//+1 because
+            chs[k].range  = 1.0f;
+            (*cals)(0,k) = chs[k].cal;
+            t_pFile->write_ch_info(&chs[k]);
+        }
+        //
+        //
+        t_pFile->end_block(FIFFB_MEAS_INFO);
+        //
+        // Start the raw data
+        //
+        t_pFile->start_block(FIFFB_RAW_DATA);
+
+        return t_pFile;
     }
 
     //=========================================================================================================

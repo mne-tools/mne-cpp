@@ -290,6 +290,41 @@ void FiffFile::write_coord_trans(FiffCoordTrans& trans)
 
 //*************************************************************************************************************
 
+void FiffFile::write_ctf_comp(QList<FiffCtfComp*>& comps)
+{
+    if (comps.size() <= 0)
+        return;
+    //
+    //  This is very simple in fact
+    //
+    this->start_block(FIFFB_MNE_CTF_COMP);
+    for(qint32 k = 0; k < comps.size(); ++k)
+    {
+        FiffCtfComp* comp = new FiffCtfComp(comps[k]);
+        this->start_block(FIFFB_MNE_CTF_COMP_DATA);
+        //
+        //    Write the compensation kind
+        //
+        this->write_int(FIFF_MNE_CTF_COMP_KIND, &comp->ctfkind);
+        qint32 save_calibrated = comp->save_calibrated;
+        this->write_int(FIFF_MNE_CTF_COMP_CALIBRATED, &save_calibrated);
+        //
+        //    Write an uncalibrated or calibrated matrix
+        //
+        comp->data->data = (comp->rowcals.diagonal()).inverse()*comp->data->data*(comp->colcals.diagonal()).inverse();
+        this->write_named_matrix(FIFF_MNE_CTF_COMP_DATA,comp->data);
+        this->end_block(FIFFB_MNE_CTF_COMP_DATA);
+
+        delete comp;
+    }
+    this->end_block(FIFFB_MNE_CTF_COMP);
+
+    return;
+}
+
+
+//*************************************************************************************************************
+
 void FiffFile::write_dig_point(fiff_dig_point_t& dig)
 {
     //?typedef struct _fiffDigPointRec {
@@ -547,6 +582,22 @@ void FiffFile::write_name_list(fiff_int_t kind,QStringList& data)
 {
     QString all = data.join(":");
     this->write_string(kind,all);
+}
+
+
+//*************************************************************************************************************
+
+void FiffFile::write_named_matrix(fiff_int_t kind,FiffNamedMatrix* mat)
+{
+    this->start_block(FIFFB_MNE_NAMED_MATRIX);
+    this->write_int(FIFF_MNE_NROW, &mat->nrow);
+    this->write_int(FIFF_MNE_NCOL, &mat->ncol);
+    if (mat->row_names.size() > 0)
+       this->write_name_list(FIFF_MNE_ROW_NAMES,mat->row_names);
+    if (mat->col_names.size() > 0)
+       this->write_name_list(FIFF_MNE_COL_NAMES,mat->col_names);
+    this->write_float_matrix(kind,mat->data);
+    this->end_block(FIFFB_MNE_NAMED_MATRIX);
 }
 
 

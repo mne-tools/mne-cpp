@@ -47,6 +47,7 @@
 #include "fiff_coord_trans.h"
 #include "fiff_proj.h"
 #include "fiff_ctf_comp.h"
+#include "fiff_ch_info.h"
 
 
 //*************************************************************************************************************
@@ -191,6 +192,167 @@ public:
     */
     static FiffFile* start_file(QString& p_sFilename);
 
+
+    //=========================================================================================================
+    /**
+    * fiff_write_ch_info
+    *
+    * ### MNE toolbox root function ###
+    *
+    * fiff_write_ch_info(fid,ch)
+    *
+    * Writes a channel information record to a fif file
+    *
+    *     fid           An open fif file descriptor
+    *     ch            The channel information structure to write
+    *
+    *     The type, cal, unit, and pos members are explained in Table 9.5
+    *     of the MNE manual
+    *
+    */
+    void write_ch_info(FiffChInfo* ch)
+    {
+        //typedef struct _fiffChPosRec {
+        //  fiff_int_t   coil_type;          /*!< What kind of coil. */
+        //  fiff_float_t r0[3];              /*!< Coil coordinate system origin */
+        //  fiff_float_t ex[3];              /*!< Coil coordinate system x-axis unit vector */
+        //  fiff_float_t ey[3];              /*!< Coil coordinate system y-axis unit vector */
+        //  fiff_float_t ez[3];             /*!< Coil coordinate system z-axis unit vector */
+        //} fiffChPosRec,*fiffChPos;        /*!< Measurement channel position and coil type */
+
+
+        //typedef struct _fiffChInfoRec {
+        //  fiff_int_t    scanNo;        /*!< Scanning order # */
+        //  fiff_int_t    logNo;         /*!< Logical channel # */
+        //  fiff_int_t    kind;          /*!< Kind of channel */
+        //  fiff_float_t  range;         /*!< Voltmeter range (only applies to raw data ) */
+        //  fiff_float_t  cal;           /*!< Calibration from volts to... */
+        //  fiff_ch_pos_t chpos;         /*!< Channel location */
+        //  fiff_int_t    unit;          /*!< Unit of measurement */
+        //  fiff_int_t    unit_mul;      /*!< Unit multiplier exponent */
+        //  fiff_char_t   ch_name[16];   /*!< Descriptive name for the channel */
+        //} fiffChInfoRec,*fiffChInfo;   /*!< Description of one channel */
+
+        fiff_int_t datasize= 4*13 + 4*7 + 16;
+
+
+        QDataStream out(this);   // we will serialize the data into the file
+        out.setByteOrder(QDataStream::BigEndian);
+
+        out << (qint32)FIFF_CH_INFO;
+        out << (qint32)FIFFT_CH_INFO_STRUCT;
+        out << (qint32)datasize;
+        out << (qint32)FIFFV_NEXT_SEQ;
+//        count = fwrite(fid,int32(FIFF_CH_INFO),'int32');
+//        if count ~= 1
+//            error(me,'write failed');
+//        end
+//        count = fwrite(fid,int32(FIFFT_CH_INFO_STRUCT),'int32');
+//        if count ~= 1
+//            error(me,'write failed');
+//        end
+//        count = fwrite(fid,int32(datasize),'int32');
+//        if count ~= 1
+//            error(me,'write failed');
+//        end
+//        count = fwrite(fid,int32(FIFFV_NEXT_SEQ),'int32');
+//        if count ~= 1
+//            error(me,'write failed');
+//        end
+        //
+        //   Start writing fiffChInfoRec
+        //
+        out << (qint32)ch->scanno;
+        out << (qint32)ch->logno;
+        out << (qint32)ch->kind;
+        out << (float)ch->range;
+        out << (float)ch->cal;
+//        count = fwrite(fid,int32(ch.scanno),'int32');
+//        if count ~= 1
+//            error(me,'write failed');
+//        end
+//        count = fwrite(fid,int32(ch.logno),'int32');
+//        if count ~= 1
+//            error(me,'write failed');
+//        end
+//        count = fwrite(fid,int32(ch.kind),'int32');
+//        if count ~= 1
+//            error(me,'write failed');
+//        end
+//        count = fwrite(fid,single(ch.range),'single');
+//        if count ~= 1
+//            error(me,'write failed');
+//        end
+//        count = fwrite(fid,single(ch.cal),'single');
+//        if count ~= 1
+//            error(me,'write failed');
+//        end
+        //
+        //   fiffChPosRec follows
+        //
+        out << (qint32)ch->coil_type;
+        qint32 i;
+        for(i = 0; i < 12; ++i)
+            out << ch->loc(i,0);
+//        count = fwrite(fid,int32(ch.coil_type),'int32');
+//        if count ~= 1
+//            error(me,'write failed');
+//        end
+//        count = fwrite(fid,single(ch.loc),'single');
+//        if count ~= 12
+//            error(me,'write failed');
+//        end
+        //
+        //   unit and unit multiplier
+        //
+        out << (qint32)ch->unit;
+        out << (qint32)ch->unit_mul;
+//        count = fwrite(fid,int32(ch.unit),'int32');
+//        if count ~= 1
+//            error(me,'write failed');
+//        end
+//        count = fwrite(fid,int32(ch.unit_mul),'int32');
+//        if count ~= 1
+//            error(me,'write failed');
+//        end
+        //
+        //   Finally channel name
+        //
+        fiff_int_t len = ch->ch_name.size();
+        QString ch_name;
+        if(len > 15)
+        {
+            ch_name = ch->ch_name.mid(0, 15);
+        }
+        else
+            ch_name = ch->ch_name;
+
+        len = ch_name.size();
+
+
+
+        const char* dataString = ch_name.toUtf8().constData();
+        for(i = 0; i < len; ++i)
+            out << dataString[i];
+//        count = fwrite(fid,ch_name,'char');
+//        if count ~= len
+//            error(me,'write failed');
+//        end
+
+        if (len < 16)
+        {
+            char chNull = NULL;
+            for(i = 0; i < 16-len; ++i)
+                out << chNull;
+//            dum=zeros(1,16-len);
+//            count = fwrite(fid,uint8(dum),'uchar');
+//            if count ~= 16-len
+//                error(me,'write failed');
+//            end
+        }
+    }
+
+
     //=========================================================================================================
     /**
     * fiff_write_coord_trans
@@ -223,41 +385,7 @@ public:
     *     comps         The compensation data to write
     *
     */
-    void write_ctf_comp(QList<FiffCtfComp*>& comps)
-    {
-        if (comps.size() <= 0)
-            return;
-        //
-        //  This is very simple in fact
-        //
-        this->start_block(FIFFB_MNE_CTF_COMP);
-        for(qint32 k = 0; k < comps.size(); ++k)
-        {
-            FiffCtfComp* comp = new FiffCtfComp(comps[k]);
-            this->start_block(FIFFB_MNE_CTF_COMP_DATA);
-            //
-            //    Write the compensation kind
-            //
-            this->write_int(FIFF_MNE_CTF_COMP_KIND, &comp->ctfkind);
-            qint32 save_calibrated = comp->save_calibrated;
-            this->write_int(FIFF_MNE_CTF_COMP_CALIBRATED, &save_calibrated);
-            //
-            //    Write an uncalibrated or calibrated matrix
-            //
-            comp->data->data = (comp->rowcals.diagonal()).inverse()*comp->data->data*(comp->colcals.diagonal()).inverse();
-//ToDo            this->write_named_matrix(FIFF_MNE_CTF_COMP_DATA,comp->data);
-            this->end_block(FIFFB_MNE_CTF_COMP_DATA);
-
-            delete comp;
-        }
-        this->end_block(FIFFB_MNE_CTF_COMP);
-
-        return;
-
-    }
-
-
-
+    void write_ctf_comp(QList<FiffCtfComp*>& comps);
 
 
     //=========================================================================================================
@@ -275,6 +403,7 @@ public:
     *
     */
     void write_dig_point(fiff_dig_point_t& dig);
+
 
     //=========================================================================================================
     /**
@@ -295,6 +424,7 @@ public:
     */
     void write_id(fiff_int_t kind, FiffId& id = defaultFiffId);
 
+
     //=========================================================================================================
     /**
     * fiff_write_int
@@ -311,6 +441,7 @@ public:
     *     nel           Zahl an Elementen in der data size
     */
     void write_int(fiff_int_t kind, fiff_int_t* data, fiff_int_t nel = 1);
+
 
     //=========================================================================================================
     /**
@@ -329,6 +460,7 @@ public:
     */
     void write_float(fiff_int_t kind, float* data, fiff_int_t nel = 1);
 
+
     //=========================================================================================================
     /**
     * fiff_write_float_matrix
@@ -346,6 +478,7 @@ public:
     */
     void write_float_matrix(fiff_int_t kind, MatrixXf& mat);
 
+
     //=========================================================================================================
     /**
     * fiff_write_name_list
@@ -362,6 +495,24 @@ public:
     *
     */
     void write_name_list(fiff_int_t kind,QStringList& data);
+
+
+    //=========================================================================================================
+    /**
+    * fiff_write_named_matrix
+    *
+    * ### MNE toolbox root function ###
+    *
+    * fiff_write_named_matrix(fid,kind,mat)
+    *
+    * Writes a named single-precision floating-point matrix
+    *
+    *     fid           An open fif file descriptor
+    *     kind          The tag kind to use for the data
+    *     mat           The data matrix
+    */
+    void write_named_matrix(fiff_int_t kind,FiffNamedMatrix* mat);
+
 
     //=========================================================================================================
     /**
