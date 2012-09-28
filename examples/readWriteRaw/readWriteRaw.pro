@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     readRaw.pro
+# @file     readWriteRaw.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -44,13 +44,13 @@ CONFIG   += console
 CONFIG   -= app_bundle
 
 CONFIG(debug, debug|release) {
-    TARGET = readRawd
+    TARGET = readWriteRawd
     LIBS += -L$$PWD/../../lib/ -lmned
     LIBS += -L$$PWD/../../lib/ -lfiffd
     DESTDIR = $$PWD/../../bin
 }
 else {
-    TARGET = readRaw
+    TARGET = readWriteRaw
     LIBS += -L$$PWD/../../lib/ -lmne
     LIBS += -L$$PWD/../../lib/ -lfiff
     DESTDIR = $$PWD/../../bin

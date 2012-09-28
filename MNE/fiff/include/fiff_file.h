@@ -143,6 +143,75 @@ public:
         this->write_int(FIFF_BLOCK_END,&kind);
     }
 
+
+
+    //=========================================================================================================
+    /**
+    * fiff_end_file
+    *
+    * fiff_end_file(fid)
+    *
+    * Writes the closing tags to a fif file and closes the file
+    *
+    *     fid           An open fif file descriptor
+    *
+    */
+    void end_file()
+    {
+        fiff_int_t datasize = 0;
+
+        QDataStream out(this);   // we will serialize the data into the file
+        out.setByteOrder(QDataStream::BigEndian);
+
+        out << (qint32)FIFF_NOP;
+        out << (qint32)FIFFT_VOID;
+        out << (qint32)datasize;
+        out << (qint32)FIFFV_NEXT_NONE;
+
+//        count = fwrite(fid, int32(FIFF.FIFF_NOP), 'int32');
+//        if count ~= 1
+//            error(me, 'write failed');
+//        end
+//        count = fwrite(fid, int32(FIFF.FIFFT_VOID), 'int32');
+//        if count ~= 1
+//            error(me, 'write failed');
+//        end
+//        count = fwrite(fid, int32(datasize), 'int32');
+//        if count ~= 1
+//            error(me, 'write failed');
+//        end
+//        count = fwrite(fid, int32(FIFF.FIFFV_NEXT_NONE), 'int32');
+//        if count ~= 1
+//            error(me, 'write failed');
+//        end
+    }
+
+
+
+
+
+
+
+
+
+    //=========================================================================================================
+    /**
+    * fiff_finish_writing_raw
+    *
+    * function fiff_finish_writing_raw(fid)
+    %
+    % fid        of an open raw data file
+    %
+    *
+    */
+    void finish_writing_raw()
+    {
+        this->end_block(FIFFB_RAW_DATA);
+        this->end_block(FIFFB_MEAS);
+        this->end_file();
+    }
+
+
     //=========================================================================================================
     /**
     * QFile::open
