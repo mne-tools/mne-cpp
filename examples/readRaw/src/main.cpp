@@ -70,6 +70,8 @@ int main(int argc, char *argv[])
 
 //    QString t_sFile = "./MNE-sample-data/MEG/test_input.fif";
 
+//    QString t_sFile = "./MNE-sample-data/MEG/noise-newsystem/noise3.fif";
+
     QString t_sOutFile = "./MNE-sample-data/MEG/test_output.fif";//"./MNE-sample-data/test_ctf_raw.fif";
 
 
@@ -102,7 +104,7 @@ int main(int argc, char *argv[])
         if(picks.cols() == 0)
         {
             printf("channel list may need modification\n");
-            return 0;
+            return -1;
         }
     }
     //
@@ -114,7 +116,7 @@ int main(int argc, char *argv[])
     //
     fiff_int_t from = raw->first_samp;
     fiff_int_t to = raw->last_samp;
-    float quantum_sec = 10.0f;
+    float quantum_sec = 10.0f;//read and write in 10 sec junks
     fiff_int_t quantum = ceil(quantum_sec*raw->info->sfreq);
     //
     //   To read the whole file at once set
@@ -129,6 +131,7 @@ int main(int argc, char *argv[])
     fiff_int_t first, last;
     MatrixXf* data = NULL;
     MatrixXf* times = NULL;
+
     for(first = from; first < to; first+=quantum)
     {
         last = first+quantum-1;
@@ -142,7 +145,8 @@ int main(int argc, char *argv[])
         {
 //                fclose(raw.fid);
 //                fclose(outfid);
-//                error(me,'%s',mne_omit_first_line(lasterr));
+                printf("error during read_raw_segment\n");
+                return -1;
         }
         //
         //   You can add your own miracle here
@@ -154,7 +158,7 @@ int main(int argc, char *argv[])
                outfid->write_int(FIFF_FIRST_SAMPLE,&first);
            first_buffer = false;
         }
-//        outfid->write_raw_buffer(data,cals);
+        outfid->write_raw_buffer(data,cals);
         printf("[done]\n");
     }
 

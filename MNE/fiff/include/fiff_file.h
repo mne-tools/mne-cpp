@@ -52,9 +52,18 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include "../../../include/3rdParty/Eigen/Core"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -89,6 +98,7 @@ static FiffId defaultFiffId;
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace Eigen;
 
 
 //=============================================================================================================
@@ -529,6 +539,37 @@ public:
     */
     void write_proj(QList<FiffProj*>& projs);
 
+
+
+
+    //=========================================================================================================
+    /**
+    * fiff_write_raw_buffer
+    *
+    * ### MNE toolbox root function ###
+    *
+    * function fiff_write_raw_buffer(fid,info,buf)
+    *
+    * fid        of an open raw data file
+    * buf        the buffer to write
+    * cals       calibration factors
+    *
+    *
+    */
+    bool write_raw_buffer(MatrixXf* buf, MatrixXf* cals)
+    {
+        if (buf->rows() != cals->cols())
+        {
+            printf("buffer and calibration sizes do not match\n");
+            return false;
+        }
+
+        MatrixXf calsMat(cals->transpose().asDiagonal());
+        MatrixXf tmp = calsMat.inverse()*(*buf);
+
+        this->write_float(FIFF_DATA_BUFFER,tmp.data(),tmp.rows()*tmp.cols()); // XXX why not diag(1./cals) ???
+        return true;
+    }
 
     //=========================================================================================================
     /**
