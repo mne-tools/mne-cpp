@@ -37,7 +37,7 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    readRaw \
+    readWriteRaw \
     readFwd \
     readFwdDisp
 

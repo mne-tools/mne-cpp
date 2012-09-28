@@ -74,8 +74,6 @@ int main(int argc, char *argv[])
 
     QString t_sOutFile = "./MNE-sample-data/MEG/test_output.fif";//"./MNE-sample-data/test_ctf_raw.fif";
 
-
-
     //
     //   Setup for reading the raw data
     //
@@ -161,6 +159,9 @@ int main(int argc, char *argv[])
         outfid->write_raw_buffer(data,cals);
         printf("[done]\n");
     }
+
+
+    outfid->finish_writing_raw();
 
     return a.exec();
 }
