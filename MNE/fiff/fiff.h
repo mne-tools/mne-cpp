@@ -484,8 +484,6 @@ public:
         fiff_int_t first_pick, last_pick, picksamp;
         for(k = 0; k < raw->rawdir.size(); ++k)
         {
-            if(k == 269)
-                qDebug() << "HERE";
             FiffRawDir thisRawDir = raw->rawdir[k];
             //
             //  Do we need this buffer
@@ -521,8 +519,8 @@ public:
                         {
                             if (t_pTag->type == FIFFT_DAU_PACK16)
                             {
-                                MatrixDau16 data = (Map< MatrixDau16 >( t_pTag->toDauPack16(),nchan, thisRawDir.nsamp));
-                                one = cal*data.cast<float>();
+                                MatrixDau16 tmp_data = (Map< MatrixDau16 >( t_pTag->toDauPack16(),nchan, thisRawDir.nsamp));
+                                one = cal*tmp_data.cast<float>();
                             }
                             else
                             {
@@ -535,11 +533,10 @@ public:
 
                             if (t_pTag->type == FIFFT_DAU_PACK16)
                             {
-                                MatrixDau16 data = (Map< MatrixDau16 >( t_pTag->toDauPack16(),nchan, thisRawDir.nsamp));
+                                MatrixXf tmp_data = (Map< MatrixDau16 >( t_pTag->toDauPack16(),nchan, thisRawDir.nsamp)).cast<float>();
 
                                 for(r = 0; r < sel.cols(); ++r)
-                                    for(c = 0; c < thisRawDir.nsamp; ++c)
-                                        newData(r, c) = data(sel(0,r), c);
+                                    newData.block(r,0,1,thisRawDir.nsamp) = tmp_data.block(sel(0,r),0,1,thisRawDir.nsamp);
                             }
                             else
                             {
@@ -616,9 +613,11 @@ public:
                 picksamp = last_pick - first_pick;// + 1;
                 if (picksamp > 0)
                 {
-                    for(r = 0; r < data->rows(); ++r)
-                        for(c = 0; c < picksamp; ++c)
-                            (*data)(r,dest + c) = one(r,first_pick + c);
+//                    for(r = 0; r < data->rows(); ++r)
+//                        for(c = 0; c < picksamp; ++c)
+//                            (*data)(r,dest + c) = one(r,first_pick + c);
+                    data->block(0,dest,data->rows(),picksamp) = one.block(0, first_pick, data->rows(), picksamp);
+
                     dest += picksamp;
                 }
             }
