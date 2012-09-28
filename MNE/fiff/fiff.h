@@ -554,7 +554,6 @@ public:
                         if (t_pTag->type == FIFFT_DAU_PACK16)
                         {
                             MatrixDau16 data = (Map< MatrixDau16 >( t_pTag->toDauPack16(),nchan, thisRawDir.nsamp));
-
                             one = mult*data.cast<float>();
                         }
                         else
