@@ -82,7 +82,7 @@ MatrixXi Fiff::pick_channels(QStringList& ch_names, QStringList& include, QStrin
         //
         sel.setZero();
         for (k = 0; k < nchan; ++k)
-            sel(0, k) = k;//+1 using MATLAB notation
+            sel(0, k) = k; //+1 using MATLAB notation
 
         qint32 nzero = 0;
         for(k = 0; k < exclude.size(); ++k)
@@ -99,7 +99,7 @@ MatrixXi Fiff::pick_channels(QStringList& ch_names, QStringList& include, QStrin
             nzero = 0;//does this make sense? - its here because its in the MATLAB file
             if(count > 0)
             {
-                sel(0, c) = 0;
+                sel(0, c) = -1;//to elimnate channels use -1 instead of 0 - cause its zero based indexed
                 ++nzero;
             }
         }
@@ -113,7 +113,7 @@ MatrixXi Fiff::pick_channels(QStringList& ch_names, QStringList& include, QStrin
             p = 0;
             for(k = 0; k < nchan; ++k)
             {
-                if (sel(0, k) > 0)
+                if (sel(0, k) >= 0)
                 {
                     newsel(0, p) = sel(0, k);
                     ++p;
@@ -154,14 +154,14 @@ MatrixXi Fiff::pick_channels(QStringList& ch_names, QStringList& include, QStrin
             {
 
                 count = 0;
-                for (i = exclude.size()-1; i >= 0 ; --i)
+                for (i = 0; i < exclude.size(); ++i)
                 {
                     if (QString::compare(include.at(k),exclude.at(i)) == 0)
-                        count += 1;
+                        ++count;
                 }
                 if (count > 0)
                 {
-                    sel(0, k) = 0;
+                    sel(0, k) = -1;//to elimnate channels use -1 instead of 0 - cause its zero based indexed
                     ++nzero;
                 }
             }
@@ -177,7 +177,7 @@ MatrixXi Fiff::pick_channels(QStringList& ch_names, QStringList& include, QStrin
             p = 0;
             for(k = 0; k < include.size(); ++k)
             {
-                if (sel(0,k) > 0)
+                if (sel(0,k) >= 0) // equal also cause of zero based picking
                 {
                     newsel(0,p) = sel(0,k);
                     ++p;

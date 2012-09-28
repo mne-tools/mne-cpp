@@ -389,7 +389,7 @@ public:
         //  Initialize the data and calibration vector
         //
         qint32 nchan = raw->info->nchan;
-        qint32 dest  = 1;
+        qint32 dest  = 0;//1;
         qint32 i, k, r, c;
         MatrixXf cal(nchan,nchan);
         cal.setZero();
@@ -519,8 +519,15 @@ public:
                     {
                         if (sel.cols() == 0)
                         {
-                            MatrixXf data(Map<MatrixXf>( static_cast< float* >(t_pTag->data),nchan, thisRawDir.nsamp));
-                            one = cal*data;
+                            if (t_pTag->type == FIFFT_DAU_PACK16)
+                            {
+                                MatrixDau16 data = (Map< MatrixDau16 >( t_pTag->toDauPack16(),nchan, thisRawDir.nsamp));
+                                one = cal*data.cast<float>();
+                            }
+                            else
+                            {
+                                printf("Data Storage Format not known jet!!\n");
+                            }
                         }
                         else
                         {
@@ -536,7 +543,7 @@ public:
                             }
                             else
                             {
-                                printf("Data Storage Format not known jet!!");
+                                printf("Data Storage Format not known jet!!\n");
                             }
 
                             one = cal*newData;
@@ -544,8 +551,18 @@ public:
                     }
                     else
                     {
-                        MatrixXf data(Map<MatrixXf>( static_cast< float* >(t_pTag->data),nchan, thisRawDir.nsamp));
-                        one = mult*data;
+                        if (t_pTag->type == FIFFT_DAU_PACK16)
+                        {
+                            MatrixDau16 data = (Map< MatrixDau16 >( t_pTag->toDauPack16(),nchan, thisRawDir.nsamp));
+
+                            one = mult*data.cast<float>();
+                        }
+                        else
+                        {
+                            printf("Data Storage Format not known jet!!\n");
+                        }
+
+
                     }
                 }
                 //
@@ -556,20 +573,21 @@ public:
                     //
                     //  We need the whole buffer
                     //
-                    first_pick = 1;
+                    first_pick = 0;//1;
                     last_pick  = thisRawDir.nsamp;
                     if (do_debug)
                         printf("W");
                 }
                 else if (from > thisRawDir.first)
                 {
-                    first_pick = from - thisRawDir.first + 1;
+                    first_pick = from - thisRawDir.first;// + 1;
                     if(to < thisRawDir.last)
                     {
                         //
                         //  Something from the middle
                         //
-                        last_pick = thisRawDir.nsamp + to - thisRawDir.last;
+                        qDebug() << "This needs to be debugged!";
+                        last_pick = thisRawDir.nsamp + to - thisRawDir.last;//is this alright?
                         if (do_debug)
                             printf("M");
                     }
@@ -588,7 +606,7 @@ public:
                     //
                     //  From the beginning to the middle
                     //
-                    first_pick = 1;
+                    first_pick = 0;//1;
                     last_pick  = to - thisRawDir.first + 1;
                     if (do_debug)
                         printf("B");
@@ -596,7 +614,7 @@ public:
                 //
                 //  Now we are ready to pick
                 //
-                picksamp = last_pick - first_pick + 1;
+                picksamp = last_pick - first_pick;// + 1;
                 if (picksamp > 0)
                 {
                     for(r = 0; r < data->rows(); ++r)
@@ -617,27 +635,16 @@ public:
 
 //        fclose(fid);
 
-
         if(times)
             delete times;
 
         times = new MatrixXf(1, to-from+1);
 
+        for (i = 0; i < times->cols(); ++i)
+            (*times)(0, i) = ((float)(from+i)) / raw->info->sfreq;
 
-        for (i = from; i < to; ++i)
-            (*times)(0, i) = ((float)i) / raw->info->sfreq;
-
+        return true;
     }
-
-
-
-
-
-
-
-
-
-
 
 
     //=========================================================================================================
