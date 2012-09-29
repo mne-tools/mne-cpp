@@ -66,11 +66,9 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    QString t_sFile = "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif";//"./MNE-sample-data/test_ctf_raw.fif";
-
+//    QString t_sFile = "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif";//"./MNE-sample-data/test_ctf_raw.fif";
 //    QString t_sFile = "./MNE-sample-data/MEG/test_input.fif";
-
-//    QString t_sFile = "./MNE-sample-data/MEG/noise-newsystem/noise3.fif";
+    QString t_sFile = "./MNE-sample-data/MEG/noise-newsystem/noise3.fif";
 
     QString t_sOutFile = "./MNE-sample-data/MEG/test_output.fif";//"./MNE-sample-data/test_ctf_raw.fif";
 
@@ -78,7 +76,7 @@ int main(int argc, char *argv[])
     //   Setup for reading the raw data
     //
     FiffRawData* raw = NULL;
-    if(!Fiff::setup_read_raw(t_sFile, raw))
+    if(!FiffFile::setup_read_raw(t_sFile, raw))
     {
         printf("Error during fiff setup raw read");
         return 0;
@@ -160,8 +158,13 @@ int main(int argc, char *argv[])
         printf("[done]\n");
     }
 
-
     outfid->finish_writing_raw();
+
+
+    delete raw;
+    delete outfid;
+
+    printf("Finished\n");
 
     return a.exec();
 }

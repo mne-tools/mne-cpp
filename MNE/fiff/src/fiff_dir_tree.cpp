@@ -944,7 +944,7 @@ QList<FiffProj*> FiffDirTree::read_proj(FiffFile* p_pFile)
         t_pFiffDirTreeItem->find_tag(p_pFile, FIFF_MNE_PROJ_ITEM_ACTIVE, t_pTag);
         bool active;
         if (t_pTag)
-            active = *t_pTag->toByte(); //this has to be debugged.
+            active = *t_pTag->toInt();
         else
             active = false;
 
