@@ -238,8 +238,6 @@ public:
     bool open(FiffDirTree*& p_pTree, QList<fiff_dir_entry_t>*& p_pDir);
 
 
-
-
     //=========================================================================================================
     /**
     * fiff_start_block
@@ -484,7 +482,6 @@ public:
     void write_coord_trans(FiffCoordTrans& trans);
 
 
-
     //=========================================================================================================
     /**
     * fiff_write_ctf_comp
@@ -674,6 +671,7 @@ public:
         this->write_float(FIFF_DATA_BUFFER,tmp.data(),tmp.rows()*tmp.cols()); // XXX why not diag(1./cals) ???
         return true;
     }
+
 
     //=========================================================================================================
     /**
