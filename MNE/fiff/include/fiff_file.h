@@ -442,10 +442,12 @@ public:
         len = ch_name.size();
 
 
+        out.writeRawData(ch_name.toUtf8().constData(),len);
+//        out << ch_name.toUtf8().constData();
+//        const char* dataString = ch_name.toUtf8().constData();//ToDo
+//        for(i = 0; i < len; ++i)
+//            out << dataString[i];
 
-        const char* dataString = ch_name.toUtf8().constData();
-        for(i = 0; i < len; ++i)
-            out << dataString[i];
 //        count = fwrite(fid,ch_name,'char');
 //        if count ~= len
 //            error(me,'write failed');

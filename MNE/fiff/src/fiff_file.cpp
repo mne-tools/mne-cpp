@@ -146,6 +146,11 @@ bool FiffFile::open(FiffDirTree*& p_pTree, QList<fiff_dir_entry_t>*& p_pDir)
             t_fiffDirEntry.type = t_pTag->type;
             t_fiffDirEntry.size = t_pTag->size;
             p_pDir->append(t_fiffDirEntry);
+
+//            qDebug() << k;
+//            qDebug() << "Kind: " << t_pTag->kind << "; Type: " << t_pTag->type << "; Size: " << t_pTag->size << "; Next: " << t_pTag->next << "; Pos: " << t_fiffDirEntry.pos;
+//            if( k == 200 || k == 400 || k == 600 || k == 900)
+//                qDebug() << "HERE";
         }
     }
     delete t_pTag;
@@ -389,10 +394,10 @@ FiffFile* FiffFile::start_file(QString& p_sFilename)
     //
     //   Write the compulsory items
     //
-    p_pFile->write_id(FIFF_FILE_ID);
+    p_pFile->write_id(FIFF_FILE_ID);//1
     qint32 data = -1;
-    p_pFile->write_int(FIFF_DIR_POINTER,&data);
-    p_pFile->write_int(FIFF_FREE_LIST,&data);
+    p_pFile->write_int(FIFF_DIR_POINTER,&data);//2
+    p_pFile->write_int(FIFF_FREE_LIST,&data);//3
     //
     //   Ready for more
     //
@@ -427,18 +432,18 @@ FiffFile* FiffFile::start_writing_raw(QString& p_sFileName, FiffInfo* info, Matr
     //  Create the file and save the essentials
     //
 
-    FiffFile* t_pFile = start_file(p_sFileName);
-    t_pFile->start_block(FIFFB_MEAS);
-    t_pFile->write_id(FIFF_BLOCK_ID);
+    FiffFile* t_pFile = start_file(p_sFileName);//1, 2, 3
+    t_pFile->start_block(FIFFB_MEAS);//4
+    t_pFile->write_id(FIFF_BLOCK_ID);//5
     if(info->meas_id.version != -1)
     {
-        t_pFile->write_id(FIFF_PARENT_BLOCK_ID,info->meas_id);
+        t_pFile->write_id(FIFF_PARENT_BLOCK_ID,info->meas_id);//6
     }
     //
     //
     //    Measurement info
     //
-    t_pFile->start_block(FIFFB_MEAS_INFO);
+    t_pFile->start_block(FIFFB_MEAS_INFO);//7
     //
     //    Blocks from the original
     //
@@ -1018,7 +1023,8 @@ void FiffFile::write_string(fiff_int_t kind, QString& data)
     out << (qint32)datasize;
     out << (qint32)FIFFV_NEXT_SEQ;
 
-    out << data.toUtf8().constData();//ToDo: Debug
+    out.writeRawData(data.toUtf8().constData(),datasize);
+//    out << data.toUtf8().constData();//ToDo: Debug
 //    const char* dataString = data.toUtf8().constData();
 //    for(qint32 i = 0; i < datasize; ++i)
 //        out << data.toUtf8().constData()[i];//ToDo: Debug
