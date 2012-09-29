@@ -48,6 +48,7 @@
 #include "fiff_proj.h"
 #include "fiff_ctf_comp.h"
 #include "fiff_ch_info.h"
+#include "fiff_info.h"
 
 
 //*************************************************************************************************************
@@ -88,8 +89,7 @@ namespace FIFFLIB
 
 class FiffDirTree;
 
-
-
+static MatrixXi defaultFileMatrixXi(0,0);
 static FiffId defaultFiffId;
 
 
@@ -142,7 +142,6 @@ public:
     {
         this->write_int(FIFF_BLOCK_END,&kind);
     }
-
 
 
     //=========================================================================================================
@@ -270,6 +269,22 @@ public:
     *
     */
     static FiffFile* start_file(QString& p_sFilename);
+
+
+    //=========================================================================================================
+    /**
+    * fiff_start_writing_raw
+    *
+    * ### MNE toolbox root function ###
+    *
+    * function [fid,cals] = fiff_start_writing_raw(name,info,sel)
+    *
+    * name       filename
+    * info       The measurement info block of the source file
+    * sel        Which channels will be included in the output file (optional)
+    *
+    */
+    static FiffFile* start_writing_raw(QString& p_sFileName, FiffInfo* info, MatrixXf*& cals, MatrixXi sel = defaultFileMatrixXi);
 
 
     //=========================================================================================================
@@ -655,7 +670,6 @@ public:
     *     data          The string data to write
     */
     void write_string(fiff_int_t kind, QString& data);
-
 };
 
 } // NAMESPACE

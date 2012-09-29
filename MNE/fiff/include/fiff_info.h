@@ -46,6 +46,8 @@
 #include "fiff_id.h"
 #include "fiff_ch_info.h"
 #include "fiff_ctf_comp.h"
+#include "fiff_coord_trans.h"
+#include "fiff_proj.h"
 
 
 //*************************************************************************************************************

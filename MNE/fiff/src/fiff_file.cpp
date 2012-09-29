@@ -193,6 +193,168 @@ FiffFile* FiffFile::start_file(QString& p_sFilename)
 
 //*************************************************************************************************************
 
+FiffFile* FiffFile::start_writing_raw(QString& p_sFileName, FiffInfo* info, MatrixXf*& cals, MatrixXi sel)
+{
+    //
+    //   We will always write floats
+    //
+    fiff_int_t data_type = 4;
+    qint32 k;
+
+    if(sel.cols() == 0)
+    {
+        sel.resize(1,info->nchan);
+        for (k = 0; k < info->nchan; ++k)
+            sel(0, k) = k; //+1 when MATLAB notation
+    }
+
+    QList<FiffChInfo> chs;
+
+    for(k = 0; k < sel.cols(); ++k)
+        chs << info->chs.at(sel(0,k));
+
+    fiff_int_t nchan = chs.size();
+    //
+    //  Create the file and save the essentials
+    //
+
+    FiffFile* t_pFile = start_file(p_sFileName);
+    t_pFile->start_block(FIFFB_MEAS);
+    t_pFile->write_id(FIFF_BLOCK_ID);
+    if(info->meas_id.version != -1)
+    {
+        t_pFile->write_id(FIFF_PARENT_BLOCK_ID,info->meas_id);
+    }
+    //
+    //
+    //    Measurement info
+    //
+    t_pFile->start_block(FIFFB_MEAS_INFO);
+    //
+    //    Blocks from the original
+    //
+    QList<fiff_int_t> blocks;
+    blocks << FIFFB_SUBJECT << FIFFB_HPI_MEAS << FIFFB_HPI_RESULT << FIFFB_ISOTRAK << FIFFB_PROCESSING_HISTORY;
+    bool have_hpi_result = false;
+    bool have_isotrak    = false;
+    if (blocks.size() > 0 && !info->filename.isEmpty())
+    {
+        FiffFile* t_pFile2 = new FiffFile(info->filename);
+
+        FiffDirTree* t_pTree = NULL;
+        QList<fiff_dir_entry_t>* t_pDir = NULL;
+        t_pFile2->open(t_pTree, t_pDir);
+
+        for(qint32 k = 0; k < blocks.size(); ++k)
+        {
+            QList<FiffDirTree*> nodes = t_pTree->dir_tree_find(blocks.at(k));
+            FiffDirTree::copy_tree(t_pFile2,t_pTree->id,nodes,t_pFile);
+            if(blocks[k] == FIFFB_HPI_RESULT && nodes.size() > 0)
+                have_hpi_result = true;
+
+            if(blocks[k] == FIFFB_ISOTRAK && nodes.size() > 0)
+                have_isotrak = true;
+        }
+
+        delete t_pDir;
+        delete t_pTree;
+        delete t_pFile2;
+        t_pFile2 = NULL;
+    }
+    //
+    //    megacq parameters
+    //
+    if (!info->acq_pars.isEmpty() || !info->acq_stim.isEmpty())
+    {
+        t_pFile->start_block(FIFFB_DACQ_PARS);
+        if (!info->acq_pars.isEmpty())
+            t_pFile->write_string(FIFF_DACQ_PARS, info->acq_pars);
+
+        if (!info->acq_stim.isEmpty())
+            t_pFile->write_string(FIFF_DACQ_STIM, info->acq_stim);
+
+        t_pFile->end_block(FIFFB_DACQ_PARS);
+    }
+    //
+    //    Coordinate transformations if the HPI result block was not there
+    //
+    if (!have_hpi_result)
+    {
+        if (info->dev_head_t.from != -1)
+            t_pFile->write_coord_trans(info->dev_head_t);
+
+        if (info->ctf_head_t.from != -1)
+            t_pFile->write_coord_trans(info->ctf_head_t);
+    }
+    //
+    //    Polhemus data
+    //
+    if (info->dig.size() > 0 && !have_isotrak)
+    {
+        t_pFile->start_block(FIFFB_ISOTRAK);
+        for (qint32 k = 0; k < info->dig.size(); ++k)
+            t_pFile->write_dig_point(info->dig[k]);
+
+        t_pFile->end_block(FIFFB_ISOTRAK);
+    }
+    //
+    //    Projectors
+    //
+    t_pFile->write_proj(info->projs);
+    //
+    //    CTF compensation info
+    //
+    t_pFile->write_ctf_comp(info->comps);
+    //
+    //    Bad channels
+    //
+    if (info->bads.size() > 0)
+    {
+        t_pFile->start_block(FIFFB_MNE_BAD_CHANNELS);
+        t_pFile->write_name_list(FIFF_MNE_CH_NAME_LIST,info->bads);
+        t_pFile->end_block(FIFFB_MNE_BAD_CHANNELS);
+    }
+    //
+    //    General
+    //
+    t_pFile->write_float(FIFF_SFREQ,&info->sfreq);
+    t_pFile->write_float(FIFF_HIGHPASS,&info->highpass);
+    t_pFile->write_float(FIFF_LOWPASS,&info->lowpass);
+    t_pFile->write_int(FIFF_NCHAN,&nchan);
+    t_pFile->write_int(FIFF_DATA_PACK,&data_type);
+    if (info->meas_date[0] != -1)
+        t_pFile->write_int(FIFF_MEAS_DATE,info->meas_date, 2);
+    //
+    //    Channel info
+    //
+    if (cals)
+        delete cals;
+    cals = new MatrixXf(1,nchan);
+
+    for(k = 0; k < nchan; ++k)
+    {
+        //
+        //    Scan numbers may have been messed up
+        //
+        chs[k].scanno = k+1;//+1 because
+        chs[k].range  = 1.0f;
+        (*cals)(0,k) = chs[k].cal;
+        t_pFile->write_ch_info(&chs[k]);
+    }
+    //
+    //
+    t_pFile->end_block(FIFFB_MEAS_INFO);
+    //
+    // Start the raw data
+    //
+    t_pFile->start_block(FIFFB_RAW_DATA);
+
+    return t_pFile;
+}
+
+
+//*************************************************************************************************************
+
 void FiffFile::write_coord_trans(FiffCoordTrans& trans)
 {
     //?typedef struct _fiffCoordTransRec {
