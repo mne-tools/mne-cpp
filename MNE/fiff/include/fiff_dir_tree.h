@@ -135,14 +135,14 @@ public:
 
         for(k = 0; k < nodes.size(); ++k)
         {
-            fidout->start_block(nodes[k]->block);
+            fidout->start_block(nodes[k]->block);//8
             if (nodes[k]->id.version != -1)
             {
                 if (in_id.version != -1)
-                    fidout->write_id(FIFF_PARENT_FILE_ID, in_id);
+                    fidout->write_id(FIFF_PARENT_FILE_ID, in_id);//9
 
-                fidout->write_id(FIFF_BLOCK_ID);
-                fidout->write_id(FIFF_PARENT_BLOCK_ID, nodes[k]->id);
+                fidout->write_id(FIFF_BLOCK_ID);//10
+                fidout->write_id(FIFF_PARENT_BLOCK_ID, nodes[k]->id);//11
             }
             for (p = 0; p < nodes[k]->nent; ++p)
             {
@@ -194,13 +194,18 @@ public:
                 QDataStream out(fidout);
                 out.setByteOrder(QDataStream::BigEndian);
 
+//                qDebug() << "tag.kind: " << tag.kind << "; tag.type: " << tag.type << "; tag.size: " << tag.size;//12
+
                 out << (qint32)tag.kind;
                 out << (qint32)tag.type;
                 out << (qint32)tag.size;
                 out << (qint32)FIFFV_NEXT_SEQ;
-                char* data = static_cast< char* >(tag.data);
-                for(qint32 i = 0; i < tag.size; ++i)
-                    out << data[i];
+
+                out.writeRawData(static_cast< const char* >(tag.data),tag.size);
+//                out << tag.toString().toUtf8().constData();
+//                char* data = static_cast< char* >(tag.data);
+//                for(qint32 i = 0; i < tag.size; ++i)
+//                    out << data[i];
 
 //                count = fwrite(fidout, tag.kind, 'int32');
 //                if count ~= 1
