@@ -49,7 +49,7 @@
 #include "fiff_ctf_comp.h"
 #include "fiff_ch_info.h"
 #include "fiff_info.h"
-
+#include "fiff_raw_data.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -88,6 +88,9 @@ namespace FIFFLIB
 {
 
 class FiffDirTree;
+class FiffFile;
+class FiffTag;
+class FiffRawData;
 
 static MatrixXi defaultFileMatrixXi(0,0);
 static FiffId defaultFiffId;
@@ -253,6 +256,23 @@ public:
     {
         this->write_int(FIFF_BLOCK_START,&kind);
     }
+
+
+    //=========================================================================================================
+    /**
+    * fiff_setup_read_raw
+    *
+    * ### MNE toolbox root function ###
+    *
+    * [data] = fiff_setup_read_raw(fname,allow_maxshield)
+    *
+    * Read information about raw data file
+    *
+    * fname               Name of the file to read
+    * allow_maxshield     Accept unprocessed MaxShield data
+    */
+    static bool setup_read_raw(QString t_sFileName, FiffRawData*& data, bool allow_maxshield = false);
+
 
     //=========================================================================================================
     /**

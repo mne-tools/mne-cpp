@@ -418,7 +418,10 @@ public:
     * fname               Name of the file to read
     * allow_maxshield     Accept unprocessed MaxShield data
     */
-    static bool setup_read_raw(QString t_sFileName, FiffRawData*& data, bool allow_maxshield = false);
+    inline static bool setup_read_raw(QString t_sFileName, FiffRawData*& data, bool allow_maxshield = false)
+    {
+        return FiffFile::setup_read_raw(t_sFileName, data, allow_maxshield);
+    }
 
     //=========================================================================================================
     /**
@@ -428,7 +431,7 @@ public:
     *
     * Wrapper for the FiffDirTree::split_name_list static function
     */
-    static inline QStringList split_name_list(QString p_sNameList)
+    inline static QStringList split_name_list(QString p_sNameList)
     {
         return FiffDirTree::split_name_list(p_sNameList);
     }

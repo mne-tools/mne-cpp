@@ -119,6 +119,8 @@
 namespace FIFFLIB
 {
 
+class FiffFile;
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -792,7 +794,7 @@ inline FiffCoordTrans FiffTag::toCoordTrans() const
                 t_fiffDirEntry.kind = t_pInt32[k*4];//fread(fid,1,'int32');
                 t_fiffDirEntry.type = t_pInt32[k*4+1];//fread(fid,1,'uint32');
                 t_fiffDirEntry.size = t_pInt32[k*4+2];//fread(fid,1,'int32');
-                t_fiffDirEntry.pos  = t_pInt32[k*4+2];//fread(fid,1,'int32');
+                t_fiffDirEntry.pos  = t_pInt32[k*4+3];//fread(fid,1,'int32');
                 p_ListFiffDir.append(t_fiffDirEntry);
             }
         }

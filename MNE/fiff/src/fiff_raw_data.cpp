@@ -55,7 +55,7 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 FiffRawData::FiffRawData()
-: m_pFile(NULL)
+: file(NULL)
 , info(NULL)
 {
 
@@ -66,7 +66,10 @@ FiffRawData::FiffRawData()
 
 FiffRawData::~FiffRawData()
 {
-
+    if(file)
+        delete file;
+    if(info)
+        delete info;
 }
 
 
@@ -173,17 +176,17 @@ bool FiffRawData::read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t
 //        end
 
     FiffFile* fid = NULL;
-    if (!this->m_pFile->isOpen())
+    if (!this->file->isOpen())
     {
-        if (!this->m_pFile->open(QIODevice::ReadOnly))
+        if (!this->file->open(QIODevice::ReadOnly))
         {
             printf("Cannot open file %s",this->info->filename.toUtf8().constData());
         }
-        fid = this->m_pFile;
+        fid = this->file;
     }
     else
     {
-        fid = this->m_pFile;
+        fid = this->file;
     }
 
     MatrixXf one;

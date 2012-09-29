@@ -77,6 +77,7 @@ namespace FIFFLIB
 {
 
 class FiffRawData;
+class FiffFile;
 
 
 static MatrixXi defaultMatrixXi(0,0);
@@ -139,7 +140,7 @@ public:
     bool read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t from = -1, fiff_int_t to = -1, MatrixXi sel = defaultMatrixXi);
 
 public:
-    FiffFile* m_pFile;//replaces fid
+    FiffFile* file;//replaces fid
     FiffInfo* info;
     fiff_int_t first_samp;
     fiff_int_t last_samp;

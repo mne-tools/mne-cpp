@@ -127,7 +127,7 @@ bool FiffTag::read_tag_info(FiffFile* p_pFile, FiffTag*& p_pTag)
 
 bool FiffTag::read_tag(FiffFile* p_pFile, FiffTag*& p_pTag, qint64 pos)
 {
-    if (pos > 0)
+    if (pos >= 0)
     {
         p_pFile->seek(pos);
     }
