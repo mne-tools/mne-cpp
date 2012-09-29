@@ -229,12 +229,16 @@ bool FiffRawData::read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t
                     {
                         if (t_pTag->type == FIFFT_DAU_PACK16)
                         {
-                            MatrixDau16 tmp_data = (Map< MatrixDau16 >( t_pTag->toDauPack16(),nchan, thisRawDir.nsamp));
-                            one = cal*tmp_data.cast<float>();
+//                            MatrixDau16 tmp_data = (Map< MatrixDau16 >( t_pTag->toDauPack16(),nchan, thisRawDir.nsamp));
+                            one = cal*(Map< MatrixDau16 >( t_pTag->toDauPack16(),nchan, thisRawDir.nsamp)).cast<float>();
+                        }
+                        else if(t_pTag->type == FIFFT_INT)
+                        {
+                            one = cal*(Map< MatrixXi >( t_pTag->toInt(),nchan, thisRawDir.nsamp)).cast<float>();
                         }
                         else
                         {
-                            printf("Data Storage Format not known jet!!\n");
+                            printf("Data Storage Format not known jet!! Type: %d\n", t_pTag->type);
                         }
                     }
                     else
@@ -248,9 +252,16 @@ bool FiffRawData::read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t
                             for(r = 0; r < sel.cols(); ++r)
                                 newData.block(r,0,1,thisRawDir.nsamp) = tmp_data.block(sel(0,r),0,1,thisRawDir.nsamp);
                         }
+                        else if(t_pTag->type == FIFFT_INT)
+                        {
+                            MatrixXf tmp_data = (Map< MatrixXi >( t_pTag->toInt(),nchan, thisRawDir.nsamp)).cast<float>();
+
+                            for(r = 0; r < sel.cols(); ++r)
+                                newData.block(r,0,1,thisRawDir.nsamp) = tmp_data.block(sel(0,r),0,1,thisRawDir.nsamp);
+                        }
                         else
                         {
-                            printf("Data Storage Format not known jet!!\n");
+                            printf("Data Storage Format not known jet!! Type: %d\n", t_pTag->type);
                         }
 
                         one = cal*newData;
@@ -260,12 +271,16 @@ bool FiffRawData::read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t
                 {
                     if (t_pTag->type == FIFFT_DAU_PACK16)
                     {
-                        MatrixDau16 data = (Map< MatrixDau16 >( t_pTag->toDauPack16(),nchan, thisRawDir.nsamp));
-                        one = mult*data.cast<float>();
+//                        MatrixDau16 tmp_data = (Map< MatrixDau16 >( t_pTag->toDauPack16(),nchan, thisRawDir.nsamp));
+                        one = mult*(Map< MatrixDau16 >( t_pTag->toDauPack16(),nchan, thisRawDir.nsamp)).cast<float>();
+                    }
+                    else if(t_pTag->type == FIFFT_INT)
+                    {
+                        one = mult*(Map< MatrixXi >( t_pTag->toInt(),nchan, thisRawDir.nsamp)).cast<float>();
                     }
                     else
                     {
-                        printf("Data Storage Format not known jet!!\n");
+                        printf("Data Storage Format not known jet!! Type: %d\n", t_pTag->type);
                     }
 
 
