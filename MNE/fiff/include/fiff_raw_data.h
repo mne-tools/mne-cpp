@@ -48,6 +48,15 @@
 #include "fiff_ctf_comp.h"
 #include "fiff_raw_dir.h"
 #include "fiff_file.h"
+#include "fiff_tag.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include "../../../include/3rdParty/Eigen/Core"
 
 
 //*************************************************************************************************************
@@ -56,6 +65,7 @@
 //=============================================================================================================
 
 #include <QFile>
+#include <QList>
 
 
 //*************************************************************************************************************
@@ -66,12 +76,20 @@
 namespace FIFFLIB
 {
 
+class FiffRawData;
+
+
+static MatrixXi defaultMatrixXi(0,0);
+
+typedef Matrix<qint16, Dynamic, Dynamic> MatrixDau16;
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-//using namespace Eigen;
+using namespace Eigen;
 
 
 //=============================================================================================================
@@ -89,18 +107,36 @@ public:
     /**
     * ctor
     */
-    FiffRawData()
-    {
-    }
+    FiffRawData();
 
     //=========================================================================================================
     /**
     * Destroys the FiffInfo.
     */
-    ~FiffRawData()
-    {
+    ~FiffRawData();
 
-    }
+    //=========================================================================================================
+    /**
+    * ToDo make this part of FiffRawData
+    *
+    * fiff_read_raw_segment
+    *
+    * [data,times] = fiff_read_raw_segment(raw,from,to,sel)
+    *
+    * Read a specific raw data segment
+    *
+    * raw    - structure returned by fiff_setup_read_raw
+    * from   - first sample to include. If omitted, defaults to the
+    *          first sample in data
+    * to     - last sample to include. If omitted, defaults to the last
+    *          sample in data
+    * sel    - optional channel selection vector
+    *
+    * data   - returns the data matrix (channels x samples)
+    * times  - returns the time values corresponding to the samples (optional)
+    *
+    */
+    bool read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t from = -1, fiff_int_t to = -1, MatrixXi sel = defaultMatrixXi);
 
 public:
     FiffFile* m_pFile;//replaces fid

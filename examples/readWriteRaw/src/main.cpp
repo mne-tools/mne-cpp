@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
         }
             //[ data, times ] =
 
-        if (!Fiff::read_raw_segment(raw,data,times,first,last,picks))
+        if (!raw->read_raw_segment(data,times,first,last,picks))
         {
 //                fclose(raw.fid);
 //                fclose(outfid);

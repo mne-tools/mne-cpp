@@ -229,20 +229,10 @@ public:
                 childList << nodes[k]->children[p];
                 FiffDirTree::copy_tree(fidin, in_id, childList, fidout);
             }
-
             fidout->end_block(nodes[k]->block);
         }
+        return true;
     }
-
-
-
-
-
-
-
-
-
-
 
     //=========================================================================================================
     /**
