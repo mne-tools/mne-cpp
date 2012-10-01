@@ -773,8 +773,12 @@ void FiffFile::write_float(fiff_int_t kind, float* data, fiff_int_t nel)
     out << (qint32)datasize;
     out << (qint32)FIFFV_NEXT_SEQ;
 
+    int iData = 0;
     for(qint32 i = 0; i < nel; ++i)
-        out << data[i];
+    {
+        iData = *(int *)&data[i];
+        out << iData;
+    }
 
 //    count = fwrite(fid,int32(kind),'int32');
 //    if count ~= 1
@@ -820,8 +824,13 @@ void FiffFile::write_float_matrix(fiff_int_t kind, MatrixXf& mat)
     out << (qint32)FIFFV_NEXT_SEQ;
 
     qint32 i;
+    int iData = 0;
+
     for(i = 0; i < numel; ++i)
-        out << mat.data()[i];
+    {
+        iData = *(int *)&mat.data()[i];
+        out << iData;
+    }
 
 //        count = fwrite(fid,int32(kind),'int32');
 //        if count ~= 1
