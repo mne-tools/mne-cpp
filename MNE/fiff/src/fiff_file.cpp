@@ -135,7 +135,6 @@ bool FiffFile::open(FiffDirTree*& p_pTree, QList<fiff_dir_entry_t>*& p_pDir)
     {
         int k = 0;
         this->seek(0);//fseek(fid,0,'bof');
-        //dir = struct('kind',{},'type',{},'size',{},'pos',{});
         fiff_dir_entry_t t_fiffDirEntry;
         while (t_pTag->next >= 0)
         {
@@ -146,11 +145,6 @@ bool FiffFile::open(FiffDirTree*& p_pTree, QList<fiff_dir_entry_t>*& p_pDir)
             t_fiffDirEntry.type = t_pTag->type;
             t_fiffDirEntry.size = t_pTag->size;
             p_pDir->append(t_fiffDirEntry);
-
-//            qDebug() << k;
-//            qDebug() << "Kind: " << t_pTag->kind << "; Type: " << t_pTag->type << "; Size: " << t_pTag->size << "; Next: " << t_pTag->next << "; Pos: " << t_fiffDirEntry.pos;
-//            if( k == 200 || k == 400 || k == 600 || k == 900)
-//                qDebug() << "HERE";
         }
     }
     delete t_pTag;
@@ -160,7 +154,7 @@ bool FiffFile::open(FiffDirTree*& p_pTree, QList<fiff_dir_entry_t>*& p_pDir)
 
     FiffDirTree::make_dir_tree(this, p_pDir, p_pTree);
 
-//    qDebug() << "[done]\n";
+    printf("[done]\n");
 
     //
     //   Back to the beginning
@@ -590,35 +584,11 @@ void FiffFile::write_coord_trans(FiffCoordTrans& trans)
     out << (qint32)datasize;
     out << (qint32)FIFFV_NEXT_SEQ;
 
-//        count = fwrite(fid,int32(FIFF_COORD_TRANS),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,int32(FIFFT_COORD_TRANS_STRUCT),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,int32(datasize),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,int32(FIFFV_NEXT_SEQ),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
     //
     //   Start writing fiffCoordTransRec
     //
     out << (qint32)trans.from;
     out << (qint32)trans.to;
-//        count = fwrite(fid,int32(trans.from),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,int32(trans.to),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
 
     //
     //   The transform...
@@ -630,17 +600,6 @@ void FiffFile::write_coord_trans(FiffCoordTrans& trans)
     for (r = 0; r < 3; ++r)
         out << (float)trans.trans(r,3);
 
-//        rot = trans.trans(1:3,1:3)';
-//        move = trans.trans(1:3,4)';
-//        count = fwrite(fid,single(rot),'single');
-//        if count ~= 9
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,single(move),'single');
-//        if count ~= 3
-//            error(me,'write failed');
-//        end
-
     //
     //   ...and its inverse
     //
@@ -649,18 +608,6 @@ void FiffFile::write_coord_trans(FiffCoordTrans& trans)
             out << (float)trans.invtrans(r,c);
     for (r = 0; r < 3; ++r)
         out << (float)trans.invtrans(r,3);
-
-//        trans_inv=inv(trans.trans);
-//        rot=trans_inv(1:3,1:3)';
-//        move=trans_inv(1:3,4)';
-//        count = fwrite(fid,single(rot),'single');
-//        if count ~= 9
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,single(move),'single');
-//        if count ~= 3
-//            error(me,'write failed');
-//        end
 }
 
 
@@ -721,22 +668,6 @@ void FiffFile::write_dig_point(fiff_dig_point_t& dig)
     out << (qint32)datasize;
     out << (qint32)FIFFV_NEXT_SEQ;
 
-//        count = fwrite(fid,int32(FIFF_DIG_POINT),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,int32(FIFFT_DIG_POINT_STRUCT),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,int32(datasize),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,int32(FIFFV_NEXT_SEQ),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
     //
     //   Start writing fiffDigPointRec
     //
@@ -744,18 +675,6 @@ void FiffFile::write_dig_point(fiff_dig_point_t& dig)
     out << (qint32)dig.ident;
     for(qint32 i = 0; i < 3; ++i)
         out << dig.r[i];
-//        count = fwrite(fid,int32(dig.kind),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,int32(dig.ident),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,single(dig.r(1:3)),'single');
-//        if count ~= 3
-//            error(me,'write failed');
-//        end
 }
 
 
@@ -779,27 +698,6 @@ void FiffFile::write_float(fiff_int_t kind, float* data, fiff_int_t nel)
         iData = *(int *)&data[i];
         out << iData;
     }
-
-//    count = fwrite(fid,int32(kind),'int32');
-//    if count ~= 1
-//        error(me,'write failed');
-//    end
-//    count = fwrite(fid,int32(FIFFT_FLOAT),'int32');
-//    if count ~= 1
-//        error(me,'write failed');
-//    end
-//    count = fwrite(fid,int32(datasize),'int32');
-//    if count ~= 1
-//        error(me,'write failed');
-//    end
-//    count = fwrite(fid,int32(FIFFV_NEXT_SEQ),'int32');
-//    if count ~= 1
-//        error(me,'write failed');
-//    end
-//    count = fwrite(fid,single(data),'single');
-//    if count ~= nel
-//        error(me,'write failed');
-//    end
 }
 
 
@@ -832,27 +730,6 @@ void FiffFile::write_float_matrix(fiff_int_t kind, MatrixXf& mat)
         out << iData;
     }
 
-//        count = fwrite(fid,int32(kind),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,int32(FIFFT_MATRIX_FLOAT),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,int32(datasize),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,int32(FIFFV_NEXT_SEQ),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,single(mat'),'single');
-//        if count ~= numel(mat)
-//            error(me,'write failed');
-//        end
-
     qint32 dims[3];
     dims[0] = mat.cols();
     dims[1] = mat.rows();
@@ -860,11 +737,6 @@ void FiffFile::write_float_matrix(fiff_int_t kind, MatrixXf& mat)
 
     for(i = 0; i < 3; ++i)
         out << dims[i];
-
-//        count = fwrite(fid,int32(dims),'int32');
-//        if count ~= 3
-//            error(me,'write failed');
-//        end
 }
 
 
@@ -913,19 +785,6 @@ void FiffFile::write_id(fiff_int_t kind, FiffId& id)
 
     for(qint32 i = 0; i < 5; ++i)
         out << data[i];
-
-//        //DEBUG
-//        this->close();
-//        this->open(QIODevice::ReadOnly);
-//        QDataStream in(this);    // read the data serialized from the file
-
-//        qint32 a;
-//        for(int i = 0; i < 9; ++i)
-//        {
-//            in >> a;           // extract "the answer is" and 42
-//            qDebug() << a;
-//        }
-//        //DEBUG
 }
 
 
@@ -945,19 +804,6 @@ void FiffFile::write_int(fiff_int_t kind, fiff_int_t* data, fiff_int_t nel)
 
     for(qint32 i = 0; i < nel; ++i)
         out << data[i];
-
-//        //DEBUG
-//        this->close();
-//        this->open(QIODevice::ReadOnly);
-//        QDataStream in(this);    // read the data serialized from the file
-
-//        qint32 a;
-//        for(int i = 0; i < 9+5; ++i)
-//        {
-//            in >> a;           // extract "the answer is" and 42
-//            qDebug() << a;
-//        }
-//        //DEBUG
 }
 
 
@@ -1033,30 +879,4 @@ void FiffFile::write_string(fiff_int_t kind, QString& data)
     out << (qint32)FIFFV_NEXT_SEQ;
 
     out.writeRawData(data.toUtf8().constData(),datasize);
-//    out << data.toUtf8().constData();//ToDo: Debug
-//    const char* dataString = data.toUtf8().constData();
-//    for(qint32 i = 0; i < datasize; ++i)
-//        out << data.toUtf8().constData()[i];//ToDo: Debug
-
-
-//        count = fwrite(fid,int32(kind),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,int32(FIFFT_STRING),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,int32(datasize),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,int32(FIFFV_NEXT_SEQ),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,data,'uchar');
-//        if count ~= datasize
-//            error(me,'write failed');
-//        end
 }

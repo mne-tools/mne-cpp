@@ -194,39 +194,12 @@ public:
                 QDataStream out(fidout);
                 out.setByteOrder(QDataStream::BigEndian);
 
-//                qDebug() << "tag.kind: " << tag.kind << "; tag.type: " << tag.type << "; tag.size: " << tag.size;//12
-
                 out << (qint32)tag.kind;
                 out << (qint32)tag.type;
                 out << (qint32)tag.size;
                 out << (qint32)FIFFV_NEXT_SEQ;
 
                 out.writeRawData(static_cast< const char* >(tag.data),tag.size);
-//                out << tag.toString().toUtf8().constData();
-//                char* data = static_cast< char* >(tag.data);
-//                for(qint32 i = 0; i < tag.size; ++i)
-//                    out << data[i];
-
-//                count = fwrite(fidout, tag.kind, 'int32');
-//                if count ~= 1
-//                    error(me, 'write failed.');
-//                end
-//                count = fwrite(fidout, tag.type, 'int32');
-//                if count ~= 1
-//                    error(me, 'write failed.');
-//                end
-//                count = fwrite(fidout, tag.size, 'int32');
-//                if count ~= 1
-//                    error(me, 'write failed');
-//                end
-//                count = fwrite(fidout, int32(FIFFV_NEXT_SEQ), 'int32');
-//                if count ~= 1
-//                    error(me, 'write failed');
-//                end
-//                count = fwrite(fidout, tag.data, 'uchar');
-//                if count ~= tag.size
-//                    error(me, 'write failed');
-//                end
             }
             for(p = 0; p < nodes[k]->nchild; ++p)
             {
