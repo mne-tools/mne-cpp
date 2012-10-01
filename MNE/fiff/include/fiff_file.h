@@ -347,7 +347,6 @@ public:
 
         fiff_int_t datasize= 4*13 + 4*7 + 16;
 
-
         QDataStream out(this);   // we will serialize the data into the file
         out.setByteOrder(QDataStream::BigEndian);
 
@@ -377,8 +376,12 @@ public:
         out << (qint32)ch->scanno;
         out << (qint32)ch->logno;
         out << (qint32)ch->kind;
-        out << (float)ch->range;
-        out << (float)ch->cal;
+
+        int iData = 0;
+        iData = *(int *)&ch->range;
+        out << iData;
+        iData = *(int *)&ch->cal;
+        out << iData;
 //        count = fwrite(fid,int32(ch.scanno),'int32');
 //        if count ~= 1
 //            error(me,'write failed');
@@ -405,7 +408,10 @@ public:
         out << (qint32)ch->coil_type;
         qint32 i;
         for(i = 0; i < 12; ++i)
-            out << ch->loc(i,0);
+        {
+            iData = *(int *)&ch->loc(i,0);
+            out << iData;
+        }
 //        count = fwrite(fid,int32(ch.coil_type),'int32');
 //        if count ~= 1
 //            error(me,'write failed');
@@ -455,9 +461,11 @@ public:
 
         if (len < 16)
         {
-            char chNull = NULL;
+            const char* chNull = "";
             for(i = 0; i < 16-len; ++i)
-                out << chNull;
+                out.writeRawData(chNull,1);
+//                out << chNull;
+
 //            dum=zeros(1,16-len);
 //            count = fwrite(fid,uint8(dum),'uchar');
 //            if count ~= 16-len
