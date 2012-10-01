@@ -78,8 +78,6 @@ FiffDirTree::~FiffDirTree()
 
 qint32 FiffDirTree::make_dir_tree(FiffFile* p_pFile, QList<fiff_dir_entry_t>* p_pDir, FiffDirTree*& p_pTree, qint32 start)
 {
-//    qDebug() << "Size Dir: " << p_pDir->size();
-
     if (p_pTree != NULL)
         delete p_pTree;
     p_pTree = new FiffDirTree();
@@ -104,7 +102,6 @@ qint32 FiffDirTree::make_dir_tree(FiffFile* p_pFile, QList<fiff_dir_entry_t>* p_
     p_pTree->block = block;
     p_pTree->nent = 0;
     p_pTree->nchild = 0;
-//        p_pTree->dir.append(p_pDir->at(current));
 
     while (current < p_pDir->size())
     {
@@ -128,7 +125,6 @@ qint32 FiffDirTree::make_dir_tree(FiffFile* p_pFile, QList<fiff_dir_entry_t>* p_
         {
             ++p_pTree->nent;
             p_pTree->dir.append(p_pDir->at(current));
-
 
             //
             //  Add the id information if available
@@ -466,39 +462,32 @@ FiffDirTree* FiffDirTree::read_meas_info(FiffFile* p_pFile, FiffInfo*& info)
         {
             case FIFF_NCHAN:
                 FiffTag::read_tag(p_pFile, t_pTag, pos);
-                //qDebug() << "FIFF_NCHAN" << t_pTag->getType();
                 nchan = *t_pTag->toInt();
                 break;
             case FIFF_SFREQ:
                 FiffTag::read_tag(p_pFile, t_pTag, pos);
-                //qDebug() << "FIFF_SFREQ" << t_pTag->getType();
                 sfreq = *t_pTag->toFloat();
                 break;
             case FIFF_CH_INFO:
                 FiffTag::read_tag(p_pFile, t_pTag, pos);
-                //qDebug() << "FIFF_CH_INFO" << t_pTag->getType();
                 chs.append( t_pTag->toChInfo() );
                 break;
             case FIFF_LOWPASS:
                 FiffTag::read_tag(p_pFile, t_pTag, pos);
-                //qDebug() << "FIFF_LOWPASS" << t_pTag->getType();
                 lowpass = *t_pTag->toFloat();
                 break;
             case FIFF_HIGHPASS:
                 FiffTag::read_tag(p_pFile, t_pTag, pos);
-                //qDebug() << "FIFF_HIGHPASS" << t_pTag->getType();
                 highpass = *t_pTag->toFloat();
                 break;
             case FIFF_MEAS_DATE:
                 FiffTag::read_tag(p_pFile, t_pTag, pos);
-                //qDebug() << "FIFF_MEAS_DATE" << t_pTag->getType();
                 meas_date[0] = t_pTag->toInt()[0];
                 meas_date[1] = t_pTag->toInt()[1];
                 break;
             case FIFF_COORD_TRANS:
-                //This has to be debugged!!
+                //ToDo: This has to be debugged!!
                 FiffTag::read_tag(p_pFile, t_pTag, pos);
-                //qDebug() << "FIFF_COORD_TRANS" << t_pTag->getType();
                 cand = t_pTag->toCoordTrans();
                 if(cand.from == FIFFV_COORD_DEVICE && cand.to == FIFFV_COORD_HEAD)
                     dev_head_t = cand;
@@ -534,7 +523,6 @@ FiffDirTree* FiffDirTree::read_meas_info(FiffFile* p_pFile, FiffInfo*& info)
         delete meas[0];
         return NULL;
     }
-
 
     if ((dev_head_t.from == -1) || (ctf_head_t.from == -1)) //if isempty(dev_head_t) || isempty(ctf_head_t)
     {
