@@ -165,7 +165,7 @@ bool FiffDirTree::copy_tree(FiffFile* fidin, FiffId& in_id, QList<FiffDirTree*>&
 
 //*************************************************************************************************************
 
-qint32 FiffDirTree::make_dir_tree(FiffFile* p_pFile, QList<fiff_dir_entry_t>* p_pDir, FiffDirTree*& p_pTree, qint32 start)
+qint32 FiffDirTree::make_dir_tree(FiffFile* p_pFile, QList<FiffDirEntry>* p_pDir, FiffDirTree*& p_pTree, qint32 start)
 {
     if (p_pTree != NULL)
         delete p_pTree;
