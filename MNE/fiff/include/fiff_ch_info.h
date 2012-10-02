@@ -114,10 +114,7 @@ public:
     *
     * @return the size of the old struct fiffChInfoRec.
     */
-    inline static qint32 size()
-    {
-        return 96;
-    }
+    inline static qint32 storageSize();
 
 public:
     //EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -139,6 +136,17 @@ public:
     fiff_int_t    unit_mul;     /**< Unit multiplier exponent 1*/
     QString       ch_name;      /**< Descriptive name for the channel 16*/
 };
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline qint32 FiffChInfo::storageSize()
+{
+    return 96;
+}
 
 } // NAMESPACE
 

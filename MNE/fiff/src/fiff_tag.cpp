@@ -860,9 +860,9 @@ void FiffTag::convert_tag_data(FiffTag* tag, int from_endian, int to_endian)
 
         ithis = static_cast< fiff_int_t* >(tag->data);
         fthis = static_cast< float* >(tag->data);
-        np = tag->size/FiffChInfo::size();
+        np = tag->size/FiffChInfo::storageSize();
         for (k = 0; k < np; k++) {
-            offset = k*FiffChInfo::size();
+            offset = k*FiffChInfo::storageSize();
 
             ithis[0+offset] = swap_int(ithis[0+offset]);//scanno
             ithis[1+offset] = swap_int(ithis[1+offset]);//logno
