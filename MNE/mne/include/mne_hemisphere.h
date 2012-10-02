@@ -88,8 +88,6 @@ using namespace Eigen;
 using namespace FIFFLIB;
 
 
-
-
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -142,28 +140,28 @@ public:
 
 public:
     // MNE Suite
-    fiff_int_t id;                 /**< The ID of ... */
-    fiff_int_t np;                 /**< The... */
-    fiff_int_t ntri;               /**< The... */
-    fiff_int_t coord_frame;        /**< The... */
-    MatrixX3f rr;           /**< The... */
-    MatrixX3f nn;           /**< The... */
-    MatrixX3i tris;         /**< The... */
+    fiff_int_t id;              /**< The ID of ... */
+    fiff_int_t np;              /**< The... */
+    fiff_int_t ntri;            /**< The... */
+    fiff_int_t coord_frame;     /**< The... */
+    MatrixX3f rr;               /**< The... */
+    MatrixX3f nn;               /**< The... */
+    MatrixX3i tris;             /**< The... */
     fiff_int_t nuse;
-    VectorXi inuse;         /**< The... */
-    VectorXi vertno;        /**< The... */
-    qint32 nuse_tri;           /**< The... */
-    MatrixX3i use_tris;     /**< The... */
-    VectorXi nearest;       /**< The... */
-    VectorXf nearest_dist;  /**< The... */
-    QList<VectorXi> pinfo;  /**< The... */
-    float dist_limit;       /**< The... */
-    MatrixXf dist;          /**< The... */
-    MatrixX3f tri_cent;      /**< The... */
-    MatrixX3f tri_nn;      /**< The... */
-    VectorXf tri_area;      /**< The... */
-    MatrixX3f use_tri_cent;      /**< The... */
-    MatrixX3f use_tri_nn;      /**< The... */
+    VectorXi inuse;             /**< The... */
+    VectorXi vertno;            /**< The... */
+    qint32 nuse_tri;            /**< The... */
+    MatrixX3i use_tris;         /**< The... */
+    VectorXi nearest;           /**< The... */
+    VectorXf nearest_dist;      /**< The... */
+    QList<VectorXi> pinfo;      /**< The... */
+    float dist_limit;           /**< The... */
+    MatrixXf dist;              /**< The... */
+    MatrixX3f tri_cent;         /**< The... */
+    MatrixX3f tri_nn;           /**< The... */
+    VectorXf tri_area;          /**< The... */
+    MatrixX3f use_tri_cent;     /**< The... */
+    MatrixX3f use_tri_nn;       /**< The... */
     VectorXf use_tri_area;      /**< The... */
 //    dist;
 //    dist_limit;

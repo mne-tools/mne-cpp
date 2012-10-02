@@ -781,7 +781,7 @@ void FiffFile::write_ctf_comp(QList<FiffCtfComp*>& comps)
 
 //*************************************************************************************************************
 
-void FiffFile::write_dig_point(fiff_dig_point_t& dig)
+void FiffFile::write_dig_point(FiffDigPoint& dig)
 {
     //?typedef struct _fiffDigPointRec {
     //  fiff_int_t kind;               /*!< FIFF_POINT_CARDINAL,

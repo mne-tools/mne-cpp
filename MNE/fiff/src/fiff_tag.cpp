@@ -730,7 +730,7 @@ void FiffTag::convert_tag_data(FiffTag* tag, int from_endian, int to_endian)
 //    fiffChInfoRec* chthis;//FiffChInfo*     chthis;//ToDo adapt parsing to the new class
     fiffChPos      cpthis;
 //    fiffCoordTrans ctthis;
-    fiffDigPoint   dpthis;
+//    fiffDigPoint   dpthis;
     fiffDataRef    drthis;
 
     if (tag->data == NULL || tag->size == 0)
@@ -864,16 +864,16 @@ void FiffTag::convert_tag_data(FiffTag* tag, int from_endian, int to_endian)
         for (k = 0; k < np; k++) {
             offset = k*FiffChInfo::storageSize();
 
-            ithis[0+offset] = swap_int(ithis[0+offset]);//scanno
-            ithis[1+offset] = swap_int(ithis[1+offset]);//logno
-            ithis[2+offset] = swap_int(ithis[2+offset]); //kind
-            swap_floatp(&fthis[3+offset]); //range
-            swap_floatp(&fthis[4+offset]); //cal
-            ithis[5+offset] = swap_int(ithis[5+offset]); //coil_type
+            ithis[0+offset] = swap_int(ithis[0+offset]);    //scanno
+            ithis[1+offset] = swap_int(ithis[1+offset]);    //logno
+            ithis[2+offset] = swap_int(ithis[2+offset]);    //kind
+            swap_floatp(&fthis[3+offset]);                  //range
+            swap_floatp(&fthis[4+offset]);                  //cal
+            ithis[5+offset] = swap_int(ithis[5+offset]);    //coil_type
             for (r = 0; r < 12; ++r)
-                swap_floatp(&fthis[6+r+offset]); //loc
-            ithis[18+offset] = swap_int(ithis[18+offset]); //unit
-            ithis[19+offset] = swap_int(ithis[19+offset]); //unit_mul
+                swap_floatp(&fthis[6+r+offset]);            //loc
+            ithis[18+offset] = swap_int(ithis[18+offset]);  //unit
+            ithis[19+offset] = swap_int(ithis[19+offset]);  //unit_mul
         }
 
         break;
@@ -885,12 +885,27 @@ void FiffTag::convert_tag_data(FiffTag* tag, int from_endian, int to_endian)
         break;
 
     case FIFFT_DIG_POINT_STRUCT :
-        np = tag->size/sizeof(fiffDigPointRec);
-        for (dpthis = (fiffDigPoint)tag->data, k = 0; k < np; k++, dpthis++) {
-            dpthis->kind = swap_int(dpthis->kind);
-            dpthis->ident = swap_int(dpthis->ident);
-            for (r = 0; r < 3; r++)
-                swap_floatp(&dpthis->r[r]);
+//        np = tag->size/sizeof(fiffDigPointRec);
+//        for (dpthis = (fiffDigPoint)tag->data, k = 0; k < np; k++, dpthis++) {
+//            dpthis->kind = swap_int(dpthis->kind);
+//            dpthis->ident = swap_int(dpthis->ident);
+//            for (r = 0; r < 3; r++)
+//                swap_floatp(&dpthis->r[r]);
+//        }
+
+        ithis = static_cast< fiff_int_t* >(tag->data);
+        fthis = static_cast< float* >(tag->data);
+
+        np = tag->size/FiffDigPoint::storageSize();
+
+        for (k = 0; k < np; k++) {
+            offset = k*FiffDigPoint::storageSize();
+
+            ithis[0+offset] = swap_int(ithis[0+offset]);//kind
+            ithis[1+offset] = swap_int(ithis[1+offset]);//ident
+
+            for (r = 0; r < 3; ++r)
+                swap_floatp(&fthis[2+r+offset]);        //r
         }
         break;
 

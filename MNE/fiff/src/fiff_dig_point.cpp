@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiff_info.h
+* @file     fiff_dig_point.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -18,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
@@ -29,95 +29,43 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the FiffInfo class declaration.
+* @brief    Contains the implementation of the FiffDigPoint Class.
 *
 */
-
-#ifndef FIFF_INFO_H
-#define FIFF_INFO_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../fiff_global.h"
-#include "fiff_types.h"
-#include "fiff_id.h"
-#include "fiff_ch_info.h"
-#include "fiff_dig_point.h"
-#include "fiff_ctf_comp.h"
-#include "fiff_coord_trans.h"
-#include "fiff_proj.h"
+#include "../include/fiff_dig_point.h"
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QList>
-#include <QStringList>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
-//=============================================================================================================
-
-namespace FIFFLIB
-{
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace FIFFLIB;
 
+
+//*************************************************************************************************************
 //=============================================================================================================
-/**
-* DECLARE CLASS FiffInfo
-*
-* @brief The FiffInfo class provides fiff measurement file information
-*/
-class FIFFSHARED_EXPORT FiffInfo {
+// DEFINE MEMBER METHODS
+//=============================================================================================================
 
-public:
-    //=========================================================================================================
-    /**
-    * ctor
-    */
-    FiffInfo();
+FiffDigPoint::FiffDigPoint()
+: kind(-1)
+, ident(-1)
+, coord_frame(-1)
+{
+    r[0] = -1;
+}
 
-    //=========================================================================================================
-    /**
-    * Destroys the FiffInfo.
-    */
-    ~FiffInfo();
 
-public:
-    FiffId      file_id;
-    FiffId      meas_id;
-    fiff_int_t  meas_date[2];
-    fiff_int_t  nchan;
-    float sfreq;
-    float highpass;
-    float lowpass;
-    QList<FiffChInfo> chs;
-    QStringList ch_names;
-    FiffCoordTrans dev_head_t;
-    FiffCoordTrans ctf_head_t;
-    FiffCoordTrans dev_ctf_t;
-    QList<FiffDigPoint> dig;
-    FiffCoordTrans dig_trans;
-    QStringList bads;
-    QList<FiffProj*> projs;
-    QList<FiffCtfComp*> comps;
-    QString acq_pars;
-    QString acq_stim;
-    QString filename;
-};
+//*************************************************************************************************************
 
-} // NAMESPACE
+FiffDigPoint::~FiffDigPoint()
+{
 
-#endif // FIFF_INFO_H
+}

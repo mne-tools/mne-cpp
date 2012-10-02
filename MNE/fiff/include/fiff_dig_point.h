@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiff_info.h
+* @file     fiff_dig_point.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the FiffInfo class declaration.
+* @brief    Contains the FiffDigPoint class declaration.
 *
 */
 
-#ifndef FIFF_INFO_H
-#define FIFF_INFO_H
+#ifndef FIFF_DIG_POINT_H
+#define FIFF_DIG_POINT_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -43,21 +43,6 @@
 
 #include "../fiff_global.h"
 #include "fiff_types.h"
-#include "fiff_id.h"
-#include "fiff_ch_info.h"
-#include "fiff_dig_point.h"
-#include "fiff_ctf_comp.h"
-#include "fiff_coord_trans.h"
-#include "fiff_proj.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QList>
-#include <QStringList>
 
 
 //*************************************************************************************************************
@@ -76,48 +61,61 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FiffInfo
+* DECLARE CLASS FiffDigPoint
 *
-* @brief The FiffInfo class provides fiff measurement file information
+* @brief The FiffDigPoint class
+*
+* typedef struct _fiffDigPointRec {
+*  fiff_int_t kind;         /**< FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI, or FIFFV_POINT_EEG *
+*  fiff_int_t ident;        /**< Number identifying this point *
+*  fiff_float_t r[3];       /**< Point location *
+*  fiff_int_t coord_frame;  /**< Newly added to stay consistent with fiff MATLAB implementation *
+* } fiffDigPointRec, *fiffDigPoint; /**< Digitization point description *
+*
+* typedef fiffDigPointRec  fiff_dig_point_t;
+*
 */
-class FIFFSHARED_EXPORT FiffInfo {
+class FIFFSHARED_EXPORT FiffDigPoint {
 
 public:
     //=========================================================================================================
     /**
     * ctor
     */
-    FiffInfo();
+    FiffDigPoint();
 
     //=========================================================================================================
     /**
-    * Destroys the FiffInfo.
+    * Destroys the FiffDigPoint.
     */
-    ~FiffInfo();
+    ~FiffDigPoint();
+
+    //=========================================================================================================
+    /**
+    * Size of the old struct (fiffDigPointRec) 5*int = 5*4 = 20
+    *
+    * @return the size of the old struct fiffDigPointRec.
+    */
+    inline static qint32 storageSize();
 
 public:
-    FiffId      file_id;
-    FiffId      meas_id;
-    fiff_int_t  meas_date[2];
-    fiff_int_t  nchan;
-    float sfreq;
-    float highpass;
-    float lowpass;
-    QList<FiffChInfo> chs;
-    QStringList ch_names;
-    FiffCoordTrans dev_head_t;
-    FiffCoordTrans ctf_head_t;
-    FiffCoordTrans dev_ctf_t;
-    QList<FiffDigPoint> dig;
-    FiffCoordTrans dig_trans;
-    QStringList bads;
-    QList<FiffProj*> projs;
-    QList<FiffCtfComp*> comps;
-    QString acq_pars;
-    QString acq_stim;
-    QString filename;
+    fiff_int_t      kind;           /**< FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI, or FIFFV_POINT_EEG */
+    fiff_int_t      ident;          /**< Number identifying this point */
+    fiff_float_t    r[3];           /**< Point location */
+    fiff_int_t      coord_frame;    /**< Newly added to stay consistent with fiff MATLAB implementation */
 };
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline qint32 FiffDigPoint::storageSize()
+{
+    return 20;
+}
 
 } // NAMESPACE
 
-#endif // FIFF_INFO_H
+#endif // FIFF_DIG_POINT_H
