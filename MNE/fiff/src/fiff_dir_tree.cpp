@@ -639,7 +639,7 @@ FiffDirTree* FiffDirTree::read_meas_info(FiffFile* p_pFile, FiffInfo*& info)
     //
     QList<FiffDirTree*> isotrak = meas_info.at(0)->dir_tree_find(FIFFB_ISOTRAK);
 
-    QList<fiff_dig_point_t> dig;// = struct('kind',{},'ident',{},'r',{},'coord_frame',{});
+    QList<FiffDigPoint> dig;// = struct('kind',{},'ident',{},'r',{},'coord_frame',{});
     fiff_int_t coord_frame = FIFFV_COORD_HEAD;
     FiffCoordTrans dig_trans;
     qint32 k = 0;

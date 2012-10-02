@@ -49,6 +49,7 @@
 #include "fiff_proj.h"
 #include "fiff_ctf_comp.h"
 #include "fiff_ch_info.h"
+#include "fiff_dig_point.h"
 #include "fiff_info.h"
 #include "fiff_raw_data.h"
 
@@ -317,7 +318,7 @@ public:
     *     dig           The point to write
     *
     */
-    void write_dig_point(fiff_dig_point_t& dig);
+    void write_dig_point(FiffDigPoint& dig);
 
     //=========================================================================================================
     /**

@@ -110,7 +110,10 @@ typedef std::pair<int,int> intpair;
 */
 class MNESHARED_EXPORT MNESourceSpace {
 public:
-
+    //=========================================================================================================
+    /**
+    * ctor
+    */
     MNESourceSpace();
 
     //=========================================================================================================
@@ -195,10 +198,16 @@ private:
     */
     static bool read_source_space(FiffFile* p_pFile, FiffDirTree* p_pTree, MNEHemisphere*& p_pHemisphere);
 
-
     //=========================================================================================================
+    /**
+    * Compeartor of two int pairs
+    *
+    * @param [in]   l   pair one
+    * @param [in]   r   pair two
+    *
+    * @return true if pair one is bigger, false otherwise
+    */
     static bool intPairComparator ( const intpair& l, const intpair& r);
-
 
     //=========================================================================================================
     /**
@@ -216,9 +225,7 @@ public:
     QList<MNEHemisphere*> hemispheres;
 };
 
-
 } // NAMESPACE
-
 
 
 #endif // MNE_SOURCESPACE_H

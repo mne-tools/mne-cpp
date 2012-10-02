@@ -314,7 +314,7 @@ public:
     /**
     * to fiff DIG POINT STRUCT
     */
-    inline fiff_dig_point_t toDigPoint() const;
+    inline FiffDigPoint toDigPoint() const;
 
     //=========================================================================================================
     /**
@@ -370,6 +370,8 @@ public:
 //            t_qStringInfo = "Matrix of unknown type";
 //        }
 //    }
+
+
     //
     // MATRIX
     //
@@ -616,10 +618,10 @@ inline FiffId FiffTag::toFiffID() const
 
 //*************************************************************************************************************
 
-inline fiff_dig_point_t FiffTag::toDigPoint() const
+inline FiffDigPoint FiffTag::toDigPoint() const
 {
 
-    fiff_dig_point_t t_fiffDigPoint;
+    FiffDigPoint t_fiffDigPoint;
     if(this->isMatrix() || this->getType() != FIFFT_DIG_POINT_STRUCT || this->data == NULL)
         return t_fiffDigPoint;
     else
