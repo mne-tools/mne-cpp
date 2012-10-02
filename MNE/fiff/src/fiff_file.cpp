@@ -79,6 +79,40 @@ FiffFile::~FiffFile()
 
 //*************************************************************************************************************
 
+void FiffFile::end_block(fiff_int_t kind)
+{
+    this->write_int(FIFF_BLOCK_END,&kind);
+}
+
+
+//*************************************************************************************************************
+
+void FiffFile::end_file()
+{
+    fiff_int_t datasize = 0;
+
+    QDataStream out(this);   // we will serialize the data into the file
+    out.setByteOrder(QDataStream::BigEndian);
+
+    out << (qint32)FIFF_NOP;
+    out << (qint32)FIFFT_VOID;
+    out << (qint32)datasize;
+    out << (qint32)FIFFV_NEXT_NONE;
+}
+
+
+//*************************************************************************************************************
+
+void FiffFile::finish_writing_raw()
+{
+    this->end_block(FIFFB_RAW_DATA);
+    this->end_block(FIFFB_MEAS);
+    this->end_file();
+}
+
+
+//*************************************************************************************************************
+
 bool FiffFile::open(FiffDirTree*& p_pTree, QList<fiff_dir_entry_t>*& p_pDir)
 {
 
@@ -374,6 +408,14 @@ bool FiffFile::setup_read_raw(QString t_sFileName, FiffRawData*& data, bool allo
 
 //*************************************************************************************************************
 
+void FiffFile::start_block(fiff_int_t kind)
+{
+    this->write_int(FIFF_BLOCK_START,&kind);
+}
+
+
+//*************************************************************************************************************
+
 FiffFile* FiffFile::start_file(QString& p_sFilename)
 {
     FiffFile* p_pFile = new FiffFile(p_sFilename);
@@ -558,6 +600,97 @@ FiffFile* FiffFile::start_writing_raw(QString& p_sFileName, FiffInfo* info, Matr
     t_pFile->start_block(FIFFB_RAW_DATA);
 
     return t_pFile;
+}
+
+
+//*************************************************************************************************************
+
+void FiffFile::write_ch_info(FiffChInfo* ch)
+{
+    //typedef struct _fiffChPosRec {
+    //  fiff_int_t   coil_type;          /*!< What kind of coil. */
+    //  fiff_float_t r0[3];              /*!< Coil coordinate system origin */
+    //  fiff_float_t ex[3];              /*!< Coil coordinate system x-axis unit vector */
+    //  fiff_float_t ey[3];              /*!< Coil coordinate system y-axis unit vector */
+    //  fiff_float_t ez[3];             /*!< Coil coordinate system z-axis unit vector */
+    //} fiffChPosRec,*fiffChPos;        /*!< Measurement channel position and coil type */
+
+
+    //typedef struct _fiffChInfoRec {
+    //  fiff_int_t    scanNo;        /*!< Scanning order # */
+    //  fiff_int_t    logNo;         /*!< Logical channel # */
+    //  fiff_int_t    kind;          /*!< Kind of channel */
+    //  fiff_float_t  range;         /*!< Voltmeter range (only applies to raw data ) */
+    //  fiff_float_t  cal;           /*!< Calibration from volts to... */
+    //  fiff_ch_pos_t chpos;         /*!< Channel location */
+    //  fiff_int_t    unit;          /*!< Unit of measurement */
+    //  fiff_int_t    unit_mul;      /*!< Unit multiplier exponent */
+    //  fiff_char_t   ch_name[16];   /*!< Descriptive name for the channel */
+    //} fiffChInfoRec,*fiffChInfo;   /*!< Description of one channel */
+
+    fiff_int_t datasize= 4*13 + 4*7 + 16;
+
+    QDataStream out(this);   // we will serialize the data into the file
+    out.setByteOrder(QDataStream::BigEndian);
+
+    out << (qint32)FIFF_CH_INFO;
+    out << (qint32)FIFFT_CH_INFO_STRUCT;
+    out << (qint32)datasize;
+    out << (qint32)FIFFV_NEXT_SEQ;
+
+    //
+    //   Start writing fiffChInfoRec
+    //
+    out << (qint32)ch->scanno;
+    out << (qint32)ch->logno;
+    out << (qint32)ch->kind;
+
+    int iData = 0;
+    iData = *(int *)&ch->range;
+    out << iData;
+    iData = *(int *)&ch->cal;
+    out << iData;
+
+    //
+    //   fiffChPosRec follows
+    //
+    out << (qint32)ch->coil_type;
+    qint32 i;
+    for(i = 0; i < 12; ++i)
+    {
+        iData = *(int *)&ch->loc(i,0);
+        out << iData;
+    }
+
+    //
+    //   unit and unit multiplier
+    //
+    out << (qint32)ch->unit;
+    out << (qint32)ch->unit_mul;
+
+    //
+    //   Finally channel name
+    //
+    fiff_int_t len = ch->ch_name.size();
+    QString ch_name;
+    if(len > 15)
+    {
+        ch_name = ch->ch_name.mid(0, 15);
+    }
+    else
+        ch_name = ch->ch_name;
+
+    len = ch_name.size();
+
+
+    out.writeRawData(ch_name.toUtf8().constData(),len);
+
+    if (len < 16)
+    {
+        const char* chNull = "";
+        for(i = 0; i < 16-len; ++i)
+            out.writeRawData(chNull,1);
+    }
 }
 
 
@@ -861,6 +994,24 @@ void FiffFile::write_proj(QList<FiffProj*>& projs)
         this->end_block(FIFFB_PROJ_ITEM);
     }
     this->end_block(FIFFB_PROJ);
+}
+
+
+//*************************************************************************************************************
+
+bool FiffFile::write_raw_buffer(MatrixXf* buf, MatrixXf* cals)
+{
+    if (buf->rows() != cals->cols())
+    {
+        printf("buffer and calibration sizes do not match\n");
+        return false;
+    }
+
+    MatrixXf calsMat(cals->transpose().asDiagonal());
+    MatrixXf tmp = calsMat.inverse()*(*buf);
+
+    this->write_float(FIFF_DATA_BUFFER,tmp.data(),tmp.rows()*tmp.cols()); // XXX why not diag(1./cals) ???
+    return true;
 }
 
 

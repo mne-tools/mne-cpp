@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file		main.cpp
-* @author	Christoph Dinh <christoph.dinh@live.de>;
-* @version	1.0
-* @date		October, 2010
+* @file     main.cpp
+* @author   Christoph Dinh <christoph.dinh@live.de>;
+* @version  1.0
+* @date     October, 2010
 *
-* @section	LICENSE
+* @section  LICENSE
 *
 * Copyright (C) 2010 Christoph Dinh. All rights reserved.
 *
@@ -14,7 +14,7 @@
 * prior written consent of the author.
 *
 *
-* @brief	Implements the main() application function.
+* @brief    Implements the main() application function.
 *
 */
 

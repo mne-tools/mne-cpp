@@ -76,20 +76,13 @@ public:
     /**
     * ctor
     */
-    FiffRawDir()
-    {
-        ent.kind = -1;
-    }
-
+    FiffRawDir();
 
     //=========================================================================================================
     /**
     * Destroys the FiffCtfComp.
     */
-    ~FiffRawDir()
-    {
-
-    }
+    ~FiffRawDir();
 
 public:
     fiff_dir_entry_t    ent;
