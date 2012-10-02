@@ -123,20 +123,20 @@ typedef struct _fiffChPosRec {
 
 typedef fiffChPosRec fiff_ch_pos_t;
 
-/** Directories are composed of these structures. */
-//ToDo replace this bis a class fiff_dir_entry.h;
-typedef struct _fiffDirEntryRec {
- fiff_int_t  kind;		/**< Tag number */
- fiff_int_t  type;		/**< Data type */
- fiff_int_t  size;		/**< How many bytes */
- fiff_int_t  pos;		/**< Location in file
-                 * Note: the data is located at pos +
-                 * FIFFC_DATA_OFFSET */
-} fiffDirEntryRec,*fiffDirEntry;/**< Directory is composed of these */
+///** Directories are composed of these structures. */
+////ToDo replace this by a class fiff_dir_entry.h;
+//typedef struct _fiffDirEntryRec {
+// fiff_int_t  kind;		/**< Tag number */
+// fiff_int_t  type;		/**< Data type */
+// fiff_int_t  size;		/**< How many bytes */
+// fiff_int_t  pos;		/**< Location in file
+//                 * Note: the data is located at pos +
+//                 * FIFFC_DATA_OFFSET */
+//} fiffDirEntryRec,*fiffDirEntry;/**< Directory is composed of these */
 
-/** Alias for fiffDirEntryRec */
+///** Alias for fiffDirEntryRec */
 
-typedef fiffDirEntryRec fiff_dir_entry_t;
+//typedef fiffDirEntryRec fiff_dir_entry_t;
 
 /** Digitization point description */
 

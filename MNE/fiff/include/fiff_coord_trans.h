@@ -126,10 +126,7 @@ public:
     *
     * @return the size of the old struct fiffCoordTransRec.
     */
-    inline static qint32 size()
-    {
-        return 104;
-    }
+    inline static qint32 storageSize();
 
 public:
     //EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -139,6 +136,17 @@ public:
     Matrix<float, 4,4, DontAlign>   invtrans;   /**< The inverse transform */
 
 };
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline qint32 FiffCoordTrans::storageSize()
+{
+    return 104;
+}
 
 } // NAMESPACE
 

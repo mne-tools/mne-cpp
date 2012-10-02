@@ -47,6 +47,7 @@
 #include "include/fiff_constants.h"
 #include "include/fiff_coord_trans.h"
 #include "include/fiff_dir_tree.h"
+#include "include/fiff_dir_entry.h"
 #include "include/fiff_named_matrix.h"
 #include "include/fiff_tag.h"
 #include "include/fiff_types.h"
@@ -177,7 +178,7 @@ public:
     *
     * Wrapper for the FiffCoordTrans::invert_transform static function
     */
-    static inline qint32 make_dir_tree(FiffFile* p_pFile, QList<fiff_dir_entry_t>* p_pDir, FiffDirTree*& p_pTree, qint32 start = 0)
+    static inline qint32 make_dir_tree(FiffFile* p_pFile, QList<FiffDirEntry>* p_pDir, FiffDirTree*& p_pTree, qint32 start = 0)
     {
         return FiffDirTree::make_dir_tree(p_pFile, p_pDir, p_pTree, start);
     }
@@ -199,7 +200,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool open(QString& p_sFileName, FiffFile*& p_pFile, FiffDirTree*& p_pTree, QList<fiff_dir_entry_t>*& p_pDir)
+    static bool open(QString& p_sFileName, FiffFile*& p_pFile, FiffDirTree*& p_pTree, QList<FiffDirEntry>*& p_pDir)
     {
         if(p_pFile)
             delete p_pFile;

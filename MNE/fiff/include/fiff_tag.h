@@ -341,7 +341,7 @@ public:
     /**
     * to fiff DIR ENTRY STRUCT
     */
-    inline QList<fiff_dir_entry_t> toDirEntry() const;
+    inline QList<FiffDirEntry> toDirEntry() const;
 
 
 //    if (this->isMatrix())
@@ -773,15 +773,15 @@ inline FiffChInfo FiffTag::toChInfo() const
 
 //*************************************************************************************************************
 
-inline QList<fiff_dir_entry_t> FiffTag::toDirEntry() const
+inline QList<FiffDirEntry> FiffTag::toDirEntry() const
 {
 //         tag.data = struct('kind',{},'type',{},'size',{},'pos',{});
-    QList<fiff_dir_entry_t> p_ListFiffDir;
+    QList<FiffDirEntry> p_ListFiffDir;
     if(this->isMatrix() || this->getType() != FIFFT_DIR_ENTRY_STRUCT || this->data == NULL)
         return p_ListFiffDir;
     else
     {
-        fiff_dir_entry_t t_fiffDirEntry;
+        FiffDirEntry t_fiffDirEntry;
         qint32* t_pInt32 = static_cast< qint32* >(this->data);
         for (int k = 0; k < this->size/16; ++k)
         {

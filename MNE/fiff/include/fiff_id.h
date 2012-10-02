@@ -100,7 +100,7 @@ public:
     *
     * @return the size of the old struct fiffIdRec.
     */
-    inline static qint32 size();
+    inline static qint32 storageSize();
 
 public:
     fiff_int_t version;     /**< File version */
@@ -114,7 +114,7 @@ public:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline qint32 FiffId::size()
+inline qint32 FiffId::storageSize()
 {
     return 20;
 }

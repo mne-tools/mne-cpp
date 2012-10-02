@@ -113,7 +113,7 @@ void FiffFile::finish_writing_raw()
 
 //*************************************************************************************************************
 
-bool FiffFile::open(FiffDirTree*& p_pTree, QList<fiff_dir_entry_t>*& p_pDir)
+bool FiffFile::open(FiffDirTree*& p_pTree, QList<FiffDirEntry>*& p_pDir)
 {
 
     if (!this->open(QIODevice::ReadOnly))
@@ -157,7 +157,7 @@ bool FiffFile::open(FiffDirTree*& p_pTree, QList<fiff_dir_entry_t>*& p_pDir)
 
     if (p_pDir)
         delete p_pDir;
-    p_pDir = new QList<fiff_dir_entry_t>;
+    p_pDir = new QList<FiffDirEntry>;
 
     qint32 dirpos = *t_pTag->toInt();
     if (dirpos > 0)
@@ -169,7 +169,7 @@ bool FiffFile::open(FiffDirTree*& p_pTree, QList<fiff_dir_entry_t>*& p_pDir)
     {
         int k = 0;
         this->seek(0);//fseek(fid,0,'bof');
-        fiff_dir_entry_t t_fiffDirEntry;
+        FiffDirEntry t_fiffDirEntry;
         while (t_pTag->next >= 0)
         {
             t_fiffDirEntry.pos = this->pos();//pos = ftell(fid);
@@ -213,7 +213,7 @@ bool FiffFile::setup_read_raw(QString t_sFileName, FiffRawData*& data, bool allo
 
     FiffFile* p_pFile = new FiffFile(t_sFileName);
     FiffDirTree* t_pTree = NULL;
-    QList<fiff_dir_entry_t>* t_pDir = NULL;
+    QList<FiffDirEntry>* t_pDir = NULL;
 
     if(!p_pFile->open(t_pTree, t_pDir))
     {
@@ -278,7 +278,7 @@ bool FiffFile::setup_read_raw(QString t_sFileName, FiffRawData*& data, bool allo
     //
     //   Process the directory
     //
-    QList<fiff_dir_entry_t> dir = raw.at(0)->dir;
+    QList<FiffDirEntry> dir = raw.at(0)->dir;
     fiff_int_t nent = raw.at(0)->nent;
     fiff_int_t nchan = info->nchan;
     fiff_int_t first = 0;
@@ -317,7 +317,7 @@ bool FiffFile::setup_read_raw(QString t_sFileName, FiffRawData*& data, bool allo
     fiff_int_t nsamp = 0;
     for (qint32 k = first; k < nent; ++k)
     {
-        fiff_dir_entry_t ent = dir.at(k);
+        FiffDirEntry ent = dir.at(k);
         if (ent.kind == FIFF_DATA_SKIP)
         {
             FiffTag::read_tag(p_pFile, t_pTag, ent.pos);
@@ -492,7 +492,7 @@ FiffFile* FiffFile::start_writing_raw(QString& p_sFileName, FiffInfo* info, Matr
         FiffFile* t_pFile2 = new FiffFile(info->filename);
 
         FiffDirTree* t_pTree = NULL;
-        QList<fiff_dir_entry_t>* t_pDir = NULL;
+        QList<FiffDirEntry>* t_pDir = NULL;
         t_pFile2->open(t_pTree, t_pDir);
 
         for(qint32 k = 0; k < blocks.size(); ++k)

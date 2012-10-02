@@ -44,6 +44,7 @@
 
 #include "../fiff_global.h"
 #include "fiff_types.h"
+#include "fiff_dir_entry.h"
 
 
 //*************************************************************************************************************
@@ -85,7 +86,7 @@ public:
     ~FiffRawDir();
 
 public:
-    fiff_dir_entry_t    ent;
+    FiffDirEntry  ent;
     fiff_int_t  first;
     fiff_int_t  last;
     fiff_int_t  nsamp;

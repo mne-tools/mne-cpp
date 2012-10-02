@@ -44,6 +44,7 @@
 #include "../fiff_global.h"
 #include "fiff_types.h"
 #include "fiff_id.h"
+#include "fiff_dir_entry.h"
 #include "fiff_coord_trans.h"
 #include "fiff_proj.h"
 #include "fiff_ctf_comp.h"
@@ -189,7 +190,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool open(FiffDirTree*& p_pTree, QList<fiff_dir_entry_t>*& p_pDir);
+    bool open(FiffDirTree*& p_pTree, QList<FiffDirEntry>*& p_pDir);
 
     //=========================================================================================================
     /**

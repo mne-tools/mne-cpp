@@ -59,7 +59,7 @@ FiffRawDir::FiffRawDir()
 , last(-1)
 , nsamp(-1)
 {
-    ent.kind = -1;//ToDo this has to be removed
+
 }
 
 

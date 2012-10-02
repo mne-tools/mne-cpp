@@ -44,6 +44,7 @@
 #include "../fiff_global.h"
 #include "fiff_constants.h"
 #include "fiff_types.h"
+#include "fiff_dir_entry.h"
 #include "fiff_tag.h"
 #include "fiff_ctf_comp.h"
 #include "fiff_proj.h"
@@ -131,7 +132,7 @@ public:
     /**
     * ### MNE toolbox root function ###: Implementation of the fiff_dir_tree_find function
     */
-    static qint32 make_dir_tree(FiffFile* p_pFile, QList<fiff_dir_entry_t>* p_pDir, FiffDirTree*& p_pTree, qint32 start = 0);
+    static qint32 make_dir_tree(FiffFile* p_pFile, QList<FiffDirEntry>* p_pDir, FiffDirTree*& p_pTree, qint32 start = 0);
 
     //=========================================================================================================
     /**
@@ -247,7 +248,7 @@ public:
     fiff_int_t              block;      /**< Block type for this directory */
     FiffId                  id;         /**< Id of this block if any */
     FiffId                  parent_id;  /**< Newly added to stay consistent with MATLAB implementation */
-    QList<fiff_dir_entry_t> dir;        /**< Directory of tags in this node */
+    QList<FiffDirEntry>     dir;        /**< Directory of tags in this node */
     fiff_int_t              nent;       /**< Number of entries in this node */
     fiff_int_t              nent_tree;  /**< Number of entries in the directory tree node */
     QList<FiffDirTree*>     children;   /**< Child nodes */
