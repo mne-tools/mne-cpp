@@ -111,17 +111,20 @@ typedef struct _fiffTimeRec {
 
 //typedef fiffIdRec fiff_id_t;
 
-/** Measurement channel position and coil type. */
 
-typedef struct _fiffChPosRec {
- fiff_int_t   coil_type;    /**< What kind of coil. */
- fiff_float_t r0[3];        /**< Coil coordinate system origin */
- fiff_float_t ex[3];        /**< Coil coordinate system x-axis unit vector */
- fiff_float_t ey[3];        /**< Coil coordinate system y-axis unit vector */
- fiff_float_t ez[3];        /**< Coil coordinate system z-axis unit vector */
-} fiffChPosRec,*fiffChPos;  /**< Measurement channel position and coil type */
+///** Measurement channel position and coil type. */
 
-typedef fiffChPosRec fiff_ch_pos_t;
+// typedef struct _fiffChPosRec {
+//  fiff_int_t   coil_type;    /**< What kind of coil. */
+//  fiff_float_t r0[3];        /**< Coil coordinate system origin */
+//  fiff_float_t ex[3];        /**< Coil coordinate system x-axis unit vector */
+//  fiff_float_t ey[3];        /**< Coil coordinate system y-axis unit vector */
+//  fiff_float_t ez[3];        /**< Coil coordinate system z-axis unit vector */
+// } fiffChPosRec,*fiffChPos;  /**< Measurement channel position and coil type */
+
+// typedef fiffChPosRec fiff_ch_pos_t;
+
+
 
 ///** Directories are composed of these structures. */
 ////ToDo replace this by a class fiff_dir_entry.h;
@@ -149,6 +152,10 @@ typedef fiffChPosRec fiff_ch_pos_t;
 // fiff_int_t coord_frame; /**< Newly added to stay consistent with fiff MATLAB implementation */
 //} fiffDigPointRec, *fiffDigPoint; /**< Digitization point description */
 
+// typedef fiffDigPointRec  fiff_dig_point_t;
+
+
+
 
 /** Structure representing digitized strings. */
 
@@ -159,8 +166,8 @@ typedef struct _fiffDigStringRec {
  fiff_float_t **rr;		  /**< Array of point locations */
 } fiffDigStringRec, *fiffDigString;/**< Structure representing digitized strings. */
 
-// typedef fiffDigPointRec  fiff_dig_point_t;
 typedef fiffDigStringRec fiff_dig_string_t;
+
 
 
 /////** Coordinate transformation descriptor */

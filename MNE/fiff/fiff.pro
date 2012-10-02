@@ -66,7 +66,8 @@ SOURCES += fiff.cpp \
     src/fiff_id.cpp \
     src/fiff_info.cpp \
     src/fiff_raw_dir.cpp \
-    src/fiff_dig_point.cpp
+    src/fiff_dig_point.cpp \
+    src/fiff_ch_pos.cpp
 
 HEADERS += fiff.h \
         fiff_global.h \
@@ -85,4 +86,5 @@ HEADERS += fiff.h \
     include/fiff_dir_entry.h \
     include/fiff_raw_dir.h \
     include/fiff_file.h \
-    include/fiff_dig_point.h
+    include/fiff_dig_point.h \
+    include/fiff_ch_pos.h

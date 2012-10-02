@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiff_ch_info.h
+* @file     fiff_ch_pos.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -18,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the FiffChInfo class declaration.
+* @brief    Contains the FiffChInfoRec class declaration.
 *
 */
 
-#ifndef FIFF_CH_INFO_H
-#define FIFF_CH_INFO_H
+#ifndef FIFF_CH_POS_H
+#define FIFF_CH_POS_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -43,14 +43,6 @@
 
 #include "../fiff_global.h"
 #include "fiff_types.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-#include "../../../include/3rdParty/Eigen/Core"
 
 
 //*************************************************************************************************************
@@ -66,75 +58,56 @@ namespace FIFFLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
-
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FiffChInfo, replaces fiffChInfoRec which had a size of ...
+* DECLARE CLASS FiffChPos
 *
 * Channel Info descriptor
 *
-* typedef struct _fiffChInfoRec {
-*     fiff_int_t    scanNo;		/**< Scanning order number *
-*     fiff_int_t    logNo;		/**< Logical channel # *
-*     fiff_int_t    kind;			/**< Kind of channel *
-*     fiff_float_t  range;		/**< Voltmeter range (-1 = auto ranging) *
-*     fiff_float_t  cal;			/**< Calibration from volts to units used *
-*     fiff_ch_pos_t chpos;		/**< Channel location *
-*     fiff_int_t    unit;			/**< Unit of measurement *
-*     fiff_int_t    unit_mul;		/**< Unit multiplier exponent *
-*     fiff_char_t   ch_name[16];	/**< Descriptive name for the channel *
-* } fiffChInfoRec,*fiffChInfo;	/**< Description of one channel *
+* /** Measurement channel position and coil type. *
 *
-* /** Alias for fiffChInfoRec *
-* typedef fiffChInfoRec fiff_ch_info_t;
+* typedef struct _fiffChPosRec {
+*  fiff_int_t   coil_type;    /**< What kind of coil. *
+*  fiff_float_t r0[3];        /**< Coil coordinate system origin *
+*  fiff_float_t ex[3];        /**< Coil coordinate system x-axis unit vector *
+*  fiff_float_t ey[3];        /**< Coil coordinate system y-axis unit vector *
+*  fiff_float_t ez[3];        /**< Coil coordinate system z-axis unit vector *
+* } fiffChPosRec,*fiffChPos;  /**< Measurement channel position and coil type *
 *
-* @brief The FiffChInfo class provides the channel info descriptor
+* typedef fiffChPosRec fiff_ch_pos_t;
+*
+* @brief The FiffChPos class provides the channel info descriptor
 */
-class FIFFSHARED_EXPORT FiffChInfo {
+class FIFFSHARED_EXPORT FiffChPos {
 
 public:
     //=========================================================================================================
     /**
     * ctor
     */
-    FiffChInfo();
-
+    FiffChPos();
 
     //=========================================================================================================
     /**
     * Destroys the FiffChInfoRec.
     */
-    ~FiffChInfo();
+    ~FiffChPos();
 
     //=========================================================================================================
     /**
-    * Size of the old struct (fiffChInfoRec) 20*int + 16 = 20*4 + 16 = 96
+    * Size of the old struct (fiffChInfoRec) 13*int = 13*4 = 52
     *
     * @return the size of the old struct fiffChInfoRec.
     */
     inline static qint32 storageSize();
 
 public:
-    //EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    fiff_int_t    scanno;       /**< Scanning order number 1*/
-    fiff_int_t    logno;        /**< Logical channel # 1*/
-    fiff_int_t    kind;         /**< Kind of channel 1*/
-    fiff_float_t  range;        /**< Voltmeter range (-1 = auto ranging) 1*/
-    fiff_float_t  cal;          /**< Calibration from volts to units used 1*/
-
-    fiff_int_t coil_type;       /**< Which kind of coil. */
-
-    Matrix<float,12,1, DontAlign>   loc;
-    Matrix<float,4,4, DontAlign>    coil_trans;  /**< Channel location */
-    Matrix<float,3,2, DontAlign>    eeg_loc;
-    fiff_int_t                      coord_frame;
-
-    //    fiff_ch_pos_t chpos;        /**< Channel location 15*/
-    fiff_int_t    unit;         /**< Unit of measurement 1*/
-    fiff_int_t    unit_mul;     /**< Unit multiplier exponent 1*/
-    QString       ch_name;      /**< Descriptive name for the channel 16*/
+    fiff_int_t   coil_type;    /**< What kind of coil. */
+    fiff_float_t r0[3];        /**< Coil coordinate system origin */
+    fiff_float_t ex[3];        /**< Coil coordinate system x-axis unit vector */
+    fiff_float_t ey[3];        /**< Coil coordinate system y-axis unit vector */
+    fiff_float_t ez[3];        /**< Coil coordinate system z-axis unit vector */
 };
 
 
@@ -143,11 +116,11 @@ public:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline qint32 FiffChInfo::storageSize()
+inline qint32 FiffChPos::storageSize()
 {
-    return 96;
+    return 52;
 }
 
 } // NAMESPACE
 
-#endif // FIFF_CH_INFO_H
+#endif // FIFF_CH_POS_H

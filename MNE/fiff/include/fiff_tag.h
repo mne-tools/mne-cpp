@@ -88,6 +88,7 @@
 #include "fiff_id.h"
 #include "fiff_coord_trans.h"
 #include "fiff_ch_info.h"
+#include "fiff_ch_pos.h"
 #include "fiff_file.h"
 
 
@@ -411,7 +412,7 @@ public:
 
     static void swap_doublep(double *source);
 
-    static void convert_ch_pos(fiffChPos pos);
+    static void convert_ch_pos(FiffChPos* pos);
 
 //    static void fiff_convert_tag_info(FiffTag*& tag);
 

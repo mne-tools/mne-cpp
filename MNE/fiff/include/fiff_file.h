@@ -386,7 +386,6 @@ public:
     *     fid           An open fif file descriptor
     *     kind          The tag kind
     *     mat           The data matrix
-    *
     */
     void write_float_matrix(fiff_int_t kind, MatrixXf& mat);
 
@@ -403,7 +402,6 @@ public:
     *     fid           An open fif file descriptor
     *     kind          The tag kind
     *     data          An array of names to create the list from
-    *
     */
     void write_name_list(fiff_int_t kind,QStringList& data);
 
@@ -449,8 +447,6 @@ public:
     * fid        of an open raw data file
     * buf        the buffer to write
     * cals       calibration factors
-    *
-    *
     */
     bool write_raw_buffer(MatrixXf* buf, MatrixXf* cals);
 
