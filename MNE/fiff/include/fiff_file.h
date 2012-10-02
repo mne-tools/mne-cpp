@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the FiffFile class declaration.
+* @brief    Contains the FiffFile class declaration, ToDo increase reading/writing raw data speed.
 *
 */
 
@@ -141,11 +141,7 @@ public:
     *     kind          The block kind to end
     *
     */
-    void end_block(fiff_int_t kind)
-    {
-        this->write_int(FIFF_BLOCK_END,&kind);
-    }
-
+    void end_block(fiff_int_t kind);
 
     //=========================================================================================================
     /**
@@ -158,43 +154,7 @@ public:
     *     fid           An open fif file descriptor
     *
     */
-    void end_file()
-    {
-        fiff_int_t datasize = 0;
-
-        QDataStream out(this);   // we will serialize the data into the file
-        out.setByteOrder(QDataStream::BigEndian);
-
-        out << (qint32)FIFF_NOP;
-        out << (qint32)FIFFT_VOID;
-        out << (qint32)datasize;
-        out << (qint32)FIFFV_NEXT_NONE;
-
-//        count = fwrite(fid, int32(FIFF.FIFF_NOP), 'int32');
-//        if count ~= 1
-//            error(me, 'write failed');
-//        end
-//        count = fwrite(fid, int32(FIFF.FIFFT_VOID), 'int32');
-//        if count ~= 1
-//            error(me, 'write failed');
-//        end
-//        count = fwrite(fid, int32(datasize), 'int32');
-//        if count ~= 1
-//            error(me, 'write failed');
-//        end
-//        count = fwrite(fid, int32(FIFF.FIFFV_NEXT_NONE), 'int32');
-//        if count ~= 1
-//            error(me, 'write failed');
-//        end
-    }
-
-
-
-
-
-
-
-
+    void end_file();
 
     //=========================================================================================================
     /**
@@ -206,13 +166,7 @@ public:
     %
     *
     */
-    void finish_writing_raw()
-    {
-        this->end_block(FIFFB_RAW_DATA);
-        this->end_block(FIFFB_MEAS);
-        this->end_file();
-    }
-
+    void finish_writing_raw();
 
     //=========================================================================================================
     /**
@@ -237,25 +191,6 @@ public:
     */
     bool open(FiffDirTree*& p_pTree, QList<fiff_dir_entry_t>*& p_pDir);
 
-
-    //=========================================================================================================
-    /**
-    * fiff_start_block
-    *
-    * fiff_start_block(fid,kind)
-    *
-    * Writes a FIFF_BLOCK_START tag
-    *
-    *     fid           An open fif file descriptor
-    *     kind          The block kind to start
-    *
-    */
-    void start_block(fiff_int_t kind)
-    {
-        this->write_int(FIFF_BLOCK_START,&kind);
-    }
-
-
     //=========================================================================================================
     /**
     * fiff_setup_read_raw
@@ -271,6 +206,19 @@ public:
     */
     static bool setup_read_raw(QString t_sFileName, FiffRawData*& data, bool allow_maxshield = false);
 
+    //=========================================================================================================
+    /**
+    * fiff_start_block
+    *
+    * fiff_start_block(fid,kind)
+    *
+    * Writes a FIFF_BLOCK_START tag
+    *
+    *     fid           An open fif file descriptor
+    *     kind          The block kind to start
+    *
+    */
+    void start_block(fiff_int_t kind);
 
     //=========================================================================================================
     /**
@@ -288,7 +236,6 @@ public:
     */
     static FiffFile* start_file(QString& p_sFilename);
 
-
     //=========================================================================================================
     /**
     * fiff_start_writing_raw
@@ -303,7 +250,6 @@ public:
     *
     */
     static FiffFile* start_writing_raw(QString& p_sFileName, FiffInfo* info, MatrixXf*& cals, MatrixXi sel = defaultFileMatrixXi);
-
 
     //=========================================================================================================
     /**
@@ -322,158 +268,7 @@ public:
     *     of the MNE manual
     *
     */
-    void write_ch_info(FiffChInfo* ch)
-    {
-        //typedef struct _fiffChPosRec {
-        //  fiff_int_t   coil_type;          /*!< What kind of coil. */
-        //  fiff_float_t r0[3];              /*!< Coil coordinate system origin */
-        //  fiff_float_t ex[3];              /*!< Coil coordinate system x-axis unit vector */
-        //  fiff_float_t ey[3];              /*!< Coil coordinate system y-axis unit vector */
-        //  fiff_float_t ez[3];             /*!< Coil coordinate system z-axis unit vector */
-        //} fiffChPosRec,*fiffChPos;        /*!< Measurement channel position and coil type */
-
-
-        //typedef struct _fiffChInfoRec {
-        //  fiff_int_t    scanNo;        /*!< Scanning order # */
-        //  fiff_int_t    logNo;         /*!< Logical channel # */
-        //  fiff_int_t    kind;          /*!< Kind of channel */
-        //  fiff_float_t  range;         /*!< Voltmeter range (only applies to raw data ) */
-        //  fiff_float_t  cal;           /*!< Calibration from volts to... */
-        //  fiff_ch_pos_t chpos;         /*!< Channel location */
-        //  fiff_int_t    unit;          /*!< Unit of measurement */
-        //  fiff_int_t    unit_mul;      /*!< Unit multiplier exponent */
-        //  fiff_char_t   ch_name[16];   /*!< Descriptive name for the channel */
-        //} fiffChInfoRec,*fiffChInfo;   /*!< Description of one channel */
-
-        fiff_int_t datasize= 4*13 + 4*7 + 16;
-
-        QDataStream out(this);   // we will serialize the data into the file
-        out.setByteOrder(QDataStream::BigEndian);
-
-        out << (qint32)FIFF_CH_INFO;
-        out << (qint32)FIFFT_CH_INFO_STRUCT;
-        out << (qint32)datasize;
-        out << (qint32)FIFFV_NEXT_SEQ;
-//        count = fwrite(fid,int32(FIFF_CH_INFO),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,int32(FIFFT_CH_INFO_STRUCT),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,int32(datasize),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,int32(FIFFV_NEXT_SEQ),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-        //
-        //   Start writing fiffChInfoRec
-        //
-        out << (qint32)ch->scanno;
-        out << (qint32)ch->logno;
-        out << (qint32)ch->kind;
-
-        int iData = 0;
-        iData = *(int *)&ch->range;
-        out << iData;
-        iData = *(int *)&ch->cal;
-        out << iData;
-//        count = fwrite(fid,int32(ch.scanno),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,int32(ch.logno),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,int32(ch.kind),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,single(ch.range),'single');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,single(ch.cal),'single');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-        //
-        //   fiffChPosRec follows
-        //
-        out << (qint32)ch->coil_type;
-        qint32 i;
-        for(i = 0; i < 12; ++i)
-        {
-            iData = *(int *)&ch->loc(i,0);
-            out << iData;
-        }
-//        count = fwrite(fid,int32(ch.coil_type),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,single(ch.loc),'single');
-//        if count ~= 12
-//            error(me,'write failed');
-//        end
-        //
-        //   unit and unit multiplier
-        //
-        out << (qint32)ch->unit;
-        out << (qint32)ch->unit_mul;
-//        count = fwrite(fid,int32(ch.unit),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-//        count = fwrite(fid,int32(ch.unit_mul),'int32');
-//        if count ~= 1
-//            error(me,'write failed');
-//        end
-        //
-        //   Finally channel name
-        //
-        fiff_int_t len = ch->ch_name.size();
-        QString ch_name;
-        if(len > 15)
-        {
-            ch_name = ch->ch_name.mid(0, 15);
-        }
-        else
-            ch_name = ch->ch_name;
-
-        len = ch_name.size();
-
-
-        out.writeRawData(ch_name.toUtf8().constData(),len);
-//        out << ch_name.toUtf8().constData();
-//        const char* dataString = ch_name.toUtf8().constData();//ToDo
-//        for(i = 0; i < len; ++i)
-//            out << dataString[i];
-
-//        count = fwrite(fid,ch_name,'char');
-//        if count ~= len
-//            error(me,'write failed');
-//        end
-
-        if (len < 16)
-        {
-            const char* chNull = "";
-            for(i = 0; i < 16-len; ++i)
-                out.writeRawData(chNull,1);
-//                out << chNull;
-
-//            dum=zeros(1,16-len);
-//            count = fwrite(fid,uint8(dum),'uchar');
-//            if count ~= 16-len
-//                error(me,'write failed');
-//            end
-        }
-    }
-
+    void write_ch_info(FiffChInfo* ch);
 
     //=========================================================================================================
     /**
@@ -491,7 +286,6 @@ public:
     */
     void write_coord_trans(FiffCoordTrans& trans);
 
-
     //=========================================================================================================
     /**
     * fiff_write_ctf_comp
@@ -508,7 +302,6 @@ public:
     */
     void write_ctf_comp(QList<FiffCtfComp*>& comps);
 
-
     //=========================================================================================================
     /**
     * fiff_write_dig_point
@@ -524,7 +317,6 @@ public:
     *
     */
     void write_dig_point(fiff_dig_point_t& dig);
-
 
     //=========================================================================================================
     /**
@@ -545,7 +337,6 @@ public:
     */
     void write_id(fiff_int_t kind, FiffId& id = defaultFiffId);
 
-
     //=========================================================================================================
     /**
     * fiff_write_int
@@ -562,7 +353,6 @@ public:
     *     nel           Zahl an Elementen in der data size
     */
     void write_int(fiff_int_t kind, fiff_int_t* data, fiff_int_t nel = 1);
-
 
     //=========================================================================================================
     /**
@@ -581,7 +371,6 @@ public:
     */
     void write_float(fiff_int_t kind, float* data, fiff_int_t nel = 1);
 
-
     //=========================================================================================================
     /**
     * fiff_write_float_matrix
@@ -598,7 +387,6 @@ public:
     *
     */
     void write_float_matrix(fiff_int_t kind, MatrixXf& mat);
-
 
     //=========================================================================================================
     /**
@@ -617,7 +405,6 @@ public:
     */
     void write_name_list(fiff_int_t kind,QStringList& data);
 
-
     //=========================================================================================================
     /**
     * fiff_write_named_matrix
@@ -634,7 +421,6 @@ public:
     */
     void write_named_matrix(fiff_int_t kind,FiffNamedMatrix* mat);
 
-
     //=========================================================================================================
     /**
     * fiff_write_proj
@@ -650,9 +436,6 @@ public:
     */
     void write_proj(QList<FiffProj*>& projs);
 
-
-
-
     //=========================================================================================================
     /**
     * fiff_write_raw_buffer
@@ -667,21 +450,7 @@ public:
     *
     *
     */
-    bool write_raw_buffer(MatrixXf* buf, MatrixXf* cals)
-    {
-        if (buf->rows() != cals->cols())
-        {
-            printf("buffer and calibration sizes do not match\n");
-            return false;
-        }
-
-        MatrixXf calsMat(cals->transpose().asDiagonal());
-        MatrixXf tmp = calsMat.inverse()*(*buf);
-
-        this->write_float(FIFF_DATA_BUFFER,tmp.data(),tmp.rows()*tmp.cols()); // XXX why not diag(1./cals) ???
-        return true;
-    }
-
+    bool write_raw_buffer(MatrixXf* buf, MatrixXf* cals);
 
     //=========================================================================================================
     /**

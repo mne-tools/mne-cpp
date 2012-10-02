@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiff_ctf_comp.h
+* @file     fiff_ctf_comp.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -18,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
@@ -29,85 +29,57 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the FiffCtfComp class declaration.
+* @brief    Contains the implementation of the FiffCtfComp Class.
 *
 */
-
-#ifndef FIFF_CTF_COMP_H
-#define FIFF_CTF_COMP_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../fiff_global.h"
-#include "fiff_types.h"
-#include "fiff_named_matrix.h"
+#include "../include/fiff_ctf_comp.h"
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-#include "../../../include/3rdParty/Eigen/Core"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
-//=============================================================================================================
-
-namespace FIFFLIB
-{
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
+using namespace FIFFLIB;
 
 
+//*************************************************************************************************************
 //=============================================================================================================
-/**
-* DECLARE CLASS FiffCtfComp
-*
-* CTF software compensation data
-*
-* @brief The FiffCtfComp class provides CTF software compensation data
-*/
-class FIFFSHARED_EXPORT FiffCtfComp {
+// DEFINE MEMBER METHODS
+//=============================================================================================================
 
-public:
-    //=========================================================================================================
-    /**
-    * ctor
-    */
-    FiffCtfComp();
+FiffCtfComp::FiffCtfComp()
+: ctfkind(-1)
+, kind (-1)
+, save_calibrated(false)
+, data (NULL)
+{
+}
 
-    //=========================================================================================================
-    /**
-    * copy ctor
-    */
-    FiffCtfComp(FiffCtfComp* comp);
 
-    //=========================================================================================================
-    /**
-    * Destroys the FiffCtfComp.
-    */
-    ~FiffCtfComp();
+//*************************************************************************************************************
 
-public:
-    fiff_int_t    ctfkind;
-    fiff_int_t    kind;
-    bool save_calibrated;
-    MatrixXf rowcals;
-    MatrixXf colcals;
-    FiffNamedMatrix* data;
-};
+FiffCtfComp::FiffCtfComp(FiffCtfComp* comp)
+: ctfkind(comp->ctfkind)
+, kind (comp->ctfkind)
+, save_calibrated(comp->save_calibrated)
+, rowcals(comp->rowcals)
+, colcals(comp->colcals)
+, data (new FiffNamedMatrix(comp->data))
+{
+}
 
-} // NAMESPACE
 
-#endif // FIFF_CTF_COMP_H
+//*************************************************************************************************************
+
+FiffCtfComp::~FiffCtfComp()
+{
+    if(data)
+        delete data;
+}

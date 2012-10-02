@@ -61,7 +61,11 @@ SOURCES += fiff.cpp \
     src/fiff_proj.cpp \
     src/fiff_named_matrix.cpp \
     src/fiff_file.cpp \
-    src/fiff_raw_data.cpp
+    src/fiff_raw_data.cpp \
+    src/fiff_ctf_comp.cpp \
+    src/fiff_id.cpp \
+    src/fiff_info.cpp \
+    src/fiff_raw_dir.cpp
 
 HEADERS += fiff.h \
         fiff_global.h \

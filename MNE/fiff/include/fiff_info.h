@@ -72,16 +72,12 @@ namespace FIFFLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
-
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FiffCtfComp
+* DECLARE CLASS FiffInfo
 *
-* CTF software compensation data
-*
-* @brief The FiffCtfComp class provides CTF software compensation data
+* @brief The FiffInfo class provides fiff measurement file information
 */
 class FIFFSHARED_EXPORT FiffInfo {
 
@@ -90,29 +86,13 @@ public:
     /**
     * ctor
     */
-    FiffInfo()
-    : acq_pars("")
-    , acq_stim("")
-    , filename("")
-    {
-        meas_date[0] = -1;
-    }
-
+    FiffInfo();
 
     //=========================================================================================================
     /**
     * Destroys the FiffInfo.
     */
-    ~FiffInfo()
-    {
-        qint32 i;
-        for (i = 0; i < projs.size(); ++i)
-            if(projs[i])
-                delete projs[i];
-        for (i = 0; i < comps.size(); ++i)
-            if(comps[i])
-                delete comps[i];
-    }
+    ~FiffInfo();
 
 public:
     FiffId      file_id;

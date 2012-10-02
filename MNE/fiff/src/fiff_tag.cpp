@@ -164,7 +164,7 @@ bool FiffTag::read_tag(FiffFile* p_pFile, FiffTag*& p_pTag, qint64 pos)
         t_DataStream.readRawData(t_pCharData, p_pTag->size);
         if (p_pTag->type == FIFFT_STRING)
             t_pCharData[p_pTag->size] = NULL;//make sure that char ends with NULL
-        FiffTag::fiff_convert_tag_data(p_pTag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
+        FiffTag::convert_tag_data(p_pTag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
     }
 
     if (p_pTag->next != FIFFV_NEXT_SEQ)
@@ -714,7 +714,7 @@ void FiffTag::convert_matrix_to_file_data(FiffTag* tag)
  * The last choice means that the native byte order value will be substituted here before proceeding
  */
 
-void FiffTag::fiff_convert_tag_data(FiffTag* tag, int from_endian, int to_endian)
+void FiffTag::convert_tag_data(FiffTag* tag, int from_endian, int to_endian)
 
 {
     int            np;
