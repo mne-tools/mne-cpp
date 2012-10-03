@@ -108,10 +108,9 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FiffFile
+* FiffFile provides an interface for reading from and writing to fiff files
 *
-*
-* @brief The FiffFile class provides...
+* @brief FIFF File I/O routines.
 **/
 
 class FIFFSHARED_EXPORT FiffFile : public QFile {
@@ -133,39 +132,28 @@ public:
 
     //=========================================================================================================
     /**
-    * fiff_end_block
-    *
-    * fiff_end_block(fid, kind)
+    * ### MNE toolbox root function ###: Implementation of the fiff_end_block function
     *
     * Writes a FIFF_BLOCK_END tag
     *
-    *     fid           An open fif file descriptor
-    *     kind          The block kind to end
-    *
+    * @param[in] kind The block kind to end
     */
     void end_block(fiff_int_t kind);
 
     //=========================================================================================================
     /**
-    * fiff_end_file
-    *
-    * fiff_end_file(fid)
+    * ### MNE toolbox root function ###: Implementation of the fiff_end_file function
     *
     * Writes the closing tags to a fif file and closes the file
-    *
-    *     fid           An open fif file descriptor
     *
     */
     void end_file();
 
     //=========================================================================================================
     /**
-    * fiff_finish_writing_raw
+    * ### MNE toolbox root function ###: Implementation of the fiff_finish_writing_raw function
     *
-    * function fiff_finish_writing_raw(fid)
-    %
-    % fid        of an open raw data file
-    %
+    * Finishes a raw file by writing all necessary end tags.
     *
     */
     void finish_writing_raw();

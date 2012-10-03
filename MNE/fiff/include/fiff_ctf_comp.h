@@ -72,11 +72,9 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FiffCtfComp
-*
 * CTF software compensation data
 *
-* @brief The FiffCtfComp class provides CTF software compensation data
+* @brief CTF software compensation data
 */
 class FIFFSHARED_EXPORT FiffCtfComp {
 

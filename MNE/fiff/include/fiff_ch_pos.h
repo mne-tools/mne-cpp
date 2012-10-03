@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the FiffChInfoRec class declaration.
+* @brief    Contains the FiffChPos class declaration.
 *
 */
 
@@ -61,23 +61,9 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FiffChPos
+* Coil position description replaces _fiffChPosRec struct.
 *
-* Channel Info descriptor
-*
-* /** Measurement channel position and coil type. *
-*
-* typedef struct _fiffChPosRec {
-*  fiff_int_t   coil_type;    /**< What kind of coil. *
-*  fiff_float_t r0[3];        /**< Coil coordinate system origin *
-*  fiff_float_t ex[3];        /**< Coil coordinate system x-axis unit vector *
-*  fiff_float_t ey[3];        /**< Coil coordinate system y-axis unit vector *
-*  fiff_float_t ez[3];        /**< Coil coordinate system z-axis unit vector *
-* } fiffChPosRec,*fiffChPos;  /**< Measurement channel position and coil type *
-*
-* typedef fiffChPosRec fiff_ch_pos_t;
-*
-* @brief The FiffChPos class provides the channel info descriptor
+* @brief Coil position.
 */
 class FIFFSHARED_EXPORT FiffChPos {
 
@@ -90,24 +76,36 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the FiffChInfoRec.
+    * Destroys the FiffChPos.
     */
     ~FiffChPos();
 
     //=========================================================================================================
     /**
-    * Size of the old struct (fiffChInfoRec) 13*int = 13*4 = 52
+    * Size of the old struct (fiffChPosRec) 13*int = 13*4 = 52
     *
-    * @return the size of the old struct fiffChInfoRec.
+    * @return the size of the old struct fiffChPosRec.
     */
     inline static qint32 storageSize();
 
 public:
-    fiff_int_t   coil_type;    /**< What kind of coil. */
+    fiff_int_t   coil_type;    /**< The kind of the coil. */
     fiff_float_t r0[3];        /**< Coil coordinate system origin */
     fiff_float_t ex[3];        /**< Coil coordinate system x-axis unit vector */
     fiff_float_t ey[3];        /**< Coil coordinate system y-axis unit vector */
     fiff_float_t ez[3];        /**< Coil coordinate system z-axis unit vector */
+
+// /** Measurement channel position and coil type. *
+
+// typedef struct _fiffChPosRec {
+//  fiff_int_t   coil_type;    /**< What kind of coil. *
+//  fiff_float_t r0[3];        /**< Coil coordinate system origin *
+//  fiff_float_t ex[3];        /**< Coil coordinate system x-axis unit vector *
+//  fiff_float_t ey[3];        /**< Coil coordinate system y-axis unit vector *
+//  fiff_float_t ez[3];        /**< Coil coordinate system z-axis unit vector *
+// } fiffChPosRec,*fiffChPos;  /**< Measurement channel position and coil type *
+
+// typedef fiffChPosRec fiff_ch_pos_t;
 };
 
 

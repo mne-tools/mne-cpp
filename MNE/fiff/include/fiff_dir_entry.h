@@ -61,23 +61,9 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FiffDirEntry, replaces fiffDirEntryRec which had a size of 4*4 = 16
+* A Dir Entry, which replaces fiffDirEntryRec which had a size of 4*4 = 16
 *
-* A Dir Entry.
-*
-* /** Directories are composed of these structures. *
-* typedef struct _fiffDirEntryRec {
-*  fiff_int_t  kind;		/**< Tag number *
-*  fiff_int_t  type;		/**< Data type *
-*  fiff_int_t  size;		/**< How many bytes *
-*  fiff_int_t  pos;		/**< Location in file
-*                  * Note: the data is located at pos +
-*                  * FIFFC_DATA_OFFSET *
-* } fiffDirEntryRec,*fiffDirEntry;/**< Directory is composed of these *
-* /** Alias for fiffDirEntryRec *
-* typedef fiffDirEntryRec fiff_dir_entry_t;
-*
-* @brief The FiffId class provides the fiff file id description
+* @brief Directory entry description.
 **/
 
 class FIFFSHARED_EXPORT FiffDirEntry {
@@ -118,6 +104,18 @@ public:
     fiff_int_t  type;   /**< Data type */
     fiff_int_t  size;   /**< How many bytes */
     fiff_int_t  pos;    /**< Location in file; Note: the data is located at pos + FIFFC_DATA_OFFSET */
+
+//    /** Directories are composed of these structures. *
+//     typedef struct _fiffDirEntryRec {
+//      fiff_int_t  kind;		/**< Tag number *
+//      fiff_int_t  type;		/**< Data type *
+//      fiff_int_t  size;		/**< How many bytes *
+//      fiff_int_t  pos;		/**< Location in file
+//                      * Note: the data is located at pos +
+//                      * FIFFC_DATA_OFFSET *
+//     } fiffDirEntryRec,*fiffDirEntry;/**< Directory is composed of these *
+//     /** Alias for fiffDirEntryRec *
+//     typedef fiffDirEntryRec fiff_dir_entry_t;
 };
 
 

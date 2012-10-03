@@ -61,19 +61,9 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FiffDigPoint
+* Replaces _fiffDigPointRec struct.
 *
-* @brief The FiffDigPoint class
-*
-* typedef struct _fiffDigPointRec {
-*  fiff_int_t kind;         /**< FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI, or FIFFV_POINT_EEG *
-*  fiff_int_t ident;        /**< Number identifying this point *
-*  fiff_float_t r[3];       /**< Point location *
-*  fiff_int_t coord_frame;  /**< Newly added to stay consistent with fiff MATLAB implementation *
-* } fiffDigPointRec, *fiffDigPoint; /**< Digitization point description *
-*
-* typedef fiffDigPointRec  fiff_dig_point_t;
-*
+* @brief Digitization point description
 */
 class FIFFSHARED_EXPORT FiffDigPoint {
 
@@ -103,6 +93,15 @@ public:
     fiff_int_t      ident;          /**< Number identifying this point */
     fiff_float_t    r[3];           /**< Point location */
     fiff_int_t      coord_frame;    /**< Newly added to stay consistent with fiff MATLAB implementation */
+
+// typedef struct _fiffDigPointRec {
+//  fiff_int_t kind;         /**< FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI, or FIFFV_POINT_EEG *
+//  fiff_int_t ident;        /**< Number identifying this point *
+//  fiff_float_t r[3];       /**< Point location *
+//  fiff_int_t coord_frame;  /**< Newly added to stay consistent with fiff MATLAB implementation *
+// } fiffDigPointRec, *fiffDigPoint; /**< Digitization point description *
+
+// typedef fiffDigPointRec  fiff_dig_point_t;
 };
 
 

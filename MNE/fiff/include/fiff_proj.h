@@ -81,9 +81,9 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FiffProj
+* Provides SSP projector data.
 *
-* @brief The FiffProj class provides SSP projector data.
+* @brief SSP projector data.
 */
 class FIFFSHARED_EXPORT FiffProj {
 

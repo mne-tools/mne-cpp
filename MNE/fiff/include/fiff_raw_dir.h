@@ -65,10 +65,10 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FiffRawDir
+* Special fiff diretory entry for raw data. ToDo: derive this of FiffDirEntry.
 *
 *
-* @brief The FiffRawDir class provides...
+* @brief Raw Directory entry
 */
 class FIFFSHARED_EXPORT FiffRawDir {
 
@@ -81,7 +81,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the FiffCtfComp.
+    * Destroys the FiffRawDir.
     */
     ~FiffRawDir();
 

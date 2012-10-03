@@ -76,34 +76,9 @@ class FiffFile;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FiffDirTree
+* Replaces _fiffDirNode struct
 *
-* @brief The FiffDirTree class provides...
-*
-* Replaces _fiffDirNode:
-* typedef struct _fiffDirNode {
-*  int                 type;    /**< Block type for this directory *
-*  fiffId              id;      /**< Id of this block if any *
-*  fiffDirEntry        dir;     /**< Directory of tags in this node *
-*  int                 nent;    /**< Number of entries in this node *
-*  fiffDirEntry        dir_tree;    /**< Directory of tags within this node
-*                                     * subtrees as well as FIFF_BLOCK_START and FIFF_BLOCK_END
-*                   * included. NOTE: While dir is allocated separately
-*                   * dir_tree is a pointer to the dirtree field
-*                   * in the fiffFile structure. The dir_tree and nent_tree
-*                   * fields are only used within the library to facilitate
-*                   * certain operations. *
-*  int                 nent_tree;   /**< Number of entries in the directory tree node *
-*  struct _fiffDirNode *parent;     /**< Parent node *
-*  struct _fiffDirNode **children;  /**< Child nodes *
-*  int                 nchild;      /**< Number of child nodes *
-* } fiffDirNodeRec,*fiffDirNode;    /**< Directory tree structure used by the fiff library routines. *
-*/
-
-/**
-* FIFF data tag
-*
-* Tags are used in front of data items to tell what they are.
+* @brief Directory tree structure
 */
 class FIFFSHARED_EXPORT FiffDirTree {
 
@@ -124,9 +99,14 @@ public:
     /**
     * ### MNE toolbox root function ###: Implementation of the fiff_copy_tree function
     *
-    *    fiff_copy_tree(fidin, in_id, nodes, fidout)
+    * Copies directory subtrees from fidin to fidout
     *
-    *    Copies directory subtrees from fidin to fidout
+    * @param[in] fidin fiff file to copy from
+    * @param[in] in_id file id description
+    * @param[out] nodes subtree directories to be copied
+    * @param[in] fidout fiff file to write to
+    *
+    * @return true if succeeded, false otherwise
     */
     static bool copy_tree(FiffFile* fidin, FiffId& in_id, QList<FiffDirTree*>& nodes, FiffFile* fidout);
 
@@ -265,6 +245,23 @@ public:
     QList<FiffDirTree*>     children;   /**< Child nodes */
     fiff_int_t              nchild;     /**< Number of child nodes */
 
+// typedef struct _fiffDirNode {
+//  int                 type;    /**< Block type for this directory *
+//  fiffId              id;      /**< Id of this block if any *
+//  fiffDirEntry        dir;     /**< Directory of tags in this node *
+//  int                 nent;    /**< Number of entries in this node *
+//  fiffDirEntry        dir_tree;    /**< Directory of tags within this node
+//                                     * subtrees as well as FIFF_BLOCK_START and FIFF_BLOCK_END
+//                   * included. NOTE: While dir is allocated separately
+//                   * dir_tree is a pointer to the dirtree field
+//                   * in the fiffFile structure. The dir_tree and nent_tree
+//                   * fields are only used within the library to facilitate
+//                   * certain operations. *
+//  int                 nent_tree;   /**< Number of entries in the directory tree node *
+//  struct _fiffDirNode *parent;     /**< Parent node *
+//  struct _fiffDirNode **children;  /**< Child nodes *
+//  int                 nchild;      /**< Number of child nodes *
+// } fiffDirNodeRec,*fiffDirNode;    /**< Directory tree structure used by the fiff library routines. *
 };
 
 } // NAMESPACE

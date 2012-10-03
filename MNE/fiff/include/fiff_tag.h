@@ -155,10 +155,11 @@ const fiff_int_t DATA_TYPE           = 65535;      // ffff
 //
 
 
+//=============================================================================================================
 /**
-* FIFF data tag
-*
 * Tags are used in front of data items to tell what they are.
+*
+* @brief FIFF data tag
 */
 class FIFFSHARED_EXPORT FiffTag {
 

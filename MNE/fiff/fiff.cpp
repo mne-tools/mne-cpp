@@ -55,13 +55,6 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Fiff::Fiff()
-{
-}
-
-
-//*************************************************************************************************************
-
 MatrixXi Fiff::pick_channels(QStringList& ch_names, QStringList& include, QStringList& exclude)
 {
     qint32 nchan = ch_names.size();
