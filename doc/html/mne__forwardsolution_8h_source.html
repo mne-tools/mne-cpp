@@ -173,7 +173,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="The SourceSpace class provides.">MNEForwardSolution</a>();</div>
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;</div>
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> read_forward_solution(QString&amp; p_sFile, <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="The SourceSpace class provides.">MNEForwardSolution</a>*&amp; fwd, <span class="keywordtype">bool</span> force_fixed = <span class="keyword">false</span>, <span class="keywordtype">bool</span> surf_ori = <span class="keyword">false</span>, QStringList&amp; include = defaultQStringList, QStringList&amp; exclude = defaultQStringList);</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> read_forward_solution(QString&amp; p_sFileName, <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="The SourceSpace class provides.">MNEForwardSolution</a>*&amp; fwd, <span class="keywordtype">bool</span> force_fixed = <span class="keyword">false</span>, <span class="keywordtype">bool</span> surf_ori = <span class="keyword">false</span>, QStringList&amp; include = defaultQStringList, QStringList&amp; exclude = defaultQStringList);</div>
 <div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;</div>
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
 <div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;<span class="comment"></span><span class="comment">//    static inline MatrixXf extract_block_diag(MatrixXf&amp; A, qint32 n);</span></div>
@@ -182,20 +182,20 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keyword">inline</span> SparseMatrix&lt;float&gt; make_block_diag(MatrixXf&amp; A, qint32 n);</div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;</div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">void</span> transpose_named_matrix(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_solution.html" title="The FiffSolution class provides...">FiffSolution</a>*&amp; mat);</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">void</span> transpose_named_matrix(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="The FiffNamedMatrix class provides a named matrix.">FiffNamedMatrix</a>*&amp; mat);</div>
 <div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;</div>
 <div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;<span class="keyword">private</span>:</div>
 <div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> read_one(QFile* p_pFile, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="The Fiff class provides...">FiffDirTree</a>* node, <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="The SourceSpace class provides.">MNEForwardSolution</a>*&amp; one);</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> read_one(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="The FiffFile class provides...">FiffFile</a>* p_pFile, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="The FiffDirTree class provides...">FiffDirTree</a>* node, <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="The SourceSpace class provides.">MNEForwardSolution</a>*&amp; one);</div>
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;</div>
 <div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;<span class="keyword">public</span>:</div>
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    fiff_int_t source_ori;</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    fiff_int_t coord_frame;</div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    fiff_int_t nsource;</div>
 <div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    fiff_int_t nchan;</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_solution.html" title="The FiffSolution class provides...">FiffSolution</a>* sol;</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_solution.html" title="The FiffSolution class provides...">FiffSolution</a>* sol_grad;</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="The FiffCoordTrans class provides...">FiffCoordTrans</a> mri_head_t;</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="The FiffNamedMatrix class provides a named matrix.">FiffNamedMatrix</a>* sol;</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="The FiffNamedMatrix class provides a named matrix.">FiffNamedMatrix</a>* sol_grad;</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="The FiffCoordTrans class provides the coordinate transformation description.">FiffCoordTrans</a> mri_head_t;</div>
 <div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html" title="The SourceSpace class provides.">MNESourceSpace</a>* src;</div>
 <div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    MatrixX3f source_rr;</div>
 <div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    MatrixX3f source_nn;</div>
@@ -207,7 +207,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Sep 17 2012 19:08:45 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Oct 2 2012 23:55:41 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

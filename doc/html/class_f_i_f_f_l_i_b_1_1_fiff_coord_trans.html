@@ -95,7 +95,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>The <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="The FiffCoordTrans class provides...">FiffCoordTrans</a> class provides...  
+<p>The <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="The FiffCoordTrans class provides the coordinate transformation description.">FiffCoordTrans</a> class provides the coordinate transformation description.  
  <a href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="fiff__coord__trans_8h_source.html">fiff_coord_trans.h</a>&gt;</code></p>
@@ -111,8 +111,8 @@ Public Member Functions</h2></td></tr>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:afc1b8e7d1f6c5b9819124670b85446bc"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#afc1b8e7d1f6c5b9819124670b85446bc">invert_transform</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html">FiffCoordTrans</a> *p_pTransform)</td></tr>
 <tr class="separator:afc1b8e7d1f6c5b9819124670b85446bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7312b478ea86b28e283b7e02cd5e579d"><td class="memItemLeft" align="right" valign="top">static qint32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a7312b478ea86b28e283b7e02cd5e579d">size</a> ()</td></tr>
-<tr class="separator:a7312b478ea86b28e283b7e02cd5e579d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0dbac71c0787f5448e31857bca6a5982"><td class="memItemLeft" align="right" valign="top">static qint32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a0dbac71c0787f5448e31857bca6a5982">storageSize</a> ()</td></tr>
+<tr class="separator:a0dbac71c0787f5448e31857bca6a5982"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -120,16 +120,16 @@ Public Attributes</h2></td></tr>
 <tr class="separator:ab0cacc34492c4e9842e9de5f59368435"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0d4f29ae5b9affe90e2cfadf922e36f7"><td class="memItemLeft" align="right" valign="top">fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a0d4f29ae5b9affe90e2cfadf922e36f7">to</a></td></tr>
 <tr class="separator:a0d4f29ae5b9affe90e2cfadf922e36f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6ca2bfca16541035ce214d0b0da48dea"><td class="memItemLeft" align="right" valign="top">MatrixXf&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a6ca2bfca16541035ce214d0b0da48dea">trans</a></td></tr>
-<tr class="separator:a6ca2bfca16541035ce214d0b0da48dea"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a32ff090362fd1c91c7c2371c6246bf66"><td class="memItemLeft" align="right" valign="top">MatrixXf&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a32ff090362fd1c91c7c2371c6246bf66">invtrans</a></td></tr>
-<tr class="separator:a32ff090362fd1c91c7c2371c6246bf66"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a094443e1f367198ef85d57382987afbb"><td class="memItemLeft" align="right" valign="top">Matrix&lt; float, 4, 4, DontAlign &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a094443e1f367198ef85d57382987afbb">trans</a></td></tr>
+<tr class="separator:a094443e1f367198ef85d57382987afbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa574b1b9379269da62a6c1d282240c78"><td class="memItemLeft" align="right" valign="top">Matrix&lt; float, 4, 4, DontAlign &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#aa574b1b9379269da62a6c1d282240c78">invtrans</a></td></tr>
+<tr class="separator:aa574b1b9379269da62a6c1d282240c78"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="The FiffCoordTrans class provides...">FiffCoordTrans</a> class provides... </p>
-<p>DECLARE CLASS <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html" title="The Fiff class provides...">Fiff</a> Coord Trans, replaces fiffCoordTransRec which had a size of 104</p>
+<div class="textblock"><p>The <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="The FiffCoordTrans class provides the coordinate transformation description.">FiffCoordTrans</a> class provides the coordinate transformation description. </p>
+<p>DECLARE CLASS <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="The FiffCoordTrans class provides the coordinate transformation description.">FiffCoordTrans</a>, replaces fiffCoordTransRec which had a size of 104</p>
 <p>Coordinate transformation descriptor</p>
-<p>*typedef struct _fiffCoordTransRec { fiff_int_t from; /&lt; Source coordinate system. / fiff_int_t to; /&lt; Destination coordinate system. / fiff_float_t rot[3][3]; /&lt; The forward transform (rotation part) / fiff_float_t move[3]; /&lt; The forward transform (translation part) / fiff_float_t invrot[3][3]; /&lt; The inverse transform (rotation part) / fiff_float_t invmove[3]; /&lt; The inverse transform (translation part) / } *fiffCoordTrans, fiffCoordTransRec; /&lt; Coordinate transformation descriptor /</p>
+<p>typedef struct _fiffCoordTransRec { fiff_int_t from; /&lt; Source coordinate system. / fiff_int_t to; /&lt; Destination coordinate system. / fiff_float_t rot[3][3]; /&lt; The forward transform (rotation part) / fiff_float_t move[3]; /&lt; The forward transform (translation part) / fiff_float_t invrot[3][3]; /&lt; The inverse transform (rotation part) / fiff_float_t invmove[3]; /&lt; The inverse transform (translation part) / } *fiffCoordTrans, fiffCoordTransRec; /&lt; Coordinate transformation descriptor /</p>
 <p>typedef fiffCoordTransRec fiff_coord_trans_t; </p>
 
 <p>Definition at line <a class="el" href="fiff__coord__trans_8h_source.html#l00092">92</a> of file <a class="el" href="fiff__coord__trans_8h_source.html">fiff_coord_trans.h</a>.</p>
@@ -206,7 +206,7 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a7312b478ea86b28e283b7e02cd5e579d"></a>
+<a class="anchor" id="a0dbac71c0787f5448e31857bca6a5982"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -214,7 +214,7 @@ Public Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static qint32 FIFFLIB::FiffCoordTrans::size </td>
+          <td class="memname">qint32 FIFFLIB::FiffCoordTrans::storageSize </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -226,9 +226,10 @@ Public Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Size of the old struct 26*int = 26*4 = 104 </p>
+<p>Size of the old struct (fiffCoordTransRec) 26*int = 26*4 = 104</p>
+<dl class="section return"><dt>Returns</dt><dd>the size of the old struct fiffCoordTransRec. </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__coord__trans_8h_source.html#l00127">127</a> of file <a class="el" href="fiff__coord__trans_8h_source.html">fiff_coord_trans.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__coord__trans_8h_source.html#l00146">146</a> of file <a class="el" href="fiff__coord__trans_8h_source.html">fiff_coord_trans.h</a>.</p>
 
 </div>
 </div>
@@ -248,12 +249,12 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a32ff090362fd1c91c7c2371c6246bf66"></a>
+<a class="anchor" id="aa574b1b9379269da62a6c1d282240c78"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">MatrixXf FIFFLIB::FiffCoordTrans::invtrans</td>
+          <td class="memname">Matrix&lt;float, 4,4, DontAlign&gt; FIFFLIB::FiffCoordTrans::invtrans</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -278,12 +279,12 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a6ca2bfca16541035ce214d0b0da48dea"></a>
+<a class="anchor" id="a094443e1f367198ef85d57382987afbb"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">MatrixXf FIFFLIB::FiffCoordTrans::trans</td>
+          <td class="memname">Matrix&lt;float, 4,4, DontAlign&gt; FIFFLIB::FiffCoordTrans::trans</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -300,7 +301,7 @@ Public Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Sep 17 2012 19:08:46 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Oct 2 2012 23:55:41 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

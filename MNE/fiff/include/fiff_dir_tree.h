@@ -76,9 +76,9 @@ class FiffFile;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS Fiff
+* DECLARE CLASS FiffDirTree
 *
-* @brief The Fiff class provides...
+* @brief The FiffDirTree class provides...
 *
 * Replaces _fiffDirNode:
 * typedef struct _fiffDirNode {
@@ -116,12 +116,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the fiffTag.
+    * Destroys the fiffDirTree.
     */
     ~FiffDirTree();
 
     //=========================================================================================================
     /**
+    * ### MNE toolbox root function ###: Implementation of the fiff_copy_tree function
+    *
     *    fiff_copy_tree(fidin, in_id, nodes, fidout)
     *
     *    Copies directory subtrees from fidin to fidout
@@ -130,7 +132,16 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Implementation of the fiff_dir_tree_find function
+    * ### MNE toolbox root function ###: Implementation of the fiff_make_dir_tree function
+    *
+    * Create the directory tree structure
+    *
+    * @param[in] p_pFile the opened fiff file
+    * @param[in] p_pDir the dir entries of which the tree should be constructed
+    * @param[out] p_pTree the created dir tree
+    * @param[in] start dir entry to start (optional, by default 0)
+    *
+    * @return index of the last read dir entry
     */
     static qint32 make_dir_tree(FiffFile* p_pFile, QList<FiffDirEntry>* p_pDir, FiffDirTree*& p_pTree, qint32 start = 0);
 

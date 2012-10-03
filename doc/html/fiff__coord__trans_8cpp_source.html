@@ -110,8 +110,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;</div>
 <div class="line"><a name="l00057"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a76eeba5b0c9c6bf9f8fb7df9eaa8dbb5">   57</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a76eeba5b0c9c6bf9f8fb7df9eaa8dbb5">FiffCoordTrans::FiffCoordTrans</a>()</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;: from(0)</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;, to(0)</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;: from(-1)</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;, to(-1)</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;, trans(MatrixXf::Identity(4,4))</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;, invtrans(MatrixXf::Identity(4,4))</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;{</div>
@@ -128,7 +128,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;</div>
-<div class="line"><a name="l00076"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#afc1b8e7d1f6c5b9819124670b85446bc">   76</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#afc1b8e7d1f6c5b9819124670b85446bc">FiffCoordTrans::invert_transform</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="The FiffCoordTrans class provides...">FiffCoordTrans</a>* p_pTransform)</div>
+<div class="line"><a name="l00076"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#afc1b8e7d1f6c5b9819124670b85446bc">   76</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#afc1b8e7d1f6c5b9819124670b85446bc">FiffCoordTrans::invert_transform</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="The FiffCoordTrans class provides the coordinate transformation description.">FiffCoordTrans</a>* p_pTransform)</div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;{</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="keywordflow">if</span> (p_pTransform == NULL)</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
@@ -136,15 +136,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    fiff_int_t from_new = p_pTransform-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a0d4f29ae5b9affe90e2cfadf922e36f7">to</a>;</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    p_pTransform-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a0d4f29ae5b9affe90e2cfadf922e36f7">to</a>    = p_pTransform-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ab0cacc34492c4e9842e9de5f59368435">from</a>;</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    p_pTransform-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ab0cacc34492c4e9842e9de5f59368435">from</a>  = from_new;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    p_pTransform-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a6ca2bfca16541035ce214d0b0da48dea">trans</a> = p_pTransform-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a6ca2bfca16541035ce214d0b0da48dea">trans</a>.inverse();</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    p_pTransform-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a32ff090362fd1c91c7c2371c6246bf66">invtrans</a> = p_pTransform-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a32ff090362fd1c91c7c2371c6246bf66">invtrans</a>.inverse();</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    p_pTransform-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a094443e1f367198ef85d57382987afbb">trans</a> = p_pTransform-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a094443e1f367198ef85d57382987afbb">trans</a>.inverse();</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    p_pTransform-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#aa574b1b9379269da62a6c1d282240c78">invtrans</a> = p_pTransform-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#aa574b1b9379269da62a6c1d282240c78">invtrans</a>.inverse();</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Sep 17 2012 19:08:45 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Oct 2 2012 23:55:41 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

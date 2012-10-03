@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['machid',['machid',['../struct_f_i_f_f_l_i_b_1_1__fiff_id_rec.html#a4e717f4e4f814135a0045371f38f7c5a',1,'FIFFLIB::_fiffIdRec']]]
+  ['machid',['machid',['../class_f_i_f_f_l_i_b_1_1_fiff_id.html#a021e8aaacbaa01474e3a9c5b9cdc4d24',1,'FIFFLIB::FiffId']]]
 ];
