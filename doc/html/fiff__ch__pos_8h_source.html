@@ -115,44 +115,55 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html">   82</a></span>&#160;<span class="comment"></span><span class="keyword">class </span>FIFFSHARED_EXPORT <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html" title="The FiffChPos class provides the channel info descriptor.">FiffChPos</a> {</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html" title="The FiffChPos class provides the channel info descriptor.">FiffChPos</a>();</div>
+<div class="line"><a name="l00068"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html">   68</a></span>&#160;<span class="comment"></span><span class="keyword">class </span>FIFFSHARED_EXPORT <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html" title="Coil position.">FiffChPos</a> {</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html" title="Coil position.">FiffChPos</a>();</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html" title="Coil position.">FiffChPos</a>();</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="comment"></span>    <span class="keyword">inline</span> <span class="keyword">static</span> qint32 storageSize();</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html" title="The FiffChPos class provides the channel info descriptor.">FiffChPos</a>();</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="comment"></span>    <span class="keyword">inline</span> <span class="keyword">static</span> qint32 storageSize();</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00106"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#a7875d73688cc6722db13386709b91760">  106</a></span>&#160;    fiff_int_t   <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#a7875d73688cc6722db13386709b91760">coil_type</a>;    </div>
-<div class="line"><a name="l00107"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#a1451dd73cd864bd46a87f398964242fa">  107</a></span>&#160;    fiff_float_t r0[3];        </div>
-<div class="line"><a name="l00108"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#a3384bdc6bec84189fc61ad275127dc2f">  108</a></span>&#160;    fiff_float_t ex[3];        </div>
-<div class="line"><a name="l00109"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#aa637edd56f2bf5a062c5c8e3b0200ebc">  109</a></span>&#160;    fiff_float_t ey[3];        </div>
-<div class="line"><a name="l00110"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#aee3694181745e0a287bee5d4535ea774">  110</a></span>&#160;    fiff_float_t ez[3];        </div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;};</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00092"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#a7875d73688cc6722db13386709b91760">   92</a></span>&#160;    fiff_int_t   <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#a7875d73688cc6722db13386709b91760">coil_type</a>;    </div>
+<div class="line"><a name="l00093"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#a1451dd73cd864bd46a87f398964242fa">   93</a></span>&#160;    fiff_float_t r0[3];        </div>
+<div class="line"><a name="l00094"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#a3384bdc6bec84189fc61ad275127dc2f">   94</a></span>&#160;    fiff_float_t ex[3];        </div>
+<div class="line"><a name="l00095"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#aa637edd56f2bf5a062c5c8e3b0200ebc">   95</a></span>&#160;    fiff_float_t ey[3];        </div>
+<div class="line"><a name="l00096"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#aee3694181745e0a287bee5d4535ea774">   96</a></span>&#160;    fiff_float_t ez[3];        </div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="comment">// /** Measurement channel position and coil type. *</span></div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="comment">// typedef struct _fiffChPosRec {</span></div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="comment">//  fiff_int_t   coil_type;    /**&lt; What kind of coil. *</span></div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="comment">//  fiff_float_t r0[3];        /**&lt; Coil coordinate system origin *</span></div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="comment">//  fiff_float_t ex[3];        /**&lt; Coil coordinate system x-axis unit vector *</span></div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="comment">//  fiff_float_t ey[3];        /**&lt; Coil coordinate system y-axis unit vector *</span></div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="comment">//  fiff_float_t ez[3];        /**&lt; Coil coordinate system z-axis unit vector *</span></div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;<span class="comment">// } fiffChPosRec,*fiffChPos;  /**&lt; Measurement channel position and coil type *</span></div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="comment">// typedef fiffChPosRec fiff_ch_pos_t;</span></div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;};</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="comment">// INLINE DEFINITIONS</span></div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="comment">// INLINE DEFINITIONS</span></div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;</div>
-<div class="line"><a name="l00119"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#ad8d89c66e45b15d6f1e9a99c15f4701c">  119</a></span>&#160;<span class="keyword">inline</span> qint32 <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#ad8d89c66e45b15d6f1e9a99c15f4701c">FiffChPos::storageSize</a>()</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;{</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="keywordflow">return</span> 52;</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;}</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;</div>
+<div class="line"><a name="l00117"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#ad8d89c66e45b15d6f1e9a99c15f4701c">  117</a></span>&#160;<span class="keyword">inline</span> qint32 <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#ad8d89c66e45b15d6f1e9a99c15f4701c">FiffChPos::storageSize</a>()</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;{</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <span class="keywordflow">return</span> 52;</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;}</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;} <span class="comment">// NAMESPACE</span></div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;} <span class="comment">// NAMESPACE</span></div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="preprocessor">#endif // FIFF_CH_POS_H</span></div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;<span class="preprocessor">#endif // FIFF_CH_POS_H</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Oct 2 2012 23:55:40 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Oct 3 2012 15:45:05 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

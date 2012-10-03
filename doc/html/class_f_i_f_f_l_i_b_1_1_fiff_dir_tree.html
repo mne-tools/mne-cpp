@@ -95,7 +95,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>The <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="The FiffDirTree class provides...">FiffDirTree</a> class provides...  
+<p>Directory tree structure.  
  <a href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>&gt;</code></p>
@@ -152,22 +152,10 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a7c6ec17424cc321d944f976ccd398640"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="The FiffDirTree class provides...">FiffDirTree</a> class provides... </p>
-<p>DECLARE CLASS <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="The FiffDirTree class provides...">FiffDirTree</a></p>
-<p>Replaces _fiffDirNode: typedef struct _fiffDirNode { int type; /**&lt; Block type for this directory * fiffId id; /**&lt; Id of this block if any * fiffDirEntry dir; /**&lt; Directory of tags in this node * int nent; /**&lt; Number of entries in this node * fiffDirEntry dir_tree; /**&lt; Directory of tags within this node</p>
-<ul>
-<li>subtrees as well as FIFF_BLOCK_START and FIFF_BLOCK_END</li>
-</ul>
-<p>included. NOTE: While dir is allocated separately</p>
-<ul>
-<li>dir_tree is a pointer to the dirtree field</li>
-<li>in the fiffFile structure. The dir_tree and nent_tree</li>
-<li>fields are only used within the library to facilitate</li>
-<li>certain operations. * int nent_tree; /**&lt; Number of entries in the directory tree node * struct _fiffDirNode *parent; /**&lt; Parent node * struct _fiffDirNode <b>children; /</b>&lt; Child nodes * int nchild; /**&lt; Number of child nodes * } fiffDirNodeRec,*fiffDirNode; /**&lt; Directory tree structure used by the fiff library routines. * FIFF data tag</li>
-</ul>
-<p>Tags are used in front of data items to tell what they are. </p>
+<div class="textblock"><p>Directory tree structure. </p>
+<p>Replaces _fiffDirNode struct </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00108">108</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00083">83</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a2a5fde08f450de997f5eae02b925c864"></a>
 <div class="memitem">
@@ -250,8 +238,17 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <h3>MNE toolbox root function ###: Implementation of the fiff_copy_tree function</h3>
-<p>fiff_copy_tree(fidin, in_id, nodes, fidout)</p>
-<p>Copies directory subtrees from fidin to fidout </p>
+<p>Copies directory subtrees from fidin to fidout</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fidin</td><td>fiff file to copy from </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">in_id</td><td>file id description </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">nodes</td><td>subtree directories to be copied </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fidout</td><td>fiff file to write to</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
 <p>Definition at line <a class="el" href="fiff__dir__tree_8cpp_source.html#l00079">79</a> of file <a class="el" href="fiff__dir__tree_8cpp_source.html">fiff_dir_tree.cpp</a>.</p>
 
@@ -314,7 +311,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Implementation of the find_tag function in various files e.g. fiff_read_named_matrix.m</p>
-<p>Founds a tag of a given kind within a tree, and reeds it from file. Note: In difference to mne-matlab this is not a static function. This is a method of the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="The FiffDirTree class provides...">FiffDirTree</a> class, that's why a tree object doesn't need to be handed to the function.</p>
+<p>Founds a tag of a given kind within a tree, and reeds it from file. Note: In difference to mne-matlab this is not a static function. This is a method of the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a> class, that's why a tree object doesn't need to be handed to the function.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>the opened fif file </td></tr>
@@ -423,7 +420,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_read_bad_channels</p>
 <h3>MNE toolbox root function</h3>
-<p>Reads the bad channel list from a node if it exists Note: In difference to mne-matlab this is not a static function. This is a method of the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="The FiffDirTree class provides...">FiffDirTree</a> class, that's why a tree object doesn't need to be handed to the function.</p>
+<p>Reads the bad channel list from a node if it exists Note: In difference to mne-matlab this is not a static function. This is a method of the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a> class, that's why a tree object doesn't need to be handed to the function.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>The opened fif file to read from</td></tr>
@@ -599,7 +596,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Block type for this directory </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00259">259</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00239">239</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -614,7 +611,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Child nodes </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00265">265</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00245">245</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -629,7 +626,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Directory of tags in this node </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00262">262</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00242">242</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -644,7 +641,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Id of this block if any </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00260">260</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00240">240</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -659,7 +656,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Number of child nodes </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00266">266</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00246">246</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -674,7 +671,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Number of entries in this node </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00263">263</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00243">243</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -689,7 +686,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Number of entries in the directory tree node </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00264">264</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00244">244</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -704,7 +701,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Newly added to stay consistent with MATLAB implementation </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00261">261</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00241">241</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -715,7 +712,7 @@ Public Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Oct 2 2012 23:55:41 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Oct 3 2012 15:45:05 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

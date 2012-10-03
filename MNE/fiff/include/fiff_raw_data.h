@@ -95,11 +95,9 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FiffRawData
+*Provides fiff raw measurement data, including I/O routines.
 *
-*
-*
-* @brief The FiffRawData class provides
+* @brief FIFF raw measurement data
 */
 class FIFFSHARED_EXPORT FiffRawData {
 
@@ -118,24 +116,17 @@ public:
 
     //=========================================================================================================
     /**
-    * ToDo make this part of FiffRawData
-    *
-    * fiff_read_raw_segment
-    *
-    * [data,times] = fiff_read_raw_segment(raw,from,to,sel)
+    * ### MNE toolbox root function ###: Implementation of the fiff_read_raw_segment function
     *
     * Read a specific raw data segment
     *
-    * raw    - structure returned by fiff_setup_read_raw
-    * from   - first sample to include. If omitted, defaults to the
-    *          first sample in data
-    * to     - last sample to include. If omitted, defaults to the last
-    *          sample in data
-    * sel    - optional channel selection vector
+    * @param[out] data      returns the data matrix (channels x samples)
+    * @param[out] times     returns the time values corresponding to the samples
+    * @param[in] from       first sample to include. If omitted, defaults to the first sample in data (optional)
+    * @param[in] to         last sample to include. If omitted, defaults to the last sample in data (optional)
+    * @param[in] sel        channel selection vector (optional)
     *
-    * data   - returns the data matrix (channels x samples)
-    * times  - returns the time values corresponding to the samples (optional)
-    *
+    * @return true if succeeded, false otherwise
     */
     bool read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t from = -1, fiff_int_t to = -1, MatrixXi sel = defaultMatrixXi);
 

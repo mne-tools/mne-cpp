@@ -95,7 +95,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>The <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html" title="The FiffId class provides the fiff file id description.">FiffId</a> class provides the fiff file id description.  
+<p>A file ID.  
  <a href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="fiff__id_8h_source.html">fiff_id.h</a>&gt;</code></p>
@@ -122,14 +122,10 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a93dc35d7aa0034b38b9443906303fe6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html" title="The FiffId class provides the fiff file id description.">FiffId</a> class provides the fiff file id description. </p>
-<p>DECLARE CLASS <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html" title="The FiffId class provides the fiff file id description.">FiffId</a>, replaces fiffIdRec which had a size of 5*4 = 20</p>
-<p>A file ID.</p>
-<p>These universially unique identifiers are also used to identify blocks within the files.</p>
-<p>typedef struct _fiffIdRec { fiff_int_t version; /**&lt; File version * fiff_int_t machid[2]; /**&lt; Unique machine ID * fiffTimeRec time; /**&lt; Time of the ID creation * } fiffIdRec,*fiffId; /**&lt; This is the file identifier *</p>
-<p>typedef fiffIdRec fiff_id_t; </p>
+<div class="textblock"><p>A file ID. </p>
+<p>These universially unique identifiers are also used to identify blocks within the files. Replaces fiffIdRec which had a size of 5*4 = 20 </p>
 
-<p>Definition at line <a class="el" href="fiff__id_8h_source.html#l00082">82</a> of file <a class="el" href="fiff__id_8h_source.html">fiff_id.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__id_8h_source.html#l00070">70</a> of file <a class="el" href="fiff__id_8h_source.html">fiff_id.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a10b077d63760813d49196cbadc964ce6"></a>
 <div class="memitem">
@@ -161,7 +157,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Destroys the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="The FiffInfo class provides fiff measurement file information.">FiffInfo</a>. </p>
+<p>Destroys the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a>. </p>
 
 <p>Definition at line <a class="el" href="fiff__id_8cpp_source.html#l00069">69</a> of file <a class="el" href="fiff__id_8cpp_source.html">fiff_id.cpp</a>.</p>
 
@@ -191,7 +187,7 @@ Public Attributes</h2></td></tr>
 <p>Size of the old struct (fiffIdRec) 5*int = 5*4 = 20</p>
 <dl class="section return"><dt>Returns</dt><dd>the size of the old struct fiffIdRec. </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__id_8h_source.html#l00117">117</a> of file <a class="el" href="fiff__id_8h_source.html">fiff_id.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__id_8h_source.html#l00114">114</a> of file <a class="el" href="fiff__id_8h_source.html">fiff_id.h</a>.</p>
 
 </div>
 </div>
@@ -207,7 +203,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Unique machine ID </p>
 
-<p>Definition at line <a class="el" href="fiff__id_8h_source.html#l00107">107</a> of file <a class="el" href="fiff__id_8h_source.html">fiff_id.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__id_8h_source.html#l00095">95</a> of file <a class="el" href="fiff__id_8h_source.html">fiff_id.h</a>.</p>
 
 </div>
 </div>
@@ -222,7 +218,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Time of the ID creation </p>
 
-<p>Definition at line <a class="el" href="fiff__id_8h_source.html#l00108">108</a> of file <a class="el" href="fiff__id_8h_source.html">fiff_id.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__id_8h_source.html#l00096">96</a> of file <a class="el" href="fiff__id_8h_source.html">fiff_id.h</a>.</p>
 
 </div>
 </div>
@@ -237,7 +233,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>File version </p>
 
-<p>Definition at line <a class="el" href="fiff__id_8h_source.html#l00106">106</a> of file <a class="el" href="fiff__id_8h_source.html">fiff_id.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__id_8h_source.html#l00094">94</a> of file <a class="el" href="fiff__id_8h_source.html">fiff_id.h</a>.</p>
 
 </div>
 </div>
@@ -248,7 +244,7 @@ Public Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Oct 2 2012 23:55:41 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Oct 3 2012 15:45:05 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

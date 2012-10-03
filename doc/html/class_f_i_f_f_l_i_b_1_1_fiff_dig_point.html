@@ -95,7 +95,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>The <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dig_point.html" title="The FiffDigPoint class.">FiffDigPoint</a> class.  
+<p>Digitization point description.  
  <a href="class_f_i_f_f_l_i_b_1_1_fiff_dig_point.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="fiff__dig__point_8h_source.html">fiff_dig_point.h</a>&gt;</code></p>
@@ -124,12 +124,10 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a96eeede21a4454fae095d0b3aca8cb0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dig_point.html" title="The FiffDigPoint class.">FiffDigPoint</a> class. </p>
-<p>DECLARE CLASS <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dig_point.html" title="The FiffDigPoint class.">FiffDigPoint</a></p>
-<p>typedef struct _fiffDigPointRec { fiff_int_t kind; /**&lt; FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI, or FIFFV_POINT_EEG * fiff_int_t ident; /**&lt; Number identifying this point * fiff_float_t r[3]; /**&lt; Point location * fiff_int_t coord_frame; /**&lt; Newly added to stay consistent with fiff MATLAB implementation * } fiffDigPointRec, *fiffDigPoint; /**&lt; Digitization point description *</p>
-<p>typedef fiffDigPointRec fiff_dig_point_t; </p>
+<div class="textblock"><p>Digitization point description. </p>
+<p>Replaces _fiffDigPointRec struct. </p>
 
-<p>Definition at line <a class="el" href="fiff__dig__point_8h_source.html#l00078">78</a> of file <a class="el" href="fiff__dig__point_8h_source.html">fiff_dig_point.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dig__point_8h_source.html#l00068">68</a> of file <a class="el" href="fiff__dig__point_8h_source.html">fiff_dig_point.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="ad1076014df93b5d9e42d17c00e60d49a"></a>
 <div class="memitem">
@@ -161,7 +159,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Destroys the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dig_point.html" title="The FiffDigPoint class.">FiffDigPoint</a>. </p>
+<p>Destroys the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dig_point.html" title="Digitization point description.">FiffDigPoint</a>. </p>
 
 <p>Definition at line <a class="el" href="fiff__dig__point_8cpp_source.html#l00068">68</a> of file <a class="el" href="fiff__dig__point_8cpp_source.html">fiff_dig_point.cpp</a>.</p>
 
@@ -191,7 +189,7 @@ Public Attributes</h2></td></tr>
 <p>Size of the old struct (fiffDigPointRec) 5*int = 5*4 = 20</p>
 <dl class="section return"><dt>Returns</dt><dd>the size of the old struct fiffDigPointRec. </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__dig__point_8h_source.html#l00114">114</a> of file <a class="el" href="fiff__dig__point_8h_source.html">fiff_dig_point.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dig__point_8h_source.html#l00113">113</a> of file <a class="el" href="fiff__dig__point_8h_source.html">fiff_dig_point.h</a>.</p>
 
 </div>
 </div>
@@ -207,7 +205,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Newly added to stay consistent with fiff MATLAB implementation </p>
 
-<p>Definition at line <a class="el" href="fiff__dig__point_8h_source.html#l00105">105</a> of file <a class="el" href="fiff__dig__point_8h_source.html">fiff_dig_point.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dig__point_8h_source.html#l00095">95</a> of file <a class="el" href="fiff__dig__point_8h_source.html">fiff_dig_point.h</a>.</p>
 
 </div>
 </div>
@@ -222,7 +220,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Number identifying this point </p>
 
-<p>Definition at line <a class="el" href="fiff__dig__point_8h_source.html#l00103">103</a> of file <a class="el" href="fiff__dig__point_8h_source.html">fiff_dig_point.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dig__point_8h_source.html#l00093">93</a> of file <a class="el" href="fiff__dig__point_8h_source.html">fiff_dig_point.h</a>.</p>
 
 </div>
 </div>
@@ -237,7 +235,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI, or FIFFV_POINT_EEG </p>
 
-<p>Definition at line <a class="el" href="fiff__dig__point_8h_source.html#l00102">102</a> of file <a class="el" href="fiff__dig__point_8h_source.html">fiff_dig_point.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dig__point_8h_source.html#l00092">92</a> of file <a class="el" href="fiff__dig__point_8h_source.html">fiff_dig_point.h</a>.</p>
 
 </div>
 </div>
@@ -252,7 +250,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Point location </p>
 
-<p>Definition at line <a class="el" href="fiff__dig__point_8h_source.html#l00104">104</a> of file <a class="el" href="fiff__dig__point_8h_source.html">fiff_dig_point.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dig__point_8h_source.html#l00094">94</a> of file <a class="el" href="fiff__dig__point_8h_source.html">fiff_dig_point.h</a>.</p>
 
 </div>
 </div>
@@ -263,7 +261,7 @@ Public Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Oct 2 2012 23:55:41 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Oct 3 2012 15:45:05 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

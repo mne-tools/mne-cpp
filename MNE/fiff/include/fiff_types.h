@@ -97,66 +97,6 @@ typedef struct _fiffTimeRec {
 } *fiffTime, fiffTimeRec;	/**< Accurate time stamps used in FIFF files.*/
 
 
-/**
-* A file ID.
-*
-* These universially unique identifiers are also
-* used to identify blocks within the files.
-*/
-//typedef struct _fiffIdRec {
-// fiff_int_t version;     /**< File version */
-// fiff_int_t machid[2];   /**< Unique machine ID */
-// fiffTimeRec time;       /**< Time of the ID creation */
-//} fiffIdRec,*fiffId;     /**< This is the file identifier */
-
-//typedef fiffIdRec fiff_id_t;
-
-
-///** Measurement channel position and coil type. */
-
-// typedef struct _fiffChPosRec {
-//  fiff_int_t   coil_type;    /**< What kind of coil. */
-//  fiff_float_t r0[3];        /**< Coil coordinate system origin */
-//  fiff_float_t ex[3];        /**< Coil coordinate system x-axis unit vector */
-//  fiff_float_t ey[3];        /**< Coil coordinate system y-axis unit vector */
-//  fiff_float_t ez[3];        /**< Coil coordinate system z-axis unit vector */
-// } fiffChPosRec,*fiffChPos;  /**< Measurement channel position and coil type */
-
-// typedef fiffChPosRec fiff_ch_pos_t;
-
-
-
-///** Directories are composed of these structures. */
-////ToDo replace this by a class fiff_dir_entry.h;
-//typedef struct _fiffDirEntryRec {
-// fiff_int_t  kind;		/**< Tag number */
-// fiff_int_t  type;		/**< Data type */
-// fiff_int_t  size;		/**< How many bytes */
-// fiff_int_t  pos;		/**< Location in file
-//                 * Note: the data is located at pos +
-//                 * FIFFC_DATA_OFFSET */
-//} fiffDirEntryRec,*fiffDirEntry;/**< Directory is composed of these */
-
-///** Alias for fiffDirEntryRec */
-
-//typedef fiffDirEntryRec fiff_dir_entry_t;
-
-/** Digitization point description */
-
-//typedef struct _fiffDigPointRec {
-// fiff_int_t kind;		 /**< FIFFV_POINT_CARDINAL,
-//                           *   FIFFV_POINT_HPI, or
-//                           *   FIFFV_POINT_EEG */
-// fiff_int_t ident;		 /**< Number identifying this point */
-// fiff_float_t r[3];		 /**< Point location */
-// fiff_int_t coord_frame; /**< Newly added to stay consistent with fiff MATLAB implementation */
-//} fiffDigPointRec, *fiffDigPoint; /**< Digitization point description */
-
-// typedef fiffDigPointRec  fiff_dig_point_t;
-
-
-
-
 /** Structure representing digitized strings. */
 
 typedef struct _fiffDigStringRec {
@@ -168,20 +108,6 @@ typedef struct _fiffDigStringRec {
 
 typedef fiffDigStringRec fiff_dig_string_t;
 
-
-
-/////** Coordinate transformation descriptor */
-////obsolete just for type convertation
-//typedef struct _fiffCoordTransRec {
-// fiff_int_t   from;		      /**< Source coordinate system. */
-// fiff_int_t   to;		      /**< Destination coordinate system. */
-// fiff_float_t rot[3][3];	      /**< The forward transform (rotation part) */
-// fiff_float_t move[3];		      /**< The forward transform (translation part) */
-// fiff_float_t invrot[3][3];	      /**< The inverse transform (rotation part) */
-// fiff_float_t invmove[3];            /**< The inverse transform (translation part) */
-//} *fiffCoordTrans, fiffCoordTransRec; /**< Coordinate transformation descriptor */
-//todo put this into a class
-//typedef fiffCoordTransRec fiff_coord_trans_t;
 
 /*
 * The layered sphere model
@@ -199,48 +125,6 @@ typedef struct _fiffLayerRec {
 //=============================================================================================================
 // TYPEDEF Following types are used by the fiff library. They are not used within the files.:
 //=============================================================================================================
-
-///** Directory tree structure used by the fiff library routines. */
-////Obsolete use class fiffDirTree instead
-//typedef struct _fiffDirNode {
-// qint32              type;	 /**< Block type for this directory */
-// fiff_id_t           id;        /**< Id of this block if any */
-// /*fiffDirEntry*/
-//  fiff_id_t           parent_id;        /**< Newly added to stay consistent with MATLAB implementation */
-// QList<fiff_dir_entry_t>    dir;	 /**< Directory of tags in this node */
-// qint32              nent;	 /**< Number of entries in this node */
-//// fiffDirEntry        dir_tree;	 /**< Directory of tags within this node
-////				  * subtrees as well as FIFF_BLOCK_START and FIFF_BLOCK_END
-////				  * included. NOTE: While dir is allocated separately
-////				  * dir_tree is a pointer to the dirtree field
-////				  * in the fiffFile structure. The dir_tree and nent_tree
-////				  * fields are only used within the library to facilitate
-////				  * certain operations. */
-// qint32              nent_tree; /**< Number of entries in the directory tree node */
-// //struct _fiffDirNode *parent;	 /**< Parent node */
-// //struct _fiffDirNode
-// QList<struct _fiffDirNode*>  children;/**< Child nodes */
-// qint32              nchild;	 /**< Number of child nodes */
-//} *fiffDirNode, fiffDirNodeRec; 	 /**< Directory tree structure used by the fiff library routines. */
-
-//typedef fiffDirNodeRec fiff_dir_node_t;
-
-/** FIFF file handle returned by fiff_open(). */
-
-//typedef struct _fiffFileRec {
-//  char         *file_name;	/**< Name of the file */
-//  FILE         *fd;		/**< The normal file descriptor */
-//  fiffId       id;		/**< The file identifier */
-//  fiffDirEntry dir;		/**< This is the directory.
-//				 * If no directory exists, fiff_open
-//				 * automatically scans the file to create one. */
-//  int         nent;	        /**< How many entries? */
-//  /*fiffDirNode*/
-////  fiffDirTree dirtree;		/**< Directory compiled into a tree */
-//  char        *ext_file_name;	/**< Name of the file holding the external data */
-//  FILE        *ext_fd;		/**< The file descriptor of the above file if open  */
-//} *fiffFile,fiffFileRec;	/**< FIFF file handle. fiff_open() returns this. */
-
 
 /** Structure for sparse matrices */
 

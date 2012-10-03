@@ -162,89 +162,89 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00117"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">  117</a></span>&#160;<span class="comment"></span><span class="keyword">class </span>FIFFSHARED_EXPORT <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="The FiffFile class provides...">FiffFile</a> : <span class="keyword">public</span> QFile {</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="The FiffFile class provides...">FiffFile</a>(QString&amp; p_sFilename);</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="The FiffFile class provides...">FiffFile</a>();</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> end_block(fiff_int_t kind);</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> end_file();</div>
+<div class="line"><a name="l00116"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">  116</a></span>&#160;<span class="comment"></span><span class="keyword">class </span>FIFFSHARED_EXPORT <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a> : <span class="keyword">public</span> QFile {</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a>(QString&amp; p_sFilename);</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a>();</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> end_block(fiff_int_t kind);</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> end_file();</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> finish_writing_raw();</div>
 <div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;</div>
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> finish_writing_raw();</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;<span class="comment"></span>    <span class="keyword">using</span> QFile::open;</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;<span class="comment"></span>    <span class="keywordtype">bool</span> open(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="The FiffDirTree class provides...">FiffDirTree</a>*&amp; p_pTree, QList&lt;FiffDirEntry&gt;*&amp; p_pDir);</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> setup_read_raw(QString t_sFileName, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html" title="The FiffRawData class provides.">FiffRawData</a>*&amp; data, <span class="keywordtype">bool</span> allow_maxshield = <span class="keyword">false</span>);</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> start_block(fiff_int_t kind);</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="The FiffFile class provides...">FiffFile</a>* start_file(QString&amp; p_sFilename);</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="The FiffFile class provides...">FiffFile</a>* start_writing_raw(QString&amp; p_sFileName, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="The FiffInfo class provides fiff measurement file information.">FiffInfo</a>* info, MatrixXf*&amp; cals, MatrixXi sel = defaultFileMatrixXi);</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> write_ch_info(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html" title="The FiffChInfo class provides the channel info descriptor.">FiffChInfo</a>* ch);</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> write_coord_trans(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="The FiffCoordTrans class provides the coordinate transformation description.">FiffCoordTrans</a>&amp; trans);</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> write_ctf_comp(QList&lt;FiffCtfComp*&gt;&amp; comps);</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> write_dig_point(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dig_point.html" title="The FiffDigPoint class.">FiffDigPoint</a>&amp; dig);</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> write_id(fiff_int_t kind, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html" title="The FiffId class provides the fiff file id description.">FiffId</a>&amp; <span class="keywordtype">id</span> = defaultFiffId);</div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;</div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> write_int(fiff_int_t kind, fiff_int_t* data, fiff_int_t nel = 1);</div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;</div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> write_float(fiff_int_t kind, <span class="keywordtype">float</span>* data, fiff_int_t nel = 1);</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;</div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> write_float_matrix(fiff_int_t kind, MatrixXf&amp; mat);</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> write_name_list(fiff_int_t kind,QStringList&amp; data);</div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;</div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> write_named_matrix(fiff_int_t kind,<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="The FiffNamedMatrix class provides a named matrix.">FiffNamedMatrix</a>* mat);</div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;</div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> write_proj(QList&lt;FiffProj*&gt;&amp; projs);</div>
-<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;</div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;<span class="comment"></span>    <span class="keywordtype">bool</span> write_raw_buffer(MatrixXf* buf, MatrixXf* cals);</div>
-<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;</div>
-<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> write_string(fiff_int_t kind, QString&amp; data);</div>
-<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;};</div>
-<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;</div>
-<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;} <span class="comment">// NAMESPACE</span></div>
-<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;</div>
-<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;<span class="preprocessor">#endif // FIFF_FILE_H</span></div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;<span class="comment"></span>    <span class="keyword">using</span> QFile::open;</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;<span class="comment"></span>    <span class="keywordtype">bool</span> open(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a>*&amp; p_pTree, QList&lt;FiffDirEntry&gt;*&amp; p_pDir);</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> setup_read_raw(QString t_sFileName, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html" title="FIFF raw measurement data.">FiffRawData</a>*&amp; data, <span class="keywordtype">bool</span> allow_maxshield = <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> start_block(fiff_int_t kind);</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a>* start_file(QString&amp; p_sFilename);</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a>* start_writing_raw(QString&amp; p_sFileName, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a>* info, MatrixXf*&amp; cals, MatrixXi sel = defaultFileMatrixXi);</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> write_ch_info(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html" title="Channel info descriptor.">FiffChInfo</a>* ch);</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> write_coord_trans(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="Coordinate transformation description.">FiffCoordTrans</a>&amp; trans);</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> write_ctf_comp(QList&lt;FiffCtfComp*&gt;&amp; comps);</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> write_dig_point(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dig_point.html" title="Digitization point description.">FiffDigPoint</a>&amp; dig);</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> write_id(fiff_int_t kind, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html" title="A file ID.">FiffId</a>&amp; <span class="keywordtype">id</span> = defaultFiffId);</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> write_int(fiff_int_t kind, fiff_int_t* data, fiff_int_t nel = 1);</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> write_float(fiff_int_t kind, <span class="keywordtype">float</span>* data, fiff_int_t nel = 1);</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;</div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> write_float_matrix(fiff_int_t kind, MatrixXf&amp; mat);</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;</div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> write_name_list(fiff_int_t kind,QStringList&amp; data);</div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> write_named_matrix(fiff_int_t kind,<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="A named matrix.">FiffNamedMatrix</a>* mat);</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> write_proj(QList&lt;FiffProj*&gt;&amp; projs);</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;</div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;<span class="comment"></span>    <span class="keywordtype">bool</span> write_raw_buffer(MatrixXf* buf, MatrixXf* cals);</div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;</div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> write_string(fiff_int_t kind, QString&amp; data);</div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;};</div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;</div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;} <span class="comment">// NAMESPACE</span></div>
+<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;</div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;<span class="preprocessor">#endif // FIFF_FILE_H</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Oct 2 2012 23:55:40 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Oct 3 2012 15:45:05 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

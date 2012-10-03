@@ -61,22 +61,10 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FiffId, replaces fiffIdRec which had a size of 5*4 = 20
+* These universially unique identifiers are also used to identify blocks within the files.
+* Replaces fiffIdRec which had a size of 5*4 = 20
 *
-* A file ID.
-*
-* These universially unique identifiers are also
-* used to identify blocks within the files.
-*
-* typedef struct _fiffIdRec {
-*  fiff_int_t version;     /**< File version *
-*  fiff_int_t machid[2];   /**< Unique machine ID *
-*  fiffTimeRec time;       /**< Time of the ID creation *
-*} fiffIdRec,*fiffId;     /**< This is the file identifier *
-*
-* typedef fiffIdRec fiff_id_t;
-*
-* @brief The FiffId class provides the fiff file id description
+* @brief A file ID.
 **/
 
 class FIFFSHARED_EXPORT FiffId {
@@ -106,6 +94,15 @@ public:
     fiff_int_t version;     /**< File version */
     fiff_int_t machid[2];   /**< Unique machine ID */
     fiffTimeRec time;       /**< Time of the ID creation */
+
+
+// typedef struct _fiffIdRec {
+//  fiff_int_t version;     /**< File version *
+//  fiff_int_t machid[2];   /**< Unique machine ID *
+//  fiffTimeRec time;       /**< Time of the ID creation *
+//} fiffIdRec,*fiffId;     /**< This is the file identifier *
+
+// typedef fiffIdRec fiff_id_t;
 };
 
 

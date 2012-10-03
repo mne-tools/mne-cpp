@@ -131,7 +131,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;</div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;</div>
-<div class="line"><a name="l00079"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a542e9c1dc1505de4ae66f6932695951a">   79</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a542e9c1dc1505de4ae66f6932695951a">FiffDirTree::copy_tree</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="The FiffFile class provides...">FiffFile</a>* fidin, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html" title="The FiffId class provides the fiff file id description.">FiffId</a>&amp; in_id, QList&lt;FiffDirTree*&gt;&amp; nodes, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="The FiffFile class provides...">FiffFile</a>* fidout)</div>
+<div class="line"><a name="l00079"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a542e9c1dc1505de4ae66f6932695951a">   79</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a542e9c1dc1505de4ae66f6932695951a">FiffDirTree::copy_tree</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a>* fidin, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html" title="A file ID.">FiffId</a>&amp; in_id, QList&lt;FiffDirTree*&gt;&amp; nodes, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a>* fidout)</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;{</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="keywordflow">if</span>(nodes.size() &lt;= 0)</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
@@ -166,7 +166,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;                <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;            }</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;            <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html">FiffTag</a> tag;</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;            <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html" title="FIFF data tag.">FiffTag</a> tag;</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;</div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;            QDataStream in(fidin);</div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;            in.setByteOrder(QDataStream::BigEndian);</div>
@@ -220,13 +220,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;</div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;</div>
-<div class="line"><a name="l00168"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#aac396e6d384c4b5ebcc2c9a771e9a21d">  168</a></span>&#160;qint32 <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#aac396e6d384c4b5ebcc2c9a771e9a21d">FiffDirTree::make_dir_tree</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="The FiffFile class provides...">FiffFile</a>* p_pFile, QList&lt;FiffDirEntry&gt;* p_pDir, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="The FiffDirTree class provides...">FiffDirTree</a>*&amp; p_pTree, qint32 start)</div>
+<div class="line"><a name="l00168"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#aac396e6d384c4b5ebcc2c9a771e9a21d">  168</a></span>&#160;qint32 <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#aac396e6d384c4b5ebcc2c9a771e9a21d">FiffDirTree::make_dir_tree</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a>* p_pFile, QList&lt;FiffDirEntry&gt;* p_pDir, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a>*&amp; p_pTree, qint32 start)</div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;{</div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <span class="keywordflow">if</span> (p_pTree != NULL)</div>
 <div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        <span class="keyword">delete</span> p_pTree;</div>
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    p_pTree = <span class="keyword">new</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a2a5fde08f450de997f5eae02b925c864">FiffDirTree</a>();</div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html">FIFFLIB::FiffTag</a>* t_pTag = NULL;</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html" title="FIFF data tag.">FIFFLIB::FiffTag</a>* t_pTag = NULL;</div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;</div>
 <div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    qint32 <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ae7a0a42675b015ba4b5ff83586a2394a">block</a>;</div>
 <div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    <span class="keywordflow">if</span>(p_pDir-&gt;at(start).kind == FIFF_BLOCK_START)</div>
@@ -253,7 +253,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;        {</div>
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;            <span class="keywordflow">if</span> (current != start)</div>
 <div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;            {</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;                <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="The FiffDirTree class provides...">FiffDirTree</a>* p_pChildTree = NULL;</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;                <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a>* p_pChildTree = NULL;</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;                current = <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#aac396e6d384c4b5ebcc2c9a771e9a21d">FiffDirTree::make_dir_tree</a>(p_pFile,p_pDir,p_pChildTree, current);</div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;                ++p_pTree-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a7c6ec17424cc321d944f976ccd398640">nchild</a>;</div>
 <div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;                p_pTree-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ab06679e0ac846aff0ec30aff3898a546">children</a>.append(p_pChildTree);</div>
@@ -331,7 +331,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;</div>
 <div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;</div>
-<div class="line"><a name="l00279"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#af8a6db62d2b101a07d4fa3e85d9b148f">  279</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#af8a6db62d2b101a07d4fa3e85d9b148f">FiffDirTree::find_tag</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="The FiffFile class provides...">FiffFile</a>* p_pFile, fiff_int_t findkind, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html">FiffTag</a>*&amp; p_pTag)</div>
+<div class="line"><a name="l00279"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#af8a6db62d2b101a07d4fa3e85d9b148f">  279</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#af8a6db62d2b101a07d4fa3e85d9b148f">FiffDirTree::find_tag</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a>* p_pFile, fiff_int_t findkind, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html" title="FIFF data tag.">FiffTag</a>*&amp; p_pTag)</div>
 <div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;{</div>
 <div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> p = 0; p &lt; this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a37e90c64f3b2e3a5cd89204ec7fbfa53">nent</a>; ++p)</div>
 <div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    {</div>
@@ -363,10 +363,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;</div>
 <div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;</div>
-<div class="line"><a name="l00311"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a5e7689f08bda95d93773786e4c013400">  311</a></span>&#160;QStringList <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a5e7689f08bda95d93773786e4c013400">FiffDirTree::read_bad_channels</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="The FiffFile class provides...">FiffFile</a>* p_pFile)</div>
+<div class="line"><a name="l00311"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a5e7689f08bda95d93773786e4c013400">  311</a></span>&#160;QStringList <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a5e7689f08bda95d93773786e4c013400">FiffDirTree::read_bad_channels</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a>* p_pFile)</div>
 <div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;{</div>
 <div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;    QList&lt;FiffDirTree*&gt; node = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#add5047febab5ab74581c1601f41475d3">dir_tree_find</a>(FIFFB_MNE_BAD_CHANNELS);</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html">FIFFLIB::FiffTag</a>* t_pTag = NULL;</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html" title="FIFF data tag.">FIFFLIB::FiffTag</a>* t_pTag = NULL;</div>
 <div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;</div>
 <div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;    QStringList bads;</div>
 <div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;</div>
@@ -380,23 +380,23 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;</div>
 <div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;</div>
-<div class="line"><a name="l00328"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a6e5788b42c9aa0513920301e5c890547">  328</a></span>&#160;QList&lt;FiffCtfComp*&gt; <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a6e5788b42c9aa0513920301e5c890547">FiffDirTree::read_ctf_comp</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="The FiffFile class provides...">FiffFile</a>* p_pFile, QList&lt;FiffChInfo&gt;&amp; chs)</div>
+<div class="line"><a name="l00328"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a6e5788b42c9aa0513920301e5c890547">  328</a></span>&#160;QList&lt;FiffCtfComp*&gt; <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a6e5788b42c9aa0513920301e5c890547">FiffDirTree::read_ctf_comp</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a>* p_pFile, QList&lt;FiffChInfo&gt;&amp; chs)</div>
 <div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;{</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="The FiffDirTree class provides...">FiffDirTree</a>* p_pNode = <span class="keyword">this</span>;</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a>* p_pNode = <span class="keyword">this</span>;</div>
 <div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;</div>
 <div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;    QList&lt;FiffCtfComp*&gt; compdata;</div>
 <div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;    QList&lt;FiffDirTree*&gt; t_qListComps = p_pNode-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#add5047febab5ab74581c1601f41475d3">dir_tree_find</a>(FIFFB_MNE_CTF_COMP_DATA);</div>
 <div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;</div>
 <div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;    qint32 i, k, p, col, row;</div>
 <div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;    fiff_int_t kind, pos;</div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html">FiffTag</a>* t_pTag = NULL;</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html" title="FIFF data tag.">FiffTag</a>* t_pTag = NULL;</div>
 <div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;    <span class="keywordflow">for</span> (k = 0; k &lt; t_qListComps.size(); ++k)</div>
 <div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;    {</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="The FiffDirTree class provides...">FiffDirTree</a>* node = t_qListComps.at(k);</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a>* node = t_qListComps.at(k);</div>
 <div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;        <span class="comment">//</span></div>
 <div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;        <span class="comment">//   Read the data we need</span></div>
 <div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;        <span class="comment">//</span></div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="The FiffNamedMatrix class provides a named matrix.">FiffNamedMatrix</a>* mat = NULL;</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="A named matrix.">FiffNamedMatrix</a>* mat = NULL;</div>
 <div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;        node-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#afd304b2b94055c851ddb64e42ca12312">read_named_matrix</a>(p_pFile, <a class="code" href="fiff__constants_8h.html#a91522ba496e205013d2afae997da626f">FIFF_MNE_CTF_COMP_DATA</a>, mat);</div>
 <div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;        <span class="keywordflow">for</span>(p = 0; p &lt; node-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a37e90c64f3b2e3a5cd89204ec7fbfa53">nent</a>; ++p)</div>
 <div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;        {</div>
@@ -416,7 +416,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;        <span class="comment">//</span></div>
 <div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;        <span class="comment">//   Get the compensation kind and map it to a simple number</span></div>
 <div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;        <span class="comment">//</span></div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html" title="The FiffCtfComp class provides CTF software compensation data.">FiffCtfComp</a>* one = <span class="keyword">new</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html" title="The FiffCtfComp class provides CTF software compensation data.">FiffCtfComp</a>();</div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html" title="CTF software compensation data.">FiffCtfComp</a>* one = <span class="keyword">new</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html" title="CTF software compensation data.">FiffCtfComp</a>();</div>
 <div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;        one-&gt;ctfkind = *t_pTag-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a88f8094d1f3b876708bd3d5779a30a49">toInt</a>();</div>
 <div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;        <span class="keyword">delete</span> t_pTag;</div>
 <div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;        t_pTag = NULL;</div>
@@ -549,9 +549,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;</div>
 <div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;</div>
-<div class="line"><a name="l00497"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a45afd6f994bd40aafc69530223200b56">  497</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="The FiffDirTree class provides...">FiffDirTree</a>* <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a45afd6f994bd40aafc69530223200b56">FiffDirTree::read_meas_info</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="The FiffFile class provides...">FiffFile</a>* p_pFile, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="The FiffInfo class provides fiff measurement file information.">FiffInfo</a>*&amp; info)</div>
+<div class="line"><a name="l00497"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a45afd6f994bd40aafc69530223200b56">  497</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a>* <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a45afd6f994bd40aafc69530223200b56">FiffDirTree::read_meas_info</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a>* p_pFile, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a>*&amp; info)</div>
 <div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;{</div>
-<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="The FiffDirTree class provides...">FiffDirTree</a>* p_pTree = <span class="keyword">this</span>;</div>
+<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a>* p_pTree = <span class="keyword">this</span>;</div>
 <div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;</div>
 <div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;    <span class="keywordflow">if</span> (info)</div>
 <div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;        <span class="keyword">delete</span> info;</div>
@@ -577,7 +577,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;    <span class="comment">//   Read measurement info</span></div>
 <div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html">FiffTag</a>* t_pTag = NULL;</div>
+<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html" title="FIFF data tag.">FiffTag</a>* t_pTag = NULL;</div>
 <div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;</div>
 <div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;    fiff_int_t nchan = -1;</div>
 <div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;    <span class="keywordtype">float</span> sfreq = -1.0f;</div>
@@ -585,11 +585,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;    <span class="keywordtype">float</span> lowpass = -1.0f;</div>
 <div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;    <span class="keywordtype">float</span> highpass = -1.0f;</div>
 <div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;</div>
-<div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html" title="The FiffChInfo class provides the channel info descriptor.">FiffChInfo</a> t_chInfo;</div>
+<div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html" title="Channel info descriptor.">FiffChInfo</a> t_chInfo;</div>
 <div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;</div>
-<div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="The FiffCoordTrans class provides the coordinate transformation description.">FiffCoordTrans</a> cand;</div>
-<div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="The FiffCoordTrans class provides the coordinate transformation description.">FiffCoordTrans</a> dev_head_t;</div>
-<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="The FiffCoordTrans class provides the coordinate transformation description.">FiffCoordTrans</a> ctf_head_t;</div>
+<div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="Coordinate transformation description.">FiffCoordTrans</a> cand;</div>
+<div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="Coordinate transformation description.">FiffCoordTrans</a> dev_head_t;</div>
+<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="Coordinate transformation description.">FiffCoordTrans</a> ctf_head_t;</div>
 <div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;</div>
 <div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;    fiff_int_t meas_date[2];</div>
 <div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;    meas_date[0] = -1;</div>
@@ -696,7 +696,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;</div>
 <div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;    QList&lt;FiffDigPoint&gt; dig;<span class="comment">// = struct(&#39;kind&#39;,{},&#39;ident&#39;,{},&#39;r&#39;,{},&#39;coord_frame&#39;,{});</span></div>
 <div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;    fiff_int_t coord_frame = FIFFV_COORD_HEAD;</div>
-<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="The FiffCoordTrans class provides the coordinate transformation description.">FiffCoordTrans</a> dig_trans;</div>
+<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="Coordinate transformation description.">FiffCoordTrans</a> dig_trans;</div>
 <div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;    qint32 k = 0;</div>
 <div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;</div>
 <div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;    <span class="keywordflow">if</span> (isotrak.size() == 1)</div>
@@ -734,7 +734,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;    {</div>
 <div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;        <span class="keywordflow">if</span> (dig_trans.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ab0cacc34492c4e9842e9de5f59368435">from</a> != coord_frame &amp;&amp; dig_trans.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a0d4f29ae5b9affe90e2cfadf922e36f7">to</a> != coord_frame)</div>
 <div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;        {</div>
-<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;            <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="The FiffCoordTrans class provides the coordinate transformation description.">FiffCoordTrans</a> tmpEmptyTrans;</div>
+<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;            <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="Coordinate transformation description.">FiffCoordTrans</a> tmpEmptyTrans;</div>
 <div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;            dig_trans = tmpEmptyTrans; <span class="comment">//clear(&#39;dig_trans&#39;);</span></div>
 <div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;</div>
 <div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;        }</div>
@@ -779,7 +779,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160;    <span class="comment">//   Put the data together</span></div>
 <div class="line"><a name="l00726"></a><span class="lineno">  726</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;    info = <span class="keyword">new</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="The FiffInfo class provides fiff measurement file information.">FiffInfo</a>();</div>
+<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;    info = <span class="keyword">new</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a>();</div>
 <div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;    <span class="keywordflow">if</span> (p_pTree-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a90124c28555f4b58de04f116730b1c59">id</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#ace3ce06929c786230382642f8ef596d3">version</a> != -1)</div>
 <div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;        info-&gt;file_id = p_pTree-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a90124c28555f4b58de04f116730b1c59">id</a>;</div>
 <div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;    <span class="keywordflow">else</span></div>
@@ -872,13 +872,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00817"></a><span class="lineno">  817</span>&#160;</div>
 <div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00819"></a><span class="lineno">  819</span>&#160;</div>
-<div class="line"><a name="l00820"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#afd304b2b94055c851ddb64e42ca12312">  820</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#afd304b2b94055c851ddb64e42ca12312">FiffDirTree::read_named_matrix</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="The FiffFile class provides...">FiffFile</a>* p_pFile, fiff_int_t matkind, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="The FiffNamedMatrix class provides a named matrix.">FiffNamedMatrix</a>*&amp; mat)</div>
+<div class="line"><a name="l00820"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#afd304b2b94055c851ddb64e42ca12312">  820</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#afd304b2b94055c851ddb64e42ca12312">FiffDirTree::read_named_matrix</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a>* p_pFile, fiff_int_t matkind, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="A named matrix.">FiffNamedMatrix</a>*&amp; mat)</div>
 <div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;{</div>
 <div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;    <span class="keywordflow">if</span> (mat != NULL)</div>
 <div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;        <span class="keyword">delete</span> mat;</div>
-<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;    mat = <span class="keyword">new</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="The FiffNamedMatrix class provides a named matrix.">FiffNamedMatrix</a>();</div>
+<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;    mat = <span class="keyword">new</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="A named matrix.">FiffNamedMatrix</a>();</div>
 <div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160;</div>
-<div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="The FiffDirTree class provides...">FiffDirTree</a>* node = <span class="keyword">this</span>;</div>
+<div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a>* node = <span class="keyword">this</span>;</div>
 <div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160;    <span class="comment">//   Descend one level if necessary</span></div>
 <div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160;    <span class="comment">//</span></div>
@@ -912,7 +912,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00857"></a><span class="lineno">  857</span>&#160;        }</div>
 <div class="line"><a name="l00858"></a><span class="lineno">  858</span>&#160;    }</div>
 <div class="line"><a name="l00859"></a><span class="lineno">  859</span>&#160;</div>
-<div class="line"><a name="l00860"></a><span class="lineno">  860</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html">FIFFLIB::FiffTag</a>* t_pTag = NULL;</div>
+<div class="line"><a name="l00860"></a><span class="lineno">  860</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html" title="FIFF data tag.">FIFFLIB::FiffTag</a>* t_pTag = NULL;</div>
 <div class="line"><a name="l00861"></a><span class="lineno">  861</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00862"></a><span class="lineno">  862</span>&#160;    <span class="comment">//   Read everything we need</span></div>
 <div class="line"><a name="l00863"></a><span class="lineno">  863</span>&#160;    <span class="comment">//</span></div>
@@ -966,9 +966,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00911"></a><span class="lineno">  911</span>&#160;</div>
 <div class="line"><a name="l00912"></a><span class="lineno">  912</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00913"></a><span class="lineno">  913</span>&#160;</div>
-<div class="line"><a name="l00914"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ae2f59b2cfb544a13c6f8c5a8d007bbb4">  914</a></span>&#160;QList&lt;FiffProj*&gt; <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ae2f59b2cfb544a13c6f8c5a8d007bbb4">FiffDirTree::read_proj</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="The FiffFile class provides...">FiffFile</a>* p_pFile)</div>
+<div class="line"><a name="l00914"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ae2f59b2cfb544a13c6f8c5a8d007bbb4">  914</a></span>&#160;QList&lt;FiffProj*&gt; <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ae2f59b2cfb544a13c6f8c5a8d007bbb4">FiffDirTree::read_proj</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a>* p_pFile)</div>
 <div class="line"><a name="l00915"></a><span class="lineno">  915</span>&#160;{</div>
-<div class="line"><a name="l00916"></a><span class="lineno">  916</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="The FiffDirTree class provides...">FiffDirTree</a>* p_pNode = <span class="keyword">this</span>;</div>
+<div class="line"><a name="l00916"></a><span class="lineno">  916</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a>* p_pNode = <span class="keyword">this</span>;</div>
 <div class="line"><a name="l00917"></a><span class="lineno">  917</span>&#160;</div>
 <div class="line"><a name="l00918"></a><span class="lineno">  918</span>&#160;    QList&lt;FiffProj*&gt; projdata;<span class="comment">// = struct(&#39;kind&#39;,{},&#39;active&#39;,{},&#39;desc&#39;,{},&#39;data&#39;,{});</span></div>
 <div class="line"><a name="l00919"></a><span class="lineno">  919</span>&#160;    <span class="comment">//</span></div>
@@ -979,7 +979,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00924"></a><span class="lineno">  924</span>&#160;        <span class="keywordflow">return</span> projdata;</div>
 <div class="line"><a name="l00925"></a><span class="lineno">  925</span>&#160;</div>
 <div class="line"><a name="l00926"></a><span class="lineno">  926</span>&#160;</div>
-<div class="line"><a name="l00927"></a><span class="lineno">  927</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html">FIFFLIB::FiffTag</a>* t_pTag = NULL;</div>
+<div class="line"><a name="l00927"></a><span class="lineno">  927</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html" title="FIFF data tag.">FIFFLIB::FiffTag</a>* t_pTag = NULL;</div>
 <div class="line"><a name="l00928"></a><span class="lineno">  928</span>&#160;    t_qListNodes.at(0)-&gt;find_tag(p_pFile, FIFF_NCHAN, t_pTag);</div>
 <div class="line"><a name="l00929"></a><span class="lineno">  929</span>&#160;    fiff_int_t global_nchan;</div>
 <div class="line"><a name="l00930"></a><span class="lineno">  930</span>&#160;    <span class="keywordflow">if</span> (t_pTag)</div>
@@ -993,7 +993,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00938"></a><span class="lineno">  938</span>&#160;        <span class="comment">//</span></div>
 <div class="line"><a name="l00939"></a><span class="lineno">  939</span>&#160;        <span class="comment">//   Find all desired tags in one item</span></div>
 <div class="line"><a name="l00940"></a><span class="lineno">  940</span>&#160;        <span class="comment">//</span></div>
-<div class="line"><a name="l00941"></a><span class="lineno">  941</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="The FiffDirTree class provides...">FiffDirTree</a>* t_pFiffDirTreeItem = t_qListItems[i];</div>
+<div class="line"><a name="l00941"></a><span class="lineno">  941</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a>* t_pFiffDirTreeItem = t_qListItems[i];</div>
 <div class="line"><a name="l00942"></a><span class="lineno">  942</span>&#160;        t_pFiffDirTreeItem-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#af8a6db62d2b101a07d4fa3e85d9b148f">find_tag</a>(p_pFile, FIFF_NCHAN, t_pTag);</div>
 <div class="line"><a name="l00943"></a><span class="lineno">  943</span>&#160;        <span class="keywordflow">if</span> (t_pTag)</div>
 <div class="line"><a name="l00944"></a><span class="lineno">  944</span>&#160;            nchan = *t_pTag-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a88f8094d1f3b876708bd3d5779a30a49">toInt</a>();</div>
@@ -1092,9 +1092,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l01037"></a><span class="lineno"> 1037</span>&#160;        <span class="comment">//   create a named matrix for the data</span></div>
 <div class="line"><a name="l01038"></a><span class="lineno"> 1038</span>&#160;        <span class="comment">//</span></div>
 <div class="line"><a name="l01039"></a><span class="lineno"> 1039</span>&#160;        QStringList defaultList;</div>
-<div class="line"><a name="l01040"></a><span class="lineno"> 1040</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="The FiffNamedMatrix class provides a named matrix.">FiffNamedMatrix</a>* t_fiffNamedMatrix = <span class="keyword">new</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="The FiffNamedMatrix class provides a named matrix.">FiffNamedMatrix</a>(nvec, nchan, defaultList, names, data);</div>
+<div class="line"><a name="l01040"></a><span class="lineno"> 1040</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="A named matrix.">FiffNamedMatrix</a>* t_fiffNamedMatrix = <span class="keyword">new</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="A named matrix.">FiffNamedMatrix</a>(nvec, nchan, defaultList, names, data);</div>
 <div class="line"><a name="l01041"></a><span class="lineno"> 1041</span>&#160;</div>
-<div class="line"><a name="l01042"></a><span class="lineno"> 1042</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html" title="The FiffProj class provides SSP projector data.">FiffProj</a>* one = <span class="keyword">new</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html" title="The FiffProj class provides SSP projector data.">FiffProj</a>(kind, active, desc, t_fiffNamedMatrix);</div>
+<div class="line"><a name="l01042"></a><span class="lineno"> 1042</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html" title="SSP projector data.">FiffProj</a>* one = <span class="keyword">new</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html" title="SSP projector data.">FiffProj</a>(kind, active, desc, t_fiffNamedMatrix);</div>
 <div class="line"><a name="l01043"></a><span class="lineno"> 1043</span>&#160;        <span class="comment">//</span></div>
 <div class="line"><a name="l01044"></a><span class="lineno"> 1044</span>&#160;        projdata.append(one);</div>
 <div class="line"><a name="l01045"></a><span class="lineno"> 1045</span>&#160;    }</div>
@@ -1120,7 +1120,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Oct 2 2012 23:55:41 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Oct 3 2012 15:45:05 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

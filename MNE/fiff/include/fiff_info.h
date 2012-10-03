@@ -76,9 +76,9 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FiffInfo
+* Provides fiff measurement file information
 *
-* @brief The FiffInfo class provides fiff measurement file information
+* @brief FIFF measurement file information
 */
 class FIFFSHARED_EXPORT FiffInfo {
 

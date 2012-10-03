@@ -77,15 +77,9 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FiffNamedMatrix
+* A matrix with named rows and cols. ToDo: derive this from Eigen::Matrix
 *
-* @brief The FiffNamedMatrix class provides a named matrix
-*/
-
-/**
-* FIFF data tag
-*
-*
+* @brief A named matrix
 */
 class FIFFSHARED_EXPORT FiffNamedMatrix {
 

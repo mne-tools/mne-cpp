@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['fiff',['Fiff',['../class_f_i_f_f_l_i_b_1_1_fiff.html#aa6540379901b8f54fdcb29e6c7c60026',1,'FIFFLIB::Fiff']]],
   ['fiffchinfo',['FiffChInfo',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a69742331b0d3364e7ac8ace4b754633a',1,'FIFFLIB::FiffChInfo']]],
   ['fiffchpos',['FiffChPos',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#ac369673a0bb46850d867e0f683c969fd',1,'FIFFLIB::FiffChPos']]],
   ['fiffcoordtrans',['FiffCoordTrans',['../class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a76eeba5b0c9c6bf9f8fb7df9eaa8dbb5',1,'FIFFLIB::FiffCoordTrans']]],
@@ -18,5 +17,5 @@ var searchData=
   ['fifftag',['FiffTag',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#ac69c9131fa8d307bac69034785079407',1,'FIFFLIB::FiffTag']]],
   ['find_5fsource_5fspace_5fhemi',['find_source_space_hemi',['../class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a73b850bc44b6c1903e5fdac82f9e5189',1,'MNELIB::MNESourceSpace::find_source_space_hemi()'],['../class_m_n_e_l_i_b_1_1_m_n_e.html#aeb29bbc5770f5a6b24dce376ef7c0285',1,'MNELIB::MNE::find_source_space_hemi()']]],
   ['find_5ftag',['find_tag',['../class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#af8a6db62d2b101a07d4fa3e85d9b148f',1,'FIFFLIB::FiffDirTree']]],
-  ['finish_5fwriting_5fraw',['finish_writing_raw',['../class_f_i_f_f_l_i_b_1_1_fiff_file.html#a307d08ce06d35a65543ef3506d9be863',1,'FIFFLIB::FiffFile']]]
+  ['finish_5fwriting_5fraw',['finish_writing_raw',['../class_f_i_f_f_l_i_b_1_1_fiff.html#a851de614a99c6dc752fc04c9ba031bad',1,'FIFFLIB::Fiff::finish_writing_raw()'],['../class_f_i_f_f_l_i_b_1_1_fiff_file.html#a307d08ce06d35a65543ef3506d9be863',1,'FIFFLIB::FiffFile::finish_writing_raw()']]]
 ];

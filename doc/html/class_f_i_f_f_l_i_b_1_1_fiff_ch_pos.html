@@ -95,7 +95,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>The <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html" title="The FiffChPos class provides the channel info descriptor.">FiffChPos</a> class provides the channel info descriptor.  
+<p>Coil position.  
  <a href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="fiff__ch__pos_8h_source.html">fiff_ch_pos.h</a>&gt;</code></p>
@@ -126,14 +126,10 @@ Public Attributes</h2></td></tr>
 <tr class="separator:aee3694181745e0a287bee5d4535ea774"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html" title="The FiffChPos class provides the channel info descriptor.">FiffChPos</a> class provides the channel info descriptor. </p>
-<p>DECLARE CLASS <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html" title="The FiffChPos class provides the channel info descriptor.">FiffChPos</a></p>
-<p>Channel Info descriptor</p>
-<p>/** Measurement channel position and coil type. *</p>
-<p>typedef struct _fiffChPosRec { fiff_int_t coil_type; /**&lt; What kind of coil. * fiff_float_t r0[3]; /**&lt; Coil coordinate system origin * fiff_float_t ex[3]; /**&lt; Coil coordinate system x-axis unit vector * fiff_float_t ey[3]; /**&lt; Coil coordinate system y-axis unit vector * fiff_float_t ez[3]; /**&lt; Coil coordinate system z-axis unit vector * } fiffChPosRec,*fiffChPos; /**&lt; Measurement channel position and coil type *</p>
-<p>typedef fiffChPosRec fiff_ch_pos_t; </p>
+<div class="textblock"><p>Coil position. </p>
+<p>Coil position description replaces _fiffChPosRec struct. </p>
 
-<p>Definition at line <a class="el" href="fiff__ch__pos_8h_source.html#l00082">82</a> of file <a class="el" href="fiff__ch__pos_8h_source.html">fiff_ch_pos.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__ch__pos_8h_source.html#l00068">68</a> of file <a class="el" href="fiff__ch__pos_8h_source.html">fiff_ch_pos.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="ac369673a0bb46850d867e0f683c969fd"></a>
 <div class="memitem">
@@ -165,7 +161,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Destroys the FiffChInfoRec. </p>
+<p>Destroys the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html" title="Coil position.">FiffChPos</a>. </p>
 
 <p>Definition at line <a class="el" href="fiff__ch__pos_8cpp_source.html#l00069">69</a> of file <a class="el" href="fiff__ch__pos_8cpp_source.html">fiff_ch_pos.cpp</a>.</p>
 
@@ -192,10 +188,10 @@ Public Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Size of the old struct (fiffChInfoRec) 13*int = 13*4 = 52</p>
-<dl class="section return"><dt>Returns</dt><dd>the size of the old struct fiffChInfoRec. </dd></dl>
+<p>Size of the old struct (fiffChPosRec) 13*int = 13*4 = 52</p>
+<dl class="section return"><dt>Returns</dt><dd>the size of the old struct fiffChPosRec. </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__ch__pos_8h_source.html#l00119">119</a> of file <a class="el" href="fiff__ch__pos_8h_source.html">fiff_ch_pos.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__ch__pos_8h_source.html#l00117">117</a> of file <a class="el" href="fiff__ch__pos_8h_source.html">fiff_ch_pos.h</a>.</p>
 
 </div>
 </div>
@@ -209,9 +205,9 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>What kind of coil. </p>
+<p>The kind of the coil. </p>
 
-<p>Definition at line <a class="el" href="fiff__ch__pos_8h_source.html#l00106">106</a> of file <a class="el" href="fiff__ch__pos_8h_source.html">fiff_ch_pos.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__ch__pos_8h_source.html#l00092">92</a> of file <a class="el" href="fiff__ch__pos_8h_source.html">fiff_ch_pos.h</a>.</p>
 
 </div>
 </div>
@@ -226,7 +222,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Coil coordinate system x-axis unit vector </p>
 
-<p>Definition at line <a class="el" href="fiff__ch__pos_8h_source.html#l00108">108</a> of file <a class="el" href="fiff__ch__pos_8h_source.html">fiff_ch_pos.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__ch__pos_8h_source.html#l00094">94</a> of file <a class="el" href="fiff__ch__pos_8h_source.html">fiff_ch_pos.h</a>.</p>
 
 </div>
 </div>
@@ -241,7 +237,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Coil coordinate system y-axis unit vector </p>
 
-<p>Definition at line <a class="el" href="fiff__ch__pos_8h_source.html#l00109">109</a> of file <a class="el" href="fiff__ch__pos_8h_source.html">fiff_ch_pos.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__ch__pos_8h_source.html#l00095">95</a> of file <a class="el" href="fiff__ch__pos_8h_source.html">fiff_ch_pos.h</a>.</p>
 
 </div>
 </div>
@@ -256,7 +252,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Coil coordinate system z-axis unit vector </p>
 
-<p>Definition at line <a class="el" href="fiff__ch__pos_8h_source.html#l00110">110</a> of file <a class="el" href="fiff__ch__pos_8h_source.html">fiff_ch_pos.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__ch__pos_8h_source.html#l00096">96</a> of file <a class="el" href="fiff__ch__pos_8h_source.html">fiff_ch_pos.h</a>.</p>
 
 </div>
 </div>
@@ -271,7 +267,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Coil coordinate system origin </p>
 
-<p>Definition at line <a class="el" href="fiff__ch__pos_8h_source.html#l00107">107</a> of file <a class="el" href="fiff__ch__pos_8h_source.html">fiff_ch_pos.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__ch__pos_8h_source.html#l00093">93</a> of file <a class="el" href="fiff__ch__pos_8h_source.html">fiff_ch_pos.h</a>.</p>
 
 </div>
 </div>
@@ -282,7 +278,7 @@ Public Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Oct 2 2012 23:55:41 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Oct 3 2012 15:45:05 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

@@ -94,7 +94,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>The <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html" title="The FiffRawData class provides.">FiffRawData</a> class provides.  
+<p>FIFF raw measurement data.  
  <a href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="fiff__raw__data_8h_source.html">fiff_raw_data.h</a>&gt;</code></p>
@@ -136,10 +136,10 @@ QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html">FiffRaw
 <tr class="separator:adbe4741e8ec3c9438da36e627995ef1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html" title="The FiffRawData class provides.">FiffRawData</a> class provides. </p>
-<p>DECLARE CLASS <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html" title="The FiffRawData class provides.">FiffRawData</a> </p>
+<div class="textblock"><p>FIFF raw measurement data. </p>
+<p>*Provides fiff raw measurement data, including I/O routines. </p>
 
-<p>Definition at line <a class="el" href="fiff__raw__data_8h_source.html#l00104">104</a> of file <a class="el" href="fiff__raw__data_8h_source.html">fiff_raw_data.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__raw__data_8h_source.html#l00102">102</a> of file <a class="el" href="fiff__raw__data_8h_source.html">fiff_raw_data.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="ac4f5bbd43f8eea9c61fdcd2e3556bd73"></a>
 <div class="memitem">
@@ -171,7 +171,7 @@ QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html">FiffRaw
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Destroys the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="The FiffInfo class provides fiff measurement file information.">FiffInfo</a>. </p>
+<p>Destroys the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a>. </p>
 
 <p>Definition at line <a class="el" href="fiff__raw__data_8cpp_source.html#l00067">67</a> of file <a class="el" href="fiff__raw__data_8cpp_source.html">fiff_raw_data.cpp</a>.</p>
 
@@ -219,12 +219,19 @@ QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html">FiffRaw
         </tr>
       </table>
 </div><div class="memdoc">
-<p>ToDo make this part of <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html" title="The FiffRawData class provides.">FiffRawData</a></p>
-<p>fiff_read_raw_segment</p>
-<p>[data,times] = fiff_read_raw_segment(raw,from,to,sel)</p>
+<h3>MNE toolbox root function ###: Implementation of the fiff_read_raw_segment function</h3>
 <p>Read a specific raw data segment</p>
-<p>raw - structure returned by fiff_setup_read_raw from - first sample to include. If omitted, defaults to the first sample in data to - last sample to include. If omitted, defaults to the last sample in data sel - optional channel selection vector</p>
-<p>data - returns the data matrix (channels x samples) times - returns the time values corresponding to the samples (optional) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">data</td><td>returns the data matrix (channels x samples) </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">times</td><td>returns the time values corresponding to the samples </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">from</td><td>first sample to include. If omitted, defaults to the first sample in data (optional) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">to</td><td>last sample to include. If omitted, defaults to the last sample in data (optional) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">sel</td><td>channel selection vector (optional)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
 <p>Definition at line <a class="el" href="fiff__raw__data_8cpp_source.html#l00077">77</a> of file <a class="el" href="fiff__raw__data_8cpp_source.html">fiff_raw_data.cpp</a>.</p>
 
@@ -237,7 +244,7 @@ QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html">FiffRaw
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Oct 2 2012 23:55:41 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Oct 3 2012 15:45:05 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

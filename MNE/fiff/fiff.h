@@ -30,7 +30,8 @@
 *
 *
 * @brief    Contains the FIFF class declaration, which provides static wrapper functions to stay consistent
-*           with mne matlab toolbox
+*           with mne matlab toolbox - Note: avoid using the wrappers, prefer the wrapped methods! Its
+*           sufficient to include this header to have access to all Fiff classes.
 *
 */
 
@@ -111,25 +112,93 @@ using namespace Eigen;
 /**
 * DECLARE CLASS Fiff
 *
-* @brief The Fiff class provides...
+* @brief The Fiff class provides static wrapper functions to stay consistent with mne matlab toolbox
+*        Note: avoid using the wrappers, prefer the wrapped methods!
 */
 class FIFFSHARED_EXPORT Fiff
 {
 public:
     //=========================================================================================================
     /**
-    * ctor
+    * dtor
     */
-    Fiff();
+    virtual ~Fiff(){ }
+
+    //Alphabetic ordered MNE Toolbox fiff_function
 
     //=========================================================================================================
     /**
-    * dtor
+    * fiff_copy_tree
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the static FiffDirTree::copy_tree function
+    *
+    * Copies directory subtrees from fidin to fidout
+    *
+    * @param[in] fidin fiff file to copy from
+    * @param[in] in_id file id description
+    * @param[out] nodes subtree directories to be copied
+    * @param[in] fidout fiff file to write to
+    *
+    * @return true if succeeded, false otherwise
     */
-    ~Fiff()
-    { }
+    static inline bool copy_tree(FiffFile* fidin, FiffId& in_id, QList<FiffDirTree*>& nodes, FiffFile* fidout)
+    {
+        return FiffDirTree::copy_tree(fidin, in_id, nodes, fidout);
+    }
 
-    //Alphabetic ordered MNE Toolbox fiff_function
+    //=========================================================================================================
+    /**
+    * fiff_end_block
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffFile end_block member function
+    *
+    * Writes a FIFF_BLOCK_END tag
+    *
+    * @param[in] p_pFile the opened fiff file
+    * @param[in] kind The block kind to end
+    */
+    void end_block(FiffFile* p_pFile, fiff_int_t kind)
+    {
+        p_pFile->end_block(kind);
+    }
+
+    //=========================================================================================================
+    /**
+    * fiff_end_file
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffFile end_file member function
+    *
+    * Writes the closing tags to a fif file and closes the file
+    *
+    * @param[in] p_pFile the opened fiff file
+    */
+    void end_file(FiffFile* p_pFile)
+    {
+        p_pFile->end_file();
+    }
+
+    //=========================================================================================================
+    /**
+    * fiff_finish_writing_raw
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffFile finish_writing_raw member function
+    *
+    * Finishes a raw file by writing all necessary end tags.
+    *
+    * @param[in] p_pFile the opened fiff file
+    */
+    void finish_writing_raw(FiffFile* p_pFile)
+    {
+        p_pFile->finish_writing_raw();
+    }
 
 
     //=========================================================================================================
@@ -158,7 +227,7 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffCoordTrans::invert_transform static function
+    * Wrapper for the static FiffCoordTrans::invert_transform function
     *
     * Invert a coordinate transformation
     *
@@ -342,29 +411,27 @@ public:
     */
     static inline QList<FiffProj*>read_proj(FiffFile* p_pFile, FiffDirTree* p_pNode)
     {
-        return p_pNode-> read_proj(p_pFile);
+        return p_pNode->read_proj(p_pFile);
     }
 
     //=========================================================================================================
     /**
-    * ToDo make this part of FiffRawData
-    *
     * fiff_read_raw_segment
     *
-    * [data,times] = fiff_read_raw_segment(raw,from,to,sel)
+    * ### MNE toolbox root function ###: Implementation of the fiff_read_raw_segment function
+    *
+    * Wrapper for the FiffRawData read_raw_segment member function
     *
     * Read a specific raw data segment
     *
-    * raw    - structure returned by fiff_setup_read_raw
-    * from   - first sample to include. If omitted, defaults to the
-    *          first sample in data
-    * to     - last sample to include. If omitted, defaults to the last
-    *          sample in data
-    * sel    - optional channel selection vector
+    * @param[in] raw        structure returned by fiff_setup_read_raw
+    * @param[out] data      returns the data matrix (channels x samples)
+    * @param[out] times     returns the time values corresponding to the samples
+    * @param[in] from       first sample to include. If omitted, defaults to the first sample in data (optional)
+    * @param[in] to         last sample to include. If omitted, defaults to the last sample in data (optional)
+    * @param[in] sel        channel selection vector (optional)
     *
-    * data   - returns the data matrix (channels x samples)
-    * times  - returns the time values corresponding to the samples (optional)
-    *
+    * @return true if succeeded, false otherwise
     */
     inline static bool read_raw_segment(FiffRawData* raw, MatrixXf*& data, MatrixXf*& times, fiff_int_t from = -1, fiff_int_t to = -1, MatrixXi sel = defaultMatrixXi)
     {

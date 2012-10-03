@@ -72,22 +72,9 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FiffCoordTrans, replaces fiffCoordTransRec which had a size of 104
+* Replaces fiffCoordTransRec which had a size of 104
 *
-* Coordinate transformation descriptor
-*
-* typedef struct _fiffCoordTransRec {
-*  fiff_int_t   from;                    /< Source coordinate system. /
-*  fiff_int_t   to;                      /< Destination coordinate system. /
-*  fiff_float_t rot[3][3];               /< The forward transform (rotation part) /
-*  fiff_float_t move[3];                 /< The forward transform (translation part) /
-*  fiff_float_t invrot[3][3];            /< The inverse transform (rotation part) /
-*  fiff_float_t invmove[3];              /< The inverse transform (translation part) /
-* } *fiffCoordTrans, fiffCoordTransRec;  /< Coordinate transformation descriptor /
-*
-* typedef fiffCoordTransRec fiff_coord_trans_t;
-*
-* @brief The FiffCoordTrans class provides the coordinate transformation description
+* @brief Coordinate transformation description.
 */
 class FIFFSHARED_EXPORT FiffCoordTrans {
 
@@ -135,6 +122,18 @@ public:
     Matrix<float, 4,4, DontAlign>   trans;      /**< The forward transform */
     Matrix<float, 4,4, DontAlign>   invtrans;   /**< The inverse transform */
 
+// Coordinate transformation descriptor
+
+// typedef struct _fiffCoordTransRec {
+//  fiff_int_t   from;                    /< Source coordinate system. /
+//  fiff_int_t   to;                      /< Destination coordinate system. /
+//  fiff_float_t rot[3][3];               /< The forward transform (rotation part) /
+//  fiff_float_t move[3];                 /< The forward transform (translation part) /
+//  fiff_float_t invrot[3][3];            /< The inverse transform (rotation part) /
+//  fiff_float_t invmove[3];              /< The inverse transform (translation part) /
+// } *fiffCoordTrans, fiffCoordTransRec;  /< Coordinate transformation descriptor /
+
+// typedef fiffCoordTransRec fiff_coord_trans_t;
 };
 
 

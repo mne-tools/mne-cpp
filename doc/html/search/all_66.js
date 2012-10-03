@@ -1,7 +1,6 @@
 var searchData=
 [
   ['fiff',['Fiff',['../class_f_i_f_f_l_i_b_1_1_fiff.html',1,'FIFFLIB']]],
-  ['fiff',['Fiff',['../class_f_i_f_f_l_i_b_1_1_fiff.html#aa6540379901b8f54fdcb29e6c7c60026',1,'FIFFLIB::Fiff']]],
   ['fiff_2ecpp',['fiff.cpp',['../fiff_8cpp.html',1,'']]],
   ['fiff_2eh',['fiff.h',['../fiff_8h.html',1,'']]],
   ['fiff_5fch_5finfo_2ecpp',['fiff_ch_info.cpp',['../fiff__ch__info_8cpp.html',1,'']]],
@@ -113,8 +112,8 @@ var searchData=
   ['fiffnamedmatrix',['FiffNamedMatrix',['../class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#aab914e6cfc84dc9dffe1773de5750893',1,'FIFFLIB::FiffNamedMatrix::FiffNamedMatrix()'],['../class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#a64b82bffa0baa637eba38ebc51a15637',1,'FIFFLIB::FiffNamedMatrix::FiffNamedMatrix(fiff_int_t p_nrow, fiff_int_t p_ncol, QStringList &amp;p_row_names, QStringList &amp;p_col_names, MatrixXf &amp;p_data)'],['../class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#aa9ee985cf70aba691e5969bc8001b341',1,'FIFFLIB::FiffNamedMatrix::FiffNamedMatrix(const FiffNamedMatrix *p_pFiffNamedMatrix)']]],
   ['fiffproj',['FiffProj',['../class_f_i_f_f_l_i_b_1_1_fiff_proj.html',1,'FIFFLIB']]],
   ['fiffproj',['FiffProj',['../class_f_i_f_f_l_i_b_1_1_fiff_proj.html#a8697939307d08cb52238f987d2a6da15',1,'FIFFLIB::FiffProj::FiffProj()'],['../class_f_i_f_f_l_i_b_1_1_fiff_proj.html#a90196c21c94098daefaecad65273459a',1,'FIFFLIB::FiffProj::FiffProj(fiff_int_t p_kind, bool p_active, QString p_desc, FiffNamedMatrix *p_data)']]],
-  ['fiffrawdata',['FiffRawData',['../class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#ac4f5bbd43f8eea9c61fdcd2e3556bd73',1,'FIFFLIB::FiffRawData']]],
   ['fiffrawdata',['FiffRawData',['../class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html',1,'FIFFLIB']]],
+  ['fiffrawdata',['FiffRawData',['../class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#ac4f5bbd43f8eea9c61fdcd2e3556bd73',1,'FIFFLIB::FiffRawData']]],
   ['fiffrawdir',['FiffRawDir',['../class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a4560401eb9389bac6d7f5c5977f205e2',1,'FIFFLIB::FiffRawDir']]],
   ['fiffrawdir',['FiffRawDir',['../class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html',1,'FIFFLIB']]],
   ['fifftag',['FiffTag',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html',1,'FIFFLIB']]],
@@ -181,7 +180,7 @@ var searchData=
   ['fiffv_5fxfit_5fmap_5fsurf_5fsphere',['FIFFV_XFIT_MAP_SURF_SPHERE',['../fiff__constants_8h.html#a1a40d2a550fec9643cb3040bdb3a3541',1,'fiff_constants.h']]],
   ['find_5fsource_5fspace_5fhemi',['find_source_space_hemi',['../class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a73b850bc44b6c1903e5fdac82f9e5189',1,'MNELIB::MNESourceSpace::find_source_space_hemi()'],['../class_m_n_e_l_i_b_1_1_m_n_e.html#aeb29bbc5770f5a6b24dce376ef7c0285',1,'MNELIB::MNE::find_source_space_hemi()']]],
   ['find_5ftag',['find_tag',['../class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#af8a6db62d2b101a07d4fa3e85d9b148f',1,'FIFFLIB::FiffDirTree']]],
-  ['finish_5fwriting_5fraw',['finish_writing_raw',['../class_f_i_f_f_l_i_b_1_1_fiff_file.html#a307d08ce06d35a65543ef3506d9be863',1,'FIFFLIB::FiffFile']]],
+  ['finish_5fwriting_5fraw',['finish_writing_raw',['../class_f_i_f_f_l_i_b_1_1_fiff.html#a851de614a99c6dc752fc04c9ba031bad',1,'FIFFLIB::Fiff::finish_writing_raw()'],['../class_f_i_f_f_l_i_b_1_1_fiff_file.html#a307d08ce06d35a65543ef3506d9be863',1,'FIFFLIB::FiffFile::finish_writing_raw()']]],
   ['from',['from',['../class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ab0cacc34492c4e9842e9de5f59368435',1,'FIFFLIB::FiffCoordTrans']]],
   ['from_5fmask',['from_mask',['../struct_f_i_f_f_l_i_b_1_1__fiff__event__bits.html#ab8309cb4a5200fea31c252016778cb82',1,'FIFFLIB::_fiff_event_bits']]],
   ['from_5fstate',['from_state',['../struct_f_i_f_f_l_i_b_1_1__fiff__event__bits.html#ad80a99b8f5f3f33f1f54864a33eb38e0',1,'FIFFLIB::_fiff_event_bits']]]
