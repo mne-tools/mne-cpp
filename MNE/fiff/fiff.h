@@ -131,6 +131,7 @@ public:
 
     //Alphabetic ordered MNE Toolbox fiff_function
 
+
     //=========================================================================================================
     /**
     * fiff_dir_tree_find
@@ -176,7 +177,14 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffCoordTrans::invert_transform static function
+    * Wrapper for the FiffCoordTrans::make_dir_tree static function
+    *
+    * @param[in] p_pFile the opened fiff file
+    * @param[in] p_pDir the dir entries of which the tree should be constructed
+    * @param[out] p_pTree the created dir tree
+    * @param[in] start dir entry to start (optional, by default 0)
+    *
+    * @return index of the last read dir entry
     */
     static inline qint32 make_dir_tree(FiffFile* p_pFile, QList<FiffDirEntry>* p_pDir, FiffDirTree*& p_pTree, qint32 start = 0)
     {
