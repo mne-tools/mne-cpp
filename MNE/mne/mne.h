@@ -59,6 +59,14 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QMap>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // DEFINE NAMESPACE MNELIB
 //=============================================================================================================
 
@@ -91,17 +99,12 @@ class MNESHARED_EXPORT MNE
 {
 
 public:
-    //=========================================================================================================
-    /**
-    * ctor
-    */
-    MNE();
 
     //=========================================================================================================
     /**
     * dtor
     */
-    ~MNE()
+    virtual ~MNE()
     { }
 
 
@@ -139,6 +142,247 @@ public:
         return MNEForwardSolution::make_block_diag(A, n);
 
     }
+
+
+    //=========================================================================================================
+    /**
+    * mne_make_projector_info
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Make a SSP operator using the meas info
+    *
+    * @param[in] info A Matrix which should be diagonlized
+    *
+    * @return
+    */
+    static qint32 make_projector_info(FiffInfo* info)
+    {
+
+//        [ proj, nproj ] = mne_make_projector(info.projs,info.ch_names,info.bads);
+
+        return MNE::make_projector(info->projs,info->ch_names,info->bads);
+
+    }
+
+
+
+
+
+
+    /**
+    * mne_make_projector
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Make a SSP operator using the meas info
+    *
+    * @param[in] info A Matrix which should be diagonlized
+    *
+    * @return
+    */
+
+
+
+
+
+
+//    %
+//    % [proj,nproj,U] = mne_make_projector(projs,ch_names,bads)
+//    %
+//    % proj     - The projection operator to apply to the data
+//    % nproj    - How many items in the projector
+//    % U        - The orthogonal basis of the projection vectors (optional)
+//    %
+//    % Make an SSP operator
+//    %
+//    % projs    - A set of projection vectors
+//    % ch_names - A cell array of channel names
+//    % bads     - Bad channels to exclude
+//    %
+
+//    function [proj,nproj,U] =
+
+
+    static fiff_int_t make_projector(QList<FiffProj*>& projs, QStringList& ch_names, QStringList& bads = defaultQStringList)
+    {
+        fiff_int_t nchan = ch_names.size();
+        if (nchan == 0)
+        {
+            printf("No channel names specified\n");
+            return -1;
+        }
+
+        MatrixXf proj = MatrixXf::Identity(nchan,nchan);
+        fiff_int_t nproj = 0;
+//        U     = [];
+        //
+        //   Check trivial cases first
+        //
+        if (projs.size() == 0)
+            return -1;
+
+        fiff_int_t nactive = 0;
+        fiff_int_t nvec    = 0;
+        fiff_int_t k, l;
+        for (k = 0; k < projs.size(); ++k)
+        {
+            if (projs[k]->active)
+            {
+                ++nactive;
+                nvec += projs[k]->data->nrow;
+            }
+        }
+
+        if (nactive == 0)
+            return -1;
+
+        //
+        //   Pick the appropriate entries
+        //
+        MatrixXf vecs = MatrixXf::Zero(nchan,nvec);
+        nvec = 0;
+        fiff_int_t nonzero = 0;
+        for (k = 0; k < projs.size(); ++k)
+        {
+            if (projs[k]->active)
+            {
+                FiffProj* one = projs[k];
+//                sel = [];
+//                vecsel = [];
+
+                QMap<QString, int> uniqueMap;
+                for(l = 0; l < one->data->col_names.size(); ++l)
+                    uniqueMap[one->data->col_names[l] ] = 0;
+
+                if (one->data->col_names.size() != uniqueMap.keys().size())
+                {
+                    printf("Channel name list in projection item %d contains duplicate items");
+                    return -1;
+                }
+
+//                //
+//                // Get the two selection vectors to pick correct elements from
+//                // the projection vectors omitting bad channels
+//                //
+//                p = 0;
+//                for c = 1:nchan
+//                    match = strmatch(ch_names{c},one.data.col_names);
+//                    if ~isempty(match) && isempty(strmatch(ch_names{c},bads))
+//                        p = p + 1;
+//                        sel(p)    = c;
+//                        vecsel(p) = match(1);
+//                    end
+//                end
+//                //
+//                // If there is something to pick, pickit
+//                //
+//                if ~isempty(sel)
+//                    for v = 1:one.data.nrow
+//                        vecs(sel,nvec+v) = one.data.data(v,vecsel)';
+//                    end
+//                    %
+//                    %   Rescale for more straightforward detection of small singular values
+//                    %
+//                    for v = 1:one.data.nrow
+//                        onesize = sqrt(vecs(:,nvec+v)'*vecs(:,nvec+v));
+//                        if onesize > 0
+//                            vecs(:,nvec+v) = vecs(:,nvec+v)/onesize;
+//                            nonzero = nonzero + 1;
+//                        end
+//                    end
+//                    nvec = nvec + one.data.nrow;
+//                end
+            }
+        }
+//        //
+//        //   Check whether all of the vectors are exactly zero
+//        //
+//        if nonzero == 0
+//            return;
+
+//        %
+//        %   Reorthogonalize the vectors
+//        %
+//        [U,S,V] = svd(vecs(:,1:nvec),0);
+//        S = diag(S);
+//        %
+//        %   Throw away the linearly dependent guys
+//        %
+//        for k = 1:nvec
+//            if S(k)/S(1) < 1e-2
+//                nvec = k;
+//                break;
+//            end
+//        end
+//        U = U(:,1:nvec);
+//        %
+//        %   Here is the celebrated result
+//        %
+//        proj  = proj - U*U';
+        nproj = nvec;
+
+        return nproj;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     //=========================================================================================================
     /**

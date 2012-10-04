@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     examples.pro
+# @file     readRaw.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,17 +29,34 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds all examples of the mne-cpp project.
+# @brief    ToDo Documentation...
 #
 #--------------------------------------------------------------------------------------------------------------
 
 
-TEMPLATE = subdirs
+TEMPLATE = app
 
-SUBDIRS += \
-    readRaw \
-    readWriteRaw \
-    readFwd \
-    readFwdDisp
+QT += core
+QT -= gui
 
-CONFIG += ordered
+
+CONFIG   += console
+CONFIG   -= app_bundle
+
+CONFIG(debug, debug|release) {
+    TARGET = readRawd
+    LIBS += -L$$PWD/../../lib/ -lmned
+    LIBS += -L$$PWD/../../lib/ -lfiffd
+    DESTDIR = $$PWD/../../bin
+}
+else {
+    TARGET = readRaw
+    LIBS += -L$$PWD/../../lib/ -lmne
+    LIBS += -L$$PWD/../../lib/ -lfiff
+    DESTDIR = $$PWD/../../bin
+}
+
+SOURCES += \
+    src/main.cpp \
+
+HEADERS += \
