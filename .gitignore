@@ -1,3 +1,16 @@
+/bin/readFwd
+/bin/readFwdDisp
+/bin/readRaw
+/bin/readWriteRaw
+/lib/libdisp.so.1
+/lib/libdisp.so.1.0
+/lib/libdisp.so.1.0.0
+/lib/libfiff.so.1
+/lib/libfiff.so.1.0
+/lib/libfiff.so.1.0.0
+/lib/libmne.so.1
+/lib/libmne.so.1.0
+/lib/libmne.so.1.0.0
 # Compiled Object files
 *.slo
 *.lo
