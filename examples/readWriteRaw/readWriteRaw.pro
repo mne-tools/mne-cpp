@@ -38,6 +38,8 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
+VERSION = $${MNE_CPP_VERSION}
+
 QT += core
 QT -= gui
 

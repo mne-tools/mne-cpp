@@ -50,7 +50,6 @@ CONFIG(debug, debug|release) {
 
 win32:QMAKE_POST_LINK += $${QMAKE_COPY} "..\\..\\..\\mne-cpp\\lib\\$${TARGET}.dll" "..\\..\\..\\mne-cpp\\bin\\"
 DESTDIR = $${PWD}/../../lib
-DESTDIR = $${PWD}/../../lib
 
 CONFIG(debug, debug|release) {
     LIBS += -L$${PWD}/../../lib/ -lfiffd

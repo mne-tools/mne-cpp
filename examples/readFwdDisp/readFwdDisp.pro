@@ -37,6 +37,8 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
+VERSION = $${MNE_CPP_VERSION}
+
 QT       += 3d
 QT       += core
 QT       -= gui
