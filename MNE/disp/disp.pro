@@ -33,6 +33,8 @@
 #
 #--------------------------------------------------------------------------------------------------------------
 
+include(../../mne-cpp.pri)
+
 TEMPLATE = lib
 
 QT       += 3d
@@ -41,24 +43,30 @@ QT       -= gui
 
 DEFINES += DISP_LIBRARY
 
+TARGET = disp
+
 CONFIG(debug, debug|release) {
-    TARGET = dispd
-    DESTDIR = $$PWD/../../lib
-    LIBS += -L$$PWD/../../lib/ -lfiffd
-    LIBS += -L$$PWD/../../lib/ -lmned
-    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\..\\mne-cpp\\lib\\dispd.dll" "..\\..\\..\\mne-cpp\\bin\\"
-}
-else {
-    TARGET = disp
-    DESTDIR = $$PWD/../../lib
-    LIBS += -L$$PWD/../../lib/ -lfiff
-    LIBS += -L$$PWD/../../lib/ -lmne
-    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\..\\mne-cpp\\lib\\disp.dll" "..\\..\\..\\mne-cpp\\bin\\"
+    TARGET = $$join(TARGET,,,d)
 }
 
+win32:QMAKE_POST_LINK += $${QMAKE_COPY} "..\\..\\..\\mne-cpp\\lib\\$${TARGET}.dll" "..\\..\\..\\mne-cpp\\bin\\"
+DESTDIR = $${PWD}/../../lib
+
+CONFIG(debug, debug|release) {
+    LIBS += -L$${PWD}/../../lib/ -lfiffd
+    LIBS += -L$${PWD}/../../lib/ -lmned
+}
+else {
+    LIBS += -L$${PWD}/../../lib -lfiff
+    LIBS += -L$${PWD}/../../lib/ -lmne
+}
 
 SOURCES += \
     geometryview.cpp
 
 HEADERS += disp_global.h \
     geometryview.h
+
+header_files.files = $$HEADERS
+header_files.path = ../../include/disp
+INSTALLS += header_files

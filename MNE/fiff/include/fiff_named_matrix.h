@@ -44,7 +44,7 @@
 #include "../fiff_global.h"
 #include "fiff_constants.h"
 #include "fiff_types.h"
-#include "../../../include/3rdParty/Eigen/Core"
+#include "../../3rdParty/Eigen/Core"
 
 
 //*************************************************************************************************************

@@ -33,6 +33,8 @@
 #
 #--------------------------------------------------------------------------------------------------------------
 
+include(../../mne-cpp.pri)
+
 TEMPLATE = lib
 
 QT       += core
@@ -40,19 +42,22 @@ QT       -= gui
 
 DEFINES += MNE_LIBRARY
 
+TARGET = mne
+
 CONFIG(debug, debug|release) {
-    TARGET = mned
-    DESTDIR = $$PWD/../../lib
-    LIBS += -L$$PWD/../../lib/ -lfiffd
-    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\..\\mne-cpp\\lib\\mned.dll" "..\\..\\..\\mne-cpp\\bin\\"
-}
-else {
-    TARGET = mne
-    DESTDIR = $$PWD/../../lib
-    LIBS += -L$$PWD/../../lib -lfiff
-    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\..\\mne-cpp\\lib\\mne.dll" "..\\..\\..\\mne-cpp\\bin\\"
+    TARGET = $$join(TARGET,,,d)
 }
 
+win32:QMAKE_POST_LINK += $${QMAKE_COPY} "..\\..\\..\\mne-cpp\\lib\\$${TARGET}.dll" "..\\..\\..\\mne-cpp\\bin\\"
+DESTDIR = $${PWD}/../../lib
+DESTDIR = $${PWD}/../../lib
+
+CONFIG(debug, debug|release) {
+    LIBS += -L$${PWD}/../../lib/ -lfiffd
+}
+else {
+    LIBS += -L$${PWD}/../../lib -lfiff
+}
 
 SOURCES += mne.cpp \
     src/mne_sourcespace.cpp \
@@ -61,7 +66,11 @@ SOURCES += mne.cpp \
 
 HEADERS += mne.h\
         mne_global.h \
-    include/hpcmatrix.h \
+#    include/hpcmatrix.h \
     include/mne_sourcespace.h \
     include/mne_hemisphere.h \
     include/mne_forwardsolution.h
+
+header_files.files = $$HEADERS
+header_files.path = ../../include/mne
+INSTALLS += header_files

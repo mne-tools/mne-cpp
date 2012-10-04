@@ -33,6 +33,7 @@
 #
 #--------------------------------------------------------------------------------------------------------------
 
+include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
@@ -40,22 +41,25 @@ QT += core
 QT -= gui
 QT += 3d
 
-
 CONFIG   += console
 CONFIG   -= app_bundle
 
+TARGET = readFwd
+
 CONFIG(debug, debug|release) {
-    TARGET = readFwdd
-    LIBS += -L$$PWD/../../lib/ -lmned
-    LIBS += -L$$PWD/../../lib/ -lfiffd
-    DESTDIR = $$PWD/../../bin
+    TARGET = $$join(TARGET,,,d)
+}
+
+CONFIG(debug, debug|release) {
+    LIBS += -L$${PWD}/../../lib/ -lmned
+    LIBS += -L$${PWD}/../../lib/ -lfiffd
 }
 else {
-    TARGET = readFwd
-    LIBS += -L$$PWD/../../lib/ -lmne
-    LIBS += -L$$PWD/../../lib/ -lfiff
-    DESTDIR = $$PWD/../../bin
+    LIBS += -L$${PWD}/../../lib/ -lmne
+    LIBS += -L$${PWD}/../../lib/ -lfiff
 }
+
+DESTDIR = $${PWD}/../../bin
 
 SOURCES += \
     src/main.cpp \

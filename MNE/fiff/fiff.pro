@@ -33,6 +33,7 @@
 #
 #--------------------------------------------------------------------------------------------------------------
 
+include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
@@ -40,17 +41,14 @@ QT       -= gui
 
 DEFINES += FIFF_LIBRARY
 
+TARGET = fiff
+
 CONFIG(debug, debug|release) {
-    TARGET = fiffd
-    DESTDIR = $$PWD/../../lib
-    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\..\\mne-cpp\\lib\\fiffd.dll" "..\\..\\..\\mne-cpp\\bin\\"
-}
-else {
-    TARGET = fiff
-    DESTDIR = $$PWD/../../lib
-    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\..\\mne-cpp\\lib\\fiff.dll" "..\\..\\..\\mne-cpp\\bin\\"
+    TARGET = $$join(TARGET,,,d)
 }
 
+win32:QMAKE_POST_LINK += $${QMAKE_COPY} "..\\..\\..\\mne-cpp\\lib\\$${TARGET}.dll" "..\\..\\..\\mne-cpp\\bin\\"
+DESTDIR = $${PWD}/../../lib
 
 SOURCES += fiff.cpp \
 #    src/fiff_parser.cpp \
@@ -88,3 +86,9 @@ HEADERS += fiff.h \
     include/fiff_file.h \
     include/fiff_dig_point.h \
     include/fiff_ch_pos.h
+
+
+header_files.files = $$HEADERS
+header_files.path = ../../include/fiff
+
+INSTALLS += header_files
