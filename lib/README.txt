@@ -1,1 +1,0 @@
-This is the directory of the build libraries.

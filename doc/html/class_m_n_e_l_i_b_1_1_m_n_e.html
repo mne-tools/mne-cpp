@@ -101,15 +101,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a0606ad94bb4ccc8a35a3d1d7f2265877"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html#a0606ad94bb4ccc8a35a3d1d7f2265877">MNE</a> ()</td></tr>
-<tr class="separator:a0606ad94bb4ccc8a35a3d1d7f2265877"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7cadba9cbfb799f4c11b4343cc20c939"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html#a7cadba9cbfb799f4c11b4343cc20c939">~MNE</a> ()</td></tr>
-<tr class="separator:a7cadba9cbfb799f4c11b4343cc20c939"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a3db7fcf53cdd25d194538cf455ee4f"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html#a3a3db7fcf53cdd25d194538cf455ee4f">~MNE</a> ()</td></tr>
+<tr class="separator:a3a3db7fcf53cdd25d194538cf455ee4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a86678bef8ed1448392954fbf8a778720"><td class="memItemLeft" align="right" valign="top">static SparseMatrix&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html#a86678bef8ed1448392954fbf8a778720">make_block_diag</a> (MatrixXf &amp;A, qint32 n)</td></tr>
 <tr class="separator:a86678bef8ed1448392954fbf8a778720"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac6a16e8bf2d0bb4be17aa61d99646550"><td class="memItemLeft" align="right" valign="top">static qint32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html#ac6a16e8bf2d0bb4be17aa61d99646550">make_projector_info</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> *info)</td></tr>
+<tr class="separator:ac6a16e8bf2d0bb4be17aa61d99646550"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a76d878d98decc767c33645f1c55d3cf7"><td class="memItemLeft" align="right" valign="top">static fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html#a76d878d98decc767c33645f1c55d3cf7">make_projector</a> (QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html">FiffProj</a> * &gt; &amp;projs, QStringList &amp;ch_names, QStringList &amp;bads=defaultQStringList)</td></tr>
+<tr class="separator:a76d878d98decc767c33645f1c55d3cf7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeb29bbc5770f5a6b24dce376ef7c0285"><td class="memItemLeft" align="right" valign="top">static qint32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html#aeb29bbc5770f5a6b24dce376ef7c0285">find_source_space_hemi</a> (<a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a> *p_pHemisphere)</td></tr>
 <tr class="separator:aeb29bbc5770f5a6b24dce376ef7c0285"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8da88839a7739af8b44830889a563900"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html#a8da88839a7739af8b44830889a563900">patch_info</a> (VectorXi &amp;nearest, QList&lt; VectorXi &gt; &amp;pinfo)</td></tr>
@@ -127,27 +129,9 @@ Static Public Member Functions</h2></td></tr>
 <div class="textblock"><p>The <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> class provides wrapper functions to stay consistent with mne matlab toolbox. </p>
 <p>DECLARE <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> WRAPPER CLASS </p>
 
-<p>Definition at line <a class="el" href="mne_8h_source.html#l00090">90</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
+<p>Definition at line <a class="el" href="mne_8h_source.html#l00098">98</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a0606ad94bb4ccc8a35a3d1d7f2265877"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">MNE::MNE </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>ctor </p>
-
-<p>Definition at line <a class="el" href="mne_8cpp_source.html#l00068">68</a> of file <a class="el" href="mne_8cpp_source.html">mne.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a7cadba9cbfb799f4c11b4343cc20c939"></a>
+<a class="anchor" id="a3a3db7fcf53cdd25d194538cf455ee4f"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -155,7 +139,7 @@ Static Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">MNELIB::MNE::~MNE </td>
+          <td class="memname">virtual MNELIB::MNE::~MNE </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -163,13 +147,13 @@ Static Public Member Functions</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 <p>dtor </p>
 
-<p>Definition at line <a class="el" href="mne_8h_source.html#l00104">104</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
+<p>Definition at line <a class="el" href="mne_8h_source.html#l00107">107</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
 
 </div>
 </div>
@@ -207,7 +191,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the deduced hemisphere id </dd></dl>
 
-<p>Definition at line <a class="el" href="mne_8h_source.html#l00157">157</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
+<p>Definition at line <a class="el" href="mne_8h_source.html#l00401">401</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
 
 </div>
 </div>
@@ -258,7 +242,95 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A sparse block diagonal, diagonalized from the elements in "A". </dd></dl>
 
-<p>Definition at line <a class="el" href="mne_8h_source.html#l00137">137</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
+<p>Definition at line <a class="el" href="mne_8h_source.html#l00140">140</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a76d878d98decc767c33645f1c55d3cf7"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static fiff_int_t MNELIB::MNE::make_projector </td>
+          <td>(</td>
+          <td class="paramtype">QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html">FiffProj</a> * &gt; &amp;&#160;</td>
+          <td class="paramname"><em>projs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QStringList &amp;&#160;</td>
+          <td class="paramname"><em>ch_names</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QStringList &amp;&#160;</td>
+          <td class="paramname"><em>bads</em> = <code>defaultQStringList</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>mne_make_projector</p>
+<h3><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> toolbox root function</h3>
+<p>Make a SSP operator using the meas info</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">info</td><td>A Matrix which should be diagonlized</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+
+<p>Definition at line <a class="el" href="mne_8h_source.html#l00207">207</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ac6a16e8bf2d0bb4be17aa61d99646550"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static qint32 MNELIB::MNE::make_projector_info </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> *&#160;</td>
+          <td class="paramname"><em>info</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>mne_make_projector_info</p>
+<h3><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> toolbox root function</h3>
+<p>Make a SSP operator using the meas info</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">info</td><td>A Matrix which should be diagonlized</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+
+<p>Definition at line <a class="el" href="mne_8h_source.html#l00159">159</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
 
 </div>
 </div>
@@ -305,7 +377,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="mne_8h_source.html#l00175">175</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
+<p>Definition at line <a class="el" href="mne_8h_source.html#l00419">419</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
 
 </div>
 </div>
@@ -381,7 +453,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="mne_8h_source.html#l00199">199</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
+<p>Definition at line <a class="el" href="mne_8h_source.html#l00443">443</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
 
 </div>
 </div>
@@ -443,7 +515,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="mne_8h_source.html#l00222">222</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
+<p>Definition at line <a class="el" href="mne_8h_source.html#l00466">466</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
 
 </div>
 </div>
@@ -497,7 +569,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mne_8h_source.html#l00241">241</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
+<p>Definition at line <a class="el" href="mne_8h_source.html#l00485">485</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
 
 </div>
 </div>
@@ -533,18 +605,17 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mne_8h_source.html#l00259">259</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
+<p>Definition at line <a class="el" href="mne_8h_source.html#l00503">503</a> of file <a class="el" href="mne_8h_source.html">mne.h</a>.</p>
 
 </div>
 </div>
-<hr/>The documentation for this class was generated from the following files:<ul>
+<hr/>The documentation for this class was generated from the following file:<ul>
 <li>D:/Users/Christoph/Documents/GitHub/mne-cpp/MNE/mne/<a class="el" href="mne_8h_source.html">mne.h</a></li>
-<li>D:/Users/Christoph/Documents/GitHub/mne-cpp/MNE/mne/<a class="el" href="mne_8cpp_source.html">mne.cpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Oct 3 2012 15:45:05 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Oct 4 2012 17:56:15 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

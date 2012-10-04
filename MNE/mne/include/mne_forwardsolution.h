@@ -62,10 +62,10 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include "../../../include/3rdParty/Eigen/Core"
-#include "../../../include/3rdParty/Eigen/SVD"
-#include "../../../include/3rdParty/Eigen/Sparse"
-#include "../../../include/3rdParty/Eigen/unsupported/KroneckerProduct"
+#include "../../3rdParty/Eigen/Core"
+#include "../../3rdParty/Eigen/SVD"
+#include "../../3rdParty/Eigen/Sparse"
+#include "../../3rdParty/Eigen/unsupported/KroneckerProduct"
 
 
 //*************************************************************************************************************
