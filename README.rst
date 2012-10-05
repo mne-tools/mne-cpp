@@ -1,7 +1,7 @@
 mne-cpp (pre-alpha)
 ==================
 
-Fast MNE Qt 5 based C++ library (pre-alpha state)
+MNE Qt 5 based C++ library (pre-alpha state)
 
 
 Getting the latest code
@@ -67,7 +67,7 @@ MNE-cpp is **BSD-licenced** (3 clause):
     This software is OSI Certified Open Source Software.
     OSI Certified is a certification mark of the Open Source Initiative.
 
-    Copyright (c) 2011, authors of MNE-cpp.
+    Copyright (C) 2012, authors of MNE-cpp.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
