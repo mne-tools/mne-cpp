@@ -51,3 +51,6 @@
 /lib/*.rc
 /lib/*.res
 /bin/MNE-sample-data/test_ctf_raw.fif
+/include/disp
+/include/fiff
+/include/mne
