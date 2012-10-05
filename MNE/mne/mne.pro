@@ -70,6 +70,13 @@ HEADERS += mne.h\
     include/mne_hemisphere.h \
     include/mne_forwardsolution.h
 
-header_files.files = $$HEADERS
-header_files.path = ../../include/mne
-INSTALLS += header_files
+
+
+#Install headers to include directory
+baseheader_files.files = ./*.h
+baseheader_files.path = ../../include/mne
+header_files.files = ./include/*.h
+header_files.path = ../../include/mne/include
+
+INSTALLS += baseheader_files \
+            header_files
