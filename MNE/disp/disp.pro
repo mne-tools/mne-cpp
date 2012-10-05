@@ -67,6 +67,10 @@ SOURCES += \
 HEADERS += disp_global.h \
     geometryview.h
 
-header_files.files = $$HEADERS
-header_files.path = ../../include/disp
-INSTALLS += header_files
+
+#Install headers to include directory
+baseheader_files.files = ./*.h
+baseheader_files.path = ../../include/disp
+
+INSTALLS += baseheader_files \
+            header_files

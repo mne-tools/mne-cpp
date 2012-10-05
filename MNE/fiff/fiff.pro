@@ -87,8 +87,11 @@ HEADERS += fiff.h \
     include/fiff_dig_point.h \
     include/fiff_ch_pos.h
 
+#Install headers to include directory
+baseheader_files.files = ./*.h
+baseheader_files.path = ../../include/fiff
+header_files.files = ./include/*.h
+header_files.path = ../../include/fiff/include
 
-header_files.files = $$HEADERS
-header_files.path = ../../include/fiff
-
-INSTALLS += header_files
+INSTALLS += baseheader_files \
+            header_files
