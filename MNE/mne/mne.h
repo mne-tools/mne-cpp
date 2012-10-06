@@ -243,8 +243,19 @@ public:
         MatrixXf vecs = MatrixXf::Zero(nchan,nvec);
         nvec = 0;
         fiff_int_t nonzero = 0;
+        qint32 p, c, i, j, v;
+        double onesize;
+        bool isBad = false;
+        MatrixXi sel(1, nchan);
+        MatrixXi vecSel(1, nchan);
+        sel.setConstant(-1);
+        vecSel.setConstant(-1);
         for (k = 0; k < projs.size(); ++k)
         {
+            sel.resize(1, nchan);
+            vecSel.resize(1, nchan);
+            sel.setConstant(-1);
+            vecSel.setConstant(-1);
             if (projs[k]->active)
             {
                 FiffProj* one = projs[k];
@@ -261,65 +272,96 @@ public:
                     return -1;
                 }
 
-//                //
-//                // Get the two selection vectors to pick correct elements from
-//                // the projection vectors omitting bad channels
-//                //
-//                p = 0;
-//                for c = 1:nchan
-//                    match = strmatch(ch_names{c},one.data.col_names);
-//                    if ~isempty(match) && isempty(strmatch(ch_names{c},bads))
-//                        p = p + 1;
-//                        sel(p)    = c;
-//                        vecsel(p) = match(1);
-//                    end
-//                end
-//                //
-//                // If there is something to pick, pickit
-//                //
-//                if ~isempty(sel)
-//                    for v = 1:one.data.nrow
-//                        vecs(sel,nvec+v) = one.data.data(v,vecsel)';
-//                    end
-//                    %
-//                    %   Rescale for more straightforward detection of small singular values
-//                    %
-//                    for v = 1:one.data.nrow
-//                        onesize = sqrt(vecs(:,nvec+v)'*vecs(:,nvec+v));
-//                        if onesize > 0
-//                            vecs(:,nvec+v) = vecs(:,nvec+v)/onesize;
-//                            nonzero = nonzero + 1;
-//                        end
-//                    end
-//                    nvec = nvec + one.data.nrow;
-//                end
+                //
+                // Get the two selection vectors to pick correct elements from
+                // the projection vectors omitting bad channels
+                //
+                p = 0;
+                for (c = 0; c < nchan; ++c)
+                {
+                    for (i = 0; i < one->data->col_names.size(); ++i)
+                    {
+                        if (QString::compare(ch_names.at(c),one->data->col_names.at(i)) == 0)
+                        {
+                            isBad = false;
+                            for (j = 0; j < bads.size(); ++j)
+                            {
+                                if (QString::compare(ch_names.at(c),bads.at(j)) == 0)
+                                {
+                                    isBad = true;
+                                }
+                            }
+
+                            if (!isBad && sel(0,p) != c)
+                            {
+                                sel(0,p) = c;
+                                vecSel(0, p) = i;
+                                ++p;
+                            }
+
+                        }
+                    }
+                }
+                sel.conservativeResize(1, p);
+                vecSel.conservativeResize(1, p);
+                //
+                // If there is something to pick, pickit
+                //
+                if (sel.cols() > 0)
+                {
+                    for (v = 0; v < one->data->nrow; ++v)
+                        for (i = 0; i < p; ++i)
+                            vecs(sel(0,i),nvec+v) = one->data->data(v,vecSel(i));
+                    //
+                    //   Rescale for more straightforward detection of small singular values
+                    //
+
+                    for (v = 0; v < one->data->nrow; ++v)
+                    {
+                        onesize = sqrt((vecs.col(nvec+v).transpose()*vecs.col(nvec+v))(0,0));
+                        if (onesize > 0.0)
+                        {
+                            vecs.col(nvec+v) = vecs.col(nvec+v)/onesize;
+                            ++nonzero;
+                        }
+                    }
+                    nvec += one->data->nrow;
+                }
             }
         }
-//        //
-//        //   Check whether all of the vectors are exactly zero
-//        //
-//        if nonzero == 0
-//            return;
+        //
+        //   Check whether all of the vectors are exactly zero
+        //
+        if (nonzero == 0)
+            return -1;
 
-//        %
-//        %   Reorthogonalize the vectors
-//        %
-//        [U,S,V] = svd(vecs(:,1:nvec),0);
-//        S = diag(S);
-//        %
-//        %   Throw away the linearly dependent guys
-//        %
-//        for k = 1:nvec
-//            if S(k)/S(1) < 1e-2
-//                nvec = k;
-//                break;
-//            end
-//        end
-//        U = U(:,1:nvec);
-//        %
-//        %   Here is the celebrated result
-//        %
-//        proj  = proj - U*U';
+        //
+        //   Reorthogonalize the vectors
+        //
+        qDebug() << "Attention Jacobi SVD is used, not the MATLAB lapack version. Since the SVD is not unique the results might be a bit different!";
+        JacobiSVD<MatrixXf> svd(vecs.block(0,0,vecs.rows(),nvec), ComputeThinU);
+
+        VectorXf S = svd.singularValues();
+
+        //
+        //   Throw away the linearly dependent guys
+        //
+        for(k = 0; k < nvec; ++k)
+        {
+            if (S(k)/S(0) < 1e-2)
+            {
+                nvec = k+1;
+                break;
+            }
+
+        }
+
+        MatrixXf U = svd.matrixU().block(0, 0, vecs.rows(), nvec);
+
+        //
+        //   Here is the celebrated result
+        //
+        proj  = proj - U*U.transpose();
         nproj = nvec;
 
         return nproj;

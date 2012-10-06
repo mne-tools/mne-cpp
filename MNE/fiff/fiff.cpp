@@ -85,7 +85,7 @@ MatrixXi Fiff::pick_channels(QStringList& ch_names, QStringList& include, QStrin
             {
                 if (QString::compare(exclude.at(k),ch_names.at(i)) == 0)
                 {
-                    count += 1;
+                    ++count;
                     c = i;
                 }
             }
