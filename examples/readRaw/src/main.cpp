@@ -45,6 +45,7 @@
 
 
 #include "../../../MNE/fiff/fiff.h"
+#include "../../../MNE/mne/mne.h"
 
 
 //*************************************************************************************************************
@@ -61,6 +62,7 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -123,7 +125,8 @@ int main(int argc, char *argv[])
         //
         //   Create the projector
         //
-//        [proj,nproj] = MNE::make_projector_info(raw->info);
+//        [proj,nproj] =
+        MNE::make_projector_info(raw->info);
 //        if nproj == 0
 //            fprintf(1,'The projection vectors do not apply to these channels\n');
 //            raw.proj = [];
