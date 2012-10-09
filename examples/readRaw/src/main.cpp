@@ -85,6 +85,13 @@ int main(int argc, char *argv[])
 
     QString t_sFile = "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
 
+    float from = 42.956;
+    float to = 320.670;
+
+    bool in_samples = false;
+
+    bool keep_comp = true;
+
     //
     //   Setup for reading the raw data
     //
@@ -125,16 +132,70 @@ int main(int argc, char *argv[])
         //
         //   Create the projector
         //
-//        [proj,nproj] =
-        MNE::make_projector_info(raw->info);
-//        if nproj == 0
-//            fprintf(1,'The projection vectors do not apply to these channels\n');
-//            raw.proj = [];
-//        else
-//            fprintf(1,'Created an SSP operator (subspace dimension = %d)\n',nproj);
-//            raw.proj = proj;
+        fiff_int_t nproj = MNE::make_projector_info(raw->info, raw->proj);
+
+
+//        qDebug() << raw->proj.data->data.rows();
+//        qDebug() << raw->proj.data->data.cols();
+//        std::cout << "proj: \n" << raw->proj.data->data.block(0,0,10,10);
+
+        if (nproj == 0)
+        {
+            printf("The projection vectors do not apply to these channels\n");
+        }
+        else
+        {
+            printf("Created an SSP operator (subspace dimension = %d)\n",nproj);
+        }
+    }
+
+    //
+    //   Set up the CTF compensator
+    //
+    qint32 current_comp = MNE::get_current_comp(raw->info);
+    qint32 dest_comp = -1;
+
+    if (current_comp > 0)
+        printf("Current compensation grade : %d\n",current_comp);
+
+    if (keep_comp)
+        dest_comp = current_comp;
+
+    if (current_comp != dest_comp)
+    {
+//        try
+//            raw.comp = mne_make_compensator(raw.info,current_comp,dest_comp);
+//            raw.info.chs  = mne_set_current_comp(raw.info.chs,dest_comp);
+//            printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
+//        catch
+//            error(me,'%s',mne_omit_first_line(lasterr));
 //        end
     }
+    //
+    //   Read a data segment
+    //   times output argument is optional
+    //
+//    try
+
+    bool readSuccessful = false;
+    MatrixXf* data = NULL;
+    MatrixXf* times = NULL;
+    if (in_samples)
+        readSuccessful = raw->read_raw_segment(data, times, (qint32)from, (qint32)to, picks);
+    else
+        readSuccessful = raw->read_raw_segment_times(data, times, from, to, picks);
+
+    if (!readSuccessful)
+    {
+        printf("Could not read raw segment.\n");
+        delete raw;
+        return -1;
+    }
+
+    printf("Read %d samples.\n",data->cols());
+
+
+    std::cout << data->block(0,0,10,10);
 
 
     delete raw;

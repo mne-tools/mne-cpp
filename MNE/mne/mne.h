@@ -73,6 +73,10 @@
 namespace MNELIB
 {
 
+static MatrixXf defaultUMatrix = MatrixXf::Constant(1,1,-1);
+
+
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -118,6 +122,37 @@ public:
     */
     //    static inline MatrixXf extract_block_diag(MatrixXf& A, qint32 n);
 
+
+
+
+
+    //ToDo make this part of fiff Info
+    static qint32 get_current_comp(FiffInfo* info)
+    {
+        qint32 comp = 0;
+        qint32 first_comp = -1;
+
+        qint32 k = 0;
+        for (k = 0; k < info->nchan; ++k)
+        {
+            if (info->chs[k].kind == FIFFV_MEG_CH)
+            {
+                comp = info->chs[k].coil_type >> 16;
+                if (first_comp < 0)
+                    first_comp = comp;
+                else if (comp != first_comp)
+                    printf("Compensation is not set equally on all MEG channels");
+            }
+        }
+        return comp;
+    }
+
+
+
+
+
+
+
     //=========================================================================================================
     /**
     * mne_block_diag - encoding part
@@ -144,6 +179,147 @@ public:
     }
 
 
+
+//    %
+//    % [comp] = mne_make_compensator(info,from,to,exclude_comp_chs)
+//    %
+//    % info              - measurement info as returned by the fif reading routines
+//    % from              - compensation in the input data
+//    % to                - desired compensation in the output
+//    % exclude_comp_chs  - exclude compensation channels from the output (optional)
+//    %
+
+//    %
+//    % Create a compensation matrix to bring the data from one compensation
+//    % state to another
+//    %
+
+
+
+
+//    function [comp] =
+//    mne_make_compensator(info,from,to,exclude_comp_chs)
+
+
+//    me='MNE:mne_make_compensator';
+
+//    global FIFF;
+//    if isempty(FIFF)
+//        FIFF = fiff_define_constants();
+//    end
+
+//    if nargin == 3
+//        exclude_comp_chs = false;
+//    elseif nargin ~= 4
+//        error(me,'Incorrect number of arguments');
+//    end
+
+//    if from == to
+//        comp = zeros(info.nchan,info.nchan);
+//        return;
+//    end
+
+//    if from == 0
+//        C1 = zeros(info.nchan,info.nchan);
+//    else
+//        try
+//            C1 = make_compensator(info,from);
+//        catch
+//            error(me,'Cannot create compensator C1 (%s)',mne_omit_first_line(lasterr));
+//        end
+//        if isempty(C1)
+//            error(me,'Desired compensation matrix (kind = %d) not found',from);
+//        end
+//    end
+//    if to == 0
+//        C2 = zeros(info.nchan,info.nchan);
+//    else
+//        try
+//            C2 = make_compensator(info,to);
+//        catch
+//            error(me,'Cannot create compensator C2 (%s)',mne_omit_first_line(lasterr));
+//        end
+//        if isempty(C2)
+//            error(me,'Desired compensation matrix (kind = %d) not found',to);
+//        end
+//    end
+//    %
+//    %   s_orig = s_from + C1*s_from = (I + C1)*s_from
+//    %   s_to   = s_orig - C2*s_orig = (I - C2)*s_orig
+//    %   s_to   = (I - C2)*(I + C1)*s_from = (I + C1 - C2 - C2*C1)*s_from
+//    %
+//    comp = eye(info.nchan,info.nchan) + C1 - C2 - C2*C1;
+
+//    if exclude_comp_chs
+//        pick  = zeros(info.nchan);
+//        npick = 0;
+//        for k = 1:info.nchan
+//            if info.chs(k).kind ~= FIFF.FIFFV_REF_MEG_CH
+//                npick = npick + 1;
+//                pick(npick) = k;
+//            end
+//        end
+//        if npick == 0
+//            error(me,'Nothing remains after excluding the compensation channels');
+//        end
+//        comp = comp(pick(1:npick),:);
+//    end
+
+//    return;
+
+//        function this_comp = make_compensator(info,kind)
+
+//            for k = 1:length(info.comps)
+//                if info.comps(k).kind == kind
+//                    this_data = info.comps(k).data;
+//                    %
+//                    %   Create the preselector
+//                    %
+//                    presel  = zeros(this_data.ncol,info.nchan);
+//                    for col = 1:this_data.ncol
+//                        c = strmatch(this_data.col_names{col},info.ch_names,'exact');
+//                        if isempty(c)
+//                            error(me,'Channel %s is not available in data',this_data.col_names{col});
+//                        elseif length(c) > 1
+//                            error(me,'Ambiguous channel %s',mat.col_names{col});
+//                        end
+//                        presel(col,c) = 1.0;
+//                    end
+//                    %
+//                    %   Create the postselector
+//                    %
+//                    postsel = zeros(info.nchan,this_data.nrow);
+//                    for c = 1:info.nchan
+//                        row = strmatch(info.ch_names{c},this_data.row_names,'exact');
+//                        if length(row) > 1
+//                            error(me,'Ambiguous channel %s', info.ch_names{c});
+//                        elseif length(row) == 1
+//                            postsel(c,row) = 1.0;
+//                        end
+//                    end
+//                    this_comp = postsel*this_data.data*presel;
+//                    return;
+//                end
+//            end
+//            this_comp = [];
+//            return;
+//        end
+
+//    end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     //=========================================================================================================
     /**
     * mne_make_projector_info
@@ -152,75 +328,50 @@ public:
     *
     * Make a SSP operator using the meas info
     *
-    * @param[in] info A Matrix which should be diagonlized
+    * @param[in] info       Fiff measurement info
+    * @param[out] proj      The projection operator to apply to the data
     *
-    * @return
+    * @return nproj - How many items in the projector
     */
-    static qint32 make_projector_info(FiffInfo* info)
+    static qint32 make_projector_info(FiffInfo* info, MatrixXf& proj)
     {
-
-//        [ proj, nproj ] = mne_make_projector(info.projs,info.ch_names,info.bads);
-
-        return MNE::make_projector(info->projs,info->ch_names,info->bads);
-
+        return MNE::make_projector(info->projs,info->ch_names, proj, info->bads);
     }
 
 
-
-
-
-
     /**
-    * mne_make_projector
+    * make_projector
     *
     * ### MNE toolbox root function ###
     *
-    * Make a SSP operator using the meas info
+    * Make an SSP operator
     *
-    * @param[in] info A Matrix which should be diagonlized
+    * @param[in] projs      A set of projection vectors
+    * @param[in] ch_names   A cell array of channel names
+    * @param[out] proj      The projection operator to apply to the data
+    * @param[in] bads       Bad channels to exclude
+    * @param[out] U         The orthogonal basis of the projection vectors (optional)
     *
-    * @return
+    * @return nproj - How many items in the projector
     */
-
-
-
-
-
-
-//    %
-//    % [proj,nproj,U] = mne_make_projector(projs,ch_names,bads)
-//    %
-//    % proj     - The projection operator to apply to the data
-//    % nproj    - How many items in the projector
-//    % U        - The orthogonal basis of the projection vectors (optional)
-//    %
-//    % Make an SSP operator
-//    %
-//    % projs    - A set of projection vectors
-//    % ch_names - A cell array of channel names
-//    % bads     - Bad channels to exclude
-//    %
-
-//    function [proj,nproj,U] =
-
-
-    static fiff_int_t make_projector(QList<FiffProj*>& projs, QStringList& ch_names, QStringList& bads = defaultQStringList)
+    static fiff_int_t make_projector(QList<FiffProj*>& projs, QStringList& ch_names, MatrixXf& proj, QStringList& bads = defaultQStringList, MatrixXf& U = defaultUMatrix)
     {
+
         fiff_int_t nchan = ch_names.size();
         if (nchan == 0)
         {
             printf("No channel names specified\n");
-            return -1;
+            return 0;
         }
 
-        MatrixXf proj = MatrixXf::Identity(nchan,nchan);
+        proj = MatrixXf::Identity(nchan,nchan);
         fiff_int_t nproj = 0;
-//        U     = [];
+
         //
         //   Check trivial cases first
         //
         if (projs.size() == 0)
-            return -1;
+            return 0;
 
         fiff_int_t nactive = 0;
         fiff_int_t nvec    = 0;
@@ -235,7 +386,7 @@ public:
         }
 
         if (nactive == 0)
-            return -1;
+            return 0;
 
         //
         //   Pick the appropriate entries
@@ -259,8 +410,6 @@ public:
             if (projs[k]->active)
             {
                 FiffProj* one = projs[k];
-//                sel = [];
-//                vecsel = [];
 
                 QMap<QString, int> uniqueMap;
                 for(l = 0; l < one->data->col_names.size(); ++l)
@@ -269,7 +418,7 @@ public:
                 if (one->data->col_names.size() != uniqueMap.keys().size())
                 {
                     printf("Channel name list in projection item %d contains duplicate items");
-                    return -1;
+                    return 0;
                 }
 
                 //
@@ -333,12 +482,13 @@ public:
         //   Check whether all of the vectors are exactly zero
         //
         if (nonzero == 0)
-            return -1;
+            return 0;
 
         //
         //   Reorthogonalize the vectors
         //
         qDebug() << "Attention Jacobi SVD is used, not the MATLAB lapack version. Since the SVD is not unique the results might be a bit different!";
+
         JacobiSVD<MatrixXf> svd(vecs.block(0,0,vecs.rows(),nvec), ComputeThinU);
 
         VectorXf S = svd.singularValues();
@@ -356,12 +506,12 @@ public:
 
         }
 
-        MatrixXf U = svd.matrixU().block(0, 0, vecs.rows(), nvec);
+        U = svd.matrixU().block(0, 0, vecs.rows(), nvec);
 
         //
         //   Here is the celebrated result
         //
-        proj  = proj - U*U.transpose();
+        proj -= U*U.transpose();
         nproj = nvec;
 
         return nproj;
