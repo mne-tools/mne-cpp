@@ -192,14 +192,6 @@ bool FiffRawData::read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t
     }
     mult.makeCompressed();
 
-//ToDo
-//        if ~isempty(cal)
-//            cal = sparse(cal);
-//        end
-//        if ~isempty(mult)
-//            mult = sparse(mult);
-//        end
-
     //
 
     FiffFile* fid = NULL;
