@@ -130,14 +130,44 @@ public:
     */
     bool read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t from = -1, fiff_int_t to = -1, MatrixXi sel = defaultMatrixXi);
 
+
+    //=========================================================================================================
+    /**
+    * ### MNE toolbox root function ###: Implementation of the fiff_read_raw_segment function
+    *
+    * Read a specific raw data segment
+    *
+    * @param[out] data      returns the data matrix (channels x samples)
+    * @param[out] times     returns the time values corresponding to the samples
+    * @param[in] from       starting time of the segment in seconds
+    * @param[in] to         end time of the segment in seconds
+    * @param[in] sel        optional channel selection vector
+    *
+    * @return true if succeeded, false otherwise
+    */
+    bool read_raw_segment_times(MatrixXf*& data, MatrixXf*& times, float from, float to, MatrixXi sel = defaultMatrixXi)
+    {
+        //
+        //   Convert to samples
+        //
+        from = floor(from*this->info->sfreq);
+        to   = ceil(to*this->info->sfreq);
+        //
+        //   Read it
+        //
+        return this->read_raw_segment(data, times, (qint32)from, (qint32)to, sel);
+    }
+
+
+
 public:
     FiffFile* file;//replaces fid
     FiffInfo* info;
     fiff_int_t first_samp;
     fiff_int_t last_samp;
-    MatrixXf cals;
+    MatrixXf   cals;
     QList<FiffRawDir> rawdir;
-    FiffProj proj;
+    MatrixXf   proj;
     FiffCtfComp comp;
 };
 
