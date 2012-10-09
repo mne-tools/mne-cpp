@@ -105,12 +105,15 @@ bool FiffRawData::read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t
     qint32 nchan = this->info->nchan;
     qint32 dest  = 0;//1;
     qint32 i, k, r;
-    MatrixXf cal(nchan,nchan);
-    cal.setZero();
+//    MatrixXf cal(nchan,nchan);
+    SparseMatrix<float> cal(nchan,nchan);
+//    cal.setZero();
+    cal.reserve(nchan);
     for(i = 0; i < nchan; ++i)
-        cal(i,i) = this->cals(0,i);
+        cal.insert(i,i) = this->cals(0,i);
+    cal.makeCompressed();
 
-    MatrixXf mult;
+    MatrixXf mult_full;
     //
     if (sel.cols() == 0)
     {
@@ -121,11 +124,11 @@ bool FiffRawData::read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t
         if (projAvailable || this->comp.kind != -1)
         {
             if (!projAvailable)
-                mult = this->comp.data->data*cal;
+                mult_full = this->comp.data->data*cal;
             else if (this->comp.kind == -1)
-                mult = this->proj*cal;
+                mult_full = this->proj*cal;
             else
-                mult = this->proj*this->comp.data->data*cal;
+                mult_full = this->proj*this->comp.data->data*cal;
         }
     }
     else
@@ -142,9 +145,10 @@ bool FiffRawData::read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t
         if (!projAvailable && this->comp.kind == -1)
         {
             cal.resize(sel.cols(),sel.cols());
-            cal.setZero();
+//            cal.setZero();
             for( i = 0; i  < sel.cols(); ++i)
-                cal(i,i) = this->cals(0,sel(0,i));
+                cal.insert(i,i) = this->cals(0,sel(0,i));
+            cal.makeCompressed();
         }
         else
         {
@@ -153,14 +157,14 @@ bool FiffRawData::read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t
                 qDebug() << "This has to be debugged! #1";
                 for( i = 0; i  < sel.cols(); ++i)
                     selVect.row(i) = this->comp.data->data.block(sel(0,i),0,1,nchan);
-                mult = selVect*cal;
+                mult_full = selVect*cal;
             }
             else if (this->comp.kind == -1)
             {
                 for( i = 0; i  < sel.cols(); ++i)
                     selVect.row(i) = this->proj.block(sel(0,i),0,1,nchan);
 
-                mult = selVect*cal;
+                mult_full = selVect*cal;
             }
             else
             {
@@ -168,11 +172,25 @@ bool FiffRawData::read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t
                 for( i = 0; i  < sel.cols(); ++i)
                     selVect.row(i) = this->proj.block(sel(0,i),0,1,nchan);
 
-                mult = selVect*this->comp.data->data*cal;
+                mult_full = selVect*this->comp.data->data*cal;
             }
         }
     }
     bool do_debug = false;
+
+    //
+    // Make mult sparse
+    //
+    SparseMatrix<float> mult(mult_full.rows(),mult_full.cols());
+    for(i = 0; i < mult_full.rows(); ++i)
+    {
+        for(k = 0; k < mult_full.cols(); ++k)
+        {
+            if(mult_full(i,k) != 0)
+                mult.insert(i,k) = mult_full(i,k);
+        }
+    }
+    mult.makeCompressed();
 
 //ToDo
 //        if ~isempty(cal)
@@ -181,6 +199,8 @@ bool FiffRawData::read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t
 //        if ~isempty(mult)
 //            mult = sparse(mult);
 //        end
+
+    //
 
     FiffFile* fid = NULL;
     if (!this->file->isOpen())
@@ -359,11 +379,6 @@ bool FiffRawData::read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t
             break;
         }
     }
-
-
-
-    qDebug() << "Here finished reading " << data->cols();
-
 
 //        fclose(fid);
 
