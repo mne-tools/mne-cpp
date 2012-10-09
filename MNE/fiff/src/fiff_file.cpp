@@ -1007,10 +1007,13 @@ bool FiffFile::write_raw_buffer(MatrixXf* buf, MatrixXf* cals)
         return false;
     }
 
-    MatrixXf calsMat(cals->transpose().asDiagonal());
-    MatrixXf tmp = calsMat.inverse()*(*buf);
+    SparseMatrix<float> inv_calsMat(cals->cols(), cals->cols());
 
-    this->write_float(FIFF_DATA_BUFFER,tmp.data(),tmp.rows()*tmp.cols()); // XXX why not diag(1./cals) ???
+    for(qint32 i = 0; i < cals->cols(); ++i)
+        inv_calsMat.insert(i, i) = 1.0/(*cals)(0,i);
+
+    MatrixXf tmp = inv_calsMat*(*buf);
+    this->write_float(FIFF_DATA_BUFFER,tmp.data(),tmp.rows()*tmp.cols());
     return true;
 }
 
