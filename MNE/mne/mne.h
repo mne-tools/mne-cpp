@@ -76,8 +76,6 @@ namespace MNELIB
 static MatrixXf defaultUMatrix = MatrixXf::Constant(1,1,-1);
 
 
-
-
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -310,39 +308,14 @@ public:
 
 
 
-
-
-
-
-
-
-
-
-
-
-    //=========================================================================================================
-    /**
-    * mne_make_projector_info
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Make a SSP operator using the meas info
-    *
-    * @param[in] info       Fiff measurement info
-    * @param[out] proj      The projection operator to apply to the data
-    *
-    * @return nproj - How many items in the projector
-    */
-    static qint32 make_projector_info(FiffInfo* info, MatrixXf& proj)
-    {
-        return MNE::make_projector(info->projs,info->ch_names, proj, info->bads);
-    }
-
-
     /**
     * make_projector
     *
     * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffInfo::make_projector static function
+    * There exists also a member function which should be preferred:
+    * make_projector(MatrixXf& proj, MatrixXf& U = defaultUMatrix)
     *
     * Make an SSP operator
     *
@@ -354,226 +327,33 @@ public:
     *
     * @return nproj - How many items in the projector
     */
-    static fiff_int_t make_projector(QList<FiffProj*>& projs, QStringList& ch_names, MatrixXf& proj, QStringList& bads = defaultQStringList, MatrixXf& U = defaultUMatrix)
+    inline static fiff_int_t make_projector(QList<FiffProj*>& projs, QStringList& ch_names, MatrixXf& proj, QStringList& bads = defaultQStringList, MatrixXf& U = defaultUMatrix)
     {
-
-        fiff_int_t nchan = ch_names.size();
-        if (nchan == 0)
-        {
-            printf("No channel names specified\n");
-            return 0;
-        }
-
-        proj = MatrixXf::Identity(nchan,nchan);
-        fiff_int_t nproj = 0;
-
-        //
-        //   Check trivial cases first
-        //
-        if (projs.size() == 0)
-            return 0;
-
-        fiff_int_t nactive = 0;
-        fiff_int_t nvec    = 0;
-        fiff_int_t k, l;
-        for (k = 0; k < projs.size(); ++k)
-        {
-            if (projs[k]->active)
-            {
-                ++nactive;
-                nvec += projs[k]->data->nrow;
-            }
-        }
-
-        if (nactive == 0)
-            return 0;
-
-        //
-        //   Pick the appropriate entries
-        //
-        MatrixXf vecs = MatrixXf::Zero(nchan,nvec);
-        nvec = 0;
-        fiff_int_t nonzero = 0;
-        qint32 p, c, i, j, v;
-        double onesize;
-        bool isBad = false;
-        MatrixXi sel(1, nchan);
-        MatrixXi vecSel(1, nchan);
-        sel.setConstant(-1);
-        vecSel.setConstant(-1);
-        for (k = 0; k < projs.size(); ++k)
-        {
-            sel.resize(1, nchan);
-            vecSel.resize(1, nchan);
-            sel.setConstant(-1);
-            vecSel.setConstant(-1);
-            if (projs[k]->active)
-            {
-                FiffProj* one = projs[k];
-
-                QMap<QString, int> uniqueMap;
-                for(l = 0; l < one->data->col_names.size(); ++l)
-                    uniqueMap[one->data->col_names[l] ] = 0;
-
-                if (one->data->col_names.size() != uniqueMap.keys().size())
-                {
-                    printf("Channel name list in projection item %d contains duplicate items");
-                    return 0;
-                }
-
-                //
-                // Get the two selection vectors to pick correct elements from
-                // the projection vectors omitting bad channels
-                //
-                p = 0;
-                for (c = 0; c < nchan; ++c)
-                {
-                    for (i = 0; i < one->data->col_names.size(); ++i)
-                    {
-                        if (QString::compare(ch_names.at(c),one->data->col_names.at(i)) == 0)
-                        {
-                            isBad = false;
-                            for (j = 0; j < bads.size(); ++j)
-                            {
-                                if (QString::compare(ch_names.at(c),bads.at(j)) == 0)
-                                {
-                                    isBad = true;
-                                }
-                            }
-
-                            if (!isBad && sel(0,p) != c)
-                            {
-                                sel(0,p) = c;
-                                vecSel(0, p) = i;
-                                ++p;
-                            }
-
-                        }
-                    }
-                }
-                sel.conservativeResize(1, p);
-                vecSel.conservativeResize(1, p);
-                //
-                // If there is something to pick, pickit
-                //
-                if (sel.cols() > 0)
-                {
-                    for (v = 0; v < one->data->nrow; ++v)
-                        for (i = 0; i < p; ++i)
-                            vecs(sel(0,i),nvec+v) = one->data->data(v,vecSel(i));
-                    //
-                    //   Rescale for more straightforward detection of small singular values
-                    //
-
-                    for (v = 0; v < one->data->nrow; ++v)
-                    {
-                        onesize = sqrt((vecs.col(nvec+v).transpose()*vecs.col(nvec+v))(0,0));
-                        if (onesize > 0.0)
-                        {
-                            vecs.col(nvec+v) = vecs.col(nvec+v)/onesize;
-                            ++nonzero;
-                        }
-                    }
-                    nvec += one->data->nrow;
-                }
-            }
-        }
-        //
-        //   Check whether all of the vectors are exactly zero
-        //
-        if (nonzero == 0)
-            return 0;
-
-        //
-        //   Reorthogonalize the vectors
-        //
-        qDebug() << "Attention Jacobi SVD is used, not the MATLAB lapack version. Since the SVD is not unique the results might be a bit different!";
-
-        JacobiSVD<MatrixXf> svd(vecs.block(0,0,vecs.rows(),nvec), ComputeThinU);
-
-        VectorXf S = svd.singularValues();
-
-        //
-        //   Throw away the linearly dependent guys
-        //
-        for(k = 0; k < nvec; ++k)
-        {
-            if (S(k)/S(0) < 1e-2)
-            {
-                nvec = k+1;
-                break;
-            }
-
-        }
-
-        U = svd.matrixU().block(0, 0, vecs.rows(), nvec);
-
-        //
-        //   Here is the celebrated result
-        //
-        proj -= U*U.transpose();
-        nproj = nvec;
-
-        return nproj;
+        return FiffInfo::make_projector(projs, ch_names, proj, bads, U);
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    //=========================================================================================================
+    /**
+    * mne_make_projector_info
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffInfo::make_projector_info(FiffInfo* info, MatrixXf& proj) static function
+    * There exists also a member functions which should be preferred:
+    * FiffInfo make_projector_info(MatrixXf& proj)
+    *
+    * Make a SSP operator using the meas info
+    *
+    * @param[in] info       Fiff measurement info
+    * @param[out] proj      The projection operator to apply to the data
+    *
+    * @return nproj - How many items in the projector
+    */
+    static inline qint32 make_projector_info(FiffInfo* info, MatrixXf& proj)
+    {
+        return info->make_projector_info(proj);
+    }
 
 
     //=========================================================================================================
@@ -590,7 +370,7 @@ public:
     *
     * @return the deduced hemisphere id
     */
-    static qint32 find_source_space_hemi(MNEHemisphere* p_pHemisphere)
+    inline static qint32 find_source_space_hemi(MNEHemisphere* p_pHemisphere)
     {
         return MNESourceSpace::find_source_space_hemi(p_pHemisphere);
     }

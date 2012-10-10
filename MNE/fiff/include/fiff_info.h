@@ -68,6 +68,7 @@
 namespace FIFFLIB
 {
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -94,6 +95,64 @@ public:
     * Destroys the FiffInfo.
     */
     ~FiffInfo();
+
+
+    //=========================================================================================================
+    /**
+    * mne_make_projector
+    *
+    * ### MNE toolbox root function ### Implementation of the mne_make_projector function
+    *
+    *
+    * Make an SSP operator
+    *
+    * @param[in] projs      A set of projection vectors
+    * @param[in] ch_names   A cell array of channel names
+    * @param[out] proj      The projection operator to apply to the data
+    * @param[in] bads       Bad channels to exclude
+    * @param[out] U         The orthogonal basis of the projection vectors (optional)
+    *
+    * @return nproj - How many items in the projector
+    */
+    static fiff_int_t make_projector(QList<FiffProj*>& projs, QStringList& ch_names, MatrixXf& proj, QStringList& bads = defaultQStringList, MatrixXf& U = defaultUMatrix);
+
+
+    //=========================================================================================================
+    /**
+    * Make a SSP operator using the meas info
+    *
+    * @param[in] info       Fiff measurement info
+    * @param[out] proj      The projection operator to apply to the data
+    *
+    * @return nproj - How many items in the projector
+    */
+    inline qint32 make_projector_info(MatrixXf& proj)
+    {
+        return make_projector(this->projs,this->ch_names, proj, this->bads);
+    }
+
+
+    //=========================================================================================================
+    /**
+    * mne_make_projector_info
+    *
+    * ### MNE toolbox root function ###  Implementation of the mne_make_projector_info function
+    *
+    * The member function should be prefered: make_projector_info(MatrixXf& proj)
+    *
+    * Make a SSP operator using the meas info
+    *
+    * @param[in] info       Fiff measurement info
+    * @param[out] proj      The projection operator to apply to the data
+    *
+    * @return nproj - How many items in the projector
+    */
+    inline static qint32 make_projector_info(FiffInfo* info, MatrixXf& proj)
+    {
+        return info->make_projector_info(proj);
+    }
+
+
 
 public:
     FiffId      file_id;
