@@ -236,7 +236,6 @@ fiff_int_t FiffInfo::make_projector(QList<FiffProj*>& projs, QStringList& ch_nam
             nvec = k+1;
             break;
         }
-
     }
 
     U = svd.matrixU().block(0, 0, vecs.rows(), nvec);

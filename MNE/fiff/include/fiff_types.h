@@ -72,7 +72,7 @@ namespace FIFFLIB
 {
 
 static QStringList defaultQStringList = QStringList();
-static Eigen::MatrixXf defaultUMatrix = Eigen::MatrixXf::Constant(1,1,-1);
+static Eigen::MatrixXf defaultMatrixXf = Eigen::MatrixXf::Constant(1,1,-1);
 
 
 

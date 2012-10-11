@@ -114,7 +114,7 @@ public:
     *
     * @return nproj - How many items in the projector
     */
-    static fiff_int_t make_projector(QList<FiffProj*>& projs, QStringList& ch_names, MatrixXf& proj, QStringList& bads = defaultQStringList, MatrixXf& U = defaultUMatrix);
+    static fiff_int_t make_projector(QList<FiffProj*>& projs, QStringList& ch_names, MatrixXf& proj, QStringList& bads = defaultQStringList, MatrixXf& U = defaultMatrixXf);
 
 
     //=========================================================================================================
@@ -151,8 +151,6 @@ public:
     {
         return info->make_projector_info(proj);
     }
-
-
 
 public:
     FiffId      file_id;

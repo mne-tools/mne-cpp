@@ -84,13 +84,16 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
 
     QString t_sFile = "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
+    qint32 event = 1;
+    QString t_sEventName = "../../mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif";
+    float tmin = -1.5;
+    float tmax = 1.5;
 
-    float from = 42.956f;
-    float to = 320.670f;
+    bool keep_comp = false;
+    fiff_int_t dest_comp = 0;
+    bool pick_all  = true;
 
-    bool in_samples = false;
-
-    bool keep_comp = true;
+    qint32 k, p;
 
     //
     //   Setup for reading the raw data
@@ -98,25 +101,40 @@ int main(int argc, char *argv[])
     FiffRawData* raw = NULL;
     if(!FiffFile::setup_read_raw(t_sFile, raw))
     {
-        printf("Error during fiff setup raw read");
+        printf("Error during fiff setup raw read\n");
         return 0;
     }
-    //
-    //   Set up pick list: MEG + STI 014 - bad channels
-    //
-    //
-    QStringList include;
-    include << "STI 014";
-    bool want_meg   = true;
-    bool want_eeg   = false;
-    bool want_stim  = false;
 
-    MatrixXi picks = Fiff::pick_types(raw->info, want_meg, want_eeg, want_stim, include, raw->info->bads);
+    MatrixXi picks;
+    if (pick_all)
+    {
+        //
+        // Pick all
+        //
+        picks.resize(1,raw->info->nchan);
+
+        for(k = 0; k < raw->info->nchan; ++k)
+            picks(0,k) = k;
+        //
+    }
+    else
+    {
+        QStringList include;
+        include << "STI 014";
+        bool want_meg   = true;
+        bool want_eeg   = false;
+        bool want_stim  = false;
+
+        picks = Fiff::pick_types(raw->info, want_meg, want_eeg, want_stim, include, raw->info->bads);
+    }
+
+    QStringList ch_names;
+    for(k = 0; k < picks.cols(); ++k)
+        ch_names << raw->info->ch_names[picks(0,k)];
 
     //
     //   Set up projection
     //
-    qint32 k = 0;
     if (raw->info->projs.size() == 0)
         printf("No projector specified for these data\n");
     else
@@ -134,11 +152,6 @@ int main(int argc, char *argv[])
 //        fiff_int_t nproj = MNE::make_projector_info(raw->info, raw->proj); Using the member function instead
         fiff_int_t nproj = raw->info->make_projector_info(raw->proj);
 
-
-//        qDebug() << raw->proj.data->data.rows();
-//        qDebug() << raw->proj.data->data.cols();
-//        std::cout << "proj: \n" << raw->proj.data->data.block(0,0,10,10);
-
         if (nproj == 0)
         {
             printf("The projection vectors do not apply to these channels\n");
@@ -153,8 +166,6 @@ int main(int argc, char *argv[])
     //   Set up the CTF compensator
     //
     qint32 current_comp = MNE::get_current_comp(raw->info);
-    qint32 dest_comp = -1;
-
     if (current_comp > 0)
         printf("Current compensation grade : %d\n",current_comp);
 
@@ -172,35 +183,159 @@ int main(int argc, char *argv[])
         else
         {
             printf("Could not make the compensator\n");
-            return -1;
+            return 0;
         }
     }
     //
-    //   Read a data segment
-    //   times output argument is optional
+    //  Read the events
     //
-    bool readSuccessful = false;
-    MatrixXf* data = NULL;
-    MatrixXf* times = NULL;
-    if (in_samples)
-        readSuccessful = raw->read_raw_segment(data, times, (qint32)from, (qint32)to, picks);
-    else
-        readSuccessful = raw->read_raw_segment_times(data, times, from, to, picks);
-
-    if (!readSuccessful)
+    MatrixXi events;
+    if (t_sEventName.size() == 0)
     {
-        printf("Could not read raw segment.\n");
-        delete raw;
-        return -1;
+        p = t_sFile.indexOf(".fif");
+        if (p > 0)
+        {
+            t_sEventName = t_sFile.replace(p, 4, "-eve.fif");
+        }
+        else
+        {
+            printf("Raw file name does not end properly\n");
+            return 0;
+        }
+//        events = mne_read_events(t_sEventName);
+        MNE::read_events(t_sEventName, events);
+        printf("Events read from %s\n",t_sEventName.toUtf8().constData());
+    }
+    else
+    {
+        //
+        //   Binary file
+        //
+        p = t_sFile.indexOf(".fif");
+        if (p > 0)
+        {
+            if(!MNE::read_events(t_sEventName, events))
+            {
+                printf("Error while read events.\n");
+                return 0;
+            }
+            printf("Binary event file %s read\n",t_sEventName.toUtf8().constData());
+        }
+        else
+        {
+            //
+            //   Text file
+            //
+            printf("Text file %s is not supported jet.\n",t_sEventName.toUtf8().constData());
+//            try
+//                events = load(eventname);
+//            catch
+//                error(me,mne_omit_first_line(lasterr));
+//            end
+//            if size(events,1) < 1
+//                error(me,'No data in the event file');
+//            end
+//            //
+//            //   Convert time to samples if sample number is negative
+//            //
+//            for p = 1:size(events,1)
+//                if events(p,1) < 0
+//                    events(p,1) = events(p,2)*raw.info.sfreq;
+//                end
+//            end
+//            //
+//            //    Select the columns of interest (convert to integers)
+//            //
+//            events = int32(events(:,[1 3 4]));
+//            //
+//            //    New format?
+//            //
+//            if events(1,2) == 0 && events(1,3) == 0
+//                fprintf(1,'The text event file %s is in the new format\n',eventname);
+//                if events(1,1) ~= raw.first_samp
+//                    error(me,'This new format event file is not compatible with the raw data');
+//                end
+//            else
+//                fprintf(1,'The text event file %s is in the old format\n',eventname);
+//                //
+//                //   Offset with first sample
+//                //
+//                events(:,1) = events(:,1) + raw.first_samp;
+//            end
+        }
+    }
+    //
+    //    Select the desired events
+    //
+    qint32 count = 0;
+    MatrixXi selected = MatrixXi::Zero(1, events.rows());
+    for (p = 0; p < events.rows(); ++p)
+    {
+        if (events(p,1) == 0 && events(p,2) == event)
+        {
+            selected(0,count) = p;
+            ++count;
+        }
+    }
+    selected.conservativeResize(1, count);
+    if (count > 0)
+        printf("%d matching events found\n",count);
+    else
+    {
+        printf("No desired events found.\n");
+        return 0;
     }
 
-    printf("Read %d samples.\n",data->cols());
 
 
-    std::cout << data->block(0,0,10,10);
 
 
-    delete raw;
+
+
+
+//    for p = 1:count
+//        %
+//        %       Read a data segment
+//        %
+//        event_samp = events(selected(p),1);
+//        from = event_samp + tmin*raw.info.sfreq;
+//        to   = event_samp + tmax*raw.info.sfreq;
+//        try
+//            if p == 1
+//                [ epoch ] = fiff_read_raw_segment(raw,from,to,picks);
+//                times = double([(from-event_samp):(to-event_samp)])/raw.info.sfreq;
+//            else
+//                [ epoch ] = fiff_read_raw_segment(raw,from,to,picks);
+//            end
+//            data(p).epoch = epoch;
+//            data(p).event = event;
+//            data(p).tmin  = (double(from)-double(raw.first_samp))/raw.info.sfreq;
+//            data(p).tmax  = (double(to)-double(raw.first_samp))/raw.info.sfreq;
+//        catch
+//            fclose(raw.fid);
+//            error(me,'%s',mne_omit_first_line(lasterr));
+//        end
+//    end
+//    fprintf(1,'Read %d epochs, %d samples each.\n',count,length(data(1).epoch));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//    delete raw;
 
     return a.exec();
 }

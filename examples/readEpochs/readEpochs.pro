@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     examples.pro
+# @file     readEpochs.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,18 +29,41 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds all examples of the mne-cpp project.
+# @brief    ToDo Documentation...
 #
 #--------------------------------------------------------------------------------------------------------------
 
+include(../../mne-cpp.pri)
 
-TEMPLATE = subdirs
+TEMPLATE = app
 
-SUBDIRS += \
-    readRaw \
-    readWriteRaw \
-    readFwd \
-    readFwdDisp \
-    readEpochs
+VERSION = $${MNE_CPP_VERSION}
 
-CONFIG += ordered
+QT += core
+QT -= gui
+
+
+CONFIG   += console
+CONFIG   -= app_bundle
+
+TARGET = readEpochs
+
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
+}
+
+CONFIG(debug, debug|release) {
+    LIBS += -L$${PWD}/../../lib/ -lmned
+    LIBS += -L$${PWD}/../../lib/ -lfiffd
+}
+else {
+    LIBS += -L$${PWD}/../../lib/ -lmne
+    LIBS += -L$${PWD}/../../lib/ -lfiff
+}
+
+DESTDIR = $${PWD}/../../bin
+
+SOURCES += \
+    src/main.cpp \
+
+HEADERS += \
