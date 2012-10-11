@@ -76,6 +76,9 @@ FiffRawData::~FiffRawData()
 
 bool FiffRawData::read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t from, fiff_int_t to, MatrixXi sel)
 {
+    if(data)
+        delete data;
+
     bool projAvailable = true;
 
     if (this->proj.rows() == 1 && this->proj.cols() == 1 && this->proj(0,0) == -1)
@@ -117,8 +120,6 @@ bool FiffRawData::read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t
     //
     if (sel.cols() == 0)
     {
-        if(data)
-            delete data;
         data = new MatrixXf(nchan, to-from+1);
 //            data->setZero();
         if (projAvailable || this->comp.kind != -1)
@@ -133,8 +134,6 @@ bool FiffRawData::read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t
     }
     else
     {
-        if(data)
-            delete data;
         data = new MatrixXf(sel.cols(),to-from+1);
 //            data->setZero();
 

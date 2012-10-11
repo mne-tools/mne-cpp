@@ -44,8 +44,15 @@
 #include <math.h>
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// MNE INCLUDES
+//=============================================================================================================
+
 #include "../../../MNE/fiff/fiff.h"
 #include "../../../MNE/mne/mne.h"
+
+#include "../../../MNE/mne/include/mne_epoch_data_list.h"
 
 
 //*************************************************************************************************************
@@ -287,55 +294,64 @@ int main(int argc, char *argv[])
     }
 
 
+    fiff_int_t event_samp, from, to;
+    MatrixXf* timesDummy = NULL;
+
+    MNEEpochDataList data;
+
+    MNEEpochData* epochData = NULL;
+
+    MatrixXf times;
+
+    for (p = 0; p < count; ++p)
+    {
+        //
+        //       Read a data segment
+        //
+        event_samp = events(selected(p),0);
+        from = event_samp + tmin*raw->info->sfreq;
+        to   = event_samp + floor(tmax*raw->info->sfreq + 0.5);
+
+        epochData = new MNEEpochData();
+
+        if(raw->read_raw_segment(epochData->epoch, timesDummy, from, to, picks))
+        {
+            if (p == 0)
+            {
+                times.resize(1, to-from+1);
+                for (qint32 i = 0; i < times.cols(); ++i)
+                    times(0, i) = ((float)(from-event_samp+i)) / raw->info->sfreq;
+            }
+
+            epochData->event = event;
+            epochData->tmin = ((float)(from)-(float)(raw->first_samp))/raw->info->sfreq;
+            epochData->tmax = ((float)(to)-(float)(raw->first_samp))/raw->info->sfreq;
+
+            data.append(epochData);//List takes ownwership of the pointer - no delete need
+        }
+        else
+        {
+            printf("Can't read the event data segments");
+            delete raw;
+            return 0;
+        }
+    }
+
+    if(data.size() > 0)
+    {
+        printf("Read %d epochs, %d samples each.\n",data.size(),data[0]->epoch->cols());
+
+        //DEBUG
+        std::cout << data[0]->epoch->block(0,0,10,10) << std::endl;
+        qDebug() << data[0]->epoch->rows() << " x " << data[0]->epoch->cols();
+    }
 
 
 
+    std::cout << times << std::endl;
+    qDebug() << times.rows() << " x " << times.cols();
 
-
-
-//    for p = 1:count
-//        %
-//        %       Read a data segment
-//        %
-//        event_samp = events(selected(p),1);
-//        from = event_samp + tmin*raw.info.sfreq;
-//        to   = event_samp + tmax*raw.info.sfreq;
-//        try
-//            if p == 1
-//                [ epoch ] = fiff_read_raw_segment(raw,from,to,picks);
-//                times = double([(from-event_samp):(to-event_samp)])/raw.info.sfreq;
-//            else
-//                [ epoch ] = fiff_read_raw_segment(raw,from,to,picks);
-//            end
-//            data(p).epoch = epoch;
-//            data(p).event = event;
-//            data(p).tmin  = (double(from)-double(raw.first_samp))/raw.info.sfreq;
-//            data(p).tmax  = (double(to)-double(raw.first_samp))/raw.info.sfreq;
-//        catch
-//            fclose(raw.fid);
-//            error(me,'%s',mne_omit_first_line(lasterr));
-//        end
-//    end
-//    fprintf(1,'Read %d epochs, %d samples each.\n',count,length(data(1).epoch));
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    delete raw;
+    delete raw;
 
     return a.exec();
 }

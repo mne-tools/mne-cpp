@@ -61,14 +61,18 @@ else {
 SOURCES += mne.cpp \
     src/mne_sourcespace.cpp \
     src/mne_forwardsolution.cpp \
-    src/mne_hemisphere.cpp
+    src/mne_hemisphere.cpp \
+    src/mne_epoch_data.cpp \
+    src/mne_epoch_data_list.cpp
 
 HEADERS += mne.h\
         mne_global.h \
 #    include/hpcmatrix.h \
     include/mne_sourcespace.h \
     include/mne_hemisphere.h \
-    include/mne_forwardsolution.h
+    include/mne_forwardsolution.h \
+    include/mne_epoch_data.h \
+    include/mne_epoch_data_list.h
 
 
 

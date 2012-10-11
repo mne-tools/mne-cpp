@@ -197,7 +197,7 @@ int main(int argc, char *argv[])
     printf("Read %d samples.\n",data->cols());
 
 
-    std::cout << data->block(0,0,10,10);
+    std::cout << data->block(0,0,10,10) << std::endl;
 
 
     delete raw;
