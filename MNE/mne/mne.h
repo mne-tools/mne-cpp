@@ -44,9 +44,9 @@
 
 #include "mne_global.h"
 
-#include "include/mne_forwardsolution.h"
-#include "include/mne_hemisphere.h"
-#include "include/mne_sourcespace.h"
+#include "mne_forwardsolution.h"
+#include "mne_hemisphere.h"
+#include "mne_sourcespace.h"
 
 
 //*************************************************************************************************************
@@ -54,7 +54,7 @@
 // FIFF INCLUDES
 //=============================================================================================================
 
-#include "../fiff/include/fiff_constants.h"
+#include "../fiff/fiff_constants.h"
 
 
 //*************************************************************************************************************

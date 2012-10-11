@@ -51,47 +51,44 @@ win32:QMAKE_POST_LINK += $${QMAKE_COPY} "..\\..\\..\\mne-cpp\\lib\\$${TARGET}.dl
 DESTDIR = $${PWD}/../../lib
 
 SOURCES += fiff.cpp \
-#    src/fiff_parser.cpp \
-    src/fiff_tag.cpp \
-    src/fiff_dir_tree.cpp \
-    src/fiff_coord_trans.cpp \
-    src/fiff_ch_info.cpp \
-    src/fiff_proj.cpp \
-    src/fiff_named_matrix.cpp \
-    src/fiff_file.cpp \
-    src/fiff_raw_data.cpp \
-    src/fiff_ctf_comp.cpp \
-    src/fiff_id.cpp \
-    src/fiff_info.cpp \
-    src/fiff_raw_dir.cpp \
-    src/fiff_dig_point.cpp \
-    src/fiff_ch_pos.cpp
+#    fiff_parser.cpp \
+    fiff_tag.cpp \
+    fiff_dir_tree.cpp \
+    fiff_coord_trans.cpp \
+    fiff_ch_info.cpp \
+    fiff_proj.cpp \
+    fiff_named_matrix.cpp \
+    fiff_file.cpp \
+    fiff_raw_data.cpp \
+    fiff_ctf_comp.cpp \
+    fiff_id.cpp \
+    fiff_info.cpp \
+    fiff_raw_dir.cpp \
+    fiff_dig_point.cpp \
+    fiff_ch_pos.cpp
 
 HEADERS += fiff.h \
         fiff_global.h \
-    include/fiff_types.h \
-    include/fiff_id.h \
-    include/fiff_constants.h \
-    include/fiff_tag.h \
-    include/fiff_dir_tree.h \
-    include/fiff_coord_trans.h \
-    include/fiff_ch_info.h \
-    include/fiff_proj.h \
-    include/fiff_named_matrix.h \
-    include/fiff_ctf_comp.h \
-    include/fiff_info.h \
-    include/fiff_raw_data.h \
-    include/fiff_dir_entry.h \
-    include/fiff_raw_dir.h \
-    include/fiff_file.h \
-    include/fiff_dig_point.h \
-    include/fiff_ch_pos.h
+    fiff_types.h \
+    fiff_id.h \
+    fiff_constants.h \
+    fiff_tag.h \
+    fiff_dir_tree.h \
+    fiff_coord_trans.h \
+    fiff_ch_info.h \
+    fiff_proj.h \
+    fiff_named_matrix.h \
+    fiff_ctf_comp.h \
+    fiff_info.h \
+    fiff_raw_data.h \
+    fiff_dir_entry.h \
+    fiff_raw_dir.h \
+    fiff_file.h \
+    fiff_dig_point.h \
+    fiff_ch_pos.h
 
 #Install headers to include directory
-baseheader_files.files = ./*.h
-baseheader_files.path = ../../include/fiff
-header_files.files = ./include/*.h
-header_files.path = ../../include/fiff/include
+header_files.files = ./*.h
+header_files.path = ../../include/fiff
 
-INSTALLS += baseheader_files \
-            header_files
+INSTALLS += header_files

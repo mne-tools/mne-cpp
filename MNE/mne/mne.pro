@@ -59,28 +59,26 @@ else {
 }
 
 SOURCES += mne.cpp \
-    src/mne_sourcespace.cpp \
-    src/mne_forwardsolution.cpp \
-    src/mne_hemisphere.cpp \
-    src/mne_epoch_data.cpp \
-    src/mne_epoch_data_list.cpp
+    mne_sourcespace.cpp \
+    mne_forwardsolution.cpp \
+    mne_hemisphere.cpp \
+    mne_epoch_data.cpp \
+    mne_epoch_data_list.cpp
 
 HEADERS += mne.h\
         mne_global.h \
-#    include/hpcmatrix.h \
-    include/mne_sourcespace.h \
-    include/mne_hemisphere.h \
-    include/mne_forwardsolution.h \
-    include/mne_epoch_data.h \
-    include/mne_epoch_data_list.h
+#    hpcmatrix.h \
+    mne_sourcespace.h \
+    mne_hemisphere.h \
+    mne_forwardsolution.h \
+    mne_epoch_data.h \
+    mne_epoch_data_list.h
 
 
 
 #Install headers to include directory
-baseheader_files.files = ./*.h
-baseheader_files.path = ../../include/mne
-header_files.files = ./include/*.h
-header_files.path = ../../include/mne/include
+header_files.files = ./*.h
+header_files.path = ../../include/mne
 
 INSTALLS += baseheader_files \
             header_files
