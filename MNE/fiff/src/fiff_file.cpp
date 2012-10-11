@@ -71,7 +71,7 @@ FiffFile::~FiffFile()
 {
     if(this->isOpen())
     {
-        qDebug() << "close File " << this->fileName();
+        printf("Closing file %s.\n", this->fileName().toUtf8().constData());
         this->close();
     }
 }

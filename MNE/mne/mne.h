@@ -73,9 +73,6 @@
 namespace MNELIB
 {
 
-static MatrixXf defaultUMatrix = MatrixXf::Constant(1,1,-1);
-
-
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -191,123 +188,245 @@ public:
 //    % Create a compensation matrix to bring the data from one compensation
 //    % state to another
 //    %
-
-
-
-
 //    function [comp] =
 //    mne_make_compensator(info,from,to,exclude_comp_chs)
 
 
-//    me='MNE:mne_make_compensator';
+    //=========================================================================================================
+    /**
+    * ToDo make this part of FiffInfo
+    * mne_make_compensator
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Create a compensation matrix to bring the data from one compensation state to another
+    *
+    * @param[in] info               measurement info as returned by the fif reading routines
+    * @param[in] from               compensation in the input data
+    * @param[in] to                 desired compensation in the output
+    * @param[out] comp              Compensation Matrix
+    * @param[in] exclude_comp_chs   exclude compensation channels from the output (optional)
+    *
+    * @return true if succeeded, false otherwise
+    */
+    static bool make_compensator(FiffInfo* info, fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf_comp, bool exclude_comp_chs = false)
+    {
+        qDebug() << "make_compensator not debugged jet";
 
-//    global FIFF;
-//    if isempty(FIFF)
-//        FIFF = fiff_define_constants();
-//    end
+        MatrixXf C1, C2, comp_tmp;
 
-//    if nargin == 3
-//        exclude_comp_chs = false;
-//    elseif nargin ~= 4
-//        error(me,'Incorrect number of arguments');
-//    end
+        qDebug() << "Todo add all need ctf variables.";
+        if(ctf_comp.data)
+            delete ctf_comp.data;
+        ctf_comp.data = new FiffNamedMatrix();
 
-//    if from == to
-//        comp = zeros(info.nchan,info.nchan);
-//        return;
-//    end
+        if (from == to)
+        {
+            ctf_comp.data->data = MatrixXf::Zero(info->nchan, info->nchan);
+            return false;
+        }
 
-//    if from == 0
-//        C1 = zeros(info.nchan,info.nchan);
-//    else
-//        try
-//            C1 = make_compensator(info,from);
-//        catch
-//            error(me,'Cannot create compensator C1 (%s)',mne_omit_first_line(lasterr));
-//        end
-//        if isempty(C1)
-//            error(me,'Desired compensation matrix (kind = %d) not found',from);
-//        end
-//    end
-//    if to == 0
-//        C2 = zeros(info.nchan,info.nchan);
-//    else
-//        try
-//            C2 = make_compensator(info,to);
-//        catch
-//            error(me,'Cannot create compensator C2 (%s)',mne_omit_first_line(lasterr));
-//        end
-//        if isempty(C2)
-//            error(me,'Desired compensation matrix (kind = %d) not found',to);
-//        end
-//    end
+        if (from == 0)
+            C1 = MatrixXf::Zero(info->nchan,info->nchan);
+        else
+        {
+            if (!make_compensator(info,from, C1))
+            {
+                printf("Cannot create compensator C1\n");
+                printf("Desired compensation matrix (kind = %d) not found\n",from);
+                return false;
+            }
+        }
+
+        if (to == 0)
+            C2 = MatrixXf::Zero(info->nchan,info->nchan);
+        else
+        {
+            if (!make_compensator(info, to, C2))
+            {
+                printf("Cannot create compensator C2\n");
+                printf("Desired compensation matrix (kind = %d) not found\n",to);
+                return false;
+            }
+        }
+        //
+        //   s_orig = s_from + C1*s_from = (I + C1)*s_from
+        //   s_to   = s_orig - C2*s_orig = (I - C2)*s_orig
+        //   s_to   = (I - C2)*(I + C1)*s_from = (I + C1 - C2 - C2*C1)*s_from
+        //
+        comp_tmp = MatrixXf::Identity(info->nchan,info->nchan) + C1 - C2 - C2*C1;
+
+        qint32 k;
+        if (exclude_comp_chs)
+        {
+            VectorXi pick  = MatrixXi::Zero(1,info->nchan);
+            qint32 npick = 0;
+            for (k = 0; k < info->nchan; ++k)
+            {
+                if (info->chs[k].kind != FIFFV_REF_MEG_CH)
+                {
+                    pick(npick) = k;
+                    ++npick;
+                }
+            }
+            if (npick == 0)
+            {
+                printf("Nothing remains after excluding the compensation channels\n");
+                return false;
+            }
+
+            ctf_comp.data->data.resize(npick,info->nchan);
+            for (k = 0; k < npick; ++k)
+                ctf_comp.data->data.row(k) = comp_tmp.block(pick(k), 0, 1, info->nchan);
+        }
+        return true;
+    }
+
+
+
+
+
+    //=========================================================================================================
+
+
+
+
+//    function this_comp = make_compensator(info,kind)
+
+
+    static bool make_compensator(FiffInfo* info, fiff_int_t kind, MatrixXf& this_comp)
+    {
+        qDebug() << "make_compensator not debugged jet";
+
+        FiffNamedMatrix* this_data;
+        MatrixXf presel, postsel;
+        qint32 k, col, c, ch, row, row_ch, channelAvailable;
+        for (k = 0; k < info->comps.size(); ++k)
+        {
+            if (info->comps[k]->kind == kind)
+            {
+                this_data = info->comps[k]->data;
+                //
+                //   Create the preselector
+                //
+                presel  = MatrixXf::Zero(this_data->ncol,info->nchan);
+                for(col = 0; col < this_data->ncol; ++col)
+                {
+                    channelAvailable = 0;
+                    for (c = 0; c < info->ch_names.size(); ++c)
+                    {
+                        if (QString::compare(this_data->col_names.at(col),info->ch_names.at(c)) == 0)
+                        {
+                            ++channelAvailable;
+                            ch = c;
+                        }
+                    }
+
+                    if (channelAvailable == 0)
+                    {
+                        printf("Channel %s is not available in data\n",this_data->col_names.at(col).toUtf8().constData());
+                        return false;
+                    }
+                    else if (channelAvailable > 1)
+                    {
+                        printf("Ambiguous channel %s",this_data->col_names.at(col).toUtf8().constData());
+                        return false;
+                    }
+                    presel(col,ch) = 1.0;
+                }
+                //
+                //   Create the postselector
+                //
+                postsel = MatrixXf::Zero(info->nchan,this_data->nrow);
+                for (c = 0; c  < info->nchan; ++c)
+                {
+
+                    channelAvailable = 0;
+                    for (row = 0; row < this_data->row_names.size(); ++row)
+                    {
+                        if (QString::compare(this_data->col_names.at(c),info->ch_names.at(row)) == 0)
+                        {
+                            ++channelAvailable;
+                            row_ch = row;
+                        }
+                    }
+
+                    if (channelAvailable > 1)
+                    {
+                        printf("Ambiguous channel %s", info->ch_names.at(c).toUtf8().constData());
+                        return false;
+                    }
+                    else if (channelAvailable == 1)
+                    {
+                        postsel(c,row_ch) = 1.0;
+                    }
+
+                }
+                this_comp = postsel*this_data->data*presel;
+                return true;
+            }
+        }
+        this_comp = defaultMatrixXf;
+        return false;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //=========================================================================================================
+
+//Todo: Make this part of the raw.info
+//    function new_chs = mne_set_current_comp(chs,value)
 //    %
-//    %   s_orig = s_from + C1*s_from = (I + C1)*s_from
-//    %   s_to   = s_orig - C2*s_orig = (I - C2)*s_orig
-//    %   s_to   = (I - C2)*(I + C1)*s_from = (I + C1 - C2 - C2*C1)*s_from
+//    % mne_set_current_comp(chs,value)
 //    %
-//    comp = eye(info.nchan,info.nchan) + C1 - C2 - C2*C1;
+//    % Set the current compensation value in the channel info structures
+//    %
 
-//    if exclude_comp_chs
-//        pick  = zeros(info.nchan);
-//        npick = 0;
-//        for k = 1:info.nchan
-//            if info.chs(k).kind ~= FIFF.FIFFV_REF_MEG_CH
-//                npick = npick + 1;
-//                pick(npick) = k;
-//            end
-//        end
-//        if npick == 0
-//            error(me,'Nothing remains after excluding the compensation channels');
-//        end
-//        comp = comp(pick(1:npick),:);
-//    end
 
-//    return;
+    static QList<FiffChInfo> set_current_comp(QList<FiffChInfo>& chs, fiff_int_t value)
+    {
+        QList<FiffChInfo> new_chs;
+        qint32 k;
+        fiff_int_t coil_type;
 
-//        function this_comp = make_compensator(info,kind)
+        for(k = 0; k < chs.size(); ++k)
+        {
+            new_chs.append(FiffChInfo(&chs[k]));
+        }
 
-//            for k = 1:length(info.comps)
-//                if info.comps(k).kind == kind
-//                    this_data = info.comps(k).data;
-//                    %
-//                    %   Create the preselector
-//                    %
-//                    presel  = zeros(this_data.ncol,info.nchan);
-//                    for col = 1:this_data.ncol
-//                        c = strmatch(this_data.col_names{col},info.ch_names,'exact');
-//                        if isempty(c)
-//                            error(me,'Channel %s is not available in data',this_data.col_names{col});
-//                        elseif length(c) > 1
-//                            error(me,'Ambiguous channel %s',mat.col_names{col});
-//                        end
-//                        presel(col,c) = 1.0;
-//                    end
-//                    %
-//                    %   Create the postselector
-//                    %
-//                    postsel = zeros(info.nchan,this_data.nrow);
-//                    for c = 1:info.nchan
-//                        row = strmatch(info.ch_names{c},this_data.row_names,'exact');
-//                        if length(row) > 1
-//                            error(me,'Ambiguous channel %s', info.ch_names{c});
-//                        elseif length(row) == 1
-//                            postsel(c,row) = 1.0;
-//                        end
-//                    end
-//                    this_comp = postsel*this_data.data*presel;
-//                    return;
-//                end
-//            end
-//            this_comp = [];
-//            return;
-//        end
-
-//    end
+        qint32 lower_half = 65535;// hex2dec('FFFF');
+        for (k = 0; k < chs.size(); ++k)
+        {
+            if (chs[k].kind == FIFFV_MEG_CH)
+            {
+                coil_type = chs[k].coil_type & lower_half;
+                new_chs[k].coil_type = (coil_type | (value << 16));
+            }
+        }
+        return new_chs;
+    }
 
 
 
 
+
+    //=========================================================================================================
     /**
     * make_projector
     *
@@ -327,7 +446,7 @@ public:
     *
     * @return nproj - How many items in the projector
     */
-    inline static fiff_int_t make_projector(QList<FiffProj*>& projs, QStringList& ch_names, MatrixXf& proj, QStringList& bads = defaultQStringList, MatrixXf& U = defaultUMatrix)
+    inline static fiff_int_t make_projector(QList<FiffProj*>& projs, QStringList& ch_names, MatrixXf& proj, QStringList& bads = defaultQStringList, MatrixXf& U = defaultMatrixXf)
     {
         return FiffInfo::make_projector(projs, ch_names, proj, bads, U);
     }
@@ -392,6 +511,126 @@ public:
     {
         return MNESourceSpace::patch_info(nearest, pinfo);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//    function [eventlist] = mne_read_events(filename)
+//    %
+//    % [eventlist] = mne_read_events(filename)
+//    %
+//    % Read an event list from a fif file
+//    %
+
+    static bool read_events(QString& p_sFileName, MatrixXi& eventlist)
+    {
+        //
+        // Open file
+        //
+        FiffFile* t_pFile = new FiffFile(p_sFileName);
+        FiffDirTree* t_pTree = NULL;
+        QList<FiffDirEntry>* t_pDir = NULL;
+
+        if(!t_pFile->open(t_pTree, t_pDir))
+        {
+            if(t_pTree)
+                delete t_pTree;
+
+            if(t_pDir)
+                delete t_pDir;
+
+            return false;
+        }
+
+        //
+        //   Find the desired block
+        //
+        QList<FiffDirTree*> events = t_pTree->dir_tree_find(FIFFB_MNE_EVENTS);
+
+        if (events.size() == 0)
+        {
+            printf("Could not find event data\n");
+            delete t_pFile;
+            delete t_pTree;
+            delete t_pDir;
+            return false;
+        }
+
+        qint32 k, nelem;
+        fiff_int_t kind, pos;
+        FiffTag* t_pTag = NULL;
+        quint32* serial_eventlist = NULL;
+        for(k = 0; k < events[0]->nent; ++k)
+        {
+            kind = events[0]->dir[k].kind;
+            pos  = events[0]->dir[k].pos;
+            if (kind == FIFF_MNE_EVENT_LIST)
+            {
+                FiffTag::read_tag(t_pFile,t_pTag,pos);
+                if(t_pTag->type == FIFFT_UINT)
+                {
+                    serial_eventlist = t_pTag->toUnsignedInt();
+                    nelem = t_pTag->size/4;
+                }
+                break;
+            }
+        }
+
+        if(serial_eventlist == NULL)
+        {
+            delete t_pFile;
+            delete t_pTree;
+            delete t_pDir;
+            delete t_pTag;
+            printf("Could not find any events\n");
+            return false;
+        }
+        else
+        {
+            eventlist.resize(nelem/3,3);
+            for(k = 0; k < nelem/3; ++k)
+            {
+                eventlist(k,0) = serial_eventlist[k*3];
+                eventlist(k,1) = serial_eventlist[k*3+1];
+                eventlist(k,2) = serial_eventlist[k*3+2];
+            }
+        }
+
+        delete t_pFile;
+        delete t_pTree;
+        delete t_pDir;
+        delete t_pTag;
+        return true;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     //=========================================================================================================
     /**
