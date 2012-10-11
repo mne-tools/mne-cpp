@@ -69,8 +69,7 @@ HEADERS += disp_global.h \
 
 
 #Install headers to include directory
-baseheader_files.files = ./*.h
-baseheader_files.path = ../../include/disp
+header_files.files = ./*.h
+header_files.path = ../../include/disp
 
-INSTALLS += baseheader_files \
-            header_files
+INSTALLS += header_files

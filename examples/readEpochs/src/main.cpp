@@ -52,7 +52,7 @@
 #include "../../../MNE/fiff/fiff.h"
 #include "../../../MNE/mne/mne.h"
 
-#include "../../../MNE/mne/include/mne_epoch_data_list.h"
+#include "../../../MNE/mne/mne_epoch_data_list.h"
 
 
 //*************************************************************************************************************
@@ -344,12 +344,10 @@ int main(int argc, char *argv[])
         //DEBUG
         std::cout << data[0]->epoch->block(0,0,10,10) << std::endl;
         qDebug() << data[0]->epoch->rows() << " x " << data[0]->epoch->cols();
+
+        std::cout << times.block(0,0,1,10) << std::endl;
+        qDebug() << times.rows() << " x " << times.cols();
     }
-
-
-
-    std::cout << times << std::endl;
-    qDebug() << times.rows() << " x " << times.cols();
 
     delete raw;
 
