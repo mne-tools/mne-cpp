@@ -1,6 +1,8 @@
 var searchData=
 [
   ['time',['time',['../class_f_i_f_f_l_i_b_1_1_fiff_id.html#a93dc35d7aa0034b38b9443906303fe6c',1,'FIFFLIB::FiffId']]],
+  ['tmax',['tmax',['../class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html#af14c458e96940b814fc3a54a145fc4e3',1,'MNELIB::MNEEpochData']]],
+  ['tmin',['tmin',['../class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html#ae886dc35e258419e7592afac6537e07c',1,'MNELIB::MNEEpochData']]],
   ['to',['to',['../class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a0d4f29ae5b9affe90e2cfadf922e36f7',1,'FIFFLIB::FiffCoordTrans']]],
   ['to_5fmask',['to_mask',['../struct_f_i_f_f_l_i_b_1_1__fiff__event__bits.html#ad496c3efb091087fc97791c42f1b7a65',1,'FIFFLIB::_fiff_event_bits']]],
   ['to_5fstate',['to_state',['../struct_f_i_f_f_l_i_b_1_1__fiff__event__bits.html#afd330523a68e8e49ba82d1eb71f62f0d',1,'FIFFLIB::_fiff_event_bits']]],

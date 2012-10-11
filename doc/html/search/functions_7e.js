@@ -17,6 +17,8 @@ var searchData=
   ['_7efiffrawdir',['~FiffRawDir',['../class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#acfef15bbed055ad5efdc200229a2596a',1,'FIFFLIB::FiffRawDir']]],
   ['_7efifftag',['~FiffTag',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a5bdeecbcb08d97cfa11a0af901b151fd',1,'FIFFLIB::FiffTag']]],
   ['_7emne',['~MNE',['../class_m_n_e_l_i_b_1_1_m_n_e.html#a3a3db7fcf53cdd25d194538cf455ee4f',1,'MNELIB::MNE']]],
+  ['_7emneepochdata',['~MNEEpochData',['../class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html#ada223f0edc6fb53f1fe321e201c6e692',1,'MNELIB::MNEEpochData']]],
+  ['_7emneepochdatalist',['~MNEEpochDataList',['../class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html#a36e22a830680b6eee0706993461e139f',1,'MNELIB::MNEEpochDataList']]],
   ['_7emneforwardsolution',['~MNEForwardSolution',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#af7807f7d45b2a21d782ab73aaf117411',1,'MNELIB::MNEForwardSolution']]],
   ['_7emnehemisphere',['~MNEHemisphere',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a29c61433931c07044af051a53a4f08c1',1,'MNELIB::MNEHemisphere']]],
   ['_7emnesourcespace',['~MNESourceSpace',['../class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a2dcc53eec782e14a65530db6195ec629',1,'MNELIB::MNESourceSpace']]]

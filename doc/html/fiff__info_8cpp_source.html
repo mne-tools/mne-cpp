@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>mne-cpp: D:/Users/Christoph/Documents/GitHub/mne-cpp/MNE/fiff/src/fiff_info.cpp Source File</title>
+<title>mne-cpp: D:/Users/Christoph/Documents/GitHub/mne-cpp/MNE/fiff/fiff_info.cpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -79,7 +79,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_fba7b6d30909f9ec66000534e18b073e.html">MNE</a></li><li class="navelem"><a class="el" href="dir_02d6b00d369dfdccb62582dcf5f74964.html">fiff</a></li><li class="navelem"><a class="el" href="dir_b5a948535b20cd5da5aaf43a22525590.html">src</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_fba7b6d30909f9ec66000534e18b073e.html">MNE</a></li><li class="navelem"><a class="el" href="dir_02d6b00d369dfdccb62582dcf5f74964.html">fiff</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -93,7 +93,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="comment">// INCLUDES</span></div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">#include &quot;../include/fiff_info.h&quot;</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="fiff__info_8h.html" title="Contains the FiffInfo class declaration.">fiff_info.h</a>&quot;</span></div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
@@ -101,7 +101,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="comment">// Eigen INCLUDES</span></div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">#include &quot;../../3rdParty/Eigen/SVD&quot;</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">#include &quot;../3rdParty/Eigen/SVD&quot;</span></div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
@@ -143,7 +143,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;</div>
-<div class="line"><a name="l00091"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a813c51af5bbd90d6f8294a30560ff37d">   91</a></span>&#160;fiff_int_t <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a813c51af5bbd90d6f8294a30560ff37d">FiffInfo::make_projector</a>(QList&lt;FiffProj*&gt;&amp; projs, QStringList&amp; ch_names, MatrixXf&amp; proj, QStringList&amp; bads, MatrixXf&amp; U)</div>
+<div class="line"><a name="l00091"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a6a0f80b57c898dc26df8195bf18f75a5">   91</a></span>&#160;fiff_int_t <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a6a0f80b57c898dc26df8195bf18f75a5">FiffInfo::make_projector</a>(QList&lt;FiffProj*&gt;&amp; projs, QStringList&amp; ch_names, MatrixXf&amp; proj, QStringList&amp; bads, MatrixXf&amp; U)</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;{</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    fiff_int_t nchan = ch_names.size();</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <span class="keywordflow">if</span> (nchan == 0)</div>
@@ -291,23 +291,22 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;            nvec = k+1;</div>
 <div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;            <span class="keywordflow">break</span>;</div>
 <div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;        }</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    }</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    U = svd.matrixU().block(0, 0, vecs.rows(), nvec);</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    <span class="comment">//   Here is the celebrated result</span></div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    proj -= U*U.transpose();</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    nproj = nvec;</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    <span class="keywordflow">return</span> nproj;</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;}</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    }</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    U = svd.matrixU().block(0, 0, vecs.rows(), nvec);</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    <span class="comment">//   Here is the celebrated result</span></div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    proj -= U*U.transpose();</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    nproj = nvec;</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;    <span class="keywordflow">return</span> nproj;</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Oct 9 2012 22:17:54 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Oct 11 2012 19:15:40 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

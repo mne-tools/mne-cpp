@@ -1,6 +1,8 @@
 var searchData=
 [
   ['time',['time',['../class_f_i_f_f_l_i_b_1_1_fiff_id.html#a93dc35d7aa0034b38b9443906303fe6c',1,'FIFFLIB::FiffId']]],
+  ['tmax',['tmax',['../class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html#af14c458e96940b814fc3a54a145fc4e3',1,'MNELIB::MNEEpochData']]],
+  ['tmin',['tmin',['../class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html#ae886dc35e258419e7592afac6537e07c',1,'MNELIB::MNEEpochData']]],
   ['to',['to',['../class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a0d4f29ae5b9affe90e2cfadf922e36f7',1,'FIFFLIB::FiffCoordTrans']]],
   ['to_5fmask',['to_mask',['../struct_f_i_f_f_l_i_b_1_1__fiff__event__bits.html#ad496c3efb091087fc97791c42f1b7a65',1,'FIFFLIB::_fiff_event_bits']]],
   ['to_5fstate',['to_state',['../struct_f_i_f_f_l_i_b_1_1__fiff__event__bits.html#afd330523a68e8e49ba82d1eb71f62f0d',1,'FIFFLIB::_fiff_event_bits']]],
@@ -24,8 +26,8 @@ var searchData=
   ['tounsignedshort',['toUnsignedShort',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a34644147b22eb4bcb32c3a803fbaf089',1,'FIFFLIB::FiffTag']]],
   ['trans',['trans',['../class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a094443e1f367198ef85d57382987afbb',1,'FIFFLIB::FiffCoordTrans']]],
   ['transform_5fhemisphere_5fto',['transform_hemisphere_to',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a0668a83d396e9b1b3d7ce63dd45e2bad',1,'MNELIB::MNEHemisphere']]],
-  ['transform_5fsource_5fspace_5fto',['transform_source_space_to',['../class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#ab6edd0ccf2a7aa3855b0c0281e48049b',1,'MNELIB::MNESourceSpace::transform_source_space_to()'],['../class_m_n_e_l_i_b_1_1_m_n_e.html#a1b7cefb798199742979ce479e079def2',1,'MNELIB::MNE::transform_source_space_to()']]],
-  ['transpose_5fnamed_5fmatrix',['transpose_named_matrix',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ac99b19637d1b28c40b4ddd9b417bff57',1,'MNELIB::MNEForwardSolution::transpose_named_matrix()'],['../class_m_n_e_l_i_b_1_1_m_n_e.html#a0fee75f48ea3c6b7c6cfe4dbb0ae5183',1,'MNELIB::MNE::transpose_named_matrix()']]],
+  ['transform_5fsource_5fspace_5fto',['transform_source_space_to',['../class_m_n_e_l_i_b_1_1_m_n_e.html#a1b7cefb798199742979ce479e079def2',1,'MNELIB::MNE::transform_source_space_to()'],['../class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#ab6edd0ccf2a7aa3855b0c0281e48049b',1,'MNELIB::MNESourceSpace::transform_source_space_to()']]],
+  ['transpose_5fnamed_5fmatrix',['transpose_named_matrix',['../class_m_n_e_l_i_b_1_1_m_n_e.html#a0fee75f48ea3c6b7c6cfe4dbb0ae5183',1,'MNELIB::MNE::transpose_named_matrix()'],['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ac99b19637d1b28c40b4ddd9b417bff57',1,'MNELIB::MNEForwardSolution::transpose_named_matrix()']]],
   ['tri_5farea',['tri_area',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ae281be69d45e11f69f7f348d4365ba46',1,'MNELIB::MNEHemisphere']]],
   ['tri_5fcent',['tri_cent',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a97a5bdf21c1a81358c17d3a7c49c42d3',1,'MNELIB::MNEHemisphere']]],
   ['tri_5fnn',['tri_nn',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#afc5f43df06bf061ef2a486ceb67177c0',1,'MNELIB::MNEHemisphere']]],
