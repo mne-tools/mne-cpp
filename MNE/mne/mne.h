@@ -119,33 +119,24 @@ public:
 
 
 
-
-
-    //ToDo make this part of fiff Info
-    static qint32 get_current_comp(FiffInfo* info)
+    //=========================================================================================================
+    /**
+    * mne_get_current_comp
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffInfo get_current_comp member function
+    *
+    * Get the current compensation in effect in the data
+    *
+    * @param[in] info   Fiff measurement info
+    *
+    * @return the current compensation
+    */
+    static inline qint32 get_current_comp(FiffInfo* info)
     {
-        qint32 comp = 0;
-        qint32 first_comp = -1;
-
-        qint32 k = 0;
-        for (k = 0; k < info->nchan; ++k)
-        {
-            if (info->chs[k].kind == FIFFV_MEG_CH)
-            {
-                comp = info->chs[k].coil_type >> 16;
-                if (first_comp < 0)
-                    first_comp = comp;
-                else if (comp != first_comp)
-                    printf("Compensation is not set equally on all MEG channels");
-            }
-        }
-        return comp;
+        return info->get_current_comp();
     }
-
-
-
-
-
 
 
     //=========================================================================================================
@@ -211,219 +202,32 @@ public:
     */
     static bool make_compensator(FiffInfo* info, fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf_comp, bool exclude_comp_chs = false)
     {
-        qDebug() << "make_compensator not debugged jet";
-
-        MatrixXf C1, C2, comp_tmp;
-
-        qDebug() << "Todo add all need ctf variables.";
-        if(ctf_comp.data)
-            delete ctf_comp.data;
-        ctf_comp.data = new FiffNamedMatrix();
-
-        if (from == to)
-        {
-            ctf_comp.data->data = MatrixXf::Zero(info->nchan, info->nchan);
-            return false;
-        }
-
-        if (from == 0)
-            C1 = MatrixXf::Zero(info->nchan,info->nchan);
-        else
-        {
-            if (!make_compensator(info,from, C1))
-            {
-                printf("Cannot create compensator C1\n");
-                printf("Desired compensation matrix (kind = %d) not found\n",from);
-                return false;
-            }
-        }
-
-        if (to == 0)
-            C2 = MatrixXf::Zero(info->nchan,info->nchan);
-        else
-        {
-            if (!make_compensator(info, to, C2))
-            {
-                printf("Cannot create compensator C2\n");
-                printf("Desired compensation matrix (kind = %d) not found\n",to);
-                return false;
-            }
-        }
-        //
-        //   s_orig = s_from + C1*s_from = (I + C1)*s_from
-        //   s_to   = s_orig - C2*s_orig = (I - C2)*s_orig
-        //   s_to   = (I - C2)*(I + C1)*s_from = (I + C1 - C2 - C2*C1)*s_from
-        //
-        comp_tmp = MatrixXf::Identity(info->nchan,info->nchan) + C1 - C2 - C2*C1;
-
-        qint32 k;
-        if (exclude_comp_chs)
-        {
-            VectorXi pick  = MatrixXi::Zero(1,info->nchan);
-            qint32 npick = 0;
-            for (k = 0; k < info->nchan; ++k)
-            {
-                if (info->chs[k].kind != FIFFV_REF_MEG_CH)
-                {
-                    pick(npick) = k;
-                    ++npick;
-                }
-            }
-            if (npick == 0)
-            {
-                printf("Nothing remains after excluding the compensation channels\n");
-                return false;
-            }
-
-            ctf_comp.data->data.resize(npick,info->nchan);
-            for (k = 0; k < npick; ++k)
-                ctf_comp.data->data.row(k) = comp_tmp.block(pick(k), 0, 1, info->nchan);
-        }
-        return true;
+        return info->make_compensator(from, to, ctf_comp, exclude_comp_chs);
     }
 
 
-
-
-
+    //ToDo FiffChInfoList Class
     //=========================================================================================================
-
-
-
-
-//    function this_comp = make_compensator(info,kind)
-
-
-    static bool make_compensator(FiffInfo* info, fiff_int_t kind, MatrixXf& this_comp)
-    {
-        qDebug() << "make_compensator not debugged jet";
-
-        FiffNamedMatrix* this_data;
-        MatrixXf presel, postsel;
-        qint32 k, col, c, ch, row, row_ch, channelAvailable;
-        for (k = 0; k < info->comps.size(); ++k)
-        {
-            if (info->comps[k]->kind == kind)
-            {
-                this_data = info->comps[k]->data;
-                //
-                //   Create the preselector
-                //
-                presel  = MatrixXf::Zero(this_data->ncol,info->nchan);
-                for(col = 0; col < this_data->ncol; ++col)
-                {
-                    channelAvailable = 0;
-                    for (c = 0; c < info->ch_names.size(); ++c)
-                    {
-                        if (QString::compare(this_data->col_names.at(col),info->ch_names.at(c)) == 0)
-                        {
-                            ++channelAvailable;
-                            ch = c;
-                        }
-                    }
-
-                    if (channelAvailable == 0)
-                    {
-                        printf("Channel %s is not available in data\n",this_data->col_names.at(col).toUtf8().constData());
-                        return false;
-                    }
-                    else if (channelAvailable > 1)
-                    {
-                        printf("Ambiguous channel %s",this_data->col_names.at(col).toUtf8().constData());
-                        return false;
-                    }
-                    presel(col,ch) = 1.0;
-                }
-                //
-                //   Create the postselector
-                //
-                postsel = MatrixXf::Zero(info->nchan,this_data->nrow);
-                for (c = 0; c  < info->nchan; ++c)
-                {
-
-                    channelAvailable = 0;
-                    for (row = 0; row < this_data->row_names.size(); ++row)
-                    {
-                        if (QString::compare(this_data->col_names.at(c),info->ch_names.at(row)) == 0)
-                        {
-                            ++channelAvailable;
-                            row_ch = row;
-                        }
-                    }
-
-                    if (channelAvailable > 1)
-                    {
-                        printf("Ambiguous channel %s", info->ch_names.at(c).toUtf8().constData());
-                        return false;
-                    }
-                    else if (channelAvailable == 1)
-                    {
-                        postsel(c,row_ch) = 1.0;
-                    }
-
-                }
-                this_comp = postsel*this_data->data*presel;
-                return true;
-            }
-        }
-        this_comp = defaultMatrixXf;
-        return false;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //=========================================================================================================
-
-//Todo: Make this part of the raw.info
-//    function new_chs = mne_set_current_comp(chs,value)
-//    %
-//    % mne_set_current_comp(chs,value)
-//    %
-//    % Set the current compensation value in the channel info structures
-//    %
-
-
+    /**
+    * mne_set_current_comp
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffInfo::set_current_comp static function
+    * Consider taking the member function of a FiffInfo set_current_comp(fiff_int_t value),
+    * when compensation should be applied to the channels of FiffInfo
+    *
+    * Set the current compensation value in the channel info structures
+    *
+    * @param[in] chs    fiff channel info list
+    * @param[in] value  compensation value
+    *
+    * @return the current compensation
+    */
     static QList<FiffChInfo> set_current_comp(QList<FiffChInfo>& chs, fiff_int_t value)
     {
-        QList<FiffChInfo> new_chs;
-        qint32 k;
-        fiff_int_t coil_type;
-
-        for(k = 0; k < chs.size(); ++k)
-        {
-            new_chs.append(FiffChInfo(&chs[k]));
-        }
-
-        qint32 lower_half = 65535;// hex2dec('FFFF');
-        for (k = 0; k < chs.size(); ++k)
-        {
-            if (chs[k].kind == FIFFV_MEG_CH)
-            {
-                coil_type = chs[k].coil_type & lower_half;
-                new_chs[k].coil_type = (coil_type | (value << 16));
-            }
-        }
-        return new_chs;
+        return FiffInfo::set_current_comp(chs, value);
     }
-
-
-
 
 
     //=========================================================================================================
@@ -458,9 +262,7 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffInfo::make_projector_info(FiffInfo* info, MatrixXf& proj) static function
-    * There exists also a member functions which should be preferred:
-    * FiffInfo make_projector_info(MatrixXf& proj)
+    * Wrapper for the FiffInfo make_projector_info(MatrixXf& proj) member function
     *
     * Make a SSP operator using the meas info
     *
@@ -494,6 +296,7 @@ public:
         return MNESourceSpace::find_source_space_hemi(p_pHemisphere);
     }
 
+
     //=========================================================================================================
     /**
     * mne_patch_info
@@ -513,123 +316,21 @@ public:
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    function [eventlist] = mne_read_events(filename)
-//    %
-//    % [eventlist] = mne_read_events(filename)
-//    %
-//    % Read an event list from a fif file
-//    %
-
-    static bool read_events(QString& p_sFileName, MatrixXi& eventlist)
-    {
-        //
-        // Open file
-        //
-        FiffFile* t_pFile = new FiffFile(p_sFileName);
-        FiffDirTree* t_pTree = NULL;
-        QList<FiffDirEntry>* t_pDir = NULL;
-
-        if(!t_pFile->open(t_pTree, t_pDir))
-        {
-            if(t_pTree)
-                delete t_pTree;
-
-            if(t_pDir)
-                delete t_pDir;
-
-            return false;
-        }
-
-        //
-        //   Find the desired block
-        //
-        QList<FiffDirTree*> events = t_pTree->dir_tree_find(FIFFB_MNE_EVENTS);
-
-        if (events.size() == 0)
-        {
-            printf("Could not find event data\n");
-            delete t_pFile;
-            delete t_pTree;
-            delete t_pDir;
-            return false;
-        }
-
-        qint32 k, nelem;
-        fiff_int_t kind, pos;
-        FiffTag* t_pTag = NULL;
-        quint32* serial_eventlist = NULL;
-        for(k = 0; k < events[0]->nent; ++k)
-        {
-            kind = events[0]->dir[k].kind;
-            pos  = events[0]->dir[k].pos;
-            if (kind == FIFF_MNE_EVENT_LIST)
-            {
-                FiffTag::read_tag(t_pFile,t_pTag,pos);
-                if(t_pTag->type == FIFFT_UINT)
-                {
-                    serial_eventlist = t_pTag->toUnsignedInt();
-                    nelem = t_pTag->size/4;
-                }
-                break;
-            }
-        }
-
-        if(serial_eventlist == NULL)
-        {
-            delete t_pFile;
-            delete t_pTree;
-            delete t_pDir;
-            delete t_pTag;
-            printf("Could not find any events\n");
-            return false;
-        }
-        else
-        {
-            eventlist.resize(nelem/3,3);
-            for(k = 0; k < nelem/3; ++k)
-            {
-                eventlist(k,0) = serial_eventlist[k*3];
-                eventlist(k,1) = serial_eventlist[k*3+1];
-                eventlist(k,2) = serial_eventlist[k*3+2];
-            }
-        }
-
-        delete t_pFile;
-        delete t_pTree;
-        delete t_pDir;
-        delete t_pTag;
-        return true;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// ToDo Eventlist Class??
+    //=========================================================================================================
+    /**
+    * mne_read_events
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Read an event list from a fif file
+    *
+    * @param [in] p_sFileName   The name of the file
+    * @param [out] eventlist    The read eventlist m x 3; with m events; colum: 1 - position in samples, 3 - eventcode
+    *
+    * @return true if succeeded, false otherwise
+    */
+    static bool read_events(QString& p_sFileName, MatrixXi& eventlist);
 
 
     //=========================================================================================================

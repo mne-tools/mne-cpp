@@ -106,15 +106,21 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a6d75a5e2e5f1ba918ac70a4200c7dad0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:add8bdec4260deab126d6aa3cdf367e8e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#add8bdec4260deab126d6aa3cdf367e8e">~FiffInfo</a> ()</td></tr>
 <tr class="separator:add8bdec4260deab126d6aa3cdf367e8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac84b4327b813f8acde14e43d6e34a3cd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ac84b4327b813f8acde14e43d6e34a3cd">make_compensator</a> (fiff_int_t from, fiff_int_t to, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html">FiffCtfComp</a> &amp;ctf_comp, bool exclude_comp_chs=false)</td></tr>
+<tr class="separator:ac84b4327b813f8acde14e43d6e34a3cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf6d5e56f0acb167039e2187c093bae0"><td class="memItemLeft" align="right" valign="top">qint32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#abf6d5e56f0acb167039e2187c093bae0">get_current_comp</a> ()</td></tr>
+<tr class="separator:abf6d5e56f0acb167039e2187c093bae0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aec8e404750c7cc4e2cfba0329dd5db83"><td class="memItemLeft" align="right" valign="top">qint32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#aec8e404750c7cc4e2cfba0329dd5db83">make_projector_info</a> (MatrixXf &amp;proj)</td></tr>
 <tr class="separator:aec8e404750c7cc4e2cfba0329dd5db83"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10d48ebfa8dfb2391d6b20c9d927f7ac"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a10d48ebfa8dfb2391d6b20c9d927f7ac">set_current_comp</a> (fiff_int_t value)</td></tr>
+<tr class="separator:a10d48ebfa8dfb2391d6b20c9d927f7ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a6a0f80b57c898dc26df8195bf18f75a5"><td class="memItemLeft" align="right" valign="top">static fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a6a0f80b57c898dc26df8195bf18f75a5">make_projector</a> (QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html">FiffProj</a> * &gt; &amp;projs, QStringList &amp;ch_names, MatrixXf &amp;proj, QStringList &amp;bads=defaultQStringList, MatrixXf &amp;U=defaultMatrixXf)</td></tr>
 <tr class="separator:a6a0f80b57c898dc26df8195bf18f75a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab1099fd0cd3ddc7bc8ff62cf6b4b479f"><td class="memItemLeft" align="right" valign="top">static qint32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ab1099fd0cd3ddc7bc8ff62cf6b4b479f">make_projector_info</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> *info, MatrixXf &amp;proj)</td></tr>
-<tr class="separator:ab1099fd0cd3ddc7bc8ff62cf6b4b479f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7cf472348e39ec15ecc24bda81305192"><td class="memItemLeft" align="right" valign="top">static QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html">FiffChInfo</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a7cf472348e39ec15ecc24bda81305192">set_current_comp</a> (QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html">FiffChInfo</a> &gt; &amp;chs, fiff_int_t value)</td></tr>
+<tr class="separator:a7cf472348e39ec15ecc24bda81305192"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -222,6 +228,80 @@ QString&#160;</td><td class="memItemRight" valign="bottom"><b>filename</b></td><
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="abf6d5e56f0acb167039e2187c093bae0"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">qint32 FiffInfo::get_current_comp </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>mne_get_current_comp</p>
+<h3>MNE toolbox root function</h3>
+<p>Get the current compensation in effect in the data</p>
+<dl class="section return"><dt>Returns</dt><dd>the current compensation </dd></dl>
+
+<p>Definition at line <a class="el" href="fiff__info_8cpp_source.html#l00091">91</a> of file <a class="el" href="fiff__info_8cpp_source.html">fiff_info.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ac84b4327b813f8acde14e43d6e34a3cd"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool FiffInfo::make_compensator </td>
+          <td>(</td>
+          <td class="paramtype">fiff_int_t&#160;</td>
+          <td class="paramname"><em>from</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">fiff_int_t&#160;</td>
+          <td class="paramname"><em>to</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html">FiffCtfComp</a> &amp;&#160;</td>
+          <td class="paramname"><em>ctf_comp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>exclude_comp_chs</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>mne_make_compensator</p>
+<h3>MNE toolbox root function</h3>
+<p>Create a compensation matrix to bring the data from one compensation state to another</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">from</td><td>compensation in the input data </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">to</td><td>desired compensation in the output </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">comp</td><td>Compensation Matrix </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">exclude_comp_chs</td><td>exclude compensation channels from the output (optional)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
+
+<p>Definition at line <a class="el" href="fiff__info_8cpp_source.html#l00114">114</a> of file <a class="el" href="fiff__info_8cpp_source.html">fiff_info.cpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a6a0f80b57c898dc26df8195bf18f75a5"></a>
 <div class="memitem">
 <div class="memproto">
@@ -286,7 +366,7 @@ QString&#160;</td><td class="memItemRight" valign="bottom"><b>filename</b></td><
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>nproj - How many items in the projector </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__info_8cpp_source.html#l00091">91</a> of file <a class="el" href="fiff__info_8cpp_source.html">fiff_info.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info_8cpp_source.html#l00263">263</a> of file <a class="el" href="fiff__info_8cpp_source.html">fiff_info.cpp</a>.</p>
 
 </div>
 </div>
@@ -311,6 +391,8 @@ QString&#160;</td><td class="memItemRight" valign="bottom"><b>filename</b></td><
   </tr>
 </table>
 </div><div class="memdoc">
+<p>mne_make_projector_info</p>
+<h3>MNE toolbox root function ### Implementation of the mne_make_projector_info function</h3>
 <p>Make a SSP operator using the meas info</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -321,11 +403,11 @@ QString&#160;</td><td class="memItemRight" valign="bottom"><b>filename</b></td><
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>nproj - How many items in the projector </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00129">129</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00164">164</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ab1099fd0cd3ddc7bc8ff62cf6b4b479f"></a>
+<a class="anchor" id="a10d48ebfa8dfb2391d6b20c9d927f7ac"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -333,16 +415,49 @@ QString&#160;</td><td class="memItemRight" valign="bottom"><b>filename</b></td><
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static qint32 FIFFLIB::FiffInfo::make_projector_info </td>
+          <td class="memname">void FIFFLIB::FiffInfo::set_current_comp </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> *&#160;</td>
-          <td class="paramname"><em>info</em>, </td>
+          <td class="paramtype">fiff_int_t&#160;</td>
+          <td class="paramname"><em>value</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Set the current compensation value in the channel info structures</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">value</td><td>compensation value </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00176">176</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a7cf472348e39ec15ecc24bda81305192"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html">FiffChInfo</a> &gt; FiffInfo::set_current_comp </td>
+          <td>(</td>
+          <td class="paramtype">QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html">FiffChInfo</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>chs</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">MatrixXf &amp;&#160;</td>
-          <td class="paramname"><em>proj</em>&#160;</td>
+          <td class="paramtype">fiff_int_t&#160;</td>
+          <td class="paramname"><em>value</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -352,24 +467,24 @@ QString&#160;</td><td class="memItemRight" valign="bottom"><b>filename</b></td><
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>mne_make_projector_info</p>
-<h3>MNE toolbox root function ### Implementation of the mne_make_projector_info function</h3>
-<p>The member function should be prefered: <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#aec8e404750c7cc4e2cfba0329dd5db83">make_projector_info(MatrixXf&amp; proj)</a></p>
-<p>Make a SSP operator using the meas info</p>
+<p>mne_set_current_comp</p>
+<h3>MNE toolbox root function ### Implementation of the mne_set_current_comp function</h3>
+<p>Consider taking the member function of <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a10d48ebfa8dfb2391d6b20c9d927f7ac">set_current_comp(fiff_int_t value)</a>, when compensation should be applied to the channels of <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a></p>
+<p>Set the current compensation value in the channel info structures</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">info</td><td><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html" title="The Fiff class provides static wrapper functions to stay consistent with mne matlab toolbox Note: avo...">Fiff</a> measurement info </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">proj</td><td>The projection operator to apply to the data</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">chs</td><td>fiff channel info list </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">value</td><td>compensation value</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>nproj - How many items in the projector </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the current compensation </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00150">150</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info_8cpp_source.html#l00427">427</a> of file <a class="el" href="fiff__info_8cpp_source.html">fiff_info.cpp</a>.</p>
 
 </div>
 </div>
@@ -380,7 +495,7 @@ QString&#160;</td><td class="memItemRight" valign="bottom"><b>filename</b></td><
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 11 2012 19:15:41 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Oct 13 2012 16:09:40 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

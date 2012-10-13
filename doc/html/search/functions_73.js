@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['set_5fcurrent_5fcomp',['set_current_comp',['../class_f_i_f_f_l_i_b_1_1_fiff_info.html#a10d48ebfa8dfb2391d6b20c9d927f7ac',1,'FIFFLIB::FiffInfo::set_current_comp(fiff_int_t value)'],['../class_f_i_f_f_l_i_b_1_1_fiff_info.html#a7cf472348e39ec15ecc24bda81305192',1,'FIFFLIB::FiffInfo::set_current_comp(QList&lt; FiffChInfo &gt; &amp;chs, fiff_int_t value)'],['../class_m_n_e_l_i_b_1_1_m_n_e.html#a5c6bc847cfa3c318c7567ba9c771d7bc',1,'MNELIB::MNE::set_current_comp()']]],
   ['setup_5fread_5fraw',['setup_read_raw',['../class_f_i_f_f_l_i_b_1_1_fiff.html#a6bf2613ce8623d0eff6df138a71bb2e9',1,'FIFFLIB::Fiff::setup_read_raw()'],['../class_f_i_f_f_l_i_b_1_1_fiff_file.html#a50e8878aca971407d852fb2a0d81a31d',1,'FIFFLIB::FiffFile::setup_read_raw()']]],
   ['split_5fname_5flist',['split_name_list',['../class_f_i_f_f_l_i_b_1_1_fiff.html#ae603cccb2820e101900377a2c74ba2bb',1,'FIFFLIB::Fiff::split_name_list()'],['../class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ad700c42e7c3966fe8005994e06e65667',1,'FIFFLIB::FiffDirTree::split_name_list()']]],
   ['start_5fblock',['start_block',['../class_f_i_f_f_l_i_b_1_1_fiff.html#a10ae01c50e0ba2e31492085652dd8ce4',1,'FIFFLIB::Fiff::start_block()'],['../class_f_i_f_f_l_i_b_1_1_fiff_file.html#a289ef060ac748fa96deca69cb3442474',1,'FIFFLIB::FiffFile::start_block()']]],
