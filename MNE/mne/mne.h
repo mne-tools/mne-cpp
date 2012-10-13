@@ -165,30 +165,13 @@ public:
     }
 
 
-
-//    %
-//    % [comp] = mne_make_compensator(info,from,to,exclude_comp_chs)
-//    %
-//    % info              - measurement info as returned by the fif reading routines
-//    % from              - compensation in the input data
-//    % to                - desired compensation in the output
-//    % exclude_comp_chs  - exclude compensation channels from the output (optional)
-//    %
-
-//    %
-//    % Create a compensation matrix to bring the data from one compensation
-//    % state to another
-//    %
-//    function [comp] =
-//    mne_make_compensator(info,from,to,exclude_comp_chs)
-
-
     //=========================================================================================================
     /**
-    * ToDo make this part of FiffInfo
     * mne_make_compensator
     *
     * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffInfo make_compensator member function
     *
     * Create a compensation matrix to bring the data from one compensation state to another
     *
@@ -200,7 +183,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool make_compensator(FiffInfo* info, fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf_comp, bool exclude_comp_chs = false)
+    inline static bool make_compensator(FiffInfo* info, fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf_comp, bool exclude_comp_chs = false)
     {
         return info->make_compensator(from, to, ctf_comp, exclude_comp_chs);
     }
