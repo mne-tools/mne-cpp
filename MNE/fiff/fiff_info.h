@@ -102,7 +102,7 @@ public:
     /**
     * mne_make_compensator
     *
-    * ### MNE toolbox root function ###
+    * ### MNE toolbox root function ### Implementation of the mne_make_compensator function
     *
     * Create a compensation matrix to bring the data from one compensation state to another
     *
@@ -120,7 +120,7 @@ public:
     /**
     * mne_get_current_comp
     *
-    * ### MNE toolbox root function ###
+    * ### MNE toolbox root function ### Implementation of the mne_get_current_comp function
     *
     * Get the current compensation in effect in the data
     *
