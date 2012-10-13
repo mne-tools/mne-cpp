@@ -90,6 +90,7 @@ public:
     */
     FiffInfo();
 
+
     //=========================================================================================================
     /**
     * Destroys the FiffInfo.
@@ -99,10 +100,40 @@ public:
 
     //=========================================================================================================
     /**
+    * mne_make_compensator
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Create a compensation matrix to bring the data from one compensation state to another
+    *
+    * @param[in] from               compensation in the input data
+    * @param[in] to                 desired compensation in the output
+    * @param[out] comp              Compensation Matrix
+    * @param[in] exclude_comp_chs   exclude compensation channels from the output (optional)
+    *
+    * @return true if succeeded, false otherwise
+    */
+    bool make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf_comp, bool exclude_comp_chs = false);
+
+
+    //=========================================================================================================
+    /**
+    * mne_get_current_comp
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Get the current compensation in effect in the data
+    *
+    * @return the current compensation
+    */
+    qint32 get_current_comp();
+
+
+    //=========================================================================================================
+    /**
     * mne_make_projector
     *
     * ### MNE toolbox root function ### Implementation of the mne_make_projector function
-    *
     *
     * Make an SSP operator
     *
@@ -119,6 +150,10 @@ public:
 
     //=========================================================================================================
     /**
+    * mne_make_projector_info
+    *
+    * ### MNE toolbox root function ###  Implementation of the mne_make_projector_info function
+    *
     * Make a SSP operator using the meas info
     *
     * @param[in] info       Fiff measurement info
@@ -134,25 +169,51 @@ public:
 
     //=========================================================================================================
     /**
-    * mne_make_projector_info
+    * Set the current compensation value in the channel info structures
     *
-    * ### MNE toolbox root function ###  Implementation of the mne_make_projector_info function
-    *
-    * The member function should be prefered: make_projector_info(MatrixXf& proj)
-    *
-    * Make a SSP operator using the meas info
-    *
-    * @param[in] info       Fiff measurement info
-    * @param[out] proj      The projection operator to apply to the data
-    *
-    * @return nproj - How many items in the projector
+    * @param[in] value  compensation value
     */
-    inline static qint32 make_projector_info(FiffInfo* info, MatrixXf& proj)
+    inline void set_current_comp(fiff_int_t value)
     {
-        return info->make_projector_info(proj);
+        this->chs = set_current_comp(this->chs, value);
     }
 
-public:
+
+    //=========================================================================================================
+    /**
+    * mne_set_current_comp
+    *
+    * ### MNE toolbox root function ### Implementation of the mne_set_current_comp function
+    *
+    * Consider taking the member function of set_current_comp(fiff_int_t value),
+    * when compensation should be applied to the channels of FiffInfo
+    *
+    * Set the current compensation value in the channel info structures
+    *
+    * @param[in] chs    fiff channel info list
+    * @param[in] value  compensation value
+    *
+    * @return the current compensation
+    */
+    static QList<FiffChInfo> set_current_comp(QList<FiffChInfo>& chs, fiff_int_t value);
+
+private:
+
+    //=========================================================================================================
+    /**
+    * function this_comp = make_compensator(info,kind)
+    *
+    * Create a compensation matrix to bring the data from one compensation state to another
+    *
+    * @param[in] kind               Compensation in the input data
+    * @param[out] comp              Compensation Matrix
+    *
+    * @return true if succeeded, false otherwise
+    */
+    bool make_compensator(fiff_int_t kind, MatrixXf& this_comp);
+
+
+public: //Public because it's a mne struct
     FiffId      file_id;
     FiffId      meas_id;
     fiff_int_t  meas_date[2];

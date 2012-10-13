@@ -88,6 +88,178 @@ FiffInfo::~FiffInfo()
 
 //*************************************************************************************************************
 
+qint32 FiffInfo::get_current_comp()
+{
+    qint32 comp = 0;
+    qint32 first_comp = -1;
+
+    qint32 k = 0;
+    for (k = 0; k < this->nchan; ++k)
+    {
+        if (this->chs[k].kind == FIFFV_MEG_CH)
+        {
+            comp = this->chs[k].coil_type >> 16;
+            if (first_comp < 0)
+                first_comp = comp;
+            else if (comp != first_comp)
+                printf("Compensation is not set equally on all MEG channels");
+        }
+    }
+    return comp;
+}
+
+
+//*************************************************************************************************************
+
+bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf_comp, bool exclude_comp_chs)
+{
+    qDebug() << "make_compensator not debugged jet";
+
+    MatrixXf C1, C2, comp_tmp;
+
+    qDebug() << "Todo add all need ctf variables.";
+    if(ctf_comp.data)
+        delete ctf_comp.data;
+    ctf_comp.data = new FiffNamedMatrix();
+
+    if (from == to)
+    {
+        ctf_comp.data->data = MatrixXf::Zero(this->nchan, this->nchan);
+        return false;
+    }
+
+    if (from == 0)
+        C1 = MatrixXf::Zero(this->nchan,this->nchan);
+    else
+    {
+        if (!this->make_compensator(from, C1))
+        {
+            printf("Cannot create compensator C1\n");
+            printf("Desired compensation matrix (kind = %d) not found\n",from);
+            return false;
+        }
+    }
+
+    if (to == 0)
+        C2 = MatrixXf::Zero(this->nchan,this->nchan);
+    else
+    {
+        if (!this->make_compensator(to, C2))
+        {
+            printf("Cannot create compensator C2\n");
+            printf("Desired compensation matrix (kind = %d) not found\n",to);
+            return false;
+        }
+    }
+    //
+    //   s_orig = s_from + C1*s_from = (I + C1)*s_from
+    //   s_to   = s_orig - C2*s_orig = (I - C2)*s_orig
+    //   s_to   = (I - C2)*(I + C1)*s_from = (I + C1 - C2 - C2*C1)*s_from
+    //
+    comp_tmp = MatrixXf::Identity(this->nchan,this->nchan) + C1 - C2 - C2*C1;
+
+    qint32 k;
+    if (exclude_comp_chs)
+    {
+        VectorXi pick  = MatrixXi::Zero(1,this->nchan);
+        qint32 npick = 0;
+        for (k = 0; k < this->nchan; ++k)
+        {
+            if (this->chs[k].kind != FIFFV_REF_MEG_CH)
+            {
+                pick(npick) = k;
+                ++npick;
+            }
+        }
+        if (npick == 0)
+        {
+            printf("Nothing remains after excluding the compensation channels\n");
+            return false;
+        }
+
+        ctf_comp.data->data.resize(npick,this->nchan);
+        for (k = 0; k < npick; ++k)
+            ctf_comp.data->data.row(k) = comp_tmp.block(pick(k), 0, 1, this->nchan);
+    }
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXf& this_comp)//private method
+{
+    qDebug() << "make_compensator not debugged jet";
+    FiffNamedMatrix* this_data;
+    MatrixXf presel, postsel;
+    qint32 k, col, c, ch, row, row_ch, channelAvailable;
+    for (k = 0; k < this->comps.size(); ++k)
+    {
+        if (this->comps[k]->kind == kind)
+        {                this_data = this->comps[k]->data;
+            //
+            //   Create the preselector
+            //
+            presel  = MatrixXf::Zero(this_data->ncol,this->nchan);
+            for(col = 0; col < this_data->ncol; ++col)
+            {
+                channelAvailable = 0;
+                for (c = 0; c < this->ch_names.size(); ++c)
+                {
+                    if (QString::compare(this_data->col_names.at(col),this->ch_names.at(c)) == 0)
+                    {
+                        ++channelAvailable;
+                        ch = c;
+                    }
+                }
+                if (channelAvailable == 0)
+                {
+                    printf("Channel %s is not available in data\n",this_data->col_names.at(col).toUtf8().constData());
+                    return false;
+                }
+                else if (channelAvailable > 1)
+                {
+                    printf("Ambiguous channel %s",this_data->col_names.at(col).toUtf8().constData());
+                    return false;
+                }
+                presel(col,ch) = 1.0;
+            }
+            //
+            //   Create the postselector
+            //
+            postsel = MatrixXf::Zero(this->nchan,this_data->nrow);
+            for (c = 0; c  < this->nchan; ++c)
+            {
+                channelAvailable = 0;
+                for (row = 0; row < this_data->row_names.size(); ++row)
+                {
+                    if (QString::compare(this_data->col_names.at(c),this->ch_names.at(row)) == 0)
+                    {
+                        ++channelAvailable;
+                        row_ch = row;
+                    }
+                }
+                if (channelAvailable > 1)
+                {
+                    printf("Ambiguous channel %s", this->ch_names.at(c).toUtf8().constData());
+                    return false;
+                }
+                else if (channelAvailable == 1)
+                {
+                    postsel(c,row_ch) = 1.0;
+                }
+            }
+            this_comp = postsel*this_data->data*presel;
+            return true;
+        }
+    }
+    this_comp = defaultMatrixXf;
+    return false;
+}
+
+
+//*************************************************************************************************************
+
 fiff_int_t FiffInfo::make_projector(QList<FiffProj*>& projs, QStringList& ch_names, MatrixXf& proj, QStringList& bads, MatrixXf& U)
 {
     fiff_int_t nchan = ch_names.size();
@@ -247,4 +419,30 @@ fiff_int_t FiffInfo::make_projector(QList<FiffProj*>& projs, QStringList& ch_nam
     nproj = nvec;
 
     return nproj;
+}
+
+
+//*************************************************************************************************************
+
+QList<FiffChInfo> FiffInfo::set_current_comp(QList<FiffChInfo>& chs, fiff_int_t value)
+{
+    QList<FiffChInfo> new_chs;
+    qint32 k;
+    fiff_int_t coil_type;
+
+    for(k = 0; k < chs.size(); ++k)
+    {
+        new_chs.append(FiffChInfo(&chs[k]));
+    }
+
+    qint32 lower_half = 65535;// hex2dec('FFFF');
+    for (k = 0; k < chs.size(); ++k)
+    {
+        if (chs[k].kind == FIFFV_MEG_CH)
+        {
+            coil_type = chs[k].coil_type & lower_half;
+            new_chs[k].coil_type = (coil_type | (value << 16));
+        }
+    }
+    return new_chs;
 }

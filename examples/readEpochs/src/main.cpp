@@ -172,7 +172,8 @@ int main(int argc, char *argv[])
     //
     //   Set up the CTF compensator
     //
-    qint32 current_comp = MNE::get_current_comp(raw->info);
+//    qint32 current_comp = MNE::get_current_comp(raw->info);
+    qint32 current_comp = raw->info->get_current_comp();
     if (current_comp > 0)
         printf("Current compensation grade : %d\n",current_comp);
 
@@ -184,7 +185,8 @@ int main(int argc, char *argv[])
         qDebug() << "This part needs to be debugged";
         if(MNE::make_compensator(raw->info, current_comp, dest_comp, raw->comp))
         {
-            raw->info->chs = MNE::set_current_comp(raw->info->chs,dest_comp);
+//            raw->info->chs = MNE::set_current_comp(raw->info->chs,dest_comp);
+            raw->info->set_current_comp(dest_comp);
             printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
         }
         else

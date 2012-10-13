@@ -65,8 +65,86 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-//MNE::MNE()
-//{
-//}
+bool MNE::read_events(QString& p_sFileName, MatrixXi& eventlist)
+{
+    //
+    // Open file
+    //
+    FiffFile* t_pFile = new FiffFile(p_sFileName);
+    FiffDirTree* t_pTree = NULL;
+    QList<FiffDirEntry>* t_pDir = NULL;
+
+    if(!t_pFile->open(t_pTree, t_pDir))
+    {
+        if(t_pTree)
+            delete t_pTree;
+
+        if(t_pDir)
+            delete t_pDir;
+
+        return false;
+    }
+
+    //
+    //   Find the desired block
+    //
+    QList<FiffDirTree*> events = t_pTree->dir_tree_find(FIFFB_MNE_EVENTS);
+
+    if (events.size() == 0)
+    {
+        printf("Could not find event data\n");
+        delete t_pFile;
+        delete t_pTree;
+        delete t_pDir;
+        return false;
+    }
+
+    qint32 k, nelem;
+    fiff_int_t kind, pos;
+    FiffTag* t_pTag = NULL;
+    quint32* serial_eventlist = NULL;
+    for(k = 0; k < events[0]->nent; ++k)
+    {
+        kind = events[0]->dir[k].kind;
+        pos  = events[0]->dir[k].pos;
+        if (kind == FIFF_MNE_EVENT_LIST)
+        {
+            FiffTag::read_tag(t_pFile,t_pTag,pos);
+            if(t_pTag->type == FIFFT_UINT)
+            {
+                serial_eventlist = t_pTag->toUnsignedInt();
+                nelem = t_pTag->size/4;
+            }
+            break;
+        }
+    }
+
+    if(serial_eventlist == NULL)
+    {
+        delete t_pFile;
+        delete t_pTree;
+        delete t_pDir;
+        delete t_pTag;
+        printf("Could not find any events\n");
+        return false;
+    }
+    else
+    {
+        eventlist.resize(nelem/3,3);
+        for(k = 0; k < nelem/3; ++k)
+        {
+            eventlist(k,0) = serial_eventlist[k*3];
+            eventlist(k,1) = serial_eventlist[k*3+1];
+            eventlist(k,2) = serial_eventlist[k*3+2];
+        }
+    }
+
+    delete t_pFile;
+    delete t_pTree;
+    delete t_pDir;
+    delete t_pTag;
+    return true;
+}
+
 
 //*************************************************************************************************************
