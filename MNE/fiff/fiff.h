@@ -122,7 +122,6 @@ public:
     virtual ~Fiff(){ }
 
     //Alphabetic ordered MNE Toolbox fiff_function
-
     //=========================================================================================================
     /**
     * fiff_copy_tree
@@ -284,7 +283,6 @@ public:
         return p_pFile->open(p_pTree, p_pDir);
     }
 
-
     //=========================================================================================================
     /**
     * fiff_pick_channels
@@ -435,7 +433,7 @@ public:
     /**
     * fiff_read_raw_segment
     *
-    * ### MNE toolbox root function ###: Implementation of the fiff_read_raw_segment function
+    * ### MNE toolbox root function ###
     *
     * Wrapper for the FiffRawData read_raw_segment member function
     *
@@ -551,7 +549,7 @@ public:
     * @param[in] p_pFile    An open fif file to write to
     * @param[in] kind       The block kind to start
     */
-    static void start_block(FiffFile* p_pFile, fiff_int_t kind)
+    inline static void start_block(FiffFile* p_pFile, fiff_int_t kind)
     {
         p_pFile->start_block(kind);
     }
@@ -570,7 +568,7 @@ public:
     *
     * @return The opened file.
     */
-    static FiffFile* start_file(QString& p_sFileName)
+    inline static FiffFile* start_file(QString& p_sFileName)
     {
         return FiffFile::start_file(p_sFileName);
     }
@@ -592,9 +590,83 @@ public:
     *
     * @return the started fiff file
     */
-    static FiffFile* start_writing_raw(QString& p_sFileName, FiffInfo* info, MatrixXf*& cals, MatrixXi sel = defaultFileMatrixXi)
+    inline static FiffFile* start_writing_raw(QString& p_sFileName, FiffInfo* info, MatrixXf*& cals, MatrixXi sel = defaultFileMatrixXi)
     {
         return FiffFile::start_writing_raw(p_sFileName, info, cals, sel);
+    }
+
+    //=========================================================================================================
+    /**
+    * fiff_write_ch_info
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffFile write_ch_info member function
+    *
+    * Writes a channel information record to a fif file
+    * The type, cal, unit, and pos members are explained in Table 9.5
+    * of the MNE manual
+    *
+    * @param[in] p_pFile    An open fif file
+    * @param[in] ch         The channel information structure to write
+    */
+    inline static void write_ch_info(FiffFile* p_pFile, FiffChInfo* ch)
+    {
+        p_pFile->write_ch_info(ch);
+    }
+
+    //=========================================================================================================
+    /**
+    * fiff_write_coord_trans
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffFile write_coord_trans member function
+    *
+    * Writes a coordinate transformation structure
+    *
+    * @param[in] p_pFile    An open fif file
+    * @param[in] trans      The coordinate transfomation structure
+    */
+    inline static void write_coord_trans(FiffFile* p_pFile, FiffCoordTrans& trans)
+    {
+        p_pFile->write_coord_trans(trans);
+    }
+
+    //=========================================================================================================
+    /**
+    * fiff_write_ctf_comp
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffFile write_ctf_comp member function
+    *
+    * Writes the CTF compensation data into a fif file
+    *
+    * @param[in] p_pFile    An open fif file
+    * @param[in] comps      The compensation data to write
+    */
+    inline static void write_ctf_comp(FiffFile* p_pFile, QList<FiffCtfComp*>& comps)
+    {
+        p_pFile->write_ctf_comp(comps);
+    }
+
+    //=========================================================================================================
+    /**
+    * fiff_write_dig_point
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffFile write_dig_point member function
+    *
+    * Writes a digitizer data point into a fif file
+    *
+    * @param[in] p_pFile    An open fif file
+    * @param[in] dig        The point to write
+    */
+    inline static void write_dig_point(FiffFile* p_pFile, FiffDigPoint& dig)
+    {
+        p_pFile->write_dig_point(dig);
     }
 
     //=========================================================================================================
@@ -603,22 +675,19 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * fiff_write_id(fid,kind,id)
+    * Wrapper for the FiffFile write_id member function
     *
     * Writes fiff id
-    *
-    *     fid           An open fif file descriptor
-    *     kind          The tag kind
-    *     id            The id to write
-    *
     * If the id argument is missing it will be generated here
     *
+    * @param[in] p_pFile    An open fif file
+    * @param[in] kind       The tag kind
+    * @param[in] id         The id to write
     */
-    static void write_id(FiffFile* p_pFile, fiff_int_t kind, FiffId& id = defaultFiffId)
+    inline static void write_id(FiffFile* p_pFile, fiff_int_t kind, FiffId& id = defaultFiffId)
     {
         p_pFile->write_id(kind, id);
     }
-
 
     //=========================================================================================================
     /**
@@ -626,20 +695,154 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * fiff_write_int(fid,kind,data)
+    * Wrapper for the FiffFile write_int member function
     *
     * Writes a 32-bit integer tag to a fif file
     *
-    *     fid           An open fif file descriptor
-    *     kind          Tag kind
-    *     data          The integers to use as data
-    *     nel           Zahl an Elementen in der data size
+    * @param[in] p_pFile    An open fif file
+    * @param[in] kind       Tag kind
+    * @param[in] data       The integer data pointer
+    * @param[in] nel        Number of integers to write (default = 1)
     */
-    static void write_int(FiffFile* p_pFile, fiff_int_t kind, fiff_int_t* data, fiff_int_t nel = 1)
+    inline static void write_int(FiffFile* p_pFile, fiff_int_t kind, fiff_int_t* data, fiff_int_t nel = 1)
     {
         p_pFile->write_int(kind, data, nel);
     }
 
+    //=========================================================================================================
+    /**
+    * fiff_write_float
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffFile write_float member function
+    *
+    * Writes a single-precision floating point tag to a fif file
+    *
+    * @param[in] p_pFile    An open fif file
+    * @param[in] kind       Tag kind
+    * @param[in] data       The float data pointer
+    * @param[in] nel        Number of floats to write (default = 1)
+    */
+    inline static void write_float(FiffFile* p_pFile, fiff_int_t kind, float* data, fiff_int_t nel = 1)
+    {
+        p_pFile->write_float(kind, data, nel);
+    }
+
+    //=========================================================================================================
+    /**
+    * fiff_write_float_matrix
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffFile write_float_matrix member function
+    *
+    * Writes a single-precision floating-point matrix tag
+    *
+    * @param[in] p_pFile    An open fif file
+    * @param[in] kind       The tag kind
+    * @param[in] mat        The data matrix
+    */
+    inline static void write_float_matrix(FiffFile* p_pFile, fiff_int_t kind, MatrixXf& mat)
+    {
+        p_pFile->write_float_matrix(kind, mat);
+    }
+
+    //=========================================================================================================
+    /**
+    * fiff_write_name_list
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffFile write_name_list member function
+    *
+    * Writes a colon-separated list of names
+    *
+    * @param[in] p_pFile    An open fif file
+    * @param[in] kind       The tag kind
+    * @param[in] data       An array of names to create the list from
+    */
+    inline static void write_name_list(FiffFile* p_pFile, fiff_int_t kind, QStringList& data)
+    {
+        p_pFile->write_name_list(kind, data);
+    }
+
+    //=========================================================================================================
+    /**
+    * fiff_write_named_matrix
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffFile write_named_matrix member function
+    *
+    * Writes a named single-precision floating-point matrix
+    *
+    * @param[in] p_pFile    An open fif file
+    * @param[in] kind       The tag kind to use for the data
+    * @param[in] data       The data matrix
+    */
+    inline static void write_named_matrix(FiffFile* p_pFile, fiff_int_t kind,FiffNamedMatrix* mat)
+    {
+        p_pFile->write_named_matrix(kind, mat);
+    }
+
+    //=========================================================================================================
+    /**
+    * fiff_write_proj
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffFile write_proj member function
+    *
+    * Writes the projection data into a fif file
+    *
+    * @param[in] p_pFile    An open fif file
+    * @param[in] projs      The compensation data to write
+    */
+    inline static void write_proj(FiffFile* p_pFile, QList<FiffProj*>& projs)
+    {
+        p_pFile->write_proj(projs);
+    }
+
+    //=========================================================================================================
+    /**
+    * fiff_write_raw_buffer
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffFile write_raw_buffer member function
+    *
+    * Writes a raw buffer.
+    *
+    * @param[in] p_pFile    An open fif file
+    * @param[in] buf        the buffer to write
+    * @param[in] cals       calibration factors
+    *
+    * @return true if succeeded, false otherwise
+    */
+    inline static bool write_raw_buffer(FiffFile* p_pFile, MatrixXf* buf, MatrixXf* cals)
+    {
+        return p_pFile->write_raw_buffer(buf, cals);
+    }
+
+    //=========================================================================================================
+    /**
+    * fiff_write_string
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffFile write_string member function
+    *
+    * Writes a string tag
+    *
+    * @param[in] p_pFile    An open fif file
+    * @param[in] kind       The tag kind
+    * @param[in] data       The string data to write
+    */
+    inline static void write_string(FiffFile* p_pFile, fiff_int_t kind, QString& data)
+    {
+        p_pFile->write_string(kind, data);
+    }
 
 };
 

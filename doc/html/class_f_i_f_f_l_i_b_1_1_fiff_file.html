@@ -506,13 +506,14 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_write_ch_info</p>
 <h3>MNE toolbox root function</h3>
-<p>fiff_write_ch_info(fid,ch)</p>
-<p>Writes a channel information record to a fif file </p>
-<pre class="fragment">fid           An open fif file descriptor
-ch            The channel information structure to write
+<p>Writes a channel information record to a fif file The type, cal, unit, and pos members are explained in Table 9.5 of the MNE manual</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">ch</td><td>The channel information structure to write </td></tr>
+  </table>
+  </dd>
+</dl>
 
-The type, cal, unit, and pos members are explained in Table 9.5
-of the MNE manual</pre> 
 <p>Definition at line <a class="el" href="fiff__file_8cpp_source.html#l00608">608</a> of file <a class="el" href="fiff__file_8cpp_source.html">fiff_file.cpp</a>.</p>
 
 </div>
@@ -532,10 +533,14 @@ of the MNE manual</pre>
 </div><div class="memdoc">
 <p>fiff_write_coord_trans</p>
 <h3>MNE toolbox root function</h3>
-<p>fiff_write_coord_trans(fid,trans)</p>
-<p>Writes a coordinate transformation structure </p>
-<pre class="fragment">fid           An open fif file descriptor
-trans         The coordinate transfomation structure</pre> 
+<p>Writes a coordinate transformation structure</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">trans</td><td>The coordinate transfomation structure </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p>Definition at line <a class="el" href="fiff__file_8cpp_source.html#l00699">699</a> of file <a class="el" href="fiff__file_8cpp_source.html">fiff_file.cpp</a>.</p>
 
 </div>
@@ -555,10 +560,14 @@ trans         The coordinate transfomation structure</pre>
 </div><div class="memdoc">
 <p>fiff_write_ctf_comp</p>
 <h3>MNE toolbox root function</h3>
-<p>fiff_write_ctf_comp(fid,comps)</p>
-<p>Writes the CTF compensation data into a fif file </p>
-<pre class="fragment">fid           An open fif file descriptor
-comps         The compensation data to write</pre> 
+<p>Writes the CTF compensation data into a fif file</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">comps</td><td>The compensation data to write </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p>Definition at line <a class="el" href="fiff__file_8cpp_source.html#l00749">749</a> of file <a class="el" href="fiff__file_8cpp_source.html">fiff_file.cpp</a>.</p>
 
 </div>
@@ -578,10 +587,15 @@ comps         The compensation data to write</pre>
 </div><div class="memdoc">
 <p>fiff_write_dig_point</p>
 <h3>MNE toolbox root function</h3>
-<p>fiff_write_dig_point(fid,dig)</p>
-<p>Writes a digitizer data point into a fif file </p>
-<pre class="fragment">fid           An open fif file descriptor
-dig           The point to write</pre> 
+<p>Writes a digitizer data point into a fif file</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>An open fif file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dig</td><td>The point to write </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p>Definition at line <a class="el" href="fiff__file_8cpp_source.html#l00784">784</a> of file <a class="el" href="fiff__file_8cpp_source.html">fiff_file.cpp</a>.</p>
 
 </div>
@@ -617,11 +631,16 @@ dig           The point to write</pre>
 </div><div class="memdoc">
 <p>fiff_write_float</p>
 <h3>MNE toolbox root function</h3>
-<p>fiff_write_float(fid,kind,data)</p>
-<p>Writes a single-precision floating point tag to a fif file </p>
-<pre class="fragment">fid           An open fif file descriptor
-kind          Tag kind
-data          The data</pre> 
+<p>Writes a single-precision floating point tag to a fif file</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">kind</td><td>Tag kind </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The float data pointer </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nel</td><td>Number of floats to write (default = 1) </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p>Definition at line <a class="el" href="fiff__file_8cpp_source.html#l00816">816</a> of file <a class="el" href="fiff__file_8cpp_source.html">fiff_file.cpp</a>.</p>
 
 </div>
@@ -651,11 +670,15 @@ data          The data</pre>
 </div><div class="memdoc">
 <p>fiff_write_float_matrix</p>
 <h3>MNE toolbox root function</h3>
-<p>fiff_write_float_matrix(fid,kind,mat)</p>
-<p>Writes a single-precision floating-point matrix tag </p>
-<pre class="fragment">fid           An open fif file descriptor
-kind          The tag kind
-mat           The data matrix</pre> 
+<p>Writes a single-precision floating-point matrix tag</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">kind</td><td>The tag kind </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">mat</td><td>The data matrix </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p>Definition at line <a class="el" href="fiff__file_8cpp_source.html#l00839">839</a> of file <a class="el" href="fiff__file_8cpp_source.html">fiff_file.cpp</a>.</p>
 
 </div>
@@ -685,12 +708,15 @@ mat           The data matrix</pre>
 </div><div class="memdoc">
 <p>fiff_write_id</p>
 <h3>MNE toolbox root function</h3>
-<p>fiff_write_id(fid,kind,id)</p>
-<p>Writes fiff id </p>
-<pre class="fragment">fid           An open fif file descriptor
-kind          The tag kind
-id            The id to write
-</pre><p>If the id argument is missing it will be generated here </p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a> write_id member function</p>
+<p>Writes fiff id If the id argument is missing it will be generated here</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">kind</td><td>The tag kind </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">id</td><td>The id to write </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Definition at line <a class="el" href="fiff__file_8cpp_source.html#l00878">878</a> of file <a class="el" href="fiff__file_8cpp_source.html">fiff_file.cpp</a>.</p>
 
@@ -727,12 +753,17 @@ id            The id to write
 </div><div class="memdoc">
 <p>fiff_write_int</p>
 <h3>MNE toolbox root function</h3>
-<p>fiff_write_int(fid,kind,data)</p>
-<p>Writes a 32-bit integer tag to a fif file </p>
-<pre class="fragment">fid           An open fif file descriptor
-kind          Tag kind
-data          The integers to use as data
-nel           Zahl an Elementen in der data size</pre> 
+<p>Writes a 32-bit integer tag to a fif file</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>An open fif file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">kind</td><td>Tag kind </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The integer data pointer </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nel</td><td>Number of integers to write (default = 1) </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p>Definition at line <a class="el" href="fiff__file_8cpp_source.html#l00926">926</a> of file <a class="el" href="fiff__file_8cpp_source.html">fiff_file.cpp</a>.</p>
 
 </div>
@@ -762,11 +793,15 @@ nel           Zahl an Elementen in der data size</pre>
 </div><div class="memdoc">
 <p>fiff_write_name_list</p>
 <h3>MNE toolbox root function</h3>
-<p>fiff_write_name_list(fid,kind,mat)</p>
-<p>Writes a colon-separated list of names </p>
-<pre class="fragment">fid           An open fif file descriptor
-kind          The tag kind
-data          An array of names to create the list from</pre> 
+<p>Writes a colon-separated list of names</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">kind</td><td>The tag kind </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>An array of names to create the list from </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p>Definition at line <a class="el" href="fiff__file_8cpp_source.html#l00945">945</a> of file <a class="el" href="fiff__file_8cpp_source.html">fiff_file.cpp</a>.</p>
 
 </div>
@@ -796,11 +831,15 @@ data          An array of names to create the list from</pre>
 </div><div class="memdoc">
 <p>fiff_write_named_matrix</p>
 <h3>MNE toolbox root function</h3>
-<p>fiff_write_named_matrix(fid,kind,mat)</p>
-<p>Writes a named single-precision floating-point matrix </p>
-<pre class="fragment">fid           An open fif file descriptor
-kind          The tag kind to use for the data
-mat           The data matrix</pre> 
+<p>Writes a named single-precision floating-point matrix</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">kind</td><td>The tag kind to use for the data </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The data matrix </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p>Definition at line <a class="el" href="fiff__file_8cpp_source.html#l00954">954</a> of file <a class="el" href="fiff__file_8cpp_source.html">fiff_file.cpp</a>.</p>
 
 </div>
@@ -820,10 +859,14 @@ mat           The data matrix</pre>
 </div><div class="memdoc">
 <p>fiff_write_proj</p>
 <h3>MNE toolbox root function</h3>
-<p>fiff_write_proj(fid,projs)</p>
-<p>Writes the projection data into a fif file </p>
-<pre class="fragment">fid           An open fif file descriptor
-projs         The compensation data to write</pre> 
+<p>Writes the projection data into a fif file</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">projs</td><td>The compensation data to write </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p>Definition at line <a class="el" href="fiff__file_8cpp_source.html#l00970">970</a> of file <a class="el" href="fiff__file_8cpp_source.html">fiff_file.cpp</a>.</p>
 
 </div>
@@ -854,7 +897,17 @@ projs         The compensation data to write</pre>
 <p>fiff_write_raw_buffer</p>
 <h3>MNE toolbox root function</h3>
 <p>function fiff_write_raw_buffer(fid,info,buf)</p>
-<p>fid of an open raw data file buf the buffer to write cals calibration factors </p>
+<p>fid of an open raw data file buf the buffer to write cals calibration factors fiff_write_raw_buffer</p>
+<h3>MNE toolbox root function</h3>
+<p>Writes a raw buffer.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">buf</td><td>the buffer to write </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cals</td><td>calibration factors</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
 <p>Definition at line <a class="el" href="fiff__file_8cpp_source.html#l01002">1002</a> of file <a class="el" href="fiff__file_8cpp_source.html">fiff_file.cpp</a>.</p>
 
@@ -885,11 +938,15 @@ projs         The compensation data to write</pre>
 </div><div class="memdoc">
 <p>fiff_write_string</p>
 <h3>MNE toolbox root function</h3>
-<p>fiff_write_string(fid,kind,data)</p>
-<p>Writes a string tag </p>
-<pre class="fragment">fid           An open fif file descriptor
-kind          The tag kind
-data          The string data to write</pre> 
+<p>Writes a string tag</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">kind</td><td>The tag kind </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The string data to write </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p>Definition at line <a class="el" href="fiff__file_8cpp_source.html#l01023">1023</a> of file <a class="el" href="fiff__file_8cpp_source.html">fiff_file.cpp</a>.</p>
 
 </div>
@@ -901,7 +958,7 @@ data          The string data to write</pre>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Oct 15 2012 15:31:51 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Oct 15 2012 18:50:57 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

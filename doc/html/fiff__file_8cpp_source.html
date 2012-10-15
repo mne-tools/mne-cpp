@@ -221,7 +221,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    }</div>
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    {</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;        <span class="keywordtype">int</span> k = 0;</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;        qint32 k = 0;</div>
 <div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        this-&gt;seek(0);<span class="comment">//fseek(fid,0,&#39;bof&#39;);</span></div>
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_entry.html" title="Directory entry description.">FiffDirEntry</a> t_fiffDirEntry;</div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        <span class="keywordflow">while</span> (t_pTag-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#ae95266b76119bf235b6dd25b71288ed4">next</a> &gt;= 0)</div>
@@ -442,7 +442,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;    MatrixXf cals(1,data-&gt;info-&gt;nchan);</div>
 <div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;    cals.setZero();</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k = 0; k &lt; data-&gt;info-&gt;nchan; ++k)</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;    <span class="keywordflow">for</span> (qint32 k = 0; k &lt; data-&gt;info-&gt;nchan; ++k)</div>
 <div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;        cals(0,k) = data-&gt;info-&gt;chs.at(k).range*data-&gt;info-&gt;chs.at(k).cal;</div>
 <div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;    data-&gt;cals       = cals;</div>
@@ -879,10 +879,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160;    out &lt;&lt; (qint32)datasize;</div>
 <div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160;    out &lt;&lt; (qint32)FIFFV_NEXT_SEQ;</div>
 <div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;</div>
-<div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160;    <span class="keywordtype">int</span> iData = 0;</div>
+<div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160;    qint32 iData = 0;</div>
 <div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160;    <span class="keywordflow">for</span>(qint32 i = 0; i &lt; nel; ++i)</div>
 <div class="line"><a name="l00830"></a><span class="lineno">  830</span>&#160;    {</div>
-<div class="line"><a name="l00831"></a><span class="lineno">  831</span>&#160;        iData = *(<span class="keywordtype">int</span> *)&amp;data[i];</div>
+<div class="line"><a name="l00831"></a><span class="lineno">  831</span>&#160;        iData = *(qint32 *)&amp;data[i];</div>
 <div class="line"><a name="l00832"></a><span class="lineno">  832</span>&#160;        out &lt;&lt; iData;</div>
 <div class="line"><a name="l00833"></a><span class="lineno">  833</span>&#160;    }</div>
 <div class="line"><a name="l00834"></a><span class="lineno">  834</span>&#160;}</div>
@@ -1091,7 +1091,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Oct 15 2012 15:31:51 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Oct 15 2012 18:50:56 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>
