@@ -186,7 +186,7 @@ qint32 FiffDirTree::make_dir_tree(FiffFile* p_pFile, QList<FiffDirEntry>* p_pDir
 
 //    qDebug() << "start { " << p_pTree->block;
 
-    int current = start;
+    qint32 current = start;
 
     p_pTree->block = block;
     p_pTree->nent = 0;
@@ -278,7 +278,7 @@ QList<FiffDirTree*> FiffDirTree::dir_tree_find(fiff_int_t kind)
 
 bool FiffDirTree::find_tag(FiffFile* p_pFile, fiff_int_t findkind, FiffTag*& p_pTag)
 {
-    for (int p = 0; p < this->nent; ++p)
+    for (qint32 p = 0; p < this->nent; ++p)
     {
        if (this->dir.at(p).kind == findkind)
        {
@@ -299,7 +299,7 @@ bool FiffDirTree::find_tag(FiffFile* p_pFile, fiff_int_t findkind, FiffTag*& p_p
 
 bool FiffDirTree::has_tag(fiff_int_t findkind)
 {
-    for(int p = 0; p < this->nent; ++p)
+    for(qint32 p = 0; p < this->nent; ++p)
         if(this->dir.at(p).kind == findkind)
             return true;
    return false;

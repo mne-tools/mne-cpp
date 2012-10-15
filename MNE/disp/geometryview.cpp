@@ -140,7 +140,7 @@ void GeometryView::initializeGL(QGLPainter *painter)
 
 
 
-        int index;
+        qint32 index;
         QSharedPointer<QGLMaterialCollection> palette = builder.sceneNode()->palette();
 
         QGLMaterial *matLH = new QGLMaterial();

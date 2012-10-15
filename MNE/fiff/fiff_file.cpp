@@ -167,7 +167,7 @@ bool FiffFile::open(FiffDirTree*& p_pTree, QList<FiffDirEntry>*& p_pDir)
     }
     else
     {
-        int k = 0;
+        qint32 k = 0;
         this->seek(0);//fseek(fid,0,'bof');
         FiffDirEntry t_fiffDirEntry;
         while (t_pTag->next >= 0)
@@ -388,7 +388,7 @@ bool FiffFile::setup_read_raw(QString t_sFileName, FiffRawData*& data, bool allo
     //
     MatrixXf cals(1,data->info->nchan);
     cals.setZero();
-    for (int k = 0; k < data->info->nchan; ++k)
+    for (qint32 k = 0; k < data->info->nchan; ++k)
         cals(0,k) = data->info->chs.at(k).range*data->info->chs.at(k).cal;
     //
     data->cals       = cals;
@@ -825,10 +825,10 @@ void FiffFile::write_float(fiff_int_t kind, float* data, fiff_int_t nel)
     out << (qint32)datasize;
     out << (qint32)FIFFV_NEXT_SEQ;
 
-    int iData = 0;
+    qint32 iData = 0;
     for(qint32 i = 0; i < nel; ++i)
     {
-        iData = *(int *)&data[i];
+        iData = *(qint32 *)&data[i];
         out << iData;
     }
 }

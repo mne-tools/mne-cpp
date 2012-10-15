@@ -248,16 +248,11 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * fiff_write_ch_info(fid,ch)
-    *
     * Writes a channel information record to a fif file
+    * The type, cal, unit, and pos members are explained in Table 9.5
+    * of the MNE manual
     *
-    *     fid           An open fif file descriptor
-    *     ch            The channel information structure to write
-    *
-    *     The type, cal, unit, and pos members are explained in Table 9.5
-    *     of the MNE manual
-    *
+    * @param[in] ch     The channel information structure to write
     */
     void write_ch_info(FiffChInfo* ch);
 
@@ -267,13 +262,9 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * fiff_write_coord_trans(fid,trans)
-    *
     * Writes a coordinate transformation structure
     *
-    *     fid           An open fif file descriptor
-    *     trans         The coordinate transfomation structure
-    *
+    * @param[in] trans  The coordinate transfomation structure
     */
     void write_coord_trans(FiffCoordTrans& trans);
 
@@ -283,13 +274,9 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * fiff_write_ctf_comp(fid,comps)
-    *
     * Writes the CTF compensation data into a fif file
     *
-    *     fid           An open fif file descriptor
-    *     comps         The compensation data to write
-    *
+    * @param[in] comps  The compensation data to write
     */
     void write_ctf_comp(QList<FiffCtfComp*>& comps);
 
@@ -299,13 +286,10 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * fiff_write_dig_point(fid,dig)
-    *
     * Writes a digitizer data point into a fif file
     *
-    *     fid           An open fif file descriptor
-    *     dig           The point to write
-    *
+    * @param[in] p_pFile    An open fif file
+    * @param[in] dig        The point to write
     */
     void write_dig_point(FiffDigPoint& dig);
 
@@ -315,16 +299,13 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * fiff_write_id(fid,kind,id)
+    * Wrapper for the FiffFile write_id member function
     *
     * Writes fiff id
-    *
-    *     fid           An open fif file descriptor
-    *     kind          The tag kind
-    *     id            The id to write
-    *
     * If the id argument is missing it will be generated here
     *
+    * @param[in] kind       The tag kind
+    * @param[in] id         The id to write
     */
     void write_id(fiff_int_t kind, FiffId& id = defaultFiffId);
 
@@ -334,14 +315,12 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * fiff_write_int(fid,kind,data)
-    *
     * Writes a 32-bit integer tag to a fif file
     *
-    *     fid           An open fif file descriptor
-    *     kind          Tag kind
-    *     data          The integers to use as data
-    *     nel           Zahl an Elementen in der data size
+    * @param[in] p_pFile    An open fif file
+    * @param[in] kind       Tag kind
+    * @param[in] data       The integer data pointer
+    * @param[in] nel        Number of integers to write (default = 1)
     */
     void write_int(fiff_int_t kind, fiff_int_t* data, fiff_int_t nel = 1);
 
@@ -351,14 +330,11 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * fiff_write_float(fid,kind,data)
-    *
     * Writes a single-precision floating point tag to a fif file
     *
-    *     fid           An open fif file descriptor
-    *     kind          Tag kind
-    *     data          The data
-    *
+    * @param[in] kind       Tag kind
+    * @param[in] data       The float data pointer
+    * @param[in] nel        Number of floats to write (default = 1)
     */
     void write_float(fiff_int_t kind, float* data, fiff_int_t nel = 1);
 
@@ -368,15 +344,13 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * fiff_write_float_matrix(fid,kind,mat)
-    *
     * Writes a single-precision floating-point matrix tag
     *
-    *     fid           An open fif file descriptor
-    *     kind          The tag kind
-    *     mat           The data matrix
+    * @param[in] kind       The tag kind
+    * @param[in] mat        The data matrix
     */
     void write_float_matrix(fiff_int_t kind, MatrixXf& mat);
+
 
     //=========================================================================================================
     /**
@@ -384,13 +358,10 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * fiff_write_name_list(fid,kind,mat)
-    *
     * Writes a colon-separated list of names
     *
-    *     fid           An open fif file descriptor
-    *     kind          The tag kind
-    *     data          An array of names to create the list from
+    * @param[in] kind       The tag kind
+    * @param[in] data       An array of names to create the list from
     */
     void write_name_list(fiff_int_t kind,QStringList& data);
 
@@ -400,13 +371,10 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * fiff_write_named_matrix(fid,kind,mat)
-    *
     * Writes a named single-precision floating-point matrix
     *
-    *     fid           An open fif file descriptor
-    *     kind          The tag kind to use for the data
-    *     mat           The data matrix
+    * @param[in] kind       The tag kind to use for the data
+    * @param[in] data       The data matrix
     */
     void write_named_matrix(fiff_int_t kind,FiffNamedMatrix* mat);
 
@@ -416,12 +384,9 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * fiff_write_proj(fid,projs)
-    *
     * Writes the projection data into a fif file
     *
-    *     fid           An open fif file descriptor
-    *     projs         The compensation data to write
+    * @param[in] projs      The compensation data to write
     */
     void write_proj(QList<FiffProj*>& projs);
 
@@ -437,6 +402,19 @@ public:
     * buf        the buffer to write
     * cals       calibration factors
     */
+    //=========================================================================================================
+    /**
+    * fiff_write_raw_buffer
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Writes a raw buffer.
+    *
+    * @param[in] buf        the buffer to write
+    * @param[in] cals       calibration factors
+    *
+    * @return true if succeeded, false otherwise
+    */
     bool write_raw_buffer(MatrixXf* buf, MatrixXf* cals);
 
     //=========================================================================================================
@@ -445,13 +423,10 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * fiff_write_string(fid,kind,data)
-    *
     * Writes a string tag
     *
-    *     fid           An open fif file descriptor
-    *     kind          The tag kind
-    *     data          The string data to write
+    * @param[in] kind       The tag kind
+    * @param[in] data       The string data to write
     */
     void write_string(fiff_int_t kind, QString& data);
 };
