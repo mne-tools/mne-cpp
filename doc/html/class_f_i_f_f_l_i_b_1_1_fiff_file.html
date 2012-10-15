@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">mne-cpp
-   &#160;<span id="projectnumber">alpha</span>
+   &#160;<span id="projectnumber">beta</span>
    </div>
   </td>
  </tr>
@@ -351,9 +351,16 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_setup_read_raw</p>
 <h3>MNE toolbox root function</h3>
-<p>[data] = fiff_setup_read_raw(fname,allow_maxshield)</p>
 <p>Read information about raw data file</p>
-<p>fname Name of the file to read allow_maxshield Accept unprocessed MaxShield data </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">t_sFileName</td><td>Name of the file to read </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">data</td><td>The raw data information - contains the opened fiff file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">allow_maxshield</td><td>Accept unprocessed MaxShield data</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
 <p>Definition at line <a class="el" href="fiff__file_8cpp_source.html#l00203">203</a> of file <a class="el" href="fiff__file_8cpp_source.html">fiff_file.cpp</a>.</p>
 
@@ -373,10 +380,16 @@ Static Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>fiff_start_block</p>
-<p>fiff_start_block(fid,kind)</p>
-<p>Writes a FIFF_BLOCK_START tag </p>
-<pre class="fragment">fid           An open fif file descriptor
-kind          The block kind to start</pre> 
+<h3>MNE toolbox root function</h3>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a> start_block member function</p>
+<p>Writes a FIFF_BLOCK_START tag</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">kind</td><td>The block kind to start </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p>Definition at line <a class="el" href="fiff__file_8cpp_source.html#l00411">411</a> of file <a class="el" href="fiff__file_8cpp_source.html">fiff_file.cpp</a>.</p>
 
 </div>
@@ -404,10 +417,15 @@ kind          The block kind to start</pre>
 </div><div class="memdoc">
 <p>fiff_start_file</p>
 <h3>MNE toolbox root function</h3>
-<p>[fid] = fiff_start_file(name)</p>
-<p>Opens a fiff file for writing and writes the compulsory header tags </p>
-<pre class="fragment">name           The name of the file to open. It is recommended
-               that the name ends with .fif</pre> 
+<p>Opens a fiff file for writing and writes the compulsory header tags</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">name</td><td>The name of the file to open. It is recommended that the name ends with .fif</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The opened file. </dd></dl>
+
 <p>Definition at line <a class="el" href="fiff__file_8cpp_source.html#l00419">419</a> of file <a class="el" href="fiff__file_8cpp_source.html">fiff_file.cpp</a>.</p>
 
 </div>
@@ -458,7 +476,16 @@ kind          The block kind to start</pre>
 <p>fiff_start_writing_raw</p>
 <h3>MNE toolbox root function</h3>
 <p>function [fid,cals] = fiff_start_writing_raw(name,info,sel)</p>
-<p>name filename info The measurement info block of the source file sel Which channels will be included in the output file (optional) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_sFileName</td><td>filename </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">info</td><td>The measurement info block of the source file </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">cals</td><td>Thecalibration matrix </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">sel</td><td>Which channels will be included in the output file (optional)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the started fiff file </dd></dl>
 
 <p>Definition at line <a class="el" href="fiff__file_8cpp_source.html#l00446">446</a> of file <a class="el" href="fiff__file_8cpp_source.html">fiff_file.cpp</a>.</p>
 
@@ -874,7 +901,7 @@ data          The string data to write</pre>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Oct 13 2012 16:09:40 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Oct 15 2012 15:31:51 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

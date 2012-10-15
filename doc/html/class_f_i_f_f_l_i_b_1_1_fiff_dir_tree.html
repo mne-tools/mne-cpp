@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">mne-cpp
-   &#160;<span id="projectnumber">alpha</span>
+   &#160;<span id="projectnumber">beta</span>
    </div>
   </td>
  </tr>
@@ -339,7 +339,14 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Implementation of the has_tag function in fiff_read_named_matrix.m </p>
+<p>Implementation of the has_tag function in fiff_read_named_matrix.m</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">findkind</td><td>kind to find</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true when fiff_dir_tree contains kind </dd></dl>
 
 <p>Definition at line <a class="el" href="fiff__dir__tree_8cpp_source.html#l00300">300</a> of file <a class="el" href="fiff__dir__tree_8cpp_source.html">fiff_dir_tree.cpp</a>.</p>
 
@@ -458,8 +465,15 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_read_ctf_comp</p>
 <h3>MNE toolbox root function</h3>
-<p>[ compdata ] = fiff_read_ctf_comp(fid,node,chs)</p>
-<p>Read the CTF software compensation data from the given node </p>
+<p>Read the CTF software compensation data from the given node</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>The opened fif file to read from </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">chs</td><td>channels with the calibration info</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the CTF software compensation data </dd></dl>
 
 <p>Definition at line <a class="el" href="fiff__dir__tree_8cpp_source.html#l00328">328</a> of file <a class="el" href="fiff__dir__tree_8cpp_source.html">fiff_dir_tree.cpp</a>.</p>
 
@@ -490,9 +504,15 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_read_meas_info</p>
 <h3>MNE toolbox root function</h3>
-<p>[info,meas] = fiff_read_meas_info(source,tree)</p>
-<p>Read the measurement info</p>
-<p>If tree is specified, source is assumed to be an open file id, otherwise a the name of the file to read. If tree is missing, the meas output argument should not be specified. </p>
+<p>Read the measurement info Source is assumed to be an open fiff file.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>The opened fif file to read from </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">info</td><td>the read measurement info</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the to measurement corresponding fiff_dir_tree. </dd></dl>
 
 <p>Definition at line <a class="el" href="fiff__dir__tree_8cpp_source.html#l00497">497</a> of file <a class="el" href="fiff__dir__tree_8cpp_source.html">fiff_dir_tree.cpp</a>.</p>
 
@@ -529,6 +549,16 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_read_named_matrix</p>
 <h3>MNE toolbox root function</h3>
+<p>Reads a named matrix.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>The opened fif file to read from </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">matkind</td><td>The matrix kind to look for </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">mat</td><td>The named matrix</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
 <p>Definition at line <a class="el" href="fiff__dir__tree_8cpp_source.html#l00820">820</a> of file <a class="el" href="fiff__dir__tree_8cpp_source.html">fiff_dir_tree.cpp</a>.</p>
 
@@ -579,6 +609,14 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_split_name_list</p>
 <h3>MNE toolbox root function</h3>
+<p>Splits a string by looking for seperator ":"</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_sNameList</td><td>string to split</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the splitted string list </dd></dl>
 
 <p>Definition at line <a class="el" href="fiff__dir__tree_8cpp_source.html#l00489">489</a> of file <a class="el" href="fiff__dir__tree_8cpp_source.html">fiff_dir_tree.cpp</a>.</p>
 
@@ -596,7 +634,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Block type for this directory </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00239">239</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00258">258</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -611,7 +649,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Child nodes </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00245">245</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00264">264</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -626,7 +664,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Directory of tags in this node </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00242">242</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00261">261</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -641,7 +679,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Id of this block if any </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00240">240</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00259">259</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -656,7 +694,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Number of child nodes </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00246">246</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00265">265</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -671,7 +709,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Number of entries in this node </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00243">243</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00262">262</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -686,7 +724,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Number of entries in the directory tree node </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00244">244</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00263">263</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -701,7 +739,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Newly added to stay consistent with MATLAB implementation </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00241">241</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00260">260</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -712,7 +750,7 @@ Public Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Oct 13 2012 16:09:40 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Oct 15 2012 15:31:51 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

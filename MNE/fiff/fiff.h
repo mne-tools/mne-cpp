@@ -289,37 +289,45 @@ public:
     /**
     * fiff_pick_channels
     *
-    * function [sel] = fiff_pick_channels(ch_names,include,exclude)
+    * ### MNE toolbox root function ###
     *
-    * [sel] = fiff_pick_channels(ch_names,include,exclude)
+    * Wrapper for the FiffInfo::pick_channels static function
     *
     * Make a selector to pick desired channels from data
     *
-    * ch_names  - The channel name list to consult
-    * include   - Channels to include (if empty, include all available)
-    * exclude   - Channels to exclude (if empty, do not exclude any)
-    *
+    * @param[in] ch_names  - The channel name list to consult
+    * @param[in] include   - Channels to include (if empty, include all available)
+    * @param[in] exclude   - Channels to exclude (if empty, do not exclude any)
+    * @return the selector matrix (row Vector)
     */
-    static MatrixXi pick_channels(QStringList& ch_names, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
-
+    inline static MatrixXi pick_channels(QStringList& ch_names, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList)
+    {
+        return FiffInfo::pick_channels(ch_names, include, exclude);
+    }
 
     //=========================================================================================================
     /**
-    * [sel] = fiff_pick_types(info,meg,eeg,stim,exclude)
+    * fiff_pick_types
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffInfo pick_types member function
     *
     * Create a selector to pick desired channel types from data
     *
-    * info      - The measurement info
-    * meg       - Include MEG channels
-    * eeg       - Include EEG channels
-    * stim      - Include stimulus channels
-    * include   - Additional channels to include (if empty, do not add any)
-    * exclude   - Channels to exclude (if empty, do not exclude any)
+    * @param[in] info       The measurement info
+    * @param[in] meg        Include MEG channels
+    * @param[in] eeg        Include EEG channels
+    * @param[in] stim       Include stimulus channels
+    * @param[in] include    Additional channels to include (if empty, do not add any)
+    * @param[in] exclude    Channels to exclude (if empty, do not exclude any)
     *
+    * @return the selector matrix (row vector)
     */
-    //fiff_pick_types(raw.info,want_meg,want_eeg,want_stim,include,raw.info.bads)
-    static MatrixXi pick_types(FiffInfo* info, bool meg, bool eeg = false, bool stim = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
-
+    inline static MatrixXi pick_types(FiffInfo* info, bool meg, bool eeg = false, bool stim = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList)
+    {
+        return info->pick_types(meg, eeg, stim, include, exclude);
+    }
 
     //=========================================================================================================
     /**
@@ -349,10 +357,13 @@ public:
     *
     * Wrapper for the FiffDirTree read_ctf_comp member function
     *
-    * [ compdata ] = fiff_read_ctf_comp(fid,node,chs)
-    *
     * Read the CTF software compensation data from the given node
     *
+    * @param[in] p_pFile    The opened fif file to read from
+    * @param[in] p_pTree    The node of interest
+    * @param[in] chs        channels with the calibration info
+    *
+    * @return the CTF software compensation data
     */
     static inline QList<FiffCtfComp*> read_ctf_comp(FiffFile* p_pFile, FiffDirTree* p_pNode, QList<FiffChInfo>& chs)
     {
@@ -365,14 +376,16 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * [info,meas] = fiff_read_meas_info(source,tree)
+    * Wrapper for the FiffDirTree read_meas_info member function
     *
     * Read the measurement info
+    * Source is assumed to be an open fiff file.
     *
-    * If tree is specified, source is assumed to be an open file id,
-    * otherwise a the name of the file to read. If tree is missing, the
-    * meas output argument should not be specified.
+    * @param[in] p_pFile The opened fif file to read from
+    * @param[in] p_pTree The node of interest
+    * @param[out] info the read measurement info
     *
+    * @return the to measurement corresponding fiff_dir_tree.
     */
     static inline FiffDirTree* read_meas_info(FiffFile* p_pFile, FiffDirTree* p_pTree, FiffInfo*& info)
     {
@@ -387,7 +400,14 @@ public:
     *
     * Wrapper for the FiffDirTree read_named_matrix member function
     *
-    * ToDo
+    * Reads a named matrix.
+    *
+    * @param[in] p_pFile    The opened fif file to read from
+    * @param[in] node       The node of interest
+    * @param[in] matkind    The matrix kind to look for
+    * @param[out] mat       The named matrix
+    *
+    * @return true if succeeded, false otherwise
     */
     static inline bool read_named_matrix(FiffFile* p_pFile, FiffDirTree* node, fiff_int_t matkind, FiffNamedMatrix*& mat)
     {
@@ -484,12 +504,15 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * [data] = fiff_setup_read_raw(fname,allow_maxshield)
+    * Wrapper for the FiffFile::setup_read_raw static function
     *
     * Read information about raw data file
     *
-    * fname               Name of the file to read
-    * allow_maxshield     Accept unprocessed MaxShield data
+    * @param[in] t_sFileName        Name of the file to read
+    * @param[out] data              The raw data information - contains the opened fiff file
+    * @param[in] allow_maxshield    Accept unprocessed MaxShield data
+    *
+    * @return true if succeeded, false otherwise
     */
     inline static bool setup_read_raw(QString t_sFileName, FiffRawData*& data, bool allow_maxshield = false)
     {
@@ -503,6 +526,12 @@ public:
     * ### MNE toolbox root function ###
     *
     * Wrapper for the FiffDirTree::split_name_list static function
+    *
+    * Splits a string by looking for seperator ":"
+    *
+    * @param[in] p_sNameList    string to split
+    *
+    * @return the splitted string list
     */
     inline static QStringList split_name_list(QString p_sNameList)
     {
@@ -513,40 +542,38 @@ public:
     /**
     * fiff_start_block
     *
-    * fiff_start_block(fid,kind)
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffFile start_block member function
     *
     * Writes a FIFF_BLOCK_START tag
     *
-    *     fid           An open fif file descriptor
-    *     kind          The block kind to start
-    *
+    * @param[in] p_pFile    An open fif file to write to
+    * @param[in] kind       The block kind to start
     */
     static void start_block(FiffFile* p_pFile, fiff_int_t kind)
     {
-        p_pFile->write_int(FIFF_BLOCK_START,&kind);
+        p_pFile->start_block(kind);
     }
 
     //=========================================================================================================
     /**
-    * ToDo make this part of the FiffFile classs
-    *
     * fiff_start_file
     *
     * ### MNE toolbox root function ###
     *
-    * [fid] = fiff_start_file(name)
+    * Wrapper for the FiffFile::start_file static function
     *
     * Opens a fiff file for writing and writes the compulsory header tags
     *
-    *     name           The name of the file to open. It is recommended
-    *                    that the name ends with .fif
+    * @param[in] name   The name of the file to open. It is recommended that the name ends with .fif
     *
+    * @return The opened file.
     */
     static FiffFile* start_file(QString& p_sFileName)
     {
         return FiffFile::start_file(p_sFileName);
     }
-
 
     //=========================================================================================================
     /**
@@ -554,12 +581,16 @@ public:
     *
     * ### MNE toolbox root function ###
     *
+    * Wrapper for the FiffFile::start_writing_raw static function
+    *
     * function [fid,cals] = fiff_start_writing_raw(name,info,sel)
     *
-    * name       filename
-    * info       The measurement info block of the source file
-    * sel        Which channels will be included in the output file (optional)
+    * @param[in] p_sFileName    filename
+    * @param[in] info           The measurement info block of the source file
+    * @param[out] cals          Thecalibration matrix
+    * @param[in] sel            Which channels will be included in the output file (optional)
     *
+    * @return the started fiff file
     */
     static FiffFile* start_writing_raw(QString& p_sFileName, FiffInfo* info, MatrixXf*& cals, MatrixXi sel = defaultFileMatrixXi)
     {

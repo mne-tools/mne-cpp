@@ -111,7 +111,9 @@ int main(int argc, char *argv[])
     bool want_eeg   = false;
     bool want_stim  = false;
 
-    MatrixXi picks = Fiff::pick_types(raw->info, want_meg, want_eeg, want_stim, include, raw->info->bads);
+//    MatrixXi picks = Fiff::pick_types(raw->info, want_meg, want_eeg, want_stim, include, raw->info->bads);
+    MatrixXi picks = raw->info->pick_types(want_meg, want_eeg, want_stim, include, raw->info->bads); //Prefer member function
+
 
     //
     //   Set up projection

@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the FiffFile class declaration, ToDo increase reading/writing raw data speed.
+* @brief    Contains the FiffFile class declaration
 *
 */
 
@@ -187,12 +187,13 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * [data] = fiff_setup_read_raw(fname,allow_maxshield)
-    *
     * Read information about raw data file
     *
-    * fname               Name of the file to read
-    * allow_maxshield     Accept unprocessed MaxShield data
+    * @param[in] t_sFileName        Name of the file to read
+    * @param[out] data              The raw data information - contains the opened fiff file
+    * @param[in] allow_maxshield    Accept unprocessed MaxShield data
+    *
+    * @return true if succeeded, false otherwise
     */
     static bool setup_read_raw(QString t_sFileName, FiffRawData*& data, bool allow_maxshield = false);
 
@@ -200,13 +201,13 @@ public:
     /**
     * fiff_start_block
     *
-    * fiff_start_block(fid,kind)
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffFile start_block member function
     *
     * Writes a FIFF_BLOCK_START tag
     *
-    *     fid           An open fif file descriptor
-    *     kind          The block kind to start
-    *
+    * @param[in] kind       The block kind to start
     */
     void start_block(fiff_int_t kind);
 
@@ -216,13 +217,11 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * [fid] = fiff_start_file(name)
-    *
     * Opens a fiff file for writing and writes the compulsory header tags
     *
-    *     name           The name of the file to open. It is recommended
-    *                    that the name ends with .fif
+    * @param[in] name   The name of the file to open. It is recommended that the name ends with .fif
     *
+    * @return The opened file.
     */
     static FiffFile* start_file(QString& p_sFilename);
 
@@ -234,10 +233,12 @@ public:
     *
     * function [fid,cals] = fiff_start_writing_raw(name,info,sel)
     *
-    * name       filename
-    * info       The measurement info block of the source file
-    * sel        Which channels will be included in the output file (optional)
+    * @param[in] p_sFileName    filename
+    * @param[in] info           The measurement info block of the source file
+    * @param[out] cals          Thecalibration matrix
+    * @param[in] sel            Which channels will be included in the output file (optional)
     *
+    * @return the started fiff file
     */
     static FiffFile* start_writing_raw(QString& p_sFileName, FiffInfo* info, MatrixXf*& cals, MatrixXi sel = defaultFileMatrixXi);
 
