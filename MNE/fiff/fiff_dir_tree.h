@@ -156,6 +156,10 @@ public:
     //=========================================================================================================
     /**
     * Implementation of the has_tag function in fiff_read_named_matrix.m
+    *
+    * @param[in] findkind kind to find
+    *
+    * @return true when fiff_dir_tree contains kind
     */
     bool has_tag(fiff_int_t findkind);
 
@@ -182,10 +186,12 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * [ compdata ] = fiff_read_ctf_comp(fid,node,chs)
-    *
     * Read the CTF software compensation data from the given node
     *
+    * @param[in] p_pFile    The opened fif file to read from
+    * @param[in] chs        channels with the calibration info
+    *
+    * @return the CTF software compensation data
     */
     QList<FiffCtfComp*> read_ctf_comp(FiffFile* p_pFile, QList<FiffChInfo>& chs);
 
@@ -195,14 +201,13 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * [info,meas] = fiff_read_meas_info(source,tree)
-    *
     * Read the measurement info
+    * Source is assumed to be an open fiff file.
     *
-    * If tree is specified, source is assumed to be an open file id,
-    * otherwise a the name of the file to read. If tree is missing, the
-    * meas output argument should not be specified.
+    * @param[in] p_pFile The opened fif file to read from
+    * @param[out] info the read measurement info
     *
+    * @return the to measurement corresponding fiff_dir_tree.
     */
     FiffDirTree* read_meas_info(FiffFile* p_pFile, FiffInfo*& info);
 
@@ -211,6 +216,14 @@ public:
     * fiff_read_named_matrix
     *
     * ### MNE toolbox root function ###
+    *
+    * Reads a named matrix.
+    *
+    * @param[in] p_pFile    The opened fif file to read from
+    * @param[in] matkind    The matrix kind to look for
+    * @param[out] mat       The named matrix
+    *
+    * @return true if succeeded, false otherwise
     */
     bool read_named_matrix(FiffFile* p_pFile, fiff_int_t matkind, FiffNamedMatrix*& mat);
 
@@ -232,6 +245,12 @@ public:
     * fiff_split_name_list
     *
     * ### MNE toolbox root function ###
+    *
+    * Splits a string by looking for seperator ":"
+    *
+    * @param[in] p_sNameList    string to split
+    *
+    * @return the splitted string list
     */
     static QStringList split_name_list(QString p_sNameList);
 

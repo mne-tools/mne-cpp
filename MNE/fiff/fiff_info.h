@@ -169,6 +169,42 @@ public:
 
     //=========================================================================================================
     /**
+    * fiff_pick_channels
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Make a selector to pick desired channels from data
+    *
+    * @param[in] ch_names  - The channel name list to consult
+    * @param[in] include   - Channels to include (if empty, include all available)
+    * @param[in] exclude   - Channels to exclude (if empty, do not exclude any)
+    *
+    * @return the selector matrix (row Vector)
+    */
+    static MatrixXi pick_channels(QStringList& ch_names, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
+
+
+    //=========================================================================================================
+    /**
+    * fiff_pick_types
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Create a selector to pick desired channel types from data
+    *
+    * @param[in] meg        Include MEG channels
+    * @param[in] eeg        Include EEG channels
+    * @param[in] stim       Include stimulus channels
+    * @param[in] include    Additional channels to include (if empty, do not add any)
+    * @param[in] exclude    Channels to exclude (if empty, do not exclude any)
+    *
+    * @return the selector matrix (row vector)
+    */
+    MatrixXi pick_types(bool meg, bool eeg = false, bool stim = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
+
+
+    //=========================================================================================================
+    /**
     * Set the current compensation value in the channel info structures
     *
     * @param[in] value  compensation value
