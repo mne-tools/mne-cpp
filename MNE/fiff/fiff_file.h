@@ -396,18 +396,6 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * function fiff_write_raw_buffer(fid,info,buf)
-    *
-    * fid        of an open raw data file
-    * buf        the buffer to write
-    * cals       calibration factors
-    */
-    //=========================================================================================================
-    /**
-    * fiff_write_raw_buffer
-    *
-    * ### MNE toolbox root function ###
-    *
     * Writes a raw buffer.
     *
     * @param[in] buf        the buffer to write
@@ -429,6 +417,7 @@ public:
     * @param[in] data       The string data to write
     */
     void write_string(fiff_int_t kind, QString& data);
+
 };
 
 } // NAMESPACE
