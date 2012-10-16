@@ -74,6 +74,31 @@ FiffTag::FiffTag()
 
 //*************************************************************************************************************
 
+FiffTag::FiffTag(FiffTag* p_pFiffTag)
+: kind(p_pFiffTag->kind)
+, type(p_pFiffTag->type)
+, size(p_pFiffTag->size)
+, next(p_pFiffTag->next)
+, data( malloc(p_pFiffTag->size) )
+{
+    memcpy(data, p_pFiffTag->data, p_pFiffTag->size);
+
+    if(p_pFiffTag->m_pComplexFloatData)
+        this->toComplexFloat();
+    else
+        m_pComplexFloatData = NULL;
+
+    if(p_pFiffTag->m_pComplexDoubleData)
+        this->toComplexDouble();
+    else
+        m_pComplexDoubleData = NULL;
+
+}
+
+
+//*************************************************************************************************************
+
+
 FiffTag::~FiffTag()
 {
     if(this->data)
