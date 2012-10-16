@@ -418,8 +418,6 @@ public:
                 delete t_pTree;
             if(t_pDir)
                 delete t_pDir;
-            if(meas)
-                delete meas;
             if(info)
                 delete info;
 
@@ -436,8 +434,6 @@ public:
                 delete t_pTree;
             if(t_pDir)
                 delete t_pDir;
-            if(meas)
-                delete meas;
             if(info)
                 delete info;
             printf("Could not find evoked data");
@@ -447,10 +443,14 @@ public:
         //   Identify the aspects
         //
         fiff_int_t naspect = 0;
-//        is_smsh = [];
+        fiff_int_t nsaspects = 0;
+        qint32 oldsize = 0;
+        MatrixXi is_smsh(1,0);
         QList< QList<FiffDirTree*> > sets_aspects;
         QList< qint32 > sets_naspect;
-        for (qint32 k = 0; k < evoked.size(); ++k)
+        QList<FiffDirTree*> saspects;
+        qint32 k;
+        for (k = 0; k < evoked.size(); ++k)
         {
 //            sets(k).aspects = fiff_dir_tree_find(evoked(k),FIFF.FIFFB_ASPECT);
 //            sets(k).naspect = length(sets(k).aspects);
@@ -458,173 +458,261 @@ public:
             sets_aspects.append(evoked[k]->dir_tree_find(FIFFB_ASPECT));
             sets_naspect.append(sets_aspects[k].size());
 
-            qDebug() << sets_aspects[k].size();
+            if (sets_naspect[k] > 0)
+            {
+                oldsize = is_smsh.cols();
+                is_smsh.conservativeResize(1, oldsize + sets_naspect[k]);
+                is_smsh.block(0, oldsize, 1, sets_naspect[k]) = MatrixXi::Zero(1, sets_naspect[k]);
+                naspect += sets_naspect[k];
+            }
+            saspects  = evoked[k]->dir_tree_find(FIFFB_SMSH_ASPECT);
+            nsaspects = saspects.size();
+            if (nsaspects > 0)
+            {
+                sets_naspect[k] += nsaspects;
+                sets_aspects[k].append(saspects);
 
-//            if sets(k).naspect > 0
-//                is_smsh = [ is_smsh zeros(1,sets(k).naspect) ];
-//                naspect = naspect + sets(k).naspect;
-//            end
-//            saspects  = fiff_dir_tree_find(evoked(k), FIFF.FIFFB_SMSH_ASPECT);
-//            nsaspects = length(saspects);
-//            if nsaspects > 0
-//                sets(k).naspect = sets(k).naspect + nsaspects;
-//                sets(k).aspects = [ sets(k).aspects saspects ];
-//                is_smsh = [ is_smsh ones(1,sets(k).naspect) ];
-//                naspect = naspect + nsaspects;
-//            end
+                oldsize = is_smsh.cols();
+                is_smsh.conservativeResize(1, oldsize + sets_naspect[k]);
+                is_smsh.block(0, oldsize, 1, sets_naspect[k]) = MatrixXi::Ones(1, sets_naspect[k]);
+                naspect += nsaspects;
+            }
         }
-//        fprintf(1,'\t%d evoked data sets containing a total of %d data aspects in %s\n',length(evoked),naspect,fname);
-//        if setno > naspect || setno < 1
-//            fclose(fid);
-//            error(me,'Data set selector out of range');
-//        end
-//        %
-//        %   Next locate the evoked data set
-//        %
-//        p = 0;
-//        goon = true;
-//        for k = 1:length(evoked)
-//            for a = 1:sets(k).naspect
-//                p = p + 1;
-//                if p == setno
-//                    my_evoked = evoked(k);
-//                    my_aspect = sets(k).aspects(a);
-//                    goon = false;
-//                    break;
-//                end
-//            end
-//            if ~goon
-//                break;
-//            end
-//        end
-//        %
-//        %   The desired data should have been found but better to check
-//        %
-//        if ~exist('my_evoked','var') || ~exist('my_aspect','var')
-//            fclose(fid);
-//            error(me,'Desired data set not found');
-//        end
-//        %
-//        %   Now find the data in the evoked block
-//        %
-//        nchan = 0;
-//        sfreq = -1;
-//        q = 0;
-//        for k = 1:my_evoked.nent
-//            kind = my_evoked.dir(k).kind;
-//            pos  = my_evoked.dir(k).pos;
-//            switch kind
-//                case FIFF.FIFF_COMMENT
-//                    tag = fiff_read_tag(fid,pos);
-//                    comment = tag.data;
-//                case FIFF.FIFF_FIRST_SAMPLE
-//                    tag = fiff_read_tag(fid,pos);
-//                    first = tag.data;
-//                case FIFF.FIFF_LAST_SAMPLE
-//                    tag = fiff_read_tag(fid,pos);
-//                    last = tag.data;
-//                case FIFF.FIFF_NCHAN
-//                    tag = fiff_read_tag(fid,pos);
-//                    nchan = tag.data;
-//                case FIFF.FIFF_SFREQ
-//                    tag = fiff_read_tag(fid,pos);
-//                    sfreq = tag.data;
-//                case FIFF.FIFF_CH_INFO
-//                    q = q+1;
-//                    tag = fiff_read_tag(fid,pos);
-//                    chs(q) = tag.data;
-//            end
-//        end
-//        if ~exist('comment','var')
-//            comment = 'No comment';
-//        end
-//        %
-//        %   Local channel information?
-//        %
-//        if nchan > 0
-//            if ~exist('chs','var')
-//                fclose(fid);
-//                error(me, ...
-//                    'Local channel information was not found when it was expected.');
-//            end
-//            if length(chs) ~= nchan
-//                fclose(fid);
-//                error(me, ...
-//                    'Number of channels and number of channel definitions are different');
-//            end
-//            info.chs   = chs;
-//            info.nchan = nchan;
-//            fprintf(1, ...
-//                '\tFound channel information in evoked data. nchan = %d\n',nchan);
-//            if sfreq > 0
-//                info.sfreq = sfreq;
-//            end
-//        end
-//        nsamp = last-first+1;
-//        fprintf(1,'\tFound the data of interest:\n');
-//        fprintf(1,'\t\tt = %10.2f ... %10.2f ms (%s)\n',...
-//            1000*double(first)/info.sfreq,1000*double(last)/info.sfreq,comment);
-//        if ~isempty(info.comps)
-//            fprintf(1,'\t\t%d CTF compensation matrices available\n',length(info.comps));
-//        end
-//        %
-//        % Read the data in the aspect block
-//        %
-//        nepoch = 0;
-//        for k = 1:my_aspect.nent
-//            kind = my_aspect.dir(k).kind;
-//            pos  = my_aspect.dir(k).pos;
-//            switch kind
-//                case FIFF.FIFF_COMMENT
-//                    tag = fiff_read_tag(fid,pos);
-//                    comment = tag.data;
-//                case FIFF.FIFF_ASPECT_KIND
-//                    tag = fiff_read_tag(fid,pos);
-//                    aspect_kind = tag.data;
-//                case FIFF.FIFF_NAVE
-//                    tag = fiff_read_tag(fid,pos);
-//                    nave = tag.data;
-//                case FIFF.FIFF_EPOCH
-//                    nepoch = nepoch + 1;
-//                    tag = fiff_read_tag(fid,pos);
-//                    epoch(nepoch) = tag;
-//            end
-//        end
-//        if ~exist('nave','var')
-//            nave = 1;
-//        end
-//        fprintf(1,'\t\tnave = %d aspect type = %d\n',...
-//            nave,aspect_kind);
-//        if nepoch ~= 1 && nepoch ~= info.nchan
-//            fclose(fid);
-//            error(me,'Number of epoch tags is unreasonable (nepoch = %d nchan = %d)',nepoch,info.nchan);
-//        end
-//        %
-//        if nepoch == 1
-//            %
-//            %   Only one epoch
-//            %
-//            all = epoch(1).data;
-//            %
-//            %   May need a transpose if the number of channels is one
-//            %
-//            if size(all,2) == 1 && info.nchan == 1
-//                all = all';
-//            end
-//        else
-//            %
-//            %   Put the old style epochs together
-//            %
-//            all = epoch(1).data';
-//            for k = 2:nepoch
-//                all = [ all ; epoch(k).data' ];
-//            end
-//        end
-//        if size(all,2) ~= nsamp
-//            fclose(fid);
-//            error(me,'Incorrect number of samples (%d instead of %d)',...
-//                size(all,2),nsamp);
-//        end
+        printf("\t%d evoked data sets containing a total of %d data aspects in %s\n",evoked.size(),naspect,p_sFileName.toUtf8().constData());
+        if (setno >= naspect || setno < 0)
+        {
+            if(t_pFile)
+                delete t_pFile;
+            if(t_pTree)
+                delete t_pTree;
+            if(t_pDir)
+                delete t_pDir;
+            if(info)
+                delete info;
+            printf("Data set selector out of range\n");
+            return false;
+        }
+        //
+        //   Next locate the evoked data set
+        //
+        qint32 p = 0;
+        qint32 a = 0;
+        bool goon = true;
+        FiffDirTree* my_evoked = NULL;
+        FiffDirTree* my_aspect = NULL;
+        for(k = 0; k < evoked.size(); ++k)
+        {
+            for (a = 0; a < sets_naspect[k]; ++a)
+            {
+                if(p == setno)
+                {
+                    my_evoked = evoked[k];
+                    my_aspect = sets_aspects[k][a];
+                    goon = false;
+                    break;
+                }
+                ++p;
+            }
+            if (!goon)
+                break;
+        }
+        //
+        //   The desired data should have been found but better to check
+        //
+        if (my_evoked == NULL || my_aspect == NULL)
+        {
+            if(t_pFile)
+                delete t_pFile;
+            if(t_pTree)
+                delete t_pTree;
+            if(t_pDir)
+                delete t_pDir;
+            if(info)
+                delete info;
+            printf("Desired data set not found\n");
+            return false;
+        }
+        //
+        //   Now find the data in the evoked block
+        //
+        fiff_int_t nchan = 0;
+        float sfreq = -1.0f;
+        QList<FiffChInfo> chs;
+        fiff_int_t kind, pos, first, last;
+        FiffTag* t_pTag = NULL;
+        QString comment("");
+        for (k = 0; k < my_evoked->nent; ++k)
+        {
+            kind = my_evoked->dir[k].kind;
+            pos  = my_evoked->dir[k].pos;
+            switch (kind)
+            {
+                case FIFF_COMMENT:
+                    FiffTag::read_tag(t_pFile,t_pTag,pos);
+                    comment = t_pTag->toString();
+                    break;
+                case FIFF_FIRST_SAMPLE:
+                    FiffTag::read_tag(t_pFile,t_pTag,pos);
+                    first = *t_pTag->toInt();
+                    break;
+                case FIFF_LAST_SAMPLE:
+                    FiffTag::read_tag(t_pFile,t_pTag,pos);
+                    last = *t_pTag->toInt();
+                    break;
+                case FIFF_NCHAN:
+                    FiffTag::read_tag(t_pFile,t_pTag,pos);
+                    nchan = *t_pTag->toInt();
+                    break;
+                case FIFF_SFREQ:
+                    FiffTag::read_tag(t_pFile,t_pTag,pos);
+                    sfreq = *t_pTag->toFloat();
+                    break;
+                case FIFF_CH_INFO:
+                    FiffTag::read_tag(t_pFile, t_pTag, pos);
+                    chs.append( t_pTag->toChInfo() );
+                    break;
+            }
+        }
+        if (comment.isEmpty())
+            comment = QString("No comment");
+
+        //
+        //   Local channel information?
+        //
+        if (nchan > 0)
+        {
+            if (chs.size() == 0)
+            {
+                if(t_pFile)
+                    delete t_pFile;
+                if(t_pTree)
+                    delete t_pTree;
+                if(t_pDir)
+                    delete t_pDir;
+                if(meas)
+                    delete meas;
+                if(info)
+                    delete info;
+                printf("Local channel information was not found when it was expected.\n");
+                return false;
+            }
+            if (chs.size() != nchan)
+            {
+                if(t_pFile)
+                    delete t_pFile;
+                if(t_pTree)
+                    delete t_pTree;
+                if(t_pDir)
+                    delete t_pDir;
+                if(meas)
+                    delete meas;
+                if(info)
+                    delete info;
+                printf("Number of channels and number of channel definitions are different\n");
+                return false;
+            }
+            info->chs   = chs;
+            info->nchan = nchan;
+            printf("\tFound channel information in evoked data. nchan = %d\n",nchan);
+            if (sfreq > 0.0f)
+                info->sfreq = sfreq;
+        }
+        qint32 nsamp = last-first+1;
+        printf("\tFound the data of interest:\n");
+        printf("\t\tt = %10.2f ... %10.2f ms (%s)\n", 1000*(float)first/info->sfreq, 1000*(float)last/info->sfreq,comment.toUtf8().constData());
+        if (info->comps.size() > 0)
+            printf("\t\t%d CTF compensation matrices available\n", info->comps.size());
+        //
+        // Read the data in the aspect block
+        //
+        fiff_int_t nepoch = 0;
+        fiff_int_t aspect_kind = -1;
+        fiff_int_t nave = -1;
+        QList<FiffTag*> epoch;
+        for (k = 0; k < my_aspect->nent; ++k)
+        {
+            kind = my_aspect->dir[k].kind;
+            pos  = my_aspect->dir[k].pos;
+
+            switch (kind)
+            {
+                case FIFF_COMMENT:
+                    FiffTag::read_tag(t_pFile, t_pTag, pos);
+                    comment = t_pTag->toString();
+                    break;
+                case FIFF_ASPECT_KIND:
+                    FiffTag::read_tag(t_pFile, t_pTag, pos);
+                    aspect_kind = *t_pTag->toInt();
+                    break;
+                case FIFF_NAVE:
+                    FiffTag::read_tag(t_pFile, t_pTag, pos);
+                    nave = *t_pTag->toInt();
+                    break;
+                case FIFF_EPOCH:
+                    FiffTag::read_tag(t_pFile, t_pTag, pos);
+                    epoch.append(new FiffTag(t_pTag));
+                    ++nepoch;
+                    break;
+            }
+        }
+        if (nave == -1)
+            nave = 1;
+        printf("\t\tnave = %d aspect type = %d\n", nave, aspect_kind);
+        if (nepoch != 1 && nepoch != info->nchan)
+        {
+            if(t_pFile)
+                delete t_pFile;
+            if(t_pTree)
+                delete t_pTree;
+            if(t_pDir)
+                delete t_pDir;
+            if(info)
+                delete info;
+            printf("Number of epoch tags is unreasonable (nepoch = %d nchan = %d)\n", nepoch, info->nchan);
+            return false;
+        }
+        //
+        MatrixXf all;
+        if (nepoch == 1)
+        {
+            //
+            //   Only one epoch
+            //
+            all = epoch[0]->toFloatMatrix().transpose();
+            //
+            //   May need a transpose if the number of channels is one
+            //
+            if (all.cols() == 1 && info->nchan == 1)
+                all = all.transpose();
+        }
+        else
+        {
+            //
+            //   Put the old style epochs together
+            //
+            all = epoch[0]->toFloatMatrix().transpose();
+
+            for (k = 2; k < nepoch; ++k)
+            {
+                oldsize = all.rows();
+                MatrixXf tmp = epoch[k]->toFloatMatrix().transpose();
+                all.conservativeResize(oldsize+tmp.rows(), all.cols());
+                all.block(oldsize, 0, tmp.rows(), tmp.cols()) = tmp;
+            }
+        }
+        if (all.cols() != nsamp)
+        {
+            if(t_pFile)
+                delete t_pFile;
+            if(t_pTree)
+                delete t_pTree;
+            if(t_pDir)
+                delete t_pDir;
+            if(info)
+                delete info;
+            printf("Incorrect number of samples (%d instead of %d)", all.cols(), nsamp);
+            return false;
+        }
 //        %
 //        %   Calibrate
 //        %
