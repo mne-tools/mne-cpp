@@ -200,7 +200,7 @@ bool FiffFile::open(FiffDirTree*& p_pTree, QList<FiffDirEntry>*& p_pDir)
 
 //*************************************************************************************************************
 
-bool FiffFile::setup_read_raw(QString t_sFileName, FiffRawData*& data, bool allow_maxshield)
+bool FiffFile::setup_read_raw(QString& p_sFileName, FiffRawData*& data, bool allow_maxshield)
 {
     if(data)
         delete data;
@@ -209,17 +209,18 @@ bool FiffFile::setup_read_raw(QString t_sFileName, FiffRawData*& data, bool allo
     //
     //   Open the file
     //
-    printf("Opening raw data file %s...\n",t_sFileName.toUtf8().constData());
+    printf("Opening raw data file %s...\n",p_sFileName.toUtf8().constData());
 
-    FiffFile* p_pFile = new FiffFile(t_sFileName);
+    FiffFile* p_pFile = new FiffFile(p_sFileName);
     FiffDirTree* t_pTree = NULL;
     QList<FiffDirEntry>* t_pDir = NULL;
 
     if(!p_pFile->open(t_pTree, t_pDir))
     {
+        if(p_pFile)
+            delete p_pFile;
         if(t_pTree)
             delete t_pTree;
-
         if(t_pDir)
             delete t_pDir;
 
@@ -251,7 +252,14 @@ bool FiffFile::setup_read_raw(QString t_sFileName, FiffRawData*& data, bool allo
             raw = meas->dir_tree_find(FIFFB_SMSH_RAW_DATA);
             if (raw.size() == 0)
             {
-                printf("No raw data in %s\n", t_sFileName.toUtf8().constData());
+                printf("No raw data in %s\n", p_sFileName.toUtf8().constData());
+                if(p_pFile)
+                    delete p_pFile;
+                if(t_pTree)
+                    delete t_pTree;
+                if(t_pDir)
+                    delete t_pDir;
+
                 return false;
             }
         }
@@ -259,7 +267,14 @@ bool FiffFile::setup_read_raw(QString t_sFileName, FiffRawData*& data, bool allo
         {
             if (raw.size() == 0)
             {
-                printf("No raw data in %s\n", t_sFileName.toUtf8().constData());
+                printf("No raw data in %s\n", p_sFileName.toUtf8().constData());
+                if(p_pFile)
+                    delete p_pFile;
+                if(t_pTree)
+                    delete t_pTree;
+                if(t_pDir)
+                    delete t_pDir;
+
                 return false;
             }
         }
@@ -268,7 +283,7 @@ bool FiffFile::setup_read_raw(QString t_sFileName, FiffRawData*& data, bool allo
     //
     //   Set up the output structure
     //
-    info->filename   = t_sFileName;
+    info->filename   = p_sFileName;
 
     data = new FiffRawData();
     data->file = p_pFile;// fid;
@@ -402,6 +417,12 @@ bool FiffFile::setup_read_raw(QString t_sFileName, FiffRawData*& data, bool allo
            (double)data->last_samp/data->info->sfreq);
     printf("Ready.\n");
     data->file->close();
+
+    if(t_pTree)
+        delete t_pTree;
+    if(t_pDir)
+        delete t_pDir;
+
     return true;
 }
 

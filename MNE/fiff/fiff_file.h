@@ -195,7 +195,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool setup_read_raw(QString t_sFileName, FiffRawData*& data, bool allow_maxshield = false);
+    static bool setup_read_raw(QString& t_sFileName, FiffRawData*& data, bool allow_maxshield = false);
 
     //=========================================================================================================
     /**

@@ -99,6 +99,95 @@ int main(int argc, char *argv[])
 
     qint32 event = 1;
 
+    //
+    //   Read the data first
+    //
+//    data = fiff_read_evoked(fname_data,setno);
+    Fiff::read_evoked(t_sFileEvoked,setno);
+
+
+
+//    %
+//    %   Then the inverse operator
+//    %
+//    inv = mne_read_inverse_operator(fname_inv);
+//    %
+//    %   Set up the inverse according to the parameters
+//    %
+//    if nave < 0
+//        nave = data.evoked.nave;
+//    end
+//    inv = mne_prepare_inverse_operator(inv,nave,lambda2,dSPM,sLORETA);
+//    %
+//    %   Pick the correct channels from the data
+//    %
+//    data = fiff_pick_channels_evoked(data,inv.noise_cov.names);
+//    fprintf(1,'Picked %d channels from the data\n',data.info.nchan);
+//    fprintf(1,'Computing inverse...');
+//    %
+//    %   Simple matrix multiplication followed by combination of the
+//    %   three current components
+//    %
+//    %   This does all the data transformations to compute the weights for the
+//    %   eigenleads
+//    %
+//    trans = diag(sparse(inv.reginv))*inv.eigen_fields.data*inv.whitener*inv.proj*double(data.evoked(1).epochs);
+//    %
+//    %   Transformation into current distributions by weighting the eigenleads
+//    %   with the weights computed above
+//    %
+//    if inv.eigen_leads_weighted
+//       %
+//       %     R^0.5 has been already factored in
+//       %
+//       fprintf(1,'(eigenleads already weighted)...');
+//       sol   = inv.eigen_leads.data*trans;
+//    else
+//       %
+//       %     R^0.5 has to factored in
+//       %
+//       fprintf(1,'(eigenleads need to be weighted)...');
+//       sol   = diag(sparse(sqrt(inv.source_cov.data)))*inv.eigen_leads.data*trans;
+//    end
+
+//    if inv.source_ori == FIFF.FIFFV_MNE_FREE_ORI
+//        fprintf(1,'combining the current components...');
+//        sol1 = zeros(size(sol,1)/3,size(sol,2));
+//        for k = 1:size(sol,2)
+//            sol1(:,k) = sqrt(mne_combine_xyz(sol(:,k)));
+//        end
+//        sol = sol1;
+//    end
+//    if dSPM
+//        fprintf(1,'(dSPM)...');
+//        sol = inv.noisenorm*sol;
+//    elseif sLORETA
+//        fprintf(1,'(sLORETA)...');
+//        sol = inv.noisenorm*sol;
+//    end
+//    res.inv   = inv;
+//    res.sol   = sol;
+//    res.tmin  = double(data.evoked(1).first)/data.info.sfreq;
+//    res.tstep = 1/data.info.sfreq;
+//    printf("[done]\n");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
