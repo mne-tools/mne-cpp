@@ -163,6 +163,7 @@ public:
     */
     bool has_tag(fiff_int_t findkind);
 
+    //ToDo this is a read function make this member of FiffFile class
     //=========================================================================================================
     /**
     * fiff_read_bad_channels
@@ -180,6 +181,7 @@ public:
     */
     QStringList read_bad_channels(FiffFile* p_pFile);
 
+    //ToDo this is a read function make this member of FiffFile class
     //=========================================================================================================
     /**
     * fiff_read_ctf_comp
@@ -195,6 +197,7 @@ public:
     */
     QList<FiffCtfComp*> read_ctf_comp(FiffFile* p_pFile, QList<FiffChInfo>& chs);
 
+    //ToDo this is a read function make this member of FiffFile class
     //=========================================================================================================
     /**
     * fiff_read_meas_info
@@ -211,6 +214,7 @@ public:
     */
     FiffDirTree* read_meas_info(FiffFile* p_pFile, FiffInfo*& info);
 
+    //ToDo this is a read function make this member of FiffFile class
     //=========================================================================================================
     /**
     * fiff_read_named_matrix
@@ -227,6 +231,7 @@ public:
     */
     bool read_named_matrix(FiffFile* p_pFile, fiff_int_t matkind, FiffNamedMatrix*& mat);
 
+    //ToDo this is a read function make this member of FiffFile class
     //=========================================================================================================
     /**
     * fiff_read_proj

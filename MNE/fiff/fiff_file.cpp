@@ -153,7 +153,7 @@ bool FiffFile::open(FiffDirTree*& p_pTree, QList<FiffDirEntry>*& p_pDir)
     //
     //   Read or create the directory tree
     //
-    printf("\nCreating tag directory for %s...\n", this->fileName().toUtf8().constData());
+    printf("\nCreating tag directory for %s...", this->fileName().toUtf8().constData());
 
     if (p_pDir)
         delete p_pDir;

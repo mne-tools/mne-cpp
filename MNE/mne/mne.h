@@ -44,6 +44,7 @@
 
 #include "mne_global.h"
 
+#include "mne_inverse_operator.h"
 #include "mne_forwardsolution.h"
 #include "mne_hemisphere.h"
 #include "mne_sourcespace.h"
@@ -189,30 +190,6 @@ public:
     }
 
 
-    //ToDo FiffChInfoList Class
-    //=========================================================================================================
-    /**
-    * mne_set_current_comp
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the FiffInfo::set_current_comp static function
-    * Consider taking the member function of a FiffInfo set_current_comp(fiff_int_t value),
-    * when compensation should be applied to the channels of FiffInfo
-    *
-    * Set the current compensation value in the channel info structures
-    *
-    * @param[in] chs    fiff channel info list
-    * @param[in] value  compensation value
-    *
-    * @return the current compensation
-    */
-    static QList<FiffChInfo> set_current_comp(QList<FiffChInfo>& chs, fiff_int_t value)
-    {
-        return FiffInfo::set_current_comp(chs, value);
-    }
-
-
     //=========================================================================================================
     /**
     * make_projector
@@ -316,6 +293,349 @@ public:
     static bool read_events(QString& p_sFileName, MatrixXi& eventlist);
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//    function [inv] = mne_read_inverse_operator(fname)
+//    %
+//    % [inv] = mne_read_inverse_operator(fname)
+//    %
+//    % Reads the inverse operator decomposition from a fif file
+//    %
+//    % fname        - The name of the file
+//    %
+
+    static bool read_inverse_operator(QString& p_sFileName)
+    {
+        //
+        //   Open the file, create directory
+        //
+        printf("Reading inverse operator decomposition from %s...\n",p_sFileName.toUtf8().constData());
+        FiffFile* t_pFile = new FiffFile(p_sFileName);
+        FiffDirTree* t_pTree = NULL;
+        QList<FiffDirEntry>* t_pDir = NULL;
+
+        if(!t_pFile->open(t_pTree, t_pDir))
+        {
+            if(t_pFile)
+                delete t_pFile;
+            if(t_pTree)
+                delete t_pTree;
+            if(t_pDir)
+                delete t_pDir;
+
+            return false;
+        }
+        //
+        //   Find all inverse operators
+        //
+        QList <FiffDirTree *> invs_list = t_pTree->dir_tree_find(FIFFB_MNE_INVERSE_SOLUTION);
+        if ( invs_list.size()== 0)
+        {
+            printf("No inverse solutions in %s\n", p_sFileName.toUtf8().constData());
+            if(t_pFile)
+                delete t_pFile;
+            if(t_pTree)
+                delete t_pTree;
+            if(t_pDir)
+                delete t_pDir;
+            return false;
+        }
+        FiffDirTree* invs = invs_list[0];
+        //
+        //   Parent MRI data
+        //
+        QList <FiffDirTree *> parent_mri = t_pTree->dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
+        if (parent_mri.size() == 0)
+        {
+            printf("No parent MRI information in %s", p_sFileName.toUtf8().constData());
+            if(t_pFile)
+                delete t_pFile;
+            if(t_pTree)
+                delete t_pTree;
+            if(t_pDir)
+                delete t_pDir;
+            return false;
+        }
+        printf("\tReading inverse operator info...");
+        //
+        //   Methods and source orientations
+        //
+        FiffTag* tag = NULL;
+        invs->find_tag(t_pFile, FIFF_MNE_INCLUDED_METHODS, tag);
+        if (tag->data == NULL)
+        {
+            printf("Modalities not found\n");
+            if(t_pFile)
+                delete t_pFile;
+            if(t_pTree)
+                delete t_pTree;
+            if(t_pDir)
+                delete t_pDir;
+            return false;
+        }
+        MNEInverseOperator* inv = new MNEInverseOperator();
+        inv->methods = *tag->toInt();
+        //
+        invs->find_tag(t_pFile, FIFF_MNE_SOURCE_ORIENTATION, tag);
+        if (tag->data == NULL)
+        {
+            printf("Source orientation constraints not found\n");
+            if(t_pFile)
+                delete t_pFile;
+            if(t_pTree)
+                delete t_pTree;
+            if(t_pDir)
+                delete t_pDir;
+            return false;
+        }
+        inv->source_ori = *tag->toInt();
+        //
+        invs->find_tag(t_pFile, FIFF_MNE_SOURCE_SPACE_NPOINTS, tag);
+        if (tag->data == NULL)
+        {
+            printf("Number of sources not found\n");
+            if(t_pFile)
+                delete t_pFile;
+            if(t_pTree)
+                delete t_pTree;
+            if(t_pDir)
+                delete t_pDir;
+            return false;
+        }
+        inv->nsource = *tag->toInt();
+        inv->nchan   = 0;
+        //
+        //   Coordinate frame
+        //
+        invs->find_tag(t_pFile, FIFF_MNE_COORD_FRAME, tag);
+        if (tag == NULL)
+        {
+            printf("Coordinate frame tag not found\n");
+            if(t_pFile)
+                delete t_pFile;
+            if(t_pTree)
+                delete t_pTree;
+            if(t_pDir)
+                delete t_pDir;
+            return false;
+        }
+        inv->coord_frame = *tag->toInt();
+        //
+        //   The actual source orientation vectors
+        //
+        invs->find_tag(t_pFile, FIFF_MNE_INVERSE_SOURCE_ORIENTATIONS, tag);
+        if (tag->data == NULL)
+        {
+            printf("Source orientation information not found\n");
+            if(t_pFile)
+                delete t_pFile;
+            if(t_pTree)
+                delete t_pTree;
+            if(t_pDir)
+                delete t_pDir;
+            return false;
+        }
+
+        if(inv->source_nn)
+            delete inv->source_nn;
+        inv->source_nn = new MatrixXf(tag->toFloatMatrix().transpose());
+
+        printf("[done]\n");
+        //
+        //   The SVD decomposition...
+        //
+        printf("\tReading inverse operator decomposition...");
+        invs->find_tag(t_pFile, FIFF_MNE_INVERSE_SING, tag);
+        if (tag == NULL)
+        {
+            printf("Singular values not found\n");
+            if(t_pFile)
+                delete t_pFile;
+            if(t_pTree)
+                delete t_pTree;
+            if(t_pDir)
+                delete t_pDir;
+            return false;
+        }
+
+        if(inv->sing)
+            delete inv->sing;
+        inv->sing = new VectorXf(Map<VectorXf>(tag->toFloat(), tag->size/4));
+        inv->nchan = inv->sing->rows();
+        //
+        //   The eigenleads and eigenfields
+        //
+        inv->eigen_leads_weighted = false;
+        if(!Fiff::read_named_matrix(t_pFile, invs, FIFF_MNE_INVERSE_LEADS, inv->eigen_leads))
+        {
+            inv->eigen_leads_weighted = true;
+            if(!Fiff::read_named_matrix(t_pFile, invs, FIFF_MNE_INVERSE_LEADS_WEIGHTED, inv->eigen_leads))
+            {
+                printf("Error reading eigenleads named matrix.\n");
+                if(t_pFile)
+                    delete t_pFile;
+                if(t_pTree)
+                    delete t_pTree;
+                if(t_pDir)
+                    delete t_pDir;
+                return false;
+            }
+        }
+        //
+        //   Having the eigenleads as columns is better for the inverse calculations
+        //
+        inv->eigen_leads->transpose_named_matrix();
+
+
+        if(!Fiff::read_named_matrix(t_pFile, invs, FIFF_MNE_INVERSE_FIELDS, inv->eigen_fields))
+        {
+            printf("Error reading eigenfields named matrix.\n");
+            if(t_pFile)
+                delete t_pFile;
+            if(t_pTree)
+                delete t_pTree;
+            if(t_pDir)
+                delete t_pDir;
+            return false;
+        }
+        printf("[done]\n");
+        //
+        //   Read the covariance matrices
+        //
+//        MNE::read_cov(t_pFile,invs,FIFF.FIFFV_MNE_NOISE_COV);
+//        try
+//            inv.noise_cov = mne_read_cov(fid,invs,FIFF.FIFFV_MNE_NOISE_COV);
+//            fprintf('\tNoise covariance matrix read.\n');
+//        catch
+//            fclose(fid);
+//            error(me,'%s',mne_omit_first_line(lasterr));
+//        end
+//        try
+//            inv.source_cov = mne_read_cov(fid,invs,FIFF.FIFFV_MNE_SOURCE_COV);
+//            fprintf('\tSource covariance matrix read.\n');
+//        catch
+//            fclose(fid);
+//            error(me,'%s',mne_omit_first_line(lasterr));
+//        end
+//        %
+//        %   Read the various priors
+//        %
+//        try
+//            inv.orient_prior = mne_read_cov(fid,invs,FIFF.FIFFV_MNE_ORIENT_PRIOR_COV);
+//            fprintf('\tOrientation priors read.\n');
+//        catch
+//            inv.orient_prior = [];
+//        end
+//        try
+//            inv.depth_prior = mne_read_cov(fid,invs,FIFF.FIFFV_MNE_DEPTH_PRIOR_COV);
+//            fprintf('\tDepth priors read.\n');
+//        catch
+//            inv.depth_prior = [];
+//        end
+//        try
+//            inv.fmri_prior = mne_read_cov(fid,invs,FIFF.FIFFV_MNE_FMRI_PRIOR_COV);
+//            fprintf('\tfMRI priors read.\n');
+//        catch
+//            inv.fmri_prior = [];
+//        end
+//        %
+//        %   Read the source spaces
+//        %
+//        try
+//            inv.src = mne_read_source_spaces(fid,false,tree);
+//        catch
+//            fclose(fid);
+//            error(me,'Could not read the source spaces (%s)',mne_omit_first_line(lasterr));
+//        end
+//        for k = 1:length(inv.src)
+//           inv.src(k).id = mne_find_source_space_hemi(inv.src(k));
+//        end
+//        %
+//        %   Get the MRI <-> head coordinate transformation
+//        %
+//        tag = find_tag(parent_mri,FIFF.FIFF_COORD_TRANS);
+//        if isempty(tag)
+//            fclose(fid);
+//            error(me,'MRI/head coordinate transformation not found');
+//        else
+//            mri_head_t = tag.data;
+//            if mri_head_t.from ~= FIFF.FIFFV_COORD_MRI || mri_head_t.to ~= FIFF.FIFFV_COORD_HEAD
+//                mri_head_t = fiff_invert_transform(mri_head_t);
+//                if mri_head_t.from ~= FIFF.FIFFV_COORD_MRI || mri_head_t.to ~= FIFF.FIFFV_COORD_HEAD
+//                    fclose(fid);
+//                    error(me,'MRI/head coordinate transformation not found');
+//                end
+//            end
+//        end
+//        inv.mri_head_t  = mri_head_t;
+//        %
+//        %   Transform the source spaces to the correct coordinate frame
+//        %   if necessary
+//        %
+//        if inv.coord_frame ~= FIFF.FIFFV_COORD_MRI && ...
+//                inv.coord_frame ~= FIFF.FIFFV_COORD_HEAD
+//            fclose(fid);
+//            error(me,'Only inverse solutions computed in MRI or head coordinates are acceptable');
+//        end
+//        %
+//        %  Number of averages is initially one
+//        %
+//        inv.nave = 1;
+//        %
+//        %  We also need the SSP operator
+//        %
+//        inv.projs     = fiff_read_proj(fid,tree);
+//        %
+//        %  Some empty fields to be filled in later
+//        %
+//        inv.proj      = [];      %   This is the projector to apply to the data
+//        inv.whitener  = [];      %   This whitens the data
+//        inv.reginv    = [];      %   This the diagonal matrix implementing
+//                                 %   regularization and the inverse
+//        inv.noisenorm = [];      %   These are the noise-normalization factors
+//        %
+//        nuse = 0;
+//        for k = 1:length(inv.src)
+//           try
+//              inv.src(k) = mne_transform_source_space_to(inv.src(k),inv.coord_frame,mri_head_t);
+//           catch
+//              fclose(fid);
+//              error(me,'Could not transform source space (%s)',mne_omit_first_line(lasterr));
+//           end
+//           nuse = nuse + inv.src(k).nuse;
+//        end
+//        fprintf(1,'\tSource spaces transformed to the inverse solution coordinate frame\n');
+//        %
+//        %   Done!
+//        %
+//        fclose(fid);
+
+        return true;
+    }
+
+
+
+
+
+
+
+
+
+
     //=========================================================================================================
     /**
     * mne_read_forward_solution
@@ -363,6 +683,29 @@ public:
         return MNESourceSpace::read_source_spaces(p_pFile, add_geom, p_pTree, p_pSourceSpace);
     }
 
+    //ToDo FiffChInfoList Class
+    //=========================================================================================================
+    /**
+    * mne_set_current_comp
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffInfo::set_current_comp static function
+    * Consider taking the member function of a FiffInfo set_current_comp(fiff_int_t value),
+    * when compensation should be applied to the channels of FiffInfo
+    *
+    * Set the current compensation value in the channel info structures
+    *
+    * @param[in] chs    fiff channel info list
+    * @param[in] value  compensation value
+    *
+    * @return the current compensation
+    */
+    static QList<FiffChInfo> set_current_comp(QList<FiffChInfo>& chs, fiff_int_t value)
+    {
+        return FiffInfo::set_current_comp(chs, value);
+    }
+
     //=========================================================================================================
     /**
     * mne_transform_source_space_to
@@ -388,16 +731,16 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the MNEForwardSolution::transpose_named_matrix static function
+    * Wrapper for the FiffNamedMatrix transpose_named_matrix member  function
     *
     * Transpose a named matrix (FiffNamedMatrix)
     *
     * @param[in, out] mat FiffNamedMatrix which shoul be transposed.
     *
     */
-    static inline void transpose_named_matrix(FiffNamedMatrix*& mat)
+    static inline void transpose_named_matrix(FiffNamedMatrix* mat)
     {
-        return MNEForwardSolution::transpose_named_matrix(mat);
+        mat->transpose_named_matrix();
     }
 
 private:

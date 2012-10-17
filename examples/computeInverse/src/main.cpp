@@ -102,15 +102,15 @@ int main(int argc, char *argv[])
     //
     //   Read the data first
     //
+    FiffEvokedDataSet* data = NULL;
 //    data = fiff_read_evoked(fname_data,setno);
-    Fiff::read_evoked(t_sFileEvoked,setno);
+    Fiff::read_evoked(t_sFileEvoked, data, setno);
 
-
-
-//    %
-//    %   Then the inverse operator
-//    %
+    //
+    //   Then the inverse operator
+    //
 //    inv = mne_read_inverse_operator(fname_inv);
+    MNE::read_inverse_operator(t_sFileInv);
 //    %
 //    %   Set up the inverse according to the parameters
 //    %
