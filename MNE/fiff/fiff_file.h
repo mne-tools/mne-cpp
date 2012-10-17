@@ -202,17 +202,90 @@ public:
 
 
 
+    //ToDo this is a read function make this member of FiffFile class
+    //=========================================================================================================
+    /**
+    * fiff_read_bad_channels
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Reads the bad channel list from a node if it exists
+    * Note: In difference to mne-matlab this is not a static function. This is a method of the FiffDirTree
+    *       class, that's why a tree object doesn't need to be handed to the function.
+    *
+    *
+    * @param[in] p_pTree The node of interest
+    *
+    * @return the bad channel list
+    */
+    QStringList read_bad_channels(FiffDirTree* p_pTree);
 
+    //ToDo this is a read function make this member of FiffFile class
+    //=========================================================================================================
+    /**
+    * fiff_read_ctf_comp
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Read the CTF software compensation data from the given node
+    *
+    * @param[in] p_pTree    The node of interest
+    * @param[in] chs        channels with the calibration info
+    *
+    * @return the CTF software compensation data
+    */
+    QList<FiffCtfComp*> read_ctf_comp( FiffDirTree* p_pNode, QList<FiffChInfo>& chs);
 
+    //ToDo this is a read function make this member of FiffFile class
+    //=========================================================================================================
+    /**
+    * fiff_read_meas_info
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Read the measurement info
+    * Source is assumed to be an open fiff file.
+    *
+    * @param[in] p_pTree    The node of interest
+    * @param[out] info      the read measurement info
+    *
+    * @return the to measurement corresponding fiff_dir_tree.
+    */
+    FiffDirTree* read_meas_info(FiffDirTree* p_pTree, FiffInfo*& info);
 
+    //ToDo this is a read function make this member of FiffFile class
+    //=========================================================================================================
+    /**
+    * fiff_read_named_matrix
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Reads a named matrix.
+    *
+    * @param[in] p_pTree    The node of interest
+    * @param[in] matkind    The matrix kind to look for
+    * @param[out] mat       The named matrix
+    *
+    * @return true if succeeded, false otherwise
+    */
+    bool read_named_matrix(FiffDirTree* p_pTree, fiff_int_t matkind, FiffNamedMatrix*& mat);
 
-
-
-
-
-
-
-
+    //ToDo this is a read function make this member of FiffFile class
+    //=========================================================================================================
+    /**
+    * fiff_read_proj
+    *
+    * ### MNE toolbox root function ###
+    *
+    * [ projdata ] = fiff_read_proj(fid,node)
+    *
+    * Read the SSP data under a given directory node
+    *
+    * @param[in] p_pTree    The node of interest
+    *
+    * @return a list of SSP projectors
+    */
+    QList<FiffProj*> read_proj(FiffDirTree* p_pTree);
 
     //=========================================================================================================
     /**
@@ -229,6 +302,20 @@ public:
     * @return true if succeeded, false otherwise
     */
     static bool setup_read_raw(QString& t_sFileName, FiffRawData*& data, bool allow_maxshield = false);
+
+    //=========================================================================================================
+    /**
+    * fiff_split_name_list
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Splits a string by looking for seperator ":"
+    *
+    * @param[in] p_sNameList    string to split
+    *
+    * @return the splitted string list
+    */
+    static QStringList split_name_list(QString p_sNameList);
 
     //=========================================================================================================
     /**

@@ -334,7 +334,7 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffDirTree read_bad_channels member function
+    * Wrapper for the FiffFile read_bad_channels member function
     *
     * Reads the bad channel list from a node if it exists
     *
@@ -345,7 +345,7 @@ public:
     */
     static inline QStringList read_bad_channels(FiffFile* p_pFile, FiffDirTree* p_pTree)
     {
-        return p_pTree->read_bad_channels(p_pFile);
+        return p_pFile->read_bad_channels(p_pTree);
     }
 
     //=========================================================================================================
@@ -354,7 +354,7 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffDirTree read_ctf_comp member function
+    * Wrapper for the FiffFile read_ctf_comp member function
     *
     * Read the CTF software compensation data from the given node
     *
@@ -364,9 +364,9 @@ public:
     *
     * @return the CTF software compensation data
     */
-    static inline QList<FiffCtfComp*> read_ctf_comp(FiffFile* p_pFile, FiffDirTree* p_pNode, QList<FiffChInfo>& chs)
+    static inline QList<FiffCtfComp*> read_ctf_comp(FiffFile* p_pFile, FiffDirTree* p_pTree, QList<FiffChInfo>& chs)
     {
-        return p_pNode->read_ctf_comp(p_pFile, chs);
+        return p_pFile->read_ctf_comp(p_pTree, chs);
     }
 
 
@@ -410,7 +410,7 @@ public:
         //   Read the measurement info
         //
         FiffInfo* info = NULL;
-        FiffDirTree* meas = t_pTree->read_meas_info(t_pFile,info);
+        FiffDirTree* meas = t_pFile->read_meas_info(t_pTree, info);
         info->filename = p_sFileName; //move fname storage to read_meas_info member function
         //
         //   Locate the data of interest
@@ -780,7 +780,7 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffDirTree read_meas_info member function
+    * Wrapper for the FiffFile read_meas_info member function
     *
     * Read the measurement info
     * Source is assumed to be an open fiff file.
@@ -793,7 +793,7 @@ public:
     */
     static inline FiffDirTree* read_meas_info(FiffFile* p_pFile, FiffDirTree* p_pTree, FiffInfo*& info)
     {
-        return p_pTree->read_meas_info(p_pFile, info);
+        return p_pFile->read_meas_info(p_pTree, info);
     }
 
     //ToDo this is a read function make this member of FiffFile class
@@ -803,7 +803,7 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffDirTree read_named_matrix member function
+    * Wrapper for the FiffFile read_named_matrix member function
     *
     * Reads a named matrix.
     *
@@ -816,7 +816,7 @@ public:
     */
     static inline bool read_named_matrix(FiffFile* p_pFile, FiffDirTree* node, fiff_int_t matkind, FiffNamedMatrix*& mat)
     {
-        return node->read_named_matrix(p_pFile, matkind, mat);
+        return p_pFile->read_named_matrix(node, matkind, mat);
     }
 
     //ToDo this is a read function make this member of FiffFile class
@@ -828,13 +828,16 @@ public:
     *
     * Read the SSP data under a given directory node
     *
-    * Wrapper for the FiffDirTree read_proj member function
+    * Wrapper for the FiffFile read_proj member function
     *
-    * ToDo
+    * @param[in] p_pFile    The opened fif file to read from
+    * @param[in] node       The node of interest
+    *
+    * @return a list of SSP projectors
     */
-    static inline QList<FiffProj*>read_proj(FiffFile* p_pFile, FiffDirTree* p_pNode)
+    static inline QList<FiffProj*> read_proj(FiffFile* p_pFile, FiffDirTree* p_pNode)
     {
-        return p_pNode->read_proj(p_pFile);
+        return p_pFile->read_proj(p_pNode);
     }
 
     //=========================================================================================================
@@ -931,7 +934,7 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffDirTree::split_name_list static function
+    * Wrapper for the FiffFile::split_name_list static function
     *
     * Splits a string by looking for seperator ":"
     *
@@ -941,7 +944,7 @@ public:
     */
     inline static QStringList split_name_list(QString p_sNameList)
     {
-        return FiffDirTree::split_name_list(p_sNameList);
+        return FiffFile::split_name_list(p_sNameList);
     }
 
     //=========================================================================================================
