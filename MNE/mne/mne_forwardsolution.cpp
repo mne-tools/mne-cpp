@@ -775,7 +775,7 @@ bool MNEForwardSolution::read_one(FiffFile* p_pFile, FiffDirTree* node, MNEForwa
 
     one->nchan = *t_pTag->toInt();
 
-    if(node->read_named_matrix(p_pFile, FIFF_MNE_FORWARD_SOLUTION, one->sol))
+    if(p_pFile->read_named_matrix(node, FIFF_MNE_FORWARD_SOLUTION, one->sol))
         one->sol->transpose_named_matrix();
     else
     {
@@ -785,7 +785,7 @@ bool MNEForwardSolution::read_one(FiffFile* p_pFile, FiffDirTree* node, MNEForwa
         return false;
     }
 
-    if(node->read_named_matrix(p_pFile, FIFF_MNE_FORWARD_SOLUTION_GRAD, one->sol_grad))
+    if(p_pFile->read_named_matrix(node, FIFF_MNE_FORWARD_SOLUTION_GRAD, one->sol_grad))
         one->sol_grad->transpose_named_matrix();
     else
     {
