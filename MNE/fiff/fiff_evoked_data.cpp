@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiff_named_matrix.cpp
+* @file     fiff_evoked_data.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -18,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the FiffNamedMatrix Class.
+* @brief    Contains the implementation of the FIFFEvokedData Class.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "fiff_named_matrix.h"
+#include "fiff_evoked_data.h"
 
 
 //*************************************************************************************************************
@@ -54,40 +54,15 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FiffNamedMatrix::FiffNamedMatrix()
-: nrow(-1)
-, ncol(-1)
-{
-}
-
-
-//*************************************************************************************************************
-
-FiffNamedMatrix::FiffNamedMatrix(fiff_int_t p_nrow, fiff_int_t p_ncol, QStringList& p_row_names, QStringList& p_col_names, MatrixXf& p_data)
-: nrow(p_nrow)
-, ncol(p_ncol)
-, row_names(p_row_names)
-, col_names(p_col_names)
-, data(p_data)
-{
-}
-
-
-//*************************************************************************************************************
-
-FiffNamedMatrix::FiffNamedMatrix(const FiffNamedMatrix* p_pFiffNamedMatrix)
-: nrow(p_pFiffNamedMatrix->nrow)
-, ncol(p_pFiffNamedMatrix->ncol)
-, row_names(p_pFiffNamedMatrix->row_names)
-, col_names(p_pFiffNamedMatrix->col_names)
-, data(p_pFiffNamedMatrix->data)
-{
-}
-
-
-//*************************************************************************************************************
-
-FiffNamedMatrix::~FiffNamedMatrix()
+FiffEvokedData::FiffEvokedData()
+: aspect_kind(-1)
+, is_smsh(-1)
+, nave(-1)
+, first(-1)
+, last(-1)
+, comment("")
+, times(NULL)
+, epochs(NULL)
 {
 
 }
@@ -95,15 +70,10 @@ FiffNamedMatrix::~FiffNamedMatrix()
 
 //*************************************************************************************************************
 
-void FiffNamedMatrix::transpose_named_matrix()
+FiffEvokedData::~FiffEvokedData()
 {
-    QStringList col_names_old = this->col_names;
-    this->col_names = this->row_names;
-    this->row_names = col_names_old;
-
-    MatrixXf tmp_data = this->data.transpose();
-    this->data = tmp_data;
-
-    this->nrow = this->data.rows();
-    this->ncol = this->data.cols();
+    if (times)
+        delete times;
+    if (epochs)
+        delete epochs;
 }

@@ -41,7 +41,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// INCLUDES
+// FIFF INCLUDES
 //=============================================================================================================
 
 #include "fiff_global.h"
@@ -58,6 +58,7 @@
 #include "fiff_raw_data.h"
 #include "fiff_raw_dir.h"
 #include "fiff_file.h"
+#include "fiff_evoked_data_set.h"
 
 
 //*************************************************************************************************************
@@ -375,8 +376,11 @@ public:
 //    %
 //    % Read one evoked data set
 //    %
-    static inline bool read_evoked(QString& p_sFileName, fiff_int_t setno = 0)
+    static inline bool read_evoked(QString& p_sFileName, FiffEvokedDataSet*& data, fiff_int_t setno = 0)
     {
+        if(data)
+            delete data;
+        data = NULL;
 
         if (setno < 0)
         {
@@ -393,6 +397,8 @@ public:
 
         if(!t_pFile->open(t_pTree, t_pDir))
         {
+            if(t_pFile)
+                delete t_pFile;
             if(t_pTree)
                 delete t_pTree;
             if(t_pDir)
@@ -589,8 +595,6 @@ public:
                     delete t_pTree;
                 if(t_pDir)
                     delete t_pDir;
-                if(meas)
-                    delete meas;
                 if(info)
                     delete info;
                 printf("Local channel information was not found when it was expected.\n");
@@ -604,8 +608,6 @@ public:
                     delete t_pTree;
                 if(t_pDir)
                     delete t_pDir;
-                if(meas)
-                    delete meas;
                 if(info)
                     delete info;
                 printf("Number of channels and number of channel definitions are different\n");
@@ -672,35 +674,35 @@ public:
             return false;
         }
         //
-        MatrixXf all;
+        MatrixXf* all = NULL;
         if (nepoch == 1)
         {
             //
             //   Only one epoch
             //
-            all = epoch[0]->toFloatMatrix().transpose();
+            all = new MatrixXf(epoch[0]->toFloatMatrix().transpose());
             //
             //   May need a transpose if the number of channels is one
             //
-            if (all.cols() == 1 && info->nchan == 1)
-                all = all.transpose();
+            if (all->cols() == 1 && info->nchan == 1)
+                *all = all->transpose();
         }
         else
         {
             //
             //   Put the old style epochs together
             //
-            all = epoch[0]->toFloatMatrix().transpose();
+            all = new MatrixXf(epoch[0]->toFloatMatrix().transpose());
 
             for (k = 2; k < nepoch; ++k)
             {
-                oldsize = all.rows();
+                oldsize = all->rows();
                 MatrixXf tmp = epoch[k]->toFloatMatrix().transpose();
-                all.conservativeResize(oldsize+tmp.rows(), all.cols());
-                all.block(oldsize, 0, tmp.rows(), tmp.cols()) = tmp;
+                all->conservativeResize(oldsize+tmp.rows(), all->cols());
+                all->block(oldsize, 0, tmp.rows(), tmp.cols()) = tmp;
             }
         }
-        if (all.cols() != nsamp)
+        if (all->cols() != nsamp)
         {
             if(t_pFile)
                 delete t_pFile;
@@ -710,39 +712,57 @@ public:
                 delete t_pDir;
             if(info)
                 delete info;
-            printf("Incorrect number of samples (%d instead of %d)", all.cols(), nsamp);
+            printf("Incorrect number of samples (%d instead of %d)", all->cols(), nsamp);
             return false;
         }
-//        %
-//        %   Calibrate
-//        %
-//        for k = 1:info.nchan
-//            cals(k) = info.chs(k).cal;
-//        end
-//        all = diag(cals)*all;
-//        %
-//        %   Put it all together
-//        %
-//        data.info = info;
-//        data.evoked.aspect_kind = aspect_kind;
-//        data.evoked.is_smsh     = is_smsh(setno);
-//        if exist('nave','var')
-//            data.evoked.nave = nave;
-//        else
-//            data.evoked.nave  = 1;
-//        end
-//        data.evoked.first = first;
-//        data.evoked.last  = last;
-//        if exist('comment','var')
-//            data.evoked.comment = comment;
-//        end
-//        %
-//        %   Times for convenience and the actual epoch data
-//        %
-//        data.evoked.times = double(data.evoked.first:1:data.evoked.last)/data.info.sfreq;
-//        data.evoked.epochs = all;
+        //
+        //   Calibrate
+        //
+        SparseMatrix<float> cals(info->nchan, info->nchan);
+        for(k = 0; k < info->nchan; ++k)
+            cals.insert(k, k) = info->chs[k].cal;
+        *all = cals* *all;
+        //
+        //   Put it all together
+        //
+        data = new FiffEvokedDataSet();
+        data->info = info;
 
-//        fclose(fid);
+        if(data->evoked)
+            delete data->evoked;
+        data->evoked = new FiffEvokedData();
+        data->evoked->aspect_kind = aspect_kind;
+        data->evoked->is_smsh     = is_smsh(0,setno);
+        if (nave != -1)
+            data->evoked->nave = nave;
+        else
+            data->evoked->nave  = 1;
+
+        data->evoked->first = first;
+        data->evoked->last  = last;
+        if (!comment.isEmpty())
+            data->evoked->comment = comment;
+        //
+        //   Times for convenience and the actual epoch data
+        //
+
+        if(data->evoked->times)
+            delete data->evoked->times;
+        data->evoked->times = new MatrixXf(1, last-first+1);
+
+        for (k = 0; k < data->evoked->times->cols(); ++k)
+            (*data->evoked->times)(0, k) = ((float)(first+k)) / info->sfreq;
+
+        if(data->evoked->epochs)
+            delete data->evoked->epochs;
+        data->evoked->epochs = all;
+
+        if(t_pFile)
+            delete t_pFile;
+        if(t_pTree)
+            delete t_pTree;
+        if(t_pDir)
+            delete t_pDir;
 
         return true;
     }
@@ -776,6 +796,7 @@ public:
         return p_pTree->read_meas_info(p_pFile, info);
     }
 
+    //ToDo this is a read function make this member of FiffFile class
     //=========================================================================================================
     /**
     * fiff_read_named_matrix
@@ -798,6 +819,7 @@ public:
         return node->read_named_matrix(p_pFile, matkind, mat);
     }
 
+    //ToDo this is a read function make this member of FiffFile class
     //=========================================================================================================
     /**
     * ### MNE toolbox root function ###

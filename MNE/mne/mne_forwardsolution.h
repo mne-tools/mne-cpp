@@ -170,16 +170,6 @@ public:
     */
     static inline SparseMatrix<float> make_block_diag(MatrixXf& A, qint32 n);
 
-    //=========================================================================================================
-    /**
-    * ### MNE toolbox root function ###: Implementation of the mne_transpose_named_matrix function
-    *
-    * Transpose a named matrix (FiffNamedMatrix)
-    *
-    * @param[in, out] mat FiffNamedMatrix which shoul be transposed.
-    */
-    static void transpose_named_matrix(FiffNamedMatrix*& mat);
-
 private:
     //=========================================================================================================
     /**

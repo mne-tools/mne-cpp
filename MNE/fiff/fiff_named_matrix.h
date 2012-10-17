@@ -112,6 +112,15 @@ public:
     */
     ~FiffNamedMatrix();
 
+    //ToDo return the transposed matrix instead of applying it to its members
+    //=========================================================================================================
+    /**
+    * ### MNE toolbox root function ###: Implementation of the mne_transpose_named_matrix function
+    *
+    * Transpose a named matrix (FiffNamedMatrix)
+    */
+    void transpose_named_matrix();
+
 public:
     fiff_int_t nrow;
     fiff_int_t  ncol;

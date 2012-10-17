@@ -776,7 +776,7 @@ bool MNEForwardSolution::read_one(FiffFile* p_pFile, FiffDirTree* node, MNEForwa
     one->nchan = *t_pTag->toInt();
 
     if(node->read_named_matrix(p_pFile, FIFF_MNE_FORWARD_SOLUTION, one->sol))
-        transpose_named_matrix(one->sol);
+        one->sol->transpose_named_matrix();
     else
     {
         p_pFile->close();
@@ -786,7 +786,7 @@ bool MNEForwardSolution::read_one(FiffFile* p_pFile, FiffDirTree* node, MNEForwa
     }
 
     if(node->read_named_matrix(p_pFile, FIFF_MNE_FORWARD_SOLUTION_GRAD, one->sol_grad))
-        transpose_named_matrix(one->sol_grad);
+        one->sol_grad->transpose_named_matrix();
     else
     {
         if (one->sol_grad)
@@ -816,21 +816,4 @@ bool MNEForwardSolution::read_one(FiffFile* p_pFile, FiffDirTree* node, MNEForwa
     if (t_pTag)
         delete t_pTag;
     return true;
-}
-
-
-//*************************************************************************************************************
-
-void MNEForwardSolution::transpose_named_matrix(FiffNamedMatrix*& mat)
-{
-    QStringList col_names_old = mat->col_names;
-    mat->col_names = mat->row_names;
-    mat->row_names = col_names_old;
-
-    MatrixXf tmp_data = mat->data.transpose();
-
-    mat->data = tmp_data;
-
-    mat->nrow = mat->data.rows();
-    mat->ncol = mat->data.cols();
 }

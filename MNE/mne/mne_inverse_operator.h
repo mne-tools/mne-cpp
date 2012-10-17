@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiff_named_matrix.cpp
+* @file     mne_epoch_data.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -18,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
@@ -29,17 +29,45 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the FiffNamedMatrix Class.
+* @brief    Contains the MNEInverseOperator class declaration.
 *
 */
+
+#ifndef MNE_INVERSE_OPERATOR_H
+#define MNE_INVERSE_OPERATOR_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "fiff_named_matrix.h"
+#include "mne_global.h"
 
+//*************************************************************************************************************
+//=============================================================================================================
+// FIFF INCLUDES
+//=============================================================================================================
+
+#include "../fiff/fiff_types.h"
+#include "../fiff/fiff_named_matrix.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include "../3rdParty/Eigen/Core"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNELIB
+//=============================================================================================================
+
+namespace MNELIB
+{
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -47,63 +75,44 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace Eigen;
 
 
-//*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-FiffNamedMatrix::FiffNamedMatrix()
-: nrow(-1)
-, ncol(-1)
-{
-}
-
-
-//*************************************************************************************************************
-
-FiffNamedMatrix::FiffNamedMatrix(fiff_int_t p_nrow, fiff_int_t p_ncol, QStringList& p_row_names, QStringList& p_col_names, MatrixXf& p_data)
-: nrow(p_nrow)
-, ncol(p_ncol)
-, row_names(p_row_names)
-, col_names(p_col_names)
-, data(p_data)
-{
-}
-
-
-//*************************************************************************************************************
-
-FiffNamedMatrix::FiffNamedMatrix(const FiffNamedMatrix* p_pFiffNamedMatrix)
-: nrow(p_pFiffNamedMatrix->nrow)
-, ncol(p_pFiffNamedMatrix->ncol)
-, row_names(p_pFiffNamedMatrix->row_names)
-, col_names(p_pFiffNamedMatrix->col_names)
-, data(p_pFiffNamedMatrix->data)
-{
-}
-
-
-//*************************************************************************************************************
-
-FiffNamedMatrix::~FiffNamedMatrix()
+/**
+* MNE epoch data, which corresponds to an event
+*
+* @brief epoch data
+*/
+class MNESHARED_EXPORT MNEInverseOperator
 {
 
-}
+public:
+    //=========================================================================================================
+    /**
+    * ctor
+    */
+    MNEInverseOperator();
 
+    //=========================================================================================================
+    /**
+    * Destroys the MNEInverseOperator.
+    */
+    ~MNEInverseOperator();
 
-//*************************************************************************************************************
+public:
+    fiff_int_t methods;
+    fiff_int_t source_ori;
+    fiff_int_t nsource;
+    fiff_int_t nchan;
+    fiff_int_t coord_frame;
+    MatrixXf*  source_nn;
+    VectorXf*  sing;
+    bool    eigen_leads_weighted;
+    FiffNamedMatrix* eigen_leads;
+    FiffNamedMatrix* eigen_fields;
+};
 
-void FiffNamedMatrix::transpose_named_matrix()
-{
-    QStringList col_names_old = this->col_names;
-    this->col_names = this->row_names;
-    this->row_names = col_names_old;
+} // NAMESPACE
 
-    MatrixXf tmp_data = this->data.transpose();
-    this->data = tmp_data;
-
-    this->nrow = this->data.rows();
-    this->ncol = this->data.cols();
-}
+#endif // MNE_INVERSE_OPERATOR_H
