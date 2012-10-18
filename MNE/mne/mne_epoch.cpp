@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_epoch_data_list.h
+* @file     mne_epoch.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -18,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-*
+* 
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
@@ -29,74 +29,45 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the MNEEpochDataList class declaration.
+* @brief    Contains the implementation of the MNEEpoch Class.
 *
 */
-
-#ifndef MNE_EPOCH_DATA_LIST_H
-#define MNE_EPOCH_DATA_LIST_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
+#include "mne_epoch.h"
 
-//*************************************************************************************************************
-//=============================================================================================================
-// MNE INCLUDES
-//=============================================================================================================
-
-#include "mne_global.h"
-#include "mne_epoch_data.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QList>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MNELIB
-//=============================================================================================================
-
-namespace MNELIB
-{
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace MNELIB;
 
+
+//*************************************************************************************************************
 //=============================================================================================================
-/**
-* MNE epoch data, which corresponds to an event
-*
-* @brief epoch data
-*/
-class MNESHARED_EXPORT MNEEpochDataList : public QList<MNEEpochData*>
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+MNEEpoch::MNEEpoch()
+: epoch(NULL)
+, event(-1)
+, tmin(-1)
+, tmax(-1)
 {
-public:
 
-    //=========================================================================================================
-    /**
-    * ctor
-    */
-    MNEEpochDataList();
+}
 
-    //=========================================================================================================
-    /**
-    * Destroys the MNEEpochData.
-    */
-    ~MNEEpochDataList();
 
-};
+//*************************************************************************************************************
 
-} // NAMESPACE
-
-#endif // MNE_EPOCH_DATA_LIST_H
+MNEEpoch::~MNEEpoch()
+{
+    if (epoch)
+        delete epoch;
+}

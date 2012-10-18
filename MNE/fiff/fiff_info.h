@@ -259,11 +259,11 @@ public: //Public because it's a mne struct
     float lowpass;
     QList<FiffChInfo> chs;
     QStringList ch_names;
-    FiffCoordTrans dev_head_t;
-    FiffCoordTrans ctf_head_t;
-    FiffCoordTrans dev_ctf_t;
+    FiffCoordTrans* dev_head_t;
+    FiffCoordTrans* ctf_head_t;
+    FiffCoordTrans* dev_ctf_t;
     QList<FiffDigPoint> dig;
-    FiffCoordTrans dig_trans;
+    FiffCoordTrans* dig_trans;
     QStringList bads;
     QList<FiffProj*> projs;
     QList<FiffCtfComp*> comps;

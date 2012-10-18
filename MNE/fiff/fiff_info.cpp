@@ -64,7 +64,11 @@ using namespace Eigen;
 //=============================================================================================================
 
 FiffInfo::FiffInfo()
-: acq_pars("")
+: dev_head_t(NULL)
+, ctf_head_t(NULL)
+, dev_ctf_t(NULL)
+, dig_trans(NULL)
+, acq_pars("")
 , acq_stim("")
 , filename("")
 {
@@ -76,6 +80,15 @@ FiffInfo::FiffInfo()
 
 FiffInfo::~FiffInfo()
 {
+    if(dev_head_t)
+        delete dev_head_t;
+    if(ctf_head_t)
+        delete ctf_head_t;
+    if(dev_ctf_t)
+        delete dev_ctf_t;
+    if(dig_trans)
+        delete dig_trans;
+
     qint32 i;
     for (i = 0; i < projs.size(); ++i)
         if(projs[i])

@@ -65,6 +65,27 @@ FiffCoordTrans::FiffCoordTrans()
 
 //*************************************************************************************************************
 
+FiffCoordTrans::FiffCoordTrans(FiffCoordTrans* t_pFiffCoordTrans)
+{
+    if(t_pFiffCoordTrans)
+    {
+        from = t_pFiffCoordTrans->from;
+        to = t_pFiffCoordTrans->to;
+        trans = MatrixXf(t_pFiffCoordTrans->trans);
+        invtrans = MatrixXf(t_pFiffCoordTrans->invtrans);
+    }
+    else
+    {
+        this->from = -1;
+        this->to = -1;
+        this->trans = MatrixXf::Identity(4,4);
+        this->invtrans = MatrixXf::Identity(4,4);
+    }
+}
+
+
+//*************************************************************************************************************
+
 FiffCoordTrans::~FiffCoordTrans()
 {
 
@@ -73,16 +94,13 @@ FiffCoordTrans::~FiffCoordTrans()
 
 //*************************************************************************************************************
 
-bool FiffCoordTrans::invert_transform(FiffCoordTrans* p_pTransform)
+bool FiffCoordTrans::invert_transform()
 {
-    if (p_pTransform == NULL)
-        return false;
-
-    fiff_int_t from_new = p_pTransform->to;
-    p_pTransform->to    = p_pTransform->from;
-    p_pTransform->from  = from_new;
-    p_pTransform->trans = p_pTransform->trans.inverse();
-    p_pTransform->invtrans = p_pTransform->invtrans.inverse();
+    fiff_int_t from_new = this->to;
+    this->to    = this->from;
+    this->from  = from_new;
+    this->trans = this->trans.inverse();
+    this->invtrans = this->invtrans.inverse();
 
     return true;
 }

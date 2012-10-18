@@ -192,7 +192,7 @@ public:
     fiff_int_t nchan;
     FiffNamedMatrix* sol;
     FiffNamedMatrix* sol_grad;
-    FiffCoordTrans mri_head_t;
+    FiffCoordTrans* mri_head_t;
     MNESourceSpace* src;
     MatrixX3f source_rr;
     MatrixX3f source_nn;

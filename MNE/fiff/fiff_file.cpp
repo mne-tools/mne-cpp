@@ -412,9 +412,9 @@ FiffDirTree* FiffFile::read_meas_info(FiffDirTree* p_pTree, FiffInfo*& info)
 
     FiffChInfo t_chInfo;
 
-    FiffCoordTrans cand;
-    FiffCoordTrans dev_head_t;
-    FiffCoordTrans ctf_head_t;
+    FiffCoordTrans* cand = NULL;
+    FiffCoordTrans* dev_head_t = NULL;
+    FiffCoordTrans* ctf_head_t = NULL;
 
     fiff_int_t meas_date[2];
     meas_date[0] = -1;
@@ -458,9 +458,9 @@ FiffDirTree* FiffFile::read_meas_info(FiffDirTree* p_pTree, FiffInfo*& info)
                 //ToDo: This has to be debugged!!
                 FiffTag::read_tag(this, t_pTag, pos);
                 cand = t_pTag->toCoordTrans();
-                if(cand.from == FIFFV_COORD_DEVICE && cand.to == FIFFV_COORD_HEAD)
+                if(cand->from == FIFFV_COORD_DEVICE && cand->to == FIFFV_COORD_HEAD)
                     dev_head_t = cand;
-                else if (cand.from == FIFFV_MNE_COORD_CTF_HEAD && cand.to == FIFFV_COORD_HEAD)
+                else if (cand->from == FIFFV_MNE_COORD_CTF_HEAD && cand->to == FIFFV_COORD_HEAD)
                     ctf_head_t = cand;
                 break;
         }
@@ -493,7 +493,7 @@ FiffDirTree* FiffFile::read_meas_info(FiffDirTree* p_pTree, FiffInfo*& info)
         return NULL;
     }
 
-    if ((dev_head_t.from == -1) || (ctf_head_t.from == -1)) //if isempty(dev_head_t) || isempty(ctf_head_t)
+    if ((dev_head_t == NULL) || (ctf_head_t == NULL)) //if isempty(dev_head_t) || isempty(ctf_head_t)
     {
         QList<FiffDirTree*> hpi_result = meas_info.at(0)->dir_tree_find(FIFFB_HPI_RESULT);
         if (hpi_result.size() == 1)
@@ -506,9 +506,9 @@ FiffDirTree* FiffFile::read_meas_info(FiffDirTree* p_pTree, FiffInfo*& info)
                 {
                     FiffTag::read_tag(this, t_pTag, pos);
                     cand = t_pTag->toCoordTrans();
-                    if (cand.from == FIFFV_COORD_DEVICE && cand.to == FIFFV_COORD_HEAD)
+                    if (cand->from == FIFFV_COORD_DEVICE && cand->to == FIFFV_COORD_HEAD)
                         dev_head_t = cand;
-                    else if (cand.from == FIFFV_MNE_COORD_CTF_HEAD && cand.to == FIFFV_COORD_HEAD)
+                    else if (cand->from == FIFFV_MNE_COORD_CTF_HEAD && cand->to == FIFFV_COORD_HEAD)
                         ctf_head_t = cand;
                 }
             }
@@ -521,7 +521,7 @@ FiffDirTree* FiffFile::read_meas_info(FiffDirTree* p_pTree, FiffInfo*& info)
 
     QList<FiffDigPoint> dig;// = struct('kind',{},'ident',{},'r',{},'coord_frame',{});
     fiff_int_t coord_frame = FIFFV_COORD_HEAD;
-    FiffCoordTrans dig_trans;
+    FiffCoordTrans* dig_trans = NULL;
     qint32 k = 0;
 
     if (isotrak.size() == 1)
@@ -555,12 +555,12 @@ FiffDirTree* FiffFile::read_meas_info(FiffDirTree* p_pTree, FiffInfo*& info)
     for(k = 0; k < dig.size(); ++k)
         dig[k].coord_frame = coord_frame;
 
-    if (dig_trans.from != -1) //if exist('dig_trans','var')
+    if (dig_trans != NULL) //if exist('dig_trans','var')
     {
-        if (dig_trans.from != coord_frame && dig_trans.to != coord_frame)
+        if (dig_trans->from != coord_frame && dig_trans->to != coord_frame)
         {
-            FiffCoordTrans tmpEmptyTrans;
-            dig_trans = tmpEmptyTrans; //clear('dig_trans');
+            delete dig_trans;
+            dig_trans = NULL; //clear('dig_trans');
 
         }
     }
@@ -669,20 +669,24 @@ FiffDirTree* FiffFile::read_meas_info(FiffDirTree* p_pTree, FiffInfo*& info)
     //
     info->dev_head_t = dev_head_t;
     info->ctf_head_t = ctf_head_t;
-    if ((info->dev_head_t.from != -1) && (info->ctf_head_t.from != -1)) //~isempty(info.dev_head_t) && ~isempty(info.ctf_head_t)
+    if ((info->dev_head_t != NULL) && (info->ctf_head_t != NULL)) //~isempty(info.dev_head_t) && ~isempty(info.ctf_head_t)
     {
-        info->dev_ctf_t    = info->dev_head_t;
-        info->dev_ctf_t.to = info->ctf_head_t.from;
-        info->dev_ctf_t.trans = ctf_head_t.trans.inverse()*info->dev_ctf_t.trans;
+        info->dev_ctf_t     = info->dev_head_t;
+        info->dev_ctf_t->to = info->ctf_head_t->from;
+        info->dev_ctf_t->trans = ctf_head_t->trans.inverse()*info->dev_ctf_t->trans;
     }
     else
-        info->dev_ctf_t.from = -1;
+    {
+        if(info->dev_ctf_t)
+            delete info->dev_ctf_t;
+        info->dev_ctf_t = NULL;
+    }
 
     //
     //   All kinds of auxliary stuff
     //
     info->dig   = dig;
-    if (dig_trans.from != -1)
+    if (dig_trans != NULL)
         info->dig_trans = dig_trans;
 
     info->bads  = bads;
@@ -1302,10 +1306,10 @@ FiffFile* FiffFile::start_writing_raw(QString& p_sFileName, FiffInfo* info, Matr
     //
     if (!have_hpi_result)
     {
-        if (info->dev_head_t.from != -1)
+        if (info->dev_head_t != NULL)
             t_pFile->write_coord_trans(info->dev_head_t);
 
-        if (info->ctf_head_t.from != -1)
+        if (info->ctf_head_t != NULL)
             t_pFile->write_coord_trans(info->ctf_head_t);
     }
     //
@@ -1468,7 +1472,7 @@ void FiffFile::write_ch_info(FiffChInfo* ch)
 
 //*************************************************************************************************************
 
-void FiffFile::write_coord_trans(FiffCoordTrans& trans)
+void FiffFile::write_coord_trans(FiffCoordTrans* trans)
 {
     //?typedef struct _fiffCoordTransRec {
     //  fiff_int_t   from;                   /*!< Source coordinate system. */
@@ -1492,8 +1496,8 @@ void FiffFile::write_coord_trans(FiffCoordTrans& trans)
     //
     //   Start writing fiffCoordTransRec
     //
-    out << (qint32)trans.from;
-    out << (qint32)trans.to;
+    out << (qint32)trans->from;
+    out << (qint32)trans->to;
 
     //
     //   The transform...
@@ -1501,18 +1505,18 @@ void FiffFile::write_coord_trans(FiffCoordTrans& trans)
     qint32 r, c;
     for (r = 0; r < 3; ++r)
         for (c = 0; c < 3; ++c)
-            out << (float)trans.trans(r,c);
+            out << (float)trans->trans(r,c);
     for (r = 0; r < 3; ++r)
-        out << (float)trans.trans(r,3);
+        out << (float)trans->trans(r,3);
 
     //
     //   ...and its inverse
     //
     for (r = 0; r < 3; ++r)
         for (c = 0; c < 3; ++c)
-            out << (float)trans.invtrans(r,c);
+            out << (float)trans->invtrans(r,c);
     for (r = 0; r < 3; ++r)
-        out << (float)trans.invtrans(r,3);
+        out << (float)trans->invtrans(r,3);
 }
 
 

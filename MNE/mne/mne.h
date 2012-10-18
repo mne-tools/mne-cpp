@@ -610,11 +610,12 @@ public:
         //
         //   Methods and source orientations
         //
-        FiffTag* tag = NULL;
-        invs->find_tag(t_pFile, FIFF_MNE_INCLUDED_METHODS, tag);
-        if (tag->data == NULL)
+        FiffTag* t_pTag = NULL;
+        if (!invs->find_tag(t_pFile, FIFF_MNE_INCLUDED_METHODS, t_pTag))
         {
             printf("Modalities not found\n");
+            if(t_pTag)
+                delete t_pTag;
             if(t_pFile)
                 delete t_pFile;
             if(t_pTree)
@@ -624,12 +625,13 @@ public:
             return false;
         }
         MNEInverseOperator* inv = new MNEInverseOperator();
-        inv->methods = *tag->toInt();
+        inv->methods = *t_pTag->toInt();
         //
-        invs->find_tag(t_pFile, FIFF_MNE_SOURCE_ORIENTATION, tag);
-        if (tag->data == NULL)
+        if (!invs->find_tag(t_pFile, FIFF_MNE_SOURCE_ORIENTATION, t_pTag))
         {
             printf("Source orientation constraints not found\n");
+            if(t_pTag)
+                delete t_pTag;
             if(t_pFile)
                 delete t_pFile;
             if(t_pTree)
@@ -638,12 +640,13 @@ public:
                 delete t_pDir;
             return false;
         }
-        inv->source_ori = *tag->toInt();
+        inv->source_ori = *t_pTag->toInt();
         //
-        invs->find_tag(t_pFile, FIFF_MNE_SOURCE_SPACE_NPOINTS, tag);
-        if (tag->data == NULL)
+        if (!invs->find_tag(t_pFile, FIFF_MNE_SOURCE_SPACE_NPOINTS, t_pTag))
         {
             printf("Number of sources not found\n");
+            if(t_pTag)
+                delete t_pTag;
             if(t_pFile)
                 delete t_pFile;
             if(t_pTree)
@@ -652,15 +655,16 @@ public:
                 delete t_pDir;
             return false;
         }
-        inv->nsource = *tag->toInt();
+        inv->nsource = *t_pTag->toInt();
         inv->nchan   = 0;
         //
         //   Coordinate frame
         //
-        invs->find_tag(t_pFile, FIFF_MNE_COORD_FRAME, tag);
-        if (tag == NULL)
+        if (invs->find_tag(t_pFile, FIFF_MNE_COORD_FRAME, t_pTag))
         {
             printf("Coordinate frame tag not found\n");
+            if(t_pTag)
+                delete t_pTag;
             if(t_pFile)
                 delete t_pFile;
             if(t_pTree)
@@ -669,14 +673,15 @@ public:
                 delete t_pDir;
             return false;
         }
-        inv->coord_frame = *tag->toInt();
+        inv->coord_frame = *t_pTag->toInt();
         //
         //   The actual source orientation vectors
         //
-        invs->find_tag(t_pFile, FIFF_MNE_INVERSE_SOURCE_ORIENTATIONS, tag);
-        if (tag->data == NULL)
+        if (!invs->find_tag(t_pFile, FIFF_MNE_INVERSE_SOURCE_ORIENTATIONS, t_pTag))
         {
             printf("Source orientation information not found\n");
+            if(t_pTag)
+                delete t_pTag;
             if(t_pFile)
                 delete t_pFile;
             if(t_pTree)
@@ -688,17 +693,18 @@ public:
 
         if(inv->source_nn)
             delete inv->source_nn;
-        inv->source_nn = new MatrixXf(tag->toFloatMatrix().transpose());
+        inv->source_nn = new MatrixXf(t_pTag->toFloatMatrix().transpose());
 
         printf("[done]\n");
         //
         //   The SVD decomposition...
         //
         printf("\tReading inverse operator decomposition...");
-        invs->find_tag(t_pFile, FIFF_MNE_INVERSE_SING, tag);
-        if (tag == NULL)
+        if (!invs->find_tag(t_pFile, FIFF_MNE_INVERSE_SING, t_pTag))
         {
             printf("Singular values not found\n");
+            if(t_pTag)
+                delete t_pTag;
             if(t_pFile)
                 delete t_pFile;
             if(t_pTree)
@@ -710,7 +716,7 @@ public:
 
         if(inv->sing)
             delete inv->sing;
-        inv->sing = new VectorXf(Map<VectorXf>(tag->toFloat(), tag->size/4));
+        inv->sing = new VectorXf(Map<VectorXf>(t_pTag->toFloat(), t_pTag->size/4));
         inv->nchan = inv->sing->rows();
         //
         //   The eigenleads and eigenfields
@@ -722,6 +728,8 @@ public:
             if(!Fiff::read_named_matrix(t_pFile, invs, FIFF_MNE_INVERSE_LEADS_WEIGHTED, inv->eigen_leads))
             {
                 printf("Error reading eigenleads named matrix.\n");
+                if(t_pTag)
+                    delete t_pTag;
                 if(t_pFile)
                     delete t_pFile;
                 if(t_pTree)
@@ -740,6 +748,8 @@ public:
         if(!Fiff::read_named_matrix(t_pFile, invs, FIFF_MNE_INVERSE_FIELDS, inv->eigen_fields))
         {
             printf("Error reading eigenfields named matrix.\n");
+            if(t_pTag)
+                delete t_pTag;
             if(t_pFile)
                 delete t_pFile;
             if(t_pTree)
@@ -752,71 +762,132 @@ public:
         //
         //   Read the covariance matrices
         //
-        MNE::read_cov(t_pFile,invs,FIFFV_MNE_NOISE_COV, inv->noise_cov);
-//        try
-//            inv.noise_cov = mne_read_cov(fid,invs,FIFF.FIFFV_MNE_NOISE_COV);
-//            fprintf('\tNoise covariance matrix read.\n');
-//        catch
-//            fclose(fid);
-//            error(me,'%s',mne_omit_first_line(lasterr));
-//        end
-//        try
-//            inv.source_cov = mne_read_cov(fid,invs,FIFF.FIFFV_MNE_SOURCE_COV);
-//            fprintf('\tSource covariance matrix read.\n');
-//        catch
-//            fclose(fid);
-//            error(me,'%s',mne_omit_first_line(lasterr));
-//        end
-//        %
-//        %   Read the various priors
-//        %
-//        try
-//            inv.orient_prior = mne_read_cov(fid,invs,FIFF.FIFFV_MNE_ORIENT_PRIOR_COV);
-//            fprintf('\tOrientation priors read.\n');
-//        catch
-//            inv.orient_prior = [];
-//        end
-//        try
-//            inv.depth_prior = mne_read_cov(fid,invs,FIFF.FIFFV_MNE_DEPTH_PRIOR_COV);
-//            fprintf('\tDepth priors read.\n');
-//        catch
-//            inv.depth_prior = [];
-//        end
-//        try
-//            inv.fmri_prior = mne_read_cov(fid,invs,FIFF.FIFFV_MNE_FMRI_PRIOR_COV);
-//            fprintf('\tfMRI priors read.\n');
-//        catch
-//            inv.fmri_prior = [];
-//        end
-//        %
-//        %   Read the source spaces
-//        %
-//        try
-//            inv.src = mne_read_source_spaces(fid,false,tree);
-//        catch
-//            fclose(fid);
-//            error(me,'Could not read the source spaces (%s)',mne_omit_first_line(lasterr));
-//        end
-//        for k = 1:length(inv.src)
-//           inv.src(k).id = mne_find_source_space_hemi(inv.src(k));
-//        end
-//        %
-//        %   Get the MRI <-> head coordinate transformation
-//        %
-//        tag = find_tag(parent_mri,FIFF.FIFF_COORD_TRANS);
-//        if isempty(tag)
-//            fclose(fid);
-//            error(me,'MRI/head coordinate transformation not found');
-//        else
-//            mri_head_t = tag.data;
-//            if mri_head_t.from ~= FIFF.FIFFV_COORD_MRI || mri_head_t.to ~= FIFF.FIFFV_COORD_HEAD
-//                mri_head_t = fiff_invert_transform(mri_head_t);
-//                if mri_head_t.from ~= FIFF.FIFFV_COORD_MRI || mri_head_t.to ~= FIFF.FIFFV_COORD_HEAD
-//                    fclose(fid);
-//                    error(me,'MRI/head coordinate transformation not found');
-//                end
-//            end
-//        end
+        if(MNE::read_cov(t_pFile, invs, FIFFV_MNE_NOISE_COV, inv->noise_cov))
+        {
+            printf("\tNoise covariance matrix read.\n");
+        }
+        else
+        {
+            printf("\tError: Not able to read noise covariance matrix.\n");
+            if(t_pTag)
+                delete t_pTag;
+            if(t_pFile)
+                delete t_pFile;
+            if(t_pTree)
+                delete t_pTree;
+            if(t_pDir)
+                delete t_pDir;
+            return false;
+        }
+
+        if(MNE::read_cov(t_pFile, invs, FIFFV_MNE_SOURCE_COV, inv->source_cov))
+        {
+            printf("\tSource covariance matrix read.\n");
+        }
+        else
+        {
+            printf("\tError: Not able to read source covariance matrix.\n");
+            if(t_pTag)
+                delete t_pTag;
+            if(t_pFile)
+                delete t_pFile;
+            if(t_pTree)
+                delete t_pTree;
+            if(t_pDir)
+                delete t_pDir;
+            return false;
+        }
+        //
+        //   Read the various priors
+        //
+        if(MNE::read_cov(t_pFile, invs, FIFFV_MNE_ORIENT_PRIOR_COV, inv->orient_prior))
+        {
+            printf("\tOrientation priors read.\n");
+        }
+        else
+        {
+            if(inv->orient_prior)
+                delete inv->orient_prior;
+            inv->orient_prior = NULL;
+        }
+        if(MNE::read_cov(t_pFile, invs, FIFFV_MNE_DEPTH_PRIOR_COV, inv->depth_prior))
+        {
+            printf("\tDepth priors read.\n");
+        }
+        else
+        {
+            if(inv->depth_prior)
+                delete inv->depth_prior;
+            inv->depth_prior = NULL;
+        }
+        if(MNE::read_cov(t_pFile, invs, FIFFV_MNE_FMRI_PRIOR_COV, inv->fmri_prior))
+        {
+            printf("\tfMRI priors read.\n");
+        }
+        else
+        {
+            if(inv->fmri_prior)
+                delete inv->fmri_prior;
+            inv->fmri_prior = NULL;
+        }
+        //
+        //   Read the source spaces
+        //
+        if(!MNESourceSpace::read_source_spaces(t_pFile, false, t_pTree, inv->src))
+        {
+            printf("\tError: Could not read the source spaces.\n");
+            if(t_pTag)
+                delete t_pTag;
+            if(t_pFile)
+                delete t_pFile;
+            if(t_pTree)
+                delete t_pTree;
+            if(t_pDir)
+                delete t_pDir;
+            return false;
+        }
+        for (qint32 k = 0; k < inv->src->hemispheres.size(); ++k)
+           inv->src->hemispheres[k]->id = find_source_space_hemi(inv->src->hemispheres[k]);
+        //
+        //   Get the MRI <-> head coordinate transformation
+        //
+        FiffCoordTrans* mri_head_t = NULL;
+        if (!parent_mri[0]->find_tag(t_pFile, FIFF_COORD_TRANS, t_pTag))
+        {
+            printf("MRI/head coordinate transformation not found\n");
+            if(t_pTag)
+                delete t_pTag;
+            if(t_pFile)
+                delete t_pFile;
+            if(t_pTree)
+                delete t_pTree;
+            if(t_pDir)
+                delete t_pDir;
+            return false;
+        }
+        else
+        {
+            mri_head_t = t_pTag->toCoordTrans();
+            if (mri_head_t->from != FIFFV_COORD_MRI || mri_head_t->to != FIFFV_COORD_HEAD)
+            {
+                mri_head_t->invert_transform();
+                if (mri_head_t->from != FIFFV_COORD_MRI || mri_head_t->to != FIFFV_COORD_HEAD)
+                {
+                    printf("MRI/head coordinate transformation not found");
+                    if(mri_head_t)
+                        delete mri_head_t;
+                    if(t_pTag)
+                        delete t_pTag;
+                    if(t_pFile)
+                        delete t_pFile;
+                    if(t_pTree)
+                        delete t_pTree;
+                    if(t_pDir)
+                        delete t_pDir;
+                    return false;
+                }
+            }
+        }
 //        inv.mri_head_t  = mri_head_t;
 //        %
 //        %   Transform the source spaces to the correct coordinate frame

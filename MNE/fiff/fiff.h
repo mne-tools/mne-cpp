@@ -233,7 +233,7 @@ public:
     */
     static inline bool invert_transform(FiffCoordTrans* p_pTransform)
     {
-        return FiffCoordTrans::invert_transform(p_pTransform);
+        return p_pTransform->invert_transform();
     }
 
     //=========================================================================================================
@@ -1028,7 +1028,7 @@ public:
     * @param[in] p_pFile    An open fif file
     * @param[in] trans      The coordinate transfomation structure
     */
-    inline static void write_coord_trans(FiffFile* p_pFile, FiffCoordTrans& trans)
+    inline static void write_coord_trans(FiffFile* p_pFile, FiffCoordTrans* trans)
     {
         p_pFile->write_coord_trans(trans);
     }

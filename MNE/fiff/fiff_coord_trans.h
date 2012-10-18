@@ -85,6 +85,11 @@ public:
     */
     FiffCoordTrans();
 
+    //=========================================================================================================
+    /**
+    * copy ctor
+    */
+    FiffCoordTrans(FiffCoordTrans* t_pFiffCoordTrans);
 
     //=========================================================================================================
     /**
@@ -100,11 +105,9 @@ public:
     * Invert a coordinate transformation
     * (actual obsolete - cause trans and inverse are both stored)
     *
-    * @param[in] p_pTransform the transformation which should be inverted
-    *
     * @return true if succeeded, false otherwise
     */
-    static bool invert_transform(FiffCoordTrans* p_pTransform);
+    bool invert_transform();
 
 
     //=========================================================================================================

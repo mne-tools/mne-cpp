@@ -61,7 +61,7 @@ MNEForwardSolution::MNEForwardSolution()
 , nchan(0)
 , sol(NULL)
 , sol_grad(NULL)
-, mri_head_t(FiffCoordTrans())
+, mri_head_t(NULL)
 , src(NULL)
 , source_rr(MatrixX3f::Zero(0,3))
 , source_nn(MatrixX3f::Zero(0,3))
@@ -79,7 +79,7 @@ MNEForwardSolution::MNEForwardSolution(MNEForwardSolution* p_pMNEForwardSolution
 , nchan(p_pMNEForwardSolution->nchan)
 , sol(p_pMNEForwardSolution->sol ? new FiffNamedMatrix(p_pMNEForwardSolution->sol) : NULL)
 , sol_grad(p_pMNEForwardSolution->sol_grad ? new FiffNamedMatrix(p_pMNEForwardSolution->sol_grad) : NULL)
-, mri_head_t( p_pMNEForwardSolution->mri_head_t)
+, mri_head_t( new FiffCoordTrans(p_pMNEForwardSolution->mri_head_t) )
 , src(p_pMNEForwardSolution->src ? new MNESourceSpace(p_pMNEForwardSolution->src) : NULL)
 , source_rr(MatrixX3f(p_pMNEForwardSolution->source_rr))
 , source_nn(MatrixX3f(p_pMNEForwardSolution->source_nn))
@@ -96,6 +96,8 @@ MNEForwardSolution::~MNEForwardSolution()
         delete sol;
     if(sol_grad)
         delete sol_grad;
+    if(mri_head_t)
+        delete mri_head_t;
     if(src)
         delete src;
 }
@@ -308,6 +310,8 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
     }
     else
     {
+        if(fwd->mri_head_t)
+            delete fwd->mri_head_t;
         fwd->mri_head_t = t_pTag->toCoordTrans();
 //            std::cout << "Transformation\n" << fwd->mri_head_t.trans << std::endl;
 //            std::cout << "from " << fwd->mri_head_t.from << " to " << fwd->mri_head_t.to << std::endl;
@@ -316,10 +320,10 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
 //            std::cout << "size " << sizeof(FiffCoordTrans) << std::endl;
 //            std::cout << "size " << sizeof(fiffCoordTransRec) << std::endl;
 
-        if (fwd->mri_head_t.from != FIFFV_COORD_MRI || fwd->mri_head_t.to != FIFFV_COORD_HEAD)
+        if (fwd->mri_head_t->from != FIFFV_COORD_MRI || fwd->mri_head_t->to != FIFFV_COORD_HEAD)
         {
-            FiffCoordTrans::invert_transform(&fwd->mri_head_t);
-            if (fwd->mri_head_t.from != FIFFV_COORD_MRI || fwd->mri_head_t.to != FIFFV_COORD_HEAD)
+            fwd->mri_head_t->invert_transform();
+            if (fwd->mri_head_t->from != FIFFV_COORD_MRI || fwd->mri_head_t->to != FIFFV_COORD_HEAD)
             {
                 t_pFile->close();
                 std::cout << "MRI/head coordinate transformation not found\n"; // ToDo throw error
@@ -352,7 +356,7 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
 
     //
     qint32 nuse = 0;
-    t_pSourceSpace->transform_source_space_to(fwd->coord_frame,&fwd->mri_head_t);
+    t_pSourceSpace->transform_source_space_to(fwd->coord_frame,fwd->mri_head_t);
     for(int k = 0; k < t_pSourceSpace->hemispheres.size(); ++k)
         nuse = nuse +  t_pSourceSpace->hemispheres.at(k)->nuse;
 
@@ -727,12 +731,12 @@ bool MNEForwardSolution::read_one(FiffFile* p_pFile, FiffDirTree* node, MNEForwa
 {
     if (one != NULL)
         delete one;
+    one = NULL;
     //
     //   Read all interesting stuff for one forward solution
     //
     if(node == NULL)
     {
-        one = NULL;
         return false;
     }
 

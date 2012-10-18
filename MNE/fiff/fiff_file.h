@@ -359,7 +359,7 @@ public:
     *
     * @param[in] trans  The coordinate transfomation structure
     */
-    void write_coord_trans(FiffCoordTrans& trans);
+    void write_coord_trans(FiffCoordTrans* trans);
 
     //=========================================================================================================
     /**
