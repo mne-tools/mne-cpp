@@ -181,28 +181,6 @@ public:
     */
     bool open(FiffDirTree*& p_pTree, QList<FiffDirEntry>*& p_pDir);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //ToDo this is a read function make this member of FiffFile class
     //=========================================================================================================
     /**
     * fiff_read_bad_channels
@@ -213,14 +191,12 @@ public:
     * Note: In difference to mne-matlab this is not a static function. This is a method of the FiffDirTree
     *       class, that's why a tree object doesn't need to be handed to the function.
     *
-    *
     * @param[in] p_pTree The node of interest
     *
     * @return the bad channel list
     */
     QStringList read_bad_channels(FiffDirTree* p_pTree);
 
-    //ToDo this is a read function make this member of FiffFile class
     //=========================================================================================================
     /**
     * fiff_read_ctf_comp
@@ -236,7 +212,6 @@ public:
     */
     QList<FiffCtfComp*> read_ctf_comp( FiffDirTree* p_pNode, QList<FiffChInfo>& chs);
 
-    //ToDo this is a read function make this member of FiffFile class
     //=========================================================================================================
     /**
     * fiff_read_meas_info
@@ -253,7 +228,6 @@ public:
     */
     FiffDirTree* read_meas_info(FiffDirTree* p_pTree, FiffInfo*& info);
 
-    //ToDo this is a read function make this member of FiffFile class
     //=========================================================================================================
     /**
     * fiff_read_named_matrix
@@ -270,7 +244,6 @@ public:
     */
     bool read_named_matrix(FiffDirTree* p_pTree, fiff_int_t matkind, FiffNamedMatrix*& mat);
 
-    //ToDo this is a read function make this member of FiffFile class
     //=========================================================================================================
     /**
     * fiff_read_proj
