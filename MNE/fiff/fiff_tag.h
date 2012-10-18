@@ -329,7 +329,7 @@ public:
     /**
     * to fiff COORD TRANS STRUCT
     */
-    inline FiffCoordTrans toCoordTrans() const;
+    inline FiffCoordTrans* toCoordTrans() const;
 
 
     //=========================================================================================================
@@ -654,41 +654,41 @@ inline FiffDigPoint FiffTag::toDigPoint() const
 
 //*************************************************************************************************************
 
-inline FiffCoordTrans FiffTag::toCoordTrans() const
+inline FiffCoordTrans* FiffTag::toCoordTrans() const
 {
 
-    FiffCoordTrans t_fiffCoordTrans;
+    FiffCoordTrans* p_pFiffCoordTrans = new FiffCoordTrans();
     if(this->isMatrix() || this->getType() != FIFFT_COORD_TRANS_STRUCT || this->data == NULL)
-        return t_fiffCoordTrans;
+        return p_pFiffCoordTrans;
     else
     {
         qint32* t_pInt32 = static_cast< qint32* >(this->data);
-        t_fiffCoordTrans.from = t_pInt32[0];
-        t_fiffCoordTrans.to = t_pInt32[1];
+        p_pFiffCoordTrans->from = t_pInt32[0];
+        p_pFiffCoordTrans->to = t_pInt32[1];
 
-        t_fiffCoordTrans.trans.setIdentity(4,4);
+        p_pFiffCoordTrans->trans.setIdentity(4,4);
         float* t_pFloat = static_cast< float* >(this->data);
         int count = 0;
         int r, c;
         for (r = 0; r < 3; ++r) {
-            t_fiffCoordTrans.trans(r,3) = t_pFloat[11+r];
+            p_pFiffCoordTrans->trans(r,3) = t_pFloat[11+r];
             for (c = 0; c < 3; ++c) {
-                t_fiffCoordTrans.trans(r,c) = t_pFloat[2+count];
+                p_pFiffCoordTrans->trans(r,c) = t_pFloat[2+count];
                 ++count;
             }
         }
 
-        t_fiffCoordTrans.invtrans.setIdentity(4,4);
+        p_pFiffCoordTrans->invtrans.setIdentity(4,4);
         count = 0;
         for (r = 0; r < 3; ++r) {
-            t_fiffCoordTrans.invtrans(r,3) = t_pFloat[23+r];
+            p_pFiffCoordTrans->invtrans(r,3) = t_pFloat[23+r];
             for (c = 0; c < 3; ++c) {
-                t_fiffCoordTrans.invtrans(r,c) = t_pFloat[14+count];
+                p_pFiffCoordTrans->invtrans(r,c) = t_pFloat[14+count];
                 ++count;
             }
         }
 
-        return t_fiffCoordTrans;
+        return p_pFiffCoordTrans;
     }
 }
 

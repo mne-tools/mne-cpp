@@ -52,7 +52,7 @@
 #include "../../../MNE/fiff/fiff.h"
 #include "../../../MNE/mne/mne.h"
 
-#include "../../../MNE/mne/mne_epoch_data_list.h"
+#include "../../../MNE/mne/mne_epoch_list.h"
 
 
 //*************************************************************************************************************
@@ -300,9 +300,9 @@ int main(int argc, char *argv[])
     fiff_int_t event_samp, from, to;
     MatrixXf* timesDummy = NULL;
 
-    MNEEpochDataList data;
+    MNEEpochList data;
 
-    MNEEpochData* epochData = NULL;
+    MNEEpoch* epoch = NULL;
 
     MatrixXf times;
 
@@ -315,9 +315,9 @@ int main(int argc, char *argv[])
         from = event_samp + tmin*raw->info->sfreq;
         to   = event_samp + floor(tmax*raw->info->sfreq + 0.5);
 
-        epochData = new MNEEpochData();
+        epoch = new MNEEpoch();
 
-        if(raw->read_raw_segment(epochData->epoch, timesDummy, from, to, picks))
+        if(raw->read_raw_segment(epoch->epoch, timesDummy, from, to, picks))
         {
             if (p == 0)
             {
@@ -326,11 +326,11 @@ int main(int argc, char *argv[])
                     times(0, i) = ((float)(from-event_samp+i)) / raw->info->sfreq;
             }
 
-            epochData->event = event;
-            epochData->tmin = ((float)(from)-(float)(raw->first_samp))/raw->info->sfreq;
-            epochData->tmax = ((float)(to)-(float)(raw->first_samp))/raw->info->sfreq;
+            epoch->event = event;
+            epoch->tmin = ((float)(from)-(float)(raw->first_samp))/raw->info->sfreq;
+            epoch->tmax = ((float)(to)-(float)(raw->first_samp))/raw->info->sfreq;
 
-            data.append(epochData);//List takes ownwership of the pointer - no delete need
+            data.append(epoch);//List takes ownwership of the pointer - no delete need
         }
         else
         {

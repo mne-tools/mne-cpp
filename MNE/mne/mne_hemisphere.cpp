@@ -142,7 +142,7 @@ bool MNEHemisphere::transform_hemisphere_to(fiff_int_t dest, FiffCoordTrans* tra
     }
 
     if (trans->to == this->coord_frame && trans->from == dest)
-        FiffCoordTrans::invert_transform(trans);
+        trans->invert_transform();
     else if(trans->from != this->coord_frame || trans->to != dest)
     {
         printf("Cannot transform the source space using this coordinate transformation");//Consider throw

@@ -66,6 +66,11 @@ MNEInverseOperator::MNEInverseOperator()
 , eigen_leads(NULL)
 , eigen_fields(NULL)
 , noise_cov(NULL)
+, source_cov(NULL)
+, orient_prior(NULL)
+, depth_prior(NULL)
+, fmri_prior(NULL)
+, src(NULL)
 {
 
 }
@@ -85,4 +90,12 @@ MNEInverseOperator::~MNEInverseOperator()
         delete eigen_fields;
     if(noise_cov)
         delete noise_cov;
+    if(source_cov)
+        delete source_cov;
+    if(orient_prior)
+        delete orient_prior;
+    if(depth_prior)
+        delete depth_prior;
+    if(fmri_prior)
+        delete fmri_prior;
 }

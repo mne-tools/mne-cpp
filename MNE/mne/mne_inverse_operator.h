@@ -44,6 +44,7 @@
 
 #include "mne_global.h"
 #include "mne_cov.h"
+#include "mne_sourcespace.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -113,6 +114,11 @@ public:
     FiffNamedMatrix* eigen_leads;
     FiffNamedMatrix* eigen_fields;
     MNECov* noise_cov;
+    MNECov* source_cov;
+    MNECov* orient_prior;
+    MNECov* depth_prior;
+    MNECov* fmri_prior;
+    MNESourceSpace* src;
 };
 
 } // NAMESPACE
