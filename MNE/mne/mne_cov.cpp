@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_inverse_operator.cpp
+* @file     mne_cov.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the MNEInverseOperator Class.
+* @brief    Contains the implementation of the MNECov Class.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_inverse_operator.h"
+#include "mne_cov.h"
 
 
 //*************************************************************************************************************
@@ -54,18 +54,8 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MNEInverseOperator::MNEInverseOperator()
-: methods(-1)
-, source_ori(-1)
-, nsource(-1)
-, nchan(-1)
-, coord_frame(-1)
-, source_nn(NULL)
-, sing(NULL)
-, eigen_leads_weighted(false)
-, eigen_leads(NULL)
-, eigen_fields(NULL)
-, noise_cov(NULL)
+MNECov::MNECov()
+: kind(-1)
 {
 
 }
@@ -73,16 +63,9 @@ MNEInverseOperator::MNEInverseOperator()
 
 //*************************************************************************************************************
 
-MNEInverseOperator::~MNEInverseOperator()
+MNECov::~MNECov()
 {
-    if(source_nn)
-        delete source_nn;
-    if(sing)
-        delete sing;
-    if(eigen_leads)
-        delete eigen_leads;
-    if(eigen_fields)
-        delete eigen_fields;
-    if(noise_cov)
-        delete noise_cov;
+    for (qint32 i = 0; i < projs.size(); ++i)
+        if(projs[i])
+            delete projs[i];
 }

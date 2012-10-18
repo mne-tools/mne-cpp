@@ -197,7 +197,6 @@ public:
         p_pFile->finish_writing_raw();
     }
 
-
     //=========================================================================================================
     /**
     * fiff_dir_tree_find
@@ -581,7 +580,6 @@ public:
         }
         if (comment.isEmpty())
             comment = QString("No comment");
-
         //
         //   Local channel information?
         //
@@ -767,13 +765,6 @@ public:
         return true;
     }
 
-
-
-
-
-
-
-
     //=========================================================================================================
     /**
     * fiff_read_meas_info
@@ -796,7 +787,6 @@ public:
         return p_pFile->read_meas_info(p_pTree, info);
     }
 
-    //ToDo this is a read function make this member of FiffFile class
     //=========================================================================================================
     /**
     * fiff_read_named_matrix
@@ -819,7 +809,6 @@ public:
         return p_pFile->read_named_matrix(node, matkind, mat);
     }
 
-    //ToDo this is a read function make this member of FiffFile class
     //=========================================================================================================
     /**
     * ### MNE toolbox root function ###
