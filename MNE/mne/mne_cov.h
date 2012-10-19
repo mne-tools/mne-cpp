@@ -95,6 +95,12 @@ public:
 
     //=========================================================================================================
     /**
+    * copy ctor
+    */
+    MNECov(MNECov* p_pMNECov);
+
+    //=========================================================================================================
+    /**
     * Destroys the MNECov.
     */
     ~MNECov();
@@ -104,12 +110,12 @@ public:
     bool diag;              /**< ToDo... */
     fiff_int_t dim;         /**< ToDo... */
     QStringList names;      /**< ToDo... */
-    MatrixXd data;          /**< ToDo... */
+    MatrixXd* data;         /**< ToDo... */
     QList<FiffProj*> projs; /**< ToDo... */
     QStringList bads;       /**< ToDo... */
     fiff_int_t nfree;       /**< ToDo... */
-    VectorXd eig;           /**< ToDo... */
-    MatrixXf eigvec;        /**< ToDo... */
+    VectorXd* eig;          /**< ToDo... */
+    MatrixXf* eigvec;       /**< ToDo... */
 };
 
 } // NAMESPACE

@@ -138,7 +138,7 @@ bool MNEHemisphere::transform_hemisphere_to(fiff_int_t dest, FiffCoordTrans* tra
     if (this->coord_frame == dest)
     {
 //            res = src;
-        return false;
+        return true;
     }
 
     if (trans->to == this->coord_frame && trans->from == dest)

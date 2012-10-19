@@ -88,16 +88,23 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
+//  fname_data  - Name of the data file
+//  setno       - Data set number
+//  fname_inv   - Inverse operator file name
+//  nave        - Number of averages (scales the noise covariance)
+//             If negative, the number of averages in the data will be
+//             used
+//  lambda2     - The regularization factor
+//  dSPM        - do dSPM?
+//  sLORETA     - do sLORETA?
     QString t_sFileEvoked = "../../mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis-ave.fif";
-
-    QString t_sFileInv = "../../mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif";
-
     qint32 setno = 0;
+    QString t_sFileInv = "../../mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif";
+    qint32 nave = 40;
     float snr = 3.0f;
     float lambda2 = pow(1.0f / snr, 2.0f);
     bool dSPM = true;
-
-    qint32 event = 1;
+    bool sLORETA = false;
 
     //
     //   Read the data first
@@ -109,18 +116,18 @@ int main(int argc, char *argv[])
     //
     //   Then the inverse operator
     //
-//    inv = mne_read_inverse_operator(fname_inv);
-    MNE::read_inverse_operator(t_sFileInv);
-//    %
-//    %   Set up the inverse according to the parameters
-//    %
-//    if nave < 0
-//        nave = data.evoked.nave;
-//    end
-//    inv = mne_prepare_inverse_operator(inv,nave,lambda2,dSPM,sLORETA);
-//    %
-//    %   Pick the correct channels from the data
-//    %
+    MNEInverseOperator* inv = NULL;
+    MNE::read_inverse_operator(t_sFileInv, inv);
+    //
+    //   Set up the inverse according to the parameters
+    //
+    if (nave < 0)
+        nave = data->evoked->nave;
+//    inv =
+    MNE::prepare_inverse_operator(inv,nave,lambda2,dSPM,sLORETA);
+    //
+    //   Pick the correct channels from the data
+    //
 //    data = fiff_pick_channels_evoked(data,inv.noise_cov.names);
 //    fprintf(1,'Picked %d channels from the data\n',data.info.nchan);
 //    fprintf(1,'Computing inverse...');
