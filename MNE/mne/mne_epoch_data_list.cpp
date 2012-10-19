@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_epoch.cpp
+* @file     mne_epoch_data_list.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the MNEEpoch Class.
+* @brief    Contains the implementation of the MNEEpochDataList Class.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_epoch.h"
+#include "mne_epoch_data_list.h"
 
 
 //*************************************************************************************************************
@@ -54,11 +54,7 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MNEEpoch::MNEEpoch()
-: epoch(NULL)
-, event(-1)
-, tmin(-1)
-, tmax(-1)
+MNEEpochDataList::MNEEpochDataList()
 {
 
 }
@@ -66,8 +62,11 @@ MNEEpoch::MNEEpoch()
 
 //*************************************************************************************************************
 
-MNEEpoch::~MNEEpoch()
+MNEEpochDataList::~MNEEpochDataList()
 {
-    if (epoch)
-        delete epoch;
+    MNEEpochDataList::iterator i;
+    for( i = this->begin(); i!=this->end(); ++i) {
+        if (*i)
+            delete (*i);
+    }
 }
