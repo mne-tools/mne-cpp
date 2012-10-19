@@ -98,7 +98,7 @@ public:
                         fiff_int_t p_ncol,
                         QStringList& p_row_names,
                         QStringList& p_col_names,
-                        MatrixXf& p_data);
+                        MatrixXf* p_data);
 
     //=========================================================================================================
     /**
@@ -126,7 +126,7 @@ public:
     fiff_int_t  ncol;
     QStringList row_names;
     QStringList col_names;
-    MatrixXf data;
+    MatrixXf* data;
 };
 
 } // NAMESPACE

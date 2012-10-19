@@ -315,7 +315,7 @@ public:
         *inv->source_cov->data *= scale;
         //
         if (inv->eigen_leads_weighted)
-            inv->eigen_leads->data *= sqrt(scale);
+            (*inv->eigen_leads->data) *= sqrt(scale);
         //
         printf("\tScaled noise and source covariance from nave = %d to nave = %d\n",inv->nave,nave);
         inv->nave = nave;
@@ -397,7 +397,7 @@ public:
             {
                for (k = 0; k < inv->eigen_leads->nrow; ++k)
                {
-                  one = inv->eigen_leads->data.block(k,0,1,inv->eigen_leads->data.cols()).cwiseProduct(*noise_weight);
+                  one = inv->eigen_leads->data->block(k,0,1,inv->eigen_leads->data->cols()).cwiseProduct(*noise_weight);
                   (*noise_norm)(k,0) = sqrt(one.dot(one));
                }
             }
@@ -407,7 +407,7 @@ public:
                 for (k = 0; k < inv->eigen_leads->nrow; ++k)
                 {
                     c = sqrt((*inv->source_cov->data)(k,0));
-                    one = c*(inv->eigen_leads->data.block(k,0,1,inv->eigen_leads->data.cols()).transpose()).cwiseProduct(*noise_weight);//ToDo eigenleads data -> pointer
+                    one = c*(inv->eigen_leads->data->block(k,0,1,inv->eigen_leads->data->cols()).transpose()).cwiseProduct(*noise_weight);//ToDo eigenleads data -> pointer
                     (*noise_norm)(k,0) = sqrt(one.dot(one));
                 }
             }
@@ -654,7 +654,8 @@ public:
                 if (current->find_tag(p_pFile, FIFF_MNE_COV_EIGENVALUES, tag1) && current->find_tag(p_pFile, FIFF_MNE_COV_EIGENVECTORS, tag2))
                 {
                     eig = new VectorXd(Map<VectorXd>(tag1->toDouble(),dim));
-                    eigvec = new MatrixXf(tag2->toFloatMatrix().transpose());
+                    eigvec = tag2->toFloatMatrix();
+                    eigvec->transposeInPlace();
                 }
                 //
                 //   Read the projection operator
@@ -885,7 +886,8 @@ public:
 
         if(inv->source_nn)
             delete inv->source_nn;
-        inv->source_nn = new MatrixXf(t_pTag->toFloatMatrix().transpose());
+        inv->source_nn = t_pTag->toFloatMatrix();
+        inv->source_nn->transposeInPlace();
 
         printf("[done]\n");
         //

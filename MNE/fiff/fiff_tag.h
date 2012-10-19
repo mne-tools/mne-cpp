@@ -395,7 +395,7 @@ public:
     /**
     * to fiff FIFFT FLOAT MATRIX
     */
-    inline MatrixXf toFloatMatrix() const;
+    inline MatrixXf* toFloatMatrix() const;
 
 
 
@@ -846,14 +846,12 @@ inline MatrixXi FiffTag::toIntMatrix() const
 
 //*************************************************************************************************************
 
-inline MatrixXf FiffTag::toFloatMatrix() const
+inline MatrixXf* FiffTag::toFloatMatrix() const
 {
 //        qDebug() << "toFloatMatrix";
 
-    MatrixXf p_defaultMatrix(0, 0);
-
     if(!this->isMatrix() || this->getType() != FIFFT_FLOAT || this->data == NULL)
-        return p_defaultMatrix;
+        return NULL;
 
 
     qint32 ndim;
@@ -867,16 +865,16 @@ inline MatrixXf FiffTag::toFloatMatrix() const
     {
         delete pDims;
         printf("Only two-dimensional matrices are supported at this time");
-        return p_defaultMatrix;
+        return NULL;
     }
 
     //MatrixXf p_Matrix = Map<MatrixXf>( static_cast< float* >(this->data),pDims[0], pDims[1]);
     // --> Use copy constructor instead --> slower performance but higher memory management reliability
-    MatrixXf p_Matrix(Map<MatrixXf>( static_cast< float* >(this->data),pDims[0], pDims[1]));
+    MatrixXf* p_pMatrix = new MatrixXf(Map<MatrixXf>( static_cast< float* >(this->data),pDims[0], pDims[1]));
 
     delete pDims;
 
-    return p_Matrix;
+    return p_pMatrix;
 }
 
 } // NAMESPACE

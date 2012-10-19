@@ -156,7 +156,7 @@ public:
     VectorXf nearest_dist;      /**< The... */
     QList<VectorXi> pinfo;      /**< The... */
     float dist_limit;           /**< The... */
-    MatrixXf dist;              /**< The... */
+    MatrixXf* dist;             /**< The... */
     MatrixX3f tri_cent;         /**< The... */
     MatrixX3f tri_nn;           /**< The... */
     VectorXf tri_area;          /**< The... */
