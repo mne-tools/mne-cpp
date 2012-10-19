@@ -48,6 +48,7 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
+#ToDo Fix this: remove mne-cpp from path
 win32:QMAKE_POST_LINK += $${QMAKE_COPY} "..\\..\\..\\mne-cpp\\lib\\$${TARGET}.dll" "..\\..\\..\\mne-cpp\\bin\\"
 DESTDIR = $${PWD}/../../lib
 

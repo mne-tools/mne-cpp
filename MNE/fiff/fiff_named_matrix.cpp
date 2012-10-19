@@ -57,18 +57,19 @@ using namespace FIFFLIB;
 FiffNamedMatrix::FiffNamedMatrix()
 : nrow(-1)
 , ncol(-1)
+, data(NULL)
 {
 }
 
 
 //*************************************************************************************************************
 
-FiffNamedMatrix::FiffNamedMatrix(fiff_int_t p_nrow, fiff_int_t p_ncol, QStringList& p_row_names, QStringList& p_col_names, MatrixXf& p_data)
+FiffNamedMatrix::FiffNamedMatrix(fiff_int_t p_nrow, fiff_int_t p_ncol, QStringList& p_row_names, QStringList& p_col_names, MatrixXf* p_data)
 : nrow(p_nrow)
 , ncol(p_ncol)
 , row_names(p_row_names)
 , col_names(p_col_names)
-, data(p_data)
+, data(p_data ? new MatrixXf(*p_data) : NULL)
 {
 }
 
@@ -80,7 +81,7 @@ FiffNamedMatrix::FiffNamedMatrix(const FiffNamedMatrix* p_pFiffNamedMatrix)
 , ncol(p_pFiffNamedMatrix->ncol)
 , row_names(p_pFiffNamedMatrix->row_names)
 , col_names(p_pFiffNamedMatrix->col_names)
-, data(p_pFiffNamedMatrix->data)
+, data(p_pFiffNamedMatrix->data ? new MatrixXf(*p_pFiffNamedMatrix->data) : NULL)
 {
 }
 
@@ -89,7 +90,8 @@ FiffNamedMatrix::FiffNamedMatrix(const FiffNamedMatrix* p_pFiffNamedMatrix)
 
 FiffNamedMatrix::~FiffNamedMatrix()
 {
-
+    if(data)
+        delete data;
 }
 
 
@@ -101,9 +103,8 @@ void FiffNamedMatrix::transpose_named_matrix()
     this->col_names = this->row_names;
     this->row_names = col_names_old;
 
-    MatrixXf tmp_data = this->data.transpose();
-    this->data = tmp_data;
+    this->data->transposeInPlace();
 
-    this->nrow = this->data.rows();
-    this->ncol = this->data.cols();
+    this->nrow = this->data->rows();
+    this->ncol = this->data->cols();
 }

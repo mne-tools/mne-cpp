@@ -283,8 +283,8 @@ QList<FiffCtfComp*> FiffFile::read_ctf_comp(FiffDirTree* p_pNode, QList<FiffChIn
             calibrated = (bool)*t_pTag->toInt();
 
         one->save_calibrated = calibrated;
-        one->rowcals = MatrixXf::Ones(1,mat->data.rows());//ones(1,size(mat.data,1));
-        one->colcals = MatrixXf::Ones(1,mat->data.cols());//ones(1,size(mat.data,2));
+        one->rowcals = MatrixXf::Ones(1,mat->data->rows());//ones(1,size(mat.data,1));
+        one->colcals = MatrixXf::Ones(1,mat->data->cols());//ones(1,size(mat.data,2));
         if (!calibrated)
         {
             //
@@ -298,9 +298,9 @@ QList<FiffCtfComp*> FiffFile::read_ctf_comp(FiffDirTree* p_pNode, QList<FiffChIn
                 ch_names.append(chs.at(p).ch_name);
 
             qint32 count;
-            MatrixXf col_cals(mat->data.cols(), 1);
+            MatrixXf col_cals(mat->data->cols(), 1);
             col_cals.setZero();
-            for (col = 0; col < mat->data.cols(); ++col)
+            for (col = 0; col < mat->data->cols(); ++col)
             {
                 count = 0;
                 for (i = 0; i < ch_names.size(); ++i)
@@ -328,9 +328,9 @@ QList<FiffCtfComp*> FiffFile::read_ctf_comp(FiffDirTree* p_pNode, QList<FiffChIn
             //
             //    Then the rows
             //
-            MatrixXf row_cals(mat->data.rows(), 1);
+            MatrixXf row_cals(mat->data->rows(), 1);
             row_cals.setZero();
-            for (row = 0; row < mat->data.rows(); ++row)
+            for (row = 0; row < mat->data->rows(); ++row)
             {
                 count = 0;
                 for (i = 0; i < ch_names.size(); ++i)
@@ -357,7 +357,7 @@ QList<FiffCtfComp*> FiffFile::read_ctf_comp(FiffDirTree* p_pNode, QList<FiffChIn
 
                 row_cals(row, 0) = chs.at(p).range*chs.at(p).cal;
             }
-            mat->data            = row_cals.asDiagonal()*mat->data*col_cals.asDiagonal();
+            *mat->data           = row_cals.asDiagonal()* (*mat->data) *col_cals.asDiagonal();
             one->rowcals         = row_cals;
             one->colcals         = col_cals;
         }
@@ -753,11 +753,12 @@ bool FiffFile::read_named_matrix(FiffDirTree* p_pTree, fiff_int_t matkind, FiffN
     else
     {
         //qDebug() << "Is Matrix" << t_pTag->isMatrix() << "Special Type:" << t_pTag->getType();
-        mat->data = t_pTag->toFloatMatrix().transpose();
+        mat->data = t_pTag->toFloatMatrix();
+        mat->data->transposeInPlace();
     }
 
-    mat->nrow = mat->data.rows();
-    mat->ncol = mat->data.cols();
+    mat->nrow = mat->data->rows();
+    mat->ncol = mat->data->cols();
 
     if(node->find_tag(this, FIFF_MNE_NROW, t_pTag))
         if (*t_pTag->toInt() != mat->nrow)
@@ -890,10 +891,11 @@ QList<FiffProj*> FiffFile::read_proj(FiffDirTree* p_pNode)
             return projdata;
         }
         t_pFiffDirTreeItem->find_tag(this, FIFF_PROJ_ITEM_VECTORS, t_pTag);
-        MatrixXf data;
+        MatrixXf* data = NULL;
         if (t_pTag)
         {
-            data = t_pTag->toFloatMatrix().transpose();
+            data = t_pTag->toFloatMatrix();
+            data->transposeInPlace();
         }
         else
         {
@@ -907,9 +909,10 @@ QList<FiffProj*> FiffFile::read_proj(FiffDirTree* p_pNode)
         else
             active = false;
 
-        if (data.cols() != names.size())
+        if (data->cols() != names.size())
         {
             printf("Number of channel names does not match the size of data matrix\n");
+            delete data;
             return projdata;
         }
 
@@ -920,6 +923,7 @@ QList<FiffProj*> FiffFile::read_proj(FiffDirTree* p_pNode)
         //
         QStringList defaultList;
         FiffNamedMatrix* t_fiffNamedMatrix = new FiffNamedMatrix(nvec, nchan, defaultList, names, data);
+        delete data;
 
         FiffProj* one = new FiffProj(kind, active, desc, t_fiffNamedMatrix);
         //
@@ -1543,7 +1547,7 @@ void FiffFile::write_ctf_comp(QList<FiffCtfComp*>& comps)
         //
         //    Write an uncalibrated or calibrated matrix
         //
-        comp->data->data = (comp->rowcals.diagonal()).inverse()*comp->data->data*(comp->colcals.diagonal()).inverse();
+        *comp->data->data = (comp->rowcals.diagonal()).inverse()*(*comp->data->data)*(comp->colcals.diagonal()).inverse();
         this->write_named_matrix(FIFF_MNE_CTF_COMP_DATA,comp->data);
         this->end_block(FIFFB_MNE_CTF_COMP_DATA);
 
@@ -1612,12 +1616,12 @@ void FiffFile::write_float(fiff_int_t kind, float* data, fiff_int_t nel)
 
 //*************************************************************************************************************
 
-void FiffFile::write_float_matrix(fiff_int_t kind, MatrixXf& mat)
+void FiffFile::write_float_matrix(fiff_int_t kind, const MatrixXf* mat)
 {
     qint32 FIFFT_MATRIX = 1 << 30;
     qint32 FIFFT_MATRIX_FLOAT = FIFFT_FLOAT | FIFFT_MATRIX;
 
-    qint32 numel = mat.rows()*mat.cols();
+    qint32 numel = mat->rows()*mat->cols();
 
     fiff_int_t datasize = 4*numel + 4*3;
 
@@ -1635,13 +1639,13 @@ void FiffFile::write_float_matrix(fiff_int_t kind, MatrixXf& mat)
 
     for(i = 0; i < numel; ++i)
     {
-        iData = *(int *)&mat.data()[i];
+        iData = *(int *)&mat->data()[i];
         out << iData;
     }
 
     qint32 dims[3];
-    dims[0] = mat.cols();
-    dims[1] = mat.rows();
+    dims[0] = mat->cols();
+    dims[1] = mat->rows();
     dims[2] = 2;
 
     for(i = 0; i < 3; ++i)

@@ -238,7 +238,7 @@ bool MNESourceSpace::read_source_space(FiffFile* p_pFile, FiffDirTree* p_pTree, 
         return false;
     }
 
-    p_pHemisphere->rr = t_pTag->toFloatMatrix().transpose();
+    p_pHemisphere->rr = t_pTag->toFloatMatrix()->transpose();
     qint32 rows_rr = p_pHemisphere->rr.rows();
 //        qDebug() << "last element rr: " << p_pHemisphere->rr(rows_rr-1, 0) << p_pHemisphere->rr(rows_rr-1, 1) << p_pHemisphere->rr(rows_rr-1, 2);
 
@@ -259,7 +259,7 @@ bool MNESourceSpace::read_source_space(FiffFile* p_pFile, FiffDirTree* p_pTree, 
         return false;
     }
 
-    p_pHemisphere->nn = t_pTag->toFloatMatrix().transpose();
+    p_pHemisphere->nn = t_pTag->toFloatMatrix()->transpose();
     qint32 rows_nn = p_pHemisphere->nn.rows();
 
     if (rows_nn != p_pHemisphere->np)
@@ -393,10 +393,11 @@ bool MNESourceSpace::read_source_space(FiffFile* p_pFile, FiffDirTree* p_pTree, 
     //
     // Distances
     //
+    if(p_pHemisphere->dist)
+        delete p_pHemisphere->dist;
     if(!p_pTree->find_tag(p_pFile, FIFF_MNE_SOURCE_SPACE_DIST, t_pTag1) || !p_pTree->find_tag(p_pFile, FIFF_MNE_SOURCE_SPACE_DIST_LIMIT, t_pTag2))
     {
-       MatrixXf p_defaultMatrix(0, 0);
-       p_pHemisphere->dist = p_defaultMatrix;
+       p_pHemisphere->dist = NULL;
        p_pHemisphere->dist_limit = 0;
     }
     else
@@ -407,7 +408,7 @@ bool MNESourceSpace::read_source_space(FiffFile* p_pFile, FiffDirTree* p_pTree, 
         //
         //  Add the upper triangle
         //
-        p_pHemisphere->dist += p_pHemisphere->dist.transpose();
+        *p_pHemisphere->dist += p_pHemisphere->dist->transpose();
     }
 
     delete t_pTag2;

@@ -137,7 +137,7 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
 
     if (from == to)
     {
-        ctf_comp.data->data = MatrixXf::Zero(this->nchan, this->nchan);
+        ctf_comp.data->data = new MatrixXf(MatrixXf::Zero(this->nchan, this->nchan));
         return false;
     }
 
@@ -190,9 +190,9 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
             return false;
         }
 
-        ctf_comp.data->data.resize(npick,this->nchan);
+        ctf_comp.data->data->resize(npick,this->nchan);
         for (k = 0; k < npick; ++k)
-            ctf_comp.data->data.row(k) = comp_tmp.block(pick(k), 0, 1, this->nchan);
+            ctf_comp.data->data->row(k) = comp_tmp.block(pick(k), 0, 1, this->nchan);
     }
     return true;
 }
@@ -262,7 +262,7 @@ bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXf& this_comp)//private m
                     postsel(c,row_ch) = 1.0;
                 }
             }
-            this_comp = postsel*this_data->data*presel;
+            this_comp = postsel*(*this_data->data)*presel;
             return true;
         }
     }
@@ -381,7 +381,7 @@ fiff_int_t FiffInfo::make_projector(QList<FiffProj*>& projs, QStringList& ch_nam
             {
                 for (v = 0; v < one->data->nrow; ++v)
                     for (i = 0; i < p; ++i)
-                        vecs(sel(0,i),nvec+v) = one->data->data(v,vecSel(i));
+                        vecs(sel(0,i),nvec+v) = (*one->data->data)(v,vecSel(i));
                 //
                 //   Rescale for more straightforward detection of small singular values
                 //

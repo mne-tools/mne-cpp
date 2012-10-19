@@ -72,7 +72,7 @@ MNEHemisphere::MNEHemisphere()
 , nearest_dist(VectorXf::Zero(0))
 , pinfo(QList<VectorXi>())
 , dist_limit(-1)
-, dist(MatrixXf::Zero(0,0))
+, dist(NULL)
 , tri_cent(MatrixX3f::Zero(0,3))
 , tri_nn(MatrixX3f::Zero(0,3))
 , tri_area(VectorXf::Zero(0))
@@ -104,7 +104,7 @@ MNEHemisphere::MNEHemisphere(MNEHemisphere* p_pMNEHemisphere)
 , nearest_dist(VectorXf(p_pMNEHemisphere->nearest_dist))
 , pinfo(p_pMNEHemisphere->pinfo)
 , dist_limit(p_pMNEHemisphere->dist_limit)
-, dist(MatrixXf(p_pMNEHemisphere->dist))
+, dist(p_pMNEHemisphere->dist ? new MatrixXf(*p_pMNEHemisphere->dist) : NULL)
 , tri_cent(MatrixX3f(p_pMNEHemisphere->tri_cent))
 , tri_nn(MatrixX3f(p_pMNEHemisphere->tri_nn))
 , tri_area(VectorXf(p_pMNEHemisphere->tri_area))
@@ -125,8 +125,8 @@ MNEHemisphere::~MNEHemisphere()
     if(m_pTriCoords)
         delete m_pTriCoords;
 
-//    if(m_pGeometryData)
-//        delete m_pGeometryData;
+    if(dist)
+        delete dist;
 
 }
 

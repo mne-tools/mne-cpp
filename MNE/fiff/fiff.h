@@ -678,26 +678,30 @@ public:
             //
             //   Only one epoch
             //
-            all = new MatrixXf(epoch[0]->toFloatMatrix().transpose());
+            all = epoch[0]->toFloatMatrix();
+            all->transposeInPlace();
             //
             //   May need a transpose if the number of channels is one
             //
             if (all->cols() == 1 && info->nchan == 1)
-                *all = all->transpose();
+                all->transposeInPlace();
         }
         else
         {
             //
             //   Put the old style epochs together
             //
-            all = new MatrixXf(epoch[0]->toFloatMatrix().transpose());
+            all = epoch[0]->toFloatMatrix();
+            all->transposeInPlace();
 
             for (k = 2; k < nepoch; ++k)
             {
                 oldsize = all->rows();
-                MatrixXf tmp = epoch[k]->toFloatMatrix().transpose();
-                all->conservativeResize(oldsize+tmp.rows(), all->cols());
-                all->block(oldsize, 0, tmp.rows(), tmp.cols()) = tmp;
+                MatrixXf* tmp = epoch[k]->toFloatMatrix();
+                tmp->transposeInPlace();
+                all->conservativeResize(oldsize+tmp->rows(), all->cols());
+                all->block(oldsize, 0, tmp->rows(), tmp->cols()) = *tmp;
+                delete tmp;
             }
         }
         if (all->cols() != nsamp)
@@ -1143,7 +1147,7 @@ public:
     * @param[in] kind       The tag kind
     * @param[in] mat        The data matrix
     */
-    inline static void write_float_matrix(FiffFile* p_pFile, fiff_int_t kind, MatrixXf& mat)
+    inline static void write_float_matrix(FiffFile* p_pFile, fiff_int_t kind, MatrixXf* mat)
     {
         p_pFile->write_float_matrix(kind, mat);
     }
