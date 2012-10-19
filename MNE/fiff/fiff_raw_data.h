@@ -168,7 +168,7 @@ public:
     fiff_int_t last_samp;
     MatrixXf   cals;
     QList<FiffRawDir> rawdir;
-    MatrixXf   proj;
+    MatrixXf*  proj;
     FiffCtfComp comp;
 };
 
