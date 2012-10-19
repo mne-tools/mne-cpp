@@ -273,7 +273,7 @@ bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXf& this_comp)//private m
 
 //*************************************************************************************************************
 
-fiff_int_t FiffInfo::make_projector(QList<FiffProj*>& projs, QStringList& ch_names, MatrixXf& proj, QStringList& bads, MatrixXf& U)
+fiff_int_t FiffInfo::make_projector(QList<FiffProj*>& projs, QStringList& ch_names, MatrixXf*& proj, QStringList& bads, MatrixXf& U)
 {
     fiff_int_t nchan = ch_names.size();
     if (nchan == 0)
@@ -282,7 +282,10 @@ fiff_int_t FiffInfo::make_projector(QList<FiffProj*>& projs, QStringList& ch_nam
         return 0;
     }
 
-    proj = MatrixXf::Identity(nchan,nchan);
+    if(proj)
+        delete proj;
+
+    proj = new MatrixXf(MatrixXf::Identity(nchan,nchan));
     fiff_int_t nproj = 0;
 
     //
@@ -428,7 +431,7 @@ fiff_int_t FiffInfo::make_projector(QList<FiffProj*>& projs, QStringList& ch_nam
     //
     //   Here is the celebrated result
     //
-    proj -= U*U.transpose();
+    *proj -= U*U.transpose();
     nproj = nvec;
 
     return nproj;

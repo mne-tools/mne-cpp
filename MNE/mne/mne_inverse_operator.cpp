@@ -74,6 +74,7 @@ MNEInverseOperator::MNEInverseOperator()
 , mri_head_t(NULL)
 , nave(-1)
 , proj(NULL)
+, whitener(NULL)
 , reginv(NULL)
 {
 
@@ -101,7 +102,8 @@ MNEInverseOperator::MNEInverseOperator(MNEInverseOperator* p_pMNEInverseOperator
 , src(p_pMNEInverseOperator->src ? new MNESourceSpace(p_pMNEInverseOperator->src) : NULL)
 , mri_head_t(p_pMNEInverseOperator->mri_head_t ? new FiffCoordTrans(p_pMNEInverseOperator->mri_head_t) : NULL)
 , nave(p_pMNEInverseOperator->nave)
-, proj(NULL)
+, proj(p_pMNEInverseOperator->proj ? new MatrixXf(*p_pMNEInverseOperator->proj) : NULL)
+, whitener(p_pMNEInverseOperator->whitener ? new MatrixXf(*p_pMNEInverseOperator->whitener) : NULL)
 , reginv(p_pMNEInverseOperator->reginv ? new VectorXf(*p_pMNEInverseOperator->reginv) : NULL)
 {
 
@@ -134,4 +136,10 @@ MNEInverseOperator::~MNEInverseOperator()
         delete src;
     if(mri_head_t)
         delete mri_head_t;
+    if(proj)
+        delete proj;
+    if(whitener)
+        delete whitener;
+    if(reginv)
+        delete reginv;
 }

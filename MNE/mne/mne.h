@@ -226,7 +226,7 @@ public:
     *
     * @return nproj - How many items in the projector
     */
-    inline static fiff_int_t make_projector(QList<FiffProj*>& projs, QStringList& ch_names, MatrixXf& proj, QStringList& bads = defaultQStringList, MatrixXf& U = defaultMatrixXf)
+    inline static fiff_int_t make_projector(QList<FiffProj*>& projs, QStringList& ch_names, MatrixXf*& proj, QStringList& bads = defaultQStringList, MatrixXf& U = defaultMatrixXf)
     {
         return FiffInfo::make_projector(projs, ch_names, proj, bads, U);
     }
@@ -246,7 +246,7 @@ public:
     *
     * @return nproj - How many items in the projector
     */
-    static inline qint32 make_projector_info(FiffInfo* info, MatrixXf& proj)
+    static inline qint32 make_projector_info(FiffInfo* info, MatrixXf*& proj)
     {
         return info->make_projector_info(proj);
     }
@@ -323,46 +323,57 @@ public:
         //   Create the diagonal matrix for computing the regularized inverse
         //
         VectorXf tmp = inv->sing->cwiseProduct(*inv->sing) + VectorXf::Constant(inv->sing->size(), lambda2);
+        if(inv->reginv)
+            delete inv->reginv;
         inv->reginv = new VectorXf(inv->sing->cwiseQuotient(tmp));
         printf("\tCreated the regularized inverter\n");
         //
         //   Create the projection operator
         //
-//    [ inv.proj, ncomp ] = mne_make_projector(inv.projs,inv.noise_cov.names);
-//    if ncomp > 0
 
-//        fprintf(1,'\tCreated an SSP operator (subspace dimension = %d)\n',ncomp);
-//    end
-//    %
-//    %   Create the whitener
-//    %
-//    inv.whitener = zeros(inv.noise_cov.dim);
-//    if inv.noise_cov.diag == 0
-//        %
-//        %   Omit the zeroes due to projection
-//        %
-//        nnzero = 0;
-//        for k = ncomp+1:inv.noise_cov.dim
-//            if inv.noise_cov.eig(k) > 0
-//                inv.whitener(k,k) = 1.0/sqrt(inv.noise_cov.eig(k));
-//                nnzero = nnzero + 1;
-//            end
-//        end
-//        %
-//        %   Rows of eigvec are the eigenvectors
-//        %
-//        inv.whitener = inv.whitener*inv.noise_cov.eigvec;
-//        fprintf(1,'\tCreated the whitener using a full noise covariance matrix (%d small eigenvalues omitted)\n', ...
-//            inv.noise_cov.dim - nnzero);
-//    else
-//        %
-//        %   No need to omit the zeroes due to projection
-//        %
-//        for k = 1:inv.noise_cov.dim
-//            inv.whitener(k,k) = 1.0/sqrt(inv.noise_cov.data(k));
-//        end
-//        fprintf(1,'\tCreated the whitener using a diagonal noise covariance matrix (%d small eigenvalues discarded)\n',ncomp);
-//    end
+        qint32 ncomp = MNE::make_projector(inv->projs, inv->noise_cov->names, inv->proj);
+        if (ncomp > 0)
+            printf("\tCreated an SSP operator (subspace dimension = %d)\n",ncomp);
+
+        //
+        //   Create the whitener
+        //
+        if(inv->whitener)
+            delete inv->whitener;
+        inv->whitener = new MatrixXf(MatrixXf::Zero(inv->noise_cov->dim, inv->noise_cov->dim));
+
+        qint32 nnzero, k;
+        if (inv->noise_cov->diag == 0)
+        {
+            //
+            //   Omit the zeroes due to projection
+            //
+            nnzero = 0;
+
+            for (k = ncomp; k < inv->noise_cov->dim; ++k)
+            {
+                if ((*inv->noise_cov->eig)[k] > 0)
+                {
+                    (*inv->whitener)(k,k) = 1.0/sqrt((*inv->noise_cov->eig)[k]);
+                    ++nnzero;
+                }
+            }
+            //
+            //   Rows of eigvec are the eigenvectors
+            //
+            *inv->whitener *= *inv->noise_cov->eigvec;
+            printf("\tCreated the whitener using a full noise covariance matrix (%d small eigenvalues omitted)\n", inv->noise_cov->dim - nnzero);
+        }
+        else
+        {
+            //
+            //   No need to omit the zeroes due to projection
+            //
+            for (k = 0; k < inv->noise_cov->dim; ++k)
+                (*inv->whitener)(k,k) = 1.0/sqrt((*inv->noise_cov->data)(k,0));
+
+            printf("\tCreated the whitener using a diagonal noise covariance matrix (%d small eigenvalues discarded)\n",ncomp);
+        }
 //    %
 //    %   Finally, compute the noise-normalization factors
 //    %
@@ -624,7 +635,7 @@ public:
                 if (current->find_tag(p_pFile, FIFF_MNE_COV_EIGENVALUES, tag1) && current->find_tag(p_pFile, FIFF_MNE_COV_EIGENVECTORS, tag2))
                 {
                     eig = new VectorXd(Map<VectorXd>(tag1->toDouble(),dim));
-                    eigvec = new MatrixXf(tag2->toFloatMatrix());
+                    eigvec = new MatrixXf(tag2->toFloatMatrix().transpose());
                 }
                 //
                 //   Read the projection operator
