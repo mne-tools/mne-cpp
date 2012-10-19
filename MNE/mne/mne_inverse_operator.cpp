@@ -76,6 +76,7 @@ MNEInverseOperator::MNEInverseOperator()
 , proj(NULL)
 , whitener(NULL)
 , reginv(NULL)
+, noisenorm(NULL)
 {
 
 }
@@ -105,6 +106,7 @@ MNEInverseOperator::MNEInverseOperator(MNEInverseOperator* p_pMNEInverseOperator
 , proj(p_pMNEInverseOperator->proj ? new MatrixXf(*p_pMNEInverseOperator->proj) : NULL)
 , whitener(p_pMNEInverseOperator->whitener ? new MatrixXf(*p_pMNEInverseOperator->whitener) : NULL)
 , reginv(p_pMNEInverseOperator->reginv ? new VectorXf(*p_pMNEInverseOperator->reginv) : NULL)
+, noisenorm(p_pMNEInverseOperator->noisenorm ? new VectorXf(*p_pMNEInverseOperator->noisenorm) : NULL)
 {
 
 }
@@ -142,4 +144,6 @@ MNEInverseOperator::~MNEInverseOperator()
         delete whitener;
     if(reginv)
         delete reginv;
+    if(noisenorm)
+        delete noisenorm;
 }

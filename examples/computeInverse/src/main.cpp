@@ -103,8 +103,8 @@ int main(int argc, char *argv[])
     qint32 nave = 40;
     float snr = 3.0f;
     float lambda2 = pow(1.0f / snr, 2.0f);
-    bool dSPM = true;
-    bool sLORETA = false;
+    bool dSPM = false;
+    bool sLORETA = true;
 
     //
     //   Read the data first
