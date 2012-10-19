@@ -108,6 +108,49 @@ public:
     virtual ~MNE()
     { }
 
+
+//    function [comb] = mne_combine_xyz(vec)
+//    %
+//    % function [comb] = mne_combine_xyz(vec)
+//    %
+//    % Compute the three Cartesian components of a vector together
+//    %
+//    %
+//    % vec         - Input row or column vector [ x1 y1 z1 ... x_n y_n z_n ]
+//    % comb        - Output vector [x1^2+y1^2+z1^2 ... x_n^2+y_n^2+z_n^2 ]
+//    %
+
+    static VectorXf* combine_xyz(const VectorXf* vec)
+    {
+        if (vec->size() % 3 != 0)
+        {
+            printf("Input must be a row or a column vector with 3N components");
+            return NULL;
+        }
+
+        MatrixXf tmp = MatrixXf(vec->transpose());
+        SparseMatrix<float>* s = make_block_diag(&tmp,3);
+
+        SparseMatrix<float> sC = *s*s->transpose();
+        VectorXf* comb = new VectorXf(sC.rows());
+
+        for(qint32 i = 0; i < sC.rows(); ++i)
+            (*comb)[i] = sC.coeff(i,i);
+
+        delete s;
+        return comb;
+    }
+
+    //=========================================================================================================
+    /**
+    * mne_block_diag - decoding part
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the MNEForwardSolution::extract_block_diag static function
+    */
+    //    static inline MatrixXf extract_block_diag(MatrixXf& A, qint32 n);
+
     //=========================================================================================================
     /**
     * mne_find_source_space_hemi
@@ -129,18 +172,6 @@ public:
 
     //=========================================================================================================
     /**
-    * mne_block_diag - decoding part
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the MNEForwardSolution::extract_block_diag static function
-    */
-    //    static inline MatrixXf extract_block_diag(MatrixXf& A, qint32 n);
-
-
-
-    //=========================================================================================================
-    /**
     * mne_get_current_comp
     *
     * ### MNE toolbox root function ###
@@ -158,6 +189,7 @@ public:
         return info->get_current_comp();
     }
 
+    //ToDo why is make_block_diag part of MNEFOrwardSolution - restructure this
     //=========================================================================================================
     /**
     * mne_block_diag - encoding part
@@ -177,7 +209,7 @@ public:
     *
     * @return A sparse block diagonal, diagonalized from the elements in "A".
     */
-    static inline SparseMatrix<float> make_block_diag(MatrixXf& A, qint32 n)
+    static inline SparseMatrix<float>* make_block_diag(const MatrixXf* A, qint32 n)
     {
         return MNEForwardSolution::make_block_diag(A, n);
 
@@ -297,12 +329,12 @@ public:
 
 
 
-    static bool prepare_inverse_operator(MNEInverseOperator* orig, qint32 nave ,float lambda2, bool dSPM, bool sLORETA = false)
+    static MNEInverseOperator* prepare_inverse_operator(const MNEInverseOperator* orig, qint32 nave ,float lambda2, bool dSPM, bool sLORETA = false)
     {
         if(nave <= 0)
         {
             printf("The number of averages should be positive\n");
-            return false;
+            return NULL;
         }
         printf("Preparing the inverse operator for use...\n");
         MNEInverseOperator* inv = new MNEInverseOperator(orig);
@@ -379,7 +411,7 @@ public:
         //
         if (dSPM || sLORETA)
         {
-            MatrixXf* noise_norm = new MatrixXf(MatrixXf::Zero(inv->eigen_leads->nrow,1));
+            VectorXf* noise_norm = new VectorXf(VectorXf::Zero(inv->eigen_leads->nrow));
             VectorXf* noise_weight = NULL;
             if (dSPM)
             {
@@ -398,7 +430,7 @@ public:
                for (k = 0; k < inv->eigen_leads->nrow; ++k)
                {
                   one = inv->eigen_leads->data->block(k,0,1,inv->eigen_leads->data->cols()).cwiseProduct(*noise_weight);
-                  (*noise_norm)(k,0) = sqrt(one.dot(one));
+                  (*noise_norm)[k] = sqrt(one.dot(one));
                }
             }
             else
@@ -408,12 +440,13 @@ public:
                 {
                     c = sqrt((*inv->source_cov->data)(k,0));
                     one = c*(inv->eigen_leads->data->block(k,0,1,inv->eigen_leads->data->cols()).transpose()).cwiseProduct(*noise_weight);//ToDo eigenleads data -> pointer
-                    (*noise_norm)(k,0) = sqrt(one.dot(one));
+                    (*noise_norm)[k] = sqrt(one.dot(one));
                 }
             }
             //
             //   Compute the final result
             //
+            VectorXf noise_norm_new;
             if (inv->source_ori == FIFFV_MNE_FREE_ORI)
             {
                 //
@@ -424,14 +457,27 @@ public:
                 //   Even in this case return only one noise-normalization factor
                 //   per source location
                 //
-//                noise_norm = sqrt(mne_combine_xyz(noise_norm));
+                VectorXf v = noise_norm->transpose();
+                VectorXf* t = combine_xyz(&v);
+                noise_norm_new = t->cwiseSqrt();
+                delete t;
                 //
                 //   This would replicate the same value on three consequtive
                 //   entries
                 //
                 //   noise_norm = kron(sqrt(mne_combine_xyz(noise_norm)),ones(3,1));
             }
-//            inv.noisenorm = diag(sparse(1./abs(noise_norm)));
+            VectorXf vOnes = VectorXf::Ones(noise_norm_new.size());
+            VectorXf tmp = vOnes.cwiseQuotient(noise_norm_new.cwiseAbs());
+            if(inv->noisenorm)
+                delete inv->noisenorm;
+            inv->noisenorm = new SparseMatrix<float>(noise_norm_new.size(),noise_norm_new.size());
+
+            for(qint32 i = 0; i < noise_norm_new.size(); ++i)
+                inv->noisenorm->insert(i,i) = tmp[i];
+
+            delete noise_weight;
+            delete noise_norm;
             printf("[done]\n");
         }
         else
@@ -441,8 +487,7 @@ public:
             inv->noisenorm = NULL;
         }
 
-        return true;
-
+        return inv;
     }
 
 

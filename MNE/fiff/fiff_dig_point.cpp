@@ -65,6 +65,19 @@ FiffDigPoint::FiffDigPoint()
 
 //*************************************************************************************************************
 
+FiffDigPoint::FiffDigPoint(const FiffDigPoint* p_pFiffDigPoint)
+: kind(p_pFiffDigPoint->kind)
+, ident(p_pFiffDigPoint->ident)
+, coord_frame(p_pFiffDigPoint->coord_frame)
+{
+    r[0] = p_pFiffDigPoint->r[0];
+    r[1] = p_pFiffDigPoint->r[1];
+    r[2] = p_pFiffDigPoint->r[2];
+}
+
+
+//*************************************************************************************************************
+
 FiffDigPoint::~FiffDigPoint()
 {
 

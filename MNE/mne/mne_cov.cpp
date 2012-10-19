@@ -66,7 +66,7 @@ MNECov::MNECov()
 
 //*************************************************************************************************************
 
-MNECov::MNECov(MNECov* p_pMNECov)
+MNECov::MNECov(const MNECov* p_pMNECov)
 : kind(p_pMNECov->kind)
 , diag(p_pMNECov->diag)
 , dim(p_pMNECov->dim)

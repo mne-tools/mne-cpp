@@ -78,6 +78,49 @@ FiffInfo::FiffInfo()
 
 //*************************************************************************************************************
 
+FiffInfo::FiffInfo(const FiffInfo* p_pFiffInfo)
+: file_id(FiffId(&p_pFiffInfo->file_id))
+, meas_id(FiffId(&p_pFiffInfo->meas_id))
+, nchan(p_pFiffInfo->nchan)
+, sfreq(p_pFiffInfo->sfreq)
+, highpass(p_pFiffInfo->highpass)
+, lowpass(p_pFiffInfo->lowpass)
+{
+    meas_date[0] = p_pFiffInfo->meas_date[0];
+    meas_date[1] = p_pFiffInfo->meas_date[1];
+
+    qint32 i;
+
+    for(i = 0; i < p_pFiffInfo->chs.size(); ++i)
+        chs.append(FiffChInfo(&p_pFiffInfo->chs[i]));
+
+    ch_names = p_pFiffInfo->ch_names;
+    dev_head_t = new FiffCoordTrans(p_pFiffInfo->dev_head_t);
+    ctf_head_t = new FiffCoordTrans(p_pFiffInfo->ctf_head_t);
+    dev_ctf_t = new FiffCoordTrans(p_pFiffInfo->dev_ctf_t);
+
+
+    for(i = 0; i < p_pFiffInfo->dig.size(); ++i)
+        dig.append(FiffDigPoint(&p_pFiffInfo->dig[i]));
+
+    dig_trans = new FiffCoordTrans(p_pFiffInfo->dig_trans);
+
+    bads = p_pFiffInfo->bads;
+
+    for(i = 0; i < p_pFiffInfo->projs.size(); ++i)
+        projs.append(new FiffProj(p_pFiffInfo->projs[i]));
+
+    for(i = 0; i < p_pFiffInfo->comps.size(); ++i)
+        comps.append(new FiffCtfComp(p_pFiffInfo->comps[i]));
+
+    acq_pars = p_pFiffInfo->acq_pars;
+    acq_stim = p_pFiffInfo->acq_stim;
+    filename = p_pFiffInfo->filename;
+}
+
+
+//*************************************************************************************************************
+
 FiffInfo::~FiffInfo()
 {
     if(dev_head_t)

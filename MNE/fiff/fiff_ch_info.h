@@ -89,7 +89,7 @@ public:
     /**
     * Copy ctor
     */
-    FiffChInfo(FiffChInfo* ch);
+    FiffChInfo(const FiffChInfo* ch);
 
 
     //=========================================================================================================

@@ -56,9 +56,20 @@ using namespace FIFFLIB;
 
 FiffEvokedDataSet::FiffEvokedDataSet()
 : info(NULL)
-, evoked(NULL)
 {
 
+}
+
+
+//*************************************************************************************************************
+
+FiffEvokedDataSet::FiffEvokedDataSet(const FiffEvokedDataSet* p_pFiffEvokedDataSet)
+: info(p_pFiffEvokedDataSet->info ? new FiffInfo(p_pFiffEvokedDataSet->info) : NULL)
+{
+    for(qint32 i = 0; i < p_pFiffEvokedDataSet->evoked.size(); ++i)
+    {
+        evoked.append(new FiffEvokedData(p_pFiffEvokedDataSet->evoked[i]));
+    }
 }
 
 
@@ -68,6 +79,9 @@ FiffEvokedDataSet::~FiffEvokedDataSet()
 {
     if (info)
         delete info;
-    if (evoked)
-        delete evoked;
+
+    QList<FiffEvokedData*>::iterator i;
+    for (i = this->evoked.begin(); i != this->evoked.end(); ++i)
+        if (*i)
+            delete *i;
 }

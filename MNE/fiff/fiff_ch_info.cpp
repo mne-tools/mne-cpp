@@ -74,7 +74,7 @@ FiffChInfo::FiffChInfo()
 
 //*************************************************************************************************************
 
-FiffChInfo::FiffChInfo(FiffChInfo* ch)
+FiffChInfo::FiffChInfo(const FiffChInfo* ch)
 : scanno(ch->scanno)
 , logno(ch->logno)
 , kind(ch->kind)

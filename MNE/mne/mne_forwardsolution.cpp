@@ -390,9 +390,8 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
             printf("\tChanging to fixed-orientation forward solution...");
 
             MatrixXf tmp = fwd->source_nn.transpose();
-
-            SparseMatrix<float> fix_rot = make_block_diag(tmp,1);
-            *fwd->sol->data  = (*fwd->sol->data)*fix_rot;
+            SparseMatrix<float>* fix_rot = make_block_diag(&tmp,1);
+            *fwd->sol->data  = (*fwd->sol->data)*(*fix_rot);
             fwd->sol->ncol  = fwd->nsource;
             fwd->source_ori = FIFFV_MNE_FIXED_ORI;
 
@@ -402,10 +401,11 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
                 SparseMatrix<float> t_eye(3,3);
                 for (qint32 i = 0; i < 3; ++i)
                     t_eye.insert(i,i) = 1.0f;
-                kroneckerProduct(fix_rot,t_eye,t_matKron);//kron(fix_rot,eye(3));
+                kroneckerProduct(*fix_rot,t_eye,t_matKron);//kron(fix_rot,eye(3));
                 *fwd->sol_grad->data   = (*fwd->sol_grad->data)*t_matKron;
                 fwd->sol_grad->ncol   = 3*fwd->nsource;
             }
+            delete fix_rot;
             printf("[done]\n");
         }
     }
@@ -458,10 +458,9 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
                 nuse += t_pSourceSpace->hemispheres.at(k)->nuse;
             }
             MatrixXf tmp = fwd->source_nn.transpose();
+            SparseMatrix<float>* surf_rot = make_block_diag(&tmp,3);
 
-            SparseMatrix<float> surf_rot = make_block_diag(tmp,3);
-
-            *fwd->sol->data = (*fwd->sol->data)*surf_rot;
+            *fwd->sol->data = (*fwd->sol->data)*(*surf_rot);
 
             if (fwd->sol_grad != NULL)
             {
@@ -469,10 +468,10 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
                 SparseMatrix<float> t_eye(3,3);
                 for (qint32 i = 0; i < 3; ++i)
                     t_eye.insert(i,i) = 1.0f;
-                kroneckerProduct(surf_rot,t_eye,t_matKron);//kron(surf_rot,eye(3));
+                kroneckerProduct(*surf_rot,t_eye,t_matKron);//kron(surf_rot,eye(3));
                 (*fwd->sol_grad->data)   = (*fwd->sol_grad->data)*t_matKron;
             }
-
+            delete surf_rot;
             printf("[done]\n");
         }
         else
@@ -697,31 +696,32 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
 
 //*************************************************************************************************************
 
-inline SparseMatrix<float> MNEForwardSolution::make_block_diag(MatrixXf& A, qint32 n)
+inline SparseMatrix<float>* MNEForwardSolution::make_block_diag(const MatrixXf* A, qint32 n)
 {
 
-    float ma = A.rows();
-    float na = A.cols();
-    float bdn = na/n; 			// number of submatrices
+    qint32 ma = A->rows();
+    qint32 na = A->cols();
+    float bdn = ((float)na)/n;      // number of submatrices
 
-    std::cout << std::endl << "ma " << ma << " na " << na << " bdn " << bdn << std::endl;
+//    std::cout << std::endl << "ma " << ma << " na " << na << " bdn " << bdn << std::endl;
 
     if(bdn - floor(bdn))
-        throw("Width of matrix must be even multiple of n");
+    {
+        printf("Width of matrix must be even multiple of n\n");
+        return NULL;
+    }
 
-    SparseMatrix<float> bd(ma*bdn,na);
+    SparseMatrix<float>* bd = new SparseMatrix<float>((int)floor((float)ma*bdn+0.5),na);
 
     qint32 current_col, current_row, i, r, c;
-    MatrixXf matblock;
     for(i = 0; i < bdn; ++i)
     {
         current_col = i * n;
         current_row = i * ma;
-        matblock = A.block(0, current_col, ma, n);
 
         for(r = 0; r < ma; ++r)
             for(c = 0; c < n; ++c)
-                bd.insert(r+current_row,c+current_col)=A(r, c+current_col);
+                bd->insert(r+current_row,c+current_col) = (*A)(r, c+current_col);
     }
     return bd;
 }
