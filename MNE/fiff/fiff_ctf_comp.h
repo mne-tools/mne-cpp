@@ -89,7 +89,7 @@ public:
     /**
     * copy ctor
     */
-    FiffCtfComp(FiffCtfComp* comp);
+    FiffCtfComp(const FiffCtfComp* comp);
 
     //=========================================================================================================
     /**

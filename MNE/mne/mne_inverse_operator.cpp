@@ -84,7 +84,7 @@ MNEInverseOperator::MNEInverseOperator()
 
 //*************************************************************************************************************
 
-MNEInverseOperator::MNEInverseOperator(MNEInverseOperator* p_pMNEInverseOperator)
+MNEInverseOperator::MNEInverseOperator(const MNEInverseOperator* p_pMNEInverseOperator)
 : methods(p_pMNEInverseOperator->methods)
 , source_ori(p_pMNEInverseOperator->source_ori)
 , nsource(p_pMNEInverseOperator->nsource)
@@ -106,7 +106,7 @@ MNEInverseOperator::MNEInverseOperator(MNEInverseOperator* p_pMNEInverseOperator
 , proj(p_pMNEInverseOperator->proj ? new MatrixXf(*p_pMNEInverseOperator->proj) : NULL)
 , whitener(p_pMNEInverseOperator->whitener ? new MatrixXf(*p_pMNEInverseOperator->whitener) : NULL)
 , reginv(p_pMNEInverseOperator->reginv ? new VectorXf(*p_pMNEInverseOperator->reginv) : NULL)
-, noisenorm(p_pMNEInverseOperator->noisenorm ? new VectorXf(*p_pMNEInverseOperator->noisenorm) : NULL)
+, noisenorm(p_pMNEInverseOperator->noisenorm ? new SparseMatrix<float>(*p_pMNEInverseOperator->noisenorm) : NULL)
 {
 
 }

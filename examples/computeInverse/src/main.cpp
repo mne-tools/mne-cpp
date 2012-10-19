@@ -116,18 +116,21 @@ int main(int argc, char *argv[])
     //
     //   Then the inverse operator
     //
-    MNEInverseOperator* inv = NULL;
-    MNE::read_inverse_operator(t_sFileInv, inv);
+    MNEInverseOperator* inv_raw = NULL;
+    MNE::read_inverse_operator(t_sFileInv, inv_raw);
     //
     //   Set up the inverse according to the parameters
     //
     if (nave < 0)
-        nave = data->evoked->nave;
-//    inv =
-    MNE::prepare_inverse_operator(inv,nave,lambda2,dSPM,sLORETA);
+        nave = data->evoked[0]->nave;
+    MNEInverseOperator* inv = MNE::prepare_inverse_operator(inv_raw,nave,lambda2,dSPM,sLORETA);
+    delete inv_raw;
     //
     //   Pick the correct channels from the data
     //
+
+    Fiff::pick_channels_evoked(data, inv->noise_cov->names);
+
 //    data = fiff_pick_channels_evoked(data,inv.noise_cov.names);
 //    fprintf(1,'Picked %d channels from the data\n',data.info.nchan);
 //    fprintf(1,'Computing inverse...');

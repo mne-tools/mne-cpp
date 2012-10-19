@@ -303,6 +303,121 @@ public:
         return FiffInfo::pick_channels(ch_names, include, exclude);
     }
 
+
+
+
+
+
+
+
+//    function [res] = fiff_pick_channels_evoked(orig,include,exclude)
+//    %
+//    % [res] = fiff_pick_channels_evoked(orig,include,exclude)
+//    %
+//    % Pick desired channels from evoked-response data
+//    %
+//    % orig      - The original data
+//    % include   - Channels to include (if empty, include all available)
+//    % exclude   - Channels to exclude (if empty, do not exclude any)
+//    %
+//    %
+
+    inline static FiffEvokedDataSet* pick_channels_evoked(const FiffEvokedDataSet* orig, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList)
+    {
+        if(include.size() == 0 && exclude.size() == 0)
+            return new FiffEvokedDataSet(orig);
+
+        MatrixXi sel = FiffInfo::pick_channels(orig->info->ch_names, include, exclude);
+        if (sel.cols() == 0)
+        {
+            printf("Warning : No channels match the selection.\n");
+            return new FiffEvokedDataSet(orig);
+        }
+
+        FiffEvokedDataSet* res = new FiffEvokedDataSet(orig);
+        //
+        //   Modify the measurement info
+        //
+        FiffInfo* info = pick_info(res->info,&sel);
+        //
+        //   Create the reduced data set
+        //
+//        for (qint32 k = 0; k < res->evoked.size(); ++k)
+//            res.evoked(k).epochs = res.evoked(k).epochs(sel,:);
+//        end
+
+//        return;
+
+//        end
+
+
+
+
+
+        return NULL;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//    function [res] = fiff_pick_info(info,sel)
+//    %
+//    % [res] = fiff_pick_info(info,sel)
+//    %
+//    % Pick desired channels from measurement info
+//    %
+//    % res       - Info modified according to sel
+//    % info      - The original data
+//    % sel       - List of channels to select
+//    %
+    static FiffInfo* pick_info(const FiffInfo* info, const MatrixXi* sel = NULL)
+    {
+        FiffInfo* res = new FiffInfo(info);
+        if (sel == NULL)
+            return res;
+
+        //ToDo when pointer List do delation
+        res->chs.clear();
+        res->ch_names.clear();
+
+        qint32 idx;
+        for(qint32 i = 0; i < sel->cols(); ++i)
+        {
+            idx = (*sel)(0,i);
+            res->chs.append(info->chs[idx]);
+            res->ch_names.append(info->ch_names[idx]);
+        }
+        res->nchan  = sel->cols();
+
+        return NULL;
+    }
+
+
+
+
+
+
+
+
+
+
     //=========================================================================================================
     /**
     * fiff_pick_types
@@ -730,34 +845,34 @@ public:
         data = new FiffEvokedDataSet();
         data->info = info;
 
-        if(data->evoked)
-            delete data->evoked;
-        data->evoked = new FiffEvokedData();
-        data->evoked->aspect_kind = aspect_kind;
-        data->evoked->is_smsh     = is_smsh(0,setno);
+//        if(data->evoked)
+//            delete data->evoked;
+        data->evoked.append(new FiffEvokedData());
+        data->evoked[0]->aspect_kind = aspect_kind;
+        data->evoked[0]->is_smsh     = is_smsh(0,setno);
         if (nave != -1)
-            data->evoked->nave = nave;
+            data->evoked[0]->nave = nave;
         else
-            data->evoked->nave  = 1;
+            data->evoked[0]->nave  = 1;
 
-        data->evoked->first = first;
-        data->evoked->last  = last;
+        data->evoked[0]->first = first;
+        data->evoked[0]->last  = last;
         if (!comment.isEmpty())
-            data->evoked->comment = comment;
+            data->evoked[0]->comment = comment;
         //
         //   Times for convenience and the actual epoch data
         //
 
-        if(data->evoked->times)
-            delete data->evoked->times;
-        data->evoked->times = new MatrixXf(1, last-first+1);
+        if(data->evoked[0]->times)
+            delete data->evoked[0]->times;
+        data->evoked[0]->times = new MatrixXf(1, last-first+1);
 
-        for (k = 0; k < data->evoked->times->cols(); ++k)
-            (*data->evoked->times)(0, k) = ((float)(first+k)) / info->sfreq;
+        for (k = 0; k < data->evoked[0]->times->cols(); ++k)
+            (*data->evoked[0]->times)(0, k) = ((float)(first+k)) / info->sfreq;
 
-        if(data->evoked->epochs)
-            delete data->evoked->epochs;
-        data->evoked->epochs = all;
+        if(data->evoked[0]->epochs)
+            delete data->evoked[0]->epochs;
+        data->evoked[0]->epochs = all;
 
         if(t_pFile)
             delete t_pFile;

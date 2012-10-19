@@ -111,7 +111,7 @@ public:
     /**
     * Copy ctor
     */
-    MNEInverseOperator(MNEInverseOperator* p_pMNEInverseOperator);
+    MNEInverseOperator(const MNEInverseOperator* p_pMNEInverseOperator);
 
     //=========================================================================================================
     /**
@@ -139,11 +139,10 @@ public:
     FiffCoordTrans* mri_head_t;
     fiff_int_t nave;
     QList<FiffProj*> projs;
-    MatrixXf* proj;         /**< This is the projector to apply to the data. */
-    MatrixXf* whitener;     /**< This whitens the data */
-    VectorXf* reginv;       /**< This the diagonal matrix implementing. */
-//                                 %   regularization and the inverse
-    VectorXf* noisenorm;    /**< These are the noise-normalization factors */
+    MatrixXf* proj;                     /**< This is the projector to apply to the data. */
+    MatrixXf* whitener;                 /**< This whitens the data */
+    VectorXf* reginv;                   /**< This the diagonal matrix implementing. regularization and the inverse */
+    SparseMatrix<float>* noisenorm;     /**< These are the noise-normalization factors */
 };
 
 } // NAMESPACE

@@ -65,7 +65,7 @@ FiffCtfComp::FiffCtfComp()
 
 //*************************************************************************************************************
 
-FiffCtfComp::FiffCtfComp(FiffCtfComp* comp)
+FiffCtfComp::FiffCtfComp(const FiffCtfComp* comp)
 : ctfkind(comp->ctfkind)
 , kind (comp->ctfkind)
 , save_calibrated(comp->save_calibrated)

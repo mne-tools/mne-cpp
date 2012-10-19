@@ -124,10 +124,8 @@ MNEHemisphere::~MNEHemisphere()
     qDebug() << "MNEHemisphere Destructor";
     if(m_pTriCoords)
         delete m_pTriCoords;
-
     if(dist)
         delete dist;
-
 }
 
 

@@ -70,6 +70,22 @@ FiffEvokedData::FiffEvokedData()
 
 //*************************************************************************************************************
 
+FiffEvokedData::FiffEvokedData(const FiffEvokedData* p_pFiffEvokedData)
+: aspect_kind(p_pFiffEvokedData->aspect_kind)
+, is_smsh(p_pFiffEvokedData->is_smsh)
+, nave(p_pFiffEvokedData->nave)
+, first(p_pFiffEvokedData->first)
+, last(p_pFiffEvokedData->last)
+, comment(p_pFiffEvokedData->comment)
+, times(p_pFiffEvokedData->times ? new MatrixXf(*p_pFiffEvokedData->times) : NULL )
+, epochs(p_pFiffEvokedData->epochs ? new MatrixXf(*p_pFiffEvokedData->epochs) : NULL )
+{
+
+}
+
+
+//*************************************************************************************************************
+
 FiffEvokedData::~FiffEvokedData()
 {
     if (times)

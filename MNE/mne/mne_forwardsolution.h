@@ -168,7 +168,7 @@ public:
     *
     * @return A sparse block diagonal, diagonalized from the elements in "A".
     */
-    static inline SparseMatrix<float> make_block_diag(MatrixXf& A, qint32 n);
+    static inline SparseMatrix<float>* make_block_diag(const MatrixXf* A, qint32 n);
 
 private:
     //=========================================================================================================
