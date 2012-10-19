@@ -374,53 +374,72 @@ public:
 
             printf("\tCreated the whitener using a diagonal noise covariance matrix (%d small eigenvalues discarded)\n",ncomp);
         }
-//    %
-//    %   Finally, compute the noise-normalization factors
-//    %
-//    if dSPM || sLORETA
-//        noise_norm = zeros(inv.eigen_leads.nrow,1);
-//        if dSPM
-//           fprintf(1,'\tComputing noise-normalization factors (dSPM)...');
-//           noise_weight = inv.reginv;
-//        else
-//           fprintf(1,'\tComputing noise-normalization factors (sLORETA)...');
-//           noise_weight = inv.reginv.*sqrt((1 + inv.sing.*inv.sing/lambda2));
-//        end
-//        if inv.eigen_leads_weighted
-//           for k = 1:inv.eigen_leads.nrow
-//              one = inv.eigen_leads.data(k,:).*noise_weight';
-//              noise_norm(k) = sqrt(one*one');
-//           end
-//        else
-//           for k = 1:inv.eigen_leads.nrow
-//              one = sqrt(inv.source_cov.data(k))*(inv.eigen_leads.data(k,:).*noise_weight');
-//              noise_norm(k) = sqrt(one*one');
-//           end
-//        end
-//        %
-//        %   Compute the final result
-//        %
-//        if inv.source_ori == FIFF.FIFFV_MNE_FREE_ORI
-//            %
-//            %   The three-component case is a little bit more involved
-//            %   The variances at three consequtive entries must be squeared and
-//            %   added together
-//            %
-//            %   Even in this case return only one noise-normalization factor
-//            %   per source location
-//            %
-//            noise_norm = sqrt(mne_combine_xyz(noise_norm));
-//            %
-//            %   This would replicate the same value on three consequtive
-//            %   entries
-//            %
-//            %   noise_norm = kron(sqrt(mne_combine_xyz(noise_norm)),ones(3,1));
-//        end
-//        inv.noisenorm = diag(sparse(1./abs(noise_norm)));
-//        fprintf(1,'[done]\n');
-//    else
-//        inv.noisenorm = [];
-//    end
+        //
+        //   Finally, compute the noise-normalization factors
+        //
+        if (dSPM || sLORETA)
+        {
+            MatrixXf* noise_norm = new MatrixXf(MatrixXf::Zero(inv->eigen_leads->nrow,1));
+            VectorXf* noise_weight = NULL;
+            if (dSPM)
+            {
+               printf("\tComputing noise-normalization factors (dSPM)...");
+               noise_weight = new VectorXf(*inv->reginv);
+            }
+            else
+            {
+               printf("\tComputing noise-normalization factors (sLORETA)...");
+               VectorXf tmp = (VectorXf::Constant(inv->sing->size(), 1) + inv->sing->cwiseProduct(*inv->sing)/lambda2);
+               noise_weight = new VectorXf(inv->reginv->cwiseProduct(tmp.cwiseSqrt()));
+            }
+            VectorXf one;
+            if (inv->eigen_leads_weighted)
+            {
+               for (k = 0; k < inv->eigen_leads->nrow; ++k)
+               {
+                  one = inv->eigen_leads->data.block(k,0,1,inv->eigen_leads->data.cols()).cwiseProduct(*noise_weight);
+                  (*noise_norm)(k,0) = sqrt(one.dot(one));
+               }
+            }
+            else
+            {
+                float c;
+                for (k = 0; k < inv->eigen_leads->nrow; ++k)
+                {
+                    c = sqrt((*inv->source_cov->data)(k,0));
+                    one = c*(inv->eigen_leads->data.block(k,0,1,inv->eigen_leads->data.cols()).transpose()).cwiseProduct(*noise_weight);//ToDo eigenleads data -> pointer
+                    (*noise_norm)(k,0) = sqrt(one.dot(one));
+                }
+            }
+            //
+            //   Compute the final result
+            //
+            if (inv->source_ori == FIFFV_MNE_FREE_ORI)
+            {
+                //
+                //   The three-component case is a little bit more involved
+                //   The variances at three consequtive entries must be squeared and
+                //   added together
+                //
+                //   Even in this case return only one noise-normalization factor
+                //   per source location
+                //
+//                noise_norm = sqrt(mne_combine_xyz(noise_norm));
+                //
+                //   This would replicate the same value on three consequtive
+                //   entries
+                //
+                //   noise_norm = kron(sqrt(mne_combine_xyz(noise_norm)),ones(3,1));
+            }
+//            inv.noisenorm = diag(sparse(1./abs(noise_norm)));
+            printf("[done]\n");
+        }
+        else
+        {
+            if(inv->noisenorm)
+                delete inv->noisenorm;
+            inv->noisenorm = NULL;
+        }
 
         return true;
 

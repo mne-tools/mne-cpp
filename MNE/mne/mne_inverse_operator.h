@@ -139,11 +139,11 @@ public:
     FiffCoordTrans* mri_head_t;
     fiff_int_t nave;
     QList<FiffProj*> projs;
-    MatrixXf* proj;     /**< This is the projector to apply to the data. */
-    MatrixXf* whitener; /**< This whitens the data */
-    VectorXf* reginv;   /**< This the diagonal matrix implementing. */
+    MatrixXf* proj;         /**< This is the projector to apply to the data. */
+    MatrixXf* whitener;     /**< This whitens the data */
+    VectorXf* reginv;       /**< This the diagonal matrix implementing. */
 //                                 %   regularization and the inverse
-//    noisenorm = [];      %   These are the noise-normalization factors
+    VectorXf* noisenorm;    /**< These are the noise-normalization factors */
 };
 
 } // NAMESPACE
