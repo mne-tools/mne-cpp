@@ -159,20 +159,17 @@ qint32 MNESourceSpace::find_source_space_hemi(MNEHemisphere* p_pHemisphere)
 
 //*************************************************************************************************************
 
-void MNESourceSpace::transform_source_space_to(fiff_int_t dest, FiffCoordTrans* trans)
+bool MNESourceSpace::transform_source_space_to(fiff_int_t dest, FiffCoordTrans* trans)
 {
     for(int k = 0; k < this->hemispheres.size(); ++k)
     {
-        try
+        if(!this->hemispheres.at(k)->transform_hemisphere_to(dest,trans))
         {
-            this->hemispheres.at(k)->transform_hemisphere_to(dest,trans);
-        }
-        catch(char *s)
-        {
-            //error(me,'Could not transform source space (%s)',mne_omit_first_line(lasterr));
-            printf("Could not transform source space (%s)", s);
+            printf("Could not transform source space.\n");
+            return false;
         }
     }
+    return true;
 }
 
 

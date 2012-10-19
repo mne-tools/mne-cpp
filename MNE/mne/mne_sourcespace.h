@@ -180,8 +180,10 @@ public:
     *
     * @param [in] dest destination check code
     * @param [in] trans transformation information
+    *
+    * @return true if succeeded, false otherwise
     */
-    void transform_source_space_to(fiff_int_t dest, FiffCoordTrans* trans);
+    bool transform_source_space_to(fiff_int_t dest, FiffCoordTrans* trans);
 
 private:
     //=========================================================================================================

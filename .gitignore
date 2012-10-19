@@ -54,3 +54,4 @@
 /include/disp
 /include/fiff
 /include/mne
+/lib/*.bak

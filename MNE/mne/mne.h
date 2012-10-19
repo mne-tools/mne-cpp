@@ -108,6 +108,24 @@ public:
     virtual ~MNE()
     { }
 
+    //=========================================================================================================
+    /**
+    * mne_find_source_space_hemi
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the MNESourceSpace::find_source_space_hemi static function
+    *
+    * Returns the hemisphere id (FIFFV_MNE_SURF_LEFT_HEMI or FIFFV_MNE_SURF_RIGHT_HEMI) for a source space.
+    *
+    * @param[in] p_pHemisphere the hemisphere to investigate
+    *
+    * @return the deduced hemisphere id
+    */
+    inline static qint32 find_source_space_hemi(MNEHemisphere* p_pHemisphere)
+    {
+        return MNESourceSpace::find_source_space_hemi(p_pHemisphere);
+    }
 
     //=========================================================================================================
     /**
@@ -140,7 +158,6 @@ public:
         return info->get_current_comp();
     }
 
-
     //=========================================================================================================
     /**
     * mne_block_diag - encoding part
@@ -166,7 +183,6 @@ public:
 
     }
 
-
     //=========================================================================================================
     /**
     * mne_make_compensator
@@ -189,7 +205,6 @@ public:
     {
         return info->make_compensator(from, to, ctf_comp, exclude_comp_chs);
     }
-
 
     //=========================================================================================================
     /**
@@ -216,7 +231,6 @@ public:
         return FiffInfo::make_projector(projs, ch_names, proj, bads, U);
     }
 
-
     //=========================================================================================================
     /**
     * mne_make_projector_info
@@ -237,26 +251,6 @@ public:
         return info->make_projector_info(proj);
     }
 
-
-    //=========================================================================================================
-    /**
-    * mne_find_source_space_hemi
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the MNESourceSpace::find_source_space_hemi static function
-    *
-    * Returns the hemisphere id (FIFFV_MNE_SURF_LEFT_HEMI or FIFFV_MNE_SURF_RIGHT_HEMI) for a source space.
-    *
-    * @param[in] p_pHemisphere the hemisphere to investigate
-    *
-    * @return the deduced hemisphere id
-    */
-    inline static qint32 find_source_space_hemi(MNEHemisphere* p_pHemisphere)
-    {
-        return MNESourceSpace::find_source_space_hemi(p_pHemisphere);
-    }
-
     //=========================================================================================================
     /**
     * mne_patch_info
@@ -274,6 +268,172 @@ public:
     {
         return MNESourceSpace::patch_info(nearest, pinfo);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//    function [inv] = mne_prepare_inverse_operator(orig,nave,lambda2,dSPM,sLORETA)
+//    %
+//    % [inv] = mne_prepare_inverse_operator(orig,nave,lambda2,dSPM,sLORETA)
+//    %
+//    % Prepare for actually computing the inverse
+//    %
+//    % orig        - The inverse operator structure read from a file
+//    % nave        - Number of averages (scales the noise covariance)
+//    % lambda2     - The regularization factor
+//    % dSPM        - Compute the noise-normalization factors for dSPM?
+//    % sLORETA     - Compute the noise-normalization factors for sLORETA?
+//    %
+
+
+
+    static bool prepare_inverse_operator(MNEInverseOperator* orig, qint32 nave ,float lambda2, bool dSPM, bool sLORETA = false)
+    {
+        if(nave <= 0)
+        {
+            printf("The number of averages should be positive\n");
+            return false;
+        }
+        printf("Preparing the inverse operator for use...\n");
+        MNEInverseOperator* inv = new MNEInverseOperator(orig);
+        //
+        //   Scale some of the stuff
+        //
+        float scale     = ((float)inv->nave)/((float)nave);
+        *inv->noise_cov->data  *= scale;
+        *inv->noise_cov->eig   *= scale;
+        *inv->source_cov->data *= scale;
+        //
+        if (inv->eigen_leads_weighted)
+            inv->eigen_leads->data *= sqrt(scale);
+        //
+        printf("\tScaled noise and source covariance from nave = %d to nave = %d\n",inv->nave,nave);
+        inv->nave = nave;
+        //
+        //   Create the diagonal matrix for computing the regularized inverse
+        //
+        VectorXf tmp = inv->sing->cwiseProduct(*inv->sing) + VectorXf::Constant(inv->sing->size(), lambda2);
+        inv->reginv = new VectorXf(inv->sing->cwiseQuotient(tmp));
+        printf("\tCreated the regularized inverter\n");
+        //
+        //   Create the projection operator
+        //
+//    [ inv.proj, ncomp ] = mne_make_projector(inv.projs,inv.noise_cov.names);
+//    if ncomp > 0
+
+//        fprintf(1,'\tCreated an SSP operator (subspace dimension = %d)\n',ncomp);
+//    end
+//    %
+//    %   Create the whitener
+//    %
+//    inv.whitener = zeros(inv.noise_cov.dim);
+//    if inv.noise_cov.diag == 0
+//        %
+//        %   Omit the zeroes due to projection
+//        %
+//        nnzero = 0;
+//        for k = ncomp+1:inv.noise_cov.dim
+//            if inv.noise_cov.eig(k) > 0
+//                inv.whitener(k,k) = 1.0/sqrt(inv.noise_cov.eig(k));
+//                nnzero = nnzero + 1;
+//            end
+//        end
+//        %
+//        %   Rows of eigvec are the eigenvectors
+//        %
+//        inv.whitener = inv.whitener*inv.noise_cov.eigvec;
+//        fprintf(1,'\tCreated the whitener using a full noise covariance matrix (%d small eigenvalues omitted)\n', ...
+//            inv.noise_cov.dim - nnzero);
+//    else
+//        %
+//        %   No need to omit the zeroes due to projection
+//        %
+//        for k = 1:inv.noise_cov.dim
+//            inv.whitener(k,k) = 1.0/sqrt(inv.noise_cov.data(k));
+//        end
+//        fprintf(1,'\tCreated the whitener using a diagonal noise covariance matrix (%d small eigenvalues discarded)\n',ncomp);
+//    end
+//    %
+//    %   Finally, compute the noise-normalization factors
+//    %
+//    if dSPM || sLORETA
+//        noise_norm = zeros(inv.eigen_leads.nrow,1);
+//        if dSPM
+//           fprintf(1,'\tComputing noise-normalization factors (dSPM)...');
+//           noise_weight = inv.reginv;
+//        else
+//           fprintf(1,'\tComputing noise-normalization factors (sLORETA)...');
+//           noise_weight = inv.reginv.*sqrt((1 + inv.sing.*inv.sing/lambda2));
+//        end
+//        if inv.eigen_leads_weighted
+//           for k = 1:inv.eigen_leads.nrow
+//              one = inv.eigen_leads.data(k,:).*noise_weight';
+//              noise_norm(k) = sqrt(one*one');
+//           end
+//        else
+//           for k = 1:inv.eigen_leads.nrow
+//              one = sqrt(inv.source_cov.data(k))*(inv.eigen_leads.data(k,:).*noise_weight');
+//              noise_norm(k) = sqrt(one*one');
+//           end
+//        end
+//        %
+//        %   Compute the final result
+//        %
+//        if inv.source_ori == FIFF.FIFFV_MNE_FREE_ORI
+//            %
+//            %   The three-component case is a little bit more involved
+//            %   The variances at three consequtive entries must be squeared and
+//            %   added together
+//            %
+//            %   Even in this case return only one noise-normalization factor
+//            %   per source location
+//            %
+//            noise_norm = sqrt(mne_combine_xyz(noise_norm));
+//            %
+//            %   This would replicate the same value on three consequtive
+//            %   entries
+//            %
+//            %   noise_norm = kron(sqrt(mne_combine_xyz(noise_norm)),ones(3,1));
+//        end
+//        inv.noisenorm = diag(sparse(1./abs(noise_norm)));
+//        fprintf(1,'[done]\n');
+//    else
+//        inv.noisenorm = [];
+//    end
+
+        return true;
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // ToDo Eventlist Class??
     //=========================================================================================================
@@ -345,8 +505,8 @@ public:
         fiff_int_t dim, nfree, nn;
         QStringList names;
         bool diagmat = false;
-        VectorXd eig;
-        MatrixXf eigvec;
+        VectorXd* eig = NULL;
+        MatrixXf* eigvec = NULL;
         VectorXd* cov_diag = NULL;
         VectorXd* cov = NULL;
         VectorXd* cov_sparse = NULL;
@@ -463,8 +623,8 @@ public:
                 FiffTag* tag2 = NULL;
                 if (current->find_tag(p_pFile, FIFF_MNE_COV_EIGENVALUES, tag1) && current->find_tag(p_pFile, FIFF_MNE_COV_EIGENVECTORS, tag2))
                 {
-                    eig =       VectorXd(Map<VectorXd>(tag1->toDouble(),dim));
-                    eigvec =    tag2->toFloatMatrix();
+                    eig = new VectorXd(Map<VectorXd>(tag1->toDouble(),dim));
+                    eigvec = new MatrixXf(tag2->toFloatMatrix());
                 }
                 //
                 //   Read the projection operator
@@ -485,11 +645,11 @@ public:
                 p_covData->names  = names;
 
                 if(cov_diag)
-                    p_covData->data   = MatrixXd(*cov_diag);
+                    p_covData->data   = new MatrixXd(*cov_diag);
                 else if(cov)
-                    p_covData->data   = MatrixXd(*cov);
+                    p_covData->data   = new MatrixXd(*cov);
                 else if(cov_sparse)
-                    p_covData->data   = MatrixXd(*cov_sparse);
+                    p_covData->data   = new MatrixXd(*cov_sparse);
 
                 p_covData->projs  = projs;
                 p_covData->bads   = bads;
@@ -554,7 +714,7 @@ public:
 //    % fname        - The name of the file
 //    %
 
-    static bool read_inverse_operator(QString& p_sFileName)
+    static bool read_inverse_operator(QString& p_sFileName, MNEInverseOperator*& inv)
     {
         //
         //   Open the file, create directory
@@ -624,7 +784,9 @@ public:
                 delete t_pDir;
             return false;
         }
-        MNEInverseOperator* inv = new MNEInverseOperator();
+        if(inv)
+            delete inv;
+        inv = new MNEInverseOperator();
         inv->methods = *t_pTag->toInt();
         //
         if (!invs->find_tag(t_pFile, FIFF_MNE_SOURCE_ORIENTATION, t_pTag))
@@ -660,7 +822,7 @@ public:
         //
         //   Coordinate frame
         //
-        if (invs->find_tag(t_pFile, FIFF_MNE_COORD_FRAME, t_pTag))
+        if (!invs->find_tag(t_pFile, FIFF_MNE_COORD_FRAME, t_pTag))
         {
             printf("Coordinate frame tag not found\n");
             if(t_pTag)
@@ -888,48 +1050,56 @@ public:
                 }
             }
         }
-//        inv.mri_head_t  = mri_head_t;
-//        %
-//        %   Transform the source spaces to the correct coordinate frame
-//        %   if necessary
-//        %
-//        if inv.coord_frame ~= FIFF.FIFFV_COORD_MRI && ...
-//                inv.coord_frame ~= FIFF.FIFFV_COORD_HEAD
-//            fclose(fid);
-//            error(me,'Only inverse solutions computed in MRI or head coordinates are acceptable');
-//        end
-//        %
-//        %  Number of averages is initially one
-//        %
-//        inv.nave = 1;
-//        %
-//        %  We also need the SSP operator
-//        %
-//        inv.projs     = fiff_read_proj(fid,tree);
-//        %
-//        %  Some empty fields to be filled in later
-//        %
+        inv->mri_head_t  = mri_head_t;
+        //
+        //   Transform the source spaces to the correct coordinate frame
+        //   if necessary
+        //
+        if (inv->coord_frame != FIFFV_COORD_MRI && inv->coord_frame != FIFFV_COORD_HEAD)
+        {
+            printf("Only inverse solutions computed in MRI or head coordinates are acceptable");
+            if(t_pTag)
+                delete t_pTag;
+            if(t_pFile)
+                delete t_pFile;
+            if(t_pTree)
+                delete t_pTree;
+            if(t_pDir)
+                delete t_pDir;
+        }
+        //
+        //  Number of averages is initially one
+        //
+        inv->nave = 1;
+        //
+        //  We also need the SSP operator
+        //
+        inv->projs     = t_pFile->read_proj(t_pTree);
+        //
+        //  Some empty fields to be filled in later
+        //
 //        inv.proj      = [];      %   This is the projector to apply to the data
 //        inv.whitener  = [];      %   This whitens the data
 //        inv.reginv    = [];      %   This the diagonal matrix implementing
 //                                 %   regularization and the inverse
 //        inv.noisenorm = [];      %   These are the noise-normalization factors
-//        %
-//        nuse = 0;
-//        for k = 1:length(inv.src)
-//           try
-//              inv.src(k) = mne_transform_source_space_to(inv.src(k),inv.coord_frame,mri_head_t);
-//           catch
-//              fclose(fid);
-//              error(me,'Could not transform source space (%s)',mne_omit_first_line(lasterr));
-//           end
-//           nuse = nuse + inv.src(k).nuse;
-//        end
-//        fprintf(1,'\tSource spaces transformed to the inverse solution coordinate frame\n');
-//        %
-//        %   Done!
-//        %
-//        fclose(fid);
+        //
+        if(!inv->src->transform_source_space_to(inv->coord_frame, mri_head_t))
+        {
+            printf("Could not transform source space.\n");
+        }
+        printf("\tSource spaces transformed to the inverse solution coordinate frame\n");
+        //
+        //   Done!
+        //
+        if(t_pTag)
+            delete t_pTag;
+        if(t_pFile)
+            delete t_pFile;
+        if(t_pTree)
+            delete t_pTree;
+        if(t_pDir)
+            delete t_pDir;
 
         return true;
     }
@@ -1026,8 +1196,10 @@ public:
     * @param [in, out] p_pMNESourceSpace the source space which is should be transformed
     * @param [in] dest destination check code
     * @param [in] trans transformation information
+    *
+    * @return true if succeeded, false otherwise
     */
-    static inline void transform_source_space_to(MNESourceSpace* p_pMNESourceSpace, fiff_int_t dest, FiffCoordTrans* trans)
+    static inline bool transform_source_space_to(MNESourceSpace* p_pMNESourceSpace, fiff_int_t dest, FiffCoordTrans* trans)
     {
         return p_pMNESourceSpace->transform_source_space_to(dest, trans);
     }

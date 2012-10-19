@@ -56,7 +56,31 @@ using namespace MNELIB;
 
 MNECov::MNECov()
 : kind(-1)
+, data(NULL)
+, eig(NULL)
+, eigvec(NULL)
 {
+
+}
+
+
+//*************************************************************************************************************
+
+MNECov::MNECov(MNECov* p_pMNECov)
+: kind(p_pMNECov->kind)
+, diag(p_pMNECov->diag)
+, dim(p_pMNECov->dim)
+, names(p_pMNECov->names)
+, data(p_pMNECov->data ? new MatrixXd(*p_pMNECov->data) : NULL)
+, bads(p_pMNECov->bads)
+, nfree(p_pMNECov->nfree)
+, eig(p_pMNECov->eig ? new VectorXd(*p_pMNECov->eig) : NULL)
+, eigvec(p_pMNECov->eigvec ? new MatrixXf(*p_pMNECov->eigvec) : NULL)
+{
+    for(qint32 i = 0; i < p_pMNECov->projs.size(); ++i)
+    {
+        projs.append(new FiffProj(p_pMNECov->projs[i]));
+    }
 
 }
 
@@ -65,7 +89,13 @@ MNECov::MNECov()
 
 MNECov::~MNECov()
 {
+    if (data)
+        delete data;
     for (qint32 i = 0; i < projs.size(); ++i)
         if(projs[i])
             delete projs[i];
+    if (eig)
+        delete eig;
+    if (eigvec)
+        delete eigvec;
 }

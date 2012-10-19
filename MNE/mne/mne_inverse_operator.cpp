@@ -71,6 +71,38 @@ MNEInverseOperator::MNEInverseOperator()
 , depth_prior(NULL)
 , fmri_prior(NULL)
 , src(NULL)
+, mri_head_t(NULL)
+, nave(-1)
+, proj(NULL)
+, reginv(NULL)
+{
+
+}
+
+
+//*************************************************************************************************************
+
+MNEInverseOperator::MNEInverseOperator(MNEInverseOperator* p_pMNEInverseOperator)
+: methods(p_pMNEInverseOperator->methods)
+, source_ori(p_pMNEInverseOperator->source_ori)
+, nsource(p_pMNEInverseOperator->nsource)
+, nchan(p_pMNEInverseOperator->nchan)
+, coord_frame(p_pMNEInverseOperator->coord_frame)
+, source_nn(p_pMNEInverseOperator->source_nn ? new MatrixXf(*p_pMNEInverseOperator->source_nn) : NULL)
+, sing(p_pMNEInverseOperator->sing ? new VectorXf(*p_pMNEInverseOperator->sing) : NULL)
+, eigen_leads_weighted(p_pMNEInverseOperator->eigen_leads_weighted)
+, eigen_leads(p_pMNEInverseOperator->eigen_leads ? new FiffNamedMatrix(p_pMNEInverseOperator->eigen_leads) : NULL)
+, eigen_fields(p_pMNEInverseOperator->eigen_fields ? new FiffNamedMatrix(p_pMNEInverseOperator->eigen_fields) : NULL)
+, noise_cov(p_pMNEInverseOperator->noise_cov ? new MNECov(p_pMNEInverseOperator->noise_cov) : NULL)
+, source_cov(p_pMNEInverseOperator->source_cov ? new MNECov(p_pMNEInverseOperator->source_cov) : NULL)
+, orient_prior(p_pMNEInverseOperator->orient_prior ? new MNECov(p_pMNEInverseOperator->orient_prior) : NULL)
+, depth_prior(p_pMNEInverseOperator->depth_prior ? new MNECov(p_pMNEInverseOperator->depth_prior) : NULL)
+, fmri_prior(p_pMNEInverseOperator->fmri_prior ? new MNECov(p_pMNEInverseOperator->fmri_prior) : NULL)
+, src(p_pMNEInverseOperator->src ? new MNESourceSpace(p_pMNEInverseOperator->src) : NULL)
+, mri_head_t(p_pMNEInverseOperator->mri_head_t ? new FiffCoordTrans(p_pMNEInverseOperator->mri_head_t) : NULL)
+, nave(p_pMNEInverseOperator->nave)
+, proj(NULL)
+, reginv(p_pMNEInverseOperator->reginv ? new VectorXf(*p_pMNEInverseOperator->reginv) : NULL)
 {
 
 }
@@ -98,4 +130,8 @@ MNEInverseOperator::~MNEInverseOperator()
         delete depth_prior;
     if(fmri_prior)
         delete fmri_prior;
+    if(src)
+        delete src;
+    if(mri_head_t)
+        delete mri_head_t;
 }
