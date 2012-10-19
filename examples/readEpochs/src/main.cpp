@@ -52,7 +52,7 @@
 #include "../../../MNE/fiff/fiff.h"
 #include "../../../MNE/mne/mne.h"
 
-#include "../../../MNE/mne/mne_epoch_list.h"
+#include "../../../MNE/mne/mne_epoch_data_list.h"
 
 
 //*************************************************************************************************************
@@ -300,9 +300,9 @@ int main(int argc, char *argv[])
     fiff_int_t event_samp, from, to;
     MatrixXf* timesDummy = NULL;
 
-    MNEEpochList data;
+    MNEEpochDataList data;
 
-    MNEEpoch* epoch = NULL;
+    MNEEpochData* epoch = NULL;
 
     MatrixXf times;
 
@@ -315,7 +315,7 @@ int main(int argc, char *argv[])
         from = event_samp + tmin*raw->info->sfreq;
         to   = event_samp + floor(tmax*raw->info->sfreq + 0.5);
 
-        epoch = new MNEEpoch();
+        epoch = new MNEEpochData();
 
         if(raw->read_raw_segment(epoch->epoch, timesDummy, from, to, picks))
         {

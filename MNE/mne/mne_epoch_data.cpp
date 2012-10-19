@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_epoch.h
+* @file     mne_epoch_data.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -18,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-*
+* 
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
@@ -29,95 +29,45 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the MNEEpoch class declaration.
+* @brief    Contains the implementation of the MNEEpochData Class.
 *
 */
-
-#ifndef MNE_EPOCH_H
-#define MNE_EPOCH_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_global.h"
+#include "mne_epoch_data.h"
 
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFF INCLUDES
-//=============================================================================================================
-
-#include "../fiff/fiff_types.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-#include "../3rdParty/Eigen/Core"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MNELIB
-//=============================================================================================================
-
-namespace MNELIB
-{
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
-using namespace Eigen;
+using namespace MNELIB;
 
 
+//*************************************************************************************************************
 //=============================================================================================================
-/**
-* MNE epoch data, which corresponds to an event
-*
-* @brief epoch data
-*/
-class MNESHARED_EXPORT MNEEpoch
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+MNEEpochData::MNEEpochData()
+: epoch(NULL)
+, event(-1)
+, tmin(-1)
+, tmax(-1)
 {
 
-public:
-    //=========================================================================================================
-    /**
-    * ctor
-    */
-    MNEEpoch();
-
-    //=========================================================================================================
-    /**
-    * Destroys the MNEEpochData.
-    */
-    ~MNEEpoch();
+}
 
 
-    //=========================================================================================================
-    /**
-    * Comparison of two Epoch data
-    *
-    *@
-    */
-    bool operator== (const MNEEpoch& MED_other) const
-    {
-        return (this->tmin == MED_other.tmin && this->tmax == MED_other.tmax);
-    }
+//*************************************************************************************************************
 
-public:
-    MatrixXf*   epoch;  /**< the data */
-    fiff_int_t  event;  /**< the event code */
-    float       tmin;   /**< minimal time */
-    float       tmax;   /**< maximal time */
-
-};
-
-} // NAMESPACE
-
-#endif // MNE_EPOCH_H
+MNEEpochData::~MNEEpochData()
+{
+    if (epoch)
+        delete epoch;
+}
