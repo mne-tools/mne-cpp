@@ -339,22 +339,27 @@ public:
         //   Modify the measurement info
         //
         FiffInfo* info = pick_info(res->info,&sel);
+        if (res->info)
+            delete res->info;
+        res->info = info;
         //
         //   Create the reduced data set
         //
-//        for (qint32 k = 0; k < res->evoked.size(); ++k)
-//            res.evoked(k).epochs = res.evoked(k).epochs(sel,:);
-//        end
+        MatrixXf selBlock(1,1);
+        qint32 k, l;
+        for(k = 0; k < res->evoked.size(); ++k)
+        {
+            if(selBlock.rows() != sel.cols() || selBlock.cols() != res->evoked[k]->epochs->cols())
+                selBlock.resize(sel.cols(), res->evoked[k]->epochs->cols());
+            for(l = 0; l < sel.cols(); ++l)
+            {
+                selBlock.block(l,0,1,selBlock.cols()) = res->evoked[k]->epochs->block(sel(0,l),0,1,selBlock.cols());
+            }
+            res->evoked[k]->epochs->resize(sel.cols(), res->evoked[k]->epochs->cols());
+            *res->evoked[k]->epochs = selBlock;
+        }
 
-//        return;
-
-//        end
-
-
-
-
-
-        return NULL;
+        return res;
     }
 
 
@@ -406,7 +411,7 @@ public:
         }
         res->nchan  = sel->cols();
 
-        return NULL;
+        return res;
     }
 
 

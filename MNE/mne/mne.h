@@ -120,15 +120,15 @@ public:
 //    % comb        - Output vector [x1^2+y1^2+z1^2 ... x_n^2+y_n^2+z_n^2 ]
 //    %
 
-    static VectorXf* combine_xyz(const VectorXf* vec)
+    static VectorXf* combine_xyz(const VectorXf& vec)
     {
-        if (vec->size() % 3 != 0)
+        if (vec.size() % 3 != 0)
         {
             printf("Input must be a row or a column vector with 3N components");
             return NULL;
         }
 
-        MatrixXf tmp = MatrixXf(vec->transpose());
+        MatrixXf tmp = MatrixXf(vec.transpose());
         SparseMatrix<float>* s = make_block_diag(&tmp,3);
 
         SparseMatrix<float> sC = *s*s->transpose();
@@ -457,8 +457,7 @@ public:
                 //   Even in this case return only one noise-normalization factor
                 //   per source location
                 //
-                VectorXf v = noise_norm->transpose();
-                VectorXf* t = combine_xyz(&v);
+                VectorXf* t = combine_xyz(noise_norm->transpose());
                 noise_norm_new = t->cwiseSqrt();
                 delete t;
                 //
