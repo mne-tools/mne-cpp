@@ -310,7 +310,6 @@ public:
         return orig->prepare_inverse_operator(nave, lambda2, dSPM, sLORETA);
     }
 
-
 // ToDo Eventlist Class??
     //=========================================================================================================
     /**
@@ -477,11 +476,6 @@ public:
     {
         mat->transpose_named_matrix();
     }
-
-private:
-
-
-
 };
 
 
