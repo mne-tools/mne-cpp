@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_cov.cpp
+* @file     fiff_cov.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the MNECov Class.
+* @brief    Contains the implementation of the FiffCov Class.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_cov.h"
+#include "fiff_cov.h"
 
 
 //*************************************************************************************************************
@@ -46,7 +46,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -54,7 +54,7 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MNECov::MNECov()
+FiffCov::FiffCov()
 : kind(-1)
 , data(NULL)
 , eig(NULL)
@@ -66,20 +66,20 @@ MNECov::MNECov()
 
 //*************************************************************************************************************
 
-MNECov::MNECov(const MNECov* p_pMNECov)
-: kind(p_pMNECov->kind)
-, diag(p_pMNECov->diag)
-, dim(p_pMNECov->dim)
-, names(p_pMNECov->names)
-, data(p_pMNECov->data ? new MatrixXd(*p_pMNECov->data) : NULL)
-, bads(p_pMNECov->bads)
-, nfree(p_pMNECov->nfree)
-, eig(p_pMNECov->eig ? new VectorXd(*p_pMNECov->eig) : NULL)
-, eigvec(p_pMNECov->eigvec ? new MatrixXf(*p_pMNECov->eigvec) : NULL)
+FiffCov::FiffCov(const FiffCov* p_pFiffCov)
+: kind(p_pFiffCov->kind)
+, diag(p_pFiffCov->diag)
+, dim(p_pFiffCov->dim)
+, names(p_pFiffCov->names)
+, data(p_pFiffCov->data ? new MatrixXd(*p_pFiffCov->data) : NULL)
+, bads(p_pFiffCov->bads)
+, nfree(p_pFiffCov->nfree)
+, eig(p_pFiffCov->eig ? new VectorXd(*p_pFiffCov->eig) : NULL)
+, eigvec(p_pFiffCov->eigvec ? new MatrixXf(*p_pFiffCov->eigvec) : NULL)
 {
-    for(qint32 i = 0; i < p_pMNECov->projs.size(); ++i)
+    for(qint32 i = 0; i < p_pFiffCov->projs.size(); ++i)
     {
-        projs.append(new FiffProj(p_pMNECov->projs[i]));
+        projs.append(new FiffProj(p_pFiffCov->projs[i]));
     }
 
 }
@@ -87,7 +87,7 @@ MNECov::MNECov(const MNECov* p_pMNECov)
 
 //*************************************************************************************************************
 
-MNECov::~MNECov()
+FiffCov::~FiffCov()
 {
     if (data)
         delete data;

@@ -147,29 +147,6 @@ public:
     */
     static bool read_forward_solution(QString& p_sFileName, MNEForwardSolution*& fwd, bool force_fixed = false, bool surf_ori = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
 
-    //=========================================================================================================
-    /**
-    * ### MNE toolbox root function ###: Implementation of the mne_block_diag function - decoding part
-    */
-//    static inline MatrixXf extract_block_diag(MatrixXf& A, qint32 n);
-
-    //=========================================================================================================
-    /**
-    * ### MNE toolbox root function ###: Implementation of the mne_block_diag function - encoding part
-    *
-    * Make a sparse block diagonal matrix
-    *
-    * Returns a sparse block diagonal, diagonalized from the elements in "A". "A" is ma x na, comprising
-    * bdn=(na/"n") blocks of submatrices. Each submatrix is ma x "n", and these submatrices are placed down
-    * the diagonal of the matrix.
-    *
-    * @param[in, out] A Matrix which should be diagonlized
-    * @param[in, out] n Columns of the submatrices
-    *
-    * @return A sparse block diagonal, diagonalized from the elements in "A".
-    */
-    static inline SparseMatrix<float>* make_block_diag(const MatrixXf* A, qint32 n);
-
 private:
     //=========================================================================================================
     /**

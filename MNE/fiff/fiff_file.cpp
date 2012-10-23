@@ -217,6 +217,204 @@ QStringList FiffFile::read_bad_channels(FiffDirTree* p_pTree)
 
 //*************************************************************************************************************
 
+bool FiffFile::read_cov(FiffDirTree* node, fiff_int_t cov_kind, FiffCov*& p_covData)
+{
+    if(p_covData)
+        delete p_covData;
+    p_covData = NULL;
+
+    //
+    //   Find all covariance matrices
+    //
+    QList<FiffDirTree*> covs = node->dir_tree_find(FIFFB_MNE_COV);
+    if (covs.size() == 0)
+    {
+        printf("No covariance matrices found");
+        return false;
+    }
+    //
+    //   Is any of the covariance matrices a noise covariance
+    //
+    qint32 p = 0;
+    FiffTag* tag = NULL;
+    bool success = false;
+    fiff_int_t dim, nfree, nn;
+    QStringList names;
+    bool diagmat = false;
+    VectorXd* eig = NULL;
+    MatrixXf* eigvec = NULL;
+    VectorXd* cov_diag = NULL;
+    VectorXd* cov = NULL;
+    VectorXd* cov_sparse = NULL;
+    QStringList bads;
+    for(p = 0; p < covs.size(); ++p)
+    {
+        success = covs[p]->find_tag(this, FIFF_MNE_COV_KIND, tag);
+        if (success && *tag->toInt() == cov_kind)
+        {
+            FiffDirTree* current = covs[p];
+            //
+            //   Find all the necessary data
+            //
+            if (!current->find_tag(this, FIFF_MNE_COV_DIM, tag))
+            {
+                printf("Covariance matrix dimension not found.\n");
+                return false;
+            }
+            dim = *tag->toInt();
+            if (!current->find_tag(this, FIFF_MNE_COV_NFREE, tag))
+                nfree = -1;
+            else
+                nfree = *tag->toInt();
+
+            if (current->find_tag(this, FIFF_MNE_ROW_NAMES, tag))
+            {
+                names = FiffFile::split_name_list(tag->toString());
+                if (names.size() != dim)
+                {
+                    printf("Number of names does not match covariance matrix dimension\n");
+                    return false;
+                }
+            }
+            if (!current->find_tag(this, FIFF_MNE_COV, tag))
+            {
+                if (!current->find_tag(this, FIFF_MNE_COV_DIAG, tag))
+                {
+                    printf("No covariance matrix data found\n");
+                    return false;
+                }
+                else
+                {
+                    //
+                    //   Diagonal is stored
+                    //
+                    if (tag->type == FIFFT_DOUBLE)
+                    {
+                        cov_diag = new VectorXd(Map<VectorXd>(tag->toDouble(),dim));
+                    }
+                    else if (tag->type == FIFFT_FLOAT)
+                    {
+                        cov_diag = new VectorXd(Map<VectorXf>(tag->toFloat(),dim).cast<double>());
+                    }
+                    else {
+                        printf("Illegal data type for covariance matrix\n");
+                        return false;
+                    }
+
+                    diagmat = true;
+                    printf("\t%d x %d diagonal covariance (kind = %d) found.\n", dim, dim, cov_kind);
+                }
+            }
+            else
+            {
+                diagmat = false;
+                nn = dim*(dim+1)/2;
+                if (tag->type == FIFFT_DOUBLE)
+                {
+                    cov =  new VectorXd(Map<VectorXd>(tag->toDouble(),nn));
+                }
+                else if (tag->type == FIFFT_FLOAT)
+                {
+                    cov = new VectorXd(Map<VectorXf>(tag->toFloat(),nn).cast<double>());
+                }
+                else
+                {
+                    qDebug() << tag->getInfo();
+                    return false;
+                }
+
+
+//                    if ~issparse(tag.data)
+//                        //
+//                        //   Lower diagonal is stored
+//                        //
+//                        qDebug() << tag->getInfo();
+//                        vals = tag.data;
+//                        data = zeros(dim,dim);
+//                        % XXX : should remove for loops
+//                        q = 1;
+//                        for j = 1:dim
+//                            for k = 1:j
+//                                data(j,k) = vals(q);
+//                                q = q + 1;
+//                            end
+//                        end
+//                        for j = 1:dim
+//                            for k = j+1:dim
+//                                data(j,k) = data(k,j);
+//                            end
+//                        end
+//                        diagmat = false;
+//                        fprintf('\t%d x %d full covariance (kind = %d) found.\n',dim,dim,cov_kind);
+//                    else
+//                        diagmat = false;
+//                        data = tag.data;
+//                        fprintf('\t%d x %d sparse covariance (kind = %d) found.\n',dim,dim,cov_kind);
+//                    end
+            }
+            //
+            //   Read the possibly precomputed decomposition
+            //
+            FiffTag* tag1 = NULL;
+            FiffTag* tag2 = NULL;
+            if (current->find_tag(this, FIFF_MNE_COV_EIGENVALUES, tag1) && current->find_tag(this, FIFF_MNE_COV_EIGENVECTORS, tag2))
+            {
+                eig = new VectorXd(Map<VectorXd>(tag1->toDouble(),dim));
+                eigvec = tag2->toFloatMatrix();
+                eigvec->transposeInPlace();
+            }
+            //
+            //   Read the projection operator
+            //
+            QList<FiffProj*> projs = this->read_proj(current);
+            //
+            //   Read the bad channel list
+            //
+            bads = this->read_bad_channels(current);
+            //
+            //   Put it together
+            //
+            p_covData = new FiffCov();
+
+            p_covData->kind   = cov_kind;
+            p_covData->diag   = diagmat;
+            p_covData->dim    = dim;
+            p_covData->names  = names;
+
+            if(cov_diag)
+                p_covData->data   = new MatrixXd(*cov_diag);
+            else if(cov)
+                p_covData->data   = new MatrixXd(*cov);
+            else if(cov_sparse)
+                p_covData->data   = new MatrixXd(*cov_sparse);
+
+            p_covData->projs  = projs;
+            p_covData->bads   = bads;
+            p_covData->nfree  = nfree;
+            p_covData->eig    = eig;
+            p_covData->eigvec = eigvec;
+
+            if (cov_diag)
+                delete cov_diag;
+            if (cov)
+                delete cov;
+            if (cov_sparse)
+                delete cov_sparse;
+
+            if (tag)
+                delete tag;
+            //
+            return true;
+        }
+    }
+
+    printf("Did not find the desired covariance matrix\n");
+    return false;
+}
+
+
+//*************************************************************************************************************
+
 QList<FiffCtfComp*> FiffFile::read_ctf_comp(FiffDirTree* p_pNode, QList<FiffChInfo>& chs)
 {
     QList<FiffCtfComp*> compdata;

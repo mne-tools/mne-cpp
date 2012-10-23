@@ -48,7 +48,7 @@
 #include "mne_forwardsolution.h"
 #include "mne_hemisphere.h"
 #include "mne_sourcespace.h"
-#include "mne_cov.h"
+#include "mne_math.h"
 
 
 //*************************************************************************************************************
@@ -57,6 +57,7 @@
 //=============================================================================================================
 
 #include "../fiff/fiff_constants.h"
+#include "../fiff/fiff_cov.h"
 
 
 //*************************************************************************************************************
@@ -108,37 +109,23 @@ public:
     virtual ~MNE()
     { }
 
-
-//    function [comb] = mne_combine_xyz(vec)
-//    %
-//    % function [comb] = mne_combine_xyz(vec)
-//    %
-//    % Compute the three Cartesian components of a vector together
-//    %
-//    %
-//    % vec         - Input row or column vector [ x1 y1 z1 ... x_n y_n z_n ]
-//    % comb        - Output vector [x1^2+y1^2+z1^2 ... x_n^2+y_n^2+z_n^2 ]
-//    %
-
-    static VectorXf* combine_xyz(const VectorXf& vec)
+    //=========================================================================================================
+    /**
+    * mne_combine_xyz
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the MNEMath::combine_xyz static function
+    *
+    * Compute the three Cartesian components of a vector together
+    *
+    * @param[in] vec    Input row vector [ x1 y1 z1 ... x_n y_n z_n ]
+    *
+    * @return Output vector [x1^2+y1^2+z1^2 ... x_n^2+y_n^2+z_n^2 ]
+    */
+    inline static VectorXf* combine_xyz(const VectorXf& vec)
     {
-        if (vec.size() % 3 != 0)
-        {
-            printf("Input must be a row or a column vector with 3N components");
-            return NULL;
-        }
-
-        MatrixXf tmp = MatrixXf(vec.transpose());
-        SparseMatrix<float>* s = make_block_diag(&tmp,3);
-
-        SparseMatrix<float> sC = *s*s->transpose();
-        VectorXf* comb = new VectorXf(sC.rows());
-
-        for(qint32 i = 0; i < sC.rows(); ++i)
-            (*comb)[i] = sC.coeff(i,i);
-
-        delete s;
-        return comb;
+        return MNEMath::combine_xyz(vec);
     }
 
     //=========================================================================================================
@@ -189,7 +176,7 @@ public:
         return info->get_current_comp();
     }
 
-    //ToDo why is make_block_diag part of MNEFOrwardSolution - restructure this
+    //ToDo Why is make_block_diag part of MNEForwardSolution - restructure this
     //=========================================================================================================
     /**
     * mne_block_diag - encoding part
@@ -211,8 +198,7 @@ public:
     */
     static inline SparseMatrix<float>* make_block_diag(const MatrixXf* A, qint32 n)
     {
-        return MNEForwardSolution::make_block_diag(A, n);
-
+        return MNEMath::make_block_diag(A, n);
     }
 
     //=========================================================================================================
@@ -301,212 +287,28 @@ public:
         return MNESourceSpace::patch_info(nearest, pinfo);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    function [inv] = mne_prepare_inverse_operator(orig,nave,lambda2,dSPM,sLORETA)
-//    %
-//    % [inv] = mne_prepare_inverse_operator(orig,nave,lambda2,dSPM,sLORETA)
-//    %
-//    % Prepare for actually computing the inverse
-//    %
-//    % orig        - The inverse operator structure read from a file
-//    % nave        - Number of averages (scales the noise covariance)
-//    % lambda2     - The regularization factor
-//    % dSPM        - Compute the noise-normalization factors for dSPM?
-//    % sLORETA     - Compute the noise-normalization factors for sLORETA?
-//    %
-
-
-
-    static MNEInverseOperator* prepare_inverse_operator(const MNEInverseOperator* orig, qint32 nave ,float lambda2, bool dSPM, bool sLORETA = false)
+    //=========================================================================================================
+    /**
+    * mne_prepare_inverse_operator
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the MNEInverseOperator prepare_inverse_operator member function
+    *
+    * Prepare for actually computing the inverse
+    *
+    * @param [in] orig      The inverse operator structure read from a file
+    * @param [in] nave      Number of averages (scales the noise covariance)
+    * @param [in] lambda2   The regularization factor
+    * @param [in] dSPM      Compute the noise-normalization factors for dSPM?
+    * @param [in] sLORETA   Compute the noise-normalization factors for sLORETA?
+    *
+    * @return the prepared inverse operator
+    */
+    inline static MNEInverseOperator* prepare_inverse_operator(MNEInverseOperator* orig, qint32 nave ,float lambda2, bool dSPM, bool sLORETA = false)
     {
-        if(nave <= 0)
-        {
-            printf("The number of averages should be positive\n");
-            return NULL;
-        }
-        printf("Preparing the inverse operator for use...\n");
-        MNEInverseOperator* inv = new MNEInverseOperator(orig);
-        //
-        //   Scale some of the stuff
-        //
-        float scale     = ((float)inv->nave)/((float)nave);
-        *inv->noise_cov->data  *= scale;
-        *inv->noise_cov->eig   *= scale;
-        *inv->source_cov->data *= scale;
-        //
-        if (inv->eigen_leads_weighted)
-            (*inv->eigen_leads->data) *= sqrt(scale);
-        //
-        printf("\tScaled noise and source covariance from nave = %d to nave = %d\n",inv->nave,nave);
-        inv->nave = nave;
-        //
-        //   Create the diagonal matrix for computing the regularized inverse
-        //
-        VectorXf tmp = inv->sing->cwiseProduct(*inv->sing) + VectorXf::Constant(inv->sing->size(), lambda2);
-        if(inv->reginv)
-            delete inv->reginv;
-        inv->reginv = new VectorXf(inv->sing->cwiseQuotient(tmp));
-        printf("\tCreated the regularized inverter\n");
-        //
-        //   Create the projection operator
-        //
-
-        qint32 ncomp = MNE::make_projector(inv->projs, inv->noise_cov->names, inv->proj);
-        if (ncomp > 0)
-            printf("\tCreated an SSP operator (subspace dimension = %d)\n",ncomp);
-
-        //
-        //   Create the whitener
-        //
-        if(inv->whitener)
-            delete inv->whitener;
-        inv->whitener = new MatrixXf(MatrixXf::Zero(inv->noise_cov->dim, inv->noise_cov->dim));
-
-        qint32 nnzero, k;
-        if (inv->noise_cov->diag == 0)
-        {
-            //
-            //   Omit the zeroes due to projection
-            //
-            nnzero = 0;
-
-            for (k = ncomp; k < inv->noise_cov->dim; ++k)
-            {
-                if ((*inv->noise_cov->eig)[k] > 0)
-                {
-                    (*inv->whitener)(k,k) = 1.0/sqrt((*inv->noise_cov->eig)[k]);
-                    ++nnzero;
-                }
-            }
-            //
-            //   Rows of eigvec are the eigenvectors
-            //
-            *inv->whitener *= *inv->noise_cov->eigvec;
-            printf("\tCreated the whitener using a full noise covariance matrix (%d small eigenvalues omitted)\n", inv->noise_cov->dim - nnzero);
-        }
-        else
-        {
-            //
-            //   No need to omit the zeroes due to projection
-            //
-            for (k = 0; k < inv->noise_cov->dim; ++k)
-                (*inv->whitener)(k,k) = 1.0/sqrt((*inv->noise_cov->data)(k,0));
-
-            printf("\tCreated the whitener using a diagonal noise covariance matrix (%d small eigenvalues discarded)\n",ncomp);
-        }
-        //
-        //   Finally, compute the noise-normalization factors
-        //
-        if (dSPM || sLORETA)
-        {
-            VectorXf* noise_norm = new VectorXf(VectorXf::Zero(inv->eigen_leads->nrow));
-            VectorXf* noise_weight = NULL;
-            if (dSPM)
-            {
-               printf("\tComputing noise-normalization factors (dSPM)...");
-               noise_weight = new VectorXf(*inv->reginv);
-            }
-            else
-            {
-               printf("\tComputing noise-normalization factors (sLORETA)...");
-               VectorXf tmp = (VectorXf::Constant(inv->sing->size(), 1) + inv->sing->cwiseProduct(*inv->sing)/lambda2);
-               noise_weight = new VectorXf(inv->reginv->cwiseProduct(tmp.cwiseSqrt()));
-            }
-            VectorXf one;
-            if (inv->eigen_leads_weighted)
-            {
-               for (k = 0; k < inv->eigen_leads->nrow; ++k)
-               {
-                  one = inv->eigen_leads->data->block(k,0,1,inv->eigen_leads->data->cols()).cwiseProduct(*noise_weight);
-                  (*noise_norm)[k] = sqrt(one.dot(one));
-               }
-            }
-            else
-            {
-                float c;
-                for (k = 0; k < inv->eigen_leads->nrow; ++k)
-                {
-                    c = sqrt((*inv->source_cov->data)(k,0));
-                    one = c*(inv->eigen_leads->data->block(k,0,1,inv->eigen_leads->data->cols()).transpose()).cwiseProduct(*noise_weight);//ToDo eigenleads data -> pointer
-                    (*noise_norm)[k] = sqrt(one.dot(one));
-                }
-            }
-            //
-            //   Compute the final result
-            //
-            VectorXf noise_norm_new;
-            if (inv->source_ori == FIFFV_MNE_FREE_ORI)
-            {
-                //
-                //   The three-component case is a little bit more involved
-                //   The variances at three consequtive entries must be squeared and
-                //   added together
-                //
-                //   Even in this case return only one noise-normalization factor
-                //   per source location
-                //
-                VectorXf* t = combine_xyz(noise_norm->transpose());
-                noise_norm_new = t->cwiseSqrt();
-                delete t;
-                //
-                //   This would replicate the same value on three consequtive
-                //   entries
-                //
-                //   noise_norm = kron(sqrt(mne_combine_xyz(noise_norm)),ones(3,1));
-            }
-            VectorXf vOnes = VectorXf::Ones(noise_norm_new.size());
-            VectorXf tmp = vOnes.cwiseQuotient(noise_norm_new.cwiseAbs());
-            if(inv->noisenorm)
-                delete inv->noisenorm;
-            inv->noisenorm = new SparseMatrix<float>(noise_norm_new.size(),noise_norm_new.size());
-
-            for(qint32 i = 0; i < noise_norm_new.size(); ++i)
-                inv->noisenorm->insert(i,i) = tmp[i];
-
-            delete noise_weight;
-            delete noise_norm;
-            printf("[done]\n");
-        }
-        else
-        {
-            if(inv->noisenorm)
-                delete inv->noisenorm;
-            inv->noisenorm = NULL;
-        }
-
-        return inv;
+        return orig->prepare_inverse_operator(nave, lambda2, dSPM, sLORETA);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 // ToDo Eventlist Class??
@@ -525,669 +327,47 @@ public:
     */
     static bool read_events(QString& p_sFileName, MatrixXi& eventlist);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    function [cov] = mne_read_cov(fid,node,cov_kind)
-//    %
-//    % [cov] = mne_read_cov(fid,node,kind)
-//    %
-//    % Reads a covariance matrix from a fiff file
-//    %
-//    % fid       - an open file descriptor
-//    % node      - look for the matrix in here
-//    % cov_kind  - what kind of a covariance matrix do we want?
-//    %
-
-
-    static bool read_cov(FiffFile* p_pFile, FiffDirTree* node, fiff_int_t cov_kind, MNECov*& p_covData)
+    //=========================================================================================================
+    /**
+    * mne_read_cov
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffFile read_cov member function
+    *
+    * Reads a covariance matrix from a fiff file
+    *
+    * @param [in] p_pFile       an open fiff file
+    * @param [in] node          look for the matrix in here
+    * @param [in] cov_kind      what kind of a covariance matrix do we want?
+    * @param [out] p_covData    the read covariance matrix
+    *
+    * @return true if succeeded, false otherwise
+    */
+    inline static bool read_cov(FiffFile* p_pFile, FiffDirTree* node, fiff_int_t cov_kind, FiffCov*& p_covData)
     {
-        if(p_covData)
-            delete p_covData;
-        p_covData = NULL;
-
-        //
-        //   Find all covariance matrices
-        //
-        QList<FiffDirTree*> covs = node->dir_tree_find(FIFFB_MNE_COV);
-        if (covs.size() == 0)
-        {
-            printf("No covariance matrices found");
-            return false;
-        }
-        //
-        //   Is any of the covariance matrices a noise covariance
-        //
-        qint32 p = 0;
-        FiffTag* tag = NULL;
-        bool success = false;
-        fiff_int_t dim, nfree, nn;
-        QStringList names;
-        bool diagmat = false;
-        VectorXd* eig = NULL;
-        MatrixXf* eigvec = NULL;
-        VectorXd* cov_diag = NULL;
-        VectorXd* cov = NULL;
-        VectorXd* cov_sparse = NULL;
-        QStringList bads;
-        for(p = 0; p < covs.size(); ++p)
-        {
-            success = covs[p]->find_tag(p_pFile, FIFF_MNE_COV_KIND, tag);
-            if (success && *tag->toInt() == cov_kind)
-            {
-                FiffDirTree* current = covs[p];
-                //
-                //   Find all the necessary data
-                //
-                if (!current->find_tag(p_pFile, FIFF_MNE_COV_DIM, tag))
-                {
-                    printf("Covariance matrix dimension not found.\n");
-                    return false;
-                }
-                dim = *tag->toInt();
-                if (!current->find_tag(p_pFile, FIFF_MNE_COV_NFREE, tag))
-                    nfree = -1;
-                else
-                    nfree = *tag->toInt();
-
-                if (current->find_tag(p_pFile, FIFF_MNE_ROW_NAMES, tag))
-                {
-                    names = FiffFile::split_name_list(tag->toString());
-                    if (names.size() != dim)
-                    {
-                        printf("Number of names does not match covariance matrix dimension\n");
-                        return false;
-                    }
-                }
-                if (!current->find_tag(p_pFile, FIFF_MNE_COV, tag))
-                {
-                    if (!current->find_tag(p_pFile, FIFF_MNE_COV_DIAG, tag))
-                    {
-                        printf("No covariance matrix data found\n");
-                        return false;
-                    }
-                    else
-                    {
-                        //
-                        //   Diagonal is stored
-                        //
-                        if (tag->type == FIFFT_DOUBLE)
-                        {
-                            cov_diag = new VectorXd(Map<VectorXd>(tag->toDouble(),dim));
-                        }
-                        else if (tag->type == FIFFT_FLOAT)
-                        {
-                            cov_diag = new VectorXd(Map<VectorXf>(tag->toFloat(),dim).cast<double>());
-                        }
-                        else {
-                            printf("Illegal data type for covariance matrix\n");
-                            return false;
-                        }
-
-                        diagmat = true;
-                        printf("\t%d x %d diagonal covariance (kind = %d) found.\n", dim, dim, cov_kind);
-                    }
-                }
-                else
-                {
-                    diagmat = false;
-                    nn = dim*(dim+1)/2;
-                    if (tag->type == FIFFT_DOUBLE)
-                    {
-                        cov =  new VectorXd(Map<VectorXd>(tag->toDouble(),nn));
-                    }
-                    else if (tag->type == FIFFT_FLOAT)
-                    {
-                        cov = new VectorXd(Map<VectorXf>(tag->toFloat(),nn).cast<double>());
-                    }
-                    else
-                    {
-                        qDebug() << tag->getInfo();
-                        return false;
-                    }
-
-
-//                    if ~issparse(tag.data)
-//                        //
-//                        //   Lower diagonal is stored
-//                        //
-//                        qDebug() << tag->getInfo();
-//                        vals = tag.data;
-//                        data = zeros(dim,dim);
-//                        % XXX : should remove for loops
-//                        q = 1;
-//                        for j = 1:dim
-//                            for k = 1:j
-//                                data(j,k) = vals(q);
-//                                q = q + 1;
-//                            end
-//                        end
-//                        for j = 1:dim
-//                            for k = j+1:dim
-//                                data(j,k) = data(k,j);
-//                            end
-//                        end
-//                        diagmat = false;
-//                        fprintf('\t%d x %d full covariance (kind = %d) found.\n',dim,dim,cov_kind);
-//                    else
-//                        diagmat = false;
-//                        data = tag.data;
-//                        fprintf('\t%d x %d sparse covariance (kind = %d) found.\n',dim,dim,cov_kind);
-//                    end
-                }
-                //
-                //   Read the possibly precomputed decomposition
-                //
-                FiffTag* tag1 = NULL;
-                FiffTag* tag2 = NULL;
-                if (current->find_tag(p_pFile, FIFF_MNE_COV_EIGENVALUES, tag1) && current->find_tag(p_pFile, FIFF_MNE_COV_EIGENVECTORS, tag2))
-                {
-                    eig = new VectorXd(Map<VectorXd>(tag1->toDouble(),dim));
-                    eigvec = tag2->toFloatMatrix();
-                    eigvec->transposeInPlace();
-                }
-                //
-                //   Read the projection operator
-                //
-                QList<FiffProj*> projs = p_pFile->read_proj(current);
-                //
-                //   Read the bad channel list
-                //
-                bads = p_pFile->read_bad_channels(current);
-                //
-                //   Put it together
-                //
-                p_covData = new MNECov();
-
-                p_covData->kind   = cov_kind;
-                p_covData->diag   = diagmat;
-                p_covData->dim    = dim;
-                p_covData->names  = names;
-
-                if(cov_diag)
-                    p_covData->data   = new MatrixXd(*cov_diag);
-                else if(cov)
-                    p_covData->data   = new MatrixXd(*cov);
-                else if(cov_sparse)
-                    p_covData->data   = new MatrixXd(*cov_sparse);
-
-                p_covData->projs  = projs;
-                p_covData->bads   = bads;
-                p_covData->nfree  = nfree;
-                p_covData->eig    = eig;
-                p_covData->eigvec = eigvec;
-
-                if (cov_diag)
-                    delete cov_diag;
-                if (cov)
-                    delete cov;
-                if (cov_sparse)
-                    delete cov_sparse;
-
-                if (tag)
-                    delete tag;
-                //
-                return true;
-            }
-        }
-
-        printf("Did not find the desired covariance matrix\n");
-        return false;
+        return p_pFile->read_cov(node, cov_kind, p_covData);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    function [inv] = mne_read_inverse_operator(fname)
-//    %
-//    % [inv] = mne_read_inverse_operator(fname)
-//    %
-//    % Reads the inverse operator decomposition from a fif file
-//    %
-//    % fname        - The name of the file
-//    %
-
+    //=========================================================================================================
+    /**
+    * mne_read_inverse_operator
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the MNEInverseOperator::read_inverse_operator static function
+    *
+    * Reads the inverse operator decomposition from a fif file
+    *
+    * @param [in] p_sFileName   The name of the file
+    * @param [out] inv          The read inverse operator
+    *
+    * @return true if succeeded, false otherwise
+    */
     static bool read_inverse_operator(QString& p_sFileName, MNEInverseOperator*& inv)
     {
-        //
-        //   Open the file, create directory
-        //
-        printf("Reading inverse operator decomposition from %s...\n",p_sFileName.toUtf8().constData());
-        FiffFile* t_pFile = new FiffFile(p_sFileName);
-        FiffDirTree* t_pTree = NULL;
-        QList<FiffDirEntry>* t_pDir = NULL;
-
-        if(!t_pFile->open(t_pTree, t_pDir))
-        {
-            if(t_pFile)
-                delete t_pFile;
-            if(t_pTree)
-                delete t_pTree;
-            if(t_pDir)
-                delete t_pDir;
-
-            return false;
-        }
-        //
-        //   Find all inverse operators
-        //
-        QList <FiffDirTree *> invs_list = t_pTree->dir_tree_find(FIFFB_MNE_INVERSE_SOLUTION);
-        if ( invs_list.size()== 0)
-        {
-            printf("No inverse solutions in %s\n", p_sFileName.toUtf8().constData());
-            if(t_pFile)
-                delete t_pFile;
-            if(t_pTree)
-                delete t_pTree;
-            if(t_pDir)
-                delete t_pDir;
-            return false;
-        }
-        FiffDirTree* invs = invs_list[0];
-        //
-        //   Parent MRI data
-        //
-        QList <FiffDirTree *> parent_mri = t_pTree->dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
-        if (parent_mri.size() == 0)
-        {
-            printf("No parent MRI information in %s", p_sFileName.toUtf8().constData());
-            if(t_pFile)
-                delete t_pFile;
-            if(t_pTree)
-                delete t_pTree;
-            if(t_pDir)
-                delete t_pDir;
-            return false;
-        }
-        printf("\tReading inverse operator info...");
-        //
-        //   Methods and source orientations
-        //
-        FiffTag* t_pTag = NULL;
-        if (!invs->find_tag(t_pFile, FIFF_MNE_INCLUDED_METHODS, t_pTag))
-        {
-            printf("Modalities not found\n");
-            if(t_pTag)
-                delete t_pTag;
-            if(t_pFile)
-                delete t_pFile;
-            if(t_pTree)
-                delete t_pTree;
-            if(t_pDir)
-                delete t_pDir;
-            return false;
-        }
-        if(inv)
-            delete inv;
-        inv = new MNEInverseOperator();
-        inv->methods = *t_pTag->toInt();
-        //
-        if (!invs->find_tag(t_pFile, FIFF_MNE_SOURCE_ORIENTATION, t_pTag))
-        {
-            printf("Source orientation constraints not found\n");
-            if(t_pTag)
-                delete t_pTag;
-            if(t_pFile)
-                delete t_pFile;
-            if(t_pTree)
-                delete t_pTree;
-            if(t_pDir)
-                delete t_pDir;
-            return false;
-        }
-        inv->source_ori = *t_pTag->toInt();
-        //
-        if (!invs->find_tag(t_pFile, FIFF_MNE_SOURCE_SPACE_NPOINTS, t_pTag))
-        {
-            printf("Number of sources not found\n");
-            if(t_pTag)
-                delete t_pTag;
-            if(t_pFile)
-                delete t_pFile;
-            if(t_pTree)
-                delete t_pTree;
-            if(t_pDir)
-                delete t_pDir;
-            return false;
-        }
-        inv->nsource = *t_pTag->toInt();
-        inv->nchan   = 0;
-        //
-        //   Coordinate frame
-        //
-        if (!invs->find_tag(t_pFile, FIFF_MNE_COORD_FRAME, t_pTag))
-        {
-            printf("Coordinate frame tag not found\n");
-            if(t_pTag)
-                delete t_pTag;
-            if(t_pFile)
-                delete t_pFile;
-            if(t_pTree)
-                delete t_pTree;
-            if(t_pDir)
-                delete t_pDir;
-            return false;
-        }
-        inv->coord_frame = *t_pTag->toInt();
-        //
-        //   The actual source orientation vectors
-        //
-        if (!invs->find_tag(t_pFile, FIFF_MNE_INVERSE_SOURCE_ORIENTATIONS, t_pTag))
-        {
-            printf("Source orientation information not found\n");
-            if(t_pTag)
-                delete t_pTag;
-            if(t_pFile)
-                delete t_pFile;
-            if(t_pTree)
-                delete t_pTree;
-            if(t_pDir)
-                delete t_pDir;
-            return false;
-        }
-
-        if(inv->source_nn)
-            delete inv->source_nn;
-        inv->source_nn = t_pTag->toFloatMatrix();
-        inv->source_nn->transposeInPlace();
-
-        printf("[done]\n");
-        //
-        //   The SVD decomposition...
-        //
-        printf("\tReading inverse operator decomposition...");
-        if (!invs->find_tag(t_pFile, FIFF_MNE_INVERSE_SING, t_pTag))
-        {
-            printf("Singular values not found\n");
-            if(t_pTag)
-                delete t_pTag;
-            if(t_pFile)
-                delete t_pFile;
-            if(t_pTree)
-                delete t_pTree;
-            if(t_pDir)
-                delete t_pDir;
-            return false;
-        }
-
-        if(inv->sing)
-            delete inv->sing;
-        inv->sing = new VectorXf(Map<VectorXf>(t_pTag->toFloat(), t_pTag->size/4));
-        inv->nchan = inv->sing->rows();
-        //
-        //   The eigenleads and eigenfields
-        //
-        inv->eigen_leads_weighted = false;
-        if(!Fiff::read_named_matrix(t_pFile, invs, FIFF_MNE_INVERSE_LEADS, inv->eigen_leads))
-        {
-            inv->eigen_leads_weighted = true;
-            if(!Fiff::read_named_matrix(t_pFile, invs, FIFF_MNE_INVERSE_LEADS_WEIGHTED, inv->eigen_leads))
-            {
-                printf("Error reading eigenleads named matrix.\n");
-                if(t_pTag)
-                    delete t_pTag;
-                if(t_pFile)
-                    delete t_pFile;
-                if(t_pTree)
-                    delete t_pTree;
-                if(t_pDir)
-                    delete t_pDir;
-                return false;
-            }
-        }
-        //
-        //   Having the eigenleads as columns is better for the inverse calculations
-        //
-        inv->eigen_leads->transpose_named_matrix();
-
-
-        if(!Fiff::read_named_matrix(t_pFile, invs, FIFF_MNE_INVERSE_FIELDS, inv->eigen_fields))
-        {
-            printf("Error reading eigenfields named matrix.\n");
-            if(t_pTag)
-                delete t_pTag;
-            if(t_pFile)
-                delete t_pFile;
-            if(t_pTree)
-                delete t_pTree;
-            if(t_pDir)
-                delete t_pDir;
-            return false;
-        }
-        printf("[done]\n");
-        //
-        //   Read the covariance matrices
-        //
-        if(MNE::read_cov(t_pFile, invs, FIFFV_MNE_NOISE_COV, inv->noise_cov))
-        {
-            printf("\tNoise covariance matrix read.\n");
-        }
-        else
-        {
-            printf("\tError: Not able to read noise covariance matrix.\n");
-            if(t_pTag)
-                delete t_pTag;
-            if(t_pFile)
-                delete t_pFile;
-            if(t_pTree)
-                delete t_pTree;
-            if(t_pDir)
-                delete t_pDir;
-            return false;
-        }
-
-        if(MNE::read_cov(t_pFile, invs, FIFFV_MNE_SOURCE_COV, inv->source_cov))
-        {
-            printf("\tSource covariance matrix read.\n");
-        }
-        else
-        {
-            printf("\tError: Not able to read source covariance matrix.\n");
-            if(t_pTag)
-                delete t_pTag;
-            if(t_pFile)
-                delete t_pFile;
-            if(t_pTree)
-                delete t_pTree;
-            if(t_pDir)
-                delete t_pDir;
-            return false;
-        }
-        //
-        //   Read the various priors
-        //
-        if(MNE::read_cov(t_pFile, invs, FIFFV_MNE_ORIENT_PRIOR_COV, inv->orient_prior))
-        {
-            printf("\tOrientation priors read.\n");
-        }
-        else
-        {
-            if(inv->orient_prior)
-                delete inv->orient_prior;
-            inv->orient_prior = NULL;
-        }
-        if(MNE::read_cov(t_pFile, invs, FIFFV_MNE_DEPTH_PRIOR_COV, inv->depth_prior))
-        {
-            printf("\tDepth priors read.\n");
-        }
-        else
-        {
-            if(inv->depth_prior)
-                delete inv->depth_prior;
-            inv->depth_prior = NULL;
-        }
-        if(MNE::read_cov(t_pFile, invs, FIFFV_MNE_FMRI_PRIOR_COV, inv->fmri_prior))
-        {
-            printf("\tfMRI priors read.\n");
-        }
-        else
-        {
-            if(inv->fmri_prior)
-                delete inv->fmri_prior;
-            inv->fmri_prior = NULL;
-        }
-        //
-        //   Read the source spaces
-        //
-        if(!MNESourceSpace::read_source_spaces(t_pFile, false, t_pTree, inv->src))
-        {
-            printf("\tError: Could not read the source spaces.\n");
-            if(t_pTag)
-                delete t_pTag;
-            if(t_pFile)
-                delete t_pFile;
-            if(t_pTree)
-                delete t_pTree;
-            if(t_pDir)
-                delete t_pDir;
-            return false;
-        }
-        for (qint32 k = 0; k < inv->src->hemispheres.size(); ++k)
-           inv->src->hemispheres[k]->id = find_source_space_hemi(inv->src->hemispheres[k]);
-        //
-        //   Get the MRI <-> head coordinate transformation
-        //
-        FiffCoordTrans* mri_head_t = NULL;
-        if (!parent_mri[0]->find_tag(t_pFile, FIFF_COORD_TRANS, t_pTag))
-        {
-            printf("MRI/head coordinate transformation not found\n");
-            if(t_pTag)
-                delete t_pTag;
-            if(t_pFile)
-                delete t_pFile;
-            if(t_pTree)
-                delete t_pTree;
-            if(t_pDir)
-                delete t_pDir;
-            return false;
-        }
-        else
-        {
-            mri_head_t = t_pTag->toCoordTrans();
-            if (mri_head_t->from != FIFFV_COORD_MRI || mri_head_t->to != FIFFV_COORD_HEAD)
-            {
-                mri_head_t->invert_transform();
-                if (mri_head_t->from != FIFFV_COORD_MRI || mri_head_t->to != FIFFV_COORD_HEAD)
-                {
-                    printf("MRI/head coordinate transformation not found");
-                    if(mri_head_t)
-                        delete mri_head_t;
-                    if(t_pTag)
-                        delete t_pTag;
-                    if(t_pFile)
-                        delete t_pFile;
-                    if(t_pTree)
-                        delete t_pTree;
-                    if(t_pDir)
-                        delete t_pDir;
-                    return false;
-                }
-            }
-        }
-        inv->mri_head_t  = mri_head_t;
-        //
-        //   Transform the source spaces to the correct coordinate frame
-        //   if necessary
-        //
-        if (inv->coord_frame != FIFFV_COORD_MRI && inv->coord_frame != FIFFV_COORD_HEAD)
-        {
-            printf("Only inverse solutions computed in MRI or head coordinates are acceptable");
-            if(t_pTag)
-                delete t_pTag;
-            if(t_pFile)
-                delete t_pFile;
-            if(t_pTree)
-                delete t_pTree;
-            if(t_pDir)
-                delete t_pDir;
-        }
-        //
-        //  Number of averages is initially one
-        //
-        inv->nave = 1;
-        //
-        //  We also need the SSP operator
-        //
-        inv->projs     = t_pFile->read_proj(t_pTree);
-        //
-        //  Some empty fields to be filled in later
-        //
-//        inv.proj      = [];      %   This is the projector to apply to the data
-//        inv.whitener  = [];      %   This whitens the data
-//        inv.reginv    = [];      %   This the diagonal matrix implementing
-//                                 %   regularization and the inverse
-//        inv.noisenorm = [];      %   These are the noise-normalization factors
-        //
-        if(!inv->src->transform_source_space_to(inv->coord_frame, mri_head_t))
-        {
-            printf("Could not transform source space.\n");
-        }
-        printf("\tSource spaces transformed to the inverse solution coordinate frame\n");
-        //
-        //   Done!
-        //
-        if(t_pTag)
-            delete t_pTag;
-        if(t_pFile)
-            delete t_pFile;
-        if(t_pTree)
-            delete t_pTree;
-        if(t_pDir)
-            delete t_pDir;
-
-        return true;
+        return MNEInverseOperator::read_inverse_operator(p_sFileName, inv);
     }
-
-
-
-
-
-
-
-
-
 
     //=========================================================================================================
     /**

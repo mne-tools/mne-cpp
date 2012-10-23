@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include "mne_forwardsolution.h"
+#include "mne_math.h"
 
 
 //*************************************************************************************************************
@@ -390,7 +391,7 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
             printf("\tChanging to fixed-orientation forward solution...");
 
             MatrixXf tmp = fwd->source_nn.transpose();
-            SparseMatrix<float>* fix_rot = make_block_diag(&tmp,1);
+            SparseMatrix<float>* fix_rot = MNEMath::make_block_diag(&tmp,1);
             *fwd->sol->data  = (*fwd->sol->data)*(*fix_rot);
             fwd->sol->ncol  = fwd->nsource;
             fwd->source_ori = FIFFV_MNE_FIXED_ORI;
@@ -458,7 +459,7 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
                 nuse += t_pSourceSpace->hemispheres.at(k)->nuse;
             }
             MatrixXf tmp = fwd->source_nn.transpose();
-            SparseMatrix<float>* surf_rot = make_block_diag(&tmp,3);
+            SparseMatrix<float>* surf_rot = MNEMath::make_block_diag(&tmp,3);
 
             *fwd->sol->data = (*fwd->sol->data)*(*surf_rot);
 
@@ -629,101 +630,6 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
         delete t_pTag;
 
     return true;
-}
-
-
-//*************************************************************************************************************
-
-//    static inline MatrixXf extract_block_diag(MatrixXf& A, qint32 n)
-//    {
-
-
-//        //
-//        // Principal Investigators and Developers:
-//        // ** Richard M. Leahy, PhD, Signal & Image Processing Institute,
-//        //    University of Southern California, Los Angeles, CA
-//        // ** John C. Mosher, PhD, Biophysics Group,
-//        //    Los Alamos National Laboratory, Los Alamos, NM
-//        // ** Sylvain Baillet, PhD, Cognitive Neuroscience & Brain Imaging Laboratory,
-//        //    CNRS, Hopital de la Salpetriere, Paris, France
-//        //
-//        // Copyright (c) 2005 BrainStorm by the University of Southern California
-//        // This software distributed  under the terms of the GNU General Public License
-//        // as published by the Free Software Foundation. Further details on the GPL
-//        // license can be found at http://www.gnu.org/copyleft/gpl.html .
-//        //
-//        //FOR RESEARCH PURPOSES ONLY. THE SOFTWARE IS PROVIDED "AS IS," AND THE
-//        // UNIVERSITY OF SOUTHERN CALIFORNIA AND ITS COLLABORATORS DO NOT MAKE ANY
-//        // WARRANTY, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF
-//        // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, NOR DO THEY ASSUME ANY
-//        // LIABILITY OR RESPONSIBILITY FOR THE USE OF THIS SOFTWARE.
-//        //
-//        // Author: John C. Mosher 1993 - 2004
-//        //
-//        //
-//        // Modifications for mne Matlab toolbox
-//        //
-//        //   Matti Hamalainen
-//        //   2006
-
-
-//          [mA,na] = size(A);		% matrix always has na columns
-//          % how many entries in the first column?
-//          bdn = na/n;			% number of blocks
-//          ma = mA/bdn;			% rows in first block
-
-//          % blocks may themselves contain zero entries.  Build indexing as above
-//          tmp = reshape([1:(ma*bdn)]',ma,bdn);
-//          i = zeros(ma*n,bdn);
-//          for iblock = 1:n,
-//            i((iblock-1)*ma+[1:ma],:) = tmp;
-//          end
-
-//          i = i(:); 			% row indices foreach sparse bd
-
-
-//          j = [0:mA:(mA*(na-1))];
-//          j = j(ones(ma,1),:);
-//          j = j(:);
-
-//          i = i + j;
-
-//          bd = full(A(i)); 	% column vector
-//          bd = reshape(bd,ma,na);	% full matrix
-
-//    }
-
-
-//*************************************************************************************************************
-
-inline SparseMatrix<float>* MNEForwardSolution::make_block_diag(const MatrixXf* A, qint32 n)
-{
-
-    qint32 ma = A->rows();
-    qint32 na = A->cols();
-    float bdn = ((float)na)/n;      // number of submatrices
-
-//    std::cout << std::endl << "ma " << ma << " na " << na << " bdn " << bdn << std::endl;
-
-    if(bdn - floor(bdn))
-    {
-        printf("Width of matrix must be even multiple of n\n");
-        return NULL;
-    }
-
-    SparseMatrix<float>* bd = new SparseMatrix<float>((int)floor((float)ma*bdn+0.5),na);
-
-    qint32 current_col, current_row, i, r, c;
-    for(i = 0; i < bdn; ++i)
-    {
-        current_col = i * n;
-        current_row = i * ma;
-
-        for(r = 0; r < ma; ++r)
-            for(c = 0; c < n; ++c)
-                bd->insert(r+current_row,c+current_col) = (*A)(r, c+current_col);
-    }
-    return bd;
 }
 
 
