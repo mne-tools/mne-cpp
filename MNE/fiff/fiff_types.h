@@ -95,7 +95,7 @@ typedef quint16              fiff_dau_pack13_t;
 typedef quint16              fiff_dau_pack14_t;
 typedef qint16               fiff_dau_pack16_t;
 typedef qint32               fiff_julian_t;
-typedef void                 fiff_data_t;
+typedef char                 fiff_data_t; //unsig char instead of void -> avoid void in C++ cause of its undefined behaviour using delete -> this can happen during lots of casting
 
 
 //*************************************************************************************************************
@@ -106,9 +106,9 @@ typedef void                 fiff_data_t;
 /** Accurate time stamps used in FIFF files.*/
 
 typedef struct _fiffTimeRec {
- fiff_int_t secs;		/**< GMT time in seconds since epoch */
- fiff_int_t usecs;		/**< Fraction of seconds in microseconds */
-} *fiffTime, fiffTimeRec;	/**< Accurate time stamps used in FIFF files.*/
+ fiff_int_t secs;           /**< GMT time in seconds since epoch */
+ fiff_int_t usecs;          /**< Fraction of seconds in microseconds */
+} *fiffTime, fiffTimeRec;   /**< Accurate time stamps used in FIFF files.*/
 
 
 /** Structure representing digitized strings. */
