@@ -52,6 +52,8 @@
 #include "fiff_types.h"
 #include "fiff_info.h"
 #include "fiff_evoked_data.h"
+#include "fiff_file.h"
+#include "fiff_dir_tree.h"
 
 
 //*************************************************************************************************************
@@ -113,6 +115,24 @@ public:
     * Destroys the FiffEvokedDataSet.
     */
     ~FiffEvokedDataSet();
+
+    //=========================================================================================================
+    /**
+    * fiff_read_evoked
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffEvokedDataSet::read_evoked static function
+    *
+    * Read one evoked data set
+    *
+    * @param[in] p_sFileName    The name of the file to read from
+    * @param[out] data          The read evoked data
+    * @param[in] setno          the set to pick
+    *
+    * @return the CTF software compensation data
+    */
+    static bool read_evoked(QString& p_sFileName, FiffEvokedDataSet*& data, fiff_int_t setno = 0);
 
 public:
     FiffInfo*               info;   /**< ToDo... */
