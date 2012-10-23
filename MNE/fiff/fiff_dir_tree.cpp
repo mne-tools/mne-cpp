@@ -131,16 +131,18 @@ bool FiffDirTree::copy_tree(FiffFile* fidin, FiffId& in_id, QList<FiffDirTree*>&
 //                    tag.data = new fiff_data_t[tag.size];// + ((tag.type == FIFFT_STRING) ? 1 : 0));//realloc(tag.data,tag.size + ((tag.type == FIFFT_STRING) ? 1 : 0));
                 if (tag.data != NULL)
                     delete tag.data;
-                tag.data = new fiff_data_t[tag.size + ((tag.type == FIFFT_STRING) ? 1 : 0)];
+//                tag.data = new QByteArray();// + ((tag.type == FIFFT_STRING) ? 1 : 0)];
 
-                if (tag.data == NULL) {
-                    printf("fiff_read_tag: memory allocation failed.\n");//consider throw
-                    return false;
-                }
-                char *t_pCharData = static_cast< char* >(tag.data);
-                in.readRawData(t_pCharData, tag.size);
-                if (tag.type == FIFFT_STRING)
-                    t_pCharData[tag.size] = NULL;//make sure that char ends with NULL
+//                if (tag.data == NULL) {
+//                    printf("fiff_read_tag: memory allocation failed.\n");//consider throw
+//                    return false;
+//                }
+
+                tag.data = new QByteArray();
+                tag.data->resize(tag.size);
+                in.readRawData(tag.data->data(), tag.size);
+//                if (tag.type == FIFFT_STRING)
+//                    tag.data[tag.size] = NULL;//make sure that char ends with NULL
                 FiffTag::convert_tag_data(&tag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
             } //tag.data = fread(fidin, tag.size, 'uchar');
 
@@ -153,7 +155,7 @@ bool FiffDirTree::copy_tree(FiffFile* fidin, FiffId& in_id, QList<FiffDirTree*>&
             out << (qint32)tag.size;
             out << (qint32)FIFFV_NEXT_SEQ;
 
-            out.writeRawData(static_cast< const char* >(tag.data),tag.size);
+            out.writeRawData(tag.data->data(),tag.size);
         }
         for(p = 0; p < nodes[k]->nchild; ++p)
         {

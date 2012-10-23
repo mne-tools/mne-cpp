@@ -79,13 +79,8 @@ FiffTag::FiffTag(FiffTag* p_pFiffTag)
 , type(p_pFiffTag->type)
 , size(p_pFiffTag->size)
 , next(p_pFiffTag->next)
-, data( new char[p_pFiffTag->size + ((p_pFiffTag->type == FIFFT_STRING) ? 1 : 0)] )
+, data( new QByteArray(*p_pFiffTag->data))
 {
-    memcpy(data, p_pFiffTag->data, p_pFiffTag->size);
-    if (p_pFiffTag->type == FIFFT_STRING)
-        data[p_pFiffTag->size] = NULL;//make sure that char ends with NULL
-
-
     if(p_pFiffTag->m_pComplexFloatData)
         this->toComplexFloat();
     else
@@ -95,7 +90,6 @@ FiffTag::FiffTag(FiffTag* p_pFiffTag)
         this->toComplexDouble();
     else
         m_pComplexDoubleData = NULL;
-
 }
 
 
@@ -105,7 +99,7 @@ FiffTag::FiffTag(FiffTag* p_pFiffTag)
 FiffTag::~FiffTag()
 {
     if(this->data)
-        delete[](this->data);
+        delete this->data;
     if(this->m_pComplexFloatData)
         delete this->m_pComplexFloatData;
     if(this->m_pComplexDoubleData)
@@ -185,22 +179,25 @@ bool FiffTag::read_tag(FiffFile* p_pFile, FiffTag*& p_pTag, qint64 pos)
 //            p_pTag->data = new fiff_data_t[p_pTag->size];//,p_pTag->size + ((p_pTag->type == FIFFT_STRING) ? 1 : 0));//realloc(p_pTag->data,p_pTag->size + ((p_pTag->type == FIFFT_STRING) ? 1 : 0));
 //        }
 
+
+
         if (p_pTag->data != NULL)
             delete p_pTag->data;
-        p_pTag->data = new fiff_data_t[p_pTag->size + ((p_pTag->type == FIFFT_STRING) ? 1 : 0)];
+//        p_pTag->data = new QByteArray();// + ((p_pTag->type == FIFFT_STRING) ? 1 : 0)];
 
+//        if (p_pTag->data == NULL) {
+//            printf("fiff_read_tag: memory allocation failed.\n");//consider throw
+//            delete p_pTag;
+//            p_pTag = NULL;
+//            return false;
+//        }
 
+        p_pTag->data = new QByteArray();
+        p_pTag->data->resize(p_pTag->size);
+        t_DataStream.readRawData(p_pTag->data->data(), p_pTag->size);
 
-        if (p_pTag->data == NULL) {
-            printf("fiff_read_tag: memory allocation failed.\n");//consider throw
-            delete p_pTag;
-            p_pTag = NULL;
-            return false;
-        }
-        char *t_pCharData = p_pTag->data;
-        t_DataStream.readRawData(t_pCharData, p_pTag->size);
-        if (p_pTag->type == FIFFT_STRING)
-            t_pCharData[p_pTag->size] = NULL;//make sure that char ends with NULL
+//        if (p_pTag->type == FIFFT_STRING)
+//            p_pTag->data[p_pTag->size] = NULL;//make sure that char ends with NULL
         FiffTag::convert_tag_data(p_pTag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
     }
 
@@ -246,7 +243,7 @@ bool FiffTag::getMatrixDimensions(qint32& p_ndim, qint32*& p_pDims) const
     //
     // Find dimensions and return to the beginning of tag data
     //
-    qint32* t_pInt32 = (qint32*)this->data;
+    qint32* t_pInt32 = (qint32*)this->data->data();
 
     p_ndim = t_pInt32[(this->size-4)/4];
 
@@ -602,7 +599,7 @@ void FiffTag::convert_matrix_from_file_data(FiffTag* tag)
     if (tsize < sizeof(fiff_int_t))
         return;
 
-    dimp = ((fiff_int_t *)(((char *)tag->data)+tag->size-sizeof(fiff_int_t)));
+    dimp = ((fiff_int_t *)((tag->data->data())+tag->size-sizeof(fiff_int_t)));
     swap_intp(dimp);
     ndim = *dimp;
     if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_DENSE) {
@@ -632,7 +629,7 @@ void FiffTag::convert_matrix_from_file_data(FiffTag* tag)
         /*
          * Take care of the indices
         */
-        for (data = (int *)(tag->data)+nz, k = 0; k < np; k++)
+        for (data = (int *)(tag->data->data())+nz, k = 0; k < np; k++)
             swap_intp(data+k);
         np = nz;
     }
@@ -641,15 +638,15 @@ void FiffTag::convert_matrix_from_file_data(FiffTag* tag)
      */
     kind = fiff_type_base(tag->type);
     if (kind == FIFFT_INT) {
-        for (data = (int *)(tag->data), k = 0; k < np; k++)
+        for (data = (int *)(tag->data->data()), k = 0; k < np; k++)
             swap_intp(data+k);
     }
     else if (kind == FIFFT_FLOAT) {
-        for (fdata = (float *)(tag->data), k = 0; k < np; k++)
+        for (fdata = (float *)(tag->data->data()), k = 0; k < np; k++)
             swap_floatp(fdata+k);
     }
     else if (kind == FIFFT_DOUBLE) {
-        for (ddata = (double *)(tag->data), k = 0; k < np; k++)
+        for (ddata = (double *)(tag->data->data()), k = 0; k < np; k++)
             swap_doublep(ddata+k);
     }
     return;
@@ -795,14 +792,14 @@ void FiffTag::convert_tag_data(FiffTag* tag, int from_endian, int to_endian)
     case FIFFT_JULIAN :
     case FIFFT_UINT :
         np = tag->size/sizeof(fiff_int_t);
-        for (ithis = (fiff_int_t *)tag->data, k = 0; k < np; k++, ithis++)
+        for (ithis = (fiff_int_t *)tag->data->data(), k = 0; k < np; k++, ithis++)
             swap_intp(ithis);
         break;
 
     case FIFFT_LONG :
     case FIFFT_ULONG :
         np = tag->size/sizeof(fiff_long_t);
-        for (lthis = (fiff_long_t *)tag->data, k = 0; k < np; k++, lthis++)
+        for (lthis = (fiff_long_t *)tag->data->data(), k = 0; k < np; k++, lthis++)
             swap_longp(lthis);
         break;
 
@@ -810,27 +807,27 @@ void FiffTag::convert_tag_data(FiffTag* tag, int from_endian, int to_endian)
     case FIFFT_DAU_PACK16 :
     case FIFFT_USHORT :
         np = tag->size/sizeof(fiff_short_t);
-        for (sthis = (fiff_short_t *)tag->data, k = 0; k < np; k++, sthis++)
+        for (sthis = (fiff_short_t *)tag->data->data(), k = 0; k < np; k++, sthis++)
             *sthis = swap_short(*sthis);
         break;
 
     case FIFFT_FLOAT :
     case FIFFT_COMPLEX_FLOAT :
         np = tag->size/sizeof(fiff_float_t);
-        for (fthis = (fiff_float_t *)tag->data, k = 0; k < np; k++, fthis++)
+        for (fthis = (fiff_float_t *)tag->data->data(), k = 0; k < np; k++, fthis++)
             swap_floatp(fthis);
         break;
 
     case FIFFT_DOUBLE :
     case FIFFT_COMPLEX_DOUBLE :
         np = tag->size/sizeof(fiff_double_t);
-        for (dthis = (fiff_double_t *)tag->data, k = 0; k < np; k++, dthis++)
+        for (dthis = (fiff_double_t *)tag->data->data(), k = 0; k < np; k++, dthis++)
             swap_doublep(dthis);
         break;
 
 
     case FIFFT_OLD_PACK :
-        fthis = (float *)tag->data;
+        fthis = (float *)tag->data->data();
     /*
      * Offset and scale...
      */
@@ -844,7 +841,7 @@ void FiffTag::convert_tag_data(FiffTag* tag, int from_endian, int to_endian)
 
     case FIFFT_DIR_ENTRY_STRUCT :
 //        np = tag->size/sizeof(fiffDirEntryRec);
-//        for (dethis = (fiffDirEntry)tag->data, k = 0; k < np; k++, dethis++) {
+//        for (dethis = (fiffDirEntry)tag->data->data(), k = 0; k < np; k++, dethis++) {
 //            dethis->kind = swap_int(dethis->kind);
 //            dethis->type = swap_int(dethis->type);
 //            dethis->size = swap_int(dethis->size);
@@ -852,7 +849,7 @@ void FiffTag::convert_tag_data(FiffTag* tag, int from_endian, int to_endian)
 //        }
         np = tag->size/FiffDirEntry::storageSize();
         for (k = 0; k < np; k++) {
-            offset = (char*)tag->data + k*FiffDirEntry::storageSize();
+            offset = (char*)tag->data->data() + k*FiffDirEntry::storageSize();
             ithis = (fiff_int_t*) offset;
             ithis[0] = swap_int(ithis[0]);//kind
             ithis[1] = swap_int(ithis[1]);//type
@@ -863,7 +860,7 @@ void FiffTag::convert_tag_data(FiffTag* tag, int from_endian, int to_endian)
 
     case FIFFT_ID_STRUCT :
 //        np = tag->size/sizeof(fiffIdRec);
-//        for (idthis = (fiffId)tag->data, k = 0; k < np; k++, idthis++) {
+//        for (idthis = (fiffId)tag->data->data(), k = 0; k < np; k++, idthis++) {
 //            idthis->version = swap_int(idthis->version);
 //            idthis->machid[0] = swap_int(idthis->machid[0]);
 //            idthis->machid[1] = swap_int(idthis->machid[1]);
@@ -872,7 +869,7 @@ void FiffTag::convert_tag_data(FiffTag* tag, int from_endian, int to_endian)
 //        }
         np = tag->size/FiffId::storageSize();
         for (k = 0; k < np; k++) {
-            offset = (char*)tag->data + k*FiffId::storageSize();
+            offset = (char*)tag->data->data() + k*FiffId::storageSize();
             ithis = (fiff_int_t*) offset;
             ithis[0] = swap_int(ithis[0]);//version
             ithis[1] = swap_int(ithis[1]);//machid[0]
@@ -884,7 +881,7 @@ void FiffTag::convert_tag_data(FiffTag* tag, int from_endian, int to_endian)
 
     case FIFFT_CH_INFO_STRUCT :
 //        np = tag->size/sizeof(fiffChInfoRec);
-//        for (chthis = (fiffChInfoRec*)tag->data, k = 0; k < np; k++, chthis++) {
+//        for (chthis = (fiffChInfoRec*)tag->data->data(), k = 0; k < np; k++, chthis++) {
 //            chthis->scanNo    = swap_int(chthis->scanNo);
 //            chthis->logNo     = swap_int(chthis->logNo);
 //            chthis->kind      = swap_int(chthis->kind);
@@ -897,7 +894,7 @@ void FiffTag::convert_tag_data(FiffTag* tag, int from_endian, int to_endian)
 
         np = tag->size/FiffChInfo::storageSize();
         for (k = 0; k < np; k++) {
-            offset = (char*)tag->data + k*FiffChInfo::storageSize();
+            offset = (char*)tag->data->data() + k*FiffChInfo::storageSize();
             ithis = (fiff_int_t*) offset;
             fthis = (float*) offset;
 
@@ -917,13 +914,13 @@ void FiffTag::convert_tag_data(FiffTag* tag, int from_endian, int to_endian)
 
     case FIFFT_CH_POS_STRUCT :
 //        np = tag->size/sizeof(fiffChPosRec);
-//        for (cpthis = (fiffChPos)tag->data, k = 0; k < np; k++, cpthis++)
+//        for (cpthis = (fiffChPos)tag->data->data(), k = 0; k < np; k++, cpthis++)
 //            convert_ch_pos(cpthis);
 
         np = tag->size/FiffChPos::storageSize();
         for (k = 0; k < np; ++k)
         {
-            offset = (char*)tag->data + k*FiffChPos::storageSize();
+            offset = (char*)tag->data->data() + k*FiffChPos::storageSize();
             ithis = (fiff_int_t*) offset;
             fthis = (float*) offset;
 
@@ -936,7 +933,7 @@ void FiffTag::convert_tag_data(FiffTag* tag, int from_endian, int to_endian)
 
     case FIFFT_DIG_POINT_STRUCT :
 //        np = tag->size/sizeof(fiffDigPointRec);
-//        for (dpthis = (fiffDigPoint)tag->data, k = 0; k < np; k++, dpthis++) {
+//        for (dpthis = (fiffDigPoint)tag->data->data(), k = 0; k < np; k++, dpthis++) {
 //            dpthis->kind = swap_int(dpthis->kind);
 //            dpthis->ident = swap_int(dpthis->ident);
 //            for (r = 0; r < 3; r++)
@@ -946,7 +943,7 @@ void FiffTag::convert_tag_data(FiffTag* tag, int from_endian, int to_endian)
         np = tag->size/FiffDigPoint::storageSize();
 
         for (k = 0; k < np; k++) {
-            offset = (char*)tag->data + k*FiffDigPoint::storageSize();
+            offset = (char*)tag->data->data() + k*FiffDigPoint::storageSize();
             ithis = (fiff_int_t*) offset;
             fthis = (float*) offset;
 
@@ -960,7 +957,7 @@ void FiffTag::convert_tag_data(FiffTag* tag, int from_endian, int to_endian)
 
     case FIFFT_COORD_TRANS_STRUCT :
 //        np = tag->size/sizeof(fiffCoordTransRec);
-//        for (ctthis = (fiffCoordTrans)tag->data, k = 0; k < np; k++, ctthis++) {
+//        for (ctthis = (fiffCoordTrans)tag->data->data(), k = 0; k < np; k++, ctthis++) {
 //            ctthis->from = swap_int(ctthis->from);
 //            ctthis->to   = swap_int(ctthis->to);
 //        for (r = 0; r < 3; r++) {
@@ -977,7 +974,7 @@ void FiffTag::convert_tag_data(FiffTag* tag, int from_endian, int to_endian)
 
         for( k = 0; k < np; ++k)
         {
-            offset = (char*)tag->data + k*FiffCoordTrans::storageSize();
+            offset = (char*)tag->data->data() + k*FiffCoordTrans::storageSize();
             ithis = (fiff_int_t*)offset;
             fthis = (float*)offset;
 
@@ -991,7 +988,7 @@ void FiffTag::convert_tag_data(FiffTag* tag, int from_endian, int to_endian)
 
     case FIFFT_DATA_REF_STRUCT :
         np = tag->size/sizeof(fiffDataRefRec);
-        for (drthis = (fiffDataRef)tag->data, k = 0; k < np; k++, drthis++) {
+        for (drthis = (fiffDataRef)tag->data->data(), k = 0; k < np; k++, drthis++) {
             drthis->type   = swap_int(drthis->type);
             drthis->endian = swap_int(drthis->endian);
             drthis->size   = swap_long(drthis->size);
