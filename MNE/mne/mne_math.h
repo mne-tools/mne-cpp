@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_epoch_data.h
+* @file     mne_math.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,22 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the MNEInverseOperator class declaration.
+* @brief    ToDo Documentation...
 *
 */
 
-#ifndef MNE_INVERSE_OPERATOR_H
-#define MNE_INVERSE_OPERATOR_H
-
+#ifndef MNE_MATH_H
+#define MNE_MATH_H
 
 //*************************************************************************************************************
 //=============================================================================================================
-// INCLUDES
+// MNE INCLUDES
 //=============================================================================================================
 
 #include "mne_global.h"
-#include "mne_sourcespace.h"
-#include "mne_math.h"
 
 
 //*************************************************************************************************************
@@ -53,9 +50,6 @@
 //=============================================================================================================
 
 #include "../fiff/fiff_types.h"
-#include "../fiff/fiff_named_matrix.h"
-#include "../fiff/fiff_proj.h"
-#include "../fiff/fiff_cov.h"
 
 
 //*************************************************************************************************************
@@ -64,16 +58,13 @@
 //=============================================================================================================
 
 #include "../3rdParty/Eigen/Core"
+#include "../3rdParty/Eigen/SparseCore"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
-
-#include <QList>
-
-
 
 
 //*************************************************************************************************************
@@ -89,96 +80,70 @@ namespace MNELIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
 using namespace Eigen;
+using namespace FIFFLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
 
 //=============================================================================================================
 /**
-* MNE epoch data, which corresponds to an event
+* DECLARE CLASS MNEMath
 *
-* @brief epoch data
+* @brief The MNEMath class provides
 */
-class MNESHARED_EXPORT MNEInverseOperator
-{
-
+class MNESHARED_EXPORT MNEMath {
 public:
     //=========================================================================================================
     /**
-    * ctor
+    * dtor
     */
-    MNEInverseOperator();
+    virtual ~MNEMath()
+    { }
 
     //=========================================================================================================
     /**
-    * Copy ctor
-    */
-    MNEInverseOperator(const MNEInverseOperator* p_pMNEInverseOperator);
-
-    //=========================================================================================================
-    /**
-    * Destroys the MNEInverseOperator.
-    */
-    ~MNEInverseOperator();
-
-    //=========================================================================================================
-    /**
-    * mne_prepare_inverse_operator
+    * mne_combine_xyz
     *
     * ### MNE toolbox root function ###
     *
-    * Prepare for actually computing the inverse
+    * Compute the three Cartesian components of a vector together
     *
-    * @param [in] nave      Number of averages (scales the noise covariance)
-    * @param [in] lambda2   The regularization factor
-    * @param [in] dSPM      Compute the noise-normalization factors for dSPM?
-    * @param [in] sLORETA   Compute the noise-normalization factors for sLORETA?
+    * @param[in] vec    Input row vector [ x1 y1 z1 ... x_n y_n z_n ]
     *
-    * @return the prepared inverse operator
+    * @return Output vector [x1^2+y1^2+z1^2 ... x_n^2+y_n^2+z_n^2 ]
     */
-    MNEInverseOperator* prepare_inverse_operator(qint32 nave ,float lambda2, bool dSPM, bool sLORETA = false);
+    static VectorXf* combine_xyz(const VectorXf& vec);
 
     //=========================================================================================================
     /**
-    * mne_read_inverse_operator
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Reads the inverse operator decomposition from a fif file
-    *
-    * @param [in] p_sFileName   The name of the file
-    * @param [out] inv          The read inverse operator
-    *
-    * @return true if succeeded, false otherwise
+    * ### MNE toolbox root function ###: Implementation of the mne_block_diag function - decoding part
     */
-    static bool read_inverse_operator(QString& p_sFileName, MNEInverseOperator*& inv);
+//    static inline MatrixXf extract_block_diag(MatrixXf& A, qint32 n);
 
-public:
-    fiff_int_t methods;
-    fiff_int_t source_ori;
-    fiff_int_t nsource;
-    fiff_int_t nchan;
-    fiff_int_t coord_frame;
-    MatrixXf*  source_nn;
-    VectorXf*  sing;
-    bool    eigen_leads_weighted;
-    FiffNamedMatrix* eigen_leads;
-    FiffNamedMatrix* eigen_fields;
-    FiffCov* noise_cov;
-    FiffCov* source_cov;
-    FiffCov* orient_prior;
-    FiffCov* depth_prior;
-    FiffCov* fmri_prior;
-    MNESourceSpace* src;
-    FiffCoordTrans* mri_head_t;
-    fiff_int_t nave;
-    QList<FiffProj*> projs;
-    MatrixXf* proj;                     /**< This is the projector to apply to the data. */
-    MatrixXf* whitener;                 /**< This whitens the data */
-    VectorXf* reginv;                   /**< This the diagonal matrix implementing. regularization and the inverse */
-    SparseMatrix<float>* noisenorm;     /**< These are the noise-normalization factors */
+    //=========================================================================================================
+    /**
+    * ### MNE toolbox root function ###: Implementation of the mne_block_diag function - encoding part
+    *
+    * Make a sparse block diagonal matrix
+    *
+    * Returns a sparse block diagonal, diagonalized from the elements in "A". "A" is ma x na, comprising
+    * bdn=(na/"n") blocks of submatrices. Each submatrix is ma x "n", and these submatrices are placed down
+    * the diagonal of the matrix.
+    *
+    * @param[in, out] A Matrix which should be diagonlized
+    * @param[in, out] n Columns of the submatrices
+    *
+    * @return A sparse block diagonal, diagonalized from the elements in "A".
+    */
+    static SparseMatrix<float>* make_block_diag(const MatrixXf* A, qint32 n);
 };
+
 
 } // NAMESPACE
 
-#endif // MNE_INVERSE_OPERATOR_H
+#endif // MNE_MATH_H

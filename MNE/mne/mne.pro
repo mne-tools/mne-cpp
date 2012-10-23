@@ -64,9 +64,9 @@ SOURCES += mne.cpp \
     mne_forwardsolution.cpp \
     mne_hemisphere.cpp \
     mne_inverse_operator.cpp \
-    mne_cov.cpp \
     mne_epoch_data.cpp \
-    mne_epoch_data_list.cpp
+    mne_epoch_data_list.cpp \
+    mne_math.cpp
 
 HEADERS += mne.h\
         mne_global.h \
@@ -75,9 +75,9 @@ HEADERS += mne.h\
     mne_hemisphere.h \
     mne_forwardsolution.h \
     mne_inverse_operator.h \
-    mne_cov.h \
     mne_epoch_data.h \
-    mne_epoch_data_list.h
+    mne_epoch_data_list.h \
+    mne_math.h
 
 #Install headers to include directory
 header_files.files = ./*.h

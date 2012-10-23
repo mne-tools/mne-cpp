@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_cov.h
+* @file     fiff_cov.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,27 +29,27 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the MNECov class declaration.
+* @brief    Contains the FiffCov class declaration.
 *
 */
 
-#ifndef MNE_COV_H
-#define MNE_COV_H
+#ifndef FIFF_COV_H
+#define FIFF_COV_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_global.h"
+#include "fiff_global.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FIFF INCLUDES
 //=============================================================================================================
 
-#include "../fiff/fiff_types.h"
-#include "../fiff/fiff_proj.h"
+#include "fiff_types.h"
+#include "fiff_proj.h"
 
 
 //*************************************************************************************************************
@@ -65,7 +65,7 @@
 // DEFINE NAMESPACE MNELIB
 //=============================================================================================================
 
-namespace MNELIB
+namespace FIFFLIB
 {
 
 //*************************************************************************************************************
@@ -73,17 +73,16 @@ namespace MNELIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
 using namespace Eigen;
 
 
 //=============================================================================================================
 /**
-* MNE cov data, which corresponds to an event
+* Fiff cov data, which corresponds to a covariance data matrix
 *
 * @brief covariance data
 */
-class MNESHARED_EXPORT MNECov
+class FIFFSHARED_EXPORT FiffCov
 {
 
 public:
@@ -91,19 +90,19 @@ public:
     /**
     * ctor
     */
-    MNECov();
+    FiffCov();
 
     //=========================================================================================================
     /**
     * copy ctor
     */
-    MNECov(const MNECov* p_pMNECov);
+    FiffCov(const FiffCov* p_pFiffCov);
 
     //=========================================================================================================
     /**
     * Destroys the MNECov.
     */
-    ~MNECov();
+    ~FiffCov();
 
 public:
     fiff_int_t  kind;       /**< ToDo... */
@@ -120,4 +119,4 @@ public:
 
 } // NAMESPACE
 
-#endif // MNE_COV_DATA_H
+#endif // FIFF_COV_H

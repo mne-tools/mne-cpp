@@ -68,7 +68,8 @@ SOURCES += fiff.cpp \
     fiff_dig_point.cpp \
     fiff_ch_pos.cpp \
     fiff_evoked_data_set.cpp \
-    fiff_evoked_data.cpp
+    fiff_evoked_data.cpp \
+    fiff_cov.cpp
 
 HEADERS += fiff.h \
     fiff_global.h \
@@ -92,7 +93,8 @@ HEADERS += fiff.h \
     fiff_evoked_data.h \
     fiff_evoked_data.h \
     fiff_evoked_data_set.h \
-    fiff_evoked_data.h
+    fiff_evoked_data.h \
+    fiff_cov.h
 
 #Install headers to include directory
 header_files.files = ./*.h

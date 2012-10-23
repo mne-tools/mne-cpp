@@ -52,6 +52,8 @@
 #include "fiff_dig_point.h"
 #include "fiff_info.h"
 #include "fiff_raw_data.h"
+#include "fiff_cov.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -196,6 +198,22 @@ public:
     * @return the bad channel list
     */
     QStringList read_bad_channels(FiffDirTree* p_pTree);
+
+    //=========================================================================================================
+    /**
+    * mne_read_cov
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Reads a covariance matrix from a fiff file
+    *
+    * @param [in] node          look for the matrix in here
+    * @param [in] cov_kind      what kind of a covariance matrix do we want?
+    * @param [out] p_covData    the read covariance matrix
+    *
+    * @return true if succeeded, false otherwise
+    */
+    bool read_cov(FiffDirTree* node, fiff_int_t cov_kind, FiffCov*& p_covData);
 
     //=========================================================================================================
     /**
