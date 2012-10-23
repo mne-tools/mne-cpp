@@ -111,45 +111,29 @@ bool FiffDirTree::copy_tree(FiffFile* fidin, FiffId& in_id, QList<FiffDirTree*>&
                 return false;
             }
 
+//ToDo this is the same like read_tag
             FiffTag tag;
-
             QDataStream in(fidin);
             in.setByteOrder(QDataStream::BigEndian);
 
-            in >> tag.kind;// = fread(fidin, 1, 'int32');
-            in >> tag.type;// = fread(fidin, 1, 'uint32');
+            //
+            // Read fiff tag header from stream
+            //
+            in >> tag.kind;
+            in >> tag.type;
             qint32 size;
-            in >> size;// = fread(fidin, 1, 'int32');
+            in >> size;
             tag.resize(size);
-            in >> tag.next;// = fread(fidin, 1, 'int32');
+            in >> tag.next;
 
-
+            //
+            // Read data when available
+            //
             if (tag.size() > 0)
             {
-//                if (tag.data == NULL)
-//                    tag.data = new fiff_data_t[tag.size + ((tag.type == FIFFT_STRING) ? 1 : 0)];// + ((tag.type == FIFFT_STRING) ? 1 : 0));//malloc(tag.size + ((tag.type == FIFFT_STRING) ? 1 : 0));
-//                else
-//                    delete tag.data;
-//                    tag.data = new fiff_data_t[tag.size];// + ((tag.type == FIFFT_STRING) ? 1 : 0));//realloc(tag.data,tag.size + ((tag.type == FIFFT_STRING) ? 1 : 0));
-
-//                if (tag.data != NULL)
-//                    delete tag.data;
-
-//                tag.data = new QByteArray();// + ((tag.type == FIFFT_STRING) ? 1 : 0)];
-
-//                if (tag.data == NULL) {
-//                    printf("fiff_read_tag: memory allocation failed.\n");//consider throw
-//                    return false;
-//                }
-
-//                tag.data = new QByteArray();
-//                tag.data->resize(tag.size);
                 in.readRawData(tag.data(), tag.size());
-//                if (tag.type == FIFFT_STRING)
-//                    tag.data[tag.size] = NULL;//make sure that char ends with NULL
                 FiffTag::convert_tag_data(&tag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
-            } //tag.data = fread(fidin, tag.size, 'uchar');
-
+            }
 
             QDataStream out(fidout);
             out.setByteOrder(QDataStream::BigEndian);
