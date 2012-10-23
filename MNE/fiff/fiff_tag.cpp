@@ -130,7 +130,7 @@ bool FiffTag::read_tag_info(FiffFile* p_pFile, FiffTag*& p_pTag)
     p_pTag->resize(size);
     t_DataStream >> p_pTag->next;
 
-//    qDebug() << "read_tag_info" << "  Kind:" << p_pTag->kind << "  Type:" << p_pTag->type << "  Size:" << p_pTag->size << "  Next:" << p_pTag->next;
+//    qDebug() << "read_tag_info" << "  Kind:" << p_pTag->kind << "  Type:" << p_pTag->type << "  Size:" << p_pTag->size() << "  Next:" << p_pTag->next;
 
     if (p_pTag->next == FIFFV_NEXT_SEQ)
     {
