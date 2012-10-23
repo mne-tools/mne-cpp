@@ -136,7 +136,7 @@ bool FiffFile::open(FiffDirTree*& p_pTree, QList<FiffDirEntry>*& p_pDir)
         printf("Fiff::open: file does not start with a file id tag");//consider throw
         return false;
     }
-    if (t_pTag->size != 20)
+    if (t_pTag->size() != 20)
     {
         printf("Fiff::open: file does not start with a file id tag");//consider throw
         return false;
@@ -177,7 +177,7 @@ bool FiffFile::open(FiffDirTree*& p_pTree, QList<FiffDirEntry>*& p_pDir)
             ++k;
             t_fiffDirEntry.kind = t_pTag->kind;
             t_fiffDirEntry.type = t_pTag->type;
-            t_fiffDirEntry.size = t_pTag->size;
+            t_fiffDirEntry.size = t_pTag->size();
             p_pDir->append(t_fiffDirEntry);
         }
     }

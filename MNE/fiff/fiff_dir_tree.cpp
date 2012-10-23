@@ -118,19 +118,23 @@ bool FiffDirTree::copy_tree(FiffFile* fidin, FiffId& in_id, QList<FiffDirTree*>&
 
             in >> tag.kind;// = fread(fidin, 1, 'int32');
             in >> tag.type;// = fread(fidin, 1, 'uint32');
-            in >> tag.size;// = fread(fidin, 1, 'int32');
+            qint32 size;
+            in >> size;// = fread(fidin, 1, 'int32');
+            tag.resize(size);
             in >> tag.next;// = fread(fidin, 1, 'int32');
 
 
-            if (tag.size > 0)
+            if (tag.size() > 0)
             {
 //                if (tag.data == NULL)
 //                    tag.data = new fiff_data_t[tag.size + ((tag.type == FIFFT_STRING) ? 1 : 0)];// + ((tag.type == FIFFT_STRING) ? 1 : 0));//malloc(tag.size + ((tag.type == FIFFT_STRING) ? 1 : 0));
 //                else
 //                    delete tag.data;
 //                    tag.data = new fiff_data_t[tag.size];// + ((tag.type == FIFFT_STRING) ? 1 : 0));//realloc(tag.data,tag.size + ((tag.type == FIFFT_STRING) ? 1 : 0));
-                if (tag.data != NULL)
-                    delete tag.data;
+
+//                if (tag.data != NULL)
+//                    delete tag.data;
+
 //                tag.data = new QByteArray();// + ((tag.type == FIFFT_STRING) ? 1 : 0)];
 
 //                if (tag.data == NULL) {
@@ -138,9 +142,9 @@ bool FiffDirTree::copy_tree(FiffFile* fidin, FiffId& in_id, QList<FiffDirTree*>&
 //                    return false;
 //                }
 
-                tag.data = new QByteArray();
-                tag.data->resize(tag.size);
-                in.readRawData(tag.data->data(), tag.size);
+//                tag.data = new QByteArray();
+//                tag.data->resize(tag.size);
+                in.readRawData(tag.data(), tag.size());
 //                if (tag.type == FIFFT_STRING)
 //                    tag.data[tag.size] = NULL;//make sure that char ends with NULL
                 FiffTag::convert_tag_data(&tag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
@@ -152,10 +156,10 @@ bool FiffDirTree::copy_tree(FiffFile* fidin, FiffId& in_id, QList<FiffDirTree*>&
 
             out << (qint32)tag.kind;
             out << (qint32)tag.type;
-            out << (qint32)tag.size;
+            out << (qint32)tag.size();
             out << (qint32)FIFFV_NEXT_SEQ;
 
-            out.writeRawData(tag.data->data(),tag.size);
+            out.writeRawData(tag.data(),tag.size());
         }
         for(p = 0; p < nodes[k]->nchild; ++p)
         {
