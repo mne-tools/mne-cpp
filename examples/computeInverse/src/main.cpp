@@ -117,13 +117,13 @@ int main(int argc, char *argv[])
     //   Then the inverse operator
     //
     MNEInverseOperator* inv_raw = NULL;
-    MNE::read_inverse_operator(t_sFileInv, inv_raw);
+    MNEInverseOperator::read_inverse_operator(t_sFileInv, inv_raw);
     //
     //   Set up the inverse according to the parameters
     //
     if (nave < 0)
         nave = data->evoked[0]->nave;
-    MNEInverseOperator* inv = MNE::prepare_inverse_operator(inv_raw,nave,lambda2,dSPM,sLORETA);
+    MNEInverseOperator* inv = inv_raw->prepare_inverse_operator(nave,lambda2,dSPM,sLORETA);
     delete inv_raw;
     //
     //   Pick the correct channels from the data
