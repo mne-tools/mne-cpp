@@ -837,7 +837,7 @@ inline MatrixXi FiffTag::toIntMatrix() const
     // --> Use copy constructor instead --> slower performance but higher memory management reliability
     MatrixXi p_Matrix(Map<MatrixXi>( (int*)this->data(),pDims[0], pDims[1]));
 
-    delete pDims;
+    delete[] pDims;
 
     return p_Matrix;
 }
@@ -871,7 +871,7 @@ inline MatrixXf* FiffTag::toFloatMatrix() const
     // --> Use copy constructor instead --> slower performance but higher memory management reliability
     MatrixXf* p_pMatrix = new MatrixXf(Map<MatrixXf>( (float*)this->data(),pDims[0], pDims[1]));
 
-    delete pDims;
+    delete[] pDims;
 
     return p_pMatrix;
 }
