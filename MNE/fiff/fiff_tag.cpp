@@ -155,12 +155,15 @@ bool FiffTag::read_tag(FiffFile* p_pFile, FiffTag*& p_pTag, qint64 pos)
     }
 
     QDataStream t_DataStream(p_pFile);
+    t_DataStream.setByteOrder(QDataStream::BigEndian);
 
     if (p_pTag != NULL)
         delete p_pTag;
     p_pTag = new FiffTag();
 
-    //Option 2
+    //
+    // Read fiff tag header from stream
+    //
     t_DataStream >> p_pTag->kind;
     t_DataStream >> p_pTag->type;
     qint32 size;
@@ -168,39 +171,14 @@ bool FiffTag::read_tag(FiffFile* p_pFile, FiffTag*& p_pTag, qint64 pos)
     p_pTag->resize(size);
     t_DataStream >> p_pTag->next;
 
-//    qDebug() << "read_tag" << "  Kind:" << p_pTag->kind << "  Type:" << p_pTag->type << "  Size:" << p_pTag->size << "  Next:" << p_pTag->next;
+//    qDebug() << "read_tag" << "  Kind:" << p_pTag->kind << "  Type:" << p_pTag->type << "  Size:" << p_pTag->size() << "  Next:" << p_pTag->next;
 
+    //
+    // Read data when available
     //
     if (p_pTag->size() > 0)
     {
-//        if (p_pTag->data == NULL)
-//            p_pTag->data = new fiff_data_t[p_pTag->size];// + ((p_pTag->type == FIFFT_STRING) ? 1 : 0));//malloc(p_pTag->size + ((p_pTag->type == FIFFT_STRING) ? 1 : 0));
-//        else
-//        {
-//            delete p_pTag->data;
-//            p_pTag->data = new fiff_data_t[p_pTag->size];//,p_pTag->size + ((p_pTag->type == FIFFT_STRING) ? 1 : 0));//realloc(p_pTag->data,p_pTag->size + ((p_pTag->type == FIFFT_STRING) ? 1 : 0));
-//        }
-
-
-
-//        if (p_pTag->data != NULL)
-//            delete p_pTag->data;
-
-//        p_pTag->data = new QByteArray();// + ((p_pTag->type == FIFFT_STRING) ? 1 : 0)];
-
-//        if (p_pTag->data == NULL) {
-//            printf("fiff_read_tag: memory allocation failed.\n");//consider throw
-//            delete p_pTag;
-//            p_pTag = NULL;
-//            return false;
-//        }
-
-//        p_pTag->data = new QByteArray();
-//        p_pTag->data->resize(p_pTag->size);
         t_DataStream.readRawData(p_pTag->data(), p_pTag->size());
-
-//        if (p_pTag->type == FIFFT_STRING)
-//            p_pTag->data[p_pTag->size] = NULL;//make sure that char ends with NULL
         FiffTag::convert_tag_data(p_pTag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
     }
 
