@@ -124,10 +124,14 @@ bool FiffDirTree::copy_tree(FiffFile* fidin, FiffId& in_id, QList<FiffDirTree*>&
 
             if (tag.size > 0)
             {
-                if (tag.data == NULL)
-                    tag.data = malloc(tag.size + ((tag.type == FIFFT_STRING) ? 1 : 0));
-                else
-                    tag.data = realloc(tag.data,tag.size + ((tag.type == FIFFT_STRING) ? 1 : 0));
+//                if (tag.data == NULL)
+//                    tag.data = new fiff_data_t[tag.size + ((tag.type == FIFFT_STRING) ? 1 : 0)];// + ((tag.type == FIFFT_STRING) ? 1 : 0));//malloc(tag.size + ((tag.type == FIFFT_STRING) ? 1 : 0));
+//                else
+//                    delete tag.data;
+//                    tag.data = new fiff_data_t[tag.size];// + ((tag.type == FIFFT_STRING) ? 1 : 0));//realloc(tag.data,tag.size + ((tag.type == FIFFT_STRING) ? 1 : 0));
+                if (tag.data != NULL)
+                    delete tag.data;
+                tag.data = new fiff_data_t[tag.size + ((tag.type == FIFFT_STRING) ? 1 : 0)];
 
                 if (tag.data == NULL) {
                     printf("fiff_read_tag: memory allocation failed.\n");//consider throw

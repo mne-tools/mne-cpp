@@ -79,9 +79,12 @@ FiffTag::FiffTag(FiffTag* p_pFiffTag)
 , type(p_pFiffTag->type)
 , size(p_pFiffTag->size)
 , next(p_pFiffTag->next)
-, data( malloc(p_pFiffTag->size) )
+, data( new char[p_pFiffTag->size + ((p_pFiffTag->type == FIFFT_STRING) ? 1 : 0)] )
 {
     memcpy(data, p_pFiffTag->data, p_pFiffTag->size);
+    if (p_pFiffTag->type == FIFFT_STRING)
+        data[p_pFiffTag->size] = NULL;//make sure that char ends with NULL
+
 
     if(p_pFiffTag->m_pComplexFloatData)
         this->toComplexFloat();
@@ -102,7 +105,7 @@ FiffTag::FiffTag(FiffTag* p_pFiffTag)
 FiffTag::~FiffTag()
 {
     if(this->data)
-        free(this->data);
+        delete[](this->data);
     if(this->m_pComplexFloatData)
         delete this->m_pComplexFloatData;
     if(this->m_pComplexDoubleData)
@@ -174,10 +177,19 @@ bool FiffTag::read_tag(FiffFile* p_pFile, FiffTag*& p_pTag, qint64 pos)
     //
     if (p_pTag->size > 0)
     {
-        if (p_pTag->data == NULL)
-            p_pTag->data = malloc(p_pTag->size + ((p_pTag->type == FIFFT_STRING) ? 1 : 0));
-        else
-            p_pTag->data = realloc(p_pTag->data,p_pTag->size + ((p_pTag->type == FIFFT_STRING) ? 1 : 0));
+//        if (p_pTag->data == NULL)
+//            p_pTag->data = new fiff_data_t[p_pTag->size];// + ((p_pTag->type == FIFFT_STRING) ? 1 : 0));//malloc(p_pTag->size + ((p_pTag->type == FIFFT_STRING) ? 1 : 0));
+//        else
+//        {
+//            delete p_pTag->data;
+//            p_pTag->data = new fiff_data_t[p_pTag->size];//,p_pTag->size + ((p_pTag->type == FIFFT_STRING) ? 1 : 0));//realloc(p_pTag->data,p_pTag->size + ((p_pTag->type == FIFFT_STRING) ? 1 : 0));
+//        }
+
+        if (p_pTag->data != NULL)
+            delete p_pTag->data;
+        p_pTag->data = new fiff_data_t[p_pTag->size + ((p_pTag->type == FIFFT_STRING) ? 1 : 0)];
+
+
 
         if (p_pTag->data == NULL) {
             printf("fiff_read_tag: memory allocation failed.\n");//consider throw
@@ -185,7 +197,7 @@ bool FiffTag::read_tag(FiffFile* p_pFile, FiffTag*& p_pTag, qint64 pos)
             p_pTag = NULL;
             return false;
         }
-        char *t_pCharData = static_cast< char* >(p_pTag->data);
+        char *t_pCharData = p_pTag->data;
         t_DataStream.readRawData(t_pCharData, p_pTag->size);
         if (p_pTag->type == FIFFT_STRING)
             t_pCharData[p_pTag->size] = NULL;//make sure that char ends with NULL
@@ -234,7 +246,7 @@ bool FiffTag::getMatrixDimensions(qint32& p_ndim, qint32*& p_pDims) const
     //
     // Find dimensions and return to the beginning of tag data
     //
-    qint32* t_pInt32 = static_cast< qint32* >(this->data);
+    qint32* t_pInt32 = (qint32*)this->data;
 
     p_ndim = t_pInt32[(this->size-4)/4];
 

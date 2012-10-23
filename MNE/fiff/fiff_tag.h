@@ -478,7 +478,7 @@ inline quint8* FiffTag::toByte()
     if(this->isMatrix() || this->getType() != FIFFT_BYTE)
         return NULL;
     else
-        return static_cast< quint8* >(this->data);
+        return (quint8*)this->data;
 }
 
 
@@ -489,7 +489,7 @@ inline quint16* FiffTag::toUnsignedShort()
     if(this->isMatrix() || this->getType() != FIFFT_USHORT)
         return NULL;
     else
-        return static_cast< quint16* >(this->data);
+        return (quint16*)this->data;
 }
 
 
@@ -500,7 +500,7 @@ inline qint16* FiffTag::toShort()
     if(this->isMatrix() || this->getType() != FIFFT_SHORT)
         return NULL;
     else
-        return static_cast< qint16* >(this->data);
+        return (qint16*)this->data;
 }
 
 
@@ -511,7 +511,7 @@ inline quint32* FiffTag::toUnsignedInt()
     if(this->isMatrix() || this->getType() != FIFFT_UINT)
         return NULL;
     else
-        return static_cast< quint32* >(this->data);
+        return (quint32*)this->data;
 }
 
 
@@ -522,7 +522,7 @@ inline qint32* FiffTag::toInt()
     if(this->isMatrix() || this->getType() != FIFFT_INT)
         return NULL;
     else
-        return static_cast< qint32* >(this->data);
+        return (qint32*)this->data;
 }
 
 
@@ -533,7 +533,7 @@ inline float* FiffTag::toFloat()
     if(this->isMatrix() || this->getType() != FIFFT_FLOAT)
         return NULL;
     else
-        return static_cast< float* >(this->data);
+        return (float*)this->data;
 }
 
 
@@ -544,7 +544,7 @@ inline double* FiffTag::toDouble()
     if(this->isMatrix() || this->getType() != FIFFT_DOUBLE)
         return NULL;
     else
-        return static_cast< double* >(this->data);
+        return (double*)this->data;
 }
 
 
@@ -555,7 +555,7 @@ inline QString FiffTag::toString()
     if(this->isMatrix() || this->getType() != FIFFT_STRING)
         return NULL;
     else
-        return QString::fromAscii(static_cast< char* >(this->data));
+        return QString::fromAscii((char*)this->data);
 }
 
 
@@ -566,7 +566,7 @@ inline qint16* FiffTag::toDauPack16()
     if(this->isMatrix() || this->getType() != FIFFT_DAU_PACK16)
         return NULL;
     else
-        return static_cast< qint16* >(this->data);
+        return (qint16*)this->data;
 }
 
 
@@ -578,7 +578,7 @@ inline std::complex<float>* FiffTag::toComplexFloat()
         return NULL;
     else if(this->m_pComplexFloatData == NULL)
     {
-        float* t_pFloat = static_cast< float* >(this->data);
+        float* t_pFloat = (float*)this->data;
         this->m_pComplexFloatData = new std::complex<float>(t_pFloat[0],t_pFloat[1]);
     }
     return m_pComplexFloatData;
@@ -593,7 +593,7 @@ inline std::complex<double>* FiffTag::toComplexDouble()
         return NULL;
     else if(this->m_pComplexDoubleData == NULL)
     {
-        double* t_pDouble = static_cast< double* >(this->data);
+        double* t_pDouble = (double*)this->data;
         this->m_pComplexDoubleData = new std::complex<double>(t_pDouble[0],t_pDouble[1]);
     }
     return m_pComplexDoubleData;
@@ -611,7 +611,7 @@ inline FiffId FiffTag::toFiffID() const
         return p_fiffID;
     else
     {
-        qint32* t_pInt32 = static_cast< qint32* >(this->data);
+        qint32* t_pInt32 = (qint32*)this->data;
 //            memcpy (&t_fiffID,this->data,this->size);
 
         p_fiffID.version = t_pInt32[0];
@@ -635,13 +635,13 @@ inline FiffDigPoint FiffTag::toDigPoint() const
         return t_fiffDigPoint;
     else
     {
-        qint32* t_pInt32 = static_cast< qint32* >(this->data);
+        qint32* t_pInt32 = (qint32*)this->data;
 //            memcpy (&t_fiffDigPoint,this->data,this->size);
 
         t_fiffDigPoint.kind = t_pInt32[0];
         t_fiffDigPoint.ident = t_pInt32[1];
 
-        float* t_pFloat = static_cast< float* >(this->data);
+        float* t_pFloat = (float*)this->data;
         t_fiffDigPoint.r[0] = t_pFloat[2];
         t_fiffDigPoint.r[1] = t_pFloat[3];
         t_fiffDigPoint.r[2] = t_pFloat[4];
@@ -662,12 +662,12 @@ inline FiffCoordTrans* FiffTag::toCoordTrans() const
         return p_pFiffCoordTrans;
     else
     {
-        qint32* t_pInt32 = static_cast< qint32* >(this->data);
+        qint32* t_pInt32 = (qint32*)this->data;
         p_pFiffCoordTrans->from = t_pInt32[0];
         p_pFiffCoordTrans->to = t_pInt32[1];
 
         p_pFiffCoordTrans->trans.setIdentity(4,4);
-        float* t_pFloat = static_cast< float* >(this->data);
+        float* t_pFloat = (float*)this->data;
         int count = 0;
         int r, c;
         for (r = 0; r < 3; ++r) {
@@ -705,11 +705,11 @@ inline FiffChInfo FiffTag::toChInfo() const
         return p_FiffChInfo;
     else
     {
-        qint32* t_pInt32 = static_cast< qint32* >(this->data);
+        qint32* t_pInt32 = (qint32*)this->data;
         p_FiffChInfo.scanno = t_pInt32[0];
         p_FiffChInfo.logno = t_pInt32[1];
         p_FiffChInfo.kind = t_pInt32[2];
-        float* t_pFloat = static_cast< float* >(this->data);
+        float* t_pFloat = (float*)this->data;
         p_FiffChInfo.range = t_pFloat[3];
         p_FiffChInfo.cal = t_pFloat[4];
         p_FiffChInfo.coil_type = t_pInt32[5];
@@ -762,7 +762,7 @@ inline FiffChInfo FiffTag::toChInfo() const
         //
         //   Handle the channel name
         //
-        char* orig = static_cast< char* >(this->data);
+        char* orig = (char*)this->data;
         p_FiffChInfo.ch_name = QString::fromAscii(orig + 80);
 
         return p_FiffChInfo;
@@ -793,7 +793,7 @@ inline QList<FiffDirEntry> FiffTag::toDirEntry() const
     else
     {
         FiffDirEntry t_fiffDirEntry;
-        qint32* t_pInt32 = static_cast< qint32* >(this->data);
+        qint32* t_pInt32 = (qint32*)this->data;
         for (int k = 0; k < this->size/16; ++k)
         {
             t_fiffDirEntry.kind = t_pInt32[k*4];//fread(fid,1,'int32');
@@ -834,9 +834,9 @@ inline MatrixXi FiffTag::toIntMatrix() const
         return p_defaultMatrix;
     }
 
-    //MatrixXf p_Matrix = Map<MatrixXf>( static_cast< float* >(this->data),p_dims[0], p_dims[1]);
+    //MatrixXf p_Matrix = Map<MatrixXf>( (float*)this->data,p_dims[0], p_dims[1]);
     // --> Use copy constructor instead --> slower performance but higher memory management reliability
-    MatrixXi p_Matrix(Map<MatrixXi>( static_cast< int* >(this->data),pDims[0], pDims[1]));
+    MatrixXi p_Matrix(Map<MatrixXi>( (int*)this->data,pDims[0], pDims[1]));
 
     delete pDims;
 
@@ -868,9 +868,9 @@ inline MatrixXf* FiffTag::toFloatMatrix() const
         return NULL;
     }
 
-    //MatrixXf p_Matrix = Map<MatrixXf>( static_cast< float* >(this->data),pDims[0], pDims[1]);
+    //MatrixXf p_Matrix = Map<MatrixXf>( (float*)this->data,pDims[0], pDims[1]);
     // --> Use copy constructor instead --> slower performance but higher memory management reliability
-    MatrixXf* p_pMatrix = new MatrixXf(Map<MatrixXf>( static_cast< float* >(this->data),pDims[0], pDims[1]));
+    MatrixXf* p_pMatrix = new MatrixXf(Map<MatrixXf>( (float*)this->data,pDims[0], pDims[1]));
 
     delete pDims;
 
