@@ -113,7 +113,7 @@ bool MNE::read_events(QString& p_sFileName, MatrixXi& eventlist)
             if(t_pTag->type == FIFFT_UINT)
             {
                 serial_eventlist = t_pTag->toUnsignedInt();
-                nelem = t_pTag->size/4;
+                nelem = t_pTag->size()/4;
             }
             break;
         }

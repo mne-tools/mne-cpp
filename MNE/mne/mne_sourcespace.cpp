@@ -327,7 +327,7 @@ bool MNESourceSpace::read_source_space(FiffFile* p_pFile, FiffDirTree* p_pTree, 
             std::cout << "Source selection information missing."; //ToDo: throw error.
             return false;
         }
-        p_pHemisphere->inuse = VectorXi(Map<VectorXi>(t_pTag->toInt(), t_pTag->size/4, 1));//use copy constructor, for the sake of easy memory management
+        p_pHemisphere->inuse = VectorXi(Map<VectorXi>(t_pTag->toInt(), t_pTag->size()/4, 1));//use copy constructor, for the sake of easy memory management
 
         p_pHemisphere->vertno = VectorXi::Zero(p_pHemisphere->nuse);
         if (p_pHemisphere->inuse.rows() != p_pHemisphere->np)
@@ -380,8 +380,8 @@ bool MNESourceSpace::read_source_space(FiffFile* p_pFile, FiffDirTree* p_pTree, 
     else
     {
        //res.nearest = tag1.data + 1;
-       p_pHemisphere->nearest = VectorXi(Map<VectorXi>(t_pTag1->toInt(), t_pTag1->size/4, 1));//use copy constructor, for the sake of easy memory management
-       p_pHemisphere->nearest_dist = VectorXf(Map<VectorXf>(t_pTag2->toFloat(), t_pTag1->size/4, 1));//use copy constructor, for the sake of easy memory management
+       p_pHemisphere->nearest = VectorXi(Map<VectorXi>(t_pTag1->toInt(), t_pTag1->size()/4, 1));//use copy constructor, for the sake of easy memory management
+       p_pHemisphere->nearest_dist = VectorXf(Map<VectorXf>(t_pTag2->toFloat(), t_pTag1->size()/4, 1));//use copy constructor, for the sake of easy memory management
     }
 
     patch_info(p_pHemisphere->nearest, p_pHemisphere->pinfo);

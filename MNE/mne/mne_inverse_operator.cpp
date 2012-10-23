@@ -479,7 +479,7 @@ bool MNEInverseOperator::read_inverse_operator(QString& p_sFileName, MNEInverseO
 
     if(inv->sing)
         delete inv->sing;
-    inv->sing = new VectorXf(Map<VectorXf>(t_pTag->toFloat(), t_pTag->size/4));
+    inv->sing = new VectorXf(Map<VectorXf>(t_pTag->toFloat(), t_pTag->size()/4));
     inv->nchan = inv->sing->rows();
     //
     //   The eigenleads and eigenfields
