@@ -72,7 +72,6 @@ MNESourceSpace::MNESourceSpace(MNESourceSpace* p_pMNESourceSpace)
 
 MNESourceSpace::~MNESourceSpace()
 {
-    qDebug() << "MNESourceSpace Destructor";
     QList<MNEHemisphere*>::iterator i;
      for (i = hemispheres.begin(); i != hemispheres.end(); ++i)
          delete *i;
