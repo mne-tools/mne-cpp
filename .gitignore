@@ -1,3 +1,4 @@
+/.gitignore~
 /bin/readEpochs
 /bin/computeInverse
 /bin/readFwd
