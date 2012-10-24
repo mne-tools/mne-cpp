@@ -89,6 +89,49 @@ FiffEvokedDataSet::~FiffEvokedDataSet()
 
 //*************************************************************************************************************
 
+FiffEvokedDataSet* FiffEvokedDataSet::pick_channels_evoked(QStringList& include, QStringList& exclude)
+{
+    if(include.size() == 0 && exclude.size() == 0)
+        return new FiffEvokedDataSet(this);
+
+    MatrixXi sel = FiffInfo::pick_channels(this->info->ch_names, include, exclude);
+    if (sel.cols() == 0)
+    {
+        printf("Warning : No channels match the selection.\n");
+        return new FiffEvokedDataSet(this);
+    }
+
+    FiffEvokedDataSet* res = new FiffEvokedDataSet(this);
+    //
+    //   Modify the measurement info
+    //
+    FiffInfo* info = res->info->pick_info(&sel);
+    if (res->info)
+        delete res->info;
+    res->info = info;
+    //
+    //   Create the reduced data set
+    //
+    MatrixXd selBlock(1,1);
+    qint32 k, l;
+    for(k = 0; k < res->evoked.size(); ++k)
+    {
+        if(selBlock.rows() != sel.cols() || selBlock.cols() != res->evoked[k]->epochs->cols())
+            selBlock.resize(sel.cols(), res->evoked[k]->epochs->cols());
+        for(l = 0; l < sel.cols(); ++l)
+        {
+            selBlock.block(l,0,1,selBlock.cols()) = res->evoked[k]->epochs->block(sel(0,l),0,1,selBlock.cols());
+        }
+        res->evoked[k]->epochs->resize(sel.cols(), res->evoked[k]->epochs->cols());
+        *res->evoked[k]->epochs = selBlock;
+    }
+
+    return res;
+}
+
+
+//*************************************************************************************************************
+
 bool FiffEvokedDataSet::read_evoked(QString& p_sFileName, FiffEvokedDataSet*& data, fiff_int_t setno)
 {
     if(data)

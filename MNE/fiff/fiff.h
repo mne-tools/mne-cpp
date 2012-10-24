@@ -303,18 +303,6 @@ public:
         return FiffInfo::pick_channels(ch_names, include, exclude);
     }
 
-
-//    function [res] = fiff_pick_channels_evoked(orig,include,exclude)
-//    %
-//    % [res] = fiff_pick_channels_evoked(orig,include,exclude)
-//    %
-//    % Pick desired channels from evoked-response data
-//    %
-//    % orig      - The original data
-//    % include   - Channels to include (if empty, include all available)
-//    % exclude   - Channels to exclude (if empty, do not exclude any)
-//    %
-//    %
     //=========================================================================================================
     /**
     * fiff_pick_channels_evoked
@@ -331,106 +319,30 @@ public:
     *
     * @return the desired fiff evoked data set
     */
-    inline static FiffEvokedDataSet* pick_channels_evoked(const FiffEvokedDataSet* orig, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList)
+    inline static FiffEvokedDataSet* pick_channels_evoked(FiffEvokedDataSet* orig, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList)
     {
-        if(include.size() == 0 && exclude.size() == 0)
-            return new FiffEvokedDataSet(orig);
-
-        MatrixXi sel = FiffInfo::pick_channels(orig->info->ch_names, include, exclude);
-        if (sel.cols() == 0)
-        {
-            printf("Warning : No channels match the selection.\n");
-            return new FiffEvokedDataSet(orig);
-        }
-
-        FiffEvokedDataSet* res = new FiffEvokedDataSet(orig);
-        //
-        //   Modify the measurement info
-        //
-        FiffInfo* info = pick_info(res->info,&sel);
-        if (res->info)
-            delete res->info;
-        res->info = info;
-        //
-        //   Create the reduced data set
-        //
-        MatrixXd selBlock(1,1);
-        qint32 k, l;
-        for(k = 0; k < res->evoked.size(); ++k)
-        {
-            if(selBlock.rows() != sel.cols() || selBlock.cols() != res->evoked[k]->epochs->cols())
-                selBlock.resize(sel.cols(), res->evoked[k]->epochs->cols());
-            for(l = 0; l < sel.cols(); ++l)
-            {
-                selBlock.block(l,0,1,selBlock.cols()) = res->evoked[k]->epochs->block(sel(0,l),0,1,selBlock.cols());
-            }
-            res->evoked[k]->epochs->resize(sel.cols(), res->evoked[k]->epochs->cols());
-            *res->evoked[k]->epochs = selBlock;
-        }
-
-        return res;
+        return orig->pick_channels_evoked(include, exclude);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    function [res] = fiff_pick_info(info,sel)
-//    %
-//    % [res] = fiff_pick_info(info,sel)
-//    %
-//    % Pick desired channels from measurement info
-//    %
-//    % res       - Info modified according to sel
-//    % info      - The original data
-//    % sel       - List of channels to select
-//    %
-    static FiffInfo* pick_info(const FiffInfo* info, const MatrixXi* sel = NULL)
+    //=========================================================================================================
+    /**
+    * fiff_pick_info
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffInfo pick_info member function
+    *
+    * Pick desired channels from measurement info
+    *
+    * @param[in] info   The original data
+    * @param[in] sel    List of channels to select
+    *
+    * @return Info modified according to sel
+    */
+    inline static FiffInfo* pick_info(FiffInfo* info, const MatrixXi* sel = NULL)
     {
-        FiffInfo* res = new FiffInfo(info);
-        if (sel == NULL)
-            return res;
-
-        //ToDo when pointer List do delation
-        res->chs.clear();
-        res->ch_names.clear();
-
-        qint32 idx;
-        for(qint32 i = 0; i < sel->cols(); ++i)
-        {
-            idx = (*sel)(0,i);
-            res->chs.append(info->chs[idx]);
-            res->ch_names.append(info->ch_names[idx]);
-        }
-        res->nchan  = sel->cols();
-
-        return res;
+        return info->pick_info(sel);
     }
-
-
-
-
-
-
-
-
-
 
     //=========================================================================================================
     /**

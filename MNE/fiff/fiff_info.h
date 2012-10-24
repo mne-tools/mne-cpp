@@ -188,6 +188,19 @@ public:
     */
     static MatrixXi pick_channels(QStringList& ch_names, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
 
+    //=========================================================================================================
+    /**
+    * fiff_pick_info
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Pick desired channels from measurement info
+    *
+    * @param[in] sel    List of channels to select
+    *
+    * @return Info modified according to sel
+    */
+    FiffInfo* pick_info(const MatrixXi* sel = NULL);
 
     //=========================================================================================================
     /**
@@ -206,7 +219,6 @@ public:
     * @return the selector matrix (row vector)
     */
     MatrixXi pick_types(bool meg, bool eeg = false, bool stim = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
-
 
     //=========================================================================================================
     /**

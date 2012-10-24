@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
     //
     //   Pick the correct channels from the data
     //
-    FiffEvokedDataSet* newData = Fiff::pick_channels_evoked(data, inv->noise_cov->names);
+    FiffEvokedDataSet* newData = data->pick_channels_evoked(inv->noise_cov->names);
     if (data)
         delete data;
     data = newData;
