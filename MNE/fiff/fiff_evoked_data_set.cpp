@@ -386,7 +386,7 @@ bool FiffEvokedDataSet::read_evoked(QString& p_sFileName, FiffEvokedDataSet*& da
         return false;
     }
     //
-    MatrixXf* all = NULL;
+    MatrixXd* all = NULL;
     if (nepoch == 1)
     {
         //
@@ -411,7 +411,7 @@ bool FiffEvokedDataSet::read_evoked(QString& p_sFileName, FiffEvokedDataSet*& da
         for (k = 2; k < nepoch; ++k)
         {
             oldsize = all->rows();
-            MatrixXf* tmp = epoch[k]->toFloatMatrix();
+            MatrixXd* tmp = epoch[k]->toFloatMatrix();
             tmp->transposeInPlace();
             all->conservativeResize(oldsize+tmp->rows(), all->cols());
             all->block(oldsize, 0, tmp->rows(), tmp->cols()) = *tmp;
@@ -434,7 +434,7 @@ bool FiffEvokedDataSet::read_evoked(QString& p_sFileName, FiffEvokedDataSet*& da
     //
     //   Calibrate
     //
-    SparseMatrix<float> cals(info->nchan, info->nchan);
+    SparseMatrix<double> cals(info->nchan, info->nchan);
     for(k = 0; k < info->nchan; ++k)
         cals.insert(k, k) = info->chs[k].cal;
     *all = cals* *all;
@@ -464,7 +464,7 @@ bool FiffEvokedDataSet::read_evoked(QString& p_sFileName, FiffEvokedDataSet*& da
 
     if(data->evoked[0]->times)
         delete data->evoked[0]->times;
-    data->evoked[0]->times = new MatrixXf(1, last-first+1);
+    data->evoked[0]->times = new MatrixXd(1, last-first+1);
 
     for (k = 0; k < data->evoked[0]->times->cols(); ++k)
         (*data->evoked[0]->times)(0, k) = ((float)(first+k)) / info->sfreq;

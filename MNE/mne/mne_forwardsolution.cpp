@@ -64,8 +64,8 @@ MNEForwardSolution::MNEForwardSolution()
 , sol_grad(NULL)
 , mri_head_t(NULL)
 , src(NULL)
-, source_rr(MatrixX3f::Zero(0,3))
-, source_nn(MatrixX3f::Zero(0,3))
+, source_rr(MatrixX3d::Zero(0,3))
+, source_nn(MatrixX3d::Zero(0,3))
 {
 
 }
@@ -82,8 +82,8 @@ MNEForwardSolution::MNEForwardSolution(MNEForwardSolution* p_pMNEForwardSolution
 , sol_grad(p_pMNEForwardSolution->sol_grad ? new FiffNamedMatrix(p_pMNEForwardSolution->sol_grad) : NULL)
 , mri_head_t( new FiffCoordTrans(p_pMNEForwardSolution->mri_head_t) )
 , src(p_pMNEForwardSolution->src ? new MNESourceSpace(p_pMNEForwardSolution->src) : NULL)
-, source_rr(MatrixX3f(p_pMNEForwardSolution->source_rr))
-, source_nn(MatrixX3f(p_pMNEForwardSolution->source_nn))
+, source_rr(MatrixX3d(p_pMNEForwardSolution->source_rr))
+, source_nn(MatrixX3d(p_pMNEForwardSolution->source_nn))
 {
 
 }
@@ -264,7 +264,7 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
         }
 
         fwd = new MNEForwardSolution(megfwd);
-        fwd->sol->data = new MatrixXf(megfwd->sol->nrow + eegfwd->sol->nrow, megfwd->sol->ncol);
+        fwd->sol->data = new MatrixXd(megfwd->sol->nrow + eegfwd->sol->nrow, megfwd->sol->ncol);
 
         fwd->sol->data->block(0,0,megfwd->sol->nrow,megfwd->sol->ncol) = *megfwd->sol->data;
         fwd->sol->data->block(megfwd->sol->nrow,0,eegfwd->sol->nrow,eegfwd->sol->ncol) = *eegfwd->sol->data;
@@ -372,8 +372,8 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
     if (fwd->source_ori == FIFFV_MNE_FIXED_ORI || force_fixed == true)
     {
         nuse = 0;
-        fwd->source_rr = MatrixXf::Zero(fwd->nsource,3);
-        fwd->source_nn = MatrixXf::Zero(fwd->nsource,3);
+        fwd->source_rr = MatrixXd::Zero(fwd->nsource,3);
+        fwd->source_nn = MatrixXd::Zero(fwd->nsource,3);
         for(qint32 k = 0; k < t_pSourceSpace->hemispheres.size();++k)
         {
             for(qint32 q = 0; q < t_pSourceSpace->hemispheres.at(k)->nuse; ++q)
@@ -390,16 +390,16 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
         {
             printf("\tChanging to fixed-orientation forward solution...");
 
-            MatrixXf tmp = fwd->source_nn.transpose();
-            SparseMatrix<float>* fix_rot = MNEMath::make_block_diag(&tmp,1);
+            MatrixXd tmp = fwd->source_nn.transpose();
+            SparseMatrix<double>* fix_rot = MNEMath::make_block_diag(&tmp,1);
             *fwd->sol->data  = (*fwd->sol->data)*(*fix_rot);
             fwd->sol->ncol  = fwd->nsource;
             fwd->source_ori = FIFFV_MNE_FIXED_ORI;
 
             if (fwd->sol_grad != NULL)
             {
-                SparseMatrix<float> t_matKron;
-                SparseMatrix<float> t_eye(3,3);
+                SparseMatrix<double> t_matKron;
+                SparseMatrix<double> t_eye(3,3);
                 for (qint32 i = 0; i < 3; ++i)
                     t_eye.insert(i,i) = 1.0f;
                 kroneckerProduct(*fix_rot,t_eye,t_matKron);//kron(fix_rot,eye(3));
@@ -420,8 +420,8 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
             printf("\tConverting to surface-based source orientations...");
             nuse = 0;
             qint32 pp = 0;
-            fwd->source_rr = MatrixXf::Zero(fwd->nsource,3);
-            fwd->source_nn = MatrixXf::Zero(fwd->nsource*3,3);
+            fwd->source_rr = MatrixXd::Zero(fwd->nsource,3);
+            fwd->source_nn = MatrixXd::Zero(fwd->nsource*3,3);
 
             printf(" (Warning: Rotating the source coordinate system haven't been verified --> Singular Vectors U are different from MATLAB!) ");
 
@@ -436,13 +436,13 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
                     //
                     //  Project out the surface normal and compute SVD
                     //
-                    Vector3f nn = t_pSourceSpace->hemispheres.at(k)->nn.block(t_pSourceSpace->hemispheres.at(k)->vertno(p),0,1,3).transpose();
+                    Vector3d nn = t_pSourceSpace->hemispheres.at(k)->nn.block(t_pSourceSpace->hemispheres.at(k)->vertno(p),0,1,3).transpose();
 
-                    Matrix3f tmp = Matrix3f::Identity() - nn*nn.transpose();
+                    Matrix3d tmp = Matrix3d::Identity() - nn*nn.transpose();
 
-                    JacobiSVD<MatrixXf> t_svd(tmp, Eigen::ComputeThinU);
+                    JacobiSVD<MatrixXd> t_svd(tmp, Eigen::ComputeThinU);
 
-                    MatrixXf U(t_svd.matrixU());
+                    MatrixXd U(t_svd.matrixU());
 
                     //
                     //  Make sure that ez is in the direction of nn
@@ -458,15 +458,15 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
                 }
                 nuse += t_pSourceSpace->hemispheres.at(k)->nuse;
             }
-            MatrixXf tmp = fwd->source_nn.transpose();
-            SparseMatrix<float>* surf_rot = MNEMath::make_block_diag(&tmp,3);
+            MatrixXd tmp = fwd->source_nn.transpose();
+            SparseMatrix<double>* surf_rot = MNEMath::make_block_diag(&tmp,3);
 
             *fwd->sol->data = (*fwd->sol->data)*(*surf_rot);
 
             if (fwd->sol_grad != NULL)
             {
-                SparseMatrix<float> t_matKron;
-                SparseMatrix<float> t_eye(3,3);
+                SparseMatrix<double> t_matKron;
+                SparseMatrix<double> t_eye(3,3);
                 for (qint32 i = 0; i < 3; ++i)
                     t_eye.insert(i,i) = 1.0f;
                 kroneckerProduct(*surf_rot,t_eye,t_matKron);//kron(surf_rot,eye(3));
@@ -479,7 +479,7 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
         {
             printf("\tCartesian source orientations...");
             nuse = 0;
-            fwd->source_rr = MatrixXf::Zero(fwd->nsource,3);
+            fwd->source_rr = MatrixXd::Zero(fwd->nsource,3);
             for(int k = 0; k < t_pSourceSpace->hemispheres.size(); ++k)
             {
                 for (qint32 q = 0; q < t_pSourceSpace->hemispheres.at(k)->nuse; ++q)
@@ -488,8 +488,8 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
                 nuse += t_pSourceSpace->hemispheres.at(k)->nuse;
             }
 
-            MatrixXf t_ones = MatrixXf::Ones(fwd->nsource,1);
-            Matrix3f t_eye = Matrix3f::Identity();
+            MatrixXd t_ones = MatrixXd::Ones(fwd->nsource,1);
+            Matrix3d t_eye = Matrix3d::Identity();
             kroneckerProduct(t_ones,t_eye,fwd->source_nn);
 
             printf("[done]\n");
@@ -566,14 +566,14 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
         //   Create the selector
         //
         qint32 p = 0;
-        MatrixXf* t_solData = new MatrixXf(nuse,fwd->sol->data->cols());
+        MatrixXd* t_solData = new MatrixXd(nuse,fwd->sol->data->cols());
         QStringList t_solRowNames;
 
-        MatrixXf* t_solGradData = NULL;
+        MatrixXd* t_solGradData = NULL;
         QStringList t_solGradRowNames;
 
         if (fwd->sol_grad != NULL)
-            t_solGradData = new MatrixXf(nuse, fwd->sol_grad->data->cols());
+            t_solGradData = new MatrixXd(nuse, fwd->sol_grad->data->cols());
 
         for(qint32 k = 0; k < fwd->nchan; ++k)
         {

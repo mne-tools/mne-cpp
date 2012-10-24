@@ -75,7 +75,7 @@ FiffCov::FiffCov(const FiffCov* p_pFiffCov)
 , bads(p_pFiffCov->bads)
 , nfree(p_pFiffCov->nfree)
 , eig(p_pFiffCov->eig ? new VectorXd(*p_pFiffCov->eig) : NULL)
-, eigvec(p_pFiffCov->eigvec ? new MatrixXf(*p_pFiffCov->eigvec) : NULL)
+, eigvec(p_pFiffCov->eigvec ? new MatrixXd(*p_pFiffCov->eigvec) : NULL)
 {
     for(qint32 i = 0; i < p_pFiffCov->projs.size(); ++i)
     {

@@ -90,8 +90,8 @@ MNEInverseOperator::MNEInverseOperator(const MNEInverseOperator* p_pMNEInverseOp
 , nsource(p_pMNEInverseOperator->nsource)
 , nchan(p_pMNEInverseOperator->nchan)
 , coord_frame(p_pMNEInverseOperator->coord_frame)
-, source_nn(p_pMNEInverseOperator->source_nn ? new MatrixXf(*p_pMNEInverseOperator->source_nn) : NULL)
-, sing(p_pMNEInverseOperator->sing ? new VectorXf(*p_pMNEInverseOperator->sing) : NULL)
+, source_nn(p_pMNEInverseOperator->source_nn ? new MatrixXd(*p_pMNEInverseOperator->source_nn) : NULL)
+, sing(p_pMNEInverseOperator->sing ? new VectorXd(*p_pMNEInverseOperator->sing) : NULL)
 , eigen_leads_weighted(p_pMNEInverseOperator->eigen_leads_weighted)
 , eigen_leads(p_pMNEInverseOperator->eigen_leads ? new FiffNamedMatrix(p_pMNEInverseOperator->eigen_leads) : NULL)
 , eigen_fields(p_pMNEInverseOperator->eigen_fields ? new FiffNamedMatrix(p_pMNEInverseOperator->eigen_fields) : NULL)
@@ -103,9 +103,9 @@ MNEInverseOperator::MNEInverseOperator(const MNEInverseOperator* p_pMNEInverseOp
 , src(p_pMNEInverseOperator->src ? new MNESourceSpace(p_pMNEInverseOperator->src) : NULL)
 , mri_head_t(p_pMNEInverseOperator->mri_head_t ? new FiffCoordTrans(p_pMNEInverseOperator->mri_head_t) : NULL)
 , nave(p_pMNEInverseOperator->nave)
-, proj(p_pMNEInverseOperator->proj ? new MatrixXf(*p_pMNEInverseOperator->proj) : NULL)
-, whitener(p_pMNEInverseOperator->whitener ? new MatrixXf(*p_pMNEInverseOperator->whitener) : NULL)
-, reginv(p_pMNEInverseOperator->reginv ? new VectorXf(*p_pMNEInverseOperator->reginv) : NULL)
+, proj(p_pMNEInverseOperator->proj ? new MatrixXd(*p_pMNEInverseOperator->proj) : NULL)
+, whitener(p_pMNEInverseOperator->whitener ? new MatrixXd(*p_pMNEInverseOperator->whitener) : NULL)
+, reginv(p_pMNEInverseOperator->reginv ? new VectorXd(*p_pMNEInverseOperator->reginv) : NULL)
 , noisenorm(p_pMNEInverseOperator->noisenorm ? new SparseMatrix<double>(*p_pMNEInverseOperator->noisenorm) : NULL)
 {
 
@@ -176,10 +176,10 @@ MNEInverseOperator* MNEInverseOperator::prepare_inverse_operator(qint32 nave ,fl
     //
     //   Create the diagonal matrix for computing the regularized inverse
     //
-    VectorXf tmp = inv->sing->cwiseProduct(*inv->sing) + VectorXf::Constant(inv->sing->size(), lambda2);
+    VectorXd tmp = inv->sing->cwiseProduct(*inv->sing) + VectorXd::Constant(inv->sing->size(), lambda2);
     if(inv->reginv)
         delete inv->reginv;
-    inv->reginv = new VectorXf(inv->sing->cwiseQuotient(tmp));
+    inv->reginv = new VectorXd(inv->sing->cwiseQuotient(tmp));
     printf("\tCreated the regularized inverter\n");
     //
     //   Create the projection operator
@@ -194,7 +194,7 @@ MNEInverseOperator* MNEInverseOperator::prepare_inverse_operator(qint32 nave ,fl
     //
     if(inv->whitener)
         delete inv->whitener;
-    inv->whitener = new MatrixXf(MatrixXf::Zero(inv->noise_cov->dim, inv->noise_cov->dim));
+    inv->whitener = new MatrixXd(MatrixXd::Zero(inv->noise_cov->dim, inv->noise_cov->dim));
 
     qint32 nnzero, k;
     if (inv->noise_cov->diag == 0)
@@ -233,20 +233,20 @@ MNEInverseOperator* MNEInverseOperator::prepare_inverse_operator(qint32 nave ,fl
     //
     if (dSPM || sLORETA)
     {
-        VectorXf* noise_norm = new VectorXf(VectorXf::Zero(inv->eigen_leads->nrow));
-        VectorXf* noise_weight = NULL;
+        VectorXd* noise_norm = new VectorXd(VectorXd::Zero(inv->eigen_leads->nrow));
+        VectorXd* noise_weight = NULL;
         if (dSPM)
         {
            printf("\tComputing noise-normalization factors (dSPM)...");
-           noise_weight = new VectorXf(*inv->reginv);
+           noise_weight = new VectorXd(*inv->reginv);
         }
         else
         {
            printf("\tComputing noise-normalization factors (sLORETA)...");
-           VectorXf tmp = (VectorXf::Constant(inv->sing->size(), 1) + inv->sing->cwiseProduct(*inv->sing)/lambda2);
-           noise_weight = new VectorXf(inv->reginv->cwiseProduct(tmp.cwiseSqrt()));
+           VectorXd tmp = (VectorXd::Constant(inv->sing->size(), 1) + inv->sing->cwiseProduct(*inv->sing)/lambda2);
+           noise_weight = new VectorXd(inv->reginv->cwiseProduct(tmp.cwiseSqrt()));
         }
-        VectorXf one;
+        VectorXd one;
         if (inv->eigen_leads_weighted)
         {
            for (k = 0; k < inv->eigen_leads->nrow; ++k)
@@ -279,8 +279,8 @@ MNEInverseOperator* MNEInverseOperator::prepare_inverse_operator(qint32 nave ,fl
             //   Even in this case return only one noise-normalization factor
             //   per source location
             //
-            VectorXf* t = MNEMath::combine_xyz(noise_norm->transpose());
-            noise_norm_new = t->cast<double>().cwiseSqrt();//double otherwise values are getting too small
+            VectorXd* t = MNEMath::combine_xyz(noise_norm->transpose());
+            noise_norm_new = t->cwiseSqrt();//double otherwise values are getting too small
             delete t;
             //
             //   This would replicate the same value on three consequtive
@@ -479,7 +479,7 @@ bool MNEInverseOperator::read_inverse_operator(QString& p_sFileName, MNEInverseO
 
     if(inv->sing)
         delete inv->sing;
-    inv->sing = new VectorXf(Map<VectorXf>(t_pTag->toFloat(), t_pTag->size()/4));
+    inv->sing = new VectorXd((Map<VectorXf>(t_pTag->toFloat(), t_pTag->size()/4)).cast<double>());
     inv->nchan = inv->sing->rows();
     //
     //   The eigenleads and eigenfields

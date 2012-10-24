@@ -112,8 +112,8 @@ public:
     fiff_int_t  first;          /**< ToDo... */
     fiff_int_t  last;           /**< ToDo... */
     QString     comment;        /**< ToDo... */
-    MatrixXf*   times;          /**< ToDo... */
-    MatrixXf*   epochs;         /**< ToDo... */
+    MatrixXd*   times;          /**< ToDo... */
+    MatrixXd*   epochs;         /**< ToDo... */
 };
 
 } // NAMESPACE

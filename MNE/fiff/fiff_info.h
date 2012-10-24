@@ -150,7 +150,7 @@ public:
     *
     * @return nproj - How many items in the projector
     */
-    static fiff_int_t make_projector(QList<FiffProj*>& projs, QStringList& ch_names, MatrixXf*& proj, QStringList& bads = defaultQStringList, MatrixXf& U = defaultMatrixXf);
+    static fiff_int_t make_projector(QList<FiffProj*>& projs, QStringList& ch_names, MatrixXd*& proj, QStringList& bads = defaultQStringList, MatrixXd& U = defaultMatrixXd);
 
 
     //=========================================================================================================
@@ -166,7 +166,7 @@ public:
     *
     * @return nproj - How many items in the projector
     */
-    inline qint32 make_projector_info(MatrixXf*& proj)
+    inline qint32 make_projector_info(MatrixXd*& proj)
     {
         return make_projector(this->projs,this->ch_names, proj, this->bads);
     }
@@ -251,7 +251,7 @@ private:
     *
     * @return true if succeeded, false otherwise
     */
-    bool make_compensator(fiff_int_t kind, MatrixXf& this_comp);
+    bool make_compensator(fiff_int_t kind, MatrixXd& this_comp);
 
 
 public: //Public because it's a mne struct

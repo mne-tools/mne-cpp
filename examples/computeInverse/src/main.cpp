@@ -142,19 +142,19 @@ int main(int argc, char *argv[])
     //   This does all the data transformations to compute the weights for the
     //   eigenleads
     //
-    SparseMatrix<float> reginv(inv->reginv->rows(),inv->reginv->rows());
+    SparseMatrix<double> reginv(inv->reginv->rows(),inv->reginv->rows());
 
     // put this in the MNE algorithm class derived from inverse algorithm
     //ToDo put this into a function of inv data
     qint32 i;
     for(i = 0; i < inv->reginv->rows(); ++i)
         reginv.insert(i,i) = (*inv->reginv)(i,0);
-    MatrixXf trans = reginv*(*inv->eigen_fields->data)*(*inv->whitener)*(*inv->proj)*(*data->evoked[0]->epochs);
+    MatrixXd trans = reginv*(*inv->eigen_fields->data)*(*inv->whitener)*(*inv->proj)*(*data->evoked[0]->epochs);
     //
     //   Transformation into current distributions by weighting the eigenleads
     //   with the weights computed above
     //
-    MatrixXf sol;
+    MatrixXd sol;
     if (inv->eigen_leads_weighted)
     {
         //
@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
         //
        printf("(eigenleads need to be weighted)...");
 
-       SparseMatrix<float> sourceCov(inv->source_cov->data->rows(),inv->source_cov->data->rows());
+       SparseMatrix<double> sourceCov(inv->source_cov->data->rows(),inv->source_cov->data->rows());
        for(i = 0; i < inv->source_cov->data->rows(); ++i)
            sourceCov.insert(i,i) = sqrt((*inv->source_cov->data)(i,0));
 
@@ -180,26 +180,25 @@ int main(int argc, char *argv[])
     if (inv->source_ori == FIFFV_MNE_FREE_ORI)
     {
         printf("combining the current components...");
-        MatrixXf sol1(sol.rows()/3,sol.cols());
+        MatrixXd sol1(sol.rows()/3,sol.cols());
         for(i = 0; i < sol.cols(); ++i)
         {
-            VectorXf* tmp = MNE::combine_xyz(sol.block(0,i,sol.rows(),1));
+            VectorXd* tmp = MNE::combine_xyz(sol.block(0,i,sol.rows(),1));
             sol1.block(0,i,sol.rows()/3,1) = tmp->cwiseSqrt();
             delete tmp;
         }
         sol.resize(sol1.rows(),sol1.cols());
         sol = sol1;
     }
-    MatrixXd sol2;
     if (dSPM)
     {
         printf("(dSPM)...");
-        sol2 = (*inv->noisenorm)*sol.cast<double>();
+        sol = (*inv->noisenorm)*sol;
     }
     else if (sLORETA)
     {
         printf("(sLORETA)...");
-        sol2 = (*inv->noisenorm)*sol.cast<double>();
+        sol = (*inv->noisenorm)*sol;
     }
     printf("[done]\n");
 
@@ -209,7 +208,7 @@ int main(int argc, char *argv[])
     float tmin = ((float)data->evoked[0]->first) / data->info->sfreq;
     float tstep = 1/data->info->sfreq;
 
-    std::cout << std::endl << "part ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << sol2.block(0,0,10,10) << std::endl;
+    std::cout << std::endl << "part ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << sol.block(0,0,10,10) << std::endl;
     printf("tmin = %f s\n", tmin);
     printf("tstep = %f s\n", tstep);
 

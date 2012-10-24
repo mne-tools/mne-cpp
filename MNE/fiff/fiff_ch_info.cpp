@@ -85,14 +85,14 @@ FiffChInfo::FiffChInfo(const FiffChInfo* ch)
 , unit(ch->unit)
 , unit_mul(ch->unit_mul)
 , ch_name(ch->ch_name)
-, loc(Matrix<float,12,1, DontAlign>(ch->loc))
-, coil_trans(Matrix<float,4,4, DontAlign>(ch->coil_trans))
-, eeg_loc(Matrix<float,3,2, DontAlign>(ch->eeg_loc))
+, loc(Matrix<double,12,1, DontAlign>(ch->loc))
+, coil_trans(Matrix<double,4,4, DontAlign>(ch->coil_trans))
+, eeg_loc(Matrix<double,3,2, DontAlign>(ch->eeg_loc))
 {
 
 
-    Matrix<float,4,4, DontAlign>    coil_trans;  /**< Channel location */
-    Matrix<float,3,2, DontAlign>    eeg_loc;
+    Matrix<double,4,4, DontAlign>    coil_trans;  /**< Channel location */
+    Matrix<double,3,2, DontAlign>    eeg_loc;
     loc.setZero();
     coil_trans.setZero();
     eeg_loc.setZero();

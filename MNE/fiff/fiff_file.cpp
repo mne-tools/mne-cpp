@@ -242,7 +242,7 @@ bool FiffFile::read_cov(FiffDirTree* node, fiff_int_t cov_kind, FiffCov*& p_covD
     QStringList names;
     bool diagmat = false;
     VectorXd* eig = NULL;
-    MatrixXf* eigvec = NULL;
+    MatrixXd* eigvec = NULL;
     VectorXd* cov_diag = NULL;
     VectorXd* cov = NULL;
     VectorXd* cov_sparse = NULL;
@@ -481,8 +481,8 @@ QList<FiffCtfComp*> FiffFile::read_ctf_comp(FiffDirTree* p_pNode, QList<FiffChIn
             calibrated = (bool)*t_pTag->toInt();
 
         one->save_calibrated = calibrated;
-        one->rowcals = MatrixXf::Ones(1,mat->data->rows());//ones(1,size(mat.data,1));
-        one->colcals = MatrixXf::Ones(1,mat->data->cols());//ones(1,size(mat.data,2));
+        one->rowcals = MatrixXd::Ones(1,mat->data->rows());//ones(1,size(mat.data,1));
+        one->colcals = MatrixXd::Ones(1,mat->data->cols());//ones(1,size(mat.data,2));
         if (!calibrated)
         {
             //
@@ -496,7 +496,7 @@ QList<FiffCtfComp*> FiffFile::read_ctf_comp(FiffDirTree* p_pNode, QList<FiffChIn
                 ch_names.append(chs.at(p).ch_name);
 
             qint32 count;
-            MatrixXf col_cals(mat->data->cols(), 1);
+            MatrixXd col_cals(mat->data->cols(), 1);
             col_cals.setZero();
             for (col = 0; col < mat->data->cols(); ++col)
             {
@@ -526,7 +526,7 @@ QList<FiffCtfComp*> FiffFile::read_ctf_comp(FiffDirTree* p_pNode, QList<FiffChIn
             //
             //    Then the rows
             //
-            MatrixXf row_cals(mat->data->rows(), 1);
+            MatrixXd row_cals(mat->data->rows(), 1);
             row_cals.setZero();
             for (row = 0; row < mat->data->rows(); ++row)
             {
@@ -1089,7 +1089,7 @@ QList<FiffProj*> FiffFile::read_proj(FiffDirTree* p_pNode)
             return projdata;
         }
         t_pFiffDirTreeItem->find_tag(this, FIFF_PROJ_ITEM_VECTORS, t_pTag);
-        MatrixXf* data = NULL;
+        MatrixXd* data = NULL;
         if (t_pTag)
         {
             data = t_pTag->toFloatMatrix();
@@ -1351,7 +1351,7 @@ bool FiffFile::setup_read_raw(QString& p_sFileName, FiffRawData*& data, bool all
     //
     //   Add the calibration factors
     //
-    MatrixXf cals(1,data->info->nchan);
+    MatrixXd cals(1,data->info->nchan);
     cals.setZero();
     for (qint32 k = 0; k < data->info->nchan; ++k)
         cals(0,k) = data->info->chs.at(k).range*data->info->chs.at(k).cal;
@@ -1421,7 +1421,7 @@ FiffFile* FiffFile::start_file(QString& p_sFilename)
 
 //*************************************************************************************************************
 
-FiffFile* FiffFile::start_writing_raw(QString& p_sFileName, FiffInfo* info, MatrixXf*& cals, MatrixXi sel)
+FiffFile* FiffFile::start_writing_raw(QString& p_sFileName, FiffInfo* info, MatrixXd*& cals, MatrixXi sel)
 {
     //
     //   We will always write floats
@@ -1557,7 +1557,7 @@ FiffFile* FiffFile::start_writing_raw(QString& p_sFileName, FiffInfo* info, Matr
     //
     if (cals)
         delete cals;
-    cals = new MatrixXf(1,nchan);
+    cals = new MatrixXd(1,nchan);
 
     for(k = 0; k < nchan; ++k)
     {
@@ -1814,7 +1814,7 @@ void FiffFile::write_float(fiff_int_t kind, float* data, fiff_int_t nel)
 
 //*************************************************************************************************************
 
-void FiffFile::write_float_matrix(fiff_int_t kind, const MatrixXf* mat)
+void FiffFile::write_float_matrix(fiff_int_t kind, const MatrixXd* mat)
 {
     qint32 FIFFT_MATRIX = 1 << 30;
     qint32 FIFFT_MATRIX_FLOAT = FIFFT_FLOAT | FIFFT_MATRIX;
@@ -1977,7 +1977,7 @@ void FiffFile::write_proj(QList<FiffProj*>& projs)
 
 //*************************************************************************************************************
 
-bool FiffFile::write_raw_buffer(MatrixXf* buf, MatrixXf* cals)
+bool FiffFile::write_raw_buffer(MatrixXd* buf, MatrixXd* cals)
 {
     if (buf->rows() != cals->cols())
     {
@@ -1985,12 +1985,12 @@ bool FiffFile::write_raw_buffer(MatrixXf* buf, MatrixXf* cals)
         return false;
     }
 
-    SparseMatrix<float> inv_calsMat(cals->cols(), cals->cols());
+    SparseMatrix<double> inv_calsMat(cals->cols(), cals->cols());
 
     for(qint32 i = 0; i < cals->cols(); ++i)
         inv_calsMat.insert(i, i) = 1.0/(*cals)(0,i);
 
-    MatrixXf tmp = inv_calsMat*(*buf);
+    MatrixXf tmp = (inv_calsMat*(*buf)).cast<float>();
     this->write_float(FIFF_DATA_BUFFER,tmp.data(),tmp.rows()*tmp.cols());
     return true;
 }

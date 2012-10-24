@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
         }
     }
     //
-    MatrixXf* cals = NULL;
+    MatrixXd* cals = NULL;
 
     FiffFile* outfid = Fiff::start_writing_raw(t_sOutFile,raw->info, cals, picks);
     //
@@ -141,8 +141,8 @@ int main(int argc, char *argv[])
     bool first_buffer = true;
 
     fiff_int_t first, last;
-    MatrixXf* data = NULL;
-    MatrixXf* times = NULL;
+    MatrixXd* data = NULL;
+    MatrixXd* times = NULL;
 
     for(first = from; first < to; first+=quantum)
     {

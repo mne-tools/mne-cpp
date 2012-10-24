@@ -60,8 +60,8 @@ MNEHemisphere::MNEHemisphere()
 , np(-1)
 , ntri(-1)
 , coord_frame(-1)
-, rr(MatrixX3f::Zero(0,3))
-, nn(MatrixX3f::Zero(0,3))
+, rr(MatrixX3d::Zero(0,3))
+, nn(MatrixX3d::Zero(0,3))
 , tris(MatrixX3i::Zero(0,3))
 , nuse(-1)
 , inuse(VectorXi::Zero(0))
@@ -69,16 +69,16 @@ MNEHemisphere::MNEHemisphere()
 , nuse_tri(-1)
 , use_tris(MatrixX3i::Zero(0,3))
 , nearest(VectorXi::Zero(0))
-, nearest_dist(VectorXf::Zero(0))
+, nearest_dist(VectorXd::Zero(0))
 , pinfo(QList<VectorXi>())
 , dist_limit(-1)
 , dist(NULL)
-, tri_cent(MatrixX3f::Zero(0,3))
-, tri_nn(MatrixX3f::Zero(0,3))
-, tri_area(VectorXf::Zero(0))
-, use_tri_cent(MatrixX3f::Zero(0,3))
-, use_tri_nn(MatrixX3f::Zero(0,3))
-, use_tri_area(VectorXf::Zero(0))
+, tri_cent(MatrixX3d::Zero(0,3))
+, tri_nn(MatrixX3d::Zero(0,3))
+, tri_area(VectorXd::Zero(0))
+, use_tri_cent(MatrixX3d::Zero(0,3))
+, use_tri_nn(MatrixX3d::Zero(0,3))
+, use_tri_area(VectorXd::Zero(0))
 , m_pTriCoords(NULL)
 //, m_pGeometryData(NULL)
 {
@@ -92,8 +92,8 @@ MNEHemisphere::MNEHemisphere(MNEHemisphere* p_pMNEHemisphere)
 , np(p_pMNEHemisphere->np)
 , ntri(p_pMNEHemisphere->ntri)
 , coord_frame(p_pMNEHemisphere->coord_frame)
-, rr(MatrixX3f(p_pMNEHemisphere->rr))
-, nn(MatrixX3f(p_pMNEHemisphere->nn))
+, rr(MatrixX3d(p_pMNEHemisphere->rr))
+, nn(MatrixX3d(p_pMNEHemisphere->nn))
 , tris(MatrixX3i(p_pMNEHemisphere->tris))
 , nuse(p_pMNEHemisphere->nuse)
 , inuse(VectorXi(p_pMNEHemisphere->inuse))
@@ -101,16 +101,16 @@ MNEHemisphere::MNEHemisphere(MNEHemisphere* p_pMNEHemisphere)
 , nuse_tri(p_pMNEHemisphere->nuse_tri)
 , use_tris(MatrixX3i(p_pMNEHemisphere->use_tris))
 , nearest(VectorXi(p_pMNEHemisphere->nearest))
-, nearest_dist(VectorXf(p_pMNEHemisphere->nearest_dist))
+, nearest_dist(VectorXd(p_pMNEHemisphere->nearest_dist))
 , pinfo(p_pMNEHemisphere->pinfo)
 , dist_limit(p_pMNEHemisphere->dist_limit)
-, dist(p_pMNEHemisphere->dist ? new MatrixXf(*p_pMNEHemisphere->dist) : NULL)
-, tri_cent(MatrixX3f(p_pMNEHemisphere->tri_cent))
-, tri_nn(MatrixX3f(p_pMNEHemisphere->tri_nn))
-, tri_area(VectorXf(p_pMNEHemisphere->tri_area))
-, use_tri_cent(MatrixX3f(p_pMNEHemisphere->use_tri_cent))
-, use_tri_nn(MatrixX3f(p_pMNEHemisphere->use_tri_nn))
-, use_tri_area(VectorXf(p_pMNEHemisphere->use_tri_area))
+, dist(p_pMNEHemisphere->dist ? new MatrixXd(*p_pMNEHemisphere->dist) : NULL)
+, tri_cent(MatrixX3d(p_pMNEHemisphere->tri_cent))
+, tri_nn(MatrixX3d(p_pMNEHemisphere->tri_nn))
+, tri_area(VectorXd(p_pMNEHemisphere->tri_area))
+, use_tri_cent(MatrixX3d(p_pMNEHemisphere->use_tri_cent))
+, use_tri_nn(MatrixX3d(p_pMNEHemisphere->use_tri_nn))
+, use_tri_area(VectorXd(p_pMNEHemisphere->use_tri_area))
 , m_pTriCoords(p_pMNEHemisphere->m_pTriCoords ? new MatrixXf(*(p_pMNEHemisphere->m_pTriCoords)) : NULL)
 {
     //*m_pGeometryData = *p_pMNEHemisphere->m_pGeometryData;
@@ -146,12 +146,12 @@ bool MNEHemisphere::transform_hemisphere_to(fiff_int_t dest, FiffCoordTrans* tra
         return false;
     }
 
-    MatrixXf t = trans->trans.block(0,0,3,4);
+    MatrixXd t = trans->trans.block(0,0,3,4);
 //        res             = src;
     this->coord_frame = dest;
-    MatrixXf t_rr = MatrixXf::Ones(this->np, 4);
+    MatrixXd t_rr = MatrixXd::Ones(this->np, 4);
     t_rr.block(0, 0, this->np, 3) = this->rr;
-    MatrixXf t_nn = MatrixXf::Zero(this->np, 4);
+    MatrixXd t_nn = MatrixXd::Zero(this->np, 4);
     t_nn.block(0, 0, this->np, 3) = this->nn;
 
     this->rr    = (t*t_rr.transpose()).transpose();
@@ -170,9 +170,9 @@ MatrixXf* MNEHemisphere::getTriCoords(float p_fScaling)
         m_pTriCoords = new MatrixXf(3,3*tris.rows());
         for(qint32 i = 0; i < tris.rows(); ++i)
         {
-            m_pTriCoords->block(0,i*3,3,1) = rr.row( tris(i,0) ).transpose();
-            m_pTriCoords->block(0,i*3+1,3,1) = rr.row( tris(i,1) ).transpose();
-            m_pTriCoords->block(0,i*3+2,3,1) = rr.row( tris(i,2) ).transpose();
+            m_pTriCoords->block(0,i*3,3,1) = rr.row( tris(i,0) ).transpose().cast<float>();
+            m_pTriCoords->block(0,i*3+1,3,1) = rr.row( tris(i,1) ).transpose().cast<float>();
+            m_pTriCoords->block(0,i*3+2,3,1) = rr.row( tris(i,2) ).transpose().cast<float>();
         }
     }
 
@@ -191,7 +191,7 @@ MatrixXf* MNEHemisphere::getTriCoords(float p_fScaling)
 //    {
 //        m_pGeometryData = new QGeometryData();
 
-//        MatrixXf* triCoords = getTriCoords(p_fScaling);
+//        MatrixXd* triCoords = getTriCoords(p_fScaling);
 
 //        m_pGeometryData->appendVertexArray(QArray<QVector3D>::fromRawData( reinterpret_cast<const QVector3D*>(triCoords->data()), triCoords->cols() ));
 //    }

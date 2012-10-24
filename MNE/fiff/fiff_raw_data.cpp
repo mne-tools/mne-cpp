@@ -76,7 +76,7 @@ FiffRawData::~FiffRawData()
 
 //*************************************************************************************************************
 
-bool FiffRawData::read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t from, fiff_int_t to, MatrixXi sel)
+bool FiffRawData::read_raw_segment(MatrixXd*& data, MatrixXd*& times, fiff_int_t from, fiff_int_t to, MatrixXi sel)
 {
     if(data)
         delete data;
@@ -110,19 +110,19 @@ bool FiffRawData::read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t
     qint32 nchan = this->info->nchan;
     qint32 dest  = 0;//1;
     qint32 i, k, r;
-//    MatrixXf cal(nchan,nchan);
-    SparseMatrix<float> cal(nchan,nchan);
+//    MatrixXd cal(nchan,nchan);
+    SparseMatrix<double> cal(nchan,nchan);
 //    cal.setZero();
     cal.reserve(nchan);
     for(i = 0; i < nchan; ++i)
         cal.insert(i,i) = this->cals(0,i);
     cal.makeCompressed();
 
-    MatrixXf mult_full;
+    MatrixXd mult_full;
     //
     if (sel.cols() == 0)
     {
-        data = new MatrixXf(nchan, to-from+1);
+        data = new MatrixXd(nchan, to-from+1);
 //            data->setZero();
         if (projAvailable || this->comp.kind != -1)
         {
@@ -136,10 +136,10 @@ bool FiffRawData::read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t
     }
     else
     {
-        data = new MatrixXf(sel.cols(),to-from+1);
+        data = new MatrixXd(sel.cols(),to-from+1);
 //            data->setZero();
 
-        MatrixXf selVect(sel.cols(), nchan);
+        MatrixXd selVect(sel.cols(), nchan);
 
         selVect.setZero();
 
@@ -182,7 +182,7 @@ bool FiffRawData::read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t
     //
     // Make mult sparse
     //
-    SparseMatrix<float> mult(mult_full.rows(),mult_full.cols());
+    SparseMatrix<double> mult(mult_full.rows(),mult_full.cols());
     for(i = 0; i < mult_full.rows(); ++i)
     {
         for(k = 0; k < mult_full.cols(); ++k)
@@ -209,7 +209,7 @@ bool FiffRawData::read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t
         fid = this->file;
     }
 
-    MatrixXf one;
+    MatrixXd one;
     bool doing_whole;
     fiff_int_t first_pick, last_pick, picksamp;
     for(k = 0; k < this->rawdir.size(); ++k)
@@ -248,11 +248,11 @@ bool FiffRawData::read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t
                     if (sel.cols() == 0)
                     {
                         if (t_pTag->type == FIFFT_DAU_PACK16)
-                            one = cal*(Map< MatrixDau16 >( t_pTag->toDauPack16(),nchan, thisRawDir.nsamp)).cast<float>();
+                            one = cal*(Map< MatrixDau16 >( t_pTag->toDauPack16(),nchan, thisRawDir.nsamp)).cast<double>();
                         else if(t_pTag->type == FIFFT_INT)
-                            one = cal*(Map< MatrixXi >( t_pTag->toInt(),nchan, thisRawDir.nsamp)).cast<float>();
+                            one = cal*(Map< MatrixXi >( t_pTag->toInt(),nchan, thisRawDir.nsamp)).cast<double>();
                         else if(t_pTag->type == FIFFT_FLOAT)
-                            one = cal*(Map< MatrixXf >( t_pTag->toFloat(),nchan, thisRawDir.nsamp));
+                            one = cal*(Map< MatrixXf >( t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
                         else
                             printf("Data Storage Format not known jet [1]!! Type: %d\n", t_pTag->type);
                     }
@@ -260,25 +260,25 @@ bool FiffRawData::read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t
                     {
 
                         //ToDo find a faster solution for this!! --> make cal and mul sparse like in MATLAB
-                        MatrixXf newData(sel.cols(), thisRawDir.nsamp); //ToDo this can be done much faster, without newData
+                        MatrixXd newData(sel.cols(), thisRawDir.nsamp); //ToDo this can be done much faster, without newData
 
                         if (t_pTag->type == FIFFT_DAU_PACK16)
                         {
-                            MatrixXf tmp_data = (Map< MatrixDau16 > ( t_pTag->toDauPack16(),nchan, thisRawDir.nsamp)).cast<float>();
+                            MatrixXd tmp_data = (Map< MatrixDau16 > ( t_pTag->toDauPack16(),nchan, thisRawDir.nsamp)).cast<double>();
 
                             for(r = 0; r < sel.cols(); ++r)
                                 newData.block(r,0,1,thisRawDir.nsamp) = tmp_data.block(sel(0,r),0,1,thisRawDir.nsamp);
                         }
                         else if(t_pTag->type == FIFFT_INT)
                         {
-                            MatrixXf tmp_data = (Map< MatrixXi >( t_pTag->toInt(),nchan, thisRawDir.nsamp)).cast<float>();
+                            MatrixXd tmp_data = (Map< MatrixXi >( t_pTag->toInt(),nchan, thisRawDir.nsamp)).cast<double>();
 
                             for(r = 0; r < sel.cols(); ++r)
                                 newData.block(r,0,1,thisRawDir.nsamp) = tmp_data.block(sel(0,r),0,1,thisRawDir.nsamp);
                         }
                         else if(t_pTag->type == FIFFT_FLOAT)
                         {
-                            Map< MatrixXf > tmp_data( t_pTag->toFloat(),nchan, thisRawDir.nsamp);
+                            MatrixXd tmp_data = (Map< MatrixXf > ( t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
 
                             for(r = 0; r < sel.cols(); ++r)
                                 newData.block(r,0,1,thisRawDir.nsamp) = tmp_data.block(sel(0,r),0,1,thisRawDir.nsamp);
@@ -294,11 +294,11 @@ bool FiffRawData::read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t
                 else
                 {
                     if (t_pTag->type == FIFFT_DAU_PACK16)
-                        one = mult*(Map< MatrixDau16 >( t_pTag->toDauPack16(),nchan, thisRawDir.nsamp)).cast<float>();
+                        one = mult*(Map< MatrixDau16 >( t_pTag->toDauPack16(),nchan, thisRawDir.nsamp)).cast<double>();
                     else if(t_pTag->type == FIFFT_INT)
-                        one = mult*(Map< MatrixXi >( t_pTag->toInt(),nchan, thisRawDir.nsamp)).cast<float>();
+                        one = mult*(Map< MatrixXi >( t_pTag->toInt(),nchan, thisRawDir.nsamp)).cast<double>();
                     else if(t_pTag->type == FIFFT_FLOAT)
-                        one = mult*Map< MatrixXf >( t_pTag->toFloat(),nchan, thisRawDir.nsamp);
+                        one = mult*(Map< MatrixXf >( t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
                     else
                         printf("Data Storage Format not known jet [3]!! Type: %d\n", t_pTag->type);
                 }
@@ -378,7 +378,7 @@ bool FiffRawData::read_raw_segment(MatrixXf*& data, MatrixXf*& times, fiff_int_t
     if(times)
         delete times;
 
-    times = new MatrixXf(1, to-from+1);
+    times = new MatrixXd(1, to-from+1);
 
     for (i = 0; i < times->cols(); ++i)
         (*times)(0, i) = ((float)(from+i)) / this->info->sfreq;

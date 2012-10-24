@@ -114,7 +114,7 @@ public:
     QStringList bads;       /**< ToDo... */
     fiff_int_t nfree;       /**< ToDo... */
     VectorXd* eig;          /**< ToDo... */
-    MatrixXf* eigvec;       /**< ToDo... */
+    MatrixXd* eigvec;       /**< ToDo... */
 };
 
 } // NAMESPACE

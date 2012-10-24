@@ -351,7 +351,7 @@ public:
     *
     * @return the started fiff file
     */
-    static FiffFile* start_writing_raw(QString& p_sFileName, FiffInfo* info, MatrixXf*& cals, MatrixXi sel = defaultFileMatrixXi);
+    static FiffFile* start_writing_raw(QString& p_sFileName, FiffInfo* info, MatrixXd*& cals, MatrixXi sel = defaultFileMatrixXi);
 
     //=========================================================================================================
     /**
@@ -460,7 +460,7 @@ public:
     * @param[in] kind       The tag kind
     * @param[in] mat        The data matrix
     */
-    void write_float_matrix(fiff_int_t kind, const MatrixXf* mat);
+    void write_float_matrix(fiff_int_t kind, const MatrixXd* mat);
 
 
     //=========================================================================================================
@@ -514,7 +514,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool write_raw_buffer(MatrixXf* buf, MatrixXf* cals);
+    bool write_raw_buffer(MatrixXd* buf, MatrixXd* cals);
 
     //=========================================================================================================
     /**
