@@ -304,12 +304,6 @@ public:
     }
 
 
-
-
-
-
-
-
 //    function [res] = fiff_pick_channels_evoked(orig,include,exclude)
 //    %
 //    % [res] = fiff_pick_channels_evoked(orig,include,exclude)
@@ -321,7 +315,22 @@ public:
 //    % exclude   - Channels to exclude (if empty, do not exclude any)
 //    %
 //    %
-
+    //=========================================================================================================
+    /**
+    * fiff_pick_channels_evoked
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffEvokedDataSet pick_channels_evoked member function
+    *
+    * Pick desired channels from evoked-response data
+    *
+    * @param[in] orig       The original data
+    * @param[in] include   - Channels to include (if empty, include all available)
+    * @param[in] exclude   - Channels to exclude (if empty, do not exclude any)
+    *
+    * @return the desired fiff evoked data set
+    */
     inline static FiffEvokedDataSet* pick_channels_evoked(const FiffEvokedDataSet* orig, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList)
     {
         if(include.size() == 0 && exclude.size() == 0)

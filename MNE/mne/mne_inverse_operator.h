@@ -176,7 +176,7 @@ public:
     MatrixXf* proj;                     /**< This is the projector to apply to the data. */
     MatrixXf* whitener;                 /**< This whitens the data */
     VectorXf* reginv;                   /**< This the diagonal matrix implementing. regularization and the inverse */
-    SparseMatrix<float>* noisenorm;     /**< These are the noise-normalization factors */
+    SparseMatrix<double>* noisenorm;    /**< These are the noise-normalization factors */
 };
 
 } // NAMESPACE

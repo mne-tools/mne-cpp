@@ -106,7 +106,7 @@ MNEInverseOperator::MNEInverseOperator(const MNEInverseOperator* p_pMNEInverseOp
 , proj(p_pMNEInverseOperator->proj ? new MatrixXf(*p_pMNEInverseOperator->proj) : NULL)
 , whitener(p_pMNEInverseOperator->whitener ? new MatrixXf(*p_pMNEInverseOperator->whitener) : NULL)
 , reginv(p_pMNEInverseOperator->reginv ? new VectorXf(*p_pMNEInverseOperator->reginv) : NULL)
-, noisenorm(p_pMNEInverseOperator->noisenorm ? new SparseMatrix<float>(*p_pMNEInverseOperator->noisenorm) : NULL)
+, noisenorm(p_pMNEInverseOperator->noisenorm ? new SparseMatrix<double>(*p_pMNEInverseOperator->noisenorm) : NULL)
 {
 
 }
@@ -268,7 +268,7 @@ MNEInverseOperator* MNEInverseOperator::prepare_inverse_operator(qint32 nave ,fl
         //
         //   Compute the final result
         //
-        VectorXf noise_norm_new;
+        VectorXd noise_norm_new;
         if (inv->source_ori == FIFFV_MNE_FREE_ORI)
         {
             //
@@ -280,7 +280,7 @@ MNEInverseOperator* MNEInverseOperator::prepare_inverse_operator(qint32 nave ,fl
             //   per source location
             //
             VectorXf* t = MNEMath::combine_xyz(noise_norm->transpose());
-            noise_norm_new = t->cwiseSqrt();
+            noise_norm_new = t->cast<double>().cwiseSqrt();//double otherwise values are getting too small
             delete t;
             //
             //   This would replicate the same value on three consequtive
@@ -288,11 +288,11 @@ MNEInverseOperator* MNEInverseOperator::prepare_inverse_operator(qint32 nave ,fl
             //
             //   noise_norm = kron(sqrt(mne_combine_xyz(noise_norm)),ones(3,1));
         }
-        VectorXf vOnes = VectorXf::Ones(noise_norm_new.size());
-        VectorXf tmp = vOnes.cwiseQuotient(noise_norm_new.cwiseAbs());
+        VectorXd vOnes = VectorXd::Ones(noise_norm_new.size());
+        VectorXd tmp = vOnes.cwiseQuotient(noise_norm_new.cwiseAbs());
         if(inv->noisenorm)
             delete inv->noisenorm;
-        inv->noisenorm = new SparseMatrix<float>(noise_norm_new.size(),noise_norm_new.size());
+        inv->noisenorm = new SparseMatrix<double>(noise_norm_new.size(),noise_norm_new.size());
 
         for(qint32 i = 0; i < noise_norm_new.size(); ++i)
             inv->noisenorm->insert(i,i) = tmp[i];

@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    printf("Read %d samples.\n",data->cols());
+    printf("Read %d samples.\n",(qint32)data->cols());
 
 
     std::cout << data->block(0,0,10,10) << std::endl;

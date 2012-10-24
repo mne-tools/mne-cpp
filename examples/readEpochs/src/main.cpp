@@ -342,7 +342,7 @@ int main(int argc, char *argv[])
 
     if(data.size() > 0)
     {
-        printf("Read %d epochs, %d samples each.\n",data.size(),data[0]->epoch->cols());
+        printf("Read %d epochs, %d samples each.\n",data.size(),(qint32)data[0]->epoch->cols());
 
         //DEBUG
         std::cout << data[0]->epoch->block(0,0,10,10) << std::endl;
