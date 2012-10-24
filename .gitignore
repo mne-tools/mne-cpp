@@ -1,3 +1,5 @@
+/bin/readEpochs
+/bin/computeInverse
 /bin/readFwd
 /bin/readFwdDisp
 /bin/readRaw
