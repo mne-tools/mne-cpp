@@ -190,25 +190,26 @@ int main(int argc, char *argv[])
         sol.resize(sol1.rows(),sol1.cols());
         sol = sol1;
     }
+    MatrixXd sol2;
     if (dSPM)
     {
         printf("(dSPM)...");
-        sol = (*inv->noisenorm)*sol;
+        sol2 = (*inv->noisenorm)*sol.cast<double>();
     }
     else if (sLORETA)
     {
         printf("(sLORETA)...");
-        sol = (*inv->noisenorm)*sol;
+        sol2 = (*inv->noisenorm)*sol.cast<double>();
     }
     printf("[done]\n");
 
     //Results
 //    inv;
-//    sol;
+//    sol2;
     float tmin = ((float)data->evoked[0]->first) / data->info->sfreq;
     float tstep = 1/data->info->sfreq;
 
-    std::cout << std::endl << "part ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << sol.block(0,0,10,10) << std::endl;
+    std::cout << std::endl << "part ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << sol2.block(0,0,10,10) << std::endl;
     printf("tmin = %f s\n", tmin);
     printf("tstep = %f s\n", tstep);
 
