@@ -118,6 +118,21 @@ public:
 
     //=========================================================================================================
     /**
+    * fiff_pick_channels_evoked
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Pick desired channels from evoked-response data
+    *
+    * @param[in] include   - Channels to include (if empty, include all available)
+    * @param[in] exclude   - Channels to exclude (if empty, do not exclude any)
+    *
+    * @return the desired fiff evoked data set
+    */
+    FiffEvokedDataSet* pick_channels_evoked(QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
+
+    //=========================================================================================================
+    /**
     * fiff_read_evoked
     *
     * ### MNE toolbox root function ###

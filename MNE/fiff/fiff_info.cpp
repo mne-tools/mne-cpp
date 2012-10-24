@@ -614,6 +614,31 @@ MatrixXi FiffInfo::pick_channels(QStringList& ch_names, QStringList& include, QS
 
 //*************************************************************************************************************
 
+FiffInfo* FiffInfo::pick_info(const MatrixXi* sel)
+{
+    FiffInfo* res = new FiffInfo(this);
+    if (sel == NULL)
+        return res;
+
+    //ToDo when pointer List do delation
+    res->chs.clear();
+    res->ch_names.clear();
+
+    qint32 idx;
+    for(qint32 i = 0; i < sel->cols(); ++i)
+    {
+        idx = (*sel)(0,i);
+        res->chs.append(this->chs[idx]);
+        res->ch_names.append(this->ch_names[idx]);
+    }
+    res->nchan  = sel->cols();
+
+    return res;
+}
+
+
+//*************************************************************************************************************
+
 MatrixXi FiffInfo::pick_types(bool meg, bool eeg, bool stim, QStringList& include, QStringList& exclude)
 {
     MatrixXi pick(1, this->nchan);
