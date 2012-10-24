@@ -395,8 +395,12 @@ public:
     //=========================================================================================================
     /**
     * to fiff FIFFT FLOAT MATRIX
+    *
+    * parses a fiff float matrix and returns a double matrix to make sure only double is used
+    *
+    * @return a pointer to a double matrix wich is newly created from the parsed float -> has to be destroyed
     */
-    inline MatrixXf* toFloatMatrix() const;
+    inline MatrixXd* toFloatMatrix() const;
 
 
 
@@ -833,7 +837,7 @@ inline MatrixXi FiffTag::toIntMatrix() const
         return p_defaultMatrix;
     }
 
-    //MatrixXf p_Matrix = Map<MatrixXf>( (float*)this->data,p_dims[0], p_dims[1]);
+    //MatrixXd p_Matrix = Map<MatrixXd>( (float*)this->data,p_dims[0], p_dims[1]);
     // --> Use copy constructor instead --> slower performance but higher memory management reliability
     MatrixXi p_Matrix(Map<MatrixXi>( (int*)this->data(),pDims[0], pDims[1]));
 
@@ -845,7 +849,7 @@ inline MatrixXi FiffTag::toIntMatrix() const
 
 //*************************************************************************************************************
 
-inline MatrixXf* FiffTag::toFloatMatrix() const
+inline MatrixXd* FiffTag::toFloatMatrix() const
 {
 //        qDebug() << "toFloatMatrix";
 
@@ -867,9 +871,9 @@ inline MatrixXf* FiffTag::toFloatMatrix() const
         return NULL;
     }
 
-    //MatrixXf p_Matrix = Map<MatrixXf>( (float*)this->data,pDims[0], pDims[1]);
+    //MatrixXd p_Matrix = Map<MatrixXd>( (float*)this->data,pDims[0], pDims[1]);
     // --> Use copy constructor instead --> slower performance but higher memory management reliability
-    MatrixXf* p_pMatrix = new MatrixXf(Map<MatrixXf>( (float*)this->data(),pDims[0], pDims[1]));
+    MatrixXd* p_pMatrix = new MatrixXd((Map<MatrixXf>( (float*)this->data(),pDims[0], pDims[1])).cast<double>());
 
     delete[] pDims;
 

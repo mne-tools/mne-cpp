@@ -77,8 +77,8 @@ FiffEvokedData::FiffEvokedData(const FiffEvokedData* p_pFiffEvokedData)
 , first(p_pFiffEvokedData->first)
 , last(p_pFiffEvokedData->last)
 , comment(p_pFiffEvokedData->comment)
-, times(p_pFiffEvokedData->times ? new MatrixXf(*p_pFiffEvokedData->times) : NULL )
-, epochs(p_pFiffEvokedData->epochs ? new MatrixXf(*p_pFiffEvokedData->epochs) : NULL )
+, times(p_pFiffEvokedData->times ? new MatrixXd(*p_pFiffEvokedData->times) : NULL )
+, epochs(p_pFiffEvokedData->epochs ? new MatrixXd(*p_pFiffEvokedData->epochs) : NULL )
 {
 
 }

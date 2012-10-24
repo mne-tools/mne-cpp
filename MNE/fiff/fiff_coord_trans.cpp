@@ -57,8 +57,8 @@ using namespace FIFFLIB;
 FiffCoordTrans::FiffCoordTrans()
 : from(-1)
 , to(-1)
-, trans(MatrixXf::Identity(4,4))
-, invtrans(MatrixXf::Identity(4,4))
+, trans(MatrixXd::Identity(4,4))
+, invtrans(MatrixXd::Identity(4,4))
 {
 }
 
@@ -71,15 +71,15 @@ FiffCoordTrans::FiffCoordTrans(FiffCoordTrans* t_pFiffCoordTrans)
     {
         from = t_pFiffCoordTrans->from;
         to = t_pFiffCoordTrans->to;
-        trans = MatrixXf(t_pFiffCoordTrans->trans);
-        invtrans = MatrixXf(t_pFiffCoordTrans->invtrans);
+        trans = MatrixXd(t_pFiffCoordTrans->trans);
+        invtrans = MatrixXd(t_pFiffCoordTrans->invtrans);
     }
     else
     {
         this->from = -1;
         this->to = -1;
-        this->trans = MatrixXf::Identity(4,4);
-        this->invtrans = MatrixXf::Identity(4,4);
+        this->trans = MatrixXd::Identity(4,4);
+        this->invtrans = MatrixXd::Identity(4,4);
     }
 }
 

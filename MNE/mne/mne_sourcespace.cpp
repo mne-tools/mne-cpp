@@ -373,14 +373,14 @@ bool MNESourceSpace::read_source_space(FiffFile* p_pFile, FiffDirTree* p_pTree, 
     {
         VectorXi p_defaultVector;
         p_pHemisphere->nearest = p_defaultVector;
-        VectorXf p_defaultFloatVector;
+        VectorXd p_defaultFloatVector;
         p_pHemisphere->nearest_dist = p_defaultFloatVector;
     }
     else
     {
        //res.nearest = tag1.data + 1;
        p_pHemisphere->nearest = VectorXi(Map<VectorXi>(t_pTag1->toInt(), t_pTag1->size()/4, 1));//use copy constructor, for the sake of easy memory management
-       p_pHemisphere->nearest_dist = VectorXf(Map<VectorXf>(t_pTag2->toFloat(), t_pTag1->size()/4, 1));//use copy constructor, for the sake of easy memory management
+       p_pHemisphere->nearest_dist = VectorXd((Map<VectorXf>(t_pTag2->toFloat(), t_pTag1->size()/4, 1)).cast<double>());//use copy constructor, for the sake of easy memory management
     }
 
     patch_info(p_pHemisphere->nearest, p_pHemisphere->pinfo);
@@ -489,12 +489,12 @@ bool MNESourceSpace::complete_source_space_info(MNEHemisphere* p_pHemisphere)
     //   Main triangulation
     //
     printf("\tCompleting triangulation info...");
-    p_pHemisphere->tri_cent = MatrixX3f::Zero(p_pHemisphere->ntri,3);
-    p_pHemisphere->tri_nn = MatrixX3f::Zero(p_pHemisphere->ntri,3);
-    p_pHemisphere->tri_area = VectorXf::Zero(p_pHemisphere->ntri);
+    p_pHemisphere->tri_cent = MatrixX3d::Zero(p_pHemisphere->ntri,3);
+    p_pHemisphere->tri_nn = MatrixX3d::Zero(p_pHemisphere->ntri,3);
+    p_pHemisphere->tri_area = VectorXd::Zero(p_pHemisphere->ntri);
 
-    Matrix3f r;
-    Vector3f a, b;
+    Matrix3d r;
+    Vector3d a, b;
     int k = 0;
     float size = 0;
     for (qint32 i = 0; i < p_pHemisphere->ntri; ++i)
@@ -544,9 +544,9 @@ bool MNESourceSpace::complete_source_space_info(MNEHemisphere* p_pHemisphere)
     printf("\tCompleting selection triangulation info...");
     if (p_pHemisphere->nuse_tri > 0)
     {
-        p_pHemisphere->use_tri_cent = MatrixX3f::Zero(p_pHemisphere->nuse_tri,3);
-        p_pHemisphere->use_tri_nn = MatrixX3f::Zero(p_pHemisphere->nuse_tri,3);
-        p_pHemisphere->use_tri_area = VectorXf::Zero(p_pHemisphere->nuse_tri);
+        p_pHemisphere->use_tri_cent = MatrixX3d::Zero(p_pHemisphere->nuse_tri,3);
+        p_pHemisphere->use_tri_nn = MatrixX3d::Zero(p_pHemisphere->nuse_tri,3);
+        p_pHemisphere->use_tri_area = VectorXd::Zero(p_pHemisphere->nuse_tri);
 
 
         for (qint32 i = 0; i < p_pHemisphere->nuse_tri; ++i)

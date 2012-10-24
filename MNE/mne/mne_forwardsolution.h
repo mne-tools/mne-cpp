@@ -171,8 +171,8 @@ public:
     FiffNamedMatrix* sol_grad;
     FiffCoordTrans* mri_head_t;
     MNESourceSpace* src;
-    MatrixX3f source_rr;
-    MatrixX3f source_nn;
+    MatrixX3d source_rr;
+    MatrixX3d source_nn;
 };
 
 } // NAMESPACE

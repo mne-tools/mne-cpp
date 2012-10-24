@@ -123,7 +123,7 @@ public:
     *
     * @return Output vector [x1^2+y1^2+z1^2 ... x_n^2+y_n^2+z_n^2 ]
     */
-    inline static VectorXf* combine_xyz(const VectorXf& vec)
+    inline static VectorXd* combine_xyz(const VectorXd& vec)
     {
         return MNEMath::combine_xyz(vec);
     }
@@ -136,7 +136,7 @@ public:
     *
     * Wrapper for the MNEForwardSolution::extract_block_diag static function
     */
-    //    static inline MatrixXf extract_block_diag(MatrixXf& A, qint32 n);
+    //    static inline MatrixXd extract_block_diag(MatrixXd& A, qint32 n);
 
     //=========================================================================================================
     /**
@@ -196,7 +196,7 @@ public:
     *
     * @return A sparse block diagonal, diagonalized from the elements in "A".
     */
-    static inline SparseMatrix<float>* make_block_diag(const MatrixXf* A, qint32 n)
+    static inline SparseMatrix<double>* make_block_diag(const MatrixXd* A, qint32 n)
     {
         return MNEMath::make_block_diag(A, n);
     }
@@ -232,7 +232,7 @@ public:
     *
     * Wrapper for the FiffInfo::make_projector static function
     * There exists also a member function which should be preferred:
-    * make_projector(MatrixXf& proj, MatrixXf& U = defaultUMatrix)
+    * make_projector(MatrixXd& proj, MatrixXd& U = defaultUMatrix)
     *
     * Make an SSP operator
     *
@@ -244,7 +244,7 @@ public:
     *
     * @return nproj - How many items in the projector
     */
-    inline static fiff_int_t make_projector(QList<FiffProj*>& projs, QStringList& ch_names, MatrixXf*& proj, QStringList& bads = defaultQStringList, MatrixXf& U = defaultMatrixXf)
+    inline static fiff_int_t make_projector(QList<FiffProj*>& projs, QStringList& ch_names, MatrixXd*& proj, QStringList& bads = defaultQStringList, MatrixXd& U = defaultMatrixXd)
     {
         return FiffInfo::make_projector(projs, ch_names, proj, bads, U);
     }
@@ -255,7 +255,7 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffInfo make_projector_info(MatrixXf& proj) member function
+    * Wrapper for the FiffInfo make_projector_info(MatrixXd& proj) member function
     *
     * Make a SSP operator using the meas info
     *
@@ -264,7 +264,7 @@ public:
     *
     * @return nproj - How many items in the projector
     */
-    static inline qint32 make_projector_info(FiffInfo* info, MatrixXf*& proj)
+    static inline qint32 make_projector_info(FiffInfo* info, MatrixXd*& proj)
     {
         return info->make_projector_info(proj);
     }

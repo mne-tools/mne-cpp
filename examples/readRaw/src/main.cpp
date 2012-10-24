@@ -184,8 +184,8 @@ int main(int argc, char *argv[])
     //   times output argument is optional
     //
     bool readSuccessful = false;
-    MatrixXf* data = NULL;
-    MatrixXf* times = NULL;
+    MatrixXd* data = NULL;
+    MatrixXd* times = NULL;
     if (in_samples)
         readSuccessful = raw->read_raw_segment(data, times, (qint32)from, (qint32)to, picks);
     else

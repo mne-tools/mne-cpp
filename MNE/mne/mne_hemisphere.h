@@ -144,8 +144,8 @@ public:
     fiff_int_t np;              /**< The... */
     fiff_int_t ntri;            /**< The... */
     fiff_int_t coord_frame;     /**< The... */
-    MatrixX3f rr;               /**< The... */
-    MatrixX3f nn;               /**< The... */
+    MatrixX3d rr;               /**< The... */
+    MatrixX3d nn;               /**< The... */
     MatrixX3i tris;             /**< The... */
     fiff_int_t nuse;
     VectorXi inuse;             /**< The... */
@@ -153,16 +153,16 @@ public:
     qint32 nuse_tri;            /**< The... */
     MatrixX3i use_tris;         /**< The... */
     VectorXi nearest;           /**< The... */
-    VectorXf nearest_dist;      /**< The... */
+    VectorXd nearest_dist;      /**< The... */
     QList<VectorXi> pinfo;      /**< The... */
     float dist_limit;           /**< The... */
-    MatrixXf* dist;             /**< The... */
-    MatrixX3f tri_cent;         /**< The... */
-    MatrixX3f tri_nn;           /**< The... */
-    VectorXf tri_area;          /**< The... */
-    MatrixX3f use_tri_cent;     /**< The... */
-    MatrixX3f use_tri_nn;       /**< The... */
-    VectorXf use_tri_area;      /**< The... */
+    MatrixXd* dist;             /**< The... */
+    MatrixX3d tri_cent;         /**< The... */
+    MatrixX3d tri_nn;           /**< The... */
+    VectorXd tri_area;          /**< The... */
+    MatrixX3d use_tri_cent;     /**< The... */
+    MatrixX3d use_tri_nn;       /**< The... */
+    VectorXd use_tri_area;      /**< The... */
 //    dist;
 //    dist_limit;
 

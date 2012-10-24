@@ -171,7 +171,7 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
 {
     qDebug() << "make_compensator not debugged jet";
 
-    MatrixXf C1, C2, comp_tmp;
+    MatrixXd C1, C2, comp_tmp;
 
     qDebug() << "Todo add all need ctf variables.";
     if(ctf_comp.data)
@@ -180,12 +180,12 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
 
     if (from == to)
     {
-        ctf_comp.data->data = new MatrixXf(MatrixXf::Zero(this->nchan, this->nchan));
+        ctf_comp.data->data = new MatrixXd(MatrixXd::Zero(this->nchan, this->nchan));
         return false;
     }
 
     if (from == 0)
-        C1 = MatrixXf::Zero(this->nchan,this->nchan);
+        C1 = MatrixXd::Zero(this->nchan,this->nchan);
     else
     {
         if (!this->make_compensator(from, C1))
@@ -197,7 +197,7 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
     }
 
     if (to == 0)
-        C2 = MatrixXf::Zero(this->nchan,this->nchan);
+        C2 = MatrixXd::Zero(this->nchan,this->nchan);
     else
     {
         if (!this->make_compensator(to, C2))
@@ -212,7 +212,7 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
     //   s_to   = s_orig - C2*s_orig = (I - C2)*s_orig
     //   s_to   = (I - C2)*(I + C1)*s_from = (I + C1 - C2 - C2*C1)*s_from
     //
-    comp_tmp = MatrixXf::Identity(this->nchan,this->nchan) + C1 - C2 - C2*C1;
+    comp_tmp = MatrixXd::Identity(this->nchan,this->nchan) + C1 - C2 - C2*C1;
 
     qint32 k;
     if (exclude_comp_chs)
@@ -243,11 +243,11 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
 
 //*************************************************************************************************************
 
-bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXf& this_comp)//private method
+bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXd& this_comp)//private method
 {
     qDebug() << "make_compensator not debugged jet";
     FiffNamedMatrix* this_data;
-    MatrixXf presel, postsel;
+    MatrixXd presel, postsel;
     qint32 k, col, c, ch, row, row_ch, channelAvailable;
     for (k = 0; k < this->comps.size(); ++k)
     {
@@ -256,7 +256,7 @@ bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXf& this_comp)//private m
             //
             //   Create the preselector
             //
-            presel  = MatrixXf::Zero(this_data->ncol,this->nchan);
+            presel  = MatrixXd::Zero(this_data->ncol,this->nchan);
             for(col = 0; col < this_data->ncol; ++col)
             {
                 channelAvailable = 0;
@@ -283,7 +283,7 @@ bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXf& this_comp)//private m
             //
             //   Create the postselector
             //
-            postsel = MatrixXf::Zero(this->nchan,this_data->nrow);
+            postsel = MatrixXd::Zero(this->nchan,this_data->nrow);
             for (c = 0; c  < this->nchan; ++c)
             {
                 channelAvailable = 0;
@@ -309,14 +309,14 @@ bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXf& this_comp)//private m
             return true;
         }
     }
-    this_comp = defaultMatrixXf;
+    this_comp = defaultMatrixXd;
     return false;
 }
 
 
 //*************************************************************************************************************
 
-fiff_int_t FiffInfo::make_projector(QList<FiffProj*>& projs, QStringList& ch_names, MatrixXf*& proj, QStringList& bads, MatrixXf& U)
+fiff_int_t FiffInfo::make_projector(QList<FiffProj*>& projs, QStringList& ch_names, MatrixXd*& proj, QStringList& bads, MatrixXd& U)
 {
     fiff_int_t nchan = ch_names.size();
     if (nchan == 0)
@@ -328,7 +328,7 @@ fiff_int_t FiffInfo::make_projector(QList<FiffProj*>& projs, QStringList& ch_nam
     if(proj)
         delete proj;
 
-    proj = new MatrixXf(MatrixXf::Identity(nchan,nchan));
+    proj = new MatrixXd(MatrixXd::Identity(nchan,nchan));
     fiff_int_t nproj = 0;
 
     //
@@ -355,7 +355,7 @@ fiff_int_t FiffInfo::make_projector(QList<FiffProj*>& projs, QStringList& ch_nam
     //
     //   Pick the appropriate entries
     //
-    MatrixXf vecs = MatrixXf::Zero(nchan,nvec);
+    MatrixXd vecs = MatrixXd::Zero(nchan,nvec);
     nvec = 0;
     fiff_int_t nonzero = 0;
     qint32 p, c, i, j, v;
@@ -453,9 +453,9 @@ fiff_int_t FiffInfo::make_projector(QList<FiffProj*>& projs, QStringList& ch_nam
     //
     qDebug() << "Attention Jacobi SVD is used, not the MATLAB lapack version. Since the SVD is not unique the results might be a bit different!";
 
-    JacobiSVD<MatrixXf> svd(vecs.block(0,0,vecs.rows(),nvec), ComputeThinU);
+    JacobiSVD<MatrixXd> svd(vecs.block(0,0,vecs.rows(),nvec), ComputeThinU);
 
-    VectorXf S = svd.singularValues();
+    VectorXd S = svd.singularValues();
 
     //
     //   Throw away the linearly dependent guys

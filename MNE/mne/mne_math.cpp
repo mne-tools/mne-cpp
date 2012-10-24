@@ -65,7 +65,7 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-VectorXf* MNEMath::combine_xyz(const VectorXf& vec)
+VectorXd* MNEMath::combine_xyz(const VectorXd& vec)
 {
     if (vec.size() % 3 != 0)
     {
@@ -73,11 +73,11 @@ VectorXf* MNEMath::combine_xyz(const VectorXf& vec)
         return NULL;
     }
 
-    MatrixXf tmp = MatrixXf(vec.transpose());
-    SparseMatrix<float>* s = make_block_diag(&tmp,3);
+    MatrixXd tmp = MatrixXd(vec.transpose());
+    SparseMatrix<double>* s = make_block_diag(&tmp,3);
 
-    SparseMatrix<float> sC = *s*s->transpose();
-    VectorXf* comb = new VectorXf(sC.rows());
+    SparseMatrix<double> sC = *s*s->transpose();
+    VectorXd* comb = new VectorXd(sC.rows());
 
     for(qint32 i = 0; i < sC.rows(); ++i)
         (*comb)[i] = sC.coeff(i,i);
@@ -89,7 +89,7 @@ VectorXf* MNEMath::combine_xyz(const VectorXf& vec)
 
 //*************************************************************************************************************
 
-//    static inline MatrixXf extract_block_diag(MatrixXf& A, qint32 n)
+//    static inline MatrixXd extract_block_diag(MatrixXd& A, qint32 n)
 //    {
 
 
@@ -151,7 +151,7 @@ VectorXf* MNEMath::combine_xyz(const VectorXf& vec)
 
 //*************************************************************************************************************
 
-SparseMatrix<float>* MNEMath::make_block_diag(const MatrixXf* A, qint32 n)
+SparseMatrix<double>* MNEMath::make_block_diag(const MatrixXd* A, qint32 n)
 {
 
     qint32 ma = A->rows();
@@ -166,7 +166,7 @@ SparseMatrix<float>* MNEMath::make_block_diag(const MatrixXf* A, qint32 n)
         return NULL;
     }
 
-    SparseMatrix<float>* bd = new SparseMatrix<float>((int)floor((float)ma*bdn+0.5),na);
+    SparseMatrix<double>* bd = new SparseMatrix<double>((int)floor((float)ma*bdn+0.5),na);
 
     qint32 current_col, current_row, i, r, c;
     for(i = 0; i < bdn; ++i)

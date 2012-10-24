@@ -298,13 +298,13 @@ int main(int argc, char *argv[])
 
 
     fiff_int_t event_samp, from, to;
-    MatrixXf* timesDummy = NULL;
+    MatrixXd* timesDummy = NULL;
 
     MNEEpochDataList data;
 
     MNEEpochData* epoch = NULL;
 
-    MatrixXf times;
+    MatrixXd times;
 
     for (p = 0; p < count; ++p)
     {

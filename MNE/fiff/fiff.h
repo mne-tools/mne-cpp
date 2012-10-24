@@ -354,7 +354,7 @@ public:
         //
         //   Create the reduced data set
         //
-        MatrixXf selBlock(1,1);
+        MatrixXd selBlock(1,1);
         qint32 k, l;
         for(k = 0; k < res->evoked.size(); ++k)
         {
@@ -601,7 +601,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    inline static bool read_raw_segment(FiffRawData* raw, MatrixXf*& data, MatrixXf*& times, fiff_int_t from = -1, fiff_int_t to = -1, MatrixXi sel = defaultMatrixXi)
+    inline static bool read_raw_segment(FiffRawData* raw, MatrixXd*& data, MatrixXd*& times, fiff_int_t from = -1, fiff_int_t to = -1, MatrixXi sel = defaultMatrixXi)
     {
         return raw->read_raw_segment(data, times, from, to, sel);
     }
@@ -743,7 +743,7 @@ public:
     *
     * @return the started fiff file
     */
-    inline static FiffFile* start_writing_raw(QString& p_sFileName, FiffInfo* info, MatrixXf*& cals, MatrixXi sel = defaultFileMatrixXi)
+    inline static FiffFile* start_writing_raw(QString& p_sFileName, FiffInfo* info, MatrixXd*& cals, MatrixXi sel = defaultFileMatrixXi)
     {
         return FiffFile::start_writing_raw(p_sFileName, info, cals, sel);
     }
@@ -896,7 +896,7 @@ public:
     * @param[in] kind       The tag kind
     * @param[in] mat        The data matrix
     */
-    inline static void write_float_matrix(FiffFile* p_pFile, fiff_int_t kind, MatrixXf* mat)
+    inline static void write_float_matrix(FiffFile* p_pFile, fiff_int_t kind, MatrixXd* mat)
     {
         p_pFile->write_float_matrix(kind, mat);
     }
@@ -973,7 +973,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    inline static bool write_raw_buffer(FiffFile* p_pFile, MatrixXf* buf, MatrixXf* cals)
+    inline static bool write_raw_buffer(FiffFile* p_pFile, MatrixXd* buf, MatrixXd* cals)
     {
         return p_pFile->write_raw_buffer(buf, cals);
     }

@@ -101,8 +101,8 @@ public:
     fiff_int_t    ctfkind;
     fiff_int_t    kind;
     bool save_calibrated;
-    MatrixXf rowcals;
-    MatrixXf colcals;
+    MatrixXd rowcals;
+    MatrixXd colcals;
     FiffNamedMatrix* data;
 };
 

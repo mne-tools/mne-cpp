@@ -117,13 +117,13 @@ public:
     *
     * @return Output vector [x1^2+y1^2+z1^2 ... x_n^2+y_n^2+z_n^2 ]
     */
-    static VectorXf* combine_xyz(const VectorXf& vec);
+    static VectorXd* combine_xyz(const VectorXd& vec);
 
     //=========================================================================================================
     /**
     * ### MNE toolbox root function ###: Implementation of the mne_block_diag function - decoding part
     */
-//    static inline MatrixXf extract_block_diag(MatrixXf& A, qint32 n);
+//    static inline MatrixXd extract_block_diag(MatrixXd& A, qint32 n);
 
     //=========================================================================================================
     /**
@@ -140,7 +140,7 @@ public:
     *
     * @return A sparse block diagonal, diagonalized from the elements in "A".
     */
-    static SparseMatrix<float>* make_block_diag(const MatrixXf* A, qint32 n);
+    static SparseMatrix<double>* make_block_diag(const MatrixXd* A, qint32 n);
 };
 
 
