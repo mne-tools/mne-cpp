@@ -59,3 +59,4 @@
 /include/mne
 /lib/*.bak
 /bin/mne_rt_server_plugins/*.dll
+/mne_rt_server/MATLAB
