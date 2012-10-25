@@ -47,9 +47,19 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-#ToDo Fix this: remove mne-cpp from path
-win32:QMAKE_POST_LINK += $${QMAKE_COPY} "..\\..\\..\\mne-cpp\\lib\\$${TARGET}.dll" "..\\..\\..\\mne-cpp\\bin\\"
 DESTDIR = $${PWD}/../../lib
+
+#
+# win32: copy dll's to bin dir
+# unix: add lib folder to LD_LIBRARY_PATH
+#
+win32 {
+    FILE = $${DESTDIR}/$${TARGET}.dll
+    BINDIR = $${DESTDIR}/../bin
+    FILE ~= s,/,\\,g
+    BINDIR ~= s,/,\\,g
+    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
+}
 
 SOURCES += fiff.cpp \
 #    fiff_parser.cpp \

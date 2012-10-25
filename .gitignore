@@ -58,3 +58,4 @@
 /include/fiff
 /include/mne
 /lib/*.bak
+/bin/mne_rt_server_plugins/*.dll

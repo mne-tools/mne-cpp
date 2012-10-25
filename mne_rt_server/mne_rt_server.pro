@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     readFwdDisp.pro
+# @file     SourceConnector.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,47 +29,14 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    ToDo Documentation...
+# @brief    This project file generates the makefile to build the source core app and its connector modules.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../../mne-cpp.pri)
+TEMPLATE = subdirs
 
-TEMPLATE = app
+SUBDIRS += \
+    core \
+    connectors \
 
-VERSION = $${MNE_CPP_VERSION}
-
-QT       += 3d
-QT       += core
-QT       -= gui
-
-CONFIG   += console
-CONFIG   -= app_bundle
-
-TARGET = readFwdDisp
-
-CONFIG(debug, debug|release) {
-    TARGET = $$join(TARGET,,,d)
-}
-
-LIBS += -L$${PWD}/../../lib/
-CONFIG(debug, debug|release) {
-    LIBS += -lmned \
-            -lfiffd \
-            -ldispd
-}
-else {
-    LIBS += -lmne \
-            -lfiff \
-            -ldisp
-}
-
-DESTDIR = $${PWD}/../../bin
-
-TEMPLATE = app
-
-
-SOURCES += \
-    src/main.cpp \
-
-HEADERS += \
+CONFIG += ordered

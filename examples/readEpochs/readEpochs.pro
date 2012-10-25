@@ -52,13 +52,14 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
+LIBS += -L$${PWD}/../../lib/
 CONFIG(debug, debug|release) {
-    LIBS += -L$${PWD}/../../lib/ -lmned
-    LIBS += -L$${PWD}/../../lib/ -lfiffd
+    LIBS += -lmned \
+            -lfiffd
 }
 else {
-    LIBS += -L$${PWD}/../../lib/ -lmne
-    LIBS += -L$${PWD}/../../lib/ -lfiff
+    LIBS += -lmne \
+            -lfiff
 }
 
 DESTDIR = $${PWD}/../../bin

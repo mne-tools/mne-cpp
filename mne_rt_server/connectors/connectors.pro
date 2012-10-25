@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     readFwdDisp.pro
+# @file     connectors.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -18,7 +18,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-#
+# 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
@@ -29,47 +29,13 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    ToDo Documentation...
+# @brief    This project file builds all connector modules.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../../mne-cpp.pri)
+TEMPLATE = subdirs
 
-TEMPLATE = app
+SUBDIRS += \
+    FiffSimulator
 
-VERSION = $${MNE_CPP_VERSION}
-
-QT       += 3d
-QT       += core
-QT       -= gui
-
-CONFIG   += console
-CONFIG   -= app_bundle
-
-TARGET = readFwdDisp
-
-CONFIG(debug, debug|release) {
-    TARGET = $$join(TARGET,,,d)
-}
-
-LIBS += -L$${PWD}/../../lib/
-CONFIG(debug, debug|release) {
-    LIBS += -lmned \
-            -lfiffd \
-            -ldispd
-}
-else {
-    LIBS += -lmne \
-            -lfiff \
-            -ldisp
-}
-
-DESTDIR = $${PWD}/../../bin
-
-TEMPLATE = app
-
-
-SOURCES += \
-    src/main.cpp \
-
-HEADERS += \
+CONFIG += ordered
