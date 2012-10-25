@@ -91,6 +91,9 @@ void ConnectorManager::loadConnectors(const QString& dir)
 
     foreach(QString fileName, ConnectorsDir.entryList(QDir::Files))
     {
+        if(fileName.compare("README") == 0 || fileName.compare("plugin.cfg") == 0)
+            continue;
+
         this->setFileName(ConnectorsDir.absoluteFilePath(fileName));
         QObject *pConnector = this->instance();
 
@@ -112,8 +115,8 @@ void ConnectorManager::loadConnectors(const QString& dir)
     // search config for default connector
     //
     qint32 configConnector = -1;
-    QString configFileName("config.txt");
-    QFile configFile(dir+"/../"+configFileName);
+    QString configFileName("plugin.cfg");
+    QFile configFile(dir+"/"+configFileName);
     if(!configFile.open(QIODevice::ReadOnly)) {
         printf("Not able to read config file... %s\n", configFile.fileName().toUtf8().constData());
     }
