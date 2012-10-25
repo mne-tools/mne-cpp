@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     readFwdDisp.pro
+# @file     core.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,24 +29,20 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    ToDo Documentation...
+# @brief    This project file generates the makefile to build the core app source connector.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-VERSION = $${MNE_CPP_VERSION}
-
-QT       += 3d
-QT       += core
-QT       -= gui
+QT += core
+QT -= gui
 
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = readFwdDisp
+TARGET = mne_rt_server
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -54,22 +50,26 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${PWD}/../../lib/
 CONFIG(debug, debug|release) {
-    LIBS += -lmned \
-            -lfiffd \
-            -ldispd
+    LIBS += -lmned
+    LIBS += -lfiffd
 }
 else {
-    LIBS += -lmne \
-            -lfiff \
-            -ldisp
+    LIBS += -lmne
+    LIBS += -lfiff
 }
 
 DESTDIR = $${PWD}/../../bin
 
-TEMPLATE = app
-
-
 SOURCES += \
-    src/main.cpp \
+    main.cpp \
+    datacore.cpp \
+    communicationport.cpp \
+    connectormanager.cpp
+
 
 HEADERS += \
+    datacore.h \
+    communicationport.h \
+# has to be moved to connectors
+    IConnector.h \
+    connectormanager.h

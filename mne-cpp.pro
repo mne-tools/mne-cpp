@@ -38,6 +38,7 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     MNE \
-    examples
+    examples \
+    mne_rt_server
 
 CONFIG += ordered
