@@ -71,7 +71,7 @@
 using namespace SourceConnector;
 
 
-const char* connectorDir = "/connectors";        /**< holds directory to connectors.*/
+const char* connectorDir = "/mne_rt_server_plugins";        /**< holds directory to connectors.*/
 
 
 //*************************************************************************************************************
