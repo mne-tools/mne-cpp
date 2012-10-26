@@ -439,10 +439,10 @@ public:
     * Wrapper for the FiffStream read_meas_info member function
     *
     * Read the measurement info
-    * Source is assumed to be an open fiff file.
+    * Source is assumed to be an open fiff stream.
     *
-    * @param[in] p_pStream The opened fif file to read from
-    * @param[in] p_pTree The node of interest
+    * @param[in] p_pStream  The opened fiff stream to read from
+    * @param[in] p_pTree    The node of interest
     * @param[out] info the read measurement info
     *
     * @return the to measurement corresponding fiff_dir_tree.

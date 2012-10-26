@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiffsimulator_global.h
+* @file     fiff_server.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the fiff library export/import macros.
+* @brief    Contains the implementation of the FiffServer Class.
 *
 */
 
-#ifndef FIFFSIMULATOR_GLOBAL_H
-#define FIFFSIMULATOR_GLOBAL_H
+#ifndef FIFF_SERVER_H
+#define FIFF_SERVER_H
 
 
 //*************************************************************************************************************
@@ -42,18 +42,50 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/qglobal.h>
+#include <QStringList>
+#include <QTcpServer>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// PREPROCESSOR DEFINES
+// DEFINE NAMESPACE MSERVER
 //=============================================================================================================
 
-#if defined(FIFFSIMULATOR_LIBRARY)
-#  define FIFFSIMULATORSHARED_EXPORT Q_DECL_EXPORT  /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-#else
-#  define FIFFSIMULATORSHARED_EXPORT Q_DECL_IMPORT  /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-#endif
+namespace MSERVER
+{
 
-#endif // FIFFSIMULATOR_GLOBAL_H
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+//=============================================================================================================
+/**
+* DECLARE CLASS FiffServer
+*
+* @brief The FiffServer class provides
+*/
+class FiffServer : public QTcpServer
+{
+    Q_OBJECT
+
+public:
+    FiffServer(QObject *parent = 0);
+
+protected:
+    void incomingConnection(qintptr socketDescriptor);
+
+private:
+    QStringList fortunes;
+};
+
+} // NAMESPACE
+
+#endif //FIFF_SERVER_H

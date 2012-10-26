@@ -42,22 +42,13 @@
 #include <iostream>
 #include <vector>
 
-#include "IConnector.h"
-#include "connectormanager.h"
-
-//#include "../../mne-cpp/include/mne/mne.h"
-
-//#include "../connectors/fiffconnector/fiffconnector.h"
+#include "mne_rt_server.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-#include <QDebug>
-//#include <QDir>
-//#include <QPluginLoader>
 
 #include <QtCore/QCoreApplication>
 
@@ -67,11 +58,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-//using namespace MNELIB;
-using namespace SourceConnector;
-
-
-const char* connectorDir = "/mne_rt_server_plugins";        /**< holds directory to connectors.*/
+using namespace MSERVER;
 
 
 //*************************************************************************************************************
@@ -92,13 +79,7 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    ConnectorManager* t_pConnectorManager = new ConnectorManager();
-    t_pConnectorManager->loadConnectors(qApp->applicationDirPath()+connectorDir);
-
-    IConnector* t_pActiveConnector = t_pConnectorManager->getActiveConnector();
-
-    if(t_pActiveConnector)
-        t_pActiveConnector->start();
+    MNERTServer t_MneRtServer;
 
     return a.exec();
 }

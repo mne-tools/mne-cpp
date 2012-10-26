@@ -37,8 +37,6 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       -= gui
-
 DEFINES += FIFF_LIBRARY
 
 TARGET = fiff

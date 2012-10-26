@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     core.pro
+# @file     mne_rt_server.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -36,8 +36,7 @@
 
 TEMPLATE = app
 
-QT += core
-QT -= gui
+QT += network
 
 CONFIG   += console
 CONFIG   -= app_bundle
@@ -62,14 +61,17 @@ DESTDIR = $${PWD}/../../bin
 
 SOURCES += \
     main.cpp \
-    datacore.cpp \
-    communicationport.cpp \
-    connectormanager.cpp
+    connectormanager.cpp \
+    fortunethread.cpp \
+    fiff_server.cpp \
+    mne_rt_server.cpp
 
 
 HEADERS += \
-    datacore.h \
-    communicationport.h \
 # has to be moved to connectors
     IConnector.h \
-    connectormanager.h
+    connectormanager.h \
+    fortunethread.h \
+    mne_rt_server.h \
+    fiff_server.h \
+    mne_rt_server.h

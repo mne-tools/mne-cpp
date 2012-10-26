@@ -42,7 +42,7 @@
 //=============================================================================================================
 
 #include "fiffsimulator_global.h"
-#include "../../core/IConnector.h"
+#include "../../mne_rt_server/IConnector.h"
 
 //#include "circularbuffer.h"
 
@@ -69,7 +69,7 @@ namespace FiffSimulatorPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SourceConnector;
+using namespace MSERVER;
 
 
 //*************************************************************************************************************
@@ -86,12 +86,12 @@ class FiffProducer;
 *
 * @brief The FiffSimulator class provides a Fiff data simulator.
 */
-class FIFFCONNECTORSHARED_EXPORT FiffSimulator : public IConnector
+class FIFFSIMULATORSHARED_EXPORT FiffSimulator : public IConnector
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "source_connector/1.0" FILE "fiffsimulator.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "mne_rt_server/1.0" FILE "fiffsimulator.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SourceConnector::IConnector)
+    Q_INTERFACES(MSERVER::IConnector)
 
 
     friend class FiffProducer;
