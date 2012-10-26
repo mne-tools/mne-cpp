@@ -146,12 +146,12 @@ public:
     *
     * Reads the inverse operator decomposition from a fif file
     *
-    * @param [in] p_sFileName   The name of the file
+    * @param [in] p_pIODevice   A fiff IO device like a fiff QFile or QTcpSocket
     * @param [out] inv          The read inverse operator
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_inverse_operator(QString& p_sFileName, MNEInverseOperator*& inv);
+    static bool read_inverse_operator(QIODevice* p_pIODevice, MNEInverseOperator*& inv);
 
 public:
     fiff_int_t methods;

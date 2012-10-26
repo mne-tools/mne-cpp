@@ -136,7 +136,7 @@ public:
     *
     * Reads a forward solution from a fif file
     *
-    * @param [in] p_sFileName   The name of the fif file
+    * @param [in] p_pIODevice   A fiff IO device like a fiff QFile or QTcpSocket
     * @param [out] fwd          A forward solution from a fif file
     * @param [in] force_fixed   Force fixed source orientation mode? (optional)
     * @param [in] surf_ori      Use surface based source coordinate system? (optional)
@@ -145,7 +145,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_forward_solution(QString& p_sFileName, MNEForwardSolution*& fwd, bool force_fixed = false, bool surf_ori = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
+    static bool read_forward_solution(QIODevice* p_pIODevice, MNEForwardSolution*& fwd, bool force_fixed = false, bool surf_ori = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
 
 private:
     //=========================================================================================================

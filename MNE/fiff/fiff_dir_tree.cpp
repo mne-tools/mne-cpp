@@ -105,7 +105,7 @@ bool FiffDirTree::copy_tree(FiffStream* fidin, FiffId& in_id, QList<FiffDirTree*
             //
             //   Read and write tags, pass data through transparently
             //
-            if (!fidin->seek(nodes[k]->dir[p].pos)) //fseek(fidin, nodes(k).dir(p).pos, 'bof') == -1
+            if (!fidin->device()->seek(nodes[k]->dir[p].pos)) //fseek(fidin, nodes(k).dir(p).pos, 'bof') == -1
             {
                 printf("Could not seek to the tag\n");
                 return false;
@@ -113,37 +113,39 @@ bool FiffDirTree::copy_tree(FiffStream* fidin, FiffId& in_id, QList<FiffDirTree*
 
 //ToDo this is the same like read_tag
             FiffTag tag;
-            QDataStream in(fidin);
-            in.setByteOrder(QDataStream::BigEndian);
+            //QDataStream in(fidin);
+            FiffStream* in = fidin;
+            in->setByteOrder(QDataStream::BigEndian);
 
             //
             // Read fiff tag header from stream
             //
-            in >> tag.kind;
-            in >> tag.type;
+            *in >> tag.kind;
+            *in >> tag.type;
             qint32 size;
-            in >> size;
+            *in >> size;
             tag.resize(size);
-            in >> tag.next;
+            *in >> tag.next;
 
             //
             // Read data when available
             //
             if (tag.size() > 0)
             {
-                in.readRawData(tag.data(), tag.size());
+                in->readRawData(tag.data(), tag.size());
                 FiffTag::convert_tag_data(&tag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
             }
 
-            QDataStream out(fidout);
-            out.setByteOrder(QDataStream::BigEndian);
+            //QDataStream out(fidout);
+            FiffStream* out = fidout;
+            out->setByteOrder(QDataStream::BigEndian);
 
-            out << (qint32)tag.kind;
-            out << (qint32)tag.type;
-            out << (qint32)tag.size();
-            out << (qint32)FIFFV_NEXT_SEQ;
+            *out << (qint32)tag.kind;
+            *out << (qint32)tag.type;
+            *out << (qint32)tag.size();
+            *out << (qint32)FIFFV_NEXT_SEQ;
 
-            out.writeRawData(tag.data(),tag.size());
+            out->writeRawData(tag.data(),tag.size());
         }
         for(p = 0; p < nodes[k]->nchild; ++p)
         {

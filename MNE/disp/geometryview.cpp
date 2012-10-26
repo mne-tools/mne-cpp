@@ -79,7 +79,9 @@ GeometryView::GeometryView(QWindow *parent)
 {
     QString t_sFile = "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
 
-    if(!MNE::read_forward_solution(t_sFile, t_ForwardSolution))
+    QFile* t_pFile = new QFile(t_sFile);
+
+    if(!MNE::read_forward_solution(t_pFile, t_ForwardSolution))
     {
         if( t_ForwardSolution )
             delete t_ForwardSolution;
@@ -90,6 +92,7 @@ GeometryView::GeometryView(QWindow *parent)
     hemisphereFrontalCamera = new QGLCamera(this);
     hemisphereFrontalCamera->setAdjustForAspectRatio(false);
 
+    delete t_pFile;
 }
 
 //*************************************************************************************************************

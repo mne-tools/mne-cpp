@@ -324,7 +324,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_events(QString& p_sFileName, MatrixXi& eventlist);
+    static bool read_events(QIODevice* p_pIODevice, MatrixXi& eventlist);
 
     //=========================================================================================================
     /**
@@ -358,14 +358,14 @@ public:
     *
     * Reads the inverse operator decomposition from a fif file
     *
-    * @param [in] p_sFileName   The name of the file
+    * @param [in] p_pIODevice   A fiff IO device like a fiff QFile or QTcpSocket
     * @param [out] inv          The read inverse operator
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_inverse_operator(QString& p_sFileName, MNEInverseOperator*& inv)
+    static bool read_inverse_operator(QIODevice* p_pIODevice, MNEInverseOperator*& inv)
     {
-        return MNEInverseOperator::read_inverse_operator(p_sFileName, inv);
+        return MNEInverseOperator::read_inverse_operator(p_pIODevice, inv);
     }
 
     //=========================================================================================================
@@ -378,7 +378,7 @@ public:
     *
     * Reads a forward solution from a fif file
     *
-    * @param [in] p_sFile       The name of the file
+    * @param [in] p_pIODevice   A fiff IO device like a fiff QFile or QTcpSocket
     * @param [out] fwd A forward solution from a fif file
     * @param [in] force_fixed   Force fixed source orientation mode? (optional)
     * @param [in] surf_ori      Use surface based source coordinate system? (optional)
@@ -387,9 +387,9 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static inline bool read_forward_solution(QString& p_sFile, MNEForwardSolution*& fwd, bool force_fixed = false, bool surf_ori = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList)
+    static inline bool read_forward_solution(QIODevice* p_pIODevice, MNEForwardSolution*& fwd, bool force_fixed = false, bool surf_ori = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList)
     {
-        return MNEForwardSolution::read_forward_solution(p_sFile, fwd, force_fixed, surf_ori, include, exclude);
+        return MNEForwardSolution::read_forward_solution(p_pIODevice, fwd, force_fixed, surf_ori, include, exclude);
     }
 
     //=========================================================================================================

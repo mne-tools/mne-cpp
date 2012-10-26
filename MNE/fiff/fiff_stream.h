@@ -114,16 +114,16 @@ using namespace Eigen;
 * @brief FIFF File I/O routines.
 **/
 
-class FIFFSHARED_EXPORT FiffStream : public QFile {
+class FIFFSHARED_EXPORT FiffStream : public QDataStream {
 
 public:
     //=========================================================================================================
     /**
     * ctor
     *
-    * @param[in] p_sFileName file name of the file to open
+    * @param[in] p_pIODevice    A fiff IO device like a fiff QFile or QTcpSocket
     */
-    FiffStream(QString& p_sFilename);
+    FiffStream(QIODevice* p_pIODevice);
 
     //=========================================================================================================
     /**
@@ -165,7 +165,7 @@ public:
     *
     * unmask base class open function
     */
-    using QFile::open;
+//    using QFile::open;
 
     //=========================================================================================================
     /**
@@ -285,13 +285,13 @@ public:
     *
     * Read information about raw data file
     *
-    * @param[in] t_sFileName        Name of the file to read
+    * @param[in] p_pIODevice        An fiff IO device like a fiff QFile or QTcpSocket
     * @param[out] data              The raw data information - contains the opened fiff file
     * @param[in] allow_maxshield    Accept unprocessed MaxShield data
     *
     * @return true if succeeded, false otherwise
     */
-    static bool setup_read_raw(QString& t_sFileName, FiffRawData*& data, bool allow_maxshield = false);
+    static bool setup_read_raw(QIODevice* p_pIODevice, FiffRawData*& data, bool allow_maxshield = false);
 
     //=========================================================================================================
     /**
@@ -329,11 +329,11 @@ public:
     *
     * Opens a fiff file for writing and writes the compulsory header tags
     *
-    * @param[in] name   The name of the file to open. It is recommended that the name ends with .fif
+    * @param[in] p_pIODevice    The IODevice (like QFile or QTCPSocket) to open. It is recommended that the name ends with .fif
     *
     * @return The opened file.
     */
-    static FiffStream* start_file(QString& p_sFilename);
+    static FiffStream* start_file(QIODevice* p_pIODevice);
 
     //=========================================================================================================
     /**
@@ -343,14 +343,22 @@ public:
     *
     * function [fid,cals] = fiff_start_writing_raw(name,info,sel)
     *
-    * @param[in] p_sFileName    filename
+    * @param[in] p_pIODevice    A fiff IO device like a fiff QFile or QTcpSocket
     * @param[in] info           The measurement info block of the source file
     * @param[out] cals          Thecalibration matrix
     * @param[in] sel            Which channels will be included in the output file (optional)
     *
     * @return the started fiff file
     */
-    static FiffStream* start_writing_raw(QString& p_sFileName, FiffInfo* info, MatrixXd*& cals, MatrixXi sel = defaultMatrixXi);
+    static FiffStream* start_writing_raw(QIODevice* p_pIODevice, FiffInfo* info, MatrixXd*& cals, MatrixXi sel = defaultMatrixXi);
+
+    //=========================================================================================================
+    /**
+    * Get the stream name
+    *
+    * @return the name of the current stream
+    */
+    QString streamName();
 
     //=========================================================================================================
     /**

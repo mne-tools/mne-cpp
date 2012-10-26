@@ -90,7 +90,9 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    QString t_sFile = "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
+    QString t_sFileName = "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
+    QFile* t_pFile = new QFile(t_sFileName);
+
     qint32 event = 1;
     QString t_sEventName = "../../mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif";
     float tmin = -1.5;
@@ -106,7 +108,7 @@ int main(int argc, char *argv[])
     //   Setup for reading the raw data
     //
     FiffRawData* raw = NULL;
-    if(!FiffStream::setup_read_raw(t_sFile, raw))
+    if(!FiffStream::setup_read_raw(t_pFile, raw))
     {
         printf("Error during fiff setup raw read\n");
         return 0;
@@ -200,12 +202,13 @@ int main(int argc, char *argv[])
     //  Read the events
     //
     MatrixXi events;
+    QFile* t_pEventFile = NULL;
     if (t_sEventName.size() == 0)
     {
-        p = t_sFile.indexOf(".fif");
+        p = t_sFileName.indexOf(".fif");
         if (p > 0)
         {
-            t_sEventName = t_sFile.replace(p, 4, "-eve.fif");
+            t_sEventName = t_sFileName.replace(p, 4, "-eve.fif");
         }
         else
         {
@@ -213,7 +216,9 @@ int main(int argc, char *argv[])
             return 0;
         }
 //        events = mne_read_events(t_sEventName);
-        MNE::read_events(t_sEventName, events);
+
+        t_pEventFile = new QFile(t_sEventName);
+        MNE::read_events(t_pEventFile, events);
         printf("Events read from %s\n",t_sEventName.toUtf8().constData());
     }
     else
@@ -221,10 +226,11 @@ int main(int argc, char *argv[])
         //
         //   Binary file
         //
-        p = t_sFile.indexOf(".fif");
+        p = t_sFileName.indexOf(".fif");
         if (p > 0)
         {
-            if(!MNE::read_events(t_sEventName, events))
+            t_pEventFile = new QFile(t_sEventName);
+            if(!MNE::read_events(t_pEventFile, events))
             {
                 printf("Error while read events.\n");
                 return 0;
@@ -353,6 +359,8 @@ int main(int argc, char *argv[])
     }
 
     delete raw;
+    delete t_pFile;
+    delete t_pEventFile;
 
     return a.exec();
 }

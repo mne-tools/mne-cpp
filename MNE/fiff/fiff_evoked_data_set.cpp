@@ -132,7 +132,7 @@ FiffEvokedDataSet* FiffEvokedDataSet::pick_channels_evoked(QStringList& include,
 
 //*************************************************************************************************************
 
-bool FiffEvokedDataSet::read_evoked(QString& p_sFileName, FiffEvokedDataSet*& data, fiff_int_t setno)
+bool FiffEvokedDataSet::read_evoked(QIODevice* p_pIODevice, FiffEvokedDataSet*& data, fiff_int_t setno)
 {
     if(data)
         delete data;
@@ -146,15 +146,17 @@ bool FiffEvokedDataSet::read_evoked(QString& p_sFileName, FiffEvokedDataSet*& da
     //
     //   Open the file
     //
-    printf("Reading %s ...\n",p_sFileName.toUtf8().constData());
-    FiffStream* t_pFile = new FiffStream(p_sFileName);
+    FiffStream* t_pStream = new FiffStream(p_pIODevice);
+    QString t_sFileName = t_pStream->streamName();
+
+    printf("Reading %s ...\n",t_sFileName.toUtf8().constData());
     FiffDirTree* t_pTree = NULL;
     QList<FiffDirEntry>* t_pDir = NULL;
 
-    if(!t_pFile->open(t_pTree, t_pDir))
+    if(!t_pStream->open(t_pTree, t_pDir))
     {
-        if(t_pFile)
-            delete t_pFile;
+        if(t_pStream)
+            delete t_pStream;
         if(t_pTree)
             delete t_pTree;
         if(t_pDir)
@@ -166,16 +168,16 @@ bool FiffEvokedDataSet::read_evoked(QString& p_sFileName, FiffEvokedDataSet*& da
     //   Read the measurement info
     //
     FiffInfo* info = NULL;
-    FiffDirTree* meas = t_pFile->read_meas_info(t_pTree, info);
-    info->filename = p_sFileName; //move fname storage to read_meas_info member function
+    FiffDirTree* meas = t_pStream->read_meas_info(t_pTree, info);
+    info->filename = t_sFileName; //move fname storage to read_meas_info member function
     //
     //   Locate the data of interest
     //
     QList<FiffDirTree*> processed = meas->dir_tree_find(FIFFB_PROCESSED_DATA);
     if (processed.size() == 0)
     {
-        if(t_pFile)
-            delete t_pFile;
+        if(t_pStream)
+            delete t_pStream;
         if(t_pTree)
             delete t_pTree;
         if(t_pDir)
@@ -190,8 +192,8 @@ bool FiffEvokedDataSet::read_evoked(QString& p_sFileName, FiffEvokedDataSet*& da
     QList<FiffDirTree*> evoked = meas->dir_tree_find(FIFFB_EVOKED);
     if (evoked.size() == 0)
     {
-        if(t_pFile)
-            delete t_pFile;
+        if(t_pStream)
+            delete t_pStream;
         if(t_pTree)
             delete t_pTree;
         if(t_pDir)
@@ -240,11 +242,11 @@ bool FiffEvokedDataSet::read_evoked(QString& p_sFileName, FiffEvokedDataSet*& da
             naspect += nsaspects;
         }
     }
-    printf("\t%d evoked data sets containing a total of %d data aspects in %s\n",evoked.size(),naspect,p_sFileName.toUtf8().constData());
+    printf("\t%d evoked data sets containing a total of %d data aspects in %s\n",evoked.size(),naspect,t_sFileName.toUtf8().constData());
     if (setno >= naspect || setno < 0)
     {
-        if(t_pFile)
-            delete t_pFile;
+        if(t_pStream)
+            delete t_pStream;
         if(t_pTree)
             delete t_pTree;
         if(t_pDir)
@@ -283,8 +285,8 @@ bool FiffEvokedDataSet::read_evoked(QString& p_sFileName, FiffEvokedDataSet*& da
     //
     if (my_evoked == NULL || my_aspect == NULL)
     {
-        if(t_pFile)
-            delete t_pFile;
+        if(t_pStream)
+            delete t_pStream;
         if(t_pTree)
             delete t_pTree;
         if(t_pDir)
@@ -310,27 +312,27 @@ bool FiffEvokedDataSet::read_evoked(QString& p_sFileName, FiffEvokedDataSet*& da
         switch (kind)
         {
             case FIFF_COMMENT:
-                FiffTag::read_tag(t_pFile,t_pTag,pos);
+                FiffTag::read_tag(t_pStream,t_pTag,pos);
                 comment = t_pTag->toString();
                 break;
             case FIFF_FIRST_SAMPLE:
-                FiffTag::read_tag(t_pFile,t_pTag,pos);
+                FiffTag::read_tag(t_pStream,t_pTag,pos);
                 first = *t_pTag->toInt();
                 break;
             case FIFF_LAST_SAMPLE:
-                FiffTag::read_tag(t_pFile,t_pTag,pos);
+                FiffTag::read_tag(t_pStream,t_pTag,pos);
                 last = *t_pTag->toInt();
                 break;
             case FIFF_NCHAN:
-                FiffTag::read_tag(t_pFile,t_pTag,pos);
+                FiffTag::read_tag(t_pStream,t_pTag,pos);
                 nchan = *t_pTag->toInt();
                 break;
             case FIFF_SFREQ:
-                FiffTag::read_tag(t_pFile,t_pTag,pos);
+                FiffTag::read_tag(t_pStream,t_pTag,pos);
                 sfreq = *t_pTag->toFloat();
                 break;
             case FIFF_CH_INFO:
-                FiffTag::read_tag(t_pFile, t_pTag, pos);
+                FiffTag::read_tag(t_pStream, t_pTag, pos);
                 chs.append( t_pTag->toChInfo() );
                 break;
         }
@@ -344,8 +346,8 @@ bool FiffEvokedDataSet::read_evoked(QString& p_sFileName, FiffEvokedDataSet*& da
     {
         if (chs.size() == 0)
         {
-            if(t_pFile)
-                delete t_pFile;
+            if(t_pStream)
+                delete t_pStream;
             if(t_pTree)
                 delete t_pTree;
             if(t_pDir)
@@ -357,8 +359,8 @@ bool FiffEvokedDataSet::read_evoked(QString& p_sFileName, FiffEvokedDataSet*& da
         }
         if (chs.size() != nchan)
         {
-            if(t_pFile)
-                delete t_pFile;
+            if(t_pStream)
+                delete t_pStream;
             if(t_pTree)
                 delete t_pTree;
             if(t_pDir)
@@ -394,19 +396,19 @@ bool FiffEvokedDataSet::read_evoked(QString& p_sFileName, FiffEvokedDataSet*& da
         switch (kind)
         {
             case FIFF_COMMENT:
-                FiffTag::read_tag(t_pFile, t_pTag, pos);
+                FiffTag::read_tag(t_pStream, t_pTag, pos);
                 comment = t_pTag->toString();
                 break;
             case FIFF_ASPECT_KIND:
-                FiffTag::read_tag(t_pFile, t_pTag, pos);
+                FiffTag::read_tag(t_pStream, t_pTag, pos);
                 aspect_kind = *t_pTag->toInt();
                 break;
             case FIFF_NAVE:
-                FiffTag::read_tag(t_pFile, t_pTag, pos);
+                FiffTag::read_tag(t_pStream, t_pTag, pos);
                 nave = *t_pTag->toInt();
                 break;
             case FIFF_EPOCH:
-                FiffTag::read_tag(t_pFile, t_pTag, pos);
+                FiffTag::read_tag(t_pStream, t_pTag, pos);
                 epoch.append(new FiffTag(t_pTag));
                 ++nepoch;
                 break;
@@ -417,8 +419,8 @@ bool FiffEvokedDataSet::read_evoked(QString& p_sFileName, FiffEvokedDataSet*& da
     printf("\t\tnave = %d aspect type = %d\n", nave, aspect_kind);
     if (nepoch != 1 && nepoch != info->nchan)
     {
-        if(t_pFile)
-            delete t_pFile;
+        if(t_pStream)
+            delete t_pStream;
         if(t_pTree)
             delete t_pTree;
         if(t_pDir)
@@ -463,8 +465,8 @@ bool FiffEvokedDataSet::read_evoked(QString& p_sFileName, FiffEvokedDataSet*& da
     }
     if (all->cols() != nsamp)
     {
-        if(t_pFile)
-            delete t_pFile;
+        if(t_pStream)
+            delete t_pStream;
         if(t_pTree)
             delete t_pTree;
         if(t_pDir)
@@ -516,8 +518,8 @@ bool FiffEvokedDataSet::read_evoked(QString& p_sFileName, FiffEvokedDataSet*& da
         delete data->evoked[0]->epochs;
     data->evoked[0]->epochs = all;
 
-    if(t_pFile)
-        delete t_pFile;
+    if(t_pStream)
+        delete t_pStream;
     if(t_pTree)
         delete t_pTree;
     if(t_pDir)

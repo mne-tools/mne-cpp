@@ -196,9 +196,9 @@ bool FiffRawData::read_raw_segment(MatrixXd*& data, MatrixXd*& times, fiff_int_t
     //
 
     FiffStream* fid = NULL;
-    if (!this->file->isOpen())
+    if (!this->file->device()->isOpen())
     {
-        if (!this->file->open(QIODevice::ReadOnly))
+        if (!this->file->device()->open(QIODevice::ReadOnly))
         {
             printf("Cannot open file %s",this->info->filename.toUtf8().constData());
         }

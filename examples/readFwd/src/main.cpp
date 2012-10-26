@@ -84,12 +84,17 @@ int main(int argc, char *argv[])
 
     MNEForwardSolution* t_ForwardSolution = NULL;
 
-    QString t_sFile = "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
-    if(MNE::read_forward_solution(t_sFile, t_ForwardSolution))
+    QString t_sFileName = "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
+
+    QFile* t_pFile = new QFile(t_sFileName);
+
+    if(MNE::read_forward_solution(t_pFile, t_ForwardSolution))
     {
         std::cout << std::endl << "first 10 rows and columns of the Gain Matrix:" << std::endl << t_ForwardSolution->sol->data->block(0,0,10,10) << std::endl;
         std::cout << std::endl << "first 10 dipole coordinates:" << std::endl << t_ForwardSolution->source_rr.block(0,0,10,3) << std::endl ;
     }
+
+    delete t_pFile;
 
     return a.exec();
 }

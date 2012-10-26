@@ -47,6 +47,15 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <QFile>
+
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -58,8 +67,8 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FiffStream::FiffStream(QString& p_sFilename)
-: QFile(p_sFilename)
+FiffStream::FiffStream(QIODevice* p_pIODevice)
+: QDataStream(p_pIODevice)
 {
 
 }
@@ -69,10 +78,11 @@ FiffStream::FiffStream(QString& p_sFilename)
 
 FiffStream::~FiffStream()
 {
-    if(this->isOpen())
+    if(this->device()->isOpen())
     {
-        printf("Closing file %s.\n", this->fileName().toUtf8().constData());
-        this->close();
+//        printf("Closing file %s.\n", this->fileName().toUtf8().constData());
+        printf("Closing FiffStream IODevice.\n");
+        this->device()->close();
     }
 }
 
@@ -91,13 +101,13 @@ void FiffStream::end_file()
 {
     fiff_int_t datasize = 0;
 
-    QDataStream out(this);   // we will serialize the data into the file
-    out.setByteOrder(QDataStream::BigEndian);
+//    QDataStream out(this);   // we will serialize the data into the file
+    this->setByteOrder(QDataStream::BigEndian);
 
-    out << (qint32)FIFF_NOP;
-    out << (qint32)FIFFT_VOID;
-    out << (qint32)datasize;
-    out << (qint32)FIFFV_NEXT_NONE;
+    *this << (qint32)FIFF_NOP;
+    *this << (qint32)FIFFT_VOID;
+    *this << (qint32)datasize;
+    *this << (qint32)FIFFV_NEXT_NONE;
 }
 
 
@@ -115,10 +125,11 @@ void FiffStream::finish_writing_raw()
 
 bool FiffStream::open(FiffDirTree*& p_pTree, QList<FiffDirEntry>*& p_pDir)
 {
+    QString t_sFileName = this->streamName();
 
-    if (!this->open(QIODevice::ReadOnly))
+    if (!this->device()->open(QIODevice::ReadOnly))
     {
-        printf("Cannot open file %s\n", this->fileName().toUtf8().constData());//consider throw
+        printf("Cannot open %s\n", t_sFileName.toUtf8().constData());//consider throw
         return false;
     }
 
@@ -153,7 +164,7 @@ bool FiffStream::open(FiffDirTree*& p_pTree, QList<FiffDirEntry>*& p_pDir)
     //
     //   Read or create the directory tree
     //
-    printf("\nCreating tag directory for %s...", this->fileName().toUtf8().constData());
+    printf("\nCreating tag directory for %s...", t_sFileName.toUtf8().constData());
 
     if (p_pDir)
         delete p_pDir;
@@ -168,11 +179,11 @@ bool FiffStream::open(FiffDirTree*& p_pTree, QList<FiffDirEntry>*& p_pDir)
     else
     {
         qint32 k = 0;
-        this->seek(0);//fseek(fid,0,'bof');
+        this->device()->seek(0);//fseek(fid,0,'bof');
         FiffDirEntry t_fiffDirEntry;
         while (t_pTag->next >= 0)
         {
-            t_fiffDirEntry.pos = this->pos();//pos = ftell(fid);
+            t_fiffDirEntry.pos = this->device()->pos();//pos = ftell(fid);
             FiffTag::read_tag_info(this, t_pTag);
             ++k;
             t_fiffDirEntry.kind = t_pTag->kind;
@@ -193,7 +204,7 @@ bool FiffStream::open(FiffDirTree*& p_pTree, QList<FiffDirEntry>*& p_pDir)
     //
     //   Back to the beginning
     //
-    this->seek(0); //fseek(fid,0,'bof');
+    this->device()->seek(0); //fseek(fid,0,'bof');
     return true;
 }
 
@@ -1150,7 +1161,7 @@ QList<FiffProj*> FiffStream::read_proj(FiffDirTree* p_pNode)
 
 //*************************************************************************************************************
 
-bool FiffStream::setup_read_raw(QString& p_sFileName, FiffRawData*& data, bool allow_maxshield)
+bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData*& data, bool allow_maxshield)
 {
     if(data)
         delete data;
@@ -1159,9 +1170,11 @@ bool FiffStream::setup_read_raw(QString& p_sFileName, FiffRawData*& data, bool a
     //
     //   Open the file
     //
-    printf("Opening raw data file %s...\n",p_sFileName.toUtf8().constData());
+    FiffStream* p_pStream = new FiffStream(p_pIODevice);
+    QString t_sFileName = p_pStream->streamName();
 
-    FiffStream* p_pStream = new FiffStream(p_sFileName);
+    printf("Opening raw data %s...\n",t_sFileName.toUtf8().constData());
+
     FiffDirTree* t_pTree = NULL;
     QList<FiffDirEntry>* t_pDir = NULL;
 
@@ -1202,7 +1215,7 @@ bool FiffStream::setup_read_raw(QString& p_sFileName, FiffRawData*& data, bool a
             raw = meas->dir_tree_find(FIFFB_SMSH_RAW_DATA);
             if (raw.size() == 0)
             {
-                printf("No raw data in %s\n", p_sFileName.toUtf8().constData());
+                printf("No raw data in %s\n", t_sFileName.toUtf8().constData());
                 if(p_pStream)
                     delete p_pStream;
                 if(t_pTree)
@@ -1217,7 +1230,7 @@ bool FiffStream::setup_read_raw(QString& p_sFileName, FiffRawData*& data, bool a
         {
             if (raw.size() == 0)
             {
-                printf("No raw data in %s\n", p_sFileName.toUtf8().constData());
+                printf("No raw data in %s\n", t_sFileName.toUtf8().constData());
                 if(p_pStream)
                     delete p_pStream;
                 if(t_pTree)
@@ -1233,7 +1246,7 @@ bool FiffStream::setup_read_raw(QString& p_sFileName, FiffRawData*& data, bool a
     //
     //   Set up the output structure
     //
-    info->filename   = p_sFileName;
+    info->filename   = t_sFileName;
 
     data = new FiffRawData();
     data->file = p_pStream;// fid;
@@ -1366,7 +1379,7 @@ bool FiffStream::setup_read_raw(QString& p_sFileName, FiffRawData*& data, bool a
            (double)data->first_samp/data->info->sfreq,
            (double)data->last_samp/data->info->sfreq);
     printf("Ready.\n");
-    data->file->close();
+    data->file->device()->close();
 
     if(t_pTree)
         delete t_pTree;
@@ -1394,13 +1407,14 @@ void FiffStream::start_block(fiff_int_t kind)
 
 //*************************************************************************************************************
 
-FiffStream* FiffStream::start_file(QString& p_sFilename)
+FiffStream* FiffStream::start_file(QIODevice* p_pIODevice)
 {
-    FiffStream* p_pStream = new FiffStream(p_sFilename);
+    FiffStream* p_pStream = new FiffStream(p_pIODevice);
+    QString t_sFileName = p_pStream->streamName();
 
-    if(!p_pStream->open(QIODevice::WriteOnly))
+    if(!p_pStream->device()->open(QIODevice::WriteOnly))
     {
-        printf("Cannot write to %s\n", p_pStream->fileName().toUtf8().constData());//consider throw
+        printf("Cannot write to %s\n", t_sFileName.toUtf8().constData());//consider throw
         delete p_pStream;
         return NULL;
     }
@@ -1421,7 +1435,7 @@ FiffStream* FiffStream::start_file(QString& p_sFilename)
 
 //*************************************************************************************************************
 
-FiffStream* FiffStream::start_writing_raw(QString& p_sFileName, FiffInfo* info, MatrixXd*& cals, MatrixXi sel)
+FiffStream* FiffStream::start_writing_raw(QIODevice* p_pIODevice, FiffInfo* info, MatrixXd*& cals, MatrixXi sel)
 {
     //
     //   We will always write floats
@@ -1446,18 +1460,18 @@ FiffStream* FiffStream::start_writing_raw(QString& p_sFileName, FiffInfo* info, 
     //  Create the file and save the essentials
     //
 
-    FiffStream* t_pFile = start_file(p_sFileName);//1, 2, 3
-    t_pFile->start_block(FIFFB_MEAS);//4
-    t_pFile->write_id(FIFF_BLOCK_ID);//5
+    FiffStream* t_pStream = start_file(p_pIODevice);//1, 2, 3
+    t_pStream->start_block(FIFFB_MEAS);//4
+    t_pStream->write_id(FIFF_BLOCK_ID);//5
     if(info->meas_id.version != -1)
     {
-        t_pFile->write_id(FIFF_PARENT_BLOCK_ID,info->meas_id);//6
+        t_pStream->write_id(FIFF_PARENT_BLOCK_ID,info->meas_id);//6
     }
     //
     //
     //    Measurement info
     //
-    t_pFile->start_block(FIFFB_MEAS_INFO);//7
+    t_pStream->start_block(FIFFB_MEAS_INFO);//7
     //
     //    Blocks from the original
     //
@@ -1467,16 +1481,17 @@ FiffStream* FiffStream::start_writing_raw(QString& p_sFileName, FiffInfo* info, 
     bool have_isotrak    = false;
     if (blocks.size() > 0 && !info->filename.isEmpty())
     {
-        FiffStream* t_pFile2 = new FiffStream(info->filename);
+        QFile* t_pFile = new QFile(info->filename);//ToDo this has to be adapted for TCPSocket
+        FiffStream* t_pStream2 = new FiffStream(t_pFile);
 
         FiffDirTree* t_pTree = NULL;
         QList<FiffDirEntry>* t_pDir = NULL;
-        t_pFile2->open(t_pTree, t_pDir);
+        t_pStream2->open(t_pTree, t_pDir);
 
         for(qint32 k = 0; k < blocks.size(); ++k)
         {
             QList<FiffDirTree*> nodes = t_pTree->dir_tree_find(blocks.at(k));
-            FiffDirTree::copy_tree(t_pFile2,t_pTree->id,nodes,t_pFile);
+            FiffDirTree::copy_tree(t_pStream2,t_pTree->id,nodes,t_pStream);
             if(blocks[k] == FIFFB_HPI_RESULT && nodes.size() > 0)
                 have_hpi_result = true;
 
@@ -1486,22 +1501,22 @@ FiffStream* FiffStream::start_writing_raw(QString& p_sFileName, FiffInfo* info, 
 
         delete t_pDir;
         delete t_pTree;
-        delete t_pFile2;
-        t_pFile2 = NULL;
+        delete t_pStream2;
+        t_pStream2 = NULL;
     }
     //
     //    megacq parameters
     //
     if (!info->acq_pars.isEmpty() || !info->acq_stim.isEmpty())
     {
-        t_pFile->start_block(FIFFB_DACQ_PARS);
+        t_pStream->start_block(FIFFB_DACQ_PARS);
         if (!info->acq_pars.isEmpty())
-            t_pFile->write_string(FIFF_DACQ_PARS, info->acq_pars);
+            t_pStream->write_string(FIFF_DACQ_PARS, info->acq_pars);
 
         if (!info->acq_stim.isEmpty())
-            t_pFile->write_string(FIFF_DACQ_STIM, info->acq_stim);
+            t_pStream->write_string(FIFF_DACQ_STIM, info->acq_stim);
 
-        t_pFile->end_block(FIFFB_DACQ_PARS);
+        t_pStream->end_block(FIFFB_DACQ_PARS);
     }
     //
     //    Coordinate transformations if the HPI result block was not there
@@ -1509,49 +1524,49 @@ FiffStream* FiffStream::start_writing_raw(QString& p_sFileName, FiffInfo* info, 
     if (!have_hpi_result)
     {
         if (info->dev_head_t != NULL)
-            t_pFile->write_coord_trans(info->dev_head_t);
+            t_pStream->write_coord_trans(info->dev_head_t);
 
         if (info->ctf_head_t != NULL)
-            t_pFile->write_coord_trans(info->ctf_head_t);
+            t_pStream->write_coord_trans(info->ctf_head_t);
     }
     //
     //    Polhemus data
     //
     if (info->dig.size() > 0 && !have_isotrak)
     {
-        t_pFile->start_block(FIFFB_ISOTRAK);
+        t_pStream->start_block(FIFFB_ISOTRAK);
         for (qint32 k = 0; k < info->dig.size(); ++k)
-            t_pFile->write_dig_point(info->dig[k]);
+            t_pStream->write_dig_point(info->dig[k]);
 
-        t_pFile->end_block(FIFFB_ISOTRAK);
+        t_pStream->end_block(FIFFB_ISOTRAK);
     }
     //
     //    Projectors
     //
-    t_pFile->write_proj(info->projs);
+    t_pStream->write_proj(info->projs);
     //
     //    CTF compensation info
     //
-    t_pFile->write_ctf_comp(info->comps);
+    t_pStream->write_ctf_comp(info->comps);
     //
     //    Bad channels
     //
     if (info->bads.size() > 0)
     {
-        t_pFile->start_block(FIFFB_MNE_BAD_CHANNELS);
-        t_pFile->write_name_list(FIFF_MNE_CH_NAME_LIST,info->bads);
-        t_pFile->end_block(FIFFB_MNE_BAD_CHANNELS);
+        t_pStream->start_block(FIFFB_MNE_BAD_CHANNELS);
+        t_pStream->write_name_list(FIFF_MNE_CH_NAME_LIST,info->bads);
+        t_pStream->end_block(FIFFB_MNE_BAD_CHANNELS);
     }
     //
     //    General
     //
-    t_pFile->write_float(FIFF_SFREQ,&info->sfreq);
-    t_pFile->write_float(FIFF_HIGHPASS,&info->highpass);
-    t_pFile->write_float(FIFF_LOWPASS,&info->lowpass);
-    t_pFile->write_int(FIFF_NCHAN,&nchan);
-    t_pFile->write_int(FIFF_DATA_PACK,&data_type);
+    t_pStream->write_float(FIFF_SFREQ,&info->sfreq);
+    t_pStream->write_float(FIFF_HIGHPASS,&info->highpass);
+    t_pStream->write_float(FIFF_LOWPASS,&info->lowpass);
+    t_pStream->write_int(FIFF_NCHAN,&nchan);
+    t_pStream->write_int(FIFF_DATA_PACK,&data_type);
     if (info->meas_date[0] != -1)
-        t_pFile->write_int(FIFF_MEAS_DATE,info->meas_date, 2);
+        t_pStream->write_int(FIFF_MEAS_DATE,info->meas_date, 2);
     //
     //    Channel info
     //
@@ -1567,17 +1582,32 @@ FiffStream* FiffStream::start_writing_raw(QString& p_sFileName, FiffInfo* info, 
         chs[k].scanno = k+1;//+1 because
         chs[k].range  = 1.0f;
         (*cals)(0,k) = chs[k].cal;
-        t_pFile->write_ch_info(&chs[k]);
+        t_pStream->write_ch_info(&chs[k]);
     }
     //
     //
-    t_pFile->end_block(FIFFB_MEAS_INFO);
+    t_pStream->end_block(FIFFB_MEAS_INFO);
     //
     // Start the raw data
     //
-    t_pFile->start_block(FIFFB_RAW_DATA);
+    t_pStream->start_block(FIFFB_RAW_DATA);
 
-    return t_pFile;
+    return t_pStream;
+}
+
+
+//*************************************************************************************************************
+
+QString FiffStream::streamName()
+{
+    QFile* t_pFile = qobject_cast<QFile*>(this->device());
+    QString p_sFileName;
+    if(t_pFile)
+        p_sFileName = t_pFile->fileName();
+    else
+        p_sFileName = QString("TCPSocket");
+
+    return p_sFileName;
 }
 
 
@@ -1608,43 +1638,43 @@ void FiffStream::write_ch_info(FiffChInfo* ch)
 
     fiff_int_t datasize= 4*13 + 4*7 + 16;
 
-    QDataStream out(this);   // we will serialize the data into the file
-    out.setByteOrder(QDataStream::BigEndian);
+//    QDataStream out(this);   // we will serialize the data into the file
+    this->setByteOrder(QDataStream::BigEndian);
 
-    out << (qint32)FIFF_CH_INFO;
-    out << (qint32)FIFFT_CH_INFO_STRUCT;
-    out << (qint32)datasize;
-    out << (qint32)FIFFV_NEXT_SEQ;
+    *this << (qint32)FIFF_CH_INFO;
+    *this << (qint32)FIFFT_CH_INFO_STRUCT;
+    *this << (qint32)datasize;
+    *this << (qint32)FIFFV_NEXT_SEQ;
 
     //
     //   Start writing fiffChInfoRec
     //
-    out << (qint32)ch->scanno;
-    out << (qint32)ch->logno;
-    out << (qint32)ch->kind;
+    *this << (qint32)ch->scanno;
+    *this << (qint32)ch->logno;
+    *this << (qint32)ch->kind;
 
     int iData = 0;
     iData = *(int *)&ch->range;
-    out << iData;
+    *this << iData;
     iData = *(int *)&ch->cal;
-    out << iData;
+    *this << iData;
 
     //
     //   fiffChPosRec follows
     //
-    out << (qint32)ch->coil_type;
+    *this << (qint32)ch->coil_type;
     qint32 i;
     for(i = 0; i < 12; ++i)
     {
         iData = *(int *)&ch->loc(i,0);
-        out << iData;
+        *this << iData;
     }
 
     //
     //   unit and unit multiplier
     //
-    out << (qint32)ch->unit;
-    out << (qint32)ch->unit_mul;
+    *this << (qint32)ch->unit;
+    *this << (qint32)ch->unit_mul;
 
     //
     //   Finally channel name
@@ -1661,13 +1691,13 @@ void FiffStream::write_ch_info(FiffChInfo* ch)
     len = ch_name.size();
 
 
-    out.writeRawData(ch_name.toUtf8().constData(),len);
+    this->writeRawData(ch_name.toUtf8().constData(),len);
 
     if (len < 16)
     {
         const char* chNull = "";
         for(i = 0; i < 16-len; ++i)
-            out.writeRawData(chNull,1);
+            this->writeRawData(chNull,1);
     }
 }
 
@@ -1687,19 +1717,19 @@ void FiffStream::write_coord_trans(FiffCoordTrans* trans)
 
     fiff_int_t datasize = 4*2*12 + 4*2;
 
-    QDataStream out(this);   // we will serialize the data into the file
-    out.setByteOrder(QDataStream::BigEndian);
+//    QDataStream out(this);   // we will serialize the data into the file
+    this->setByteOrder(QDataStream::BigEndian);
 
-    out << (qint32)FIFF_COORD_TRANS;
-    out << (qint32)FIFFT_COORD_TRANS_STRUCT;
-    out << (qint32)datasize;
-    out << (qint32)FIFFV_NEXT_SEQ;
+    *this << (qint32)FIFF_COORD_TRANS;
+    *this << (qint32)FIFFT_COORD_TRANS_STRUCT;
+    *this << (qint32)datasize;
+    *this << (qint32)FIFFV_NEXT_SEQ;
 
     //
     //   Start writing fiffCoordTransRec
     //
-    out << (qint32)trans->from;
-    out << (qint32)trans->to;
+    *this << (qint32)trans->from;
+    *this << (qint32)trans->to;
 
     //
     //   The transform...
@@ -1707,18 +1737,18 @@ void FiffStream::write_coord_trans(FiffCoordTrans* trans)
     qint32 r, c;
     for (r = 0; r < 3; ++r)
         for (c = 0; c < 3; ++c)
-            out << (float)trans->trans(r,c);
+            *this << (float)trans->trans(r,c);
     for (r = 0; r < 3; ++r)
-        out << (float)trans->trans(r,3);
+        *this << (float)trans->trans(r,3);
 
     //
     //   ...and its inverse
     //
     for (r = 0; r < 3; ++r)
         for (c = 0; c < 3; ++c)
-            out << (float)trans->invtrans(r,c);
+            *this << (float)trans->invtrans(r,c);
     for (r = 0; r < 3; ++r)
-        out << (float)trans->invtrans(r,3);
+        *this << (float)trans->invtrans(r,3);
 }
 
 
@@ -1771,21 +1801,21 @@ void FiffStream::write_dig_point(FiffDigPoint& dig)
 
     fiff_int_t datasize = 5*4;
 
-    QDataStream out(this);   // we will serialize the data into the file
-    out.setByteOrder(QDataStream::BigEndian);
+//    QDataStream out(this);   // we will serialize the data into the file
+    this->setByteOrder(QDataStream::BigEndian);
 
-    out << (qint32)FIFF_DIG_POINT;
-    out << (qint32)FIFFT_DIG_POINT_STRUCT;
-    out << (qint32)datasize;
-    out << (qint32)FIFFV_NEXT_SEQ;
+    *this << (qint32)FIFF_DIG_POINT;
+    *this << (qint32)FIFFT_DIG_POINT_STRUCT;
+    *this << (qint32)datasize;
+    *this << (qint32)FIFFV_NEXT_SEQ;
 
     //
     //   Start writing fiffDigPointRec
     //
-    out << (qint32)dig.kind;
-    out << (qint32)dig.ident;
+    *this << (qint32)dig.kind;
+    *this << (qint32)dig.ident;
     for(qint32 i = 0; i < 3; ++i)
-        out << dig.r[i];
+        *this << dig.r[i];
 }
 
 
@@ -1795,19 +1825,19 @@ void FiffStream::write_float(fiff_int_t kind, float* data, fiff_int_t nel)
 {
     qint32 datasize = nel * 4;
 
-    QDataStream out(this);   // we will serialize the data into the file
-    out.setByteOrder(QDataStream::BigEndian);
+//    QDataStream out(this);   // we will serialize the data into the file
+    this->setByteOrder(QDataStream::BigEndian);
 
-    out << (qint32)kind;
-    out << (qint32)FIFFT_FLOAT;
-    out << (qint32)datasize;
-    out << (qint32)FIFFV_NEXT_SEQ;
+    *this << (qint32)kind;
+    *this << (qint32)FIFFT_FLOAT;
+    *this << (qint32)datasize;
+    *this << (qint32)FIFFV_NEXT_SEQ;
 
     qint32 iData = 0;
     for(qint32 i = 0; i < nel; ++i)
     {
         iData = *(qint32 *)&data[i];
-        out << iData;
+        *this << iData;
     }
 }
 
@@ -1824,13 +1854,13 @@ void FiffStream::write_float_matrix(fiff_int_t kind, const MatrixXd* mat)
     fiff_int_t datasize = 4*numel + 4*3;
 
 
-    QDataStream out(this);   // we will serialize the data into the file
-    out.setByteOrder(QDataStream::BigEndian);
+//    QDataStream out(this);   // we will serialize the data into the file
+    this->setByteOrder(QDataStream::BigEndian);
 
-    out << (qint32)kind;
-    out << (qint32)FIFFT_MATRIX_FLOAT;
-    out << (qint32)datasize;
-    out << (qint32)FIFFV_NEXT_SEQ;
+    *this << (qint32)kind;
+    *this << (qint32)FIFFT_MATRIX_FLOAT;
+    *this << (qint32)datasize;
+    *this << (qint32)FIFFV_NEXT_SEQ;
 
     qint32 i;
     int iData = 0;
@@ -1838,7 +1868,7 @@ void FiffStream::write_float_matrix(fiff_int_t kind, const MatrixXd* mat)
     for(i = 0; i < numel; ++i)
     {
         iData = *(int *)&mat->data()[i];
-        out << iData;
+        *this << iData;
     }
 
     qint32 dims[3];
@@ -1847,7 +1877,7 @@ void FiffStream::write_float_matrix(fiff_int_t kind, const MatrixXd* mat)
     dims[2] = 2;
 
     for(i = 0; i < 3; ++i)
-        out << dims[i];
+        *this << dims[i];
 }
 
 
@@ -1877,13 +1907,13 @@ void FiffStream::write_id(fiff_int_t kind, FiffId& id)
     //
     fiff_int_t datasize = 5*4;                       //   The id comprises five integers
 
-    QDataStream out(this);   // we will serialize the data into the file
-    out.setByteOrder(QDataStream::BigEndian);
+//    QDataStream out(this);   // we will serialize the data into the file
+    this->setByteOrder(QDataStream::BigEndian);
 
-    out << (qint32)kind;
-    out << (qint32)FIFFT_ID_STRUCT;
-    out << (qint32)datasize;
-    out << (qint32)FIFFV_NEXT_SEQ;
+    *this << (qint32)kind;
+    *this << (qint32)FIFFT_ID_STRUCT;
+    *this << (qint32)datasize;
+    *this << (qint32)FIFFV_NEXT_SEQ;
     //
     // Collect the bits together for one write
     //
@@ -1895,7 +1925,7 @@ void FiffStream::write_id(fiff_int_t kind, FiffId& id)
     data[4] = id.time.usecs;
 
     for(qint32 i = 0; i < 5; ++i)
-        out << data[i];
+        *this << data[i];
 }
 
 
@@ -1905,16 +1935,16 @@ void FiffStream::write_int(fiff_int_t kind, fiff_int_t* data, fiff_int_t nel)
 {
     fiff_int_t datasize = nel * 4;
 
-    QDataStream out(this);   // we will serialize the data into the file
-    out.setByteOrder(QDataStream::BigEndian);
+//    QDataStream out(this);   // we will serialize the data into the file
+    this->setByteOrder(QDataStream::BigEndian);
 
-    out << (qint32)kind;
-    out << (qint32)FIFFT_INT;
-    out << (qint32)datasize;
-    out << (qint32)FIFFV_NEXT_SEQ;
+    *this << (qint32)kind;
+    *this << (qint32)FIFFT_INT;
+    *this << (qint32)datasize;
+    *this << (qint32)FIFFV_NEXT_SEQ;
 
     for(qint32 i = 0; i < nel; ++i)
-        out << data[i];
+        *this << data[i];
 }
 
 
@@ -2002,13 +2032,13 @@ void FiffStream::write_string(fiff_int_t kind, QString& data)
 {
     fiff_int_t datasize = data.size();//size(data,2);
 
-    QDataStream out(this);   // we will serialize the data into the file
-    out.setByteOrder(QDataStream::BigEndian);
+//    QDataStream out(this);   // we will serialize the data into the file
+    this->setByteOrder(QDataStream::BigEndian);
 
-    out << (qint32)kind;
-    out << (qint32)FIFFT_STRING;
-    out << (qint32)datasize;
-    out << (qint32)FIFFV_NEXT_SEQ;
+    *this << (qint32)kind;
+    *this << (qint32)FIFFT_STRING;
+    *this << (qint32)datasize;
+    *this << (qint32)FIFFV_NEXT_SEQ;
 
-    out.writeRawData(data.toUtf8().constData(),datasize);
+    this->writeRawData(data.toUtf8().constData(),datasize);
 }
