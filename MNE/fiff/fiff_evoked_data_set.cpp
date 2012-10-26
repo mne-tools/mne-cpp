@@ -147,7 +147,7 @@ bool FiffEvokedDataSet::read_evoked(QString& p_sFileName, FiffEvokedDataSet*& da
     //   Open the file
     //
     printf("Reading %s ...\n",p_sFileName.toUtf8().constData());
-    FiffFile* t_pFile = new FiffFile(p_sFileName);
+    FiffStream* t_pFile = new FiffStream(p_sFileName);
     FiffDirTree* t_pTree = NULL;
     QList<FiffDirEntry>* t_pDir = NULL;
 

@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
     //   Setup for reading the raw data
     //
     FiffRawData* raw = NULL;
-    if(!FiffFile::setup_read_raw(t_sFile, raw))
+    if(!FiffStream::setup_read_raw(t_sFile, raw))
     {
         printf("Error during fiff setup raw read");
         return 0;
@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
     //
     MatrixXd* cals = NULL;
 
-    FiffFile* outfid = Fiff::start_writing_raw(t_sOutFile,raw->info, cals, picks);
+    FiffStream* outfid = Fiff::start_writing_raw(t_sOutFile,raw->info, cals, picks);
     //
     //   Set up the reading parameters
     //

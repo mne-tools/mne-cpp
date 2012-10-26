@@ -320,7 +320,7 @@ bool MNEInverseOperator::read_inverse_operator(QString& p_sFileName, MNEInverseO
     //   Open the file, create directory
     //
     printf("Reading inverse operator decomposition from %s...\n",p_sFileName.toUtf8().constData());
-    FiffFile* t_pFile = new FiffFile(p_sFileName);
+    FiffStream* t_pFile = new FiffStream(p_sFileName);
     FiffDirTree* t_pTree = NULL;
     QList<FiffDirEntry>* t_pDir = NULL;
 

@@ -52,7 +52,7 @@
 #include "fiff_types.h"
 #include "fiff_info.h"
 #include "fiff_evoked_data.h"
-#include "fiff_file.h"
+#include "fiff_stream.h"
 #include "fiff_dir_tree.h"
 
 

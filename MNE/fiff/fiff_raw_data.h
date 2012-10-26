@@ -47,7 +47,7 @@
 #include "fiff_proj.h"
 #include "fiff_ctf_comp.h"
 #include "fiff_raw_dir.h"
-#include "fiff_file.h"
+#include "fiff_stream.h"
 #include "fiff_tag.h"
 
 
@@ -78,12 +78,7 @@ namespace FIFFLIB
 {
 
 class FiffRawData;
-class FiffFile;
-
-
-static MatrixXi defaultMatrixXi(0,0);
-
-typedef Matrix<qint16, Dynamic, Dynamic> MatrixDau16;
+class FiffStream;
 
 
 //*************************************************************************************************************
@@ -162,7 +157,7 @@ public:
 
 
 public:
-    FiffFile* file;//replaces fid
+    FiffStream* file;//replaces fid
     FiffInfo* info;
     fiff_int_t first_samp;
     fiff_int_t last_samp;

@@ -107,9 +107,9 @@ FiffTag::~FiffTag()
 
 //*************************************************************************************************************
 
-bool FiffTag::read_tag_info(FiffFile* p_pFile, FiffTag*& p_pTag)
+bool FiffTag::read_tag_info(FiffStream* p_pStream, FiffTag*& p_pTag)
 {
-    QDataStream t_DataStream(p_pFile);
+    QDataStream t_DataStream(p_pStream);
 
     if (p_pTag != NULL)
         delete p_pTag;
@@ -134,11 +134,11 @@ bool FiffTag::read_tag_info(FiffFile* p_pFile, FiffTag*& p_pTag)
 
     if (p_pTag->next == FIFFV_NEXT_SEQ)
     {
-        p_pFile->seek(p_pFile->pos()+p_pTag->size()); //fseek(fid,tag.size,'cof');
+        p_pStream->seek(p_pStream->pos()+p_pTag->size()); //fseek(fid,tag.size,'cof');
     }
     else if (p_pTag->next > 0)
     {
-        p_pFile->seek(p_pTag->next); //fseek(fid,tag.next,'bof');
+        p_pStream->seek(p_pTag->next); //fseek(fid,tag.next,'bof');
     }
 
     return true;
@@ -147,14 +147,14 @@ bool FiffTag::read_tag_info(FiffFile* p_pFile, FiffTag*& p_pTag)
 
 //*************************************************************************************************************
 
-bool FiffTag::read_tag(FiffFile* p_pFile, FiffTag*& p_pTag, qint64 pos)
+bool FiffTag::read_tag(FiffStream* p_pStream, FiffTag*& p_pTag, qint64 pos)
 {
     if (pos >= 0)
     {
-        p_pFile->seek(pos);
+        p_pStream->seek(pos);
     }
 
-    QDataStream t_DataStream(p_pFile);
+    QDataStream t_DataStream(p_pStream);
     t_DataStream.setByteOrder(QDataStream::BigEndian);
 
     if (p_pTag != NULL)
@@ -183,7 +183,7 @@ bool FiffTag::read_tag(FiffFile* p_pFile, FiffTag*& p_pTag, qint64 pos)
     }
 
     if (p_pTag->next != FIFFV_NEXT_SEQ)
-        p_pFile->seek(p_pTag->next);//fseek(fid,tag.next,'bof');
+        p_pStream->seek(p_pTag->next);//fseek(fid,tag.next,'bof');
 
     return true;
 }

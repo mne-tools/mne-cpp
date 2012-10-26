@@ -195,7 +195,7 @@ bool FiffRawData::read_raw_segment(MatrixXd*& data, MatrixXd*& times, fiff_int_t
 
     //
 
-    FiffFile* fid = NULL;
+    FiffStream* fid = NULL;
     if (!this->file->isOpen())
     {
         if (!this->file->open(QIODevice::ReadOnly))

@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
     //   Setup for reading the raw data
     //
     FiffRawData* raw = NULL;
-    if(!FiffFile::setup_read_raw(t_sFile, raw))
+    if(!FiffStream::setup_read_raw(t_sFile, raw))
     {
         printf("Error during fiff setup raw read");
         return 0;

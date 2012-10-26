@@ -70,7 +70,7 @@ bool MNE::read_events(QString& p_sFileName, MatrixXi& eventlist)
     //
     // Open file
     //
-    FiffFile* t_pFile = new FiffFile(p_sFileName);
+    FiffStream* t_pFile = new FiffStream(p_sFileName);
     FiffDirTree* t_pTree = NULL;
     QList<FiffDirEntry>* t_pDir = NULL;
 
