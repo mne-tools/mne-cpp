@@ -38,8 +38,6 @@ include(../../mne-cpp.pri)
 TEMPLATE = lib
 
 QT       += 3d
-QT       += core
-QT       -= gui
 
 DEFINES += DISP_LIBRARY
 

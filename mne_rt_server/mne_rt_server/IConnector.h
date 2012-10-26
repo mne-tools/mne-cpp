@@ -48,10 +48,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE SourceConnector
+// DEFINE NAMESPACE MSERVER
 //=============================================================================================================
 
-namespace SourceConnector
+namespace MSERVER
 {
 
 
@@ -178,7 +178,7 @@ inline bool IConnector::isActive() const
 } //Namespace
 
 
-#define IConnector_iid "source_connector/1.0"
-Q_DECLARE_INTERFACE(SourceConnector::IConnector, IConnector_iid)
+#define IConnector_iid "mne_rt_server/1.0"
+Q_DECLARE_INTERFACE(MSERVER::IConnector, IConnector_iid)
 
 #endif //ICONNECTOR_H

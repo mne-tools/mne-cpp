@@ -8,10 +8,9 @@ TEMPLATE = lib
 
 CONFIG += plugin
 
-DEFINES += FIFFCONNECTOR_LIBRARY
+DEFINES += FIFFSIMULATOR_LIBRARY
 
 QT += core
-QT -= gui
 
 TARGET = FiffSimulator
 
@@ -30,7 +29,21 @@ else {
     LIBS += -lfiff
 }
 
-DESTDIR = $${PWD}/../../../bin/mne_rt_server_plugins
+
+unix:DESTDIR = $${PWD}/../../../bin/mne_rt_server_plugins
+
+win32:DESTDIR = $${PWD}/../../../lib
+
+win32 {
+    FILE = $${DESTDIR}/$${TARGET}.dll
+    PLUGINDIR = $${DESTDIR}/../bin/mne_rt_server_plugins
+    FILE ~= s,/,\\,g
+    PLUGINDIR ~= s,/,\\,g
+    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${PLUGINDIR}) $$escape_expand(\\n\\t)
+}
+
+
+
 
 SOURCES += fiffsimulator.cpp \
     fiffproducer.cpp

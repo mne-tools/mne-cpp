@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file	   	modulemanager.cpp
-* @author	Christoph Dinh <christoph.dinh@live.de>;
-* @version	1.0
-* @date		October, 2010
+* @file     modulemanager.cpp
+* @author   Christoph Dinh <christoph.dinh@live.de>;
+* @version  1.0
+* @date     October, 2010
 *
-* @section	LICENSE
+* @section  LICENSE
 *
 * Copyright (C) 2010 Christoph Dinh. All rights reserved.
 *
@@ -14,7 +14,7 @@
 * prior written consent of the author.
 *
 *
-* @brief	Contains the implementation of the ModuleManager class.
+* @brief    Contains the implementation of the ModuleManager class.
 *
 */
 
@@ -56,7 +56,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SourceConnector;
+using namespace MSERVER;
 
 
 //*************************************************************************************************************

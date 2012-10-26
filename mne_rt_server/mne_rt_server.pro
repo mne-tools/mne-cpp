@@ -36,7 +36,7 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    core \
-    connectors \
+    mne_rt_server \
+    connectors
 
 CONFIG += ordered

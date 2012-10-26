@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiffsimulator_global.h
+* @file     mne_rt_server.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,31 +29,71 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the fiff library export/import macros.
+* @brief    Contains the implementation of the MNERTServer Class.
 *
 */
 
-#ifndef FIFFSIMULATOR_GLOBAL_H
-#define FIFFSIMULATOR_GLOBAL_H
+#ifndef MNE_RT_SERVER_H
+#define MNE_RT_SERVER_H
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// FIFF INCLUDES
 //=============================================================================================================
 
-#include <QtCore/qglobal.h>
+#include "fiff_server.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// PREPROCESSOR DEFINES
+// DEFINE NAMESPACE MSERVER
 //=============================================================================================================
 
-#if defined(FIFFSIMULATOR_LIBRARY)
-#  define FIFFSIMULATORSHARED_EXPORT Q_DECL_EXPORT  /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-#else
-#  define FIFFSIMULATORSHARED_EXPORT Q_DECL_IMPORT  /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-#endif
+namespace MSERVER
+{
 
-#endif // FIFFSIMULATOR_GLOBAL_H
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class ConnectorManager;
+class IConnector;
+
+
+//=============================================================================================================
+/**
+* DECLARE CLASS MNERTServer
+*
+* @brief The MNERTServer class provides a Fiff data simulator.
+*/
+class MNERTServer
+{
+public:
+    MNERTServer();
+
+    //=========================================================================================================
+    /**
+    * Destroys the MNERTServer.
+    */
+    ~MNERTServer();
+
+private:
+    FiffServer server;
+
+
+    ConnectorManager* m_pConnectorManager;
+    IConnector* m_pActiveConnector;
+
+};
+
+} // NAMESPACE
+
+#endif // MNE_RT_SERVER_H
