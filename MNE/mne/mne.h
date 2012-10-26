@@ -332,20 +332,20 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile read_cov member function
+    * Wrapper for the FiffStream read_cov member function
     *
     * Reads a covariance matrix from a fiff file
     *
-    * @param [in] p_pFile       an open fiff file
+    * @param [in] p_pStream       an open fiff file
     * @param [in] node          look for the matrix in here
     * @param [in] cov_kind      what kind of a covariance matrix do we want?
     * @param [out] p_covData    the read covariance matrix
     *
     * @return true if succeeded, false otherwise
     */
-    inline static bool read_cov(FiffFile* p_pFile, FiffDirTree* node, fiff_int_t cov_kind, FiffCov*& p_covData)
+    inline static bool read_cov(FiffStream* p_pStream, FiffDirTree* node, fiff_int_t cov_kind, FiffCov*& p_covData)
     {
-        return p_pFile->read_cov(node, cov_kind, p_covData);
+        return p_pStream->read_cov(node, cov_kind, p_covData);
     }
 
     //=========================================================================================================
@@ -402,7 +402,7 @@ public:
     *
     * Reads source spaces from a fif file
     *
-    * @param [in] p_pFile   The open fiff file
+    * @param [in] p_pStream   The open fiff file
     * @param [in] add_geom  Add geometry information to the source spaces
     * @param [in] p_pTree   Search for the source spaces here
     *
@@ -410,9 +410,9 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_source_spaces(FiffFile*& p_pFile, bool add_geom, FiffDirTree*& p_pTree, MNESourceSpace*& p_pSourceSpace)
+    static bool read_source_spaces(FiffStream*& p_pStream, bool add_geom, FiffDirTree*& p_pTree, MNESourceSpace*& p_pSourceSpace)
     {
-        return MNESourceSpace::read_source_spaces(p_pFile, add_geom, p_pTree, p_pSourceSpace);
+        return MNESourceSpace::read_source_spaces(p_pStream, add_geom, p_pTree, p_pSourceSpace);
     }
 
     //ToDo FiffChInfoList Class

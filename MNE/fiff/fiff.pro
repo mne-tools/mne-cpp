@@ -69,7 +69,6 @@ SOURCES += fiff.cpp \
     fiff_ch_info.cpp \
     fiff_proj.cpp \
     fiff_named_matrix.cpp \
-    fiff_file.cpp \
     fiff_raw_data.cpp \
     fiff_ctf_comp.cpp \
     fiff_id.cpp \
@@ -79,7 +78,8 @@ SOURCES += fiff.cpp \
     fiff_ch_pos.cpp \
     fiff_evoked_data_set.cpp \
     fiff_evoked_data.cpp \
-    fiff_cov.cpp
+    fiff_cov.cpp \
+    fiff_stream.cpp
 
 HEADERS += fiff.h \
     fiff_global.h \
@@ -97,14 +97,14 @@ HEADERS += fiff.h \
     fiff_raw_data.h \
     fiff_dir_entry.h \
     fiff_raw_dir.h \
-    fiff_file.h \
     fiff_dig_point.h \
     fiff_ch_pos.h \
     fiff_evoked_data.h \
     fiff_evoked_data.h \
     fiff_evoked_data_set.h \
     fiff_evoked_data.h \
-    fiff_cov.h
+    fiff_cov.h \
+    fiff_stream.h
 
 #Install headers to include directory
 header_files.files = ./*.h

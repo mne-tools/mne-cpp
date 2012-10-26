@@ -108,7 +108,7 @@ MNEForwardSolution::~MNEForwardSolution()
 
 bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardSolution*& fwd, bool force_fixed, bool surf_ori, QStringList& include, QStringList& exclude)
 {
-    FiffFile* t_pFile = new FiffFile(p_sFileName);
+    FiffStream* t_pFile = new FiffStream(p_sFileName);
     FiffDirTree* t_pTree = NULL;
     QList<FiffDirEntry>* t_pDir = NULL;
 
@@ -635,7 +635,7 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
 
 //*************************************************************************************************************
 
-bool MNEForwardSolution::read_one(FiffFile* p_pFile, FiffDirTree* node, MNEForwardSolution*& one)
+bool MNEForwardSolution::read_one(FiffStream* p_pStream, FiffDirTree* node, MNEForwardSolution*& one)
 {
     if (one != NULL)
         delete one;
@@ -651,53 +651,53 @@ bool MNEForwardSolution::read_one(FiffFile* p_pFile, FiffDirTree* node, MNEForwa
     one = new MNEForwardSolution();
     FIFFLIB::FiffTag* t_pTag = NULL;
 
-    if(!node->find_tag(p_pFile, FIFF_MNE_SOURCE_ORIENTATION, t_pTag))
+    if(!node->find_tag(p_pStream, FIFF_MNE_SOURCE_ORIENTATION, t_pTag))
     {
-        p_pFile->close();
+        p_pStream->close();
         std::cout << "Source orientation tag not found."; //ToDo: throw error.
         return false;
     }
 
     one->source_ori = *t_pTag->toInt();
 
-    if(!node->find_tag(p_pFile, FIFF_MNE_COORD_FRAME, t_pTag))
+    if(!node->find_tag(p_pStream, FIFF_MNE_COORD_FRAME, t_pTag))
     {
-        p_pFile->close();
+        p_pStream->close();
         std::cout << "Coordinate frame tag not found."; //ToDo: throw error.
         return false;
     }
 
     one->coord_frame = *t_pTag->toInt();
 
-    if(!node->find_tag(p_pFile, FIFF_MNE_SOURCE_SPACE_NPOINTS, t_pTag))
+    if(!node->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NPOINTS, t_pTag))
     {
-        p_pFile->close();
+        p_pStream->close();
         std::cout << "Number of sources not found."; //ToDo: throw error.
         return false;
     }
 
     one->nsource = *t_pTag->toInt();
 
-    if(!node->find_tag(p_pFile, FIFF_NCHAN, t_pTag))
+    if(!node->find_tag(p_pStream, FIFF_NCHAN, t_pTag))
     {
-        p_pFile->close();
+        p_pStream->close();
         printf("Number of channels not found."); //ToDo: throw error.
         return false;
     }
 
     one->nchan = *t_pTag->toInt();
 
-    if(p_pFile->read_named_matrix(node, FIFF_MNE_FORWARD_SOLUTION, one->sol))
+    if(p_pStream->read_named_matrix(node, FIFF_MNE_FORWARD_SOLUTION, one->sol))
         one->sol->transpose_named_matrix();
     else
     {
-        p_pFile->close();
+        p_pStream->close();
         printf("Forward solution data not found ."); //ToDo: throw error.
         //error(me,'Forward solution data not found (%s)',mne_omit_first_line(lasterr));
         return false;
     }
 
-    if(p_pFile->read_named_matrix(node, FIFF_MNE_FORWARD_SOLUTION_GRAD, one->sol_grad))
+    if(p_pStream->read_named_matrix(node, FIFF_MNE_FORWARD_SOLUTION_GRAD, one->sol_grad))
         one->sol_grad->transpose_named_matrix();
     else
     {
@@ -710,7 +710,7 @@ bool MNEForwardSolution::read_one(FiffFile* p_pFile, FiffDirTree* node, MNEForwa
     if (one->sol->data->rows() != one->nchan ||
             (one->sol->data->cols() != one->nsource && one->sol->data->cols() != 3*one->nsource))
     {
-        p_pFile->close();
+        p_pStream->close();
         printf("Forward solution matrix has wrong dimensions.\n"); //ToDo: throw error.
         //error(me,'Forward solution matrix has wrong dimensions');
         return false;
@@ -720,7 +720,7 @@ bool MNEForwardSolution::read_one(FiffFile* p_pFile, FiffDirTree* node, MNEForwa
         if (one->sol_grad->data->rows() != one->nchan ||
                 (one->sol_grad->data->cols() != 3*one->nsource && one->sol_grad->data->cols() != 3*3*one->nsource))
         {
-            p_pFile->close();
+            p_pStream->close();
             printf("Forward solution gradient matrix has wrong dimensions.\n"); //ToDo: throw error.
             //error(me,'Forward solution gradient matrix has wrong dimensions');
         }

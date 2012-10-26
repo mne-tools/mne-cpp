@@ -49,7 +49,7 @@
 #include "fiff_ctf_comp.h"
 #include "fiff_proj.h"
 #include "fiff_info.h"
-#include "fiff_file.h"
+#include "fiff_stream.h"
 
 
 //*************************************************************************************************************
@@ -71,7 +71,7 @@
 namespace FIFFLIB
 {
 
-class FiffFile;
+class FiffStream;
 
 
 //=============================================================================================================
@@ -108,7 +108,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool copy_tree(FiffFile* fidin, FiffId& in_id, QList<FiffDirTree*>& nodes, FiffFile* fidout);
+    static bool copy_tree(FiffStream* fidin, FiffId& in_id, QList<FiffDirTree*>& nodes, FiffStream* fidout);
 
     //=========================================================================================================
     /**
@@ -116,14 +116,14 @@ public:
     *
     * Create the directory tree structure
     *
-    * @param[in] p_pFile the opened fiff file
+    * @param[in] p_pStream the opened fiff file
     * @param[in] p_pDir the dir entries of which the tree should be constructed
     * @param[out] p_pTree the created dir tree
     * @param[in] start dir entry to start (optional, by default 0)
     *
     * @return index of the last read dir entry
     */
-    static qint32 make_dir_tree(FiffFile* p_pFile, QList<FiffDirEntry>* p_pDir, FiffDirTree*& p_pTree, qint32 start = 0);
+    static qint32 make_dir_tree(FiffStream* p_pStream, QList<FiffDirEntry>* p_pDir, FiffDirTree*& p_pTree, qint32 start = 0);
 
     //=========================================================================================================
     /**
@@ -145,13 +145,13 @@ public:
     * Note: In difference to mne-matlab this is not a static function. This is a method of the FiffDirTree
     *       class, that's why a tree object doesn't need to be handed to the function.
     *
-    * @param[in] p_pFile the opened fif file
+    * @param[in] p_pStream the opened fif file
     * @param[in] findkind the kind which should be found
     * @param[out] p_pTag the found tag
     *
     * @return true if found, false otherwise
     */
-    bool find_tag(FiffFile* p_pFile, fiff_int_t findkind, FiffTag*& p_pTag);
+    bool find_tag(FiffStream* p_pStream, fiff_int_t findkind, FiffTag*& p_pTag);
 
     //=========================================================================================================
     /**
@@ -182,7 +182,7 @@ public:
 //                                     * subtrees as well as FIFF_BLOCK_START and FIFF_BLOCK_END
 //                   * included. NOTE: While dir is allocated separately
 //                   * dir_tree is a pointer to the dirtree field
-//                   * in the fiffFile structure. The dir_tree and nent_tree
+//                   * in the FiffStream structure. The dir_tree and nent_tree
 //                   * fields are only used within the library to facilitate
 //                   * certain operations. *
 //  int                 nent_tree;   /**< Number of entries in the directory tree node *

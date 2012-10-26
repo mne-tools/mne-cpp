@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiff_file.h
+* @file     fiff_stream.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the FiffFile class declaration
+* @brief    Contains the FiffStream class declaration
 *
 */
 
-#ifndef FIFF_FILE_H
-#define FIFF_FILE_H
+#ifndef FIFF_STREAM_H
+#define FIFF_STREAM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -92,11 +92,10 @@ namespace FIFFLIB
 {
 
 class FiffDirTree;
-class FiffFile;
+class FiffStream;
 class FiffTag;
 class FiffRawData;
 
-static MatrixXi defaultFileMatrixXi(0,0);
 static FiffId defaultFiffId;
 
 
@@ -110,12 +109,12 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* FiffFile provides an interface for reading from and writing to fiff files
+* FiffStream provides an interface for reading from and writing to fiff files
 *
 * @brief FIFF File I/O routines.
 **/
 
-class FIFFSHARED_EXPORT FiffFile : public QFile {
+class FIFFSHARED_EXPORT FiffStream : public QFile {
 
 public:
     //=========================================================================================================
@@ -124,13 +123,13 @@ public:
     *
     * @param[in] p_sFileName file name of the file to open
     */
-    FiffFile(QString& p_sFilename);
+    FiffStream(QString& p_sFilename);
 
     //=========================================================================================================
     /**
     * Destroys the FiffInfo.
     */
-    ~FiffFile();
+    ~FiffStream();
 
     //=========================================================================================================
     /**
@@ -314,7 +313,7 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile start_block member function
+    * Wrapper for the FiffStream start_block member function
     *
     * Writes a FIFF_BLOCK_START tag
     *
@@ -334,7 +333,7 @@ public:
     *
     * @return The opened file.
     */
-    static FiffFile* start_file(QString& p_sFilename);
+    static FiffStream* start_file(QString& p_sFilename);
 
     //=========================================================================================================
     /**
@@ -351,7 +350,7 @@ public:
     *
     * @return the started fiff file
     */
-    static FiffFile* start_writing_raw(QString& p_sFileName, FiffInfo* info, MatrixXd*& cals, MatrixXi sel = defaultFileMatrixXi);
+    static FiffStream* start_writing_raw(QString& p_sFileName, FiffInfo* info, MatrixXd*& cals, MatrixXi sel = defaultMatrixXi);
 
     //=========================================================================================================
     /**
@@ -399,7 +398,7 @@ public:
     *
     * Writes a digitizer data point into a fif file
     *
-    * @param[in] p_pFile    An open fif file
+    * @param[in] p_pStream    An open fif file
     * @param[in] dig        The point to write
     */
     void write_dig_point(FiffDigPoint& dig);
@@ -410,7 +409,7 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile write_id member function
+    * Wrapper for the FiffStream write_id member function
     *
     * Writes fiff id
     * If the id argument is missing it will be generated here
@@ -428,7 +427,7 @@ public:
     *
     * Writes a 32-bit integer tag to a fif file
     *
-    * @param[in] p_pFile    An open fif file
+    * @param[in] p_pStream    An open fif file
     * @param[in] kind       Tag kind
     * @param[in] data       The integer data pointer
     * @param[in] nel        Number of integers to write (default = 1)
@@ -495,7 +494,7 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Writes the projection data into a fif file
+    * Writes the projection data into a fif stream (file)
     *
     * @param[in] projs      The compensation data to write
     */
@@ -533,4 +532,4 @@ public:
 
 } // NAMESPACE
 
-#endif // FIFF_FILE_H
+#endif // FIFF_STREAM_H

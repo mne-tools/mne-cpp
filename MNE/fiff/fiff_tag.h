@@ -89,7 +89,7 @@
 #include "fiff_coord_trans.h"
 #include "fiff_ch_info.h"
 #include "fiff_ch_pos.h"
-#include "fiff_file.h"
+#include "fiff_stream.h"
 
 
 //*************************************************************************************************************
@@ -121,7 +121,7 @@
 namespace FIFFLIB
 {
 
-class FiffFile;
+class FiffStream;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -190,12 +190,12 @@ public:
     * Read tag information of one tag from a fif file.
     * if pos is not provided, reading starts from the current file position
     *
-    * @param[in] p_pFile opened fif file
+    * @param[in] p_pStream opened fif file
     * @param[out] p_pTag the read tag info
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_tag_info(FiffFile* p_pFile, FiffTag*& p_pTag);
+    static bool read_tag_info(FiffStream* p_pStream, FiffTag*& p_pTag);
 
     //=========================================================================================================
     /**
@@ -204,13 +204,13 @@ public:
     * Read one tag from a fif file.
     * if pos is not provided, reading starts from the current file position
     *
-    * @param[in] p_pFile opened fif file
+    * @param[in] p_pStream opened fif file
     * @param[out] p_pTag the read tag
     * @param[in] pos position of the tag inside the fif file
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_tag(FiffFile* p_pFile, FiffTag*& p_pTag, qint64 pos = -1);
+    static bool read_tag(FiffStream* p_pStream, FiffTag*& p_pTag, qint64 pos = -1);
 
     //=========================================================================================================
     /**

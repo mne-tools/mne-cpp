@@ -57,7 +57,7 @@
 #include "fiff_info.h"
 #include "fiff_raw_data.h"
 #include "fiff_raw_dir.h"
-#include "fiff_file.h"
+#include "fiff_stream.h"
 #include "fiff_evoked_data_set.h"
 
 
@@ -133,16 +133,16 @@ public:
     *
     * Copies directory subtrees from fidin to fidout
     *
-    * @param[in] fidin fiff file to copy from
-    * @param[in] in_id file id description
-    * @param[out] nodes subtree directories to be copied
-    * @param[in] fidout fiff file to write to
+    * @param[in] p_pStreamIn    fiff file to copy from
+    * @param[in] in_id          file id description
+    * @param[out] nodes         subtree directories to be copied
+    * @param[in] p_pStreamOut   fiff file to write to
     *
     * @return true if succeeded, false otherwise
     */
-    static inline bool copy_tree(FiffFile* fidin, FiffId& in_id, QList<FiffDirTree*>& nodes, FiffFile* fidout)
+    static inline bool copy_tree(FiffStream* p_pStreamIn, FiffId& in_id, QList<FiffDirTree*>& nodes, FiffStream* p_pStreamOut)
     {
-        return FiffDirTree::copy_tree(fidin, in_id, nodes, fidout);
+        return FiffDirTree::copy_tree(p_pStreamIn, in_id, nodes, p_pStreamOut);
     }
 
     //=========================================================================================================
@@ -151,16 +151,16 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile end_block member function
+    * Wrapper for the FiffStream end_block member function
     *
     * Writes a FIFF_BLOCK_END tag
     *
-    * @param[in] p_pFile the opened fiff file
+    * @param[in] p_pStream the opened fiff file
     * @param[in] kind The block kind to end
     */
-    void end_block(FiffFile* p_pFile, fiff_int_t kind)
+    void end_block(FiffStream* p_pStream, fiff_int_t kind)
     {
-        p_pFile->end_block(kind);
+        p_pStream->end_block(kind);
     }
 
     //=========================================================================================================
@@ -169,15 +169,15 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile end_file member function
+    * Wrapper for the FiffStream end_file member function
     *
     * Writes the closing tags to a fif file and closes the file
     *
-    * @param[in] p_pFile the opened fiff file
+    * @param[in] p_pStream the opened fiff file
     */
-    void end_file(FiffFile* p_pFile)
+    void end_file(FiffStream* p_pStream)
     {
-        p_pFile->end_file();
+        p_pStream->end_file();
     }
 
     //=========================================================================================================
@@ -186,15 +186,15 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile finish_writing_raw member function
+    * Wrapper for the FiffStream finish_writing_raw member function
     *
     * Finishes a raw file by writing all necessary end tags.
     *
-    * @param[in] p_pFile the opened fiff file
+    * @param[in] p_pStream the opened fiff file
     */
-    void finish_writing_raw(FiffFile* p_pFile)
+    void finish_writing_raw(FiffStream* p_pStream)
     {
-        p_pFile->finish_writing_raw();
+        p_pStream->finish_writing_raw();
     }
 
     //=========================================================================================================
@@ -244,16 +244,16 @@ public:
     *
     * Wrapper for the FiffCoordTrans::make_dir_tree static function
     *
-    * @param[in] p_pFile the opened fiff file
+    * @param[in] p_pStream the opened fiff file
     * @param[in] p_pDir the dir entries of which the tree should be constructed
     * @param[out] p_pTree the created dir tree
     * @param[in] start dir entry to start (optional, by default 0)
     *
     * @return index of the last read dir entry
     */
-    static inline qint32 make_dir_tree(FiffFile* p_pFile, QList<FiffDirEntry>* p_pDir, FiffDirTree*& p_pTree, qint32 start = 0)
+    static inline qint32 make_dir_tree(FiffStream* p_pStream, QList<FiffDirEntry>* p_pDir, FiffDirTree*& p_pTree, qint32 start = 0)
     {
-        return FiffDirTree::make_dir_tree(p_pFile, p_pDir, p_pTree, start);
+        return FiffDirTree::make_dir_tree(p_pStream, p_pDir, p_pTree, start);
     }
 
     //=========================================================================================================
@@ -262,25 +262,25 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile open member function
+    * Wrapper for the FiffStream open member function
     *
     * Opens a fif file and provides the directory of tags
     *
     * @param[in] p_sFileName file name of the file to open
-    * @param[out] p_pFile file which is openened
+    * @param[out] p_pStream file which is openened
     * @param[out] p_pTree tag directory organized into a tree
     * @param[out] p_pDir the sequential tag directory
     *
     * @return true if succeeded, false otherwise
     */
-    static bool open(QString& p_sFileName, FiffFile*& p_pFile, FiffDirTree*& p_pTree, QList<FiffDirEntry>*& p_pDir)
+    static bool open(QString& p_sFileName, FiffStream*& p_pStream, FiffDirTree*& p_pTree, QList<FiffDirEntry>*& p_pDir)
     {
-        if(p_pFile)
-            delete p_pFile;
+        if(p_pStream)
+            delete p_pStream;
 
-        p_pFile = new FiffFile(p_sFileName);
+        p_pStream = new FiffStream(p_sFileName);
 
-        return p_pFile->open(p_pTree, p_pDir);
+        return p_pStream->open(p_pTree, p_pDir);
     }
 
     //=========================================================================================================
@@ -374,18 +374,18 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile read_bad_channels member function
+    * Wrapper for the FiffStream read_bad_channels member function
     *
     * Reads the bad channel list from a node if it exists
     *
-    * @param[in] p_pFile The opened fif file to read from
+    * @param[in] p_pStream The opened fif file to read from
     * @param[in] p_pTree The node of interest
     *
     * @return the bad channel list
     */
-    static inline QStringList read_bad_channels(FiffFile* p_pFile, FiffDirTree* p_pTree)
+    static inline QStringList read_bad_channels(FiffStream* p_pStream, FiffDirTree* p_pTree)
     {
-        return p_pFile->read_bad_channels(p_pTree);
+        return p_pStream->read_bad_channels(p_pTree);
     }
 
     //=========================================================================================================
@@ -394,19 +394,19 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile read_ctf_comp member function
+    * Wrapper for the FiffStream read_ctf_comp member function
     *
     * Read the CTF software compensation data from the given node
     *
-    * @param[in] p_pFile    The opened fif file to read from
+    * @param[in] p_pStream    The opened fif file to read from
     * @param[in] p_pTree    The node of interest
     * @param[in] chs        channels with the calibration info
     *
     * @return the CTF software compensation data
     */
-    static inline QList<FiffCtfComp*> read_ctf_comp(FiffFile* p_pFile, FiffDirTree* p_pTree, QList<FiffChInfo>& chs)
+    static inline QList<FiffCtfComp*> read_ctf_comp(FiffStream* p_pStream, FiffDirTree* p_pTree, QList<FiffChInfo>& chs)
     {
-        return p_pFile->read_ctf_comp(p_pTree, chs);
+        return p_pStream->read_ctf_comp(p_pTree, chs);
     }
 
     //=========================================================================================================
@@ -436,20 +436,20 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile read_meas_info member function
+    * Wrapper for the FiffStream read_meas_info member function
     *
     * Read the measurement info
     * Source is assumed to be an open fiff file.
     *
-    * @param[in] p_pFile The opened fif file to read from
+    * @param[in] p_pStream The opened fif file to read from
     * @param[in] p_pTree The node of interest
     * @param[out] info the read measurement info
     *
     * @return the to measurement corresponding fiff_dir_tree.
     */
-    static inline FiffDirTree* read_meas_info(FiffFile* p_pFile, FiffDirTree* p_pTree, FiffInfo*& info)
+    static inline FiffDirTree* read_meas_info(FiffStream* p_pStream, FiffDirTree* p_pTree, FiffInfo*& info)
     {
-        return p_pFile->read_meas_info(p_pTree, info);
+        return p_pStream->read_meas_info(p_pTree, info);
     }
 
     //=========================================================================================================
@@ -458,20 +458,20 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile read_named_matrix member function
+    * Wrapper for the FiffStream read_named_matrix member function
     *
     * Reads a named matrix.
     *
-    * @param[in] p_pFile    The opened fif file to read from
+    * @param[in] p_pStream    The opened fif file to read from
     * @param[in] node       The node of interest
     * @param[in] matkind    The matrix kind to look for
     * @param[out] mat       The named matrix
     *
     * @return true if succeeded, false otherwise
     */
-    static inline bool read_named_matrix(FiffFile* p_pFile, FiffDirTree* node, fiff_int_t matkind, FiffNamedMatrix*& mat)
+    static inline bool read_named_matrix(FiffStream* p_pStream, FiffDirTree* node, fiff_int_t matkind, FiffNamedMatrix*& mat)
     {
-        return p_pFile->read_named_matrix(node, matkind, mat);
+        return p_pStream->read_named_matrix(node, matkind, mat);
     }
 
     //=========================================================================================================
@@ -482,16 +482,16 @@ public:
     *
     * Read the SSP data under a given directory node
     *
-    * Wrapper for the FiffFile read_proj member function
+    * Wrapper for the FiffStream read_proj member function
     *
-    * @param[in] p_pFile    The opened fif file to read from
+    * @param[in] p_pStream    The opened fif file to read from
     * @param[in] node       The node of interest
     *
     * @return a list of SSP projectors
     */
-    static inline QList<FiffProj*> read_proj(FiffFile* p_pFile, FiffDirTree* p_pNode)
+    static inline QList<FiffProj*> read_proj(FiffStream* p_pStream, FiffDirTree* p_pNode)
     {
-        return p_pFile->read_proj(p_pNode);
+        return p_pStream->read_proj(p_pNode);
     }
 
     //=========================================================================================================
@@ -529,15 +529,15 @@ public:
     * Read one tag from a fif file.
     * if pos is not provided, reading starts from the current file position
     *
-    * @param[in] p_pFile opened fif file
+    * @param[in] p_pStream opened fif file
     * @param[out] p_pTag the read tag
     * @param[in] pos position of the tag inside the fif file
     *
     * @return true if succeeded, false otherwise
     */
-    inline static bool read_tag(FiffFile* p_pFile, FiffTag*& p_pTag, qint64 pos = -1)
+    inline static bool read_tag(FiffStream* p_pStream, FiffTag*& p_pTag, qint64 pos = -1)
     {
-        return FiffTag::read_tag(p_pFile, p_pTag, pos);
+        return FiffTag::read_tag(p_pStream, p_pTag, pos);
     }
 
     //=========================================================================================================
@@ -551,14 +551,14 @@ public:
     * Read tag information of one tag from a fif file.
     * if pos is not provided, reading starts from the current file position
     *
-    * @param[in] p_pFile opened fif file
+    * @param[in] p_pStream opened fif file
     * @param[out] p_pTag the read tag info
     *
     * @return true if succeeded, false otherwise
     */
-    static inline bool read_tag_info(FiffFile* p_pFile, FiffTag*& p_pTag)
+    static inline bool read_tag_info(FiffStream* p_pStream, FiffTag*& p_pTag)
     {
-        return FiffTag::read_tag_info(p_pFile, p_pTag);
+        return FiffTag::read_tag_info(p_pStream, p_pTag);
     }
 
     //=========================================================================================================
@@ -567,7 +567,7 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile::setup_read_raw static function
+    * Wrapper for the FiffStream::setup_read_raw static function
     *
     * Read information about raw data file
     *
@@ -579,7 +579,7 @@ public:
     */
     inline static bool setup_read_raw(QString& p_sFileName, FiffRawData*& data, bool allow_maxshield = false)
     {
-        return FiffFile::setup_read_raw(p_sFileName, data, allow_maxshield);
+        return FiffStream::setup_read_raw(p_sFileName, data, allow_maxshield);
     }
 
     //=========================================================================================================
@@ -588,7 +588,7 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile::split_name_list static function
+    * Wrapper for the FiffStream::split_name_list static function
     *
     * Splits a string by looking for seperator ":"
     *
@@ -598,7 +598,7 @@ public:
     */
     inline static QStringList split_name_list(QString p_sNameList)
     {
-        return FiffFile::split_name_list(p_sNameList);
+        return FiffStream::split_name_list(p_sNameList);
     }
 
     //=========================================================================================================
@@ -607,16 +607,16 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile start_block member function
+    * Wrapper for the FiffStream start_block member function
     *
     * Writes a FIFF_BLOCK_START tag
     *
-    * @param[in] p_pFile    An open fif file to write to
+    * @param[in] p_pStream    An open fif file to write to
     * @param[in] kind       The block kind to start
     */
-    inline static void start_block(FiffFile* p_pFile, fiff_int_t kind)
+    inline static void start_block(FiffStream* p_pStream, fiff_int_t kind)
     {
-        p_pFile->start_block(kind);
+        p_pStream->start_block(kind);
     }
 
     //=========================================================================================================
@@ -625,7 +625,7 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile::start_file static function
+    * Wrapper for the FiffStream::start_file static function
     *
     * Opens a fiff file for writing and writes the compulsory header tags
     *
@@ -633,9 +633,9 @@ public:
     *
     * @return The opened file.
     */
-    inline static FiffFile* start_file(QString& p_sFileName)
+    inline static FiffStream* start_file(QString& p_sFileName)
     {
-        return FiffFile::start_file(p_sFileName);
+        return FiffStream::start_file(p_sFileName);
     }
 
     //=========================================================================================================
@@ -644,7 +644,7 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile::start_writing_raw static function
+    * Wrapper for the FiffStream::start_writing_raw static function
     *
     * function [fid,cals] = fiff_start_writing_raw(name,info,sel)
     *
@@ -655,9 +655,9 @@ public:
     *
     * @return the started fiff file
     */
-    inline static FiffFile* start_writing_raw(QString& p_sFileName, FiffInfo* info, MatrixXd*& cals, MatrixXi sel = defaultFileMatrixXi)
+    inline static FiffStream* start_writing_raw(QString& p_sFileName, FiffInfo* info, MatrixXd*& cals, MatrixXi sel = defaultMatrixXi)
     {
-        return FiffFile::start_writing_raw(p_sFileName, info, cals, sel);
+        return FiffStream::start_writing_raw(p_sFileName, info, cals, sel);
     }
 
     //=========================================================================================================
@@ -666,18 +666,18 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile write_ch_info member function
+    * Wrapper for the FiffStream write_ch_info member function
     *
     * Writes a channel information record to a fif file
     * The type, cal, unit, and pos members are explained in Table 9.5
     * of the MNE manual
     *
-    * @param[in] p_pFile    An open fif file
+    * @param[in] p_pStream    An open fif file
     * @param[in] ch         The channel information structure to write
     */
-    inline static void write_ch_info(FiffFile* p_pFile, FiffChInfo* ch)
+    inline static void write_ch_info(FiffStream* p_pStream, FiffChInfo* ch)
     {
-        p_pFile->write_ch_info(ch);
+        p_pStream->write_ch_info(ch);
     }
 
     //=========================================================================================================
@@ -686,16 +686,16 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile write_coord_trans member function
+    * Wrapper for the FiffStream write_coord_trans member function
     *
     * Writes a coordinate transformation structure
     *
-    * @param[in] p_pFile    An open fif file
+    * @param[in] p_pStream    An open fif file
     * @param[in] trans      The coordinate transfomation structure
     */
-    inline static void write_coord_trans(FiffFile* p_pFile, FiffCoordTrans* trans)
+    inline static void write_coord_trans(FiffStream* p_pStream, FiffCoordTrans* trans)
     {
-        p_pFile->write_coord_trans(trans);
+        p_pStream->write_coord_trans(trans);
     }
 
     //=========================================================================================================
@@ -704,16 +704,16 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile write_ctf_comp member function
+    * Wrapper for the FiffStream write_ctf_comp member function
     *
     * Writes the CTF compensation data into a fif file
     *
-    * @param[in] p_pFile    An open fif file
+    * @param[in] p_pStream    An open fif file
     * @param[in] comps      The compensation data to write
     */
-    inline static void write_ctf_comp(FiffFile* p_pFile, QList<FiffCtfComp*>& comps)
+    inline static void write_ctf_comp(FiffStream* p_pStream, QList<FiffCtfComp*>& comps)
     {
-        p_pFile->write_ctf_comp(comps);
+        p_pStream->write_ctf_comp(comps);
     }
 
     //=========================================================================================================
@@ -722,16 +722,16 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile write_dig_point member function
+    * Wrapper for the FiffStream write_dig_point member function
     *
     * Writes a digitizer data point into a fif file
     *
-    * @param[in] p_pFile    An open fif file
+    * @param[in] p_pStream    An open fif file
     * @param[in] dig        The point to write
     */
-    inline static void write_dig_point(FiffFile* p_pFile, FiffDigPoint& dig)
+    inline static void write_dig_point(FiffStream* p_pStream, FiffDigPoint& dig)
     {
-        p_pFile->write_dig_point(dig);
+        p_pStream->write_dig_point(dig);
     }
 
     //=========================================================================================================
@@ -740,18 +740,18 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile write_id member function
+    * Wrapper for the FiffStream write_id member function
     *
     * Writes fiff id
     * If the id argument is missing it will be generated here
     *
-    * @param[in] p_pFile    An open fif file
+    * @param[in] p_pStream    An open fif file
     * @param[in] kind       The tag kind
     * @param[in] id         The id to write
     */
-    inline static void write_id(FiffFile* p_pFile, fiff_int_t kind, FiffId& id = defaultFiffId)
+    inline static void write_id(FiffStream* p_pStream, fiff_int_t kind, FiffId& id = defaultFiffId)
     {
-        p_pFile->write_id(kind, id);
+        p_pStream->write_id(kind, id);
     }
 
     //=========================================================================================================
@@ -760,18 +760,18 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile write_int member function
+    * Wrapper for the FiffStream write_int member function
     *
     * Writes a 32-bit integer tag to a fif file
     *
-    * @param[in] p_pFile    An open fif file
+    * @param[in] p_pStream    An open fif file
     * @param[in] kind       Tag kind
     * @param[in] data       The integer data pointer
     * @param[in] nel        Number of integers to write (default = 1)
     */
-    inline static void write_int(FiffFile* p_pFile, fiff_int_t kind, fiff_int_t* data, fiff_int_t nel = 1)
+    inline static void write_int(FiffStream* p_pStream, fiff_int_t kind, fiff_int_t* data, fiff_int_t nel = 1)
     {
-        p_pFile->write_int(kind, data, nel);
+        p_pStream->write_int(kind, data, nel);
     }
 
     //=========================================================================================================
@@ -780,18 +780,18 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile write_float member function
+    * Wrapper for the FiffStream write_float member function
     *
     * Writes a single-precision floating point tag to a fif file
     *
-    * @param[in] p_pFile    An open fif file
+    * @param[in] p_pStream    An open fif file
     * @param[in] kind       Tag kind
     * @param[in] data       The float data pointer
     * @param[in] nel        Number of floats to write (default = 1)
     */
-    inline static void write_float(FiffFile* p_pFile, fiff_int_t kind, float* data, fiff_int_t nel = 1)
+    inline static void write_float(FiffStream* p_pStream, fiff_int_t kind, float* data, fiff_int_t nel = 1)
     {
-        p_pFile->write_float(kind, data, nel);
+        p_pStream->write_float(kind, data, nel);
     }
 
     //=========================================================================================================
@@ -800,17 +800,17 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile write_float_matrix member function
+    * Wrapper for the FiffStream write_float_matrix member function
     *
     * Writes a single-precision floating-point matrix tag
     *
-    * @param[in] p_pFile    An open fif file
+    * @param[in] p_pStream    An open fif file
     * @param[in] kind       The tag kind
     * @param[in] mat        The data matrix
     */
-    inline static void write_float_matrix(FiffFile* p_pFile, fiff_int_t kind, MatrixXd* mat)
+    inline static void write_float_matrix(FiffStream* p_pStream, fiff_int_t kind, MatrixXd* mat)
     {
-        p_pFile->write_float_matrix(kind, mat);
+        p_pStream->write_float_matrix(kind, mat);
     }
 
     //=========================================================================================================
@@ -819,17 +819,17 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile write_name_list member function
+    * Wrapper for the FiffStream write_name_list member function
     *
     * Writes a colon-separated list of names
     *
-    * @param[in] p_pFile    An open fif file
+    * @param[in] p_pStream    An open fif file
     * @param[in] kind       The tag kind
     * @param[in] data       An array of names to create the list from
     */
-    inline static void write_name_list(FiffFile* p_pFile, fiff_int_t kind, QStringList& data)
+    inline static void write_name_list(FiffStream* p_pStream, fiff_int_t kind, QStringList& data)
     {
-        p_pFile->write_name_list(kind, data);
+        p_pStream->write_name_list(kind, data);
     }
 
     //=========================================================================================================
@@ -838,17 +838,17 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile write_named_matrix member function
+    * Wrapper for the FiffStream write_named_matrix member function
     *
     * Writes a named single-precision floating-point matrix
     *
-    * @param[in] p_pFile    An open fif file
+    * @param[in] p_pStream    An open fif file
     * @param[in] kind       The tag kind to use for the data
     * @param[in] data       The data matrix
     */
-    inline static void write_named_matrix(FiffFile* p_pFile, fiff_int_t kind,FiffNamedMatrix* mat)
+    inline static void write_named_matrix(FiffStream* p_pStream, fiff_int_t kind,FiffNamedMatrix* mat)
     {
-        p_pFile->write_named_matrix(kind, mat);
+        p_pStream->write_named_matrix(kind, mat);
     }
 
     //=========================================================================================================
@@ -857,16 +857,16 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile write_proj member function
+    * Wrapper for the FiffStream write_proj member function
     *
     * Writes the projection data into a fif file
     *
-    * @param[in] p_pFile    An open fif file
+    * @param[in] p_pStream    An open fif file
     * @param[in] projs      The compensation data to write
     */
-    inline static void write_proj(FiffFile* p_pFile, QList<FiffProj*>& projs)
+    inline static void write_proj(FiffStream* p_pStream, QList<FiffProj*>& projs)
     {
-        p_pFile->write_proj(projs);
+        p_pStream->write_proj(projs);
     }
 
     //=========================================================================================================
@@ -875,19 +875,19 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile write_raw_buffer member function
+    * Wrapper for the FiffStream write_raw_buffer member function
     *
     * Writes a raw buffer.
     *
-    * @param[in] p_pFile    An open fif file
+    * @param[in] p_pStream    An open fif file
     * @param[in] buf        the buffer to write
     * @param[in] cals       calibration factors
     *
     * @return true if succeeded, false otherwise
     */
-    inline static bool write_raw_buffer(FiffFile* p_pFile, MatrixXd* buf, MatrixXd* cals)
+    inline static bool write_raw_buffer(FiffStream* p_pStream, MatrixXd* buf, MatrixXd* cals)
     {
-        return p_pFile->write_raw_buffer(buf, cals);
+        return p_pStream->write_raw_buffer(buf, cals);
     }
 
     //=========================================================================================================
@@ -896,17 +896,17 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffFile write_string member function
+    * Wrapper for the FiffStream write_string member function
     *
     * Writes a string tag
     *
-    * @param[in] p_pFile    An open fif file
+    * @param[in] p_pStream    An open fif file
     * @param[in] kind       The tag kind
     * @param[in] data       The string data to write
     */
-    inline static void write_string(FiffFile* p_pFile, fiff_int_t kind, QString& data)
+    inline static void write_string(FiffStream* p_pStream, fiff_int_t kind, QString& data)
     {
-        p_pFile->write_string(kind, data);
+        p_pStream->write_string(kind, data);
     }
 
 };

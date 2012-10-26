@@ -482,7 +482,7 @@ namespace FIFFLIB
                                 //FIFFB_MNE_FORWARD_SOLUTION   FIFFV_COORD_HEAD
                                 //FIFFB_MNE_INVERSE_SOLUTION   FIFFV_COORD_HEAD
 #define FIFF_MNE_CH_NAME_LIST           3507
-#define FIFF_MNE_FILE_NAME              3508    /**< This removes the collision with fiff_file.h (used to be 3501)*/
+#define FIFF_MNE_FILE_NAME              3508    /**< This removes the collision with fiff_stream.h (used to be 3501)*/
     //
     // 3510... 3590... Source space or surface
     //

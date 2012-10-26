@@ -1,7 +1,7 @@
 
 //=============================================================================================================
 /**
-* @file     fiff_file.cpp
+* @file     fiff_stream.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the FiffFile Class.
+* @brief    Contains the implementation of the FiffStream Class.
 *
 */
 
@@ -40,7 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "fiff_file.h"
+#include "fiff_stream.h"
 #include "fiff_tag.h"
 #include "fiff_dir_tree.h"
 
@@ -58,7 +58,7 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FiffFile::FiffFile(QString& p_sFilename)
+FiffStream::FiffStream(QString& p_sFilename)
 : QFile(p_sFilename)
 {
 
@@ -67,7 +67,7 @@ FiffFile::FiffFile(QString& p_sFilename)
 
 //*************************************************************************************************************
 
-FiffFile::~FiffFile()
+FiffStream::~FiffStream()
 {
     if(this->isOpen())
     {
@@ -79,7 +79,7 @@ FiffFile::~FiffFile()
 
 //*************************************************************************************************************
 
-void FiffFile::end_block(fiff_int_t kind)
+void FiffStream::end_block(fiff_int_t kind)
 {
     this->write_int(FIFF_BLOCK_END,&kind);
 }
@@ -87,7 +87,7 @@ void FiffFile::end_block(fiff_int_t kind)
 
 //*************************************************************************************************************
 
-void FiffFile::end_file()
+void FiffStream::end_file()
 {
     fiff_int_t datasize = 0;
 
@@ -103,7 +103,7 @@ void FiffFile::end_file()
 
 //*************************************************************************************************************
 
-void FiffFile::finish_writing_raw()
+void FiffStream::finish_writing_raw()
 {
     this->end_block(FIFFB_RAW_DATA);
     this->end_block(FIFFB_MEAS);
@@ -113,7 +113,7 @@ void FiffFile::finish_writing_raw()
 
 //*************************************************************************************************************
 
-bool FiffFile::open(FiffDirTree*& p_pTree, QList<FiffDirEntry>*& p_pDir)
+bool FiffStream::open(FiffDirTree*& p_pTree, QList<FiffDirEntry>*& p_pDir)
 {
 
     if (!this->open(QIODevice::ReadOnly))
@@ -200,7 +200,7 @@ bool FiffFile::open(FiffDirTree*& p_pTree, QList<FiffDirEntry>*& p_pDir)
 
 //*************************************************************************************************************
 
-QStringList FiffFile::read_bad_channels(FiffDirTree* p_pTree)
+QStringList FiffStream::read_bad_channels(FiffDirTree* p_pTree)
 {
     QList<FiffDirTree*> node = p_pTree->dir_tree_find(FIFFB_MNE_BAD_CHANNELS);
     FIFFLIB::FiffTag* t_pTag = NULL;
@@ -217,7 +217,7 @@ QStringList FiffFile::read_bad_channels(FiffDirTree* p_pTree)
 
 //*************************************************************************************************************
 
-bool FiffFile::read_cov(FiffDirTree* node, fiff_int_t cov_kind, FiffCov*& p_covData)
+bool FiffStream::read_cov(FiffDirTree* node, fiff_int_t cov_kind, FiffCov*& p_covData)
 {
     if(p_covData)
         delete p_covData;
@@ -269,7 +269,7 @@ bool FiffFile::read_cov(FiffDirTree* node, fiff_int_t cov_kind, FiffCov*& p_covD
 
             if (current->find_tag(this, FIFF_MNE_ROW_NAMES, tag))
             {
-                names = FiffFile::split_name_list(tag->toString());
+                names = FiffStream::split_name_list(tag->toString());
                 if (names.size() != dim)
                 {
                     printf("Number of names does not match covariance matrix dimension\n");
@@ -415,7 +415,7 @@ bool FiffFile::read_cov(FiffDirTree* node, fiff_int_t cov_kind, FiffCov*& p_covD
 
 //*************************************************************************************************************
 
-QList<FiffCtfComp*> FiffFile::read_ctf_comp(FiffDirTree* p_pNode, QList<FiffChInfo>& chs)
+QList<FiffCtfComp*> FiffStream::read_ctf_comp(FiffDirTree* p_pNode, QList<FiffChInfo>& chs)
 {
     QList<FiffCtfComp*> compdata;
     QList<FiffDirTree*> t_qListComps = p_pNode->dir_tree_find(FIFFB_MNE_CTF_COMP_DATA);
@@ -574,7 +574,7 @@ QList<FiffCtfComp*> FiffFile::read_ctf_comp(FiffDirTree* p_pNode, QList<FiffChIn
 
 //*************************************************************************************************************
 
-FiffDirTree* FiffFile::read_meas_info(FiffDirTree* p_pTree, FiffInfo*& info)
+FiffDirTree* FiffStream::read_meas_info(FiffDirTree* p_pTree, FiffInfo*& info)
 {
     if (info)
         delete info;
@@ -899,7 +899,7 @@ FiffDirTree* FiffFile::read_meas_info(FiffDirTree* p_pTree, FiffInfo*& info)
 
 //*************************************************************************************************************
 
-bool FiffFile::read_named_matrix(FiffDirTree* p_pTree, fiff_int_t matkind, FiffNamedMatrix*& mat)
+bool FiffStream::read_named_matrix(FiffDirTree* p_pTree, fiff_int_t matkind, FiffNamedMatrix*& mat)
 {
     if (mat != NULL)
         delete mat;
@@ -994,7 +994,7 @@ bool FiffFile::read_named_matrix(FiffDirTree* p_pTree, fiff_int_t matkind, FiffN
 
 //*************************************************************************************************************
 
-QList<FiffProj*> FiffFile::read_proj(FiffDirTree* p_pNode)
+QList<FiffProj*> FiffStream::read_proj(FiffDirTree* p_pNode)
 {
     QList<FiffProj*> projdata;// = struct('kind',{},'active',{},'desc',{},'data',{});
     //
@@ -1150,7 +1150,7 @@ QList<FiffProj*> FiffFile::read_proj(FiffDirTree* p_pNode)
 
 //*************************************************************************************************************
 
-bool FiffFile::setup_read_raw(QString& p_sFileName, FiffRawData*& data, bool allow_maxshield)
+bool FiffStream::setup_read_raw(QString& p_sFileName, FiffRawData*& data, bool allow_maxshield)
 {
     if(data)
         delete data;
@@ -1161,14 +1161,14 @@ bool FiffFile::setup_read_raw(QString& p_sFileName, FiffRawData*& data, bool all
     //
     printf("Opening raw data file %s...\n",p_sFileName.toUtf8().constData());
 
-    FiffFile* p_pFile = new FiffFile(p_sFileName);
+    FiffStream* p_pStream = new FiffStream(p_sFileName);
     FiffDirTree* t_pTree = NULL;
     QList<FiffDirEntry>* t_pDir = NULL;
 
-    if(!p_pFile->open(t_pTree, t_pDir))
+    if(!p_pStream->open(t_pTree, t_pDir))
     {
-        if(p_pFile)
-            delete p_pFile;
+        if(p_pStream)
+            delete p_pStream;
         if(t_pTree)
             delete t_pTree;
         if(t_pDir)
@@ -1182,7 +1182,7 @@ bool FiffFile::setup_read_raw(QString& p_sFileName, FiffRawData*& data, bool all
     //
 //        [ info, meas ] = fiff_read_meas_info(fid,tree);
     FiffInfo* info = NULL;
-    FiffDirTree* meas = p_pFile->read_meas_info(t_pTree, info);
+    FiffDirTree* meas = p_pStream->read_meas_info(t_pTree, info);
 
     if (!meas)
         return false; //ToDo garbage collecting
@@ -1203,8 +1203,8 @@ bool FiffFile::setup_read_raw(QString& p_sFileName, FiffRawData*& data, bool all
             if (raw.size() == 0)
             {
                 printf("No raw data in %s\n", p_sFileName.toUtf8().constData());
-                if(p_pFile)
-                    delete p_pFile;
+                if(p_pStream)
+                    delete p_pStream;
                 if(t_pTree)
                     delete t_pTree;
                 if(t_pDir)
@@ -1218,8 +1218,8 @@ bool FiffFile::setup_read_raw(QString& p_sFileName, FiffRawData*& data, bool all
             if (raw.size() == 0)
             {
                 printf("No raw data in %s\n", p_sFileName.toUtf8().constData());
-                if(p_pFile)
-                    delete p_pFile;
+                if(p_pStream)
+                    delete p_pStream;
                 if(t_pTree)
                     delete t_pTree;
                 if(t_pDir)
@@ -1236,7 +1236,7 @@ bool FiffFile::setup_read_raw(QString& p_sFileName, FiffRawData*& data, bool all
     info->filename   = p_sFileName;
 
     data = new FiffRawData();
-    data->file = p_pFile;// fid;
+    data->file = p_pStream;// fid;
     data->info       = info;
     data->first_samp = 0;
     data->last_samp  = 0;
@@ -1255,7 +1255,7 @@ bool FiffFile::setup_read_raw(QString& p_sFileName, FiffRawData*& data, bool all
     FiffTag* t_pTag = NULL;
     if (dir.at(first).kind == FIFF_FIRST_SAMPLE)
     {
-        FiffTag::read_tag(p_pFile, t_pTag, dir.at(first).pos);
+        FiffTag::read_tag(p_pStream, t_pTag, dir.at(first).pos);
         first_samp = *t_pTag->toInt();
         ++first;
     }
@@ -1267,7 +1267,7 @@ bool FiffFile::setup_read_raw(QString& p_sFileName, FiffRawData*& data, bool all
         //
         //  This first skip can be applied only after we know the buffer size
         //
-        FiffTag::read_tag(p_pFile, t_pTag, dir.at(first).pos);
+        FiffTag::read_tag(p_pStream, t_pTag, dir.at(first).pos);
         first_skip = *t_pTag->toInt();
         ++first;
     }
@@ -1285,7 +1285,7 @@ bool FiffFile::setup_read_raw(QString& p_sFileName, FiffRawData*& data, bool all
         FiffDirEntry ent = dir.at(k);
         if (ent.kind == FIFF_DATA_SKIP)
         {
-            FiffTag::read_tag(p_pFile, t_pTag, ent.pos);
+            FiffTag::read_tag(p_pStream, t_pTag, ent.pos);
             nskip = *t_pTag->toInt();
         }
         else if(ent.kind == FIFF_DATA_BUFFER)
@@ -1379,14 +1379,14 @@ bool FiffFile::setup_read_raw(QString& p_sFileName, FiffRawData*& data, bool all
 
 //*************************************************************************************************************
 
-QStringList FiffFile::split_name_list(QString p_sNameList)
+QStringList FiffStream::split_name_list(QString p_sNameList)
 {
     return p_sNameList.split(":");
 }
 
 //*************************************************************************************************************
 
-void FiffFile::start_block(fiff_int_t kind)
+void FiffStream::start_block(fiff_int_t kind)
 {
     this->write_int(FIFF_BLOCK_START,&kind);
 }
@@ -1394,34 +1394,34 @@ void FiffFile::start_block(fiff_int_t kind)
 
 //*************************************************************************************************************
 
-FiffFile* FiffFile::start_file(QString& p_sFilename)
+FiffStream* FiffStream::start_file(QString& p_sFilename)
 {
-    FiffFile* p_pFile = new FiffFile(p_sFilename);
+    FiffStream* p_pStream = new FiffStream(p_sFilename);
 
-    if(!p_pFile->open(QIODevice::WriteOnly))
+    if(!p_pStream->open(QIODevice::WriteOnly))
     {
-        printf("Cannot write to %s\n", p_pFile->fileName().toUtf8().constData());//consider throw
-        delete p_pFile;
+        printf("Cannot write to %s\n", p_pStream->fileName().toUtf8().constData());//consider throw
+        delete p_pStream;
         return NULL;
     }
 
     //
     //   Write the compulsory items
     //
-    p_pFile->write_id(FIFF_FILE_ID);//1
+    p_pStream->write_id(FIFF_FILE_ID);//1
     qint32 data = -1;
-    p_pFile->write_int(FIFF_DIR_POINTER,&data);//2
-    p_pFile->write_int(FIFF_FREE_LIST,&data);//3
+    p_pStream->write_int(FIFF_DIR_POINTER,&data);//2
+    p_pStream->write_int(FIFF_FREE_LIST,&data);//3
     //
     //   Ready for more
     //
-    return p_pFile;
+    return p_pStream;
 }
 
 
 //*************************************************************************************************************
 
-FiffFile* FiffFile::start_writing_raw(QString& p_sFileName, FiffInfo* info, MatrixXd*& cals, MatrixXi sel)
+FiffStream* FiffStream::start_writing_raw(QString& p_sFileName, FiffInfo* info, MatrixXd*& cals, MatrixXi sel)
 {
     //
     //   We will always write floats
@@ -1446,7 +1446,7 @@ FiffFile* FiffFile::start_writing_raw(QString& p_sFileName, FiffInfo* info, Matr
     //  Create the file and save the essentials
     //
 
-    FiffFile* t_pFile = start_file(p_sFileName);//1, 2, 3
+    FiffStream* t_pFile = start_file(p_sFileName);//1, 2, 3
     t_pFile->start_block(FIFFB_MEAS);//4
     t_pFile->write_id(FIFF_BLOCK_ID);//5
     if(info->meas_id.version != -1)
@@ -1467,7 +1467,7 @@ FiffFile* FiffFile::start_writing_raw(QString& p_sFileName, FiffInfo* info, Matr
     bool have_isotrak    = false;
     if (blocks.size() > 0 && !info->filename.isEmpty())
     {
-        FiffFile* t_pFile2 = new FiffFile(info->filename);
+        FiffStream* t_pFile2 = new FiffStream(info->filename);
 
         FiffDirTree* t_pTree = NULL;
         QList<FiffDirEntry>* t_pDir = NULL;
@@ -1583,7 +1583,7 @@ FiffFile* FiffFile::start_writing_raw(QString& p_sFileName, FiffInfo* info, Matr
 
 //*************************************************************************************************************
 
-void FiffFile::write_ch_info(FiffChInfo* ch)
+void FiffStream::write_ch_info(FiffChInfo* ch)
 {
     //typedef struct _fiffChPosRec {
     //  fiff_int_t   coil_type;          /*!< What kind of coil. */
@@ -1674,7 +1674,7 @@ void FiffFile::write_ch_info(FiffChInfo* ch)
 
 //*************************************************************************************************************
 
-void FiffFile::write_coord_trans(FiffCoordTrans* trans)
+void FiffStream::write_coord_trans(FiffCoordTrans* trans)
 {
     //?typedef struct _fiffCoordTransRec {
     //  fiff_int_t   from;                   /*!< Source coordinate system. */
@@ -1724,7 +1724,7 @@ void FiffFile::write_coord_trans(FiffCoordTrans* trans)
 
 //*************************************************************************************************************
 
-void FiffFile::write_ctf_comp(QList<FiffCtfComp*>& comps)
+void FiffStream::write_ctf_comp(QList<FiffCtfComp*>& comps)
 {
     if (comps.size() <= 0)
         return;
@@ -1759,7 +1759,7 @@ void FiffFile::write_ctf_comp(QList<FiffCtfComp*>& comps)
 
 //*************************************************************************************************************
 
-void FiffFile::write_dig_point(FiffDigPoint& dig)
+void FiffStream::write_dig_point(FiffDigPoint& dig)
 {
     //?typedef struct _fiffDigPointRec {
     //  fiff_int_t kind;               /*!< FIFF_POINT_CARDINAL,
@@ -1791,7 +1791,7 @@ void FiffFile::write_dig_point(FiffDigPoint& dig)
 
 //*************************************************************************************************************
 
-void FiffFile::write_float(fiff_int_t kind, float* data, fiff_int_t nel)
+void FiffStream::write_float(fiff_int_t kind, float* data, fiff_int_t nel)
 {
     qint32 datasize = nel * 4;
 
@@ -1814,7 +1814,7 @@ void FiffFile::write_float(fiff_int_t kind, float* data, fiff_int_t nel)
 
 //*************************************************************************************************************
 
-void FiffFile::write_float_matrix(fiff_int_t kind, const MatrixXd* mat)
+void FiffStream::write_float_matrix(fiff_int_t kind, const MatrixXd* mat)
 {
     qint32 FIFFT_MATRIX = 1 << 30;
     qint32 FIFFT_MATRIX_FLOAT = FIFFT_FLOAT | FIFFT_MATRIX;
@@ -1853,7 +1853,7 @@ void FiffFile::write_float_matrix(fiff_int_t kind, const MatrixXd* mat)
 
 //*************************************************************************************************************
 
-void FiffFile::write_id(fiff_int_t kind, FiffId& id)
+void FiffStream::write_id(fiff_int_t kind, FiffId& id)
 {
     if(id.version == -1)
     {
@@ -1901,7 +1901,7 @@ void FiffFile::write_id(fiff_int_t kind, FiffId& id)
 
 //*************************************************************************************************************
 
-void FiffFile::write_int(fiff_int_t kind, fiff_int_t* data, fiff_int_t nel)
+void FiffStream::write_int(fiff_int_t kind, fiff_int_t* data, fiff_int_t nel)
 {
     fiff_int_t datasize = nel * 4;
 
@@ -1920,7 +1920,7 @@ void FiffFile::write_int(fiff_int_t kind, fiff_int_t* data, fiff_int_t nel)
 
 //*************************************************************************************************************
 
-void FiffFile::write_name_list(fiff_int_t kind,QStringList& data)
+void FiffStream::write_name_list(fiff_int_t kind,QStringList& data)
 {
     QString all = data.join(":");
     this->write_string(kind,all);
@@ -1929,7 +1929,7 @@ void FiffFile::write_name_list(fiff_int_t kind,QStringList& data)
 
 //*************************************************************************************************************
 
-void FiffFile::write_named_matrix(fiff_int_t kind,FiffNamedMatrix* mat)
+void FiffStream::write_named_matrix(fiff_int_t kind,FiffNamedMatrix* mat)
 {
     this->start_block(FIFFB_MNE_NAMED_MATRIX);
     this->write_int(FIFF_MNE_NROW, &mat->nrow);
@@ -1945,7 +1945,7 @@ void FiffFile::write_named_matrix(fiff_int_t kind,FiffNamedMatrix* mat)
 
 //*************************************************************************************************************
 
-void FiffFile::write_proj(QList<FiffProj*>& projs)
+void FiffStream::write_proj(QList<FiffProj*>& projs)
 {
     if (projs.size() <= 0)
         return;
@@ -1977,7 +1977,7 @@ void FiffFile::write_proj(QList<FiffProj*>& projs)
 
 //*************************************************************************************************************
 
-bool FiffFile::write_raw_buffer(MatrixXd* buf, MatrixXd* cals)
+bool FiffStream::write_raw_buffer(MatrixXd* buf, MatrixXd* cals)
 {
     if (buf->rows() != cals->cols())
     {
@@ -1998,7 +1998,7 @@ bool FiffFile::write_raw_buffer(MatrixXd* buf, MatrixXd* cals)
 
 //*************************************************************************************************************
 
-void FiffFile::write_string(fiff_int_t kind, QString& data)
+void FiffStream::write_string(fiff_int_t kind, QString& data)
 {
     fiff_int_t datasize = data.size();//size(data,2);
 
