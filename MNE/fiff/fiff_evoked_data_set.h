@@ -141,7 +141,7 @@ public:
     *
     * Read one evoked data set
     *
-    * @param[in] p_pIODevice    An fiff IO device like a fiff QFile or QTcpSocket
+    * @param[in] p_pIODevice    An fiff IO device like a fiff QFile or QTCPSocket
     * @param[out] data          The read evoked data
     * @param[in] setno          the set to pick
     *

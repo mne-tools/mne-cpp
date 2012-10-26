@@ -30,19 +30,7 @@ else {
     LIBS += -lfiff
 }
 
-
-DESTDIR = $${PWD}/../../../lib
-
-#
-# copy plugins to right subdirectory
-#
-FILE = $${DESTDIR}/$${TARGET}.dll
-PLUGINDIR = $${DESTDIR}/../bin/mne_rt_server_plugins
-win32 {
-    FILE ~= s,/,\\,g
-    PLUGINDIR ~= s,/,\\,g
-}
-QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${PLUGINDIR}) $$escape_expand(\\n\\t)
+DESTDIR = $${PWD}/../../../bin/mne_rt_server_plugins
 
 SOURCES += fiffsimulator.cpp \
     fiffproducer.cpp

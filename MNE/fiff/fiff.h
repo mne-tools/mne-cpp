@@ -266,7 +266,7 @@ public:
     *
     * Opens a fif file and provides the directory of tags
     *
-    * @param[in] p_sIODevice    A fiff IO device like a fiff QFile or QTcpSocket
+    * @param[in] p_sIODevice    A fiff IO device like a fiff QFile or QTCPSocket
     * @param[out] p_pStream     file which is openened
     * @param[out] p_pTree       tag directory organized into a tree
     * @param[out] p_pDir        the sequential tag directory
@@ -419,7 +419,7 @@ public:
     *
     * Read one evoked data set
     *
-    * @param[in] p_pIODevice    An fiff IO device like a fiff QFile or QTcpSocket
+    * @param[in] p_pIODevice    A fiff IO device like a fiff QFile or QTCPSocket
     * @param[out] data          The read evoked data
     * @param[in] setno          the set to pick
     *
@@ -571,7 +571,7 @@ public:
     *
     * Read information about raw data file
     *
-    * @param[in] p_pIODevice        A fiff IO device like a fiff QFile or QTcpSocket
+    * @param[in] p_pIODevice        A fiff IO device like a fiff QFile or QTCPSocket
     * @param[out] data              The raw data information - contains the opened fiff file
     * @param[in] allow_maxshield    Accept unprocessed MaxShield data
     *
@@ -629,7 +629,7 @@ public:
     *
     * Opens a fiff file for writing and writes the compulsory header tags
     *
-    * @param[in] p_pIODevice   A fiff IO device like a fiff QFile or QTcpSocket
+    * @param[in] p_pIODevice   A fiff IO device like a fiff QFile or QTCPSocket
     *
     * @return The opened file.
     */
@@ -648,7 +648,7 @@ public:
     *
     * function [fid,cals] = fiff_start_writing_raw(name,info,sel)
     *
-    * @param[in] p_pIODevice    A fiff IO device like a fiff QFile or QTcpSocket
+    * @param[in] p_pIODevice    A fiff IO device like a fiff QFile or QTCPSocket
     * @param[in] info           The measurement info block of the source file
     * @param[out] cals          Thecalibration matrix
     * @param[in] sel            Which channels will be included in the output file (optional)
