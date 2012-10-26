@@ -358,7 +358,7 @@ public:
     *
     * Reads the inverse operator decomposition from a fif file
     *
-    * @param [in] p_pIODevice   A fiff IO device like a fiff QFile or QTcpSocket
+    * @param [in] p_pIODevice   A fiff IO device like a fiff QFile or QTCPSocket
     * @param [out] inv          The read inverse operator
     *
     * @return true if succeeded, false otherwise
@@ -378,7 +378,7 @@ public:
     *
     * Reads a forward solution from a fif file
     *
-    * @param [in] p_pIODevice   A fiff IO device like a fiff QFile or QTcpSocket
+    * @param [in] p_pIODevice   A fiff IO device like a fiff QFile or QTCPSocket
     * @param [out] fwd A forward solution from a fif file
     * @param [in] force_fixed   Force fixed source orientation mode? (optional)
     * @param [in] surf_ori      Use surface based source coordinate system? (optional)

@@ -121,7 +121,7 @@ public:
     /**
     * ctor
     *
-    * @param[in] p_pIODevice    A fiff IO device like a fiff QFile or QTcpSocket
+    * @param[in] p_pIODevice    A fiff IO device like a fiff QFile or QTCPSocket
     */
     FiffStream(QIODevice* p_pIODevice);
 
@@ -285,7 +285,7 @@ public:
     *
     * Read information about raw data file
     *
-    * @param[in] p_pIODevice        An fiff IO device like a fiff QFile or QTcpSocket
+    * @param[in] p_pIODevice        An fiff IO device like a fiff QFile or QTCPSocket
     * @param[out] data              The raw data information - contains the opened fiff file
     * @param[in] allow_maxshield    Accept unprocessed MaxShield data
     *
@@ -343,7 +343,7 @@ public:
     *
     * function [fid,cals] = fiff_start_writing_raw(name,info,sel)
     *
-    * @param[in] p_pIODevice    A fiff IO device like a fiff QFile or QTcpSocket
+    * @param[in] p_pIODevice    A fiff IO device like a fiff QFile or QTCPSocket
     * @param[in] info           The measurement info block of the source file
     * @param[out] cals          Thecalibration matrix
     * @param[in] sel            Which channels will be included in the output file (optional)

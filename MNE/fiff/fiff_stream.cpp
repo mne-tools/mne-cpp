@@ -80,8 +80,7 @@ FiffStream::~FiffStream()
 {
     if(this->device()->isOpen())
     {
-//        printf("Closing file %s.\n", this->fileName().toUtf8().constData());
-        printf("Closing FiffStream IODevice.\n");
+        printf("Closing FiffStream %s.\n", this->streamName().toUtf8().constData());
         this->device()->close();
     }
 }
