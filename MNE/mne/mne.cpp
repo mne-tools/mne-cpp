@@ -65,12 +65,12 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-bool MNE::read_events(QString& p_sFileName, MatrixXi& eventlist)
+bool MNE::read_events(QIODevice* p_pIODevice, MatrixXi& eventlist)
 {
     //
     // Open file
     //
-    FiffStream* t_pFile = new FiffStream(p_sFileName);
+    FiffStream* t_pFile = new FiffStream(p_pIODevice);
     FiffDirTree* t_pTree = NULL;
     QList<FiffDirEntry>* t_pDir = NULL;
 

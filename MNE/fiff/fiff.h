@@ -266,19 +266,19 @@ public:
     *
     * Opens a fif file and provides the directory of tags
     *
-    * @param[in] p_sFileName file name of the file to open
-    * @param[out] p_pStream file which is openened
-    * @param[out] p_pTree tag directory organized into a tree
-    * @param[out] p_pDir the sequential tag directory
+    * @param[in] p_sIODevice    A fiff IO device like a fiff QFile or QTcpSocket
+    * @param[out] p_pStream     file which is openened
+    * @param[out] p_pTree       tag directory organized into a tree
+    * @param[out] p_pDir        the sequential tag directory
     *
     * @return true if succeeded, false otherwise
     */
-    static bool open(QString& p_sFileName, FiffStream*& p_pStream, FiffDirTree*& p_pTree, QList<FiffDirEntry>*& p_pDir)
+    static bool open(QIODevice* p_pIODevice, FiffStream*& p_pStream, FiffDirTree*& p_pTree, QList<FiffDirEntry>*& p_pDir)
     {
         if(p_pStream)
             delete p_pStream;
 
-        p_pStream = new FiffStream(p_sFileName);
+        p_pStream = new FiffStream(p_pIODevice);
 
         return p_pStream->open(p_pTree, p_pDir);
     }
@@ -419,15 +419,15 @@ public:
     *
     * Read one evoked data set
     *
-    * @param[in] p_sFileName    The name of the file to read from
+    * @param[in] p_pIODevice    An fiff IO device like a fiff QFile or QTcpSocket
     * @param[out] data          The read evoked data
     * @param[in] setno          the set to pick
     *
     * @return the CTF software compensation data
     */
-    static inline bool read_evoked(QString& p_sFileName, FiffEvokedDataSet*& data, fiff_int_t setno = 0)
+    static inline bool read_evoked(QIODevice* p_pIODevice, FiffEvokedDataSet*& data, fiff_int_t setno = 0)
     {
-        return FiffEvokedDataSet::read_evoked(p_sFileName, data, setno);
+        return FiffEvokedDataSet::read_evoked(p_pIODevice, data, setno);
     }
 
     //=========================================================================================================
@@ -571,15 +571,15 @@ public:
     *
     * Read information about raw data file
     *
-    * @param[in] t_sFileName        Name of the file to read
+    * @param[in] p_pIODevice        A fiff IO device like a fiff QFile or QTcpSocket
     * @param[out] data              The raw data information - contains the opened fiff file
     * @param[in] allow_maxshield    Accept unprocessed MaxShield data
     *
     * @return true if succeeded, false otherwise
     */
-    inline static bool setup_read_raw(QString& p_sFileName, FiffRawData*& data, bool allow_maxshield = false)
+    inline static bool setup_read_raw(QIODevice* p_pIODevice, FiffRawData*& data, bool allow_maxshield = false)
     {
-        return FiffStream::setup_read_raw(p_sFileName, data, allow_maxshield);
+        return FiffStream::setup_read_raw(p_pIODevice, data, allow_maxshield);
     }
 
     //=========================================================================================================
@@ -629,13 +629,13 @@ public:
     *
     * Opens a fiff file for writing and writes the compulsory header tags
     *
-    * @param[in] name   The name of the file to open. It is recommended that the name ends with .fif
+    * @param[in] p_pIODevice   A fiff IO device like a fiff QFile or QTcpSocket
     *
     * @return The opened file.
     */
-    inline static FiffStream* start_file(QString& p_sFileName)
+    inline static FiffStream* start_file(QIODevice* p_pIODevice)
     {
-        return FiffStream::start_file(p_sFileName);
+        return FiffStream::start_file(p_pIODevice);
     }
 
     //=========================================================================================================
@@ -648,16 +648,16 @@ public:
     *
     * function [fid,cals] = fiff_start_writing_raw(name,info,sel)
     *
-    * @param[in] p_sFileName    filename
+    * @param[in] p_pIODevice    A fiff IO device like a fiff QFile or QTcpSocket
     * @param[in] info           The measurement info block of the source file
     * @param[out] cals          Thecalibration matrix
     * @param[in] sel            Which channels will be included in the output file (optional)
     *
     * @return the started fiff file
     */
-    inline static FiffStream* start_writing_raw(QString& p_sFileName, FiffInfo* info, MatrixXd*& cals, MatrixXi sel = defaultMatrixXi)
+    inline static FiffStream* start_writing_raw(QIODevice* p_pIODevice, FiffInfo* info, MatrixXd*& cals, MatrixXi sel = defaultMatrixXi)
     {
-        return FiffStream::start_writing_raw(p_sFileName, info, cals, sel);
+        return FiffStream::start_writing_raw(p_pIODevice, info, cals, sel);
     }
 
     //=========================================================================================================

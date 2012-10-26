@@ -109,7 +109,7 @@ FiffTag::~FiffTag()
 
 bool FiffTag::read_tag_info(FiffStream* p_pStream, FiffTag*& p_pTag)
 {
-    QDataStream t_DataStream(p_pStream);
+//    QDataStream t_DataStream(p_pStream);
 
     if (p_pTag != NULL)
         delete p_pTag;
@@ -123,22 +123,22 @@ bool FiffTag::read_tag_info(FiffStream* p_pStream, FiffTag*& p_pTag)
 //    p_pTag->next = Fiff::swap_int(p_pTag->next);
 
     //Option 2
-    t_DataStream >> p_pTag->kind;
-    t_DataStream >> p_pTag->type;
+    *p_pStream  >> p_pTag->kind;
+    *p_pStream  >> p_pTag->type;
     qint32 size;
-    t_DataStream >> size;
+    *p_pStream  >> size;
     p_pTag->resize(size);
-    t_DataStream >> p_pTag->next;
+    *p_pStream  >> p_pTag->next;
 
 //    qDebug() << "read_tag_info" << "  Kind:" << p_pTag->kind << "  Type:" << p_pTag->type << "  Size:" << p_pTag->size() << "  Next:" << p_pTag->next;
 
     if (p_pTag->next == FIFFV_NEXT_SEQ)
     {
-        p_pStream->seek(p_pStream->pos()+p_pTag->size()); //fseek(fid,tag.size,'cof');
+        p_pStream->device()->seek(p_pStream->device()->pos()+p_pTag->size()); //fseek(fid,tag.size,'cof');
     }
     else if (p_pTag->next > 0)
     {
-        p_pStream->seek(p_pTag->next); //fseek(fid,tag.next,'bof');
+        p_pStream->device()->seek(p_pTag->next); //fseek(fid,tag.next,'bof');
     }
 
     return true;
@@ -151,11 +151,11 @@ bool FiffTag::read_tag(FiffStream* p_pStream, FiffTag*& p_pTag, qint64 pos)
 {
     if (pos >= 0)
     {
-        p_pStream->seek(pos);
+        p_pStream->device()->seek(pos);
     }
 
-    QDataStream t_DataStream(p_pStream);
-    t_DataStream.setByteOrder(QDataStream::BigEndian);
+//    QDataStream t_DataStream(p_pStream);
+    p_pStream->setByteOrder(QDataStream::BigEndian);
 
     if (p_pTag != NULL)
         delete p_pTag;
@@ -164,12 +164,12 @@ bool FiffTag::read_tag(FiffStream* p_pStream, FiffTag*& p_pTag, qint64 pos)
     //
     // Read fiff tag header from stream
     //
-    t_DataStream >> p_pTag->kind;
-    t_DataStream >> p_pTag->type;
+    *p_pStream  >> p_pTag->kind;
+    *p_pStream  >> p_pTag->type;
     qint32 size;
-    t_DataStream >> size;
+    *p_pStream  >> size;
     p_pTag->resize(size);
-    t_DataStream >> p_pTag->next;
+    *p_pStream  >> p_pTag->next;
 
 //    qDebug() << "read_tag" << "  Kind:" << p_pTag->kind << "  Type:" << p_pTag->type << "  Size:" << p_pTag->size() << "  Next:" << p_pTag->next;
 
@@ -178,12 +178,12 @@ bool FiffTag::read_tag(FiffStream* p_pStream, FiffTag*& p_pTag, qint64 pos)
     //
     if (p_pTag->size() > 0)
     {
-        t_DataStream.readRawData(p_pTag->data(), p_pTag->size());
+        p_pStream->readRawData(p_pTag->data(), p_pTag->size());
         FiffTag::convert_tag_data(p_pTag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
     }
 
     if (p_pTag->next != FIFFV_NEXT_SEQ)
-        p_pStream->seek(p_pTag->next);//fseek(fid,tag.next,'bof');
+        p_pStream->device()->seek(p_pTag->next);//fseek(fid,tag.next,'bof');
 
     return true;
 }

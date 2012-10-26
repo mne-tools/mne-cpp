@@ -97,9 +97,11 @@ int main(int argc, char *argv[])
 //  lambda2     - The regularization factor
 //  dSPM        - do dSPM?
 //  sLORETA     - do sLORETA?
-    QString t_sFileEvoked = "../../mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis-ave.fif";
+    QString t_sFileEvokedName = "../../mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis-ave.fif";
+    QFile* t_pFileEvoked = new QFile(t_sFileEvokedName);
     qint32 setno = 0;
-    QString t_sFileInv = "../../mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif";
+    QString t_sFileInvName = "../../mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif";
+    QFile* t_pFileInv = new QFile(t_sFileInvName);
     qint32 nave = 40;
     float snr = 3.0f;
     float lambda2 = pow(1.0f / snr, 2.0f);
@@ -111,13 +113,13 @@ int main(int argc, char *argv[])
     //
     FiffEvokedDataSet* data = NULL;
 //    data = fiff_read_evoked(fname_data,setno);
-    Fiff::read_evoked(t_sFileEvoked, data, setno);
+    Fiff::read_evoked(t_pFileEvoked, data, setno);
 
     //
     //   Then the inverse operator
     //
     MNEInverseOperator* inv_raw = NULL;
-    MNEInverseOperator::read_inverse_operator(t_sFileInv, inv_raw);
+    MNEInverseOperator::read_inverse_operator(t_pFileInv, inv_raw);
     //
     //   Set up the inverse according to the parameters
     //
@@ -214,6 +216,10 @@ int main(int argc, char *argv[])
 
     delete data;
     delete inv;
+
+
+    delete t_pFileInv;
+    delete t_pFileEvoked;
 
     return a.exec();
 }

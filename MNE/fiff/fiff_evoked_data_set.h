@@ -141,13 +141,13 @@ public:
     *
     * Read one evoked data set
     *
-    * @param[in] p_sFileName    The name of the file to read from
+    * @param[in] p_pIODevice    An fiff IO device like a fiff QFile or QTcpSocket
     * @param[out] data          The read evoked data
     * @param[in] setno          the set to pick
     *
     * @return the CTF software compensation data
     */
-    static bool read_evoked(QString& p_sFileName, FiffEvokedDataSet*& data, fiff_int_t setno = 0);
+    static bool read_evoked(QIODevice* p_pIODevice, FiffEvokedDataSet*& data, fiff_int_t setno = 0);
 
 public:
     FiffInfo*               info;   /**< ToDo... */

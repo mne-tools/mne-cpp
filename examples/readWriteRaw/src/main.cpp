@@ -81,16 +81,20 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    QString t_sFile = "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
+    QString t_sFileName = "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
 //    QString t_sFile = "./MNE-sample-data/MEG/test_input.fif";
 
-    QString t_sOutFile = "./MNE-sample-data/MEG/test_output.fif";
+    QFile* t_pFile = new QFile(t_sFileName);
+
+    QString t_sOutFileName = "./MNE-sample-data/MEG/test_output.fif";
+
+    QFile* t_pOutFile = new QFile(t_sOutFileName);
 
     //
     //   Setup for reading the raw data
     //
     FiffRawData* raw = NULL;
-    if(!FiffStream::setup_read_raw(t_sFile, raw))
+    if(!FiffStream::setup_read_raw(t_pFile, raw))
     {
         printf("Error during fiff setup raw read");
         return 0;
@@ -122,7 +126,7 @@ int main(int argc, char *argv[])
     //
     MatrixXd* cals = NULL;
 
-    FiffStream* outfid = Fiff::start_writing_raw(t_sOutFile,raw->info, cals, picks);
+    FiffStream* outfid = Fiff::start_writing_raw(t_pOutFile,raw->info, cals, picks);
     //
     //   Set up the reading parameters
     //
@@ -178,6 +182,8 @@ int main(int argc, char *argv[])
 
     delete raw;
     delete outfid;
+    delete t_pOutFile;
+    delete t_pFile;
 
     printf("Finished\n");
 

@@ -314,20 +314,20 @@ MNEInverseOperator* MNEInverseOperator::prepare_inverse_operator(qint32 nave ,fl
 
 //*************************************************************************************************************
 
-bool MNEInverseOperator::read_inverse_operator(QString& p_sFileName, MNEInverseOperator*& inv)
+bool MNEInverseOperator::read_inverse_operator(QIODevice* p_pIODevice, MNEInverseOperator*& inv)
 {
     //
     //   Open the file, create directory
     //
-    printf("Reading inverse operator decomposition from %s...\n",p_sFileName.toUtf8().constData());
-    FiffStream* t_pFile = new FiffStream(p_sFileName);
+    FiffStream* t_pStream = new FiffStream(p_pIODevice);
+    printf("Reading inverse operator decomposition from %s...\n",t_pStream->streamName().toUtf8().constData());
     FiffDirTree* t_pTree = NULL;
     QList<FiffDirEntry>* t_pDir = NULL;
 
-    if(!t_pFile->open(t_pTree, t_pDir))
+    if(!t_pStream->open(t_pTree, t_pDir))
     {
-        if(t_pFile)
-            delete t_pFile;
+        if(t_pStream)
+            delete t_pStream;
         if(t_pTree)
             delete t_pTree;
         if(t_pDir)
@@ -341,9 +341,9 @@ bool MNEInverseOperator::read_inverse_operator(QString& p_sFileName, MNEInverseO
     QList <FiffDirTree *> invs_list = t_pTree->dir_tree_find(FIFFB_MNE_INVERSE_SOLUTION);
     if ( invs_list.size()== 0)
     {
-        printf("No inverse solutions in %s\n", p_sFileName.toUtf8().constData());
-        if(t_pFile)
-            delete t_pFile;
+        printf("No inverse solutions in %s\n", t_pStream->streamName().toUtf8().constData());
+        if(t_pStream)
+            delete t_pStream;
         if(t_pTree)
             delete t_pTree;
         if(t_pDir)
@@ -357,9 +357,9 @@ bool MNEInverseOperator::read_inverse_operator(QString& p_sFileName, MNEInverseO
     QList <FiffDirTree *> parent_mri = t_pTree->dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
     if (parent_mri.size() == 0)
     {
-        printf("No parent MRI information in %s", p_sFileName.toUtf8().constData());
-        if(t_pFile)
-            delete t_pFile;
+        printf("No parent MRI information in %s", t_pStream->streamName().toUtf8().constData());
+        if(t_pStream)
+            delete t_pStream;
         if(t_pTree)
             delete t_pTree;
         if(t_pDir)
@@ -371,13 +371,13 @@ bool MNEInverseOperator::read_inverse_operator(QString& p_sFileName, MNEInverseO
     //   Methods and source orientations
     //
     FiffTag* t_pTag = NULL;
-    if (!invs->find_tag(t_pFile, FIFF_MNE_INCLUDED_METHODS, t_pTag))
+    if (!invs->find_tag(t_pStream, FIFF_MNE_INCLUDED_METHODS, t_pTag))
     {
         printf("Modalities not found\n");
         if(t_pTag)
             delete t_pTag;
-        if(t_pFile)
-            delete t_pFile;
+        if(t_pStream)
+            delete t_pStream;
         if(t_pTree)
             delete t_pTree;
         if(t_pDir)
@@ -389,13 +389,13 @@ bool MNEInverseOperator::read_inverse_operator(QString& p_sFileName, MNEInverseO
     inv = new MNEInverseOperator();
     inv->methods = *t_pTag->toInt();
     //
-    if (!invs->find_tag(t_pFile, FIFF_MNE_SOURCE_ORIENTATION, t_pTag))
+    if (!invs->find_tag(t_pStream, FIFF_MNE_SOURCE_ORIENTATION, t_pTag))
     {
         printf("Source orientation constraints not found\n");
         if(t_pTag)
             delete t_pTag;
-        if(t_pFile)
-            delete t_pFile;
+        if(t_pStream)
+            delete t_pStream;
         if(t_pTree)
             delete t_pTree;
         if(t_pDir)
@@ -404,13 +404,13 @@ bool MNEInverseOperator::read_inverse_operator(QString& p_sFileName, MNEInverseO
     }
     inv->source_ori = *t_pTag->toInt();
     //
-    if (!invs->find_tag(t_pFile, FIFF_MNE_SOURCE_SPACE_NPOINTS, t_pTag))
+    if (!invs->find_tag(t_pStream, FIFF_MNE_SOURCE_SPACE_NPOINTS, t_pTag))
     {
         printf("Number of sources not found\n");
         if(t_pTag)
             delete t_pTag;
-        if(t_pFile)
-            delete t_pFile;
+        if(t_pStream)
+            delete t_pStream;
         if(t_pTree)
             delete t_pTree;
         if(t_pDir)
@@ -422,13 +422,13 @@ bool MNEInverseOperator::read_inverse_operator(QString& p_sFileName, MNEInverseO
     //
     //   Coordinate frame
     //
-    if (!invs->find_tag(t_pFile, FIFF_MNE_COORD_FRAME, t_pTag))
+    if (!invs->find_tag(t_pStream, FIFF_MNE_COORD_FRAME, t_pTag))
     {
         printf("Coordinate frame tag not found\n");
         if(t_pTag)
             delete t_pTag;
-        if(t_pFile)
-            delete t_pFile;
+        if(t_pStream)
+            delete t_pStream;
         if(t_pTree)
             delete t_pTree;
         if(t_pDir)
@@ -439,13 +439,13 @@ bool MNEInverseOperator::read_inverse_operator(QString& p_sFileName, MNEInverseO
     //
     //   The actual source orientation vectors
     //
-    if (!invs->find_tag(t_pFile, FIFF_MNE_INVERSE_SOURCE_ORIENTATIONS, t_pTag))
+    if (!invs->find_tag(t_pStream, FIFF_MNE_INVERSE_SOURCE_ORIENTATIONS, t_pTag))
     {
         printf("Source orientation information not found\n");
         if(t_pTag)
             delete t_pTag;
-        if(t_pFile)
-            delete t_pFile;
+        if(t_pStream)
+            delete t_pStream;
         if(t_pTree)
             delete t_pTree;
         if(t_pDir)
@@ -463,13 +463,13 @@ bool MNEInverseOperator::read_inverse_operator(QString& p_sFileName, MNEInverseO
     //   The SVD decomposition...
     //
     printf("\tReading inverse operator decomposition...");
-    if (!invs->find_tag(t_pFile, FIFF_MNE_INVERSE_SING, t_pTag))
+    if (!invs->find_tag(t_pStream, FIFF_MNE_INVERSE_SING, t_pTag))
     {
         printf("Singular values not found\n");
         if(t_pTag)
             delete t_pTag;
-        if(t_pFile)
-            delete t_pFile;
+        if(t_pStream)
+            delete t_pStream;
         if(t_pTree)
             delete t_pTree;
         if(t_pDir)
@@ -485,16 +485,16 @@ bool MNEInverseOperator::read_inverse_operator(QString& p_sFileName, MNEInverseO
     //   The eigenleads and eigenfields
     //
     inv->eigen_leads_weighted = false;
-    if(!Fiff::read_named_matrix(t_pFile, invs, FIFF_MNE_INVERSE_LEADS, inv->eigen_leads))
+    if(!Fiff::read_named_matrix(t_pStream, invs, FIFF_MNE_INVERSE_LEADS, inv->eigen_leads))
     {
         inv->eigen_leads_weighted = true;
-        if(!Fiff::read_named_matrix(t_pFile, invs, FIFF_MNE_INVERSE_LEADS_WEIGHTED, inv->eigen_leads))
+        if(!Fiff::read_named_matrix(t_pStream, invs, FIFF_MNE_INVERSE_LEADS_WEIGHTED, inv->eigen_leads))
         {
             printf("Error reading eigenleads named matrix.\n");
             if(t_pTag)
                 delete t_pTag;
-            if(t_pFile)
-                delete t_pFile;
+            if(t_pStream)
+                delete t_pStream;
             if(t_pTree)
                 delete t_pTree;
             if(t_pDir)
@@ -508,13 +508,13 @@ bool MNEInverseOperator::read_inverse_operator(QString& p_sFileName, MNEInverseO
     inv->eigen_leads->transpose_named_matrix();
 
 
-    if(!Fiff::read_named_matrix(t_pFile, invs, FIFF_MNE_INVERSE_FIELDS, inv->eigen_fields))
+    if(!Fiff::read_named_matrix(t_pStream, invs, FIFF_MNE_INVERSE_FIELDS, inv->eigen_fields))
     {
         printf("Error reading eigenfields named matrix.\n");
         if(t_pTag)
             delete t_pTag;
-        if(t_pFile)
-            delete t_pFile;
+        if(t_pStream)
+            delete t_pStream;
         if(t_pTree)
             delete t_pTree;
         if(t_pDir)
@@ -525,7 +525,7 @@ bool MNEInverseOperator::read_inverse_operator(QString& p_sFileName, MNEInverseO
     //
     //   Read the covariance matrices
     //
-    if(t_pFile->read_cov(invs, FIFFV_MNE_NOISE_COV, inv->noise_cov))
+    if(t_pStream->read_cov(invs, FIFFV_MNE_NOISE_COV, inv->noise_cov))
     {
         printf("\tNoise covariance matrix read.\n");
     }
@@ -534,8 +534,8 @@ bool MNEInverseOperator::read_inverse_operator(QString& p_sFileName, MNEInverseO
         printf("\tError: Not able to read noise covariance matrix.\n");
         if(t_pTag)
             delete t_pTag;
-        if(t_pFile)
-            delete t_pFile;
+        if(t_pStream)
+            delete t_pStream;
         if(t_pTree)
             delete t_pTree;
         if(t_pDir)
@@ -543,7 +543,7 @@ bool MNEInverseOperator::read_inverse_operator(QString& p_sFileName, MNEInverseO
         return false;
     }
 
-    if(t_pFile->read_cov(invs, FIFFV_MNE_SOURCE_COV, inv->source_cov))
+    if(t_pStream->read_cov(invs, FIFFV_MNE_SOURCE_COV, inv->source_cov))
     {
         printf("\tSource covariance matrix read.\n");
     }
@@ -552,8 +552,8 @@ bool MNEInverseOperator::read_inverse_operator(QString& p_sFileName, MNEInverseO
         printf("\tError: Not able to read source covariance matrix.\n");
         if(t_pTag)
             delete t_pTag;
-        if(t_pFile)
-            delete t_pFile;
+        if(t_pStream)
+            delete t_pStream;
         if(t_pTree)
             delete t_pTree;
         if(t_pDir)
@@ -563,7 +563,7 @@ bool MNEInverseOperator::read_inverse_operator(QString& p_sFileName, MNEInverseO
     //
     //   Read the various priors
     //
-    if(t_pFile->read_cov(invs, FIFFV_MNE_ORIENT_PRIOR_COV, inv->orient_prior))
+    if(t_pStream->read_cov(invs, FIFFV_MNE_ORIENT_PRIOR_COV, inv->orient_prior))
     {
         printf("\tOrientation priors read.\n");
     }
@@ -573,7 +573,7 @@ bool MNEInverseOperator::read_inverse_operator(QString& p_sFileName, MNEInverseO
             delete inv->orient_prior;
         inv->orient_prior = NULL;
     }
-    if(t_pFile->read_cov(invs, FIFFV_MNE_DEPTH_PRIOR_COV, inv->depth_prior))
+    if(t_pStream->read_cov(invs, FIFFV_MNE_DEPTH_PRIOR_COV, inv->depth_prior))
     {
         printf("\tDepth priors read.\n");
     }
@@ -583,7 +583,7 @@ bool MNEInverseOperator::read_inverse_operator(QString& p_sFileName, MNEInverseO
             delete inv->depth_prior;
         inv->depth_prior = NULL;
     }
-    if(t_pFile->read_cov(invs, FIFFV_MNE_FMRI_PRIOR_COV, inv->fmri_prior))
+    if(t_pStream->read_cov(invs, FIFFV_MNE_FMRI_PRIOR_COV, inv->fmri_prior))
     {
         printf("\tfMRI priors read.\n");
     }
@@ -596,13 +596,13 @@ bool MNEInverseOperator::read_inverse_operator(QString& p_sFileName, MNEInverseO
     //
     //   Read the source spaces
     //
-    if(!MNESourceSpace::read_source_spaces(t_pFile, false, t_pTree, inv->src))
+    if(!MNESourceSpace::read_source_spaces(t_pStream, false, t_pTree, inv->src))
     {
         printf("\tError: Could not read the source spaces.\n");
         if(t_pTag)
             delete t_pTag;
-        if(t_pFile)
-            delete t_pFile;
+        if(t_pStream)
+            delete t_pStream;
         if(t_pTree)
             delete t_pTree;
         if(t_pDir)
@@ -615,13 +615,13 @@ bool MNEInverseOperator::read_inverse_operator(QString& p_sFileName, MNEInverseO
     //   Get the MRI <-> head coordinate transformation
     //
     FiffCoordTrans* mri_head_t = NULL;
-    if (!parent_mri[0]->find_tag(t_pFile, FIFF_COORD_TRANS, t_pTag))
+    if (!parent_mri[0]->find_tag(t_pStream, FIFF_COORD_TRANS, t_pTag))
     {
         printf("MRI/head coordinate transformation not found\n");
         if(t_pTag)
             delete t_pTag;
-        if(t_pFile)
-            delete t_pFile;
+        if(t_pStream)
+            delete t_pStream;
         if(t_pTree)
             delete t_pTree;
         if(t_pDir)
@@ -641,8 +641,8 @@ bool MNEInverseOperator::read_inverse_operator(QString& p_sFileName, MNEInverseO
                     delete mri_head_t;
                 if(t_pTag)
                     delete t_pTag;
-                if(t_pFile)
-                    delete t_pFile;
+                if(t_pStream)
+                    delete t_pStream;
                 if(t_pTree)
                     delete t_pTree;
                 if(t_pDir)
@@ -661,8 +661,8 @@ bool MNEInverseOperator::read_inverse_operator(QString& p_sFileName, MNEInverseO
         printf("Only inverse solutions computed in MRI or head coordinates are acceptable");
         if(t_pTag)
             delete t_pTag;
-        if(t_pFile)
-            delete t_pFile;
+        if(t_pStream)
+            delete t_pStream;
         if(t_pTree)
             delete t_pTree;
         if(t_pDir)
@@ -675,7 +675,7 @@ bool MNEInverseOperator::read_inverse_operator(QString& p_sFileName, MNEInverseO
     //
     //  We also need the SSP operator
     //
-    inv->projs     = t_pFile->read_proj(t_pTree);
+    inv->projs     = t_pStream->read_proj(t_pTree);
     //
     //  Some empty fields to be filled in later
     //
@@ -695,8 +695,8 @@ bool MNEInverseOperator::read_inverse_operator(QString& p_sFileName, MNEInverseO
     //
     if(t_pTag)
         delete t_pTag;
-    if(t_pFile)
-        delete t_pFile;
+    if(t_pStream)
+        delete t_pStream;
     if(t_pTree)
         delete t_pTree;
     if(t_pDir)

@@ -106,14 +106,14 @@ MNEForwardSolution::~MNEForwardSolution()
 
 //*************************************************************************************************************
 
-bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardSolution*& fwd, bool force_fixed, bool surf_ori, QStringList& include, QStringList& exclude)
+bool MNEForwardSolution::read_forward_solution(QIODevice* p_pIODevice, MNEForwardSolution*& fwd, bool force_fixed, bool surf_ori, QStringList& include, QStringList& exclude)
 {
-    FiffStream* t_pFile = new FiffStream(p_sFileName);
+    FiffStream* t_pStream = new FiffStream(p_pIODevice);
     FiffDirTree* t_pTree = NULL;
     QList<FiffDirEntry>* t_pDir = NULL;
 
-    printf("Reading forward solution from %s...\n", p_sFileName.toUtf8().constData());
-    if(!t_pFile->open(t_pTree, t_pDir))
+    printf("Reading forward solution from %s...\n", t_pStream->streamName().toUtf8().constData());
+    if(!t_pStream->open(t_pTree, t_pDir))
         return false;
 
     //
@@ -123,15 +123,15 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
 
     if (fwds.size() == 0)
     {
-        t_pFile->close();
-        std::cout << "No forward solutions in " << p_sFileName.toUtf8().constData(); // ToDo throw error
+        t_pStream->device()->close();
+        std::cout << "No forward solutions in " << t_pStream->streamName().toUtf8().constData(); // ToDo throw error
         //garbage collecting
         if(t_pDir)
             delete t_pDir;
         if(t_pTree)
             delete t_pTree;
-        if(t_pFile)
-            delete t_pFile;
+        if(t_pStream)
+            delete t_pStream;
         return false;
     }
     //
@@ -140,22 +140,22 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
     QList<FiffDirTree*> parent_mri = t_pTree->dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
     if (parent_mri.size() == 0)
     {
-        t_pFile->close();
-        std::cout << "No parent MRI information in " << p_sFileName.toUtf8().constData(); // ToDo throw error
+        t_pStream->device()->close();
+        std::cout << "No parent MRI information in " << t_pStream->streamName().toUtf8().constData(); // ToDo throw error
         //garbage collecting
         if(t_pDir)
             delete t_pDir;
         if(t_pTree)
             delete t_pTree;
-        if(t_pFile)
-            delete t_pFile;
+        if(t_pStream)
+            delete t_pStream;
         return false;
     }
 
     MNESourceSpace* t_pSourceSpace = NULL;
-    if(!MNESourceSpace::read_source_spaces(t_pFile, true, t_pTree, t_pSourceSpace))
+    if(!MNESourceSpace::read_source_spaces(t_pStream, true, t_pTree, t_pSourceSpace))
     {
-        t_pFile->close();
+        t_pStream->device()->close();
         std::cout << "Could not read the source spaces\n"; // ToDo throw error
         //ToDo error(me,'Could not read the source spaces (%s)',mne_omit_first_line(lasterr));
         //garbage collecting
@@ -163,8 +163,8 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
             delete t_pDir;
         if(t_pTree)
             delete t_pTree;
-        if(t_pFile)
-            delete t_pFile;
+        if(t_pStream)
+            delete t_pStream;
         if(t_pSourceSpace)
             delete t_pSourceSpace;
         return false;
@@ -176,7 +176,7 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
     //
     //   Bad channel list
     //
-    QStringList bads = Fiff::read_bad_channels(t_pFile,t_pTree);
+    QStringList bads = Fiff::read_bad_channels(t_pStream,t_pTree);
     printf("\t%d bad channels read\n",bads.size());
     qDebug() << bads;
 
@@ -188,17 +188,17 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
     FiffDirTree* eegnode = NULL;
     for(int k = 0; k < fwds.size(); ++k)
     {
-        if(!fwds.at(k)->find_tag(t_pFile, FIFF_MNE_INCLUDED_METHODS, t_pTag))
+        if(!fwds.at(k)->find_tag(t_pStream, FIFF_MNE_INCLUDED_METHODS, t_pTag))
         {
-            t_pFile->close();
+            t_pStream->device()->close();
             std::cout << "Methods not listed for one of the forward solutions\n"; // ToDo throw error
             //garbage collecting
             if(t_pDir)
                 delete t_pDir;
             if(t_pTree)
                 delete t_pTree;
-            if(t_pFile)
-                delete t_pFile;
+            if(t_pStream)
+                delete t_pStream;
             if(t_pSourceSpace)
                 delete t_pSourceSpace;
             return false;
@@ -217,7 +217,7 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
 
     MNEForwardSolution* megfwd = NULL;
     QString ori;
-    if (read_one(t_pFile, megnode, megfwd))
+    if (read_one(t_pStream, megnode, megfwd))
     {
         if (megfwd->source_ori == FIFFV_MNE_FIXED_ORI)
             ori = QString("fixed");
@@ -226,7 +226,7 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
         printf("\tRead MEG forward solution (%d sources, %d channels, %s orientations)\n", megfwd->nsource,megfwd->nchan,ori.toUtf8().constData());
     }
     MNEForwardSolution* eegfwd = NULL;
-    if (read_one(t_pFile, eegnode, eegfwd))
+    if (read_one(t_pStream, eegnode, eegfwd))
     {
         if (eegfwd->source_ori == FIFFV_MNE_FIXED_ORI)
             ori = QString("fixed");
@@ -249,15 +249,15 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
                 megfwd->nsource != eegfwd->nsource ||
                 megfwd->coord_frame != eegfwd->coord_frame)
         {
-            t_pFile->close();
+            t_pStream->device()->close();
             std::cout << "The MEG and EEG forward solutions do not match\n"; // ToDo throw error
             //garbage collecting
             if(t_pDir)
                 delete t_pDir;
             if(t_pTree)
                 delete t_pTree;
-            if(t_pFile)
-                delete t_pFile;
+            if(t_pStream)
+                delete t_pStream;
             if(t_pSourceSpace)
                 delete t_pSourceSpace;
             return false;
@@ -292,17 +292,17 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
     //
     //   Get the MRI <-> head coordinate transformation
     //
-    if(!parent_mri.at(0)->find_tag(t_pFile, FIFF_COORD_TRANS, t_pTag))
+    if(!parent_mri.at(0)->find_tag(t_pStream, FIFF_COORD_TRANS, t_pTag))
     {
-        t_pFile->close();
+        t_pStream->device()->close();
         std::cout << "MRI/head coordinate transformation not found\n"; // ToDo throw error
         //garbage collecting
         if(t_pDir)
             delete t_pDir;
         if(t_pTree)
             delete t_pTree;
-        if(t_pFile)
-            delete t_pFile;
+        if(t_pStream)
+            delete t_pStream;
         if(t_pSourceSpace)
             delete t_pSourceSpace;
         if(t_pTag)
@@ -326,15 +326,15 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
             fwd->mri_head_t->invert_transform();
             if (fwd->mri_head_t->from != FIFFV_COORD_MRI || fwd->mri_head_t->to != FIFFV_COORD_HEAD)
             {
-                t_pFile->close();
+                t_pStream->device()->close();
                 std::cout << "MRI/head coordinate transformation not found\n"; // ToDo throw error
                 //garbage collecting
                 if(t_pDir)
                     delete t_pDir;
                 if(t_pTree)
                     delete t_pTree;
-                if(t_pFile)
-                    delete t_pFile;
+                if(t_pStream)
+                    delete t_pStream;
                 if(t_pSourceSpace)
                     delete t_pSourceSpace;
                 if(t_pTag)
@@ -343,7 +343,7 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
             }
         }
     }
-    t_pFile->close();
+    t_pStream->device()->close();
 
     //
     //   Transform the source spaces to the correct coordinate frame
@@ -611,7 +611,7 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
     }
 
     //garbage collecting
-    t_pFile->close();
+    t_pStream->device()->close();
 
     //garbage collecting
 //    if (megfwd)
@@ -622,8 +622,8 @@ bool MNEForwardSolution::read_forward_solution(QString& p_sFileName, MNEForwardS
         delete t_pDir;
     if(t_pTree)
         delete t_pTree;
-    if(t_pFile)
-        delete t_pFile;
+    if(t_pStream)
+        delete t_pStream;
 //    if(t_pSourceSpace)
 //        delete t_pSourceSpace; // don't delete the SourceSpace because fwd->src is pointing to source space (not copied for the sake of speed)
     if(t_pTag)
@@ -653,7 +653,7 @@ bool MNEForwardSolution::read_one(FiffStream* p_pStream, FiffDirTree* node, MNEF
 
     if(!node->find_tag(p_pStream, FIFF_MNE_SOURCE_ORIENTATION, t_pTag))
     {
-        p_pStream->close();
+        p_pStream->device()->close();
         std::cout << "Source orientation tag not found."; //ToDo: throw error.
         return false;
     }
@@ -662,7 +662,7 @@ bool MNEForwardSolution::read_one(FiffStream* p_pStream, FiffDirTree* node, MNEF
 
     if(!node->find_tag(p_pStream, FIFF_MNE_COORD_FRAME, t_pTag))
     {
-        p_pStream->close();
+        p_pStream->device()->close();
         std::cout << "Coordinate frame tag not found."; //ToDo: throw error.
         return false;
     }
@@ -671,7 +671,7 @@ bool MNEForwardSolution::read_one(FiffStream* p_pStream, FiffDirTree* node, MNEF
 
     if(!node->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NPOINTS, t_pTag))
     {
-        p_pStream->close();
+        p_pStream->device()->close();
         std::cout << "Number of sources not found."; //ToDo: throw error.
         return false;
     }
@@ -680,7 +680,7 @@ bool MNEForwardSolution::read_one(FiffStream* p_pStream, FiffDirTree* node, MNEF
 
     if(!node->find_tag(p_pStream, FIFF_NCHAN, t_pTag))
     {
-        p_pStream->close();
+        p_pStream->device()->close();
         printf("Number of channels not found."); //ToDo: throw error.
         return false;
     }
@@ -691,7 +691,7 @@ bool MNEForwardSolution::read_one(FiffStream* p_pStream, FiffDirTree* node, MNEF
         one->sol->transpose_named_matrix();
     else
     {
-        p_pStream->close();
+        p_pStream->device()->close();
         printf("Forward solution data not found ."); //ToDo: throw error.
         //error(me,'Forward solution data not found (%s)',mne_omit_first_line(lasterr));
         return false;
@@ -710,7 +710,7 @@ bool MNEForwardSolution::read_one(FiffStream* p_pStream, FiffDirTree* node, MNEF
     if (one->sol->data->rows() != one->nchan ||
             (one->sol->data->cols() != one->nsource && one->sol->data->cols() != 3*one->nsource))
     {
-        p_pStream->close();
+        p_pStream->device()->close();
         printf("Forward solution matrix has wrong dimensions.\n"); //ToDo: throw error.
         //error(me,'Forward solution matrix has wrong dimensions');
         return false;
@@ -720,7 +720,7 @@ bool MNEForwardSolution::read_one(FiffStream* p_pStream, FiffDirTree* node, MNEF
         if (one->sol_grad->data->rows() != one->nchan ||
                 (one->sol_grad->data->cols() != 3*one->nsource && one->sol_grad->data->cols() != 3*3*one->nsource))
         {
-            p_pStream->close();
+            p_pStream->device()->close();
             printf("Forward solution gradient matrix has wrong dimensions.\n"); //ToDo: throw error.
             //error(me,'Forward solution gradient matrix has wrong dimensions');
         }
