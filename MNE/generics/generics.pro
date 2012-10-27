@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     MNELibraries.pro
+# @file     generics.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,15 +29,45 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds all MNE libraries.
+# @brief    This project file builds the generics library.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-TEMPLATE = subdirs
+include(../../mne-cpp.pri)
 
-SUBDIRS += generics \
-    fiff \
-    mne \
-    disp \
+TEMPLATE = lib
 
-CONFIG += ordered
+DEFINES += GENERICS_LIBRARY
+
+TARGET = generics
+
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
+}
+
+DESTDIR = $${PWD}/../../lib
+
+#
+# win32: copy dll's to bin dir
+# unix: add lib folder to LD_LIBRARY_PATH
+#
+win32 {
+    FILE = $${DESTDIR}/$${TARGET}.dll
+    BINDIR = $${DESTDIR}/../bin
+    FILE ~= s,/,\\,g
+    BINDIR ~= s,/,\\,g
+    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
+}
+
+SOURCES += \ 
+    observerpattern.cpp
+
+HEADERS += generics_global.h \
+    circularbuffer.h \
+    observerpattern.h
+
+#Install headers to include directory
+header_files.files = ./*.h
+header_files.path = ../../include/generics
+
+INSTALLS += header_files
