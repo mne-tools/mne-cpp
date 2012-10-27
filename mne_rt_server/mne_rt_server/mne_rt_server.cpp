@@ -40,7 +40,7 @@
 
 #include "mne_rt_server.h"
 
-#include "fiff_server.h"
+#include "instructionserver.h"
 
 #include "IConnector.h"
 #include "connectormanager.h"

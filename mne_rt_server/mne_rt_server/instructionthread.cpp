@@ -74,6 +74,7 @@ void InstructionThread::run()
     out << (quint16)(block.size() - sizeof(quint16));
 
     tcpSocket.write(block);
+
     tcpSocket.disconnectFromHost();
     tcpSocket.waitForDisconnected();
 }

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiff_server.cpp
+* @file     instructionserver.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the FiffServer Class.
+* @brief    Contains the implementation of the InstructionServer Class.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "fiff_server.h"
+#include "instructionserver.h"
 #include "instructionthread.h"
 
 
@@ -63,7 +63,7 @@ using namespace MSERVER;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FiffServer::FiffServer(QObject *parent)
+InstructionServer::InstructionServer(QObject *parent)
     : QTcpServer(parent)
 {
     fortunes << tr("You've been leading a dog's life. Stay off the furniture.")
@@ -78,7 +78,7 @@ FiffServer::FiffServer(QObject *parent)
 
 //*************************************************************************************************************
 
-void FiffServer::incomingConnection(qintptr socketDescriptor)
+void InstructionServer::incomingConnection(qintptr socketDescriptor)
 {
 
     QString fortune = fortunes.at(qrand() % fortunes.size());

@@ -62,9 +62,10 @@ DESTDIR = $${PWD}/../../bin
 SOURCES += \
     main.cpp \
     connectormanager.cpp \
-    fiff_server.cpp \
     mne_rt_server.cpp \
-    instructionthread.cpp
+    instructionthread.cpp \
+    instructionserver.cpp \
+    fiffstreamclient.cpp
 
 
 HEADERS += \
@@ -72,6 +73,7 @@ HEADERS += \
     IConnector.h \
     connectormanager.h \
     mne_rt_server.h \
-    fiff_server.h \
     mne_rt_server.h \
-    instructionthread.h
+    instructionthread.h \
+    instructionserver.h \
+    fiffstreamclient.h
