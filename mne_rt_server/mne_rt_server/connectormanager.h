@@ -29,10 +29,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    The declaration of the ConnectorManager class.
+* @brief    Contains the implementation of the ConnectorManager Class.
 *
 */
-
 
 #ifndef CONNECTORMANAGER_H
 #define CONNECTORMANAGER_H
