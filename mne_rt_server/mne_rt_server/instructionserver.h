@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiff_server.h
+* @file     instructionserver.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the FiffServer Class.
+* @brief    Contains the implementation of the InstructionServer Class.
 *
 */
 
-#ifndef FIFF_SERVER_H
-#define FIFF_SERVER_H
+#ifndef INSTRUCTIONSERVER_H
+#define INSTRUCTIONSERVER_H
 
 
 //*************************************************************************************************************
@@ -68,16 +68,16 @@ namespace MSERVER
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FiffServer
+* DECLARE CLASS InstructionServer
 *
-* @brief The FiffServer class provides
+* @brief The InstructionServer class provides
 */
-class FiffServer : public QTcpServer
+class InstructionServer : public QTcpServer
 {
     Q_OBJECT
 
 public:
-    FiffServer(QObject *parent = 0);
+    InstructionServer(QObject *parent = 0);
 
 protected:
     void incomingConnection(qintptr socketDescriptor);
@@ -88,4 +88,4 @@ private:
 
 } // NAMESPACE
 
-#endif //FIFF_SERVER_H
+#endif //INSTRUCTIONSERVER_H

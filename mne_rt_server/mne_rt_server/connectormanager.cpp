@@ -137,7 +137,7 @@ void ConnectorManager::loadConnectors(const QString& dir)
     }
     else
     {
-        printf("Reading %s... ", configFileName.toUtf8().constData());
+        printf("\tReading %s... ", configFileName.toUtf8().constData());
 
         QTextStream in(&configFile);
         QString line = in.readLine();

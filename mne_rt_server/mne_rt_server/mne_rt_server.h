@@ -42,7 +42,7 @@
 // FIFF INCLUDES
 //=============================================================================================================
 
-#include "fiff_server.h"
+#include "instructionserver.h"
 
 
 //*************************************************************************************************************
@@ -86,7 +86,7 @@ public:
     ~MNERTServer();
 
 private:
-    FiffServer server;
+    InstructionServer server;
 
 
     ConnectorManager* m_pConnectorManager;
