@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiff_server.cpp
+* @file     instructionthread.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,33 +29,13 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the FiffServer Class.
+* @brief    Contains the implementation of the InstructionThread Class.
 *
 */
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "fiff_server.h"
 #include "instructionthread.h"
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
-
-#include <stdlib.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace MSERVER;
+#include <QtNetwork>
 
 
 //*************************************************************************************************************
@@ -63,29 +43,37 @@ using namespace MSERVER;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FiffServer::FiffServer(QObject *parent)
-    : QTcpServer(parent)
+InstructionThread::InstructionThread(int socketDescriptor, const QString &fortune, QObject *parent)
+    : QThread(parent), socketDescriptor(socketDescriptor), text(fortune)
 {
-    fortunes << tr("You've been leading a dog's life. Stay off the furniture.")
-             << tr("You've got to think about tomorrow.")
-             << tr("You will be surprised by a loud noise.")
-             << tr("You will feel hungry again in another hour.")
-             << tr("You might have mail.")
-             << tr("You cannot kill time without injuring eternity.")
-             << tr("Computers are not intelligent. They only think they are.");
 }
 
 
 //*************************************************************************************************************
 
-void FiffServer::incomingConnection(qintptr socketDescriptor)
+void InstructionThread::run()
 {
+    QTcpSocket tcpSocket;
+    if (!tcpSocket.setSocketDescriptor(socketDescriptor)) {
+        emit error(tcpSocket.error());
+        return;
+    }
+    else
+    {
+        printf("Connection accepted from\n\tIP: %s\n\tPort: %d\n\n",
+               QHostAddress(tcpSocket.peerAddress()).toString().toUtf8().constData(),
+               tcpSocket.peerPort());
+    }
 
-    QString fortune = fortunes.at(qrand() % fortunes.size());
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_4_0);
+    out << (quint16)0;
+    out << text;
+    out.device()->seek(0);
+    out << (quint16)(block.size() - sizeof(quint16));
 
-    InstructionThread* thread = new InstructionThread(socketDescriptor, fortune, this);
-
-    //when thread has finished it gets deleted
-    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-    thread->start();
+    tcpSocket.write(block);
+    tcpSocket.disconnectFromHost();
+    tcpSocket.waitForDisconnected();
 }

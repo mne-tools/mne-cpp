@@ -62,16 +62,16 @@ DESTDIR = $${PWD}/../../bin
 SOURCES += \
     main.cpp \
     connectormanager.cpp \
-    fortunethread.cpp \
     fiff_server.cpp \
-    mne_rt_server.cpp
+    mne_rt_server.cpp \
+    instructionthread.cpp
 
 
 HEADERS += \
 # has to be moved to connectors
     IConnector.h \
     connectormanager.h \
-    fortunethread.h \
     mne_rt_server.h \
     fiff_server.h \
-    mne_rt_server.h
+    mne_rt_server.h \
+    instructionthread.h
