@@ -63,6 +63,12 @@ void FortuneThread::run()
         emit error(tcpSocket.error());
         return;
     }
+    else
+    {
+        printf("Connection accepted from\n\tIP: %s\n\tPort: %d\n\n",
+               QHostAddress(tcpSocket.peerAddress()).toString().toUtf8().constData(),
+               tcpSocket.peerPort());
+    }
 
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
