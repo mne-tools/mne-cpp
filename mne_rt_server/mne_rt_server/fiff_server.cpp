@@ -60,10 +60,17 @@ FiffServer::FiffServer(QObject *parent)
              << tr("Computers are not intelligent. They only think they are.");
 }
 
+
+//*************************************************************************************************************
+
 void FiffServer::incomingConnection(qintptr socketDescriptor)
 {
+
     QString fortune = fortunes.at(qrand() % fortunes.size());
+
     FortuneThread *thread = new FortuneThread(socketDescriptor, fortune, this);
+
+    //when thread has finished it gets deleted
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
     thread->start();
 }
