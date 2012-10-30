@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_rt_server.h
+* @file     commandserver.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,71 +29,63 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the MNERTServer Class.
+* @brief    Contains the implementation of the CommandServer Class.
 *
 */
 
-#ifndef MNE_RT_SERVER_H
-#define MNE_RT_SERVER_H
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "commandserver.h"
+#include "commandthread.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FIFF INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
+#include <stdlib.h>
 
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MSERVER
-//=============================================================================================================
-
-namespace MSERVER
-{
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace MSERVER;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-class CommandServer;
-class FiffStreamServer;
-class ConnectorManager;
-class IConnector;
-
-
-//=============================================================================================================
-/**
-* DECLARE CLASS MNERTServer
-*
-* @brief The MNERTServer class provides a Fiff data simulator.
-*/
-class MNERTServer
+CommandServer::CommandServer(QObject *parent)
+    : QTcpServer(parent)
 {
-public:
-    MNERTServer();
+    fortunes << tr("You've been leading a dog's life. Stay off the furniture.")
+             << tr("You've got to think about tomorrow.")
+             << tr("You will be surprised by a loud noise.")
+             << tr("You will feel hungry again in another hour.")
+             << tr("You might have mail.")
+             << tr("You cannot kill time without injuring eternity.")
+             << tr("Computers are not intelligent. They only think they are.");
+}
 
-    //=========================================================================================================
-    /**
-    * Destroys the MNERTServer.
-    */
-    ~MNERTServer();
 
-private:
-    CommandServer* m_pCommandServer;
-    FiffStreamServer* m_pFiffStreamServer;
+//*************************************************************************************************************
 
-    ConnectorManager* m_pConnectorManager;
-    IConnector* m_pActiveConnector;
+void CommandServer::incomingConnection(qintptr socketDescriptor)
+{
 
-};
+    QString fortune = fortunes.at(qrand() % fortunes.size());
 
-} // NAMESPACE
+    CommandThread* thread = new CommandThread(socketDescriptor, fortune, this);
 
-#endif // MNE_RT_SERVER_H
+    //when thread has finished it gets deleted
+    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    thread->start();
+}

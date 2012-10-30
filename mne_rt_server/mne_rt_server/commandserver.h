@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_rt_server.h
+* @file     commandserver.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,18 +29,21 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the MNERTServer Class.
+* @brief    Contains the implementation of the CommandServer Class.
 *
 */
 
-#ifndef MNE_RT_SERVER_H
-#define MNE_RT_SERVER_H
+#ifndef COMMANDSERVER_H
+#define COMMANDSERVER_H
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FIFF INCLUDES
+// QT INCLUDES
 //=============================================================================================================
+
+#include <QStringList>
+#include <QTcpServer>
 
 
 //*************************************************************************************************************
@@ -62,38 +65,27 @@ namespace MSERVER
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class CommandServer;
-class FiffStreamServer;
-class ConnectorManager;
-class IConnector;
-
 
 //=============================================================================================================
 /**
-* DECLARE CLASS MNERTServer
+* DECLARE CLASS CommandServer
 *
-* @brief The MNERTServer class provides a Fiff data simulator.
+* @brief The CommandServer class provides
 */
-class MNERTServer
+class CommandServer : public QTcpServer
 {
-public:
-    MNERTServer();
+    Q_OBJECT
 
-    //=========================================================================================================
-    /**
-    * Destroys the MNERTServer.
-    */
-    ~MNERTServer();
+public:
+    CommandServer(QObject *parent = 0);
+
+protected:
+    void incomingConnection(qintptr socketDescriptor);
 
 private:
-    CommandServer* m_pCommandServer;
-    FiffStreamServer* m_pFiffStreamServer;
-
-    ConnectorManager* m_pConnectorManager;
-    IConnector* m_pActiveConnector;
-
+    QStringList fortunes;
 };
 
 } // NAMESPACE
 
-#endif // MNE_RT_SERVER_H
+#endif //INSTRUCTIONSERVER_H
