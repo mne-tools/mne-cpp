@@ -1,4 +1,4 @@
-classdef mne_matlab_client < handle
+classdef mne_rt_client < handle
     %MNE_MATLAB_CLIENT Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -9,7 +9,7 @@ classdef mne_matlab_client < handle
     
     methods
         %% mne_matlab_client
-        function obj = mne_matlab_client(varargin)
+        function obj = mne_rt_client(varargin)
             
         end % mne_matlab_client
         

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     instructionthread.cpp
+* @file     commandthread.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,52 +29,31 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the InstructionThread Class.
+* @brief    Contains the implementation of the CommandThread Class.
 *
 */
 
-#include "instructionthread.h"
+#ifndef COMMANDTHREAD_H
+#define COMMANDTHREAD_H
 
-#include <QtNetwork>
+#include <QThread>
+#include <QTcpSocket>
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-InstructionThread::InstructionThread(int socketDescriptor, const QString &fortune, QObject *parent)
-    : QThread(parent), socketDescriptor(socketDescriptor), text(fortune)
+class CommandThread : public QThread
 {
-}
+    Q_OBJECT
 
+public:
+    CommandThread(int socketDescriptor, const QString &fortune, QObject *parent);
 
-//*************************************************************************************************************
+    void run();
 
-void InstructionThread::run()
-{
-    QTcpSocket tcpSocket;
-    if (!tcpSocket.setSocketDescriptor(socketDescriptor)) {
-        emit error(tcpSocket.error());
-        return;
-    }
-    else
-    {
-        printf("Connection accepted from\n\tIP: %s\n\tPort: %d\n\n",
-               QHostAddress(tcpSocket.peerAddress()).toString().toUtf8().constData(),
-               tcpSocket.peerPort());
-    }
+signals:
+    void error(QTcpSocket::SocketError socketError);
 
-    QByteArray block;
-    QDataStream out(&block, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_4_0);
-    out << (quint16)0;
-    out << text;
-    out.device()->seek(0);
-    out << (quint16)(block.size() - sizeof(quint16));
+private:
+    int socketDescriptor;
+    QString text;
+};
 
-    tcpSocket.write(block);
-
-    tcpSocket.disconnectFromHost();
-    tcpSocket.waitForDisconnected();
-}
+#endif //COMMANDTHREAD_H

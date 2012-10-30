@@ -63,9 +63,10 @@ SOURCES += \
     main.cpp \
     connectormanager.cpp \
     mne_rt_server.cpp \
-    instructionthread.cpp \
-    instructionserver.cpp \
-    fiffstreamclient.cpp
+    fiffstreamserver.cpp \
+    fiffstreamthread.cpp \
+    commandserver.cpp \
+    commandthread.cpp
 
 
 HEADERS += \
@@ -74,6 +75,7 @@ HEADERS += \
     connectormanager.h \
     mne_rt_server.h \
     mne_rt_server.h \
-    instructionthread.h \
-    instructionserver.h \
-    fiffstreamclient.h
+    fiffstreamserver.h \
+    fiffstreamthread.h \
+    commandserver.h \
+    commandthread.h

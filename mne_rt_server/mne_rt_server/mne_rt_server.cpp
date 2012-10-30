@@ -40,7 +40,8 @@
 
 #include "mne_rt_server.h"
 
-#include "instructionserver.h"
+#include "commandserver.h"
+#include "fiffstreamserver.h"
 
 #include "IConnector.h"
 #include "connectormanager.h"
@@ -82,14 +83,25 @@ const char* connectorDir = "/mne_rt_server_plugins";        /**< holds directory
 //=============================================================================================================
 
 MNERTServer::MNERTServer()
+: m_pCommandServer(new CommandServer())
+, m_pFiffStreamServer(new FiffStreamServer())
 {
     //
-    // Run server
+    // Run instruction server
     //
-    if (!server.listen()) {
-        printf("Unable to start the mne_rt_server: %s\n", server.errorString().toUtf8().constData());
+    if (!m_pCommandServer->listen()) {
+        printf("Unable to start the command server: %s\n", m_pCommandServer->errorString().toUtf8().constData());
         return;
     }
+
+    //
+    // Run data server
+    //
+    if (!m_pFiffStreamServer->listen()) {
+        printf("Unable to start the fiff stream server: %s\n", m_pFiffStreamServer->errorString().toUtf8().constData());
+        return;
+    }
+
 
     QString ipAddress;
     QList<QHostAddress> ipAddressesList = QNetworkInterface::allAddresses();
@@ -105,7 +117,8 @@ MNERTServer::MNERTServer()
     if (ipAddress.isEmpty())
         ipAddress = QHostAddress(QHostAddress::LocalHost).toString();
 
-    printf("mne_rt_server is running on\n\nIP: %s\nport: %d\n\n",ipAddress.toUtf8().constData(), server.serverPort());
+    printf("mne_rt_server is running on\n\tIP: %s\n\tcommand port: %d\n\tfiff stream port: %d\n\n",ipAddress.toUtf8().constData(), m_pCommandServer->serverPort(), m_pFiffStreamServer->serverPort());
+
 
     //
     // Load Connectors
@@ -121,6 +134,10 @@ MNERTServer::MNERTServer()
 
 MNERTServer::~MNERTServer()
 {
+    if(m_pCommandServer)
+        delete m_pCommandServer;
+    if(m_pFiffStreamServer)
+        delete m_pFiffStreamServer;
     if(m_pConnectorManager)
         delete m_pConnectorManager;
 }

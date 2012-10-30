@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     instructionserver.h
+* @file     fiffstreamthread.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,63 +29,52 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the InstructionServer Class.
+* @brief    Contains the implementation of the FiffStreamThread Class.
 *
 */
 
-#ifndef INSTRUCTIONSERVER_H
-#define INSTRUCTIONSERVER_H
+#include "fiffstreamthread.h"
+
+#include <QtNetwork>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-#include <QStringList>
-#include <QTcpServer>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MSERVER
-//=============================================================================================================
-
-namespace MSERVER
+FiffStreamThread::FiffStreamThread(int socketDescriptor, const QString &fortune, QObject *parent)
+    : QThread(parent), socketDescriptor(socketDescriptor), text(fortune)
 {
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
+}
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
 
-
-//=============================================================================================================
-/**
-* DECLARE CLASS InstructionServer
-*
-* @brief The InstructionServer class provides
-*/
-class InstructionServer : public QTcpServer
+void FiffStreamThread::run()
 {
-    Q_OBJECT
+    QTcpSocket tcpSocket;
+    if (!tcpSocket.setSocketDescriptor(socketDescriptor)) {
+        emit error(tcpSocket.error());
+        return;
+    }
+    else
+    {
+        printf("Fiff stream connection accepted from\n\tIP: %s\n\tPort: %d\n\n",
+               QHostAddress(tcpSocket.peerAddress()).toString().toUtf8().constData(),
+               tcpSocket.peerPort());
+    }
 
-public:
-    InstructionServer(QObject *parent = 0);
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_4_0);
+    out << (quint16)0;
+    out << text;
+    out.device()->seek(0);
+    out << (quint16)(block.size() - sizeof(quint16));
 
-protected:
-    void incomingConnection(qintptr socketDescriptor);
+    tcpSocket.write(block);
 
-private:
-    QStringList fortunes;
-};
-
-} // NAMESPACE
-
-#endif //INSTRUCTIONSERVER_H
+    tcpSocket.disconnectFromHost();
+    tcpSocket.waitForDisconnected();
+}

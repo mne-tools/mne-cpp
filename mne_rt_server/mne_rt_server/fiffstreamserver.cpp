@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     instructionserver.cpp
+* @file     fiffstreamserver.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the InstructionServer Class.
+* @brief    Contains the implementation of the FiffStreamServer Class.
 *
 */
 
@@ -38,8 +38,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "instructionserver.h"
-#include "instructionthread.h"
+#include "fiffstreamserver.h"
+#include "fiffstreamthread.h"
 
 
 //*************************************************************************************************************
@@ -63,8 +63,8 @@ using namespace MSERVER;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-InstructionServer::InstructionServer(QObject *parent)
-    : QTcpServer(parent)
+FiffStreamServer::FiffStreamServer(QObject *parent)
+: QTcpServer(parent)
 {
     fortunes << tr("You've been leading a dog's life. Stay off the furniture.")
              << tr("You've got to think about tomorrow.")
@@ -78,12 +78,12 @@ InstructionServer::InstructionServer(QObject *parent)
 
 //*************************************************************************************************************
 
-void InstructionServer::incomingConnection(qintptr socketDescriptor)
+void FiffStreamServer::incomingConnection(qintptr socketDescriptor)
 {
 
     QString fortune = fortunes.at(qrand() % fortunes.size());
 
-    InstructionThread* thread = new InstructionThread(socketDescriptor, fortune, this);
+    FiffStreamThread* thread = new FiffStreamThread(socketDescriptor, fortune, this);
 
     //when thread has finished it gets deleted
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
