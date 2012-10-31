@@ -117,7 +117,7 @@ MNERTServer::MNERTServer()
     if (ipAddress.isEmpty())
         ipAddress = QHostAddress(QHostAddress::LocalHost).toString();
 
-    printf("mne_rt_server is running on\n\tIP: %s\n\tcommand port: %d\n\tfiff stream port: %d\n\n",ipAddress.toUtf8().constData(), m_pCommandServer->serverPort(), m_pFiffStreamServer->serverPort());
+    printf("mne_rt_server is running on\n\tIP:\t\t%s\n\tcommand port:\t%d\n\tfiff data port:\t%d\n\n",ipAddress.toUtf8().constData(), m_pCommandServer->serverPort(), m_pFiffStreamServer->serverPort());
 
 
     //

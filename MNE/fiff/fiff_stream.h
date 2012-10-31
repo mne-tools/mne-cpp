@@ -125,6 +125,8 @@ public:
     */
     FiffStream(QIODevice* p_pIODevice);
 
+    FiffStream(QByteArray * a, QIODevice::OpenMode mode);
+
     //=========================================================================================================
     /**
     * Destroys the FiffInfo.

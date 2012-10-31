@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiffstreamserver.cpp
+* @file     mne_rt_constants.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,80 +29,31 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the FiffStreamServer Class.
+* @brief    Contains mne rt constants
 *
 */
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "fiffstreamserver.h"
-#include "fiffstreamthread.h"
-
+#ifndef MNE_RT_CONSTANTS_H
+#define MNE_RT_CONSTANTS_H
 
 //*************************************************************************************************************
 //=============================================================================================================
-// STL INCLUDES
+// DEFINE NAMESPACE FIFFLIB
 //=============================================================================================================
 
-#include <stdlib.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace MSERVER;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-FiffStreamServer::FiffStreamServer(QObject *parent)
-: QTcpServer(parent)
-, m_iNextClientId(0)
+namespace MSERVER
 {
 
-}
-
-
 //*************************************************************************************************************
+//=============================================================================================================
+// MNE RT Communication Constants
+//=============================================================================================================
 
-FiffStreamServer::~FiffStreamServer()
-{
-    clearClients();
-}
-
-
-//*************************************************************************************************************
-
-void FiffStreamServer::clearClients()
-{
-    QMap<quint8, FiffStreamThread*>::const_iterator i = m_qClientList.constBegin();
-    while (i != m_qClientList.constEnd()) {
-        if(i.value())
-            delete i.value();
-        ++i;
-    }
-    m_qClientList.clear();
-}
+#define MNE_RT_CLIENT_ID    1   /**< Client ID at mne_rt_server */
 
 
-//*************************************************************************************************************
 
-void FiffStreamServer::incomingConnection(qintptr socketDescriptor)
-{
-    FiffStreamThread* streamThread = new FiffStreamThread(m_iNextClientId, socketDescriptor, this);
 
-    m_qClientList.insert(m_iNextClientId, streamThread);
-    ++m_iNextClientId;
+} // NAMESPACE
 
-//    //when thread has finished it gets deleted
-//    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-    streamThread->start();
-}
+#endif // MNE_RT_CONSTANTS_H

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiffstreamserver.cpp
+* @file     IServer.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,62 +29,112 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the FiffStreamServer Class.
+* @brief    The server interface
 *
 */
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "fiffstreamserver.h"
-#include "fiffstreamthread.h"
+#ifndef ISERVER_H
+#define ISERVER_H
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// STL INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <stdlib.h>
+#include <QTcpServer>
+#include <QThread>
+#include <QList>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE NAMESPACE MSERVER
 //=============================================================================================================
 
-using namespace MSERVER;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-FiffStreamServer::FiffStreamServer(QObject *parent)
-: QTcpServer(parent)
-, m_iNextClientId(0)
+namespace MSERVER
 {
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// ENUMERATIONS
+//=============================================================================================================
+
+
+//=========================================================================================================
+/**
+* The IConnector class is the interface class for all connectors.
+*
+* @brief The IConnector class is the interface class of all modules.
+*/
+class IServer : public QTcpServer
+{
+    Q_OBJECT
+
+public:
+
+    //=========================================================================================================
+    /**
+    * Destroys the IConnector.
+    */
+    virtual ~IServer()
+    {
+        clearClients();
+    };
+
+    //=========================================================================================================
+    /**
+    * ToDo...
+    */
+    inline QThread* getClient(quint8 id);
+
+    //=========================================================================================================
+    /**
+    * ToDo...
+    */
+    inline quint8 addClient(QThread* p_pThreadClient);
+
+    //=========================================================================================================
+    /**
+    * ToDo...
+    */
+    inline void clearClients();
+
+private:
+    QMap<quint8, QThread*> m_qClientList;
+    quint8          m_iNextClientId;
+
+};
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+QThread* IServer::getClient(quint8 id)
+{
+    return m_qClientList[id];
 }
 
 
 //*************************************************************************************************************
 
-FiffStreamServer::~FiffStreamServer()
+quint8 IServer::addClient(QThread* p_pThreadClient)
 {
-    clearClients();
+    qint8 id = m_iNextClientId;
+    m_qClientList.insert(id, p_pThreadClient);
+    ++m_iNextClientId;
+    return id;
 }
 
 
 //*************************************************************************************************************
 
-void FiffStreamServer::clearClients()
+void IServer::clearClients()
 {
-    QMap<quint8, FiffStreamThread*>::const_iterator i = m_qClientList.constBegin();
-    while (i != m_qClientList.constEnd()) {
+    QMap<quint8, QThread*>::const_iterator i = m_qClientList.constBegin();
+    while (i != map.constEnd()) {
         if(i.value())
             delete i.value();
         ++i;
@@ -93,16 +143,8 @@ void FiffStreamServer::clearClients()
 }
 
 
-//*************************************************************************************************************
 
-void FiffStreamServer::incomingConnection(qintptr socketDescriptor)
-{
-    FiffStreamThread* streamThread = new FiffStreamThread(m_iNextClientId, socketDescriptor, this);
+} //Namespace
 
-    m_qClientList.insert(m_iNextClientId, streamThread);
-    ++m_iNextClientId;
 
-//    //when thread has finished it gets deleted
-//    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-    streamThread->start();
-}
+#endif //ISERVER_H
