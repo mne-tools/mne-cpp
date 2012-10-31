@@ -33,9 +33,35 @@
 *
 */
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
 #include "fiffstreamthread.h"
 
+
+#include "mne_rt_constants.h"
+
+#include "../../MNE/fiff/fiff_stream.h"
+#include "../../MNE/fiff/fiff_constants.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
 #include <QtNetwork>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace MSERVER;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -43,9 +69,34 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FiffStreamThread::FiffStreamThread(int socketDescriptor, const QString &fortune, QObject *parent)
-    : QThread(parent), socketDescriptor(socketDescriptor), text(fortune)
+FiffStreamThread::FiffStreamThread(quint8 id, int socketDescriptor, QObject *parent)
+: QThread(parent)
+, m_iClientId(id)
+, socketDescriptor(socketDescriptor)
 {
+}
+
+
+//*************************************************************************************************************
+
+void FiffStreamThread::write_client_info(QTcpSocket& p_qTcpSocket)
+{
+
+    QByteArray block;
+
+    FiffStream t_FiffStream(&block, QIODevice::WriteOnly);
+    t_FiffStream.setVersion(QDataStream::Qt_5_0);
+
+    qint32 init_info[2];
+    init_info[0] = MNE_RT_CLIENT_ID;
+    init_info[1] = m_iClientId;
+
+    t_FiffStream.write_int(FIFF_MNE_RT_COMMAND, init_info, 2);
+
+    p_qTcpSocket.write(block);
+    p_qTcpSocket.flush();
+
+    block.clear();
 }
 
 
@@ -53,28 +104,46 @@ FiffStreamThread::FiffStreamThread(int socketDescriptor, const QString &fortune,
 
 void FiffStreamThread::run()
 {
-    QTcpSocket tcpSocket;
-    if (!tcpSocket.setSocketDescriptor(socketDescriptor)) {
-        emit error(tcpSocket.error());
+    QTcpSocket t_qTcpSocket;
+    if (!t_qTcpSocket.setSocketDescriptor(socketDescriptor)) {
+        emit error(t_qTcpSocket.error());
         return;
     }
     else
     {
-        printf("Fiff stream connection accepted from\n\tIP: %s\n\tPort: %d\n\n",
-               QHostAddress(tcpSocket.peerAddress()).toString().toUtf8().constData(),
-               tcpSocket.peerPort());
+        printf("Fiff stream client connection accepted from\n\tIP:\t%s\n\tPort:\t%d\n\n",
+               QHostAddress(t_qTcpSocket.peerAddress()).toString().toUtf8().constData(),
+               t_qTcpSocket.peerPort());
     }
 
-    QByteArray block;
-    QDataStream out(&block, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_4_0);
-    out << (quint16)0;
-    out << text;
-    out.device()->seek(0);
-    out << (quint16)(block.size() - sizeof(quint16));
 
-    tcpSocket.write(block);
 
-    tcpSocket.disconnectFromHost();
-    tcpSocket.waitForDisconnected();
+    write_client_info(t_qTcpSocket);
+
+//    QByteArray block;
+
+//    FiffStream t_FiffStream(&block, QIODevice::WriteOnly);
+//    t_FiffStream.setVersion(QDataStream::Qt_5_0);
+
+//    qint32 init_info[2];
+//    init_info[0] = MNE_RT_CLIENT_ID;
+//    init_info[1] = m_iClientId;
+
+//    t_FiffStream.write_int(FIFF_MNE_RT_COMMAND, init_info, 2);
+
+//    t_qTcpSocket.write(block);
+//    t_qTcpSocket.flush();
+
+//    block.clear();
+
+
+
+
+//    tcpSocket.disconnectFromHost();
+//    tcpSocket.waitForDisconnected();
+
+//    while(true)
+//    {
+
+//    }
 }

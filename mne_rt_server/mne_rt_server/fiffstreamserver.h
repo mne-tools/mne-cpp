@@ -65,6 +65,7 @@ namespace MSERVER
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class FiffStreamThread;
 
 //=============================================================================================================
 /**
@@ -77,14 +78,45 @@ class FiffStreamServer : public QTcpServer
     Q_OBJECT
 
 public:
+
     FiffStreamServer(QObject *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Destroys the FiffStreamServer.
+    */
+    ~FiffStreamServer();
+
+    //=========================================================================================================
+    /**
+    * ToDo...
+    */
+    inline FiffStreamThread* getClient(quint8 id);
+
+    //=========================================================================================================
+    /**
+    * ToDo...
+    */
+    void clearClients();
 
 protected:
     void incomingConnection(qintptr socketDescriptor);
 
 private:
-    QStringList fortunes;
+    QMap<quint8, FiffStreamThread*> m_qClientList;
+    quint8                 m_iNextClientId;
 };
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+FiffStreamThread* FiffStreamServer::getClient(quint8 id)
+{
+    return m_qClientList[id];
+}
 
 } // NAMESPACE
 

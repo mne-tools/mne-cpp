@@ -59,14 +59,25 @@ classdef mne_rt_client < handle
             end
         end
 
-        %% read
-        function [blocksize, raw] = read(obj)
-
+        %% read_tag_stream
+        function [tag] = read_tag_stream(obj)
+            
             import java.net.Socket
             import java.io.*
+
+            global FIFF;
+            if isempty(FIFF)
+                FIFF = fiff_define_constants();
+            end
+
+            global MNE_RT;
+            if isempty(MNE_RT)
+                MNE_RT = mne_rt_define_constants();
+            end
             
-            blocksize = -1;
-            raw = [];
+            me='MNE_RT_CLIENT:read_tag_stream';
+            
+            tag = [];
 
             if ~isempty(obj.m_input_socket)
                 % get a buffered data input stream from the socket
@@ -76,16 +87,27 @@ classdef mne_rt_client < handle
                 % read data from the socket
                 bytes_available = input_stream.available;
                 fprintf(1, 'Reading %d bytes\n', bytes_available);
-
-                blocksize = d_input_stream.readUnsignedShort;
                 
-                bytes_available = input_stream.available;
-                data = zeros(1, bytes_available, 'uint8');
-                for i = 1:bytes_available
-                    data(i) = d_input_stream.readByte;
+                tag = fiff_read_tag_stream(d_input_stream);
+                
+                
+                if(tag.kind == FIFF.FIFF_MNE_RT_COMMAND)
+                    switch tag.data(1)
+                    %
+                    %   MNE_RT constants are stored in the first data
+                    %
+                    case MNE_RT.MNE_RT_CLIENT_ID
+                        fprintf(1, 'MNE_RT_CLIENT_ID\n');
+                    otherwise
+                        error(me,'Unimplemented tag kind %d',tag.kind); 
+                    end
                 end
                 
-                raw = char(data(5:end));
+                
+                bytes_available = input_stream.available;
+                if(bytes_available > 0)
+                    printf(1, '%d bytes more to read\n', bytes_available);
+                end
             end
         end
     end

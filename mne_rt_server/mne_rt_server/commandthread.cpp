@@ -60,7 +60,7 @@ void CommandThread::run()
     }
     else
     {
-        printf("Command connection accepted from\n\tIP: %s\n\tPort: %d\n\n",
+        printf("Command client connection accepted from\n\tIP:\t%s\n\tPort:\t%d\n\n",
                QHostAddress(tcpSocket.peerAddress()).toString().toUtf8().constData(),
                tcpSocket.peerPort());
     }

@@ -76,6 +76,15 @@ FiffStream::FiffStream(QIODevice* p_pIODevice)
 
 //*************************************************************************************************************
 
+FiffStream::FiffStream(QByteArray * a, QIODevice::OpenMode mode)
+: QDataStream(a, mode)
+{
+
+}
+
+
+//*************************************************************************************************************
+
 FiffStream::~FiffStream()
 {
     if(this->device()->isOpen())

@@ -569,9 +569,17 @@ namespace FIFFLIB
 #define FIFF_MNE_CTF_COMP_KIND         3580       /**< What kind of compensation*/
 #define FIFF_MNE_CTF_COMP_DATA         3581       /**< The compensation data itself*/
 #define FIFF_MNE_CTF_COMP_CALIBRATED   3582       /**< Are the coefficients calibrated?*/
-    //
-    // Fiff values associated with MNE computations
-    //
+
+
+//
+// 3700... Real-Time Communication
+//
+#define FIFF_MNE_RT_COMMAND     3700              /**< Fiff Real-Time Command */
+
+
+//
+// Fiff values associated with MNE computations
+//
 #define FIFFV_MNE_FIXED_ORI            1
 #define FIFFV_MNE_FREE_ORI             2
 

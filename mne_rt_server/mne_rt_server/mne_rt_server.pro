@@ -78,4 +78,5 @@ HEADERS += \
     fiffstreamserver.h \
     fiffstreamthread.h \
     commandserver.h \
-    commandthread.h
+    commandthread.h \
+    mne_rt_constants.h
