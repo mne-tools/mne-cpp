@@ -167,13 +167,13 @@ class FIFFSHARED_EXPORT FiffTag : public QByteArray {
 public:
     //=========================================================================================================
     /**
-    * ctor
+    * ctor //ToDo add FiffStream to constructor and remove static implementations --> make them members
     */
     FiffTag();
 
     //=========================================================================================================
     /**
-    * copy ctor
+    * copy ctor //ToDo add FiffStream to constructor and remove static implementations --> make them members
     */
     FiffTag(FiffTag* p_pFiffTag);
 
@@ -182,6 +182,21 @@ public:
     * Destroys the FiffTag.
     */
     ~FiffTag();
+
+    //=========================================================================================================
+    /**
+    * ### MNE toolbox root function ###: Implementation of the fiff_read_tag function
+    *
+    * Read tag data from a fif file.
+    * if pos is not provided, reading starts from the current file position
+    *
+    * @param[in] p_pStream opened fif file
+    * @param[out] p_pTag the read tag
+    * @param[in] pos position of the tag inside the fif file
+    *
+    * @return true if succeeded, false otherwise
+    */
+    static bool read_tag_data(FiffStream* p_pStream, FiffTag*& p_pTag, qint64 pos = -1);
 
     //=========================================================================================================
     /**
@@ -195,7 +210,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_tag_info(FiffStream* p_pStream, FiffTag*& p_pTag);
+    static bool read_tag_info(FiffStream* p_pStream, FiffTag*& p_pTag);//ToDo skip or no skip bool
 
     //=========================================================================================================
     /**

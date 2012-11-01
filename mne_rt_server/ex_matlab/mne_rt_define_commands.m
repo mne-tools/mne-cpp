@@ -1,6 +1,6 @@
-function [ MNE_RT ] = mne_rt_define_constants()
+function [ MNE_RT ] = mne_rt_define_commands()
 %
-%    [ FIFF ] = mne_rt_define_constants()
+%    [ FIFF ] = mne_rt_define_commands()
 %
 %    Defines structure containing the MNE_RT constants
 %
@@ -12,7 +12,7 @@ function [ MNE_RT ] = mne_rt_define_constants()
 %
 % MNE RT Communication Constants
 %
-MNE_RT.MNE_RT_CLIENT_ID = 1;      % Client ID at mne_rt_server
+MNE_RT.MNE_RT_REQUEST_CLIENT_INFO = 1;      % Reqeust client info at mne_rt_server
 
 return
 

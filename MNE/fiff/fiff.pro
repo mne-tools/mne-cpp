@@ -37,6 +37,8 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
+QT += network
+
 DEFINES += FIFF_LIBRARY
 
 TARGET = fiff

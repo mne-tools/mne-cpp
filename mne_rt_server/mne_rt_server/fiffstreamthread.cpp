@@ -41,7 +41,7 @@
 #include "fiffstreamthread.h"
 
 
-#include "mne_rt_constants.h"
+#include "mne_rt_commands.h"
 
 #include "../../MNE/fiff/fiff_stream.h"
 #include "../../MNE/fiff/fiff_constants.h"
@@ -88,13 +88,13 @@ void FiffStreamThread::write_client_info(QTcpSocket& p_qTcpSocket)
     t_FiffStream.setVersion(QDataStream::Qt_5_0);
 
     qint32 init_info[2];
-    init_info[0] = MNE_RT_CLIENT_ID;
+    init_info[0] = MNE_RT_REQUEST_CLIENT_INFO;
     init_info[1] = m_iClientId;
 
-    t_FiffStream.write_int(FIFF_MNE_RT_COMMAND, init_info, 2);
+    t_FiffStream.start_block(FIFFB_MNE_RT_CLIENT_INFO);
 
     p_qTcpSocket.write(block);
-    p_qTcpSocket.flush();
+    p_qTcpSocket.waitForBytesWritten();
 
     block.clear();
 }
@@ -118,7 +118,7 @@ void FiffStreamThread::run()
 
 
 
-    write_client_info(t_qTcpSocket);
+//    write_client_info(t_qTcpSocket);
 
 //    QByteArray block;
 
@@ -132,6 +132,7 @@ void FiffStreamThread::run()
 //    t_FiffStream.write_int(FIFF_MNE_RT_COMMAND, init_info, 2);
 
 //    t_qTcpSocket.write(block);
+//    t_qTcpSocket.waitForBytesWritten();
 //    t_qTcpSocket.flush();
 
 //    block.clear();
@@ -142,8 +143,50 @@ void FiffStreamThread::run()
 //    tcpSocket.disconnectFromHost();
 //    tcpSocket.waitForDisconnected();
 
-//    while(true)
-//    {
 
-//    }
+    FiffStream t_FiffStreamIn(&t_qTcpSocket);
+    t_FiffStreamIn.setVersion(QDataStream::Qt_5_0);
+
+    while(true)
+    {
+
+//        write_client_info(t_qTcpSocket);
+
+        t_qTcpSocket.waitForReadyRead(10);
+
+        if (t_qTcpSocket.bytesAvailable() >= (int)sizeof(qint32)*4)
+        {
+
+
+            qDebug() << "in Size before" << t_qTcpSocket.bytesAvailable();
+
+//            char* buff = (char *)malloc((t_qTcpSocket.bytesAvailable()+1)*sizeof(char));
+
+//            in.readRawData(buff, t_qTcpSocket.bytesAvailable());
+
+//            QString txt(buff);
+
+//            qDebug() << txt;
+
+//            qint32 kind, type, size, next;
+//            t_FiffStreamIn >> kind;
+//            t_FiffStreamIn >> type;
+//            t_FiffStreamIn >> size;
+//            t_FiffStreamIn >> next;
+
+            FiffTag* t_pTag = NULL;
+            FiffTag::read_tag_info(&t_FiffStreamIn, t_pTag);
+
+            qDebug() << t_pTag->kind;
+            qDebug() << t_pTag->type;
+            qDebug() << t_pTag->size();
+            qDebug() << t_pTag->next;
+
+            qDebug() << "in Size after" << t_qTcpSocket.bytesAvailable();
+
+        }
+
+//        usleep(1000);
+
+    }
 }

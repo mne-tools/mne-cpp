@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_rt_constants.h
+* @file     mne_rt_commands.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef MNE_RT_CONSTANTS_H
-#define MNE_RT_CONSTANTS_H
+#ifndef MNE_RT_COMMANDS_H
+#define MNE_RT_COMMANDS_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -49,11 +49,11 @@ namespace MSERVER
 // MNE RT Communication Constants
 //=============================================================================================================
 
-#define MNE_RT_CLIENT_ID    1   /**< Client ID at mne_rt_server */
+#define MNE_RT_REQUEST_CLIENT_INFO    1   /**< Client ID at mne_rt_server */
 
 
 
 
 } // NAMESPACE
 
-#endif // MNE_RT_CONSTANTS_H
+#endif // MNE_RT_COMMANDS_H
