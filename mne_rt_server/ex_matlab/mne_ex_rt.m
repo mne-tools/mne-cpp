@@ -7,24 +7,25 @@ addpath('D:\Users\Christoph\Documents\GitHub\mne-matlab\matlab');
 
 %% Connection Information
 mne_rt_server_ip               =   'localhost';%'172.21.16.63';
-mne_rt_server_command_port     =    27794;
-mne_rt_server_fiff_stream_port =    27795;
+mne_rt_server_command_port     =    43272;
+mne_rt_server_fiff_stream_port =    43273;
 
 %%
-global MNE_RT;
-if isempty(MNE_RT)
-    MNE_RT = mne_rt_define_constants();
-end
+% global MNE_RT;
+% if isempty(MNE_RT)
+%     MNE_RT = mne_rt_define_constants();
+% end
 
 
 % %%
-% command_client = mne_rt_client();
-% command_client.init_connection(mne_rt_server_ip, mne_rt_server_command_port);
+% cmd_client = mne_rt_cmd_client();
+% cmd_client.init(mne_rt_server_ip, mne_rt_server_command_port);
 % 
-% [blocksize, msg] = command_client.read()
+% tag = cmd_client.read_tag()
 
 %%
-fiff_stream_client = mne_rt_client();
-fiff_stream_client.init_connection(mne_rt_server_ip, mne_rt_server_fiff_stream_port);
+data_client = mne_rt_data_client();
+data_client.init(mne_rt_server_ip, mne_rt_server_fiff_stream_port);
 
-tag = fiff_stream_client.read_tag_stream();
+% tag = data_client.read_tag();
+% data_client.get_client_info();

@@ -574,7 +574,13 @@ namespace FIFFLIB
 //
 // 3700... Real-Time Communication
 //
-#define FIFF_MNE_RT_COMMAND     3700              /**< Fiff Real-Time Command */
+#define FIFF_MNE_RT_COMMAND         3700              /**< Fiff Real-Time Command */
+#define FIFF_MNE_RT_ACK             3701              /**< Fiff Real-Time Command */
+
+//
+// 3710... Real-Time Blocks
+//
+#define FIFFB_MNE_RT_CLIENT_INFO    3710              /**< Fiff Real-Time Client Info */
 
 
 //

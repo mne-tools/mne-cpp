@@ -44,6 +44,14 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QTcpSocket>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
@@ -107,6 +115,39 @@ FiffTag::~FiffTag()
 
 //*************************************************************************************************************
 
+bool FiffTag::read_tag_data(FiffStream* p_pStream, FiffTag*& p_pTag, qint64 pos)
+{
+    if (pos >= 0)
+    {
+        p_pStream->device()->seek(pos);
+    }
+
+//    QDataStream t_DataStream(p_pStream);
+    p_pStream->setByteOrder(QDataStream::BigEndian);
+
+    if (p_pTag == NULL)
+        return false;
+
+    //
+    // Read data when available
+    //
+    if (p_pTag->size() > 0)
+    {
+        p_pStream->readRawData(p_pTag->data(), p_pTag->size());
+        FiffTag::convert_tag_data(p_pTag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
+    }
+
+    if (p_pTag->next != FIFFV_NEXT_SEQ)
+        p_pStream->device()->seek(p_pTag->next);//fseek(fid,tag.next,'bof');
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+//ToDo: Split read_tag into read_tag_info & read_tag_data
+
 bool FiffTag::read_tag_info(FiffStream* p_pStream, FiffTag*& p_pTag)
 {
 //    QDataStream t_DataStream(p_pStream);
@@ -131,6 +172,14 @@ bool FiffTag::read_tag_info(FiffStream* p_pStream, FiffTag*& p_pTag)
     *p_pStream  >> p_pTag->next;
 
 //    qDebug() << "read_tag_info" << "  Kind:" << p_pTag->kind << "  Type:" << p_pTag->type << "  Size:" << p_pTag->size() << "  Next:" << p_pTag->next;
+
+    QTcpSocket* t_qTcpSocket = qobject_cast<QTcpSocket*>(p_pStream->device());
+
+    if(t_qTcpSocket)
+    {
+        qDebug() << "Its a socket no skip!";
+        return true;
+    }
 
     if (p_pTag->next == FIFFV_NEXT_SEQ)
     {
