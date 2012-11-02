@@ -36,6 +36,13 @@
 #ifndef FIFFSTREAMTHREAD_H
 #define FIFFSTREAMTHREAD_H
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "../../MNE/fiff/fiff_stream.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -59,6 +66,8 @@ namespace MSERVER
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace FIFFLIB;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -76,13 +85,27 @@ public:
 
     void run();
 
-    void write_client_info(QTcpSocket& p_qTcpSocket);
+    quint8 getID()
+    {
+        return m_iDataClientId;
+    }
+
+    QString getName()
+    {
+        return m_sDataClientName;
+    }
+
+    void read_command(FiffStream& p_FiffStreamIn, qint32 size);
+
+    void write_client_list(QTcpSocket& p_qTcpSocket);
 
 signals:
     void error(QTcpSocket::SocketError socketError);
 
 private:
-    quint8 m_iClientId;
+    quint8 m_iDataClientId;
+    QString m_sDataClientName;
+
     int socketDescriptor;
 
     QByteArray block;

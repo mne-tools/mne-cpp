@@ -12,7 +12,8 @@ function [ MNE_RT ] = mne_rt_define_commands()
 %
 % MNE RT Communication Constants
 %
-MNE_RT.MNE_RT_REQUEST_CLIENT_INFO = 1;      % Reqeust client info at mne_rt_server
+MNE_RT.MNE_RT_GET_CLIENT_LIST   =   1;	% Client List at mne_rt_server
+MNE_RT.MNE_RT_SET_CLIENT_NAME   =   2;	% Set Client name at mne_rt_server
 
 return
 

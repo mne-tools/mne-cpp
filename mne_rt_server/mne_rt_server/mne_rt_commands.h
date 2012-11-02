@@ -49,7 +49,8 @@ namespace MSERVER
 // MNE RT Communication Constants
 //=============================================================================================================
 
-#define MNE_RT_REQUEST_CLIENT_INFO    1   /**< Client ID at mne_rt_server */
+#define MNE_RT_GET_CLIENT_LIST  1   /**< Client List at mne_rt_server */
+#define MNE_RT_SET_CLIENT_NAME  2   /**< Set Client name at mne_rt_server */
 
 
 

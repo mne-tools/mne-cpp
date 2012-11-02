@@ -60,10 +60,48 @@ classdef mne_rt_client < handle
                 end
             end
         end
+        
+        % =================================================================
+        %% set_client_name
+        function [info] = set_client_name(obj, name)
+            
+            import java.net.Socket
+            import java.io.*
 
+            global FIFF;
+            if isempty(FIFF)
+                FIFF = fiff_define_constants();
+            end
+            global MNE_RT;
+            if isempty(MNE_RT)
+                MNE_RT = mne_rt_define_commands();
+            end
+            
+            info = [];
+            
+            if ~isempty(obj.m_TcpSocket)
+                % get a buffered data input stream from the socket
+                output_stream   = obj.m_TcpSocket.getOutputStream;
+                d_output_stream = DataOutputStream(output_stream);
+
+                mne_rt_client.write_command(d_output_stream, MNE_RT.MNE_RT_SET_CLIENT_NAME, name)
+                
+%                 kind = FIFF.FIFF_MNE_RT_COMMAND;
+%                 type = 3;
+%                 size = 0;
+%                 next = 0;
+%                 
+%                 d_output_stream.writeInt(kind);
+%                 d_output_stream.writeInt(type);
+%                 d_output_stream.writeInt(size);
+%                 d_output_stream.writeInt(next);
+%                 d_output_stream.flush;
+            end
+        end
+        
         % =================================================================
         %% get_client_info
-        function [info] = get_client_info(obj)
+        function [info] = get_client_list(obj)
             
             import java.net.Socket
             import java.io.*
@@ -95,12 +133,8 @@ classdef mne_rt_client < handle
                 d_output_stream.writeInt(next);
                 d_output_stream.flush;
             end
-            
-            
         end
-        
-        
-        
+
         % =================================================================
         %% read_tag
         function [tag] = read_tag(obj)
@@ -182,6 +216,32 @@ classdef mne_rt_client < handle
     end
             
     methods(Static)
+        % =================================================================
+        %% write_command
+        function write_command(p_dOutputStream, p_Cmd, p_data)
+            global FIFF;
+            if isempty(FIFF)
+                FIFF = fiff_define_constants();
+            end
+            
+            data = char(p_data);
+            
+            kind = FIFF.FIFF_MNE_RT_COMMAND;
+            type = FIFF.FIFFT_VOID;
+            size = 4+length(data);% first 4 bytes are the command code
+            next = 0;
+            
+            p_dOutputStream.writeInt(kind);
+            p_dOutputStream.writeInt(type);
+            p_dOutputStream.writeInt(size);
+            p_dOutputStream.writeInt(next);
+            p_dOutputStream.writeInt(p_Cmd);% first 4 bytes are the command code
+            if(~isempty(data))
+                p_dOutputStream.writeBytes(data);
+            end
+            p_dOutputStream.flush;
+        end
+        
         % =================================================================
         %% read_tag_data
         function [tag] = read_tag_data(p_dInputStream, p_tagInfo, pos)

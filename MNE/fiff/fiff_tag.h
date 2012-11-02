@@ -207,10 +207,11 @@ public:
     *
     * @param[in] p_pStream opened fif file
     * @param[out] p_pTag the read tag info
+    * @param[in] p_bDoSkip if true it skips the data of the tag (optional, default = true)
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_tag_info(FiffStream* p_pStream, FiffTag*& p_pTag);//ToDo skip or no skip bool
+    static bool read_tag_info(FiffStream* p_pStream, FiffTag*& p_pTag, bool p_bDoSkip = true);
 
     //=========================================================================================================
     /**
