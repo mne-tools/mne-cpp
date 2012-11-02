@@ -53,28 +53,68 @@ CommandThread::CommandThread(int socketDescriptor, const QString &fortune, QObje
 
 void CommandThread::run()
 {
-    QTcpSocket tcpSocket;
-    if (!tcpSocket.setSocketDescriptor(socketDescriptor)) {
-        emit error(tcpSocket.error());
+    QTcpSocket t_qTcpSocket;
+    if (!t_qTcpSocket.setSocketDescriptor(socketDescriptor)) {
+        emit error(t_qTcpSocket.error());
         return;
     }
     else
     {
         printf("Command client connection accepted from\n\tIP:\t%s\n\tPort:\t%d\n\n",
-               QHostAddress(tcpSocket.peerAddress()).toString().toUtf8().constData(),
-               tcpSocket.peerPort());
+               QHostAddress(t_qTcpSocket.peerAddress()).toString().toUtf8().constData(),
+               t_qTcpSocket.peerPort());
     }
 
-    QByteArray block;
-    QDataStream out(&block, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_4_0);
-    out << (quint16)0;
-    out << text;
-    out.device()->seek(0);
-    out << (quint16)(block.size() - sizeof(quint16));
+    emit sendCommandServerInstruction();
 
-    tcpSocket.write(block);
 
-    tcpSocket.disconnectFromHost();
-    tcpSocket.waitForDisconnected();
+    QDataStream t_FiffStreamIn(&t_qTcpSocket);
+    t_FiffStreamIn.setVersion(QDataStream::Qt_5_0);
+
+
+    while(true)
+    {
+
+        t_qTcpSocket.waitForReadyRead(100);
+
+        if (t_qTcpSocket.bytesAvailable() > 0)
+        {
+            quint32 v = t_qTcpSocket.bytesAvailable();
+            char* buf = new char[v+1];
+            t_FiffStreamIn.readRawData(buf, v);
+            buf[v] = 0;
+            QString t_sCommand = QString(buf);
+            delete[] buf;
+
+            qDebug() << t_sCommand;
+
+
+        }
+
+
+//        if (blockSize == 0) {
+//            if (t_FiffStreamIn->bytesAvailable() < (int)sizeof(quint16))
+//                return;
+
+//            in >> blockSize;
+//        }
+
+//        if (tcpSocket->bytesAvailable() < blockSize)
+//            return;
+
+//        QByteArray block;
+//        QDataStream out(&block, QIODevice::WriteOnly);
+//        out.setVersion(QDataStream::Qt_4_0);
+//        out << (quint16)0;
+//        out << text;
+//        out.device()->seek(0);
+//        out << (quint16)(block.size() - sizeof(quint16));
+
+//        tcpSocket.write(block);
+
+//        tcpSocket.disconnectFromHost();
+//        tcpSocket.waitForDisconnected();
+
+    }
+
 }

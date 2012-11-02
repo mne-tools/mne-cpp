@@ -109,6 +109,11 @@ private:
     int socketDescriptor;
 
     QByteArray block;
+
+//private slots: --> in Qt 5 not anymore declared as slot
+    void readFiffStreamServerInstruction(quint8 id, quint8 instruction);
+
+
 };
 
 } // NAMESPACE

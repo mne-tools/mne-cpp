@@ -87,5 +87,16 @@ void CommandServer::incomingConnection(qintptr socketDescriptor)
 
     //when thread has finished it gets deleted
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    connect(thread, &CommandThread::sendCommandServerInstruction,
+            this, &CommandServer::readCommandThreadInstruction);
     thread->start();
+}
+
+
+//*************************************************************************************************************
+
+void CommandServer::readCommandThreadInstruction()
+{
+    qDebug() << "CommandServer::readCommandThreadInstruction()";
+    emit sendFiffStreamServerInstruction();
 }

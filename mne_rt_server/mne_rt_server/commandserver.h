@@ -79,11 +79,18 @@ class CommandServer : public QTcpServer
 public:
     CommandServer(QObject *parent = 0);
 
+signals:
+    void sendFiffStreamServerInstruction();
+
 protected:
     void incomingConnection(qintptr socketDescriptor);
 
 private:
     QStringList fortunes;
+
+//private slots: --> in Qt 5 not anymore declared as slot
+    void readCommandThreadInstruction();
+
 };
 
 } // NAMESPACE

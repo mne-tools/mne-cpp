@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include "fiffstreamthread.h"
+#include "fiffstreamserver.h"
 
 
 #include "mne_rt_commands.h"
@@ -109,20 +110,27 @@ void FiffStreamThread::read_command(FiffStream& p_FiffStreamIn, qint32 size)
 
 
 //*************************************************************************************************************
+
+void FiffStreamThread::readFiffStreamServerInstruction(quint8 id, quint8 instruction)
+{
+    qDebug() << "Received Instruction: ID " << id << "; Instruction " << instruction;
+}
+
+//*************************************************************************************************************
 //ToDo Move this to command thread
 void FiffStreamThread::write_client_list(QTcpSocket& p_qTcpSocket)
 {
 
     QByteArray block;
 
-    FiffStream t_FiffStream(&block, QIODevice::WriteOnly);
-    t_FiffStream.setVersion(QDataStream::Qt_5_0);
+    FiffStream t_FiffStreamOut(&block, QIODevice::WriteOnly);
+    t_FiffStreamOut.setVersion(QDataStream::Qt_5_0);
 
     qint32 init_info[2];
     init_info[0] = MNE_RT_GET_CLIENT_LIST;
     init_info[1] = m_iDataClientId;
 
-    t_FiffStream.start_block(FIFFB_MNE_RT_CLIENT_LIST);
+    t_FiffStreamOut.start_block(FIFFB_MNE_RT_CLIENT_LIST);
 
     p_qTcpSocket.write(block);
     p_qTcpSocket.waitForBytesWritten();
@@ -135,6 +143,10 @@ void FiffStreamThread::write_client_list(QTcpSocket& p_qTcpSocket)
 
 void FiffStreamThread::run()
 {
+    FiffStreamServer* parentServer = qobject_cast<FiffStreamServer*>(this->parent());
+    connect(parentServer, &FiffStreamServer::sendFiffStreamThreadInstruction,
+            this, &FiffStreamThread::readFiffStreamServerInstruction);
+
     QTcpSocket t_qTcpSocket;
     if (!t_qTcpSocket.setSocketDescriptor(socketDescriptor)) {
         emit error(t_qTcpSocket.error());
