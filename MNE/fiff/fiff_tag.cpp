@@ -148,7 +148,7 @@ bool FiffTag::read_tag_data(FiffStream* p_pStream, FiffTag*& p_pTag, qint64 pos)
 
 //ToDo: Split read_tag into read_tag_info & read_tag_data
 
-bool FiffTag::read_tag_info(FiffStream* p_pStream, FiffTag*& p_pTag)
+bool FiffTag::read_tag_info(FiffStream* p_pStream, FiffTag*& p_pTag, bool p_bDoSkip)
 {
 //    QDataStream t_DataStream(p_pStream);
 
@@ -173,21 +173,24 @@ bool FiffTag::read_tag_info(FiffStream* p_pStream, FiffTag*& p_pTag)
 
 //    qDebug() << "read_tag_info" << "  Kind:" << p_pTag->kind << "  Type:" << p_pTag->type << "  Size:" << p_pTag->size() << "  Next:" << p_pTag->next;
 
-    QTcpSocket* t_qTcpSocket = qobject_cast<QTcpSocket*>(p_pStream->device());
-
-    if(t_qTcpSocket)
+    if (p_bDoSkip)
     {
-        qDebug() << "Its a socket no skip!";
-        return true;
-    }
-
-    if (p_pTag->next == FIFFV_NEXT_SEQ)
-    {
-        p_pStream->device()->seek(p_pStream->device()->pos()+p_pTag->size()); //fseek(fid,tag.size,'cof');
-    }
-    else if (p_pTag->next > 0)
-    {
-        p_pStream->device()->seek(p_pTag->next); //fseek(fid,tag.next,'bof');
+        QTcpSocket* t_qTcpSocket = qobject_cast<QTcpSocket*>(p_pStream->device());
+        if(t_qTcpSocket)
+        {
+            p_pStream->skipRawData(p_pTag->size());
+        }
+        else
+        {
+            if (p_pTag->next == FIFFV_NEXT_SEQ)
+            {
+                p_pStream->device()->seek(p_pStream->device()->pos()+p_pTag->size()); //fseek(fid,tag.size,'cof');
+            }
+            else if (p_pTag->next > 0)
+            {
+                p_pStream->device()->seek(p_pTag->next); //fseek(fid,tag.next,'bof');
+            }
+        }
     }
 
     return true;

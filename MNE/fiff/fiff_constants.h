@@ -580,7 +580,7 @@ namespace FIFFLIB
 //
 // 3710... Real-Time Blocks
 //
-#define FIFFB_MNE_RT_CLIENT_INFO    3710              /**< Fiff Real-Time Client Info */
+#define FIFFB_MNE_RT_CLIENT_LIST    3710              /**< Fiff Real-Time Client List */
 
 
 //
