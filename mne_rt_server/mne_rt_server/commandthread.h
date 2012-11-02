@@ -50,6 +50,7 @@ public:
 
 signals:
     void error(QTcpSocket::SocketError socketError);
+    void sendCommandServerInstruction();
 
 private:
     int socketDescriptor;

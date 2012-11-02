@@ -95,6 +95,16 @@ void FiffStreamServer::clearClients()
 
 //*************************************************************************************************************
 
+void FiffStreamServer::readCommandServerInstruction()
+{
+    qDebug() << "FiffStreamServer::readCommandServerInstruction()";
+
+    emit sendFiffStreamThreadInstruction(1, 3);
+}
+
+
+//*************************************************************************************************************
+
 void FiffStreamServer::incomingConnection(qintptr socketDescriptor)
 {
     FiffStreamThread* streamThread = new FiffStreamThread(m_iNextClientId, socketDescriptor, this);

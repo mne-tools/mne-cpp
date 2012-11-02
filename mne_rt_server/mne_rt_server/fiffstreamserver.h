@@ -99,12 +99,19 @@ public:
     */
     void clearClients();
 
+//public slots: --> in Qt 5 not anymore declared as slot
+    void readCommandServerInstruction();
+
+signals:
+    void sendFiffStreamThreadInstruction(quint8 id, quint8 instruction);
+
 protected:
     void incomingConnection(qintptr socketDescriptor);
 
 private:
     QMap<quint8, FiffStreamThread*> m_qClientList;
     quint8                 m_iNextClientId;
+
 };
 
 

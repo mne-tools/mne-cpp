@@ -87,13 +87,17 @@ MNERTServer::MNERTServer()
 , m_pFiffStreamServer(new FiffStreamServer())
 {
     //
+    // Connect instruction and data server
+    //
+    QObject::connect(m_pCommandServer, &CommandServer::sendFiffStreamServerInstruction,
+            m_pFiffStreamServer, &FiffStreamServer::readCommandServerInstruction);
+    //
     // Run instruction server
     //
     if (!m_pCommandServer->listen()) {
         printf("Unable to start the command server: %s\n", m_pCommandServer->errorString().toUtf8().constData());
         return;
     }
-
     //
     // Run data server
     //
@@ -101,7 +105,6 @@ MNERTServer::MNERTServer()
         printf("Unable to start the fiff stream server: %s\n", m_pFiffStreamServer->errorString().toUtf8().constData());
         return;
     }
-
 
     QString ipAddress;
     QList<QHostAddress> ipAddressesList = QNetworkInterface::allAddresses();
