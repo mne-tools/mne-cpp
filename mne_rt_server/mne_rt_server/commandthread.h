@@ -44,7 +44,9 @@ class CommandThread : public QThread
     Q_OBJECT
 
 public:
-    CommandThread(int socketDescriptor, const QString &fortune, QObject *parent);
+    CommandThread(int socketDescriptor, QObject *parent);
+
+    static QByteArray availableCommands();
 
     void run();
 
@@ -53,8 +55,9 @@ signals:
     void sendCommandServerInstruction();
 
 private:
+    bool parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand);
+
     int socketDescriptor;
-    QString text;
 };
 
 #endif //COMMANDTHREAD_H

@@ -50,7 +50,7 @@ namespace MSERVER
 //=============================================================================================================
 
 #define MNE_RT_GET_CLIENT_LIST  1   /**< Client List at mne_rt_server */
-#define MNE_RT_SET_CLIENT_NAME  2   /**< Set Client name at mne_rt_server */
+#define MNE_RT_SET_CLIENT_ALIAS 2   /**< Set client alias at mne_rt_server */
 
 
 

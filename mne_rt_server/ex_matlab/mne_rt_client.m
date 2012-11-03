@@ -63,7 +63,7 @@ classdef mne_rt_client < handle
         
         % =================================================================
         %% set_client_name
-        function [info] = set_client_name(obj, name)
+        function [info] = set_client_alias(obj, alias)
             
             import java.net.Socket
             import java.io.*
@@ -84,7 +84,7 @@ classdef mne_rt_client < handle
                 output_stream   = obj.m_TcpSocket.getOutputStream;
                 d_output_stream = DataOutputStream(output_stream);
 
-                mne_rt_client.write_command(d_output_stream, MNE_RT.MNE_RT_SET_CLIENT_NAME, name)
+                mne_rt_client.write_command(d_output_stream, MNE_RT.MNE_RT_SET_CLIENT_ALIAS, alias)
                 
 %                 kind = FIFF.FIFF_MNE_RT_COMMAND;
 %                 type = 3;

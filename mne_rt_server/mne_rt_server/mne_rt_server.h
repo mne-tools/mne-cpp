@@ -86,8 +86,8 @@ public:
     ~MNERTServer();
 
 private:
-    CommandServer* m_pCommandServer;
     FiffStreamServer* m_pFiffStreamServer;
+    CommandServer* m_pCommandServer;
 
     ConnectorManager* m_pConnectorManager;
     IConnector* m_pActiveConnector;

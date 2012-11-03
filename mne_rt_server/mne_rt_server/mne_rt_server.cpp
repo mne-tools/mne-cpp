@@ -83,14 +83,15 @@ const char* connectorDir = "/mne_rt_server_plugins";        /**< holds directory
 //=============================================================================================================
 
 MNERTServer::MNERTServer()
-: m_pCommandServer(new CommandServer())
-, m_pFiffStreamServer(new FiffStreamServer())
+: m_pFiffStreamServer(new FiffStreamServer())
+, m_pCommandServer(new CommandServer(m_pFiffStreamServer))
 {
     //
     // Connect instruction and data server
     //
     QObject::connect(m_pCommandServer, &CommandServer::sendFiffStreamServerInstruction,
-            m_pFiffStreamServer, &FiffStreamServer::readCommandServerInstruction);
+                m_pFiffStreamServer, &FiffStreamServer::readCommandServerInstruction);
+
     //
     // Run instruction server
     //

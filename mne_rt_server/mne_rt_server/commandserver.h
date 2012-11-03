@@ -66,6 +66,7 @@ namespace MSERVER
 //=============================================================================================================
 
 
+
 //=============================================================================================================
 /**
 * DECLARE CLASS CommandServer
@@ -86,8 +87,6 @@ protected:
     void incomingConnection(qintptr socketDescriptor);
 
 private:
-    QStringList fortunes;
-
 //private slots: --> in Qt 5 not anymore declared as slot
     void readCommandThreadInstruction();
 

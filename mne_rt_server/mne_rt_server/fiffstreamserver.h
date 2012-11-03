@@ -77,6 +77,9 @@ class FiffStreamServer : public QTcpServer
 {
     Q_OBJECT
 
+    friend class CommandServer;
+    friend class CommandThread;
+
 public:
 
     FiffStreamServer(QObject *parent = 0);
