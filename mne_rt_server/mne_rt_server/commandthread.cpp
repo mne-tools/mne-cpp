@@ -33,9 +33,27 @@
 *
 */
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
 #include "commandthread.h"
+#include "fiffstreamserver.h"
+#include "fiffstreamthread.h"
 
 #include <QtNetwork>
+#include <QStringList>
+
+#include <iostream>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace MSERVER;
 
 
 //*************************************************************************************************************
@@ -43,9 +61,90 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CommandThread::CommandThread(int socketDescriptor, const QString &fortune, QObject *parent)
-    : QThread(parent), socketDescriptor(socketDescriptor), text(fortune)
+CommandThread::CommandThread(int socketDescriptor, QObject *parent)
+: QThread(parent)
+, socketDescriptor(socketDescriptor)
 {
+
+}
+
+
+//*************************************************************************************************************
+
+QByteArray CommandThread::availableCommands()
+{
+    QByteArray t_blockCmdInfoList;
+    t_blockCmdInfoList.append("\tclist\t\t\tprints and sends all available fiff stream clients\r\n");
+    t_blockCmdInfoList.append("\tmeasinfo [ID/Alias]\tsends the measurement info to the specified fiff\r\n\t\t\t\tstream client\r\n");
+    t_blockCmdInfoList.append("\tmeas     [ID/Alias]\tadds specified fiff stream client to raw data\r\n\t\t\t\tbuffer receivers. If acquisition is not already strated, it is triggered.\r\n");
+    t_blockCmdInfoList.append("\tstop     [ID/Alias]\tremoves specified fiff stream client from raw\r\n\t\t\t\tdata buffer receivers.\r\n");
+    t_blockCmdInfoList.append("\tstop-all\t\tstops the whole acquisition process.\r\n");
+    t_blockCmdInfoList.append("\tbufsize  [samples]\tsets the buffer size of the fiff stream client\r\n\t\t\t\traw data buffers\r\n");
+
+    t_blockCmdInfoList.append("\n\tconnectors\t\tprints and sends all available connectors\r\n");
+
+    t_blockCmdInfoList.append("\n\thelp\t\t\tprints and sends this list\r\n\n");
+
+    return t_blockCmdInfoList;
+}
+
+
+//*************************************************************************************************************
+
+bool CommandThread::parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand)
+{
+    QStringList t_qCommandList = p_sCommand.split(" ");
+
+
+    bool success = false;
+    QByteArray t_blockClientList;
+    if(t_qCommandList[0].compare("clist",Qt::CaseInsensitive) == 0)
+    {
+        //
+        // Print & send client list
+        //
+        FiffStreamServer* t_pFiffStreamServer = qobject_cast<FiffStreamServer*>(this->parent()->parent());
+        if(t_pFiffStreamServer)
+        {
+            t_blockClientList.append("\tID\tAlias\r\n");
+            QMap<quint8, FiffStreamThread*>::iterator i;
+            for (i = t_pFiffStreamServer->m_qClientList.begin(); i != t_pFiffStreamServer->m_qClientList.end(); ++i)
+            {
+                QString str = QString("\t%1\t%2\r\n").arg(i.key()).arg(i.value()->getAlias());
+                t_blockClientList.append(str);
+            }
+            success = true;
+        }
+        else
+        {
+            t_blockClientList.append("Error: fiff stream not available.\r\n");
+            success = false;
+        }
+
+    }
+    else if(t_qCommandList[0].compare("help",Qt::CaseInsensitive) == 0)
+    {
+        //
+        // Help
+        //
+        t_blockClientList.append(CommandThread::availableCommands());
+    }
+    else
+    {
+        //
+        // Unknown command
+        //
+        t_blockClientList.append("command unknown\r\n");
+        t_blockClientList.append(CommandThread::availableCommands());
+    }
+
+    //print
+    std::cout << t_blockClientList.data();
+    //send
+    p_qTcpSocket.write(t_blockClientList);
+    p_qTcpSocket.waitForBytesWritten();
+
+    return success;
 }
 
 
@@ -72,6 +171,8 @@ void CommandThread::run()
     t_FiffStreamIn.setVersion(QDataStream::Qt_5_0);
 
 
+    qint64 t_iMaxBufSize = 1024;
+
     while(true)
     {
 
@@ -79,15 +180,13 @@ void CommandThread::run()
 
         if (t_qTcpSocket.bytesAvailable() > 0)
         {
-            quint32 v = t_qTcpSocket.bytesAvailable();
-            char* buf = new char[v+1];
-            t_FiffStreamIn.readRawData(buf, v);
-            buf[v] = 0;
-            QString t_sCommand = QString(buf);
-            delete[] buf;
+            QByteArray t_qByteArrayRaw = t_qTcpSocket.readLine(t_iMaxBufSize);
+            QString t_sCommand = QString(t_qByteArrayRaw).simplified();
 
-            qDebug() << t_sCommand;
+            if(!t_sCommand.isEmpty())
+                parseCommand(t_qTcpSocket, t_sCommand);
 
+//            std::cout << t_sCommand.toUtf8().constData();
 
         }
 

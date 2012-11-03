@@ -72,7 +72,7 @@ using namespace FIFFLIB;
 FiffStreamThread::FiffStreamThread(quint8 id, int socketDescriptor, QObject *parent)
 : QThread(parent)
 , m_iDataClientId(id)
-, m_sDataClientName(QString(""))
+, m_sDataClientAlias(QString(""))
 , socketDescriptor(socketDescriptor)
 {
 }
@@ -87,15 +87,15 @@ void FiffStreamThread::read_command(FiffStream& p_FiffStreamIn, qint32 size)
         qint32 t_command;
         p_FiffStreamIn >> t_command;
 
-        if(t_command == MNE_RT_SET_CLIENT_NAME)
+        if(t_command == MNE_RT_SET_CLIENT_ALIAS)
         {
             quint32 v = size-4;
             char* buf = new char[v+1];
             p_FiffStreamIn.readRawData(buf, v);
             buf[v] = 0;
-            m_sDataClientName = QString(buf);
+            m_sDataClientAlias = QString(buf);
             delete[] buf;
-            printf("Fiff stream client (ID %d): set name to '%s'\n", m_iDataClientId, m_sDataClientName.toUtf8().constData());
+            printf("Fiff stream client (ID %d): set alias to '%s'\n", m_iDataClientId, m_sDataClientAlias.toUtf8().constData());
         }
         else
         {

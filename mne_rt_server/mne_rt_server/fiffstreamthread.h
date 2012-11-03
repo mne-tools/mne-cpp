@@ -90,9 +90,9 @@ public:
         return m_iDataClientId;
     }
 
-    QString getName()
+    QString getAlias()
     {
-        return m_sDataClientName;
+        return m_sDataClientAlias;
     }
 
     void read_command(FiffStream& p_FiffStreamIn, qint32 size);
@@ -104,7 +104,7 @@ signals:
 
 private:
     quint8 m_iDataClientId;
-    QString m_sDataClientName;
+    QString m_sDataClientAlias;
 
     int socketDescriptor;
 
