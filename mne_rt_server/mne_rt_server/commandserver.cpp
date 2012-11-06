@@ -74,20 +74,31 @@ CommandServer::CommandServer(QObject *parent)
 
 void CommandServer::incomingConnection(qintptr socketDescriptor)
 {
-    CommandThread* thread = new CommandThread(socketDescriptor, this);
+    CommandThread* t_pthread = new CommandThread(socketDescriptor, this);
 
     //when thread has finished it gets deleted
-    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-    connect(thread, &CommandThread::sendCommandServerInstruction,
-            this, &CommandServer::readCommandThreadInstruction);
-    thread->start();
+    connect(t_pthread, SIGNAL(finished()), t_pthread, SLOT(deleteLater()));
+
+    //Forwards for thread safety - check if obsolete!?
+    connect(t_pthread, &CommandThread::requestMeasInfo,
+            this, &CommandServer::forwardMeasInfoRequest);
+
+    t_pthread->start();
 }
 
 
 //*************************************************************************************************************
 
-void CommandServer::readCommandThreadInstruction()
+void CommandServer::forwardMeasInfoRequest(qint32 ID)
 {
-    qDebug() << "CommandServer::readCommandThreadInstruction()";
-    emit sendFiffStreamServerInstruction();
+    emit requestMeasInfo(ID);
 }
+
+
+////*************************************************************************************************************
+
+//void CommandServer::readCommandThreadInstruction()
+//{
+//    qDebug() << "CommandServer::readCommandThreadInstruction()";
+//    emit sendFiffStreamServerInstruction();
+//}

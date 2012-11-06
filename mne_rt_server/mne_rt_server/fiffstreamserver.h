@@ -36,6 +36,13 @@
 #ifndef FIFFSTREAMSERVER_H
 #define FIFFSTREAMSERVER_H
 
+//*************************************************************************************************************
+//=============================================================================================================
+// FIFF INCLUDES
+//=============================================================================================================
+
+#include "../../MNE/fiff/fiff_info.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -58,6 +65,8 @@ namespace MSERVER
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
+
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -94,7 +103,7 @@ public:
     /**
     * ToDo...
     */
-    inline FiffStreamThread* getClient(quint8 id);
+    inline FiffStreamThread* getClient(qint32 id);
 
     //=========================================================================================================
     /**
@@ -103,17 +112,21 @@ public:
     void clearClients();
 
 //public slots: --> in Qt 5 not anymore declared as slot
-    void readCommandServerInstruction();
+//    void readCommandServerInstruction();
+    void forwardMeasInfo(qint32 ID, FiffInfo* p_pFiffInfo);
 
 signals:
-    void sendFiffStreamThreadInstruction(quint8 id, quint8 instruction);
+//    void sendFiffStreamThreadInstruction(quint8 id, quint8 instruction);
+    void sendMeasInfo(qint32 ID, FIFFLIB::FiffInfo* p_pFiffInfo);
+
+
 
 protected:
     void incomingConnection(qintptr socketDescriptor);
 
 private:
-    QMap<quint8, FiffStreamThread*> m_qClientList;
-    quint8                 m_iNextClientId;
+    QMap<qint32, FiffStreamThread*> m_qClientList;
+    qint32                          m_iNextClientId;
 
 };
 
@@ -123,7 +136,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-FiffStreamThread* FiffStreamServer::getClient(quint8 id)
+FiffStreamThread* FiffStreamServer::getClient(qint32 id)
 {
     return m_qClientList[id];
 }

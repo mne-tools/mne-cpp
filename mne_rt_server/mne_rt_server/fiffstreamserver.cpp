@@ -56,6 +56,7 @@
 //=============================================================================================================
 
 using namespace MSERVER;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -83,7 +84,7 @@ FiffStreamServer::~FiffStreamServer()
 
 void FiffStreamServer::clearClients()
 {
-    QMap<quint8, FiffStreamThread*>::const_iterator i = m_qClientList.constBegin();
+    QMap<qint32, FiffStreamThread*>::const_iterator i = m_qClientList.constBegin();
     while (i != m_qClientList.constEnd()) {
         if(i.value())
             delete i.value();
@@ -93,13 +94,21 @@ void FiffStreamServer::clearClients()
 }
 
 
+////*************************************************************************************************************
+
+//void FiffStreamServer::readCommandServerInstruction()
+//{
+//    qDebug() << "FiffStreamServer::readCommandServerInstruction()";
+
+//    emit sendFiffStreamThreadInstruction(1, 3);
+//}
+
+
 //*************************************************************************************************************
 
-void FiffStreamServer::readCommandServerInstruction()
+void FiffStreamServer::forwardMeasInfo(qint32 ID, FiffInfo* p_pFiffInfo)
 {
-    qDebug() << "FiffStreamServer::readCommandServerInstruction()";
-
-    emit sendFiffStreamThreadInstruction(1, 3);
+    emit sendMeasInfo(ID, p_pFiffInfo);
 }
 
 

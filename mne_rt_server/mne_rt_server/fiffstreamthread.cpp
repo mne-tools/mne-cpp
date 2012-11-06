@@ -95,35 +95,26 @@ void FiffStreamThread::read_command(FiffStream& p_FiffStreamIn, qint32 size)
             buf[v] = 0;
             m_sDataClientAlias = QString(buf);
             delete[] buf;
-            printf("Fiff stream client (ID %d): set alias to '%s'\n", m_iDataClientId, m_sDataClientAlias.toUtf8().constData());
+            printf("\tnew fiff stream client (ID %d) alias = '%s'\r\n\n", m_iDataClientId, m_sDataClientAlias.toUtf8().constData());
         }
         else
         {
-            printf("Fiff stream client (ID %d): unknown command\n", m_iDataClientId);
+            printf("\tfiff stream client (ID %d): unknown command\r\n\n", m_iDataClientId);
         }
     }
     else
     {
-        printf("Fiff stream client (ID %d): unknown command\n", m_iDataClientId);
+        printf("\tfiff stream client (ID %d): unknown command\r\n\n", m_iDataClientId);
     }
 }
 
 
 //*************************************************************************************************************
 
-void FiffStreamThread::readFiffStreamServerInstruction(quint8 id, quint8 instruction)
+void FiffStreamThread::getAndSendMeasurementInfo(qint32 ID, FiffInfo* p_pFiffInfo)
 {
-    qDebug() << "Received Instruction: ID " << id << "; Instruction " << instruction;
-}
-
-//*************************************************************************************************************
-//ToDo Move this to command thread
-void FiffStreamThread::write_client_list(QTcpSocket& p_qTcpSocket)
-{
-
-    QByteArray block;
-
-    FiffStream t_FiffStreamOut(&block, QIODevice::WriteOnly);
+    mutex.lock();
+    FiffStream t_FiffStreamOut(&m_qSendBlock, QIODevice::WriteOnly);
     t_FiffStreamOut.setVersion(QDataStream::Qt_5_0);
 
     qint32 init_info[2];
@@ -131,12 +122,38 @@ void FiffStreamThread::write_client_list(QTcpSocket& p_qTcpSocket)
     init_info[1] = m_iDataClientId;
 
     t_FiffStreamOut.start_block(FIFFB_MNE_RT_CLIENT_LIST);
-
-    p_qTcpSocket.write(block);
-    p_qTcpSocket.waitForBytesWritten();
-
-    block.clear();
+    mutex.unlock();
 }
+
+
+////*************************************************************************************************************
+
+//void FiffStreamThread::readFiffStreamServerInstruction(quint8 id, quint8 instruction)
+//{
+//    qDebug() << "Received Instruction: ID " << id << "; Instruction " << instruction;
+//}
+
+//*************************************************************************************************************
+//ToDo Move this to command thread
+//void FiffStreamThread::write_client_list(QTcpSocket& p_qTcpSocket)
+//{
+
+//    QByteArray m_qSendBlock;
+
+//    FiffStream t_FiffStreamOut(&m_qSendBlock, QIODevice::WriteOnly);
+//    t_FiffStreamOut.setVersion(QDataStream::Qt_5_0);
+
+//    qint32 init_info[2];
+//    init_info[0] = MNE_RT_GET_CLIENT_LIST;
+//    init_info[1] = m_iDataClientId;
+
+//    t_FiffStreamOut.start_block(FIFFB_MNE_RT_CLIENT_LIST);
+
+//    p_qTcpSocket.write(m_qSendBlock);
+//    p_qTcpSocket.waitForBytesWritten();
+
+//    m_qSendBlock.clear();
+//}
 
 
 //*************************************************************************************************************
@@ -144,8 +161,13 @@ void FiffStreamThread::write_client_list(QTcpSocket& p_qTcpSocket)
 void FiffStreamThread::run()
 {
     FiffStreamServer* parentServer = qobject_cast<FiffStreamServer*>(this->parent());
-    connect(parentServer, &FiffStreamServer::sendFiffStreamThreadInstruction,
-            this, &FiffStreamThread::readFiffStreamServerInstruction);
+//    connect(parentServer, &FiffStreamServer::sendFiffStreamThreadInstruction,
+//            this, &FiffStreamThread::readFiffStreamServerInstruction);
+
+    connect(parentServer, &FiffStreamServer::sendMeasInfo,
+            this, &FiffStreamThread::getAndSendMeasurementInfo);
+
+
 
     QTcpSocket t_qTcpSocket;
     if (!t_qTcpSocket.setSocketDescriptor(socketDescriptor)) {
@@ -182,8 +204,6 @@ void FiffStreamThread::run()
 //    block.clear();
 
 
-
-
 //    tcpSocket.disconnectFromHost();
 //    tcpSocket.waitForDisconnected();
 
@@ -193,15 +213,28 @@ void FiffStreamThread::run()
 
     while(true)
     {
+        //
+        // Write available data
+        //
+        if(m_qSendBlock.size() > 0)
+        {
+            qDebug() << "data available" << m_qSendBlock.size();
+            mutex.lock();
+            t_qTcpSocket.write(m_qSendBlock);
+            t_qTcpSocket.waitForBytesWritten();
+            m_qSendBlock.clear();
+            mutex.unlock();
+        }
 
 //        write_client_info(t_qTcpSocket);
 
+        //
+        // Wait 10ms for incomming data, read and continue
+        //
         t_qTcpSocket.waitForReadyRead(10);
 
         if (t_qTcpSocket.bytesAvailable() >= (int)sizeof(qint32)*4)
         {
-
-
 //            qDebug() << "in Size before" << t_qTcpSocket.bytesAvailable();
 
             FiffTag* t_pTag = NULL;
@@ -227,6 +260,5 @@ void FiffStreamThread::run()
         }
 
 //        usleep(1000);
-
     }
 }

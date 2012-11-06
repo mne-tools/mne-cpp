@@ -51,6 +51,7 @@
 
 #include <QThread>
 #include <QTcpSocket>
+#include <QMutex>
 
 
 //*************************************************************************************************************
@@ -97,7 +98,7 @@ public:
 
     void read_command(FiffStream& p_FiffStreamIn, qint32 size);
 
-    void write_client_list(QTcpSocket& p_qTcpSocket);
+//    void write_client_list(QTcpSocket& p_qTcpSocket);
 
 signals:
     void error(QTcpSocket::SocketError socketError);
@@ -108,11 +109,14 @@ private:
 
     int socketDescriptor;
 
-    QByteArray block;
+    QMutex mutex;
+    QByteArray m_qSendBlock;
 
 //private slots: --> in Qt 5 not anymore declared as slot
-    void readFiffStreamServerInstruction(quint8 id, quint8 instruction);
+    void getAndSendMeasurementInfo(qint32 ID, FiffInfo* p_pFiffInfo);
 
+//private slots: --> in Qt 5 not anymore declared as slot
+//    void readFiffStreamServerInstruction(quint8 id, quint8 instruction);
 
 };
 

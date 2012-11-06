@@ -38,6 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "mne_rt_server.h"
 #include "commandthread.h"
 #include "fiffstreamserver.h"
 #include "fiffstreamthread.h"
@@ -103,11 +104,11 @@ bool CommandThread::parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand)
         //
         // Print & send client list
         //
-        FiffStreamServer* t_pFiffStreamServer = qobject_cast<FiffStreamServer*>(this->parent()->parent());
+        FiffStreamServer* t_pFiffStreamServer = qobject_cast<MNERTServer*>(this->parent()->parent())->m_pFiffStreamServer;
         if(t_pFiffStreamServer)
         {
             t_blockClientList.append("\tID\tAlias\r\n");
-            QMap<quint8, FiffStreamThread*>::iterator i;
+            QMap<qint32, FiffStreamThread*>::iterator i;
             for (i = t_pFiffStreamServer->m_qClientList.begin(); i != t_pFiffStreamServer->m_qClientList.end(); ++i)
             {
                 QString str = QString("\t%1\t%2\r\n").arg(i.key()).arg(i.value()->getAlias());
@@ -120,7 +121,23 @@ bool CommandThread::parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand)
             t_blockClientList.append("Error: fiff stream not available.\r\n");
             success = false;
         }
+    }
+    else if(t_qCommandList[0].compare("measinfo",Qt::CaseInsensitive) == 0)
+    {
+        //
+        // Measurement Info
+        //
+        qint32 t_id = -1;
 
+        t_blockClientList.append(parseToId(t_qCommandList[1],t_id));
+
+        if(t_id != -1)
+        {
+            emit requestMeasInfo(t_id);
+
+            QString str = QString("\tsend measurement info to fiff stream client (ID: %1)\r\n\n").arg(t_id);
+            t_blockClientList.append(str);
+        }
     }
     else if(t_qCommandList[0].compare("help",Qt::CaseInsensitive) == 0)
     {
@@ -150,6 +167,55 @@ bool CommandThread::parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand)
 
 //*************************************************************************************************************
 
+QByteArray CommandThread::parseToId(QString& p_sRawId, qint32& p_iParsedId)
+{
+    p_iParsedId = -1;
+    QByteArray t_blockCmdIdInfo;
+    if(!p_sRawId.isEmpty())
+    {
+        FiffStreamServer* t_pFiffStreamServer = qobject_cast<MNERTServer*>(this->parent()->parent())->m_pFiffStreamServer;
+        if(t_pFiffStreamServer)
+        {
+            bool t_isInt;
+            qint32 t_id = p_sRawId.toInt(&t_isInt);
+
+            if(t_isInt && t_pFiffStreamServer->m_qClientList.contains(t_id))
+            {
+                p_iParsedId = t_id;
+            }
+            else
+            {
+                QMap<qint32, FiffStreamThread*>::iterator i;
+                for (i = t_pFiffStreamServer->m_qClientList.begin(); i != t_pFiffStreamServer->m_qClientList.end(); ++i)
+                {
+                    if(i.value()->getAlias().compare(p_sRawId) == 0)
+                    {
+                        p_iParsedId = i.key();
+                        QString str = QString("\tconvert alias '%1' => %2\r\n").arg(i.value()->getAlias()).arg(i.key());
+                        t_blockCmdIdInfo.append(str);
+                        break;
+                    }
+                }
+            }
+         }
+    }
+
+    if(p_iParsedId != -1)
+    {
+        QString str = QString("\tselect fiff stream client %1\r\n").arg(p_iParsedId);
+        t_blockCmdIdInfo.append(str);
+    }
+    else
+    {
+        t_blockCmdIdInfo.append("\twarning: requested fiff stream client not available\r\n\n");
+    }
+
+    return t_blockCmdIdInfo;
+}
+
+
+//*************************************************************************************************************
+
 void CommandThread::run()
 {
     QTcpSocket t_qTcpSocket;
@@ -164,12 +230,8 @@ void CommandThread::run()
                t_qTcpSocket.peerPort());
     }
 
-    emit sendCommandServerInstruction();
-
-
     QDataStream t_FiffStreamIn(&t_qTcpSocket);
     t_FiffStreamIn.setVersion(QDataStream::Qt_5_0);
-
 
     qint64 t_iMaxBufSize = 1024;
 
@@ -187,7 +249,6 @@ void CommandThread::run()
                 parseCommand(t_qTcpSocket, t_sCommand);
 
 //            std::cout << t_sCommand.toUtf8().constData();
-
         }
 
 
