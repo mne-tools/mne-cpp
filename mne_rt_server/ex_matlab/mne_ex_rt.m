@@ -2,32 +2,25 @@ clear all;
 close all;
 clc;
 
-addpath('D:\Users\Christoph\Documents\GitHub\mne-matlab\matlab');
-
+addpath('../../../mne-matlab/matlab');
 
 %% Connection Information
-mne_rt_server_ip               =   'localhost';%'172.21.16.63';
-mne_rt_server_command_port     =    47966;
-mne_rt_server_fiff_stream_port =    47967;
+mne_rt_server_ip            =	'localhost';%'172.21.16.63';
+mne_rt_server_commandPort	=	49534;
+mne_rt_server_fiffDataPort	=	49535;
 
-%%
-% global MNE_RT;
-% if isempty(MNE_RT)
-%     MNE_RT = mne_rt_define_constants();
-% end
+%% create command client
+t_cmdClient = mne_rt_cmd_client(mne_rt_server_ip, mne_rt_server_commandPort);
+
+%% create data client
+t_dataClient = mne_rt_data_client(mne_rt_server_ip, mne_rt_server_fiffDataPort);
+
+%% set data client alias
+t_dataClient.setClientAlias('mne_ex_matlab');
+
+%% example commands
+clistInfo = t_cmdClient.getClientList();
+fprintf('### Client List ###\n%s',clistInfo);
 
 
-%%
-cmd_client = mne_rt_cmd_client();
-cmd_client.init(mne_rt_server_ip, mne_rt_server_command_port);
-
-%tag = cmd_client.read_tag()
-
-%%
-data_client = mne_rt_data_client();
-data_client.init(mne_rt_server_ip, mne_rt_server_fiff_stream_port);
-
-% tag = data_client.read_tag();
-% data_client.get_client_list();
-data_client.set_client_alias('mne_ex_matlab');
 
