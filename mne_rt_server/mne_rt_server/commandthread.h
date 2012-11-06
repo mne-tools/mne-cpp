@@ -54,6 +54,8 @@ class CommandThread : public QThread
 public:
     CommandThread(int socketDescriptor, QObject *parent);
 
+    ~CommandThread();
+
     static QByteArray availableCommands();
 
     void run();
@@ -68,7 +70,6 @@ private:
     bool parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand);
 
     QByteArray parseToId(QString& p_sRawId, qint32& p_iParsedId);
-
 
     int socketDescriptor;
 };

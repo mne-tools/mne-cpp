@@ -86,6 +86,7 @@ class FiffStreamServer : public QTcpServer
 {
     Q_OBJECT
 
+    friend class FiffStreamThread;
     friend class CommandServer;
     friend class CommandThread;
 

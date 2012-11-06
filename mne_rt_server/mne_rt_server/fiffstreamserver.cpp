@@ -121,7 +121,8 @@ void FiffStreamServer::incomingConnection(qintptr socketDescriptor)
     m_qClientList.insert(m_iNextClientId, streamThread);
     ++m_iNextClientId;
 
-//    //when thread has finished it gets deleted
-//    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    //when thread has finished it gets deleted
+    connect(streamThread, SIGNAL(finished()), streamThread, SLOT(deleteLater()));
+
     streamThread->start();
 }

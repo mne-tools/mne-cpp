@@ -82,11 +82,13 @@ class FiffStreamThread : public QThread
     Q_OBJECT
 
 public:
-    FiffStreamThread(quint8 id, int socketDescriptor, QObject *parent);
+    FiffStreamThread(qint32 id, int socketDescriptor, QObject *parent);
+
+    ~FiffStreamThread();
 
     void run();
 
-    quint8 getID()
+    qint32 getID()
     {
         return m_iDataClientId;
     }
@@ -96,15 +98,15 @@ public:
         return m_sDataClientAlias;
     }
 
-    void read_command(FiffStream& p_FiffStreamIn, qint32 size);
+    void parseCommand(FiffTag* p_pTag);
 
-//    void write_client_list(QTcpSocket& p_qTcpSocket);
+    void writeClientId();
 
 signals:
     void error(QTcpSocket::SocketError socketError);
 
 private:
-    quint8 m_iDataClientId;
+    qint32 m_iDataClientId;
     QString m_sDataClientAlias;
 
     int socketDescriptor;

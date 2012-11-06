@@ -69,7 +69,7 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FiffStreamThread::FiffStreamThread(quint8 id, int socketDescriptor, QObject *parent)
+FiffStreamThread::FiffStreamThread(qint32 id, int socketDescriptor, QObject *parent)
 : QThread(parent)
 , m_iDataClientId(id)
 , m_sDataClientAlias(QString(""))
@@ -80,31 +80,48 @@ FiffStreamThread::FiffStreamThread(quint8 id, int socketDescriptor, QObject *par
 
 //*************************************************************************************************************
 
-void FiffStreamThread::read_command(FiffStream& p_FiffStreamIn, qint32 size)
+FiffStreamThread::~FiffStreamThread()
 {
-    if(size >= 4)
-    {
-        qint32 t_command;
-        p_FiffStreamIn >> t_command;
+    //Remove from client list
+    FiffStreamServer* t_pFiffStreamServer = qobject_cast<FiffStreamServer*>(this->parent());
+    t_pFiffStreamServer->m_qClientList.remove(m_iDataClientId);
+}
 
-        if(t_command == MNE_RT_SET_CLIENT_ALIAS)
+
+//*************************************************************************************************************
+
+void FiffStreamThread::parseCommand(FiffTag* p_pTag)
+{
+    if(p_pTag->size() >= 4)
+    {
+        qint32* t_pInt = (qint32*)p_pTag->data();
+        FiffTag::swap_intp(t_pInt);
+        qint32 t_iCmd = t_pInt[0];
+
+        if(t_iCmd == MNE_RT_SET_CLIENT_ALIAS)
         {
-            quint32 v = size-4;
-            char* buf = new char[v+1];
-            p_FiffStreamIn.readRawData(buf, v);
-            buf[v] = 0;
-            m_sDataClientAlias = QString(buf);
-            delete[] buf;
-            printf("\tnew fiff stream client (ID %d) alias = '%s'\r\n\n", m_iDataClientId, m_sDataClientAlias.toUtf8().constData());
+            //
+            // Set Client Alias
+            //
+            m_sDataClientAlias = QString(p_pTag->mid(4, p_pTag->size()-4));
+            printf("FiffStreamClient (ID %d): new alias = '%s'\r\n\n", m_iDataClientId, m_sDataClientAlias.toUtf8().constData());
+        }
+        else if(t_iCmd == MNE_RT_GET_CLIENT_ID)
+        {
+            //
+            // Send Client ID
+            //
+            printf("FiffStreamClient (ID %d): send client ID %d\r\n\n", m_iDataClientId, m_iDataClientId);
+            writeClientId();
         }
         else
         {
-            printf("\tfiff stream client (ID %d): unknown command\r\n\n", m_iDataClientId);
+            printf("FiffStreamClient (ID %d): unknown command\r\n\n", m_iDataClientId);
         }
     }
     else
     {
-        printf("\tfiff stream client (ID %d): unknown command\r\n\n", m_iDataClientId);
+        printf("FiffStreamClient (ID %d): unknown command\r\n\n", m_iDataClientId);
     }
 }
 
@@ -113,47 +130,31 @@ void FiffStreamThread::read_command(FiffStream& p_FiffStreamIn, qint32 size)
 
 void FiffStreamThread::getAndSendMeasurementInfo(qint32 ID, FiffInfo* p_pFiffInfo)
 {
-    mutex.lock();
-    FiffStream t_FiffStreamOut(&m_qSendBlock, QIODevice::WriteOnly);
-    t_FiffStreamOut.setVersion(QDataStream::Qt_5_0);
+    if(ID == m_iDataClientId)
+    {
+        mutex.lock();
+        FiffStream t_FiffStreamOut(&m_qSendBlock, QIODevice::WriteOnly);
+        t_FiffStreamOut.setVersion(QDataStream::Qt_5_0);
 
-    qint32 init_info[2];
-    init_info[0] = MNE_RT_GET_CLIENT_LIST;
-    init_info[1] = m_iDataClientId;
+        qint32 init_info[2];
+        init_info[0] = FIFF_MNE_RT_CLIENT_ID;
+        init_info[1] = m_iDataClientId;
 
-    t_FiffStreamOut.start_block(FIFFB_MNE_RT_CLIENT_LIST);
-    mutex.unlock();
+        t_FiffStreamOut.start_block(FIFFB_MNE_RT_MEAS_INFO);
+        mutex.unlock();
+    }
 }
 
 
-////*************************************************************************************************************
-
-//void FiffStreamThread::readFiffStreamServerInstruction(quint8 id, quint8 instruction)
-//{
-//    qDebug() << "Received Instruction: ID " << id << "; Instruction " << instruction;
-//}
-
 //*************************************************************************************************************
-//ToDo Move this to command thread
-//void FiffStreamThread::write_client_list(QTcpSocket& p_qTcpSocket)
-//{
 
-//    QByteArray m_qSendBlock;
+void FiffStreamThread::writeClientId()
+{
+    FiffStream t_FiffStreamOut(&m_qSendBlock, QIODevice::WriteOnly);
+    t_FiffStreamOut.setVersion(QDataStream::Qt_5_0);
 
-//    FiffStream t_FiffStreamOut(&m_qSendBlock, QIODevice::WriteOnly);
-//    t_FiffStreamOut.setVersion(QDataStream::Qt_5_0);
-
-//    qint32 init_info[2];
-//    init_info[0] = MNE_RT_GET_CLIENT_LIST;
-//    init_info[1] = m_iDataClientId;
-
-//    t_FiffStreamOut.start_block(FIFFB_MNE_RT_CLIENT_LIST);
-
-//    p_qTcpSocket.write(m_qSendBlock);
-//    p_qTcpSocket.waitForBytesWritten();
-
-//    m_qSendBlock.clear();
-//}
+    t_FiffStreamOut.write_int(FIFF_MNE_RT_CLIENT_ID, &m_iDataClientId);
+}
 
 
 //*************************************************************************************************************
@@ -168,7 +169,6 @@ void FiffStreamThread::run()
             this, &FiffStreamThread::getAndSendMeasurementInfo);
 
 
-
     QTcpSocket t_qTcpSocket;
     if (!t_qTcpSocket.setSocketDescriptor(socketDescriptor)) {
         emit error(t_qTcpSocket.error());
@@ -176,49 +176,24 @@ void FiffStreamThread::run()
     }
     else
     {
-        printf("Fiff stream client (assigned ID %d) accepted from\n\tIP:\t%s\n\tPort:\t%d\n\n",
+        printf("FiffStreamClient (assigned ID %d) accepted from\n\tIP:\t%s\n\tPort:\t%d\n\n",
                m_iDataClientId,
                QHostAddress(t_qTcpSocket.peerAddress()).toString().toUtf8().constData(),
                t_qTcpSocket.peerPort());
     }
 
 
-
-//    write_client_info(t_qTcpSocket);
-
-//    QByteArray block;
-
-//    FiffStream t_FiffStream(&block, QIODevice::WriteOnly);
-//    t_FiffStream.setVersion(QDataStream::Qt_5_0);
-
-//    qint32 init_info[2];
-//    init_info[0] = MNE_RT_CLIENT_ID;
-//    init_info[1] = m_iClientId;
-
-//    t_FiffStream.write_int(FIFF_MNE_RT_COMMAND, init_info, 2);
-
-//    t_qTcpSocket.write(block);
-//    t_qTcpSocket.waitForBytesWritten();
-//    t_qTcpSocket.flush();
-
-//    block.clear();
-
-
-//    tcpSocket.disconnectFromHost();
-//    tcpSocket.waitForDisconnected();
-
-
     FiffStream t_FiffStreamIn(&t_qTcpSocket);
     t_FiffStreamIn.setVersion(QDataStream::Qt_5_0);
 
-    while(true)
+    while(t_qTcpSocket.state() != QAbstractSocket::UnconnectedState)
     {
         //
         // Write available data
         //
         if(m_qSendBlock.size() > 0)
         {
-            qDebug() << "data available" << m_qSendBlock.size();
+//            qDebug() << "data available" << m_qSendBlock.size();
             mutex.lock();
             t_qTcpSocket.write(m_qSendBlock);
             t_qTcpSocket.waitForBytesWritten();
@@ -226,39 +201,39 @@ void FiffStreamThread::run()
             mutex.unlock();
         }
 
-//        write_client_info(t_qTcpSocket);
-
         //
-        // Wait 10ms for incomming data, read and continue
+        // Wait 10ms for incomming tag header, read and continue
         //
         t_qTcpSocket.waitForReadyRead(10);
 
         if (t_qTcpSocket.bytesAvailable() >= (int)sizeof(qint32)*4)
         {
-//            qDebug() << "in Size before" << t_qTcpSocket.bytesAvailable();
-
             FiffTag* t_pTag = NULL;
             FiffTag::read_tag_info(&t_FiffStreamIn, t_pTag, false);
 
-            while (true)
+            //
+            // wait until tag size data are available and read the data
+            //
+            while (t_qTcpSocket.bytesAvailable() < t_pTag->size())
             {
                 t_qTcpSocket.waitForReadyRead(10);
-                if(t_qTcpSocket.bytesAvailable() >= t_pTag->size())
-                    break;
             }
+            FiffTag::read_tag_data(&t_FiffStreamIn, t_pTag);
 
+            //
+            // Parse the tag
+            //
             if(t_pTag->kind == FIFF_MNE_RT_COMMAND)
             {
-                read_command(t_FiffStreamIn, t_pTag->size());
+                parseCommand(t_pTag);
             }
-
-
-//            FiffTag::read_tag_data(&t_FiffStreamIn, t_pTag);
-
-//            qDebug() << "in Size after" << t_qTcpSocket.bytesAvailable();
 
         }
 
 //        usleep(1000);
     }
+
+    t_qTcpSocket.disconnectFromHost();
+    if(t_qTcpSocket.state() != QAbstractSocket::UnconnectedState)
+        t_qTcpSocket.waitForDisconnected();
 }

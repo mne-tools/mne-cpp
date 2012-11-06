@@ -48,6 +48,30 @@ classdef mne_rt_cmd_client < mne_rt_client
                 info = char(info);              
             end
         end
+        
+        % =================================================================
+        %% getClientList
+        function requestMeasInfo(obj, AliasOrId)
+            import java.net.Socket
+            import java.io.*
+            
+            if(ischar(AliasOrId))
+                command = sprintf('measinfo %s\n', AliasOrId);
+            elseif(isnumeric(AliasOrId))
+                command = sprintf('measinfo %d\n', AliasOrId);
+            else
+                error('unknown format for AliasOrId');
+            end
+            
+            if ~isempty(obj.m_TcpSocket)
+                % get a buffered data output stream from the socket
+                t_outStream   = obj.m_TcpSocket.getOutputStream;
+                t_dataOutStream = DataOutputStream(t_outStream);
+                
+                t_dataOutStream.writeBytes(command);
+                t_dataOutStream.flush;
+            end
+        end
     end
 end
 

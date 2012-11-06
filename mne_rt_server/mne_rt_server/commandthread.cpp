@@ -72,6 +72,14 @@ CommandThread::CommandThread(int socketDescriptor, QObject *parent)
 
 //*************************************************************************************************************
 
+CommandThread::~CommandThread()
+{
+
+}
+
+
+//*************************************************************************************************************
+
 QByteArray CommandThread::availableCommands()
 {
     QByteArray t_blockCmdInfoList;
@@ -104,6 +112,7 @@ bool CommandThread::parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand)
         //
         // Print & send client list
         //
+        printf("clist\n");
         FiffStreamServer* t_pFiffStreamServer = qobject_cast<MNERTServer*>(this->parent()->parent())->m_pFiffStreamServer;
         if(t_pFiffStreamServer)
         {
@@ -114,6 +123,7 @@ bool CommandThread::parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand)
                 QString str = QString("\t%1\t%2\r\n").arg(i.key()).arg(i.value()->getAlias());
                 t_blockClientList.append(str);
             }
+            t_blockClientList.append("\n");
             success = true;
         }
         else
@@ -128,8 +138,9 @@ bool CommandThread::parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand)
         // Measurement Info
         //
         qint32 t_id = -1;
-
         t_blockClientList.append(parseToId(t_qCommandList[1],t_id));
+
+        printf("measinfo %d\n", t_id);
 
         if(t_id != -1)
         {
@@ -144,6 +155,7 @@ bool CommandThread::parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand)
         //
         // Help
         //
+        printf("help\n");
         t_blockClientList.append(CommandThread::availableCommands());
     }
     else
@@ -225,7 +237,7 @@ void CommandThread::run()
     }
     else
     {
-        printf("Command client connection accepted from\n\tIP:\t%s\n\tPort:\t%d\n\n",
+        printf("CommandClient connection accepted from\n\tIP:\t%s\n\tPort:\t%d\n\n",
                QHostAddress(t_qTcpSocket.peerAddress()).toString().toUtf8().constData(),
                t_qTcpSocket.peerPort());
     }
@@ -235,7 +247,7 @@ void CommandThread::run()
 
     qint64 t_iMaxBufSize = 1024;
 
-    while(true)
+    while(t_qTcpSocket.state() != QAbstractSocket::UnconnectedState)
     {
         t_qTcpSocket.waitForReadyRead(100);
 
@@ -256,4 +268,7 @@ void CommandThread::run()
         }
     }
 
+    t_qTcpSocket.disconnectFromHost();
+    if(t_qTcpSocket.state() != QAbstractSocket::UnconnectedState)
+        t_qTcpSocket.waitForDisconnected();
 }
