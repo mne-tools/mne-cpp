@@ -3,6 +3,7 @@ classdef mne_rt_data_client < mne_rt_client
     %   Detailed explanation goes here
     
     properties
+        m_clientID = -1;
     end
     
     methods
@@ -14,6 +15,7 @@ classdef mne_rt_data_client < mne_rt_client
                 numOfRetries = 20; % set to -1 for infinite
             end
             obj = obj@mne_rt_client(host, port, numOfRetries);%Superclass call
+            obj.getClientId();
         end % mne_rt_data_client
 
         % =================================================================
@@ -22,27 +24,18 @@ classdef mne_rt_data_client < mne_rt_client
             
             import java.net.Socket
             import java.io.*
-
-            global FIFF;
-            if isempty(FIFF)
-                FIFF = fiff_define_constants();
-            end
-            global MNE_RT;
-            if isempty(MNE_RT)
-                MNE_RT = mne_rt_define_commands();
-            end
             
-            me='MNE_RT_CLIENT:read_tag';
+            me='MNE_RT_DATA_CLIENT:read_tag';
             
             tag = [];
 
             if ~isempty(obj.m_TcpSocket)
                 % get a buffered data input stream from the socket
-                input_stream   = obj.m_TcpSocket.getInputStream;
-                d_input_stream = DataInputStream(input_stream);
+                t_inStream   = obj.m_TcpSocket.getInputStream;
+                t_dataInStream = DataInputStream(t_inStream);
 
                 % read data from the socket
-                bytes_available = input_stream.available;
+                bytes_available = t_inStream.available;
                 fprintf(1, 'Reading %d bytes\n', bytes_available);
                 
                 %
@@ -50,10 +43,10 @@ classdef mne_rt_data_client < mne_rt_client
                 %
                 tagInfo = [];
                 while true
-                    bytes_available = input_stream.available
+                    bytes_available = t_inStream.available;
                     
                     if(bytes_available >= 16)
-                        tagInfo = mne_rt_client.read_tag_info(d_input_stream);
+                        tagInfo = mne_rt_data_client.read_tag_info(t_dataInStream);
                         break;
                     end
 
@@ -62,50 +55,28 @@ classdef mne_rt_data_client < mne_rt_client
                 end
 
                 %
-                % read the tag
+                % read the tag data
                 %
                 while true
-                    bytes_available = input_stream.available
+                    bytes_available = t_inStream.available;
                     
                     if(bytes_available >= tagInfo.size)
-                        tag = mne_rt_client.read_tag_data(d_input_stream, tagInfo);
+                        tag = mne_rt_data_client.read_tag_data(t_dataInStream, tagInfo);
                         break;
                     end
 
                     % pause 100ms before retrying
                     pause(0.1);
                 end
-                
-                if(tag.kind == FIFF.FIFF_BLOCK_START)
-                    switch tag.data
-                    %
-                    %   MNE_RT constants are stored in the first data
-                    %
-                    case FIFF.FIFFB_MNE_RT_CLIENT_INFO %FIFF.FIFFB_MNE_RT_CLIENT_INFO
-                        fprintf(1, 'FIFFB_MNE_RT_CLIENT_INFO\n');
-                    otherwise
-                        error(me,'Unimplemented tag kind %d',tag.kind); 
-                    end
-                end
-
-%                 bytes_available = input_stream.available;
-%                 if(bytes_available > 0)
-%                     printf(1, '%d bytes more to read\n', bytes_available);
-%                 end
             end
         end
         
         % =================================================================
         %% setClientAlias
-        function [info] = setClientAlias(obj, alias)
-            
+        function [info] = setClientAlias(obj, alias)            
             import java.net.Socket
             import java.io.*
 
-            global FIFF;
-            if isempty(FIFF)
-                FIFF = fiff_define_constants();
-            end
             global MNE_RT;
             if isempty(MNE_RT)
                 MNE_RT = mne_rt_define_commands();
@@ -115,23 +86,46 @@ classdef mne_rt_data_client < mne_rt_client
             
             if ~isempty(obj.m_TcpSocket)
                 % get a buffered data input stream from the socket
-                output_stream   = obj.m_TcpSocket.getOutputStream;
-                d_output_stream = DataOutputStream(output_stream);
+                t_outStream   = obj.m_TcpSocket.getOutputStream;
+                t_dataOutStream = DataOutputStream(t_outStream);
 
-                mne_rt_data_client.sendFiffCommand(d_output_stream, MNE_RT.MNE_RT_SET_CLIENT_ALIAS, alias)
-                
-%                 kind = FIFF.FIFF_MNE_RT_COMMAND;
-%                 type = 3;
-%                 size = 0;
-%                 next = 0;
-%                 
-%                 d_output_stream.writeInt(kind);
-%                 d_output_stream.writeInt(type);
-%                 d_output_stream.writeInt(size);
-%                 d_output_stream.writeInt(next);
-%                 d_output_stream.flush;
+                mne_rt_data_client.sendFiffCommand(t_dataOutStream, MNE_RT.MNE_RT_SET_CLIENT_ALIAS, alias)
             end
-        end        
+        end
+        
+        % =================================================================
+        %% getClientId
+        function [id] = getClientId(obj)
+            if(obj.m_clientID == -1)
+            
+                import java.net.Socket
+                import java.io.*
+
+                global FIFF;
+                if isempty(FIFF)
+                    FIFF = fiff_define_constants();
+                end
+                global MNE_RT;
+                if isempty(MNE_RT)
+                    MNE_RT = mne_rt_define_commands();
+                end
+
+                if ~isempty(obj.m_TcpSocket)
+                    % get a buffered data input stream from the socket
+                    t_outStream   = obj.m_TcpSocket.getOutputStream;
+                    t_dataOutStream = DataOutputStream(t_outStream);
+
+                    mne_rt_data_client.sendFiffCommand(t_dataOutStream, MNE_RT.MNE_RT_GET_CLIENT_ID)
+
+                    % ID is send as answer
+                    tag = obj.read_tag();
+                    if (tag.kind == FIFF.FIFF_MNE_RT_CLIENT_ID)
+                        obj.m_clientID = tag.data;
+                    end                
+                end
+            end
+            id = obj.m_clientID;
+        end
     end
     
     methods(Static)
@@ -143,7 +137,14 @@ classdef mne_rt_data_client < mne_rt_client
                 FIFF = fiff_define_constants();
             end
             
-            data = char(p_data);
+            if (nargin == 3)
+                data = char(p_data);
+            elseif(nargin == 2)
+                data = [];
+            else
+                error('Wrong number of arguments.');
+            end
+            
             
             kind = FIFF.FIFF_MNE_RT_COMMAND;
             type = FIFF.FIFFT_VOID;

@@ -51,14 +51,19 @@ classdef mne_rt_client < handle
                     break;
 
                 catch
-                    if ~isempty(obj.m_TcpSocket)
-                        obj.m_TcpSocket.close;
-                    end
+                    obj.close();
 
                     % pause before retrying
                     pause(1);
                 end
             end
+        end
+
+        function close(obj)
+            if ~isempty(obj.m_TcpSocket)
+                obj.m_TcpSocket.close();
+            end
+            obj.m_TcpSocket = [];
         end
     end
 end

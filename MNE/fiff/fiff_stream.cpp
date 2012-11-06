@@ -1,4 +1,3 @@
-
 //=============================================================================================================
 /**
 * @file     fiff_stream.cpp
@@ -89,7 +88,7 @@ FiffStream::~FiffStream()
 {
     if(this->device()->isOpen())
     {
-        printf("Closing FiffStream %s.\n", this->streamName().toUtf8().constData());
+        printf("DEBUG: Closing FiffStream %s.\n\n", this->streamName().toUtf8().constData());
         this->device()->close();
     }
 }

@@ -12,10 +12,9 @@ function [ MNE_RT ] = mne_rt_define_commands()
 %
 % MNE RT Communication Constants
 %
-MNE_RT.MNE_RT_GET_CLIENT_LIST   =   1;	% Client List at mne_rt_server
-MNE_RT.MNE_RT_SET_CLIENT_ALIAS   =   2;	% Set client alias at mne_rt_server
+MNE_RT.MNE_RT_GET_CLIENT_ID         =   1;  % Request client id at mne_rt_server
+MNE_RT.MNE_RT_SET_CLIENT_ALIAS      =   2;	% Set client alias at mne_rt_server
 
 return
 
 end
-

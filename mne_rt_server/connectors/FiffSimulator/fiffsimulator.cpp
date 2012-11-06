@@ -176,9 +176,6 @@ void FiffSimulator::init()
     QString t_sEventName = "../../mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif";
 
 
-
-
-
     float tmin = -1.5;
     float tmax = 1.5;
 
@@ -467,6 +464,7 @@ bool FiffSimulator::readRawInfo()
     {
         QFile* t_pFile = new QFile(m_sResourceDataPath);
 
+        mutex.lock();
         if(!FiffStream::setup_read_raw(t_pFile, m_pRawInfo))
         {
             printf("Error: Not able to read raw info!\n");
@@ -477,6 +475,7 @@ bool FiffSimulator::readRawInfo()
             delete t_pFile;
             return false;
         }
+        mutex.unlock();
 
         delete t_pFile;
     }
