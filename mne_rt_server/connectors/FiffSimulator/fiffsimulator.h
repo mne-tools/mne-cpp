@@ -44,6 +44,8 @@
 #include "fiffsimulator_global.h"
 #include "../../mne_rt_server/IConnector.h"
 
+#include "../../../MNE/fiff/fiff_raw_data.h"
+
 //#include "circularbuffer.h"
 
 
@@ -116,6 +118,8 @@ public:
 
     virtual ConnectorID getConnectorID() const;
 
+    virtual FiffInfo* getMeasInfo();
+
     virtual const char* getName() const;
 
 protected:
@@ -128,11 +132,15 @@ private:
     */
     void init();
 
+    bool readRawInfo();
 
     FiffProducer*   m_pFiffProducer;    /**< Holds the DataProducer.*/
 
-    float           m_fSamplingRate;    /**< Holds the sampling rate.*/
+    FiffRawData* m_pRawInfo;            /**< Holds the fiff raw measurement information. */
 
+//    FiffInfo* m_pFiffInfo;              /**< Holds the fiff measurement header information. */
+    //ToDo: obsolete is part of FiffInfo
+    float           m_fSamplingRate;    /**< Holds the sampling rate.*/
 
 //    QString     m_qStringResourcePath;  /**< Holds the path to the Fiff resource directory.*/
     QString     m_sResourceDataPath;  /**< Holds the path to the Fiff resource simulation file directory.*/

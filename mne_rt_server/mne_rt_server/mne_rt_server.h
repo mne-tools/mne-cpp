@@ -36,6 +36,13 @@
 #ifndef MNE_RT_SERVER_H
 #define MNE_RT_SERVER_H
 
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QObject>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -63,7 +70,9 @@ namespace MSERVER
 //=============================================================================================================
 
 class CommandServer;
+class CommandThread;
 class FiffStreamServer;
+class FiffStreamThread;
 class ConnectorManager;
 class IConnector;
 
@@ -74,8 +83,15 @@ class IConnector;
 *
 * @brief The MNERTServer class provides a Fiff data simulator.
 */
-class MNERTServer
+class MNERTServer : public QObject
 {
+    Q_OBJECT
+
+    friend class CommandServer;
+    friend class CommandThread;
+    friend class FiffStreamServer;
+    friend class FiffThread;
+
 public:
     MNERTServer();
 
@@ -86,12 +102,10 @@ public:
     ~MNERTServer();
 
 private:
-    FiffStreamServer* m_pFiffStreamServer;
-    CommandServer* m_pCommandServer;
+    FiffStreamServer*   m_pFiffStreamServer;
+    CommandServer*      m_pCommandServer;
 
     ConnectorManager* m_pConnectorManager;
-    IConnector* m_pActiveConnector;
-
 };
 
 } // NAMESPACE

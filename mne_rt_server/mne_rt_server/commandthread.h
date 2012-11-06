@@ -39,6 +39,14 @@
 #include <QThread>
 #include <QTcpSocket>
 
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MSERVER
+//=============================================================================================================
+
+namespace MSERVER
+{
+
 class CommandThread : public QThread
 {
     Q_OBJECT
@@ -52,12 +60,20 @@ public:
 
 signals:
     void error(QTcpSocket::SocketError socketError);
-    void sendCommandServerInstruction();
+
+    void requestMeasInfo(qint32 p_iClientId);
+//    void sendCommandServerInstruction();
 
 private:
     bool parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand);
 
+    QByteArray parseToId(QString& p_sRawId, qint32& p_iParsedId);
+
+
     int socketDescriptor;
 };
+
+
+} // NAMESPACE
 
 #endif //COMMANDTHREAD_H

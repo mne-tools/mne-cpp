@@ -81,14 +81,16 @@ public:
     CommandServer(QObject *parent = 0);
 
 signals:
-    void sendFiffStreamServerInstruction();
+    void requestMeasInfo(qint32 ID);
+//    void sendFiffStreamServerInstruction();
 
 protected:
     void incomingConnection(qintptr socketDescriptor);
 
 private:
 //private slots: --> in Qt 5 not anymore declared as slot
-    void readCommandThreadInstruction();
+//    void readCommandThreadInstruction();
+    void forwardMeasInfoRequest(qint32 ID); //Forward
 
 };
 

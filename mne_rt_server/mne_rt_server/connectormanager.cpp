@@ -290,6 +290,7 @@ IConnector* ConnectorManager::getActiveConnector()
 }
 
 
+//*************************************************************************************************************
 
 void ConnectorManager::clearConnectorActivation()
 {
@@ -302,7 +303,6 @@ void ConnectorManager::clearConnectorActivation()
                 (*it)->setStatus(false);
     }
 }
-
 
 
 //*************************************************************************************************************

@@ -89,6 +89,7 @@ using namespace MNELIB;
 FiffSimulator::FiffSimulator()
 : m_pFiffProducer(new FiffProducer())
 , m_fSamplingRate(0)
+, m_pRawInfo(NULL)
 , m_sResourceDataPath("../../mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
 {
 
@@ -136,11 +137,31 @@ ConnectorID FiffSimulator::getConnectorID() const
 
 //*************************************************************************************************************
 
+FiffInfo* FiffSimulator::getMeasInfo()
+{
+
+    if(!m_pRawInfo)
+    {
+        readRawInfo();
+    }
+
+    if(m_pRawInfo)
+    {
+        return m_pRawInfo->info;
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
+
+//*************************************************************************************************************
+
 const char* FiffSimulator::getName() const
 {
     return "Fiff File Simulator";
 }
-
 
 
 //*************************************************************************************************************
@@ -435,6 +456,32 @@ void FiffSimulator::init()
     delete raw;
     delete t_pFile;
 
+}
+
+
+//*************************************************************************************************************
+
+bool FiffSimulator::readRawInfo()
+{
+    if(!m_pRawInfo)
+    {
+        QFile* t_pFile = new QFile(m_sResourceDataPath);
+
+        if(!FiffStream::setup_read_raw(t_pFile, m_pRawInfo))
+        {
+            printf("Error: Not able to read raw info!\n");
+            if(m_pRawInfo)
+                delete m_pRawInfo;
+            m_pRawInfo = NULL;
+
+            delete t_pFile;
+            return false;
+        }
+
+        delete t_pFile;
+    }
+
+    return true;
 }
 
 

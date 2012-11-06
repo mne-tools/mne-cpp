@@ -83,15 +83,39 @@ const char* connectorDir = "/mne_rt_server_plugins";        /**< holds directory
 //=============================================================================================================
 
 MNERTServer::MNERTServer()
-: m_pFiffStreamServer(new FiffStreamServer())
-, m_pCommandServer(new CommandServer(m_pFiffStreamServer))
+: m_pFiffStreamServer(new FiffStreamServer(this))
+, m_pCommandServer(new CommandServer(this))
+, m_pConnectorManager(new ConnectorManager(this))
 {
+
+    // ### Load everything ###
+    //
+    // Load Connectors
+    //
+    m_pConnectorManager->loadConnectors(qApp->applicationDirPath()+connectorDir);
+
+
+    // ### Connect everything ###
+    //
+    // Meas Info
+    //
+    // connect command server and connector manager
+    QObject::connect(   m_pCommandServer, &CommandServer::requestMeasInfo,
+                        m_pConnectorManager, &ConnectorManager::getActiveMeasInfo);
+    // connect connector manager and fiff stream server
+    QObject::connect(   m_pConnectorManager, &ConnectorManager::sendMeasInfo,
+                        m_pFiffStreamServer, &FiffStreamServer::forwardMeasInfo);
+
     //
     // Connect instruction and data server
     //
-    QObject::connect(m_pCommandServer, &CommandServer::sendFiffStreamServerInstruction,
-                m_pFiffStreamServer, &FiffStreamServer::readCommandServerInstruction);
+//    QObject::connect(   m_pCommandServer, &CommandServer::sendFiffStreamServerInstruction,
+//                        m_pFiffStreamServer, &FiffStreamServer::readCommandServerInstruction);
 
+
+
+
+    // ### Run everything ###
     //
     // Run instruction server
     //
@@ -122,15 +146,6 @@ MNERTServer::MNERTServer()
         ipAddress = QHostAddress(QHostAddress::LocalHost).toString();
 
     printf("mne_rt_server is running on\n\tIP:\t\t%s\n\tcommand port:\t%d\n\tfiff data port:\t%d\n\n",ipAddress.toUtf8().constData(), m_pCommandServer->serverPort(), m_pFiffStreamServer->serverPort());
-
-
-    //
-    // Load Connectors
-    //
-    m_pConnectorManager = new ConnectorManager();
-    m_pConnectorManager->loadConnectors(qApp->applicationDirPath()+connectorDir);
-
-    m_pActiveConnector = m_pConnectorManager->getActiveConnector();
 }
 
 
