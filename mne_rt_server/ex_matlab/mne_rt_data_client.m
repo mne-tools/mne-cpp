@@ -17,6 +17,40 @@ classdef mne_rt_data_client < mne_rt_client
             obj = obj@mne_rt_client(host, port, numOfRetries);%Superclass call
             obj.getClientId();
         end % mne_rt_data_client
+        
+        
+        % =================================================================
+        %% readInfo
+        function [dtd] = readInfo(obj)
+            import java.net.Socket
+            import java.io.*
+            % get a buffered data input stream from the socket
+            t_inStream   = obj.m_TcpSocket.getInputStream;
+            t_dataInStream = DataInputStream(t_inStream);
+            
+            
+            dtd = [];
+            
+            t_bReadMeasBlockEnd = false;
+            
+            while(~t_bReadMeasBlockEnd)
+                % read data from the socket - wait a short time first
+                bytes_available = t_dataInStream.available;
+                if(bytes_available == 0)
+                    t_bReadMeasBlockEnd = true;
+                end
+                
+                
+                info = zeros(1, bytes_available, 'uint8');
+                for i = 1:bytes_available
+                    info(i) = t_dataInStream.readByte;
+                end
+
+                dtd = [dtd info];
+            end
+        
+        end
+        
 
         % =================================================================
         %% read_tag

@@ -71,6 +71,33 @@ classdef mne_rt_cmd_client < mne_rt_client
                 t_dataOutStream.writeBytes(command);
                 t_dataOutStream.flush;
             end
+            
+            
+            
+            
+%             % get a buffered data input stream from the socket
+%             t_inStream   = obj.m_TcpSocket.getInputStream;
+%             t_dataInStream = DataInputStream(t_inStream);
+%             
+%             
+%             dtd = [];
+%             
+%             while(true)
+% 
+%                 % read data from the socket - wait a short time first
+%                 pause(0.5);
+%                 bytes_available = t_dataInStream.available
+%                 
+%                 info = zeros(1, bytes_available, 'uint8');
+%                 for i = 1:bytes_available
+%                     info(i) = t_dataInStream.readByte;
+%                 end
+% 
+%                 dtd = [dtd info];    
+%             end
+            
+            
+            
         end
     end
 end
