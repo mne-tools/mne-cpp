@@ -69,7 +69,8 @@ using namespace FIFFLIB;
 FiffStream::FiffStream(QIODevice* p_pIODevice)
 : QDataStream(p_pIODevice)
 {
-
+    this->setFloatingPointPrecision(QDataStream::SinglePrecision);
+    this->setByteOrder(QDataStream::BigEndian);
 }
 
 
@@ -78,7 +79,8 @@ FiffStream::FiffStream(QIODevice* p_pIODevice)
 FiffStream::FiffStream(QByteArray * a, QIODevice::OpenMode mode)
 : QDataStream(a, mode)
 {
-
+    this->setFloatingPointPrecision(QDataStream::SinglePrecision);
+    this->setByteOrder(QDataStream::BigEndian);
 }
 
 
@@ -109,8 +111,6 @@ void FiffStream::end_file()
     fiff_int_t datasize = 0;
 
 //    QDataStream out(this);   // we will serialize the data into the file
-    this->setByteOrder(QDataStream::BigEndian);
-
     *this << (qint32)FIFF_NOP;
     *this << (qint32)FIFFT_VOID;
     *this << (qint32)datasize;
@@ -1587,7 +1587,7 @@ FiffStream* FiffStream::start_writing_raw(QIODevice* p_pIODevice, FiffInfo* info
         //    Scan numbers may have been messed up
         //
         chs[k].scanno = k+1;//+1 because
-        chs[k].range  = 1.0f;
+//        chs[k].range  = 1.0f;//ToDo: Why???
         (*cals)(0,k) = chs[k].cal;
         t_pStream->write_ch_info(&chs[k]);
     }
@@ -1646,7 +1646,6 @@ void FiffStream::write_ch_info(FiffChInfo* ch)
     fiff_int_t datasize= 4*13 + 4*7 + 16;
 
 //    QDataStream out(this);   // we will serialize the data into the file
-    this->setByteOrder(QDataStream::BigEndian);
 
     *this << (qint32)FIFF_CH_INFO;
     *this << (qint32)FIFFT_CH_INFO_STRUCT;
@@ -1660,11 +1659,25 @@ void FiffStream::write_ch_info(FiffChInfo* ch)
     *this << (qint32)ch->logno;
     *this << (qint32)ch->kind;
 
-    int iData = 0;
-    iData = *(int *)&ch->range;
-    *this << iData;
-    iData = *(int *)&ch->cal;
-    *this << iData;
+//    int iData = 0;
+//    iData = *(int *)&ch->range;
+//    *this << iData;
+//    iData = *(int *)&ch->cal;
+//    *this << iData;
+
+//    //
+//    //   fiffChPosRec follows
+//    //
+//    *this << (qint32)ch->coil_type;
+//    qint32 i;
+//    for(i = 0; i < 12; ++i)
+//    {
+//        iData = *(int *)&ch->loc(i,0);
+//        *this << iData;
+//    }
+
+    *this << ch->range;
+    *this << ch->cal;
 
     //
     //   fiffChPosRec follows
@@ -1672,10 +1685,7 @@ void FiffStream::write_ch_info(FiffChInfo* ch)
     *this << (qint32)ch->coil_type;
     qint32 i;
     for(i = 0; i < 12; ++i)
-    {
-        iData = *(int *)&ch->loc(i,0);
-        *this << iData;
-    }
+        *this << ch->loc(i,0);
 
     //
     //   unit and unit multiplier
@@ -1689,14 +1699,11 @@ void FiffStream::write_ch_info(FiffChInfo* ch)
     fiff_int_t len = ch->ch_name.size();
     QString ch_name;
     if(len > 15)
-    {
         ch_name = ch->ch_name.mid(0, 15);
-    }
     else
         ch_name = ch->ch_name;
 
     len = ch_name.size();
-
 
     this->writeRawData(ch_name.toUtf8().constData(),len);
 
@@ -1725,7 +1732,6 @@ void FiffStream::write_coord_trans(FiffCoordTrans* trans)
     fiff_int_t datasize = 4*2*12 + 4*2;
 
 //    QDataStream out(this);   // we will serialize the data into the file
-    this->setByteOrder(QDataStream::BigEndian);
 
     *this << (qint32)FIFF_COORD_TRANS;
     *this << (qint32)FIFFT_COORD_TRANS_STRUCT;
@@ -1809,7 +1815,6 @@ void FiffStream::write_dig_point(FiffDigPoint& dig)
     fiff_int_t datasize = 5*4;
 
 //    QDataStream out(this);   // we will serialize the data into the file
-    this->setByteOrder(QDataStream::BigEndian);
 
     *this << (qint32)FIFF_DIG_POINT;
     *this << (qint32)FIFFT_DIG_POINT_STRUCT;
@@ -1833,19 +1838,26 @@ void FiffStream::write_float(fiff_int_t kind, float* data, fiff_int_t nel)
     qint32 datasize = nel * 4;
 
 //    QDataStream out(this);   // we will serialize the data into the file
-    this->setByteOrder(QDataStream::BigEndian);
 
     *this << (qint32)kind;
     *this << (qint32)FIFFT_FLOAT;
     *this << (qint32)datasize;
     *this << (qint32)FIFFV_NEXT_SEQ;
 
-    qint32 iData = 0;
+
+//    this->setFloatingPointPrecision(QDataStream::SinglePrecision);
+
+
+    // Old style
+//    qint32 iData = 0;
+//    for(qint32 i = 0; i < nel; ++i)
+//    {
+//        iData = *(qint32 *)&data[i];
+//        *this << iData;
+//    }
+
     for(qint32 i = 0; i < nel; ++i)
-    {
-        iData = *(qint32 *)&data[i];
-        *this << iData;
-    }
+        *this << data[i];
 }
 
 
@@ -1862,7 +1874,6 @@ void FiffStream::write_float_matrix(fiff_int_t kind, const MatrixXd* mat)
 
 
 //    QDataStream out(this);   // we will serialize the data into the file
-    this->setByteOrder(QDataStream::BigEndian);
 
     *this << (qint32)kind;
     *this << (qint32)FIFFT_MATRIX_FLOAT;
@@ -1870,13 +1881,16 @@ void FiffStream::write_float_matrix(fiff_int_t kind, const MatrixXd* mat)
     *this << (qint32)FIFFV_NEXT_SEQ;
 
     qint32 i;
-    int iData = 0;
+    // Old style with float --> now we do have doubles as input
+//    int iData = 0;
+//    for(i = 0; i < numel; ++i)
+//    {
+//        iData = *(int *)&mat->data()[i];
+//        *this << iData;
+//    }
 
     for(i = 0; i < numel; ++i)
-    {
-        iData = *(int *)&mat->data()[i];
-        *this << iData;
-    }
+        *this << (float)mat->data()[i];
 
     qint32 dims[3];
     dims[0] = mat->cols();
@@ -1915,7 +1929,6 @@ void FiffStream::write_id(fiff_int_t kind, FiffId& id)
     fiff_int_t datasize = 5*4;                       //   The id comprises five integers
 
 //    QDataStream out(this);   // we will serialize the data into the file
-    this->setByteOrder(QDataStream::BigEndian);
 
     *this << (qint32)kind;
     *this << (qint32)FIFFT_ID_STRUCT;
@@ -1943,7 +1956,6 @@ void FiffStream::write_int(fiff_int_t kind, fiff_int_t* data, fiff_int_t nel)
     fiff_int_t datasize = nel * 4;
 
 //    QDataStream out(this);   // we will serialize the data into the file
-    this->setByteOrder(QDataStream::BigEndian);
 
     *this << (qint32)kind;
     *this << (qint32)FIFFT_INT;
@@ -2040,7 +2052,6 @@ void FiffStream::write_string(fiff_int_t kind, QString& data)
     fiff_int_t datasize = data.size();//size(data,2);
 
 //    QDataStream out(this);   // we will serialize the data into the file
-    this->setByteOrder(QDataStream::BigEndian);
 
     *this << (qint32)kind;
     *this << (qint32)FIFFT_STRING;

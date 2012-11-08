@@ -266,7 +266,7 @@ void FiffStreamThread::getAndSendMeasurementInfo(qint32 ID, FiffInfo* p_pFiffInf
             //    Scan numbers may have been messed up
             //
             chs[k].scanno = k+1;//+1 because
-            chs[k].range  = 1.0f;
+//            chs[k].range  = 1.0f;//ToDo: Why???
             (*cals)(0,k) = chs[k].cal;
             t_FiffStreamOut.write_ch_info(&chs[k]);
         }
@@ -278,7 +278,7 @@ void FiffStreamThread::getAndSendMeasurementInfo(qint32 ID, FiffInfo* p_pFiffInf
 
         mutex.unlock();
 
-        qDebug() << "MeasInfo Blocksize: " << m_qSendBlock.size();
+//        qDebug() << "MeasInfo Blocksize: " << m_qSendBlock.size();
     }
 }
 
@@ -330,12 +330,12 @@ void FiffStreamThread::run()
         //
         if(m_qSendBlock.size() > 0)
         {
-            qDebug() << "is writeable " << t_qTcpSocket.isWritable();
+//            qDebug() << "is writeable " << t_qTcpSocket.isWritable();
             qint32 t_iBlockSize = m_qSendBlock.size();
-            qDebug() << "data available" << t_iBlockSize;
+//            qDebug() << "data available" << t_iBlockSize;
             mutex.lock();
             qint32 t_iBytesWritten = t_qTcpSocket.write(m_qSendBlock);
-            qDebug() << "wrote bytes " << t_iBytesWritten;
+//            qDebug() << "wrote bytes " << t_iBytesWritten;
             t_qTcpSocket.waitForBytesWritten();
             if(t_iBytesWritten == t_iBlockSize)
             {
@@ -374,9 +374,7 @@ void FiffStreamThread::run()
             {
                 parseCommand(t_pTag);
             }
-
         }
-
 //        usleep(1000);
     }
 
