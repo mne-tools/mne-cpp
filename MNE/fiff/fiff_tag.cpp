@@ -780,9 +780,8 @@ void FiffTag::convert_matrix_to_file_data(FiffTag* tag)
  * Either of these may be specified as FIFFV_LITTLE_ENDIAN, FIFFV_BIG_ENDIAN, or FIFFV_NATIVE_ENDIAN.
  * The last choice means that the native byte order value will be substituted here before proceeding
  */
-
+//ToDo remove this function by swapping -> define little endian big endian, QByteArray
 void FiffTag::convert_tag_data(FiffTag* tag, int from_endian, int to_endian)
-
 {
     int            np;
     int            k,r;//,c;
@@ -931,16 +930,16 @@ void FiffTag::convert_tag_data(FiffTag* tag, int from_endian, int to_endian)
             ithis = (fiff_int_t*) offset;
             fthis = (float*) offset;
 
-            ithis[0] = swap_int(ithis[0]);    //scanno
-            ithis[1] = swap_int(ithis[1]);    //logno
-            ithis[2] = swap_int(ithis[2]);    //kind
-            swap_floatp(&fthis[3]);                  //range
-            swap_floatp(&fthis[4]);                  //cal
-            ithis[5] = swap_int(ithis[5]);    //coil_type
+            ithis[0] = swap_int(ithis[0]);  //scanno
+            ithis[1] = swap_int(ithis[1]);  //logno
+            ithis[2] = swap_int(ithis[2]);  //kind
+            swap_floatp(&fthis[3]);         //range
+            swap_floatp(&fthis[4]);         //cal
+            ithis[5] = swap_int(ithis[5]);  //coil_type
             for (r = 0; r < 12; ++r)
-                swap_floatp(&fthis[6+r]);            //loc
-            ithis[18] = swap_int(ithis[18]);  //unit
-            ithis[19] = swap_int(ithis[19]);  //unit_mul
+                swap_floatp(&fthis[6+r]);   //loc
+            ithis[18] = swap_int(ithis[18]);//unit
+            ithis[19] = swap_int(ithis[19]);//unit_mul
         }
 
         break;

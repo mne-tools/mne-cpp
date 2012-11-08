@@ -141,18 +141,12 @@ FiffInfo* FiffSimulator::getMeasInfo()
 {
 
     if(!m_pRawInfo)
-    {
         readRawInfo();
-    }
 
     if(m_pRawInfo)
-    {
         return m_pRawInfo->info;
-    }
     else
-    {
         return NULL;
-    }
 }
 
 
