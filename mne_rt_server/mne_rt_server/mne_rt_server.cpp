@@ -99,6 +99,9 @@ MNERTServer::MNERTServer()
     //
     // Meas Info
     //
+
+//    m_pConnectorManager->connectActiveConnector();
+
     // connect command server and connector manager
     QObject::connect(   m_pCommandServer, &CommandServer::requestMeasInfo,
                         m_pConnectorManager, &ConnectorManager::getActiveMeasInfo);

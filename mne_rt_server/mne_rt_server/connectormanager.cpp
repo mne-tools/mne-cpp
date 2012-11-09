@@ -292,6 +292,33 @@ void ConnectorManager::getActiveMeasInfo(qint32 ID)
 
 //*************************************************************************************************************
 
+void ConnectorManager::connectActiveConnector()
+{
+    IConnector* t_activeConnector = ConnectorManager::getActiveConnector();
+
+    if(t_activeConnector)
+    {
+//        MNERTServer* t_pMNERTServer = qobject_cast<MNERTServer*>(this->parent());
+
+        //
+        // Meas Info
+        //
+        // connect command server and connector manager
+//        QObject::connect(   t_pMNERTServer->m_pCommandServer, &CommandServer::requestMeasInfo,
+//                            t_activeConnector, &IConnector::requestMeasInfo);
+//        // connect connector manager and fiff stream server
+//        QObject::connect(   t_activeConnector, &IConnector::remitMeasInfo,
+//                            t_pMNERTServer->m_pFiffStreamServer, &FiffStreamServer::forwardMeasInfo);
+    }
+    else
+    {
+        printf("Error: Can't send measurement info, no connector active!\n");
+    }
+}
+
+
+//*************************************************************************************************************
+
 QByteArray ConnectorManager::getByteArrayConnectorList() const
 {
     QByteArray t_blockConnectorList;

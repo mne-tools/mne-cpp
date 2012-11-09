@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_rt_server.h
+* @file     observerpattern.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,86 +29,61 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the MNERTServer Class.
+* @brief    Contains implementations of the observer design pattern: Subject class and IObserver interface.
 *
 */
 
-#ifndef MNE_RT_SERVER_H
-#define MNE_RT_SERVER_H
-
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// INCLUDES
 //=============================================================================================================
 
-#include <QObject>
+#include "observerpattern.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FIFF INCLUDES
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MSERVER
-//=============================================================================================================
-
-namespace MSERVER
+Subject::~Subject()
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
+}
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
 
-class CommandServer;
-class CommandThread;
-class FiffStreamServer;
-class FiffStreamThread;
-class ConnectorManager;
-class IConnector;
-
-
-//=============================================================================================================
-/**
-* DECLARE CLASS MNERTServer
-*
-* @brief The MNERTServer class provides a Fiff data simulator.
-*/
-class MNERTServer : public QObject
+void Subject::attach(IObserver* pObserver)
 {
-    Q_OBJECT
+    m_Observers.insert(pObserver);
+}
 
-    //for convinience by connecting signals
-    friend class CommandServer;
-    friend class CommandThread;
-    friend class FiffStreamServer;
-    friend class FiffThread;
 
-public:
-    MNERTServer();
+//*************************************************************************************************************
 
-    //=========================================================================================================
-    /**
-    * Destroys the MNERTServer.
-    */
-    ~MNERTServer();
+void Subject::detach(IObserver* pObserver)
+{
+	m_Observers.erase(m_Observers.find(pObserver));
+    //m_Observers.erase(observer); //C++ <set> STL implementation
+}
 
-private:
-    FiffStreamServer*   m_pFiffStreamServer;
-    CommandServer*      m_pCommandServer;
 
-    ConnectorManager* m_pConnectorManager;
-};
+//*************************************************************************************************************
 
-} // NAMESPACE
+void Subject::notify()
+{
+	if(notifyEnabled)
+	{
+		t_Observers::const_iterator it = m_Observers.begin();
+		for( ; it != m_Observers.end(); ++it)
+			(*it)->update(this);
+	}
+}
 
-#endif // MNE_RT_SERVER_H
+//*************************************************************************************************************
+//=============================================================================================================
+// STATIC DEFINITIONS
+//=============================================================================================================
+
+bool Subject::notifyEnabled = true;
