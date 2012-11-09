@@ -125,7 +125,7 @@ public:
 
     virtual ConnectorID getConnectorID() const;
 
-    virtual FiffInfo* getMeasInfo();
+    virtual void requestMeasInfo(qint32 ID);
 
     virtual const char* getName() const;
 

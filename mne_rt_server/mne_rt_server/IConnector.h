@@ -61,8 +61,15 @@
 // Generics INCLUDES
 //=============================================================================================================
 
-
 #include "../../MNE/generics/circularmatrixbuffer.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include "../../include/3rdParty/Eigen/Core"
 
 
 //*************************************************************************************************************
@@ -97,6 +104,7 @@ enum ConnectorID
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace Eigen;
 using namespace IOBuffer;
 
 
@@ -108,6 +116,8 @@ using namespace IOBuffer;
 */
 class IConnector : public QThread
 {
+    Q_OBJECT
+
 public:
 
     //=========================================================================================================
@@ -165,7 +175,7 @@ public:
     *
     * @return the name of module.
     */
-    virtual FiffInfo* getMeasInfo() = 0;
+    virtual void requestMeasInfo(qint32 ID) = 0;
 
     //=========================================================================================================
     /**
@@ -191,6 +201,10 @@ public:
     * @return true if module is activated.
     */
     inline bool isActive() const;
+
+signals:
+    void remitMeasInfo(qint32, FIFFLIB::FiffInfo*);
+    void remitRawBuffer(Eigen::MatrixXf);
 
 protected:
 

@@ -39,6 +39,9 @@
 //=============================================================================================================
 
 #include "connectormanager.h"
+#include "mne_rt_server.h"
+#include "commandserver.h"
+#include "fiffstreamserver.h"
 
 #include "IConnector.h"
 
@@ -274,20 +277,20 @@ IConnector* ConnectorManager::getActiveConnector()
 
 //*************************************************************************************************************
 
-void ConnectorManager::getActiveMeasInfo(qint32 ID)
-{
-    IConnector* t_activeConnector = ConnectorManager::getActiveConnector();
+//void ConnectorManager::getActiveMeasInfo(qint32 ID)
+//{
+//    IConnector* t_activeConnector = ConnectorManager::getActiveConnector();
 
-    if(t_activeConnector)
-    {
-        FiffInfo* t_FiffInfo = t_activeConnector->getMeasInfo();
-        emit sendMeasInfo(ID, t_FiffInfo);
-    }
-    else
-    {
-        printf("Error: Can't send measurement info, no connector active!\n");
-    }
-}
+//    if(t_activeConnector)
+//    {
+//        FiffInfo* t_FiffInfo = t_activeConnector->getMeasInfo();
+//        emit sendMeasInfo(ID, t_FiffInfo);
+//    }
+//    else
+//    {
+//        printf("Error: Can't send measurement info, no connector active!\n");
+//    }
+//}
 
 
 //*************************************************************************************************************
@@ -298,17 +301,17 @@ void ConnectorManager::connectActiveConnector()
 
     if(t_activeConnector)
     {
-//        MNERTServer* t_pMNERTServer = qobject_cast<MNERTServer*>(this->parent());
+        MNERTServer* t_pMNERTServer = qobject_cast<MNERTServer*>(this->parent());
 
         //
         // Meas Info
         //
         // connect command server and connector manager
-//        QObject::connect(   t_pMNERTServer->m_pCommandServer, &CommandServer::requestMeasInfo,
-//                            t_activeConnector, &IConnector::requestMeasInfo);
-//        // connect connector manager and fiff stream server
-//        QObject::connect(   t_activeConnector, &IConnector::remitMeasInfo,
-//                            t_pMNERTServer->m_pFiffStreamServer, &FiffStreamServer::forwardMeasInfo);
+        QObject::connect(   t_pMNERTServer->m_pCommandServer, &CommandServer::requestMeasInfo,
+                            t_activeConnector, &IConnector::requestMeasInfo);
+        // connect connector manager and fiff stream server
+        QObject::connect(   t_activeConnector, &IConnector::remitMeasInfo,
+                            t_pMNERTServer->m_pFiffStreamServer, &FiffStreamServer::forwardMeasInfo);
     }
     else
     {
