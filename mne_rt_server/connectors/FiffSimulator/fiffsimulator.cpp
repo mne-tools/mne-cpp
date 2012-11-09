@@ -170,16 +170,16 @@ ConnectorID FiffSimulator::getConnectorID() const
 
 //*************************************************************************************************************
 
-FiffInfo* FiffSimulator::getMeasInfo()
+void FiffSimulator::requestMeasInfo(qint32 ID)
 {
 
     if(!m_pRawInfo)
         readRawInfo();
 
     if(m_pRawInfo)
-        return m_pRawInfo->info;
-    else
-        return NULL;
+        emit remitMeasInfo(ID, m_pRawInfo->info);
+//    else
+//        return NULL;
 }
 
 

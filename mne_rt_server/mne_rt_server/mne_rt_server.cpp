@@ -100,14 +100,14 @@ MNERTServer::MNERTServer()
     // Meas Info
     //
 
-//    m_pConnectorManager->connectActiveConnector();
+    m_pConnectorManager->connectActiveConnector();
 
-    // connect command server and connector manager
-    QObject::connect(   m_pCommandServer, &CommandServer::requestMeasInfo,
-                        m_pConnectorManager, &ConnectorManager::getActiveMeasInfo);
-    // connect connector manager and fiff stream server
-    QObject::connect(   m_pConnectorManager, &ConnectorManager::sendMeasInfo,
-                        m_pFiffStreamServer, &FiffStreamServer::forwardMeasInfo);
+//    // connect command server and connector manager
+//    QObject::connect(   m_pCommandServer, &CommandServer::requestMeasInfo,
+//                        m_pConnectorManager, &ConnectorManager::getActiveMeasInfo);
+//    // connect connector manager and fiff stream server
+//    QObject::connect(   m_pConnectorManager, &ConnectorManager::sendMeasInfo,
+//                        m_pFiffStreamServer, &FiffStreamServer::forwardMeasInfo);
 
     //
     // Connect instruction and data server

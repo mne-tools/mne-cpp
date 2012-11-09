@@ -168,7 +168,7 @@ public:
     */
     static IConnector* getActiveConnector();
 
-    void getActiveMeasInfo(qint32 ID);
+//    void getActiveMeasInfo(qint32 ID);
 
 //    void getActiveMeasInfo(qint32 ID);
     void connectActiveConnector();
