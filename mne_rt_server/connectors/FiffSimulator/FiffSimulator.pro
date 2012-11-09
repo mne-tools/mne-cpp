@@ -10,7 +10,7 @@ CONFIG += plugin
 
 DEFINES += FIFFSIMULATOR_LIBRARY
 
-QT += core
+QT += network
 
 TARGET = FiffSimulator
 

@@ -61,11 +61,13 @@ win32 {
 
 SOURCES += \ 
     circularbuffer.cpp \
-    circularmatrixbuffer.cpp
+    circularmatrixbuffer.cpp \
+    observerpattern.cpp
 
 HEADERS += generics_global.h \
     circularmatrixbuffer.h \
-    circularbuffer.h
+    circularbuffer.h \
+    observerpattern.h
 
 #Install headers to include directory
 header_files.files = ./*.h

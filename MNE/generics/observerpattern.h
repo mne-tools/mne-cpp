@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     connectormanager.h
+* @file     observerpattern.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ConnectorManager Class.
+* @brief    Contains declarations of the observer design pattern: Subject class and IObserver interface.
 *
 */
 
-#ifndef CONNECTORMANAGER_H
-#define CONNECTORMANAGER_H
+#ifndef OBSERVERPATTERN_H
+#define OBSERVERPATTERN_H
 
 
 //*************************************************************************************************************
@@ -42,47 +42,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "IConnector.h"
+#include "generics_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Fiff INCLUDES
+// QT STL INCLUDES
 //=============================================================================================================
 
-#include "../../MNE/fiff/fiff_info.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QVector>
-#include <QPluginLoader>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MSERVER
-//=============================================================================================================
-
-namespace MSERVER
-{
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace FIFFLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Function Pointers
-//=============================================================================================================
-
+#include <QSet>
 
 
 //*************************************************************************************************************
@@ -90,120 +58,99 @@ using namespace FIFFLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-//class IConnector;
+class Subject;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ConnectorManager
+* DECLARE INTERFACE OBSERVER
 *
-* @brief The ConnectorManager class provides a dynamic module loader. As well as the handling of the loaded modules.
+* @brief The IObserver interface provides the base class of every observer of the observer design pattern.
 */
-class ConnectorManager : public QPluginLoader
+class IObserver
 {
-    Q_OBJECT
-
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a ConnectorManager with the given parent.
+    * Destroys the IObserver.
+    */
+    virtual ~IObserver() {};
+    //=========================================================================================================
+    /**
+    * Updates the IObserver.
     *
-    * @param [in] parent pointer to parent Object. (It's normally the default value.)
+    * @param [in] pSubject pointer to the subject where observer is attached to.
     */
-    ConnectorManager(QObject* parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the ConnectorManager.
-    */
-    virtual ~ConnectorManager();
-
-    //=========================================================================================================
-    /**
-    * Loads modules from given directory.
-    *
-    * @param dir the module directory.
-    */
-    void loadConnectors(const QString& dir);
-
-    //=========================================================================================================
-    /**
-    * Sends the command to the active connector.
-    *
-    * @param[in] p_qListCommand the command.
-    * @param[out] p_blockOutputInfo the bytearray which contains parsing information to be send back to CommandClient.
-    *
-    * @return true if successful, false otherwise
-    */
-    bool parseConnectorCommand(QStringList& p_qListCommand, QByteArray& p_blockOutputInfo);
-
-    //=========================================================================================================
-    /**
-    * Starts all modules.
-    *
-    * @return true if at least one IConnector module was started successfully, false otherwise.
-    */
-    static bool startConnector();
-
-    //=========================================================================================================
-    /**
-    * Stop active connector.
-    */
-    static void stopConnector();
-
-    //=========================================================================================================
-    /**
-    * Returns vector containing all modules.
-    *
-    * @return reference to vector containing all modules.
-    */
-    static inline const QVector<IConnector*>& getConnectors();
-
-    //=========================================================================================================
-    /**
-    * Returns vector containing active ISensor modules.
-    *
-    * @return reference to vector containing active ISensor modules.
-    */
-    static IConnector* getActiveConnector();
-
-    void getActiveMeasInfo(qint32 ID);
-
-//    void getActiveMeasInfo(qint32 ID);
-    void connectActiveConnector();
-
-
-    //=========================================================================================================
-    /**
-    * Prints a list of all connectors and their status
-    */
-    QByteArray getByteArrayConnectorList() const;
-
-
-
-
-    static void clearConnectorActivation();
-
-
-signals:
-    void sendMeasInfo(qint32, FIFFLIB::FiffInfo*);
-
-private:
-    static QVector<IConnector*> s_vecConnectors;       /**< Holds vector of all modules. */
+    virtual void update(Subject* pSubject) = 0;
 };
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-inline const QVector<IConnector*>& ConnectorManager::getConnectors()
+//=========================================================================================================
+/**
+* DECLARE BASE CLASS SUBJECT
+*
+* @brief The Subject class provides the base class of every subject of the observer design pattern.
+*/
+class GENERICSSHARED_EXPORT Subject
 {
-    return s_vecConnectors;
-}
+public:
 
-} // NAMESPACE
+    //=========================================================================================================
+    /**
+    * Destroys the Subject.
+    */
+    virtual ~Subject();
 
-#endif // CONNECTORMANAGER_H
+    //=========================================================================================================
+    /**
+    * Attaches an observer to the subject.
+    *
+    * @param [in] pObserver pointer to the observer which should be attached to the subject.
+    */
+    void attach(IObserver* pObserver);
+
+    //=========================================================================================================
+    /**
+    * Detaches an observer of the subject.
+    *
+    * @param [in] pObserver pointer to the observer which should be detached of the subject.
+    */
+    void detach(IObserver* pObserver);
+
+    //=========================================================================================================
+    /**
+    * Notifies all attached servers by calling there update method. Is used when subject has updates to provide.
+    * This method is enabled when nothifiedEnabled is true.
+    */
+    void notify();
+
+    //=========================================================================================================
+    /**
+    * Holds the status whether notification is enabled.
+    * This is used to block notify() to make the observer pattern thread safe. It's working like a mutex. The different is that data aren't stored. -> it's okay when values are queued in their own buffer.
+    */
+    static bool notifyEnabled; //ToDo move this to obeservers + make it thread safe
+
+    //=========================================================================================================
+    /**
+    * Returns number of attached observers.
+    * ToDo only for debug purpose -> could be removed
+    *
+    * @return the number of attached observers.
+    */
+    int observerNumDebug(){return m_Observers.size();};
+
+protected:
+    //=========================================================================================================
+    /**
+    * Constructs a Subject.
+    */
+    Subject() {};
+
+private:
+    typedef QSet<IObserver*>    t_Observers;	/**< Defines a new IObserver set type. */
+    t_Observers                 m_Observers;	/**< Holds the attached observers.*/
+};
+
+#endif // OBSERVERPATTERN_H
