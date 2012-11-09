@@ -87,12 +87,11 @@ using namespace MNELIB;
 //=============================================================================================================
 
 FiffSimulator::FiffSimulator()
-: m_pFiffProducer(new FiffProducer())
-, m_fSamplingRate(0)
+: m_pFiffProducer(new FiffProducer(this))
 , m_pRawInfo(NULL)
 , m_sResourceDataPath("../../mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
 {
-
+    this->setBufferSampleSize(1000);
 }
 
 
@@ -185,6 +184,14 @@ void FiffSimulator::requestMeasInfo(qint32 ID)
 
 //*************************************************************************************************************
 
+void FiffSimulator::requestRawData()
+{
+    this->m_pFiffProducer->start();
+}
+
+
+//*************************************************************************************************************
+
 const char* FiffSimulator::getName() const
 {
     return "Fiff File Simulator";
@@ -218,6 +225,11 @@ bool FiffSimulator::readRawInfo()
             delete t_pFile;
             return false;
         }
+
+        //delete it here and reopen it in an other thread
+        delete m_pRawInfo->file;
+        m_pRawInfo->file = NULL;
+
         mutex.unlock();
 
         delete t_pFile;

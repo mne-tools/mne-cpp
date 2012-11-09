@@ -82,6 +82,8 @@ void CommandServer::incomingConnection(qintptr socketDescriptor)
     //Forwards for thread safety - check if obsolete!?
     connect(t_pthread, &CommandThread::requestMeasInfo,
             this, &CommandServer::forwardMeasInfoRequest);
+    connect(t_pthread, &CommandThread::requestMeas,
+            this, &CommandServer::forwardMeasRequest);
 
     t_pthread->start();
 }
@@ -92,6 +94,15 @@ void CommandServer::incomingConnection(qintptr socketDescriptor)
 void CommandServer::forwardMeasInfoRequest(qint32 ID)
 {
     emit requestMeasInfo(ID);
+}
+
+
+//*************************************************************************************************************
+
+void CommandServer::forwardMeasRequest(qint32 ID)
+{
+    emit selectRawDataFiffStreamClient(ID);
+    emit requestRawData();
 }
 
 

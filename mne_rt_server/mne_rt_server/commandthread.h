@@ -64,6 +64,7 @@ signals:
     void error(QTcpSocket::SocketError socketError);
 
     void requestMeasInfo(qint32 p_iClientId);
+    void requestMeas(qint32 p_iClientId);
 //    void sendCommandServerInstruction();
 
 private:

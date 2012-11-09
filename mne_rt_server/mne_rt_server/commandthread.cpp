@@ -165,7 +165,19 @@ bool CommandThread::parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand)
         //
         // meas
         //
-        success = true;
+        qint32 t_id = -1;
+        t_blockClientList.append(parseToId(t_qCommandList[1],t_id));
+
+        printf("meas %d\n", t_id);
+
+        if(t_id != -1)
+        {
+            emit requestMeas(t_id);
+
+            QString str = QString("\tsend measurement raw buffer to FiffStreamClient (ID: %1)\r\n\n").arg(t_id);
+            t_blockClientList.append(str);
+            success = true;
+        }
     }
     else if(t_qCommandList[0].compare("stop",Qt::CaseInsensitive) == 0)
     {

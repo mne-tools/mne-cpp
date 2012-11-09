@@ -177,6 +177,8 @@ public:
     */
     virtual void requestMeasInfo(qint32 ID) = 0;
 
+    virtual void requestRawData() = 0;
+
     //=========================================================================================================
     /**
     * Returns the module name.
@@ -185,6 +187,10 @@ public:
     * @return the name of module.
     */
     virtual const char* getName() const = 0;
+
+    inline quint32 getBufferSampleSize();
+
+    inline void setBufferSampleSize(quint32 p_uiBuffSize);
 
     //=========================================================================================================
     /**
@@ -216,17 +222,33 @@ protected:
     */
     virtual void run() = 0;
 
-private:
-
-    bool m_bStatus;                         /**< Holds the activation status. */
-
     RawMatrixBuffer* m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
+
+private:
+    bool        m_bStatus;                  /**< Holds the activation status. */
+    quint32     m_uiBufferSampleSize;       /**< Number of Buffer Sample Size */
 };
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONSs
 //=============================================================================================================
+
+inline quint32 IConnector::getBufferSampleSize()
+{
+    return m_uiBufferSampleSize;
+}
+
+//*************************************************************************************************************
+
+inline void IConnector::setBufferSampleSize(quint32 p_uiBuffSize)
+{
+    if(p_uiBuffSize > 0)
+        m_uiBufferSampleSize = p_uiBuffSize;
+}
+
+
+//*************************************************************************************************************
 
 inline void IConnector::setStatus(bool status)
 {

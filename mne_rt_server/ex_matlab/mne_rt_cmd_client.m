@@ -63,14 +63,24 @@ classdef mne_rt_cmd_client < mne_rt_client
                 error('unknown format for AliasOrId');
             end
             
-            if ~isempty(obj.m_TcpSocket)
-                % get a buffered data output stream from the socket
-                t_outStream   = obj.m_TcpSocket.getOutputStream;
-                t_dataOutStream = DataOutputStream(t_outStream);
-                
-                t_dataOutStream.writeBytes(command);
-                t_dataOutStream.flush;
+            obj.sendCommand(command);
+        end
+        
+        % =================================================================
+        %% requestMeas
+        function requestMeas(obj, AliasOrId)
+            import java.net.Socket
+            import java.io.*
+            
+            if(ischar(AliasOrId))
+                command = sprintf('meas %s\n', AliasOrId);
+            elseif(isnumeric(AliasOrId))
+                command = sprintf('meas %d\n', AliasOrId);
+            else
+                error('unknown format for AliasOrId');
             end
+            
+            obj.sendCommand(command);
         end
     end
 end
