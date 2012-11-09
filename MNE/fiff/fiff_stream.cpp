@@ -1587,7 +1587,7 @@ FiffStream* FiffStream::start_writing_raw(QIODevice* p_pIODevice, FiffInfo* info
         //    Scan numbers may have been messed up
         //
         chs[k].scanno = k+1;//+1 because
-//        chs[k].range  = 1.0f;//ToDo: Why???
+        chs[k].range  = 1.0f;//Why? -> cause its already calibrated through reading
         (*cals)(0,k) = chs[k].cal;
         t_pStream->write_ch_info(&chs[k]);
     }

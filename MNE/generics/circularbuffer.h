@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     circularbuffer.h
+* @file     circularmatrixbuffer.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the CircularBuffer class declaration
+* @brief    Contains the CircularMatrixBuffer class declaration
 *
 */
 
-#ifndef CIRCULARBUFFER_H
-#define CIRCULARBUFFER_H
+#ifndef CIRCULARMATRIXBUFFER_H
+#define CIRCULARMATRIXBUFFER_H
 
 
 //*************************************************************************************************************
@@ -76,22 +76,23 @@ namespace IOBuffer
 * @brief The TEMPLATE CIRCULAR BUFFER provides a template for thread safe circular buffers.
 */
 template<typename _Tp>
-class CircularBuffer
+class CircularMatrixBuffer
 {
 public:
     //=========================================================================================================
     /**
-    * Constructs a CircularBuffer.
+    * Constructs a CircularMatrixBuffer.
+    * length of buffer = uiMaxNumMatrizes*rows*cols
     *
-    * @param [in] uiMaxNumElements length of buffer.
+    * @param [in] uiMaxNumMatrizes  length of buffer.
     */
-    CircularBuffer(unsigned int uiMaxNumElements);
+    CircularMatrixBuffer(unsigned int uiMaxNumMatrizes, unsigned int uiRows, unsigned int uiCols);
 
     //=========================================================================================================
     /**
     * Destroys the CircularBuffer.
     */
-    ~CircularBuffer();
+    ~CircularMatrixBuffer();
 
     //=========================================================================================================
     /**
@@ -100,15 +101,7 @@ public:
     * @param [in] pArray pointer to an Array which should be apend to the end.
     * @param [in] size number of elements containing the array.
     */
-    inline void push(const _Tp* pArray, unsigned int size);
-
-    //=========================================================================================================
-    /**
-    * Adds an element at the end of the buffer.
-    *
-    * @param [in] newElement pointer to an Array which should be apend to the end.
-    */
-    inline void push(const _Tp& newElement);
+    inline void push(const MatrixX<_Tp>* pArray);
 
     //=========================================================================================================
     /**
@@ -252,4 +245,4 @@ typedef GENERICSSHARED_EXPORT _double_CircularBuffer                   MEGBuffer
 
 } // NAMESPACE
 
-#endif // CIRCULARBUFFER_H
+#endif // CIRCULARMATRIXBUFFER_H

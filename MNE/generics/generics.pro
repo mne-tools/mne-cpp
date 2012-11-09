@@ -64,7 +64,8 @@ SOURCES += \
 
 HEADERS += generics_global.h \
     circularbuffer.h \
-    observerpattern.h
+    observerpattern.h \
+    circularmatrixbuffer.h
 
 #Install headers to include directory
 header_files.files = ./*.h
