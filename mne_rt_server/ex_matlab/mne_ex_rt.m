@@ -6,8 +6,8 @@ addpath('../../../mne-matlab/matlab');
 
 %% connection information
 mne_rt_server_ip            =	'localhost';%'172.21.16.63';
-mne_rt_server_commandPort	=	43638;
-mne_rt_server_fiffDataPort	=	43639;
+mne_rt_server_commandPort	=	44519;
+mne_rt_server_fiffDataPort	=	44520;
 
 %% create command client
 t_cmdClient = mne_rt_cmd_client(mne_rt_server_ip, mne_rt_server_commandPort);

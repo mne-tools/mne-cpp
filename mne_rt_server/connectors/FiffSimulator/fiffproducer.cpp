@@ -111,22 +111,6 @@ void FiffProducer::run()
     m_pFiffSimulator->m_pRawInfo->file = p_pStream;
 
     //
-    //   Set up pick list: MEG + STI 014 - bad channels
-    //
-    //
-    bool want_meg   = true;
-    bool want_eeg   = false;
-    bool want_stim  = false;
-    QStringList include;
-    include << "STI 014";
-
-//    MatrixXi picks = Fiff::pick_types(raw->info, want_meg, want_eeg, want_stim, include, raw->info->bads);
-    MatrixXi picks = m_pFiffSimulator->m_pRawInfo->info->pick_types(want_meg, want_eeg, want_stim, include, m_pFiffSimulator->m_pRawInfo->info->bads); // prefer member function
-
-
-
-
-    //
     //   Set up the reading parameters
     //
     fiff_int_t from = m_pFiffSimulator->m_pRawInfo->first_samp;
@@ -148,6 +132,19 @@ void FiffProducer::run()
     MatrixXd* times = NULL;
 
     first = from;
+
+    qint32 nchan = m_pFiffSimulator->m_pRawInfo->info->nchan;
+
+    MatrixXd cals(1,nchan);
+
+    SparseMatrix<double> inv_calsMat(nchan, nchan);
+
+    for(qint32 i = 0; i < nchan; ++i)
+        inv_calsMat.insert(i, i) = 1.0f/m_pFiffSimulator->m_pRawInfo->info->chs[i].cal;
+
+    //Not good cause production time is not accurate
+    //loading and thread sleep is longer than thread sleep time - better to have a extra loading thread
+    // ToDo restructure this producer as laoding buffer --> and thread sleep to simulator buffer
     while(first < to)//m_bIsRunning)
     {
         usleep(uiSamplePeriod);
@@ -155,38 +152,22 @@ void FiffProducer::run()
         qDebug() << "Data package " << count << " produced";
 
 
-//        //This is the while loop
-//        for(first = from; first < to; first+=quantum)
-//        {
             last = first+quantum-1;
             if (last > to)
             {
                 last = to;
             }
 
-            if (!m_pFiffSimulator->m_pRawInfo->read_raw_segment(data,times,first,last,picks))
+            if (!m_pFiffSimulator->m_pRawInfo->read_raw_segment(data,times,first,last))
             {
                 printf("error during read_raw_segment\n");
             }
-//            //
-//            //   You can add your own miracle here
-//            //
-//            printf("Writing...");
-//            if (first_buffer)
-//            {
-//               if (first > 0)
-//                   outfid->write_int(FIFF_FIRST_SAMPLE,&first);
-//               first_buffer = false;
-//            }
-//            outfid->write_raw_buffer(data,cals);
-//            printf("[done]\n");
-//        }
+
+//      MatrixXf tmp = (inv_calsMat*(*buf)).cast<float>();
 
         ++count;
         first+=quantum;
     }
-
-
 
     // close datastream in this thread
     delete m_pFiffSimulator->m_pRawInfo->file;
