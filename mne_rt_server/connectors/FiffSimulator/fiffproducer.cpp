@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "fiffproducer.h"
-
+#include "fiffsimulator.h"
 
 
 //*************************************************************************************************************
@@ -63,8 +63,9 @@ using namespace FiffSimulatorPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FiffProducer::FiffProducer()
-: m_bIsRunning(false)
+FiffProducer::FiffProducer(FiffSimulator* p_pFiffSimulator)
+: m_pFiffSimulator(p_pFiffSimulator)
+, m_bIsRunning(false)
 {
 
 }
@@ -91,66 +92,82 @@ void FiffProducer::stop()
 
 void FiffProducer::run()
 {
-    unsigned int uiSamplePeriod = (unsigned int) (1000000.0/6);//(m_pDataSimulator->m_fSamplingRate));
+
+    float t_fSamplingFrequency = m_pFiffSimulator->m_pRawInfo->info->sfreq;
+    float t_fBuffSampleSize = (float)m_pFiffSimulator->getBufferSampleSize();
+
+    quint32 uiSamplePeriod = (unsigned int) ((t_fBuffSampleSize/t_fSamplingFrequency)*1000000.0f);
+
+    qDebug() << "uiSamplePeriod: " << uiSamplePeriod;
 
     unsigned int count = 0;
 
     m_bIsRunning = true;
 
-    while(m_bIsRunning)
+
+    // reopen file in this thread
+    QFile* t_pFile = new QFile(m_pFiffSimulator->m_pRawInfo->info->filename);
+    FiffStream* p_pStream = new FiffStream(t_pFile);
+    m_pFiffSimulator->m_pRawInfo->file = p_pStream;
+
+    //
+    //   Set up pick list: MEG + STI 014 - bad channels
+    //
+    //
+    bool want_meg   = true;
+    bool want_eeg   = false;
+    bool want_stim  = false;
+    QStringList include;
+    include << "STI 014";
+
+//    MatrixXi picks = Fiff::pick_types(raw->info, want_meg, want_eeg, want_stim, include, raw->info->bads);
+    MatrixXi picks = m_pFiffSimulator->m_pRawInfo->info->pick_types(want_meg, want_eeg, want_stim, include, m_pFiffSimulator->m_pRawInfo->info->bads); // prefer member function
+
+
+
+
+    //
+    //   Set up the reading parameters
+    //
+    fiff_int_t from = m_pFiffSimulator->m_pRawInfo->first_samp;
+    fiff_int_t to = m_pFiffSimulator->m_pRawInfo->last_samp;
+    float quantum_sec = (float)uiSamplePeriod/1000000.0f; //read and write in 10 sec junks
+    fiff_int_t quantum = ceil(quantum_sec*m_pFiffSimulator->m_pRawInfo->info->sfreq);
+    //
+    //   To read the whole file at once set
+    //
+    //quantum     = to - from + 1;
+    //
+    //
+    //   Read and write all the data
+    //
+    bool first_buffer = true;
+
+    fiff_int_t first, last;
+    MatrixXd* data = NULL;
+    MatrixXd* times = NULL;
+
+    first = from;
+    while(first < to)//m_bIsRunning)
     {
         usleep(uiSamplePeriod);
 
         qDebug() << "Data package " << count << " produced";
 
 
-
-
-
-
-
-
-
-
-
-
-//        //
-//        //   Set up the reading parameters
-//        //
-//        fiff_int_t from = raw->first_samp;
-//        fiff_int_t to = raw->last_samp;
-//        float quantum_sec = 10.0f;//read and write in 10 sec junks
-//        fiff_int_t quantum = ceil(quantum_sec*raw->info->sfreq);
-//        //
-//        //   To read the whole file at once set
-//        //
-//        //quantum     = to - from + 1;
-//        //
-//        //
-//        //   Read and write all the data
-//        //
-//        bool first_buffer = true;
-
-//        fiff_int_t first, last;
-//        MatrixXd* data = NULL;
-//        MatrixXd* times = NULL;
-
 //        //This is the while loop
 //        for(first = from; first < to; first+=quantum)
 //        {
-//            last = first+quantum-1;
-//            if (last > to)
-//            {
-//                last = to;
-//            }
+            last = first+quantum-1;
+            if (last > to)
+            {
+                last = to;
+            }
 
-//            if (!raw->read_raw_segment(data,times,first,last,picks))
-//            {
-//                    delete raw;
-//                    delete outfid;
-//                    printf("error during read_raw_segment\n");
-//                    return -1;
-//            }
+            if (!m_pFiffSimulator->m_pRawInfo->read_raw_segment(data,times,first,last,picks))
+            {
+                printf("error during read_raw_segment\n");
+            }
 //            //
 //            //   You can add your own miracle here
 //            //
@@ -165,25 +182,13 @@ void FiffProducer::run()
 //            printf("[done]\n");
 //        }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         ++count;
+        first+=quantum;
     }
+
+
+
+    // close datastream in this thread
+    delete m_pFiffSimulator->m_pRawInfo->file;
+    m_pFiffSimulator->m_pRawInfo->file = NULL;
 }

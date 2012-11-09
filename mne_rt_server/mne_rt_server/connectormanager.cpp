@@ -312,6 +312,16 @@ void ConnectorManager::connectActiveConnector()
         // connect connector manager and fiff stream server
         QObject::connect(   t_activeConnector, &IConnector::remitMeasInfo,
                             t_pMNERTServer->m_pFiffStreamServer, &FiffStreamServer::forwardMeasInfo);
+
+        //
+        // Raw Data
+        //
+        // connect command server and connector manager
+        QObject::connect(   t_pMNERTServer->m_pCommandServer, &CommandServer::requestRawData,
+                            t_activeConnector, &IConnector::requestRawData);
+//        // connect connector manager and fiff stream server
+//        QObject::connect(   t_activeConnector, &IConnector::remitMeasInfo,
+//                            t_pMNERTServer->m_pFiffStreamServer, &FiffStreamServer::forwardMeasInfo);
     }
     else
     {

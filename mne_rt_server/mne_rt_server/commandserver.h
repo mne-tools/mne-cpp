@@ -82,6 +82,8 @@ public:
 
 signals:
     void requestMeasInfo(qint32 ID);
+    void requestRawData();
+    void selectRawDataFiffStreamClient(qint32 ID);
 //    void sendFiffStreamServerInstruction();
 
 protected:
@@ -91,6 +93,7 @@ private:
 //private slots: --> in Qt 5 not anymore declared as slot
 //    void readCommandThreadInstruction();
     void forwardMeasInfoRequest(qint32 ID); //Forward
+    void forwardMeasRequest(qint32 ID); //Forward
 
 };
 

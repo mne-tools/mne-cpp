@@ -75,7 +75,7 @@ namespace FiffSimulatorPlugin
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-//class DataSimulator;
+class FiffSimulator;
 
 
 //=============================================================================================================
@@ -93,7 +93,7 @@ public:
     * Constructs a DataProducer.
 
     */
-    FiffProducer();
+    FiffProducer(FiffSimulator* simulator);
 
     //=========================================================================================================
     /**
@@ -117,7 +117,9 @@ protected:
     virtual void run();
 
 private:
-    bool                    m_bIsRunning;		/**< Holds whether ECGProducer is running.*/
+
+    FiffSimulator*  m_pFiffSimulator;   /**< Holds a pointer to corresponding FiffSimulator.*/
+    bool            m_bIsRunning;       /**< Holds whether ECGProducer is running.*/
 };
 
 } // NAMESPACE

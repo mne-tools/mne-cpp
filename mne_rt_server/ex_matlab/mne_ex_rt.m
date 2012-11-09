@@ -6,8 +6,8 @@ addpath('../../../mne-matlab/matlab');
 
 %% connection information
 mne_rt_server_ip            =	'localhost';%'172.21.16.63';
-mne_rt_server_commandPort	=	40911;
-mne_rt_server_fiffDataPort	=	40912;
+mne_rt_server_commandPort	=	43638;
+mne_rt_server_fiffDataPort	=	43639;
 
 %% create command client
 t_cmdClient = mne_rt_cmd_client(mne_rt_server_ip, mne_rt_server_commandPort);
@@ -33,6 +33,9 @@ t_aliasOrId = t_dataClient.getClientId();
 %t_aliasOrId = 'mne_ex_matlab';
 t_cmdClient.requestMeasInfo(t_aliasOrId);
 t_measInfo = t_dataClient.readInfo();
+
+%% start measurement
+t_cmdClient.requestMeas(t_aliasOrId);
 
 %% close the sockets
 t_cmdClient.close();

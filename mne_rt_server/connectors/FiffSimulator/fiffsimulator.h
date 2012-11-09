@@ -127,6 +127,8 @@ public:
 
     virtual void requestMeasInfo(qint32 ID);
 
+    virtual void requestRawData();
+
     virtual const char* getName() const;
 
 protected:
@@ -144,15 +146,8 @@ private:
     QMutex mutex;
 
     FiffProducer*   m_pFiffProducer;    /**< Holds the DataProducer.*/
-
-    FiffRawData* m_pRawInfo;            /**< Holds the fiff raw measurement information. */
-
-//    FiffInfo* m_pFiffInfo;              /**< Holds the fiff measurement header information. */
-    //ToDo: obsolete is part of FiffInfo
-    float           m_fSamplingRate;    /**< Holds the sampling rate.*/
-
-//    QString     m_qStringResourcePath;  /**< Holds the path to the Fiff resource directory.*/
-    QString     m_sResourceDataPath;  /**< Holds the path to the Fiff resource simulation file directory.*/
+    FiffRawData*    m_pRawInfo;         /**< Holds the fiff raw measurement information. */
+    QString         m_sResourceDataPath;  /**< Holds the path to the Fiff resource simulation file directory.*/
 
 };
 
