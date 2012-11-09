@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     observerpattern.cpp
+* @file     circularmatrixbuffer.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains implementations of the observer design pattern: Subject class and IObserver interface.
+* @brief    Contains implementations of the CircularMatrixBuffer Class
 *
 */
 
@@ -38,52 +38,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "observerpattern.h"
+#include "circularmatrixbuffer.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// USED NAMESPACES
 //=============================================================================================================
 
-Subject::~Subject()
-{
-
-}
-
-
-//*************************************************************************************************************
-
-void Subject::attach(IObserver* pObserver)
-{
-    m_Observers.insert(pObserver);
-}
-
-
-//*************************************************************************************************************
-
-void Subject::detach(IObserver* pObserver)
-{
-	m_Observers.erase(m_Observers.find(pObserver));
-    //m_Observers.erase(observer); //C++ <set> STL implementation
-}
-
-
-//*************************************************************************************************************
-
-void Subject::notify()
-{
-	if(notifyEnabled)
-	{
-		t_Observers::const_iterator it = m_Observers.begin();
-		for( ; it != m_Observers.end(); ++it)
-			(*it)->update(this);
-	}
-}
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STATIC DEFINITIONS
-//=============================================================================================================
-
-bool Subject::notifyEnabled = true;
+using namespace IOBuffer;

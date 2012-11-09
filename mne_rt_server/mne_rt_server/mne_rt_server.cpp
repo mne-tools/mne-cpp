@@ -113,8 +113,6 @@ MNERTServer::MNERTServer()
 //                        m_pFiffStreamServer, &FiffStreamServer::readCommandServerInstruction);
 
 
-
-
     // ### Run everything ###
     //
     // Run instruction server

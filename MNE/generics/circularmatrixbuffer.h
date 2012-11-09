@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     circularbuffer.h
+* @file     circularmatrixbuffer.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the CircularBuffer class declaration
+* @brief    Contains the CircularMatrixBuffer class declaration
 *
 */
 
-#ifndef CIRCULARBUFFER_H
-#define CIRCULARBUFFER_H
+#ifndef CIRCULARMATRIXBUFFER_H
+#define CIRCULARMATRIXBUFFER_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "comp_global.h"
+#include "generics_global.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "../../include/3rdParty/Eigen/Core"
 
 
 //*************************************************************************************************************
@@ -68,6 +76,8 @@ namespace IOBuffer
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace Eigen;
+
 
 //=============================================================================================================
 /**
@@ -76,47 +86,40 @@ namespace IOBuffer
 * @brief The TEMPLATE CIRCULAR BUFFER provides a template for thread safe circular buffers.
 */
 template<typename _Tp>
-class CircularBuffer
+class CircularMatrixBuffer
 {
 public:
     //=========================================================================================================
     /**
-    * Constructs a CircularBuffer.
+    * Constructs a CircularMatrixBuffer.
+    * length of buffer = uiMaxNumMatrizes*rows*cols
     *
-    * @param [in] uiMaxNumElements length of buffer.
+    * @param [in] uiMaxNumMatrices  length of buffer.
     */
-    CircularBuffer(unsigned int uiMaxNumElements);
+    CircularMatrixBuffer(unsigned int uiMaxNumMatrices, unsigned int uiRows, unsigned int uiCols);
 
     //=========================================================================================================
     /**
     * Destroys the CircularBuffer.
     */
-    ~CircularBuffer();
+    ~CircularMatrixBuffer();
 
     //=========================================================================================================
     /**
-    * Adds a whole array at the end buffer.
+    * Adds a whole matrix at the end buffer.
     *
-    * @param [in] pArray pointer to an Array which should be apend to the end.
+    * @param [in] pMatrix pointer to a Matrix which should be apend to the end.
     * @param [in] size number of elements containing the array.
     */
-    inline void push(const _Tp* pArray, unsigned int size);
+    inline void push(const Matrix<_Tp, Dynamic, Dynamic>* pMatrix);
 
     //=========================================================================================================
     /**
-    * Adds an element at the end of the buffer.
+    * Returns the first matrix (first in first out).
     *
-    * @param [in] newElement pointer to an Array which should be apend to the end.
+    * @return the first matrix
     */
-    inline void push(const _Tp& newElement);
-
-    //=========================================================================================================
-    /**
-    * Returns the first element (first in first out).
-    *
-    * @return the first element
-    */
-    inline _Tp pop();
+    inline Matrix<_Tp, Dynamic, Dynamic> pop();
 
     //=========================================================================================================
     /**
@@ -133,12 +136,15 @@ private:
     * @return the mapped index.
     */
     inline unsigned int mapIndex(int& index);
-    unsigned int    m_uiMaxNumElements;		/**< Holds the maximal number of buffer elements.*/
-    _Tp*            m_pBuffer;				/**< Holds the circular buffer.*/
-    int             m_iCurrentReadIndex;	/**< Holds the current read index.*/
-    int             m_iCurrentWriteIndex;	/**< Holds the current write index.*/
-    QSemaphore*     m_pFreeElements;		/**< Holds a semaphore which acquires free elements for thread safe writing. A semaphore is a generalization of a mutex.*/
-    QSemaphore*     m_pUsedElements;		/**< Holds a semaphore which acquires written semaphore for thread safe reading.*/
+    unsigned int    m_uiMaxNumMatrices;         /**< Holds the maximal number of matrices.*/
+    unsigned int    m_uiRows;                   /**< Holds the number rows.*/
+    unsigned int    m_uiCols;                   /**< Holds the number cols.*/
+    unsigned int    m_uiMaxNumElements;         /**< Holds the maximal number of buffer elements.*/
+    _Tp*            m_pBuffer;                  /**< Holds the circular buffer.*/
+    int             m_iCurrentReadIndex;        /**< Holds the current read index.*/
+    int             m_iCurrentWriteIndex;       /**< Holds the current write index.*/
+    QSemaphore*     m_pFreeElements;            /**< Holds a semaphore which acquires free elements for thread safe writing. A semaphore is a generalization of a mutex.*/
+    QSemaphore*     m_pUsedElements;            /**< Holds a semaphore which acquires written semaphore for thread safe reading.*/
 };
 
 
@@ -148,8 +154,11 @@ private:
 //=============================================================================================================
 
 template<typename _Tp>
-CircularBuffer<_Tp>::CircularBuffer(unsigned int uiMaxNumElements)
-: m_uiMaxNumElements(uiMaxNumElements)
+CircularMatrixBuffer<_Tp>::CircularMatrixBuffer(unsigned int uiMaxNumMatrices, unsigned int uiRows, unsigned int uiCols)
+: m_uiMaxNumMatrices(uiMaxNumMatrices)
+, m_uiRows(uiRows)
+, m_uiCols(uiCols)
+, m_uiMaxNumElements(m_uiMaxNumMatrices*m_uiRows*m_uiCols)
 , m_pBuffer(new _Tp[m_uiMaxNumElements])
 , m_iCurrentReadIndex(-1)
 , m_iCurrentWriteIndex(-1)
@@ -163,7 +172,7 @@ CircularBuffer<_Tp>::CircularBuffer(unsigned int uiMaxNumElements)
 //*************************************************************************************************************
 
 template<typename _Tp>
-CircularBuffer<_Tp>::~CircularBuffer()
+CircularMatrixBuffer<_Tp>::~CircularMatrixBuffer()
 {
     delete m_pFreeElements;
     delete m_pUsedElements;
@@ -174,43 +183,34 @@ CircularBuffer<_Tp>::~CircularBuffer()
 //*************************************************************************************************************
 
 template<typename _Tp>
-inline void CircularBuffer<_Tp>::push(const _Tp* pArray, unsigned int size)
+inline void CircularMatrixBuffer<_Tp>::push(const Matrix<_Tp, Dynamic, Dynamic>* pMatrix)
 {
-    m_pFreeElements->acquire(size);
-    for(unsigned int i = 0; i < size; ++i)
-        m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = pArray[i];
-    m_pUsedElements->release(size);
+    m_pFreeElements->acquire(pMatrix->size());
+    for(unsigned int i = 0; i < pMatrix->size(); ++i)
+        m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = pMatrix->data()[i];
+    m_pUsedElements->release(pMatrix->size());
 }
 
 
 //*************************************************************************************************************
 
 template<typename _Tp>
-inline void CircularBuffer<_Tp>::push(const _Tp& newElement)
-{
-    m_pFreeElements->acquire();
-    m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = newElement;
-    m_pUsedElements->release();
-}
-
-
-//*************************************************************************************************************
-
-template<typename _Tp>
-inline _Tp CircularBuffer<_Tp>::pop()
+inline Matrix<_Tp, Dynamic, Dynamic> CircularMatrixBuffer<_Tp>::pop()
 {
     m_pUsedElements->acquire();
-    _Tp element = m_pBuffer[mapIndex(m_iCurrentReadIndex)];
+    Matrix<_Tp, Dynamic, Dynamic> matrix(m_uiRows, m_uiCols);
+    for(qint32 i = 0; i < m_uiRows*m_uiCols; ++i)
+        matrix.data()[i] = m_pBuffer[mapIndex(m_iCurrentReadIndex)];
     m_pFreeElements->release();
 
-    return element;
+    return matrix;
 }
 
 
 //*************************************************************************************************************
 
 template<typename _Tp>
-inline unsigned int CircularBuffer<_Tp>::mapIndex(int& index)
+inline unsigned int CircularMatrixBuffer<_Tp>::mapIndex(int& index)
 {
     return index = ++index % m_uiMaxNumElements;
 }
@@ -219,7 +219,7 @@ inline unsigned int CircularBuffer<_Tp>::mapIndex(int& index)
 //*************************************************************************************************************
 
 template<typename _Tp>
-void CircularBuffer<_Tp>::clear()
+void CircularMatrixBuffer<_Tp>::clear()
 {
     delete m_pFreeElements;
     m_pFreeElements = new QSemaphore(m_uiMaxNumElements);
@@ -238,18 +238,13 @@ void CircularBuffer<_Tp>::clear()
 
 //ToDo Typedef -> warning visibility ignored -> dllexport/dllimport problem
 
-typedef GENERICSSHARED_EXPORT CircularBuffer<int>                      _int_CircularBuffer;                 /**< Defines CircularBuffer of integer type.*/
-typedef GENERICSSHARED_EXPORT CircularBuffer<short>                    _short_CircularBuffer;               /**< Defines CircularBuffer of short type.*/
-typedef GENERICSSHARED_EXPORT CircularBuffer<char>                     _char_CircularBuffer;                /**< Defines CircularBuffer of char type.*/
-typedef GENERICSSHARED_EXPORT CircularBuffer<double>                   _double_CircularBuffer;              /**< Defines CircularBuffer of double type.*/
-typedef GENERICSSHARED_EXPORT CircularBuffer< QPair<int, int> >        _int_int_pair_CircularBuffer;        /**< Defines CircularBuffer of integer Pair type.*/
-typedef GENERICSSHARED_EXPORT CircularBuffer< QPair<double, double> >  _double_double_pair_CircularBuffer;  /**< Defines CircularBuffer of double Pair type.*/
+typedef GENERICSSHARED_EXPORT CircularMatrixBuffer<int>                      _int_CircularMatrixBuffer;                 /**< Defines CircularMatrixBuffer of integer type.*/
+typedef GENERICSSHARED_EXPORT CircularMatrixBuffer<float>                    _float_CircularMatrixBuffer;               /**< Defines CircularMatrixBuffer of float type.*/
+typedef GENERICSSHARED_EXPORT CircularMatrixBuffer<char>                     _char_CircularMatrixBuffer;                /**< Defines CircularMatrixBuffer of char type.*/
+typedef GENERICSSHARED_EXPORT CircularMatrixBuffer<double>                   _double_CircularMatrixBuffer;              /**< Defines CircularMatrixBuffer of double type.*/
 
-typedef GENERICSSHARED_EXPORT _double_CircularBuffer                   dBuffer;             /**< Short for _double_CircularBuffer.*/
-typedef GENERICSSHARED_EXPORT _int_CircularBuffer                      iBuffer;             /**< Short for _int_CircularBuffer.*/
-typedef GENERICSSHARED_EXPORT _char_CircularBuffer                     cBuffer;             /**< Short for _char_CircularBuffer.*/
-typedef GENERICSSHARED_EXPORT _double_CircularBuffer                   MEGBuffer;           /**< Defines MEGBuffer of type _double_CircularBuffer.*/
+typedef GENERICSSHARED_EXPORT _float_CircularMatrixBuffer                   RawMatrixBuffer;                           /**< Defines RawMatrixBuffer of type _float_CircularMatrixBuffer.*/
 
 } // NAMESPACE
 
-#endif // CIRCULARBUFFER_H
+#endif // CIRCULARMATRIXBUFFER_H

@@ -129,6 +129,17 @@ public:
 
     //=========================================================================================================
     /**
+    * Sends the command to the active connector.
+    *
+    * @param[in] p_qListCommand the command.
+    * @param[out] p_blockOutputInfo the bytearray which contains parsing information to be send back to CommandClient.
+    *
+    * @return true if successful, false otherwise
+    */
+    bool parseConnectorCommand(QStringList& p_qListCommand, QByteArray& p_blockOutputInfo);
+
+    //=========================================================================================================
+    /**
     * Starts all modules.
     *
     * @return true if at least one IConnector module was started successfully, false otherwise.
@@ -143,26 +154,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Finds index of module by name.
-    *
-    * @param name the connector name.
-    * @return index of connector.
-    */
-    static int findByName(const QString& name);
-
-    //=========================================================================================================
-    /**
     * Returns vector containing all modules.
     *
     * @return reference to vector containing all modules.
     */
     static inline const QVector<IConnector*>& getConnectors();
-
-    //=========================================================================================================
-    /**
-    * Prints a list of all connectors and their status
-    */
-    const void printConnectors();
 
     //=========================================================================================================
     /**
@@ -172,14 +168,18 @@ public:
     */
     static IConnector* getActiveConnector();
 
+    void getActiveMeasInfo(qint32 ID);
 
-    void getActiveMeasInfo(qint32 ID)
-    {
-        IConnector* t_activeConnector = ConnectorManager::getActiveConnector();
-        FiffInfo* t_FiffInfo = t_activeConnector->getMeasInfo();
 
-        emit sendMeasInfo(ID, t_FiffInfo);
-    }
+
+    //=========================================================================================================
+    /**
+    * Prints a list of all connectors and their status
+    */
+    QByteArray getByteArrayConnectorList() const;
+
+
+
 
     static void clearConnectorActivation();
 

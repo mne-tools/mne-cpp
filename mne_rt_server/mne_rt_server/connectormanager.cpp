@@ -48,6 +48,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <iostream>
 
 
 //*************************************************************************************************************
@@ -179,7 +180,23 @@ void ConnectorManager::loadConnectors(const QString& dir)
             s_vecConnectors[0]->setStatus(true);
     }
 
-    printConnectors();
+    //print
+    printf("Connector list\n");
+    printf(getByteArrayConnectorList().data());
+}
+
+
+//*************************************************************************************************************
+
+bool ConnectorManager::parseConnectorCommand(QStringList& p_qListCommand, QByteArray& p_blockOutputInfo)
+{
+    IConnector* t_pConnector = this->getActiveConnector();
+
+    if(t_pConnector)
+        return t_pConnector->parseCommand(p_qListCommand, p_blockOutputInfo);
+    else
+        return false;
+
 }
 
 
@@ -242,41 +259,6 @@ void ConnectorManager::stopConnector()
 
 //*************************************************************************************************************
 
-int ConnectorManager::findByName(const QString& name)
-{
-//    QVector<IModule*>::const_iterator it = s_vecModules.begin();
-//    for(int i = 0; it != s_vecModules.end(); ++i, ++it)
-//        if((*it)->getName() == name)
-//            return i;
-
-    return -1;
-}
-
-
-//*************************************************************************************************************
-
-const void ConnectorManager::printConnectors()
-{
-    // deactivate already loaded connectors
-    if(s_vecConnectors.size() > 0)
-    {
-        printf("Connector list\n");
-        QVector<IConnector*>::const_iterator it = s_vecConnectors.begin();
-        for( ; it != s_vecConnectors.end(); ++it)
-        {
-            if((*it)->isActive())
-                printf("  *  (%d) %s\n", (*it)->getConnectorID(), (*it)->getName());
-            else
-                printf("     (%d) %s\n", (*it)->getConnectorID(), (*it)->getName());
-        }
-    }
-    else
-        printf(" - no connector loaded - \n");
-}
-
-
-//*************************************************************************************************************
-
 IConnector* ConnectorManager::getActiveConnector()
 {
     QVector<IConnector*>::const_iterator it = s_vecConnectors.begin();
@@ -287,6 +269,48 @@ IConnector* ConnectorManager::getActiveConnector()
     }
 
     return NULL;
+}
+
+
+//*************************************************************************************************************
+
+void ConnectorManager::getActiveMeasInfo(qint32 ID)
+{
+    IConnector* t_activeConnector = ConnectorManager::getActiveConnector();
+
+    if(t_activeConnector)
+    {
+        FiffInfo* t_FiffInfo = t_activeConnector->getMeasInfo();
+        emit sendMeasInfo(ID, t_FiffInfo);
+    }
+    else
+    {
+        printf("Error: Can't send measurement info, no connector active!\n");
+    }
+}
+
+
+//*************************************************************************************************************
+
+QByteArray ConnectorManager::getByteArrayConnectorList() const
+{
+    QByteArray t_blockConnectorList;
+    if(s_vecConnectors.size() > 0)
+    {
+        QVector<IConnector*>::const_iterator it = s_vecConnectors.begin();
+        for( ; it != s_vecConnectors.end(); ++it)
+        {
+            if((*it)->isActive())
+                t_blockConnectorList.append(QString("  *  (%1) %2\r\n").arg((*it)->getConnectorID()).arg((*it)->getName()));
+            else
+                t_blockConnectorList.append(QString("     (%1) %2\r\n").arg((*it)->getConnectorID()).arg((*it)->getName()));
+        }
+    }
+    else
+        t_blockConnectorList.append(" - no connector loaded - \r\n");
+
+    t_blockConnectorList.append("\r\n");
+    return t_blockConnectorList;
 }
 
 

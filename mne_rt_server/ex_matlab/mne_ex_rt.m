@@ -5,9 +5,9 @@ clc;
 addpath('../../../mne-matlab/matlab');
 
 %% connection information
-mne_rt_server_ip            =	'172.21.16.63';%'localhost';%'172.21.16.63';
-mne_rt_server_commandPort	=	59827;
-mne_rt_server_fiffDataPort	=	55029;
+mne_rt_server_ip            =	'localhost';%'172.21.16.63';
+mne_rt_server_commandPort	=	43195;
+mne_rt_server_fiffDataPort	=	43196;
 
 %% create command client
 t_cmdClient = mne_rt_cmd_client(mne_rt_server_ip, mne_rt_server_commandPort);
@@ -19,8 +19,12 @@ t_dataClient = mne_rt_data_client(mne_rt_server_ip, mne_rt_server_fiffDataPort);
 t_dataClient.setClientAlias('mne_ex_matlab'); % used in option 2 later on
 
 %% example commands
-t_clistInfo = t_cmdClient.getClientList();
+t_helpInfo = t_cmdClient.sendCommand('help');
+fprintf('### Help ###\n%s',t_helpInfo);
+t_clistInfo = t_cmdClient.sendCommand('clist');
 fprintf('### Client List ###\n%s',t_clistInfo);
+t_conInfo = t_cmdClient.sendCommand('conlist');
+fprintf('### Connector List ###\n%s',t_conInfo);
 
 %% read meas info
 % Option 1
