@@ -44,6 +44,8 @@
 
 #include <QThread>
 #include <QtPlugin>
+#include <QByteArray>
+#include <QStringList>
 
 
 //*************************************************************************************************************
@@ -52,6 +54,15 @@
 //=============================================================================================================
 
 #include "../../MNE/fiff/fiff_info.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Generics INCLUDES
+//=============================================================================================================
+
+
+#include "../../MNE/generics/circularmatrixbuffer.h"
 
 
 //*************************************************************************************************************
@@ -86,6 +97,7 @@ enum ConnectorID
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace IOBuffer;
 
 
 //=========================================================================================================
@@ -106,10 +118,26 @@ public:
 
     //=========================================================================================================
     /**
-    * Starts the IModule.
+    * Returns the available IConnector commands.
+    *
+    * @return the available IConnector commands.
+    */
+    virtual QByteArray availableCommands() const = 0;
+
+    //=========================================================================================================
+    /**
+    * Parses the incomming command.
+    *
+    * @return true if successful parsed, false otherwise
+    */
+    virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo) = 0;
+
+    //=========================================================================================================
+    /**
+    * Starts the IConnector.
     * Pure virtual method.
     *
-    * @return true if success, false otherwise
+    * @return true if successful, false otherwise
     */
     virtual bool start() = 0;// = 0 call is not longer possible - it has to be reimplemented in child;
 
@@ -176,7 +204,9 @@ protected:
 
 private:
 
-    bool m_bStatus;                 /**< Holds the activation status. */
+    bool m_bStatus;                         /**< Holds the activation status. */
+
+    RawMatrixBuffer* m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
 };
 
 //*************************************************************************************************************

@@ -114,6 +114,12 @@ public:
     */
     virtual ~FiffSimulator();
 
+    virtual QByteArray availableCommands() const;
+
+    virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
+
+
+
     virtual bool start();
     virtual bool stop();
 

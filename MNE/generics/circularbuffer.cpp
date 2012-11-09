@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     commandthread.h
+* @file     circularbuffer.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,52 +29,21 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the CommandThread Class.
+* @brief    Contains implementations of the CircularBuffer Class
 *
 */
 
-#ifndef COMMANDTHREAD_H
-#define COMMANDTHREAD_H
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
 
-#include <QThread>
-#include <QTcpSocket>
+#include "circularbuffer.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MSERVER
+// USED NAMESPACES
 //=============================================================================================================
 
-namespace MSERVER
-{
-
-class CommandThread : public QThread
-{
-    Q_OBJECT
-
-public:
-    CommandThread(int socketDescriptor, QObject *parent);
-
-    ~CommandThread();
-
-    QByteArray availableCommands() const;
-
-    void run();
-
-signals:
-    void error(QTcpSocket::SocketError socketError);
-
-    void requestMeasInfo(qint32 p_iClientId);
-//    void sendCommandServerInstruction();
-
-private:
-    bool parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand);
-
-    QByteArray parseToId(QString& p_sRawId, qint32& p_iParsedId);
-
-    int socketDescriptor;
-};
-
-
-} // NAMESPACE
-
-#endif //COMMANDTHREAD_H
+using namespace IOBuffer;

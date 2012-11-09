@@ -23,10 +23,12 @@ LIBS += -L$${PWD}/../../../lib/
 CONFIG(debug, debug|release) {
     LIBS += -lmned
     LIBS += -lfiffd
+    LIBS += -lgenericsd
 }
 else {
     LIBS += -lmne
     LIBS += -lfiff
+    LIBS += -lgenerics
 }
 
 

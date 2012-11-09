@@ -266,7 +266,7 @@ void FiffStreamThread::getAndSendMeasurementInfo(qint32 ID, FiffInfo* p_pFiffInf
             //    Scan numbers may have been messed up
             //
             chs[k].scanno = k+1;//+1 because
-//            chs[k].range  = 1.0f;//ToDo: Why???
+            chs[k].range  = 1.0f;//Why? -> cause its already calibrated through reading
             (*cals)(0,k) = chs[k].cal;
             t_FiffStreamOut.write_ch_info(&chs[k]);
         }
