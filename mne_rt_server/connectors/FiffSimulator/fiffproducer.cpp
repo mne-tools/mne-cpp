@@ -92,18 +92,7 @@ void FiffProducer::stop()
 
 void FiffProducer::run()
 {
-
-    float t_fSamplingFrequency = m_pFiffSimulator->m_pRawInfo->info->sfreq;
-    float t_fBuffSampleSize = (float)m_pFiffSimulator->getBufferSampleSize();
-
-    quint32 uiSamplePeriod = (unsigned int) ((t_fBuffSampleSize/t_fSamplingFrequency)*1000000.0f);
-
-    qDebug() << "uiSamplePeriod: " << uiSamplePeriod;
-
-    unsigned int count = 0;
-
     m_bIsRunning = true;
-
 
     // reopen file in this thread
     QFile* t_pFile = new QFile(m_pFiffSimulator->m_pRawInfo->info->filename);
@@ -115,8 +104,12 @@ void FiffProducer::run()
     //
     fiff_int_t from = m_pFiffSimulator->m_pRawInfo->first_samp;
     fiff_int_t to = m_pFiffSimulator->m_pRawInfo->last_samp;
-    float quantum_sec = (float)uiSamplePeriod/1000000.0f; //read and write in 10 sec junks
-    fiff_int_t quantum = ceil(quantum_sec*m_pFiffSimulator->m_pRawInfo->info->sfreq);
+//    float quantum_sec = (float)uiSamplePeriod/1000000.0f; //read and write in 10 sec junks
+    fiff_int_t quantum = m_pFiffSimulator->getBufferSampleSize();//ceil(quantum_sec*m_pFiffSimulator->m_pRawInfo->info->sfreq);
+
+    qDebug() << "quantum " << quantum;
+
+
     //
     //   To read the whole file at once set
     //
@@ -147,25 +140,22 @@ void FiffProducer::run()
     // ToDo restructure this producer as laoding buffer --> and thread sleep to simulator buffer
     while(first < to)//m_bIsRunning)
     {
-        usleep(uiSamplePeriod);
+        last = first+quantum-1;
+        if (last > to)
+        {
+            last = to;
+        }
 
-        qDebug() << "Data package " << count << " produced";
+        if (!m_pFiffSimulator->m_pRawInfo->read_raw_segment(data,times,first,last))
+        {
+            printf("error during read_raw_segment\n");
+        }
+
+        MatrixXf tmp = (inv_calsMat*(*data)).cast<float>();
 
 
-            last = first+quantum-1;
-            if (last > to)
-            {
-                last = to;
-            }
+        m_pFiffSimulator->m_pRawMatrixBuffer->push(&tmp);
 
-            if (!m_pFiffSimulator->m_pRawInfo->read_raw_segment(data,times,first,last))
-            {
-                printf("error during read_raw_segment\n");
-            }
-
-//      MatrixXf tmp = (inv_calsMat*(*buf)).cast<float>();
-
-        ++count;
         first+=quantum;
     }
 
