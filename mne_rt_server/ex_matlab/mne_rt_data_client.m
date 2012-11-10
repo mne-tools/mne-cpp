@@ -204,7 +204,43 @@ classdef mne_rt_data_client < mne_rt_client
             else
                 error('mne_rt_data_client: no available TcpSocket, call init to establish a connection.');
             end
+        end
         
+        % =================================================================
+        %% readRawBuffer
+        function [buf] = readRawBuffer(obj, p_nChannels)
+            import java.net.Socket
+            import java.io.*
+              
+            global FIFF;
+            if isempty(FIFF)
+                FIFF = fiff_define_constants();
+            end
+            
+            buf = [];
+            
+            if ~isempty(obj.m_TcpSocket)
+                % get a buffered data input stream from the socket
+                t_inStream   = obj.m_TcpSocket.getInputStream;
+
+                bytes_available = t_inStream.available;
+                % Wait for incomming bytes
+                while(bytes_available == 0)
+                    bytes_available = p_inStream.available;
+                end
+                
+                
+                tag = mne_rt_data_client.read_tag(t_inStream);
+                
+                if(tag.kind == FIFF.FIFF_DATA_BUFFER)
+                    nSamples = length(tag.data)/p_nChannels;
+                    buf = reshape(tag.data, p_nChannels, nSamples);
+                else
+                    fprintf('tag is not of kind FIFF_DATA_BUFFER');
+                end
+            else
+                error('mne_rt_data_client: no available TcpSocket, call init to establish a connection.');
+            end
         end
         
         % =================================================================
@@ -343,6 +379,9 @@ classdef mne_rt_data_client < mne_rt_client
 
             me='MNE_RT_DATA_CLIENT:read_tag_data';
             
+%             t_bufferInputStream = BufferedInputStream(p_inStream);%to increase performance use a buffer in between
+%             t_dInputStream = DataInputStream(t_bufferInputStream);
+
             t_dInputStream = DataInputStream(p_inStream);
 
             if nargin == 3

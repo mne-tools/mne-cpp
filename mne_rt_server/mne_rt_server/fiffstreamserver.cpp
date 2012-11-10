@@ -94,21 +94,27 @@ void FiffStreamServer::clearClients()
 }
 
 
-////*************************************************************************************************************
+//*************************************************************************************************************
 
-//void FiffStreamServer::readCommandServerInstruction()
-//{
-//    qDebug() << "FiffStreamServer::readCommandServerInstruction()";
-
-//    emit sendFiffStreamThreadInstruction(1, 3);
-//}
+void FiffStreamServer::forwardActivateRawDataFiffStreamClient(qint32 ID)
+{
+    emit activateRawDataFiffStreamClient(ID);
+}
 
 
 //*************************************************************************************************************
 
 void FiffStreamServer::forwardMeasInfo(qint32 ID, FiffInfo* p_pFiffInfo)
 {
-    emit sendMeasInfo(ID, p_pFiffInfo);
+    emit remitMeasInfo(ID, p_pFiffInfo);
+}
+
+
+//*************************************************************************************************************
+//ToDo increase preformance --> try inline
+void FiffStreamServer::forwardRawBuffer(Eigen::MatrixXf m_matRawData)
+{
+    emit remitRawBuffer(m_matRawData);
 }
 
 

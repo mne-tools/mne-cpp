@@ -65,8 +65,6 @@
 #include <QStringList>
 #include <QTextStream>
 
-
-
 #include <QDebug>
 
 
@@ -319,9 +317,9 @@ void ConnectorManager::connectActiveConnector()
         // connect command server and connector manager
         QObject::connect(   t_pMNERTServer->m_pCommandServer, &CommandServer::requestRawData,
                             t_activeConnector, &IConnector::requestRawData);
-//        // connect connector manager and fiff stream server
-//        QObject::connect(   t_activeConnector, &IConnector::remitMeasInfo,
-//                            t_pMNERTServer->m_pFiffStreamServer, &FiffStreamServer::forwardMeasInfo);
+        // connect connector manager and fiff stream server
+        QObject::connect(   t_activeConnector, &IConnector::remitRawBuffer,
+                            t_pMNERTServer->m_pFiffStreamServer, &FiffStreamServer::forwardRawBuffer);
     }
     else
     {

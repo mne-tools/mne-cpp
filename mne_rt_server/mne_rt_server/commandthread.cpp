@@ -310,7 +310,6 @@ void CommandThread::run()
     }
 
     QDataStream t_FiffStreamIn(&t_qTcpSocket);
-    t_FiffStreamIn.setVersion(QDataStream::Qt_5_0);
 
     qint64 t_iMaxBufSize = 1024;
 

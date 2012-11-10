@@ -73,7 +73,8 @@ FiffStreamThread::FiffStreamThread(qint32 id, int socketDescriptor, QObject *par
 : QThread(parent)
 , m_iDataClientId(id)
 , m_sDataClientAlias(QString(""))
-, socketDescriptor(socketDescriptor)
+, m_bIsSendingRawBuffer(false)
+, m_iSocketDescriptor(socketDescriptor)
 {
 }
 
@@ -85,6 +86,21 @@ FiffStreamThread::~FiffStreamThread()
     //Remove from client list
     FiffStreamServer* t_pFiffStreamServer = qobject_cast<FiffStreamServer*>(this->parent());
     t_pFiffStreamServer->m_qClientList.remove(m_iDataClientId);
+}
+
+
+//*************************************************************************************************************
+
+void FiffStreamThread::acceptRawBuffer(qint32 ID)
+{
+    if(ID == m_iDataClientId)
+    {
+        qDebug() << "Activate raw buffer sending.";
+
+        m_qMutex.lock();
+        m_bIsSendingRawBuffer = true;
+        m_qMutex.unlock();
+    }
 }
 
 
@@ -128,18 +144,37 @@ void FiffStreamThread::parseCommand(FiffTag* p_pTag)
 
 //*************************************************************************************************************
 
-void FiffStreamThread::getAndSendMeasurementInfo(qint32 ID, FiffInfo* p_pFiffInfo)
+void FiffStreamThread::sendRawBuffer(Eigen::MatrixXf m_matRawData)
+{
+    if(m_bIsSendingRawBuffer)
+    {
+        qDebug() << "Send RawBuffer to client";
+
+        m_qMutex.lock();
+
+        FiffStream t_FiffStreamOut(&m_qSendBlock, QIODevice::WriteOnly);
+        t_FiffStreamOut.write_float(FIFF_DATA_BUFFER,m_matRawData.data(),m_matRawData.rows()*m_matRawData.cols());
+
+        m_qMutex.unlock();
+
+    }
+    else
+    {
+        qDebug() << "Send RawBufferis not activated";
+    }
+}
+
+
+//*************************************************************************************************************
+
+void FiffStreamThread::sendMeasurementInfo(qint32 ID, FiffInfo* p_pFiffInfo)
 {
     if(ID == m_iDataClientId)
     {
-        mutex.lock();
-
+        m_qMutex.lock();
 
 
         FiffStream t_FiffStreamOut(&m_qSendBlock, QIODevice::WriteOnly);
-        t_FiffStreamOut.setVersion(QDataStream::Qt_5_0);
-
-
 
 //        qint32 init_info[2];
 //        init_info[0] = FIFF_MNE_RT_CLIENT_ID;
@@ -276,7 +311,7 @@ void FiffStreamThread::getAndSendMeasurementInfo(qint32 ID, FiffInfo* p_pFiffInf
 
         delete cals;
 
-        mutex.unlock();
+        m_qMutex.unlock();
 
 //        qDebug() << "MeasInfo Blocksize: " << m_qSendBlock.size();
     }
@@ -288,7 +323,6 @@ void FiffStreamThread::getAndSendMeasurementInfo(qint32 ID, FiffInfo* p_pFiffInf
 void FiffStreamThread::writeClientId()
 {
     FiffStream t_FiffStreamOut(&m_qSendBlock, QIODevice::WriteOnly);
-    t_FiffStreamOut.setVersion(QDataStream::Qt_5_0);
 
     t_FiffStreamOut.write_int(FIFF_MNE_RT_CLIENT_ID, &m_iDataClientId);
 }
@@ -298,16 +332,17 @@ void FiffStreamThread::writeClientId()
 
 void FiffStreamThread::run()
 {
-    FiffStreamServer* parentServer = qobject_cast<FiffStreamServer*>(this->parent());
-//    connect(parentServer, &FiffStreamServer::sendFiffStreamThreadInstruction,
-//            this, &FiffStreamThread::readFiffStreamServerInstruction);
+    FiffStreamServer* t_pParentServer = qobject_cast<FiffStreamServer*>(this->parent());
 
-    connect(parentServer, &FiffStreamServer::sendMeasInfo,
-            this, &FiffStreamThread::getAndSendMeasurementInfo);
-
+    connect(t_pParentServer, &FiffStreamServer::remitMeasInfo,
+            this, &FiffStreamThread::sendMeasurementInfo);
+    connect(t_pParentServer, &FiffStreamServer::remitRawBuffer,
+            this, &FiffStreamThread::sendRawBuffer);
+    connect(t_pParentServer, &FiffStreamServer::activateRawDataFiffStreamClient,
+            this, &FiffStreamThread::acceptRawBuffer);
 
     QTcpSocket t_qTcpSocket;
-    if (!t_qTcpSocket.setSocketDescriptor(socketDescriptor)) {
+    if (!t_qTcpSocket.setSocketDescriptor(m_iSocketDescriptor)) {
         emit error(t_qTcpSocket.error());
         return;
     }
@@ -321,7 +356,6 @@ void FiffStreamThread::run()
 
 
     FiffStream t_FiffStreamIn(&t_qTcpSocket);
-    t_FiffStreamIn.setVersion(QDataStream::Qt_5_0);
 
     while(t_qTcpSocket.state() != QAbstractSocket::UnconnectedState)
     {
@@ -333,7 +367,7 @@ void FiffStreamThread::run()
 //            qDebug() << "is writeable " << t_qTcpSocket.isWritable();
             qint32 t_iBlockSize = m_qSendBlock.size();
 //            qDebug() << "data available" << t_iBlockSize;
-            mutex.lock();
+            m_qMutex.lock();
             qint32 t_iBytesWritten = t_qTcpSocket.write(m_qSendBlock);
 //            qDebug() << "wrote bytes " << t_iBytesWritten;
             t_qTcpSocket.waitForBytesWritten();
@@ -345,7 +379,7 @@ void FiffStreamThread::run()
             {
                 m_qSendBlock = m_qSendBlock.mid(t_iBytesWritten, t_iBlockSize-t_iBytesWritten);
             }
-            mutex.unlock();
+            m_qMutex.unlock();
         }
 
         //

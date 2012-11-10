@@ -101,7 +101,7 @@ void CommandServer::forwardMeasInfoRequest(qint32 ID)
 
 void CommandServer::forwardMeasRequest(qint32 ID)
 {
-    emit selectRawDataFiffStreamClient(ID);
+    emit activateRawDataFiffStreamClient(ID);
     emit requestRawData();
 }
 

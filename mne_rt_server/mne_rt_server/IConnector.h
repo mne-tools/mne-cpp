@@ -231,13 +231,14 @@ private:
 
 //*************************************************************************************************************
 //=============================================================================================================
-// INLINE DEFINITIONSs
+// INLINE DEFINITIONS
 //=============================================================================================================
 
 inline quint32 IConnector::getBufferSampleSize()
 {
     return m_uiBufferSampleSize;
 }
+
 
 //*************************************************************************************************************
 
@@ -263,9 +264,7 @@ inline bool IConnector::isActive() const
     return m_bStatus;
 }
 
-
 } //Namespace
-
 
 #define IConnector_iid "mne_rt_server/1.0"
 Q_DECLARE_INTERFACE(MSERVER::IConnector, IConnector_iid)

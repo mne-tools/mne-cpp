@@ -88,15 +88,12 @@ public:
 
     void run();
 
-    qint32 getID()
-    {
-        return m_iDataClientId;
-    }
+    inline qint32 getID();
 
-    QString getAlias()
-    {
-        return m_sDataClientAlias;
-    }
+    inline QString getAlias();
+
+//    void deactivateRawBufferSending();
+
 
     void parseCommand(FiffTag* p_pTag);
 
@@ -109,18 +106,31 @@ private:
     qint32 m_iDataClientId;
     QString m_sDataClientAlias;
 
-    int socketDescriptor;
+    int m_iSocketDescriptor;
 
-    QMutex mutex;
+    QMutex m_qMutex;
     QByteArray m_qSendBlock;
 
-//private slots: --> in Qt 5 not anymore declared as slot
-    void getAndSendMeasurementInfo(qint32 ID, FiffInfo* p_pFiffInfo);
+    bool m_bIsSendingRawBuffer;
 
 //private slots: --> in Qt 5 not anymore declared as slot
-//    void readFiffStreamServerInstruction(quint8 id, quint8 instruction);
-
+    void acceptRawBuffer(qint32 ID);
+    void sendMeasurementInfo(qint32 ID, FiffInfo* p_pFiffInfo);
+    void sendRawBuffer(Eigen::MatrixXf m_matRawData);
 };
+
+
+inline qint32 FiffStreamThread::getID()
+{
+    return m_iDataClientId;
+}
+
+
+inline QString FiffStreamThread::getAlias()
+{
+    return m_sDataClientAlias;
+}
+
 
 } // NAMESPACE
 

@@ -36,7 +36,6 @@
 #ifndef COMMANDSERVER_H
 #define COMMANDSERVER_H
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -83,7 +82,7 @@ public:
 signals:
     void requestMeasInfo(qint32 ID);
     void requestRawData();
-    void selectRawDataFiffStreamClient(qint32 ID);
+    void activateRawDataFiffStreamClient(qint32 ID);
 //    void sendFiffStreamServerInstruction();
 
 protected:

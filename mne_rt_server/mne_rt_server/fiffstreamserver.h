@@ -113,14 +113,15 @@ public:
     void clearClients();
 
 //public slots: --> in Qt 5 not anymore declared as slot
-//    void readCommandServerInstruction();
     void forwardMeasInfo(qint32 ID, FiffInfo* p_pFiffInfo);
+    void forwardActivateRawDataFiffStreamClient(qint32 ID);
+    void forwardRawBuffer(Eigen::MatrixXf m_matRawData);
+
 
 signals:
-//    void sendFiffStreamThreadInstruction(quint8 id, quint8 instruction);
-    void sendMeasInfo(qint32 ID, FIFFLIB::FiffInfo* p_pFiffInfo);
-
-
+    void activateRawDataFiffStreamClient(qint32 ID);
+    void remitMeasInfo(qint32 ID, FIFFLIB::FiffInfo* p_pFiffInfo);
+    void remitRawBuffer(Eigen::MatrixXf);
 
 protected:
     void incomingConnection(qintptr socketDescriptor);
