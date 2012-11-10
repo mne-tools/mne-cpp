@@ -76,7 +76,6 @@ using namespace MSERVER;
 const char* connectorDir = "/mne_rt_server_plugins";        /**< holds directory to connectors.*/
 
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -87,6 +86,7 @@ MNERTServer::MNERTServer()
 , m_pCommandServer(new CommandServer(this))
 , m_pConnectorManager(new ConnectorManager(this))
 {
+    qRegisterMetaType<MatrixXf>("MatrixXf");
 
     // ### Load everything ###
     //
@@ -99,8 +99,12 @@ MNERTServer::MNERTServer()
     //
     // Meas Info
     //
-
     m_pConnectorManager->connectActiveConnector();
+
+    QObject::connect(   m_pCommandServer, &CommandServer::activateRawDataFiffStreamClient,
+                        m_pFiffStreamServer, &FiffStreamServer::forwardActivateRawDataFiffStreamClient);
+
+
 
 //    // connect command server and connector manager
 //    QObject::connect(   m_pCommandServer, &CommandServer::requestMeasInfo,

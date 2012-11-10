@@ -71,6 +71,7 @@ FiffStream::FiffStream(QIODevice* p_pIODevice)
 {
     this->setFloatingPointPrecision(QDataStream::SinglePrecision);
     this->setByteOrder(QDataStream::BigEndian);
+    this->setVersion(QDataStream::Qt_5_0);
 }
 
 
@@ -81,6 +82,7 @@ FiffStream::FiffStream(QByteArray * a, QIODevice::OpenMode mode)
 {
     this->setFloatingPointPrecision(QDataStream::SinglePrecision);
     this->setByteOrder(QDataStream::BigEndian);
+    this->setVersion(QDataStream::Qt_5_0);
 }
 
 

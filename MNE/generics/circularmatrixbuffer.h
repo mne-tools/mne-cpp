@@ -185,12 +185,13 @@ CircularMatrixBuffer<_Tp>::~CircularMatrixBuffer()
 template<typename _Tp>
 inline void CircularMatrixBuffer<_Tp>::push(const Matrix<_Tp, Dynamic, Dynamic>* pMatrix)
 {
-    if(pMatrix->size() == m_uiRows*m_uiCols)
+    unsigned int t_size = pMatrix->size();
+    if(t_size == m_uiRows*m_uiCols)
     {
-        m_pFreeElements->acquire(pMatrix->size());
-        for(unsigned int i = 0; i < pMatrix->size(); ++i)
+        m_pFreeElements->acquire(t_size);
+        for(unsigned int i = 0; i < t_size; ++i)
             m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = pMatrix->data()[i];
-        m_pUsedElements->release(pMatrix->size());
+        m_pUsedElements->release(t_size);
     }
     else
         printf("Error: Matrix not appended to CircularMatrixBuffer - wrong dimensions\n");
