@@ -92,6 +92,7 @@ FiffSimulator::FiffSimulator()
 , m_sResourceDataPath("../../mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
 {
     this->setBufferSampleSize(1000);
+    m_pRawMatrixBuffer = NULL;
 }
 
 
@@ -187,6 +188,7 @@ void FiffSimulator::requestMeasInfo(qint32 ID)
 void FiffSimulator::requestRawData()
 {
     this->m_pFiffProducer->start();
+    this->start();
 }
 
 
@@ -230,6 +232,12 @@ bool FiffSimulator::readRawInfo()
         delete m_pRawInfo->file;
         m_pRawInfo->file = NULL;
 
+
+        if(m_pRawMatrixBuffer)
+            delete m_pRawMatrixBuffer;
+
+        m_pRawMatrixBuffer = new RawMatrixBuffer(10, m_pRawInfo->info->nchan, getBufferSampleSize());
+
         mutex.unlock();
 
         delete t_pFile;
@@ -243,8 +251,19 @@ bool FiffSimulator::readRawInfo()
 
 void FiffSimulator::run()
 {
+    float t_fSamplingFrequency = m_pRawInfo->info->sfreq;
+    float t_fBuffSampleSize = (float)getBufferSampleSize();
+
+    quint32 uiSamplePeriod = (unsigned int) ((t_fBuffSampleSize/t_fSamplingFrequency)*1000000.0f);
+    quint32 count = 0;
+
     while(true)
     {
+        MatrixXf tmp = m_pRawMatrixBuffer->pop();
+        ++count;
+//        printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
 
+        emit remitRawBuffer(tmp);
+        usleep(uiSamplePeriod);
     }
 }
