@@ -2,8 +2,16 @@ classdef mne_rt_client < handle
     %MNE_RT_CLIENT Summary of this class goes here
     %   Detailed explanation goes here
     
-    properties
+    properties (Access = public)
+        m_DataInputStream = [];
+        m_DataOutputStream = [];
+    end
+    
+    properties (Access = private)
         m_TcpSocket = [];
+        m_InputStream = [];
+        m_OutputStream = [];
+        m_BufferedInputStream = []; %to increase performance use a buffer in between
         m_iNumOfRetries = -1;
     end
     
@@ -25,8 +33,9 @@ classdef mne_rt_client < handle
                 obj.m_iNumOfRetries = 20; % set to -1 for infinite
             end
 
-            retry        = 0;
-            obj.m_TcpSocket = [];
+            retry = 0;
+            obj.close();
+            
             result      = false;
 
             while true
@@ -43,6 +52,15 @@ classdef mne_rt_client < handle
 
                     % throws if unable to connect
                     obj.m_TcpSocket = Socket(host, port);
+
+                    obj.m_InputStream = obj.m_TcpSocket.getInputStream;
+                    obj.m_BufferedInputStream = BufferedInputStream(obj.m_InputStream);
+                    obj.m_DataInputStream = DataInputStream(obj.m_BufferedInputStream);
+
+                    obj.m_OutputStream = obj.m_TcpSocket.getOutputStream;
+                    obj.m_DataOutputStream = DataOutputStream(obj.m_OutputStream);
+                    
+                    
 
                     fprintf(1, 'Connected to server\n');
                     
@@ -64,6 +82,11 @@ classdef mne_rt_client < handle
                 obj.m_TcpSocket.close();
             end
             obj.m_TcpSocket = [];
+            obj.m_InputStream = [];
+            obj.m_OutputStream = [];
+            obj.m_BufferedInputStream = []; 
+            obj.m_DataInputStream = [];
+            obj.m_DataOutputStream = [];
         end
     end
 end

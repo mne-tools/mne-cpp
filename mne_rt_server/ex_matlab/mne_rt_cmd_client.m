@@ -24,25 +24,18 @@ classdef mne_rt_cmd_client < mne_rt_client
             t_sCommand = sprintf('%s\n',p_sCommand);
             info = [];
             
-            if ~isempty(obj.m_TcpSocket)
-                % get a buffered data output stream from the socket
-                t_outStream   = obj.m_TcpSocket.getOutputStream;
-                t_dataOutStream = DataOutputStream(t_outStream);
+            if ~isempty(obj.m_DataOutputStream) && ~isempty(obj.m_DataInputStream)
                 
-                t_dataOutStream.writeBytes(t_sCommand);
-                t_dataOutStream.flush;
-                
-                
-                % get a buffered data input stream from the socket
-                t_inStream   = obj.m_TcpSocket.getInputStream;
-                t_dataInStream = DataInputStream(t_inStream);
+                obj.m_DataOutputStream.writeBytes(t_sCommand);
+                obj.m_DataOutputStream.flush;
+
                 % read data from the socket - wait a short time first
                 pause(0.5);
-                bytes_available = t_dataInStream.available;
+                bytes_available = obj.m_DataInputStream.available;
 
                 info = zeros(1, bytes_available, 'uint8');
                 for i = 1:bytes_available
-                    info(i) = t_dataInStream.readByte;
+                    info(i) = obj.m_DataInputStream.readByte;
                 end
 
                 info = char(info);              

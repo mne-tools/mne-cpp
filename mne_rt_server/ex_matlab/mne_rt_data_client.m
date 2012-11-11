@@ -30,17 +30,15 @@ classdef mne_rt_data_client < mne_rt_client
                 FIFF = fiff_define_constants();
             end
             
-            if ~isempty(obj.m_TcpSocket)
-                % get a buffered data input stream from the socket
-                t_inStream   = obj.m_TcpSocket.getInputStream;
-
+            if ~isempty(obj.m_DataInputStream)
+                
                 t_bReadMeasBlockStart = false;
                 t_bReadMeasBlockEnd = false;
                 %
                 % Find the start
                 %
                 while(~t_bReadMeasBlockStart)
-                    tag = mne_rt_data_client.read_tag(t_inStream);
+                    tag = mne_rt_data_client.read_tag(obj.m_DataInputStream);
 
                     if(tag.kind == FIFF.FIFF_BLOCK_START && tag.data == FIFF.FIFFB_MEAS_INFO)
                         disp('FIFF_BLOCK_START FIFFB_MEAS_INFO'); 
@@ -63,13 +61,13 @@ classdef mne_rt_data_client < mne_rt_client
                 ctf_head_t_read = false;
 
                 while(~t_bReadMeasBlockEnd)
-                    tag = mne_rt_data_client.read_tag(t_inStream);
+                    tag = mne_rt_data_client.read_tag(obj.m_DataInputStream);
                     %
                     %  megacq parameters
                     %
                     if(tag.kind == FIFF.FIFF_BLOCK_START && tag.data == FIFF.FIFFB_DACQ_PARS)                        
                         while(tag.kind ~= FIFF.FIFF_BLOCK_END || tag.data ~= FIFF.FIFFB_DACQ_PARS)
-                            tag = mne_rt_data_client.read_tag(t_inStream);
+                            tag = mne_rt_data_client.read_tag(obj.m_DataInputStream);
                             if(tag.kind == FIFF.FIFF_DACQ_PARS)
                                 info.acq_pars = tag.data;
                             elseif(tag.kind == FIFF.FIFF_DACQ_STIM)
@@ -95,7 +93,7 @@ classdef mne_rt_data_client < mne_rt_client
                     if(tag.kind == FIFF.FIFF_BLOCK_START && tag.data == FIFF.FIFFB_ISOTRAK)
                        info.dig = [];
                        while(tag.kind ~= FIFF.FIFF_BLOCK_END || tag.data ~= FIFF.FIFFB_ISOTRAK)
-                            tag = mne_rt_data_client.read_tag(t_inStream);
+                            tag = mne_rt_data_client.read_tag(obj.m_DataInputStream);
                             if(tag.kind == FIFF.FIFF_DIG_POINT)
                                 info.dig = [info.dig tag.data];
                             end
@@ -107,11 +105,11 @@ classdef mne_rt_data_client < mne_rt_client
                     if(tag.kind == FIFF.FIFF_BLOCK_START && tag.data == FIFF.FIFFB_PROJ)
                        info.projs = [];
                        while(tag.kind ~= FIFF.FIFF_BLOCK_END || tag.data ~= FIFF.FIFFB_PROJ)
-                            tag = mne_rt_data_client.read_tag(t_inStream);
+                            tag = mne_rt_data_client.read_tag(obj.m_DataInputStream);
                             if(tag.kind == FIFF.FIFF_BLOCK_START && tag.data == FIFF.FIFFB_PROJ_ITEM)
                                proj = [];
                                while(tag.kind ~= FIFF.FIFF_BLOCK_END || tag.data ~= FIFF.FIFFB_PROJ_ITEM)
-                                    tag = mne_rt_data_client.read_tag(t_inStream);
+                                    tag = mne_rt_data_client.read_tag(obj.m_DataInputStream);
                                     switch tag.kind
                                         case FIFF.FIFF_NAME
                                             proj.desc = tag.data;
@@ -142,11 +140,11 @@ classdef mne_rt_data_client < mne_rt_client
                     if(tag.kind == FIFF.FIFF_BLOCK_START && tag.data == FIFF.FIFFB_MNE_CTF_COMP)
                        info.comps = [];
                        while(tag.kind ~= FIFF.FIFF_BLOCK_END || tag.data ~= FIFF.FIFFB_MNE_CTF_COMP)
-                            tag = mne_rt_data_client.read_tag(t_inStream);
+                            tag = mne_rt_data_client.read_tag(obj.m_DataInputStream);
                             if(tag.kind == FIFF.FIFF_BLOCK_START && tag.data == FIFF.FIFFB_MNE_CTF_COMP_DATA)
                                comp = [];
                                while(tag.kind ~= FIFF.FIFF_BLOCK_END || tag.data ~= FIFF.FIFFB_MNE_CTF_COMP_DATA)
-                                    tag = mne_rt_data_client.read_tag(t_inStream);
+                                    tag = mne_rt_data_client.read_tag(obj.m_DataInputStream);
                                     switch tag.kind
                                         case FIFF.FIFF_MNE_CTF_COMP_KIND
                                             comp.ctfkind = tag.data;
@@ -169,7 +167,7 @@ classdef mne_rt_data_client < mne_rt_client
                     if(tag.kind == FIFF.FIFF_BLOCK_START && tag.data == FIFF.FIFFB_MNE_BAD_CHANNELS)
                        info.bads = [];
                        while(tag.kind ~= FIFF.FIFF_BLOCK_END || tag.data ~= FIFF.FIFFB_MNE_BAD_CHANNELS)
-                            tag = mne_rt_data_client.read_tag(t_inStream);
+                            tag = mne_rt_data_client.read_tag(obj.m_DataInputStream);
                             if(tag.kind == FIFF.FIFF_MNE_CH_NAME_LIST)
                                 info.bads = fiff_split_name_list(tag.data);
                             end
@@ -219,18 +217,15 @@ classdef mne_rt_data_client < mne_rt_client
             
             buf = [];
             
-            if ~isempty(obj.m_TcpSocket)
-                % get a buffered data input stream from the socket
-                t_inStream   = obj.m_TcpSocket.getInputStream;
+            if ~isempty(obj.m_DataInputStream)
 
-                bytes_available = t_inStream.available;
+                bytes_available = obj.m_DataInputStream.available;
                 % Wait for incomming bytes
                 while(bytes_available == 0)
-                    bytes_available = p_inStream.available;
+                    bytes_available = obj.m_DataInputStream.available;
                 end
-                
-                
-                tag = mne_rt_data_client.read_tag(t_inStream);
+
+                tag = mne_rt_data_client.read_tag(obj.m_DataInputStream);
                 
                 if(tag.kind == FIFF.FIFF_DATA_BUFFER)
                     nSamples = length(tag.data)/p_nChannels;
@@ -256,11 +251,8 @@ classdef mne_rt_data_client < mne_rt_client
             
             info = [];
             
-            if ~isempty(obj.m_TcpSocket)
-                % get a buffered data input stream from the socket
-                t_outStream   = obj.m_TcpSocket.getOutputStream;
-
-                mne_rt_data_client.sendFiffCommand(t_outStream, MNE_RT.MNE_RT_SET_CLIENT_ALIAS, alias)
+            if ~isempty(obj.m_DataOutputStream)
+                mne_rt_data_client.sendFiffCommand(obj.m_DataOutputStream, MNE_RT.MNE_RT_SET_CLIENT_ALIAS, alias)
             end
         end
         
@@ -279,15 +271,12 @@ classdef mne_rt_data_client < mne_rt_client
                     MNE_RT = mne_rt_define_commands();
                 end
 
-                if ~isempty(obj.m_TcpSocket)
-                    % get a buffered data input stream from the socket
-                    t_outStream   = obj.m_TcpSocket.getOutputStream;
+                if ~isempty(obj.m_DataOutputStream)
 
-                    mne_rt_data_client.sendFiffCommand(t_outStream, MNE_RT.MNE_RT_GET_CLIENT_ID)
+                    mne_rt_data_client.sendFiffCommand(obj.m_DataOutputStream, MNE_RT.MNE_RT_GET_CLIENT_ID)
 
                     % ID is send as answer
-                    t_inStream   = obj.m_TcpSocket.getInputStream;
-                    tag = obj.read_tag(t_inStream);
+                    tag = obj.read_tag(obj.m_DataInputStream);
                     if (tag.kind == FIFF.FIFF_MNE_RT_CLIENT_ID)
                         obj.m_clientID = tag.data;
                     end                
@@ -300,7 +289,7 @@ classdef mne_rt_data_client < mne_rt_client
     methods(Static)
         % =================================================================
         %% sendFiffCommand
-        function sendFiffCommand(p_outStream, p_Cmd, p_data)
+        function sendFiffCommand(p_DataOutputStream, p_Cmd, p_data)
             import java.net.Socket
             import java.io.*
             
@@ -317,27 +306,25 @@ classdef mne_rt_data_client < mne_rt_client
                 error('Wrong number of arguments.');
             end
             
-            t_dOutputStream = DataOutputStream(p_outStream);
-            
             kind = FIFF.FIFF_MNE_RT_COMMAND;
             type = FIFF.FIFFT_VOID;
             size = 4+length(data);% first 4 bytes are the command code
             next = 0;
             
-            t_dOutputStream.writeInt(kind);
-            t_dOutputStream.writeInt(type);
-            t_dOutputStream.writeInt(size);
-            t_dOutputStream.writeInt(next);
-            t_dOutputStream.writeInt(p_Cmd);% first 4 bytes are the command code
+            p_DataOutputStream.writeInt(kind);
+            p_DataOutputStream.writeInt(type);
+            p_DataOutputStream.writeInt(size);
+            p_DataOutputStream.writeInt(next);
+            p_DataOutputStream.writeInt(p_Cmd);% first 4 bytes are the command code
             if(~isempty(data))
-                t_dOutputStream.writeBytes(data);
+                p_DataOutputStream.writeBytes(data);
             end
-            t_dOutputStream.flush;
+            p_DataOutputStream.flush;
         end
         
         % =================================================================
         %% read_tag
-        function [tag] = read_tag(p_inStream)
+        function [tag] = read_tag(p_DataInputStream)
             import java.net.Socket
             import java.io.*
             
@@ -346,17 +333,17 @@ classdef mne_rt_data_client < mne_rt_client
             %
             % read the tag info
             %
-            tagInfo = mne_rt_data_client.read_tag_info(p_inStream);
+            tagInfo = mne_rt_data_client.read_tag_info(p_DataInputStream);
 
             %
             % read the tag data
             %
-            tag = mne_rt_data_client.read_tag_data(p_inStream, tagInfo);
+            tag = mne_rt_data_client.read_tag_data(p_DataInputStream, tagInfo);
         end
         
         % =================================================================
         %% read_tag_data
-        function [tag] = read_tag_data(p_inStream, p_tagInfo, pos)
+        function [tag] = read_tag_data(p_DataInputStream, p_tagInfo, pos)
         %
         % [tag] = read_tag_data(p_dInputStream, pos)
         %
@@ -378,14 +365,9 @@ classdef mne_rt_data_client < mne_rt_client
             end
 
             me='MNE_RT_DATA_CLIENT:read_tag_data';
-            
-%             t_bufferInputStream = BufferedInputStream(p_inStream);%to increase performance use a buffer in between
-%             t_dInputStream = DataInputStream(t_bufferInputStream);
-
-            t_dInputStream = DataInputStream(p_inStream);
 
             if nargin == 3
-                t_dInputStream.skipBytes(pos);
+                p_DataInputStream.skipBytes(pos);
             elseif nargin ~= 2
                 error(me,'Incorrect number of arguments');
             end
@@ -444,48 +426,21 @@ classdef mne_rt_data_client < mne_rt_client
                         el_size = tag.size - 3*4; % 3*4 --> case 2D matrix; ToDo calculate el_size through
 
                         switch matrix_type
-                            case FIFF.FIFFT_INT
-                                tag.data = zeros(1, el_size/4);
-                                for i = 1:el_size/4
-                                    tag.data(i) = t_dInputStream.readInt;%idata = fread(fid,dims(1)*dims(2),'int32=>int32');
-                                end
-                            case FIFF.FIFFT_JULIAN
-                                tag.data = zeros(1, el_size/4);
-                                for i = 1:el_size/4
-                                    tag.data(i) = t_dInputStream.readInt;%idata = fread(fid,dims(1)*dims(2),'int32=>int32');
-                                end
+%                             case FIFF.FIFFT_INT
+%                                 tag.data = zeros(el_size/4, 1);
+%                                 for i = 1:el_size/4
+%                                     tag.data(i) = p_DataInputStream.readInt;%idata = fread(fid,dims(1)*dims(2),'int32=>int32');
+%                                 end
+%                             case FIFF.FIFFT_JULIAN
+%                                 tag.data = zeros(el_size/4, 1);
+%                                 for i = 1:el_size/4
+%                                     tag.data(i) = p_DataInputStream.readInt;%idata = fread(fid,dims(1)*dims(2),'int32=>int32');
+%                                 end
                             case FIFF.FIFFT_FLOAT
-                                tag.data = zeros(1, el_size/4);
-                                for i = 1:el_size/4
-                                    tag.data(i) = t_dInputStream.readFloat;%fdata = fread(fid,dims(1)*dims(2),'single=>double');
-                                end
-                           case FIFF.FIFFT_DOUBLE
-                                tag.data = zeros(1, el_size/8);
-                                for i = 1:el_size/8
-                                    tag.data(i) = t_dInputStream.readDouble;%ddata = fread(fid,dims(1)*dims(2),'double=>double');
-                                end
-                            case FIFF.FIFFT_COMPLEX_FLOAT
-                                tag.data = zeros(1, el_size/4);
-                                for i = 1:el_size/4
-                                    tag.data(i) = t_dInputStream.readFloat;%fdata = fread(fid,2*dims(1)*dims(2),'single=>double');
-                                end
-                                nel = length(tag.data);
-                                tag.data = complex(tag.data(1:2:nel),tag.data(2:2:nel));
-                                %
-                                %   Note: we need the non-conjugate transpose here
-                                %
-%                                tag.data = transpose(reshape(fdata,dims(1),dims(2)));
-                            case FIFF.FIFFT_COMPLEX_DOUBLE
-                                tag.data = zeros(1, el_size/8);
-                                for i = 1:el_size/8
-                                    tag.data(i) = t_dInputStream.readDouble;%ddata = fread(fid,2*dims(1)*dims(2),'double=>double');
-                                end
-                                nel = length(tag.data);
-                                tag.data = complex(tag.data(1:2:nel),tag.data(2:2:nel));
-                                %
-                                %   Note: we need the non-conjugate transpose here
-                                %
-%                                tag.data = transpose(reshape(ddata,dims(1),dims(2)));
+                                t_MNERTBufferReader = mne_rt_buffer_reader(p_DataInputStream);
+                                tmp = t_MNERTBufferReader.readBuffer(el_size);
+                                tag.data = typecast(tmp, 'single');%fdata = fread(fid,dims(1)*dims(2),'single=>double');
+                                tag.data = swapbytes(tag.data);
                             otherwise
                                 error(me,'Cannot handle a matrix of type %d yet',matrix_type)
                         end
@@ -493,69 +448,12 @@ classdef mne_rt_data_client < mne_rt_client
                         % ToDo consider 3D case --> do that by using tag->size
                         dims = zeros(1, 2);
                        
-                        dims(1) = t_dInputStream.readInt;
-                        dims(2) = t_dInputStream.readInt;
+                        dims(1) = p_DataInputStream.readInt;
+                        dims(2) = p_DataInputStream.readInt;
                         
-                        ndim = t_dInputStream.readInt;
+                        ndim = p_DataInputStream.readInt;
                         
                         tag.data = reshape(tag.data,dims(1),dims(2))';
-                                                
-                    if (matrix_type == FIFF.FIFFT_COMPLEX_FLOAT || matrix_type == FIFF.FIFFT_COMPLEX_DOUBLE)
-                        %
-                        %   Note: we need the non-conjugate transpose here
-                        %
-                        tag.data = transpose(tag.data);
-                    end
-%                elseif (matrix_coding == matrix_coding_CCS || matrix_coding == matrix_coding_RCS)
-%                         %
-%                         % Find dimensions and return to the beginning of tag data
-%                         %
-%                         pos = ftell(fid);
-%                         fseek(fid,tag.size-4,'cof');
-%                         ndim = fread(fid,1,'int32');
-%                         fseek(fid,-(ndim+2)*4,'cof');
-%                         dims = fread(fid,ndim+1,'int32');
-%                         if ndim ~= 2
-%                             error(me,'Only two-dimensional matrices are supported at this time');
-%                         end
-%                         %
-%                         % Back to where the data start
-%                         %
-%                         fseek(fid,pos,'bof');
-%                         nnz   = dims(1);
-%                         nrow  = dims(2);
-%                         ncol  = dims(3);
-%                         sparse_data = zeros(nnz,3);
-%                         sparse_data(:,3) = fread(fid,nnz,'single=>double');
-%                         if (matrix_coding == matrix_coding_CCS)
-%                             %
-%                             %    CCS
-%                             %
-%                             sparse_data(:,1)  = fread(fid,nnz,'int32=>double') + 1;
-%                             ptrs  = fread(fid,ncol+1,'int32=>double') + 1;
-%                             p = 1;
-%                             for j = 1:ncol
-%                                 while p < ptrs(j+1)
-%                                     sparse_data(p,2) = j;
-%                                     p = p + 1;
-%                                 end
-%                             end
-%                         else
-%                             %
-%                             %    RCS
-%                             %
-%                             sparse_data(:,2)  = fread(fid,nnz,'int32=>double') + 1;
-%                             ptrs  = fread(fid,nrow+1,'int32=>double') + 1;
-%                             p = 1;
-%                             for j = 1:nrow
-%                                 while p < ptrs(j+1)
-%                                     sparse_data(p,1) = j;
-%                                     p = p + 1;
-%                                 end
-%                             end
-%                         end
-%                         tag.data = spconvert(sparse_data);
-%                         tag.data(nrow,ncol) = 0.0;
                     else
                         error(me,'Cannot handle other than dense or sparse matrices yet')
                     end
@@ -567,83 +465,50 @@ classdef mne_rt_data_client < mne_rt_client
                         %
                         %   Simple types
                         %
-                        case FIFF.FIFFT_BYTE
-                            tag.data = zeros(1, tag.size);
-                            for i = 1:tag.size
-                                tag.data(i) = t_dInputStream.readUnsignedByte;%fread(fid,tag.size,'uint8=>uint8');
-                            end
-                        case FIFF.FIFFT_SHORT
-                            tag.data = zeros(1, tag.size/2);
-                            for i = 1:tag.size/2
-                                tag.data(i) = t_dInputStream.readShort;%fread(fid,tag.size/2,'int16=>int16');
-                            end
                         case FIFF.FIFFT_INT
-                            tag.data = zeros(1, tag.size/4);
-                            for i = 1:tag.size/4
-                                tag.data(i) = t_dInputStream.readInt;%fread(fid,tag.size/4,'int32=>int32');
-                            end
-                        case FIFF.FIFFT_USHORT
-                            tag.data = zeros(1, tag.size/2);
-                            for i = 1:tag.size/2
-                                tag.data(i) = t_dInputStream.readUnsignedShort;%fread(fid,tag.size/2,'uint16=>uint16');
-                            end
-                        case FIFF.FIFFT_UINT
-                            tag.data = zeros(1, tag.size/4);
-                            for i = 1:tag.size/4
-                                tag.data(i) = t_dInputStream.readInt;%fread(fid,tag.size/4,'uint32=>uint32');
-                            end
+%                             tag.data = zeros(tag.size/4, 1);
+%                             for i = 1:tag.size/4
+%                                 tag.data(i) = p_DataInputStream.readInt;%fread(fid,tag.size/4,'int32=>int32');
+%                             end
+                            t_MNERTBufferReader = mne_rt_buffer_reader(p_DataInputStream);
+                            tmp = t_MNERTBufferReader.readBuffer(tag.size);
+                            tag.data = typecast(tmp, 'int32');%fread(fid,tag.size/4,'int32=>int32');
+                            tag.data = swapbytes(tag.data);
                         case FIFF.FIFFT_FLOAT
-                            tag.data = zeros(1, tag.size/4);
-                            for i = 1:tag.size/4
-                                tag.data(i) = t_dInputStream.readFloat;%fread(fid,tag.size/4,'single=>double');
-                            end
-            %             case FIFF.FIFFT_DOUBLE
-            %                 tag.data = fread(fid,tag.size/8,'double');
+                            t_MNERTBufferReader = mne_rt_buffer_reader(p_DataInputStream);
+                            tmp = t_MNERTBufferReader.readBuffer(tag.size);
+                            tag.data = typecast(tmp, 'single');%fread(fid,tag.size/4,'single=>double');
+                            tag.data = swapbytes(tag.data);
                         case FIFF.FIFFT_STRING
-                            tag.data = zeros(1, tag.size);
-                            for i = 1:tag.size
-                                tag.data(i) = t_dInputStream.readByte;%fread(fid,tag.size,'uint8=>char')';
-                            end
+                            t_MNERTBufferReader = mne_rt_buffer_reader(p_DataInputStream);
+                            tag.data = t_MNERTBufferReader.readBuffer(tag.size);%fread(fid,tag.size,'uint8=>char')';
                             tag.data = char(tag.data);                            
-            %             case FIFF.FIFFT_DAU_PACK16
-            %                 tag.data = fread(fid,tag.size/2,'int16=>int16');
-            %             case FIFF.FIFFT_COMPLEX_FLOAT
-            %                 tag.data = fread(fid,tag.size/4,'single=>double');
-            %                 nel = length(tag.data);
-            %                 tag.data = complex(tag.data(1:2:nel),tag.data(2:2:nel));
-            %             case FIFF.FIFFT_COMPLEX_DOUBLE
-            %                 tag.data = fread(fid,tag.size/8,'double');
-            %                 nel = length(tag.data);
-            %                 tag.data = complex(tag.data(1:2:nel),tag.data(2:2:nel));
-            %                 %
-            %                 %   Structures
-            %                 %
                         case FIFF.FIFFT_ID_STRUCT
-                            tag.data.version = t_dInputStream.readInt;%fread(fid,1,'int32=>int32');
+                            tag.data.version = p_DataInputStream.readInt;%fread(fid,1,'int32=>int32');
                             tag.data.machid = zeros(2,1);
-                            tag.data.machid(1)  = t_dInputStream.readInt;%fread(fid,2,'int32=>int32');
-                            tag.data.machid(2)  = t_dInputStream.readInt;
-                            tag.data.secs    = t_dInputStream.readInt;%fread(fid,1,'int32=>int32');
-                            tag.data.usecs   = t_dInputStream.readInt;%fread(fid,1,'int32=>int32');
+                            tag.data.machid(1)  = p_DataInputStream.readInt;%fread(fid,2,'int32=>int32');
+                            tag.data.machid(2)  = p_DataInputStream.readInt;
+                            tag.data.secs    = p_DataInputStream.readInt;%fread(fid,1,'int32=>int32');
+                            tag.data.usecs   = p_DataInputStream.readInt;%fread(fid,1,'int32=>int32');
                         case FIFF.FIFFT_DIG_POINT_STRUCT
-                            tag.data.kind    = t_dInputStream.readInt;%fread(fid,1,'int32=>int32');
-                            tag.data.ident   = t_dInputStream.readInt;%fread(fid,1,'int32=>int32');
+                            tag.data.kind    = p_DataInputStream.readInt;%fread(fid,1,'int32=>int32');
+                            tag.data.ident   = p_DataInputStream.readInt;%fread(fid,1,'int32=>int32');
                             tag.data.r = zeros(3,1);
                             for i = 1:3
-                                tag.data.r(i)	= t_dInputStream.readFloat;%fread(fid,3,'single=>single');
+                                tag.data.r(i)	= p_DataInputStream.readFloat;%fread(fid,3,'single=>single');
                             end
                             tag.data.coord_frame = 0;
                         case FIFF.FIFFT_COORD_TRANS_STRUCT
-                            tag.data.from = t_dInputStream.readInt;%fread(fid,1,'int32=>int32');
-                            tag.data.to   = t_dInputStream.readInt;%fread(fid,1,'int32=>int32');
+                            tag.data.from = p_DataInputStream.readInt;%fread(fid,1,'int32=>int32');
+                            tag.data.to   = p_DataInputStream.readInt;%fread(fid,1,'int32=>int32');
                             rot = zeros(9,1);
                             for i = 1:9
-                                rot(i) = t_dInputStream.readFloat;%fread(fid,9,'single=>double');
+                                rot(i) = p_DataInputStream.readFloat;%fread(fid,9,'single=>double');
                             end
                             rot = reshape(rot,3,3)';
                             move = zeros(3,1);
                             for i = 1:3
-                                move(i) = t_dInputStream.readFloat;%fread(fid,3,'single=>double');
+                                move(i) = p_DataInputStream.readFloat;%fread(fid,3,'single=>double');
                             end
                             tag.data.trans = [ rot move ; [ 0  0 0 1 ]];
                             %
@@ -651,21 +516,21 @@ classdef mne_rt_data_client < mne_rt_client
                             % It is easier to just use inverse of trans in Matlab
                             %
                             for i = 1:12 %fseek(fid,12*4,'cof');
-                                t_dInputStream.readFloat;
+                                p_DataInputStream.readFloat;
                             end
                         case FIFF.FIFFT_CH_INFO_STRUCT
-                            tag.data.scanno    = t_dInputStream.readInt;%fread(fid,1,'int32=>int32');
-                            tag.data.logno     = t_dInputStream.readInt;%fread(fid,1,'int32=>int32');
-                            tag.data.kind      = t_dInputStream.readInt;%fread(fid,1,'int32=>int32');
-                            tag.data.range     = t_dInputStream.readFloat;%fread(fid,1,'single=>double');
-                            tag.data.cal       = t_dInputStream.readFloat;%fread(fid,1,'single=>double');
-                            tag.data.coil_type = t_dInputStream.readInt;%fread(fid,1,'int32=>int32');
+                            tag.data.scanno    = p_DataInputStream.readInt;%fread(fid,1,'int32=>int32');
+                            tag.data.logno     = p_DataInputStream.readInt;%fread(fid,1,'int32=>int32');
+                            tag.data.kind      = p_DataInputStream.readInt;%fread(fid,1,'int32=>int32');
+                            tag.data.range     = p_DataInputStream.readFloat;%fread(fid,1,'single=>double');
+                            tag.data.cal       = p_DataInputStream.readFloat;%fread(fid,1,'single=>double');
+                            tag.data.coil_type = p_DataInputStream.readInt;%fread(fid,1,'int32=>int32');
                             %
                             %   Read the coil coordinate system definition
                             %
                             tag.data.loc = zeros(12,1);
                             for i = 1:12
-                                tag.data.loc(i) = t_dInputStream.readFloat;%fread(fid,12,'single=>double');
+                                tag.data.loc(i) = p_DataInputStream.readFloat;%fread(fid,12,'single=>double');
                             end
                             tag.data.coil_trans  = [];
                             tag.data.eeg_loc     = [];
@@ -688,14 +553,14 @@ classdef mne_rt_data_client < mne_rt_client
                             %
                             %   Unit and exponent
                             %
-                            tag.data.unit     = t_dInputStream.readInt;%fread(fid,1,'int32=>int32');
-                            tag.data.unit_mul = t_dInputStream.readInt;%fread(fid,1,'int32=>int32');
+                            tag.data.unit     = p_DataInputStream.readInt;%fread(fid,1,'int32=>int32');
+                            tag.data.unit_mul = p_DataInputStream.readInt;%fread(fid,1,'int32=>int32');
                             %
                             %   Handle the channel name
                             %
                             ch_name = zeros(1, 16, 'uint8');
                             for i = 1:16
-                                ch_name(i) = t_dInputStream.readByte;
+                                ch_name(i) = p_DataInputStream.readByte;
                             end
                             ch_name   = char(ch_name);
                             %
@@ -709,24 +574,6 @@ classdef mne_rt_data_client < mne_rt_client
                                 end
                             end
                             tag.data.ch_name = ch_name(1:len);
-            %             case FIFF.FIFFT_OLD_PACK
-            %                 offset   = fread(fid,1,'single=>double');
-            %                 scale    = fread(fid,1,'single=>double');
-            %                 tag.data = fread(fid,(tag.size-8)/2,'int16=>short');
-            %                 tag.data = scale*single(tag.data) + offset;
-            %             case FIFF.FIFFT_DIR_ENTRY_STRUCT
-            %                 tag.data = struct('kind',{},'type',{},'size',{},'pos',{});
-            %                 for k = 1:tag.size/16-1
-            %                     kind = fread(fid,1,'int32');
-            %                     type = fread(fid,1,'uint32');
-            %                     tagsize = fread(fid,1,'int32');
-            %                     pos  = fread(fid,1,'int32');
-            %                     tag.data(k).kind = kind;
-            %                     tag.data(k).type = type;
-            %                     tag.data(k).size = tagsize;
-            %                     tag.data(k).pos  = pos;
-            %                 end
-            %                 
                         otherwise
                             error(me,'Unimplemented tag data type %d',tag.type);
 
@@ -743,7 +590,7 @@ classdef mne_rt_data_client < mne_rt_client
             
         % =================================================================
         %% read_tag_info
-        function [tag] = read_tag_info(p_inStream, pos)
+        function [tag] = read_tag_info(p_DataInputStream, pos)
         %
         % [tag] = read_tag_info(p_inStream, pos)
         %
@@ -764,11 +611,9 @@ classdef mne_rt_data_client < mne_rt_client
             end
 
             me='MNE_RT_DATA_CLIENT:read_tag_info';
-
-            t_dInputStream = DataInputStream(p_inStream);
             
             if nargin == 2
-                t_dInputStream.skipBytes(pos);
+                p_DataInputStream.skipBytes(pos);
             elseif nargin ~= 1
                 error(me,'Incorrect number of arguments');
             end
@@ -776,10 +621,10 @@ classdef mne_rt_data_client < mne_rt_client
 %             while true
 %                 bytes_available = p_inStream.available;
 %                 if(bytes_available >= 16)
-            tag.kind = t_dInputStream.readInt;
-            tag.type = t_dInputStream.readInt;
-            tag.size = t_dInputStream.readInt;
-            tag.next = t_dInputStream.readInt;
+            tag.kind = p_DataInputStream.readInt;
+            tag.type = p_DataInputStream.readInt;
+            tag.size = p_DataInputStream.readInt;
+            tag.next = p_DataInputStream.readInt;
 %                     break;
 %                 end
 %                 % pause 100ms before retrying
