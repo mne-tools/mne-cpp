@@ -3,11 +3,12 @@ close all;
 clc;
 
 addpath('../../../mne-matlab/matlab');
+javaaddpath(fileparts(mfilename('fullpath')));
 
 %% connection information
 mne_rt_server_ip            =	'localhost';%'172.21.16.63';%
-mne_rt_server_commandPort	=	14731;
-mne_rt_server_fiffDataPort	=	14732;
+mne_rt_server_commandPort	=	5361;
+mne_rt_server_fiffDataPort	=	5362;
 
 %% create command client
 t_cmdClient = mne_rt_cmd_client(mne_rt_server_ip, mne_rt_server_commandPort);
@@ -35,12 +36,20 @@ t_cmdClient.requestMeasInfo(t_aliasOrId);
 t_measInfo = t_dataClient.readInfo();
 
 %% start measurement
-% t_cmdClient.requestMeas(t_aliasOrId);
-% while (true)
-%     fprintf('read buffer...');
-%     t_matRawBuffer = t_dataClient.readRawBuffer(t_measInfo.nchan);
-%     fprintf(' [done]\r\n');
-% end
+t_cmdClient.requestMeas(t_aliasOrId);
+
+figure;
+hold on;
+h_old=plot(0,0);
+while (true)
+    fprintf('read buffer...');
+    t_matRawBuffer = t_dataClient.readRawBuffer(t_measInfo.nchan);
+    fprintf(' [done]\r\n');
+    h = plot(t_matRawBuffer');
+    delete(h_old);
+    h_old = h;
+    drawnow;
+end
 
 %% close the sockets
 t_cmdClient.close();
