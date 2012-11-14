@@ -33,11 +33,17 @@
 #
 #--------------------------------------------------------------------------------------------------------------
 
+include(../mne-cpp.pri)
+
 TEMPLATE = subdirs
 
 SUBDIRS += generics \
     fiff \
     mne \
-#    disp \ #Qt3D is missing - figure out if module is available
+
+contains(Qt3D_available, true) {
+    message(Qt3D available: disp library configured!)
+    SUBDIRS += disp \ #Qt3D is missing - figure out if module is available
+}
 
 CONFIG += ordered
