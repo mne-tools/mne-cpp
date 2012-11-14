@@ -2,7 +2,7 @@
 #
 # @file     examples.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-#           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
+#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
 # @date     July, 2012
 #
@@ -40,8 +40,8 @@ SUBDIRS += \
     readRaw \
     readWriteRaw \
     readFwd \
-    readFwdDisp \
     readEpochs \
-    computeInverse
+    computeInverse \
+#    readFwdDisp \ #Qt3D is missing - figure out if 3D module is available
 
 CONFIG += ordered
