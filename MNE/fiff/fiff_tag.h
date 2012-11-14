@@ -2,7 +2,7 @@
 /**
 * @file     fiff_tag.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hämäläinen <msh@nmr.mgh.harvard.edu>
+*           Matti Hï¿½mï¿½lï¿½inen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2012
 *
@@ -782,7 +782,7 @@ inline FiffChInfo FiffTag::toChInfo() const
         //   Handle the channel name
         //
         char* orig = (char*)this->data();
-        p_FiffChInfo.ch_name = QString::fromAscii(orig + 80);
+        p_FiffChInfo.ch_name = QString::fromUtf8(orig + 80);
 
         return p_FiffChInfo;
     }
