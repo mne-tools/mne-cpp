@@ -67,7 +67,7 @@
 //=============================================================================================================
 
 #include <QtCore/QtPlugin>
-
+#include <QFile>
 #include <QDebug>
 
 
@@ -122,13 +122,37 @@ QByteArray FiffSimulator::availableCommands() const
 bool FiffSimulator::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo)
 {
     bool success = false;
-    QByteArray t_blockClientList;
     if(p_sListCommand[0].compare("simfile",Qt::CaseInsensitive) == 0)
     {
         //
         // simulation file
         //
         printf("simfile\r\n");
+
+        QFile t_file(p_sListCommand[1]);
+
+        QString t_sResourceDataPathOld = m_sResourceDataPath;
+
+        if(t_file.exists())
+        {
+            m_sResourceDataPath = p_sListCommand[1];
+            m_pRawInfo = false;
+
+            if (this->readRawInfo())
+            {
+                m_pFiffProducer->stop();
+                this->stop();
+
+                p_blockOutputInfo.append("New simulation file set succefully.\r\n");
+            }
+            else
+            {
+                qDebug() << "Don't set new file";
+                m_sResourceDataPath = t_sResourceDataPathOld;
+
+                p_blockOutputInfo.append("Simulation file not set.\r\n");
+            }
+        }
         success = true;
     }
 

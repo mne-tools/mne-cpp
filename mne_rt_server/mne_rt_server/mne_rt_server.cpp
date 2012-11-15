@@ -124,14 +124,14 @@ MNERTServer::MNERTServer()
     //
     // Run instruction server
     //
-    if (!m_pCommandServer->listen()) {
+    if (!m_pCommandServer->listen(QHostAddress::Any, 4217)) {
         printf("Unable to start the command server: %s\n", m_pCommandServer->errorString().toUtf8().constData());
         return;
     }
     //
     // Run data server
     //
-    if (!m_pFiffStreamServer->listen()) {
+    if (!m_pFiffStreamServer->listen(QHostAddress::Any, 4218)) {
         printf("Unable to start the fiff stream server: %s\n", m_pFiffStreamServer->errorString().toUtf8().constData());
         return;
     }

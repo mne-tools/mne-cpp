@@ -81,10 +81,12 @@ FiffProducer::~FiffProducer()
 
 //*************************************************************************************************************
 
-void FiffProducer::stop()
+bool FiffProducer::stop()
 {
     m_bIsRunning = false;
     QThread::wait();
+
+    return true;
 }
 
 
