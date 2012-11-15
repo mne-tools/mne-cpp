@@ -109,7 +109,6 @@ void FiffProducer::run()
 
     qDebug() << "quantum " << quantum;
 
-
     //
     //   To read the whole file at once set
     //
@@ -118,7 +117,7 @@ void FiffProducer::run()
     //
     //   Read and write all the data
     //
-    bool first_buffer = true;
+    bool t_bIsRunning = true;
 
     fiff_int_t first, last;
     MatrixXd* data = NULL;
@@ -138,11 +137,17 @@ void FiffProducer::run()
     //Not good cause production time is not accurate
     //loading and thread sleep is longer than thread sleep time - better to have a extra loading thread
     // ToDo restructure this producer as laoding buffer --> and thread sleep to simulator buffer
-    while(first < to)//m_bIsRunning)
+    fiff_int_t t_iDiff;
+    bool t_bRestart = false;
+
+    while(t_bIsRunning)//m_bIsRunning)
     {
         last = first+quantum-1;
         if (last > to)
         {
+            t_iDiff = last - to;
+            t_bRestart = true;
+
             last = to;
         }
 
@@ -153,10 +158,40 @@ void FiffProducer::run()
 
         MatrixXf tmp = (inv_calsMat*(*data)).cast<float>();
 
+        if(t_bRestart)
+        {
+            //
+            // Case end of Simulation: restart file from the beginning and read remaining bytes
+            //
+            printf("### RESTART Simulation File ###\r\n");
+
+            first = from;
+            last = first+t_iDiff-1;
+
+            if (!m_pFiffSimulator->m_pRawInfo->read_raw_segment(data,times,first,last))
+            {
+                printf("error during read_raw_segment\n");
+            }
+
+            MatrixXf tmp2 = (inv_calsMat*(*data)).cast<float>();
+
+            MatrixXf tmp3(tmp.rows(), tmp.cols()+tmp2.cols());
+
+            tmp3.block(0,0,tmp.rows(),tmp.cols()) = tmp;
+            tmp3.block(0,tmp.cols(),tmp.rows(),tmp2.cols()) = tmp2;
+
+            tmp = tmp3;
+
+            t_bRestart = false;
+            first += t_iDiff;
+        }
+        else
+        {
+            first += quantum;
+        }
+
 
         m_pFiffSimulator->m_pRawMatrixBuffer->push(&tmp);
-
-        first+=quantum;
     }
 
     // close datastream in this thread
