@@ -37,6 +37,7 @@
 TEMPLATE = app
 
 QT += network
+QT -= gui
 
 CONFIG   += console
 CONFIG   -= app_bundle

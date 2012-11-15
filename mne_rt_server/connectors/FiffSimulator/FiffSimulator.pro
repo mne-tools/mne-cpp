@@ -11,6 +11,7 @@ CONFIG += plugin
 DEFINES += FIFFSIMULATOR_LIBRARY
 
 QT += network
+QT -= gui
 
 TARGET = FiffSimulator
 
