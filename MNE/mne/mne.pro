@@ -37,6 +37,8 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
+QT -= gui
+
 DEFINES += MNE_LIBRARY
 
 TARGET = mne

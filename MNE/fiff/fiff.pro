@@ -38,6 +38,7 @@ include(../../mne-cpp.pri)
 TEMPLATE = lib
 
 QT += network
+QT -= gui
 
 DEFINES += FIFF_LIBRARY
 
