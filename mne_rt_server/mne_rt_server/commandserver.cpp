@@ -75,7 +75,6 @@ CommandServer::CommandServer(QObject *parent)
 CommandServer::~CommandServer()
 {
     emit closeCommandThreads();
-    qDebug() << "Destroy CommandServer";
 }
 
 

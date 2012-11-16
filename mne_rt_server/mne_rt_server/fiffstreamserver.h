@@ -106,11 +106,11 @@ public:
     */
     inline FiffStreamThread* getClient(qint32 id);
 
-    //=========================================================================================================
-    /**
-    * ToDo...
-    */
-    void clearClients();
+//    //=========================================================================================================
+//    /**
+//    * ToDo...
+//    */
+//    void clearClients();
 
 //public slots: --> in Qt 5 not anymore declared as slot
     void forwardMeasInfo(qint32 ID, FiffInfo* p_pFiffInfo);

@@ -76,7 +76,6 @@ CommandThread::CommandThread(int socketDescriptor, QObject *parent)
 
 CommandThread::~CommandThread()
 {
-    qDebug() << "Destroy CommandThread";
     m_bIsRunning = false;
     QThread::wait();
 }

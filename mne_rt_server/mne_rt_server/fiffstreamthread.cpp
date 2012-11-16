@@ -84,10 +84,10 @@ FiffStreamThread::FiffStreamThread(qint32 id, int socketDescriptor, QObject *par
 
 FiffStreamThread::~FiffStreamThread()
 {
-    qDebug() << "FiffStreamThread::~FiffStreamThread()";
     //Remove from client list
     FiffStreamServer* t_pFiffStreamServer = qobject_cast<FiffStreamServer*>(this->parent());
-    t_pFiffStreamServer->m_qClientList.remove(m_iDataClientId);
+    if(t_pFiffStreamServer)
+        t_pFiffStreamServer->m_qClientList.remove(m_iDataClientId);
 
     m_bIsRunning = false;
     QThread::wait();
@@ -412,12 +412,7 @@ void FiffStreamThread::run()
 //        usleep(1000);
     }
 
-    qDebug() << "void FiffStreamThread::run()";
-
     t_qTcpSocket.disconnectFromHost();
     if(t_qTcpSocket.state() != QAbstractSocket::UnconnectedState)
         t_qTcpSocket.waitForDisconnected();
-
-
-    qDebug() << "End void FiffStreamThread::run()";
 }
