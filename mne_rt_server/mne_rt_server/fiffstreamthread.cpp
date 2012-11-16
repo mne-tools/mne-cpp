@@ -96,14 +96,32 @@ FiffStreamThread::~FiffStreamThread()
 
 //*************************************************************************************************************
 
-void FiffStreamThread::acceptRawBuffer(qint32 ID)
+void FiffStreamThread::startMeas(qint32 ID)
 {
     if(ID == m_iDataClientId)
     {
         qDebug() << "Activate raw buffer sending.";
 
         m_qMutex.lock();
+        // ToDo send start meas
         m_bIsSendingRawBuffer = true;
+        m_qMutex.unlock();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void FiffStreamThread::stopMeas(qint32 ID)
+{
+    qDebug() << "void FiffStreamThread::stopMeas(qint32 ID)";
+    if(ID == m_iDataClientId || ID == -1)
+    {
+        qDebug() << "stop raw buffer sending.";
+
+        m_qMutex.lock();
+        // ToDo send start meas
+        m_bIsSendingRawBuffer = false;
         m_qMutex.unlock();
     }
 }
@@ -165,7 +183,7 @@ void FiffStreamThread::sendRawBuffer(Eigen::MatrixXf m_matRawData)
     }
     else
     {
-        qDebug() << "Send RawBufferis not activated";
+        qDebug() << "Send RawBuffer is not activated";
     }
 }
 
@@ -338,8 +356,10 @@ void FiffStreamThread::run()
             this, &FiffStreamThread::sendMeasurementInfo);
     connect(t_pParentServer, &FiffStreamServer::remitRawBuffer,
             this, &FiffStreamThread::sendRawBuffer);
-    connect(t_pParentServer, &FiffStreamServer::activateRawDataFiffStreamClient,
-            this, &FiffStreamThread::acceptRawBuffer);
+    connect(t_pParentServer, &FiffStreamServer::startMeasFiffStreamClient,
+            this, &FiffStreamThread::startMeas);
+    connect(t_pParentServer, &FiffStreamServer::stopMeasFiffStreamClient,
+            this, &FiffStreamThread::stopMeas);
 
     QTcpSocket t_qTcpSocket;
     if (!t_qTcpSocket.setSocketDescriptor(m_iSocketDescriptor)) {

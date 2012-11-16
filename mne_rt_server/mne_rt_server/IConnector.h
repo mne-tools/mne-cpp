@@ -173,11 +173,13 @@ public:
     /**
     * Returns the FiffInfo.
     *
-    * @return the name of module.
+    * @return ToDo
     */
     virtual void requestMeasInfo(qint32 ID) = 0;
 
-    virtual void requestRawData() = 0;
+    virtual void requestMeas() = 0;
+
+    virtual void requestMeasStop() = 0;
 
     //=========================================================================================================
     /**

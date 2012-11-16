@@ -101,8 +101,11 @@ MNERTServer::MNERTServer()
     //
     m_pConnectorManager->connectActiveConnector();
 
-    QObject::connect(   m_pCommandServer, &CommandServer::activateRawDataFiffStreamClient,
-                        m_pFiffStreamServer, &FiffStreamServer::forwardActivateRawDataFiffStreamClient);
+    QObject::connect(   m_pCommandServer, &CommandServer::startMeasFiffStreamClient,
+                        m_pFiffStreamServer, &FiffStreamServer::forwardStartMeasFiffStreamClient);
+    QObject::connect(   m_pCommandServer, &CommandServer::stopMeasFiffStreamClient,
+                        m_pFiffStreamServer, &FiffStreamServer::forwardStopMeasFiffStreamClient);
+
 
 
 

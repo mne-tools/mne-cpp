@@ -186,6 +186,7 @@ bool FiffSimulator::start()
 
 bool FiffSimulator::stop()
 {
+    m_bIsRunning = false;
     QThread::wait();
     return true;
 }
@@ -216,10 +217,19 @@ void FiffSimulator::requestMeasInfo(qint32 ID)
 
 //*************************************************************************************************************
 
-void FiffSimulator::requestRawData()
+void FiffSimulator::requestMeas()
 {
     this->m_pFiffProducer->start();
     this->start();
+}
+
+
+//*************************************************************************************************************
+
+void FiffSimulator::requestMeasStop()
+{
+    this->m_pFiffProducer->stop();
+    this->stop();
 }
 
 

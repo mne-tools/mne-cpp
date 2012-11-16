@@ -97,9 +97,17 @@ FiffStreamServer::~FiffStreamServer()
 
 //*************************************************************************************************************
 
-void FiffStreamServer::forwardActivateRawDataFiffStreamClient(qint32 ID)
+void FiffStreamServer::forwardStartMeasFiffStreamClient(qint32 ID)
 {
-    emit activateRawDataFiffStreamClient(ID);
+    emit startMeasFiffStreamClient(ID);
+}
+
+
+//*************************************************************************************************************
+
+void FiffStreamServer::forwardStopMeasFiffStreamClient(qint32 ID)
+{
+    emit stopMeasFiffStreamClient(ID);
 }
 
 
@@ -117,6 +125,7 @@ void FiffStreamServer::forwardRawBuffer(Eigen::MatrixXf m_matRawData)
 {
     emit remitRawBuffer(m_matRawData);
 }
+
 
 
 //*************************************************************************************************************
