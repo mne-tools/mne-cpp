@@ -92,7 +92,9 @@ ConnectorManager::ConnectorManager(QObject *parent)
 
 ConnectorManager::~ConnectorManager()
 {
-
+    QVector<IConnector*>::const_iterator it = s_vecConnectors.begin();
+    for( ; it != s_vecConnectors.end(); ++it)
+        delete (*it);
 }
 
 

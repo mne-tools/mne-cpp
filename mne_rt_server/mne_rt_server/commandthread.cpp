@@ -66,6 +66,7 @@ using namespace MSERVER;
 CommandThread::CommandThread(int socketDescriptor, QObject *parent)
 : QThread(parent)
 , socketDescriptor(socketDescriptor)
+, m_bIsRunning(false)
 {
 
 }
@@ -75,7 +76,9 @@ CommandThread::CommandThread(int socketDescriptor, QObject *parent)
 
 CommandThread::~CommandThread()
 {
-
+    qDebug() << "Destroy CommandThread";
+    m_bIsRunning = false;
+    QThread::wait();
 }
 
 
@@ -94,7 +97,9 @@ QByteArray CommandThread::availableCommands() const
     t_blockCmdInfoList.append("\n\tconlist\t\t\tprints and sends all available connectors\r\n");
     t_blockCmdInfoList.append("\tselcon   [ConID]\tselects a new connector, if a measurement is running it will be stopped.\r\n");
 
-    t_blockCmdInfoList.append("\n\thelp\t\t\tprints and sends this list\r\n\n");
+    t_blockCmdInfoList.append("\n\thelp\t\t\tprints and sends this list\r\n");
+
+    t_blockCmdInfoList.append("\n\tclose\t\t\tcloses mne_rt_server\r\n\n");
 
     //Connector Commands
     IConnector* t_pCurrentConnector = qobject_cast<MNERTServer*>(this->parent()->parent())->m_pConnectorManager->getActiveConnector();
@@ -218,6 +223,15 @@ bool CommandThread::parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand)
         t_blockClientList.append(CommandThread::availableCommands());
         success = true;
     }
+    else if(t_qCommandList[0].compare("close",Qt::CaseInsensitive) == 0)
+    {
+        //
+        // Closes mne_rt_server
+        //
+        printf("close\n");
+        emit qobject_cast<MNERTServer*>(this->parent()->parent())->closeServer();
+        success = true;
+    }
     else if(qobject_cast<MNERTServer*>(this->parent()->parent())->m_pConnectorManager->parseConnectorCommand(t_qCommandList, t_blockClientList))
     {
         //
@@ -297,6 +311,8 @@ QByteArray CommandThread::parseToId(QString& p_sRawId, qint32& p_iParsedId)
 
 void CommandThread::run()
 {
+    m_bIsRunning = true;
+
     QTcpSocket t_qTcpSocket;
     if (!t_qTcpSocket.setSocketDescriptor(socketDescriptor)) {
         emit error(t_qTcpSocket.error());
@@ -313,7 +329,7 @@ void CommandThread::run()
 
     qint64 t_iMaxBufSize = 1024;
 
-    while(t_qTcpSocket.state() != QAbstractSocket::UnconnectedState)
+    while(t_qTcpSocket.state() != QAbstractSocket::UnconnectedState && m_bIsRunning)
     {
         t_qTcpSocket.waitForReadyRead(100);
 

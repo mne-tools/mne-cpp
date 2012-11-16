@@ -90,6 +90,7 @@ FiffSimulator::FiffSimulator()
 : m_pFiffProducer(new FiffProducer(this))
 , m_pRawInfo(NULL)
 , m_sResourceDataPath("../../mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
+, m_bIsRunning(false)
 {
     this->setBufferSampleSize(1000);
     m_pRawMatrixBuffer = NULL;
@@ -100,6 +101,12 @@ FiffSimulator::FiffSimulator()
 
 FiffSimulator::~FiffSimulator()
 {
+    qDebug() << "Destroy FiffSimulator::~FiffSimulator()";
+
+    delete m_pFiffProducer;
+
+    m_bIsRunning = false;
+    QThread::wait();
 }
 
 
@@ -275,13 +282,15 @@ bool FiffSimulator::readRawInfo()
 
 void FiffSimulator::run()
 {
+    m_bIsRunning = true;
+
     float t_fSamplingFrequency = m_pRawInfo->info->sfreq;
     float t_fBuffSampleSize = (float)getBufferSampleSize();
 
     quint32 uiSamplePeriod = (unsigned int) ((t_fBuffSampleSize/t_fSamplingFrequency)*1000000.0f);
     quint32 count = 0;
 
-    while(true)
+    while(m_bIsRunning)
     {
         MatrixXf tmp = m_pRawMatrixBuffer->pop();
         ++count;

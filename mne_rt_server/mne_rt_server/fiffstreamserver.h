@@ -123,6 +123,8 @@ signals:
     void remitMeasInfo(qint32 ID, FIFFLIB::FiffInfo* p_pFiffInfo);
     void remitRawBuffer(Eigen::MatrixXf);
 
+    void closeFiffStreamServer();
+
 protected:
     void incomingConnection(qintptr socketDescriptor);
 

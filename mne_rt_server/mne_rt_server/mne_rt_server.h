@@ -111,6 +111,9 @@ public:
     */
     ~MNERTServer();
 
+signals:
+    void closeServer();
+
 private:
     FiffStreamServer*   m_pFiffStreamServer;
     CommandServer*      m_pCommandServer;

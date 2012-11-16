@@ -149,6 +149,7 @@ private:
     FiffRawData*    m_pRawInfo;         /**< Holds the fiff raw measurement information. */
     QString         m_sResourceDataPath;  /**< Holds the path to the Fiff resource simulation file directory.*/
 
+    bool            m_bIsRunning;
 };
 
 } // NAMESPACE

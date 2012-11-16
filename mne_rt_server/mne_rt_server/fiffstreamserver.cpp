@@ -76,6 +76,7 @@ FiffStreamServer::FiffStreamServer(QObject *parent)
 
 FiffStreamServer::~FiffStreamServer()
 {
+    emit closeFiffStreamServer();
     clearClients();
 }
 
@@ -122,13 +123,14 @@ void FiffStreamServer::forwardRawBuffer(Eigen::MatrixXf m_matRawData)
 
 void FiffStreamServer::incomingConnection(qintptr socketDescriptor)
 {
-    FiffStreamThread* streamThread = new FiffStreamThread(m_iNextClientId, socketDescriptor, this);
+    FiffStreamThread* t_pStreamThread = new FiffStreamThread(m_iNextClientId, socketDescriptor, this);
 
-    m_qClientList.insert(m_iNextClientId, streamThread);
+    m_qClientList.insert(m_iNextClientId, t_pStreamThread);
     ++m_iNextClientId;
 
     //when thread has finished it gets deleted
-    connect(streamThread, SIGNAL(finished()), streamThread, SLOT(deleteLater()));
+    connect(t_pStreamThread, SIGNAL(finished()), t_pStreamThread, SLOT(deleteLater()));
+    connect(this, SIGNAL(closeFiffStreamServer()), t_pStreamThread, SLOT(deleteLater()));
 
-    streamThread->start();
+    t_pStreamThread->start();
 }

@@ -51,6 +51,7 @@
 //=============================================================================================================
 
 #include <QtCore/QCoreApplication>
+#include <QObject>
 
 
 //*************************************************************************************************************
@@ -77,11 +78,12 @@ using namespace MSERVER;
 */
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
+    QCoreApplication app(argc, argv);
 
     MNERTServer t_MneRtServer;
+    QObject::connect(&t_MneRtServer, SIGNAL(closeServer()), &app, SLOT(quit()));
 
-    return a.exec();
+    return app.exec();
 }
 
 //*************************************************************************************************************
