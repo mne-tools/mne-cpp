@@ -75,7 +75,10 @@ FiffProducer::FiffProducer(FiffSimulator* p_pFiffSimulator)
 
 FiffProducer::~FiffProducer()
 {
+    qDebug() << "Destroy FiffProducer::~FiffProducer()";
 
+    m_bIsRunning = false;
+    QThread::wait();
 }
 
 
@@ -119,7 +122,6 @@ void FiffProducer::run()
     //
     //   Read and write all the data
     //
-    bool t_bIsRunning = true;
 
     fiff_int_t first, last;
     MatrixXd* data = NULL;
@@ -142,7 +144,7 @@ void FiffProducer::run()
     fiff_int_t t_iDiff;
     bool t_bRestart = false;
 
-    while(t_bIsRunning)//m_bIsRunning)
+    while(m_bIsRunning)
     {
         last = first+quantum-1;
         if (last > to)

@@ -75,6 +75,7 @@ FiffStreamThread::FiffStreamThread(qint32 id, int socketDescriptor, QObject *par
 , m_sDataClientAlias(QString(""))
 , m_bIsSendingRawBuffer(false)
 , m_iSocketDescriptor(socketDescriptor)
+, m_bIsRunning(false)
 {
 }
 
@@ -83,9 +84,13 @@ FiffStreamThread::FiffStreamThread(qint32 id, int socketDescriptor, QObject *par
 
 FiffStreamThread::~FiffStreamThread()
 {
+    qDebug() << "FiffStreamThread::~FiffStreamThread()";
     //Remove from client list
     FiffStreamServer* t_pFiffStreamServer = qobject_cast<FiffStreamServer*>(this->parent());
     t_pFiffStreamServer->m_qClientList.remove(m_iDataClientId);
+
+    m_bIsRunning = false;
+    QThread::wait();
 }
 
 
@@ -181,13 +186,6 @@ void FiffStreamThread::sendMeasurementInfo(qint32 ID, FiffInfo* p_pFiffInfo)
 //        init_info[1] = m_iDataClientId;
 
 //        t_FiffStreamOut.start_block(FIFFB_MNE_RT_MEAS_INFO);
-
-
-
-
-
-
-
 
 
 
@@ -332,6 +330,8 @@ void FiffStreamThread::writeClientId()
 
 void FiffStreamThread::run()
 {
+    m_bIsRunning = true;
+
     FiffStreamServer* t_pParentServer = qobject_cast<FiffStreamServer*>(this->parent());
 
     connect(t_pParentServer, &FiffStreamServer::remitMeasInfo,
@@ -357,7 +357,7 @@ void FiffStreamThread::run()
 
     FiffStream t_FiffStreamIn(&t_qTcpSocket);
 
-    while(t_qTcpSocket.state() != QAbstractSocket::UnconnectedState)
+    while(t_qTcpSocket.state() != QAbstractSocket::UnconnectedState && m_bIsRunning)
     {
         //
         // Write available data
@@ -412,7 +412,12 @@ void FiffStreamThread::run()
 //        usleep(1000);
     }
 
+    qDebug() << "void FiffStreamThread::run()";
+
     t_qTcpSocket.disconnectFromHost();
     if(t_qTcpSocket.state() != QAbstractSocket::UnconnectedState)
         t_qTcpSocket.waitForDisconnected();
+
+
+    qDebug() << "End void FiffStreamThread::run()";
 }

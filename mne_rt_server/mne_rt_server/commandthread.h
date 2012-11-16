@@ -79,6 +79,9 @@ private:
     QByteArray parseToId(QString& p_sRawId, qint32& p_iParsedId);
 
     int socketDescriptor;
+
+    bool m_bIsRunning;
+
 };
 
 

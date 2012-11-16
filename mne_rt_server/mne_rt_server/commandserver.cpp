@@ -72,20 +72,30 @@ CommandServer::CommandServer(QObject *parent)
 
 //*************************************************************************************************************
 
+CommandServer::~CommandServer()
+{
+    emit closeCommandThreads();
+    qDebug() << "Destroy CommandServer";
+}
+
+
+//*************************************************************************************************************
+
 void CommandServer::incomingConnection(qintptr socketDescriptor)
 {
-    CommandThread* t_pthread = new CommandThread(socketDescriptor, this);
+    CommandThread* t_pCommandThread = new CommandThread(socketDescriptor, this);
 
     //when thread has finished it gets deleted
-    connect(t_pthread, SIGNAL(finished()), t_pthread, SLOT(deleteLater()));
+    connect(t_pCommandThread, SIGNAL(finished()), t_pCommandThread, SLOT(deleteLater()));
+    connect(this, SIGNAL(closeCommandThreads()), t_pCommandThread, SLOT(deleteLater()));
 
     //Forwards for thread safety - check if obsolete!?
-    connect(t_pthread, &CommandThread::requestMeasInfo,
+    connect(t_pCommandThread, &CommandThread::requestMeasInfo,
             this, &CommandServer::forwardMeasInfoRequest);
-    connect(t_pthread, &CommandThread::requestMeas,
+    connect(t_pCommandThread, &CommandThread::requestMeas,
             this, &CommandServer::forwardMeasRequest);
 
-    t_pthread->start();
+    t_pCommandThread->start();
 }
 
 

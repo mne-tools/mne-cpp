@@ -158,10 +158,14 @@ MNERTServer::MNERTServer()
 
 MNERTServer::~MNERTServer()
 {
-    if(m_pCommandServer)
-        delete m_pCommandServer;
-    if(m_pFiffStreamServer)
-        delete m_pFiffStreamServer;
+    qDebug() << "Detroy MNERTServer";
     if(m_pConnectorManager)
         delete m_pConnectorManager;
+    qDebug() << "HERE1";
+    if(m_pCommandServer)
+        delete m_pCommandServer;
+    qDebug() << "HERE2";
+    if(m_pFiffStreamServer)
+        delete m_pFiffStreamServer;
+    qDebug() << "HERE3";
 }

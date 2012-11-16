@@ -113,6 +113,8 @@ private:
 
     bool m_bIsSendingRawBuffer;
 
+    bool m_bIsRunning;
+
 //private slots: --> in Qt 5 not anymore declared as slot
     void acceptRawBuffer(qint32 ID);
     void sendMeasurementInfo(qint32 ID, FiffInfo* p_pFiffInfo);

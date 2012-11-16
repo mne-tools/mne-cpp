@@ -79,10 +79,13 @@ class CommandServer : public QTcpServer
 public:
     CommandServer(QObject *parent = 0);
 
+    ~CommandServer();
+
 signals:
     void requestMeasInfo(qint32 ID);
     void requestRawData();
     void activateRawDataFiffStreamClient(qint32 ID);
+    void closeCommandThreads();
 //    void sendFiffStreamServerInstruction();
 
 protected:
