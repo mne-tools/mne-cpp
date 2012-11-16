@@ -90,7 +90,7 @@ QByteArray CommandThread::availableCommands() const
     t_blockCmdInfoList.append("\tmeasinfo [ID/Alias]\tsends the measurement info to the specified\r\n\t\t\t\tFiffStreamClient\r\n");
     t_blockCmdInfoList.append("\tmeas     [ID/Alias]\tadds specified FiffStreamClient to raw data\r\n\t\t\t\tbuffer receivers. If acquisition is not already strated, it is triggered.\r\n");
     t_blockCmdInfoList.append("\tstop     [ID/Alias]\tremoves specified FiffStreamClient from raw\r\n\t\t\t\tdata buffer receivers.\r\n");
-    t_blockCmdInfoList.append("\tstopall\t\t\tstops the whole acquisition process.\r\n");
+    t_blockCmdInfoList.append("\tstop-all\t\t\tstops the whole acquisition process.\r\n");
     t_blockCmdInfoList.append("\tbufsize  [samples]\tsets the buffer size of the FiffStreamClient\r\n\t\t\t\traw data buffers\r\n");
 
     t_blockCmdInfoList.append("\n\tconlist\t\t\tprints and sends all available connectors\r\n");
@@ -176,18 +176,30 @@ bool CommandThread::parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand)
 
         if(t_id != -1)
         {
-            emit requestMeas(t_id);
+            emit requestStartMeas(t_id);
 
             QString str = QString("\tsend measurement raw buffer to FiffStreamClient (ID: %1)\r\n\n").arg(t_id);
             t_blockClientList.append(str);
-            success = true;
         }
+        success = true;
     }
     else if(t_qCommandList[0].compare("stop",Qt::CaseInsensitive) == 0)
     {
         //
         // stop
         //
+        qint32 t_id = -1;
+        t_blockClientList.append(parseToId(t_qCommandList[1],t_id));
+
+        printf("stop %d\n", t_id);
+
+        if(t_id != -1)
+        {
+            emit requestStopMeas(t_id);
+
+            QString str = QString("\tstop FiffStreamClient (ID: %1)\r\n\n").arg(t_id);
+            t_blockClientList.append(str);
+        }
         success = true;
     }
     else if(t_qCommandList[0].compare("stop-all",Qt::CaseInsensitive) == 0)
@@ -195,6 +207,12 @@ bool CommandThread::parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand)
         //
         // stop-all
         //
+        emit requestStopMeas(-1);
+        emit requestStopConnector();
+
+        QString str = QString("\tstop all FiffStreamClients and Connectors\r\n\n");
+        t_blockClientList.append(str);
+
         success = true;
     }
     else if(t_qCommandList[0].compare("bufsize",Qt::CaseInsensitive) == 0)

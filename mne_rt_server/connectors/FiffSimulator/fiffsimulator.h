@@ -127,7 +127,9 @@ public:
 
     virtual void requestMeasInfo(qint32 ID);
 
-    virtual void requestRawData();
+    virtual void requestMeas();
+
+    virtual void requestMeasStop();
 
     virtual const char* getName() const;
 

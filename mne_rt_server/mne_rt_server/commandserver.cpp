@@ -90,9 +90,13 @@ void CommandServer::incomingConnection(qintptr socketDescriptor)
 
     //Forwards for thread safety - check if obsolete!?
     connect(t_pCommandThread, &CommandThread::requestMeasInfo,
-            this, &CommandServer::forwardMeasInfoRequest);
-    connect(t_pCommandThread, &CommandThread::requestMeas,
-            this, &CommandServer::forwardMeasRequest);
+            this, &CommandServer::forwardMeasInfo);
+    connect(t_pCommandThread, &CommandThread::requestStartMeas,
+            this, &CommandServer::forwardStartMeas);
+    connect(t_pCommandThread, &CommandThread::requestStopMeas,
+            this, &CommandServer::forwardStopMeas);
+    connect(t_pCommandThread, &CommandThread::requestStopConnector,
+            this, &CommandServer::forwardStopConnector);
 
     t_pCommandThread->start();
 }
@@ -100,25 +104,32 @@ void CommandServer::incomingConnection(qintptr socketDescriptor)
 
 //*************************************************************************************************************
 
-void CommandServer::forwardMeasInfoRequest(qint32 ID)
+void CommandServer::forwardMeasInfo(qint32 ID)
 {
-    emit requestMeasInfo(ID);
+    emit requestMeasInfoConnector(ID);
 }
 
 
 //*************************************************************************************************************
 
-void CommandServer::forwardMeasRequest(qint32 ID)
+void CommandServer::forwardStartMeas(qint32 ID)
 {
-    emit activateRawDataFiffStreamClient(ID);
-    emit requestRawData();
+    emit startMeasFiffStreamClient(ID);
+    emit startMeasConnector();
 }
 
 
-////*************************************************************************************************************
+//*************************************************************************************************************
 
-//void CommandServer::readCommandThreadInstruction()
-//{
-//    qDebug() << "CommandServer::readCommandThreadInstruction()";
-//    emit sendFiffStreamServerInstruction();
-//}
+void CommandServer::forwardStopMeas(qint32 ID)
+{
+    emit stopMeasFiffStreamClient(ID);
+}
+
+
+//*************************************************************************************************************
+
+void CommandServer::forwardStopConnector()
+{
+    emit stopMeasConnector();
+}

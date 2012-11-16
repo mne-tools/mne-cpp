@@ -114,12 +114,14 @@ public:
 
 //public slots: --> in Qt 5 not anymore declared as slot
     void forwardMeasInfo(qint32 ID, FiffInfo* p_pFiffInfo);
-    void forwardActivateRawDataFiffStreamClient(qint32 ID);
+    void forwardStartMeasFiffStreamClient(qint32 ID);
+    void forwardStopMeasFiffStreamClient(qint32 ID);
     void forwardRawBuffer(Eigen::MatrixXf m_matRawData);
 
 
 signals:
-    void activateRawDataFiffStreamClient(qint32 ID);
+    void startMeasFiffStreamClient(qint32 ID);
+    void stopMeasFiffStreamClient(qint32 ID);
     void remitMeasInfo(qint32 ID, FIFFLIB::FiffInfo* p_pFiffInfo);
     void remitRawBuffer(Eigen::MatrixXf);
 

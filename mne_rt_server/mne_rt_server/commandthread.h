@@ -70,8 +70,9 @@ signals:
     void error(QTcpSocket::SocketError socketError);
 
     void requestMeasInfo(qint32 p_iClientId);
-    void requestMeas(qint32 p_iClientId);
-//    void sendCommandServerInstruction();
+    void requestStartMeas(qint32 p_iClientId);
+    void requestStopMeas(qint32 p_iClientId);
+    void requestStopConnector();
 
 private:
     bool parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand);

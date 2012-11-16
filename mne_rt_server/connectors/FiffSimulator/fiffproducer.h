@@ -105,7 +105,7 @@ public:
     /**
     * Stops the DataProducer by stopping the producer's thread.
     */
-    bool stop();
+    virtual bool stop();
 
 protected:
     //=========================================================================================================
