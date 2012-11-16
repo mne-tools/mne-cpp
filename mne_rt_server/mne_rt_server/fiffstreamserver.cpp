@@ -77,22 +77,22 @@ FiffStreamServer::FiffStreamServer(QObject *parent)
 FiffStreamServer::~FiffStreamServer()
 {
     emit closeFiffStreamServer();
-    clearClients();
+//    clearClients();
 }
 
 
 //*************************************************************************************************************
 
-void FiffStreamServer::clearClients()
-{
-    QMap<qint32, FiffStreamThread*>::const_iterator i = m_qClientList.constBegin();
-    while (i != m_qClientList.constEnd()) {
-        if(i.value())
-            delete i.value();
-        ++i;
-    }
-    m_qClientList.clear();
-}
+//void FiffStreamServer::clearClients()
+//{
+//    QMap<qint32, FiffStreamThread*>::const_iterator i = m_qClientList.constBegin();
+//    while (i != m_qClientList.constEnd()) {
+//        if(i.value())
+//            delete i.value();
+//        ++i;
+//    }
+//    m_qClientList.clear();
+//}
 
 
 //*************************************************************************************************************
