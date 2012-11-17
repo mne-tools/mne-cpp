@@ -73,6 +73,7 @@ signals:
     void requestStartMeas(qint32 p_iClientId);
     void requestStopMeas(qint32 p_iClientId);
     void requestStopConnector();
+    void requestSetBufferSize(quint32 p_uiBuffSize);
 
 private:
     bool parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand);

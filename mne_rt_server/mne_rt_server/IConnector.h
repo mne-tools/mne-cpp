@@ -181,6 +181,9 @@ public:
 
     virtual void requestMeasStop() = 0;
 
+    virtual void requestSetBufferSize(quint32 p_uiBuffSize) = 0;
+
+
     //=========================================================================================================
     /**
     * Returns the module name.

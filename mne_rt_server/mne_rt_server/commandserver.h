@@ -87,18 +87,19 @@ signals:
     void stopMeasConnector();
     void startMeasFiffStreamClient(qint32 ID);
     void stopMeasFiffStreamClient(qint32 ID);
+    void setBufferSize(quint32 p_uiBuffSize);
     void closeCommandThreads();
-//    void sendFiffStreamServerInstruction();
 
 protected:
     void incomingConnection(qintptr socketDescriptor);
 
 private:
 //private slots: --> in Qt 5 not anymore declared as slot
-    void forwardMeasInfo(qint32 ID); //Forward
-    void forwardStartMeas(qint32 ID); //Forward
-    void forwardStopMeas(qint32 ID); //Forward
+    void forwardMeasInfo(qint32 ID);        //Forward
+    void forwardStartMeas(qint32 ID);       //Forward
+    void forwardStopMeas(qint32 ID);        //Forward
     void forwardStopConnector();
+    void forwardSetBufferSize(quint32 p_uiBuffSize); //Forward
 
 };
 

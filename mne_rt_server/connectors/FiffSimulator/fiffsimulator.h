@@ -125,13 +125,15 @@ public:
 
     virtual ConnectorID getConnectorID() const;
 
+    virtual const char* getName() const;
+
     virtual void requestMeasInfo(qint32 ID);
 
     virtual void requestMeas();
 
     virtual void requestMeasStop();
 
-    virtual const char* getName() const;
+    virtual void requestSetBufferSize(quint32 p_uiBuffSize);
 
 protected:
     virtual void run();
