@@ -325,6 +325,12 @@ void ConnectorManager::connectActiveConnector()
         // connect command server and connector manager
         QObject::connect(   t_pMNERTServer->m_pCommandServer, &CommandServer::stopMeasConnector,
                             t_activeConnector, &IConnector::requestMeasStop);
+
+        //
+        // Reset Raw Buffer
+        //
+        QObject::connect(   t_pMNERTServer->m_pCommandServer, &CommandServer::setBufferSize,
+                            t_activeConnector, &IConnector::requestSetBufferSize);
     }
     else
     {

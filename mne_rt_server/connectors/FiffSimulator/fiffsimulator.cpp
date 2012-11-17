@@ -202,6 +202,18 @@ ConnectorID FiffSimulator::getConnectorID() const
 
 //*************************************************************************************************************
 
+void FiffSimulator::requestSetBufferSize(quint32 p_uiBuffSize)
+{
+    if(p_uiBuffSize > 0)
+    {
+        qDebug() << "void FiffSimulator::requestSetBufferSize: " << p_uiBuffSize;
+        setBufferSampleSize(p_uiBuffSize);
+    }
+}
+
+
+//*************************************************************************************************************
+
 void FiffSimulator::requestMeasInfo(qint32 ID)
 {
 

@@ -97,6 +97,8 @@ void CommandServer::incomingConnection(qintptr socketDescriptor)
             this, &CommandServer::forwardStopMeas);
     connect(t_pCommandThread, &CommandThread::requestStopConnector,
             this, &CommandServer::forwardStopConnector);
+    connect(t_pCommandThread, &CommandThread::requestSetBufferSize,
+            this, &CommandServer::forwardSetBufferSize);
 
     t_pCommandThread->start();
 }
@@ -133,3 +135,12 @@ void CommandServer::forwardStopConnector()
 {
     emit stopMeasConnector();
 }
+
+
+//*************************************************************************************************************
+
+void CommandServer::forwardSetBufferSize(quint32 p_uiBuffSize)
+{
+    emit setBufferSize(p_uiBuffSize);
+}
+
