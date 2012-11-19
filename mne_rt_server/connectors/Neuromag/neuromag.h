@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiffsimulator.h
+* @file     neuromag.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,19 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the FiffSimulator Class.
+* @brief    Contains the implementation of the Neuromag Class.
 *
 */
 
-#ifndef FIFFSIMULATOR_H
-#define FIFFSIMULATOR_H
+#ifndef NEUROMAG_H
+#define NEUROMAG_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "fiffsimulator_global.h"
+#include "neuromag_global.h"
 #include "../../mne_rt_server/IConnector.h"
 
 #include "../../../MNE/fiff/fiff_raw_data.h"
@@ -60,10 +60,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE FiffConnectorPlugin
+// DEFINE NAMESPACE NeuromagPlugin
 //=============================================================================================================
 
-namespace FiffSimulatorPlugin
+namespace NeuromagPlugin
 {
 
 
@@ -80,39 +80,34 @@ using namespace MSERVER;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class FiffProducer;
-
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FiffSimulator
+* DECLARE CLASS Neuromag
 *
-* @brief The FiffSimulator class provides a Fiff data simulator.
+* @brief The Neuromag class provides a Fiff data simulator.
 */
-class FIFFSIMULATORSHARED_EXPORT FiffSimulator : public IConnector
+class NEUROMAGSHARED_EXPORT Neuromag : public IConnector
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_rt_server/1.0" FILE "fiffsimulator.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "mne_rt_server/1.0" FILE "neuromag.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MSERVER::IConnector)
-
-
-    friend class FiffProducer;
 
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a FiffSimulator.
+    * Constructs a Neuromag Connector.
     */
-    FiffSimulator();
+    Neuromag();
 
 
     //=========================================================================================================
     /**
-    * Destroys the FiffSimulator.
+    * Destroys the Neuromag Connector.
     */
-    virtual ~FiffSimulator();
+    virtual ~Neuromag();
 
     virtual QByteArray availableCommands() const;
 
@@ -153,13 +148,11 @@ private:
 
     QMutex mutex;
 
-    FiffProducer*   m_pFiffProducer;    /**< Holds the DataProducer.*/
     FiffRawData*    m_pRawInfo;         /**< Holds the fiff raw measurement information. */
-    QString         m_sResourceDataPath;  /**< Holds the path to the Fiff resource simulation file directory.*/
 
     bool            m_bIsRunning;
 };
 
 } // NAMESPACE
 
-#endif // FIFFSIMULATOR_H
+#endif // NEUROMAG_H

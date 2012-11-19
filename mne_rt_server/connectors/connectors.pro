@@ -36,6 +36,7 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    FiffSimulator
+    FiffSimulator \
+    Neuromag \
 
 CONFIG += ordered
