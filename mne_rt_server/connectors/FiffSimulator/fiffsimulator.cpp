@@ -94,6 +94,7 @@ FiffSimulator::FiffSimulator()
 {
     this->setBufferSampleSize(1000);
     m_pRawMatrixBuffer = NULL;
+    this->init();
 }
 
 
@@ -121,6 +122,35 @@ QByteArray FiffSimulator::availableCommands() const
     t_blockCmdInfoList.append("\tsimfile  [file]\t\tthe fiff file which should be used as simulation file.\r\n");
 
     return t_blockCmdInfoList;
+}
+
+
+//*************************************************************************************************************
+
+ConnectorID FiffSimulator::getConnectorID() const
+{
+    return _FIFFSIMULATOR;
+}
+
+
+//*************************************************************************************************************
+
+const char* FiffSimulator::getName() const
+{
+    return "Fiff File Simulator";
+}
+
+
+//*************************************************************************************************************
+
+void FiffSimulator::init()
+{
+    if(m_pRawMatrixBuffer)
+        delete m_pRawMatrixBuffer;
+    m_pRawMatrixBuffer = NULL;
+
+    if(m_pRawInfo)
+        m_pRawMatrixBuffer = new RawMatrixBuffer(10, m_pRawInfo->info->nchan, this->getBufferSampleSize());
 }
 
 
@@ -171,7 +201,7 @@ bool FiffSimulator::parseCommand(QStringList& p_sListCommand, QByteArray& p_bloc
 
 bool FiffSimulator::start()
 {
-    init();
+    this->init();
 
     // Start threads
     m_pFiffProducer->start();
@@ -188,27 +218,8 @@ bool FiffSimulator::stop()
 {
     m_bIsRunning = false;
     QThread::wait();
+
     return true;
-}
-
-
-//*************************************************************************************************************
-
-ConnectorID FiffSimulator::getConnectorID() const
-{
-    return _FIFFSIMULATOR;
-}
-
-
-//*************************************************************************************************************
-
-void FiffSimulator::requestSetBufferSize(quint32 p_uiBuffSize)
-{
-    if(p_uiBuffSize > 0)
-    {
-        qDebug() << "void FiffSimulator::requestSetBufferSize: " << p_uiBuffSize;
-        setBufferSampleSize(p_uiBuffSize);
-    }
 }
 
 
@@ -247,17 +258,19 @@ void FiffSimulator::requestMeasStop()
 
 //*************************************************************************************************************
 
-const char* FiffSimulator::getName() const
+void FiffSimulator::requestSetBufferSize(quint32 p_uiBuffSize)
 {
-    return "Fiff File Simulator";
-}
+    if(p_uiBuffSize > 0)
+    {
+        qDebug() << "void FiffSimulator::requestSetBufferSize: " << p_uiBuffSize;
+        this->setBufferSampleSize(p_uiBuffSize);
 
+        m_pFiffProducer->stop();
+        this->stop();
 
-//*************************************************************************************************************
+        this->start();
 
-void FiffSimulator::init()
-{
-
+    }
 }
 
 
@@ -281,14 +294,12 @@ bool FiffSimulator::readRawInfo()
             return false;
         }
 
-        //delete it here and reopen it in an other thread
+        //delete it here and reopen it in the producer thread
         delete m_pRawInfo->file;
         m_pRawInfo->file = NULL;
 
-
         if(m_pRawMatrixBuffer)
             delete m_pRawMatrixBuffer;
-
         m_pRawMatrixBuffer = new RawMatrixBuffer(10, m_pRawInfo->info->nchan, getBufferSampleSize());
 
         mutex.unlock();

@@ -171,7 +171,7 @@ void FiffStreamThread::sendRawBuffer(Eigen::MatrixXf m_matRawData)
 {
     if(m_bIsSendingRawBuffer)
     {
-        qDebug() << "Send RawBuffer to client";
+//        qDebug() << "Send RawBuffer to client";
 
         m_qMutex.lock();
 

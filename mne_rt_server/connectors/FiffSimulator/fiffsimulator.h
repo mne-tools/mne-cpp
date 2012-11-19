@@ -116,16 +116,20 @@ public:
 
     virtual QByteArray availableCommands() const;
 
-    virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
-
-
-
-    virtual bool start();
-    virtual bool stop();
-
     virtual ConnectorID getConnectorID() const;
 
     virtual const char* getName() const;
+
+
+    virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
+
+
+    virtual bool start();
+
+    virtual bool stop();
+
+
+//public slots: --> in Qt 5 not anymore declared as slot
 
     virtual void requestMeasInfo(qint32 ID);
 

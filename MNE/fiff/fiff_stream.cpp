@@ -92,7 +92,7 @@ FiffStream::~FiffStream()
 {
     if(this->device()->isOpen())
     {
-        printf("DEBUG: Closing FiffStream %s.\n\n", this->streamName().toUtf8().constData());
+//        printf("DEBUG: Closing FiffStream %s.\n\n", this->streamName().toUtf8().constData());
         this->device()->close();
     }
 }
