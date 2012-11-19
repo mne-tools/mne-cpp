@@ -312,7 +312,7 @@ bool FiffRawData::read_raw_segment(MatrixXd*& data, MatrixXd*& times, fiff_int_t
                 //  We need the whole buffer
                 //
                 first_pick = 0;//1;
-                last_pick  = thisRawDir.nsamp;
+                last_pick  = thisRawDir.nsamp - 1;
                 if (do_debug)
                     printf("W");
             }
@@ -324,8 +324,8 @@ bool FiffRawData::read_raw_segment(MatrixXd*& data, MatrixXd*& times, fiff_int_t
                     //
                     //  Something from the middle
                     //
-                    qDebug() << "This needs to be debugged!";
-                    last_pick = thisRawDir.nsamp + to - thisRawDir.last;//is this alright?
+//                    qDebug() << "This needs to be debugged!";
+                    last_pick = thisRawDir.nsamp + to - thisRawDir.last - 1;//is this alright?
                     if (do_debug)
                         printf("M");
                 }
@@ -334,7 +334,7 @@ bool FiffRawData::read_raw_segment(MatrixXd*& data, MatrixXd*& times, fiff_int_t
                     //
                     //  From the middle to the end
                     //
-                    last_pick = thisRawDir.nsamp;
+                    last_pick = thisRawDir.nsamp - 1;
                     if (do_debug)
                         printf("E");
                 }
@@ -345,14 +345,22 @@ bool FiffRawData::read_raw_segment(MatrixXd*& data, MatrixXd*& times, fiff_int_t
                 //  From the beginning to the middle
                 //
                 first_pick = 0;//1;
-                last_pick  = to - thisRawDir.first + 1;
+                last_pick  = to - thisRawDir.first;// + 1;
                 if (do_debug)
                     printf("B");
             }
             //
             //  Now we are ready to pick
             //
-            picksamp = last_pick - first_pick;// + 1;
+            picksamp = last_pick - first_pick + 1;
+
+            if(do_debug)
+            {
+                qDebug() << "first_pick: " << first_pick;
+                qDebug() << "last_pick: " << last_pick;
+                qDebug() << "picksamp: " << picksamp;
+            }
+
             if (picksamp > 0)
             {
 //                    for(r = 0; r < data->rows(); ++r)

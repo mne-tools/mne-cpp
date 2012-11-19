@@ -134,6 +134,39 @@ public:
     */
     virtual QByteArray availableCommands() const = 0;
 
+
+    //=========================================================================================================
+    /**
+    * Returns the unique connector id
+    * Pure virtual method.
+    *
+    * @return the connector ID.
+    */
+    virtual ConnectorID getConnectorID() const = 0;
+
+    //=========================================================================================================
+    /**
+    * Returns the module name.
+    * Pure virtual method.
+    *
+    * @return the name of module.
+    */
+    virtual const char* getName() const = 0;
+
+    inline quint32 getBufferSampleSize();
+
+
+
+    //=========================================================================================================
+    /**
+    * Returns the activation status of the module.
+    *
+    * @return true if module is activated.
+    */
+    inline bool isActive() const;
+
+
+
     //=========================================================================================================
     /**
     * Parses the incomming command.
@@ -160,15 +193,24 @@ public:
     */
     virtual bool stop() = 0;
 
+
+
+    inline void setBufferSampleSize(quint32 p_uiBuffSize);
+
     //=========================================================================================================
     /**
-    * Returns the unique connector id
-    * Pure virtual method.
+    * Sets the activation status of the module.
     *
-    * @return the connector ID.
+    * @param [in] status the new activation status of the module.
     */
-    virtual ConnectorID getConnectorID() const = 0;
+    inline void setStatus(bool status);
 
+signals:
+    void remitMeasInfo(qint32, FIFFLIB::FiffInfo*);
+
+    void remitRawBuffer(Eigen::MatrixXf);
+
+//public slots: --> in Qt 5 not anymore declared as slot
     //=========================================================================================================
     /**
     * Returns the FiffInfo.
@@ -182,40 +224,6 @@ public:
     virtual void requestMeasStop() = 0;
 
     virtual void requestSetBufferSize(quint32 p_uiBuffSize) = 0;
-
-
-    //=========================================================================================================
-    /**
-    * Returns the module name.
-    * Pure virtual method.
-    *
-    * @return the name of module.
-    */
-    virtual const char* getName() const = 0;
-
-    inline quint32 getBufferSampleSize();
-
-    inline void setBufferSampleSize(quint32 p_uiBuffSize);
-
-    //=========================================================================================================
-    /**
-    * Sets the activation status of the module.
-    *
-    * @param [in] status the new activation status of the module.
-    */
-    inline void setStatus(bool status);
-
-    //=========================================================================================================
-    /**
-    * Returns the activation status of the module.
-    *
-    * @return true if module is activated.
-    */
-    inline bool isActive() const;
-
-signals:
-    void remitMeasInfo(qint32, FIFFLIB::FiffInfo*);
-    void remitRawBuffer(Eigen::MatrixXf);
 
 protected:
 
@@ -247,6 +255,14 @@ inline quint32 IConnector::getBufferSampleSize()
 
 //*************************************************************************************************************
 
+inline bool IConnector::isActive() const
+{
+    return m_bStatus;
+}
+
+
+//*************************************************************************************************************
+
 inline void IConnector::setBufferSampleSize(quint32 p_uiBuffSize)
 {
     if(p_uiBuffSize > 0)
@@ -259,14 +275,6 @@ inline void IConnector::setBufferSampleSize(quint32 p_uiBuffSize)
 inline void IConnector::setStatus(bool status)
 {
     m_bStatus = status;
-}
-
-
-//*************************************************************************************************************
-
-inline bool IConnector::isActive() const
-{
-    return m_bStatus;
 }
 
 } //Namespace
