@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 #include "neuromag.h"
+#include "dacqserver.h"
 
 
 //*************************************************************************************************************
@@ -86,9 +87,18 @@ using namespace MNELIB;
 //=============================================================================================================
 
 Neuromag::Neuromag()
-: m_pRawInfo(NULL)
+: m_pDacqServer(NULL)
+, m_pInfo(NULL)
 , m_bIsRunning(false)
 {
+    //DEBUG
+    m_pDacqServer = new DacqServer();
+
+
+    m_pDacqServer->start();
+    //DEBUG
+
+
     this->setBufferSampleSize(1000);
     m_pRawMatrixBuffer = NULL;
     this->init();
@@ -99,7 +109,9 @@ Neuromag::Neuromag()
 
 Neuromag::~Neuromag()
 {
-    qDebug() << "Destroy FiffSimulator::~FiffSimulator()";
+    qDebug() << "Destroy Neuromag::~Neuromag()";
+
+    delete m_pDacqServer;
 
     m_bIsRunning = false;
     QThread::wait();
@@ -142,8 +154,8 @@ void Neuromag::init()
         delete m_pRawMatrixBuffer;
     m_pRawMatrixBuffer = NULL;
 
-    if(m_pRawInfo)
-        m_pRawMatrixBuffer = new RawMatrixBuffer(10, m_pRawInfo->info->nchan, this->getBufferSampleSize());
+    if(m_pInfo)
+        m_pRawMatrixBuffer = new RawMatrixBuffer(10, m_pInfo->nchan, this->getBufferSampleSize());
 }
 
 
@@ -220,11 +232,11 @@ bool Neuromag::stop()
 void Neuromag::requestMeasInfo(qint32 ID)
 {
 
-    if(!m_pRawInfo)
-        readRawInfo();
+//    if(!m_pRawInfo)
+//        readRawInfo();
 
-    if(m_pRawInfo)
-        emit remitMeasInfo(ID, m_pRawInfo->info);
+    if(m_pInfo)
+        emit remitMeasInfo(ID, m_pInfo);
 //    else
 //        return NULL;
 }
