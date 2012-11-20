@@ -193,8 +193,8 @@ inline void CircularMatrixBuffer<_Tp>::push(const Matrix<_Tp, Dynamic, Dynamic>*
             m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = pMatrix->data()[i];
         m_pUsedElements->release(t_size);
     }
-    else
-        printf("Error: Matrix not appended to CircularMatrixBuffer - wrong dimensions\n");
+//    else
+//        printf("Error: Matrix not appended to CircularMatrixBuffer - wrong dimensions\n");
 }
 
 

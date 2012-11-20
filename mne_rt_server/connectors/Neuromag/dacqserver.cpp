@@ -2,13 +2,15 @@
 /**
 * @file     dacqserver.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Gustavo Sudre;
+*           Lauri Parkkonen
 * @version  1.0
 * @date     July, 2012
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh, Matti Hamalainen, Gustavo Sudre and Lauri Parkkonen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -39,6 +41,15 @@
 //=============================================================================================================
 
 #include "dacqserver.h"
+#include "neuromag.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// UNIX INCLUDES
+//=============================================================================================================
+
+#include <sys/stat.h> //umask
 
 
 //*************************************************************************************************************
@@ -62,10 +73,11 @@ using namespace NeuromagPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DacqServer::DacqServer()
-: m_pCollectorHost("localhost")
-, m_iCollectorSock(-1)
-, m_iShmemSock(-1)
+DacqServer::DacqServer(Neuromag* p_pNeuromag)
+: m_pNeuromag(p_pNeuromag)
+, m_pCollectorHost("localhost")
+, m_fdCollectorSock(-1)
+, m_fdShmemSock(-1)
 , m_iShmemId(CLIENT_ID)
 , m_bIsRunning(false)
 {
@@ -104,7 +116,7 @@ bool DacqServer::collector_close()
 //        dacq_log("Neuromag collector connection: %s\n", err_get_error());
 //        return false;
 //    }
-    m_iCollectorSock = -1;
+    m_fdCollectorSock = -1;
     return true;
 }
 
@@ -430,42 +442,89 @@ void DacqServer::run()
     m_bIsRunning = true;
 
 
+    if(m_pNeuromag->getBufferSampleSize() < MIN_BUFLEN)
+        m_pNeuromag->setBufferSampleSize(MIN_BUFLEN);
+
 
 
     /* Connect to the Elekta Neuromag shared memory system */
-    printf("About to connect to the Neuromag DACQ shared memory on this workstation (client ID %d)...\n", m_iShmemId);
+    printf("About to connect to the Neuromag DACQ shared memory on this workstation (client ID %d)...\r\n", m_iShmemId);
 
     int old_umask;
     old_umask = umask(SOCKET_UMASK);
-    if ((shmem_sock = dacq_connect_client(shmem_id)) == -1) {
+    if ((m_fdShmemSock = dacq_connect_client(m_iShmemId)) == -1) {
         umask(old_umask);
-        dacq_log("Could not connect!\n");
-        return(2);
+        printf("Could not connect!\r\n");
+        return;
     }
-    dacq_log("Connection ok\n");
+    printf("Connection ok\r\n");
+
+    int t_iOriginalMaxBuflen = -1;
+    /* Connect to the Elekta Neuromag acquisition control server and
+     * fiddle with the buffer length parameter */
+    if (m_pNeuromag->getBufferSampleSize() > 0) {
+        if (collector_open()) {
+            printf("Cannot change the Neuromag buffer length: Could not open collector connection\r\n");
+            return;
+        }
+        if ((t_iOriginalMaxBuflen = collector_getMaxBuflen()) < 1) {
+            printf("Cannot change the Neuromag buffer length: Could not query the current value\r\n");
+            collector_close();
+            return;
+        }
+        printf("Changing the Neuromag buffer length %d -> %d\r\n", t_iOriginalMaxBuflen, m_pNeuromag->getBufferSampleSize());
+        if (collector_setMaxBuflen(m_pNeuromag->getBufferSampleSize())) {
+            printf("Setting a new Neuromag buffer length failed\r\n");
+            collector_close();
+            return;
+        }
+    }
+    /* Even if we're not supposed to change the buffer length, let's show it to the user */
+    else {
+        if (collector_open()) {
+            printf("Cannot find Neuromag buffer length: Could not open collector connection\r\n");
+            return;
+        }
+        t_iOriginalMaxBuflen = collector_getMaxBuflen();
+        if (t_iOriginalMaxBuflen < 1) {
+            printf("Could not query the current Neuromag buffer length\r\n");
+            collector_close();
+            return;
+        }
+        else
+            printf("Current buffer length value = %d\r\n", t_iOriginalMaxBuflen);
+
+        collector_close();
+        // just so we know no clean up is necessary
+        t_iOriginalMaxBuflen = -1;
+    }
 
 
 
 
-
-
-
-
-
-
-
-
-
-
+    /* Mainloop */
+//    printf("Will scale up MEG mags by %g, grads by %g and EEG data by %g\n",
+//         meg_mag_multiplier, meg_grad_multiplier, eeg_multiplier);
+    printf("Waiting for the measurement to start... Press Ctrl-C to terminate this program\n");
 
     qint32 count = 0;
     while(m_bIsRunning)
     {
-        ++count;
+#if defined(DACQ_OLD_CONNECTION_SCHEME)
+        if (dacq_client_receive_tag(m_fdShmemSock, m_iShmemId) == -1)
+#else
+        if (dacq_client_receive_tag(&m_fdShmemSock, m_iShmemId) == -1)
+#endif
+            break;
 
+        ++count;
 
         qDebug() << count;
 
         usleep(1000000);
     }
+
+     printf("\n");
+
+
 }

@@ -61,6 +61,9 @@ namespace NeuromagPlugin
 #define SOCKET_UMASK    0x000   /**< Acquisition system UNIX domain socket file must be world-writable */
 
 #define sockfd  int             /**< Defines a primitive data type for socket descriptor. */
+
+#define DACQ_OLD_CONNECTION_SCHEME  0 /**< If HP-UX */
+
 }
 
 #endif // TYPESDEFINITIONS_H
