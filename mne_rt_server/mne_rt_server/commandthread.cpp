@@ -91,7 +91,7 @@ QByteArray CommandThread::availableCommands() const
     t_blockCmdInfoList.append("\tmeas     [ID/Alias]\tadds specified FiffStreamClient to raw data\r\n\t\t\t\tbuffer receivers. If acquisition is not already strated, it is triggered.\r\n");
     t_blockCmdInfoList.append("\tstop     [ID/Alias]\tremoves specified FiffStreamClient from raw\r\n\t\t\t\tdata buffer receivers.\r\n");
     t_blockCmdInfoList.append("\tstop-all\t\t\tstops the whole acquisition process.\r\n");
-    t_blockCmdInfoList.append("\tbuffer   [samples]\tsets the buffer size of the FiffStreamClient\r\n\t\t\t\traw data buffers\r\n");
+    t_blockCmdInfoList.append("\tbufsize  [samples]\tsets the buffer size of the FiffStreamClient\r\n\t\t\t\traw data buffers\r\n");
 
     t_blockCmdInfoList.append("\n\tconlist\t\t\tprints and sends all available connectors\r\n");
     t_blockCmdInfoList.append("\tselcon   [ConID]\tselects a new connector, if a measurement is running it will be stopped.\r\n");
@@ -226,7 +226,7 @@ bool CommandThread::parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand)
 
         success = true;
     }
-    else if(t_qCommandList[0].compare("buffer",Qt::CaseInsensitive) == 0)
+    else if(t_qCommandList[0].compare("bufsize",Qt::CaseInsensitive) == 0)
     {
         //
         // bufsize
@@ -238,7 +238,7 @@ bool CommandThread::parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand)
 
             if(ok && t_uiBuffSize > 0)
             {
-                printf("buffer %d\n", t_uiBuffSize);
+                printf("bufsize %d\n", t_uiBuffSize);
 
                 emit requestSetBufferSize(t_uiBuffSize);
 

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     neuromag.h
+* @file     dacqserver.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,24 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the Neuromag Class.
+* @brief    Contains the implementation of the DacqServer Class.
 *
 */
 
-#ifndef NEUROMAG_H
-#define NEUROMAG_H
+
+#ifndef DACQSERVER_H
+#define DACQSERVER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "neuromag_global.h"
-#include "../../mne_rt_server/IConnector.h"
-
-#include "../../../MNE/fiff/fiff_info.h"
-
-//#include "circularbuffer.h"
+#include "types_definitions.h"
 
 
 //*************************************************************************************************************
@@ -54,8 +50,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QString>
-#include <QMutex>
+#include <QThread>
 
 
 //*************************************************************************************************************
@@ -67,12 +62,11 @@ namespace NeuromagPlugin
 {
 
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
-
-using namespace MSERVER;
 
 
 //*************************************************************************************************************
@@ -80,101 +74,142 @@ using namespace MSERVER;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class DacqServer;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS Neuromag
+* DECLARE CLASS DacqServer
 *
-* @brief The Neuromag class provides a Fiff data simulator.
+* @brief The DacqServer class provides a Neuromag MEG connector.
 */
-class NEUROMAGSHARED_EXPORT Neuromag : public IConnector
+class DacqServer : public QThread
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_rt_server/1.0" FILE "neuromag.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MSERVER::IConnector)
-
-
-    friend class DacqServer;
-
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a Neuromag Connector.
+    * Constructs a acquisition Server.
     */
-    Neuromag();
-
+    DacqServer();
+    
+    //=========================================================================================================
+    /**
+     * Open the collector control connection
+     *
+     * @return
+     */
+    bool collector_open();
 
     //=========================================================================================================
     /**
-    * Destroys the Neuromag Connector.
-    *
-    */
-    virtual ~Neuromag();
+     * Close the collector connection
+     *
+     * @return
+     */
+    bool collector_close();
 
-    virtual QByteArray availableCommands() const;
+    //=========================================================================================================
+    /**
+     * Query the current buffer length of the Elekta acquisition system
+     *
+     * @return
+     */
+    bool collector_getMaxBuflen();
 
-    virtual ConnectorID getConnectorID() const;
+    //=========================================================================================================
+    /**
+     * Set the desired maximum buffer length
+     *
+     * @return
+     */
+    bool collector_setMaxBuflen(int maxbuflen);
 
-    virtual const char* getName() const;
+    //=========================================================================================================
+    /**
+     * Quit function
+     *
+     * @return
+     */
+    void clean_up();
 
 
-    virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
-
-
-    virtual bool start();
-
-    virtual bool stop();
+signals:
 
 
 //public slots: --> in Qt 5 not anymore declared as slot
 
-    virtual void requestMeasInfo(qint32 ID);
-
-    virtual void requestMeas();
-
-    virtual void requestMeasStop();
-
-    virtual void requestSetBufferSize(quint32 p_uiBuffSize);
 
 protected:
-    virtual void run();
-
-private:
     //=========================================================================================================
     /**
-    * Initialise the FiffSimulator.
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread.
     */
-    void init();
-
-    bool readRawInfo();
+    virtual void run();
 
 
 
 
+private:
+
+    //ToDo Connect is different? to: telnet localhost collector ???
+    //=========================================================================================================
+    /**
+     * Connect to the data server process
+     *
+     * @return
+     */
+    int dacq_connect_client (int id);
+
+
+    //=========================================================================================================
+    /**
+     * Disconnect from the data server process
+     *
+     * @return
+     */
+    int dacq_disconnect_client (sockfd sock,int id);
+
+
+    void close_socket (sockfd sock, int id);
+
+    int connect_disconnect (sockfd sock,int id);
 
 
 
-    QMutex mutex;
+    /**
+     * Receive one tag from the data server.
+     *
+     * This routine reads a message from the data server
+     * socket and grabs the data. The data may actually
+     * be in a shared memory segment noted in the message.
+     *
+     * The id parameter is needed for two purposes. The
+     * data transfer mechanism varies depending on the client
+     * number. Clients with id above 10000 use shared memory
+     * transfer while other used a regular file to transfer the
+     * data.It is needed also if the conndedtion needs to be
+     * closed after an error.
+     *
+     * \return Status OK or FAIL.
+     */
+
+    int dacq_client_receive_tag (int sock, /**< Socket to read */ int id );  /**< My id number */
 
 
-    DacqServer*     m_pDacqServer;
-
-
-    FiffInfo*       m_pInfo;
-
-    bool            m_bIsRunning;
 
 
 
+    bool m_bIsRunning;
 
 
+    char*   m_pCollectorHost;
+    sockfd  m_iCollectorSock;
 
-
-
+    sockfd  m_iShmemSock;
+    int     m_iShmemId;
 
 
 
@@ -182,4 +217,4 @@ private:
 
 } // NAMESPACE
 
-#endif // NEUROMAG_H
+#endif // DACQSERVER_H
