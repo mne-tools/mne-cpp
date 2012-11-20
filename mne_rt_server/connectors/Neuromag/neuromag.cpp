@@ -87,14 +87,11 @@ using namespace MNELIB;
 //=============================================================================================================
 
 Neuromag::Neuromag()
-: m_pDacqServer(NULL)
+: m_pDacqServer(new DacqServer(this))
 , m_pInfo(NULL)
 , m_bIsRunning(false)
 {
     //DEBUG
-    m_pDacqServer = new DacqServer();
-
-
     m_pDacqServer->start();
     //DEBUG
 

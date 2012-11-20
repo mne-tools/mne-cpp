@@ -2,13 +2,15 @@
 /**
 * @file     dacqserver.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Gustavo Sudre;
+*           Lauri Parkkonen
 * @version  1.0
 * @date     July, 2012
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh, Matti Hamalainen, Gustavo Sudre and Lauri Parkkonen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -74,6 +76,7 @@ namespace NeuromagPlugin
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class Neuromag;
 
 
 //=============================================================================================================
@@ -91,7 +94,7 @@ public:
     /**
     * Constructs a acquisition Server.
     */
-    DacqServer();
+    DacqServer(Neuromag* p_pNeuromag);
     
     //=========================================================================================================
     /**
@@ -205,10 +208,13 @@ private:
     bool m_bIsRunning;
 
 
-    char*   m_pCollectorHost;
-    sockfd  m_iCollectorSock;
 
-    sockfd  m_iShmemSock;
+    Neuromag* m_pNeuromag;
+
+    char*   m_pCollectorHost;
+    sockfd  m_fdCollectorSock;
+
+    sockfd  m_fdShmemSock;
     int     m_iShmemId;
 
 
