@@ -61,6 +61,7 @@
 #include <sys/stat.h>   //umask
 #include <sys/un.h>     //sockaddr_un
 #include <sys/socket.h> //AF_UNIX
+#include <sys/shm.h>    //shmdt
 
 
 //#include <sys/types.h>
@@ -92,10 +93,12 @@ using namespace NeuromagPlugin;
 DacqServer::DacqServer(Neuromag* p_pNeuromag)
 : m_pNeuromag(p_pNeuromag)
 , m_pCollectorHost("localhost")
-, m_fdCollectorSock(-1)
-, m_fdShmemSock(-1)
+, m_iCollectorSock(-1)
+, m_iShmemSock(-1)
 , m_iShmemId(CLIENT_ID)
 , m_bIsRunning(false)
+, shmid(-1)
+, shmptr(NULL)
 {
 
 }
@@ -103,144 +106,37 @@ DacqServer::DacqServer(Neuromag* p_pNeuromag)
 
 //*************************************************************************************************************
 
-bool DacqServer::collector_open()
+int DacqServer::collector_open()
 {
-//    if (m_fdCollectorSock >= 0) {
-//        printf("Note: Tried to re-open an open connection\r\n");
-//        return true;
-//    }
-//    if ((m_fdCollectorSock = dacq_server_connect_by_name(m_pCollectorHost, COLLECTOR_PORT)) == false) {
-//        printf("Neuromag collector connection: %s\n", "Error");//, err_get_error());
-//        return false;
-//    }
-//    if (dacq_server_login(&m_fdCollectorSock, COLLECTOR_PASS, "mne_rt_server") == false) {
-//        printf("Neuromag collector connection: %s\n", "Error");//, err_get_error());
-//        return false;
-//    }
+    if (m_iCollectorSock >= 0) {
+        printf("Note: Tried to re-open an open connection\r\n");//dacq_log("Note: Tried to re-open an open connection\n");
+        return(0);
+    }
+    if ((m_iCollectorSock = dacq_server_connect_by_name(m_pCollectorHost, COLLECTOR_PORT)) == -1) {
+        printf("Neuromag collector connection: Error\n");//dacq_log("Neuromag collector connection: %s\n", err_get_error());
+        return(-1);
+    }
+    if (dacq_server_login(&m_iCollectorSock, COLLECTOR_PASS, "mne_rt_server") == -1) {
+        printf("Neuromag collector connection: Error\n");//dacq_log("Neuromag collector connection: %s\n", err_get_error());
+        return(-1);
+    }
 
-  return true;
+    return(0);
 }
-
 
 
 //*************************************************************************************************************
 
-bool DacqServer::collector_close()
+int DacqServer::collector_close()
 {
-//    if (m_fdCollectorSock < 0)
-//        return true;
-//    if (!dacq_server_close(&m_fdCollectorSock, NULL)) {
-//        printf("Neuromag collector connection: %s\n", "Error");//err_get_error());
-//        return false;
-//    }
-//    m_fdCollectorSock = -1;
-    return true;
-}
-
-
-////*************************************************************************************************************
-
-//void DacqServer::close_socket (sockfd sock, int id)
-//{
-//    char    client_path[200];	/* This our path */
-
-//    if (sock != -1) {
-//        /*
-//        * Use unlink to remove the file (inode) so that the name
-//        * will be available for the next run.
-//        */
-//        sprintf (client_path,"%s%d",SOCKET_PATHCLNT,id);
-//        unlink(client_path);
-//        close(sock);
-//    }
-//    (void) dacq_release_shmem();
-//    dacq_log ("Connection closed.\n");
-//}
-
-
-////*************************************************************************************************************
-
-//int DacqServer::connect_disconnect (sockfd sock,int id)
-//{
-//    struct  sockaddr_un servaddr;     /* address of server */
-//    struct  sockaddr_un from;
-
-//    socklen_t fromlen;
-//    int     result;
-//    int     slen, rlen;
-
-//    if (sock < 0)
-//        return 0;
-//    /*
-//    * Set up address structure for server socket
-//    */
-//    bzero(&servaddr, sizeof(servaddr));
-//    servaddr.sun_family = AF_UNIX;
-//    strcpy(servaddr.sun_path, SOCKET_PATH);
-
-//    slen = sendto(sock, (void *)(&id), sizeof(int), 0,
-//        (sockaddr *)(&servaddr), sizeof(servaddr));
-//    if (slen < 0) {
-//        printf("sendto error");
-//        close_socket (sock,abs(id));
-//        return -1;
-//    }
-//    else {
-//        fromlen = sizeof(from);
-//        rlen = recvfrom(sock, (void *)(&result), sizeof(int), 0,
-//            (sockaddr *)(&from), &fromlen);
-//    if (rlen == -1) {
-//        printf("recvfrom error");
-//        close_socket (sock,abs(id));
-//        return -1;
-//    } else
-//        return result;
-//    }
-//}
-
-
-////*************************************************************************************************************
-
-int DacqServer::dacq_connect_client (int id)
-     /*
-      * Connect to the data server process
-      */
-{
-    struct  sockaddr_un clntaddr;   /* address of client */
-    char    client_path[200];       /* This our path */
-    int     sock = -1;              /* This is the UNIX domain socket */
-
-    sprintf (client_path,"%s%d",SOCKET_PATHCLNT,id);
-    /*
-     * Is this safe?
-     */
-    (void)unlink(client_path);
-
-    /*	Create a UNIX datagram socket for client	*/
-
-    if ((sock = socket(AF_UNIX, SOCK_DGRAM, 0)) < 0) {
-        //dacq_perror("socket");
-        printf("socket error");
-        return (FAIL);
+    if (m_iCollectorSock < 0)
+        return(0);
+    if (dacq_server_close(&m_iCollectorSock, NULL)) {
+        printf("Neuromag collector connection: Eror\n");//dacq_log("Neuromag collector connection: %s\n", err_get_error());
+        return(-1);
     }
-    /*	Client will bind to an address so server will get
-     * 	an address in its recvfrom call and can use it to
-     *	send data back to the client.
-     */
-    bzero(&clntaddr, sizeof(clntaddr));
-    clntaddr.sun_family = AF_UNIX;
-    strcpy(clntaddr.sun_path, client_path);
-
-    if (bind(sock, (void *)(&clntaddr), sizeof(clntaddr)) < 0) {
-        close(sock);
-        //dacq_perror("bind");
-        printf("bind error");
-        return (FAIL);
-    }
-    if (connect_disconnect(sock,id) == FAIL)
-        return (FAIL);
-    else
-        return (sock);
+    m_iCollectorSock = -1;
+    return(0);
 }
 
 
@@ -460,34 +356,71 @@ void DacqServer::run()
 
 
 
-    /* Connect to the Elekta Neuromag shared memory system */
-    printf("About to connect to the Neuromag DACQ shared memory on this workstation (client ID %d)...\r\n", m_iShmemId);
 
-    int old_umask;
-    old_umask = umask(SOCKET_UMASK);
-    if ((m_fdShmemSock = dacq_connect_client(m_iShmemId)) == -1) {
-        umask(old_umask);
-        printf("Could not connect!\r\n");
+
+
+
+//necessary?
+    if (m_pNeuromag->getBufferSampleSize() < MIN_BUFLEN) {
+        fprintf(stderr, "%s: Too small Neuromag buffer length requested, should be at least %d\n", m_pNeuromag->getBufferSampleSize(), MIN_BUFLEN);
         return;
     }
-    printf("Connection ok\r\n");
+    else {
+        /* Connect to the Elekta Neuromag acquisition control server, change the buffer length and exit*/
+        if (collector_open()) {
+            printf("Cannot change the Neuromag buffer length: Could not open collector connection\n");//dacq_log("Cannot change the Neuromag buffer length: Could not open collector connection\n");
+            return;
+        }
+        printf("Changing the Neuromag buffer length to %d\r\n", m_pNeuromag->getBufferSampleSize());//dacq_log("Changing the Neuromag buffer length to %d\n", newMaxBuflen);
+        if (collector_setMaxBuflen(m_pNeuromag->getBufferSampleSize())) {
+            printf("Setting a new Neuromag buffer length failed\r\n");//dacq_log("Setting a new Neuromag buffer length failed\n");
+            collector_close();
+            return;
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /* Connect to the Elekta Neuromag shared memory system */
+    printf("About to connect to the Neuromag DACQ shared memory on this workstation (client ID %d)...\r\n", m_iShmemId);//dacq_log("About to connect to the Neuromag DACQ shared memory on this workstation (client ID %d)...\n", shmem_id);
+    int old_umask = umask(SOCKET_UMASK);
+    if ((m_iShmemSock = dacq_connect_client(m_iShmemId)) == -1) {
+        umask(old_umask);
+        printf("Could not connect!\r\n");//dacq_log("Could not connect!\n");
+        return;//(2);
+    }
+    printf("Connection ok\r\n");//dacq_log("Connection ok\n");
+
 
     int t_iOriginalMaxBuflen = -1;
     /* Connect to the Elekta Neuromag acquisition control server and
      * fiddle with the buffer length parameter */
     if (m_pNeuromag->getBufferSampleSize() > 0) {
         if (collector_open()) {
-            printf("Cannot change the Neuromag buffer length: Could not open collector connection\r\n");
+            printf("Cannot change the Neuromag buffer length: Could not open collector connection\r\n");//dacq_log("Cannot change the Neuromag buffer length: Could not open collector connection\n");
             return;
         }
         if ((t_iOriginalMaxBuflen = collector_getMaxBuflen()) < 1) {
-            printf("Cannot change the Neuromag buffer length: Could not query the current value\r\n");
+            printf("Cannot change the Neuromag buffer length: Could not query the current value\r\n");//dacq_log("Cannot change the Neuromag buffer length: Could not query the current value\n");
             collector_close();
             return;
         }
         printf("Changing the Neuromag buffer length %d -> %d\r\n", t_iOriginalMaxBuflen, m_pNeuromag->getBufferSampleSize());
         if (collector_setMaxBuflen(m_pNeuromag->getBufferSampleSize())) {
-            printf("Setting a new Neuromag buffer length failed\r\n");
+            printf("Setting a new Neuromag buffer length failed\r\n");//dacq_log("Setting a new Neuromag buffer length failed\n");
             collector_close();
             return;
         }
@@ -495,22 +428,27 @@ void DacqServer::run()
     /* Even if we're not supposed to change the buffer length, let's show it to the user */
     else {
         if (collector_open()) {
-            printf("Cannot find Neuromag buffer length: Could not open collector connection\r\n");
+            printf("Cannot find Neuromag buffer length: Could not open collector connection\r\n");//dacq_log("Cannot find Neuromag buffer length: Could not open collector connection\n");
             return;
         }
         t_iOriginalMaxBuflen = collector_getMaxBuflen();
         if (t_iOriginalMaxBuflen < 1) {
-            printf("Could not query the current Neuromag buffer length\r\n");
+            printf("Could not query the current Neuromag buffer length\r\n");//dacq_log("Could not query the current Neuromag buffer length\n");
             collector_close();
             return;
         }
         else
-            printf("Current buffer length value = %d\r\n", t_iOriginalMaxBuflen);
+            printf("Current buffer length value = %d\r\n",t_iOriginalMaxBuflen);//dacq_log("Current buffer length value = %d\n",originalMaxBuflen);
 
         collector_close();
         // just so we know no clean up is necessary
         t_iOriginalMaxBuflen = -1;
     }
+
+
+
+
+
 
 
 
@@ -541,3 +479,153 @@ void DacqServer::run()
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// client_socket.c
+//*************************************************************************************************************
+
+
+int DacqServer::dacq_connect_client (int id)
+     /*
+      * Connect to the data server process
+      */
+{
+    struct  sockaddr_un clntaddr;   /* address of client */
+    char    client_path[200];       /* This our path */
+    int     sock = -1;              /* This is the UNIX domain socket */
+
+    sprintf (client_path,"%s%d",SOCKET_PATHCLNT,id);
+    /*
+     * Is this safe?
+     */
+    (void)unlink(client_path);
+
+    /*	Create a UNIX datagram socket for client	*/
+
+    if ((sock = socket(AF_UNIX, SOCK_DGRAM, 0)) < 0) {
+        //dacq_perror("socket");
+        printf("socket error");
+        return (FAIL);
+    }
+    /*	Client will bind to an address so server will get
+     * 	an address in its recvfrom call and can use it to
+     *	send data back to the client.
+     */
+    bzero(&clntaddr, sizeof(clntaddr));
+    clntaddr.sun_family = AF_UNIX;
+    strcpy(clntaddr.sun_path, client_path);
+
+    if (bind(sock, (sockaddr *)(&clntaddr), sizeof(clntaddr)) < 0) {
+        close(sock);
+        //dacq_perror("bind");
+        printf("bind error");
+        return (FAIL);
+    }
+    if (connect_disconnect(sock,id) == FAIL)
+        return (FAIL);
+    else
+        return (sock);
+}
+
+
+//*************************************************************************************************************
+
+void DacqServer::close_socket (int sock, int id)
+{
+    char    client_path[200];   /* This our path */
+
+    if (sock != -1) {
+    /*
+     * Use unlink to remove the file (inode) so that the name
+     * will be available for the next run.
+     */
+        sprintf (client_path,"%s%d",SOCKET_PATHCLNT,id);
+        unlink(client_path);
+        close(sock);
+    }
+    (void) dacq_release_shmem();
+    //dacq_log ("Connection closed.\n");
+    printf ("Connection closed.\r\n");
+}
+
+
+//*************************************************************************************************************
+
+int DacqServer::connect_disconnect (int sock,int id)
+{
+    struct  sockaddr_un servaddr;       /* address of server */
+    struct  sockaddr_un from;
+
+    socklen_t fromlen;
+    int     result;
+    int     slen, rlen;
+
+    if (sock < 0)
+        return (OK);
+    /*
+     * Set up address structure for server socket
+     */
+    bzero(&servaddr, sizeof(servaddr));
+    servaddr.sun_family = AF_UNIX;
+    strcpy(servaddr.sun_path, SOCKET_PATH);
+
+    slen = sendto(sock, (void *)(&id), sizeof(int), 0,
+          (sockaddr *)(&servaddr), sizeof(servaddr));
+    if (slen<0) {
+        //dacq_perror("sendto");
+        printf("sendto error");
+        close_socket (sock,abs(id));
+        return (FAIL);
+    }
+    else {
+        fromlen = sizeof(from);
+        rlen = recvfrom(sock, (void *)(&result), sizeof(int), 0,
+              (sockaddr *)(&from), &fromlen);
+        if (rlen == -1) {
+            //dacq_perror("recvfrom");
+            printf("recvfrom");
+            close_socket (sock,abs(id));
+            return (FAIL);
+        }
+        else
+            return result;
+    }
+}
+
+
+
+// shmem.c
+//*************************************************************************************************************
+
+int DacqServer::dacq_release_shmem(void)
+{
+    if (shmid == -1)
+    return (0);
+    if (shmptr != NULL) {
+    if (shmdt(shmptr) == -1) {
+        //err_set_sys_error("shmdt");
+        printf("shmdt");
+        return (-1);
+    }
+    shmptr = NULL;
+    }
+    return (0);
+}
+
+
+
+
