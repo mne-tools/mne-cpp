@@ -54,6 +54,8 @@
 
 #include <QThread>
 
+#include <QTcpSocket>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -186,6 +188,15 @@ private:
 
 
 
+    //newly written stuff ported to qt
+
+    QString         m_sCollectorHost;
+    QTcpSocket*     m_pCollectorSock;
+
+//    QTcpSocket* dacq_server_connect_by_name(QString& p_sCollectorHost, int p_iCollectorPort);
+
+
+
 
 // client_socket.c
     void close_socket (int sock, int id);
@@ -222,9 +233,6 @@ private:
 
 
     Neuromag* m_pNeuromag;
-
-    char*   m_pCollectorHost;
-    int     m_iCollectorSock;
 
     int     m_iShmemSock;
     int     m_iShmemId;

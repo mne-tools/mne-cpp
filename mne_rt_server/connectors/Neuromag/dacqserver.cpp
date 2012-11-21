@@ -46,15 +46,6 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Neuromag INCLUDES
-//=============================================================================================================
-
-#include "../../../include/3rdParty/Neuromag/dacqcomm.h"
-
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // UNIX INCLUDES
 //=============================================================================================================
 
@@ -75,6 +66,8 @@
 //=============================================================================================================
 
 #include <QDebug>
+#include <QTcpSocket>
+#include <QtNetwork>
 
 
 //*************************************************************************************************************
@@ -92,8 +85,8 @@ using namespace NeuromagPlugin;
 
 DacqServer::DacqServer(Neuromag* p_pNeuromag)
 : m_pNeuromag(p_pNeuromag)
-, m_pCollectorHost("localhost")
-, m_iCollectorSock(-1)
+, m_sCollectorHost(QHostAddress(QHostAddress::LocalHost).toString())
+, m_pCollectorSock(new QTcpSocket(this))
 , m_iShmemSock(-1)
 , m_iShmemId(CLIENT_ID)
 , m_bIsRunning(false)
@@ -108,18 +101,56 @@ DacqServer::DacqServer(Neuromag* p_pNeuromag)
 
 int DacqServer::collector_open()
 {
-    if (m_iCollectorSock >= 0) {
+    if(m_pCollectorSock->state() == QAbstractSocket::ConnectedState)
+    {
         printf("Note: Tried to re-open an open connection\r\n");//dacq_log("Note: Tried to re-open an open connection\n");
         return(0);
     }
-    if ((m_iCollectorSock = dacq_server_connect_by_name(m_pCollectorHost, COLLECTOR_PORT)) == -1) {
-        printf("Neuromag collector connection: Error\n");//dacq_log("Neuromag collector connection: %s\n", err_get_error());
-        return(-1);
+//    if (m_pCollectorSock != NULL) {
+//        printf("Note: Tried to re-open an open connection\r\n");//dacq_log("Note: Tried to re-open an open connection\n");
+//        return(0);
+//    }
+
+
+    if(m_pCollectorSock->state() == QAbstractSocket::ConnectedState)
+    {
+        printf("Note: Tried to re-open an open connection\r\n");//dacq_log("Note: Tried to re-open an open connection\n");
+        return(0);
     }
-    if (dacq_server_login(&m_iCollectorSock, COLLECTOR_PASS, "mne_rt_server") == -1) {
-        printf("Neuromag collector connection: Error\n");//dacq_log("Neuromag collector connection: %s\n", err_get_error());
-        return(-1);
+
+    m_pCollectorSock->abort();
+
+
+
+
+    m_pCollectorSock->connectToHost(m_sCollectorHost, COLLECTOR_PORT);
+
+
+    while(!m_pCollectorSock->isReadable())
+    {
+        qDebug() << "wait for data";
     }
+
+    QDataStream in(m_pCollectorSock);
+    in.setVersion(QDataStream::Qt_4_0);
+
+    QString msg;
+    in >> msg;
+
+
+    qDebug() << msg;
+
+
+//    if ((m_pCollectorSock = dacq_server_connect_by_name(m_sCollectorHost, COLLECTOR_PORT)) == NULL) {
+//        printf("Neuromag collector connection: Error\n");//dacq_log("Neuromag collector connection: %s\n", err_get_error());
+//        return(-1);
+//    }
+
+
+//    if (dacq_server_login(m_pCollectorSock, COLLECTOR_PASS, "mne_rt_server") == -1) {
+//        printf("Neuromag collector connection: Error\n");//dacq_log("Neuromag collector connection: %s\n", err_get_error());
+//        return(-1);
+//    }
 
     return(0);
 }
@@ -129,13 +160,16 @@ int DacqServer::collector_open()
 
 int DacqServer::collector_close()
 {
-    if (m_iCollectorSock < 0)
+    if (m_pCollectorSock == NULL)
         return(0);
-    if (dacq_server_close(&m_iCollectorSock, NULL)) {
-        printf("Neuromag collector connection: Eror\n");//dacq_log("Neuromag collector connection: %s\n", err_get_error());
-        return(-1);
-    }
-    m_iCollectorSock = -1;
+//    if (dacq_server_close(&m_pCollectorSock, NULL)) {
+//        printf("Neuromag collector connection: Eror\n");//dacq_log("Neuromag collector connection: %s\n", err_get_error());
+//        return(-1);
+//    }
+
+    m_pCollectorSock->close();
+
+//    m_iCollectorSock = -1;
     return(0);
 }
 
@@ -357,93 +391,31 @@ void DacqServer::run()
 
 
 
-
-
-
-//necessary?
-    if (m_pNeuromag->getBufferSampleSize() < MIN_BUFLEN) {
-        fprintf(stderr, "%s: Too small Neuromag buffer length requested, should be at least %d\n", m_pNeuromag->getBufferSampleSize(), MIN_BUFLEN);
-        return;
-    }
-    else {
-        /* Connect to the Elekta Neuromag acquisition control server, change the buffer length and exit*/
-        if (collector_open()) {
-            printf("Cannot change the Neuromag buffer length: Could not open collector connection\n");//dacq_log("Cannot change the Neuromag buffer length: Could not open collector connection\n");
-            return;
-        }
-        printf("Changing the Neuromag buffer length to %d\r\n", m_pNeuromag->getBufferSampleSize());//dacq_log("Changing the Neuromag buffer length to %d\n", newMaxBuflen);
-        if (collector_setMaxBuflen(m_pNeuromag->getBufferSampleSize())) {
-            printf("Setting a new Neuromag buffer length failed\r\n");//dacq_log("Setting a new Neuromag buffer length failed\n");
-            collector_close();
-            return;
-        }
-    }
+    collector_open();
+    collector_close();
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-    /* Connect to the Elekta Neuromag shared memory system */
-    printf("About to connect to the Neuromag DACQ shared memory on this workstation (client ID %d)...\r\n", m_iShmemId);//dacq_log("About to connect to the Neuromag DACQ shared memory on this workstation (client ID %d)...\n", shmem_id);
-    int old_umask = umask(SOCKET_UMASK);
-    if ((m_iShmemSock = dacq_connect_client(m_iShmemId)) == -1) {
-        umask(old_umask);
-        printf("Could not connect!\r\n");//dacq_log("Could not connect!\n");
-        return;//(2);
-    }
-    printf("Connection ok\r\n");//dacq_log("Connection ok\n");
-
-
-    int t_iOriginalMaxBuflen = -1;
-    /* Connect to the Elekta Neuromag acquisition control server and
-     * fiddle with the buffer length parameter */
-    if (m_pNeuromag->getBufferSampleSize() > 0) {
-        if (collector_open()) {
-            printf("Cannot change the Neuromag buffer length: Could not open collector connection\r\n");//dacq_log("Cannot change the Neuromag buffer length: Could not open collector connection\n");
-            return;
-        }
-        if ((t_iOriginalMaxBuflen = collector_getMaxBuflen()) < 1) {
-            printf("Cannot change the Neuromag buffer length: Could not query the current value\r\n");//dacq_log("Cannot change the Neuromag buffer length: Could not query the current value\n");
-            collector_close();
-            return;
-        }
-        printf("Changing the Neuromag buffer length %d -> %d\r\n", t_iOriginalMaxBuflen, m_pNeuromag->getBufferSampleSize());
-        if (collector_setMaxBuflen(m_pNeuromag->getBufferSampleSize())) {
-            printf("Setting a new Neuromag buffer length failed\r\n");//dacq_log("Setting a new Neuromag buffer length failed\n");
-            collector_close();
-            return;
-        }
-    }
-    /* Even if we're not supposed to change the buffer length, let's show it to the user */
-    else {
-        if (collector_open()) {
-            printf("Cannot find Neuromag buffer length: Could not open collector connection\r\n");//dacq_log("Cannot find Neuromag buffer length: Could not open collector connection\n");
-            return;
-        }
-        t_iOriginalMaxBuflen = collector_getMaxBuflen();
-        if (t_iOriginalMaxBuflen < 1) {
-            printf("Could not query the current Neuromag buffer length\r\n");//dacq_log("Could not query the current Neuromag buffer length\n");
-            collector_close();
-            return;
-        }
-        else
-            printf("Current buffer length value = %d\r\n",t_iOriginalMaxBuflen);//dacq_log("Current buffer length value = %d\n",originalMaxBuflen);
-
-        collector_close();
-        // just so we know no clean up is necessary
-        t_iOriginalMaxBuflen = -1;
-    }
+////necessary?
+//    if (m_pNeuromag->getBufferSampleSize() < MIN_BUFLEN) {
+//        fprintf(stderr, "%s: Too small Neuromag buffer length requested, should be at least %d\n", m_pNeuromag->getBufferSampleSize(), MIN_BUFLEN);
+//        return;
+//    }
+//    else {
+//        /* Connect to the Elekta Neuromag acquisition control server, change the buffer length and exit*/
+//        if (collector_open()) {
+//            printf("Cannot change the Neuromag buffer length: Could not open collector connection\n");//dacq_log("Cannot change the Neuromag buffer length: Could not open collector connection\n");
+//            return;
+//        }
+//        printf("Changing the Neuromag buffer length to %d\r\n", m_pNeuromag->getBufferSampleSize());//dacq_log("Changing the Neuromag buffer length to %d\n", newMaxBuflen);
+//        if (collector_setMaxBuflen(m_pNeuromag->getBufferSampleSize())) {
+//            printf("Setting a new Neuromag buffer length failed\r\n");//dacq_log("Setting a new Neuromag buffer length failed\n");
+//            collector_close();
+//            return;
+//        }
+//    }
 
 
 
@@ -453,32 +425,134 @@ void DacqServer::run()
 
 
 
-    /* Mainloop */
-//    printf("Will scale up MEG mags by %g, grads by %g and EEG data by %g\n",
-//         meg_mag_multiplier, meg_grad_multiplier, eeg_multiplier);
-    printf("Waiting for the measurement to start... Press Ctrl-C to terminate this program\n");
 
-    qint32 count = 0;
-    while(m_bIsRunning)
-    {
-//#if defined(DACQ_OLD_CONNECTION_SCHEME)
-//        if (dacq_client_receive_tag(m_fdShmemSock, m_iShmemId) == -1)
-//#else
-//        if (dacq_client_receive_tag(&m_fdShmemSock, m_iShmemId) == -1)
-//#endif
-//            break;
 
-        ++count;
 
-        qDebug() << count;
 
-        usleep(1000000);
-    }
 
-     printf("\n");
+
+
+//    /* Connect to the Elekta Neuromag shared memory system */
+//    printf("About to connect to the Neuromag DACQ shared memory on this workstation (client ID %d)...\r\n", m_iShmemId);//dacq_log("About to connect to the Neuromag DACQ shared memory on this workstation (client ID %d)...\n", shmem_id);
+//    int old_umask = umask(SOCKET_UMASK);
+//    if ((m_iShmemSock = dacq_connect_client(m_iShmemId)) == -1) {
+//        umask(old_umask);
+//        printf("Could not connect!\r\n");//dacq_log("Could not connect!\n");
+//        return;//(2);
+//    }
+//    printf("Connection ok\r\n");//dacq_log("Connection ok\n");
+
+
+//    int t_iOriginalMaxBuflen = -1;
+//    /* Connect to the Elekta Neuromag acquisition control server and
+//     * fiddle with the buffer length parameter */
+//    if (m_pNeuromag->getBufferSampleSize() > 0) {
+//        if (collector_open()) {
+//            printf("Cannot change the Neuromag buffer length: Could not open collector connection\r\n");//dacq_log("Cannot change the Neuromag buffer length: Could not open collector connection\n");
+//            return;
+//        }
+//        if ((t_iOriginalMaxBuflen = collector_getMaxBuflen()) < 1) {
+//            printf("Cannot change the Neuromag buffer length: Could not query the current value\r\n");//dacq_log("Cannot change the Neuromag buffer length: Could not query the current value\n");
+//            collector_close();
+//            return;
+//        }
+//        printf("Changing the Neuromag buffer length %d -> %d\r\n", t_iOriginalMaxBuflen, m_pNeuromag->getBufferSampleSize());
+//        if (collector_setMaxBuflen(m_pNeuromag->getBufferSampleSize())) {
+//            printf("Setting a new Neuromag buffer length failed\r\n");//dacq_log("Setting a new Neuromag buffer length failed\n");
+//            collector_close();
+//            return;
+//        }
+//    }
+//    /* Even if we're not supposed to change the buffer length, let's show it to the user */
+//    else {
+//        if (collector_open()) {
+//            printf("Cannot find Neuromag buffer length: Could not open collector connection\r\n");//dacq_log("Cannot find Neuromag buffer length: Could not open collector connection\n");
+//            return;
+//        }
+//        t_iOriginalMaxBuflen = collector_getMaxBuflen();
+//        if (t_iOriginalMaxBuflen < 1) {
+//            printf("Could not query the current Neuromag buffer length\r\n");//dacq_log("Could not query the current Neuromag buffer length\n");
+//            collector_close();
+//            return;
+//        }
+//        else
+//            printf("Current buffer length value = %d\r\n",t_iOriginalMaxBuflen);//dacq_log("Current buffer length value = %d\n",originalMaxBuflen);
+
+//        collector_close();
+//        // just so we know no clean up is necessary
+//        t_iOriginalMaxBuflen = -1;
+//    }
+
+
+
+
+
+
+
+
+
+//    /* Mainloop */
+////    printf("Will scale up MEG mags by %g, grads by %g and EEG data by %g\n",
+////         meg_mag_multiplier, meg_grad_multiplier, eeg_multiplier);
+//    printf("Waiting for the measurement to start... Press Ctrl-C to terminate this program\n");
+
+//    qint32 count = 0;
+//    while(m_bIsRunning)
+//    {
+////#if defined(DACQ_OLD_CONNECTION_SCHEME)
+////        if (dacq_client_receive_tag(m_fdShmemSock, m_iShmemId) == -1)
+////#else
+////        if (dacq_client_receive_tag(&m_fdShmemSock, m_iShmemId) == -1)
+////#endif
+////            break;
+
+//        ++count;
+
+//        qDebug() << count;
+
+//        usleep(1000000);
+//    }
+
+//     printf("\n");
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//QTcpSocket* DacqServer::dacq_server_connect_by_name(QString& p_sCollectorHost, int p_iCollectorPort)
+//{
+
+
+//    return NULL;
+
+//}
 
 
 
@@ -605,6 +679,12 @@ int DacqServer::connect_disconnect (int sock,int id)
             return result;
     }
 }
+
+
+
+
+
+
 
 
 
