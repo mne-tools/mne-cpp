@@ -49,7 +49,14 @@
 // UNIX INCLUDES
 //=============================================================================================================
 
-#include <sys/stat.h> //umask
+#include <sys/stat.h>   //umask
+#include <sys/un.h>     //sockaddr_un
+#include <sys/socket.h> //AF_UNIX
+
+
+//#include <sys/types.h>
+//#include <netinet/in.h>
+
 
 
 //*************************************************************************************************************
@@ -89,16 +96,16 @@ DacqServer::DacqServer(Neuromag* p_pNeuromag)
 
 bool DacqServer::collector_open()
 {
-//    if (collector_sock >= 0) {
-//        dacq_log("Note: Tried to re-open an open connection\n");
+//    if (m_fdCollectorSock >= 0) {
+//        printf("Note: Tried to re-open an open connection\r\n");
 //        return true;
 //    }
-//    if ((collector_sock = dacq_server_connect_by_name(collector_host, COLLECTOR_PORT)) == false) {
-//        dacq_log("Neuromag collector connection: %s\n", err_get_error());
+//    if ((m_fdCollectorSock = dacq_server_connect_by_name(m_pCollectorHost, COLLECTOR_PORT)) == false) {
+//        printf("Neuromag collector connection: %s\n", "Error");//, err_get_error());
 //        return false;
 //    }
-//    if (dacq_server_login(&collector_sock, COLLECTOR_PASS, "neuromag2ft") == false) {
-//        dacq_log("Neuromag collector connection: %s\n", err_get_error());
+//    if (dacq_server_login(&m_fdCollectorSock, COLLECTOR_PASS, "mne_rt_server") == false) {
+//        printf("Neuromag collector connection: %s\n", "Error");//, err_get_error());
 //        return false;
 //    }
 
@@ -106,17 +113,18 @@ bool DacqServer::collector_open()
 }
 
 
+
 //*************************************************************************************************************
 
 bool DacqServer::collector_close()
 {
-//    if (collector_sock < 0)
+//    if (m_fdCollectorSock < 0)
 //        return true;
-//    if (!dacq_server_close(&collector_sock, NULL)) {
-//        dacq_log("Neuromag collector connection: %s\n", err_get_error());
+//    if (!dacq_server_close(&m_fdCollectorSock, NULL)) {
+//        printf("Neuromag collector connection: %s\n", "Error");//err_get_error());
 //        return false;
 //    }
-    m_fdCollectorSock = -1;
+//    m_fdCollectorSock = -1;
     return true;
 }
 
@@ -145,87 +153,83 @@ void DacqServer::close_socket (sockfd sock, int id)
 
 int DacqServer::connect_disconnect (sockfd sock,int id)
 {
-//    struct  sockaddr_un servaddr;     /* address of server */
-//    struct  sockaddr_un from;
+    struct  sockaddr_un servaddr;     /* address of server */
+    struct  sockaddr_un from;
 
-//    socklen_t fromlen;
-//    int     result;
-//    int     slen, rlen;
+    socklen_t fromlen;
+    int     result;
+    int     slen, rlen;
 
-//    if (sock < 0)
-//        return (OK);
-//    /*
-//    * Set up address structure for server socket
-//    */
-//    bzero(&servaddr, sizeof(servaddr));
-//    servaddr.sun_family = AF_UNIX;
-//    strcpy(servaddr.sun_path, SOCKET_PATH);
+    if (sock < 0)
+        return 0;
+    /*
+    * Set up address structure for server socket
+    */
+    bzero(&servaddr, sizeof(servaddr));
+    servaddr.sun_family = AF_UNIX;
+    strcpy(servaddr.sun_path, SOCKET_PATH);
 
-//    slen = sendto(sock, (void *)(&id), sizeof(int), 0,
-//        (void *)(&servaddr), sizeof(servaddr));
-//    if (slen<0) {
-//        dacq_perror("sendto");
-//        close_socket (sock,abs(id));
-//        return (FAIL);
-//    }
-//    else {
-//        fromlen = sizeof(from);
-//        rlen = recvfrom(sock, (void *)(&result), sizeof(int), 0,
-//            (void *)(&from), &fromlen);
-//    if (rlen == -1) {
-//        dacq_perror("recvfrom");
-//        close_socket (sock,abs(id));
-//        return (FAIL);
-//    } else
-//        return result;
-//    }
-
-    //DEBUG
-    return 0;
+    slen = sendto(sock, (void *)(&id), sizeof(int), 0,
+        (sockaddr *)(&servaddr), sizeof(servaddr));
+    if (slen < 0) {
+        printf("sendto error");
+        close_socket (sock,abs(id));
+        return -1;
+    }
+    else {
+        fromlen = sizeof(from);
+        rlen = recvfrom(sock, (void *)(&result), sizeof(int), 0,
+            (sockaddr *)(&from), &fromlen);
+    if (rlen == -1) {
+        printf("recvfrom error");
+        close_socket (sock,abs(id));
+        return -1;
+    } else
+        return result;
+    }
 }
 
 
 //*************************************************************************************************************
 
 int DacqServer::dacq_connect_client (int id)
+     /*
+      * Connect to the data server process
+      */
 {
-//    struct  sockaddr_un clntaddr;	/* address of client */
-//    char    client_path[200];	/* This our path */
-//    int     sock = -1;		/* This is the UNIX domain socket */
+    struct  sockaddr_un clntaddr;	/* address of client */
+    char    client_path[200];	/* This our path */
+    int     sock = -1;		/* This is the UNIX domain socket */
 
-//    sprintf (client_path,"%s%d",SOCKET_PATHCLNT,id);
-//    /*
-//    * Is this safe?
-//    */
-//    (void)unlink(client_path);
+    printf (client_path,"%s%d",SOCKET_PATHCLNT,id);
+    /*
+    * Is this safe?
+    */
+    (void)unlink(client_path);
 
-//    /*	Create a UNIX datagram socket for client	*/
+    /*  Create a UNIX datagram socket for client	*/
 
-//    if ((sock = socket(AF_UNIX, SOCK_DGRAM, 0)) < 0) {
-//        dacq_perror("socket");
-//        return (FAIL);
-//    }
-//    /*	Client will bind to an address so server will get
-//    * 	an address in its recvfrom call and can use it to
-//    *	send data back to the client.
-//    */
-//    bzero(&clntaddr, sizeof(clntaddr));
-//    clntaddr.sun_family = AF_UNIX;
-//    strcpy(clntaddr.sun_path, client_path);
+    if ((sock = socket(AF_UNIX, SOCK_DGRAM, 0)) < 0) {
+        printf("socket error");
+        return -1;
+    }
+    /*  Client will bind to an address so server will get
+    *   an address in its recvfrom call and can use it to
+    *   send data back to the client.
+    */
+    bzero(&clntaddr, sizeof(clntaddr));
+    clntaddr.sun_family = AF_UNIX;
+    strcpy(clntaddr.sun_path, client_path);
 
-//    if (bind(sock, (void *)(&clntaddr), sizeof(clntaddr)) < 0) {
-//        close(sock);
-//        dacq_perror("bind");
-//        return (FAIL);
-//    }
-//    if (connect_disconnect(sock,id) == FAIL)
-//        return (FAIL);
-//    else
-//        return (sock);
-
-
-    //DEBUG
-    return 0;
+    if (bind(sock, (sockaddr *)(&clntaddr), sizeof(clntaddr)) < 0) {
+        close(sock);
+        printf("bind error");
+        return -1;
+    }
+    if (connect_disconnect(sock,id) == -1)
+        return -1;
+    else
+        return sock;
 }
 
 
@@ -510,12 +514,12 @@ void DacqServer::run()
     qint32 count = 0;
     while(m_bIsRunning)
     {
-#if defined(DACQ_OLD_CONNECTION_SCHEME)
-        if (dacq_client_receive_tag(m_fdShmemSock, m_iShmemId) == -1)
-#else
-        if (dacq_client_receive_tag(&m_fdShmemSock, m_iShmemId) == -1)
-#endif
-            break;
+//#if defined(DACQ_OLD_CONNECTION_SCHEME)
+//        if (dacq_client_receive_tag(m_fdShmemSock, m_iShmemId) == -1)
+//#else
+//        if (dacq_client_receive_tag(&m_fdShmemSock, m_iShmemId) == -1)
+//#endif
+//            break;
 
         ++count;
 
