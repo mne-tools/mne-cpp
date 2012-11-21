@@ -86,7 +86,7 @@ using namespace NeuromagPlugin;
 DacqServer::DacqServer(Neuromag* p_pNeuromag)
 : m_pNeuromag(p_pNeuromag)
 , m_sCollectorHost(QHostAddress(QHostAddress::LocalHost).toString())
-, m_pCollectorSock(new QTcpSocket(this))
+, m_pCollectorSock(NULL)
 , m_iShmemSock(-1)
 , m_iShmemId(CLIENT_ID)
 , m_bIsRunning(false)
@@ -383,6 +383,14 @@ int DacqServer::collector_close()
 void DacqServer::run()
 {
     m_bIsRunning = true;
+
+
+
+
+    if(m_pCollectorSock)
+        delete m_pCollectorSock;
+
+    m_pCollectorSock = new QTcpSocket(this);
 
 
     if(m_pNeuromag->getBufferSampleSize() < MIN_BUFLEN)
