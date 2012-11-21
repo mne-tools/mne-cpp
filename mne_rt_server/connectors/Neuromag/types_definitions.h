@@ -51,7 +51,7 @@ namespace NeuromagPlugin
 // DEFINES
 //=============================================================================================================
 
-#define COLLECTOR_PORT    "collector"
+#define COLLECTOR_PORT    11122         //"collector"
 #define COLLECTOR_PASS    "homunculus122"
 #define COLLECTOR_BUFS    32768
 
@@ -60,7 +60,7 @@ namespace NeuromagPlugin
 
 #define SOCKET_UMASK    0x000   /**< Acquisition system UNIX domain socket file must be world-writable */
 
-#define SOCKET_PATH 	"/neuro/dacq/sockets/dacq_server"
+#define SOCKET_PATH     "/neuro/dacq/sockets/dacq_server"
 #define SOCKET_PATHCLNT "/neuro/dacq/sockets/dacq_client_"
 
 //#define sockfd  int             /**< Defines a primitive data type for socket descriptor. */

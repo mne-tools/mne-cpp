@@ -34,8 +34,6 @@ else {
     LIBS += -lgenerics
 }
 
-LIBS += -L$${PWD}/../../../lib/3rdParty/Neuromag/x86_64-pc-linux-gnu/ -ldacqcomm
-
 
 unix:DESTDIR = $${PWD}/../../../bin/mne_rt_server_plugins
 
