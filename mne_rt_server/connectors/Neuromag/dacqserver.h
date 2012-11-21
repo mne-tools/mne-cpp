@@ -152,9 +152,6 @@ protected:
     */
     virtual void run();
 
-
-
-
 private:
 
     //ToDo Connect is different? to: telnet localhost collector ???
@@ -167,39 +164,39 @@ private:
     int dacq_connect_client (int id);
 
 
-    //=========================================================================================================
-    /**
-     * Disconnect from the data server process
-     *
-     * @return
-     */
-    int dacq_disconnect_client (sockfd sock,int id);
+//    //=========================================================================================================
+//    /**
+//     * Disconnect from the data server process
+//     *
+//     * @return
+//     */
+//    int dacq_disconnect_client (sockfd sock,int id);
 
 
-    void close_socket (sockfd sock, int id);
+//    void close_socket (sockfd sock, int id);
 
-    int connect_disconnect (sockfd sock,int id);
+//    int connect_disconnect (sockfd sock,int id);
 
 
 
-    /**
-     * Receive one tag from the data server.
-     *
-     * This routine reads a message from the data server
-     * socket and grabs the data. The data may actually
-     * be in a shared memory segment noted in the message.
-     *
-     * The id parameter is needed for two purposes. The
-     * data transfer mechanism varies depending on the client
-     * number. Clients with id above 10000 use shared memory
-     * transfer while other used a regular file to transfer the
-     * data.It is needed also if the conndedtion needs to be
-     * closed after an error.
-     *
-     * \return Status OK or FAIL.
-     */
+//    /**
+//     * Receive one tag from the data server.
+//     *
+//     * This routine reads a message from the data server
+//     * socket and grabs the data. The data may actually
+//     * be in a shared memory segment noted in the message.
+//     *
+//     * The id parameter is needed for two purposes. The
+//     * data transfer mechanism varies depending on the client
+//     * number. Clients with id above 10000 use shared memory
+//     * transfer while other used a regular file to transfer the
+//     * data.It is needed also if the conndedtion needs to be
+//     * closed after an error.
+//     *
+//     * \return Status OK or FAIL.
+//     */
 
-    int dacq_client_receive_tag (int sock, /**< Socket to read */ int id );  /**< My id number */
+//    int dacq_client_receive_tag (int sock, /**< Socket to read */ int id );  /**< My id number */
 
 
 
