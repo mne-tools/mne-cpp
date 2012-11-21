@@ -65,7 +65,8 @@ namespace NeuromagPlugin
 
 #define sockfd  int             /**< Defines a primitive data type for socket descriptor. */
 
-#define DACQ_OLD_CONNECTION_SCHEME  0 /**< If HP-UX */
+#define OK      0
+#define FAIL    -1
 
 }
 

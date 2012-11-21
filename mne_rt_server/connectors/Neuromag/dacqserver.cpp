@@ -46,6 +46,15 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// Neuromag INCLUDES
+//=============================================================================================================
+
+#include "../../../include/3rdParty/Neuromag/dacqcomm.h"
+
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // UNIX INCLUDES
 //=============================================================================================================
 
@@ -129,11 +138,11 @@ bool DacqServer::collector_close()
 }
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-void DacqServer::close_socket (sockfd sock, int id)
-{
-    char    client_path[200];	/* This our path */
+//void DacqServer::close_socket (sockfd sock, int id)
+//{
+//    char    client_path[200];	/* This our path */
 
 //    if (sock != -1) {
 //        /*
@@ -146,126 +155,128 @@ void DacqServer::close_socket (sockfd sock, int id)
 //    }
 //    (void) dacq_release_shmem();
 //    dacq_log ("Connection closed.\n");
-}
+//}
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-int DacqServer::connect_disconnect (sockfd sock,int id)
-{
-    struct  sockaddr_un servaddr;     /* address of server */
-    struct  sockaddr_un from;
+//int DacqServer::connect_disconnect (sockfd sock,int id)
+//{
+//    struct  sockaddr_un servaddr;     /* address of server */
+//    struct  sockaddr_un from;
 
-    socklen_t fromlen;
-    int     result;
-    int     slen, rlen;
+//    socklen_t fromlen;
+//    int     result;
+//    int     slen, rlen;
 
-    if (sock < 0)
-        return 0;
-    /*
-    * Set up address structure for server socket
-    */
-    bzero(&servaddr, sizeof(servaddr));
-    servaddr.sun_family = AF_UNIX;
-    strcpy(servaddr.sun_path, SOCKET_PATH);
+//    if (sock < 0)
+//        return 0;
+//    /*
+//    * Set up address structure for server socket
+//    */
+//    bzero(&servaddr, sizeof(servaddr));
+//    servaddr.sun_family = AF_UNIX;
+//    strcpy(servaddr.sun_path, SOCKET_PATH);
 
-    slen = sendto(sock, (void *)(&id), sizeof(int), 0,
-        (sockaddr *)(&servaddr), sizeof(servaddr));
-    if (slen < 0) {
-        printf("sendto error");
-        close_socket (sock,abs(id));
-        return -1;
-    }
-    else {
-        fromlen = sizeof(from);
-        rlen = recvfrom(sock, (void *)(&result), sizeof(int), 0,
-            (sockaddr *)(&from), &fromlen);
-    if (rlen == -1) {
-        printf("recvfrom error");
-        close_socket (sock,abs(id));
-        return -1;
-    } else
-        return result;
-    }
-}
+//    slen = sendto(sock, (void *)(&id), sizeof(int), 0,
+//        (sockaddr *)(&servaddr), sizeof(servaddr));
+//    if (slen < 0) {
+//        printf("sendto error");
+//        close_socket (sock,abs(id));
+//        return -1;
+//    }
+//    else {
+//        fromlen = sizeof(from);
+//        rlen = recvfrom(sock, (void *)(&result), sizeof(int), 0,
+//            (sockaddr *)(&from), &fromlen);
+//    if (rlen == -1) {
+//        printf("recvfrom error");
+//        close_socket (sock,abs(id));
+//        return -1;
+//    } else
+//        return result;
+//    }
+//}
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
 int DacqServer::dacq_connect_client (int id)
      /*
       * Connect to the data server process
       */
 {
-    struct  sockaddr_un clntaddr;	/* address of client */
-    char    client_path[200];	/* This our path */
-    int     sock = -1;		/* This is the UNIX domain socket */
+    struct  sockaddr_un clntaddr;   /* address of client */
+    char    client_path[200];       /* This our path */
+    int     sock = -1;              /* This is the UNIX domain socket */
 
-    printf (client_path,"%s%d",SOCKET_PATHCLNT,id);
+    sprintf (client_path,"%s%d",SOCKET_PATHCLNT,id);
     /*
-    * Is this safe?
-    */
+     * Is this safe?
+     */
     (void)unlink(client_path);
 
-    /*  Create a UNIX datagram socket for client	*/
+    /*	Create a UNIX datagram socket for client	*/
 
     if ((sock = socket(AF_UNIX, SOCK_DGRAM, 0)) < 0) {
+        //dacq_perror("socket");
         printf("socket error");
-        return -1;
+        return (FAIL);
     }
-    /*  Client will bind to an address so server will get
-    *   an address in its recvfrom call and can use it to
-    *   send data back to the client.
-    */
+    /*	Client will bind to an address so server will get
+     * 	an address in its recvfrom call and can use it to
+     *	send data back to the client.
+     */
     bzero(&clntaddr, sizeof(clntaddr));
     clntaddr.sun_family = AF_UNIX;
     strcpy(clntaddr.sun_path, client_path);
 
-    if (bind(sock, (sockaddr *)(&clntaddr), sizeof(clntaddr)) < 0) {
+    if (bind(sock, (void *)(&clntaddr), sizeof(clntaddr)) < 0) {
         close(sock);
+        //dacq_perror("bind");
         printf("bind error");
-        return -1;
+        return (FAIL);
     }
-    if (connect_disconnect(sock,id) == -1)
-        return -1;
+    if (connect_disconnect(sock,id) == FAIL)
+        return (FAIL);
     else
-        return sock;
+        return (sock);
 }
+
+
+////*************************************************************************************************************
+
+//int DacqServer::dacq_disconnect_client (int sock, int id)
+//{
+//    int result = connect_disconnect(sock,-id);
+//    close_socket (sock,id);
+//    return (result);
+//}
 
 
 //*************************************************************************************************************
 
-int DacqServer::dacq_disconnect_client (int sock, int id)
-{
-    int result = connect_disconnect(sock,-id);
-    close_socket (sock,id);
-    return (result);
-}
+///**
+// * Receive one tag from the data server.
+// *
+// * This routine reads a message from the data server
+// * socket and grabs the data. The data may actually
+// * be in a shared memory segment noted in the message.
+// *
+// * The id parameter is needed for two purposes. The
+// * data transfer mechanism varies depending on the client
+// * number. Clients with id above 10000 use shared memory
+// * transfer while other used a regular file to transfer the
+// * data.It is needed also if the conndedtion needs to be
+// * closed after an error.
+// *
+// * \return Status OK or FAIL.
+// */
 
+//int DacqServer::dacq_client_receive_tag (int sock, /**< Socket to read */
+//                 int id )  /**< My id number */
 
-//*************************************************************************************************************
-
-/**
- * Receive one tag from the data server.
- *
- * This routine reads a message from the data server
- * socket and grabs the data. The data may actually
- * be in a shared memory segment noted in the message.
- *
- * The id parameter is needed for two purposes. The
- * data transfer mechanism varies depending on the client
- * number. Clients with id above 10000 use shared memory
- * transfer while other used a regular file to transfer the
- * data.It is needed also if the conndedtion needs to be
- * closed after an error.
- *
- * \return Status OK or FAIL.
- */
-
-int DacqServer::dacq_client_receive_tag (int sock, /**< Socket to read */
-                 int id )  /**< My id number */
-
-{
+//{
 //    struct  sockaddr_un from;	/* Address (not used) */
 //    socklen_t fromlen;
 
@@ -434,9 +445,7 @@ int DacqServer::dacq_client_receive_tag (int sock, /**< Socket to read */
 //      data = tag.data;
 //    }
 //    return (OK);
-
-    return 0;
-}
+//}
 
 
 //*************************************************************************************************************
