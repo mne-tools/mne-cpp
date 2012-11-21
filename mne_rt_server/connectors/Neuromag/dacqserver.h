@@ -102,7 +102,7 @@ public:
      *
      * @return
      */
-    bool collector_open();
+    int collector_open();
 
     //=========================================================================================================
     /**
@@ -110,7 +110,7 @@ public:
      *
      * @return
      */
-    bool collector_close();
+    int collector_close();
 
     //=========================================================================================================
     /**
@@ -154,16 +154,6 @@ protected:
 
 private:
 
-    //ToDo Connect is different? to: telnet localhost collector ???
-    //=========================================================================================================
-    /**
-     * Connect to the data server process
-     *
-     * @return
-     */
-    int dacq_connect_client (int id);
-
-
 //    //=========================================================================================================
 //    /**
 //     * Disconnect from the data server process
@@ -171,11 +161,6 @@ private:
 //     * @return
 //     */
 //    int dacq_disconnect_client (sockfd sock,int id);
-
-
-//    void close_socket (sockfd sock, int id);
-
-//    int connect_disconnect (sockfd sock,int id);
 
 
 
@@ -202,6 +187,36 @@ private:
 
 
 
+// client_socket.c
+    void close_socket (int sock, int id);
+
+    int connect_disconnect (int sock,int id);
+
+    //ToDo Connect is different? to: telnet localhost collector ???
+    //=========================================================================================================
+    /**
+     * Connect to the data server process
+     *
+     * @return
+     */
+    int dacq_connect_client (int id);
+
+
+// shmem.c
+
+    /**
+     * Release the shared memory
+     */
+
+    int dacq_release_shmem(void);
+
+    int shmid;
+    dacqShmBlock shmptr;
+
+
+
+
+//dacqserver
     bool m_bIsRunning;
 
 
@@ -209,9 +224,9 @@ private:
     Neuromag* m_pNeuromag;
 
     char*   m_pCollectorHost;
-    sockfd  m_fdCollectorSock;
+    int     m_iCollectorSock;
 
-    sockfd  m_fdShmemSock;
+    int     m_iShmemSock;
     int     m_iShmemId;
 
 

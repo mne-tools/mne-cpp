@@ -63,10 +63,41 @@ namespace NeuromagPlugin
 #define SOCKET_PATH 	"/neuro/dacq/sockets/dacq_server"
 #define SOCKET_PATHCLNT "/neuro/dacq/sockets/dacq_client_"
 
-#define sockfd  int             /**< Defines a primitive data type for socket descriptor. */
+//#define sockfd  int             /**< Defines a primitive data type for socket descriptor. */
 
 #define OK      0
 #define FAIL    -1
+
+
+
+
+//dacq_shmem.h
+
+#define SHM_FILE       "/neuro/dacq/shmem/data_server"
+#define SHM_FAIL_FILE  "/neuro/dacq/raw/data_server_shmem"
+#define SHM_MAX_CLIENT 10
+
+#ifdef OLD_SHM
+#define SHM_MAX_DATA   2*2*2*31*1024
+#define SHM_NUM_BLOCKS 10
+#else
+#define SHM_MAX_DATA   450*2*3000
+#define SHM_NUM_BLOCKS 5
+#endif
+#define SHM_NO_BUF     -1
+
+typedef struct {
+  int client_id;
+  int done;
+} *dacqShmClient,dacqShmClientRec;
+
+typedef struct {
+  dacqShmClientRec clients[SHM_MAX_CLIENT];
+  unsigned char data[SHM_MAX_DATA];
+} *dacqShmBlock,dacqShmBlockRec;
+
+#define SHM_SIZE SHM_NUM_BLOCKS*sizeof(dacqShmBlockRec)
+
 
 }
 
