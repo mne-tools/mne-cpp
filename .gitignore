@@ -25,7 +25,7 @@
 # Compiled Static libraries
 *.lai
 *.la
-*.a
+#*.a
 /MNE/MNELibraries.pro.user
 /bin/*.dll
 /lib/*.dll
