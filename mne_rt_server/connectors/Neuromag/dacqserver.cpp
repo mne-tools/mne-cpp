@@ -143,6 +143,49 @@ int DacqServer::collector_close()
 
 //*************************************************************************************************************
 
+int collector_getMaxBuflen()
+{
+//#define REPLYSIZ 65536
+
+//    char *line;
+//    char buf[REPLYSIZ];
+//    char var_name[BUFSIZ];
+//    char var_value[BUFSIZ];
+//    char var_type[BUFSIZ];
+//    int maxbuflen = -1;
+
+//    sprintf(buf, "%s\n", COLLECTOR_GETVARS);
+//    if (dacq_server_send(&collector_sock, buf, strlen(buf), DACQ_DRAIN_INPUT) == -1) {
+//        dacq_log("Neuromag collector connection: %s\n", err_get_error());
+//        return(-1);
+//    }
+
+//    if (dacq_server_recv(&collector_sock, buf, REPLYSIZ-1, DACQ_REPLY_ASCII | DACQ_REPLY_RFC) == -1) {
+//        dacq_log("Neuromag collector connection: %s\n", err_get_error());
+//        return(-1);
+//    }
+
+//    line = strtok(buf, "\n");
+//    while (line != NULL) {
+//        /* All lines start with a three-digit code and a space or minus sign. Skip them and parse the rest */
+//        if (sscanf(line+4, "%s %s %s", var_name, var_value, var_type) == 3) {
+//            if (!strcmp(var_name, COLLECTOR_BUFVAR)) {
+//                if (sscanf(var_value, "%d", &maxbuflen) != 1) {
+//                    dacq_log("Neuromag collector: Misformatted variable line '%s'\n", line);
+//                    return(-1);
+//                } else {
+//                    return(maxbuflen);
+//                }
+//            }
+//        }
+//        line = strtok(NULL, "\n");
+//    }
+    return(-1);
+}
+
+
+//*************************************************************************************************************
+
 int DacqServer::collector_setMaxBuflen(int maxbuflen)
 {
     if (maxbuflen < 1)
@@ -430,58 +473,58 @@ void DacqServer::run()
             return;
         }
     }
-    /* Even if we're not supposed to change the buffer length, let's show it to the user */
-    else {
-        if (collector_open()) {
-            printf("Cannot find Neuromag buffer length: Could not open collector connection\r\n");//dacq_log("Cannot find Neuromag buffer length: Could not open collector connection\n");
-            return;
-        }
-        t_iOriginalMaxBuflen = collector_getMaxBuflen();
-        if (t_iOriginalMaxBuflen < 1) {
-            printf("Could not query the current Neuromag buffer length\r\n");//dacq_log("Could not query the current Neuromag buffer length\n");
-            collector_close();
-            return;
-        }
-        else
-            printf("Current buffer length value = %d\r\n",t_iOriginalMaxBuflen);//dacq_log("Current buffer length value = %d\n",originalMaxBuflen);
+//    /* Even if we're not supposed to change the buffer length, let's show it to the user */
+//    else {
+//        if (collector_open()) {
+//            printf("Cannot find Neuromag buffer length: Could not open collector connection\r\n");//dacq_log("Cannot find Neuromag buffer length: Could not open collector connection\n");
+//            return;
+//        }
+//        t_iOriginalMaxBuflen = collector_getMaxBuflen();
+//        if (t_iOriginalMaxBuflen < 1) {
+//            printf("Could not query the current Neuromag buffer length\r\n");//dacq_log("Could not query the current Neuromag buffer length\n");
+//            collector_close();
+//            return;
+//        }
+//        else
+//            printf("Current buffer length value = %d\r\n",t_iOriginalMaxBuflen);//dacq_log("Current buffer length value = %d\n",originalMaxBuflen);
 
 
-        collector_close();
-        // just so we know no clean up is necessary
-        t_iOriginalMaxBuflen = -1;
-    }
-
-
-
-
-
-
-
-
-
-//    /* Mainloop */
-////    printf("Will scale up MEG mags by %g, grads by %g and EEG data by %g\n",
-////         meg_mag_multiplier, meg_grad_multiplier, eeg_multiplier);
-//    printf("Waiting for the measurement to start... Press Ctrl-C to terminate this program\n");
-
-//    qint32 count = 0;
-//    while(m_bIsRunning)
-//    {
-////#if defined(DACQ_OLD_CONNECTION_SCHEME)
-////        if (dacq_client_receive_tag(m_fdShmemSock, m_iShmemId) == -1)
-////#else
-////        if (dacq_client_receive_tag(&m_fdShmemSock, m_iShmemId) == -1)
-////#endif
-////            break;
-
-//        ++count;
-
-//        qDebug() << count;
-
-//        usleep(1000000);
+//        collector_close();
+//        // just so we know no clean up is necessary
+//        t_iOriginalMaxBuflen = -1;
 //    }
 
-//     printf("\n");
+
+
+
+
+
+
+
+
+    /* Mainloop */
+//    printf("Will scale up MEG mags by %g, grads by %g and EEG data by %g\n",
+//         meg_mag_multiplier, meg_grad_multiplier, eeg_multiplier);
+    printf("Waiting for the measurement to start...\n");
+
+    qint32 count = 0;
+    while(m_bIsRunning)
+    {
+//#if defined(DACQ_OLD_CONNECTION_SCHEME)
+//        if (dacq_client_receive_tag(m_fdShmemSock, m_iShmemId) == -1)
+//#else
+//        if (dacq_client_receive_tag(&m_fdShmemSock, m_iShmemId) == -1)
+//#endif
+//            break;
+
+        ++count;
+
+        qDebug() << count;
+
+        usleep(1000000);
+    }
+
+     printf("\n");
 
 
 }
