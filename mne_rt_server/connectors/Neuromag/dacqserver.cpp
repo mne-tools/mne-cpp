@@ -3,14 +3,12 @@
 * @file     dacqserver.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Gustavo Sudre;
-*           Lauri Parkkonen
 * @version  1.0
 * @date     July, 2012
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh, Matti Hamalainen, Gustavo Sudre and Lauri Parkkonen. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -68,6 +66,7 @@
 #include <QDebug>
 #include <QTcpSocket>
 #include <QtNetwork>
+#include <QDataStream>
 
 
 //*************************************************************************************************************
@@ -93,7 +92,6 @@ DacqServer::DacqServer(Neuromag* p_pNeuromag)
 , shmid(-1)
 , shmptr(NULL)
 {
-
 }
 
 
@@ -106,51 +104,15 @@ int DacqServer::collector_open()
         printf("Note: Tried to re-open an open connection\r\n");//dacq_log("Note: Tried to re-open an open connection\n");
         return(0);
     }
-//    if (m_pCollectorSock != NULL) {
-//        printf("Note: Tried to re-open an open connection\r\n");//dacq_log("Note: Tried to re-open an open connection\n");
-//        return(0);
-//    }
-
-
-    if(m_pCollectorSock->state() == QAbstractSocket::ConnectedState)
-    {
-        printf("Note: Tried to re-open an open connection\r\n");//dacq_log("Note: Tried to re-open an open connection\n");
-        return(0);
-    }
 
     m_pCollectorSock->abort();
-
-
-
-
     m_pCollectorSock->connectToHost(m_sCollectorHost, COLLECTOR_PORT);
+    m_pCollectorSock->waitForConnected( -1 );//qDebug() << "Socket Stat: " << m_pCollectorSock->state();
 
-
-    while(!m_pCollectorSock->isReadable())
-    {
-        qDebug() << "wait for data";
+    if (!dacq_server_login(QString(COLLECTOR_PASS), QString("mne_rt_server"))) {
+        printf("Neuromag collector connection: Error\n");//dacq_log("Neuromag collector connection: %s\n", err_get_error());
+        return(-1);
     }
-
-    QDataStream in(m_pCollectorSock);
-    in.setVersion(QDataStream::Qt_4_0);
-
-    QString msg;
-    in >> msg;
-
-
-    qDebug() << msg;
-
-
-//    if ((m_pCollectorSock = dacq_server_connect_by_name(m_sCollectorHost, COLLECTOR_PORT)) == NULL) {
-//        printf("Neuromag collector connection: Error\n");//dacq_log("Neuromag collector connection: %s\n", err_get_error());
-//        return(-1);
-//    }
-
-
-//    if (dacq_server_login(m_pCollectorSock, COLLECTOR_PASS, "mne_rt_server") == -1) {
-//        printf("Neuromag collector connection: Error\n");//dacq_log("Neuromag collector connection: %s\n", err_get_error());
-//        return(-1);
-//    }
 
     return(0);
 }
@@ -160,12 +122,17 @@ int DacqServer::collector_open()
 
 int DacqServer::collector_close()
 {
+
+    qDebug() << "DacqServer::collector_close()";
+
     if (m_pCollectorSock == NULL)
         return(0);
 //    if (dacq_server_close(&m_pCollectorSock, NULL)) {
 //        printf("Neuromag collector connection: Eror\n");//dacq_log("Neuromag collector connection: %s\n", err_get_error());
 //        return(-1);
 //    }
+
+    m_pCollectorSock->waitForReadyRead(100);
 
     m_pCollectorSock->close();
 
@@ -386,47 +353,43 @@ void DacqServer::run()
 
 
 
-
     if(m_pCollectorSock)
         delete m_pCollectorSock;
+    m_pCollectorSock = new QTcpSocket();
 
-    m_pCollectorSock = new QTcpSocket(this);
+    collector_open();
+
+
 
 
     if(m_pNeuromag->getBufferSampleSize() < MIN_BUFLEN)
         m_pNeuromag->setBufferSampleSize(MIN_BUFLEN);
 
 
-
-
-    collector_open();
-    collector_close();
-
-
-
-
-
-////necessary?
-//    if (m_pNeuromag->getBufferSampleSize() < MIN_BUFLEN) {
-//        fprintf(stderr, "%s: Too small Neuromag buffer length requested, should be at least %d\n", m_pNeuromag->getBufferSampleSize(), MIN_BUFLEN);
-//        return;
-//    }
-//    else {
-//        /* Connect to the Elekta Neuromag acquisition control server, change the buffer length and exit*/
-//        if (collector_open()) {
-//            printf("Cannot change the Neuromag buffer length: Could not open collector connection\n");//dacq_log("Cannot change the Neuromag buffer length: Could not open collector connection\n");
-//            return;
-//        }
-//        printf("Changing the Neuromag buffer length to %d\r\n", m_pNeuromag->getBufferSampleSize());//dacq_log("Changing the Neuromag buffer length to %d\n", newMaxBuflen);
-//        if (collector_setMaxBuflen(m_pNeuromag->getBufferSampleSize())) {
-//            printf("Setting a new Neuromag buffer length failed\r\n");//dacq_log("Setting a new Neuromag buffer length failed\n");
-//            collector_close();
-//            return;
-//        }
-//    }
+//necessary?
+    if (m_pNeuromag->getBufferSampleSize() < MIN_BUFLEN) {
+        fprintf(stderr, "%s: Too small Neuromag buffer length requested, should be at least %d\n", m_pNeuromag->getBufferSampleSize(), MIN_BUFLEN);
+        return;
+    }
+    else {
+        /* Connect to the Elekta Neuromag acquisition control server, change the buffer length and exit*/
+        if (collector_open()) {
+            printf("Cannot change the Neuromag buffer length: Could not open collector connection\n");//dacq_log("Cannot change the Neuromag buffer length: Could not open collector connection\n");
+            return;
+        }
+        printf("Changing the Neuromag buffer length to %d\r\n", m_pNeuromag->getBufferSampleSize());//dacq_log("Changing the Neuromag buffer length to %d\n", newMaxBuflen);
+        if (collector_setMaxBuflen(m_pNeuromag->getBufferSampleSize())) {
+            printf("Setting a new Neuromag buffer length failed\r\n");//dacq_log("Setting a new Neuromag buffer length failed\n");
+            collector_close();
+            return;
+        }
+    }
 
 
 
+    QString data = QString("vara maxBuflen 987\r\n");
+    dacq_server_command(data);
+    qDebug() << "Write " << data;
 
 
 
@@ -694,8 +657,6 @@ int DacqServer::connect_disconnect (int sock,int id)
 
 
 
-
-
 // shmem.c
 //*************************************************************************************************************
 
@@ -715,5 +676,37 @@ int DacqServer::dacq_release_shmem(void)
 }
 
 
+// new client.c to qt functions
+//*************************************************************************************************************
+
+bool DacqServer::dacq_server_command(const QString& p_sCommand)
+{
+
+    if (m_pCollectorSock->state() != QAbstractSocket::ConnectedState)
+        return false;
+
+    QByteArray t_arrCommand = p_sCommand.toLocal8Bit();
+
+    if(t_arrCommand.size() > 0)
+    {
+        m_pCollectorSock->write(t_arrCommand);
+        m_pCollectorSock->flush();
+    }
+
+    //ToDo check if command was succefull processed by the collector
+
+    return true;
+}
 
 
+//*************************************************************************************************************
+
+bool DacqServer::dacq_server_login(const QString& p_sCollectorPass, const QString& p_sMyName)
+{
+    qDebug() << "Where to set myName: " << p_sMyName;
+
+    QString t_sLogin = QString("pass %1\r\n").arg(p_sCollectorPass);
+    dacq_server_command(t_sLogin);
+
+    return true;
+}
