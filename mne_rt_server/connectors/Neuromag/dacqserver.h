@@ -3,14 +3,12 @@
 * @file     dacqserver.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Gustavo Sudre;
-*           Lauri Parkkonen
 * @version  1.0
 * @date     July, 2012
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh, Matti Hamalainen, Gustavo Sudre and Lauri Parkkonen. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -55,6 +53,8 @@
 #include <QThread>
 
 #include <QTcpSocket>
+
+#include <QByteArray>
 
 
 //*************************************************************************************************************
@@ -139,10 +139,15 @@ public:
     void clean_up();
 
 
+
+public slots: //--> in Qt 5 not anymore declared as slot
+
+    void readCollectorMsg();
+
+
 signals:
 
 
-//public slots: --> in Qt 5 not anymore declared as slot
 
 
 protected:
@@ -225,12 +230,14 @@ private:
     dacqShmBlock shmptr;
 
 
+// new client.c to qt functions
+    bool dacq_server_command(const QString& p_sCommand);
+    bool dacq_server_login(const QString& p_sCollectorPass, const QString& p_sMyName);//where to register myName?
 
 
 //dacqserver
+
     bool m_bIsRunning;
-
-
 
     Neuromag* m_pNeuromag;
 
@@ -238,9 +245,9 @@ private:
     int     m_iShmemId;
 
 
-
 };
 
 } // NAMESPACE
+
 
 #endif // DACQSERVER_H
