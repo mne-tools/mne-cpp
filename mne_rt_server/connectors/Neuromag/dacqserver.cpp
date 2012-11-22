@@ -143,7 +143,7 @@ int DacqServer::collector_close()
 
 //*************************************************************************************************************
 
-int collector_getMaxBuflen()
+int DacqServer::collector_getMaxBuflen()
 {
 //#define REPLYSIZ 65536
 
