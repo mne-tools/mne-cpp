@@ -55,6 +55,11 @@ namespace NeuromagPlugin
 #define COLLECTOR_PASS    "homunculus122"
 #define COLLECTOR_BUFS    32768
 
+#define COLLECTOR_GETVARS "vars"
+#define COLLECTOR_SETVARS "vara"
+#define COLLECTOR_DOSETUP "setu"
+#define COLLECTOR_BUFVAR  "maxBuflen"
+
 #define MIN_BUFLEN      1*28    /**< DSP units send packets of 28 samples, which is the ultimate lower bound */
 #define CLIENT_ID       13014   /**< ID of rtclient. A unique ID for us as a shared memory client. Should be more than 10000. Is also used to create the sun_path which is used to connect to the data acquisition peer over a UNIX datagram socket.*/
 

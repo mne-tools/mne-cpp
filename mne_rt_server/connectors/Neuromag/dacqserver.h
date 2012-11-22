@@ -120,7 +120,7 @@ public:
      *
      * @return
      */
-    bool collector_getMaxBuflen();
+    int collector_getMaxBuflen();
 
     //=========================================================================================================
     /**
@@ -128,7 +128,7 @@ public:
      *
      * @return
      */
-    bool collector_setMaxBuflen(int maxbuflen);
+    int collector_setMaxBuflen(int maxbuflen);
 
     //=========================================================================================================
     /**
@@ -160,15 +160,6 @@ protected:
     virtual void run();
 
 private:
-
-//    //=========================================================================================================
-//    /**
-//     * Disconnect from the data server process
-//     *
-//     * @return
-//     */
-//    int dacq_disconnect_client (sockfd sock,int id);
-
 
 
 //    /**
@@ -204,9 +195,8 @@ private:
 
 
 // client_socket.c
-    void close_socket (int sock, int id);
 
-    int connect_disconnect (int sock,int id);
+
 
     //ToDo Connect is different? to: telnet localhost collector ???
     //=========================================================================================================
@@ -216,6 +206,32 @@ private:
      * @return
      */
     int dacq_connect_client (int id);
+
+
+
+    //=========================================================================================================
+    /**
+     * Disconnect from the data server process
+     *
+     * @return
+     */
+    int dacq_disconnect_client (int sock,int id);
+
+
+
+
+
+
+    void close_socket (int sock, int id);
+
+    int connect_disconnect (int sock,int id);
+
+
+
+
+
+
+
 
 
 // shmem.c
