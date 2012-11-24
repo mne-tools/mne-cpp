@@ -96,7 +96,7 @@ Neuromag::Neuromag()
     //DEBUG
 
 
-    this->setBufferSampleSize(1500);
+    this->setBufferSampleSize(100);
     m_pRawMatrixBuffer = NULL;
     this->init();
 }
