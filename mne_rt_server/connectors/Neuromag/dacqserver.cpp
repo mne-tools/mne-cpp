@@ -484,9 +484,9 @@ int DacqServer::dacq_client_receive_tag (int sock, int id )
             {
                 memcpy(data,shmBlock->data,mess.size);
                 data_ok = 1;
-            #ifdef DEBUG
+            //#ifdef DEBUG
                 printf("client # %d read shmem buffer # %d\n", id,mess.shmem_buf);//dacq_log("client # %d read shmem buffer # %d\n", id,mess.shmem_buf);
-            #endif
+            //#endif
             }
             /*
             * Indicate that this client has processed the data
@@ -534,6 +534,20 @@ int DacqServer::dacq_client_receive_tag (int sock, int id )
             }
         }
     }
+    
+    
+    
+    if(mess.kind == 4) // FIFF_ERROR_MESSAGE
+    {
+    
+        QByteArray test((char*)data, mess.size);
+        
+        qDebug() << "Error: " << test;
+    
+    }
+    
+    
+    
 //    /*
 //    * Special case: close old input file
 //    */
