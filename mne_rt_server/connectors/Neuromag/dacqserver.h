@@ -100,42 +100,42 @@ public:
     
     //=========================================================================================================
     /**
-     * Open the collector control connection
-     *
-     * @return
-     */
-    int collector_open();
+    * Open the collector control connection
+    *
+    * @return
+    */
+    bool collector_open();
 
     //=========================================================================================================
     /**
-     * Close the collector connection
-     *
-     * @return
-     */
+    * Close the collector connection
+    *
+    * @return
+    */
     int collector_close();
 
     //=========================================================================================================
     /**
-     * Query the current buffer length of the Elekta acquisition system
-     *
-     * @return
-     */
+    * Query the current buffer length of the Elekta acquisition system
+    *
+    * @return
+    */
     int collector_getMaxBuflen();
 
     //=========================================================================================================
     /**
-     * Set the desired maximum buffer length
-     *
-     * @return
-     */
+    * Set the desired maximum buffer length
+    *
+    * @return
+    */
     int collector_setMaxBuflen(int maxbuflen);
 
     //=========================================================================================================
     /**
-     * Quit function
-     *
-     * @return
-     */
+    * Quit function
+    *
+    * @return
+    */
     void clean_up();
 
 
@@ -162,28 +162,6 @@ protected:
 private:
 
 
-//    /**
-//     * Receive one tag from the data server.
-//     *
-//     * This routine reads a message from the data server
-//     * socket and grabs the data. The data may actually
-//     * be in a shared memory segment noted in the message.
-//     *
-//     * The id parameter is needed for two purposes. The
-//     * data transfer mechanism varies depending on the client
-//     * number. Clients with id above 10000 use shared memory
-//     * transfer while other used a regular file to transfer the
-//     * data.It is needed also if the conndedtion needs to be
-//     * closed after an error.
-//     *
-//     * \return Status OK or FAIL.
-//     */
-
-//    int dacq_client_receive_tag (int sock, /**< Socket to read */ int id );  /**< My id number */
-
-
-
-
     //newly written stuff ported to qt
 
     QString         m_sCollectorHost;
@@ -197,38 +175,78 @@ private:
 // client_socket.c
 
 
+    //=========================================================================================================
+    /**
+    * Filter out some large data blocks
+    * which are not of interest
+    *
+    * @return
+    */
+    int interesting_data (int kind);
+
+    /**
+    * Receive one tag from the data server.
+    *
+    * This routine reads a message from the data server
+    * socket and grabs the data. The data may actually
+    * be in a shared memory segment noted in the message.
+    *
+    * The id parameter is needed for two purposes. The
+    * data transfer mechanism varies depending on the client
+    * number. Clients with id above 10000 use shared memory
+    * transfer while other used a regular file to transfer the
+    * data.It is needed also if the conndedtion needs to be
+    * closed after an error.
+    *
+    * \return Status OK or FAIL.
+    */
+    int dacq_client_receive_tag (int sock, /**< Socket to read */ int id );  /**< My id number */
 
     //ToDo Connect is different? to: telnet localhost collector ???
     //=========================================================================================================
     /**
-     * Connect to the data server process
-     *
-     * @return
-     */
+    * Connect to the data server process
+    *
+    * @return
+    */
     int dacq_connect_client (int id);
+
+    //=========================================================================================================
+    /**
+    * Disconnect from the data server process
+    *
+    * @return
+    */
+    int dacq_disconnect_client (int sock,int id);
+
+    //=========================================================================================================  
+    /*
+    * Select tags that we are not interested in!
+    *
+    */
+    void dacq_set_data_filter (int *kinds, int nkind);
 
 
 
     //=========================================================================================================
     /**
-     * Disconnect from the data server process
-     *
-     * @return
-     */
-    int dacq_disconnect_client (int sock,int id);
-
-
-
-
-
-
+    *
+    * @return
+    */
     void close_socket (int sock, int id);
 
+
+    //=========================================================================================================
+    /**
+    *
+    * @return
+    */
     int connect_disconnect (int sock,int id);
 
 
 
-
+    int* filter_kinds;  /**< Filter these tags */
+    int nfilt;		    /**< How many are they */
 
 
 
@@ -236,10 +254,30 @@ private:
 
 // shmem.c
 
-    /**
-     * Release the shared memory
-     */
 
+    //=========================================================================================================
+    /**
+    *
+    * @return
+    */
+    dacqShmBlock dacq_get_shmem(void);
+
+    //=========================================================================================================
+    /**
+    * Initialize data acquisition shared memory segment
+    *
+    * @return
+    */
+
+    int dacq_init_shmem(void);
+
+
+    //=========================================================================================================
+    /**
+    * Release the shared memory
+    *
+    * @return
+    */
     int dacq_release_shmem(void);
 
     int shmid;
@@ -248,7 +286,8 @@ private:
 
 // new client.c to qt functions
     bool dacq_server_command(const QString& p_sCommand);
-    bool dacq_server_login(const QString& p_sCollectorPass, const QString& p_sMyName);//where to register myName?
+    bool dacq_server_login(const QString& p_sCollectorPass, const QString& p_sMyName);
+    bool dacq_server_send(QString& p_sDataSend, QByteArray& p_dataOut, int p_iInputFlag = DACQ_DRAIN_INPUT);
 
 
 //dacqserver

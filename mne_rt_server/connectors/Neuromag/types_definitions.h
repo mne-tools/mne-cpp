@@ -51,6 +51,28 @@ namespace NeuromagPlugin
 // DEFINES
 //=============================================================================================================
 
+#define DACQ_REPLY_PACKET 1
+#define DACQ_REPLY_RFC    2
+#define DACQ_REPLY_BINARY 4
+#define DACQ_REPLY_ASCII  8
+
+#define DACQ_DRAIN_INPUT  0
+#define DACQ_KEEP_INPUT   1
+
+#define DACQ_REPLY_GOOD   1
+#define DACQ_REPLY_BAD    0
+#define DACQ_REPLY_ERROR -1
+
+#define DACQ_CMD_PASSWORD "pass"
+#define DACQ_CMD_NAME     "name"
+#define DACQ_CMD_ABOUT    "abou"
+#define DACQ_CMD_MONITOR  "moni"
+#define DACQ_CMD_HELP     "help"
+#define DACQ_CMD_QUIT     "quit"
+
+
+
+
 #define COLLECTOR_PORT    11122         //"collector"
 #define COLLECTOR_PASS    "homunculus122"
 #define COLLECTOR_BUFS    32768
@@ -73,11 +95,16 @@ namespace NeuromagPlugin
 #define OK      0
 #define FAIL    -1
 
+//
+// compat.h
+//
+
+//typedef int socklen_t;
 
 
-
-//dacq_shmem.h
-
+//
+// dacq_shmem.h
+//
 #define SHM_FILE       "/neuro/dacq/shmem/data_server"
 #define SHM_FAIL_FILE  "/neuro/dacq/raw/data_server_shmem"
 #define SHM_MAX_CLIENT 10
@@ -103,6 +130,21 @@ typedef struct {
 
 #define SHM_SIZE SHM_NUM_BLOCKS*sizeof(dacqShmBlockRec)
 
+
+
+//
+// data_message.h
+//
+typedef struct {
+  int     kind;			/* What is this data? */
+  int     type;			/* What is its type */
+  int     size;			/* Size of item */
+  int     loc;			/* Position in file */
+  int     shmem_buf;		/* Shared mem block */
+  int     shmem_loc;		/* Not used, set to -1 */
+} dacqDataMessageRec,*dacqDataMessage;
+
+#define DATA_MESS_SIZE sizeof(dacqDataMessageRec)
 
 }
 
