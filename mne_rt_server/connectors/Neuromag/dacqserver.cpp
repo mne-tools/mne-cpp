@@ -94,9 +94,153 @@ DacqServer::DacqServer(Neuromag* p_pNeuromag)
 , shmptr(NULL)
 {
 
-    filter_kinds = NULL; /* Filter these tags */
-    nfilt = 0;		/* How many are they */
+    filter_kinds = NULL;    /* Filter these tags */
+    nfilt = 0;		        /* How many are they */
     
+}
+
+
+//*************************************************************************************************************
+
+DacqServer::~DacqServer()
+{
+    if(m_pCollectorSock)
+        delete m_pCollectorSock;      
+//    if(shmptr)
+//        delete shmptr;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// run
+//=============================================================================================================
+
+void DacqServer::run()
+{
+    m_bIsRunning = true;
+
+    dacq_set_data_filter (NULL, 0);
+
+    if(m_pCollectorSock)
+        delete m_pCollectorSock;
+    m_pCollectorSock = new QTcpSocket();
+    
+    //
+    // Make sure the buffer size is at least as big as the minimal buffer size
+    //
+    if(m_pNeuromag->getBufferSampleSize() < MIN_BUFLEN)
+        m_pNeuromag->setBufferSampleSize(MIN_BUFLEN);
+
+///////necessary? -> without that it sometimes doesn't work -> this sets the buffer size without questioning it
+    if (m_pNeuromag->getBufferSampleSize() < MIN_BUFLEN) {
+        fprintf(stderr, "%s: Too small Neuromag buffer length requested, should be at least %d\n", m_pNeuromag->getBufferSampleSize(), MIN_BUFLEN);
+        return;
+    }
+    else {
+        /* Connect to the Elekta Neuromag acquisition control server, change the buffer length and exit*/
+        if (!collector_open()) {
+            printf("Cannot change the Neuromag buffer length: Could not open collector connection\n");//dacq_log("Cannot change the Neuromag buffer length: Could not open collector connection\n");
+            return;
+        }
+        printf("Changing the Neuromag buffer length to %d... ", m_pNeuromag->getBufferSampleSize());//dacq_log("Changing the Neuromag buffer length to %d\n", newMaxBuflen);
+        if (collector_setMaxBuflen(m_pNeuromag->getBufferSampleSize())) {
+            printf("Setting a new Neuromag buffer length failed\r\n");//dacq_log("Setting a new Neuromag buffer length failed\n");
+            collector_close();
+            return;
+        }
+        printf("[done]\r\n");        
+    }
+////////////
+
+    /* Connect to the Elekta Neuromag shared memory system */
+    printf("About to connect to the Neuromag DACQ shared memory on this workstation (client ID %d)... ", m_iShmemId);//dacq_log("About to connect to the Neuromag DACQ shared memory on this workstation (client ID %d)...\n", shmem_id);
+    int old_umask = umask(SOCKET_UMASK);
+    if ((m_iShmemSock = dacq_connect_client(m_iShmemId)) == -1) {
+        umask(old_umask);
+        printf("Could not connect!\r\n");//dacq_log("Could not connect!\n");
+        return;//(2);
+    }
+    printf("[done]\r\n");//dacq_log("Connection ok\n");
+
+//    int  t_iOriginalMaxBuflen = -1;
+//    /* Connect to the Elekta Neuromag acquisition control server and
+//     * fiddle with the buffer length parameter */
+//    if (m_pNeuromag->getBufferSampleSize() > 0) {
+//        if (!collector_open()) {
+//            printf("Cannot change the Neuromag buffer length: Could not open collector connection\r\n");//dacq_log("Cannot change the Neuromag buffer length: Could not open collector connection\n");
+//            return;
+//        }
+//        if ((t_iOriginalMaxBuflen = collector_getMaxBuflen()) < 1) {
+//            printf("Cannot change the Neuromag buffer length: Could not query the current value\r\n");//dacq_log("Cannot change the Neuromag buffer length: Could not query the current value\n");
+//            collector_close();
+//            return;
+//        }
+//        
+//        if (t_iOriginalMaxBuflen != m_pNeuromag->getBufferSampleSize())
+//        {
+//            printf("Changing the Neuromag buffer length %d -> %d\r\n", t_iOriginalMaxBuflen, m_pNeuromag->getBufferSampleSize());
+//            if (collector_setMaxBuflen(m_pNeuromag->getBufferSampleSize())) {
+//                printf("Setting a new Neuromag buffer length failed");//dacq_log("Setting a new Neuromag buffer length failed\n");
+//                collector_close();
+//                return;
+//            }
+//            printf("[done]\r\n");    
+//        }
+//    }
+//    /* Even if we're not supposed to change the buffer length, let's show it to the user */
+//    else {
+//        if (collector_open()) {
+//            printf("Cannot find Neuromag buffer length: Could not open collector connection\r\n");//dacq_log("Cannot find Neuromag buffer length: Could not open collector connection\n");
+//            return;
+//        }
+//        t_iOriginalMaxBuflen = collector_getMaxBuflen();
+//        if (t_iOriginalMaxBuflen < 1) {
+//            printf("Could not query the current Neuromag buffer length\r\n");//dacq_log("Could not query the current Neuromag buffer length\n");
+//            collector_close();
+//            return;
+//        }
+//        else
+//            printf("Current buffer length value = %d\r\n",t_iOriginalMaxBuflen);//dacq_log("Current buffer length value = %d\n",originalMaxBuflen);
+//    }
+
+    /* Mainloop */
+//    printf("Will scale up MEG mags by %g, grads by %g and EEG data by %g\n",
+//         meg_mag_multiplier, meg_grad_multiplier, eeg_multiplier);
+    printf("Waiting for the measurement to start...\n");
+    
+    //
+    // Control measurement start through Neuromag connector. ToDo: in Case Realtime measurement should be performed during normal acqusition process, change this!!
+    //
+    QString t_sCommand = QString("%1\r\n").arg("meas");
+    dacq_server_command(t_sCommand);
+    
+    //
+    // Receive shmem tags
+    //
+    
+    FiffTag* t_pTag = NULL;
+    
+    qint32 count = 0;
+    while(m_bIsRunning)
+    {
+    
+        qDebug() << count;
+//#if defined(DACQ_OLD_CONNECTION_SCHEME)
+        if (dacq_client_receive_tag(m_iShmemSock, m_iShmemId, t_pTag) == -1)
+//#else
+//        if (dacq_client_receive_tag(&m_iShmemSock, m_iShmemId) == -1)
+//#endif
+            break;
+            
+        qDebug() << "Tag Kind: " << t_pTag->kind << " Type: " << t_pTag->type << "Size: " << t_pTag->size();
+
+        ++count;
+    }
+    
+    delete t_pTag;
+
+    printf("\r\n");
 }
 
 
@@ -208,186 +352,11 @@ int DacqServer::collector_setMaxBuflen(int maxbuflen)
 
 
 //*************************************************************************************************************
-
-void DacqServer::run()
-{
-    m_bIsRunning = true;
-
-
-    dacq_set_data_filter (NULL, 0);
-
-
-    if(m_pCollectorSock)
-        delete m_pCollectorSock;
-    m_pCollectorSock = new QTcpSocket();
-    
-    //
-    // Make sure the buffer size is at least as big as the minimal buffer size
-    //
-    if(m_pNeuromag->getBufferSampleSize() < MIN_BUFLEN)
-        m_pNeuromag->setBufferSampleSize(MIN_BUFLEN);
-
-
-///////necessary? -> without that it sometimes doesn't work -> this sets the buffer size without questioning it
-    if (m_pNeuromag->getBufferSampleSize() < MIN_BUFLEN) {
-        fprintf(stderr, "%s: Too small Neuromag buffer length requested, should be at least %d\n", m_pNeuromag->getBufferSampleSize(), MIN_BUFLEN);
-        return;
-    }
-    else {
-        /* Connect to the Elekta Neuromag acquisition control server, change the buffer length and exit*/
-        if (!collector_open()) {
-            printf("Cannot change the Neuromag buffer length: Could not open collector connection\n");//dacq_log("Cannot change the Neuromag buffer length: Could not open collector connection\n");
-            return;
-        }
-        printf("Changing the Neuromag buffer length to %d... ", m_pNeuromag->getBufferSampleSize());//dacq_log("Changing the Neuromag buffer length to %d\n", newMaxBuflen);
-        if (collector_setMaxBuflen(m_pNeuromag->getBufferSampleSize())) {
-            printf("Setting a new Neuromag buffer length failed\r\n");//dacq_log("Setting a new Neuromag buffer length failed\n");
-            collector_close();
-            return;
-        }
-        printf("[done]\r\n");        
-    }
-////////////
-
-
-
-    /* Connect to the Elekta Neuromag shared memory system */
-    printf("About to connect to the Neuromag DACQ shared memory on this workstation (client ID %d)... ", m_iShmemId);//dacq_log("About to connect to the Neuromag DACQ shared memory on this workstation (client ID %d)...\n", shmem_id);
-    int old_umask = umask(SOCKET_UMASK);
-    if ((m_iShmemSock = dacq_connect_client(m_iShmemId)) == -1) {
-        umask(old_umask);
-        printf("Could not connect!\r\n");//dacq_log("Could not connect!\n");
-        return;//(2);
-    }
-    printf("[done]\r\n");//dacq_log("Connection ok\n");
-
-
-
-//    int  t_iOriginalMaxBuflen = -1;
-//    /* Connect to the Elekta Neuromag acquisition control server and
-//     * fiddle with the buffer length parameter */
-//    if (m_pNeuromag->getBufferSampleSize() > 0) {
-//        if (!collector_open()) {
-//            printf("Cannot change the Neuromag buffer length: Could not open collector connection\r\n");//dacq_log("Cannot change the Neuromag buffer length: Could not open collector connection\n");
-//            return;
-//        }
-//        if ((t_iOriginalMaxBuflen = collector_getMaxBuflen()) < 1) {
-//            printf("Cannot change the Neuromag buffer length: Could not query the current value\r\n");//dacq_log("Cannot change the Neuromag buffer length: Could not query the current value\n");
-//            collector_close();
-//            return;
-//        }
-//        
-//        if (t_iOriginalMaxBuflen != m_pNeuromag->getBufferSampleSize())
-//        {
-//            printf("Changing the Neuromag buffer length %d -> %d\r\n", t_iOriginalMaxBuflen, m_pNeuromag->getBufferSampleSize());
-//            if (collector_setMaxBuflen(m_pNeuromag->getBufferSampleSize())) {
-//                printf("Setting a new Neuromag buffer length failed");//dacq_log("Setting a new Neuromag buffer length failed\n");
-//                collector_close();
-//                return;
-//            }
-//            printf("[done]\r\n");    
-//        }
-//    }
-//    /* Even if we're not supposed to change the buffer length, let's show it to the user */
-//    else {
-//        if (collector_open()) {
-//            printf("Cannot find Neuromag buffer length: Could not open collector connection\r\n");//dacq_log("Cannot find Neuromag buffer length: Could not open collector connection\n");
-//            return;
-//        }
-//        t_iOriginalMaxBuflen = collector_getMaxBuflen();
-//        if (t_iOriginalMaxBuflen < 1) {
-//            printf("Could not query the current Neuromag buffer length\r\n");//dacq_log("Could not query the current Neuromag buffer length\n");
-//            collector_close();
-//            return;
-//        }
-//        else
-//            printf("Current buffer length value = %d\r\n",t_iOriginalMaxBuflen);//dacq_log("Current buffer length value = %d\n",originalMaxBuflen);
-//    }
-
-
-
-    /* Mainloop */
-//    printf("Will scale up MEG mags by %g, grads by %g and EEG data by %g\n",
-//         meg_mag_multiplier, meg_grad_multiplier, eeg_multiplier);
-    printf("Waiting for the measurement to start...\n");
-    
-    
-    //
-    // Control measurement start through Neuromag connector. ToDo: in Case Realtime measurement should be performed during normal acqusition process, change this!!
-    //
-    QString t_sCommand = QString("%1\r\n").arg("meas");
-    dacq_server_command(t_sCommand);
-    
-    
-    
-
-    qint32 count = 0;
-    while(m_bIsRunning)
-    {
-//#if defined(DACQ_OLD_CONNECTION_SCHEME)
-        if (dacq_client_receive_tag(m_iShmemSock, m_iShmemId) == -1)
-//#else
-//        if (dacq_client_receive_tag(&m_iShmemSock, m_iShmemId) == -1)
-//#endif
-            break;
-
-        ++count;
-
-        qDebug() << count;
-    }
-
-     printf("\n");
-
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//QTcpSocket* DacqServer::dacq_server_connect_by_name(QString& p_sCollectorHost, int p_iCollectorPort)
-//{
-
-
-//    return NULL;
-
-//}
-
-
-
-
-
-
-
-
+//=============================================================================================================
 // client_socket.c
-//*************************************************************************************************************
+//=============================================================================================================
 
-int DacqServer::dacq_client_receive_tag (int sock, int id )
+int DacqServer::dacq_client_receive_tag (int sock, int id, FiffTag*& p_pTag )
 {
     struct  sockaddr_un from;	/* Address (not used) */
     socklen_t fromlen;
@@ -396,8 +365,8 @@ int DacqServer::dacq_client_receive_tag (int sock, int id )
     int rlen;
     int data_ok = 0;
 
-    static unsigned char *data = NULL; /* The data */
-    static int           cursize = 0; /* Its current allocated size */
+//    static unsigned char *data = NULL; /* The data */
+//    static int           cursize = 0; /* Its current allocated size */
 
     static FILE   *fd = NULL;		/* The temporary file */
     static FILE   *shmem_fd = NULL;
@@ -417,15 +386,13 @@ int DacqServer::dacq_client_receive_tag (int sock, int id )
     if (sock < 0)
         return (OK);
 
-
     //
     // read from the socket
     //
     fromlen = sizeof(from);
     rlen = recvfrom(sock, (void *)(&mess), DATA_MESS_SIZE, 0, (sockaddr *)(&from), &fromlen);
 
-    qDebug() << "Kind: " << mess.kind << " Type: " << mess.type << "Size: " << mess.size;
-
+    qDebug() << "Mess Kind: " << mess.kind << " Type: " << mess.type << "Size: " << mess.size;
 
     //
     // Parse received message
@@ -447,21 +414,30 @@ int DacqServer::dacq_client_receive_tag (int sock, int id )
         mess.kind = FIFF_NOP;
     }
 
+
+    if(p_pTag)
+        delete p_pTag;
+    p_pTag = new FiffTag();  
+
+
     if (mess.size > (size_t) 0)
     {
         int newsize = (mess.type == FIFFT_STRING) ? mess.size+1 : mess.size;
-        if (data == NULL)
-            data = (unsigned char*)malloc(newsize);
-        else
-            data = (unsigned char*)realloc(data,newsize);
+        
+        p_pTag->resize(mess.size);
+        
+//        if (data == NULL)
+//            data = (unsigned char*)malloc(newsize);
+//        else
+//            data = (unsigned char*)realloc(data,newsize);
 
-        cursize = newsize;
+//        cursize = newsize;
     }
 
     if (mess.loc < 0 && mess.size > (size_t) 0 && mess.shmem_buf < 0 && mess.shmem_loc < 0)
     {
         fromlen = sizeof(from);
-        rlen = recvfrom(sock, (void *)data, mess.size, 0, (sockaddr *)(&from), &fromlen);
+        rlen = recvfrom(sock, (void *)p_pTag->data(), mess.size, 0, (sockaddr *)(&from), &fromlen);
         if (rlen == -1)
         {
             printf("recvfrom");//dacq_perror("recvfrom");
@@ -469,8 +445,8 @@ int DacqServer::dacq_client_receive_tag (int sock, int id )
             return (FAIL);
         }
         data_ok = 1;
-        if (mess.type == FIFFT_STRING)
-            data[mess.size] = '\0';
+//        if (mess.type == FIFFT_STRING)
+//            data[mess.size] = '\0';
     }
     else if (mess.size > (size_t) 0) {
         /*
@@ -480,9 +456,12 @@ int DacqServer::dacq_client_receive_tag (int sock, int id )
         {
             shmBlock  = shmem + mess.shmem_buf;
             shmClient = shmBlock->clients;
+            
+            p_pTag->resize(mess.size);
+            
             if (interesting_data(mess.kind))
             {
-                memcpy(data,shmBlock->data,mess.size);
+                memcpy(p_pTag->data(),shmBlock->data,mess.size);
                 data_ok = 1;
             //#ifdef DEBUG
                 printf("client # %d read shmem buffer # %d\n", id,mess.shmem_buf);//dacq_log("client # %d read shmem buffer # %d\n", id,mess.shmem_buf);
@@ -512,9 +491,9 @@ int DacqServer::dacq_client_receive_tag (int sock, int id )
                 read_fd  = fd;
                 read_loc = mess.loc;
             }
-            if (interesting_data(mess.kind))
-            {
-                qDebug() << "Interesting data: " << mess.kind;
+//            if (interesting_data(mess.kind))
+//            {
+//                qDebug() << "Interesting data: " << mess.kind;
 //                if (read_fif (read_fd,read_loc,mess.size,(char *)data) == -1)
 //                {
 //                    printf("Could not read data (tag = %d, size = %d, pos = %d)!\n", mess.kind,mess.size,read_loc);
@@ -531,28 +510,30 @@ int DacqServer::dacq_client_receive_tag (int sock, int id )
 //                if (fd == shmem_fd)
 //                    printf("client # %d read shmem file pos %d\n",id,mess.shmem_loc);//dacq_log("client # %d read shmem file pos %d\n",id,mess.shmem_loc);
 //            #endif
-            }
+//            }
         }
     }
     
     
     
-    if(mess.kind == 4) // FIFF_ERROR_MESSAGE
+    if(mess.kind == FIFF_ERROR_MESSAGE)
     {
     
-        QByteArray test((char*)data, mess.size);
+//        QByteArray test((char*)p_pTag->data(), mess.size);
         
-        qDebug() << "Error: " << test;
+        qDebug() << "Error: " << *p_pTag;
     
     }
     
     
     
-//    /*
-//    * Special case: close old input file
-//    */
-//    if (mess.kind == FIFF_CLOSE_FILE)
-//    {
+    /*
+    * Special case: close old input file
+    */
+    if (mess.kind == FIFF_CLOSE_FILE)
+    {
+        printf("FIFF CLOSE FILE.\r\n");
+
 //        if (fd != NULL) 
 //        {
 //            printf("File to be closed (lib/FIFF_CLOSE_FILE).\n");//dacq_log("File to be closed (lib/FIFF_CLOSE_FILE).\n");
@@ -561,12 +542,13 @@ int DacqServer::dacq_client_receive_tag (int sock, int id )
 //        }
 //        else
 //            printf("No file to close (lib/FIFF_CLOSE_FILE).\n");//dacq_log("No file to close (lib/FIFF_CLOSE_FILE).\n");
-//    }
-//    /*
-//    * Another special case: open new input file
-//    */
-//    else if (mess.kind == FIFF_NEW_FILE)
-//    {
+    }
+    /*
+    * Another special case: open new input file
+    */
+    else if (mess.kind == FIFF_NEW_FILE)
+    {
+        printf("FIFF NEW FILE.\r\n");
 //        if (fd != NULL)
 //        {
 //            (void)fclose(fd);
@@ -575,13 +557,15 @@ int DacqServer::dacq_client_receive_tag (int sock, int id )
 //        fd = open_fif((char *)data);
 //        free (filename);
 //        filename = strdup((char *)data);
-//
+
 //        if (shmem_fd == NULL)
 //            shmem_fd = open_fif (SHM_FAIL_FILE);
-//    }
-
-
-
+    }
+  
+    
+    p_pTag->kind = mess.kind;
+    p_pTag->type = mess.type;
+    p_pTag->next = 0;
 
 //    tag.kind = mess.kind;
 //    tag.type = mess.type;
@@ -652,7 +636,6 @@ int DacqServer::dacq_connect_client (int id)
 }
 
 
-
 //*************************************************************************************************************
 
 int DacqServer::dacq_disconnect_client (int sock, int id)
@@ -681,25 +664,6 @@ void DacqServer::dacq_set_data_filter (int *kinds, int nkind)
     }
     return;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 //*************************************************************************************************************
@@ -777,15 +741,10 @@ int DacqServer::interesting_data (int kind)
 }
 
 
-
-
-
-// shmem.c
 //*************************************************************************************************************
-
-/**
- * Get pointer to the shared memory
- */
+//=============================================================================================================
+// shmem.c
+//=============================================================================================================
 
 dacqShmBlock DacqServer::dacq_get_shmem(void)
 {
@@ -837,12 +796,10 @@ int DacqServer::dacq_release_shmem(void)
 }
 
 
-
-
-
-
-// new client.c to qt functions
 //*************************************************************************************************************
+//=============================================================================================================
+// new client.c to qt functions
+//=============================================================================================================
 
 bool DacqServer::dacq_server_command(const QString& p_sCommand)
 {

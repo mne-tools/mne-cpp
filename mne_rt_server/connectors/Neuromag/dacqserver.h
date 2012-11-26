@@ -44,6 +44,8 @@
 
 #include "types_definitions.h"
 
+#include "../../../MNE/fiff/fiff_tag.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -72,6 +74,7 @@ namespace NeuromagPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace FIFFLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -79,6 +82,7 @@ namespace NeuromagPlugin
 //=============================================================================================================
 
 class Neuromag;
+//class FiffTag;
 
 
 //=============================================================================================================
@@ -98,6 +102,38 @@ public:
     */
     DacqServer(Neuromag* p_pNeuromag);
     
+    
+    //=========================================================================================================
+    /**
+    * Constructs a acquisition Server.
+    */
+    ~DacqServer();
+    
+    
+    
+    
+    
+public slots: //--> in Qt 5 not anymore declared as slot
+
+    void readCollectorMsg();
+
+
+signals:
+
+
+
+
+protected:
+    //=========================================================================================================
+    /**
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread.
+    */
+    virtual void run();
+
+private:
+
     //=========================================================================================================
     /**
     * Open the collector control connection
@@ -136,54 +172,17 @@ public:
     *
     * @return
     */
-    void clean_up();
+//    void clean_up();
 
-
-
-public slots: //--> in Qt 5 not anymore declared as slot
-
-    void readCollectorMsg();
-
-
-signals:
-
-
-
-
-protected:
-    //=========================================================================================================
-    /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
-    virtual void run();
-
-private:
 
 
     //newly written stuff ported to qt
-
     QString         m_sCollectorHost;
     QTcpSocket*     m_pCollectorSock;
 
-//    QTcpSocket* dacq_server_connect_by_name(QString& p_sCollectorHost, int p_iCollectorPort);
-
-
-
 
 // client_socket.c
-
-
     //=========================================================================================================
-    /**
-    * Filter out some large data blocks
-    * which are not of interest
-    *
-    * @return
-    */
-    int interesting_data (int kind);
-
     /**
     * Receive one tag from the data server.
     *
@@ -198,9 +197,12 @@ private:
     * data.It is needed also if the conndedtion needs to be
     * closed after an error.
     *
+    * @param[in] sock   Socket to read
+    * @param[in] id     My id number
+    *
     * \return Status OK or FAIL.
     */
-    int dacq_client_receive_tag (int sock, /**< Socket to read */ int id );  /**< My id number */
+    int dacq_client_receive_tag (int sock, int id, FiffTag*& p_pTag);
 
     //ToDo Connect is different? to: telnet localhost collector ???
     //=========================================================================================================
@@ -226,8 +228,6 @@ private:
     */
     void dacq_set_data_filter (int *kinds, int nkind);
 
-
-
     //=========================================================================================================
     /**
     *
@@ -235,13 +235,23 @@ private:
     */
     void close_socket (int sock, int id);
 
-
     //=========================================================================================================
     /**
     *
     * @return
     */
     int connect_disconnect (int sock,int id);
+    
+    //=========================================================================================================
+    /**
+    * Filter out some large data blocks
+    * which are not of interest
+    *
+    * @return
+    */
+    int interesting_data (int kind);
+    
+    
 
 
 
@@ -253,8 +263,6 @@ private:
 
 
 // shmem.c
-
-
     //=========================================================================================================
     /**
     *
@@ -268,7 +276,6 @@ private:
     *
     * @return
     */
-
     int dacq_init_shmem(void);
 
 
@@ -280,13 +287,37 @@ private:
     */
     int dacq_release_shmem(void);
 
+
+
     int shmid;
     dacqShmBlock shmptr;
 
 
 // new client.c to qt functions
+    //=========================================================================================================
+    /**
+    * 
+    *
+    * @return
+    */
     bool dacq_server_command(const QString& p_sCommand);
+    
+    
+    //=========================================================================================================
+    /**
+    * 
+    *
+    * @return
+    */
     bool dacq_server_login(const QString& p_sCollectorPass, const QString& p_sMyName);
+    
+    
+    //=========================================================================================================
+    /**
+    * 
+    *
+    * @return
+    */
     bool dacq_server_send(QString& p_sDataSend, QByteArray& p_dataOut, int p_iInputFlag = DACQ_DRAIN_INPUT);
 
 
