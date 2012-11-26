@@ -762,9 +762,29 @@ namespace FIFFLIB
 #define FIFFTS_MC_RCS         0x00200000
 
 
-
-
-
+/*
+ * Real-time shmem
+ */
+#define FIFF_NEW_FILE            1
+#define FIFF_CLOSE_FILE          2
+#define FIFF_DISCARD_FILE        3
+#define FIFF_ERROR_MESSAGE       4
+#define FIFF_SUSPEND_READING     5
+#define FIFF_FATAL_ERROR_MESSAGE 6
+#define FIFF_CONNECTION_CHECK    7
+#define FIFF_SUSPEND_FILING      8
+#define FIFF_RESUME_FILING       9
+#define FIFF_RAW_PREBASE        10
+#define FIFF_RAW_PICK_LIST      11
+#define FIFF_ECHO               12
+#define FIFF_RESUME_READING     13
+#define FIFF_DACQ_SYSTEM_TYPE   14
+#define FIFF_SELECT_RAW_CH      15  /* Instruct rawdisp to select this channel */
+#define FIFF_PLAYBACK_MODE      16  /* Tell that we are playing data back from the hard
+                     * disks in the data acquisition front end */
+#define FIFF_CONTINUE_FILE      17  /* Used to inform that data is saved into a continuation file. */
+#define FIFF_JITTER_MAX         18  /* Used to tell the jitter in the timing of data packets */
+#define  FIFF_STREAM_SEGMENT    19  /* A segment of data stream */
 
 
 
