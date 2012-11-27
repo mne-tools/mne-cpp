@@ -322,10 +322,12 @@ namespace FIFFLIB
 #define FIFF_COMMENT     206
 #define FIFF_NAVE        207
 #define FIFF_DIG_POINT   213
+#define FIFF_HPI_NCOIL   216
 #define FIFF_LOWPASS     219
 #define FIFF_COORD_TRANS 222
 #define FIFF_HIGHPASS    223
 #define FIFF_NAME        233
+#define FIFF_LINE_FREQ   235
 #define FIFF_DESCRIPTION FIFF_COMMENT
     //
     // Pointers
