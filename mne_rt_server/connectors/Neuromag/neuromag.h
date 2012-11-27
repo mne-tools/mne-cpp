@@ -130,6 +130,8 @@ public:
     virtual bool stop();
 
 
+    void releaseMeasInfo();
+
 //public slots: --> in Qt 5 not anymore declared as slot
 
     virtual void requestMeasInfo(qint32 ID);
@@ -150,32 +152,17 @@ private:
     */
     void init();
 
-    bool readRawInfo();
-
-
-
-
-
-
 
     QMutex mutex;
 
 
     DacqServer*     m_pDacqServer;
 
-
     FiffInfo*       m_pInfo;
 
+    int             m_iID;
+
     bool            m_bIsRunning;
-
-
-
-
-
-
-
-
-
 
 
 };
