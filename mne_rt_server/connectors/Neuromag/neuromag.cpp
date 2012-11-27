@@ -90,6 +90,7 @@ Neuromag::Neuromag()
 : m_pDacqServer(new DacqServer(this))
 , m_pInfo(NULL)
 , m_bIsRunning(false)
+, m_iID(-1)
 {
     //DEBUG
     m_pDacqServer->start();
@@ -226,16 +227,19 @@ bool Neuromag::stop()
 
 //*************************************************************************************************************
 
+void Neuromag::releaseMeasInfo()
+{
+    if(m_pInfo)
+        emit remitMeasInfo(m_iID, m_pInfo);
+}
+
+
+//*************************************************************************************************************
+
 void Neuromag::requestMeasInfo(qint32 ID)
 {
-
-//    if(!m_pRawInfo)
-//        readRawInfo();
-
-    if(m_pInfo)
-        emit remitMeasInfo(ID, m_pInfo);
-//    else
-//        return NULL;
+    m_iID = ID;
+    m_pDacqServer->m_bMeasInfoRequest = true;
 }
 
 
@@ -269,43 +273,6 @@ void Neuromag::requestSetBufferSize(quint32 p_uiBuffSize)
 
         this->start();
     }
-}
-
-
-//*************************************************************************************************************
-
-bool Neuromag::readRawInfo()
-{
-//    if(!m_pRawInfo)
-//    {
-//        QFile* t_pFile = new QFile(m_sResourceDataPath);
-
-//        mutex.lock();
-//        if(!FiffStream::setup_read_raw(t_pFile, m_pRawInfo))
-//        {
-//            printf("Error: Not able to read raw info!\n");
-//            if(m_pRawInfo)
-//                delete m_pRawInfo;
-//            m_pRawInfo = NULL;
-
-//            delete t_pFile;
-//            return false;
-//        }
-
-//        //delete it here and reopen it in the producer thread
-//        delete m_pRawInfo->file;
-//        m_pRawInfo->file = NULL;
-
-//        if(m_pRawMatrixBuffer)
-//            delete m_pRawMatrixBuffer;
-//        m_pRawMatrixBuffer = new RawMatrixBuffer(10, m_pRawInfo->info->nchan, getBufferSampleSize());
-
-//        mutex.unlock();
-
-//        delete t_pFile;
-//    }
-
-    return true;
 }
 
 

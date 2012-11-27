@@ -94,6 +94,11 @@ class Neuromag;
 class DacqServer : public QThread
 {
     Q_OBJECT
+
+
+
+    friend class Neuromag;
+
 public:
 
     //=========================================================================================================
@@ -120,7 +125,7 @@ public slots: //--> in Qt 5 not anymore declared as slot
 
 signals:
 
-
+    void measInfoAvailable();
 
 
 protected:
@@ -320,9 +325,36 @@ private:
     bool dacq_server_send(QString& p_sDataSend, QByteArray& p_dataOut, int p_iInputFlag = DACQ_DRAIN_INPUT);
 
 
+    //=========================================================================================================
+    /**
+    *
+    *
+    * @return
+    */
+    bool dacq_server_start();
+
+
+    //=========================================================================================================
+    /**
+    *
+    *
+    * @return
+    */
+    bool dacq_server_stop();
+
+
 //dacqserver
 
     bool m_bIsRunning;
+    bool m_bIsMeasuring;
+
+    bool m_bMeasInfoRequest;
+    bool m_bMeasRequest;
+    bool m_bMeasStopRequest;
+    bool m_bSetBuffersizeRequest;
+
+
+    bool getMeasInfo(FiffInfo*& p_pFiffInfo);
 
     Neuromag* m_pNeuromag;
 

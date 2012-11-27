@@ -90,12 +90,17 @@ DacqServer::DacqServer(Neuromag* p_pNeuromag)
 , m_iShmemSock(-1)
 , m_iShmemId(CLIENT_ID)
 , m_bIsRunning(false)
+, m_bIsMeasuring(false)
+, m_bMeasInfoRequest(false)
+, m_bMeasRequest(false)
+, m_bMeasStopRequest(false)
+, m_bSetBuffersizeRequest(false)
 , shmid(-1)
 , shmptr(NULL)
 {
 
     filter_kinds = NULL;    /* Filter these tags */
-    nfilt = 0;		        /* How many are they */
+    nfilt = 0;              /* How many are they */
     
 }
 
@@ -112,6 +117,31 @@ DacqServer::~DacqServer()
 
 
 //*************************************************************************************************************
+
+bool DacqServer::getMeasInfo(FiffInfo*& p_pFiffInfo)
+{
+
+    if(p_pFiffInfo)
+        delete p_pFiffInfo;
+    p_pFiffInfo = new FiffInfo();
+
+    dacq_server_stop();
+    dacq_server_start();
+
+
+
+
+
+    if(!m_bMeasRequest)
+        dacq_server_stop();
+
+    return true;
+}
+
+
+
+
+//*************************************************************************************************************
 //=============================================================================================================
 // run
 //=============================================================================================================
@@ -119,6 +149,12 @@ DacqServer::~DacqServer()
 void DacqServer::run()
 {
     m_bIsRunning = true;
+
+
+    connect(this, &DacqServer::measInfoAvailable,
+            m_pNeuromag, &Neuromag::releaseMeasInfo);
+
+
 
     dacq_set_data_filter (NULL, 0);
 
@@ -133,6 +169,9 @@ void DacqServer::run()
         m_pNeuromag->setBufferSampleSize(MIN_BUFLEN);
 
 ///////necessary? -> without that it sometimes doesn't work -> this sets the buffer size without questioning it
+
+
+    int  t_iOriginalMaxBuflen = 1500;// set the standard size as long as we can't get it without setting it
     if (m_pNeuromag->getBufferSampleSize() < MIN_BUFLEN) {
         fprintf(stderr, "%s: Too small Neuromag buffer length requested, should be at least %d\n", m_pNeuromag->getBufferSampleSize(), MIN_BUFLEN);
         return;
@@ -212,8 +251,7 @@ void DacqServer::run()
     //
     // Control measurement start through Neuromag connector. ToDo: in Case Realtime measurement should be performed during normal acqusition process, change this!!
     //
-    QString t_sCommand = QString("%1\r\n").arg("meas");
-    dacq_server_command(t_sCommand);
+    dacq_server_start();
     
     //
     // Receive shmem tags
@@ -224,7 +262,16 @@ void DacqServer::run()
     qint32 count = 0;
     while(m_bIsRunning)
     {
-    
+        if(m_bMeasInfoRequest)
+        {
+            //Requesting new info
+            if(getMeasInfo(m_pNeuromag->m_pInfo))
+            {
+                emit measInfoAvailable();
+                m_bMeasInfoRequest = false;
+            }
+        }
+
         qDebug() << count;
 //#if defined(DACQ_OLD_CONNECTION_SCHEME)
         if (dacq_client_receive_tag(t_pTag) == -1)
@@ -241,6 +288,11 @@ void DacqServer::run()
             break;            
         }
 
+
+
+
+
+
         ++count;
     }
     
@@ -248,8 +300,7 @@ void DacqServer::run()
     //
     // Stop and clean up
     //    
-    t_sCommand = QString("%1\r\n").arg("stop");
-    dacq_server_command(t_sCommand);
+    dacq_server_stop();
     
     dacq_disconnect_client(m_iShmemSock, m_iShmemId);
     collector_close();
@@ -260,6 +311,12 @@ void DacqServer::run()
 
     printf("\r\n");
 }
+
+
+
+
+
+
 
 
 //*************************************************************************************************************
@@ -310,7 +367,7 @@ int DacqServer::collector_close()
 
 
 //*************************************************************************************************************
-
+// ToDo doesn't work without setting first buffersize first
 int DacqServer::collector_getMaxBuflen()
 {
 
@@ -373,8 +430,7 @@ int DacqServer::collector_setMaxBuflen(int maxbuflen)
 //=============================================================================================================
 // client_socket.c
 //=============================================================================================================
-//int sock, int id, 
-//m_iShmemSock, m_iShmemId
+
 int DacqServer::dacq_client_receive_tag (FiffTag*& p_pTag )
 {
     struct  sockaddr_un from;	/* Address (not used) */
@@ -758,6 +814,44 @@ bool DacqServer::dacq_server_send(QString& p_sDataSend, QByteArray& p_dataOut, i
     else if( p_iInputFlag == DACQ_KEEP_INPUT ) 
     {
         p_dataOut = m_pCollectorSock->readAll();//readAll that QTcpSocket is empty again -> prevent overflow
+    }
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool DacqServer::dacq_server_start()
+{
+    if(!m_bIsMeasuring)
+    {
+        printf("Start measurement... ");
+
+        QString t_sCommand = QString("%1\r\n").arg("meas");
+        dacq_server_command(t_sCommand);
+
+        m_bIsMeasuring = true;
+        printf("[done]\r\n");
+    }
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool DacqServer::dacq_server_stop()
+{
+    if(m_bIsMeasuring)
+    {
+        printf("Stop measurement... ");
+
+        QString t_sCommand = QString("%1\r\n").arg("stop");
+        dacq_server_command(t_sCommand);
+
+        m_bIsMeasuring = false;
+        printf("[done]\r\n");
     }
 
     return true;
