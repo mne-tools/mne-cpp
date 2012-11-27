@@ -109,13 +109,17 @@ namespace NeuromagPlugin
 #define SHM_FAIL_FILE  "/neuro/dacq/raw/data_server_shmem"
 #define SHM_MAX_CLIENT 10
 
-#ifdef OLD_SHM
-#define SHM_MAX_DATA   2*2*2*31*1024
-#define SHM_NUM_BLOCKS 10
-#else
-#define SHM_MAX_DATA   450*2*3000
-#define SHM_NUM_BLOCKS 5
-#endif
+//#ifdef OLD_SHM
+//#define SHM_MAX_DATA   2*2*2*31*1024
+//#define SHM_NUM_BLOCKS 10
+//#else
+//#define SHM_MAX_DATA   450*2*3000
+//#define SHM_NUM_BLOCKS 5
+//#endif
+//#define SHM_NO_BUF     -1
+
+#define SHM_MAX_DATA   500*1500*4
+#define SHM_NUM_BLOCKS 100
 #define SHM_NO_BUF     -1
 
 typedef struct {

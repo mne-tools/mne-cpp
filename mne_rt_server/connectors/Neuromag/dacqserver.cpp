@@ -227,7 +227,7 @@ void DacqServer::run()
     
         qDebug() << count;
 //#if defined(DACQ_OLD_CONNECTION_SCHEME)
-        if (dacq_client_receive_tag(m_iShmemSock, m_iShmemId, t_pTag) == -1)
+        if (dacq_client_receive_tag(t_pTag) == -1)
 //#else
 //        if (dacq_client_receive_tag(&m_iShmemSock, m_iShmemId) == -1)
 //#endif
@@ -235,10 +235,28 @@ void DacqServer::run()
             
         qDebug() << "Tag Kind: " << t_pTag->kind << " Type: " << t_pTag->type << "Size: " << t_pTag->size();
 
+        if(t_pTag->kind == FIFF_ERROR_MESSAGE)
+        {
+            qDebug() << "Error: " << *t_pTag;
+            break;            
+        }
+
         ++count;
     }
     
+    
+    //
+    // Stop and clean up
+    //    
+    t_sCommand = QString("%1\r\n").arg("stop");
+    dacq_server_command(t_sCommand);
+    
+    dacq_disconnect_client(m_iShmemSock, m_iShmemId);
+    collector_close();
+    
     delete t_pTag;
+    delete m_pCollectorSock;
+    m_pCollectorSock = NULL;
 
     printf("\r\n");
 }
@@ -355,8 +373,9 @@ int DacqServer::collector_setMaxBuflen(int maxbuflen)
 //=============================================================================================================
 // client_socket.c
 //=============================================================================================================
-
-int DacqServer::dacq_client_receive_tag (int sock, int id, FiffTag*& p_pTag )
+//int sock, int id, 
+//m_iShmemSock, m_iShmemId
+int DacqServer::dacq_client_receive_tag (FiffTag*& p_pTag )
 {
     struct  sockaddr_un from;	/* Address (not used) */
     socklen_t fromlen;
@@ -365,34 +384,25 @@ int DacqServer::dacq_client_receive_tag (int sock, int id, FiffTag*& p_pTag )
     int rlen;
     int data_ok = 0;
 
-//    static unsigned char *data = NULL; /* The data */
-//    static int           cursize = 0; /* Its current allocated size */
-
-    static FILE   *fd = NULL;		/* The temporary file */
-    static FILE   *shmem_fd = NULL;
-    static char   *filename = NULL;
-
-    long read_loc;
-    FILE *read_fd;
-
-//    fiffTagRec    tag;			/* We convert it to a tag... */
-//    extern dacqShmBlock dacq_get_shmem();
+    if(p_pTag)
+        delete p_pTag;
+    p_pTag = new FiffTag();
     dacqShmBlock  shmem = dacq_get_shmem();
     dacqShmBlock  shmBlock;
     dacqShmClient shmClient;
     int           k;
     
 
-    if (sock < 0)
+    if (m_iShmemSock < 0)
         return (OK);
 
     //
     // read from the socket
     //
     fromlen = sizeof(from);
-    rlen = recvfrom(sock, (void *)(&mess), DATA_MESS_SIZE, 0, (sockaddr *)(&from), &fromlen);
+    rlen = recvfrom(m_iShmemSock, (void *)(&mess), DATA_MESS_SIZE, 0, (sockaddr *)(&from), &fromlen);
 
-    qDebug() << "Mess Kind: " << mess.kind << " Type: " << mess.type << "Size: " << mess.size;
+//    qDebug() << "Mess Kind: " << mess.kind << " Type: " << mess.type << "Size: " << mess.size;
 
     //
     // Parse received message
@@ -400,7 +410,7 @@ int DacqServer::dacq_client_receive_tag (int sock, int id, FiffTag*& p_pTag )
     if (rlen == -1) 
     {
         printf("recvfrom");//dacq_perror("recvfrom");
-        close_socket (sock,id);
+        close_socket (m_iShmemSock, m_iShmemId);
         return (FAIL);
     }
 
@@ -413,35 +423,19 @@ int DacqServer::dacq_client_receive_tag (int sock, int id, FiffTag*& p_pTag )
         mess.size = 0;
         mess.kind = FIFF_NOP;
     }
-
-
-    if(p_pTag)
-        delete p_pTag;
-    p_pTag = new FiffTag();  
-
-
     if (mess.size > (size_t) 0)
     {
-        int newsize = (mess.type == FIFFT_STRING) ? mess.size+1 : mess.size;
-        
         p_pTag->resize(mess.size);
-        
-//        if (data == NULL)
-//            data = (unsigned char*)malloc(newsize);
-//        else
-//            data = (unsigned char*)realloc(data,newsize);
-
-//        cursize = newsize;
     }
 
     if (mess.loc < 0 && mess.size > (size_t) 0 && mess.shmem_buf < 0 && mess.shmem_loc < 0)
     {
         fromlen = sizeof(from);
-        rlen = recvfrom(sock, (void *)p_pTag->data(), mess.size, 0, (sockaddr *)(&from), &fromlen);
+        rlen = recvfrom(m_iShmemSock, (void *)p_pTag->data(), mess.size, 0, (sockaddr *)(&from), &fromlen);
         if (rlen == -1)
         {
             printf("recvfrom");//dacq_perror("recvfrom");
-            close_socket(sock,id);
+            close_socket(m_iShmemSock, m_iShmemId);
             return (FAIL);
         }
         data_ok = 1;
@@ -452,7 +446,7 @@ int DacqServer::dacq_client_receive_tag (int sock, int id, FiffTag*& p_pTag )
         /*
          * Copy data from shared memory
          */
-        if (mess.shmem_buf >= 0 && id/10000 > 0) 
+        if (mess.shmem_buf >= 0 && m_iShmemId/10000 > 0) 
         {
             shmBlock  = shmem + mess.shmem_buf;
             shmClient = shmBlock->clients;
@@ -464,129 +458,26 @@ int DacqServer::dacq_client_receive_tag (int sock, int id, FiffTag*& p_pTag )
                 memcpy(p_pTag->data(),shmBlock->data,mess.size);
                 data_ok = 1;
             //#ifdef DEBUG
-                printf("client # %d read shmem buffer # %d\n", id,mess.shmem_buf);//dacq_log("client # %d read shmem buffer # %d\n", id,mess.shmem_buf);
+                printf("client # %d read shmem buffer # %d\n", m_iShmemId, mess.shmem_buf);//dacq_log("client # %d read shmem buffer # %d\n", id,mess.shmem_buf);
             //#endif
             }
             /*
             * Indicate that this client has processed the data
             */
             for (k = 0; k < SHM_MAX_CLIENT; k++,shmClient++)
-                if (shmClient->client_id == id)
+                if (shmClient->client_id == m_iShmemId)
                     shmClient->done = 1;
         }
-        /*
-         * Read data from file
-         */
-        else {
-            /*
-            * Possibly read from shmem file
-            */
-            if (id/10000 > 0 && mess.shmem_loc >= 0)
-            {
-                read_fd  = shmem_fd;
-                read_loc = mess.shmem_loc;
-            }
-            else
-            {
-                read_fd  = fd;
-                read_loc = mess.loc;
-            }
-//            if (interesting_data(mess.kind))
-//            {
-//                qDebug() << "Interesting data: " << mess.kind;
-//                if (read_fif (read_fd,read_loc,mess.size,(char *)data) == -1)
-//                {
-//                    printf("Could not read data (tag = %d, size = %d, pos = %d)!\n", mess.kind,mess.size,read_loc);
-//                    //dacq_log("Could not read data (tag = %d, size = %d, pos = %d)!\n", mess.kind,mess.size,read_loc);
-//                    printf("%s\n",err_get_error());//dacq_log("%s\n",err_get_error());
-//                }
-//                else
-//                {
-//                    data_ok = 1;
-//                    if (mess.type == FIFFT_STRING)
-//                        data[mess.size] = '\0';
-//                }
-//            #ifdef DEBUG
-//                if (fd == shmem_fd)
-//                    printf("client # %d read shmem file pos %d\n",id,mess.shmem_loc);//dacq_log("client # %d read shmem file pos %d\n",id,mess.shmem_loc);
-//            #endif
-//            }
-        }
     }
-    
-    
-    
-    if(mess.kind == FIFF_ERROR_MESSAGE)
-    {
-    
-//        QByteArray test((char*)p_pTag->data(), mess.size);
-        
-        qDebug() << "Error: " << *p_pTag;
-    
-    }
-    
-    
-    
-    /*
-    * Special case: close old input file
-    */
-    if (mess.kind == FIFF_CLOSE_FILE)
-    {
-        printf("FIFF CLOSE FILE.\r\n");
 
-//        if (fd != NULL) 
-//        {
-//            printf("File to be closed (lib/FIFF_CLOSE_FILE).\n");//dacq_log("File to be closed (lib/FIFF_CLOSE_FILE).\n");
-//            (void)fclose(fd);
-//            fd = NULL;
-//        }
-//        else
-//            printf("No file to close (lib/FIFF_CLOSE_FILE).\n");//dacq_log("No file to close (lib/FIFF_CLOSE_FILE).\n");
-    }
-    /*
-    * Another special case: open new input file
-    */
-    else if (mess.kind == FIFF_NEW_FILE)
-    {
-        printf("FIFF NEW FILE.\r\n");
-//        if (fd != NULL)
-//        {
-//            (void)fclose(fd);
-//            dacq_log("File closed (lib/FIFF_NEW_FILE).\n");
-//        }
-//        fd = open_fif((char *)data);
-//        free (filename);
-//        filename = strdup((char *)data);
-
-//        if (shmem_fd == NULL)
-//            shmem_fd = open_fif (SHM_FAIL_FILE);
-    }
-  
-    
     p_pTag->kind = mess.kind;
     p_pTag->type = mess.type;
     p_pTag->next = 0;
 
-//    tag.kind = mess.kind;
-//    tag.type = mess.type;
-//    tag.size = mess.size;
-//    tag.next = 0;
-//    tag.data = data_ok ? data : NULL;
-//    if (tag.size <= 0)
-//    {
-//        tag.data = NULL;
-//        data_ok  = 0;
-//    }
-//    if (dacq_client_process_tag != NULL)
-//    {
-//        if (dacq_client_process_tag(&tag))
-//        {/* Non null = don't reuse data */
-//            data = NULL;
-//            cursize = 0;
-//        }
-//        else if (data_ok)		/* Client may have done a secret * 1-to-1 exchange */
-//            data = tag.data;
-//    }
+    if (p_pTag->size() <= 0)
+    {
+        data_ok  = 0;
+    }
     return (OK);
 }
 

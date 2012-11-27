@@ -197,12 +197,11 @@ private:
     * data.It is needed also if the conndedtion needs to be
     * closed after an error.
     *
-    * @param[in] sock   Socket to read
-    * @param[in] id     My id number
+    * @param[in] p_pTag ToDo
     *
     * \return Status OK or FAIL.
     */
-    int dacq_client_receive_tag (int sock, int id, FiffTag*& p_pTag);
+    int dacq_client_receive_tag (FiffTag*& p_pTag );
 
     //ToDo Connect is different? to: telnet localhost collector ???
     //=========================================================================================================
