@@ -288,10 +288,10 @@ void DacqServer::run()
             break;            
         }
 
-
-
-
-
+        if(t_pTag->kind == FIFF_CLOSE_FILE)
+        {
+            printf("Measurement stopped.\r\n");
+        }
 
         ++count;
     }
