@@ -36,6 +36,14 @@
 #ifndef SHMEMSOCKET_H
 #define SHMEMSOCKET_H
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "types_definitions.h"
+#include "../../../MNE/fiff/fiff_tag.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -53,11 +61,190 @@
 namespace NeuromagPlugin
 {
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace FIFFLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+//class FiffTag;
+
+
+//=============================================================================================================
+/**
+* DECLARE CLASS ShmemSocket
+*
+* @brief The ShmemSocket class provides...
+*/
+
 class ShmemSocket : public QObject
 {
     Q_OBJECT
 public:
     explicit ShmemSocket(QObject *parent = 0);
+
+
+    // client_socket.c
+    //=========================================================================================================
+    /**
+    * Receive one tag from the data server.
+    *
+    * This routine reads a message from the data server
+    * socket and grabs the data. The data may actually
+    * be in a shared memory segment noted in the message.
+    *
+    * The id parameter is needed for two purposes. The
+    * data transfer mechanism varies depending on the client
+    * number. Clients with id above 10000 use shared memory
+    * transfer while other used a regular file to transfer the
+    * data.It is needed also if the conndedtion needs to be
+    * closed after an error.
+    *
+    * @param[in] p_pTag ToDo
+    *
+    * \return Status OK or FAIL.
+    */
+    int receive_tag (FiffTag*& p_pTag );
+
+    //ToDo Connect is different? to: telnet localhost collector ???
+    //=========================================================================================================
+    /**
+    * Connect to the data server process
+    *
+    * @return
+    */
+    bool connect_client ();
+
+    //=========================================================================================================
+    /**
+    * Disconnect from the data server process
+    *
+    * @return
+    */
+    int disconnect_client ();
+
+    //=========================================================================================================
+    /*
+    * Select tags that we are not interested in!
+    *
+    */
+    void set_data_filter (int *kinds, int nkind);
+
+    //=========================================================================================================
+    /**
+    *
+    * @return
+    */
+    void close_socket ();
+
+    //=========================================================================================================
+    /**
+    *
+    * @return
+    */
+    int connect_disconnect (int sock,int id);
+
+    //=========================================================================================================
+    /**
+    * Filter out some large data blocks
+    * which are not of interest
+    *
+    * @return
+    */
+    int interesting_data (int kind);
+
+
+
+
+//private:
+
+    // shmem.c
+    //=========================================================================================================
+    /**
+    *
+    * @return
+    */
+    dacqShmBlock get_shmem();
+
+    //=========================================================================================================
+    /**
+    * Initialize data acquisition shared memory segment
+    *
+    * @return
+    */
+    int init_shmem();
+
+
+    //=========================================================================================================
+    /**
+    * Release the shared memory
+    *
+    * @return
+    */
+    int release_shmem();
+
+
+    FILE* open_fif (char *name);
+
+
+    int read_fif (FILE   *fd,		/* File to read from */
+             long   pos,		/* Position in file */
+             size_t size,		/* How long */
+             char   *data);              /* Put data here */
+
+
+
+private:
+
+    int* filter_kinds;  /**< Filter these tags */
+    int nfilt;		    /**< How many are they */
+
+    int shmid;
+    dacqShmBlock shmptr;
+
+
+
+
+    int     m_iShmemSock;
+    int     m_iShmemId;
+
+
+
+
+    FILE   *fd;		/* The temporary file */
+    FILE   *shmem_fd;
+    char   *filename;
+
+    long read_loc;
+    FILE *read_fd;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
 signals:
     
