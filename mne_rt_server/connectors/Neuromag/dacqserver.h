@@ -96,8 +96,6 @@ class DacqServer : public QThread
 {
     Q_OBJECT
 
-
-
     friend class Neuromag;
 
 public:
@@ -106,7 +104,7 @@ public:
     /**
     * Constructs a acquisition Server.
     */
-    DacqServer(Neuromag* p_pNeuromag);
+    explicit DacqServer(Neuromag* p_pNeuromag, QObject * parent = 0);
     
     
     //=========================================================================================================
@@ -114,10 +112,7 @@ public:
     * Constructs a acquisition Server.
     */
     ~DacqServer();
-    
-    
-    
-    
+
     
 public slots: //--> in Qt 5 not anymore declared as slot
 
@@ -139,38 +134,6 @@ protected:
     virtual void run();
 
 private:
-
-//    //=========================================================================================================
-//    /**
-//    * Open the collector control connection
-//    *
-//    * @return
-//    */
-//    bool collector_open();
-
-//    //=========================================================================================================
-//    /**
-//    * Close the collector connection
-//    *
-//    * @return
-//    */
-//    int collector_close();
-
-//    //=========================================================================================================
-//    /**
-//    * Query the current buffer length of the Elekta acquisition system
-//    *
-//    * @return
-//    */
-//    int collector_getMaxBuflen();
-
-//    //=========================================================================================================
-//    /**
-//    * Set the desired maximum buffer length
-//    *
-//    * @return
-//    */
-//    int collector_setMaxBuflen(int maxbuflen);
 
     //=========================================================================================================
     /**
@@ -298,56 +261,10 @@ private:
     dacqShmBlock shmptr;
 
 
-// new client.c to qt functions
-//    //=========================================================================================================
-//    /**
-//    *
-//    *
-//    * @return
-//    */
-//    bool dacq_server_command(const QString& p_sCommand);
-    
-    
-//    //=========================================================================================================
-//    /**
-//    *
-//    *
-//    * @return
-//    */
-//    bool dacq_server_login(const QString& p_sCollectorPass, const QString& p_sMyName);
-    
-    
-//    //=========================================================================================================
-//    /**
-//    *
-//    *
-//    * @return
-//    */
-//    bool dacq_server_send(QString& p_sDataSend, QByteArray& p_dataOut, int p_iInputFlag = DACQ_DRAIN_INPUT);
-
-
-//    //=========================================================================================================
-//    /**
-//    *
-//    *
-//    * @return
-//    */
-//    bool dacq_server_start();
-
-
-//    //=========================================================================================================
-//    /**
-//    *
-//    *
-//    * @return
-//    */
-//    bool dacq_server_stop();
-
 
 //dacqserver
 
     bool m_bIsRunning;
-//    bool m_bIsMeasuring;
 
     bool m_bMeasInfoRequest;
     bool m_bMeasRequest;
