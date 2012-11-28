@@ -122,12 +122,104 @@ bool DacqServer::getMeasInfo(FiffInfo*& p_pFiffInfo)
     MatrixXd* data = NULL;
     FiffTag* t_pTag = NULL;
     bool t_bReadHeader = true;
+    
+    
     while(t_bReadHeader)
     {
         if (m_pShmemSock->receive_tag(t_pTag) == -1)
             break;
     
+    
+    
+/*    
+    FIFF_BLOCK_START 
+        FIFFB_PROJ_ITEM 
+    FIFF_NCHAN  102 
+    FIFF_PROJ_ITEM_CH_NAME_LIST  102 
+    FIFF_NAME  "axial-10.0-200.0-PCA-02" 
+    FIFF_PROJ_ITEM_KIND  1 
+    FIFF_PROJ_ITEM_TIME  0 
+    FIFF_PROJ_ITEM_NVEC  1 
+    FIFF_MNE_PROJ_ITEM_ACTIVE  0 
+    FIFF_PROJ_ITEM_VECTORS  
+    1 x 102 
+    FIFF_BLOCK_END  314 
+         FIFFB_PROJ_ITEM 
+*/
 
+        //
+        // Projector Item
+        //
+        if( t_pTag->kind == FIFF_BLOCK_START && *(t_pTag->toInt()) == FIFFB_PROJ_ITEM )
+        {
+            int nvec = -1;
+            int nchan = -1;
+            QStringList defaultList;
+            QStringList names;
+            MatrixXd* data = NULL;
+            
+            fiff_int_t kind;
+            bool active;
+            QString desc; // maybe, in some cases this has to be a struct.
+
+            //
+            while(!(t_pTag->kind == FIFF_BLOCK_END && *(t_pTag->toInt()) == FIFFB_PROJ_ITEM))
+            {
+                m_pShmemSock->receive_tag(t_pTag);
+                
+                switch(t_pTag->kind)
+                {
+                    case FIFF_NCHAN:
+                        nchan = *(t_pTag->toInt());
+                        qDebug() << "Parse FIFF_NCHAN";
+                        break;
+                    case FIFF_PROJ_ITEM_CH_NAME_LIST:
+                        names = FiffStream::split_name_list(t_pTag->toString());
+                        qDebug() << "Parse FIFF_PROJ_ITEM_CH_NAME_LIST ";
+                        break;
+                    case FIFF_NAME:
+                        desc = t_pTag->toString();
+                        qDebug() << "Parse FIFF_NAME ";
+                        break;
+                    case FIFF_PROJ_ITEM_KIND:
+                        kind = *(t_pTag->toInt());
+                        qDebug() << "Parse FIFF_PROJ_ITEM_KIND ";
+                        break;
+                    case FIFF_PROJ_ITEM_TIME:
+                        qDebug() << "Parse FIFF_PROJ_ITEM_TIME " << *(t_pTag->toFloat());
+                        break;
+                    case FIFF_PROJ_ITEM_NVEC:
+                        nvec == *(t_pTag->toInt());
+                        qDebug() << "Parse FIFF_PROJ_ITEM_NVEC ";
+                        break;        
+                    case FIFF_MNE_PROJ_ITEM_ACTIVE:
+                        active == *(t_pTag->toInt());
+                        qDebug() << "Parse FIFF_MNE_PROJ_ITEM_ACTIVE ";
+                        break;
+                    case FIFF_PROJ_ITEM_VECTORS:
+                        data = t_pTag->toFloatMatrix();
+                        data->transposeInPlace();
+                        qDebug() << "Parse FIFF_PROJ_ITEM_VECTORS ";
+                        break;
+                }
+            }
+            
+            FiffNamedMatrix* t_fiffNamedMatrix = new FiffNamedMatrix(nvec, nchan, defaultList, names, data);
+            
+            FiffProj* one = new FiffProj(kind, active, desc, t_fiffNamedMatrix);
+            
+            p_pFiffInfo->projs.append(one);
+        }
+        
+        
+    
+    
+    
+    
+    
+    
+    
+    
         switch(t_pTag->kind)
         {
             case FIFFV_MEG_CH:
@@ -164,37 +256,6 @@ bool DacqServer::getMeasInfo(FiffInfo*& p_pFiffInfo)
             
             case FIFFB_PROCESSED_DATA:
                 qDebug() << "FIFFB_PROCESSED_DATA " << t_pTag->toFiffID().version;
-                break;
-
-            case FIFF_NCHAN:
-                qDebug() << "FIFF_NCHAN " << *(t_pTag->toInt());
-                break;
-            case FIFF_PROJ_ITEM_CH_NAME_LIST:
-                names = FiffStream::split_name_list(t_pTag->toString());
-                qDebug() << "FIFF_PROJ_ITEM_CH_NAME_LIST " << names.size();// << t_pTag->toString();
-                break;
-            case FIFF_NAME:
-                qDebug() << "FIFF_NAME " << t_pTag->toString();
-                break;
-            case FIFF_PROJ_ITEM_KIND:
-                qDebug() << "FIFF_PROJ_ITEM_KIND " << *(t_pTag->toInt());
-                break;
-            case FIFF_PROJ_ITEM_TIME:
-                qDebug() << "FIFF_PROJ_ITEM_TIME " << *(t_pTag->toFloat());
-                break;
-            case FIFF_PROJ_ITEM_NVEC:
-                qDebug() << "FIFF_PROJ_ITEM_NVEC " << *(t_pTag->toInt());
-                break;        
-            case FIFF_MNE_PROJ_ITEM_ACTIVE:
-                qDebug() << "FIFF_MNE_PROJ_ITEM_ACTIVE " << *(t_pTag->toInt());
-                break;
-            case FIFF_PROJ_ITEM_VECTORS:
-                qDebug() << "FIFF_PROJ_ITEM_VECTORS ";
-                data = t_pTag->toFloatMatrix();
-                data->transposeInPlace();
-                qDebug() << data->rows() << "x" << data->cols();
-                delete data;
-                data = NULL;
                 break;
             case FIFF_MEAS_DATE:
                 qDebug() << "FIFF_MEAS_DATE " << t_pTag->toInt()[0] << t_pTag->toInt()[1];
