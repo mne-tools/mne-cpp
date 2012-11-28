@@ -82,6 +82,7 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 class Neuromag;
+class CollectorSocket;
 //class FiffTag;
 
 
@@ -139,37 +140,37 @@ protected:
 
 private:
 
-    //=========================================================================================================
-    /**
-    * Open the collector control connection
-    *
-    * @return
-    */
-    bool collector_open();
+//    //=========================================================================================================
+//    /**
+//    * Open the collector control connection
+//    *
+//    * @return
+//    */
+//    bool collector_open();
 
-    //=========================================================================================================
-    /**
-    * Close the collector connection
-    *
-    * @return
-    */
-    int collector_close();
+//    //=========================================================================================================
+//    /**
+//    * Close the collector connection
+//    *
+//    * @return
+//    */
+//    int collector_close();
 
-    //=========================================================================================================
-    /**
-    * Query the current buffer length of the Elekta acquisition system
-    *
-    * @return
-    */
-    int collector_getMaxBuflen();
+//    //=========================================================================================================
+//    /**
+//    * Query the current buffer length of the Elekta acquisition system
+//    *
+//    * @return
+//    */
+//    int collector_getMaxBuflen();
 
-    //=========================================================================================================
-    /**
-    * Set the desired maximum buffer length
-    *
-    * @return
-    */
-    int collector_setMaxBuflen(int maxbuflen);
+//    //=========================================================================================================
+//    /**
+//    * Set the desired maximum buffer length
+//    *
+//    * @return
+//    */
+//    int collector_setMaxBuflen(int maxbuflen);
 
     //=========================================================================================================
     /**
@@ -182,8 +183,8 @@ private:
 
 
     //newly written stuff ported to qt
-    QString         m_sCollectorHost;
-    QTcpSocket*     m_pCollectorSock;
+//    QString         m_sCollectorHost;
+    CollectorSocket*     m_pCollectorSock;
 
 
 // client_socket.c
@@ -298,55 +299,55 @@ private:
 
 
 // new client.c to qt functions
-    //=========================================================================================================
-    /**
-    * 
-    *
-    * @return
-    */
-    bool dacq_server_command(const QString& p_sCommand);
+//    //=========================================================================================================
+//    /**
+//    *
+//    *
+//    * @return
+//    */
+//    bool dacq_server_command(const QString& p_sCommand);
     
     
-    //=========================================================================================================
-    /**
-    * 
-    *
-    * @return
-    */
-    bool dacq_server_login(const QString& p_sCollectorPass, const QString& p_sMyName);
+//    //=========================================================================================================
+//    /**
+//    *
+//    *
+//    * @return
+//    */
+//    bool dacq_server_login(const QString& p_sCollectorPass, const QString& p_sMyName);
     
     
-    //=========================================================================================================
-    /**
-    * 
-    *
-    * @return
-    */
-    bool dacq_server_send(QString& p_sDataSend, QByteArray& p_dataOut, int p_iInputFlag = DACQ_DRAIN_INPUT);
+//    //=========================================================================================================
+//    /**
+//    *
+//    *
+//    * @return
+//    */
+//    bool dacq_server_send(QString& p_sDataSend, QByteArray& p_dataOut, int p_iInputFlag = DACQ_DRAIN_INPUT);
 
 
-    //=========================================================================================================
-    /**
-    *
-    *
-    * @return
-    */
-    bool dacq_server_start();
+//    //=========================================================================================================
+//    /**
+//    *
+//    *
+//    * @return
+//    */
+//    bool dacq_server_start();
 
 
-    //=========================================================================================================
-    /**
-    *
-    *
-    * @return
-    */
-    bool dacq_server_stop();
+//    //=========================================================================================================
+//    /**
+//    *
+//    *
+//    * @return
+//    */
+//    bool dacq_server_stop();
 
 
 //dacqserver
 
     bool m_bIsRunning;
-    bool m_bIsMeasuring;
+//    bool m_bIsMeasuring;
 
     bool m_bMeasInfoRequest;
     bool m_bMeasRequest;
