@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "types_definitions.h"
-
+#include "../../../MNE/fiff/fiff_info.h"
 #include "../../../MNE/fiff/fiff_tag.h"
 
 
@@ -68,13 +68,13 @@ namespace NeuromagPlugin
 {
 
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace FIFFLIB;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -83,7 +83,8 @@ using namespace FIFFLIB;
 
 class Neuromag;
 class CollectorSocket;
-//class FiffTag;
+class ShmemSocket;
+//class FiffInfo;
 
 
 //=============================================================================================================
@@ -147,118 +148,17 @@ private:
 
     //newly written stuff ported to qt
 //    QString         m_sCollectorHost;
-    CollectorSocket*     m_pCollectorSock;
+    CollectorSocket*    m_pCollectorSock;
 
 
-// client_socket.c
-    //=========================================================================================================
-    /**
-    * Receive one tag from the data server.
-    *
-    * This routine reads a message from the data server
-    * socket and grabs the data. The data may actually
-    * be in a shared memory segment noted in the message.
-    *
-    * The id parameter is needed for two purposes. The
-    * data transfer mechanism varies depending on the client
-    * number. Clients with id above 10000 use shared memory
-    * transfer while other used a regular file to transfer the
-    * data.It is needed also if the conndedtion needs to be
-    * closed after an error.
-    *
-    * @param[in] p_pTag ToDo
-    *
-    * \return Status OK or FAIL.
-    */
-    int dacq_client_receive_tag (FiffTag*& p_pTag );
-
-    //ToDo Connect is different? to: telnet localhost collector ???
-    //=========================================================================================================
-    /**
-    * Connect to the data server process
-    *
-    * @return
-    */
-    int dacq_connect_client (int id);
-
-    //=========================================================================================================
-    /**
-    * Disconnect from the data server process
-    *
-    * @return
-    */
-    int dacq_disconnect_client (int sock,int id);
-
-    //=========================================================================================================  
-    /*
-    * Select tags that we are not interested in!
-    *
-    */
-    void dacq_set_data_filter (int *kinds, int nkind);
-
-    //=========================================================================================================
-    /**
-    *
-    * @return
-    */
-    void close_socket (int sock, int id);
-
-    //=========================================================================================================
-    /**
-    *
-    * @return
-    */
-    int connect_disconnect (int sock,int id);
-    
-    //=========================================================================================================
-    /**
-    * Filter out some large data blocks
-    * which are not of interest
-    *
-    * @return
-    */
-    int interesting_data (int kind);
-    
+    ShmemSocket*        m_pShmemSock;
     
 
 
 
-    int* filter_kinds;  /**< Filter these tags */
-    int nfilt;		    /**< How many are they */
 
 
 
-
-
-// shmem.c
-    //=========================================================================================================
-    /**
-    *
-    * @return
-    */
-    dacqShmBlock dacq_get_shmem(void);
-
-    //=========================================================================================================
-    /**
-    * Initialize data acquisition shared memory segment
-    *
-    * @return
-    */
-    int dacq_init_shmem(void);
-
-
-    //=========================================================================================================
-    /**
-    * Release the shared memory
-    *
-    * @return
-    */
-    int dacq_release_shmem(void);
-
-
-
-    int shmid;
-    dacqShmBlock shmptr;
 
 
 
@@ -276,28 +176,6 @@ private:
 
     Neuromag* m_pNeuromag;
 
-    int     m_iShmemSock;
-    int     m_iShmemId;
-    
-
-
-
-    FILE   *fd;		/* The temporary file */
-    FILE   *shmem_fd;
-    char   *filename;
-
-    long read_loc;
-    FILE *read_fd;
-    
-    
-
-    FILE* open_fif (char *name);
-
-
-    int read_fif (FILE   *fd,		/* File to read from */
-		     long   pos,		/* Position in file */
-		     size_t size,		/* How long */
-		     char   *data);              /* Put data here */
 
 };
 

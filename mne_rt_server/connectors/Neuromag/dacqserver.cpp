@@ -41,24 +41,9 @@
 #include "dacqserver.h"
 #include "neuromag.h"
 #include "collectorsocket.h"
+#include "shmemsocket.h"
 #include "../../../MNE/fiff/fiff_constants.h"
 #include "../../../MNE/fiff/fiff_stream.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// UNIX INCLUDES
-//=============================================================================================================
-
-#include <sys/stat.h>   //umask
-#include <sys/un.h>     //sockaddr_un
-#include <sys/socket.h> //AF_UNIX
-#include <sys/shm.h>    //shmdt
-
-
-//#include <sys/types.h>
-//#include <netinet/in.h>
-
 
 
 //*************************************************************************************************************
@@ -90,23 +75,22 @@ DacqServer::DacqServer(Neuromag* p_pNeuromag, QObject * parent)
 , m_pNeuromag(p_pNeuromag)
 //, m_sCollectorHost(QHostAddress(QHostAddress::LocalHost).toString())
 , m_pCollectorSock(NULL)
-, m_iShmemSock(-1)
-, m_iShmemId(CLIENT_ID)
+, m_pShmemSock(NULL)
+//, m_iShmemSock(-1)
+//, m_iShmemId(CLIENT_ID)
 , m_bIsRunning(false)
 //, m_bIsMeasuring(false)
 , m_bMeasInfoRequest(true)
 , m_bMeasRequest(true)
 , m_bMeasStopRequest(false)
 , m_bSetBuffersizeRequest(false)
-, shmid(-1)
-, shmptr(NULL)
-, fd(NULL)
-, shmem_fd(NULL)
-, filename(NULL)
+//, shmid(-1)
+//, shmptr(NULL)
+//, fd(NULL)
+//, shmem_fd(NULL)
+//, filename(NULL)
 {
 
-    filter_kinds = NULL;    /* Filter these tags */
-    nfilt = 0;              /* How many are they */
     
 }
 
@@ -140,7 +124,7 @@ bool DacqServer::getMeasInfo(FiffInfo*& p_pFiffInfo)
     bool t_bReadHeader = true;
     while(t_bReadHeader)
     {
-        if (dacq_client_receive_tag(t_pTag) == -1)
+        if (m_pShmemSock->receive_tag(t_pTag) == -1)
             break;
     
 
@@ -307,13 +291,9 @@ void DacqServer::run()
 {
     m_bIsRunning = true;
 
-
     connect(this, &DacqServer::measInfoAvailable,
             m_pNeuromag, &Neuromag::releaseMeasInfo);
 
-
-
-    dacq_set_data_filter (NULL, 0);
 
     if(m_pCollectorSock)
         delete m_pCollectorSock;
@@ -349,15 +329,17 @@ void DacqServer::run()
     }
 ////////////
 
+    if(m_pShmemSock)
+        delete m_pShmemSock;
+    m_pShmemSock = new ShmemSocket();
+
+    m_pShmemSock->set_data_filter (NULL, 0);
+
     /* Connect to the Elekta Neuromag shared memory system */
-    printf("About to connect to the Neuromag DACQ shared memory on this workstation (client ID %d)... ", m_iShmemId);//dacq_log("About to connect to the Neuromag DACQ shared memory on this workstation (client ID %d)...\n", shmem_id);
-    int old_umask = umask(SOCKET_UMASK);
-    if ((m_iShmemSock = dacq_connect_client(m_iShmemId)) == -1) {
-        umask(old_umask);
+    if (!m_pShmemSock->connect_client()) {
         printf("Could not connect!\r\n");//dacq_log("Could not connect!\n");
         return;//(2);
     }
-    printf("[done]\r\n");//dacq_log("Connection ok\n");
 
 //    int  t_iOriginalMaxBuflen = -1;
 //    /* Connect to the Elekta Neuromag acquisition control server and
@@ -431,7 +413,7 @@ void DacqServer::run()
         
         if(m_bMeasRequest)
         {
-            if (dacq_client_receive_tag(t_pTag) == -1)
+            if (m_pShmemSock->receive_tag(t_pTag) == -1)
                 break;
         }
         
@@ -489,7 +471,7 @@ void DacqServer::run()
     //    
     m_pCollectorSock->server_stop();
     
-    dacq_disconnect_client(m_iShmemSock, m_iShmemId);
+    m_pShmemSock->disconnect_client();
     m_pCollectorSock->close();
     
     delete t_pTag;
@@ -500,416 +482,416 @@ void DacqServer::run()
 }
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// client_socket.c
-//=============================================================================================================
+////*************************************************************************************************************
+////=============================================================================================================
+//// client_socket.c
+////=============================================================================================================
 
-int DacqServer::dacq_client_receive_tag (FiffTag*& p_pTag )
-{
-    struct  sockaddr_un from;	/* Address (not used) */
-    socklen_t fromlen;
+//int DacqServer::dacq_client_receive_tag (FiffTag*& p_pTag )
+//{
+//    struct  sockaddr_un from;	/* Address (not used) */
+//    socklen_t fromlen;
 
-    dacqDataMessageRec mess;	/* This is the kind of message we receive */
-    int rlen;
-    int data_ok = 0;
+//    dacqDataMessageRec mess;	/* This is the kind of message we receive */
+//    int rlen;
+//    int data_ok = 0;
 
-    if(p_pTag)
-        delete p_pTag;
-    p_pTag = new FiffTag();
-    dacqShmBlock  shmem = dacq_get_shmem();
-    dacqShmBlock  shmBlock;
-    dacqShmClient shmClient;
-    int           k;
+//    if(p_pTag)
+//        delete p_pTag;
+//    p_pTag = new FiffTag();
+//    dacqShmBlock  shmem = dacq_get_shmem();
+//    dacqShmBlock  shmBlock;
+//    dacqShmClient shmClient;
+//    int           k;
     
 
-    long read_loc;
+//    long read_loc;
 
-    if (m_iShmemSock < 0)
-        return (OK);
+//    if (m_iShmemSock < 0)
+//        return (OK);
 
-    //
-    // read from the socket
-    //
-    fromlen = sizeof(from);
-    rlen = recvfrom(m_iShmemSock, (void *)(&mess), DATA_MESS_SIZE, 0, (sockaddr *)(&from), &fromlen);
+//    //
+//    // read from the socket
+//    //
+//    fromlen = sizeof(from);
+//    rlen = recvfrom(m_iShmemSock, (void *)(&mess), DATA_MESS_SIZE, 0, (sockaddr *)(&from), &fromlen);
 
-//    qDebug() << "Mess Kind: " << mess.kind << " Type: " << mess.type << "Size: " << mess.size;
+////    qDebug() << "Mess Kind: " << mess.kind << " Type: " << mess.type << "Size: " << mess.size;
     
-    //
-    // Parse received message
-    //
-    if (rlen == -1) 
-    {
-        printf("recvfrom");//dacq_perror("recvfrom");
-        close_socket (m_iShmemSock, m_iShmemId);
-        return (FAIL);
-    }
+//    //
+//    // Parse received message
+//    //
+//    if (rlen == -1)
+//    {
+//        printf("recvfrom");//dacq_perror("recvfrom");
+//        close_socket (m_iShmemSock, m_iShmemId);
+//        return (FAIL);
+//    }
 
-    /* A sanity check to survive at least some crazy messages */
+//    /* A sanity check to survive at least some crazy messages */
 
-    if (mess.kind > 20000 || mess.size > (size_t) 100000000)
-    {
-        printf("ALERT: Unreasonable data received, skipping! (size=%d)(kind=%d)", mess.kind, mess.size);
-        //dacq_log("ALERT: Unreasonable data received, skipping! (size=%d)(kind=%d)", mess.kind, mess.size);
-        mess.size = 0;
-        mess.kind = FIFF_NOP;
-    }
+//    if (mess.kind > 20000 || mess.size > (size_t) 100000000)
+//    {
+//        printf("ALERT: Unreasonable data received, skipping! (size=%d)(kind=%d)", mess.kind, mess.size);
+//        //dacq_log("ALERT: Unreasonable data received, skipping! (size=%d)(kind=%d)", mess.kind, mess.size);
+//        mess.size = 0;
+//        mess.kind = FIFF_NOP;
+//    }
     
-    p_pTag->kind = mess.kind;
-    p_pTag->type = mess.type;
-    p_pTag->next = 0;
+//    p_pTag->kind = mess.kind;
+//    p_pTag->type = mess.type;
+//    p_pTag->next = 0;
     
-    if (mess.size > (size_t) 0)
-    {
-        p_pTag->resize(mess.size);
-    }
+//    if (mess.size > (size_t) 0)
+//    {
+//        p_pTag->resize(mess.size);
+//    }
 
-//    qDebug() << mess.loc << " " << mess.size << " " << mess.shmem_buf << " " << mess.shmem_loc;
+////    qDebug() << mess.loc << " " << mess.size << " " << mess.shmem_buf << " " << mess.shmem_loc;
 
-    if (mess.loc < 0 && mess.size > (size_t) 0 && mess.shmem_buf < 0 && mess.shmem_loc < 0)
-    {
-        fromlen = sizeof(from);
-        rlen = recvfrom(m_iShmemSock, (void *)p_pTag->data(), mess.size, 0, (sockaddr *)(&from), &fromlen);
-        if (rlen == -1)
-        {
-            printf("recvfrom");//dacq_perror("recvfrom");
-            close_socket(m_iShmemSock, m_iShmemId);
-            return (FAIL);
-        }
-        data_ok = 1;
-//        if (mess.type == FIFFT_STRING)
-//            data[mess.size] = '\0';
-    }
-    else if (mess.size > (size_t) 0) {
-        /*
-         * Copy data from shared memory
-         */   
-        if (mess.shmem_buf >= 0 && m_iShmemId/10000 > 0) 
-        {
-            shmBlock  = shmem + mess.shmem_buf;
-            shmClient = shmBlock->clients;
+//    if (mess.loc < 0 && mess.size > (size_t) 0 && mess.shmem_buf < 0 && mess.shmem_loc < 0)
+//    {
+//        fromlen = sizeof(from);
+//        rlen = recvfrom(m_iShmemSock, (void *)p_pTag->data(), mess.size, 0, (sockaddr *)(&from), &fromlen);
+//        if (rlen == -1)
+//        {
+//            printf("recvfrom");//dacq_perror("recvfrom");
+//            close_socket(m_iShmemSock, m_iShmemId);
+//            return (FAIL);
+//        }
+//        data_ok = 1;
+////        if (mess.type == FIFFT_STRING)
+////            data[mess.size] = '\0';
+//    }
+//    else if (mess.size > (size_t) 0) {
+//        /*
+//         * Copy data from shared memory
+//         */
+//        if (mess.shmem_buf >= 0 && m_iShmemId/10000 > 0)
+//        {
+//            shmBlock  = shmem + mess.shmem_buf;
+//            shmClient = shmBlock->clients;
             
-            if (interesting_data(mess.kind))
-            {
-                memcpy(p_pTag->data(),shmBlock->data,mess.size);
-                data_ok = 1;
-            //#ifdef DEBUG
-                printf("client # %d read shmem buffer # %d\n", m_iShmemId, mess.shmem_buf);//dacq_log("client # %d read shmem buffer # %d\n", id,mess.shmem_buf);
-            //#endif
-            }
-            /*
-            * Indicate that this client has processed the data
-            */
-            for (k = 0; k < SHM_MAX_CLIENT; k++,shmClient++)
-                if (shmClient->client_id == m_iShmemId)
-                    shmClient->done = 1;
-        }
-        /*
-        * Read data from file
-        */
-        else {
-            /*
-            * Possibly read from shmem file
-            */
-            if (m_iShmemId/10000 > 0 && mess.shmem_loc >= 0) {
-                read_fd  = shmem_fd;
-                read_loc = mess.shmem_loc;
-            }
-            else {
-                read_fd  = fd;
-                read_loc = mess.loc;
-            }
-            if (interesting_data(mess.kind)) {
-                if (read_fif (read_fd,read_loc,mess.size,(char *)p_pTag->data()) == -1) {
-                    printf("Could not read data (tag = %d, size = %d, pos = %d)!\n", mess.kind,mess.size,read_loc);//dacq_log("Could not read data (tag = %d, size = %d, pos = %d)!\n", mess.kind,mess.size,read_loc);
-                    //dacq_log("%s\n",err_get_error());
-                }
-                else {
-                    data_ok = 1;
-//                    if (mess.type == FIFFT_STRING)
-//                        data[mess.size] = '\0';
-                    FiffTag::convert_tag_data(p_pTag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
-                }
-            }
-        }
-    }
+//            if (interesting_data(mess.kind))
+//            {
+//                memcpy(p_pTag->data(),shmBlock->data,mess.size);
+//                data_ok = 1;
+//            //#ifdef DEBUG
+//                printf("client # %d read shmem buffer # %d\n", m_iShmemId, mess.shmem_buf);//dacq_log("client # %d read shmem buffer # %d\n", id,mess.shmem_buf);
+//            //#endif
+//            }
+//            /*
+//            * Indicate that this client has processed the data
+//            */
+//            for (k = 0; k < SHM_MAX_CLIENT; k++,shmClient++)
+//                if (shmClient->client_id == m_iShmemId)
+//                    shmClient->done = 1;
+//        }
+//        /*
+//        * Read data from file
+//        */
+//        else {
+//            /*
+//            * Possibly read from shmem file
+//            */
+//            if (m_iShmemId/10000 > 0 && mess.shmem_loc >= 0) {
+//                read_fd  = shmem_fd;
+//                read_loc = mess.shmem_loc;
+//            }
+//            else {
+//                read_fd  = fd;
+//                read_loc = mess.loc;
+//            }
+//            if (interesting_data(mess.kind)) {
+//                if (read_fif (read_fd,read_loc,mess.size,(char *)p_pTag->data()) == -1) {
+//                    printf("Could not read data (tag = %d, size = %d, pos = %d)!\n", mess.kind,mess.size,read_loc);//dacq_log("Could not read data (tag = %d, size = %d, pos = %d)!\n", mess.kind,mess.size,read_loc);
+//                    //dacq_log("%s\n",err_get_error());
+//                }
+//                else {
+//                    data_ok = 1;
+////                    if (mess.type == FIFFT_STRING)
+////                        data[mess.size] = '\0';
+//                    FiffTag::convert_tag_data(p_pTag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
+//                }
+//            }
+//        }
+//    }
 
-    /*
-    * Special case: close old input file
-    */
-    if (mess.kind == FIFF_CLOSE_FILE) {
-        if (fd != NULL) {
-            printf("File to be closed (lib/FIFF_CLOSE_FILE).\n");//dacq_log("File to be closed (lib/FIFF_CLOSE_FILE).\n");
-            (void)fclose(fd);
-            fd = NULL;
-        }
-        else
-            printf("No file to close (lib/FIFF_CLOSE_FILE).\n");//dacq_log("No file to close (lib/FIFF_CLOSE_FILE).\n");
-    }
-    /*
-    * Another special case: open new input file
-    */
-    else if (mess.kind == FIFF_NEW_FILE) {
-        if (fd != NULL) {
-            (void)fclose(fd);
-            printf("File closed (lib/FIFF_NEW_FILE).\n");//dacq_log("File closed (lib/FIFF_NEW_FILE).\n");
-        }
-        fd = open_fif((char *)p_pTag->data());
-        free (filename);
-        filename = strdup((char *)p_pTag->data());
+//    /*
+//    * Special case: close old input file
+//    */
+//    if (mess.kind == FIFF_CLOSE_FILE) {
+//        if (fd != NULL) {
+//            printf("File to be closed (lib/FIFF_CLOSE_FILE).\n");//dacq_log("File to be closed (lib/FIFF_CLOSE_FILE).\n");
+//            (void)fclose(fd);
+//            fd = NULL;
+//        }
+//        else
+//            printf("No file to close (lib/FIFF_CLOSE_FILE).\n");//dacq_log("No file to close (lib/FIFF_CLOSE_FILE).\n");
+//    }
+//    /*
+//    * Another special case: open new input file
+//    */
+//    else if (mess.kind == FIFF_NEW_FILE) {
+//        if (fd != NULL) {
+//            (void)fclose(fd);
+//            printf("File closed (lib/FIFF_NEW_FILE).\n");//dacq_log("File closed (lib/FIFF_NEW_FILE).\n");
+//        }
+//        fd = open_fif((char *)p_pTag->data());
+//        free (filename);
+//        filename = strdup((char *)p_pTag->data());
 
-        if (shmem_fd == NULL)
-            shmem_fd = open_fif (SHM_FAIL_FILE);
-    }
+//        if (shmem_fd == NULL)
+//            shmem_fd = open_fif (SHM_FAIL_FILE);
+//    }
 
-    if (p_pTag->size() <= 0)
-    {
-        data_ok  = 0;
-        return (FAIL);
-    }
-    return (OK);
-}
-
-
-//*************************************************************************************************************
-
-FILE *DacqServer::open_fif (char *name)
-
-{
-    FILE *fd;
-    printf("should open %s\n",name);//dacq_log ("should open %s\n",name);
-    if ((fd = fopen(name,"r")) == NULL) {
-        printf ("failed to open %s\n",name);//dacq_log ("failed to open %s\n",name);
-        //dacq_perror(name);
-    }
-    return (fd);
-}
+//    if (p_pTag->size() <= 0)
+//    {
+//        data_ok  = 0;
+//        return (FAIL);
+//    }
+//    return (OK);
+//}
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-int DacqServer::read_fif (FILE   *fd,		/* File to read from */
-		     long   pos,		/* Position in file */
-		     size_t size,		/* How long */
-		     char   *data)              /* Put data here */
-{
-    if (fd == NULL) {
-        printf("Cannot read from NULL fd.");//err_set_error("Cannot read from NULL fd.");
-        return (FAIL);
-    }
-    if (fseek(fd,pos,SEEK_SET) == -1) {
-        printf("fseek");//err_set_sys_error("fseek");
-        return (FAIL);
-    }
-    if (fread(data,size,1,fd) != (size_t) 1) {
-        printf("Data not available.");//err_set_error("Data not available.");
-        return (FAIL);
-    }
-    return (OK);
-}
+//FILE *DacqServer::open_fif (char *name)
+
+//{
+//    FILE *fd;
+//    printf("should open %s\n",name);//dacq_log ("should open %s\n",name);
+//    if ((fd = fopen(name,"r")) == NULL) {
+//        printf ("failed to open %s\n",name);//dacq_log ("failed to open %s\n",name);
+//        //dacq_perror(name);
+//    }
+//    return (fd);
+//}
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-int DacqServer::dacq_connect_client (int id)
-     /*
-      * Connect to the data server process
-      */
-{
-    struct  sockaddr_un clntaddr;   /* address of client */
-    char    client_path[200];       /* This our path */
-    int     sock = -1;              /* This is the UNIX domain socket */
-
-    sprintf (client_path,"%s%d",SOCKET_PATHCLNT,id);
-    /*
-     * Is this safe?
-     */
-    (void)unlink(client_path);
-
-    /*	Create a UNIX datagram socket for client	*/
-
-    if ((sock = socket(AF_UNIX, SOCK_DGRAM, 0)) < 0) {
-        //dacq_perror("socket");
-        printf("socket error");
-        return (FAIL);
-    }
-    /*	Client will bind to an address so server will get
-     * 	an address in its recvfrom call and can use it to
-     *	send data back to the client.
-     */
-    bzero(&clntaddr, sizeof(clntaddr));
-    clntaddr.sun_family = AF_UNIX;
-    strcpy(clntaddr.sun_path, client_path);
-
-    if (bind(sock, (sockaddr *)(&clntaddr), sizeof(clntaddr)) < 0) {
-        close(sock);
-        //dacq_perror("bind");
-        printf("bind error");
-        return (FAIL);
-    }
-    if (connect_disconnect(sock,id) == FAIL)
-        return (FAIL);
-    else
-        return (sock);
-}
+//int DacqServer::read_fif (FILE   *fd,		/* File to read from */
+//		     long   pos,		/* Position in file */
+//		     size_t size,		/* How long */
+//		     char   *data)              /* Put data here */
+//{
+//    if (fd == NULL) {
+//        printf("Cannot read from NULL fd.");//err_set_error("Cannot read from NULL fd.");
+//        return (FAIL);
+//    }
+//    if (fseek(fd,pos,SEEK_SET) == -1) {
+//        printf("fseek");//err_set_sys_error("fseek");
+//        return (FAIL);
+//    }
+//    if (fread(data,size,1,fd) != (size_t) 1) {
+//        printf("Data not available.");//err_set_error("Data not available.");
+//        return (FAIL);
+//    }
+//    return (OK);
+//}
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-int DacqServer::dacq_disconnect_client (int sock, int id)
-{
-    int result = connect_disconnect(sock,-id);
-    close_socket (sock,id);
-    return (result);
-}
+//int DacqServer::dacq_connect_client (int id)
+//     /*
+//      * Connect to the data server process
+//      */
+//{
+//    struct  sockaddr_un clntaddr;   /* address of client */
+//    char    client_path[200];       /* This our path */
+//    int     sock = -1;              /* This is the UNIX domain socket */
 
+//    sprintf (client_path,"%s%d",SOCKET_PATHCLNT,id);
+//    /*
+//     * Is this safe?
+//     */
+//    (void)unlink(client_path);
 
-//*************************************************************************************************************
+//    /*	Create a UNIX datagram socket for client	*/
 
-void DacqServer::dacq_set_data_filter (int *kinds, int nkind)
-{
-    if (nkind <= 0) {
-        free (filter_kinds);
-        delete[] filter_kinds;
-        nfilt = 0;
-    }
-    else {
-        nfilt = nkind;
-        if(filter_kinds)
-            delete[] filter_kinds;
-        filter_kinds = new int[nfilt];
-        memcpy(filter_kinds,kinds,nfilt*sizeof(int));
-    }
-    return;
-}
+//    if ((sock = socket(AF_UNIX, SOCK_DGRAM, 0)) < 0) {
+//        //dacq_perror("socket");
+//        printf("socket error");
+//        return (FAIL);
+//    }
+//    /*	Client will bind to an address so server will get
+//     * 	an address in its recvfrom call and can use it to
+//     *	send data back to the client.
+//     */
+//    bzero(&clntaddr, sizeof(clntaddr));
+//    clntaddr.sun_family = AF_UNIX;
+//    strcpy(clntaddr.sun_path, client_path);
 
-
-//*************************************************************************************************************
-
-void DacqServer::close_socket (int sock, int id)
-{
-    char    client_path[200];   /* This our path */
-
-    if (sock != -1) {
-    /*
-     * Use unlink to remove the file (inode) so that the name
-     * will be available for the next run.
-     */
-        sprintf (client_path,"%s%d",SOCKET_PATHCLNT,id);
-        unlink(client_path);
-        close(sock);
-    }
-    (void) dacq_release_shmem();
-    //dacq_log ("Connection closed.\n");
-    printf ("Connection closed.\r\n");
-}
+//    if (bind(sock, (sockaddr *)(&clntaddr), sizeof(clntaddr)) < 0) {
+//        close(sock);
+//        //dacq_perror("bind");
+//        printf("bind error");
+//        return (FAIL);
+//    }
+//    if (connect_disconnect(sock,id) == FAIL)
+//        return (FAIL);
+//    else
+//        return (sock);
+//}
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-int DacqServer::connect_disconnect (int sock,int id)
-{
-    struct  sockaddr_un servaddr;       /* address of server */
-    struct  sockaddr_un from;
-
-    socklen_t fromlen;
-    int     result;
-    int     slen, rlen;
-
-    if (sock < 0)
-        return (OK);
-    /*
-     * Set up address structure for server socket
-     */
-    bzero(&servaddr, sizeof(servaddr));
-    servaddr.sun_family = AF_UNIX;
-    strcpy(servaddr.sun_path, SOCKET_PATH);
-
-    slen = sendto(sock, (void *)(&id), sizeof(int), 0,
-          (sockaddr *)(&servaddr), sizeof(servaddr));
-    if (slen<0) {
-        printf("sendto error");//dacq_perror("sendto");
-        close_socket (sock,abs(id));
-        return (FAIL);
-    }
-    else {
-        fromlen = sizeof(from);
-        rlen = recvfrom(sock, (void *)(&result), sizeof(int), 0,
-              (sockaddr *)(&from), &fromlen);
-        if (rlen == -1) {
-            printf("recvfrom");//dacq_perror("recvfrom");
-            close_socket (sock,abs(id));
-            return (FAIL);
-        }
-        else
-            return result;
-    }
-}
+//int DacqServer::dacq_disconnect_client (int sock, int id)
+//{
+//    int result = connect_disconnect(sock,-id);
+//    close_socket (sock,id);
+//    return (result);
+//}
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-int DacqServer::interesting_data (int kind)
-{
-    int k;
-    for (k = 0; k < nfilt; k++)
-        if (kind == filter_kinds[k])
-            return (0);
-    return (1);
-}
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// shmem.c
-//=============================================================================================================
-
-dacqShmBlock DacqServer::dacq_get_shmem(void)
-{
-  if (dacq_init_shmem() == -1)
-    return(NULL);
-  else
-    return(shmptr);
-}
+//void DacqServer::dacq_set_data_filter (int *kinds, int nkind)
+//{
+//    if (nkind <= 0) {
+//        free (filter_kinds);
+//        delete[] filter_kinds;
+//        nfilt = 0;
+//    }
+//    else {
+//        nfilt = nkind;
+//        if(filter_kinds)
+//            delete[] filter_kinds;
+//        filter_kinds = new int[nfilt];
+//        memcpy(filter_kinds,kinds,nfilt*sizeof(int));
+//    }
+//    return;
+//}
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-int DacqServer::dacq_init_shmem(void)
-{
-    key_t key = ftok(SHM_FILE,'A');
+//void DacqServer::close_socket (int sock, int id)
+//{
+//    char    client_path[200];   /* This our path */
 
-    if (shmid == -1) {
-        if ((shmid = shmget(key,SHM_SIZE,IPC_CREAT | 0666)) == -1) {
-            printf("shmget");//err_set_sys_error("shmget");
-            return (-1);
-        }
-    }
-    if (shmptr == NULL) {
-        if (!(shmptr = (dacqShmBlockRec*)shmat(shmid,0,0))) {
-            printf("shmat");//err_set_sys_error("shmat");
-            shmptr = NULL;
-            return (-1);
-        }
-    }
-    return (0);
-}
+//    if (sock != -1) {
+//    /*
+//     * Use unlink to remove the file (inode) so that the name
+//     * will be available for the next run.
+//     */
+//        sprintf (client_path,"%s%d",SOCKET_PATHCLNT,id);
+//        unlink(client_path);
+//        close(sock);
+//    }
+//    (void) dacq_release_shmem();
+//    //dacq_log ("Connection closed.\n");
+//    printf ("Connection closed.\r\n");
+//}
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-int DacqServer::dacq_release_shmem(void)
-{
-    if (shmid == -1)
-    return (0);
-    if (shmptr != NULL) {
-    if (shmdt(shmptr) == -1) {
-        //err_set_sys_error("shmdt");
-        printf("shmdt");
-        return (-1);
-    }
-    shmptr = NULL;
-    }
-    return (0);
-}
+//int DacqServer::connect_disconnect (int sock,int id)
+//{
+//    struct  sockaddr_un servaddr;       /* address of server */
+//    struct  sockaddr_un from;
+
+//    socklen_t fromlen;
+//    int     result;
+//    int     slen, rlen;
+
+//    if (sock < 0)
+//        return (OK);
+//    /*
+//     * Set up address structure for server socket
+//     */
+//    bzero(&servaddr, sizeof(servaddr));
+//    servaddr.sun_family = AF_UNIX;
+//    strcpy(servaddr.sun_path, SOCKET_PATH);
+
+//    slen = sendto(sock, (void *)(&id), sizeof(int), 0,
+//          (sockaddr *)(&servaddr), sizeof(servaddr));
+//    if (slen<0) {
+//        printf("sendto error");//dacq_perror("sendto");
+//        close_socket (sock,abs(id));
+//        return (FAIL);
+//    }
+//    else {
+//        fromlen = sizeof(from);
+//        rlen = recvfrom(sock, (void *)(&result), sizeof(int), 0,
+//              (sockaddr *)(&from), &fromlen);
+//        if (rlen == -1) {
+//            printf("recvfrom");//dacq_perror("recvfrom");
+//            close_socket (sock,abs(id));
+//            return (FAIL);
+//        }
+//        else
+//            return result;
+//    }
+//}
+
+
+////*************************************************************************************************************
+
+//int DacqServer::interesting_data (int kind)
+//{
+//    int k;
+//    for (k = 0; k < nfilt; k++)
+//        if (kind == filter_kinds[k])
+//            return (0);
+//    return (1);
+//}
+
+
+////*************************************************************************************************************
+////=============================================================================================================
+//// shmem.c
+////=============================================================================================================
+
+//dacqShmBlock DacqServer::dacq_get_shmem(void)
+//{
+//  if (dacq_init_shmem() == -1)
+//    return(NULL);
+//  else
+//    return(shmptr);
+//}
+
+
+////*************************************************************************************************************
+
+//int DacqServer::dacq_init_shmem(void)
+//{
+//    key_t key = ftok(SHM_FILE,'A');
+
+//    if (shmid == -1) {
+//        if ((shmid = shmget(key,SHM_SIZE,IPC_CREAT | 0666)) == -1) {
+//            printf("shmget");//err_set_sys_error("shmget");
+//            return (-1);
+//        }
+//    }
+//    if (shmptr == NULL) {
+//        if (!(shmptr = (dacqShmBlockRec*)shmat(shmid,0,0))) {
+//            printf("shmat");//err_set_sys_error("shmat");
+//            shmptr = NULL;
+//            return (-1);
+//        }
+//    }
+//    return (0);
+//}
+
+
+////*************************************************************************************************************
+
+//int DacqServer::dacq_release_shmem(void)
+//{
+//    if (shmid == -1)
+//    return (0);
+//    if (shmptr != NULL) {
+//    if (shmdt(shmptr) == -1) {
+//        //err_set_sys_error("shmdt");
+//        printf("shmdt");
+//        return (-1);
+//    }
+//    shmptr = NULL;
+//    }
+//    return (0);
+//}
