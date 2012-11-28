@@ -91,6 +91,8 @@ class ShmemSocket : public QObject
 public:
     explicit ShmemSocket(QObject *parent = 0);
 
+    virtual ~ShmemSocket();
+
 
     // client_socket.c
     //=========================================================================================================
@@ -164,7 +166,7 @@ public:
 
 
 
-//private:
+private:
 
     // shmem.c
     //=========================================================================================================
@@ -192,20 +194,32 @@ public:
     int release_shmem();
 
 
+    //=========================================================================================================
+    /**
+    *
+    * @return
+    */
     FILE* open_fif (char *name);
 
 
-    int read_fif (FILE   *fd,		/* File to read from */
-             long   pos,		/* Position in file */
-             size_t size,		/* How long */
-             char   *data);              /* Put data here */
+    //=========================================================================================================
+    /**
+    *
+    *
+    * fd        File to read from
+    * pos       Position in file
+    * size      How long
+    * data);    Put data here
+    * @return
+    */
+    int read_fif (FILE *fd, long pos, size_t size, char *data);
 
 
 
 private:
 
     int* filter_kinds;  /**< Filter these tags */
-    int nfilt;		    /**< How many are they */
+    int nfilt;          /**< How many are they */
 
     int shmid;
     dacqShmBlock shmptr;

@@ -52,11 +52,6 @@
 #include <sys/shm.h>    //shmdt
 
 
-//#include <sys/types.h>
-//#include <netinet/in.h>
-
-
-
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -83,6 +78,16 @@ ShmemSocket::ShmemSocket(QObject *parent)
     filter_kinds = NULL;    /* Filter these tags */
     nfilt = 0;              /* How many are they */
 }
+
+
+//*************************************************************************************************************
+
+ShmemSocket::~ShmemSocket()
+{
+    delete[] filter_kinds;
+    free (filename);
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -273,10 +278,7 @@ FILE *ShmemSocket::open_fif (char *name)
 
 //*************************************************************************************************************
 
-int ShmemSocket::read_fif (FILE   *fd,		/* File to read from */
-             long   pos,		/* Position in file */
-             size_t size,		/* How long */
-             char   *data)              /* Put data here */
+int ShmemSocket::read_fif (FILE   *fd, long   pos, size_t size, char   *data)
 {
     if (fd == NULL) {
         printf("Cannot read from NULL fd.");//err_set_error("Cannot read from NULL fd.");
@@ -297,14 +299,9 @@ int ShmemSocket::read_fif (FILE   *fd,		/* File to read from */
 //*************************************************************************************************************
 
 bool ShmemSocket::connect_client ()
-     /*
-      * Connect to the data server process
-      */
 {
     printf("About to connect to the Neuromag DACQ shared memory on this workstation (client ID %d)... ", m_iShmemId);//dacq_log("About to connect to the Neuromag DACQ shared memory on this workstation (client ID %d)...\n", shmem_id);
-
     int old_umask = umask(SOCKET_UMASK);
-
     int id = m_iShmemId;
 
     struct  sockaddr_un clntaddr;   /* address of client */
