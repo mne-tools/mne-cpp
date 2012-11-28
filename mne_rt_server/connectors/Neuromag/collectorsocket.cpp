@@ -178,6 +178,31 @@ int CollectorSocket::setMaxBuflen(int maxbuflen)
 
 //*************************************************************************************************************
 
+bool CollectorSocket::server_command(const QString& p_sCommand)
+{
+
+    if (this->state() != QAbstractSocket::ConnectedState)
+        return false;
+
+    //ToDo Command Check
+    QByteArray t_arrCommand = p_sCommand.toLocal8Bit();
+
+    if(t_arrCommand.size() > 0)
+    {
+        this->write(t_arrCommand);
+        this->flush();
+    }
+
+    //ToDo check if command was succefull processed by the collector
+    this->waitForReadyRead(-1);
+    this->readAll();//readAll that QTcpSocket is empty again
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
 bool CollectorSocket::server_login(const QString& p_sCollectorPass, const QString& p_sMyName)
 {
     printf("Login... ");
