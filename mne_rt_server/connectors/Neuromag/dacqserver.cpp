@@ -40,6 +40,7 @@
 
 #include "dacqserver.h"
 #include "neuromag.h"
+#include "collectorsocket.h"
 #include "../../../MNE/fiff/fiff_constants.h"
 #include "../../../MNE/fiff/fiff_stream.h"
 
@@ -86,12 +87,12 @@ using namespace NeuromagPlugin;
 
 DacqServer::DacqServer(Neuromag* p_pNeuromag)
 : m_pNeuromag(p_pNeuromag)
-, m_sCollectorHost(QHostAddress(QHostAddress::LocalHost).toString())
+//, m_sCollectorHost(QHostAddress(QHostAddress::LocalHost).toString())
 , m_pCollectorSock(NULL)
 , m_iShmemSock(-1)
 , m_iShmemId(CLIENT_ID)
 , m_bIsRunning(false)
-, m_bIsMeasuring(false)
+//, m_bIsMeasuring(false)
 , m_bMeasInfoRequest(true)
 , m_bMeasRequest(true)
 , m_bMeasStopRequest(false)
@@ -129,8 +130,8 @@ bool DacqServer::getMeasInfo(FiffInfo*& p_pFiffInfo)
         delete p_pFiffInfo;
     p_pFiffInfo = new FiffInfo();
 
-    dacq_server_stop();
-    dacq_server_start();
+    m_pCollectorSock->server_stop();
+    m_pCollectorSock->server_start();
 
     QStringList names;
     MatrixXd* data = NULL;
@@ -284,7 +285,7 @@ bool DacqServer::getMeasInfo(FiffInfo*& p_pFiffInfo)
     delete t_pTag;
 
     if (!m_bMeasRequest)
-        dacq_server_stop();
+        m_pCollectorSock->server_stop();
         
     //t_bReadHeader is still true --> that means a break occured
     if (t_bReadHeader)
@@ -315,7 +316,7 @@ void DacqServer::run()
 
     if(m_pCollectorSock)
         delete m_pCollectorSock;
-    m_pCollectorSock = new QTcpSocket();
+    m_pCollectorSock = new CollectorSocket();
     
     //
     // Make sure the buffer size is at least as big as the minimal buffer size
@@ -333,14 +334,14 @@ void DacqServer::run()
     }
     else {
         /* Connect to the Elekta Neuromag acquisition control server, change the buffer length and exit*/
-        if (!collector_open()) {
+        if (!m_pCollectorSock->open()) {
             printf("Cannot change the Neuromag buffer length: Could not open collector connection\n");//dacq_log("Cannot change the Neuromag buffer length: Could not open collector connection\n");
             return;
         }
         printf("Changing the Neuromag buffer length to %d... ", m_pNeuromag->getBufferSampleSize());//dacq_log("Changing the Neuromag buffer length to %d\n", newMaxBuflen);
-        if (collector_setMaxBuflen(m_pNeuromag->getBufferSampleSize())) {
+        if (m_pCollectorSock->setMaxBuflen(m_pNeuromag->getBufferSampleSize())) {
             printf("Setting a new Neuromag buffer length failed\r\n");//dacq_log("Setting a new Neuromag buffer length failed\n");
-            collector_close();
+            m_pCollectorSock->close();
             return;
         }
         printf("[done]\r\n");        
@@ -485,10 +486,10 @@ void DacqServer::run()
     //
     // Stop and clean up
     //    
-    dacq_server_stop();
+    m_pCollectorSock->server_stop();
     
     dacq_disconnect_client(m_iShmemSock, m_iShmemId);
-    collector_close();
+    m_pCollectorSock->close();
     
     delete t_pTag;
     delete m_pCollectorSock;
@@ -504,111 +505,111 @@ void DacqServer::run()
 
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-bool DacqServer::collector_open()
-{
-    printf("About to connect to collector... ");
-    if(m_pCollectorSock->state() == QAbstractSocket::ConnectedState)
-    {
-        printf("Note: Tried to re-open an open connection... [done]\r\n");//dacq_log("Note: Tried to re-open an open connection\n");
-        return true;
-    }
-    m_pCollectorSock->abort();
-    m_pCollectorSock->connectToHost(m_sCollectorHost, COLLECTOR_PORT);
-    m_pCollectorSock->waitForConnected( -1 );//qDebug() << "Socket Stat: " << m_pCollectorSock->state();
-    printf("[done]\r\n");
+//bool DacqServer::collector_open()
+//{
+//    printf("About to connect to collector... ");
+//    if(m_pCollectorSock->state() == QAbstractSocket::ConnectedState)
+//    {
+//        printf("Note: Tried to re-open an open connection... [done]\r\n");//dacq_log("Note: Tried to re-open an open connection\n");
+//        return true;
+//    }
+//    m_pCollectorSock->abort();
+//    m_pCollectorSock->connectToHost(m_sCollectorHost, COLLECTOR_PORT);
+//    m_pCollectorSock->waitForConnected( -1 );//qDebug() << "Socket Stat: " << m_pCollectorSock->state();
+//    printf("[done]\r\n");
 
-    if (!dacq_server_login(QString(COLLECTOR_PASS), QString("mne_rt_server"))) {
-        printf("Neuromag collector connection: Error\r\n");//dacq_log("Neuromag collector connection: %s\n", err_get_error());
-        return false;
-    }
+//    if (!dacq_server_login(QString(COLLECTOR_PASS), QString("mne_rt_server"))) {
+//        printf("Neuromag collector connection: Error\r\n");//dacq_log("Neuromag collector connection: %s\n", err_get_error());
+//        return false;
+//    }
 
-    return true;
-}
+//    return true;
+//}
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-int DacqServer::collector_close()
-{
+//int DacqServer::collector_close()
+//{
 
-    qDebug() << "DacqServer::collector_close()";
+//    qDebug() << "DacqServer::collector_close()";
 
-    if (m_pCollectorSock == NULL)
-        return(0);
-//    if (dacq_server_close(&m_pCollectorSock, NULL)) {
-//        printf("Neuromag collector connection: Eror\n");//dacq_log("Neuromag collector connection: %s\n", err_get_error());
+//    if (m_pCollectorSock == NULL)
+//        return(0);
+////    if (dacq_server_close(&m_pCollectorSock, NULL)) {
+////        printf("Neuromag collector connection: Eror\n");//dacq_log("Neuromag collector connection: %s\n", err_get_error());
+////        return(-1);
+////    }
+
+//    m_pCollectorSock->waitForReadyRead(100);
+
+//    m_pCollectorSock->close();
+
+////    m_iCollectorSock = -1;
+//    return(0);
+//}
+
+
+////*************************************************************************************************************
+//// ToDo doesn't work without setting first buffersize first
+//int DacqServer::collector_getMaxBuflen()
+//{
+
+//    int maxbuflen = -1;
+
+//    QString t_sSend = QString("%1\r\n").arg(COLLECTOR_GETVARS);
+
+//    QByteArray t_buf;
+//    if (!dacq_server_send(t_sSend, t_buf, DACQ_KEEP_INPUT)) {
+//        printf("Neuromag collector connection: Error\r\n");//dacq_log("Neuromag collector connection: %s\n", err_get_error());
+//        return -1;
+//    }
+
+//    QList<QByteArray> t_lLinesBuffer = t_buf.split('\n');
+
+//    QByteArray bufVar1(COLLECTOR_BUFVAR);
+//    QByteArray bufVar2("Vectors in a buffer");
+//    for(qint32 i = 0; i < t_lLinesBuffer.size(); ++i)
+//    {
+//        if(t_lLinesBuffer[i].contains(bufVar1)) //option 1
+//        {
+//            char var_name[1024];
+//            char var_value[1024];
+//            char var_type[1024];
+//            sscanf(t_lLinesBuffer[i].data()+4, "%s %s %s", var_name, var_value, var_type);
+//            maxbuflen = QString(var_value).toInt();
+//            return maxbuflen;
+//        }
+//        else if(t_lLinesBuffer[i].contains(bufVar2)) //option 2
+//        {
+//            QList<QByteArray> t_lMaxBuflen = t_lLinesBuffer[i].split(':');
+//            maxbuflen = t_lMaxBuflen[t_lMaxBuflen.size()-1].trimmed().toInt();
+//            return maxbuflen;
+//        }
+//    }
+
+//    return -1;
+//}
+
+
+////*************************************************************************************************************
+
+//int DacqServer::collector_setMaxBuflen(int maxbuflen)
+//{
+//    if (maxbuflen < 1)
+//        return(0);
+
+//    if (!dacq_server_command(QString("%1 %2 %3\n").arg(COLLECTOR_SETVARS).arg(COLLECTOR_BUFVAR).arg(maxbuflen)) ||
+//            !dacq_server_command(QString("%1\n").arg(COLLECTOR_DOSETUP)))
+//    {
+//        printf("Neuromag collector connection: Error\n");//dacq_log("Neuromag collector connection: %s\n", err_get_error());
 //        return(-1);
 //    }
 
-    m_pCollectorSock->waitForReadyRead(100);
-
-    m_pCollectorSock->close();
-
-//    m_iCollectorSock = -1;
-    return(0);
-}
-
-
-//*************************************************************************************************************
-// ToDo doesn't work without setting first buffersize first
-int DacqServer::collector_getMaxBuflen()
-{
-
-    int maxbuflen = -1;
-
-    QString t_sSend = QString("%1\r\n").arg(COLLECTOR_GETVARS);
-
-    QByteArray t_buf;
-    if (!dacq_server_send(t_sSend, t_buf, DACQ_KEEP_INPUT)) {
-        printf("Neuromag collector connection: Error\r\n");//dacq_log("Neuromag collector connection: %s\n", err_get_error());
-        return -1;
-    }
-
-    QList<QByteArray> t_lLinesBuffer = t_buf.split('\n');
-
-    QByteArray bufVar1(COLLECTOR_BUFVAR);
-    QByteArray bufVar2("Vectors in a buffer");
-    for(qint32 i = 0; i < t_lLinesBuffer.size(); ++i)
-    {
-        if(t_lLinesBuffer[i].contains(bufVar1)) //option 1
-        {
-            char var_name[1024];
-            char var_value[1024];
-            char var_type[1024];
-            sscanf(t_lLinesBuffer[i].data()+4, "%s %s %s", var_name, var_value, var_type);
-            maxbuflen = QString(var_value).toInt();
-            return maxbuflen;
-        }
-        else if(t_lLinesBuffer[i].contains(bufVar2)) //option 2
-        {
-            QList<QByteArray> t_lMaxBuflen = t_lLinesBuffer[i].split(':');
-            maxbuflen = t_lMaxBuflen[t_lMaxBuflen.size()-1].trimmed().toInt();
-            return maxbuflen;
-        }
-    }
-
-    return -1;
-}
-
-
-//*************************************************************************************************************
-
-int DacqServer::collector_setMaxBuflen(int maxbuflen)
-{
-    if (maxbuflen < 1)
-        return(0);
-
-    if (!dacq_server_command(QString("%1 %2 %3\n").arg(COLLECTOR_SETVARS).arg(COLLECTOR_BUFVAR).arg(maxbuflen)) ||
-            !dacq_server_command(QString("%1\n").arg(COLLECTOR_DOSETUP)))
-    {
-        printf("Neuromag collector connection: Error\n");//dacq_log("Neuromag collector connection: %s\n", err_get_error());
-        return(-1);
-    }
-
-    return(0);
-}
+//    return(0);
+//}
 
 
 //*************************************************************************************************************
@@ -1031,111 +1032,111 @@ int DacqServer::dacq_release_shmem(void)
 // new client.c to qt functions
 //=============================================================================================================
 
-bool DacqServer::dacq_server_command(const QString& p_sCommand)
-{
+//bool DacqServer::dacq_server_command(const QString& p_sCommand)
+//{
 
-    if (m_pCollectorSock->state() != QAbstractSocket::ConnectedState)
-        return false;
+//    if (m_pCollectorSock->state() != QAbstractSocket::ConnectedState)
+//        return false;
 
-    //ToDo Command Check
+//    //ToDo Command Check
 
-    QByteArray t_arrCommand = p_sCommand.toLocal8Bit();
+//    QByteArray t_arrCommand = p_sCommand.toLocal8Bit();
 
-    if(t_arrCommand.size() > 0)
-    {
-        m_pCollectorSock->write(t_arrCommand);
-        m_pCollectorSock->flush();
-    }
+//    if(t_arrCommand.size() > 0)
+//    {
+//        m_pCollectorSock->write(t_arrCommand);
+//        m_pCollectorSock->flush();
+//    }
 
-    //ToDo check if command was succefull processed by the collector 
-    m_pCollectorSock->waitForReadyRead(-1);
-    m_pCollectorSock->readAll();//readAll that QTcpSocket is empty again
+//    //ToDo check if command was succefull processed by the collector
+//    m_pCollectorSock->waitForReadyRead(-1);
+//    m_pCollectorSock->readAll();//readAll that QTcpSocket is empty again
     
 
-    return true;
-}
+//    return true;
+//}
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-bool DacqServer::dacq_server_login(const QString& p_sCollectorPass, const QString& p_sMyName)
-{
-    printf("Login... ");
+//bool DacqServer::dacq_server_login(const QString& p_sCollectorPass, const QString& p_sMyName)
+//{
+//    printf("Login... ");
 
-    QString t_sCommand = QString("%1 %2\r\n").arg(DACQ_CMD_PASSWORD).arg(p_sCollectorPass);
-    dacq_server_command(t_sCommand);
+//    QString t_sCommand = QString("%1 %2\r\n").arg(DACQ_CMD_PASSWORD).arg(p_sCollectorPass);
+//    dacq_server_command(t_sCommand);
     
-    t_sCommand = QString("%1 %2\r\n").arg(DACQ_CMD_NAME).arg(p_sMyName);
-    dacq_server_command(t_sCommand);
+//    t_sCommand = QString("%1 %2\r\n").arg(DACQ_CMD_NAME).arg(p_sMyName);
+//    dacq_server_command(t_sCommand);
 
-    printf("[done]\r\n");
+//    printf("[done]\r\n");
 
-    return true;
-}
+//    return true;
+//}
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-bool DacqServer::dacq_server_send(QString& p_sDataSend, QByteArray& p_dataOut, int p_iInputFlag)
-{
-    if (m_pCollectorSock->state() != QAbstractSocket::ConnectedState)
-        return false;
+//bool DacqServer::dacq_server_send(QString& p_sDataSend, QByteArray& p_dataOut, int p_iInputFlag)
+//{
+//    if (m_pCollectorSock->state() != QAbstractSocket::ConnectedState)
+//        return false;
 
-    QByteArray t_arrSend = p_sDataSend.toLocal8Bit();
+//    QByteArray t_arrSend = p_sDataSend.toLocal8Bit();
 
-    if(t_arrSend.size() > 0)
-    {
-        m_pCollectorSock->write(t_arrSend);
-        m_pCollectorSock->flush();
-    }
+//    if(t_arrSend.size() > 0)
+//    {
+//        m_pCollectorSock->write(t_arrSend);
+//        m_pCollectorSock->flush();
+//    }
     
-    m_pCollectorSock->waitForReadyRead(-1);
-    if ( p_iInputFlag == DACQ_DRAIN_INPUT )
-    {
-        m_pCollectorSock->readAll();//readAll that QTcpSocket is empty again -> prevent overflow
-    }
-    else if( p_iInputFlag == DACQ_KEEP_INPUT ) 
-    {
-        p_dataOut = m_pCollectorSock->readAll();//readAll that QTcpSocket is empty again -> prevent overflow
-    }
+//    m_pCollectorSock->waitForReadyRead(-1);
+//    if ( p_iInputFlag == DACQ_DRAIN_INPUT )
+//    {
+//        m_pCollectorSock->readAll();//readAll that QTcpSocket is empty again -> prevent overflow
+//    }
+//    else if( p_iInputFlag == DACQ_KEEP_INPUT )
+//    {
+//        p_dataOut = m_pCollectorSock->readAll();//readAll that QTcpSocket is empty again -> prevent overflow
+//    }
 
-    return true;
-}
-
-
-//*************************************************************************************************************
-
-bool DacqServer::dacq_server_start()
-{
-    if(!m_bIsMeasuring)
-    {
-        printf("Start measurement... ");
-
-        QString t_sCommand = QString("%1\r\n").arg("meas");
-        dacq_server_command(t_sCommand);
-
-        m_bIsMeasuring = true;
-        printf("[done]\r\n");
-    }
-
-    return true;
-}
+//    return true;
+//}
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-bool DacqServer::dacq_server_stop()
-{
-    if(m_bIsMeasuring)
-    {
-        printf("Stop measurement... ");
+//bool DacqServer::dacq_server_start()
+//{
+//    if(!m_bIsMeasuring)
+//    {
+//        printf("Start measurement... ");
 
-        QString t_sCommand = QString("%1\r\n").arg("stop");
-        dacq_server_command(t_sCommand);
+//        QString t_sCommand = QString("%1\r\n").arg("meas");
+//        dacq_server_command(t_sCommand);
 
-        m_bIsMeasuring = false;
-        printf("[done]\r\n");
-    }
+//        m_bIsMeasuring = true;
+//        printf("[done]\r\n");
+//    }
 
-    return true;
-}
+//    return true;
+//}
+
+
+////*************************************************************************************************************
+
+//bool DacqServer::dacq_server_stop()
+//{
+//    if(m_bIsMeasuring)
+//    {
+//        printf("Stop measurement... ");
+
+//        QString t_sCommand = QString("%1\r\n").arg("stop");
+//        dacq_server_command(t_sCommand);
+
+//        m_bIsMeasuring = false;
+//        printf("[done]\r\n");
+//    }
+
+//    return true;
+//}
