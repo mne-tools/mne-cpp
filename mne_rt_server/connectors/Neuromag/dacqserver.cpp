@@ -41,6 +41,7 @@
 #include "dacqserver.h"
 #include "neuromag.h"
 #include "../../../MNE/fiff/fiff_constants.h"
+#include "../../../MNE/fiff/fiff_stream.h"
 
 
 //*************************************************************************************************************
@@ -91,12 +92,15 @@ DacqServer::DacqServer(Neuromag* p_pNeuromag)
 , m_iShmemId(CLIENT_ID)
 , m_bIsRunning(false)
 , m_bIsMeasuring(false)
-, m_bMeasInfoRequest(false)
-, m_bMeasRequest(false)
+, m_bMeasInfoRequest(true)
+, m_bMeasRequest(true)
 , m_bMeasStopRequest(false)
 , m_bSetBuffersizeRequest(false)
 , shmid(-1)
 , shmptr(NULL)
+, fd(NULL)
+, shmem_fd(NULL)
+, filename(NULL)
 {
 
     filter_kinds = NULL;    /* Filter these tags */
@@ -121,20 +125,171 @@ DacqServer::~DacqServer()
 bool DacqServer::getMeasInfo(FiffInfo*& p_pFiffInfo)
 {
 
-    if(p_pFiffInfo)
+    if (p_pFiffInfo)
         delete p_pFiffInfo;
     p_pFiffInfo = new FiffInfo();
 
     dacq_server_stop();
     dacq_server_start();
 
+    QStringList names;
+    MatrixXd* data = NULL;
+    FiffTag* t_pTag = NULL;
+    bool t_bReadHeader = true;
+    while(t_bReadHeader)
+    {
+        if (dacq_client_receive_tag(t_pTag) == -1)
+            break;
+    
+
+        switch(t_pTag->kind)
+        {
+            case FIFFV_MEG_CH:
+                qDebug() << "FIFFV_MEG_CH " << t_pTag->toString();
+                break;
+
+            case FIFF_BLOCK_START:
+                qDebug() << "FIFF_BLOCK_START";
+                switch(*(t_pTag->toInt()))
+                {
+                    
+                    case FIFFB_MEAS:
+                        qDebug() << "    FIFFB_MEAS";
+                        break;
+                    case FIFFB_MEAS_INFO:
+                        qDebug() << "    FIFFB_MEAS_INFO";
+                        break;
+                    case FIFFB_PROJ:
+                        qDebug() << "    FIFFB_PROJ";
+                        break;
+                    case FIFFB_PROJ_ITEM:
+                        qDebug() << "    FIFFB_PROJ_ITEM";
+                        break;
+                    case FIFFB_PROCESSING_HISTORY:
+                        qDebug() << "    FIFFB_PROCESSING_HISTORY";
+                        break;
+                    case FIFFB_RAW_DATA:
+                        qDebug() << "    FIFFB_RAW_DATA";
+                        break;
+                    default:
+                        qDebug() << "    Unknown " << *(t_pTag->toInt());
+                }
+                break;
+            
+            case FIFFB_PROCESSED_DATA:
+                qDebug() << "FIFFB_PROCESSED_DATA " << t_pTag->toFiffID().version;
+                break;
+
+            case FIFF_NCHAN:
+                qDebug() << "FIFF_NCHAN " << *(t_pTag->toInt());
+                break;
+            case FIFF_PROJ_ITEM_CH_NAME_LIST:
+                names = FiffStream::split_name_list(t_pTag->toString());
+                qDebug() << "FIFF_PROJ_ITEM_CH_NAME_LIST " << names.size();// << t_pTag->toString();
+                break;
+            case FIFF_NAME:
+                qDebug() << "FIFF_NAME " << t_pTag->toString();
+                break;
+            case FIFF_PROJ_ITEM_KIND:
+                qDebug() << "FIFF_PROJ_ITEM_KIND " << *(t_pTag->toInt());
+                break;
+            case FIFF_PROJ_ITEM_TIME:
+                qDebug() << "FIFF_PROJ_ITEM_TIME " << *(t_pTag->toFloat());
+                break;
+            case FIFF_PROJ_ITEM_NVEC:
+                qDebug() << "FIFF_PROJ_ITEM_NVEC " << *(t_pTag->toInt());
+                break;        
+            case FIFF_MNE_PROJ_ITEM_ACTIVE:
+                qDebug() << "FIFF_MNE_PROJ_ITEM_ACTIVE " << *(t_pTag->toInt());
+                break;
+            case FIFF_PROJ_ITEM_VECTORS:
+                qDebug() << "FIFF_PROJ_ITEM_VECTORS ";
+                data = t_pTag->toFloatMatrix();
+                data->transposeInPlace();
+                qDebug() << data->rows() << "x" << data->cols();
+                delete data;
+                data = NULL;
+                break;
+            case FIFF_MEAS_DATE:
+                qDebug() << "FIFF_MEAS_DATE " << t_pTag->toInt()[0] << t_pTag->toInt()[1];
+    //            meas_date[0] = t_pTag->toInt()[0];
+    //            meas_date[1] = t_pTag->toInt()[1];
+                break;
+            case FIFF_SFREQ:
+                qDebug() << "FIFF_SFREQ " << *(t_pTag->toFloat());
+                break;
+            case FIFF_LOWPASS:
+                qDebug() << "FIFF_LOWPASS " << *(t_pTag->toFloat());
+                break;
+            case FIFF_HIGHPASS:
+                qDebug() << "FIFF_HIGHPASS " << *(t_pTag->toFloat());
+                break;
+            case FIFF_LINE_FREQ:
+                qDebug() << "FIFF_LINE_FREQ " << *(t_pTag->toFloat());
+                break;
+            case FIFF_UNIT_AM:
+                qDebug() << "FIFF_UNIT_AM " << *(t_pTag->toInt());
+                break;
+            case FIFF_CH_INFO:
+                qDebug() << "FIFF_CH_INFO";
+                break;
+            case FIFF_BLOCK_END:
+                qDebug() << "FIFF_BLOCK_END " << *(t_pTag->toInt());
+                switch(*(t_pTag->toInt()))
+                {
+                    
+                    case FIFFB_MEAS:
+                        qDebug() << "    FIFFB_MEAS";
+                        break;
+                    case FIFFB_MEAS_INFO:
+                        qDebug() << "    FIFFB_MEAS_INFO";
+                        t_bReadHeader = false;
+                        break;
+                    case FIFFB_PROJ:
+                        qDebug() << "    FIFFB_PROJ";
+                        break;
+                    case FIFFB_PROJ_ITEM:
+                        qDebug() << "     FIFFB_PROJ_ITEM";
+                        break;
+                    case FIFFB_RAW_DATA:
+                        qDebug() << "    FIFFB_RAW_DATA";
+                        break;
+                    case FIFFB_PROCESSING_HISTORY:
+                        qDebug() << "    FIFFB_PROCESSING_HISTORY";
+                        break;
+                    default:
+                        qDebug() << "    Unknown " << *(t_pTag->toInt());
+                }
+                break;
+            case FIFF_HPI_NCOIL:
+                qDebug() << "FIFF_HPI_NCOIL " << *(t_pTag->toInt());
+                break;
+            case FIFFV_RESP_CH:
+                qDebug() << "FIFFV_RESP_CH " << t_pTag->toString();
+                break;
+            default:
+                qDebug() << "Unknown Tag Kind: " << t_pTag->kind << " Type: " << t_pTag->type << "Size: " << t_pTag->size();
+        }
+        
+        
+        
+        
+        
+        
+        
+    }
 
 
 
+    delete t_pTag;
 
-    if(!m_bMeasRequest)
+    if (!m_bMeasRequest)
         dacq_server_stop();
-
+        
+    //t_bReadHeader is still true --> that means a break occured
+    if (t_bReadHeader)
+        return false;
+        
     return true;
 }
 
@@ -251,7 +406,7 @@ void DacqServer::run()
     //
     // Control measurement start through Neuromag connector. ToDo: in Case Realtime measurement should be performed during normal acqusition process, change this!!
     //
-    dacq_server_start();
+//    dacq_server_start();
     
     //
     // Receive shmem tags
@@ -271,27 +426,57 @@ void DacqServer::run()
                 m_bMeasInfoRequest = false;
             }
         }
+        
+        if(m_bMeasRequest)
+        {
+            if (dacq_client_receive_tag(t_pTag) == -1)
+                break;
+        }
+        
+        
+        
 
         qDebug() << count;
 //#if defined(DACQ_OLD_CONNECTION_SCHEME)
-        if (dacq_client_receive_tag(t_pTag) == -1)
+//        if (dacq_client_receive_tag(t_pTag) == -1)        
 //#else
 //        if (dacq_client_receive_tag(&m_iShmemSock, m_iShmemId) == -1)
 //#endif
-            break;
+//            break;
             
-        qDebug() << "Tag Kind: " << t_pTag->kind << " Type: " << t_pTag->type << "Size: " << t_pTag->size();
 
+
+            
         if(t_pTag->kind == FIFF_ERROR_MESSAGE)
         {
             qDebug() << "Error: " << *t_pTag;
             break;            
         }
-
-        if(t_pTag->kind == FIFF_CLOSE_FILE)
+        
+        else if(t_pTag->kind == FIFF_CLOSE_FILE)
         {
             printf("Measurement stopped.\r\n");
         }
+        
+        else
+        {
+            qDebug() << "Tag Kind: " << t_pTag->kind << " Type: " << t_pTag->type << "Size: " << t_pTag->size();
+        }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+
 
         ++count;
     }
@@ -449,6 +634,8 @@ int DacqServer::dacq_client_receive_tag (FiffTag*& p_pTag )
     int           k;
     
 
+    long read_loc;
+
     if (m_iShmemSock < 0)
         return (OK);
 
@@ -459,7 +646,7 @@ int DacqServer::dacq_client_receive_tag (FiffTag*& p_pTag )
     rlen = recvfrom(m_iShmemSock, (void *)(&mess), DATA_MESS_SIZE, 0, (sockaddr *)(&from), &fromlen);
 
 //    qDebug() << "Mess Kind: " << mess.kind << " Type: " << mess.type << "Size: " << mess.size;
-
+    
     //
     // Parse received message
     //
@@ -479,10 +666,17 @@ int DacqServer::dacq_client_receive_tag (FiffTag*& p_pTag )
         mess.size = 0;
         mess.kind = FIFF_NOP;
     }
+    
+    p_pTag->kind = mess.kind;
+    p_pTag->type = mess.type;
+    p_pTag->next = 0;
+    
     if (mess.size > (size_t) 0)
     {
         p_pTag->resize(mess.size);
     }
+
+//    qDebug() << mess.loc << " " << mess.size << " " << mess.shmem_buf << " " << mess.shmem_loc;
 
     if (mess.loc < 0 && mess.size > (size_t) 0 && mess.shmem_buf < 0 && mess.shmem_loc < 0)
     {
@@ -501,13 +695,11 @@ int DacqServer::dacq_client_receive_tag (FiffTag*& p_pTag )
     else if (mess.size > (size_t) 0) {
         /*
          * Copy data from shared memory
-         */
+         */   
         if (mess.shmem_buf >= 0 && m_iShmemId/10000 > 0) 
         {
             shmBlock  = shmem + mess.shmem_buf;
             shmClient = shmBlock->clients;
-            
-            p_pTag->resize(mess.size);
             
             if (interesting_data(mess.kind))
             {
@@ -524,15 +716,106 @@ int DacqServer::dacq_client_receive_tag (FiffTag*& p_pTag )
                 if (shmClient->client_id == m_iShmemId)
                     shmClient->done = 1;
         }
+        /*
+        * Read data from file
+        */
+        else {
+            /*
+            * Possibly read from shmem file
+            */
+            if (m_iShmemId/10000 > 0 && mess.shmem_loc >= 0) {
+                read_fd  = shmem_fd;
+                read_loc = mess.shmem_loc;
+            }
+            else {
+                read_fd  = fd;
+                read_loc = mess.loc;
+            }
+            if (interesting_data(mess.kind)) {
+                if (read_fif (read_fd,read_loc,mess.size,(char *)p_pTag->data()) == -1) {
+                    printf("Could not read data (tag = %d, size = %d, pos = %d)!\n", mess.kind,mess.size,read_loc);//dacq_log("Could not read data (tag = %d, size = %d, pos = %d)!\n", mess.kind,mess.size,read_loc);
+                    //dacq_log("%s\n",err_get_error());
+                }
+                else {
+                    data_ok = 1;
+//                    if (mess.type == FIFFT_STRING)
+//                        data[mess.size] = '\0';
+                    FiffTag::convert_tag_data(p_pTag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
+                }
+            }
+        }
     }
 
-    p_pTag->kind = mess.kind;
-    p_pTag->type = mess.type;
-    p_pTag->next = 0;
+    /*
+    * Special case: close old input file
+    */
+    if (mess.kind == FIFF_CLOSE_FILE) {
+        if (fd != NULL) {
+            printf("File to be closed (lib/FIFF_CLOSE_FILE).\n");//dacq_log("File to be closed (lib/FIFF_CLOSE_FILE).\n");
+            (void)fclose(fd);
+            fd = NULL;
+        }
+        else
+            printf("No file to close (lib/FIFF_CLOSE_FILE).\n");//dacq_log("No file to close (lib/FIFF_CLOSE_FILE).\n");
+    }
+    /*
+    * Another special case: open new input file
+    */
+    else if (mess.kind == FIFF_NEW_FILE) {
+        if (fd != NULL) {
+            (void)fclose(fd);
+            printf("File closed (lib/FIFF_NEW_FILE).\n");//dacq_log("File closed (lib/FIFF_NEW_FILE).\n");
+        }
+        fd = open_fif((char *)p_pTag->data());
+        free (filename);
+        filename = strdup((char *)p_pTag->data());
+
+        if (shmem_fd == NULL)
+            shmem_fd = open_fif (SHM_FAIL_FILE);
+    }
 
     if (p_pTag->size() <= 0)
     {
         data_ok  = 0;
+        return (FAIL);
+    }
+    return (OK);
+}
+
+
+//*************************************************************************************************************
+
+FILE *DacqServer::open_fif (char *name)
+
+{
+    FILE *fd;
+    printf("should open %s\n",name);//dacq_log ("should open %s\n",name);
+    if ((fd = fopen(name,"r")) == NULL) {
+        printf ("failed to open %s\n",name);//dacq_log ("failed to open %s\n",name);
+        //dacq_perror(name);
+    }
+    return (fd);
+}
+
+
+//*************************************************************************************************************
+
+int DacqServer::read_fif (FILE   *fd,		/* File to read from */
+		     long   pos,		/* Position in file */
+		     size_t size,		/* How long */
+		     char   *data)              /* Put data here */
+{
+    if (fd == NULL) {
+        printf("Cannot read from NULL fd.");//err_set_error("Cannot read from NULL fd.");
+        return (FAIL);
+    }
+    if (fseek(fd,pos,SEEK_SET) == -1) {
+        printf("fseek");//err_set_sys_error("fseek");
+        return (FAIL);
+    }
+    if (fread(data,size,1,fd) != (size_t) 1) {
+        printf("Data not available.");//err_set_error("Data not available.");
+        return (FAIL);
     }
     return (OK);
 }

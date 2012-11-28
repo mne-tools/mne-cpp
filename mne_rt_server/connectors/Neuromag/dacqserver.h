@@ -360,7 +360,26 @@ private:
 
     int     m_iShmemSock;
     int     m_iShmemId;
+    
 
+
+
+    FILE   *fd;		/* The temporary file */
+    FILE   *shmem_fd;
+    char   *filename;
+
+    long read_loc;
+    FILE *read_fd;
+    
+    
+
+    FILE* open_fif (char *name);
+
+
+    int read_fif (FILE   *fd,		/* File to read from */
+		     long   pos,		/* Position in file */
+		     size_t size,		/* How long */
+		     char   *data);              /* Put data here */
 
 };
 
