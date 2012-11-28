@@ -73,22 +73,13 @@ using namespace NeuromagPlugin;
 DacqServer::DacqServer(Neuromag* p_pNeuromag, QObject * parent)
 : QThread(parent)
 , m_pNeuromag(p_pNeuromag)
-//, m_sCollectorHost(QHostAddress(QHostAddress::LocalHost).toString())
 , m_pCollectorSock(NULL)
 , m_pShmemSock(NULL)
-//, m_iShmemSock(-1)
-//, m_iShmemId(CLIENT_ID)
 , m_bIsRunning(false)
-//, m_bIsMeasuring(false)
 , m_bMeasInfoRequest(true)
 , m_bMeasRequest(true)
 , m_bMeasStopRequest(false)
 , m_bSetBuffersizeRequest(false)
-//, shmid(-1)
-//, shmptr(NULL)
-//, fd(NULL)
-//, shmem_fd(NULL)
-//, filename(NULL)
 {
 
     
@@ -100,9 +91,9 @@ DacqServer::DacqServer(Neuromag* p_pNeuromag, QObject * parent)
 DacqServer::~DacqServer()
 {
     if(m_pCollectorSock)
-        delete m_pCollectorSock;      
-//    if(shmptr)
-//        delete shmptr;
+        delete m_pCollectorSock;
+    if(m_pShmemSock)
+        delete m_pShmemSock;
 }
 
 
@@ -118,35 +109,13 @@ bool DacqServer::getMeasInfo(FiffInfo*& p_pFiffInfo)
     m_pCollectorSock->server_stop();
     m_pCollectorSock->server_start();
 
-    QStringList names;
-    MatrixXd* data = NULL;
     FiffTag* t_pTag = NULL;
     bool t_bReadHeader = true;
-    
-    
+
     while(t_bReadHeader)
     {
         if (m_pShmemSock->receive_tag(t_pTag) == -1)
             break;
-    
-    
-    
-/*    
-    FIFF_BLOCK_START 
-        FIFFB_PROJ_ITEM 
-    FIFF_NCHAN  102 
-    FIFF_PROJ_ITEM_CH_NAME_LIST  102 
-    FIFF_NAME  "axial-10.0-200.0-PCA-02" 
-    FIFF_PROJ_ITEM_KIND  1 
-    FIFF_PROJ_ITEM_TIME  0 
-    FIFF_PROJ_ITEM_NVEC  1 
-    FIFF_MNE_PROJ_ITEM_ACTIVE  0 
-    FIFF_PROJ_ITEM_VECTORS  
-    1 x 102 
-    FIFF_BLOCK_END  314 
-         FIFFB_PROJ_ITEM 
-*/
-
         //
         // Projector Item
         //
@@ -210,16 +179,8 @@ bool DacqServer::getMeasInfo(FiffInfo*& p_pFiffInfo)
             
             p_pFiffInfo->projs.append(one);
         }
-        
-        
-    
-    
-    
-    
-    
-    
-    
-    
+
+
         switch(t_pTag->kind)
         {
             case FIFFV_MEG_CH:
@@ -230,7 +191,6 @@ bool DacqServer::getMeasInfo(FiffInfo*& p_pFiffInfo)
                 qDebug() << "FIFF_BLOCK_START";
                 switch(*(t_pTag->toInt()))
                 {
-                    
                     case FIFFB_MEAS:
                         qDebug() << "    FIFFB_MEAS";
                         break;
@@ -255,21 +215,29 @@ bool DacqServer::getMeasInfo(FiffInfo*& p_pFiffInfo)
                 break;
             
             case FIFFB_PROCESSED_DATA:
-                qDebug() << "FIFFB_PROCESSED_DATA " << t_pTag->toFiffID().version;
+                qDebug() << "Processed FIFFB_PROCESSED_DATA";
+                p_pFiffInfo->meas_id = t_pTag->toFiffID();
                 break;
             case FIFF_MEAS_DATE:
-                qDebug() << "FIFF_MEAS_DATE " << t_pTag->toInt()[0] << t_pTag->toInt()[1];
-    //            meas_date[0] = t_pTag->toInt()[0];
-    //            meas_date[1] = t_pTag->toInt()[1];
+                qDebug() << "Processed FIFF_MEAS_DATE";
+                p_pFiffInfo->meas_date[0] = t_pTag->toInt()[0];
+                p_pFiffInfo->meas_date[1] = t_pTag->toInt()[1];
+                break;
+            case FIFF_NCHAN:
+                qDebug() << "Processed FIFF_NCHAN";
+                p_pFiffInfo->nchan = *(t_pTag->toInt());
                 break;
             case FIFF_SFREQ:
-                qDebug() << "FIFF_SFREQ " << *(t_pTag->toFloat());
+                qDebug() << "Processed FIFF_SFREQ";
+                p_pFiffInfo->sfreq = *(t_pTag->toFloat());
                 break;
             case FIFF_LOWPASS:
-                qDebug() << "FIFF_LOWPASS " << *(t_pTag->toFloat());
+                qDebug() << "Processed FIFF_LOWPASS";
+                p_pFiffInfo->lowpass = *(t_pTag->toFloat());
                 break;
             case FIFF_HIGHPASS:
-                qDebug() << "FIFF_HIGHPASS " << *(t_pTag->toFloat());
+                qDebug() << "Processed FIFF_HIGHPASS";
+                p_pFiffInfo->highpass = *(t_pTag->toFloat());
                 break;
             case FIFF_LINE_FREQ:
                 qDebug() << "FIFF_LINE_FREQ " << *(t_pTag->toFloat());
@@ -278,13 +246,13 @@ bool DacqServer::getMeasInfo(FiffInfo*& p_pFiffInfo)
                 qDebug() << "FIFF_UNIT_AM " << *(t_pTag->toInt());
                 break;
             case FIFF_CH_INFO:
-                qDebug() << "FIFF_CH_INFO";
+                qDebug() << "Processed FIFF_CH_INFO";
+                p_pFiffInfo->chs.append( t_pTag->toChInfo() );
                 break;
             case FIFF_BLOCK_END:
                 qDebug() << "FIFF_BLOCK_END " << *(t_pTag->toInt());
                 switch(*(t_pTag->toInt()))
                 {
-                    
                     case FIFFB_MEAS:
                         qDebug() << "    FIFFB_MEAS";
                         break;
@@ -317,18 +285,13 @@ bool DacqServer::getMeasInfo(FiffInfo*& p_pFiffInfo)
             default:
                 qDebug() << "Unknown Tag Kind: " << t_pTag->kind << " Type: " << t_pTag->type << "Size: " << t_pTag->size();
         }
-        
-        
-        
-        
-        
-        
-        
     }
 
-
-
     delete t_pTag;
+
+    for(qint32 i = 0; i < p_pFiffInfo->chs.size(); ++i)
+        p_pFiffInfo->ch_names.append(p_pFiffInfo->chs[i].ch_name);
+
 
     if (!m_bMeasRequest)
         m_pCollectorSock->server_stop();
@@ -451,12 +414,14 @@ void DacqServer::run()
     //
     // Control measurement start through Neuromag connector. ToDo: in Case Realtime measurement should be performed during normal acqusition process, change this!!
     //
-//    dacq_server_start();
+//    m_pCollectorSock->server_start();
     
     //
     // Receive shmem tags
     //
     
+    qint32 nchan = -1;
+
     FiffTag* t_pTag = NULL;
     
     qint32 count = 0;
@@ -477,9 +442,6 @@ void DacqServer::run()
             if (m_pShmemSock->receive_tag(t_pTag) == -1)
                 break;
         }
-        
-        
-        
 
         qDebug() << count;
 //#if defined(DACQ_OLD_CONNECTION_SCHEME)
@@ -491,37 +453,35 @@ void DacqServer::run()
             
 
 
-            
-        if(t_pTag->kind == FIFF_ERROR_MESSAGE)
+        if (nchan > 0 && m_pNeuromag->m_pInfo)
         {
-            qDebug() << "Error: " << *t_pTag;
-            break;            
+            nchan = m_pNeuromag->m_pInfo->nchan;
         }
-        
+
+
+        if (t_pTag->kind == FIFF_DATA_BUFFER && nchan > 0)
+        {
+//            MatrixXd* p_pMatrix = new MatrixXd((Map<MatrixXf>( (float*)this->data(),pDims[0], pDims[1])).cast<double>());
+
+            Map<MatrixXf> tmp( (float*)t_pTag->data(), nchan, m_pNeuromag->getBufferSampleSize());
+
+            std::cout << "Matrix Xf " << tmp.block(0,0,1,10);
+
+//            m_pNeuromag->m_pRawMatrixBuffer->push(&tmp);
+        }
+        else if(t_pTag->kind == FIFF_ERROR_MESSAGE)
+        {
+            printf("Error: %s\r\n", t_pTag->data());
+            break;
+        }
         else if(t_pTag->kind == FIFF_CLOSE_FILE)
         {
             printf("Measurement stopped.\r\n");
         }
-        
         else
         {
             qDebug() << "Tag Kind: " << t_pTag->kind << " Type: " << t_pTag->type << "Size: " << t_pTag->size();
         }
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
 
         ++count;
     }
