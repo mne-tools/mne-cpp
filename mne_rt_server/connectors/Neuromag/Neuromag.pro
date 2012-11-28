@@ -52,14 +52,16 @@ win32 {
 
 SOURCES += neuromag.cpp \
     dacqserver.cpp \
-    collectorsocket.cpp
+    collectorsocket.cpp \
+    shmemsocket.cpp
 
 HEADERS += neuromag.h\
     neuromag_global.h \
     ../../mne_rt_server/IConnector.h \  #IConnector is a Q_OBJECT and the resulting moc file needs to be known -> that's why inclution is important!
     types_definitions.h \
     dacqserver.h \
-    collectorsocket.h
+    collectorsocket.h \
+    shmemsocket.h
 
 OTHER_FILES += neuromag.json
 

@@ -62,8 +62,9 @@ using namespace NeuromagPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CollectorSocket::CollectorSocket()
-: m_sCollectorHost(QHostAddress(QHostAddress::LocalHost).toString())
+CollectorSocket::CollectorSocket(QObject *parent)
+: QTcpSocket(parent)
+, m_sCollectorHost(QHostAddress(QHostAddress::LocalHost).toString())
 , m_bIsMeasuring(false)
 {
 
