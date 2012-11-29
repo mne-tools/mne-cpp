@@ -121,7 +121,9 @@ void ConnectorManager::loadConnectors(const QString& dir)
         // IModule
         if(pConnector)
         {
-            s_vecConnectors.push_back(qobject_cast<IConnector*>(pConnector));
+            IConnector* t_pIConnector = qobject_cast<IConnector*>(pConnector);
+            t_pIConnector->setStatus(false);
+            s_vecConnectors.push_back(t_pIConnector);
             printf("[done]\n");
         }
         else
@@ -175,7 +177,6 @@ void ConnectorManager::loadConnectors(const QString& dir)
                 }
             }
         }
-
         printf("[done]\n");
 
         //default
