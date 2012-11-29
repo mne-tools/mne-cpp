@@ -121,6 +121,8 @@ bool DacqServer::getMeasInfo(FiffInfo*& p_pFiffInfo)
         //
         if( t_pTag->kind == FIFF_BLOCK_START && *(t_pTag->toInt()) == FIFFB_PROJ_ITEM )
         {
+            printf("\tProjector... ");
+            
             int nvec = -1;
             int nchan = -1;
             QStringList defaultList;
@@ -140,35 +142,29 @@ bool DacqServer::getMeasInfo(FiffInfo*& p_pFiffInfo)
                 {
                     case FIFF_NCHAN:
                         nchan = *(t_pTag->toInt());
-                        qDebug() << "Parse FIFF_NCHAN";
                         break;
                     case FIFF_PROJ_ITEM_CH_NAME_LIST:
                         names = FiffStream::split_name_list(t_pTag->toString());
-                        qDebug() << "Parse FIFF_PROJ_ITEM_CH_NAME_LIST ";
                         break;
                     case FIFF_NAME:
                         desc = t_pTag->toString();
-                        qDebug() << "Parse FIFF_NAME ";
+                        printf("%s... ", desc.toUtf8().constData());
                         break;
                     case FIFF_PROJ_ITEM_KIND:
                         kind = *(t_pTag->toInt());
-                        qDebug() << "Parse FIFF_PROJ_ITEM_KIND ";
                         break;
-                    case FIFF_PROJ_ITEM_TIME:
-                        qDebug() << "Parse FIFF_PROJ_ITEM_TIME " << *(t_pTag->toFloat());
-                        break;
+//                    case FIFF_PROJ_ITEM_TIME:
+//                        qDebug() << "FIFF_PROJ_ITEM_TIME";
+//                        break;
                     case FIFF_PROJ_ITEM_NVEC:
                         nvec == *(t_pTag->toInt());
-                        qDebug() << "Parse FIFF_PROJ_ITEM_NVEC ";
                         break;        
                     case FIFF_MNE_PROJ_ITEM_ACTIVE:
                         active == *(t_pTag->toInt());
-                        qDebug() << "Parse FIFF_MNE_PROJ_ITEM_ACTIVE ";
                         break;
                     case FIFF_PROJ_ITEM_VECTORS:
                         data = t_pTag->toFloatMatrix();
                         data->transposeInPlace();
-                        qDebug() << "Parse FIFF_PROJ_ITEM_VECTORS ";
                         break;
                 }
             }
@@ -178,120 +174,132 @@ bool DacqServer::getMeasInfo(FiffInfo*& p_pFiffInfo)
             FiffProj* one = new FiffProj(kind, active, desc, t_fiffNamedMatrix);
             
             p_pFiffInfo->projs.append(one);
+            
+            printf("[done]\r\n");   
         }
 
 
         switch(t_pTag->kind)
         {
-            case FIFFV_MEG_CH:
-                qDebug() << "FIFFV_MEG_CH " << t_pTag->toString();
-                break;
+//            case FIFFV_MEG_CH:
+//                qDebug() << "FIFFV_MEG_CH " << t_pTag->toString();
+//                break;
 
             case FIFF_BLOCK_START:
-                qDebug() << "FIFF_BLOCK_START";
+//                qDebug() << "FIFF_BLOCK_START";
                 switch(*(t_pTag->toInt()))
                 {
-                    case FIFFB_MEAS:
-                        qDebug() << "    FIFFB_MEAS";
-                        break;
+//                    case FIFFB_MEAS:
+//                        qDebug() << "    FIFFB_MEAS";
+//                        break;
                     case FIFFB_MEAS_INFO:
-                        qDebug() << "    FIFFB_MEAS_INFO";
+                        printf("Reading measurement info... \r\n");
                         break;
-                    case FIFFB_PROJ:
-                        qDebug() << "    FIFFB_PROJ";
-                        break;
-                    case FIFFB_PROJ_ITEM:
-                        qDebug() << "    FIFFB_PROJ_ITEM";
-                        break;
-                    case FIFFB_PROCESSING_HISTORY:
-                        qDebug() << "    FIFFB_PROCESSING_HISTORY";
-                        break;
-                    case FIFFB_RAW_DATA:
-                        qDebug() << "    FIFFB_RAW_DATA";
-                        break;
-                    default:
-                        qDebug() << "    Unknown " << *(t_pTag->toInt());
+//                    case FIFFB_PROJ:
+//                        qDebug() << "    FIFFB_PROJ";
+//                        break;
+//                    case FIFFB_PROJ_ITEM:
+//                        qDebug() << "    FIFFB_PROJ_ITEM";
+//                        break;
+//                    case FIFFB_PROCESSING_HISTORY:
+//                        qDebug() << "    FIFFB_PROCESSING_HISTORY";
+//                        break;
+//                    case FIFFB_RAW_DATA:
+//                        qDebug() << "    FIFFB_RAW_DATA";
+//                        break;
+//                    default:
+//                        qDebug() << "    Unknown " << *(t_pTag->toInt());
                 }
                 break;
             
             case FIFFB_PROCESSED_DATA:
-                qDebug() << "Processed FIFFB_PROCESSED_DATA";
+                printf("Measurement ID... ");
                 p_pFiffInfo->meas_id = t_pTag->toFiffID();
+                printf("[done]\r\n");  
                 break;
             case FIFF_MEAS_DATE:
-                qDebug() << "Processed FIFF_MEAS_DATE";
+                printf("\tMeasurement date... ");
                 p_pFiffInfo->meas_date[0] = t_pTag->toInt()[0];
                 p_pFiffInfo->meas_date[1] = t_pTag->toInt()[1];
+                printf("[done]\r\n"); 
                 break;
             case FIFF_NCHAN:
-                qDebug() << "Processed FIFF_NCHAN";
+                printf("\tNumber of channels... ");
                 p_pFiffInfo->nchan = *(t_pTag->toInt());
+                printf("%d... [done]\r\n", p_pFiffInfo->nchan); 
                 break;
             case FIFF_SFREQ:
-                qDebug() << "Processed FIFF_SFREQ";
+                printf("\tSampling frequency... ");
                 p_pFiffInfo->sfreq = *(t_pTag->toFloat());
+                printf("%f... [done]\r\n", p_pFiffInfo->sfreq); 
                 break;
             case FIFF_LOWPASS:
-                qDebug() << "Processed FIFF_LOWPASS";
+                printf("\tLowpass frequency... ");
                 p_pFiffInfo->lowpass = *(t_pTag->toFloat());
+                printf("%f Hz... [done]\r\n", p_pFiffInfo->lowpass);
                 break;
             case FIFF_HIGHPASS:
-                qDebug() << "Processed FIFF_HIGHPASS";
+                printf("\tHighpass frequency... ");
                 p_pFiffInfo->highpass = *(t_pTag->toFloat());
+                printf("%f Hz... [done]\r\n", p_pFiffInfo->highpass);
                 break;
-            case FIFF_LINE_FREQ:
-                qDebug() << "FIFF_LINE_FREQ " << *(t_pTag->toFloat());
-                break;
-            case FIFF_UNIT_AM:
-                qDebug() << "FIFF_UNIT_AM " << *(t_pTag->toInt());
-                break;
+//            case FIFF_LINE_FREQ:
+//                qDebug() << "FIFF_LINE_FREQ " << *(t_pTag->toFloat());
+//                break;
+//            case FIFF_UNIT_AM:
+//                qDebug() << "FIFF_UNIT_AM " << *(t_pTag->toInt());
+//                break;
             case FIFF_CH_INFO:
-                qDebug() << "Processed FIFF_CH_INFO";
+//                qDebug() << "Processed FIFF_CH_INFO";
                 p_pFiffInfo->chs.append( t_pTag->toChInfo() );
                 break;
             case FIFF_BLOCK_END:
-                qDebug() << "FIFF_BLOCK_END " << *(t_pTag->toInt());
+//                qDebug() << "FIFF_BLOCK_END " << *(t_pTag->toInt());
                 switch(*(t_pTag->toInt()))
                 {
-                    case FIFFB_MEAS:
-                        qDebug() << "    FIFFB_MEAS";
-                        break;
+//                    case FIFFB_MEAS:
+//                        qDebug() << "    FIFFB_MEAS";
+//                        break;
                     case FIFFB_MEAS_INFO:
-                        qDebug() << "    FIFFB_MEAS_INFO";
+//                        qDebug() << "    FIFFB_MEAS_INFO";
                         t_bReadHeader = false;
                         break;
-                    case FIFFB_PROJ:
-                        qDebug() << "    FIFFB_PROJ";
-                        break;
-                    case FIFFB_PROJ_ITEM:
-                        qDebug() << "     FIFFB_PROJ_ITEM";
-                        break;
-                    case FIFFB_RAW_DATA:
-                        qDebug() << "    FIFFB_RAW_DATA";
-                        break;
-                    case FIFFB_PROCESSING_HISTORY:
-                        qDebug() << "    FIFFB_PROCESSING_HISTORY";
-                        break;
-                    default:
-                        qDebug() << "    Unknown " << *(t_pTag->toInt());
+//                    case FIFFB_PROJ:
+//                        qDebug() << "    FIFFB_PROJ";
+//                        break;
+//                    case FIFFB_PROJ_ITEM:
+//                        qDebug() << "     FIFFB_PROJ_ITEM";
+//                        break;
+//                    case FIFFB_RAW_DATA:
+//                        qDebug() << "    FIFFB_RAW_DATA";
+//                        break;
+//                    case FIFFB_PROCESSING_HISTORY:
+//                        qDebug() << "    FIFFB_PROCESSING_HISTORY";
+//                        break;
+//                    default:
+//                        qDebug() << "    Unknown " << *(t_pTag->toInt());
                 }
                 break;
-            case FIFF_HPI_NCOIL:
-                qDebug() << "FIFF_HPI_NCOIL " << *(t_pTag->toInt());
-                break;
-            case FIFFV_RESP_CH:
-                qDebug() << "FIFFV_RESP_CH " << t_pTag->toString();
-                break;
-            default:
-                qDebug() << "Unknown Tag Kind: " << t_pTag->kind << " Type: " << t_pTag->type << "Size: " << t_pTag->size();
+//            case FIFF_HPI_NCOIL:
+//                qDebug() << "FIFF_HPI_NCOIL " << *(t_pTag->toInt());
+//                break;
+//            case FIFFV_RESP_CH:
+//                qDebug() << "FIFFV_RESP_CH " << t_pTag->toString();
+//                break;
+//            default:
+//                qDebug() << "Unknown Tag Kind: " << t_pTag->kind << " Type: " << t_pTag->type << "Size: " << t_pTag->size();
         }
     }
 
     delete t_pTag;
 
+    printf("\tProcessing channels... ");
     for(qint32 i = 0; i < p_pFiffInfo->chs.size(); ++i)
         p_pFiffInfo->ch_names.append(p_pFiffInfo->chs[i].ch_name);
 
+    printf("[done]\r\n", p_pFiffInfo->chs.size());
+    
+    printf("measurement info read.\r\n");   
 
     if (!m_bMeasRequest)
         m_pCollectorSock->server_stop();
@@ -419,12 +427,14 @@ void DacqServer::run()
     //
     // Receive shmem tags
     //
-    
     qint32 nchan = -1;
+    float sfreq = -1.0f;
 
     FiffTag* t_pTag = NULL;
     
-    qint32 count = 0;
+    qint32 t_nSamples = 0;
+    qint32 t_nSamplesNew = 0;
+    
     while(m_bIsRunning)
     {
         if(m_bMeasInfoRequest)
@@ -443,47 +453,58 @@ void DacqServer::run()
                 break;
         }
 
-        qDebug() << count;
-//#if defined(DACQ_OLD_CONNECTION_SCHEME)
-//        if (dacq_client_receive_tag(t_pTag) == -1)        
-//#else
-//        if (dacq_client_receive_tag(&m_iShmemSock, m_iShmemId) == -1)
-//#endif
-//            break;
-            
-
-
-        if (nchan > 0 && m_pNeuromag->m_pInfo)
+        if (nchan < 0 && m_pNeuromag->m_pInfo)
         {
             nchan = m_pNeuromag->m_pInfo->nchan;
+            sfreq = m_pNeuromag->m_pInfo->sfreq;
         }
 
 
-        if (t_pTag->kind == FIFF_DATA_BUFFER && nchan > 0)
+
+
+        switch(t_pTag->kind)
         {
-//            MatrixXd* p_pMatrix = new MatrixXd((Map<MatrixXf>( (float*)this->data(),pDims[0], pDims[1])).cast<double>());
+            case FIFF_DATA_BUFFER:
+                if(nchan > 0)
+                {
+                    t_nSamplesNew = t_nSamples + m_pNeuromag->getBufferSampleSize() - 1;
+                    printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", t_nSamples, t_nSamplesNew, ((float)t_nSamples) / sfreq, ((float)t_nSamplesNew) / sfreq );
+                    t_nSamples += m_pNeuromag->getBufferSampleSize();
+                    
+                    MatrixXf* t_pMatrix = new MatrixXf( (Map<MatrixXi>( (int*) t_pTag->data(), nchan, m_pNeuromag->getBufferSampleSize())).cast<float>());
 
-            Map<MatrixXf> tmp( (float*)t_pTag->data(), nchan, m_pNeuromag->getBufferSampleSize());
+//                    std::cout << "Matrix Xf " << t_pMatrix->block(0,0,1,4);
 
-            std::cout << "Matrix Xf " << tmp.block(0,0,1,10);
+                    delete t_pMatrix;
+                    
+                    printf(" [done]\r\n");
 
-//            m_pNeuromag->m_pRawMatrixBuffer->push(&tmp);
-        }
-        else if(t_pTag->kind == FIFF_ERROR_MESSAGE)
-        {
-            printf("Error: %s\r\n", t_pTag->data());
-            break;
-        }
-        else if(t_pTag->kind == FIFF_CLOSE_FILE)
-        {
-            printf("Measurement stopped.\r\n");
-        }
-        else
-        {
-            qDebug() << "Tag Kind: " << t_pTag->kind << " Type: " << t_pTag->type << "Size: " << t_pTag->size();
+//                    m_pNeuromag->m_pRawMatrixBuffer->push(&tmp);
+                }
+                break;
+            case FIFF_BLOCK_START:
+//                qDebug() << "FIFF_BLOCK_START";
+                switch(*(t_pTag->toInt()))
+                {
+                    case FIFFB_RAW_DATA:
+                        printf("Processing raw data...\r\n");
+                        break;
+//                    default:
+//                        qDebug() << "    Unknown " << *(t_pTag->toInt());
+                }
+                break;
+            case FIFF_ERROR_MESSAGE:
+                printf("Error: %s\r\n", t_pTag->data());
+                m_bIsRunning = false;
+                break;
+            case FIFF_CLOSE_FILE:
+                printf("Measurement stopped.\r\n");
+                break;
+//            default:
+//                printf("Unknow tag; Kind: %d, Type: %d, Size: %d \r\n", t_pTag->kind, t_pTag->type, t_pTag->size());
         }
 
-        ++count;
+//        ++count;
     }
     
     
