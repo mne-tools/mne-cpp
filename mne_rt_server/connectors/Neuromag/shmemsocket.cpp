@@ -267,11 +267,15 @@ FILE *ShmemSocket::open_fif (char *name)
 
 {
     FILE *fd;
-    printf("should open %s\n",name);//dacq_log ("should open %s\n",name);
+    printf("Open %s... ",name);//dacq_log ("should open %s\n",name);
+
     if ((fd = fopen(name,"r")) == NULL) {
-        printf ("failed to open %s\n",name);//dacq_log ("failed to open %s\n",name);
+        printf ("failed!\r\n");//dacq_log ("failed to open %s\n",name);
         //dacq_perror(name);
     }
+    else
+        printf ("[done]\r\n");
+
     return (fd);
 }
 
