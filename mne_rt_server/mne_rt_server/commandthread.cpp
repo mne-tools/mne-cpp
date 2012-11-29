@@ -155,7 +155,7 @@ bool CommandThread::parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand)
             qint32 t_id = -1;
             t_blockClientList.append(parseToId(t_qCommandList[1],t_id));
 
-            printf("measinfo %d\n", t_id);
+            printf("measinfo %d\r\n", t_id);
 
             if(t_id != -1)
             {
@@ -252,15 +252,6 @@ bool CommandThread::parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand)
         }
         success = true;
     }
-    else if(t_qCommandList[0].compare("conlist",Qt::CaseInsensitive) == 0)
-    {
-        //
-        // conlist
-        //
-        printf("conlist\n");
-        t_blockClientList.append(qobject_cast<MNERTServer*>(this->parent()->parent())->m_pConnectorManager->getByteArrayConnectorList());
-        success = true;
-    }
     else if(t_qCommandList[0].compare("help",Qt::CaseInsensitive) == 0)
     {
         //
@@ -282,7 +273,7 @@ bool CommandThread::parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand)
     else if(qobject_cast<MNERTServer*>(this->parent()->parent())->m_pConnectorManager->parseConnectorCommand(t_qCommandList, t_blockClientList))
     {
         //
-        // Connector Command
+        // Connector/ConnectorManager Command
         //
         success = true;
     }
