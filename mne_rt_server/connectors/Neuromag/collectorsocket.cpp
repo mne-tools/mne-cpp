@@ -261,7 +261,6 @@ bool CollectorSocket::server_start()
         this->server_command(t_sCommand);
 
         m_bIsMeasuring = true;
-        printf("[done]\r\n");
     }
 
     return true;
