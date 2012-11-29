@@ -129,28 +129,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Sends the command to the active connector.
+    * Parses the command or sends the command to the active connector.
     *
-    * @param[in] p_qListCommand the command.
+    * @param[in] p_qCommandList the command.
     * @param[out] p_blockOutputInfo the bytearray which contains parsing information to be send back to CommandClient.
     *
     * @return true if successful, false otherwise
     */
-    bool parseConnectorCommand(QStringList& p_qListCommand, QByteArray& p_blockOutputInfo);
-
-    //=========================================================================================================
-    /**
-    * Starts all modules.
-    *
-    * @return true if at least one IConnector module was started successfully, false otherwise.
-    */
-    static bool startConnector();
-
-    //=========================================================================================================
-    /**
-    * Stop active connector.
-    */
-    static void stopConnector();
+    bool parseConnectorCommand(QStringList& p_qCommandList, QByteArray& p_blockOutputInfo);
 
     //=========================================================================================================
     /**
@@ -166,11 +152,15 @@ public:
     *
     * @return reference to vector containing active ISensor modules.
     */
-    static IConnector* getActiveConnector();
+    IConnector* getActiveConnector();
 
-//    void getActiveMeasInfo(qint32 ID);
+    //=========================================================================================================
+    /**
+    * ToDo
+    */
+    QByteArray setActiveConnector(qint32 ID);
 
-//    void getActiveMeasInfo(qint32 ID);
+
     void connectActiveConnector();
 
 
@@ -178,7 +168,7 @@ public:
     /**
     * Prints a list of all connectors and their status
     */
-    QByteArray getByteArrayConnectorList() const;
+    QByteArray getConnectorList() const;
 
 
 

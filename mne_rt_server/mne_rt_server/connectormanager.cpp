@@ -186,78 +186,57 @@ void ConnectorManager::loadConnectors(const QString& dir)
 
     //print
     printf("Connector list\n");
-    printf(getByteArrayConnectorList().data());
+    printf(getConnectorList().data());
 }
 
 
 //*************************************************************************************************************
 
-bool ConnectorManager::parseConnectorCommand(QStringList& p_qListCommand, QByteArray& p_blockOutputInfo)
+bool ConnectorManager::parseConnectorCommand(QStringList& p_qCommandList, QByteArray& p_blockOutputInfo)
 {
-    IConnector* t_pConnector = this->getActiveConnector();
-
-    if(t_pConnector)
-        return t_pConnector->parseCommand(p_qListCommand, p_blockOutputInfo);
+    bool success = false;
+    if(p_qCommandList[0].compare("conlist",Qt::CaseInsensitive) == 0)
+    {
+        //
+        // conlist
+        //
+        printf("conlist\n");
+        p_blockOutputInfo.append(this->getConnectorList());
+        success = true;
+    }
+    else if(p_qCommandList[0].compare("selcon",Qt::CaseInsensitive) == 0)
+    {
+        //
+        // selcon
+        //
+        if(p_qCommandList.size() > 1)
+        {
+            bool t_isInt;
+            qint32 t_id = p_qCommandList[1].toInt(&t_isInt);
+            printf("selcon %d\r\n", t_id);
+            if(t_isInt)
+            {
+                p_blockOutputInfo.append(this->setActiveConnector(t_id));
+            }
+        }
+        success = true;
+    }
     else
-        return false;
+    {
+        //
+        // Forward to active connector
+        // Connector
+        //
+        IConnector* t_pConnector = this->getActiveConnector();
 
-}
+        if(t_pConnector)
+            success = t_pConnector->parseCommand(p_qCommandList, p_blockOutputInfo);
+        else
+            success = false;
+    }
 
+    return success;
 
-//*************************************************************************************************************
-
-bool ConnectorManager::startConnector()
-{
-//    qDebug() << "ModuleManager::startModules()";
-//    // Start ISensor and IRTAlgorithm modules first!
-//    bool bFlag = startSensorModules();
-//    startRTAlgorithmModules();
-//    startRTVisualizationModules();
-//    startRTRecordModules();
-//    startAlertModules();
-//    //ToDo other Modules
-
-    return true;//bFlag;
-}
-
-
-//*************************************************************************************************************
-
-void ConnectorManager::stopConnector()
-{
-//    // Stop ISensor modules first!
-//    qDebug() << "Try stopping sensor modules.";
-//    QVector<IModule*>::const_iterator it = s_vecModules.begin();
-//    for( ; it != s_vecModules.end(); ++it)
-//    {
-//        if((*it)->isActive())
-//        {
-//            if((*it)->getType() == _ISensor)
-//            {
-//                if(!(*it)->stop())
-//                {
-//                    qDebug() << "Could not stop IModule: " << (*it)->getName();
-//                }
-//            }
-//        }
-//    }
-
-//    // Stop all other modules!
-//    qDebug() << "Try stopping all other modules";
-//    it = s_vecModules.begin();
-//    for( ; it != s_vecModules.end(); ++it)
-//    {
-//        if((*it)->isActive())
-//        {
-//            if((*it)->getType() != _ISensor)
-//            {
-//                if(!(*it)->stop())
-//                {
-//                    qDebug() << "Could not stop IModule: " << (*it)->getName();
-//                }
-//            }
-//        }
-//    }
 }
 
 
@@ -278,20 +257,39 @@ IConnector* ConnectorManager::getActiveConnector()
 
 //*************************************************************************************************************
 
-//void ConnectorManager::getActiveMeasInfo(qint32 ID)
-//{
-//    IConnector* t_activeConnector = ConnectorManager::getActiveConnector();
+QByteArray ConnectorManager::setActiveConnector(qint32 ID)
+{
+    QByteArray p_blockClientList;
+    QString str;
 
-//    if(t_activeConnector)
-//    {
-//        FiffInfo* t_FiffInfo = t_activeConnector->getMeasInfo();
-//        emit sendMeasInfo(ID, t_FiffInfo);
-//    }
-//    else
-//    {
-//        printf("Error: Can't send measurement info, no connector active!\n");
-//    }
-//}
+    if(ID != getActiveConnector()->getConnectorID())
+    {
+        IConnector* t_pNewActiveConnector = NULL;
+        QVector<IConnector*>::const_iterator it = s_vecConnectors.begin();
+        for( ; it != s_vecConnectors.end(); ++it)
+            if((*it)->getConnectorID() == ID)
+                t_pNewActiveConnector = *it;
+
+        if (t_pNewActiveConnector)
+        {
+            str = QString("\t%1 activated. ToDo...\r\n\n").arg(t_pNewActiveConnector->getName());
+            p_blockClientList.append(str);
+        }
+        else
+        {
+            str = QString("\tID %1 doesn't match a connector ID.\r\n\n").arg(ID);
+            p_blockClientList.append(str);
+            p_blockClientList.append(getConnectorList());
+        }
+    }
+    else
+    {
+        str = QString("\t%1 is already active.\r\n\n").arg(getActiveConnector()->getName());
+        p_blockClientList.append(str);
+    }
+
+    return p_blockClientList;
+}
 
 
 //*************************************************************************************************************
@@ -303,6 +301,18 @@ void ConnectorManager::connectActiveConnector()
     if(t_activeConnector)
     {
         MNERTServer* t_pMNERTServer = qobject_cast<MNERTServer*>(this->parent());
+
+        // use signal slots instead of call backs
+        //Consulting the Signal/Slot documentation describes why the Signal/Slot approach is better:
+        //    Callbacks have two fundamental flaws: Firstly, they are not type-safe. We can never be certain
+        //    that the processing function will call the callback with the correct arguments.
+        //    Secondly, the callback is strongly coupled to the processing function since the processing
+        //    function must know which callback to call.
+        //Do be aware of the following though:
+        //    Compared to callbacks, signals and slots are slightly slower because of the increased
+        //    flexibility they provide
+        //The speed probably doesn't matter for most cases, but there may be some extreme cases of repeated
+        //calling that makes a difference.
 
         //
         // Meas Info
@@ -342,7 +352,7 @@ void ConnectorManager::connectActiveConnector()
 
 //*************************************************************************************************************
 
-QByteArray ConnectorManager::getByteArrayConnectorList() const
+QByteArray ConnectorManager::getConnectorList() const
 {
     QByteArray t_blockConnectorList;
     if(s_vecConnectors.size() > 0)
