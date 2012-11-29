@@ -92,14 +92,10 @@ Neuromag::Neuromag()
 , m_bIsRunning(false)
 , m_iID(-1)
 {
-    //DEBUG
-    m_pDacqServer->start();
-    //DEBUG
-
-
     this->setBufferSampleSize(100);
     m_pRawMatrixBuffer = NULL;
     this->init();
+    this->start();
 }
 
 
@@ -148,12 +144,7 @@ const char* Neuromag::getName() const
 
 void Neuromag::init()
 {
-    if(m_pRawMatrixBuffer)
-        delete m_pRawMatrixBuffer;
-    m_pRawMatrixBuffer = NULL;
 
-    if(m_pInfo)
-        m_pRawMatrixBuffer = new RawMatrixBuffer(10, m_pInfo->nchan, this->getBufferSampleSize());
 }
 
 
@@ -207,6 +198,8 @@ bool Neuromag::start()
     this->init();
 
     // Start thread
+    m_pDacqServer->start();
+
     QThread::start();
 
     return true;
@@ -290,8 +283,12 @@ void Neuromag::run()
 
     while(m_bIsRunning)
     {
-//        MatrixXf tmp = m_pRawMatrixBuffer->pop();
         ++count;
+
+        MatrixXf tmp = m_pRawMatrixBuffer->pop();
+
+        qDebug() << "Pop: " << count;
+
 ////        printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
 
 //        emit remitRawBuffer(tmp);

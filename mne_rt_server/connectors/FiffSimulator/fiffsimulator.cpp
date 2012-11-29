@@ -150,7 +150,7 @@ void FiffSimulator::init()
     m_pRawMatrixBuffer = NULL;
 
     if(m_pRawInfo)
-        m_pRawMatrixBuffer = new RawMatrixBuffer(10, m_pRawInfo->info->nchan, this->getBufferSampleSize());
+        m_pRawMatrixBuffer = new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_pRawInfo->info->nchan, this->getBufferSampleSize());
 }
 
 

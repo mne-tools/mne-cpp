@@ -444,6 +444,15 @@ void DacqServer::run()
             {
                 emit measInfoAvailable();
                 m_bMeasInfoRequest = false;
+
+                // Reset Buffer Size
+                if(m_pNeuromag->m_pRawMatrixBuffer)
+                    delete m_pNeuromag->m_pRawMatrixBuffer;
+                m_pNeuromag->m_pRawMatrixBuffer = NULL;
+
+                if(m_pNeuromag->m_pInfo)
+                    m_pNeuromag->m_pRawMatrixBuffer = new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_pNeuromag->m_pInfo->nchan, m_pNeuromag->getBufferSampleSize());
+
             }
         }
         
@@ -474,12 +483,10 @@ void DacqServer::run()
                     MatrixXf* t_pMatrix = new MatrixXf( (Map<MatrixXi>( (int*) t_pTag->data(), nchan, m_pNeuromag->getBufferSampleSize())).cast<float>());
 
 //                    std::cout << "Matrix Xf " << t_pMatrix->block(0,0,1,4);
+                    m_pNeuromag->m_pRawMatrixBuffer->push(t_pMatrix);
 
                     delete t_pMatrix;
-                    
                     printf(" [done]\r\n");
-
-//                    m_pNeuromag->m_pRawMatrixBuffer->push(&tmp);
                 }
                 break;
             case FIFF_BLOCK_START:
