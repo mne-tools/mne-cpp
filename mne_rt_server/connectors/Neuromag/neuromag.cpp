@@ -95,7 +95,7 @@ Neuromag::Neuromag()
     this->setBufferSampleSize(100);
     m_pRawMatrixBuffer = NULL;
     this->init();
-    this->start();
+//    this->start();
 }
 
 
@@ -283,15 +283,21 @@ void Neuromag::run()
 
     while(m_bIsRunning)
     {
-        ++count;
 
-        MatrixXf tmp = m_pRawMatrixBuffer->pop();
 
-        qDebug() << "Pop: " << count;
+        if(m_pRawMatrixBuffer)
+        {
+            ++count;
+            MatrixXf tmp = m_pRawMatrixBuffer->pop();
 
-////        printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
+            qDebug() << "Pop: " << count;
 
-//        emit remitRawBuffer(tmp);
-//        usleep(uiSamplePeriod);
+////            printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
+
+            emit remitRawBuffer(tmp);
+          
+          
+          
+        }
     }
 }
