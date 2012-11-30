@@ -181,10 +181,9 @@ int CollectorSocket::setMaxBuflen(int maxbuflen)
 // ToDo doesn't work without setting first buffersize first
 int CollectorSocket::getStat()
 {
-
-    int maxbuflen = -1;
-
     QString t_sSend = QString("%1\r\n").arg(COLLECTOR_STAT);
+
+    this->readAll();
 
     QByteArray t_buf;
     if (!this->server_send(t_sSend, t_buf, DACQ_KEEP_INPUT)) {
@@ -192,9 +191,9 @@ int CollectorSocket::getStat()
         return -1;
     }
 
-    QList<QByteArray> t_sBuffer = t_buf.split(' ');
+//    QList<QByteArray> t_sBuffer = t_buf.split(' ');
 
-    qDebug() << "int CollectorSocket::getStat() " << t_sBuffer[0];
+    qDebug() << "int CollectorSocket::getStat() " << t_buf;//t_sBuffer[0];
 
     return -1;
 }
