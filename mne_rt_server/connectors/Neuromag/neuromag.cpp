@@ -206,8 +206,10 @@ bool Neuromag::start()
 
 bool Neuromag::stop()
 {
-    m_bIsRunning = false;
+    m_pDacqServer->m_bIsRunning = false;
+    m_pDacqServer->wait();
 
+    m_bIsRunning = false;
     QThread::wait();
 
     return true;
@@ -293,29 +295,16 @@ void Neuromag::run()
 {
     m_bIsRunning = true;
 
-//    float t_fSamplingFrequency = m_pRawInfo->info->sfreq;
-//    float t_fBuffSampleSize = (float)getBufferSampleSize();
-
-//    quint32 uiSamplePeriod = (unsigned int) ((t_fBuffSampleSize/t_fSamplingFrequency)*1000000.0f);
-    quint32 count = 0;
-
     while(m_bIsRunning)
     {
-
-
         if(m_pRawMatrixBuffer)
         {
-            ++count;
+            // Pop available Buffers
             MatrixXf tmp = m_pRawMatrixBuffer->pop();
-
-            qDebug() << "Pop: " << count;
 
 ////            printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
 
             emit remitRawBuffer(tmp);
-          
-          
-          
         }
     }
 }

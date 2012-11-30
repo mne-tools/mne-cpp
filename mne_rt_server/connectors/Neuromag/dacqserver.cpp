@@ -183,37 +183,10 @@ bool DacqServer::getMeasInfo(FiffInfo*& p_pFiffInfo)
 
         switch(t_pTag->kind)
         {
-//            case FIFFV_MEG_CH:
-//                qDebug() << "FIFFV_MEG_CH " << t_pTag->toString();
-//                break;
-
             case FIFF_BLOCK_START:
-//                qDebug() << "FIFF_BLOCK_START";
-                switch(*(t_pTag->toInt()))
-                {
-//                    case FIFFB_MEAS:
-//                        qDebug() << "    FIFFB_MEAS";
-//                        break;
-                    case FIFFB_MEAS_INFO:
-                        printf("Reading measurement info... \r\n");
-                        break;
-//                    case FIFFB_PROJ:
-//                        qDebug() << "    FIFFB_PROJ";
-//                        break;
-//                    case FIFFB_PROJ_ITEM:
-//                        qDebug() << "    FIFFB_PROJ_ITEM";
-//                        break;
-//                    case FIFFB_PROCESSING_HISTORY:
-//                        qDebug() << "    FIFFB_PROCESSING_HISTORY";
-//                        break;
-//                    case FIFFB_RAW_DATA:
-//                        qDebug() << "    FIFFB_RAW_DATA";
-//                        break;
-//                    default:
-//                        qDebug() << "    Unknown " << *(t_pTag->toInt());
-                }
+                if(*(t_pTag->toInt()) == FIFFB_MEAS_INFO)
+                    printf("Reading measurement info... \r\n");
                 break;
-            
             case FIFFB_PROCESSED_DATA:
                 printf("Measurement ID... ");
                 p_pFiffInfo->meas_id = t_pTag->toFiffID();
@@ -256,30 +229,11 @@ bool DacqServer::getMeasInfo(FiffInfo*& p_pFiffInfo)
                 p_pFiffInfo->chs.append( t_pTag->toChInfo() );
                 break;
             case FIFF_BLOCK_END:
-//                qDebug() << "FIFF_BLOCK_END " << *(t_pTag->toInt());
                 switch(*(t_pTag->toInt()))
                 {
-//                    case FIFFB_MEAS:
-//                        qDebug() << "    FIFFB_MEAS";
-//                        break;
                     case FIFFB_MEAS_INFO:
-//                        qDebug() << "    FIFFB_MEAS_INFO";
                         t_bReadHeader = false;
                         break;
-//                    case FIFFB_PROJ:
-//                        qDebug() << "    FIFFB_PROJ";
-//                        break;
-//                    case FIFFB_PROJ_ITEM:
-//                        qDebug() << "     FIFFB_PROJ_ITEM";
-//                        break;
-//                    case FIFFB_RAW_DATA:
-//                        qDebug() << "    FIFFB_RAW_DATA";
-//                        break;
-//                    case FIFFB_PROCESSING_HISTORY:
-//                        qDebug() << "    FIFFB_PROCESSING_HISTORY";
-//                        break;
-//                    default:
-//                        qDebug() << "    Unknown " << *(t_pTag->toInt());
                 }
                 break;
 //            case FIFF_HPI_NCOIL:
@@ -428,8 +382,6 @@ void DacqServer::run()
             m_bIsRunning = false;
         m_pNeuromag->mutex.unlock();
     }
-
-
 
 
     //
