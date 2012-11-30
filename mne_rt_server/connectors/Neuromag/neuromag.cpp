@@ -247,6 +247,7 @@ void Neuromag::requestMeasInfo(qint32 ID)
         else
         {
             m_pDacqServer->start();
+            m_pDacqServer->wait();// until header reading finished
         }
     }
 }
