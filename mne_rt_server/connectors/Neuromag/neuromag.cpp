@@ -228,7 +228,27 @@ void Neuromag::releaseMeasInfo()
 void Neuromag::requestMeasInfo(qint32 ID)
 {
     m_iID = ID;
-    m_pDacqServer->m_bMeasInfoRequest = true;
+
+
+    if(m_pInfo)
+        releaseMeasInfo();
+    else
+    {
+        m_pDacqServer->m_bMeasInfoRequest = true;
+
+        //This should never happen
+        if(m_pDacqServer->isRunning())
+        {
+            m_pDacqServer->m_bIsRunning = false;
+            m_pDacqServer->wait();
+            m_pDacqServer->start();
+        }
+        //
+        else
+        {
+            m_pDacqServer->start();
+        }
+    }
 }
 
 

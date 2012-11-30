@@ -361,9 +361,6 @@ void DacqServer::run()
     }
 ////////////
 
-
-    m_pCollectorSock->getStat();
-
     if(m_pShmemSock)
         delete m_pShmemSock;
     m_pShmemSock = new ShmemSocket();
@@ -426,8 +423,6 @@ void DacqServer::run()
     // Control measurement start through Neuromag connector. ToDo: in Case Realtime measurement should be performed during normal acqusition process, change this!!
     //
     m_pCollectorSock->server_start();
-
-    m_pCollectorSock->getStat();
     
     //
     // Receive shmem tags
@@ -440,31 +435,44 @@ void DacqServer::run()
     qint32 t_nSamples = 0;
     qint32 t_nSamplesNew = 0;
     
-    while(m_bIsRunning)
+
+    //
+    // Requesting new info
+    //
+    m_pNeuromag->mutex.lock();
+    if(getMeasInfo(m_pNeuromag->m_pInfo))
     {
         if(m_bMeasInfoRequest)
         {
-            //Requesting new info
-            if(getMeasInfo(m_pNeuromag->m_pInfo))
-            {
-                emit measInfoAvailable();
-                m_bMeasInfoRequest = false;
-
-                // Reset Buffer Size
-                if(m_pNeuromag->m_pRawMatrixBuffer)
-                    delete m_pNeuromag->m_pRawMatrixBuffer;
-                m_pNeuromag->m_pRawMatrixBuffer = NULL;
-
-                if(m_pNeuromag->m_pInfo)
-                    m_pNeuromag->m_pRawMatrixBuffer = new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_pNeuromag->m_pInfo->nchan, m_pNeuromag->getBufferSampleSize());
-
-            }
+            emit measInfoAvailable();
+            m_bMeasInfoRequest = false;
         }
+
+        // Reset Buffer Size
+        if(m_pNeuromag->m_pRawMatrixBuffer)
+            delete m_pNeuromag->m_pRawMatrixBuffer;
+        m_pNeuromag->m_pRawMatrixBuffer = NULL;
+
+        if(m_pNeuromag->m_pInfo)
+            m_pNeuromag->m_pRawMatrixBuffer = new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_pNeuromag->m_pInfo->nchan, m_pNeuromag->getBufferSampleSize());
+    }
+    else
+        m_bIsRunning = false;
+    m_pNeuromag->mutex.unlock();
+
+
+    while(m_bIsRunning)
+    {
         
         if(m_bMeasRequest)
         {
             if (m_pShmemSock->receive_tag(t_pTag) == -1)
                 break;
+        }
+        else
+        {
+            // break while loop when no measurement request
+            break;
         }
 
         if (nchan < 0 && m_pNeuromag->m_pInfo)
@@ -472,8 +480,6 @@ void DacqServer::run()
             nchan = m_pNeuromag->m_pInfo->nchan;
             sfreq = m_pNeuromag->m_pInfo->sfreq;
         }
-
-
 
 
         switch(t_pTag->kind)
@@ -515,8 +521,6 @@ void DacqServer::run()
 //            default:
 //                printf("Unknow tag; Kind: %d, Type: %d, Size: %d \r\n", t_pTag->kind, t_pTag->type, t_pTag->size());
         }
-
-//        ++count;
     }
     
     

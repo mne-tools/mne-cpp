@@ -109,6 +109,7 @@ public:
     */
     int getMaxBuflen();
 
+
     //=========================================================================================================
     /**
     * Set the desired maximum buffer length
@@ -116,15 +117,6 @@ public:
     * @return
     */
     int setMaxBuflen(int maxbuflen);
-
-
-    //=========================================================================================================
-    /**
-    *
-    * @return
-    */
-    int getStat();
-
 
 
     // new client.c to qt functions
