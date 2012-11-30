@@ -178,6 +178,29 @@ int CollectorSocket::setMaxBuflen(int maxbuflen)
 
 
 //*************************************************************************************************************
+// ToDo doesn't work without setting first buffersize first
+int CollectorSocket::getStat()
+{
+
+    int maxbuflen = -1;
+
+    QString t_sSend = QString("%1\r\n").arg(COLLECTOR_STAT);
+
+    QByteArray t_buf;
+    if (!this->server_send(t_sSend, t_buf, DACQ_KEEP_INPUT)) {
+        printf("Neuromag collector connection: Error\r\n");//dacq_log("Neuromag collector connection: %s\n", err_get_error());
+        return -1;
+    }
+
+    QList<QByteArray> t_sBuffer = t_buf.split(' ');
+
+    qDebug() << "int CollectorSocket::getStat() " << t_sBuffer[0];
+
+    return -1;
+}
+
+
+//*************************************************************************************************************
 
 bool CollectorSocket::server_command(const QString& p_sCommand)
 {
