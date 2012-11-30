@@ -361,6 +361,9 @@ void DacqServer::run()
     }
 ////////////
 
+
+    m_pCollectorSock->getStat();
+
     if(m_pShmemSock)
         delete m_pShmemSock;
     m_pShmemSock = new ShmemSocket();
@@ -422,7 +425,9 @@ void DacqServer::run()
     //
     // Control measurement start through Neuromag connector. ToDo: in Case Realtime measurement should be performed during normal acqusition process, change this!!
     //
-//    m_pCollectorSock->server_start();
+    m_pCollectorSock->server_start();
+
+    m_pCollectorSock->getStat();
     
     //
     // Receive shmem tags

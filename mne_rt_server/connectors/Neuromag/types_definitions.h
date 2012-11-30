@@ -80,6 +80,7 @@ namespace NeuromagPlugin
 #define COLLECTOR_GETVARS "vars"
 #define COLLECTOR_SETVARS "vara"
 #define COLLECTOR_DOSETUP "setu"
+#define COLLECTOR_STAT    "stat"
 #define COLLECTOR_BUFVAR  "maxBuflen"
 
 #define MIN_BUFLEN      1*28    /**< DSP units send packets of 28 samples, which is the ultimate lower bound */
