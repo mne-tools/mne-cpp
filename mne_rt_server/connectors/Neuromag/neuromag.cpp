@@ -191,8 +191,6 @@ bool Neuromag::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutp
 
 bool Neuromag::start()
 {
-    this->init();
-
     // Start thread
     m_pDacqServer->start();
 
@@ -231,7 +229,6 @@ void Neuromag::requestMeasInfo(qint32 ID)
 {
     m_iID = ID;
 
-
     if(m_pInfo)
         releaseMeasInfo();
     else
@@ -259,6 +256,8 @@ void Neuromag::requestMeasInfo(qint32 ID)
 
 void Neuromag::requestMeas()
 {
+    qDebug() << "void Neuromag::requestMeas()";
+
     m_pDacqServer->m_bMeasRequest = true;
     this->start();
 }
