@@ -124,6 +124,8 @@ public:
     virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
 
 
+    virtual void requestSetBufferSize(quint32 p_uiBuffSize);
+
     virtual bool start();
 
     virtual bool stop();
@@ -137,7 +139,6 @@ public:
 
     virtual void requestMeasStop();
 
-    virtual void requestSetBufferSize(quint32 p_uiBuffSize);
 
 protected:
     virtual void run();

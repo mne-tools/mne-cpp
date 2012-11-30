@@ -272,6 +272,18 @@ QByteArray ConnectorManager::setActiveConnector(qint32 ID)
 
         if (t_pNewActiveConnector)
         {
+
+           IConnector* t_pActiveConnector = getActiveConnector();
+
+           //Stop and disconnect active connector
+           t_pActiveConnector->stop();
+           this->disconnectActiveConnector();
+           t_pActiveConnector->setStatus(false);
+
+           //set new active connector
+           t_pNewActiveConnector->setStatus(true);
+           this->connectActiveConnector();
+
             str = QString("\t%1 activated. ToDo...\r\n\n").arg(t_pNewActiveConnector->getName());
             p_blockClientList.append(str);
         }
@@ -340,12 +352,64 @@ void ConnectorManager::connectActiveConnector()
         //
         // Reset Raw Buffer
         //
-        QObject::connect(   t_pMNERTServer->m_pCommandServer, &CommandServer::setBufferSize,
-                            t_activeConnector, &IConnector::requestSetBufferSize);
+//        QObject::connect(   t_pMNERTServer->m_pCommandServer, &CommandServer::setBufferSize,
+//                            t_activeConnector, &IConnector::requestSetBufferSize);
     }
     else
     {
-        printf("Error: Can't send measurement info, no connector active!\n");
+        printf("Error: Can't connect, no connector active!\n");
+    }
+}
+
+
+//*************************************************************************************************************
+
+void ConnectorManager::disconnectActiveConnector()
+{
+    IConnector* t_activeConnector = ConnectorManager::getActiveConnector();
+
+    if(t_activeConnector)
+    {
+        MNERTServer* t_pMNERTServer = qobject_cast<MNERTServer*>(this->parent());
+
+        // use signal slots instead of call backs
+        //Consulting the Signal/Slot documentation describes why the Signal/Slot approach is better:
+        //    Callbacks have two fundamental flaws: Firstly, they are not type-safe. We can never be certain
+        //    that the processing function will call the callback with the correct arguments.
+        //    Secondly, the callback is strongly coupled to the processing function since the processing
+        //    function must know which callback to call.
+        //Do be aware of the following though:
+        //    Compared to callbacks, signals and slots are slightly slower because of the increased
+        //    flexibility they provide
+        //The speed probably doesn't matter for most cases, but there may be some extreme cases of repeated
+        //calling that makes a difference.
+
+        //
+        // Meas Info
+        //
+        //
+        t_pMNERTServer->m_pCommandServer->disconnect(t_activeConnector);
+        //
+        t_activeConnector->disconnect(t_pMNERTServer->m_pFiffStreamServer);
+
+        //
+        // Raw Data
+        //
+        //
+//        t_pMNERTServer->m_pCommandServer->disconnect(t_activeConnector);
+        //
+//        t_activeConnector->disconnect(t_pMNERTServer->m_pFiffStreamServer);
+        // connect command server and connector manager
+//        t_pMNERTServer->m_pCommandServer->disconnect(t_activeConnector);
+
+        //
+        // Reset Raw Buffer
+        //
+//        t_pMNERTServer->m_pCommandServer->disconnect(t_activeConnector);
+    }
+    else
+    {
+        printf("Error: Can't connect, no connector active!\n");
     }
 }
 

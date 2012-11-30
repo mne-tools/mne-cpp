@@ -119,6 +119,7 @@ QByteArray Neuromag::availableCommands() const
     QByteArray t_blockCmdInfoList;
 
     t_blockCmdInfoList.append(QString("\t### %1 connector###\r\n").arg(this->getName()));
+    t_blockCmdInfoList.append("\tbufsize  [samples]\tsets the buffer size of the FiffStreamClient\r\n\t\t\t\traw data buffers\r\n");
 
     return t_blockCmdInfoList;
 }
@@ -153,39 +154,34 @@ void Neuromag::init()
 bool Neuromag::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo)
 {
     bool success = false;
-//    if(p_sListCommand[0].compare("simfile",Qt::CaseInsensitive) == 0)
-//    {
-//        //
-//        // simulation file
-//        //
-//        printf("simfile\r\n");
 
-//        QFile t_file(p_sListCommand[1]);
 
-//        QString t_sResourceDataPathOld = m_sResourceDataPath;
+    if(p_sListCommand[0].compare("bufsize",Qt::CaseInsensitive) == 0)
+    {
+        //
+        // bufsize
+        //
+        if(p_sListCommand.size() > 1)
+        {
+            bool ok;
+            quint32 t_uiBuffSize = p_sListCommand[1].toInt(&ok);
 
-//        if(t_file.exists())
-//        {
-//            m_sResourceDataPath = p_sListCommand[1];
-//            m_pRawInfo = false;
+            if(ok && t_uiBuffSize > 0)
+            {
+                printf("bufsize %d\n", t_uiBuffSize);
 
-//            if (this->readRawInfo())
-//            {
-//                m_pFiffProducer->stop();
-//                this->stop();
+                requestSetBufferSize(t_uiBuffSize);
 
-//                p_blockOutputInfo.append("New simulation file set succefully.\r\n");
-//            }
-//            else
-//            {
-//                qDebug() << "Don't set new file";
-//                m_sResourceDataPath = t_sResourceDataPathOld;
-
-//                p_blockOutputInfo.append("Simulation file not set.\r\n");
-//            }
-//        }
-//        success = true;
-//    }
+                QString str = QString("\tSet %1 buffer sample size to %2 samples\r\n\n").arg(getName()).arg(t_uiBuffSize);
+                p_blockOutputInfo.append(str);
+            }
+            else
+            {
+                p_blockOutputInfo.append("\tBuffer size not set\r\n\n");
+            }
+        }
+        success = true;
+    }
 
     return success;
 }
@@ -258,7 +254,7 @@ void Neuromag::requestSetBufferSize(quint32 p_uiBuffSize)
 {
     if(p_uiBuffSize > 0)
     {
-        qDebug() << "void FiffSimulator::requestSetBufferSize: " << p_uiBuffSize;
+        qDebug() << "void Neuromag::setBufferSize: " << p_uiBuffSize;
 
         this->stop();
 
