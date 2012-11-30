@@ -163,6 +163,8 @@ public:
 
     void connectActiveConnector();
 
+    void disconnectActiveConnector();
+
 
     //=========================================================================================================
     /**

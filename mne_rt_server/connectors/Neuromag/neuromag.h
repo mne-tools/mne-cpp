@@ -122,7 +122,7 @@ public:
     virtual const char* getName() const;
 
 
-    virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
+    virtual bool parseCommand(QStringList& p_qCommandList, QByteArray& p_blockOutputInfo);
 
 
     virtual bool start();

@@ -87,7 +87,7 @@ signals:
     void stopMeasConnector();
     void startMeasFiffStreamClient(qint32 ID);
     void stopMeasFiffStreamClient(qint32 ID);
-    void setBufferSize(quint32 p_uiBuffSize);
+//    void setBufferSize(quint32 p_uiBuffSize);
     void closeCommandThreads();
 
 protected:
@@ -99,7 +99,7 @@ private:
     void forwardStartMeas(qint32 ID);       //Forward
     void forwardStopMeas(qint32 ID);        //Forward
     void forwardStopConnector();
-    void forwardSetBufferSize(quint32 p_uiBuffSize); //Forward
+//    void forwardSetBufferSize(quint32 p_uiBuffSize); //Forward
 
 };
 
