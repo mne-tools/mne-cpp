@@ -104,6 +104,8 @@ void FiffStreamThread::startMeas(qint32 ID)
 
         m_qMutex.lock();
         // ToDo send start meas
+        FiffStream t_FiffStreamOut(&m_qSendBlock, QIODevice::WriteOnly);
+        t_FiffStreamOut.start_block(FIFFB_RAW_DATA);
         m_bIsSendingRawBuffer = true;
         m_qMutex.unlock();
     }
@@ -120,7 +122,8 @@ void FiffStreamThread::stopMeas(qint32 ID)
         qDebug() << "stop raw buffer sending.";
 
         m_qMutex.lock();
-        // ToDo send start meas
+        FiffStream t_FiffStreamOut(&m_qSendBlock, QIODevice::WriteOnly);
+        t_FiffStreamOut.end_block(FIFFB_RAW_DATA);
         m_bIsSendingRawBuffer = false;
         m_qMutex.unlock();
     }
@@ -205,10 +208,7 @@ void FiffStreamThread::sendMeasurementInfo(qint32 ID, FiffInfo* p_pFiffInfo)
 
 //        t_FiffStreamOut.start_block(FIFFB_MNE_RT_MEAS_INFO);
 
-
-
 //FiffStream::start_writing_raw
-
 
         //
         //   We will always write floats
