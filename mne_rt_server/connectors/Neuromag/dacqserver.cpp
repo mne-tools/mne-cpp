@@ -106,8 +106,10 @@ bool DacqServer::getMeasInfo(FiffInfo*& p_pFiffInfo)
         delete p_pFiffInfo;
     p_pFiffInfo = new FiffInfo();
 
+#ifdef DACQ_AUTOSTART
     m_pCollectorSock->server_stop();
     m_pCollectorSock->server_start();
+#endif
 
     FiffTag* t_pTag = NULL;
     bool t_bReadHeader = true;
@@ -301,8 +303,10 @@ bool DacqServer::getMeasInfo(FiffInfo*& p_pFiffInfo)
     
     printf("measurement info read.\r\n");   
 
+#ifdef DACQ_AUTOSTART
     if (!m_bMeasRequest)
         m_pCollectorSock->server_stop();
+#endif
         
     //t_bReadHeader is still true --> that means a break occured
     if (t_bReadHeader)
@@ -337,10 +341,14 @@ void DacqServer::run()
     if(m_pNeuromag->getBufferSampleSize() < MIN_BUFLEN)
         m_pNeuromag->setBufferSampleSize(MIN_BUFLEN);
 
-///////necessary? -> without that it sometimes doesn't work -> this sets the buffer size without questioning it
-
-
     int  t_iOriginalMaxBuflen = 1500;// set the standard size as long as we can't get it without setting it
+    // this doesn't work without reseting it
+    //        t_iOriginalMaxBuflen = collector_getMaxBuflen();
+    //        if (t_iOriginalMaxBuflen < 1) {
+    //            printf("Could not query the current Neuromag buffer length\r\n");//dacq_log("Could not query the current Neuromag buffer length\n");
+    //            collector_close();
+    //            return;
+    //        }
     if (m_pNeuromag->getBufferSampleSize() < MIN_BUFLEN) {
         fprintf(stderr, "%s: Too small Neuromag buffer length requested, should be at least %d\n", m_pNeuromag->getBufferSampleSize(), MIN_BUFLEN);
         return;
@@ -357,9 +365,12 @@ void DacqServer::run()
             m_pCollectorSock->close();
             return;
         }
-        printf("[done]\r\n");        
+        printf("[done]\r\n");
     }
-////////////
+
+
+
+////
 
     if(m_pShmemSock)
         delete m_pShmemSock;
@@ -373,56 +384,11 @@ void DacqServer::run()
         return;//(2);
     }
 
-//    int  t_iOriginalMaxBuflen = -1;
-//    /* Connect to the Elekta Neuromag acquisition control server and
-//     * fiddle with the buffer length parameter */
-//    if (m_pNeuromag->getBufferSampleSize() > 0) {
-//        if (!collector_open()) {
-//            printf("Cannot change the Neuromag buffer length: Could not open collector connection\r\n");//dacq_log("Cannot change the Neuromag buffer length: Could not open collector connection\n");
-//            return;
-//        }
-//        if ((t_iOriginalMaxBuflen = collector_getMaxBuflen()) < 1) {
-//            printf("Cannot change the Neuromag buffer length: Could not query the current value\r\n");//dacq_log("Cannot change the Neuromag buffer length: Could not query the current value\n");
-//            collector_close();
-//            return;
-//        }
-//        
-//        if (t_iOriginalMaxBuflen != m_pNeuromag->getBufferSampleSize())
-//        {
-//            printf("Changing the Neuromag buffer length %d -> %d\r\n", t_iOriginalMaxBuflen, m_pNeuromag->getBufferSampleSize());
-//            if (collector_setMaxBuflen(m_pNeuromag->getBufferSampleSize())) {
-//                printf("Setting a new Neuromag buffer length failed");//dacq_log("Setting a new Neuromag buffer length failed\n");
-//                collector_close();
-//                return;
-//            }
-//            printf("[done]\r\n");    
-//        }
-//    }
-//    /* Even if we're not supposed to change the buffer length, let's show it to the user */
-//    else {
-//        if (collector_open()) {
-//            printf("Cannot find Neuromag buffer length: Could not open collector connection\r\n");//dacq_log("Cannot find Neuromag buffer length: Could not open collector connection\n");
-//            return;
-//        }
-//        t_iOriginalMaxBuflen = collector_getMaxBuflen();
-//        if (t_iOriginalMaxBuflen < 1) {
-//            printf("Could not query the current Neuromag buffer length\r\n");//dacq_log("Could not query the current Neuromag buffer length\n");
-//            collector_close();
-//            return;
-//        }
-//        else
-//            printf("Current buffer length value = %d\r\n",t_iOriginalMaxBuflen);//dacq_log("Current buffer length value = %d\n",originalMaxBuflen);
-//    }
 
     /* Mainloop */
 //    printf("Will scale up MEG mags by %g, grads by %g and EEG data by %g\n",
 //         meg_mag_multiplier, meg_grad_multiplier, eeg_multiplier);
     printf("Waiting for the measurement to start...\n");
-    
-    //
-    // Control measurement start through Neuromag connector. ToDo: in Case Realtime measurement should be performed during normal acqusition process, change this!!
-    //
-    m_pCollectorSock->server_start();
     
     //
     // Receive shmem tags
@@ -437,29 +403,42 @@ void DacqServer::run()
     
 
     //
-    // Requesting new info
+    // Requesting new header info: read it every time a measurement starts or a measurement info is requested
     //
-    m_pNeuromag->mutex.lock();
-    if(getMeasInfo(m_pNeuromag->m_pInfo))
+    if(m_pNeuromag->m_pInfo || m_bMeasInfoRequest)
     {
-        if(m_bMeasInfoRequest)
+        m_pNeuromag->mutex.lock();
+        if(getMeasInfo(m_pNeuromag->m_pInfo))
         {
-            emit measInfoAvailable();
-            m_bMeasInfoRequest = false;
+            if(m_bMeasInfoRequest)
+            {
+                emit measInfoAvailable();
+                m_bMeasInfoRequest = false;
+            }
+
+            // Reset Buffer Size
+            if(m_pNeuromag->m_pRawMatrixBuffer)
+                delete m_pNeuromag->m_pRawMatrixBuffer;
+            m_pNeuromag->m_pRawMatrixBuffer = NULL;
+
+            if(m_pNeuromag->m_pInfo)
+                m_pNeuromag->m_pRawMatrixBuffer = new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_pNeuromag->m_pInfo->nchan, m_pNeuromag->getBufferSampleSize());
         }
-
-        // Reset Buffer Size
-        if(m_pNeuromag->m_pRawMatrixBuffer)
-            delete m_pNeuromag->m_pRawMatrixBuffer;
-        m_pNeuromag->m_pRawMatrixBuffer = NULL;
-
-        if(m_pNeuromag->m_pInfo)
-            m_pNeuromag->m_pRawMatrixBuffer = new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_pNeuromag->m_pInfo->nchan, m_pNeuromag->getBufferSampleSize());
+        else
+            m_bIsRunning = false;
+        m_pNeuromag->mutex.unlock();
     }
-    else
-        m_bIsRunning = false;
-    m_pNeuromag->mutex.unlock();
 
+
+
+
+    //
+    // Control measurement start through Neuromag connector. ToDo: in Case Realtime measurement should be performed during normal acqusition process, change this!!
+    //
+#ifdef DACQ_AUTOSTART
+    if(m_bMeasRequest)
+        m_pCollectorSock->server_start();
+#endif
 
     while(m_bIsRunning)
     {
@@ -522,12 +501,13 @@ void DacqServer::run()
 //                printf("Unknow tag; Kind: %d, Type: %d, Size: %d \r\n", t_pTag->kind, t_pTag->type, t_pTag->size());
         }
     }
-    
-    
+
     //
     // Stop and clean up
-    //    
+    //
+#ifdef DACQ_AUTOSTART
     m_pCollectorSock->server_stop();
+#endif
     
     m_pShmemSock->disconnect_client();
     m_pCollectorSock->close();

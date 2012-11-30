@@ -51,6 +51,8 @@ namespace NeuromagPlugin
 // DEFINES
 //=============================================================================================================
 
+#define DACQ_AUTOSTART
+
 #define DACQ_REPLY_PACKET 1
 #define DACQ_REPLY_RFC    2
 #define DACQ_REPLY_BINARY 4
