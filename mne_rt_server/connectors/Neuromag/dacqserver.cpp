@@ -359,7 +359,7 @@ void DacqServer::run()
     //
     // Requesting new header info: read it every time a measurement starts or a measurement info is requested
     //
-    if(m_pNeuromag->m_pInfo || m_bMeasInfoRequest)
+    if(m_pNeuromag->m_pInfo == NULL || m_bMeasInfoRequest)
     {
         m_pNeuromag->mutex.lock();
         if(getMeasInfo(m_pNeuromag->m_pInfo))
@@ -449,8 +449,8 @@ void DacqServer::run()
             case FIFF_CLOSE_FILE:
                 printf("Measurement stopped.\r\n");
                 break;
-//            default:
-//                printf("Unknow tag; Kind: %d, Type: %d, Size: %d \r\n", t_pTag->kind, t_pTag->type, t_pTag->size());
+            default:
+                printf("Unknow tag; Kind: %d, Type: %d, Size: %d \r\n", t_pTag->kind, t_pTag->type, t_pTag->size());
         }
     }
 

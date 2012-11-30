@@ -204,11 +204,13 @@ bool Neuromag::start()
 
 bool Neuromag::stop()
 {
+    m_bIsRunning = false;
+    QThread::wait();//ToDo: This thread will never be terminated when circular buffer is blocking the thread (happens when circularbuffer is empty)
+    
     m_pDacqServer->m_bIsRunning = false;
     m_pDacqServer->wait();
 
-    m_bIsRunning = false;
-    QThread::wait();
+    qDebug() << "bool Neuromag::stop()";
 
     return true;
 }
@@ -300,8 +302,7 @@ void Neuromag::run()
         {
             // Pop available Buffers
             MatrixXf tmp = m_pRawMatrixBuffer->pop();
-
-////            printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
+//            printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
 
             emit remitRawBuffer(tmp);
         }
