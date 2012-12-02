@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     commandserver.h
+* @file     ICommandParser.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,28 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the CommandServer Class.
+* @brief    The command parser interface
 *
 */
 
-#ifndef COMMANDSERVER_H
-#define COMMANDSERVER_H
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "ICommandParser.h"
-
+#ifndef ICOMMANDPARSER_H
+#define ICOMMANDPARSER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QByteArray>
 #include <QStringList>
-#include <QTcpServer>
 
 
 //*************************************************************************************************************
@@ -61,62 +53,48 @@
 namespace MSERVER
 {
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-
-
-//=============================================================================================================
+//=========================================================================================================
 /**
-* DECLARE CLASS CommandServer
+* The ICommandParser class is the interface class....
 *
-* @brief The CommandServer class provides
+* @brief The ICommandParser class is the interface class...
 */
-class CommandServer : public QTcpServer, ICommandParser
+class ICommandParser
 {
-    Q_OBJECT
 
 public:
-    CommandServer(QObject *parent = 0);
 
-    ~CommandServer();
+    //=========================================================================================================
+    /**
+    * Destroys the ICommandParser.
+    */
+    virtual ~ICommandParser() {};
 
-    virtual QByteArray availableCommands() const;
+    //=========================================================================================================
+    /**
+    * Returns the available IConnector commands.
+    *
+    * @return the available IConnector commands.
+    */
+    virtual QByteArray availableCommands() const = 0;
 
-    virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
-
-    void registerCommandParser(ICommandParser* p_pCommandParser);
-
-signals:
-    void requestMeasInfoConnector(qint32 ID);
-    void startMeasConnector();
-    void stopMeasConnector();
-    void startMeasFiffStreamClient(qint32 ID);
-    void stopMeasFiffStreamClient(qint32 ID);
-//    void setBufferSize(quint32 p_uiBuffSize);
-    void closeCommandThreads();
-
-protected:
-    void incomingConnection(qintptr socketDescriptor);
-
-private:
-//private slots: --> in Qt 5 not anymore declared as slot
-    void forwardMeasInfo(qint32 ID);        //Forward
-    void forwardStartMeas(qint32 ID);       //Forward
-    void forwardStopMeas(qint32 ID);        //Forward
-    void forwardStopConnector();
-//    void forwardSetBufferSize(quint32 p_uiBuffSize); //Forward
+    //=========================================================================================================
+    /**
+    * Parses the incomming command.
+    *
+    * @return true if successful parsed, false otherwise
+    */
+    virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo) = 0;
 
 };
 
-} // NAMESPACE
+} //Namespace
 
-#endif //INSTRUCTIONSERVER_H
+#endif // ICOMMANDPARSER_H

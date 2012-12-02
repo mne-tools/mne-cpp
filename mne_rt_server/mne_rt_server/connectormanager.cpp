@@ -100,6 +100,16 @@ ConnectorManager::~ConnectorManager()
 
 //*************************************************************************************************************
 
+QByteArray ConnectorManager::availableCommands() const
+{
+    QByteArray t_blockCmdInfoList;
+
+    return t_blockCmdInfoList;
+}
+
+
+//*************************************************************************************************************
+
 void ConnectorManager::loadConnectors(const QString& dir)
 {
     clearConnectorActivation();
@@ -192,10 +202,10 @@ void ConnectorManager::loadConnectors(const QString& dir)
 
 //*************************************************************************************************************
 
-bool ConnectorManager::parseConnectorCommand(QStringList& p_qCommandList, QByteArray& p_blockOutputInfo)
+bool ConnectorManager::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo)
 {
     bool success = false;
-    if(p_qCommandList[0].compare("conlist",Qt::CaseInsensitive) == 0)
+    if(p_sListCommand[0].compare("conlist",Qt::CaseInsensitive) == 0)
     {
         //
         // conlist
@@ -204,15 +214,15 @@ bool ConnectorManager::parseConnectorCommand(QStringList& p_qCommandList, QByteA
         p_blockOutputInfo.append(this->getConnectorList());
         success = true;
     }
-    else if(p_qCommandList[0].compare("selcon",Qt::CaseInsensitive) == 0)
+    else if(p_sListCommand[0].compare("selcon",Qt::CaseInsensitive) == 0)
     {
         //
         // selcon
         //
-        if(p_qCommandList.size() > 1)
+        if(p_sListCommand.size() > 1)
         {
             bool t_isInt;
-            qint32 t_id = p_qCommandList[1].toInt(&t_isInt);
+            qint32 t_id = p_sListCommand[1].toInt(&t_isInt);
             printf("selcon %d\r\n", t_id);
             if(t_isInt)
             {
@@ -230,7 +240,7 @@ bool ConnectorManager::parseConnectorCommand(QStringList& p_qCommandList, QByteA
         IConnector* t_pConnector = this->getActiveConnector();
 
         if(t_pConnector)
-            success = t_pConnector->parseCommand(p_qCommandList, p_blockOutputInfo);
+            success = t_pConnector->parseCommand(p_sListCommand, p_blockOutputInfo);
         else
             success = false;
     }
