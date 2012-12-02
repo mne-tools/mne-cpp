@@ -82,4 +82,5 @@ HEADERS += \
     fiffstreamthread.h \
     commandserver.h \
     commandthread.h \
-    mne_rt_commands.h
+    mne_rt_commands.h \
+    ICommandParser.h

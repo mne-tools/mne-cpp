@@ -43,6 +43,7 @@
 //=============================================================================================================
 
 #include "IConnector.h"
+#include "ICommandParser.h"
 
 
 //*************************************************************************************************************
@@ -99,7 +100,7 @@ using namespace FIFFLIB;
 *
 * @brief The ConnectorManager class provides a dynamic module loader. As well as the handling of the loaded modules.
 */
-class ConnectorManager : public QPluginLoader
+class ConnectorManager : public QPluginLoader, ICommandParser
 {
     Q_OBJECT
 
@@ -127,16 +128,23 @@ public:
     */
     void loadConnectors(const QString& dir);
 
-    //=========================================================================================================
-    /**
-    * Parses the command or sends the command to the active connector.
-    *
-    * @param[in] p_qCommandList the command.
-    * @param[out] p_blockOutputInfo the bytearray which contains parsing information to be send back to CommandClient.
-    *
-    * @return true if successful, false otherwise
-    */
-    bool parseConnectorCommand(QStringList& p_qCommandList, QByteArray& p_blockOutputInfo);
+//    //=========================================================================================================
+//    /**
+//    * Parses the command or sends the command to the active connector.
+//    *
+//    * @param[in] p_qCommandList the command.
+//    * @param[out] p_blockOutputInfo the bytearray which contains parsing information to be send back to CommandClient.
+//    *
+//    * @return true if successful, false otherwise
+//    */
+//    bool parseConnectorCommand(QStringList& p_qCommandList, QByteArray& p_blockOutputInfo);
+
+    virtual QByteArray availableCommands() const;
+
+    virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
+
+
+
 
     //=========================================================================================================
     /**

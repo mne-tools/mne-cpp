@@ -36,6 +36,14 @@
 #ifndef ICONNECTOR_H
 #define ICONNECTOR_H
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "ICommandParser.h"
+
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -122,7 +130,7 @@ using namespace IOBuffer;
 *
 * @brief The IConnector class is the interface class of all modules.
 */
-class IConnector : public QThread
+class IConnector : public QThread, ICommandParser
 {
     Q_OBJECT
 
@@ -213,12 +221,7 @@ public:
     */
     inline void setStatus(bool status);
 
-signals:
-    void remitMeasInfo(qint32, FIFFLIB::FiffInfo*);
-
-    void remitRawBuffer(Eigen::MatrixXf);
-
-//public slots: --> in Qt 5 not anymore declared as slot
+    //public slots: --> in Qt 5 not anymore declared as slot
     //=========================================================================================================
     /**
     * Returns the FiffInfo.
@@ -232,6 +235,11 @@ signals:
     virtual void requestMeasStop() = 0;
 
     virtual void requestSetBufferSize(quint32 p_uiBuffSize) = 0;
+
+signals:
+    void remitMeasInfo(qint32, FIFFLIB::FiffInfo*);
+
+    void remitRawBuffer(Eigen::MatrixXf);
 
 protected:
 

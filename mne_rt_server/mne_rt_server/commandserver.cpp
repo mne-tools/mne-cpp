@@ -80,6 +80,26 @@ CommandServer::~CommandServer()
 
 //*************************************************************************************************************
 
+QByteArray CommandServer::availableCommands() const
+{
+    QByteArray t_blockCmdInfoList;
+
+    return t_blockCmdInfoList;
+}
+
+
+//*************************************************************************************************************
+
+bool CommandServer::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo)
+{
+    bool success = false;
+
+    return success;
+}
+
+
+//*************************************************************************************************************
+
 void CommandServer::incomingConnection(qintptr socketDescriptor)
 {
     CommandThread* t_pCommandThread = new CommandThread(socketDescriptor, this);
@@ -143,4 +163,12 @@ void CommandServer::forwardStopConnector()
 //{
 //    emit setBufferSize(p_uiBuffSize);
 //}
+
+
+//*************************************************************************************************************
+
+void CommandServer::registerCommandParser(ICommandParser* p_pCommandParser)
+{
+
+}
 

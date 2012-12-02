@@ -243,7 +243,7 @@ bool CommandThread::parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand)
         emit qobject_cast<MNERTServer*>(this->parent()->parent())->closeServer();
         success = true;
     }
-    else if(qobject_cast<MNERTServer*>(this->parent()->parent())->m_pConnectorManager->parseConnectorCommand(t_qCommandList, t_blockClientList))
+    else if(qobject_cast<MNERTServer*>(this->parent()->parent())->m_pConnectorManager->parseCommand(t_qCommandList, t_blockClientList))
     {
         //
         // Connector/ConnectorManager Command

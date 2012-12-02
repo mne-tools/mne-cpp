@@ -83,6 +83,26 @@ FiffStreamServer::~FiffStreamServer()
 
 //*************************************************************************************************************
 
+QByteArray FiffStreamServer::availableCommands() const
+{
+    QByteArray t_blockCmdInfoList;
+
+    return t_blockCmdInfoList;
+}
+
+
+//*************************************************************************************************************
+
+bool FiffStreamServer::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo)
+{
+    bool success = false;
+
+    return success;
+}
+
+
+//*************************************************************************************************************
+
 //void FiffStreamServer::clearClients()
 //{
 //    QMap<qint32, FiffStreamThread*>::const_iterator i = m_qClientList.constBegin();
