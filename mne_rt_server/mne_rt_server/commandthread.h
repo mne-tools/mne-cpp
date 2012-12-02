@@ -62,7 +62,7 @@ public:
 
     ~CommandThread();
 
-    QByteArray availableCommands() const;
+//    QByteArray availableCommands() const;
 
     void run();
 
@@ -78,7 +78,7 @@ signals:
 private:
     bool parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand);
 
-    QByteArray parseToId(QString& p_sRawId, qint32& p_iParsedId);
+//    QByteArray parseToId(QString& p_sRawId, qint32& p_iParsedId);
 
     int socketDescriptor;
 
