@@ -108,11 +108,14 @@ protected:
     void incomingConnection(qintptr socketDescriptor);
 
 private:
+
+    QByteArray parseToId(QString& p_sRawId, qint32& p_iParsedId);
+
 //private slots: --> in Qt 5 not anymore declared as slot
-    void forwardMeasInfo(qint32 ID);        //Forward
-    void forwardStartMeas(qint32 ID);       //Forward
-    void forwardStopMeas(qint32 ID);        //Forward
-    void forwardStopConnector();
+//    void forwardMeasInfo(qint32 ID);        //Forward
+//    void forwardStartMeas(qint32 ID);       //Forward
+//    void forwardStopMeas(qint32 ID);        //Forward
+//    void forwardStopConnector();
 //    void forwardSetBufferSize(quint32 p_uiBuffSize); //Forward
 
 };
