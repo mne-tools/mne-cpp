@@ -118,8 +118,7 @@ QByteArray Neuromag::availableCommands()
 {
     QByteArray t_blockCmdInfoList;
 
-    t_blockCmdInfoList.append(QString("\t### %1 connector###\r\n").arg(this->getName()));
-    t_blockCmdInfoList.append("\tbufsize  [samples]\tsets the buffer size of the FiffStreamClient\r\n\t\t\t\traw data buffers\r\n");
+//    t_blockCmdInfoList.append(QString("\t### %1 connector###\r\n").arg(this->getName()));
 
     return t_blockCmdInfoList;
 }
@@ -154,34 +153,6 @@ void Neuromag::init()
 bool Neuromag::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo)
 {
     bool success = false;
-
-
-    if(p_sListCommand[0].compare("bufsize",Qt::CaseInsensitive) == 0)
-    {
-        //
-        // bufsize
-        //
-        if(p_sListCommand.size() > 1)
-        {
-            bool ok;
-            quint32 t_uiBuffSize = p_sListCommand[1].toInt(&ok);
-
-            if(ok && t_uiBuffSize > 0)
-            {
-                printf("bufsize %d\n", t_uiBuffSize);
-
-                requestSetBufferSize(t_uiBuffSize);
-
-                QString str = QString("\tSet %1 buffer sample size to %2 samples\r\n\n").arg(getName()).arg(t_uiBuffSize);
-                p_blockOutputInfo.append(str);
-            }
-            else
-            {
-                p_blockOutputInfo.append("\tBuffer size not set\r\n\n");
-            }
-        }
-        success = true;
-    }
 
     return success;
 }

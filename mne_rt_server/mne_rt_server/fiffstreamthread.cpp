@@ -184,10 +184,10 @@ void FiffStreamThread::sendRawBuffer(Eigen::MatrixXf m_matRawData)
         m_qMutex.unlock();
 
     }
-    else
-    {
-        qDebug() << "Send RawBuffer is not activated";
-    }
+//    else
+//    {
+//        qDebug() << "Send RawBuffer is not activated";
+//    }
 }
 
 

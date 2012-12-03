@@ -91,7 +91,7 @@ using namespace FIFFLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-//class IConnector;
+class FiffStreamServer;
 
 
 //=============================================================================================================
@@ -112,7 +112,7 @@ public:
     *
     * @param [in] parent pointer to parent Object. (It's normally the default value.)
     */
-    ConnectorManager(QObject* parent = 0);
+    ConnectorManager(FiffStreamServer* p_pFiffStreamServer, QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -141,18 +141,11 @@ public:
 
     virtual QByteArray availableCommands();
 
-    virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
+    static void clearConnectorActivation();
 
+    void connectActiveConnector();
 
-
-
-    //=========================================================================================================
-    /**
-    * Returns vector containing all modules.
-    *
-    * @return reference to vector containing all modules.
-    */
-    static inline const QVector<IConnector*>& getConnectors();
+    void disconnectActiveConnector();
 
     //=========================================================================================================
     /**
@@ -164,15 +157,11 @@ public:
 
     //=========================================================================================================
     /**
-    * ToDo
+    * Returns vector containing all modules.
+    *
+    * @return reference to vector containing all modules.
     */
-    QByteArray setActiveConnector(qint32 ID);
-
-
-    void connectActiveConnector();
-
-    void disconnectActiveConnector();
-
+    static inline const QVector<IConnector*>& getConnectors();
 
     //=========================================================================================================
     /**
@@ -180,23 +169,26 @@ public:
     */
     QByteArray getConnectorList() const;
 
+    virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
 
-
-
-    static void clearConnectorActivation();
-
+    //=========================================================================================================
+    /**
+    * ToDo
+    */
+    QByteArray setActiveConnector(qint32 ID);
 
 signals:
-    void requestMeasInfoConnector(qint32 ID);
-
     void sendMeasInfo(qint32, FIFFLIB::FiffInfo*);
-
+    void setBufferSize(qint32 ID);
     void startMeasConnector();
-
     void stopMeasConnector();
 
 private:
     static QVector<IConnector*> s_vecConnectors;       /**< Holds vector of all modules. */
+
+
+    FiffStreamServer* m_pFiffStreamServer;
+
 };
 
 
