@@ -63,9 +63,7 @@ public:
 
     ~CommandThread();
 
-//    QByteArray availableCommands() const;
-
-    void cmdReply(QByteArray p_blockReply, qint32 p_iID);
+    void attachCommandReply(QByteArray p_blockReply, qint32 p_iID);
 
     void run();
 
@@ -74,16 +72,7 @@ signals:
 
     void newCommand(QString p_sCommand, qint32 p_iThreadID);
 
-//    void requestMeasInfo(qint32 p_iClientId);
-//    void requestStartMeas(qint32 p_iClientId);
-//    void requestStopMeas(qint32 p_iClientId);
-//    void requestStopConnector();
-//    void requestSetBufferSize(quint32 p_uiBuffSize);
-
 private:
-//    bool parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand);
-
-//    QByteArray parseToId(QString& p_sRawId, qint32& p_iParsedId);
 
     int socketDescriptor;
 

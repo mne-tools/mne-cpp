@@ -83,7 +83,7 @@ public:
     *
     * @return the available IConnector commands.
     */
-    virtual QByteArray availableCommands() const = 0;
+    virtual QByteArray availableCommands() = 0;
 
     //=========================================================================================================
     /**

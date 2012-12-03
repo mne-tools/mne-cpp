@@ -115,7 +115,7 @@ public:
     */
     virtual ~Neuromag();
 
-    virtual QByteArray availableCommands() const;
+    virtual QByteArray availableCommands();
 
     virtual ConnectorID getConnectorID() const;
 

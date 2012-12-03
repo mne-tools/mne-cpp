@@ -98,7 +98,6 @@ class MNERTServer : public QObject
     //for convinience by connecting signals
     friend class ConnectorManager;
     friend class CommandServer;
-    friend class CommandThread;
     friend class FiffStreamServer;
     friend class FiffThread;
 

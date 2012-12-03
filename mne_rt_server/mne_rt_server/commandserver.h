@@ -89,8 +89,7 @@ public:
 
     ~CommandServer();
 
-    virtual QByteArray availableCommands() const;
-
+    virtual QByteArray availableCommands();
 
     void incommingCommand(QString p_sCommand, qint32 p_iThreadID);
 
@@ -102,11 +101,11 @@ signals:
     void replyCommand(QByteArray p_blockReply, qint32 p_iID);
 
 
-    void requestMeasInfoConnector(qint32 ID);
-    void startMeasConnector();
+//    void requestMeasInfoConnector(qint32 ID);
+//    void startMeasConnector();
     void stopMeasConnector();
     void startMeasFiffStreamClient(qint32 ID);
-    void stopMeasFiffStreamClient(qint32 ID);
+//    void stopMeasFiffStreamClient(qint32 ID);
 //    void setBufferSize(quint32 p_uiBuffSize);
     void closeCommandThreads();
 
@@ -115,16 +114,9 @@ protected:
 
 private:
 
-    QByteArray parseToId(QString& p_sRawId, qint32& p_iParsedId);
-
+    QList<ICommandParser*> m_qListParser;
 
     qint32 m_iThreadCount;
-//private slots: --> in Qt 5 not anymore declared as slot
-//    void forwardMeasInfo(qint32 ID);        //Forward
-//    void forwardStartMeas(qint32 ID);       //Forward
-//    void forwardStopMeas(qint32 ID);        //Forward
-//    void forwardStopConnector();
-//    void forwardSetBufferSize(quint32 p_uiBuffSize); //Forward
 
 };
 
