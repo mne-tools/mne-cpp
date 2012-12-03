@@ -53,6 +53,7 @@
 //=============================================================================================================
 
 #include <stdlib.h>
+#include <iostream>
 
 
 //*************************************************************************************************************
@@ -70,6 +71,7 @@ using namespace MSERVER;
 
 CommandServer::CommandServer(QObject *parent)
 : QTcpServer(parent)
+, m_iThreadCount(0)
 {
 
 }
@@ -110,6 +112,23 @@ QByteArray CommandServer::availableCommands() const
         t_blockCmdInfoList.append("No connector commands available - no connector active.\r\n");
 
     return t_blockCmdInfoList;
+}
+
+
+void CommandServer::incommingCommand(QString p_sCommand, qint32 p_iThreadID)
+{
+
+    QStringList t_qCommandList = p_sCommand.split(" ");
+
+    QByteArray t_blockReply;
+
+    this->parseCommand(t_qCommandList, t_blockReply);
+
+    //print
+    std::cout << t_blockReply.data();
+
+    //send reply
+    emit replyCommand(t_blockReply, p_iThreadID);
 }
 
 
@@ -244,7 +263,7 @@ bool CommandServer::parseCommand(QStringList& p_sListCommand, QByteArray& p_bloc
         // Closes mne_rt_server
         //
         printf("close\n");
-        emit qobject_cast<MNERTServer*>(this->parent()->parent())->closeServer();
+        emit qobject_cast<MNERTServer*>(this->parent())->closeServer();
         success = true;
     }
     else if(qobject_cast<MNERTServer*>(this->parent())->m_pConnectorManager->parseCommand(p_sListCommand, p_blockOutputInfo))
@@ -271,11 +290,20 @@ bool CommandServer::parseCommand(QStringList& p_sListCommand, QByteArray& p_bloc
 
 void CommandServer::incomingConnection(qintptr socketDescriptor)
 {
-    CommandThread* t_pCommandThread = new CommandThread(socketDescriptor, this);
+    CommandThread* t_pCommandThread = new CommandThread(socketDescriptor, m_iThreadCount, this);
+    ++m_iThreadCount;
 
     //when thread has finished it gets deleted
     connect(t_pCommandThread, SIGNAL(finished()), t_pCommandThread, SLOT(deleteLater()));
     connect(this, SIGNAL(closeCommandThreads()), t_pCommandThread, SLOT(deleteLater()));
+
+    //Forwards for thread safety
+    //Connect incomming commands
+    connect(t_pCommandThread, &CommandThread::newCommand,
+            this, &CommandServer::incommingCommand);
+    //Connect command Replies
+    connect(this, &CommandServer::replyCommand,
+            t_pCommandThread, &CommandThread::cmdReply);
 
 //    //Forwards for thread safety - check if obsolete!?
 //    connect(t_pCommandThread, &CommandThread::requestMeasInfo,

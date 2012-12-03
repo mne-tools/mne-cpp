@@ -91,11 +91,17 @@ public:
 
     virtual QByteArray availableCommands() const;
 
+
+    void incommingCommand(QString p_sCommand, qint32 p_iThreadID);
+
     virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
 
     void registerCommandParser(ICommandParser* p_pCommandParser);
 
 signals:
+    void replyCommand(QByteArray p_blockReply, qint32 p_iID);
+
+
     void requestMeasInfoConnector(qint32 ID);
     void startMeasConnector();
     void stopMeasConnector();
@@ -111,6 +117,8 @@ private:
 
     QByteArray parseToId(QString& p_sRawId, qint32& p_iParsedId);
 
+
+    qint32 m_iThreadCount;
 //private slots: --> in Qt 5 not anymore declared as slot
 //    void forwardMeasInfo(qint32 ID);        //Forward
 //    void forwardStartMeas(qint32 ID);       //Forward

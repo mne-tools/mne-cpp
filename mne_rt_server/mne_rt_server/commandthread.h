@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include <QThread>
+#include <QMutex>
 #include <QTcpSocket>
 
 
@@ -58,34 +59,41 @@ class CommandThread : public QThread
     Q_OBJECT
 
 public:
-    CommandThread(int socketDescriptor, QObject *parent);
+    CommandThread(int socketDescriptor, qint32 p_iId, QObject *parent);
 
     ~CommandThread();
 
 //    QByteArray availableCommands() const;
+
+    void cmdReply(QByteArray p_blockReply, qint32 p_iID);
 
     void run();
 
 signals:
     void error(QTcpSocket::SocketError socketError);
 
-    void requestMeasInfo(qint32 p_iClientId);
-    void requestStartMeas(qint32 p_iClientId);
-    void requestStopMeas(qint32 p_iClientId);
-    void requestStopConnector();
+    void newCommand(QString p_sCommand, qint32 p_iThreadID);
+
+//    void requestMeasInfo(qint32 p_iClientId);
+//    void requestStartMeas(qint32 p_iClientId);
+//    void requestStopMeas(qint32 p_iClientId);
+//    void requestStopConnector();
 //    void requestSetBufferSize(quint32 p_uiBuffSize);
 
 private:
-    bool parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand);
+//    bool parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand);
 
 //    QByteArray parseToId(QString& p_sRawId, qint32& p_iParsedId);
 
     int socketDescriptor;
 
     bool m_bIsRunning;
+    qint32 m_iThreadID;
+
+    QMutex m_qMutex;
+    QByteArray m_qSendBlock;
 
 };
-
 
 } // NAMESPACE
 
