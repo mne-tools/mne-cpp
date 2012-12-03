@@ -46,8 +46,6 @@
 #include <QtNetwork>
 #include <QStringList>
 
-#include <iostream>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -62,10 +60,11 @@ using namespace MSERVER;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CommandThread::CommandThread(int socketDescriptor, QObject *parent)
+CommandThread::CommandThread(int socketDescriptor, qint32 p_iId, QObject *parent)
 : QThread(parent)
 , socketDescriptor(socketDescriptor)
 , m_bIsRunning(false)
+, m_iThreadID(p_iId)
 {
 
 }
@@ -82,24 +81,36 @@ CommandThread::~CommandThread()
 
 //*************************************************************************************************************
 
-bool CommandThread::parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand)
+void CommandThread::cmdReply(QByteArray p_blockReply, qint32 p_iID)
 {
-    QStringList t_qCommandList = p_sCommand.split(" ");
-
-    bool success = false;
-    QByteArray t_blockClientList;
-
-    CommandServer* t_pCommandServer = qobject_cast<CommandServer*>(this->parent());
-    success = t_pCommandServer->parseCommand(t_qCommandList, t_blockClientList);
-
-    //print
-    std::cout << t_blockClientList.data();
-    //send
-    p_qTcpSocket.write(t_blockClientList);
-    p_qTcpSocket.waitForBytesWritten();
-
-    return success;
+    if(p_iID == m_iThreadID)
+    {
+        m_qMutex.lock();
+        m_qSendBlock.append(p_blockReply);
+        m_qMutex.unlock();
+    }
 }
+
+//*************************************************************************************************************
+
+//bool CommandThread::parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand)
+//{
+//    QStringList t_qCommandList = p_sCommand.split(" ");
+
+//    bool success = false;
+//    QByteArray t_blockClientList;
+
+//    CommandServer* t_pCommandServer = qobject_cast<CommandServer*>(this->parent());
+//    success = t_pCommandServer->parseCommand(t_qCommandList, t_blockClientList);
+
+//    //print
+//    std::cout << t_blockClientList.data();
+//    //send
+//    p_qTcpSocket.write(t_blockClientList);
+//    p_qTcpSocket.waitForBytesWritten();
+
+//    return success;
+//}
 
 
 //*************************************************************************************************************
@@ -109,6 +120,7 @@ void CommandThread::run()
     m_bIsRunning = true;
 
     QTcpSocket t_qTcpSocket;
+
     if (!t_qTcpSocket.setSocketDescriptor(socketDescriptor)) {
         emit error(t_qTcpSocket.error());
         return;
@@ -126,6 +138,29 @@ void CommandThread::run()
 
     while(t_qTcpSocket.state() != QAbstractSocket::UnconnectedState && m_bIsRunning)
     {
+        //
+        // Write available data
+        //
+        if(m_qSendBlock.size() > 0)
+        {
+            qint32 t_iBlockSize = m_qSendBlock.size();
+            m_qMutex.lock();
+            qint32 t_iBytesWritten = t_qTcpSocket.write(m_qSendBlock);
+            t_qTcpSocket.waitForBytesWritten();
+            if(t_iBytesWritten == t_iBlockSize)
+            {
+                m_qSendBlock.clear();
+            }
+            else
+            {
+                m_qSendBlock = m_qSendBlock.mid(t_iBytesWritten, t_iBlockSize-t_iBytesWritten);
+            }
+            m_qMutex.unlock();
+        }
+
+        //
+        // Read: Wait 100ms for incomming tag header, read and continue
+        //
         t_qTcpSocket.waitForReadyRead(100);
 
         if (t_qTcpSocket.bytesAvailable() > 0 && t_qTcpSocket.canReadLine())
@@ -138,7 +173,8 @@ void CommandThread::run()
             //
             if(!t_sCommand.isEmpty())
             {
-                parseCommand(t_qTcpSocket, t_sCommand);
+//                parseCommand(m_pTcpSocket, t_sCommand);
+                emit newCommand(t_sCommand, m_iThreadID);
             }
         }
         else if(t_qTcpSocket.bytesAvailable() > t_iMaxBufSize)
