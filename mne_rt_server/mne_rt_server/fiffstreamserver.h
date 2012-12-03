@@ -109,7 +109,7 @@ public:
     ~FiffStreamServer();
 
 
-    virtual QByteArray availableCommands() const;
+    virtual QByteArray availableCommands();
 
 
     //=========================================================================================================
@@ -132,7 +132,7 @@ public:
 //public slots: --> in Qt 5 not anymore declared as slot
     void forwardMeasInfo(qint32 ID, FiffInfo* p_pFiffInfo);
     void forwardStartMeasFiffStreamClient(qint32 ID);
-    void forwardStopMeasFiffStreamClient(qint32 ID);
+//    void forwardStopMeasFiffStreamClient(qint32 ID);
     void forwardRawBuffer(Eigen::MatrixXf m_matRawData);
 
 
@@ -148,6 +148,8 @@ protected:
     void incomingConnection(qintptr socketDescriptor);
 
 private:
+    QByteArray parseToId(QString& p_sRawId, qint32& p_iParsedId);
+
     QMap<qint32, FiffStreamThread*> m_qClientList;
     qint32                          m_iNextClientId;
 

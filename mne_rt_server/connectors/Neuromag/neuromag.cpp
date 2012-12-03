@@ -114,7 +114,7 @@ Neuromag::~Neuromag()
 
 //*************************************************************************************************************
 
-QByteArray Neuromag::availableCommands() const
+QByteArray Neuromag::availableCommands()
 {
     QByteArray t_blockCmdInfoList;
 

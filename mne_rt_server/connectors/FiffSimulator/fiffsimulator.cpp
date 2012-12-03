@@ -113,15 +113,14 @@ FiffSimulator::~FiffSimulator()
 
 //*************************************************************************************************************
 
-QByteArray FiffSimulator::availableCommands() const
+QByteArray FiffSimulator::availableCommands()
 {
     QByteArray t_blockCmdInfoList;
 
-    t_blockCmdInfoList.append(QString("\t### %1 connector###\r\n").arg(this->getName()));
+//    t_blockCmdInfoList.append(QString("\t### %1 connector###\r\n").arg(this->getName()));
 
-    t_blockCmdInfoList.append("\tsimfile  [file]\t\tthe fiff file which should be used as simulation file.\r\n");
-    t_blockCmdInfoList.append("\tbufsize  [samples]\tsets the buffer size of the FiffStreamClient\r\n\t\t\t\traw data buffers\r\n");
-
+    t_blockCmdInfoList.append(QString("\tsimfile  [file]\t\t%1: the fiff file which should be used as simulation file.\r\n").arg(this->getName()));
+    t_blockCmdInfoList.append(QString("\tbufsize  [samples]\t%1: sets the buffer size of the FiffStreamClient\r\n\t\t\t\traw data buffers\r\n").arg(this->getName()));
 
     return t_blockCmdInfoList;
 }

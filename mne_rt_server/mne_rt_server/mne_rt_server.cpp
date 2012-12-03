@@ -103,24 +103,13 @@ MNERTServer::MNERTServer()
 
     QObject::connect(   m_pCommandServer, &CommandServer::startMeasFiffStreamClient,
                         m_pFiffStreamServer, &FiffStreamServer::forwardStartMeasFiffStreamClient);
-    QObject::connect(   m_pCommandServer, &CommandServer::stopMeasFiffStreamClient,
-                        m_pFiffStreamServer, &FiffStreamServer::forwardStopMeasFiffStreamClient);
+//    QObject::connect(   m_pCommandServer, &CommandServer::stopMeasFiffStreamClient,
+//                        m_pFiffStreamServer, &FiffStreamServer::forwardStopMeasFiffStreamClient);
 
-
-
-
-//    // connect command server and connector manager
-//    QObject::connect(   m_pCommandServer, &CommandServer::requestMeasInfo,
-//                        m_pConnectorManager, &ConnectorManager::getActiveMeasInfo);
-//    // connect connector manager and fiff stream server
-//    QObject::connect(   m_pConnectorManager, &ConnectorManager::sendMeasInfo,
-//                        m_pFiffStreamServer, &FiffStreamServer::forwardMeasInfo);
-
-    //
-    // Connect instruction and data server
-    //
-//    QObject::connect(   m_pCommandServer, &CommandServer::sendFiffStreamServerInstruction,
-//                        m_pFiffStreamServer, &FiffStreamServer::readCommandServerInstruction);
+    //Register Connector Manager for command parsing
+    m_pCommandServer->registerCommandParser((ICommandParser*)m_pConnectorManager);
+    //Register Fiff Sream Server for command parsing
+    m_pCommandServer->registerCommandParser((ICommandParser*)m_pFiffStreamServer);
 
 
     // ### Run everything ###

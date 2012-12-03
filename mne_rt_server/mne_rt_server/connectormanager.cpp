@@ -100,9 +100,16 @@ ConnectorManager::~ConnectorManager()
 
 //*************************************************************************************************************
 
-QByteArray ConnectorManager::availableCommands() const
+QByteArray ConnectorManager::availableCommands()
 {
     QByteArray t_blockCmdInfoList;
+
+    IConnector* t_pCurrentConnector = getActiveConnector();
+
+    if(t_pCurrentConnector)
+        t_blockCmdInfoList.append(t_pCurrentConnector->availableCommands());
+    else
+        t_blockCmdInfoList.append("No connector commands available - no connector active.\r\n");
 
     return t_blockCmdInfoList;
 }
@@ -205,7 +212,59 @@ void ConnectorManager::loadConnectors(const QString& dir)
 bool ConnectorManager::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo)
 {
     bool success = false;
-    if(p_sListCommand[0].compare("conlist",Qt::CaseInsensitive) == 0)
+    if(p_sListCommand[0].compare("measinfo",Qt::CaseInsensitive) == 0)
+    {
+        //
+        // Measurement Info
+        //
+        if(p_sListCommand.size() > 1)
+        {
+            qint32 t_id = -1;
+//            p_blockOutputInfo.append(parseToId(p_sListCommand[1],t_id));
+
+            bool t_isInt;
+            t_id = p_sListCommand[1].toInt(&t_isInt);
+
+            if(t_isInt)// ToDo Check whether ID is correct --> move this parsing to fiff stream server
+            {
+                printf("measinfo %d\r\n", t_id);
+            }
+            if(t_id != -1)
+            {
+                emit requestMeasInfoConnector(t_id);//requestMeasInfo(t_id);
+
+                QString str = QString("\tsend measurement info to FiffStreamClient (ID: %1)\r\n\n").arg(t_id);
+                p_blockOutputInfo.append(str);
+                success = true;
+            }
+        }
+    }
+    else if(p_sListCommand[0].compare("meas",Qt::CaseInsensitive) == 0)
+    {
+        //
+        // meas
+        //
+        if(p_sListCommand.size() > 1)
+        {
+            qint32 t_id = -1;
+
+            bool t_isInt;
+            t_id = p_sListCommand[1].toInt(&t_isInt);
+
+            printf("meas %d\n", t_id);
+            if(t_id != -1)// ToDo Check whether ID is correct --> move this parsing to fiff stream server
+            {
+                //emit requestStartMeas(t_id);
+//                emit startMeasFiffStreamClient(t_id);
+                emit startMeasConnector();
+
+                QString str = QString("\tsend measurement raw buffer to FiffStreamClient (ID: %1)\r\n\n").arg(t_id);
+                p_blockOutputInfo.append(str);
+            }
+        }
+        success = true;
+    }
+    else if(p_sListCommand[0].compare("conlist",Qt::CaseInsensitive) == 0)
     {
         //
         // conlist
@@ -229,6 +288,19 @@ bool ConnectorManager::parseCommand(QStringList& p_sListCommand, QByteArray& p_b
                 p_blockOutputInfo.append(this->setActiveConnector(t_id));
             }
         }
+        success = true;
+    }
+    else if(p_sListCommand[0].compare("stop-all",Qt::CaseInsensitive) == 0)
+    {
+        //
+        // stop-all
+        //
+//        emit stopMeasFiffStreamClient(-1);//emit requestStopMeas(-1);
+        emit stopMeasConnector();//emit requestStopConnector();
+
+        QString str = QString("\tstop all Connectors\r\n\n");
+        p_blockOutputInfo.append(str);
+
         success = true;
     }
     else
@@ -340,7 +412,7 @@ void ConnectorManager::connectActiveConnector()
         // Meas Info
         //
         // connect command server and connector manager
-        QObject::connect(   t_pMNERTServer->m_pCommandServer, &CommandServer::requestMeasInfoConnector,
+        QObject::connect(   t_pMNERTServer->m_pConnectorManager, &ConnectorManager::requestMeasInfoConnector,
                             t_activeConnector, &IConnector::requestMeasInfo);
         // connect connector manager and fiff stream server
         QObject::connect(   t_activeConnector, &IConnector::remitMeasInfo,
@@ -350,13 +422,13 @@ void ConnectorManager::connectActiveConnector()
         // Raw Data
         //
         // connect command server and connector manager
-        QObject::connect(   t_pMNERTServer->m_pCommandServer, &CommandServer::startMeasConnector,
+        QObject::connect(   t_pMNERTServer->m_pConnectorManager, &ConnectorManager::startMeasConnector,
                             t_activeConnector, &IConnector::requestMeas);
         // connect connector manager and fiff stream server
         QObject::connect(   t_activeConnector, &IConnector::remitRawBuffer,
                             t_pMNERTServer->m_pFiffStreamServer, &FiffStreamServer::forwardRawBuffer);
         // connect command server and connector manager
-        QObject::connect(   t_pMNERTServer->m_pCommandServer, &CommandServer::stopMeasConnector,
+        QObject::connect(   t_pMNERTServer->m_pConnectorManager, &ConnectorManager::stopMeasConnector,
                             t_activeConnector, &IConnector::requestMeasStop);
 
         //

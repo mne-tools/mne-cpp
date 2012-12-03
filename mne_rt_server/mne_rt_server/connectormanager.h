@@ -139,7 +139,7 @@ public:
 //    */
 //    bool parseConnectorCommand(QStringList& p_qCommandList, QByteArray& p_blockOutputInfo);
 
-    virtual QByteArray availableCommands() const;
+    virtual QByteArray availableCommands();
 
     virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
 
@@ -187,7 +187,13 @@ public:
 
 
 signals:
+    void requestMeasInfoConnector(qint32 ID);
+
     void sendMeasInfo(qint32, FIFFLIB::FiffInfo*);
+
+    void startMeasConnector();
+
+    void stopMeasConnector();
 
 private:
     static QVector<IConnector*> s_vecConnectors;       /**< Holds vector of all modules. */

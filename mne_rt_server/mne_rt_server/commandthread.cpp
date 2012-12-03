@@ -38,13 +38,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "commandserver.h"
-
 #include "commandthread.h"
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
 #include <QtNetwork>
-#include <QStringList>
 
 
 //*************************************************************************************************************
@@ -81,7 +83,7 @@ CommandThread::~CommandThread()
 
 //*************************************************************************************************************
 
-void CommandThread::cmdReply(QByteArray p_blockReply, qint32 p_iID)
+void CommandThread::attachCommandReply(QByteArray p_blockReply, qint32 p_iID)
 {
     if(p_iID == m_iThreadID)
     {
@@ -90,27 +92,6 @@ void CommandThread::cmdReply(QByteArray p_blockReply, qint32 p_iID)
         m_qMutex.unlock();
     }
 }
-
-//*************************************************************************************************************
-
-//bool CommandThread::parseCommand(QTcpSocket& p_qTcpSocket, QString& p_sCommand)
-//{
-//    QStringList t_qCommandList = p_sCommand.split(" ");
-
-//    bool success = false;
-//    QByteArray t_blockClientList;
-
-//    CommandServer* t_pCommandServer = qobject_cast<CommandServer*>(this->parent());
-//    success = t_pCommandServer->parseCommand(t_qCommandList, t_blockClientList);
-
-//    //print
-//    std::cout << t_blockClientList.data();
-//    //send
-//    p_qTcpSocket.write(t_blockClientList);
-//    p_qTcpSocket.waitForBytesWritten();
-
-//    return success;
-//}
 
 
 //*************************************************************************************************************
@@ -148,13 +129,9 @@ void CommandThread::run()
             qint32 t_iBytesWritten = t_qTcpSocket.write(m_qSendBlock);
             t_qTcpSocket.waitForBytesWritten();
             if(t_iBytesWritten == t_iBlockSize)
-            {
                 m_qSendBlock.clear();
-            }
             else
-            {
                 m_qSendBlock = m_qSendBlock.mid(t_iBytesWritten, t_iBlockSize-t_iBytesWritten);
-            }
             m_qMutex.unlock();
         }
 
@@ -169,13 +146,10 @@ void CommandThread::run()
             QString t_sCommand = QString(t_qByteArrayRaw).simplified();
 
             //
-            // Parse command & send answer
+            // Parse comman
             //
             if(!t_sCommand.isEmpty())
-            {
-//                parseCommand(m_pTcpSocket, t_sCommand);
                 emit newCommand(t_sCommand, m_iThreadID);
-            }
         }
         else if(t_qTcpSocket.bytesAvailable() > t_iMaxBufSize)
         {
