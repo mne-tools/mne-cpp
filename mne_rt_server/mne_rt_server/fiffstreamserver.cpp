@@ -100,9 +100,8 @@ bool FiffStreamServer::parseCommand(QStringList& p_sListCommand, QByteArray& p_b
     if(p_sListCommand[0].compare("clist",Qt::CaseInsensitive) == 0)
     {
         //
-        // Print & send client list
+        // client list
         //
-        // ToDO move this to connector manager
         printf("clist\n");
 
         p_blockOutputInfo.append("\tID\tAlias\r\n");
@@ -114,6 +113,33 @@ bool FiffStreamServer::parseCommand(QStringList& p_sListCommand, QByteArray& p_b
         }
         p_blockOutputInfo.append("\n");
         success = true;
+    }
+    else if(p_sListCommand[0].compare("measinfo",Qt::CaseInsensitive) == 0)
+    {
+        //
+        // Measurement Info
+        //
+        if(p_sListCommand.size() > 1)
+        {
+            qint32 t_id = -1;
+//            p_blockOutputInfo.append(parseToId(p_sListCommand[1],t_id));
+
+            bool t_isInt;
+            t_id = p_sListCommand[1].toInt(&t_isInt);
+
+            if(t_isInt)// ToDo Check whether ID is correct --> move this parsing to fiff stream server
+            {
+                printf("measinfo %d\r\n", t_id);
+            }
+            if(t_id != -1)
+            {
+                emit requestMeasInfo(t_id);//requestMeasInfo(t_id);
+
+                QString str = QString("\tsend measurement info to FiffStreamClient (ID: %1)\r\n\n").arg(t_id);
+                p_blockOutputInfo.append(str);
+                success = true;
+            }
+        }
     }
     else if(p_sListCommand[0].compare("meas",Qt::CaseInsensitive) == 0)
     {
@@ -128,11 +154,9 @@ bool FiffStreamServer::parseCommand(QStringList& p_sListCommand, QByteArray& p_b
             printf("meas %d\n", t_id);
             if(t_id != -1)
             {
-                //emit requestStartMeas(t_id);
                 emit startMeasFiffStreamClient(t_id);
-//                emit startMeasConnector();
 
-                QString str = QString("\tsend measurement raw buffer to FiffStreamClient (ID: %1)\r\n\n").arg(t_id);
+                QString str = QString("\tFiffStreamClient (ID: %1) is now set to accept raw buffers\r\n\n").arg(t_id);
                 p_blockOutputInfo.append(str);
             }
         }
@@ -155,7 +179,7 @@ bool FiffStreamServer::parseCommand(QStringList& p_sListCommand, QByteArray& p_b
             {
                 emit stopMeasFiffStreamClient(t_id);//emit requestStopMeas(t_id);
 
-                QString str = QString("\tstop FiffStreamClient (ID: %1)\r\n\n").arg(t_id);
+                QString str = QString("\tstop FiffStreamClient (ID: %1) from receiving raw Buffers.\r\n\n").arg(t_id);
                 p_blockOutputInfo.append(str);
             }
         }
@@ -166,15 +190,13 @@ bool FiffStreamServer::parseCommand(QStringList& p_sListCommand, QByteArray& p_b
         //
         // stop-all
         //
-        emit stopMeasFiffStreamClient(-1);//emit requestStopMeas(-1);
-//        emit stopMeasConnector();//emit requestStopConnector();
+        emit stopMeasFiffStreamClient(-1);
 
-        QString str = QString("\tstop all FiffStreamClients\r\n\n");
+        QString str = QString("\tstop all FiffStreamClients from receiving raw buffers\r\n\n");
         p_blockOutputInfo.append(str);
 
         success = true;
     }
-
 
     return success;
 }
@@ -236,22 +258,6 @@ QByteArray FiffStreamServer::parseToId(QString& p_sRawId, qint32& p_iParsedId)
 //        ++i;
 //    }
 //    m_qClientList.clear();
-//}
-
-
-//*************************************************************************************************************
-
-void FiffStreamServer::forwardStartMeasFiffStreamClient(qint32 ID)
-{
-    emit startMeasFiffStreamClient(ID);
-}
-
-
-////*************************************************************************************************************
-
-//void FiffStreamServer::forwardStopMeasFiffStreamClient(qint32 ID)
-//{
-//    emit stopMeasFiffStreamClient(ID);
 //}
 
 

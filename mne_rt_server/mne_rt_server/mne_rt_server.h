@@ -78,11 +78,8 @@ namespace MSERVER
 //=============================================================================================================
 
 class CommandServer;
-class CommandThread;
 class FiffStreamServer;
-class FiffStreamThread;
 class ConnectorManager;
-class IConnector;
 
 
 //=============================================================================================================
@@ -94,13 +91,6 @@ class IConnector;
 class MNERTServer : public QObject
 {
     Q_OBJECT
-
-    //for convinience by connecting signals
-    friend class ConnectorManager;
-    friend class CommandServer;
-    friend class FiffStreamServer;
-    friend class FiffThread;
-
 public:
     MNERTServer();
 

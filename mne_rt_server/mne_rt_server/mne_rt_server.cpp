@@ -84,7 +84,7 @@ const char* connectorDir = "/mne_rt_server_plugins";        /**< holds directory
 MNERTServer::MNERTServer()
 : m_pFiffStreamServer(new FiffStreamServer(this))
 , m_pCommandServer(new CommandServer(this))
-, m_pConnectorManager(new ConnectorManager(this))
+, m_pConnectorManager(new ConnectorManager(m_pFiffStreamServer, this))
 {
     qRegisterMetaType<MatrixXf>("MatrixXf");
 
@@ -94,22 +94,21 @@ MNERTServer::MNERTServer()
     //
     m_pConnectorManager->loadConnectors(qApp->applicationDirPath()+connectorDir);
 
-
     // ### Connect everything ###
     //
     // Meas Info
     //
+//    QObject::connect(   this->m_pFiffStreamServer, &FiffStreamServer::requestMeasInfo,
+//                        this->m_pConnectorManager, &ConnectorManager::forwardMeasInfoRequest);
+
     m_pConnectorManager->connectActiveConnector();
 
-    QObject::connect(   m_pCommandServer, &CommandServer::startMeasFiffStreamClient,
-                        m_pFiffStreamServer, &FiffStreamServer::forwardStartMeasFiffStreamClient);
-//    QObject::connect(   m_pCommandServer, &CommandServer::stopMeasFiffStreamClient,
-//                        m_pFiffStreamServer, &FiffStreamServer::forwardStopMeasFiffStreamClient);
+    //Register Fiff Sream Server for command parsing
+    m_pCommandServer->registerCommandParser((ICommandParser*)m_pFiffStreamServer);
 
     //Register Connector Manager for command parsing
     m_pCommandServer->registerCommandParser((ICommandParser*)m_pConnectorManager);
-    //Register Fiff Sream Server for command parsing
-    m_pCommandServer->registerCommandParser((ICommandParser*)m_pFiffStreamServer);
+
 
 
     // ### Run everything ###

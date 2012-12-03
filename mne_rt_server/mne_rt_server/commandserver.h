@@ -100,13 +100,8 @@ public:
 signals:
     void replyCommand(QByteArray p_blockReply, qint32 p_iID);
 
-
-//    void requestMeasInfoConnector(qint32 ID);
-//    void startMeasConnector();
-    void stopMeasConnector();
-    void startMeasFiffStreamClient(qint32 ID);
-//    void stopMeasFiffStreamClient(qint32 ID);
-//    void setBufferSize(quint32 p_uiBuffSize);
+//    void stopMeasConnector();
+//    void startMeasFiffStreamClient(qint32 ID);
     void closeCommandThreads();
 
 protected:

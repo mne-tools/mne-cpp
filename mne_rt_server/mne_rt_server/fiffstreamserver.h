@@ -95,8 +95,6 @@ class FiffStreamServer : public QTcpServer, ICommandParser
     Q_OBJECT
 
     friend class FiffStreamThread;
-    friend class CommandServer;
-    friend class CommandThread;
 
 public:
 
@@ -131,14 +129,14 @@ public:
 
 //public slots: --> in Qt 5 not anymore declared as slot
     void forwardMeasInfo(qint32 ID, FiffInfo* p_pFiffInfo);
-    void forwardStartMeasFiffStreamClient(qint32 ID);
-//    void forwardStopMeasFiffStreamClient(qint32 ID);
     void forwardRawBuffer(Eigen::MatrixXf m_matRawData);
 
-
 signals:
+    void requestMeasInfo(qint32 ID);
+
     void startMeasFiffStreamClient(qint32 ID);
     void stopMeasFiffStreamClient(qint32 ID);
+
     void remitMeasInfo(qint32 ID, FIFFLIB::FiffInfo* p_pFiffInfo);
     void remitRawBuffer(Eigen::MatrixXf);
 

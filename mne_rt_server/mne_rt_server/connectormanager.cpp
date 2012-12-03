@@ -81,8 +81,9 @@ using namespace MSERVER;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ConnectorManager::ConnectorManager(QObject *parent)
+ConnectorManager::ConnectorManager(FiffStreamServer* p_pFiffStreamServer, QObject *parent)
 : QPluginLoader(parent)
+, m_pFiffStreamServer(p_pFiffStreamServer)
 {
 
 }
@@ -106,12 +107,176 @@ QByteArray ConnectorManager::availableCommands()
 
     IConnector* t_pCurrentConnector = getActiveConnector();
 
+    t_blockCmdInfoList.append("\tbufsize  [samples]\tsets the buffer size of the FiffStreamClient\r\n\t\t\t\traw data buffers\r\n");
+
     if(t_pCurrentConnector)
         t_blockCmdInfoList.append(t_pCurrentConnector->availableCommands());
     else
         t_blockCmdInfoList.append("No connector commands available - no connector active.\r\n");
 
     return t_blockCmdInfoList;
+}
+
+
+//*************************************************************************************************************
+
+void ConnectorManager::clearConnectorActivation()
+{
+    // deactivate activated connectors
+    if(s_vecConnectors.size() > 0)
+    {
+        QVector<IConnector*>::const_iterator it = s_vecConnectors.begin();
+        for( ; it != s_vecConnectors.end(); ++it)
+            if((*it)->isActive())
+                (*it)->setStatus(false);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void ConnectorManager::connectActiveConnector()
+{
+    IConnector* t_activeConnector = ConnectorManager::getActiveConnector();
+
+    if(t_activeConnector)
+    {
+        // use signal slots instead of call backs
+        //Consulting the Signal/Slot documentation describes why the Signal/Slot approach is better:
+        //    Callbacks have two fundamental flaws: Firstly, they are not type-safe. We can never be certain
+        //    that the processing function will call the callback with the correct arguments.
+        //    Secondly, the callback is strongly coupled to the processing function since the processing
+        //    function must know which callback to call.
+        //Do be aware of the following though:
+        //    Compared to callbacks, signals and slots are slightly slower because of the increased
+        //    flexibility they provide
+        //The speed probably doesn't matter for most cases, but there may be some extreme cases of repeated
+        //calling that makes a difference.
+
+        //
+        // Meas Info
+        //
+        // connect command server and connector manager
+        QObject::connect(   this->m_pFiffStreamServer, &FiffStreamServer::requestMeasInfo,
+                            t_activeConnector, &IConnector::requestMeasInfo);
+
+        // connect connector manager and fiff stream server
+        QObject::connect(   t_activeConnector, &IConnector::remitMeasInfo,
+                            this->m_pFiffStreamServer, &FiffStreamServer::forwardMeasInfo);
+
+        //
+        // Raw Data
+        //
+        // connect command server and connector manager
+        QObject::connect(   this, &ConnectorManager::startMeasConnector,
+                            t_activeConnector, &IConnector::requestMeas);
+        // connect connector manager and fiff stream server
+        QObject::connect(   t_activeConnector, &IConnector::remitRawBuffer,
+                            this->m_pFiffStreamServer, &FiffStreamServer::forwardRawBuffer);
+        // connect command server and connector manager
+        QObject::connect(   this, &ConnectorManager::stopMeasConnector,
+                            t_activeConnector, &IConnector::requestMeasStop);
+
+        //
+        // Reset Raw Buffer Size
+        //
+        QObject::connect(   this, &ConnectorManager::setBufferSize,
+                            t_activeConnector, &IConnector::requestSetBufferSize);
+    }
+    else
+    {
+        printf("Error: Can't connect, no connector active!\n");
+    }
+}
+
+
+//*************************************************************************************************************
+
+void ConnectorManager::disconnectActiveConnector()
+{
+    IConnector* t_activeConnector = ConnectorManager::getActiveConnector();
+
+    if(t_activeConnector)
+    {
+        // use signal slots instead of call backs
+        //Consulting the Signal/Slot documentation describes why the Signal/Slot approach is better:
+        //    Callbacks have two fundamental flaws: Firstly, they are not type-safe. We can never be certain
+        //    that the processing function will call the callback with the correct arguments.
+        //    Secondly, the callback is strongly coupled to the processing function since the processing
+        //    function must know which callback to call.
+        //Do be aware of the following though:
+        //    Compared to callbacks, signals and slots are slightly slower because of the increased
+        //    flexibility they provide
+        //The speed probably doesn't matter for most cases, but there may be some extreme cases of repeated
+        //calling that makes a difference.
+
+        //
+        // Meas Info
+        //
+        this->disconnect(t_activeConnector);
+        //
+        t_activeConnector->disconnect(this->m_pFiffStreamServer);
+
+        this->m_pFiffStreamServer->disconnect(t_activeConnector);
+
+
+        //
+        // Raw Data
+        //
+//        t_pMNERTServer->m_pCommandServer->disconnect(t_activeConnector);
+        //
+//        t_activeConnector->disconnect(t_pMNERTServer->m_pFiffStreamServer);
+        // connect command server and connector manager
+//        t_pMNERTServer->m_pCommandServer->disconnect(t_activeConnector);
+
+        //
+        // Reset Raw Buffer
+        //
+//        t_pMNERTServer->m_pCommandServer->disconnect(t_activeConnector);
+    }
+    else
+    {
+        printf("Error: Can't connect, no connector active!\n");
+    }
+}
+
+
+//*************************************************************************************************************
+
+IConnector* ConnectorManager::getActiveConnector()
+{
+    QVector<IConnector*>::const_iterator it = s_vecConnectors.begin();
+    for( ; it != s_vecConnectors.end(); ++it)
+    {
+        if((*it)->isActive())
+            return *it;
+    }
+
+    return NULL;
+}
+
+
+//*************************************************************************************************************
+
+QByteArray ConnectorManager::getConnectorList() const
+{
+    QByteArray t_blockConnectorList;
+    if(s_vecConnectors.size() > 0)
+    {
+        QVector<IConnector*>::const_iterator it = s_vecConnectors.begin();
+        for( ; it != s_vecConnectors.end(); ++it)
+        {
+            if((*it)->isActive())
+                t_blockConnectorList.append(QString("  *  (%1) %2\r\n").arg((*it)->getConnectorID()).arg((*it)->getName()));
+            else
+                t_blockConnectorList.append(QString("     (%1) %2\r\n").arg((*it)->getConnectorID()).arg((*it)->getName()));
+        }
+    }
+    else
+        t_blockConnectorList.append(" - no connector loaded - \r\n");
+
+    t_blockConnectorList.append("\r\n");
+    return t_blockConnectorList;
 }
 
 
@@ -212,54 +377,42 @@ void ConnectorManager::loadConnectors(const QString& dir)
 bool ConnectorManager::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo)
 {
     bool success = false;
-    if(p_sListCommand[0].compare("measinfo",Qt::CaseInsensitive) == 0)
-    {
-        //
-        // Measurement Info
-        //
-        if(p_sListCommand.size() > 1)
-        {
-            qint32 t_id = -1;
-//            p_blockOutputInfo.append(parseToId(p_sListCommand[1],t_id));
-
-            bool t_isInt;
-            t_id = p_sListCommand[1].toInt(&t_isInt);
-
-            if(t_isInt)// ToDo Check whether ID is correct --> move this parsing to fiff stream server
-            {
-                printf("measinfo %d\r\n", t_id);
-            }
-            if(t_id != -1)
-            {
-                emit requestMeasInfoConnector(t_id);//requestMeasInfo(t_id);
-
-                QString str = QString("\tsend measurement info to FiffStreamClient (ID: %1)\r\n\n").arg(t_id);
-                p_blockOutputInfo.append(str);
-                success = true;
-            }
-        }
-    }
-    else if(p_sListCommand[0].compare("meas",Qt::CaseInsensitive) == 0)
+    if(p_sListCommand[0].compare("meas",Qt::CaseInsensitive) == 0)
     {
         //
         // meas
         //
         if(p_sListCommand.size() > 1)
         {
-            qint32 t_id = -1;
+            emit startMeasConnector();
 
-            bool t_isInt;
-            t_id = p_sListCommand[1].toInt(&t_isInt);
+            QString str = QString("\tstart connector\r\n\n");
+            p_blockOutputInfo.append(str);
+        }
+        success = true;
+    }
+    else if(p_sListCommand[0].compare("bufsize",Qt::CaseInsensitive) == 0)
+    {
+        //
+        // bufsize
+        //
+        if(p_sListCommand.size() > 1)
+        {
+            bool ok;
+            quint32 t_uiBuffSize = p_sListCommand[1].toInt(&ok);
 
-            printf("meas %d\n", t_id);
-            if(t_id != -1)// ToDo Check whether ID is correct --> move this parsing to fiff stream server
+            if(ok && t_uiBuffSize > 0)
             {
-                //emit requestStartMeas(t_id);
-//                emit startMeasFiffStreamClient(t_id);
-                emit startMeasConnector();
+                printf("bufsize %d\n", t_uiBuffSize);
 
-                QString str = QString("\tsend measurement raw buffer to FiffStreamClient (ID: %1)\r\n\n").arg(t_id);
+                emit setBufferSize(t_uiBuffSize);
+
+                QString str = QString("\tSet %1 buffer sample size to %2 samples\r\n\n").arg(getActiveConnector()->getName()).arg(t_uiBuffSize);
                 p_blockOutputInfo.append(str);
+            }
+            else
+            {
+                p_blockOutputInfo.append("\tBuffer size not set\r\n\n");
             }
         }
         success = true;
@@ -295,8 +448,7 @@ bool ConnectorManager::parseCommand(QStringList& p_sListCommand, QByteArray& p_b
         //
         // stop-all
         //
-//        emit stopMeasFiffStreamClient(-1);//emit requestStopMeas(-1);
-        emit stopMeasConnector();//emit requestStopConnector();
+        emit stopMeasConnector();
 
         QString str = QString("\tstop all Connectors\r\n\n");
         p_blockOutputInfo.append(str);
@@ -318,22 +470,6 @@ bool ConnectorManager::parseCommand(QStringList& p_sListCommand, QByteArray& p_b
     }
 
     return success;
-
-}
-
-
-//*************************************************************************************************************
-
-IConnector* ConnectorManager::getActiveConnector()
-{
-    QVector<IConnector*>::const_iterator it = s_vecConnectors.begin();
-    for( ; it != s_vecConnectors.end(); ++it)
-    {
-        if((*it)->isActive())
-            return *it;
-    }
-
-    return NULL;
 }
 
 
@@ -383,155 +519,6 @@ QByteArray ConnectorManager::setActiveConnector(qint32 ID)
     }
 
     return p_blockClientList;
-}
-
-
-//*************************************************************************************************************
-
-void ConnectorManager::connectActiveConnector()
-{
-    IConnector* t_activeConnector = ConnectorManager::getActiveConnector();
-
-    if(t_activeConnector)
-    {
-        MNERTServer* t_pMNERTServer = qobject_cast<MNERTServer*>(this->parent());
-
-        // use signal slots instead of call backs
-        //Consulting the Signal/Slot documentation describes why the Signal/Slot approach is better:
-        //    Callbacks have two fundamental flaws: Firstly, they are not type-safe. We can never be certain
-        //    that the processing function will call the callback with the correct arguments.
-        //    Secondly, the callback is strongly coupled to the processing function since the processing
-        //    function must know which callback to call.
-        //Do be aware of the following though:
-        //    Compared to callbacks, signals and slots are slightly slower because of the increased
-        //    flexibility they provide
-        //The speed probably doesn't matter for most cases, but there may be some extreme cases of repeated
-        //calling that makes a difference.
-
-        //
-        // Meas Info
-        //
-        // connect command server and connector manager
-        QObject::connect(   t_pMNERTServer->m_pConnectorManager, &ConnectorManager::requestMeasInfoConnector,
-                            t_activeConnector, &IConnector::requestMeasInfo);
-        // connect connector manager and fiff stream server
-        QObject::connect(   t_activeConnector, &IConnector::remitMeasInfo,
-                            t_pMNERTServer->m_pFiffStreamServer, &FiffStreamServer::forwardMeasInfo);
-
-        //
-        // Raw Data
-        //
-        // connect command server and connector manager
-        QObject::connect(   t_pMNERTServer->m_pConnectorManager, &ConnectorManager::startMeasConnector,
-                            t_activeConnector, &IConnector::requestMeas);
-        // connect connector manager and fiff stream server
-        QObject::connect(   t_activeConnector, &IConnector::remitRawBuffer,
-                            t_pMNERTServer->m_pFiffStreamServer, &FiffStreamServer::forwardRawBuffer);
-        // connect command server and connector manager
-        QObject::connect(   t_pMNERTServer->m_pConnectorManager, &ConnectorManager::stopMeasConnector,
-                            t_activeConnector, &IConnector::requestMeasStop);
-
-        //
-        // Reset Raw Buffer
-        //
-//        QObject::connect(   t_pMNERTServer->m_pCommandServer, &CommandServer::setBufferSize,
-//                            t_activeConnector, &IConnector::requestSetBufferSize);
-    }
-    else
-    {
-        printf("Error: Can't connect, no connector active!\n");
-    }
-}
-
-
-//*************************************************************************************************************
-
-void ConnectorManager::disconnectActiveConnector()
-{
-    IConnector* t_activeConnector = ConnectorManager::getActiveConnector();
-
-    if(t_activeConnector)
-    {
-        MNERTServer* t_pMNERTServer = qobject_cast<MNERTServer*>(this->parent());
-
-        // use signal slots instead of call backs
-        //Consulting the Signal/Slot documentation describes why the Signal/Slot approach is better:
-        //    Callbacks have two fundamental flaws: Firstly, they are not type-safe. We can never be certain
-        //    that the processing function will call the callback with the correct arguments.
-        //    Secondly, the callback is strongly coupled to the processing function since the processing
-        //    function must know which callback to call.
-        //Do be aware of the following though:
-        //    Compared to callbacks, signals and slots are slightly slower because of the increased
-        //    flexibility they provide
-        //The speed probably doesn't matter for most cases, but there may be some extreme cases of repeated
-        //calling that makes a difference.
-
-        //
-        // Meas Info
-        //
-        //
-        t_pMNERTServer->m_pCommandServer->disconnect(t_activeConnector);
-        //
-        t_activeConnector->disconnect(t_pMNERTServer->m_pFiffStreamServer);
-
-        //
-        // Raw Data
-        //
-        //
-//        t_pMNERTServer->m_pCommandServer->disconnect(t_activeConnector);
-        //
-//        t_activeConnector->disconnect(t_pMNERTServer->m_pFiffStreamServer);
-        // connect command server and connector manager
-//        t_pMNERTServer->m_pCommandServer->disconnect(t_activeConnector);
-
-        //
-        // Reset Raw Buffer
-        //
-//        t_pMNERTServer->m_pCommandServer->disconnect(t_activeConnector);
-    }
-    else
-    {
-        printf("Error: Can't connect, no connector active!\n");
-    }
-}
-
-
-//*************************************************************************************************************
-
-QByteArray ConnectorManager::getConnectorList() const
-{
-    QByteArray t_blockConnectorList;
-    if(s_vecConnectors.size() > 0)
-    {
-        QVector<IConnector*>::const_iterator it = s_vecConnectors.begin();
-        for( ; it != s_vecConnectors.end(); ++it)
-        {
-            if((*it)->isActive())
-                t_blockConnectorList.append(QString("  *  (%1) %2\r\n").arg((*it)->getConnectorID()).arg((*it)->getName()));
-            else
-                t_blockConnectorList.append(QString("     (%1) %2\r\n").arg((*it)->getConnectorID()).arg((*it)->getName()));
-        }
-    }
-    else
-        t_blockConnectorList.append(" - no connector loaded - \r\n");
-
-    t_blockConnectorList.append("\r\n");
-    return t_blockConnectorList;
-}
-
-
-//*************************************************************************************************************
-
-void ConnectorManager::clearConnectorActivation()
-{
-    // deactivate activated connectors
-    if(s_vecConnectors.size() > 0)
-    {
-        QVector<IConnector*>::const_iterator it = s_vecConnectors.begin();
-        for( ; it != s_vecConnectors.end(); ++it)
-            if((*it)->isActive())
-                (*it)->setStatus(false);
-    }
 }
 
 
