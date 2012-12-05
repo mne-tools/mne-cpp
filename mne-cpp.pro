@@ -33,12 +33,23 @@
 #
 #--------------------------------------------------------------------------------------------------------------
 
+include(mne-cpp.pri)
 
 TEMPLATE = subdirs
 
-SUBDIRS += \
-    MNE \
-    examples \
-    mne_rt_server
+#At leas major version 5
+lessThan(QT_MAJOR_VERSION, 5){
+    message(mne-cpp requires at least Qt version 5!)
+} else {
+    SUBDIRS += \
+        MNE \
+        examples \
+        mne_rt_server
+
+    contains(isGui, true) {
+        SUBDIRS += \
+            mne_browse_rawq
+    }
+}
 
 CONFIG += ordered
