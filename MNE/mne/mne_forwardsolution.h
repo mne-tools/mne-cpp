@@ -122,7 +122,7 @@ public:
     /**
     * Copy ctor
     */
-    MNEForwardSolution(MNEForwardSolution* p_pMNEForwardSolution);
+    MNEForwardSolution(const MNEForwardSolution* p_pMNEForwardSolution);
 
     //=========================================================================================================
     /**

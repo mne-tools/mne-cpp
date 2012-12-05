@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     fwdrt.pro
+# @file     fs.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the fwdr library.
+# @brief    This project file builds the fs library.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -39,9 +39,9 @@ TEMPLATE = lib
 
 QT       -= gui
 
-DEFINES += FWDRT_LIBRARY
+DEFINES += FS_LIBRARY
 
-TARGET = fwdrt
+TARGET = fs
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -72,9 +72,8 @@ win32 {
     QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
 }
 
-SOURCES += \
-    fwd.cpp
 
-HEADERS +=\
-        fwdrt_global.h \
-    fwd.h
+SOURCES += annotation.cpp
+
+HEADERS += annotation.h\
+        fs_global.h

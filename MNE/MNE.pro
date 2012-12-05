@@ -41,7 +41,8 @@ SUBDIRS += generics \
     fiff \
     mne \
     fwdrt \
-    invrt
+    invrt \
+    fs
 
 contains(Qt3D_available, true) {
     message(Qt3D available: disp library configured!)

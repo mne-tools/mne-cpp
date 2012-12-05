@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     fwdrt.pro
+# @file     realtimeInverse.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -18,7 +18,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-#
+# 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
@@ -29,19 +29,22 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the fwdr library.
+# @brief    ToDo Documentation...
 #
 #--------------------------------------------------------------------------------------------------------------
 
 include(../../mne-cpp.pri)
 
-TEMPLATE = lib
+TEMPLATE = app
 
-QT       -= gui
+VERSION = $${MNE_CPP_VERSION}
 
-DEFINES += FWDRT_LIBRARY
+QT -= gui
 
-TARGET = fwdrt
+CONFIG   += console
+CONFIG   -= app_bundle
+
+TARGET = realtimeInverse
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -49,32 +52,21 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${PWD}/../../lib/
 CONFIG(debug, debug|release) {
-    LIBS += -lfiffd
-    LIBS += -lmned
+    LIBS += -lmned \
+            -lfiffd \
+            -lfwdrtd \
+            -lfsd \
 }
 else {
-    LIBS += -lfiff
-    LIBS += -lmne
+    LIBS += -lmne \
+            -lfiff \
+            -lfwdrt \
+            -lfs \
 }
 
-
-DESTDIR = $${PWD}/../../lib
-
-#
-# win32: copy dll's to bin dir
-# unix: add lib folder to LD_LIBRARY_PATH
-#
-win32 {
-    FILE = $${DESTDIR}/$${TARGET}.dll
-    BINDIR = $${DESTDIR}/../bin
-    FILE ~= s,/,\\,g
-    BINDIR ~= s,/,\\,g
-    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
-}
+DESTDIR = $${PWD}/../../bin
 
 SOURCES += \
-    fwd.cpp
+    src/main.cpp \
 
-HEADERS +=\
-        fwdrt_global.h \
-    fwd.h
+HEADERS += \
