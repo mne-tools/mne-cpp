@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile to build the core app source connector.
+# @brief    This project file generates the makefile to build the core app.
 #
 #--------------------------------------------------------------------------------------------------------------
 

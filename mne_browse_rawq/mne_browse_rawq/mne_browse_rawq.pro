@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     SourceConnector.pro
+# @file     mne_browse_rawq.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,14 +29,42 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile to build the mne_browse_rawq app and its plugins.
+# @brief    This project file generates the makefile to build the core app source connector.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-TEMPLATE = subdirs
+TEMPLATE = app
 
-SUBDIRS += \
-    mne_browse_rawq \
-#    plugins
+QT += core gui
+QT += widgets
+QT += printsupport
 
-CONFIG += ordered
+TARGET = mne_browse_rawq
+
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
+}
+
+LIBS += -L$${PWD}/../../lib/
+CONFIG(debug, debug|release) {
+    LIBS += -lmned
+    LIBS += -lfiffd
+    LIBS += -lgenericsd
+}
+else {
+    LIBS += -lmne
+    LIBS += -lfiff
+    LIBS += -lgenerics
+}
+
+DESTDIR = $${PWD}/../../bin
+
+SOURCES += main.cpp \
+        mnebrowserawq.cpp \
+        3rdParty/QCustomPlot/qcustomplot.cpp
+
+HEADERS  += \
+        mnebrowserawq.h \
+        3rdParty/QCustomPlot/qcustomplot.h
+
+FORMS    += mnebrowserawq.ui
