@@ -43,6 +43,7 @@ SUBDIRS += \
     readFwd \
     readEpochs \
     computeInverse \
+    realtimeInverse \
 
 contains(Qt3D_available, true) {
     message(Qt3D available: readFwdDisp configured!)

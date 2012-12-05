@@ -73,7 +73,7 @@ MNEForwardSolution::MNEForwardSolution()
 
 //*************************************************************************************************************
 
-MNEForwardSolution::MNEForwardSolution(MNEForwardSolution* p_pMNEForwardSolution)
+MNEForwardSolution::MNEForwardSolution(const MNEForwardSolution* p_pMNEForwardSolution)
 : source_ori(p_pMNEForwardSolution->source_ori)
 , coord_frame(p_pMNEForwardSolution->coord_frame)
 , nsource(p_pMNEForwardSolution->nsource)
