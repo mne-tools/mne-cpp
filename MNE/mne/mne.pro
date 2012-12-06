@@ -50,9 +50,11 @@ CONFIG(debug, debug|release) {
 LIBS += -L$${PWD}/../../lib/
 CONFIG(debug, debug|release) {
     LIBS += -lfiffd
+    LIBS += -lfsd
 }
 else {
     LIBS += -lfiff
+    LIBS += -lfs
 }
 
 

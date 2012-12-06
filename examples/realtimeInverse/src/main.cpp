@@ -43,7 +43,6 @@
 #include <vector>
 
 #include "../../../MNE/mne/mne.h"
-#include "../../../MNE/fwd/fwd.h"
 #include "../../../MNE/fs/annotation.h"
 
 
@@ -64,7 +63,6 @@
 //=============================================================================================================
 
 using namespace MNELIB;
-using namespace FWDLIB;
 using namespace FSLIB;
 
 
@@ -104,8 +102,6 @@ int main(int argc, char *argv[])
 
     MNEForwardSolution* t_pFwdClustered = NULL;
 
-
-
     QString t_sLHAnnotFileName = "./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot";
     Annotation* t_pLHAnnotation= new Annotation(t_sLHAnnotFileName);
 
@@ -113,7 +109,7 @@ int main(int argc, char *argv[])
     QString t_sRHAnnotFileName = "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot";
     Annotation* t_pRHAnnotation= new Annotation(t_sRHAnnotFileName);
 
-    Fwd::clusterFwd(t_pFwd, t_pFwdClustered, t_pLHAnnotation, t_pRHAnnotation, 40);
+    t_pFwd->cluster_forward_solution(t_pFwdClustered, t_pLHAnnotation, t_pRHAnnotation, 40);
 
     delete t_pFile;
     delete t_pFwd;
