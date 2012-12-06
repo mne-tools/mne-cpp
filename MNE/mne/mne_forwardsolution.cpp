@@ -158,13 +158,17 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
             -0.00684932810334806, 1.53263030828475, -0.769665913753682,
             0.371378812760058, -0.225584402271252, 1.11735613881447;
 
-    std::cout << test;
+    std::cout << test << std::endl;
 
-    MatrixXd means(3,2);
+    MatrixXd means;
+
+    means = MatrixXd::Zero(2,3);
 
 
     KMeans testK(test, means);
 
+
+    std::cout << "Means:\n" << testK.means << std::endl;
 
 
 
