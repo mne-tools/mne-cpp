@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     fwdrt.pro
+# @file     fwd.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the fwdr library.
+# @brief    This project file builds the fwd library.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -39,9 +39,9 @@ TEMPLATE = lib
 
 QT       -= gui
 
-DEFINES += FWDRT_LIBRARY
+DEFINES += FWD_LIBRARY
 
-TARGET = fwdrt
+TARGET = fwd
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -76,5 +76,5 @@ SOURCES += \
     fwd.cpp
 
 HEADERS +=\
-        fwdrt_global.h \
+        fwd_global.h \
     fwd.h

@@ -73,7 +73,9 @@ win32 {
 }
 
 
-SOURCES += annotation.cpp
+SOURCES += annotation.cpp \
+    colortable.cpp
 
 HEADERS += annotation.h\
-        fs_global.h
+        fs_global.h \
+    colortable.h

@@ -1,16 +1,17 @@
 #ifndef FWD_H
 #define FWD_H
 
-#include "fwdrt_global.h"
-#include "../../MNE/mne/mne.h"
+#include "fwd_global.h"
 
+#include "../mne/mne.h"
+#include "../fs/annotation.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE FWDRTLIB
+// DEFINE NAMESPACE FWDLIB
 //=============================================================================================================
 
-namespace FWDRTLIB
+namespace FWDLIB
 {
 
 //*************************************************************************************************************
@@ -19,6 +20,7 @@ namespace FWDRTLIB
 //=============================================================================================================
 
 using namespace MNELIB;
+using namespace FSLIB;
 
 
 //*************************************************************************************************************
@@ -27,12 +29,13 @@ using namespace MNELIB;
 //=============================================================================================================
 
 
-class FWDRTSHARED_EXPORT Fwd
+class FWDSHARED_EXPORT Fwd
 {
 public:
     Fwd();
 
-    static bool clusterRois(const MNEForwardSolution* p_fwdIn, MNEForwardSolution* p_fwdOut, qint32 p_iClusterSize);
+    static bool clusterFwd( const MNEForwardSolution* p_fwdIn, MNEForwardSolution* p_fwdOut,
+                            Annotation* p_pLHAnnotation, Annotation* p_pRHAnnotation, qint32 p_iClusterSize);
 
 };
 

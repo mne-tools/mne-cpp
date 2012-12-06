@@ -40,7 +40,7 @@ TEMPLATE = subdirs
 SUBDIRS += generics \
     fiff \
     mne \
-    fwdrt \
+    fwd \
     invrt \
     fs
 
