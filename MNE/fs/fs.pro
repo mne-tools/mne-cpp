@@ -47,17 +47,6 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-LIBS += -L$${PWD}/../../lib/
-CONFIG(debug, debug|release) {
-    LIBS += -lfiffd
-    LIBS += -lmned
-}
-else {
-    LIBS += -lfiff
-    LIBS += -lmne
-}
-
-
 DESTDIR = $${PWD}/../../lib
 
 #

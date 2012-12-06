@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     realtimeInverse.pro
+# @file     mne_math.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -18,7 +18,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
@@ -29,42 +29,39 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    ToDo Documentation...
+# @brief    This project file builds the mne_math library.
 #
 #--------------------------------------------------------------------------------------------------------------
 
 include(../../mne-cpp.pri)
 
-TEMPLATE = app
+TEMPLATE = lib
 
-VERSION = $${MNE_CPP_VERSION}
+QT       -= gui
 
-QT -= gui
+DEFINES += MNE_MATH_LIBRARY
 
-CONFIG   += console
-CONFIG   -= app_bundle
-
-TARGET = realtimeInverse
+TARGET = mne_math
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-LIBS += -L$${PWD}/../../lib/
-CONFIG(debug, debug|release) {
-    LIBS += -lmned \
-            -lfiffd \
-            -lfsd \
+DESTDIR = $${PWD}/../../lib
+
+#
+# win32: copy dll's to bin dir
+# unix: add lib folder to LD_LIBRARY_PATH
+#
+win32 {
+    FILE = $${DESTDIR}/$${TARGET}.dll
+    BINDIR = $${DESTDIR}/../bin
+    FILE ~= s,/,\\,g
+    BINDIR ~= s,/,\\,g
+    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
 }
-else {
-    LIBS += -lmne \
-            -lfiff \
-            -lfs \
-}
 
-DESTDIR = $${PWD}/../../bin
+SOURCES += kmeans.cpp
 
-SOURCES += \
-    src/main.cpp \
-
-HEADERS += \
+HEADERS += kmeans.h\
+        mne_math_global.h

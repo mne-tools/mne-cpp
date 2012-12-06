@@ -39,9 +39,10 @@ TEMPLATE = subdirs
 
 SUBDIRS += generics \
     fiff \
+    fs \
+    mne_math \
     mne \
     invrt \
-    fs
 
 contains(Qt3D_available, true) {
     message(Qt3D available: disp library configured!)

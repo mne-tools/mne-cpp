@@ -51,10 +51,12 @@ LIBS += -L$${PWD}/../../lib/
 CONFIG(debug, debug|release) {
     LIBS += -lfiffd
     LIBS += -lfsd
+    LIBS += -lmne_mathd
 }
 else {
     LIBS += -lfiff
     LIBS += -lfs
+    LIBS += -lmne_math
 }
 
 
