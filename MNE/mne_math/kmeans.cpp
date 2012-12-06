@@ -40,6 +40,7 @@
 
 #include "kmeans.h"
 #include <math.h>
+#include <iostream>
 
 
 //*************************************************************************************************************
@@ -61,8 +62,8 @@ KMeans::KMeans(MatrixXd &ddata, MatrixXd &mmeans)
 , kk(mmeans.rows())
 , data(ddata)
 , means(mmeans)
-, assign(nn)
-, count(kk)
+, assign(VectorXi::Zero(nn))
+, count(VectorXi::Zero(kk))
 {
     estep();
     mstep();
@@ -83,7 +84,10 @@ int KMeans::estep() {
         for (k=0;k<kk;k++)
         {
             for (d=0.,m=0; m<mm; m++)
-                d += sqrt(data(n,m)-means(k,m));
+            {
+                std::cout << data(n,m) << " " << means(k,m) << std::endl;
+                d += sqrt(abs(data(n,m) - means(k,m)));
+            }
             if (d < dmin)
             {
                 dmin = d;
