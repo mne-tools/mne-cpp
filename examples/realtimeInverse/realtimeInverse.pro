@@ -54,13 +54,13 @@ LIBS += -L$${PWD}/../../lib/
 CONFIG(debug, debug|release) {
     LIBS += -lmned \
             -lfiffd \
-            -lfwdrtd \
+            -lfwdd \
             -lfsd \
 }
 else {
     LIBS += -lmne \
             -lfiff \
-            -lfwdrt \
+            -lfwd \
             -lfs \
 }
 

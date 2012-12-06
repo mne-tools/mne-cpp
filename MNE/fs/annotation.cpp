@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 #include "annotation.h"
+#include "colortable.h"
 
 
 //*************************************************************************************************************
@@ -47,7 +48,11 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QDebug>
 #include <QFile>
+#include <QDataStream>
+
+#include <iostream>
 
 
 //*************************************************************************************************************
@@ -63,8 +68,26 @@ using namespace FSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Annotation::Annotation()
+Annotation::Annotation(QString& t_sFileName)
+: m_sFileName(t_sFileName)
+, m_pVertices(NULL)
+, m_pLabel(NULL)
+, m_pColortable(NULL)
 {
+    read_annotation(m_sFileName);
+}
+
+
+//*************************************************************************************************************
+
+Annotation::~Annotation()
+{
+    if(m_pVertices)
+        delete m_pVertices;
+    if(m_pLabel)
+        delete m_pLabel;
+    if(m_pColortable)
+        delete m_pColortable;
 }
 
 
@@ -72,109 +95,143 @@ Annotation::Annotation()
 
 void Annotation::read_annotation(QString& t_sFileName)
 {
+    printf("Reading annotation...\n");
     QFile t_File(t_sFileName);
 
-//    fp = fopen(filename, 'r', 'b');
+    if (!t_File.open(QIODevice::ReadOnly))
+    {
+        printf("\tError: Couldn't open the file\n");
+        return;
+    }
 
-//    verbosity = 1;
-//    if length(varargin)
-//        verbosity       = varargin{1};
-//    end;
+    QDataStream t_Stream(&t_File);
+    t_Stream.setByteOrder(QDataStream::BigEndian);
 
-//    if(fp < 0)
-//       if verbosity, disp('Annotation file cannot be opened'); end;
-//       return;
-//    end
+    qint32 numEl;
+    t_Stream >> numEl;
 
-//    A = fread(fp, 1, 'int');
+    if(m_pVertices)
+        delete m_pVertices;
+    m_pVertices = new VectorXi(numEl);
+    if(m_pLabel)
+        delete m_pLabel;
+    m_pLabel = new VectorXi(numEl);
 
-//    tmp = fread(fp, 2*A, 'int');
-//    vertices = tmp(1:2:end);
-//    label = tmp(2:2:end);
+    for(qint32 i = 0; i < numEl; ++i)
+    {
+        t_Stream >> (*m_pVertices)[i];
+        t_Stream >> (*m_pLabel)[i];
+    }
 
-//    bool = fread(fp, 1, 'int');
-//    if(isempty(bool)) %means no colortable
-//       if verbosity, disp('No Colortable found.'); end;
-//       colortable = struct([]);
-//       fclose(fp);
-//       return;
-//    end
+//    std::cout << "Vertices" << std::endl << m_pVertices->block(0,0,10,1) << std::endl;
+//    std::cout << "Label" << std::endl << m_pLabel->block(0,0,10,1) << std::endl;
 
-//    if(bool)
+    qint32 hasColortable;
+    t_Stream >> hasColortable;
+    if (hasColortable)
+    {
+        if(m_pColortable)
+            delete m_pColortable;
 
-//        %Read colortable
-//        numEntries = fread(fp, 1, 'int');
+        m_pColortable = new Colortable();
 
-//        if(numEntries > 0)
+        //Read colortable
+        qint32 numEntries;
+        t_Stream >> numEntries;
+        qint32 len;
+        if(numEntries > 0)
+        {
 
-//            if verbosity, disp(['Reading from Original Version']); end;
-//            colortable.numEntries = numEntries;
-//            len = fread(fp, 1, 'int');
-//            colortable.orig_tab = fread(fp, len, '*char')';
-//            colortable.orig_tab = colortable.orig_tab(1:end-1);
+            printf("\tReading from Original Version\n");
+            m_pColortable->numEntries = numEntries;
+            t_Stream >> len;
+            QByteArray tmp;
+            tmp.resize(len);
+            t_Stream.readRawData(tmp.data(),len);
+            m_pColortable->orig_tab = tmp;
 
-//            colortable.struct_names = cell(numEntries,1);
-//            colortable.table = zeros(numEntries,5);
-//            for i = 1:numEntries
-//                len = fread(fp, 1, 'int');
-//                colortable.struct_names{i} = fread(fp, len, '*char')';
-//                colortable.struct_names{i} = colortable.struct_names{i}(1:end-1);
-//                colortable.table(i,1) = fread(fp, 1, 'int');
-//                colortable.table(i,2) = fread(fp, 1, 'int');
-//                colortable.table(i,3) = fread(fp, 1, 'int');
-//                colortable.table(i,4) = fread(fp, 1, 'int');
-//                colortable.table(i,5) = colortable.table(i,1) + colortable.table(i,2)*2^8 + colortable.table(i,3)*2^16 + colortable.table(i,4)*2^24;
-//            end
-//            if verbosity
-//                disp(['colortable with ' num2str(colortable.numEntries) ' entries read (originally ' colortable.orig_tab ')']);
-//            end
-//        else
-//            version = -numEntries;
-//            if verbosity
-//              if(version~=2)
-//                disp(['Error! Does not handle version ' num2str(version)]);
-//              else
-//                disp(['Reading from version ' num2str(version)]);
-//              end
-//            end
-//            numEntries = fread(fp, 1, 'int');
-//            colortable.numEntries = numEntries;
-//            len = fread(fp, 1, 'int');
-//            colortable.orig_tab = fread(fp, len, '*char')';
-//            colortable.orig_tab = colortable.orig_tab(1:end-1);
+            for(qint32 i = 0; i < numEntries; ++i)
+                m_pColortable->struct_names.append("");
 
-//            colortable.struct_names = cell(numEntries,1);
-//            colortable.table = zeros(numEntries,5);
+            m_pColortable->table = MatrixXi(numEntries,5);
 
-//            numEntriesToRead = fread(fp, 1, 'int');
-//            for i = 1:numEntriesToRead
-//                structure = fread(fp, 1, 'int')+1;
-//                if (structure < 0)
-//                  if verbosity, disp(['Error! Read entry, index ' num2str(structure)]); end;
-//                end
-//                if(~isempty(colortable.struct_names{structure}))
-//                  if verbosity, disp(['Error! Duplicate Structure ' num2str(structure)]); end;
-//                end
-//                len = fread(fp, 1, 'int');
-//                colortable.struct_names{structure} = fread(fp, len, '*char')';
-//                colortable.struct_names{structure} = colortable.struct_names{structure}(1:end-1);
-//                colortable.table(structure,1) = fread(fp, 1, 'int');
-//                colortable.table(structure,2) = fread(fp, 1, 'int');
-//                colortable.table(structure,3) = fread(fp, 1, 'int');
-//                colortable.table(structure,4) = fread(fp, 1, 'int');
-//                colortable.table(structure,5) = colortable.table(structure,1) + colortable.table(structure,2)*2^8 + colortable.table(structure,3)*2^16 + colortable.table(structure,4)*2^24;
-//            end
-//            if verbosity
-//              disp(['colortable with ' num2str(colortable.numEntries) ' entries read (originally ' colortable.orig_tab ')']);
-//            end
-//        end
-//    else
-//        if verbosity
-//            disp('Error! Should not be expecting bool = 0');
-//        end;
-//    end
+            for(qint32 i = 0; i < numEntries; ++i)
+            {
+                t_Stream >> len;
+                tmp.resize(len);
+                t_Stream.readRawData(tmp.data(),len);
 
-//    fclose(fp);
+                m_pColortable->struct_names[i]= tmp;
 
+                for(qint32 j = 0; j < 4; ++j)
+                    t_Stream >> m_pColortable->table(i,j);
+
+                m_pColortable->table(i,4) = m_pColortable->table(i,0)
+                        + m_pColortable->table(i,1) * 256       //(2^8)
+                        + m_pColortable->table(i,2) * 65536     //(2^16)
+                        + m_pColortable->table(i,3) * 16777216; //(2^24);
+            }
+        }
+        else
+        {
+            qint32 version = -numEntries;
+            if(version != 2)
+                printf("\tError! Does not handle version %d\n", version);
+            else
+                printf("\tReading from version %d\n", version);
+
+            t_Stream >> numEntries;
+            m_pColortable->numEntries = numEntries;
+
+            t_Stream >> len;
+            QByteArray tmp;
+            tmp.resize(len);
+            t_Stream.readRawData(tmp.data(),len);
+            m_pColortable->orig_tab = tmp;
+
+            for(qint32 i = 0; i < numEntries; ++i)
+                m_pColortable->struct_names.append("");
+
+            m_pColortable->table = MatrixXi(numEntries,5);
+
+            qint32 numEntriesToRead;
+            t_Stream >> numEntriesToRead;
+
+            qint32 structure;
+            for(qint32 i = 0; i < numEntriesToRead; ++i)
+            {
+
+                t_Stream >> structure;
+                if (structure < 0)
+                    printf("\tError! Read entry, index %d\n", structure);
+
+                if(!m_pColortable->struct_names.at(structure).isEmpty())
+                    printf("Error! Duplicate Structure %d", structure);
+
+                t_Stream >> len;
+                tmp.resize(len);
+                t_Stream.readRawData(tmp.data(),len);
+
+                m_pColortable->struct_names[structure]= tmp;
+
+                for(qint32 j = 0; j < 4; ++j)
+                    t_Stream >> m_pColortable->table(structure,j);
+
+                m_pColortable->table(structure,4) = m_pColortable->table(structure,0)
+                        + m_pColortable->table(structure,1) * 256       //(2^8)
+                        + m_pColortable->table(structure,2) * 65536     //(2^16)
+                        + m_pColortable->table(structure,3) * 16777216; //(2^24);
+            }
+        }
+        printf("\tcolortable with %d entries read\n\t(originally %s)\n", m_pColortable->numEntries, m_pColortable->orig_tab.toUtf8().constData());
+    }
+    else
+    {
+        printf("\tError! No colortable stored\n");
+    }
+
+    printf("[done]\n");
+
+    t_File.close();
 }
 

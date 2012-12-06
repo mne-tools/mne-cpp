@@ -43,7 +43,7 @@
 #include <vector>
 
 #include "../../../MNE/mne/mne.h"
-#include "../../../MNE/fwdrt/fwd.h"
+#include "../../../MNE/fwd/fwd.h"
 #include "../../../MNE/fs/annotation.h"
 
 
@@ -64,7 +64,7 @@
 //=============================================================================================================
 
 using namespace MNELIB;
-using namespace FWDRTLIB;
+using namespace FWDLIB;
 using namespace FSLIB;
 
 
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 
     QFile* t_pFile = new QFile(t_sFileName);
 
-    if(!MNE::read_forward_solution(t_pFile, t_pFwd))
+    if(!MNEForwardSolution::read_forward_solution(t_pFile, t_pFwd))
     {
         delete t_pFile;
         if(t_pFwd)
@@ -104,17 +104,16 @@ int main(int argc, char *argv[])
 
     MNEForwardSolution* t_pFwdClustered = NULL;
 
-    Annotation* t_pLHAnnotation= new Annotation();
-
-    QString t_sAnnotFileName = "./MNE-sample-data/subjects/sample/lh.aparc.a2009s.annot";
-
-    t_pLHAnnotation->read_annotation(t_sAnnotFileName);
 
 
-    Fwd::clusterRois(t_pFwd, t_pFwdClustered, 40);
+    QString t_sLHAnnotFileName = "./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot";
+    Annotation* t_pLHAnnotation= new Annotation(t_sLHAnnotFileName);
 
 
+    QString t_sRHAnnotFileName = "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot";
+    Annotation* t_pRHAnnotation= new Annotation(t_sRHAnnotFileName);
 
+    Fwd::clusterFwd(t_pFwd, t_pFwdClustered, t_pLHAnnotation, t_pRHAnnotation, 40);
 
     delete t_pFile;
     delete t_pFwd;
