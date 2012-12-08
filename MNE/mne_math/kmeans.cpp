@@ -251,10 +251,9 @@ void KMeans::calculate(    MatrixXd X, qint32 kClusters,
             C = MatrixXd::Zero(k,p);
             for(qint32 i = 0; i < k; ++i)
                 C.block(i,0,1,p) = X.block(rand() % n, 0, 1, p);
-//            C.block(0,0,1,p) = X.block(1, 0, 1, p);
-//            C.block(1,0,1,p) = X.block(4, 0, 1, p);
-
-        std::cout << "C" << std::endl << C << std::endl;
+//            C.block(0,0,1,p) = X.block(2, 0, 1, p);
+//            C.block(1,0,1,p) = X.block(7, 0, 1, p);
+//            std::cout << "C" << std::endl << C << std::endl;
         }
     //    else if (start.compare("cluster") == 0)
     //    {
@@ -639,7 +638,7 @@ bool KMeans::onlineUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx)
                 for(qint32 j = 0; j < Xsorted.cols(); ++j)
                     std::sort(Xsorted.col(j).data(),Xsorted.col(j).data()+Xsorted.rows());
 
-
+//                std::cout << "Xsorted" << std::endl << Xsorted << std::endl;
 
                 qint32 nn = floor(0.5*m[i])-1;
                 if ((m[i] % 2) == 0)
@@ -657,6 +656,10 @@ bool KMeans::onlineUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx)
                     Xmid1.row(i) = Xsorted.row(0);
                     Xmid2.row(i) = Xsorted.row(0);
                 }
+
+//                std::cout << "Xmid1" << std::endl << Xmid1 << std::endl;
+//                std::cout << "Xmid2" << std::endl << Xmid2 << std::endl;
+
             }
         }
     }
@@ -724,6 +727,7 @@ bool KMeans::onlineUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx)
                     MatrixXd ldist = Xmid1.row(i).replicate(n,1) - X;
                     MatrixXd rdist = X - Xmid2.row(i).replicate(n,1);
                     VectorXd mbrs = VectorXd::Zero(idx.rows());
+
                     for(qint32 l = 0; l < idx.rows(); ++l)
                         if(idx[l] == i)
                             mbrs[l] = 1;
@@ -732,12 +736,13 @@ bool KMeans::onlineUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx)
 
                     for(qint32 l = 0; l < idx.rows(); ++l)
                     {
-                        double sum;
+                        double sum = 0;
                         for(qint32 h = 0; h < rdist.cols(); ++h)
                             sum += rdist(l,h) > ldist(l,h) ? rdist(l,h) < 0 ? 0 : rdist(l,h) : ldist(l,h) < 0 ? 0 : ldist(l,h);
                         Del(l,i) = sum;
                     }
 //                    Del(:,i) = sum(max(0, max(sgn.*rdist, sgn.*ldist)), 2);
+
                 }
                 else
                 {
@@ -786,6 +791,7 @@ bool KMeans::onlineUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx)
         previdx = idx;
         prevtotsumD = totsumD;
 
+
     //    [minDel, nidx] = min(Del, [], 2);
         VectorXi nidx = VectorXi::Zero(Del.rows());
         VectorXd minDel = VectorXd::Zero(Del.rows());
@@ -804,6 +810,7 @@ bool KMeans::onlineUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx)
             }
         }
         moved.conservativeResize(count);
+
     //    moved = find(previdx ~= nidx);
         if (moved.sum() > 0) //~isempty(moved)
         {
@@ -821,6 +828,9 @@ bool KMeans::onlineUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx)
             moved_new.conservativeResize(count);
             moved = moved_new;
         }
+
+        std::cout << "moved" << std::endl << moved << std::endl;
+
         if (moved.rows() <= 0)
         {
             // Count an iteration if phase 2 did nothing at all, or if we're
@@ -848,6 +858,10 @@ bool KMeans::onlineUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx)
 
         moved[0] = moved_new.minCoeff() % n;//+1
         moved.conservativeResize(1);
+
+
+//        std::cout << "moved" << std::endl << moved << std::endl;
+
 
         // If we've gone once through all the points, that's an iteration
         if (moved[0] <= lastmoved)
