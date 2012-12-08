@@ -1,7 +1,20 @@
 #ifndef KMEANS_H
 #define KMEANS_H
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
 #include "mne_math_global.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QString>
 
 
 //*************************************************************************************************************
@@ -31,22 +44,85 @@ using namespace Eigen;
 class MNE_MATHSHARED_EXPORT KMeans
 {
 public:
-    KMeans(MatrixXd &ddata, MatrixXd &mmeans);
+//    KMeans(MatrixXd &ddata, MatrixXd &mmeans);
 
-    int estep();
+//    int estep();
 
-    void mstep();
+//    void mstep();
 
 
-    int nn;
-    int mm;
-    int kk;
-    int nchg;
+//    int nn;
+//    int mm;
+//    int kk;
+//    int nchg;
 
-    MatrixXd data;
-    MatrixXd means;
-    VectorXi assign;
-    VectorXi count;
+//    MatrixXd data;
+//    MatrixXd means;
+//    VectorXi assign;
+//    VectorXi count;
+
+
+
+    //distance {'sqeuclidean','cityblock','cosine','correlation','hamming'};
+    //startNames = {'uniform','sample','cluster'};
+    //emptyactNames = {'error','drop','singleton'};
+
+    KMeans(QString &distance = QString("sqeuclidean") , QString &start = QString("sample"), qint32 replicates = 1, QString& emptyact = QString("error"), qint32 maxit = 100, bool online = true);
+
+
+
+    void calculate(    MatrixXd X, qint32 kClusters,
+                        VectorXi& idx, MatrixXd& C, VectorXd& sumD, MatrixXd& D);
+
+
+
+
+
+
+
+//private:
+    MatrixXd distfun(MatrixXd& X, MatrixXd& C, qint32 iter);
+
+    bool batchUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx);
+
+
+    void gcentroids(MatrixXd& X, VectorXi& index, VectorXi& clusts,
+                                        MatrixXd& centroids, VectorXi& counts);
+
+
+    bool onlineUpdate(MatrixXd& X, MatrixXd& C,  VectorXi& idx);
+
+
+    QString m_sDistance;
+    QString m_sStart;
+
+    qint32 m_iReps;
+
+    QString m_sEmptyact;
+
+    qint32 m_iMaxit;
+
+    bool m_bOnline;
+
+
+private:
+    qint32 iter;
+    qint32 k;
+    qint32 n;
+    qint32 p;
+
+    MatrixXd Del;
+
+    VectorXd d;
+
+    VectorXi m;
+
+    double totsumD;
+
+    double prevtotsumD;
+
+    VectorXi previdx;
+
 };
 
 } // NAMESPACE
