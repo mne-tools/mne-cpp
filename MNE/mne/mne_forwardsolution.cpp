@@ -160,17 +160,24 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
 
     std::cout << test << std::endl;
 
-    MatrixXd means;
-
-    means = MatrixXd::Zero(2,3);
-
-
-    KMeans testK(test, means);
+//    MatrixXd means;
+//    means = MatrixXd::Zero(2,3);
+//    KMeans testK(test, means);
+//    std::cout << "Means:\n" << testK.means << std::endl;
 
 
-    std::cout << "Means:\n" << testK.means << std::endl;
+    VectorXi idx;
+    MatrixXd ctrs;
+    VectorXd sumd;
+    MatrixXd D;
+
+    KMeans testK(QString("cityblock"), QString("sample"), 5);
+
+    testK.calculate(test, 2, idx, ctrs, sumd, D);
 
 
+
+    std::cout << "ctrs" << ctrs << std::endl;
 
 
 
@@ -201,7 +208,7 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
             if (label[i] != 0)
             {
                 QString curr_name = t_pCurrentColorTable->struct_names[i];//obj.label2AtlasName(label(i));
-                printf("\tCluster %d / %d %s\n", i+1, label.rows(), curr_name.toUtf8().constData());
+//                printf("\tCluster %d / %d %s\n", i+1, label.rows(), curr_name.toUtf8().constData());
 
 //                    if h == 1
 //                        curr_name = [curr_name(1,1).names{1,1} ' left hemisphere'];

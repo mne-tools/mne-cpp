@@ -42,8 +42,8 @@
 #include <iostream>
 #include <vector>
 
-#include "../../../MNE/mne/mne.h"
-#include "../../../MNE/fs/annotation.h"
+#include "../MNE/mne/mne.h"
+#include "../MNE/fs/annotation.h"
 
 
 //*************************************************************************************************************
@@ -80,6 +80,7 @@ using namespace FSLIB;
 * @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
 * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
 */
+
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
@@ -98,7 +99,21 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    qDebug() << "ToDo....\n";
+    //Cluster the forward solution
+
+    MNEForwardSolution* t_pFwdClustered = NULL;
+
+    QString t_sLHAnnotFileName = "./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot";
+    Annotation* t_pLHAnnotation= new Annotation(t_sLHAnnotFileName);
+
+
+    QString t_sRHAnnotFileName = "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot";
+    Annotation* t_pRHAnnotation= new Annotation(t_sRHAnnotFileName);
+
+    t_pFwd->cluster_forward_solution(t_pFwdClustered, t_pLHAnnotation, t_pRHAnnotation, 40);
+
+
+
 
 
 
@@ -112,5 +127,4 @@ int main(int argc, char *argv[])
 //=============================================================================================================
 // STATIC DEFINITIONS
 //=============================================================================================================
-
 
