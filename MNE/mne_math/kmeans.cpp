@@ -92,7 +92,6 @@ KMeans::KMeans(QString &distance, QString &start, qint32 replicates, QString& em
 bool KMeans::calculate(    MatrixXd X, qint32 kClusters,
                             VectorXi& idx, MatrixXd& C, VectorXd& sumD, MatrixXd& D)
 {
-
 // n points in p dimensional space
     k = kClusters;
     n = X.rows();
@@ -175,12 +174,11 @@ bool KMeans::calculate(    MatrixXd X, qint32 kClusters,
         else if (m_sStart.compare("sample") == 0)
         {
             C = MatrixXd::Zero(k,p);
-//            for(qint32 i = 0; i < k; ++i)
-//                C.block(i,0,1,p) = X.block(rand() % n, 0, 1, p);
-
-            C.block(0,0,1,p) = X.block(2, 0, 1, p);
-            C.block(1,0,1,p) = X.block(7, 0, 1, p);
-
+            for(qint32 i = 0; i < k; ++i)
+                C.block(i,0,1,p) = X.block(rand() % n, 0, 1, p);
+//            C.block(0,0,1,p) = X.block(2, 0, 1, p);
+//            C.block(1,0,1,p) = X.block(7, 0, 1, p);
+//            C.block(2,0,1,p) = X.block(17, 0, 1, p);
         }
     //    else if (start.compare("cluster") == 0)
     //    {
@@ -320,7 +318,6 @@ bool KMeans::calculate(    MatrixXd X, qint32 kClusters,
 
 bool KMeans::batchUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx)
 {
-
     // Every point moved, every cluster will need an update
     qint32 i = 0;
     VectorXi moved(n);
@@ -335,10 +332,12 @@ bool KMeans::batchUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx)
 
     prevtotsumD = std::numeric_limits<double>::max();//max double
 
+
+    MatrixXd D = MatrixXd::Zero(X.rows(), k);
+
     //
     // Begin phase one:  batch reassignments
     //
-
     iter = 0;
     bool converged = false;
     while(true)
@@ -350,11 +349,14 @@ bool KMeans::batchUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx)
         MatrixXd C_new;
         VectorXi m_new;
         KMeans::gcentroids(X, idx, changed, C_new, m_new);
-        C.block(0,0,k,C.cols()) = C_new;
-        m.block(0,0,k,1) = m_new;
+        MatrixXd D_new = distfun(X, C_new, iter);
 
-        MatrixXd C_changed = C.block(0,0,k,C.cols());
-        MatrixXd D = distfun(X, C_changed, iter);
+        for(qint32 i = 0; i < changed.rows(); ++i)
+        {
+            C.row(changed[i]) = C_new.row(i);
+            D.col(changed[i]) = D_new.col(i);
+            m[changed[i]] = m_new[i];
+        }
 
         // Deal with clusters that have just lost all their members
         VectorXi empties = VectorXi::Zero(changed.rows());
@@ -466,6 +468,7 @@ bool KMeans::batchUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx)
             moved_new.conservativeResize(count);
             moved = moved_new;
         }
+
         if (moved.rows() == 0)
         {
             converged = true;
@@ -490,9 +493,9 @@ bool KMeans::batchUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx)
         tmp.resize( it - tmp.begin() );
 
         changed.conservativeResize(tmp.size());
+
         for(quint32 i = 0; i < tmp.size(); ++i)
             changed[i] = tmp[i];
-
     } // phase one
     return converged;
 } // nested function
