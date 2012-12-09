@@ -69,6 +69,8 @@ private:
 
     bool onlineUpdate(MatrixXd& X, MatrixXd& C,  VectorXi& idx);
 
+    double unifrnd(double a, double b);
+
 
     QString m_sDistance;
     QString m_sStart;
