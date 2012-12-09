@@ -171,7 +171,7 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
     VectorXd sumd;
     MatrixXd D;
 
-    KMeans testK(QString("cityblock"), QString("uniform"), 5);//QString("sample")
+    KMeans testK(QString("sqeuclidean"), QString("sample"), 5);//QString("sample")
 
     testK.calculate(test, 2, idx, ctrs, sumd, D);
 

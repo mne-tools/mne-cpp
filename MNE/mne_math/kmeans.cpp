@@ -165,23 +165,22 @@ bool KMeans::calculate(    MatrixXd X, qint32 kClusters,
             for(qint32 i = 0; i < k; ++i)
                 for(qint32 j = 0; j < p; ++j)
                     C(i,j) = unifrnd(Xmins[j], Xmaxs[j]);
-
-//            // For 'cosine' and 'correlation', these are uniform inside a subset
-//            // of the unit hypersphere.  Still need to center them for
-//            // 'correlation'.  (Re)normalization for 'cosine'/'correlation' is
-//            // done at each iteration.
-//            if isequal(distance, 'correlation')
+            // For 'cosine' and 'correlation', these are uniform inside a subset
+            // of the unit hypersphere.  Still need to center them for
+            // 'correlation'.  (Re)normalization for 'cosine'/'correlation' is
+            // done at each iteration.
+//            if (m_sDistance.compare("correlation") == 0)
 //                C = C - repmat(mean(C,2),1,p);
-//            end
-//            if isa(X,'single')
-//                C = single(C);
-//            end
         }
         else if (m_sStart.compare("sample") == 0)
         {
             C = MatrixXd::Zero(k,p);
-            for(qint32 i = 0; i < k; ++i)
-                C.block(i,0,1,p) = X.block(rand() % n, 0, 1, p);
+//            for(qint32 i = 0; i < k; ++i)
+//                C.block(i,0,1,p) = X.block(rand() % n, 0, 1, p);
+
+            C.block(0,0,1,p) = X.block(2, 0, 1, p);
+            C.block(1,0,1,p) = X.block(7, 0, 1, p);
+
         }
     //    else if (start.compare("cluster") == 0)
     //    {
@@ -594,14 +593,25 @@ bool KMeans::onlineUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx)
 
         if (m_sDistance.compare("sqeuclidean") == 0)
         {
-//            for i = changed
-//                mbrs = (idx == i);
-//                sgn = 1 - 2*mbrs; % -1 for members, 1 for nonmembers
-//                if m(i) == 1
-//                    sgn(mbrs) = 0; % prevent divide-by-zero for singleton mbrs
-//                end
-//                Del(:,i) = (m(i) ./ (m(i) + sgn)) .* sum((X - C(repmat(i,n,1),:)).^2, 2);
-//            end
+            for(qint32 j = 0; j < changed.rows(); ++j)
+            {
+                qint32 i = changed[j];
+                VectorXi mbrs = VectorXi::Zero(idx.rows());
+                for(qint32 l = 0; l < idx.rows(); ++l)
+                    if(idx[l] == i)
+                        mbrs[l] = 1;
+
+                VectorXi sgn = 1 - 2 * mbrs.array(); // -1 for members, 1 for nonmembers
+
+                if (m[i] == 1)
+                    for(qint32 l = 0; l < mbrs.rows(); ++l)
+                        if(mbrs[l])
+                            sgn[l] = 0; // prevent divide-by-zero for singleton mbrs
+
+                Del.col(i) = ((double)m[i] / ((double)m[i] + sgn.cast<double>().array()));
+
+                Del.col(i).array() *= (X - C.row(i).replicate(n,1)).array().pow(2).rowwise().sum().array();
+            }
         }
         else if (m_sDistance.compare("cityblock") == 0)
         {
@@ -754,8 +764,8 @@ bool KMeans::onlineUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx)
 
         if (m_sDistance.compare("sqeuclidean") == 0)
         {
-//            C(nidx,:) = C(nidx,:) + (X(moved,:) - C(nidx,:)) / m(nidx);
-//            C(oidx,:) = C(oidx,:) - (X(moved,:) - C(oidx,:)) / m(oidx);
+            C.row(nidx[0]) = C.row(nidx[0]).array() + (X.row(moved[0]) - C.row(nidx[0])).array() / m[nidx[0]];
+            C.row(oidx) = C.row(oidx).array() - (X.row(moved[0]) - C.row(oidx)).array() / m[oidx];
         }
         else if (m_sDistance.compare("cityblock") == 0)
         {
@@ -839,17 +849,17 @@ MatrixXd KMeans::distfun(MatrixXd& X, MatrixXd& C, qint32 iter)
     MatrixXd D = MatrixXd::Zero(n,C.rows());
     qint32 nclusts = C.rows();
 
-//    if (m_sDistance.compare("sqeuclidean") == 0)
-//    {
-//    for i = 1:nclusts
-//        D(:,i) = (X(:,1) - C(i,1)).^2;
-//        for j = 2:p
-//            D(:,i) = D(:,i) + (X(:,j) - C(i,j)).^2;
-//        end
-//        % D(:,i) = sum((X - C(repmat(i,n,1),:)).^2, 2);
-//    end
-//    }
-    /*else*/ if (m_sDistance.compare("cityblock") == 0)
+    if (m_sDistance.compare("sqeuclidean") == 0)
+    {
+        for(qint32 i = 0; i < nclusts; ++i)
+        {
+            D.col(i) = (X.col(0).array() - C(i,0)).pow(2);
+
+            for(qint32 j = 1; j < p; ++j)
+                D.col(i) = D.col(i).array() + (X.col(j).array() - C(i,j)).pow(2);
+        }
+    }
+    else if (m_sDistance.compare("cityblock") == 0)
     {
         for(qint32 i = 0; i < nclusts; ++i)
         {
@@ -914,11 +924,16 @@ void KMeans::gcentroids(MatrixXd& X, VectorXi& index, VectorXi& clusts,
         if (c > 0)
         {
             counts[i] = c;
-//            if(m_sDistance.compare("sqeuclidean") == 0)
-//            {
-//                centroids(i,:) = sum(X(members,:),1) / counts(i);
-//            }
-            /*else*/ if(m_sDistance.compare("cityblock") == 0)
+            if(m_sDistance.compare("sqeuclidean") == 0)
+            {
+                //Initialize
+                if(members.rows() > 0)
+                    centroids.row(i) = RowVectorXd::Zero(centroids.cols());
+
+                for(qint32 j = 0; j < members.rows(); ++j)
+                    centroids.row(i).array() += X.row(members[j]).array() / counts[i];
+            }
+            else if(m_sDistance.compare("cityblock") == 0)
             {
                 // Separate out sorted coords for points in i'th cluster,
                 // and use to compute a fast median, component-wise
