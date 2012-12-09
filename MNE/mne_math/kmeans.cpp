@@ -126,23 +126,23 @@ bool KMeans::calculate(    MatrixXd X, qint32 kClusters,
 //        end
 //    }
 
-//# Start
-//    if (start.compare('uniform') == 0)
-//    {
-//        if (distance.compare('hamming') == 0)
-//        {
-//            printf('Error:kmeans:UniformStartForHamm\n');
-//            return;
-//        }
-//        Xmins = min(X,[],1);
-//        Xmaxs = max(X,[],1);
-//    }
+    // Start
+    RowVectorXd Xmins;
+    RowVectorXd Xmaxs;
+    if (m_sStart.compare("uniform") == 0)
+    {
+        if (m_sDistance.compare("hamming") == 0)
+        {
+            printf("Error: Uniform Start For Hamming\n");
+            return false;
+        }
+        Xmins = X.colwise().minCoeff();
+        Xmaxs = X.colwise().maxCoeff();
+    }
 
-//
-// Done with input argument processing, begin clustering
-//
-
-    //dispfmt = '%6d\t%6d\t%8d\t%12g';
+    //
+    // Done with input argument processing, begin clustering
+    //
     if (m_bOnline)
     {
         Del = MatrixXd(n,k);
@@ -159,21 +159,25 @@ bool KMeans::calculate(    MatrixXd X, qint32 kClusters,
 
     for(qint32 rep = 0; rep < m_iReps; ++rep)
     {
-    //    if (start.compare('uniform') == 0)
-    //    {
-    //        C = unifrnd(Xmins(ones(k,1),:), Xmaxs(ones(k,1),:));
-    //        % For 'cosine' and 'correlation', these are uniform inside a subset
-    //        % of the unit hypersphere.  Still need to center them for
-    //        % 'correlation'.  (Re)normalization for 'cosine'/'correlation' is
-    //        % done at each iteration.
-    //        if isequal(distance, 'correlation')
-    //            C = C - repmat(mean(C,2),1,p);
-    //        end
-    //        if isa(X,'single')
-    //            C = single(C);
-    //        end
-    //    }
-        /*else*/ if (m_sStart.compare("sample") == 0)
+        if (m_sStart.compare("uniform") == 0)
+        {
+            C = MatrixXd::Zero(k,p);
+            for(qint32 i = 0; i < k; ++i)
+                for(qint32 j = 0; j < p; ++j)
+                    C(i,j) = unifrnd(Xmins[j], Xmaxs[j]);
+
+//            // For 'cosine' and 'correlation', these are uniform inside a subset
+//            // of the unit hypersphere.  Still need to center them for
+//            // 'correlation'.  (Re)normalization for 'cosine'/'correlation' is
+//            // done at each iteration.
+//            if isequal(distance, 'correlation')
+//                C = C - repmat(mean(C,2),1,p);
+//            end
+//            if isa(X,'single')
+//                C = single(C);
+//            end
+        }
+        else if (m_sStart.compare("sample") == 0)
         {
             C = MatrixXd::Zero(k,p);
             for(qint32 i = 0; i < k; ++i)
@@ -951,3 +955,21 @@ void KMeans::gcentroids(MatrixXd& X, VectorXi& index, VectorXi& clusts,
         }
     }
 }// function
+
+
+//*************************************************************************************************************
+
+double KMeans::unifrnd(double a, double b)
+{
+    if (a > b)
+        return std::numeric_limits<double>::quiet_NaN();
+
+    double a2 = a/2.0;
+    double b2 = b/2.0;
+    double mu = a2+b2;
+    double sig = b2-a2;
+
+    double r = mu + sig * (2.0* (rand() % 1000)/1000 -1.0);
+
+    return r;
+}

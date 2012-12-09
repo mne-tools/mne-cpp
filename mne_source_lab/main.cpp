@@ -112,11 +112,6 @@ int main(int argc, char *argv[])
 
     t_pFwd->cluster_forward_solution(t_pFwdClustered, t_pLHAnnotation, t_pRHAnnotation, 40);
 
-
-
-
-
-
     delete t_pFile;
     delete t_pFwd;
 
