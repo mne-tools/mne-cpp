@@ -171,10 +171,9 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
     VectorXd sumd;
     MatrixXd D;
 
-    KMeans testK(QString("sqeuclidean"), QString("sample"), 5);//QString("sample")
+    KMeans testK(QString("cityblock"), QString("sample"), 5);//QString("sqeuclidean")//QString("sample")
 
-    testK.calculate(test, 3, idx, ctrs, sumd, D);
-
+    testK.calculate(test, 4, idx, ctrs, sumd, D);
 
     std::cout << "idx" << std::endl << idx << std::endl;
     std::cout << "ctrs" << std::endl << ctrs << std::endl;

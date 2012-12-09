@@ -92,13 +92,16 @@ KMeans::KMeans(QString &distance, QString &start, qint32 replicates, QString& em
 bool KMeans::calculate(    MatrixXd X, qint32 kClusters,
                             VectorXi& idx, MatrixXd& C, VectorXd& sumD, MatrixXd& D)
 {
+    if (kClusters < 1)
+        return false;
+
 // n points in p dimensional space
     k = kClusters;
     n = X.rows();
     p = X.cols();
 
-//    if(distance.compare('cosine') == 0)
-//    {
+    if(m_sDistance.compare("cosine") == 0)
+    {
 //        Xnorm = sqrt(sum(X.^2, 2));
 //        if any(min(Xnorm) <= eps(max(Xnorm)))
 //            error(['Some points have small relative magnitudes, making them ', ...
@@ -106,19 +109,20 @@ bool KMeans::calculate(    MatrixXd X, qint32 kClusters,
 //                   'distance other than ''cosine''.']);
 //        end
 //        X = X ./ Xnorm(:,ones(1,p));
-//    }
-//    else if(distance.compare('correlation')==0)
-//    {
-//        X = X - repmat(mean(X,2),1,p);
-//        Xnorm = sqrt(sum(X.^2, 2));
+    }
+    else if(m_sDistance.compare("correlation")==0)
+    {
+
+        X.array() -= (X.rowwise().sum().array() / (double)p).replicate(1,p); //X - X.rowwise().sum();//.repmat(mean(X,2),1,p);
+        MatrixXd Xnorm = (X.array().pow(2).rowwise().sum()).sqrt();//sqrt(sum(X.^2, 2));
 //        if any(min(Xnorm) <= eps(max(Xnorm)))
 //            error(['Some points have small relative standard deviations, making them ', ...
 //                   'effectively constant.\nEither remove those points, or choose a ', ...
 //                   'distance other than ''correlation''.']);
 //        end
-//        X = X ./ Xnorm(:,ones(1,p));
-//    }
-//    else if(distance.compare('hamming')==0)
+        X.array() /= Xnorm.replicate(1,p).array();
+    }
+//    else if(m_sDistance.compare('hamming')==0)
 //    {
 //        if ~all(ismember(X(:),[0 1]))
 //            error(message('NonbinaryDataForHamm'));
@@ -168,14 +172,15 @@ bool KMeans::calculate(    MatrixXd X, qint32 kClusters,
             // of the unit hypersphere.  Still need to center them for
             // 'correlation'.  (Re)normalization for 'cosine'/'correlation' is
             // done at each iteration.
-//            if (m_sDistance.compare("correlation") == 0)
-//                C = C - repmat(mean(C,2),1,p);
+            if (m_sDistance.compare("correlation") == 0)
+                C.array() -= (C.array().rowwise().sum()/p).replicate(1, p).array();
         }
         else if (m_sStart.compare("sample") == 0)
         {
             C = MatrixXd::Zero(k,p);
             for(qint32 i = 0; i < k; ++i)
                 C.block(i,0,1,p) = X.block(rand() % n, 0, 1, p);
+            // DEBUG
 //            C.block(0,0,1,p) = X.block(2, 0, 1, p);
 //            C.block(1,0,1,p) = X.block(7, 0, 1, p);
 //            C.block(2,0,1,p) = X.block(17, 0, 1, p);
@@ -196,7 +201,6 @@ bool KMeans::calculate(    MatrixXd X, qint32 kClusters,
         idx = VectorXi::Zero(D.rows());
         d = VectorXd::Zero(D.rows());
 
-    //    [d, idx] = min(D, [], 2);
         for(qint32 i = 0; i < D.rows(); ++i)
             d[i] = D.row(i).minCoeff(&idx[i]);
 
@@ -223,7 +227,7 @@ bool KMeans::calculate(    MatrixXd X, qint32 kClusters,
             quint32 count = 0;
             for(qint32 i = 0; i < m.rows(); ++i)
             {
-                if(m[i] > 0)//find(m>0);
+                if(m[i] > 0)
                 {
                     nonempties[i] = 1;
                     ++count;
@@ -372,7 +376,7 @@ bool KMeans::batchUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx)
             }
             else if (m_sEmptyact.compare("drop") == 0)
             {
-    //            % Remove the empty cluster from any further processing
+    //            // Remove the empty cluster from any further processing
     //            D(:,empties) = NaN;
     //            changed = changed(m(changed) > 0);
     //            warning('Empty cluster created at iteration %d during replicate %d.',iter, rep,);
@@ -382,7 +386,7 @@ bool KMeans::batchUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx)
     //            warning('Empty cluster created at iteration %d during replicate %d.', iter, rep);
 
     //            for i = empties
-    //                d = D((idx-1)*n + (1:n)'); % use newly updated distances
+    //                d = D((idx-1)*n + (1:n)'); // use newly updated distances
 
     //                % Find the point furthest away from its current cluster.
     //                % Take that point out of its cluster and use it to create
@@ -439,7 +443,6 @@ bool KMeans::batchUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx)
             d[i] = D.row(i).minCoeff(&nidx[i]);
 
         // Determine which points moved
-        //ToDo this can be spead up
         VectorXi moved = VectorXi::Zero(nidx.rows());
         qint32 count = 0;
         for(qint32 i = 0; i < nidx.rows(); ++i)
@@ -562,9 +565,9 @@ bool KMeans::onlineUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx)
 //    end
     }
 
-//
-// Begin phase two:  single reassignments
-//
+    //
+    // Begin phase two:  single reassignments
+    //
     VectorXi changed = VectorXi(m.rows());
     qint32 count = 0;
     for(qint32 i = 0; i < m.rows(); ++i)
