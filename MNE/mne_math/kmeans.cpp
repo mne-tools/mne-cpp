@@ -50,6 +50,7 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
+#include <time.h>
 
 
 //*************************************************************************************************************
@@ -94,6 +95,9 @@ bool KMeans::calculate(    MatrixXd X, qint32 kClusters,
 {
     if (kClusters < 1)
         return false;
+
+    //Init random generator
+    srand ( time(NULL) );
 
 // n points in p dimensional space
     k = kClusters;
