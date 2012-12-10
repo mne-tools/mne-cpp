@@ -55,7 +55,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
 #include <QDebug>
@@ -116,7 +116,6 @@ bool KMeans::calculate(    MatrixXd X, qint32 kClusters,
     }
     else if(m_sDistance.compare("correlation")==0)
     {
-
         X.array() -= (X.rowwise().sum().array() / (double)p).replicate(1,p); //X - X.rowwise().sum();//.repmat(mean(X,2),1,p);
         MatrixXd Xnorm = (X.array().pow(2).rowwise().sum()).sqrt();//sqrt(sum(X.^2, 2));
 //        if any(min(Xnorm) <= eps(max(Xnorm)))
@@ -272,7 +271,7 @@ bool KMeans::calculate(    MatrixXd X, qint32 kClusters,
 
             totsumD = sumD.array().sum();
 
-            printf("%d iterations, total sum of distances = %f\n", iter, totsumD);
+//            printf("%d iterations, total sum of distances = %f\n", iter, totsumD);
 
             // Save the best solution so far
             if (totsumD < totsumDBest)
@@ -296,7 +295,7 @@ bool KMeans::calculate(    MatrixXd X, qint32 kClusters,
                 else
                 {
                     emptyErrCnt = emptyErrCnt + 1;
-                    printf("Replicate %d terminated: empty cluster created at iteration %d.\n", rep, iter);
+//                    printf("Replicate %d terminated: empty cluster created at iteration %d.\n", rep, iter);
                     if (emptyErrCnt == m_iReps)
                     {
 //                        error(message('EmptyClusterAllReps'));
@@ -654,19 +653,40 @@ bool KMeans::onlineUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx)
         }
         else if (m_sDistance.compare("cosine") == 0 || m_sDistance.compare("correlation") == 0)
         {
-//            % The points are normalized, centroids are not, so normalize them
-//            normC = sqrt(sum(C.^2, 2));
+            // The points are normalized, centroids are not, so normalize them
+            MatrixXd normC = C.array().pow(2).rowwise().sum().sqrt();
 //            if any(normC < eps(class(normC))) % small relative to unit-length data points
 //                error('Zero cluster centroid created at iteration %d during replicate %d.',iter, rep);
 //            end
-//            % This can be done without a loop, but the loop saves memory allocations
-//            for i = changed
-//                XCi = X * C(i,:)';
-//                mbrs = (idx == i);
-//                sgn = 1 - 2*mbrs; % -1 for members, 1 for nonmembers
+            // This can be done without a loop, but the loop saves memory allocations
+            MatrixXd XCi;
+            qint32 i;
+            for(qint32 j = 0; j < changed.rows(); ++j)
+            {
+                i = changed[j];
+                XCi = X * C.row(i).transpose();
+
+                VectorXi mbrs = VectorXi::Zero(idx.rows());
+                for(qint32 l = 0; l < idx.rows(); ++l)
+                    if(idx[l] == i)
+                        mbrs[l] = 1;
+
+                VectorXi sgn = 1 - 2 * mbrs.array(); // -1 for members, 1 for nonmembers
+
+
+                double A = (double)m[i] * normC(i,0);
+                double B = pow(((double)m[i] * normC(i,0)),2);
+
+                Del.col(i) = 1 + sgn.cast<double>().array()*
+                        (A - (B + 2 * sgn.cast<double>().array() * m[i] * XCi.array() + 1).sqrt());
+
+                std::cout << "Del.col(i)\n" << Del.col(i) << std::endl;
+
+
+
 //                Del(:,i) = 1 + sgn .*...
 //                      (m(i).*normC(i) - sqrt((m(i).*normC(i)).^2 + 2.*sgn.*m(i).*XCi + 1));
-//            end
+            }
         }
         else if (m_sDistance.compare("hamming") == 0)
         {
@@ -779,8 +799,8 @@ bool KMeans::onlineUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx)
         }
         else if (m_sDistance.compare("cityblock") == 0)
         {
-            VectorXi onidx(1 + nidx.rows());
-            onidx << oidx, nidx;
+            VectorXi onidx(2);
+            onidx << oidx, nidx[0];//ToDo always right?
 
             qint32 i;
             for(qint32 h = 0; h < 2; ++h)
@@ -828,8 +848,8 @@ bool KMeans::onlineUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx)
         }
         else if (m_sDistance.compare("cosine") == 0 || m_sDistance.compare("correlation") == 0)
         {
-//            C(nidx,:) = C(nidx,:) + (X(moved,:) - C(nidx,:)) / m(nidx);
-//            C(oidx,:) = C(oidx,:) - (X(moved,:) - C(oidx,:)) / m(oidx);
+            C.row(nidx[0]).array() += (X.row(moved[0]) - C.row(nidx[0])).array() / m[nidx[0]];
+            C.row(oidx).array() += (X.row(moved[0]) - C.row(oidx)).array() / m[oidx];
         }
         else if (m_sDistance.compare("hamming") == 0)
         {
@@ -880,16 +900,21 @@ MatrixXd KMeans::distfun(MatrixXd& X, MatrixXd& C, qint32 iter)
             }
         }
     }
-//    else if (m_sDistance.compare("cosine") == 0 || dist.compare("correlation") == 0)
-//    {
-//    % The points are normalized, centroids are not, so normalize them
-//    normC = sqrt(sum(C.^2, 2));
-//    if any(normC < eps(class(normC))) % small relative to unit-length data points
-//        error('Zero cluster centroid created at iteration %d.',iter);
-//    for i = 1:nclusts
-//        D(:,i) = max(1 - X * (C(i,:)./normC(i))', 0);
-//    end
-//    }
+    else if (m_sDistance.compare("cosine") == 0 || m_sDistance.compare("correlation") == 0)
+    {
+        // The points are normalized, centroids are not, so normalize them
+        MatrixXd normC = C.array().pow(2).rowwise().sum().sqrt();
+//        if any(normC < eps(class(normC))) % small relative to unit-length data points
+//            error('Zero cluster centroid created at iteration %d.',iter);
+        for (qint32 i = 0; i < nclusts; ++i)
+        {
+            MatrixXd C_tmp = (C.row(i).array() / normC(i,0)).transpose();
+            D.col(i) = X * C_tmp;//max(1 - X * (C(i,:)./normC(i))', 0);
+            for(qint32 j = 0; j < D.rows(); ++j)
+                if(D(j,i) < 0)
+                    D(j,i) = 0;
+        }
+    }
 //case 'hamming'
 //    for i = 1:nclusts
 //        D(:,i) = abs(X(:,1) - C(i,1));
@@ -968,10 +993,11 @@ void KMeans::gcentroids(MatrixXd& X, VectorXi& index, VectorXi& clusts,
                 else
                     centroids.row(i) = Xsorted.row(nn+1);
             }
-//            else if(m_sDistance.compare("cosine") == 0 || dist.compare("correlation") == 0)
-//            {
-//                centroids(i,:) = sum(X(members,:),1) / counts(i); // unnormalized
-//            }
+            else if(m_sDistance.compare("cosine") == 0 || m_sDistance.compare("correlation") == 0)
+            {
+                for(qint32 j = 0; j < members.rows(); ++j)
+                    centroids.row(i).array() += X.row(members[j]).array() / counts[i]; // unnormalized
+            }
 //            else if(m_sDistance.compare("hamming") == 0)
 //            {
 //                % Compute a fast median for binary data, component-wise

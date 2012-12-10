@@ -135,50 +135,61 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
     t_listAnnotation.append(p_pLHAnnotation);
     t_listAnnotation.append(p_pRHAnnotation);
 
+    //
+    // Check consisty
+    //
+//    for(qint32 h = 0; h < this->src->hemispheres.size(); ++h )//obj.sizeForwardSolution)
+//    {
+//        if(this->src->hemispheres[h]->vertno.rows() !=  t_listAnnotation[h]->getLabel()->rows())
+//        {
+//            printf("Error: Annotation doesn't fit to Forward Solution: Vertice number is different!");
+//            return false;
+//        }
+//    }
 
-    MatrixXd test(20,3);
-    test << 0.537667139546100, 1.83388501459509, -2.25884686100365,
-            0.862173320368121, 0.318765239858981, -1.30768829630527,
-            -0.433592022305684, 0.342624466538650, 3.57839693972576,
-            2.76943702988488, -1.34988694015652, 3.03492346633185,
-            0.725404224946106, -0.0630548731896562, 0.714742903826096,
-            -0.204966058299775, -0.124144348216312, 1.48969760778547,
-            1.40903448980048, 1.41719241342961, 0.671497133608081,
-            -1.20748692268504, 0.717238651328839, 1.63023528916473,
-            0.488893770311789, 1.03469300991786, 0.726885133383238,
-            -0.303440924786016, 0.293871467096658, -0.787282803758638,
-            0.888395631757642, -1.14707010696915, -1.06887045816803,
-            -0.809498694424876, -2.94428416199490, 1.43838029281510,
-            0.325190539456198, -0.754928319169703, 1.37029854009523,
-            -1.71151641885370, -0.102242446085491, -0.241447041607358,
-            0.319206739165502, 0.312858596637428, -0.864879917324457,
-            -0.0300512961962686, -0.164879019209038, 0.627707287528727,
-            1.09326566903948, 1.10927329761440, -0.863652821988714,
-            0.0773590911304249, -1.21411704361541, -1.11350074148676,
-            -0.00684932810334806, 1.53263030828475, -0.769665913753682,
-            0.371378812760058, -0.225584402271252, 1.11735613881447;
+//    //DEBUG
+//    MatrixXd test(20,3);
+//    test << 0.537667139546100, 1.83388501459509, -2.25884686100365,
+//            0.862173320368121, 0.318765239858981, -1.30768829630527,
+//            -0.433592022305684, 0.342624466538650, 3.57839693972576,
+//            2.76943702988488, -1.34988694015652, 3.03492346633185,
+//            0.725404224946106, -0.0630548731896562, 0.714742903826096,
+//            -0.204966058299775, -0.124144348216312, 1.48969760778547,
+//            1.40903448980048, 1.41719241342961, 0.671497133608081,
+//            -1.20748692268504, 0.717238651328839, 1.63023528916473,
+//            0.488893770311789, 1.03469300991786, 0.726885133383238,
+//            -0.303440924786016, 0.293871467096658, -0.787282803758638,
+//            0.888395631757642, -1.14707010696915, -1.06887045816803,
+//            -0.809498694424876, -2.94428416199490, 1.43838029281510,
+//            0.325190539456198, -0.754928319169703, 1.37029854009523,
+//            -1.71151641885370, -0.102242446085491, -0.241447041607358,
+//            0.319206739165502, 0.312858596637428, -0.864879917324457,
+//            -0.0300512961962686, -0.164879019209038, 0.627707287528727,
+//            1.09326566903948, 1.10927329761440, -0.863652821988714,
+//            0.0773590911304249, -1.21411704361541, -1.11350074148676,
+//            -0.00684932810334806, 1.53263030828475, -0.769665913753682,
+//            0.371378812760058, -0.225584402271252, 1.11735613881447;
 
 //    std::cout << test << std::endl;
 
-//    MatrixXd means;
-//    means = MatrixXd::Zero(2,3);
-//    KMeans testK(test, means);
-//    std::cout << "Means:\n" << testK.means << std::endl;
+//    VectorXi idx;
+//    MatrixXd ctrs;
+//    VectorXd sumd;
+//    MatrixXd D;
+
+//    KMeans testK(QString("cityblock"), QString("sample"), 5);//QString("sqeuclidean")//QString("sample")
+
+//    testK.calculate(test, 2, idx, ctrs, sumd, D);
+
+//    std::cout << "idx" << std::endl << idx << std::endl;
+//    std::cout << "ctrs" << std::endl << ctrs << std::endl;
+//    std::cout << "sumd" << std::endl << sumd << std::endl;
+//    std::cout << "D" << std::endl << D << std::endl;
 
 
-    VectorXi idx;
-    MatrixXd ctrs;
-    VectorXd sumd;
-    MatrixXd D;
+    //DEBUG END
 
-    KMeans testK(QString("cityblock"), QString("sample"), 5);//QString("sqeuclidean")//QString("sample")
 
-    testK.calculate(test, 4, idx, ctrs, sumd, D);
-
-    std::cout << "idx" << std::endl << idx << std::endl;
-    std::cout << "ctrs" << std::endl << ctrs << std::endl;
-    std::cout << "sumd" << std::endl << sumd << std::endl;
-    std::cout << "D" << std::endl << D << std::endl;
 
 
 
@@ -194,6 +205,10 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
 //        t_src_new(1,2).vertno = [];
 
 
+    KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);//QString("sqeuclidean")//QString("sample")
+    MatrixXd t_LF_new;
+
+
     for(qint32 h = 0; h < this->src->hemispheres.size(); ++h )//obj.sizeForwardSolution)
     {
         if(h == 0)
@@ -203,139 +218,143 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
 
         Colortable* t_pCurrentColorTable = t_listAnnotation[h]->getColortable();
         VectorXi label = t_pCurrentColorTable->getAvailableROIs();
+
+        // Get label for every vertice
+        VectorXi vertno_labeled = VectorXi::Zero(this->src->hemispheres[h]->vertno.rows());
+
+        for(qint32 i = 0; i < vertno_labeled.rows(); ++i)
+            vertno_labeled[i] = (*t_listAnnotation[h]->getLabel())[this->src->hemispheres[h]->vertno[i]];
+
+//        std::cout << "vertno_labeled:\n " << vertno_labeled.block(0,0,20,1)
+//                  << std::endl;
+
+        MatrixXd t_LF_partial;
+
         for (qint32 i = 0; i < label.rows(); ++i)
         {
             if (label[i] != 0)
             {
                 QString curr_name = t_pCurrentColorTable->struct_names[i];//obj.label2AtlasName(label(i));
-//                printf("\tCluster %d / %d %s\n", i+1, label.rows(), curr_name.toUtf8().constData());
+                printf("\tCluster %d / %d %s...", i+1, label.rows(), curr_name.toUtf8().constData());
 
-//                    if h == 1
-//                        curr_name = [curr_name(1,1).names{1,1} ' left hemisphere'];
-//                        disp(['Cluster ' num2str(i) '/' num2str(length(label)) ', ' curr_name]);
-//                        p_ClusteredForwardSolution.selectROIs('lh',label(i),'rh',[]);
-//                    else
-//                        curr_name = [curr_name(1,2).names{1,1} ' right hemisphere'];
-//                        disp(['Cluster ' num2str(i) '/' num2str(length(label)) ', ' curr_name]);
-//                        p_ClusteredForwardSolution.selectROIs('lh',[],'rh',label(i));
-//                    end
+                //
+                // Get source space indeces
+                //
+                VectorXi idcs = VectorXi::Zero(vertno_labeled.rows());
+                qint32 c = 0;
+                qint32 offset = 0;
 
-//                    t_LF = p_ClusteredForwardSolution.data;
-
-//                    [t_iSensors, t_iSources_p] = size(t_LF);
-
-//                    if t_iSources_p > 0
-//                        t_iSources = t_iSources_p/3;
-//                        t_iClusters = ceil(t_iSources/p_iClusterSize);
-
-//                        fprintf('%d Cluster(s)\n', t_iClusters);
-
-//                        t_LF_partial = zeros(t_iSensors,t_iClusters*3);
-
-//                        for j = 1:t_iSensors %parfor
-//                            t_sensLF = reshape(t_LF(j,:),3,[]);
-//                            t_sensLF = t_sensLF';
-
-//                            % Kmeans Reduction
-//                            opts = statset('Display','off');%'final');
-//%                                     %Euclidean
-//%                                     [idx, ctrs] = kmeans(t_sensLF,t_iClusters,...
-//%                                                         'Distance','sqEuclidean',...
-//%                                                         'Replicates',5,...
-//%                                                         'Options',opts);
-//%                                     %Correlation
-//%                                     [idx, ctrs] = kmeans(t_sensLF,t_iClusters,...
-//%                                                         'Distance','correlation',...
-//%                                                         'Replicates',5,...
-//%                                                         'Options',opts);
-//                            %L1
-//                            [idx, ctrs] = kmeans(t_sensLF,t_iClusters,...
-//                                                'Distance','cityblock',...
-//                                                'Replicates',5,...
-//                                                'Options',opts);
-//%                                     [idx, ctrs] = kmeans(t_sensLF,t_iClusters,...
-//%                                                         'Distance','cosine',...
-//%                                                         'Replicates',5,...
-//%                                                         'Options',opts);
+                // Offset for continuous indexing;
+                if(h > 0)
+                    for(qint32 j = 0; j < h; ++j)
+                        offset += this->src->hemispheres[j]->nuse;
 
 
-//                            ctrs_straight = ctrs';
-//                            t_LF_partial(j,:) = ctrs_straight(:)';
+                //Select ROIs
+                for(qint32 j = 0; j < vertno_labeled.rows(); ++j)
+                {
+                    if(vertno_labeled[j] == label[i])
+                    {
+                        idcs[c] = j;
+                        ++c;
+                    }
+                }
+                idcs.conservativeResize(c);
 
+                VectorXi idcs_triplet = tripletSelection(idcs);
 
+                //get selected LF
+                MatrixXd t_LF(this->sol->data->rows(), idcs_triplet.rows());
 
+                for(qint32 j = 0; j < idcs_triplet.rows(); ++j)
+                    t_LF.col(j) = this->sol->data->col(idcs_triplet[j]);
 
-//                            %Plot %% ToDo problem with ParFor
-//                            if ~isempty(find(ismember(p_vecPlotSensors, j),1)) %plot the selected sensor
-//                                %Before Clustering
-//                                if h == 1
-//                                    color = obj.label2Color('lh',label(i));
-//                                else
-//                                    color = obj.label2Color('rh',label(i));
-//                                end
-//                                figure('Name', 'Before Clustering');
-//                                plot3(t_sensLF(:,1), t_sensLF(:,2), t_sensLF(:,3), 'o', 'MarkerSize', 6, 'MarkerFaceColor', color./255);
-//                                title(['Sensor ' num2str(j) ' ' strrep(curr_name, '_', ' ')]);
-//                                axis equal
+                qint32 nSens = t_LF.rows();
+                qint32 nSources = t_LF.cols()/3;
 
-//                                %After Clustring
-//                                figure('Name', 'After Clustering');
-//                                color_map = jet(t_iClusters);
-//                                marker = ['+'; 'o';'s';'*';'.';'x';'d';'^';'v'];
-//                                for k = 1:t_iClusters
-//                                    plot3(t_sensLF(idx==k,1),t_sensLF(idx==k,2),t_sensLF(idx==k,3),marker(k),'MarkerEdgeColor',color./255,'MarkerFaceColor',color./255,'MarkerSize',6);%'MarkerEdgeColor',color_map(k,:),'LineWidth',2,
-//                                    axis equal
-//                                    hold on
-//                                end
-//                                plot3(ctrs(:,1),ctrs(:,2),ctrs(:,3),'x',...
-//                                    'MarkerEdgeColor',color./255,'MarkerSize',12,'LineWidth',2)
-//                                title(['Clustered Sensor ' num2str(j) ' ' strrep(curr_name, '_', ' ')]);
-//                                sl_CUtility.ArrFig('Region', 'fullscreen', 'figmat', [], 'distance', 20, 'monitor', 1);
-//                                pause;
-//                                close all;
-//                            end
+                if (nSources > 0)
+                {
+                    qint32 nClusters = ceil((double)nSources/(double)p_iClusterSize);
+
+                    printf("%d Cluster(s)... ", nClusters);
+
+                    t_LF_partial.resize(nSens,nClusters*3);
+
+                    // Do sensor wise clustering
+                    for(qint32 j = 0; j < nSens; ++j)
+                    {
+                        MatrixXd t_sensLF(t_LF.cols()/3, 3);
+                        for(qint32 k = 0; k < t_sensLF.rows(); ++k)
+                            t_sensLF.row(k) = t_LF.block(j,k*3,1,3);
+
+                        // Kmeans Reduction
+                        VectorXi idx;
+                        MatrixXd ctrs;
+                        VectorXd sumd;
+                        MatrixXd D;
+
+                        t_kMeans.calculate(t_sensLF, nClusters, idx, ctrs, sumd, D);
+
+                        for(qint32 k = 0; k < nClusters; ++k)
+                            t_LF_partial.block(j,k*3,1,3) = ctrs.row(k);
+                    }
+
+                    // Assign clustered data to new LeadField
+                    if(t_LF_partial.rows() > 0 && t_LF_partial.cols() > 0)
+                    {
+                        t_LF_new.conservativeResize(t_LF_partial.rows(), t_LF_new.cols() + t_LF_partial.cols());
+                        t_LF_new.block(0, t_LF_new.cols() - t_LF_partial.cols(), t_LF_new.rows(), t_LF_partial.cols()) = t_LF_partial;
+                    }
+
+//                    // Map the centroid to the closest rr
+//                    for(qint32 k = 0; k < nClusters; ++k)
+//                    {
+//                        [~, n] = size(t_LF);
+//                        nSources = n/3;
+//                        idx = (k-1)*3+1;
+//                        t_LF_partial_resized = repmat(t_LF_partial(:,idx:idx+2),1,nSources);
+//                        t_LF_diff = sum(abs(t_LF-t_LF_partial_resized),1);
+
+//                        t_LF_diff_dip = [];
+//                        for l = 1:nSources
+//                            idx = (l-1)*3+1;
+//                            t_LF_diff_dip = [t_LF_diff_dip sum(t_LF_diff(idx:idx+2))];
 //                        end
 
-//                        %Assign clustered data to new LeadField
-//                        t_LF_new = [t_LF_new t_LF_partial];
+//                        // Take the closest coordinates
+//                        sel_idx = ismember(t_LF_diff_dip, min(t_LF_diff_dip));
+//                        rr = p_ClusteredForwardSolution.src(1,h).rr(sel_idx,:);
+//                        nn = [0 0 0];
+//                        t_src_new(1,h).rr = [t_src_new(1,h).rr; rr];
+//                        t_src_new(1,h).nn = [t_src_new(1,h).nn; nn];
 
-//                        for k = 1:t_iClusters
-//                            [~, n] = size(t_LF);
-//                            nSources = n/3;
-//                            idx = (k-1)*3+1;
-//                            t_LF_partial_resized = repmat(t_LF_partial(:,idx:idx+2),1,nSources);
-//                            t_LF_diff = sum(abs(t_LF-t_LF_partial_resized),1);
-
-//                            t_LF_diff_dip = [];
-//                            for l = 1:nSources
-//                                idx = (l-1)*3+1;
-//                                t_LF_diff_dip = [t_LF_diff_dip sum(t_LF_diff(idx:idx+2))];
-//                            end
-
-//                            %Take the closest coordinates
-//                            sel_idx = ismember(t_LF_diff_dip, min(t_LF_diff_dip));
-//                            rr = p_ClusteredForwardSolution.src(1,h).rr(sel_idx,:);
-//                            nn = [0 0 0];
-//                            t_src_new(1,h).rr = [t_src_new(1,h).rr; rr];
-//                            t_src_new(1,h).nn = [t_src_new(1,h).nn; nn];
-
-//                            rr_idx = ismember(p_ClusteredForwardSolution.defaultSolutionSourceSpace.src(1,h).rr, rr);
-//                            vertno_idx = rr_idx(:,1) & rr_idx(:,2) & rr_idx(:,3);
-//                            t_src_new(1,h).vertno = [t_src_new(1,h).vertno p_ClusteredForwardSolution.defaultSolutionSourceSpace.src(1,h).vertno(vertno_idx)];
-//                        end
-//                    end
+//                        rr_idx = ismember(p_ClusteredForwardSolution.defaultSolutionSourceSpace.src(1,h).rr, rr);
+//                        vertno_idx = rr_idx(:,1) & rr_idx(:,2) & rr_idx(:,3);
+//                        t_src_new(1,h).vertno = [t_src_new(1,h).vertno p_ClusteredForwardSolution.defaultSolutionSourceSpace.src(1,h).vertno(vertno_idx)];
+//                    }
+                    printf("[done]\n");
+                }
+                else
+                {
+                    printf("failed! Label contains no sources.\n");
+                }
             }
         }
+
         printf("[done]\n");
     }
 
-//        %set new stuff;
-//        p_ClusteredForwardSolution.m_ForwardSolution.sol.data = t_LF_new;
-//        [p_ClusteredForwardSolution.m_ForwardSolution.sol.nrow,...
-//            p_ClusteredForwardSolution.m_ForwardSolution.sol.ncol] = size(t_LF_new);
 
-//        p_ClusteredForwardSolution.m_ForwardSolution.nsource = p_ClusteredForwardSolution.m_ForwardSolution.sol.ncol/3;
-//        p_ClusteredForwardSolution.m_ForwardSolution.nchan = p_ClusteredForwardSolution.m_ForwardSolution.sol.nrow;
+
+
+    std::cout << "LF\n" << t_LF_new.block(0,0,20,20);
+
+
+    // set new fwd solution;
+    *(p_fwdOut->sol->data) = t_LF_new;
+    p_fwdOut->sol->ncol = t_LF_new.cols();
+
+    p_fwdOut->nsource = p_fwdOut->sol->ncol/3;
 
 //        source_rr = [];
 //        for h = 1:obj.sizeForwardSolution

@@ -143,6 +143,18 @@ public:
     bool cluster_forward_solution( MNEForwardSolution* p_fwdOut, Annotation* p_pLHAnnotation, Annotation* p_pRHAnnotation, qint32 p_iClusterSize);
 
 
+    VectorXi tripletSelection(VectorXi& p_vecIdxSelection)
+    {
+        MatrixXi triSelect = p_vecIdxSelection.transpose().replicate(3,1).array() * 3;//repmat((p_vecIdxSelection - 1) * 3 + 1, 3, 1);
+        triSelect.row(1).array() += 1;
+        triSelect.row(2).array() += 2;
+        VectorXi retTriSelect(triSelect.cols()*3);
+        for(int i = 0; i < triSelect.cols(); ++i)
+            retTriSelect.block(i*3,0,3,1) = triSelect.col(i);
+        return retTriSelect;
+    } // tripletSelection
+
+
     //=========================================================================================================
     /**
     * ### MNE toolbox root function ###: Implementation of the mne_read_forward_solution function
