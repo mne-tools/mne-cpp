@@ -147,6 +147,7 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
 //        }
 //    }
 
+
 //    //DEBUG
 //    MatrixXd test(20,3);
 //    test << 0.537667139546100, 1.83388501459509, -2.25884686100365,
@@ -190,27 +191,23 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
     //DEBUG END
 
 
-
-
-
-//        p_ClusteredForwardSolution = sl_CForwardSolution(obj);
-
-//        t_LF_new = [];
-//        t_src_new(1,1).rr = [];
-//        t_src_new(1,1).nn = [];
-//        t_src_new(1,1).vertno = [];
-
-//        t_src_new(1,2).rr = [];
-//        t_src_new(1,2).nn = [];
-//        t_src_new(1,2).vertno = [];
-
-
     KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);//QString("sqeuclidean")//QString("sample")
     MatrixXd t_LF_new;
 
+    qint32 count;
+    qint32 offset;
 
     for(qint32 h = 0; h < this->src->hemispheres.size(); ++h )//obj.sizeForwardSolution)
     {
+        count = 0;
+        offset = 0;
+
+        // Offset for continuous indexing;
+        if(h > 0)
+            for(qint32 j = 0; j < h; ++j)
+                offset += this->src->hemispheres[j]->nuse;
+
+
         if(h == 0)
             printf("Cluster Left Hemisphere\n");
         else
@@ -225,13 +222,10 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
         for(qint32 i = 0; i < vertno_labeled.rows(); ++i)
             vertno_labeled[i] = (*t_listAnnotation[h]->getLabel())[this->src->hemispheres[h]->vertno[i]];
 
-//        std::cout << "vertno_labeled:\n " << vertno_labeled.block(0,0,20,1)
-//                  << std::endl;
-
         MatrixXd t_LF_partial;
-
         for (qint32 i = 0; i < label.rows(); ++i)
         {
+
             if (label[i] != 0)
             {
                 QString curr_name = t_pCurrentColorTable->struct_names[i];//obj.label2AtlasName(label(i));
@@ -242,13 +236,6 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
                 //
                 VectorXi idcs = VectorXi::Zero(vertno_labeled.rows());
                 qint32 c = 0;
-                qint32 offset = 0;
-
-                // Offset for continuous indexing;
-                if(h > 0)
-                    for(qint32 j = 0; j < h; ++j)
-                        offset += this->src->hemispheres[j]->nuse;
-
 
                 //Select ROIs
                 for(qint32 j = 0; j < vertno_labeled.rows(); ++j)
@@ -261,13 +248,13 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
                 }
                 idcs.conservativeResize(c);
 
-                VectorXi idcs_triplet = tripletSelection(idcs);
+//                VectorXi idcs_triplet = tripletSelection(idcs);//ToDo obsolete: use block instead
 
                 //get selected LF
-                MatrixXd t_LF(this->sol->data->rows(), idcs_triplet.rows());
+                MatrixXd t_LF(this->sol->data->rows(), idcs.rows()*3);
 
-                for(qint32 j = 0; j < idcs_triplet.rows(); ++j)
-                    t_LF.col(j) = this->sol->data->col(idcs_triplet[j]);
+                for(qint32 j = 0; j < idcs.rows(); ++j)
+                    t_LF.block(0, j*3, t_LF.rows(), 3) = this->sol->data->block(0, (idcs[j]+offset)*3, t_LF.rows(), 3);
 
                 qint32 nSens = t_LF.rows();
                 qint32 nSources = t_LF.cols()/3;
@@ -304,34 +291,36 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
                     {
                         t_LF_new.conservativeResize(t_LF_partial.rows(), t_LF_new.cols() + t_LF_partial.cols());
                         t_LF_new.block(0, t_LF_new.cols() - t_LF_partial.cols(), t_LF_new.rows(), t_LF_partial.cols()) = t_LF_partial;
+
+                        // Map the centroids to the closest rr
+                        for(qint32 k = 0; k < nClusters; ++k)
+                        {
+                            qint32 j = 0;
+                            double sqec = sqrt((this->sol->data->block(0, (idcs[j]+offset)*3, t_LF.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
+                            double sqec_min = sqec;
+                            double j_min = j;
+                            for(qint32 j = 1; j < idcs.rows(); ++j)
+                            {
+                                sqec = sqrt((this->sol->data->block(0, (idcs[j]+offset)*3, t_LF.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
+                                if(sqec < sqec_min)
+                                {
+                                    sqec_min = sqec;
+                                    j_min = j;
+                                }
+                            }
+
+
+                            // Take the closest coordinates
+                            qint32 sel_idx = idcs[j_min];
+                            p_fwdOut->src->hemispheres[h]->rr.row(count) = this->src->hemispheres[h]->rr.row(sel_idx);
+                            p_fwdOut->src->hemispheres[h]->nn.row(count) = MatrixXd::Zero(1,3);
+
+                            p_fwdOut->src->hemispheres[h]->vertno[count] = this->src->hemispheres[h]->vertno[sel_idx];
+                            ++count;
+                        }
+
                     }
 
-//                    // Map the centroid to the closest rr
-//                    for(qint32 k = 0; k < nClusters; ++k)
-//                    {
-//                        [~, n] = size(t_LF);
-//                        nSources = n/3;
-//                        idx = (k-1)*3+1;
-//                        t_LF_partial_resized = repmat(t_LF_partial(:,idx:idx+2),1,nSources);
-//                        t_LF_diff = sum(abs(t_LF-t_LF_partial_resized),1);
-
-//                        t_LF_diff_dip = [];
-//                        for l = 1:nSources
-//                            idx = (l-1)*3+1;
-//                            t_LF_diff_dip = [t_LF_diff_dip sum(t_LF_diff(idx:idx+2))];
-//                        end
-
-//                        // Take the closest coordinates
-//                        sel_idx = ismember(t_LF_diff_dip, min(t_LF_diff_dip));
-//                        rr = p_ClusteredForwardSolution.src(1,h).rr(sel_idx,:);
-//                        nn = [0 0 0];
-//                        t_src_new(1,h).rr = [t_src_new(1,h).rr; rr];
-//                        t_src_new(1,h).nn = [t_src_new(1,h).nn; nn];
-
-//                        rr_idx = ismember(p_ClusteredForwardSolution.defaultSolutionSourceSpace.src(1,h).rr, rr);
-//                        vertno_idx = rr_idx(:,1) & rr_idx(:,2) & rr_idx(:,3);
-//                        t_src_new(1,h).vertno = [t_src_new(1,h).vertno p_ClusteredForwardSolution.defaultSolutionSourceSpace.src(1,h).vertno(vertno_idx)];
-//                    }
                     printf("[done]\n");
                 }
                 else
@@ -341,40 +330,37 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
             }
         }
 
+        p_fwdOut->src->hemispheres[h]->rr.conservativeResize(count, 3);
+        p_fwdOut->src->hemispheres[h]->nn.conservativeResize(count, 3);
+        p_fwdOut->src->hemispheres[h]->vertno.conservativeResize(count);
+
+        p_fwdOut->src->hemispheres[h]->nuse_tri = 0;
+        p_fwdOut->src->hemispheres[h]->use_tris = MatrixX3i(0,3);
+
+
+        if(p_fwdOut->src->hemispheres[h]->rr.rows() > 0 && p_fwdOut->src->hemispheres[h]->rr.cols() > 0)
+        {
+            if(h == 0)
+            {
+                p_fwdOut->source_rr = MatrixX3d(0,3);
+                p_fwdOut->source_nn = MatrixX3d(0,3);
+            }
+
+            p_fwdOut->source_rr.conservativeResize(p_fwdOut->source_rr.rows() + p_fwdOut->src->hemispheres[h]->rr.rows(),3);
+            p_fwdOut->source_rr.block(p_fwdOut->source_rr.rows() -  p_fwdOut->src->hemispheres[h]->rr.rows(), 0,  p_fwdOut->src->hemispheres[h]->rr.rows(), 3) = p_fwdOut->src->hemispheres[h]->rr;
+
+            p_fwdOut->source_nn.conservativeResize(p_fwdOut->source_nn.rows() + p_fwdOut->src->hemispheres[h]->nn.rows(),3);
+            p_fwdOut->source_nn.block(p_fwdOut->source_nn.rows() -  p_fwdOut->src->hemispheres[h]->nn.rows(), 0,  p_fwdOut->src->hemispheres[h]->nn.rows(), 3) = p_fwdOut->src->hemispheres[h]->nn;
+        }
+
         printf("[done]\n");
     }
-
-
-
-
-    std::cout << "LF\n" << t_LF_new.block(0,0,20,20);
-
 
     // set new fwd solution;
     *(p_fwdOut->sol->data) = t_LF_new;
     p_fwdOut->sol->ncol = t_LF_new.cols();
 
     p_fwdOut->nsource = p_fwdOut->sol->ncol/3;
-
-//        source_rr = [];
-//        for h = 1:obj.sizeForwardSolution
-//            p_ClusteredForwardSolution.m_ForwardSolution.src(1,h).vertno = t_src_new(1,h).vertno;
-//            p_ClusteredForwardSolution.m_ForwardSolution.src(1,h).nuse = length(t_src_new(1,h).vertno);
-//            source_rr = [source_rr; t_src_new(1,h).rr];
-//            p_ClusteredForwardSolution.m_ForwardSolution.src(1,h).nuse_tri = 0;
-//            p_ClusteredForwardSolution.m_ForwardSolution.src(1,h).use_tris = [];
-//        end
-//        p_ClusteredForwardSolution.m_ForwardSolution.source_rr = source_rr;
-//        p_ClusteredForwardSolution.m_ForwardSolution.source_nn = ...
-//            p_ClusteredForwardSolution.m_ForwardSolution.source_nn(1:p_ClusteredForwardSolution.m_ForwardSolution.sol.ncol,:);
-
-
-//        p_ClusteredForwardSolution.resetROISelection();
-//        p_ClusteredForwardSolution.resetSourceSelection();
-
-
-
-
 
     return true;
 }
