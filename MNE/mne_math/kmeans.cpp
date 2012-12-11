@@ -74,7 +74,7 @@ using namespace MNE_MATHLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-KMeans::KMeans(QString &distance, QString &start, qint32 replicates, QString& emptyact, bool online, qint32 maxit)
+KMeans::KMeans(QString distance, QString start, qint32 replicates, QString emptyact, bool online, qint32 maxit)
 : m_sDistance(distance)
 , m_sStart(start)
 , m_iReps(replicates)
