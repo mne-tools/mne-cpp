@@ -47,14 +47,16 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${PWD}/../../lib/
 CONFIG(debug, debug|release) {
-    LIBS += -lmned
-    LIBS += -lfiffd
-    LIBS += -lgenericsd
+    LIBS += -lmne_mathd \
+            -lmned \
+            -lfiffd \
+            -lgenericsd
 }
 else {
-    LIBS += -lmne
-    LIBS += -lfiff
-    LIBS += -lgenerics
+    LIBS += -lmne_math \
+            -lmne \
+            -lfiff \
+            -lgenerics
 }
 
 DESTDIR = $${PWD}/../../bin
