@@ -41,10 +41,6 @@ namespace MNE_MATHLIB
 
 using namespace Eigen;
 
-QString defaultDistance("sqeuclidean");
-QString defaultStart("sample");
-QString defaultEmptyact("error");
-
 
 class MNE_MATHSHARED_EXPORT KMeans
 {
@@ -53,7 +49,7 @@ public:
     //startNames = {'uniform','sample','cluster'};
     //emptyactNames = {'error','drop','singleton'};
 
-    KMeans(QString &distance = defaultDistance , QString &start = defaultStart, qint32 replicates = 1, QString& emptyact = defaultEmptyact, bool online = true, qint32 maxit = 100);
+    KMeans(QString distance = QString("sqeuclidean") , QString start = QString("sample"), qint32 replicates = 1, QString emptyact = QString("error"), bool online = true, qint32 maxit = 100);
 
 
 
