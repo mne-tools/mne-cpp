@@ -188,16 +188,18 @@ private:
     static bool read_one(FiffStream* p_pStream, FiffDirTree* node, MNEForwardSolution*& one);
 
 public:
-    fiff_int_t source_ori;
-    fiff_int_t coord_frame;
-    fiff_int_t nsource;
-    fiff_int_t nchan;
-    FiffNamedMatrix* sol;
-    FiffNamedMatrix* sol_grad;
-    FiffCoordTrans* mri_head_t;
-    MNESourceSpace* src;
-    MatrixX3d source_rr;
-    MatrixX3d source_nn;
+    fiff_int_t source_ori;      /**< ToDo... */
+    fiff_int_t coord_frame;     /**< ToDo... */
+    fiff_int_t nsource;         /**< ToDo... */
+    fiff_int_t nchan;           /**< ToDo... */
+    FiffNamedMatrix* sol;       /**< ToDo... */
+    FiffNamedMatrix* sol_grad;  /**< ToDo... */
+    FiffCoordTrans* mri_head_t; /**< ToDo... */
+    MNESourceSpace* src;        /**< ToDo... */
+    MatrixX3d source_rr;        /**< ToDo... */
+    MatrixX3d source_nn;        /**< ToDo... */
+
+    bool isClustered;           /**< Indicates whether fwd conatins a clustered forward solution. */
 };
 
 } // NAMESPACE
