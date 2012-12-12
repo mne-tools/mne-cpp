@@ -258,33 +258,129 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
 
                 qint32 nSens = t_LF.rows();
                 qint32 nSources = t_LF.cols()/3;
+                qint32 nClusters = 0;
 
                 if (nSources > 0)
                 {
-                    qint32 nClusters = ceil((double)nSources/(double)p_iClusterSize);
+                    nClusters = ceil((double)nSources/(double)p_iClusterSize);
 
                     printf("%d Cluster(s)... ", nClusters);
 
-                    t_LF_partial.resize(nSens,nClusters*3);
+                    t_LF_partial = MatrixXd::Zero(nSens,nClusters*3);
 
-                    // Do sensor wise clustering
+
+
+
+
+                    // Clustering
+                    MatrixXd t_sensLF(t_LF.cols()/3, 3*nSens);
                     for(qint32 j = 0; j < nSens; ++j)
                     {
-                        MatrixXd t_sensLF(t_LF.cols()/3, 3);
                         for(qint32 k = 0; k < t_sensLF.rows(); ++k)
-                            t_sensLF.row(k) = t_LF.block(j,k*3,1,3);
-
-                        // Kmeans Reduction
-                        VectorXi idx;
-                        MatrixXd ctrs;
-                        VectorXd sumd;
-                        MatrixXd D;
-
-                        t_kMeans.calculate(t_sensLF, nClusters, idx, ctrs, sumd, D);
-
-                        for(qint32 k = 0; k < nClusters; ++k)
-                            t_LF_partial.block(j,k*3,1,3) = ctrs.row(k);
+                            t_sensLF.block(k,j*3,1,3) = t_LF.block(j,k*3,1,3);
                     }
+
+                    // Kmeans Reduction
+                    VectorXi roiIdx;
+                    MatrixXd ctrs;
+                    VectorXd sumd;
+                    MatrixXd D;
+
+                    t_kMeans.calculate(t_sensLF, nClusters, roiIdx, ctrs, sumd, D);
+
+//                    std::cout << idx.transpose() << std::endl;
+//                    roiIdxSensList.append(idx);
+
+                        //-> Don't mix different cluster centres
+//                        for(qint32 k = 0; k < nClusters; ++k)
+//                            t_LF_partial.block(j,k*3,1,3) = ctrs.row(k);
+
+
+
+
+
+
+
+
+                    //QList<VectorXi> roiIdxSensList;
+
+//                    // Do sensor wise clustering
+//                    for(qint32 j = 0; j < nSens; ++j)
+//                    {
+//                        MatrixXd t_sensLF(t_LF.cols()/3, 3);
+//                        for(qint32 k = 0; k < t_sensLF.rows(); ++k)
+//                            t_sensLF.row(k) = t_LF.block(j,k*3,1,3);
+
+//                        // Kmeans Reduction
+//                        VectorXi idx;
+//                        MatrixXd ctrs;
+//                        VectorXd sumd;
+//                        MatrixXd D;
+
+//                        t_kMeans.calculate(t_sensLF, nClusters, idx, ctrs, sumd, D);
+
+//                        std::cout << idx.transpose() << std::endl;
+
+//                        roiIdxSensList.append(idx);
+
+//                        //-> Don't mix different cluster centres
+////                        for(qint32 k = 0; k < nClusters; ++k)
+////                            t_LF_partial.block(j,k*3,1,3) = ctrs.row(k);
+//                    }
+
+                    //New
+//                    VectorXi roiIdx(0);
+                    if(nClusters > 0)// && roiIdxSensList.size() > 0)
+                    {
+//                        VectorXi clusterCount;
+
+//                        if(nClusters == 1)
+//                            roiIdx = roiIdxSensList[0];
+//                        else
+//                        {
+//                           roiIdx.resize(roiIdxSensList[0].rows());
+
+//                            //
+//                            // Search maximum occurence of one idx and assign them to the ROI Index
+//                            //
+//                            for(qint32 j = 0; j < roiIdx.rows(); ++j)
+//                            {
+//                                clusterCount = VectorXi::Zero(nClusters);
+
+//                                for(qint32 k = 0; k < roiIdxSensList.size(); ++k)
+//                                    ++clusterCount[roiIdxSensList[k][j]];
+
+//                                qint32 maxIdx = 0;
+//                                qint32 maxIdxCount = 0;
+//                                for(qint32 k = 0; k < nClusters; ++k)
+//                                {
+//                                    if(maxIdxCount < clusterCount[k])
+//                                    {
+//                                        maxIdx = k;
+//                                        maxIdxCount = clusterCount[k];
+//                                    }
+//                                }
+
+//                                roiIdx[j] = maxIdx;
+//                            }
+//                        }
+
+                        //calculate one euclidean centroid for all sensors
+                        VectorXi clusterCount = VectorXi::Zero(nClusters);
+
+                        for(qint32 k = 0; k < roiIdx.rows(); ++k)
+                        {
+                            t_LF_partial.block(0, roiIdx[k]*3, t_LF.rows(), 3) += t_LF.block(0, 3*k, t_LF.rows(), 3);
+                            ++clusterCount[roiIdx[k]];
+                        }
+
+                        //Normalize
+                        for(qint32 k = 0; k < clusterCount.rows(); ++k)
+                            t_LF_partial.block(0, k*3, t_LF.rows(), 3).array() /= (double)clusterCount[k];
+                    }
+
+                    //New end
+
 
                     // Assign clustered data to new LeadField
                     if(t_LF_partial.rows() > 0 && t_LF_partial.cols() > 0)
