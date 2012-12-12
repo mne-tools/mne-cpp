@@ -67,4 +67,10 @@ else {
 
 DESTDIR = $${PWD}/../bin
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    dataclient.cpp \
+    sourcelab.cpp
+
+HEADERS += \
+    dataclient.h \
+    sourcelab.h

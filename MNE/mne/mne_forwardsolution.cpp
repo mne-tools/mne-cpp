@@ -191,7 +191,7 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
     //DEBUG END
 
 
-    KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);//QString("sqeuclidean")//QString("sample")
+    KMeans t_kMeans(QString("sqeuclidean"), QString("sample"), 5);//QString("sqeuclidean")//QString("sample")//cityblock
     MatrixXd t_LF_new;
 
     qint32 count;
@@ -272,7 +272,7 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
 
 
 
-                    // Clustering
+                    // Reshape Input data -> sources rows; sensors columns
                     MatrixXd t_sensLF(t_LF.cols()/3, 3*nSens);
                     for(qint32 j = 0; j < nSens; ++j)
                     {
@@ -288,101 +288,16 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
 
                     t_kMeans.calculate(t_sensLF, nClusters, roiIdx, ctrs, sumd, D);
 
-//                    std::cout << idx.transpose() << std::endl;
-//                    roiIdxSensList.append(idx);
+                    //
+                    // Assign the centroid for each cluster to the partial LF
+                    //
+                    for(qint32 j = 0; j < nSens; ++j)
+                        for(qint32 k = 0; k < nClusters; ++k)
+                            t_LF_partial.block(j, k*3, 1, 3) = ctrs.block(k,j*3,1,3);
 
-                        //-> Don't mix different cluster centres
-//                        for(qint32 k = 0; k < nClusters; ++k)
-//                            t_LF_partial.block(j,k*3,1,3) = ctrs.row(k);
-
-
-
-
-
-
-
-
-                    //QList<VectorXi> roiIdxSensList;
-
-//                    // Do sensor wise clustering
-//                    for(qint32 j = 0; j < nSens; ++j)
-//                    {
-//                        MatrixXd t_sensLF(t_LF.cols()/3, 3);
-//                        for(qint32 k = 0; k < t_sensLF.rows(); ++k)
-//                            t_sensLF.row(k) = t_LF.block(j,k*3,1,3);
-
-//                        // Kmeans Reduction
-//                        VectorXi idx;
-//                        MatrixXd ctrs;
-//                        VectorXd sumd;
-//                        MatrixXd D;
-
-//                        t_kMeans.calculate(t_sensLF, nClusters, idx, ctrs, sumd, D);
-
-//                        std::cout << idx.transpose() << std::endl;
-
-//                        roiIdxSensList.append(idx);
-
-//                        //-> Don't mix different cluster centres
-////                        for(qint32 k = 0; k < nClusters; ++k)
-////                            t_LF_partial.block(j,k*3,1,3) = ctrs.row(k);
-//                    }
-
-                    //New
-//                    VectorXi roiIdx(0);
-                    if(nClusters > 0)// && roiIdxSensList.size() > 0)
-                    {
-//                        VectorXi clusterCount;
-
-//                        if(nClusters == 1)
-//                            roiIdx = roiIdxSensList[0];
-//                        else
-//                        {
-//                           roiIdx.resize(roiIdxSensList[0].rows());
-
-//                            //
-//                            // Search maximum occurence of one idx and assign them to the ROI Index
-//                            //
-//                            for(qint32 j = 0; j < roiIdx.rows(); ++j)
-//                            {
-//                                clusterCount = VectorXi::Zero(nClusters);
-
-//                                for(qint32 k = 0; k < roiIdxSensList.size(); ++k)
-//                                    ++clusterCount[roiIdxSensList[k][j]];
-
-//                                qint32 maxIdx = 0;
-//                                qint32 maxIdxCount = 0;
-//                                for(qint32 k = 0; k < nClusters; ++k)
-//                                {
-//                                    if(maxIdxCount < clusterCount[k])
-//                                    {
-//                                        maxIdx = k;
-//                                        maxIdxCount = clusterCount[k];
-//                                    }
-//                                }
-
-//                                roiIdx[j] = maxIdx;
-//                            }
-//                        }
-
-                        //calculate one euclidean centroid for all sensors
-                        VectorXi clusterCount = VectorXi::Zero(nClusters);
-
-                        for(qint32 k = 0; k < roiIdx.rows(); ++k)
-                        {
-                            t_LF_partial.block(0, roiIdx[k]*3, t_LF.rows(), 3) += t_LF.block(0, 3*k, t_LF.rows(), 3);
-                            ++clusterCount[roiIdx[k]];
-                        }
-
-                        //Normalize
-                        for(qint32 k = 0; k < clusterCount.rows(); ++k)
-                            t_LF_partial.block(0, k*3, t_LF.rows(), 3).array() /= (double)clusterCount[k];
-                    }
-
-                    //New end
-
-
-                    // Assign clustered data to new LeadField
+                    //
+                    // Assign partial LF to new LeadField
+                    //
                     if(t_LF_partial.rows() > 0 && t_LF_partial.cols() > 0)
                     {
                         t_LF_new.conservativeResize(t_LF_partial.rows(), t_LF_new.cols() + t_LF_partial.cols());
@@ -405,7 +320,6 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
                                 }
                             }
 
-
                             // Take the closest coordinates
                             qint32 sel_idx = idcs[j_min];
                             p_fwdOut->src->hemispheres[h]->rr.row(count) = this->src->hemispheres[h]->rr.row(sel_idx);
@@ -414,9 +328,7 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
                             p_fwdOut->src->hemispheres[h]->vertno[count] = this->src->hemispheres[h]->vertno[sel_idx];
                             ++count;
                         }
-
                     }
-
                     printf("[done]\n");
                 }
                 else
