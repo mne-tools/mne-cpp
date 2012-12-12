@@ -39,31 +39,16 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
-#include <vector>
-
-#include "../MNE/mne/mne.h"
-#include "../MNE/fs/annotation.h"
+#include "sourcelab.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-//#include <QDebug>
-//#include <QDir>
-//#include <QPluginLoader>
 
 #include <QtCore/QCoreApplication>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace MNELIB;
-using namespace FSLIB;
+#include <QObject>
 
 
 //*************************************************************************************************************
@@ -83,39 +68,12 @@ using namespace FSLIB;
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
+    QCoreApplication app(argc, argv);
 
-    MNEForwardSolution* t_pFwd = NULL;
+    SourceLab t_SourceLab;
+//    QObject::connect(&t_SourceLab, SIGNAL(closeSourceLab()), &app, SLOT(quit()));
 
-    QString t_sFileName = "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
-
-    QFile* t_pFile = new QFile(t_sFileName);
-
-    if(!MNEForwardSolution::read_forward_solution(t_pFile, t_pFwd))
-    {
-        delete t_pFile;
-        if(t_pFwd)
-            delete t_pFwd;
-        return -1;
-    }
-
-    //Cluster the forward solution
-
-    MNEForwardSolution* t_pFwdClustered = NULL;
-
-    QString t_sLHAnnotFileName = "./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot";
-    Annotation* t_pLHAnnotation= new Annotation(t_sLHAnnotFileName);
-
-
-    QString t_sRHAnnotFileName = "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot";
-    Annotation* t_pRHAnnotation= new Annotation(t_sRHAnnotFileName);
-
-    t_pFwd->cluster_forward_solution(t_pFwdClustered, t_pLHAnnotation, t_pRHAnnotation, 40);
-
-    delete t_pFile;
-    delete t_pFwd;
-
-    return a.exec();
+    return app.exec();
 }
 
 //*************************************************************************************************************
