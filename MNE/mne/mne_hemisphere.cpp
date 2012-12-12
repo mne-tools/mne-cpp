@@ -112,6 +112,8 @@ MNEHemisphere::MNEHemisphere(MNEHemisphere* p_pMNEHemisphere)
 , use_tri_nn(MatrixX3d(p_pMNEHemisphere->use_tri_nn))
 , use_tri_area(VectorXd(p_pMNEHemisphere->use_tri_area))
 , m_pTriCoords(p_pMNEHemisphere->m_pTriCoords ? new MatrixXf(*(p_pMNEHemisphere->m_pTriCoords)) : NULL)
+, cluster_vertnos(p_pMNEHemisphere->cluster_vertnos)
+, cluster_distances(p_pMNEHemisphere->cluster_distances)
 {
     //*m_pGeometryData = *p_pMNEHemisphere->m_pGeometryData;
 }

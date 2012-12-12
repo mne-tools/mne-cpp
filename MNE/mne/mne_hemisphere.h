@@ -140,31 +140,36 @@ public:
 
 public:
     // MNE Suite
-    fiff_int_t id;              /**< The ID of ... */
-    fiff_int_t np;              /**< The... */
-    fiff_int_t ntri;            /**< The... */
-    fiff_int_t coord_frame;     /**< The... */
-    MatrixX3d rr;               /**< The... */
-    MatrixX3d nn;               /**< The... */
-    MatrixX3i tris;             /**< The... */
+    fiff_int_t id;              /**< ID of ... */
+    fiff_int_t np;              /**< ToDo... */
+    fiff_int_t ntri;            /**< ToDo... */
+    fiff_int_t coord_frame;     /**< ToDo... */
+    MatrixX3d rr;               /**< ToDo... */
+    MatrixX3d nn;               /**< ToDo... */
+    MatrixX3i tris;             /**< ToDo... */
     fiff_int_t nuse;
-    VectorXi inuse;             /**< The... */
-    VectorXi vertno;            /**< The... */
-    qint32 nuse_tri;            /**< The... */
-    MatrixX3i use_tris;         /**< The... */
-    VectorXi nearest;           /**< The... */
-    VectorXd nearest_dist;      /**< The... */
-    QList<VectorXi> pinfo;      /**< The... */
-    float dist_limit;           /**< The... */
-    MatrixXd* dist;             /**< The... */
-    MatrixX3d tri_cent;         /**< The... */
-    MatrixX3d tri_nn;           /**< The... */
-    VectorXd tri_area;          /**< The... */
-    MatrixX3d use_tri_cent;     /**< The... */
-    MatrixX3d use_tri_nn;       /**< The... */
-    VectorXd use_tri_area;      /**< The... */
+    VectorXi inuse;             /**< ToDo... */
+    VectorXi vertno;            /**< ToDo... */
+    qint32 nuse_tri;            /**< ToDo... */
+    MatrixX3i use_tris;         /**< ToDo... */
+    VectorXi nearest;           /**< ToDo... */
+    VectorXd nearest_dist;      /**< ToDo... */
+    QList<VectorXi> pinfo;      /**< ToDo... */
+    float dist_limit;           /**< ToDo... */
+    MatrixXd* dist;             /**< ToDo... */
+    MatrixX3d tri_cent;         /**< ToDo... */
+    MatrixX3d tri_nn;           /**< ToDo... */
+    VectorXd tri_area;          /**< ToDo... */
+    MatrixX3d use_tri_cent;     /**< ToDo... */
+    MatrixX3d use_tri_nn;       /**< ToDo... */
+    VectorXd use_tri_area;      /**< ToDo... */
 //    dist;
 //    dist_limit;
+
+
+    QList<VectorXi> cluster_vertnos;    /**< Only used within clustered forward solutions */
+    QList<VectorXd> cluster_distances;  /**< Distances to clusters centroid. */
+
 
 private:
     // Newly added

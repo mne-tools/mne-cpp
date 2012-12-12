@@ -84,6 +84,7 @@ MNEForwardSolution::MNEForwardSolution()
 , src(NULL)
 , source_rr(MatrixX3d::Zero(0,3))
 , source_nn(MatrixX3d::Zero(0,3))
+, isClustered(false)
 {
 
 }
@@ -102,6 +103,7 @@ MNEForwardSolution::MNEForwardSolution(const MNEForwardSolution* p_pMNEForwardSo
 , src(p_pMNEForwardSolution->src ? new MNESourceSpace(p_pMNEForwardSolution->src) : NULL)
 , source_rr(MatrixX3d(p_pMNEForwardSolution->source_rr))
 , source_nn(MatrixX3d(p_pMNEForwardSolution->source_nn))
+, isClustered(p_pMNEForwardSolution->isClustered)
 {
 
 }
@@ -296,6 +298,28 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
                             t_LF_partial.block(j, k*3, 1, 3) = ctrs.block(k,j*3,1,3);
 
                     //
+                    // Get cluster indizes and its distances to the centroid
+                    //
+                    for(qint32 j = 0; j < nClusters; ++j)
+                    {
+                        VectorXi clusterIdcs = VectorXi::Zero(roiIdx.rows());
+                        VectorXd clusterDistance = VectorXd::Zero(roiIdx.rows());
+                        qint32 nClusterIdcs = 0;
+                        for(qint32 k = 0; k < roiIdx.rows(); ++k)
+                        {
+                            if(roiIdx[k] == j)
+                            {
+                                clusterIdcs[nClusterIdcs] = idcs[k];
+                                clusterDistance[nClusterIdcs] = D(k,j);
+                                ++nClusterIdcs;
+                            }
+                        }
+                        clusterIdcs.conservativeResize(nClusterIdcs);
+                        p_fwdOut->src->hemispheres[h]->cluster_vertnos.append(clusterIdcs);
+                        p_fwdOut->src->hemispheres[h]->cluster_distances.append(clusterDistance);
+                    }
+
+                    //
                     // Assign partial LF to new LeadField
                     //
                     if(t_LF_partial.rows() > 0 && t_LF_partial.cols() > 0)
@@ -369,6 +393,8 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
     p_fwdOut->sol->ncol = t_LF_new.cols();
 
     p_fwdOut->nsource = p_fwdOut->sol->ncol/3;
+
+    p_fwdOut->isClustered = true;
 
     return true;
 }
