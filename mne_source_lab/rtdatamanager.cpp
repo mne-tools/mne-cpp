@@ -113,15 +113,24 @@ void RtDataManager::run()
     qDebug() << t_cmdClient.sendCommand("clist");
     qDebug() << t_cmdClient.sendCommand("conlist");
 
-    // read meas info
     qint32 clientId = t_dataClient.getClientId();
 
+    // read meas info
     t_cmdClient.requestMeasInfo(clientId);
-
     FiffInfo* t_pMeasInfo = t_dataClient.readInfo();
+
+    // start measurement
+    t_cmdClient.requestMeas(clientId);
+
+    MatrixXf t_matRawBuffer;
 
     while(m_bIsRunning)
     {
+        printf("read buffer...\n");
+
+        t_dataClient.readRawBuffer(t_pMeasInfo->nchan, t_matRawBuffer);
+
+        qDebug() << "Raw Buffer: " << t_matRawBuffer.rows() << "x" << t_matRawBuffer.cols();
 
     }
 
