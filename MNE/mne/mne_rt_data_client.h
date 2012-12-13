@@ -29,7 +29,7 @@ public:
     explicit MNERtDataClient(QObject *parent = 0);
 
     void connectToHost(QString& p_sRtServerHostName);
-    
+
 
     FiffInfo* readInfo()
     {
@@ -44,8 +44,7 @@ public:
         FiffTag* t_pTag = NULL;
         while(!t_bReadMeasBlockStart)
         {
-            FiffTag::read_tag(&t_fiffStream, t_pTag);
-
+            FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
             if(t_pTag->kind == FIFF_BLOCK_START && *(t_pTag->toInt()) == FIFFB_MEAS_INFO)
             {
                 printf("FIFF_BLOCK_START FIFFB_MEAS_INFO\n");
@@ -62,7 +61,7 @@ public:
 
         while(!t_bReadMeasBlockEnd)
         {
-            FiffTag::read_tag(&t_fiffStream, t_pTag);
+            FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
             //
             //  megacq parameters
             //
@@ -70,7 +69,7 @@ public:
             {
                 while(t_pTag->kind != FIFF_BLOCK_END || *(t_pTag->toInt()) != FIFFB_DACQ_PARS)
                 {
-                    FiffTag::read_tag(&t_fiffStream, t_pTag);
+                    FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
                     if(t_pTag->kind == FIFF_DACQ_PARS)
                         p_pFiffInfo->acq_pars = t_pTag->toString();
                     else if(t_pTag->kind == FIFF_DACQ_STIM)
@@ -100,7 +99,8 @@ public:
             {
                 while(t_pTag->kind != FIFF_BLOCK_END || *(t_pTag->toInt()) != FIFFB_ISOTRAK)
                 {
-                    FiffTag::read_tag(&t_fiffStream, t_pTag);
+                    FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
+
                     if(t_pTag->kind == FIFF_DIG_POINT)
                         p_pFiffInfo->dig.append(t_pTag->toDigPoint());
                 }
@@ -112,98 +112,112 @@ public:
             {
                 while(t_pTag->kind != FIFF_BLOCK_END || *(t_pTag->toInt()) != FIFFB_PROJ)
                 {
-                FiffTag::read_tag(&t_fiffStream, t_pTag);
+                    FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
                     if(t_pTag->kind == FIFF_BLOCK_START && *(t_pTag->toInt()) == FIFFB_PROJ_ITEM)
                     {
                         FiffProj* proj = NULL;
-                        qint32 countProj = 0;
+                        qint32 countProj = p_pFiffInfo->projs.size();
                         while(t_pTag->kind != FIFF_BLOCK_END || *(t_pTag->toInt()) != FIFFB_PROJ_ITEM)
                         {
-//                            FiffTag::read_tag(&t_fiffStream, t_pTag);
+                            FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
                             switch (t_pTag->kind)
                             {
-                            case FIFF_NAME:
+                            case FIFF_NAME: // First proj -> Proj is created
                                 proj = new FiffProj();
                                 p_pFiffInfo->projs.append(proj);
-                                ++countProj;
-                                p_pFiffInfo->projs[countProj-1]->desc = t_pTag->toString();
+                                p_pFiffInfo->projs[countProj]->desc = t_pTag->toString();
                                 break;
                             case FIFF_PROJ_ITEM_KIND:
-                                p_pFiffInfo->projs[countProj-1]->kind = *(t_pTag->toInt());
+                                p_pFiffInfo->projs[countProj]->kind = *(t_pTag->toInt());
                                 break;
-                            case FIFF_NCHAN:
-                                p_pFiffInfo->projs[countProj-1]->data->ncol = *(t_pTag->toInt());
+                            case FIFF_NCHAN: // First data -> FiffNamedMatrix is created
+                                p_pFiffInfo->projs[countProj]->data = new FiffNamedMatrix();
+                                p_pFiffInfo->projs[countProj]->data->ncol = *(t_pTag->toInt());
                                 break;
                             case FIFF_PROJ_ITEM_NVEC:
-                                p_pFiffInfo->projs[countProj-1]->data->nrow = *(t_pTag->toInt());
+                                p_pFiffInfo->projs[countProj]->data->nrow = *(t_pTag->toInt());
                                 break;
                             case FIFF_MNE_PROJ_ITEM_ACTIVE:
-                                p_pFiffInfo->projs[countProj-1]->active = *(t_pTag->toInt());
+                                p_pFiffInfo->projs[countProj]->active = *(t_pTag->toInt());
                                 break;
                             case FIFF_PROJ_ITEM_CH_NAME_LIST:
-//                                p_pFiffInfo->projs[countProj-1]->data->col_names = Fiff::split_name_list(t_pTag->toString());
+                                p_pFiffInfo->projs[countProj]->data->col_names = FiffStream::split_name_list(t_pTag->toString());
                                 break;
                             case FIFF_PROJ_ITEM_VECTORS:
-                                p_pFiffInfo->projs[countProj-1]->data->data = t_pTag->toFloatMatrix();
+                                p_pFiffInfo->projs[countProj]->data->data = t_pTag->toFloatMatrix();
                                 break;
                             }
                         }
                     }
                 }
             }
-//            %
-//            %    CTF compensation info
-//            %
-//            if(tag.kind == FIFF.FIFF_BLOCK_START && tag.data == FIFF.FIFFB_MNE_CTF_COMP)
-//               info.comps = [];
-//               while(tag.kind ~= FIFF.FIFF_BLOCK_END || tag.data ~= FIFF.FIFFB_MNE_CTF_COMP)
-//                    tag = mne_rt_data_client.read_tag(obj.m_DataInputStream);
-//                    if(tag.kind == FIFF.FIFF_BLOCK_START && tag.data == FIFF.FIFFB_MNE_CTF_COMP_DATA)
-//                       comp = [];
-//                       while(tag.kind ~= FIFF.FIFF_BLOCK_END || tag.data ~= FIFF.FIFFB_MNE_CTF_COMP_DATA)
-//                            tag = mne_rt_data_client.read_tag(obj.m_DataInputStream);
-//                            switch tag.kind
-//                                case FIFF.FIFF_MNE_CTF_COMP_KIND
-//                                    comp.ctfkind = tag.data;
-//                                case FIFF.FIFF_MNE_CTF_COMP_CALIBRATED
-//                                    comp.save_calibrated = tag.data;
-//                                case FIFF.FIFF_MNE_CTF_COMP_DATA
-//                                    comp.data = tag.data;
-//                            end
-//                        end
-//                    end
-
-//                    if ~isempty(comp)
-//                        info.comps = [info.comps comp];
-//                    end
-//                end
-//            end
-//            %
-//            %    Bad channels
-//            %
-//            if(tag.kind == FIFF.FIFF_BLOCK_START && tag.data == FIFF.FIFFB_MNE_BAD_CHANNELS)
-//               info.bads = [];
-//               while(tag.kind ~= FIFF.FIFF_BLOCK_END || tag.data ~= FIFF.FIFFB_MNE_BAD_CHANNELS)
-//                    tag = mne_rt_data_client.read_tag(obj.m_DataInputStream);
-//                    if(tag.kind == FIFF.FIFF_MNE_CH_NAME_LIST)
-//                        info.bads = fiff_split_name_list(tag.data);
-//                    end
-//                end
-//            end
-//            %
-//            %    General
-//            %
-//            if (tag.kind == FIFF.FIFF_SFREQ)
-//                info.sfreq = tag.data;
-//            elseif (tag.kind == FIFF.FIFF_HIGHPASS)
-//                info.highpass = tag.data;
-//            elseif (tag.kind == FIFF.FIFF_LOWPASS)
-//                info.lowpass = tag.data;
-//            elseif (tag.kind == FIFF.FIFF_NCHAN)
-//                info.nchan = tag.data;
-//            elseif (tag.kind == FIFF.FIFF_MEAS_DATE)
-//                info.highpass = tag.data;
-//            end
+            //
+            //    CTF compensation info
+            //
+            if(t_pTag->kind == FIFF_BLOCK_START && *(t_pTag->toInt()) == FIFFB_MNE_CTF_COMP)
+            {
+                while(t_pTag->kind != FIFF_BLOCK_END || *(t_pTag->toInt()) != FIFFB_MNE_CTF_COMP)
+                {
+                    FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
+                    if(t_pTag->kind == FIFF_BLOCK_START && *(t_pTag->toInt()) == FIFFB_MNE_CTF_COMP_DATA)
+                    {
+                        FiffCtfComp* comp = NULL;
+                        qint32 countComp = p_pFiffInfo->comps.size();
+                        while(t_pTag->kind != FIFF_BLOCK_END || *(t_pTag->toInt()) != FIFFB_MNE_CTF_COMP_DATA)
+                        {
+                            FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
+                            switch (t_pTag->kind)
+                            {
+                            case FIFF_MNE_CTF_COMP_KIND: //First comp -> create comp
+                                comp = new FiffCtfComp();
+                                p_pFiffInfo->comps.append(comp);
+                                p_pFiffInfo->comps[countComp]->ctfkind = *(t_pTag->toInt());
+                                break;
+                            case FIFF_MNE_CTF_COMP_CALIBRATED:
+                                p_pFiffInfo->comps[countComp]->save_calibrated = *(t_pTag->toInt());
+                                break;
+//                            case FIFF_MNE_CTF_COMP_DATA:
+//                                p_pFiffInfo->comps[countComp]->data = *(t_pTag->toNamedMatrix());
+//                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            //
+            //    Bad channels
+            //
+            if(t_pTag->kind == FIFF_BLOCK_START && *(t_pTag->toInt()) == FIFFB_MNE_BAD_CHANNELS)
+            {
+                while(t_pTag->kind != FIFF_BLOCK_END || *(t_pTag->toInt()) != FIFFB_MNE_BAD_CHANNELS)
+                {
+                    FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
+                    if(t_pTag->kind == FIFF_MNE_CH_NAME_LIST)
+                        p_pFiffInfo->bads = FiffStream::split_name_list(t_pTag->data());
+                }
+            }
+            //
+            //    General
+            //
+            switch(t_pTag->kind)
+            {
+            case FIFF_SFREQ:
+                p_pFiffInfo->sfreq = *(t_pTag->toFloat());
+                break;
+            case FIFF_HIGHPASS:
+                p_pFiffInfo->highpass = *(t_pTag->toFloat());
+                break;
+            case FIFF_LOWPASS:
+                p_pFiffInfo->lowpass = *(t_pTag->toFloat());
+                break;
+            case FIFF_NCHAN:
+                p_pFiffInfo->nchan = *(t_pTag->toInt());
+                break;
+            case FIFF_MEAS_DATE:
+                p_pFiffInfo->meas_date[0] = t_pTag->toInt()[0];
+                p_pFiffInfo->meas_date[1] = t_pTag->toInt()[1];
+                break;
+            }
 
             if (t_pTag->kind == FIFF_CH_INFO)
                 p_pFiffInfo->chs.append(t_pTag->toChInfo());

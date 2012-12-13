@@ -199,6 +199,26 @@ bool FiffTag::read_tag_info(FiffStream* p_pStream, FiffTag*& p_pTag, bool p_bDoS
 
 //*************************************************************************************************************
 
+bool FiffTag::read_rt_tag(FiffStream* p_pStream, FiffTag*& p_pTag)
+{
+    while(p_pStream->device()->bytesAvailable() < 16)
+        p_pStream->device()->waitForReadyRead(10);
+
+    if(!FiffTag::read_tag_info(p_pStream, p_pTag, false))
+        return false;
+
+    while(p_pStream->device()->bytesAvailable() < p_pTag->size())
+        p_pStream->device()->waitForReadyRead(10);
+
+    if(!FiffTag::read_tag_data(p_pStream, p_pTag))
+        return false;
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
 bool FiffTag::read_tag(FiffStream* p_pStream, FiffTag*& p_pTag, qint64 pos)
 {
     if (pos >= 0)
