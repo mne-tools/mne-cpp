@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dataproducer.h
+* @file     rtdatamanager.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,20 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DataProducer Class.
+* @brief    Contains the declaration of the RtDataManager Class.
 *
 */
 
-#ifndef FIFFPRODUCER_H
-#define FIFFPRODUCER_H
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-//#include "circularbuffer.h"
+#ifndef RTDATAMANAGER_H
+#define RTDATAMANAGER_H
 
 
 //*************************************************************************************************************
@@ -52,57 +44,28 @@
 
 #include <QThread>
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE FiffConnectorPlugin
-//=============================================================================================================
-
-namespace FiffSimulatorPlugin
+class RtDataManager : public QThread
 {
+    Q_OBJECT
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-//using namespace IOBuffer;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class FiffSimulator;
-
-
-//=============================================================================================================
-/**
-* DECLARE CLASS ECGProducer
-*
-* @brief The ECGProducer class provides a ECG data producer for a given sampling rate.
-*/
-class FiffProducer : public QThread
-{
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a DataProducer.
+    * Constructs a RtClient.
     */
-    FiffProducer(FiffSimulator* simulator);
+    explicit RtDataManager(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the DataProducer.
+    * Destroys the RtClient.
     */
-    ~FiffProducer();
+    ~RtDataManager();
 
     //=========================================================================================================
     /**
-    * Stops the DataProducer by stopping the producer's thread.
+    * Stops the Producer by stopping the producer's thread.
     */
     virtual bool stop();
 
@@ -115,12 +78,16 @@ protected:
     */
     virtual void run();
 
+
 private:
 
-    FiffSimulator*  m_pFiffSimulator;   /**< Holds a pointer to corresponding FiffSimulator.*/
+//    FiffSimulator*  m_pFiffSimulator;   /**< Holds a pointer to corresponding FiffSimulator.*/
     bool            m_bIsRunning;       /**< Holds whether ECGProducer is running.*/
+
+    QString m_sRtServerHostName;
+
+signals:
+
 };
 
-} // NAMESPACE
-
-#endif // FIFFPRODUCER_H
+#endif // RTDATAMANAGER_H

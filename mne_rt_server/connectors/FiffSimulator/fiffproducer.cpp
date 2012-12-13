@@ -77,8 +77,7 @@ FiffProducer::~FiffProducer()
 {
     qDebug() << "Destroy FiffProducer::~FiffProducer()";
 
-    m_bIsRunning = false;
-    QThread::wait();
+    stop();
 }
 
 
