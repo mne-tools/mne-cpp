@@ -124,7 +124,6 @@ MNEForwardSolution::~MNEForwardSolution()
 }
 
 
-
 //*************************************************************************************************************
 
 bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, Annotation* p_pLHAnnotation, Annotation* p_pRHAnnotation, qint32 p_iClusterSize)
@@ -331,12 +330,13 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
                         for(qint32 k = 0; k < nClusters; ++k)
                         {
                             qint32 j = 0;
-                            double sqec = sqrt((this->sol->data->block(0, (idcs[j]+offset)*3, t_LF.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
+
+                            double sqec = sqrt((t_LF.block(0, j*3, t_LF.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
                             double sqec_min = sqec;
                             double j_min = j;
                             for(qint32 j = 1; j < idcs.rows(); ++j)
                             {
-                                sqec = sqrt((this->sol->data->block(0, (idcs[j]+offset)*3, t_LF.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
+                                sqec = sqrt((t_LF.block(0, j*3, t_LF.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
                                 if(sqec < sqec_min)
                                 {
                                     sqec_min = sqec;

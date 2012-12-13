@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     commandthread.cpp
+* @file     rtdatamanager.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the CommandThread Class.
+* @brief    Contains the implementation of the RtClient Class.
 *
 */
 
@@ -38,12 +38,21 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "commandthread.h"
+#include "rtdatamanager.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// MNE INCLUDES
+//=============================================================================================================
+
+#include "../MNE/mne/mne_rt_cmd_client.h"
+#include "../MNE/mne/mne_rt_data_client.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
 //=============================================================================================================
 
 #include <QtNetwork>
@@ -51,114 +60,71 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace MSERVER;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CommandThread::CommandThread(int socketDescriptor, qint32 p_iId, QObject *parent)
+RtDataManager::RtDataManager(QObject *parent)
 : QThread(parent)
-, socketDescriptor(socketDescriptor)
-, m_bIsRunning(false)
-, m_iThreadID(p_iId)
+, m_sRtServerHostName("127.0.0.1")
 {
-
 }
 
 
 //*************************************************************************************************************
 
-CommandThread::~CommandThread()
+RtDataManager::~RtDataManager()
+{
+    stop();
+}
+
+
+//*************************************************************************************************************
+
+bool RtDataManager::stop()
 {
     m_bIsRunning = false;
     QThread::wait();
+
+    return true;
 }
 
 
 //*************************************************************************************************************
 
-void CommandThread::attachCommandReply(QByteArray p_blockReply, qint32 p_iID)
-{
-    if(p_iID == m_iThreadID)
-    {
-        m_qMutex.lock();
-        m_qSendBlock.append(p_blockReply);
-        m_qMutex.unlock();
-    }
-}
-
-
-//*************************************************************************************************************
-
-void CommandThread::run()
+void RtDataManager::run()
 {
     m_bIsRunning = true;
 
-    QTcpSocket t_qTcpSocket;
+    qDebug() << "void RtDataManager::run()";
 
-    if (!t_qTcpSocket.setSocketDescriptor(socketDescriptor)) {
-        emit error(t_qTcpSocket.error());
-        return;
-    }
-    else
+    MNERtCmdClient t_cmdClient;
+    t_cmdClient.connectToHost(m_sRtServerHostName);
+    t_cmdClient.waitForConnected();
+
+    MNERtDataClient t_dataClient;
+    t_dataClient.connectToHost(m_sRtServerHostName);
+    t_dataClient.waitForConnected();
+
+    // set data client alias -> for convinience (optional)
+    t_dataClient.setClientAlias("mne_source_lab"); // used in option 2 later on
+
+    // example commands
+    qDebug() << t_cmdClient.sendCommand("help");
+    qDebug() << t_cmdClient.sendCommand("clist");
+    qDebug() << t_cmdClient.sendCommand("conlist");
+
+    // read meas info
+    qint32 clientId = t_dataClient.getClientId();
+
+    t_cmdClient.requestMeasInfo(clientId);
+
+    FiffInfo* t_pMeasInfo = t_dataClient.readInfo();
+
+    while(m_bIsRunning)
     {
-        printf("CommandClient connection accepted from\n\tIP:\t%s\n\tPort:\t%d\n\n",
-               QHostAddress(t_qTcpSocket.peerAddress()).toString().toUtf8().constData(),
-               t_qTcpSocket.peerPort());
+
     }
 
-    QDataStream t_FiffStreamIn(&t_qTcpSocket);
+    delete t_pMeasInfo;
 
-    qint64 t_iMaxBufSize = 1024;
-
-    while(t_qTcpSocket.state() != QAbstractSocket::UnconnectedState && m_bIsRunning)
-    {
-        //
-        // Write available data
-        //
-        if(m_qSendBlock.size() > 0)
-        {
-            qint32 t_iBlockSize = m_qSendBlock.size();
-            m_qMutex.lock();
-            qint32 t_iBytesWritten = t_qTcpSocket.write(m_qSendBlock);
-            t_qTcpSocket.waitForBytesWritten();
-            if(t_iBytesWritten == t_iBlockSize)
-                m_qSendBlock.clear();
-            else
-                m_qSendBlock = m_qSendBlock.mid(t_iBytesWritten, t_iBlockSize-t_iBytesWritten);
-            m_qMutex.unlock();
-        }
-
-        //
-        // Read: Wait 100ms for incomming tag header, read and continue
-        //
-        //ToDo its not the best solution in terms of receiving the command for sure
-        t_qTcpSocket.waitForReadyRead(100);
-
-        if (t_qTcpSocket.bytesAvailable() > 0 && t_qTcpSocket.canReadLine())
-        {
-            QByteArray t_qByteArrayRaw = t_qTcpSocket.readLine(t_iMaxBufSize);
-            QString t_sCommand = QString(t_qByteArrayRaw).simplified();
-
-            //
-            // Parse command
-            //
-            if(!t_sCommand.isEmpty())
-                emit newCommand(t_sCommand, m_iThreadID);
-        }
-        else if(t_qTcpSocket.bytesAvailable() > t_iMaxBufSize)
-        {
-            t_qTcpSocket.readAll();//readAll that QTcpSocket is empty again -> prevent overflow
-        }
-    }
-
-    t_qTcpSocket.disconnectFromHost();
-    if(t_qTcpSocket.state() != QAbstractSocket::UnconnectedState)
-        t_qTcpSocket.waitForDisconnected();
 }

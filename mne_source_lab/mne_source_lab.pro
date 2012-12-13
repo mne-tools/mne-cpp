@@ -40,6 +40,7 @@ TEMPLATE = app
 VERSION = $${MNE_CPP_VERSION}
 
 QT       += core
+QT       += network
 QT       -= gui
 
 CONFIG   += console
@@ -68,9 +69,9 @@ else {
 DESTDIR = $${PWD}/../bin
 
 SOURCES += main.cpp \
-    dataclient.cpp \
-    sourcelab.cpp
+    sourcelab.cpp \
+    rtdatamanager.cpp
 
 HEADERS += \
-    dataclient.h \
-    sourcelab.h
+    sourcelab.h \
+    rtdatamanager.h

@@ -538,6 +538,14 @@ public:
     */
     void write_string(fiff_int_t kind, QString& data);
 
+    //=========================================================================================================
+    /**
+    * Writes a real-time command
+    *
+    * @param[in] command    The real time command
+    * @param[in] data       The string data to write
+    */
+    void write_rt_command(fiff_int_t command, QString& data);
 };
 
 } // NAMESPACE

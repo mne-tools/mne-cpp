@@ -90,11 +90,14 @@ FiffStream::FiffStream(QByteArray * a, QIODevice::OpenMode mode)
 
 FiffStream::~FiffStream()
 {
-    if(this->device()->isOpen())
-    {
+    //ToDo check if all IO devices are closed outside --> don't do this here!!
+//    printf("DEBUG: check if FiffStream::IODevice is closed else where. Cause here it's not anymore.");
+
+//    if(this->device()->isOpen())
+//    {
 //        printf("DEBUG: Closing FiffStream %s.\n\n", this->streamName().toUtf8().constData());
-        this->device()->close();
-    }
+//        this->device()->close();
+//    }
 }
 
 
@@ -2059,6 +2062,24 @@ void FiffStream::write_string(fiff_int_t kind, QString& data)
     *this << (qint32)FIFFT_STRING;
     *this << (qint32)datasize;
     *this << (qint32)FIFFV_NEXT_SEQ;
+
+    this->writeRawData(data.toUtf8().constData(),datasize);
+}
+
+
+//*************************************************************************************************************
+
+void FiffStream::write_rt_command(fiff_int_t command, QString& data)
+{
+    fiff_int_t datasize = data.size();//size(data,2);
+
+//    QDataStream out(this);   // we will serialize the data into the file
+
+    *this << (qint32)FIFF_MNE_RT_COMMAND;
+    *this << (qint32)FIFFT_VOID;
+    *this << 4+(qint32)datasize;
+    *this << (qint32)FIFFV_NEXT_SEQ;
+    *this << command;
 
     this->writeRawData(data.toUtf8().constData(),datasize);
 }
