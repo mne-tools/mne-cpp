@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include "rtdatamanager.h"
+#include "sourcelab.h"
 
 
 //*************************************************************************************************************
@@ -63,8 +64,9 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtDataManager::RtDataManager(QObject *parent)
+RtDataManager::RtDataManager(SourceLab* p_pSourceLab, QObject *parent)
 : QThread(parent)
+, m_pSourceLab(p_pSourceLab)
 , m_sRtServerHostName("127.0.0.1")
 {
 }
@@ -117,23 +119,54 @@ void RtDataManager::run()
 
     // read meas info
     t_cmdClient.requestMeasInfo(clientId);
-    FiffInfo* t_pMeasInfo = t_dataClient.readInfo();
+
+    m_pSourceLab->mutex.lock();
+    if(m_pSourceLab->m_pRawInfo)
+        delete m_pSourceLab->m_pRawInfo;
+    m_pSourceLab->m_pRawInfo = t_dataClient.readInfo();
+    m_pSourceLab->mutex.unlock();
 
     // start measurement
     t_cmdClient.requestMeas(clientId);
 
     MatrixXf t_matRawBuffer;
 
+    fiff_int_t kind;
+
+    qint32 from = 0;
+    qint32 to = -1;
+
+    qint32 sampleSize = 0;
+
     while(m_bIsRunning)
     {
-        printf("read buffer...\n");
+        t_dataClient.readRawBuffer(m_pSourceLab->m_pRawInfo->nchan, t_matRawBuffer, kind);
 
-        t_dataClient.readRawBuffer(t_pMeasInfo->nchan, t_matRawBuffer);
 
-        qDebug() << "Raw Buffer: " << t_matRawBuffer.rows() << "x" << t_matRawBuffer.cols();
+        if(kind == FIFF_DATA_BUFFER)
+        {
+            //When sample buffer size is changed reininit circular buffer
+            if(sampleSize != t_matRawBuffer.cols())
+            {
+                if(m_pSourceLab->isRunning())
+                    m_pSourceLab->stop();
+                if(m_pSourceLab->m_pRawMatrixBuffer)
+                    delete m_pSourceLab->m_pRawMatrixBuffer;
+                m_pSourceLab->m_pRawMatrixBuffer = new RawMatrixBuffer(10, m_pSourceLab->m_pRawInfo->nchan, t_matRawBuffer.cols());
 
+                sampleSize = t_matRawBuffer.cols();
+                m_pSourceLab->start();
+            }
+
+            to += t_matRawBuffer.cols();
+            printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, ((float)from)/m_pSourceLab->m_pRawInfo->sfreq, ((float)to)/m_pSourceLab->m_pRawInfo->sfreq);
+            from += t_matRawBuffer.cols();
+
+            m_pSourceLab->m_pRawMatrixBuffer->push(&t_matRawBuffer);
+        }
+        else if(FIFF_DATA_BUFFER == FIFF_BLOCK_END)
+            m_bIsRunning;
+
+        printf("[done]\n");
     }
-
-    delete t_pMeasInfo;
-
 }

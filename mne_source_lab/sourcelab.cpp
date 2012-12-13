@@ -44,7 +44,11 @@ using namespace FSLIB;
 
 
 SourceLab::SourceLab(QObject *parent)
-: QObject(parent)
+: QThread(parent)
+, m_pRtDataManager(NULL)
+, m_pRawInfo(NULL)
+, m_bIsRunning(false)
+, m_pRawMatrixBuffer(NULL)
 {
 //    MNEForwardSolution* t_pFwd = NULL;
 
@@ -78,7 +82,7 @@ SourceLab::SourceLab(QObject *parent)
 //    delete t_pFwd;
 
 
-    m_pRtDataManager = new RtDataManager();
+    m_pRtDataManager = new RtDataManager(this);
 
     m_pRtDataManager->start();
 
@@ -91,4 +95,48 @@ SourceLab::~SourceLab()
 {
     if(m_pRtDataManager)
         delete m_pRtDataManager;
+}
+
+
+//*************************************************************************************************************
+
+bool SourceLab::start()
+{
+    // Start threads
+    m_pRtDataManager->start();
+
+    QThread::start();
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool SourceLab::stop()
+{
+    m_bIsRunning = false;
+    QThread::wait();
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+void SourceLab::run()
+{
+    m_bIsRunning = true;
+
+    quint32 count = 0;
+    while(m_bIsRunning)
+    {
+        MatrixXf tmp = m_pRawMatrixBuffer->pop();
+        qDebug() << "Received Buffer " << count;
+        ++count;
+//        printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
+
+//        emit remitRawBuffer(tmp);
+    }
+
 }

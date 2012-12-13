@@ -44,6 +44,10 @@
 
 #include <QThread>
 
+
+class SourceLab;
+
+
 class RtDataManager : public QThread
 {
     Q_OBJECT
@@ -55,7 +59,7 @@ public:
     /**
     * Constructs a RtClient.
     */
-    explicit RtDataManager(QObject *parent = 0);
+    explicit RtDataManager(SourceLab* p_pSourceLab, QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -82,9 +86,10 @@ protected:
 private:
 
 //    FiffSimulator*  m_pFiffSimulator;   /**< Holds a pointer to corresponding FiffSimulator.*/
-    bool            m_bIsRunning;       /**< Holds whether ECGProducer is running.*/
+    bool        m_bIsRunning;       /**< Holds whether ECGProducer is running.*/
 
-    QString m_sRtServerHostName;
+    QString     m_sRtServerHostName;
+    SourceLab*  m_pSourceLab;
 
 signals:
 
