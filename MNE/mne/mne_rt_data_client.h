@@ -249,7 +249,7 @@ public:
     /**
     *
     */
-    void readRawBuffer(qint32 p_nChannels, MatrixXf& data)
+    void readRawBuffer(qint32 p_nChannels, MatrixXf& data, fiff_int_t& kind)
     {
 //        data = [];
 
@@ -261,7 +261,7 @@ public:
 
         FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
 
-        fiff_int_t kind = t_pTag->kind;
+        kind = t_pTag->kind;
 
         if(kind == FIFF_DATA_BUFFER)
         {
