@@ -215,6 +215,20 @@ public:
 
     //=========================================================================================================
     /**
+    * Read one tag from a fif real-time stream.
+    * difference to the other read tag functions is: that this function has blocking behaviour (waitForReadyRead)
+    *
+    * @param[in] p_pStream opened fif file
+    * @param[out] p_pTag the read tag
+    * @param[in] pos position of the tag inside the fif file
+    *
+    * @return true if succeeded, false otherwise
+    */
+    static bool read_rt_tag(FiffStream* p_pStream, FiffTag*& p_pTag);
+
+
+    //=========================================================================================================
+    /**
     * ### MNE toolbox root function ###: Implementation of the fiff_read_tag function
     *
     * Read one tag from a fif file.
