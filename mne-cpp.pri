@@ -10,7 +10,3 @@ isGui = true #false
 isGui {
     Qt3D_available = false #true
 }
-
-HEADERS +=
-
-SOURCES +=
