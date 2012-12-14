@@ -95,9 +95,15 @@ FiffInfo::FiffInfo(const FiffInfo* p_pFiffInfo)
         chs.append(FiffChInfo(&p_pFiffInfo->chs[i]));
 
     ch_names = p_pFiffInfo->ch_names;
-    dev_head_t = new FiffCoordTrans(p_pFiffInfo->dev_head_t);
-    ctf_head_t = new FiffCoordTrans(p_pFiffInfo->ctf_head_t);
-    dev_ctf_t = new FiffCoordTrans(p_pFiffInfo->dev_ctf_t);
+
+    if(dev_head_t)
+        dev_head_t = new FiffCoordTrans(p_pFiffInfo->dev_head_t);
+
+    if(ctf_head_t)
+        ctf_head_t = new FiffCoordTrans(p_pFiffInfo->ctf_head_t);
+
+    if(dev_ctf_t)
+        dev_ctf_t = new FiffCoordTrans(p_pFiffInfo->dev_ctf_t);
 
 
     for(i = 0; i < p_pFiffInfo->dig.size(); ++i)

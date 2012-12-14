@@ -68,10 +68,7 @@ else {
 
 DESTDIR = $${PWD}/../bin
 
-SOURCES += main.cpp \
-    sourcelab.cpp \
-    rtdatamanager.cpp
+SOURCES +=  main.cpp \
+            sourcelab.cpp \
 
-HEADERS += \
-    sourcelab.h \
-    rtdatamanager.h
+HEADERS += sourcelab.h \
