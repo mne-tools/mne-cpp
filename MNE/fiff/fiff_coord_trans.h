@@ -97,7 +97,6 @@ public:
     */
     ~FiffCoordTrans();
 
-
     //=========================================================================================================
     /**
     * ### MNE toolbox root function ###: implementation of the fiff_invert_transform function

@@ -65,10 +65,9 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MNERtClient::MNERtClient(QString& p_sRtServerHostname, QObject *parent)
+MNERtClient::MNERtClient(QString p_sRtServerHostname, QObject *parent)
 : QThread(parent)
 , m_bIsRunning(false)
-, m_bFiffInfoRequest(false)
 , m_sRtServerHostName(p_sRtServerHostname)
 , m_pFiffInfo(NULL)
 {
@@ -82,16 +81,6 @@ MNERtClient::~MNERtClient()
     stop();
     if(m_pFiffInfo)
         delete m_pFiffInfo;
-}
-
-
-//*************************************************************************************************************
-
-void MNERtClient::requestFiffInfo()
-{
-    mutex.lock();
-    m_bFiffInfoRequest = true;
-    mutex.unlock();
 }
 
 
@@ -137,8 +126,6 @@ void MNERtClient::run()
         delete m_pFiffInfo;
     m_pFiffInfo = t_dataClient.readInfo();
 
-    emit fiffInfoReceived(*m_pFiffInfo);
-
     // start measurement
     t_cmdClient.requestMeas(clientId);
 
@@ -151,14 +138,6 @@ void MNERtClient::run()
 
     while(m_bIsRunning)
     {
-        mutex.lock();
-        if(m_bFiffInfoRequest)
-        {
-            emit fiffInfoReceived(*m_pFiffInfo);
-            m_bFiffInfoRequest = false;
-        }
-        mutex.unlock();
-
         t_dataClient.readRawBuffer(m_pFiffInfo->nchan, t_matRawBuffer, kind);
 
         if(kind == FIFF_DATA_BUFFER)

@@ -111,9 +111,8 @@ public:
     * @param[in] p_sRtServerHostname    The IP address of the mne_rt_server
     * @param[in] parent                 Parent QObject (optional)
     */
-    explicit MNERtClient(QString& p_sRtServerHostname,QObject *parent = 0);
+    explicit MNERtClient(QString p_sRtServerHostname,QObject *parent = 0);
     
-
     //=========================================================================================================
     /**
     * Destroys the RtClient.
@@ -125,9 +124,10 @@ public:
     /**
     * Request Fiff Info
     */
-    void requestFiffInfo();
-
-
+    inline const FiffInfo* getFiffInfo()
+    {
+        return m_pFiffInfo;
+    }
 
     //=========================================================================================================
     /**
@@ -150,7 +150,6 @@ private:
     QMutex      mutex;
 
     bool        m_bIsRunning;           /**< Holds whether RtClient is running.*/
-    bool        m_bFiffInfoRequest;     /**< Holds whether the fiff Info should be emmited via signal fiffInfoReceived.*/
 
     QString     m_sRtServerHostName;    /**< The IP Adress of mne_rt_server.*/
 
@@ -158,9 +157,10 @@ private:
 
 signals:
     void rawBufferReceived(Eigen::MatrixXf p_rawBuffer);
-    void fiffInfoReceived(FIFFLIB::FiffInfo p_fiffInfo);
 };
 
 } // NAMESPACE
+
+Q_DECLARE_METATYPE(Eigen::MatrixXf);
 
 #endif // MNE_RT_CLIENT_H

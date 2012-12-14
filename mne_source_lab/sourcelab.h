@@ -7,7 +7,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rtdatamanager.h"
 
 
 //*************************************************************************************************************
@@ -16,6 +15,14 @@
 //=============================================================================================================
 
 #include "../MNE/fiff/fiff_info.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// MNE INCLUDES
+//=============================================================================================================
+
+#include "../MNE/mne/mne_rt_client.h"
 
 
 //*************************************************************************************************************
@@ -38,13 +45,14 @@
 
 using namespace IOBuffer;
 using namespace FIFFLIB;
+using namespace MNELIB;
 
 
 class SourceLab : public QThread
 {
     Q_OBJECT
 public:
-    friend class RtDataManager;
+//    friend class RtDataManager;
 
     explicit SourceLab(QObject *parent = 0);
 
@@ -59,6 +67,7 @@ public:
 
     virtual bool stop();
 
+    void receiveRawBuffer(MatrixXf p_rawBuffer);
 
 protected:
     //=========================================================================================================
@@ -72,16 +81,13 @@ protected:
 signals:
     void closeSourceLab();
 
-public slots:
-
 private:
-    RtDataManager*  m_pRtDataManager;
-
-    FiffInfo*       m_pRawInfo;         /**< Holds the fiff raw measurement information. */
-
+    MNERtClient*    m_pRtClient;
+    FiffInfo*       m_pFiffInfo;         /**< Holds the fiff raw measurement information. */
     RawMatrixBuffer* m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
 
     bool    m_bIsRunning;
+    bool    m_bIsRawBufferInit;
 
     QMutex mutex;
 

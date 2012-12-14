@@ -45,9 +45,9 @@ using namespace FSLIB;
 
 SourceLab::SourceLab(QObject *parent)
 : QThread(parent)
-, m_pRtDataManager(NULL)
-, m_pRawInfo(NULL)
+, m_pFiffInfo(NULL)
 , m_bIsRunning(false)
+, m_bIsRawBufferInit(false)
 , m_pRawMatrixBuffer(NULL)
 {
 //    MNEForwardSolution* t_pFwd = NULL;
@@ -82,10 +82,13 @@ SourceLab::SourceLab(QObject *parent)
 //    delete t_pFwd;
 
 
-    m_pRtDataManager = new RtDataManager(this);
+    m_pRtClient = new MNERtClient("127.0.0.1", this);
 
-    m_pRtDataManager->start();
+    qRegisterMetaType<MatrixXf>("MatrixXf");
+    connect(m_pRtClient, &MNERtClient::rawBufferReceived,
+            this, &SourceLab::receiveRawBuffer);
 
+    this->start();
 }
 
 
@@ -93,8 +96,12 @@ SourceLab::SourceLab(QObject *parent)
 
 SourceLab::~SourceLab()
 {
-    if(m_pRtDataManager)
-        delete m_pRtDataManager;
+    if(m_pRtClient)
+        delete m_pRtClient;
+    if(m_pFiffInfo)
+        delete m_pFiffInfo;
+    if(m_pRawMatrixBuffer)
+        delete m_pRawMatrixBuffer;
 }
 
 
@@ -103,7 +110,7 @@ SourceLab::~SourceLab()
 bool SourceLab::start()
 {
     // Start threads
-    m_pRtDataManager->start();
+    m_pRtClient->start();
 
     QThread::start();
 
@@ -124,6 +131,23 @@ bool SourceLab::stop()
 
 //*************************************************************************************************************
 
+void SourceLab::receiveRawBuffer(MatrixXf p_rawBuffer)
+{
+    if(!m_pRawMatrixBuffer)
+    {
+        m_pRawMatrixBuffer = new RawMatrixBuffer(10, p_rawBuffer.rows(), p_rawBuffer.cols());
+
+        mutex.lock();
+        m_bIsRawBufferInit = true;
+        mutex.unlock();
+    }
+
+    m_pRawMatrixBuffer->push(&p_rawBuffer);
+}
+
+
+//*************************************************************************************************************
+
 void SourceLab::run()
 {
     m_bIsRunning = true;
@@ -132,24 +156,24 @@ void SourceLab::run()
 
     while(m_bIsRunning)
     {
-        MatrixXf rawSegment = m_pRawMatrixBuffer->pop();
-        qDebug() << "Received Buffer " << count;
-        ++count;
+        if(m_bIsRawBufferInit && m_pRtClient->getFiffInfo())
+        {
+            MatrixXf rawSegment = m_pRawMatrixBuffer->pop();
+            qDebug() << "Received Buffer " << count;
+            ++count;
 
+            qint32 samples = rawSegment.cols();
+            VectorXf mu = rawSegment.rowwise().sum().array() / (float)samples;
 
-        qint32 samples = rawSegment.cols();
-        VectorXf mu = rawSegment.rowwise().sum().array() / (float)samples;
+            MatrixXf noise_covariance = rawSegment * rawSegment.transpose();// noise_covariance == raw_covariance
+            noise_covariance.array() -= samples * (mu * mu.transpose()).array();
+            noise_covariance.array() /= (samples - 1);
 
-        MatrixXf noise_covariance = rawSegment * rawSegment.transpose();// noise_covariance == raw_covariance
-        noise_covariance.array() -= samples * (mu * mu.transpose()).array();
-        noise_covariance.array() /= (samples - 1);
+            std::cout << "Noise Covariance:\n" << noise_covariance.block(0,0,10,10) << std::endl;
 
+//            printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
 
-        std::cout << "Noise Covariance:\n" << noise_covariance.block(0,0,10,10) << std::endl;
-
-//        printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
-
-//        emit remitRawBuffer(tmp);
+        }
     }
 
 }
