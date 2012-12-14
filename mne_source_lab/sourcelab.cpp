@@ -129,11 +129,24 @@ void SourceLab::run()
     m_bIsRunning = true;
 
     quint32 count = 0;
+
     while(m_bIsRunning)
     {
-        MatrixXf tmp = m_pRawMatrixBuffer->pop();
+        MatrixXf rawSegment = m_pRawMatrixBuffer->pop();
         qDebug() << "Received Buffer " << count;
         ++count;
+
+
+        qint32 samples = rawSegment.cols();
+        VectorXf mu = rawSegment.rowwise().sum().array() / (float)samples;
+
+        MatrixXf noise_covariance = rawSegment * rawSegment.transpose();// noise_covariance == raw_covariance
+        noise_covariance.array() -= samples * (mu * mu.transpose()).array();
+        noise_covariance.array() /= (samples - 1);
+
+
+        std::cout << "Noise Covariance:\n" << noise_covariance.block(0,0,10,10) << std::endl;
+
 //        printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
 
 //        emit remitRawBuffer(tmp);
