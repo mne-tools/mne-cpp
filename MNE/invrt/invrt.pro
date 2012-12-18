@@ -49,12 +49,15 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${PWD}/../../lib/
 CONFIG(debug, debug|release) {
-    LIBS += -lfiffd
-    LIBS += -lmned
+    LIBS += -lfiffd \
+            -lmned \
+            -lgenericsd
+
 }
 else {
-    LIBS += -lfiff
-    LIBS += -lmne
+    LIBS += -lfiff \
+            -lmne \
+            -lgenerics
 }
 
 DESTDIR = $${PWD}/../../lib
@@ -71,10 +74,12 @@ win32 {
     QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
 }
 
-SOURCES += invrt.cpp
+SOURCES += invrt.cpp \
+    covrt.cpp
 
 HEADERS += invrt.h\
-        invrt_global.h
+        invrt_global.h \
+    covrt.h
 
 
 

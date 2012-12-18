@@ -1,9 +1,8 @@
 //=============================================================================================================
 /**
-* @file     mne_rt_client.h
+* @file     covrt.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
-*           To Be continued...
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 *
 * @version  1.0
 * @date     July, 2012
@@ -31,27 +30,17 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the MNERtClient Class.
+* @brief    Contains the implementation of the CovRt Class.
 *
 */
 
-#ifndef MNE_RT_CLIENT_H
-#define MNE_RT_CLIENT_H
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MNE INCLUDES
+// INCLUDES
 //=============================================================================================================
 
-#include "mne_global.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFF INCLUDES
-//=============================================================================================================
-
-#include "../fiff/fiff_info.h"
+#include "covrt.h"
 
 
 //*************************************************************************************************************
@@ -59,111 +48,99 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QThread>
-#include <QMutex>
+#include <QDebug>
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-#include "../3rdParty/Eigen/Core"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MNELIB
-//=============================================================================================================
-
-namespace MNELIB
-{
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
-using namespace FIFFLIB;
+using namespace INVRTLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
-//=============================================================================================================
-/**
-* DECLARE MNE RT CLIENT CLASS
-* @brief The MNERtClient class provides an interface to communicate with a running mne_rt_server.
-*/
-class MNESHARED_EXPORT MNERtClient : public QThread
+CovRt::CovRt(QObject *parent)
+: QThread(parent)
+, m_bIsRunning(false)
+, m_bIsRawBufferInit(false)
+, m_pRawMatrixBuffer(NULL)
 {
-    Q_OBJECT
-public:
 
-    //=========================================================================================================
-    /**
-    * Destroys the RtClient.
-    *
-    * @param[in] p_sRtServerHostname    The IP address of the mne_rt_server
-    * @param[in] parent                 Parent QObject (optional)
-    */
-    explicit MNERtClient(QString p_sRtServerHostname,QObject *parent = 0);
-    
-    //=========================================================================================================
-    /**
-    * Destroys the RtClient.
-    */
-    ~MNERtClient();
+}
 
 
-    //=========================================================================================================
-    /**
-    * Request Fiff Info
-    */
-    inline const FiffInfo* getFiffInfo()
+//*************************************************************************************************************
+
+CovRt::~CovRt()
+{
+    stop();
+    if(m_pRawMatrixBuffer)
+        delete m_pRawMatrixBuffer;
+}
+
+
+//*************************************************************************************************************
+
+void CovRt::receiveDataSegment(MatrixXf p_DataSegment)
+{
+//    if(m_pRawMatrixBuffer) // ToDo handle change buffersize
+
+    if(!m_pRawMatrixBuffer)
     {
-        return m_pFiffInfo;
+        mutex.lock();
+        m_pRawMatrixBuffer = new RawMatrixBuffer(10, p_DataSegment.rows(), p_DataSegment.cols());
+
+        m_bIsRawBufferInit = true;
+        mutex.unlock();
     }
 
-    //=========================================================================================================
-    /**
-    * Stops the RtClient by stopping the producer's thread.
-    *
-    * @return true if succeeded, false otherwise
-    */
-    virtual bool stop();
+    m_pRawMatrixBuffer->push(&p_DataSegment);
+}
 
-protected:
-    //=========================================================================================================
-    /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
-    virtual void run();
 
-private:
-    QMutex      mutex;
+//*************************************************************************************************************
 
-    bool        m_bIsRunning;           /**< Holds whether RtClient is running.*/
+bool CovRt::stop()
+{
+    m_bIsRunning = false;
+    QThread::wait();
 
-    QString     m_sRtServerHostName;    /**< The IP Adress of mne_rt_server.*/
+    return true;
+}
 
-    FiffInfo*   m_pFiffInfo;
 
-signals:
-    void rawBufferReceived(Eigen::MatrixXf p_rawBuffer);
-};
+//*************************************************************************************************************
 
-} // NAMESPACE
+void CovRt::run()
+{
+    m_bIsRunning = true;
 
-#ifndef metatype_matrixxf
-#define metatype_matrixxf
-Q_DECLARE_METATYPE(Eigen::MatrixXf);
-#endif
+//    quint32 sampleCount = 0;
 
-#endif // MNE_RT_CLIENT_H
+    while(m_bIsRunning)
+    {
+        if(m_bIsRawBufferInit)
+        {
+            MatrixXf rawSegment = m_pRawMatrixBuffer->pop();
+
+            qDebug() << "COVRT";
+
+//            qint32 samples = rawSegment.cols();
+//            VectorXf mu = rawSegment.rowwise().sum().array() / (float)samples;
+
+//            MatrixXf noise_covariance = rawSegment * rawSegment.transpose();// noise_covariance == raw_covariance
+//            noise_covariance.array() -= samples * (mu * mu.transpose()).array();
+//            noise_covariance.array() /= (samples - 1);
+
+//            std::cout << "Noise Covariance:\n" << noise_covariance.block(0,0,10,10) << std::endl;
+
+//            printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
+
+        }
+    }
+}

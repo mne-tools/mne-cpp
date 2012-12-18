@@ -82,13 +82,19 @@ SourceLab::SourceLab(QObject *parent)
 //    delete t_pFwd;
 
 
-    m_pRtClient = new MNERtClient("127.0.0.1", this);
-
     qRegisterMetaType<MatrixXf>("MatrixXf");
+
+    m_pRtClient = new MNERtClient("127.0.0.1", this);
     connect(m_pRtClient, &MNERtClient::rawBufferReceived,
             this, &SourceLab::receiveRawBuffer);
-
     this->start();
+
+    m_pCovRt = new CovRt(this);
+    connect(m_pRtClient, &MNERtClient::rawBufferReceived,
+            m_pCovRt, &CovRt::receiveDataSegment);
+    m_pCovRt->start();
+
+
 }
 
 
@@ -175,5 +181,4 @@ void SourceLab::run()
 
         }
     }
-
 }
