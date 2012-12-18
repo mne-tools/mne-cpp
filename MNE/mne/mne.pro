@@ -50,14 +50,14 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${PWD}/../../lib/
 CONFIG(debug, debug|release) {
-    LIBS += -lfiffd
-    LIBS += -lfsd
-    LIBS += -lmne_mathd
+    LIBS += -lfiffd \
+            -lfsd \
+            -lmne_mathd
 }
 else {
-    LIBS += -lfiff
-    LIBS += -lfs
-    LIBS += -lmne_math
+    LIBS += -lfiff \
+            -lfs \
+            -lmne_math
 }
 
 
@@ -75,31 +75,31 @@ win32 {
     QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
 }
 
-SOURCES += mne.cpp \
-    mne_sourcespace.cpp \
-    mne_forwardsolution.cpp \
-    mne_hemisphere.cpp \
-    mne_inverse_operator.cpp \
-    mne_epoch_data.cpp \
-    mne_epoch_data_list.cpp \
-    mne_math.cpp \
-    mne_rt_cmd_client.cpp \
-    mne_rt_data_client.cpp \
-    mne_rt_client.cpp
+SOURCES +=  mne.cpp \
+            mne_sourcespace.cpp \
+            mne_forwardsolution.cpp \
+            mne_hemisphere.cpp \
+            mne_inverse_operator.cpp \
+            mne_epoch_data.cpp \
+            mne_epoch_data_list.cpp \
+            mne_math.cpp \
+            mne_rt_cmd_client.cpp \
+            mne_rt_data_client.cpp \
+            mne_rt_client.cpp
 
-HEADERS += mne.h\
-        mne_global.h \
-#    hpcmatrix.h \
-    mne_sourcespace.h \
-    mne_hemisphere.h \
-    mne_forwardsolution.h \
-    mne_inverse_operator.h \
-    mne_epoch_data.h \
-    mne_epoch_data_list.h \
-    mne_math.h \
-    mne_rt_cmd_client.h \
-    mne_rt_data_client.h \
-    mne_rt_client.h
+HEADERS +=  mne.h \
+            mne_global.h \
+#            hpcmatrix.h \
+            mne_sourcespace.h \
+            mne_hemisphere.h \
+            mne_forwardsolution.h \
+            mne_inverse_operator.h \
+            mne_epoch_data.h \
+            mne_epoch_data_list.h \
+            mne_math.h \
+            mne_rt_cmd_client.h \
+            mne_rt_data_client.h \
+            mne_rt_client.h
 
 #Install headers to include directory
 header_files.files = ./*.h

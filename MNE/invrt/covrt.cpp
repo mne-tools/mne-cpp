@@ -42,6 +42,8 @@
 
 #include "covrt.h"
 
+#include <iostream>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -69,6 +71,7 @@ CovRt::CovRt(QObject *parent)
 , m_bIsRunning(false)
 , m_bIsRawBufferInit(false)
 , m_pRawMatrixBuffer(NULL)
+, m_iMaxSamples(10000)
 {
 
 }
@@ -120,7 +123,11 @@ void CovRt::run()
 {
     m_bIsRunning = true;
 
-//    quint32 sampleCount = 0;
+
+    quint32 samples = 0;
+
+    MatrixXf cov;
+    VectorXf mu;
 
     while(m_bIsRunning)
     {
@@ -128,7 +135,31 @@ void CovRt::run()
         {
             MatrixXf rawSegment = m_pRawMatrixBuffer->pop();
 
-            qDebug() << "COVRT";
+            if(samples == 0)
+            {
+                mu = rawSegment.rowwise().sum();
+                cov = rawSegment * rawSegment.transpose();
+            }
+            else
+            {
+                mu.array() += rawSegment.rowwise().sum().array();
+                cov += rawSegment * rawSegment.transpose();
+            }
+            samples += rawSegment.cols();
+
+            if(samples > m_iMaxSamples)
+            {
+                mu /= (float)samples;
+                cov.array() -= samples * (mu * mu.transpose()).array();
+                cov.array() /= (samples - 1);
+
+//                std::cout << "Covariance:\n" << cov.block(0,0,10,10) << std::endl;
+
+                emit covCalculated(cov);
+
+                samples = 0;
+            }
+
 
 //            qint32 samples = rawSegment.cols();
 //            VectorXf mu = rawSegment.rowwise().sum().array() / (float)samples;
