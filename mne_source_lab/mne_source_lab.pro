@@ -58,12 +58,16 @@ CONFIG(debug, debug|release) {
             -lmned \
             -lfiffd \
             -lfsd \
+            -linvrtd \
+            -lgenericsd
 }
 else {
     LIBS += -lmne_math \
             -lmne \
             -lfiff \
             -lfs \
+            -linvrt \
+            -lgenerics
 }
 
 DESTDIR = $${PWD}/../bin

@@ -1,10 +1,8 @@
 //=============================================================================================================
 /**
-* @file     mne_rt_client.h
+* @file     covrt.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
-*           To Be continued...
-*
 * @version  1.0
 * @date     July, 2012
 *
@@ -31,27 +29,27 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the MNERtClient Class.
+* @brief    Contains the CovRt class declaration.
 *
 */
 
-#ifndef MNE_RT_CLIENT_H
-#define MNE_RT_CLIENT_H
+#ifndef COVRT_H
+#define COVRT_H
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MNE INCLUDES
+// INCLUDES
 //=============================================================================================================
 
-#include "mne_global.h"
+#include "invrt_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FIFF INCLUDES
+// Generics INCLUDES
 //=============================================================================================================
 
-#include "../fiff/fiff_info.h"
+#include "../generics/circularmatrixbuffer.h"
 
 
 //*************************************************************************************************************
@@ -73,11 +71,12 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE INVRTLIB
 //=============================================================================================================
 
-namespace MNELIB
+namespace INVRTLIB
 {
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -85,53 +84,36 @@ namespace MNELIB
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FIFFLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
+using namespace IOBuffer;
 
 
 //=============================================================================================================
 /**
-* DECLARE MNE RT CLIENT CLASS
-* @brief The MNERtClient class provides an interface to communicate with a running mne_rt_server.
+* DECLARE CLASS CovRt
+*
+* @brief The CovRt class provides...
 */
-class MNESHARED_EXPORT MNERtClient : public QThread
+class INVRTSHARED_EXPORT CovRt : public QThread
 {
     Q_OBJECT
 public:
 
-    //=========================================================================================================
-    /**
-    * Destroys the RtClient.
-    *
-    * @param[in] p_sRtServerHostname    The IP address of the mne_rt_server
-    * @param[in] parent                 Parent QObject (optional)
-    */
-    explicit MNERtClient(QString p_sRtServerHostname,QObject *parent = 0);
-    
-    //=========================================================================================================
-    /**
-    * Destroys the RtClient.
-    */
-    ~MNERtClient();
-
+    explicit CovRt(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Request Fiff Info
+    * Destroys the CovRt.
     */
-    inline const FiffInfo* getFiffInfo()
-    {
-        return m_pFiffInfo;
-    }
+    ~CovRt();
+
+
+
+
+    void receiveDataSegment(MatrixXf p_DataSegment);
 
     //=========================================================================================================
     /**
-    * Stops the RtClient by stopping the producer's thread.
+    * Stops the CovRt by stopping the producer's thread.
     *
     * @return true if succeeded, false otherwise
     */
@@ -148,15 +130,18 @@ protected:
 
 private:
     QMutex      mutex;
-
     bool        m_bIsRunning;           /**< Holds whether RtClient is running.*/
+    bool        m_bIsRawBufferInit;
 
-    QString     m_sRtServerHostName;    /**< The IP Adress of mne_rt_server.*/
+    qint32      m_iMaxSample;
+    qint32      m_iSampleCount;
 
-    FiffInfo*   m_pFiffInfo;
+    RawMatrixBuffer* m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
+
+
 
 signals:
-    void rawBufferReceived(Eigen::MatrixXf p_rawBuffer);
+    void CovCalculated(Eigen::MatrixXf p_Cov);
 };
 
 } // NAMESPACE
@@ -166,4 +151,4 @@ signals:
 Q_DECLARE_METATYPE(Eigen::MatrixXf);
 #endif
 
-#endif // MNE_RT_CLIENT_H
+#endif // COVRT_H
