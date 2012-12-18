@@ -106,9 +106,6 @@ public:
     */
     ~CovRt();
 
-
-
-
     void receiveDataSegment(MatrixXf p_DataSegment);
 
     //=========================================================================================================
@@ -130,18 +127,17 @@ protected:
 
 private:
     QMutex      mutex;
-    bool        m_bIsRunning;           /**< Holds whether RtClient is running.*/
+    bool        m_bIsRunning;           /**< Holds whether CovRt is running.*/
     bool        m_bIsRawBufferInit;
 
-    qint32      m_iMaxSample;
-    qint32      m_iSampleCount;
+    quint32      m_iMaxSamples;
 
     RawMatrixBuffer* m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
 
 
 
 signals:
-    void CovCalculated(Eigen::MatrixXf p_Cov);
+    void covCalculated(Eigen::MatrixXf p_Cov);
 };
 
 } // NAMESPACE
