@@ -71,6 +71,8 @@ HEADERS += generics_global.h \
     circularbuffer.h \
     observerpattern.h
 
+INCLUDEPATH += $${PWD}/../../include/3rdParty
+
 #Install headers to include directory
 header_files.files = ./*.h
 header_files.path = ../../include/generics
