@@ -107,6 +107,8 @@ HEADERS += fiff.h \
     fiff_cov.h \
     fiff_stream.h
 
+INCLUDEPATH += $${PWD}/../../include/3rdParty
+
 #Install headers to include directory
 header_files.files = ./*.h
 header_files.path = ../../include/fiff
