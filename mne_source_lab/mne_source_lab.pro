@@ -75,4 +75,6 @@ DESTDIR = $${PWD}/../bin
 SOURCES +=  main.cpp \
             sourcelab.cpp \
 
+INCLUDEPATH += $${PWD}/../include/3rdParty
+
 HEADERS += sourcelab.h \

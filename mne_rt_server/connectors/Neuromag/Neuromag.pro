@@ -63,6 +63,8 @@ HEADERS += neuromag.h\
     collectorsocket.h \
     shmemsocket.h
 
+INCLUDEPATH += $${PWD}/../../../include/3rdParty
+
 OTHER_FILES += neuromag.json
 
 # Put generated form headers into the origin --> cause other src is pointing at them
