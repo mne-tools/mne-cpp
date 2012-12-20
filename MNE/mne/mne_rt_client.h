@@ -124,9 +124,9 @@ public:
     /**
     * Request Fiff Info
     */
-    inline const FiffInfo* getFiffInfo()
+    inline FiffInfo** getFiffInfo()
     {
-        return m_pFiffInfo;
+        return &m_pFiffInfo;
     }
 
     //=========================================================================================================

@@ -172,6 +172,51 @@ public:
     */
     static bool read_forward_solution(QIODevice* p_pIODevice, MNEForwardSolution*& fwd, bool force_fixed = false, bool surf_ori = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
 
+
+
+
+
+
+    void prepare_forward(FiffInfo* p_pFiffInfo)
+    {
+        QStringList fwdChNames = this->sol->row_names;
+        QStringList chNames;
+        for(qint32 i = 0; i < p_pFiffInfo->ch_names.size(); ++i)
+        {
+            bool inBads = false;
+            bool inFwd = false;
+
+            for(qint32 j = 0; j < p_pFiffInfo->bads.size(); ++j)
+            {
+                if(QString::compare(p_pFiffInfo->bads[j], p_pFiffInfo->ch_names[i]) == 0)
+                {
+                    inBads = true;
+                    break;
+                }
+            }
+
+            for(qint32 j = 0; j < fwdChNames.size(); ++j)
+            {
+                if(QString::compare(fwdChNames[j], p_pFiffInfo->ch_names[i]) == 0)
+                {
+                    inFwd = true;
+                    break;
+                }
+            }
+
+            if(!inBads && inFwd)
+                chNames.append(p_pFiffInfo->ch_names[i]);
+        }
+
+        qint32 nchan = chNames.size();
+
+    }
+
+
+
+
+
+
 private:
     //=========================================================================================================
     /**

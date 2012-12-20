@@ -77,10 +77,6 @@ win32 {
 SOURCES += invrt.cpp \
     covrt.cpp
 
-HEADERS += invrt.h\
-        invrt_global.h \
-    covrt.h
-
-
-
-
+HEADERS +=  invrt.h\
+            invrt_global.h \
+            covrt.h
