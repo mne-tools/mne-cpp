@@ -155,6 +155,16 @@ void CovRt::run()
 
 //                std::cout << "Covariance:\n" << cov.block(0,0,10,10) << std::endl;
 
+
+//                FiffCov finalCov;
+
+//                finalCov.kind = FIFFV_MNE_NOISE_COV;
+//                finalCov.diag = false;
+//                finalCov.dim = cov.rows();
+////                finalCov.names =
+//                finalCov.data = new MatrixXf(cov);
+
+
                 emit covCalculated(cov);
 
                 samples = 0;

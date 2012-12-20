@@ -11,6 +11,22 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// FIFF INCLUDES
+//=============================================================================================================
+
+#include "../fiff/fiff_info.h"
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FIFF INCLUDES
+//=============================================================================================================
+
+#include "../mne/mne_forwardsolution.h"
+#include "../mne/mne_inverse_operator.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
@@ -41,7 +57,8 @@ namespace INVRTLIB
 //=============================================================================================================
 
 using namespace Eigen;
-//using namespace IOBuffer;
+using namespace FIFFLIB;
+using namespace MNELIB;
 
 
 //=============================================================================================================
@@ -54,7 +71,7 @@ class INVRTSHARED_EXPORT InvRt : public QThread
 {
     Q_OBJECT
 public:
-    explicit InvRt(QObject *parent = 0);
+    explicit InvRt(FiffInfo** p_ppFiffInfo, MNEForwardSolution* p_pFwd, QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -62,7 +79,7 @@ public:
     */
     ~InvRt();
 
-    void receiveNoiseCov(MatrixXf p_NoiseCov);
+    void receiveNoiseCov(MatrixXf p_noiseCov);
 
     //=========================================================================================================
     /**
@@ -87,11 +104,18 @@ private:
 
     MatrixXf    m_noiseCov;
 
-signals:
-    void invOperatorAvailable();
+    FiffInfo**          m_ppFiffInfo;
+    MNEForwardSolution* m_pFwd;
 
+signals:
+    void invOperatorAvailable(MNELIB::MNEInverseOperator);
 };
 
 } // NAMESPACE
+
+#ifndef metatype_mneinverseoperator
+#define metatype_mneinverseoperator
+Q_DECLARE_METATYPE(MNELIB::MNEInverseOperator);
+#endif
 
 #endif // INVRT_H

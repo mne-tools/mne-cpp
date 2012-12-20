@@ -14,6 +14,7 @@
 //=============================================================================================================
 
 #include "../MNE/invrt/covrt.h"
+#include "../MNE/invrt/invrt.h"
 
 
 //*************************************************************************************************************
@@ -30,6 +31,7 @@
 //=============================================================================================================
 
 #include "../MNE/mne/mne_rt_client.h"
+#include "../MNE/mne/mne_forwardsolution.h"
 
 
 //*************************************************************************************************************
@@ -97,9 +99,12 @@ private:
     MNERtClient*    m_pRtClient;
     CovRt*          m_pCovRt;
 
+    InvRt*          m_pInvRt;
 
 
-    FiffInfo*       m_pFiffInfo;         /**< Holds the fiff raw measurement information. */
+    FiffInfo**      m_ppFiffInfo;         /**< Holds the fiff raw measurement information. */
+    MNEForwardSolution* m_pFwd;
+
     RawMatrixBuffer* m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
 
     bool    m_bIsRunning;

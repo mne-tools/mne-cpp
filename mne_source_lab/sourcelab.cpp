@@ -21,7 +21,6 @@
 // MNE INCLUDES
 //=============================================================================================================
 
-#include "../MNE/mne/mne.h"
 #include "../MNE/fs/annotation.h"
 
 
@@ -45,44 +44,44 @@ using namespace FSLIB;
 
 SourceLab::SourceLab(QObject *parent)
 : QThread(parent)
-, m_pFiffInfo(NULL)
+, m_ppFiffInfo(NULL)
+, m_pFwd(NULL)
 , m_bIsRunning(false)
 , m_bIsRawBufferInit(false)
 , m_pRawMatrixBuffer(NULL)
 {
-//    MNEForwardSolution* t_pFwd = NULL;
+    QString t_sFileName = "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
 
-//    QString t_sFileName = "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
+    QFile* t_pFile = new QFile(t_sFileName);
 
-//    QFile* t_pFile = new QFile(t_sFileName);
+    if(!MNEForwardSolution::read_forward_solution(t_pFile, m_pFwd))
+    {
+        delete t_pFile;
+        if(m_pFwd)
+            delete m_pFwd;
+//        return -1;
+        return;
+    }
 
-//    if(!MNEForwardSolution::read_forward_solution(t_pFile, t_pFwd))
-//    {
-//        delete t_pFile;
-//        if(t_pFwd)
-//            delete t_pFwd;
-////        return -1;
-//        return;
-//    }
+    //Cluster the forward solution
 
-//    //Cluster the forward solution
+    MNEForwardSolution* t_pFwdClustered = NULL;
 
-//    MNEForwardSolution* t_pFwdClustered = NULL;
-
-//    QString t_sLHAnnotFileName = "./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot";
-//    Annotation* t_pLHAnnotation= new Annotation(t_sLHAnnotFileName);
+    QString t_sLHAnnotFileName = "./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot";
+    Annotation* t_pLHAnnotation= new Annotation(t_sLHAnnotFileName);
 
 
-//    QString t_sRHAnnotFileName = "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot";
-//    Annotation* t_pRHAnnotation= new Annotation(t_sRHAnnotFileName);
+    QString t_sRHAnnotFileName = "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot";
+    Annotation* t_pRHAnnotation= new Annotation(t_sRHAnnotFileName);
 
-//    t_pFwd->cluster_forward_solution(t_pFwdClustered, t_pLHAnnotation, t_pRHAnnotation, 40);
+    m_pFwd->cluster_forward_solution(t_pFwdClustered, t_pLHAnnotation, t_pRHAnnotation, 40);
 
-//    delete t_pFile;
+    delete t_pFile;
 //    delete t_pFwd;
 
 
     qRegisterMetaType<MatrixXf>("MatrixXf");
+    qRegisterMetaType<MNEInverseOperator>("MNEInverseOperator");
 
     m_pRtClient = new MNERtClient("127.0.0.1", this);
     connect(m_pRtClient, &MNERtClient::rawBufferReceived,
@@ -94,7 +93,12 @@ SourceLab::SourceLab(QObject *parent)
             m_pCovRt, &CovRt::receiveDataSegment);
     m_pCovRt->start();
 
+    m_ppFiffInfo = m_pRtClient->getFiffInfo();
 
+    m_pInvRt = new InvRt(m_ppFiffInfo, m_pFwd, this);
+    connect(m_pCovRt, &CovRt::covCalculated,
+            m_pInvRt, &InvRt::receiveNoiseCov);
+    m_pInvRt->start();
 }
 
 
@@ -104,8 +108,8 @@ SourceLab::~SourceLab()
 {
     if(m_pRtClient)
         delete m_pRtClient;
-    if(m_pFiffInfo)
-        delete m_pFiffInfo;
+//    if(m_ppFiffInfo)
+//        delete m_ppFiffInfo;
     if(m_pRawMatrixBuffer)
         delete m_pRawMatrixBuffer;
 }
@@ -141,9 +145,8 @@ void SourceLab::receiveRawBuffer(MatrixXf p_rawBuffer)
 {
     if(!m_pRawMatrixBuffer)
     {
-        m_pRawMatrixBuffer = new RawMatrixBuffer(10, p_rawBuffer.rows(), p_rawBuffer.cols());
-
         mutex.lock();
+        m_pRawMatrixBuffer = new RawMatrixBuffer(10, p_rawBuffer.rows(), p_rawBuffer.cols());
         m_bIsRawBufferInit = true;
         mutex.unlock();
     }
