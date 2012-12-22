@@ -81,4 +81,4 @@ HEADERS +=  invrt.h\
             invrt_global.h \
             covrt.h
 
-INCLUDEPATH += $${PWD}/../../include/3rdParty
+INCLUDEPATH += $${PWD}/../../$${EIGEN_HOME}

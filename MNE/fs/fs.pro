@@ -69,4 +69,4 @@ HEADERS += annotation.h\
         fs_global.h \
     colortable.h
 
-INCLUDEPATH += $${PWD}/../../include/3rdParty
+INCLUDEPATH += $${PWD}/../../$${EIGEN_HOME}
