@@ -88,4 +88,5 @@ HEADERS += \
     mne_rt_commands.h \
     ICommandParser.h
 
-INCLUDEPATH += $${PWD}/../../include/3rdParty
+INCLUDEPATH += $${PWD}/../../include/3rdParty \
+               $${PWD}/../../MNE

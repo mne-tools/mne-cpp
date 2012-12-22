@@ -44,7 +44,7 @@
 #include "fiffsimulator_global.h"
 #include "../../mne_rt_server/IConnector.h"
 
-#include "../../../MNE/fiff/fiff_raw_data.h"
+#include <fiff/fiff_raw_data.h>
 
 //#include "circularbuffer.h"
 

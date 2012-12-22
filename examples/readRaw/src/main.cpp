@@ -44,8 +44,8 @@
 #include <math.h>
 
 
-#include "../../../MNE/fiff/fiff.h"
-#include "../../../MNE/mne/mne.h"
+#include <fiff/fiff.h>
+#include <mne/mne.h>
 
 
 //*************************************************************************************************************
