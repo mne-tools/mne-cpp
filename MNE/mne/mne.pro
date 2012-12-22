@@ -42,22 +42,22 @@ QT -= gui
 
 DEFINES += MNE_LIBRARY
 
-TARGET = mne
-
+TARGET = Mne
+TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
 LIBS += -L$${PWD}/../../lib/
 CONFIG(debug, debug|release) {
-    LIBS += -lfiffd \
-            -lfsd \
-            -lmne_mathd
+    LIBS += -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
+            -lMNE$${MNE_LIB_VERSION}MneMathd
 }
 else {
-    LIBS += -lfiff \
-            -lfs \
-            -lmne_math
+    LIBS += -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Fs \
+            -lMNE$${MNE_LIB_VERSION}MneMath
 }
 
 

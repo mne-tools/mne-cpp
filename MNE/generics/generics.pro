@@ -41,8 +41,8 @@ QT -= gui
 
 DEFINES += GENERICS_LIBRARY
 
-TARGET = generics
-
+TARGET = Generics
+TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }

@@ -42,8 +42,8 @@ QT -= gui
 
 DEFINES += FIFF_LIBRARY
 
-TARGET = fiff
-
+TARGET = Fiff
+TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
