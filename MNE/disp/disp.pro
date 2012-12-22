@@ -77,6 +77,7 @@ SOURCES += \
 HEADERS += disp_global.h \
     geometryview.h
 
+INCLUDEPATH += $${PWD}/../../include/3rdParty
 
 #Install headers to include directory
 header_files.files = ./*.h
