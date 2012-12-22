@@ -103,6 +103,8 @@ HEADERS +=  mne.h \
 
 INCLUDEPATH += $${PWD}/../../include/3rdParty
 
+INCLUDEPATH += $${PWD}/../../include/3rdParty
+
 #Install headers to include directory
 header_files.files = ./*.h
 header_files.path = ../../include/mne
