@@ -70,5 +70,5 @@ SOURCES += \
 
 HEADERS += \
 
-INCLUDEPATH += $${PWD}/../../include/3rdParty \
-               $${PWD}/../../MNE
+INCLUDEPATH += $${PWD}/../../$${EIGEN_HOME} \
+               $${PWD}/../../$${MNE_HOME}

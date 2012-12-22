@@ -66,4 +66,4 @@ SOURCES += kmeans.cpp
 HEADERS +=  kmeans.h\
             mnemath_global.h
 
-INCLUDEPATH += $${PWD}/../../include/3rdParty
+INCLUDEPATH += $${PWD}/../../$${EIGEN_HOME}
