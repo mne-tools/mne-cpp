@@ -41,23 +41,23 @@ QT       -= gui
 
 DEFINES += INVRT_LIBRARY
 
-TARGET = invrt
-
+TARGET = InvRt
+TARGET = $$join(TARGET,,MNE$$MNE_LIB_VERSION,)
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
 LIBS += -L$${PWD}/../../lib/
 CONFIG(debug, debug|release) {
-    LIBS += -lfiffd \
-            -lmned \
-            -lgenericsd
+    LIBS += -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Genericsd
 
 }
 else {
-    LIBS += -lfiff \
-            -lmne \
-            -lgenerics
+    LIBS += -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Generics
 }
 
 DESTDIR = $${PWD}/../../lib

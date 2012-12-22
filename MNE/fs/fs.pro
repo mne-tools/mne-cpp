@@ -41,8 +41,8 @@ QT       -= gui
 
 DEFINES += FS_LIBRARY
 
-TARGET = fs
-
+TARGET = Fs
+TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }

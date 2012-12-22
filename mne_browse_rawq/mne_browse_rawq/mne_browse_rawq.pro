@@ -33,6 +33,8 @@
 #
 #--------------------------------------------------------------------------------------------------------------
 
+include(../../mne-cpp.pri)
+
 TEMPLATE = app
 
 QT += core gui
@@ -47,16 +49,16 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${PWD}/../../lib/
 CONFIG(debug, debug|release) {
-    LIBS += -lmne_mathd \
-            -lmned \
-            -lfiffd \
-            -lgenericsd
+    LIBS += -lMNE$${MNE_LIB_VERSION}MneMathd \
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Genericsd
 }
 else {
-    LIBS += -lmne_math \
-            -lmne \
-            -lfiff \
-            -lgenerics
+    LIBS += -lMNE$${MNE_LIB_VERSION}MneMath \
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Generics
 }
 
 DESTDIR = $${PWD}/../../bin

@@ -6,7 +6,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_math_global.h"
+#include "mnemath_global.h"
 
 
 //*************************************************************************************************************
@@ -30,7 +30,7 @@
 // DEFINE NAMESPACE MNELIB
 //=============================================================================================================
 
-namespace MNE_MATHLIB
+namespace MNEMATHLIB
 {
 
 
@@ -42,7 +42,7 @@ namespace MNE_MATHLIB
 using namespace Eigen;
 
 
-class MNE_MATHSHARED_EXPORT KMeans
+class MNEMATHSHARED_EXPORT KMeans
 {
 public:
     //distance {'sqeuclidean','cityblock','cosine','correlation','hamming'};

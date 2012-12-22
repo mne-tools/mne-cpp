@@ -52,16 +52,16 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${PWD}/../../lib/
 CONFIG(debug, debug|release) {
-    LIBS += -lmne_mathd \
-            -lmned \
-            -lfiffd \
-            -ldispd
+    LIBS += -lMNE$${MNE_LIB_VERSION}MneMathd \
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Dispd
 }
 else {
-    LIBS += -lmne_math \
-            -lmne \
-            -lfiff \
-            -ldisp
+    LIBS += -lMNE$${MNE_LIB_VERSION}MneMath \
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Disp
 }
 
 DESTDIR = $${PWD}/../../bin

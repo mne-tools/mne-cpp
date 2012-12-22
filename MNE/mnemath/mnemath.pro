@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mne_math.pro
+# @file     mnemath.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -39,10 +39,10 @@ TEMPLATE = lib
 
 QT       -= gui
 
-DEFINES += MNE_MATH_LIBRARY
+DEFINES += MNEMATH_LIBRARY
 
-TARGET = mne_math
-
+TARGET = MneMath
+TARGET = $$join(TARGET,,MNE$$MNE_LIB_VERSION,)
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -63,7 +63,7 @@ win32 {
 
 SOURCES += kmeans.cpp
 
-HEADERS += kmeans.h\
-        mne_math_global.h
+HEADERS +=  kmeans.h\
+            mnemath_global.h
 
 INCLUDEPATH += $${PWD}/../../include/3rdParty

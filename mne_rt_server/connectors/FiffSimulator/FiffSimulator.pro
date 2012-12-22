@@ -4,6 +4,8 @@
 #
 #-------------------------------------------------
 
+include(../../../mne-cpp.pri)
+
 TEMPLATE = lib
 
 CONFIG += plugin
@@ -22,14 +24,14 @@ CONFIG(debug, debug|release) {
 LIBS += -L$${PWD}/../../../lib/
 
 CONFIG(debug, debug|release) {
-    LIBS += -lmned
-    LIBS += -lfiffd
-    LIBS += -lgenericsd
+    LIBS += -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Genericsd
 }
 else {
-    LIBS += -lmne
-    LIBS += -lfiff
-    LIBS += -lgenerics
+    LIBS += -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Generics
 }
 
 

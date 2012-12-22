@@ -41,20 +41,20 @@ QT       += 3d
 
 DEFINES += DISP_LIBRARY
 
-TARGET = disp
-
+TARGET = Disp
+TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
 LIBS += -L$${PWD}/../../lib/
 CONFIG(debug, debug|release) {
-    LIBS += -lfiffd
-    LIBS += -lmned
+    LIBS += -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned
 }
 else {
-    LIBS += -lfiff
-    LIBS += -lmne
+    LIBS += -lMNE$${MNE_LIB_VERSION}Fiff
+    LIBS += -lMNE$${MNE_LIB_VERSION}Mne
 }
 
 DESTDIR = $${PWD}/../../lib
