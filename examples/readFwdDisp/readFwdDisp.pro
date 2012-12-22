@@ -73,3 +73,5 @@ SOURCES += \
     src/main.cpp \
 
 HEADERS += \
+
+INCLUDEPATH += $${PWD}/../../include/3rdParty

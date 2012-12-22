@@ -65,3 +65,5 @@ SOURCES += kmeans.cpp
 
 HEADERS += kmeans.h\
         mne_math_global.h
+
+INCLUDEPATH += $${PWD}/../../include/3rdParty
