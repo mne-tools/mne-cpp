@@ -80,3 +80,5 @@ SOURCES += invrt.cpp \
 HEADERS +=  invrt.h\
             invrt_global.h \
             covrt.h
+
+INCLUDEPATH += $${PWD}/../../include/3rdParty

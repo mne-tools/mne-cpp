@@ -101,6 +101,8 @@ HEADERS +=  mne.h \
             mne_rt_data_client.h \
             mne_rt_client.h
 
+INCLUDEPATH += $${PWD}/../../include/3rdParty
+
 #Install headers to include directory
 header_files.files = ./*.h
 header_files.path = ../../include/mne
