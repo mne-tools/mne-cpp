@@ -65,7 +65,8 @@ HEADERS += neuromag.h\
     collectorsocket.h \
     shmemsocket.h
 
-INCLUDEPATH += $${PWD}/../../../include/3rdParty
+INCLUDEPATH += $${PWD}/../../../include/3rdParty \
+               $${PWD}/../../../MNE
 
 OTHER_FILES += neuromag.json
 

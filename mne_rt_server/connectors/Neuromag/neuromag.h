@@ -44,7 +44,7 @@
 #include "neuromag_global.h"
 #include "../../mne_rt_server/IConnector.h"
 
-#include "../../../MNE/fiff/fiff_info.h"
+#include <fiff/fiff_info.h>
 
 //#include "circularbuffer.h"
 

@@ -58,7 +58,8 @@ HEADERS += fiffsimulator.h\
     fiffproducer.h \
     ../../mne_rt_server/IConnector.h #IConnector is a Q_OBJECT and the resulting moc file needs to be known -> that's why inclution is important!
 
-INCLUDEPATH += $${PWD}/../../../include/3rdParty
+INCLUDEPATH += $${PWD}/../../../include/3rdParty \
+               $${PWD}/../../../MNE
 
 OTHER_FILES += fiffconnector.json
 

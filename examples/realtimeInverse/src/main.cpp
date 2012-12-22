@@ -42,8 +42,8 @@
 #include <iostream>
 #include <vector>
 
-#include "../../../MNE/mne/mne.h"
-#include "../../../MNE/fs/annotation.h"
+#include <mne/mne.h>
+#include <fs/annotation.h>
 
 
 //*************************************************************************************************************

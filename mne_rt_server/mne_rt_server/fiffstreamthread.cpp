@@ -44,7 +44,7 @@
 
 #include "mne_rt_commands.h"
 
-#include "../../MNE/fiff/fiff_constants.h"
+#include <fiff/fiff_constants.h>
 
 
 //*************************************************************************************************************

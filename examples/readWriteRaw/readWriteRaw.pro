@@ -70,4 +70,5 @@ SOURCES += \
 
 HEADERS += \
 
-INCLUDEPATH += $${PWD}/../../include/3rdParty
+INCLUDEPATH += $${PWD}/../../include/3rdParty \
+               $${PWD}/../../MNE

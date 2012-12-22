@@ -71,4 +71,6 @@ HEADERS  += \
         mnebrowserawq.h \
         3rdParty/QCustomPlot/qcustomplot.h
 
+INCLUDEPATH += $${PWD}/../../MNE
+
 FORMS    += mnebrowserawq.ui
