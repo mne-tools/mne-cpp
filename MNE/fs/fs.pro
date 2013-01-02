@@ -47,7 +47,7 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-DESTDIR = $${PWD}/../../lib
+DESTDIR = $${MNE_LIBRARY_DIR}
 
 #
 # win32: copy dll's to bin dir
@@ -69,4 +69,4 @@ HEADERS += annotation.h\
         fs_global.h \
     colortable.h
 
-INCLUDEPATH += $${PWD}/../../$${EIGEN_HOME}
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

@@ -48,7 +48,7 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-LIBS += -L$${PWD}/../../lib/
+LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Fsd \
@@ -61,7 +61,7 @@ else {
 }
 
 
-DESTDIR = $${PWD}/../../lib
+DESTDIR = $${MNE_LIBRARY_DIR}
 
 #
 # win32: copy dll's to bin dir
@@ -101,9 +101,7 @@ HEADERS +=  mne.h \
             mne_rt_data_client.h \
             mne_rt_client.h
 
-INCLUDEPATH += $${PWD}/../../$${EIGEN_HOME}
-
-INCLUDEPATH += $${PWD}/../../$${EIGEN_HOME}
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 
 #Install headers to include directory
 header_files.files = ./*.h
