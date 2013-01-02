@@ -73,8 +73,8 @@ HEADERS += generics_global.h \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 
-#Install headers to include directory
+# Install headers to include directory
 header_files.files = ./*.h
-header_files.path = ../../include/generics
+header_files.path = $${MNE_INCLUDE_DIR}/generics
 
 INSTALLS += header_files
