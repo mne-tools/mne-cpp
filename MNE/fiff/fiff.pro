@@ -48,7 +48,7 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-DESTDIR = $${PWD}/../../lib
+DESTDIR = $${MNE_LIBRARY_DIR}
 
 #
 # win32: copy dll's to bin dir
@@ -107,10 +107,10 @@ HEADERS += fiff.h \
     fiff_cov.h \
     fiff_stream.h
 
-INCLUDEPATH += $${PWD}/../../$${EIGEN_HOME}
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 
-#Install headers to include directory
+# Install headers to include directory
 header_files.files = ./*.h
-header_files.path = ../../include/fiff
+header_files.path = $${MNE_INCLUDE_DIR}/fiff
 
 INSTALLS += header_files

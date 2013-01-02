@@ -47,7 +47,7 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-DESTDIR = $${PWD}/../../lib
+DESTDIR = $${MNE_LIBRARY_DIR}
 
 #
 # win32: copy dll's to bin dir
@@ -71,10 +71,10 @@ HEADERS += generics_global.h \
     circularbuffer.h \
     observerpattern.h
 
-INCLUDEPATH += $${PWD}/../../$${EIGEN_HOME}
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 
-#Install headers to include directory
+# Install headers to include directory
 header_files.files = ./*.h
-header_files.path = ../../include/generics
+header_files.path = $${MNE_INCLUDE_DIR}/generics
 
 INSTALLS += header_files

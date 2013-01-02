@@ -21,7 +21,7 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-LIBS += -L$${PWD}/../../../lib/
+LIBS += -L$${MNE_LIBRARY_DIR}
 
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Mned \
@@ -58,8 +58,8 @@ HEADERS += fiffsimulator.h\
     fiffproducer.h \
     ../../mne_rt_server/IConnector.h #IConnector is a Q_OBJECT and the resulting moc file needs to be known -> that's why inclution is important!
 
-INCLUDEPATH += $${PWD}/../../../$${EIGEN_HOME} \
-               $${PWD}/../../../$${MNE_HOME}
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 OTHER_FILES += fiffconnector.json
 

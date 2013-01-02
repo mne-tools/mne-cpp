@@ -47,7 +47,7 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-LIBS += -L$${PWD}/../../lib/
+LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}MneMathd \
             -lMNE$${MNE_LIB_VERSION}Mned \
@@ -71,6 +71,6 @@ HEADERS  += \
         mnebrowserawq.h \
         3rdParty/QCustomPlot/qcustomplot.h
 
-INCLUDEPATH += $${PWD}/../../MNE
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 FORMS    += mnebrowserawq.ui
