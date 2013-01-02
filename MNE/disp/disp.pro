@@ -79,8 +79,8 @@ HEADERS += disp_global.h \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 
-#Install headers to include directory
+# Install headers to include directory
 header_files.files = ./*.h
-header_files.path = ../../include/disp
+header_files.path = $${MNE_INCLUDE_DIR}/disp
 
 INSTALLS += header_files
