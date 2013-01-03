@@ -102,6 +102,7 @@ HEADERS +=  mne.h \
             mne_rt_client.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 # Install headers to include directory
 header_files.files = ./*.h
