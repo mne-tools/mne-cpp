@@ -436,7 +436,7 @@ public:
     *
     * @return a pointer to a double matrix wich is newly created from the parsed float -> has to be destroyed
     */
-    inline MatrixXd* toFloatMatrix() const;
+    inline MatrixXd toFloatMatrix() const;
 
 
 
@@ -885,12 +885,12 @@ inline MatrixXi FiffTag::toIntMatrix() const
 
 //*************************************************************************************************************
 
-inline MatrixXd* FiffTag::toFloatMatrix() const
+inline MatrixXd FiffTag::toFloatMatrix() const
 {
 //        qDebug() << "toFloatMatrix";
 
     if(!this->isMatrix() || this->getType() != FIFFT_FLOAT || this->data() == NULL)
-        return NULL;
+        return MatrixXd();//NULL;
 
 
     qint32 ndim;
@@ -904,16 +904,18 @@ inline MatrixXd* FiffTag::toFloatMatrix() const
     {
         delete pDims;
         printf("Only two-dimensional matrices are supported at this time");
-        return NULL;
+        return MatrixXd();//NULL;
     }
 
     //MatrixXd p_Matrix = Map<MatrixXd>( (float*)this->data,pDims[0], pDims[1]);
     // --> Use copy constructor instead --> slower performance but higher memory management reliability
-    MatrixXd* p_pMatrix = new MatrixXd((Map<MatrixXf>( (float*)this->data(),pDims[0], pDims[1])).cast<double>());
+//    MatrixXd* p_pMatrix = new MatrixXd((Map<MatrixXf>( (float*)this->data(),pDims[0], pDims[1])).cast<double>());
+
+    MatrixXd p_Matrix((Map<MatrixXf>( (float*)this->data(),pDims[0], pDims[1])).cast<double>());
 
     delete[] pDims;
 
-    return p_pMatrix;
+    return p_Matrix;
 }
 
 } // NAMESPACE

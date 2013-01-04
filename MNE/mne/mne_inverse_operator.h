@@ -159,7 +159,7 @@ public:
     fiff_int_t nsource;
     fiff_int_t nchan;
     fiff_int_t coord_frame;
-    MatrixXd*  source_nn;
+    MatrixXd  source_nn;
     VectorXd*  sing;
     bool    eigen_leads_weighted;
     FiffNamedMatrix* eigen_leads;
@@ -172,7 +172,7 @@ public:
     MNESourceSpace* src;
     FiffCoordTrans* mri_head_t;
     fiff_int_t nave;
-    QList<FiffProj*> projs;
+    QList<FiffProj> projs;
     MatrixXd* proj;                     /**< This is the projector to apply to the data. */
     MatrixXd* whitener;                 /**< This whitens the data */
     VectorXd* reginv;                   /**< This the diagonal matrix implementing. regularization and the inverse */

@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
         //   Activate the projection items
         //
         for (k = 0; k < raw->info->projs.size(); ++k)
-            raw->info->projs[k]->active = true;
+            raw->info->projs[k].active = true;
 
         printf("%d projection items activated\n",raw->info->projs.size());
         //

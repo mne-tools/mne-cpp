@@ -264,8 +264,8 @@ bool FiffStream::read_cov(FiffDirTree* node, fiff_int_t cov_kind, FiffCov*& p_co
     fiff_int_t dim, nfree, nn;
     QStringList names;
     bool diagmat = false;
-    VectorXd* eig = NULL;
-    MatrixXd* eigvec = NULL;
+    VectorXd eig;// = NULL;
+    MatrixXd eigvec;// = NULL;
     VectorXd* cov_diag = NULL;
     VectorXd* cov = NULL;
     VectorXd* cov_sparse = NULL;
@@ -382,14 +382,14 @@ bool FiffStream::read_cov(FiffDirTree* node, fiff_int_t cov_kind, FiffCov*& p_co
             FiffTag* tag2 = NULL;
             if (current->find_tag(this, FIFF_MNE_COV_EIGENVALUES, tag1) && current->find_tag(this, FIFF_MNE_COV_EIGENVECTORS, tag2))
             {
-                eig = new VectorXd(Map<VectorXd>(tag1->toDouble(),dim));
+                eig = VectorXd(Map<VectorXd>(tag1->toDouble(),dim));
                 eigvec = tag2->toFloatMatrix();
-                eigvec->transposeInPlace();
+                eigvec.transposeInPlace();
             }
             //
             //   Read the projection operator
             //
-            QList<FiffProj*> projs = this->read_proj(current);
+            QList<FiffProj> projs = this->read_proj(current);
             //
             //   Read the bad channel list
             //
@@ -405,11 +405,11 @@ bool FiffStream::read_cov(FiffDirTree* node, fiff_int_t cov_kind, FiffCov*& p_co
             p_covData->names  = names;
 
             if(cov_diag)
-                p_covData->data   = new MatrixXd(*cov_diag);
+                p_covData->data   = MatrixXd(*cov_diag);
             else if(cov)
-                p_covData->data   = new MatrixXd(*cov);
+                p_covData->data   = MatrixXd(*cov);
             else if(cov_sparse)
-                p_covData->data   = new MatrixXd(*cov_sparse);
+                p_covData->data   = MatrixXd(*cov_sparse);
 
             p_covData->projs  = projs;
             p_covData->bads   = bads;
@@ -504,8 +504,8 @@ QList<FiffCtfComp*> FiffStream::read_ctf_comp(FiffDirTree* p_pNode, QList<FiffCh
             calibrated = (bool)*t_pTag->toInt();
 
         one->save_calibrated = calibrated;
-        one->rowcals = MatrixXd::Ones(1,mat->data->rows());//ones(1,size(mat.data,1));
-        one->colcals = MatrixXd::Ones(1,mat->data->cols());//ones(1,size(mat.data,2));
+        one->rowcals = MatrixXd::Ones(1,mat->data.rows());//ones(1,size(mat.data,1));
+        one->colcals = MatrixXd::Ones(1,mat->data.cols());//ones(1,size(mat.data,2));
         if (!calibrated)
         {
             //
@@ -519,9 +519,9 @@ QList<FiffCtfComp*> FiffStream::read_ctf_comp(FiffDirTree* p_pNode, QList<FiffCh
                 ch_names.append(chs.at(p).ch_name);
 
             qint32 count;
-            MatrixXd col_cals(mat->data->cols(), 1);
+            MatrixXd col_cals(mat->data.cols(), 1);
             col_cals.setZero();
-            for (col = 0; col < mat->data->cols(); ++col)
+            for (col = 0; col < mat->data.cols(); ++col)
             {
                 count = 0;
                 for (i = 0; i < ch_names.size(); ++i)
@@ -549,9 +549,9 @@ QList<FiffCtfComp*> FiffStream::read_ctf_comp(FiffDirTree* p_pNode, QList<FiffCh
             //
             //    Then the rows
             //
-            MatrixXd row_cals(mat->data->rows(), 1);
+            MatrixXd row_cals(mat->data.rows(), 1);
             row_cals.setZero();
-            for (row = 0; row < mat->data->rows(); ++row)
+            for (row = 0; row < mat->data.rows(); ++row)
             {
                 count = 0;
                 for (i = 0; i < ch_names.size(); ++i)
@@ -578,7 +578,7 @@ QList<FiffCtfComp*> FiffStream::read_ctf_comp(FiffDirTree* p_pNode, QList<FiffCh
 
                 row_cals(row, 0) = chs.at(p).range*chs.at(p).cal;
             }
-            *mat->data           = row_cals.asDiagonal()* (*mat->data) *col_cals.asDiagonal();
+            mat->data           = row_cals.asDiagonal()* mat->data *col_cals.asDiagonal();
             one->rowcals         = row_cals;
             one->colcals         = col_cals;
         }
@@ -813,7 +813,7 @@ FiffDirTree* FiffStream::read_meas_info(FiffDirTree* p_pTree, FiffInfo*& info)
     //
     //   Load the SSP data
     //
-    QList<FiffProj*> projs = this->read_proj(meas_info[0]);//ToDo Member Function
+    QList<FiffProj> projs = this->read_proj(meas_info[0]);//ToDo Member Function
     //
     //   Load the CTF compensation data
     //
@@ -975,11 +975,11 @@ bool FiffStream::read_named_matrix(FiffDirTree* p_pTree, fiff_int_t matkind, Fif
     {
         //qDebug() << "Is Matrix" << t_pTag->isMatrix() << "Special Type:" << t_pTag->getType();
         mat->data = t_pTag->toFloatMatrix();
-        mat->data->transposeInPlace();
+        mat->data.transposeInPlace();
     }
 
-    mat->nrow = mat->data->rows();
-    mat->ncol = mat->data->cols();
+    mat->nrow = mat->data.rows();
+    mat->ncol = mat->data.cols();
 
     if(node->find_tag(this, FIFF_MNE_NROW, t_pTag))
         if (*t_pTag->toInt() != mat->nrow)
@@ -1017,9 +1017,9 @@ bool FiffStream::read_named_matrix(FiffDirTree* p_pTree, fiff_int_t matkind, Fif
 
 //*************************************************************************************************************
 
-QList<FiffProj*> FiffStream::read_proj(FiffDirTree* p_pNode)
+QList<FiffProj> FiffStream::read_proj(FiffDirTree* p_pNode)
 {
-    QList<FiffProj*> projdata;// = struct('kind',{},'active',{},'desc',{},'data',{});
+    QList<FiffProj> projdata;// = struct('kind',{},'active',{},'desc',{},'data',{});
     //
     //   Locate the projection data
     //
@@ -1112,11 +1112,11 @@ QList<FiffProj*> FiffStream::read_proj(FiffDirTree* p_pNode)
             return projdata;
         }
         t_pFiffDirTreeItem->find_tag(this, FIFF_PROJ_ITEM_VECTORS, t_pTag);
-        MatrixXd* data = NULL;
+        MatrixXd data;// = NULL;
         if (t_pTag)
         {
             data = t_pTag->toFloatMatrix();
-            data->transposeInPlace();
+            data.transposeInPlace();
         }
         else
         {
@@ -1130,10 +1130,10 @@ QList<FiffProj*> FiffStream::read_proj(FiffDirTree* p_pNode)
         else
             active = false;
 
-        if (data->cols() != names.size())
+        if (data.cols() != names.size())
         {
             printf("Number of channel names does not match the size of data matrix\n");
-            delete data;
+//            delete data;
             return projdata;
         }
 
@@ -1143,10 +1143,10 @@ QList<FiffProj*> FiffStream::read_proj(FiffDirTree* p_pNode)
         //   create a named matrix for the data
         //
         QStringList defaultList;
-        FiffNamedMatrix* t_fiffNamedMatrix = new FiffNamedMatrix(nvec, nchan, defaultList, names, data);
-        delete data;
+        FiffNamedMatrix t_fiffNamedMatrix(nvec, nchan, defaultList, names, data);
+//        delete data;
 
-        FiffProj* one = new FiffProj(kind, active, desc, t_fiffNamedMatrix);
+        FiffProj one(kind, active, desc, t_fiffNamedMatrix);
         //
         projdata.append(one);
     }
@@ -1156,8 +1156,8 @@ QList<FiffProj*> FiffStream::read_proj(FiffDirTree* p_pNode)
         printf("\tRead a total of %d projection items:\n", projdata.size());
         for(qint32 k = 0; k < projdata.size(); ++k)
         {
-            printf("\t\t%s (%d x %d)",projdata.at(k)->desc.toUtf8().constData(), projdata.at(k)->data->nrow, projdata.at(k)->data->ncol);
-            if (projdata.at(k)->active)
+            printf("\t\t%s (%d x %d)",projdata[k].desc.toUtf8().constData(), projdata[k].data.nrow, projdata[k].data.ncol);
+            if (projdata[k].active)
                 printf(" active\n");
             else
                 printf(" idle\n");
@@ -1793,7 +1793,7 @@ void FiffStream::write_ctf_comp(QList<FiffCtfComp*>& comps)
         //
         //    Write an uncalibrated or calibrated matrix
         //
-        *comp->data->data = (comp->rowcals.diagonal()).inverse()*(*comp->data->data)*(comp->colcals.diagonal()).inverse();
+        comp->data->data = (comp->rowcals.diagonal()).inverse()* comp->data->data * (comp->colcals.diagonal()).inverse();
         this->write_named_matrix(FIFF_MNE_CTF_COMP_DATA,comp->data);
         this->end_block(FIFFB_MNE_CTF_COMP_DATA);
 
@@ -1868,12 +1868,12 @@ void FiffStream::write_float(fiff_int_t kind, float* data, fiff_int_t nel)
 
 //*************************************************************************************************************
 
-void FiffStream::write_float_matrix(fiff_int_t kind, const MatrixXd* mat)
+void FiffStream::write_float_matrix(fiff_int_t kind, const MatrixXd& mat)
 {
     qint32 FIFFT_MATRIX = 1 << 30;
     qint32 FIFFT_MATRIX_FLOAT = FIFFT_FLOAT | FIFFT_MATRIX;
 
-    qint32 numel = mat->rows()*mat->cols();
+    qint32 numel = mat.rows() * mat.cols();
 
     fiff_int_t datasize = 4*numel + 4*3;
 
@@ -1895,11 +1895,11 @@ void FiffStream::write_float_matrix(fiff_int_t kind, const MatrixXd* mat)
 //    }
 
     for(i = 0; i < numel; ++i)
-        *this << (float)mat->data()[i];
+        *this << (float)mat.data()[i];
 
     qint32 dims[3];
-    dims[0] = mat->cols();
-    dims[1] = mat->rows();
+    dims[0] = mat.cols();
+    dims[1] = mat.rows();
     dims[2] = 2;
 
     for(i = 0; i < 3; ++i)
@@ -1999,7 +1999,7 @@ void FiffStream::write_named_matrix(fiff_int_t kind,FiffNamedMatrix* mat)
 
 //*************************************************************************************************************
 
-void FiffStream::write_proj(QList<FiffProj*>& projs)
+void FiffStream::write_proj(QList<FiffProj>& projs)
 {
     if (projs.size() <= 0)
         return;
@@ -2009,20 +2009,20 @@ void FiffStream::write_proj(QList<FiffProj*>& projs)
     for(qint32 k = 0; k < projs.size(); ++k)
     {
         this->start_block(FIFFB_PROJ_ITEM);
-        this->write_string(FIFF_NAME,projs[k]->desc);
-        this->write_int(FIFF_PROJ_ITEM_KIND,&projs[k]->kind);
-        if (projs[k]->kind == FIFFV_PROJ_ITEM_FIELD)
+        this->write_string(FIFF_NAME,projs[k].desc);
+        this->write_int(FIFF_PROJ_ITEM_KIND,&projs[k].kind);
+        if (projs[k].kind == FIFFV_PROJ_ITEM_FIELD)
         {
             float fValue = 0.0f;
             this->write_float(FIFF_PROJ_ITEM_TIME, &fValue);
         }
 
-        this->write_int(FIFF_NCHAN, &projs[k]->data->ncol);
-        this->write_int(FIFF_PROJ_ITEM_NVEC, &projs[k]->data->nrow);
-        qint32 bValue = (qint32)projs[k]->active;
+        this->write_int(FIFF_NCHAN, &projs[k].data.ncol);
+        this->write_int(FIFF_PROJ_ITEM_NVEC, &projs[k].data.nrow);
+        qint32 bValue = (qint32)projs[k].active;
         this->write_int(FIFF_MNE_PROJ_ITEM_ACTIVE, &bValue);
-        this->write_name_list(FIFF_PROJ_ITEM_CH_NAME_LIST, projs[k]->data->col_names);
-        this->write_float_matrix(FIFF_PROJ_ITEM_VECTORS, projs[k]->data->data);
+        this->write_name_list(FIFF_PROJ_ITEM_CH_NAME_LIST, projs[k].data.col_names);
+        this->write_float_matrix(FIFF_PROJ_ITEM_VECTORS, projs[k].data.data);
         this->end_block(FIFFB_PROJ_ITEM);
     }
     this->end_block(FIFFB_PROJ);

@@ -277,7 +277,7 @@ public:
     *
     * @return a list of SSP projectors
     */
-    QList<FiffProj*> read_proj(FiffDirTree* p_pTree);
+    QList<FiffProj> read_proj(FiffDirTree* p_pTree);
 
     //=========================================================================================================
     /**
@@ -469,7 +469,7 @@ public:
     * @param[in] kind       The tag kind
     * @param[in] mat        The data matrix
     */
-    void write_float_matrix(fiff_int_t kind, const MatrixXd* mat);
+    void write_float_matrix(fiff_int_t kind, const MatrixXd& mat);
 
 
     //=========================================================================================================
@@ -508,7 +508,7 @@ public:
     *
     * @param[in] projs      The compensation data to write
     */
-    void write_proj(QList<FiffProj*>& projs);
+    void write_proj(QList<FiffProj>& projs);
 
     //=========================================================================================================
     /**

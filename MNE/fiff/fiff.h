@@ -489,7 +489,7 @@ public:
     *
     * @return a list of SSP projectors
     */
-    static inline QList<FiffProj*> read_proj(FiffStream* p_pStream, FiffDirTree* p_pNode)
+    static inline QList<FiffProj> read_proj(FiffStream* p_pStream, FiffDirTree* p_pNode)
     {
         return p_pStream->read_proj(p_pNode);
     }
@@ -808,7 +808,7 @@ public:
     * @param[in] kind       The tag kind
     * @param[in] mat        The data matrix
     */
-    inline static void write_float_matrix(FiffStream* p_pStream, fiff_int_t kind, MatrixXd* mat)
+    inline static void write_float_matrix(FiffStream* p_pStream, fiff_int_t kind, MatrixXd& mat)
     {
         p_pStream->write_float_matrix(kind, mat);
     }
@@ -864,7 +864,7 @@ public:
     * @param[in] p_pStream    An open fif file
     * @param[in] projs      The compensation data to write
     */
-    inline static void write_proj(FiffStream* p_pStream, QList<FiffProj*>& projs)
+    inline static void write_proj(FiffStream* p_pStream, QList<FiffProj>& projs)
     {
         p_pStream->write_proj(projs);
     }
