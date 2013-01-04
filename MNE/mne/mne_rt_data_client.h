@@ -8,19 +8,12 @@
 
 #include "mne_global.h"
 
-
-#include "../fiff/fiff_stream.h"
-
-#include "../fiff/fiff_info.h"
-
-
+#include "fiff/fiff_stream.h"
+#include "fiff/fiff_info.h"
 
 #include <QTcpSocket>
 
-
-
 using namespace FIFFLIB;
-
 
 class MNESHARED_EXPORT MNERtDataClient : public QTcpSocket
 {

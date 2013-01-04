@@ -52,7 +52,7 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-LIBS += -L$${PWD}/../lib/
+LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}MneMathd \
             -lMNE$${MNE_LIB_VERSION}Mned \
@@ -75,7 +75,7 @@ DESTDIR = $${PWD}/../bin
 SOURCES +=  main.cpp \
             sourcelab.cpp \
 
-INCLUDEPATH += $${PWD}/../$${EIGEN_HOME} \
-               $${PWD}/../$${MNE_HOME}
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 HEADERS += sourcelab.h \

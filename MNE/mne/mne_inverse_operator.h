@@ -52,10 +52,10 @@
 // FIFF INCLUDES
 //=============================================================================================================
 
-#include "../fiff/fiff_types.h"
-#include "../fiff/fiff_named_matrix.h"
-#include "../fiff/fiff_proj.h"
-#include "../fiff/fiff_cov.h"
+#include "fiff/fiff_types.h"
+#include "fiff/fiff_named_matrix.h"
+#include "fiff/fiff_proj.h"
+#include "fiff/fiff_cov.h"
 
 
 //*************************************************************************************************************
