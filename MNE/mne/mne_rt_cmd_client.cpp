@@ -1,5 +1,7 @@
 #include "mne_rt_cmd_client.h"
 
+using namespace MNELIB;
+
 MNERtCmdClient::MNERtCmdClient(QObject *parent)
 : QTcpSocket(parent)
 {

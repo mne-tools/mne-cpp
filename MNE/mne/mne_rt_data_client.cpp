@@ -1,5 +1,9 @@
 #include "mne_rt_data_client.h"
 
+
+using namespace MNELIB;
+
+
 MNERtDataClient::MNERtDataClient(QObject *parent)
 : QTcpSocket(parent)
 , m_clientID(-1)
