@@ -156,7 +156,7 @@ public:
     VectorXd nearest_dist;      /**< ToDo... */
     QList<VectorXi> pinfo;      /**< ToDo... */
     float dist_limit;           /**< ToDo... */
-    MatrixXd* dist;             /**< ToDo... */
+    MatrixXd dist;             /**< ToDo... */
     MatrixX3d tri_cent;         /**< ToDo... */
     MatrixX3d tri_nn;           /**< ToDo... */
     VectorXd tri_area;          /**< ToDo... */

@@ -70,7 +70,7 @@ FiffProj::FiffProj( FiffProj* p_pFiffProj)
 : kind(p_pFiffProj->kind)
 , active(p_pFiffProj->active)
 , desc(p_pFiffProj->desc)
-, data(new FiffNamedMatrix(p_pFiffProj->data))
+, data(p_pFiffProj->data)
 {
 
 }
@@ -78,11 +78,11 @@ FiffProj::FiffProj( FiffProj* p_pFiffProj)
 
 //*************************************************************************************************************
 
-FiffProj::FiffProj( fiff_int_t p_kind, bool p_active, QString p_desc, FiffNamedMatrix* p_data)
+FiffProj::FiffProj( fiff_int_t p_kind, bool p_active, QString p_desc, FiffNamedMatrix& p_data)
 : kind(p_kind)
 , active(p_active)
 , desc(p_desc)
-, data(new FiffNamedMatrix(p_data))
+, data(p_data)
 {
 
 }
@@ -92,6 +92,6 @@ FiffProj::FiffProj( fiff_int_t p_kind, bool p_active, QString p_desc, FiffNamedM
 
 FiffProj::~FiffProj()
 {
-    if(data)
-        delete data;
+//    if(data)
+//        delete data;
 }

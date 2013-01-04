@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
     qint32 i;
     for(i = 0; i < inv->reginv->rows(); ++i)
         reginv.insert(i,i) = (*inv->reginv)(i,0);
-    MatrixXd trans = reginv*(*inv->eigen_fields->data)*(*inv->whitener)*(*inv->proj)*(*data->evoked[0]->epochs);
+    MatrixXd trans = reginv*inv->eigen_fields->data*(*inv->whitener)*(*inv->proj)*data->evoked[0]->epochs;
     //
     //   Transformation into current distributions by weighting the eigenleads
     //   with the weights computed above
@@ -163,7 +163,7 @@ int main(int argc, char *argv[])
         //     R^0.5 has been already factored in
         //
         printf("(eigenleads already weighted)...");
-        sol = (*inv->eigen_leads->data)*trans;
+        sol = inv->eigen_leads->data*trans;
     }
     else
     {
@@ -172,11 +172,11 @@ int main(int argc, char *argv[])
         //
        printf("(eigenleads need to be weighted)...");
 
-       SparseMatrix<double> sourceCov(inv->source_cov->data->rows(),inv->source_cov->data->rows());
-       for(i = 0; i < inv->source_cov->data->rows(); ++i)
-           sourceCov.insert(i,i) = sqrt((*inv->source_cov->data)(i,0));
+       SparseMatrix<double> sourceCov(inv->source_cov->data.rows(),inv->source_cov->data.rows());
+       for(i = 0; i < inv->source_cov->data.rows(); ++i)
+           sourceCov.insert(i,i) = sqrt(inv->source_cov->data(i,0));
 
-       sol   = sourceCov*(*inv->eigen_leads->data)*trans;
+       sol   = sourceCov*inv->eigen_leads->data*trans;
     }
 
     if (inv->source_ori == FIFFV_MNE_FREE_ORI)

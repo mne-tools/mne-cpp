@@ -109,12 +109,12 @@ public:
     bool diag;              /**< ToDo... */
     fiff_int_t dim;         /**< ToDo... */
     QStringList names;      /**< ToDo... */
-    MatrixXd* data;         /**< ToDo... */
-    QList<FiffProj*> projs; /**< ToDo... */
+    MatrixXd data;         /**< ToDo... */
+    QList<FiffProj> projs; /**< ToDo... */
     QStringList bads;       /**< ToDo... */
     fiff_int_t nfree;       /**< ToDo... */
-    VectorXd* eig;          /**< ToDo... */
-    MatrixXd* eigvec;       /**< ToDo... */
+    VectorXd eig;          /**< ToDo... */
+    MatrixXd eigvec;       /**< ToDo... */
 };
 
 } // NAMESPACE

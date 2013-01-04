@@ -150,7 +150,7 @@ public:
     *
     * @return nproj - How many items in the projector
     */
-    static fiff_int_t make_projector(QList<FiffProj*>& projs, QStringList& ch_names, MatrixXd*& proj, QStringList& bads = defaultQStringList, MatrixXd& U = defaultMatrixXd);
+    static fiff_int_t make_projector(QList<FiffProj>& projs, QStringList& ch_names, MatrixXd*& proj, QStringList& bads = defaultQStringList, MatrixXd& U = defaultMatrixXd);
 
 
     //=========================================================================================================
@@ -282,7 +282,7 @@ public: //Public because it's a mne struct
     QList<FiffDigPoint> dig;
     FiffCoordTrans* dig_trans;
     QStringList bads;
-    QList<FiffProj*> projs;
+    QList<FiffProj> projs;
     QList<FiffCtfComp*> comps;
     QString acq_pars;
     QString acq_stim;

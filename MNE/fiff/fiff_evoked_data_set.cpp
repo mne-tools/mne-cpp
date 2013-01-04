@@ -116,14 +116,14 @@ FiffEvokedDataSet* FiffEvokedDataSet::pick_channels_evoked(QStringList& include,
     qint32 k, l;
     for(k = 0; k < res->evoked.size(); ++k)
     {
-        if(selBlock.rows() != sel.cols() || selBlock.cols() != res->evoked[k]->epochs->cols())
-            selBlock.resize(sel.cols(), res->evoked[k]->epochs->cols());
+        if(selBlock.rows() != sel.cols() || selBlock.cols() != res->evoked[k]->epochs.cols())
+            selBlock.resize(sel.cols(), res->evoked[k]->epochs.cols());
         for(l = 0; l < sel.cols(); ++l)
         {
-            selBlock.block(l,0,1,selBlock.cols()) = res->evoked[k]->epochs->block(sel(0,l),0,1,selBlock.cols());
+            selBlock.block(l,0,1,selBlock.cols()) = res->evoked[k]->epochs.block(sel(0,l),0,1,selBlock.cols());
         }
-        res->evoked[k]->epochs->resize(sel.cols(), res->evoked[k]->epochs->cols());
-        *res->evoked[k]->epochs = selBlock;
+        res->evoked[k]->epochs.resize(sel.cols(), res->evoked[k]->epochs.cols());
+        res->evoked[k]->epochs = selBlock;
     }
 
     return res;
@@ -431,19 +431,19 @@ bool FiffEvokedDataSet::read_evoked(QIODevice* p_pIODevice, FiffEvokedDataSet*& 
         return false;
     }
     //
-    MatrixXd* all = NULL;
+    MatrixXd all;// = NULL;
     if (nepoch == 1)
     {
         //
         //   Only one epoch
         //
         all = epoch[0]->toFloatMatrix();
-        all->transposeInPlace();
+        all.transposeInPlace();
         //
         //   May need a transpose if the number of channels is one
         //
-        if (all->cols() == 1 && info->nchan == 1)
-            all->transposeInPlace();
+        if (all.cols() == 1 && info->nchan == 1)
+            all.transposeInPlace();
     }
     else
     {
@@ -451,19 +451,19 @@ bool FiffEvokedDataSet::read_evoked(QIODevice* p_pIODevice, FiffEvokedDataSet*& 
         //   Put the old style epochs together
         //
         all = epoch[0]->toFloatMatrix();
-        all->transposeInPlace();
+        all.transposeInPlace();
 
         for (k = 2; k < nepoch; ++k)
         {
-            oldsize = all->rows();
-            MatrixXd* tmp = epoch[k]->toFloatMatrix();
-            tmp->transposeInPlace();
-            all->conservativeResize(oldsize+tmp->rows(), all->cols());
-            all->block(oldsize, 0, tmp->rows(), tmp->cols()) = *tmp;
-            delete tmp;
+            oldsize = all.rows();
+            MatrixXd tmp = epoch[k]->toFloatMatrix();
+            tmp.transposeInPlace();
+            all.conservativeResize(oldsize+tmp.rows(), all.cols());
+            all.block(oldsize, 0, tmp.rows(), tmp.cols()) = tmp;
+//            delete tmp;
         }
     }
-    if (all->cols() != nsamp)
+    if (all.cols() != nsamp)
     {
         if(t_pStream)
             delete t_pStream;
@@ -473,7 +473,7 @@ bool FiffEvokedDataSet::read_evoked(QIODevice* p_pIODevice, FiffEvokedDataSet*& 
             delete t_pDir;
         if(info)
             delete info;
-        printf("Incorrect number of samples (%d instead of %d)", all->cols(), nsamp);
+        printf("Incorrect number of samples (%d instead of %d)", all.cols(), nsamp);
         return false;
     }
     //
@@ -482,7 +482,7 @@ bool FiffEvokedDataSet::read_evoked(QIODevice* p_pIODevice, FiffEvokedDataSet*& 
     SparseMatrix<double> cals(info->nchan, info->nchan);
     for(k = 0; k < info->nchan; ++k)
         cals.insert(k, k) = info->chs[k].cal;
-    *all = cals* *all;
+    all = cals * all;
     //
     //   Put it all together
     //
@@ -514,8 +514,8 @@ bool FiffEvokedDataSet::read_evoked(QIODevice* p_pIODevice, FiffEvokedDataSet*& 
     for (k = 0; k < data->evoked[0]->times->cols(); ++k)
         (*data->evoked[0]->times)(0, k) = ((float)(first+k)) / info->sfreq;
 
-    if(data->evoked[0]->epochs)
-        delete data->evoked[0]->epochs;
+//    if(data->evoked[0].epochs)
+//        delete data->evoked[0]->epochs;
     data->evoked[0]->epochs = all;
 
     if(t_pStream)
