@@ -50,9 +50,9 @@
 // FIFF INCLUDES
 //=============================================================================================================
 
-#include "fiff/fiff_types.h"
-#include "fiff/fiff_dir_tree.h"
-#include "fiff/fiff.h"
+#include <fiff/fiff_types.h>
+#include <fiff/fiff_dir_tree.h>
+#include <fiff/fiff.h>
 
 
 //*************************************************************************************************************
