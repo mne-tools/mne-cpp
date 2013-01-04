@@ -23,7 +23,7 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-LIBS += -L$${PWD}/../../../lib/
+LIBS += -L$${MNE_LIBRARY_DIR}
 
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Mned \
@@ -65,8 +65,8 @@ HEADERS += neuromag.h\
     collectorsocket.h \
     shmemsocket.h
 
-INCLUDEPATH += $${PWD}/../../../$${EIGEN_HOME} \
-               $${PWD}/../../../$${MNE_HOME}
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 OTHER_FILES += neuromag.json
 
