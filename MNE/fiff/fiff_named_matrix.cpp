@@ -90,9 +90,7 @@ FiffNamedMatrix::FiffNamedMatrix(const FiffNamedMatrix* p_pFiffNamedMatrix)
 
 FiffNamedMatrix::~FiffNamedMatrix()
 {
-    /*
-    if(data)
-        delete data;*/
+
 }
 
 

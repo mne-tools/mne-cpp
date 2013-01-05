@@ -58,7 +58,6 @@ FiffCtfComp::FiffCtfComp()
 : ctfkind(-1)
 , kind (-1)
 , save_calibrated(false)
-, data (NULL)
 {
 }
 
@@ -71,7 +70,7 @@ FiffCtfComp::FiffCtfComp(const FiffCtfComp* comp)
 , save_calibrated(comp->save_calibrated)
 , rowcals(comp->rowcals)
 , colcals(comp->colcals)
-, data (new FiffNamedMatrix(comp->data))
+, data (comp->data)
 {
 }
 
@@ -80,6 +79,5 @@ FiffCtfComp::FiffCtfComp(const FiffCtfComp* comp)
 
 FiffCtfComp::~FiffCtfComp()
 {
-    if(data)
-        delete data;
+
 }

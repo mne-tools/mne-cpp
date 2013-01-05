@@ -58,7 +58,6 @@ FiffProj::FiffProj()
 : kind(-1)
 , active(false)
 , desc("")
-, data(NULL)
 {
 
 }
@@ -66,7 +65,7 @@ FiffProj::FiffProj()
 
 //*************************************************************************************************************
 
-FiffProj::FiffProj( FiffProj* p_pFiffProj)
+FiffProj::FiffProj(const FiffProj* p_pFiffProj)
 : kind(p_pFiffProj->kind)
 , active(p_pFiffProj->active)
 , desc(p_pFiffProj->desc)
@@ -92,6 +91,5 @@ FiffProj::FiffProj( fiff_int_t p_kind, bool p_active, QString p_desc, FiffNamedM
 
 FiffProj::~FiffProj()
 {
-//    if(data)
-//        delete data;
+
 }

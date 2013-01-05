@@ -404,7 +404,7 @@ public:
     *
     * @return the CTF software compensation data
     */
-    static inline QList<FiffCtfComp*> read_ctf_comp(FiffStream* p_pStream, FiffDirTree* p_pTree, QList<FiffChInfo>& chs)
+    static inline QList<FiffCtfComp> read_ctf_comp(FiffStream* p_pStream, FiffDirTree* p_pTree, QList<FiffChInfo>& chs)
     {
         return p_pStream->read_ctf_comp(p_pTree, chs);
     }
@@ -469,7 +469,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static inline bool read_named_matrix(FiffStream* p_pStream, FiffDirTree* node, fiff_int_t matkind, FiffNamedMatrix*& mat)
+    static inline bool read_named_matrix(FiffStream* p_pStream, FiffDirTree* node, fiff_int_t matkind, FiffNamedMatrix& mat)
     {
         return p_pStream->read_named_matrix(node, matkind, mat);
     }
@@ -693,7 +693,7 @@ public:
     * @param[in] p_pStream    An open fif file
     * @param[in] trans      The coordinate transfomation structure
     */
-    inline static void write_coord_trans(FiffStream* p_pStream, FiffCoordTrans* trans)
+    inline static void write_coord_trans(FiffStream* p_pStream, FiffCoordTrans& trans)
     {
         p_pStream->write_coord_trans(trans);
     }
@@ -711,7 +711,7 @@ public:
     * @param[in] p_pStream    An open fif file
     * @param[in] comps      The compensation data to write
     */
-    inline static void write_ctf_comp(FiffStream* p_pStream, QList<FiffCtfComp*>& comps)
+    inline static void write_ctf_comp(FiffStream* p_pStream, QList<FiffCtfComp>& comps)
     {
         p_pStream->write_ctf_comp(comps);
     }
@@ -846,7 +846,7 @@ public:
     * @param[in] kind       The tag kind to use for the data
     * @param[in] data       The data matrix
     */
-    inline static void write_named_matrix(FiffStream* p_pStream, fiff_int_t kind,FiffNamedMatrix* mat)
+    inline static void write_named_matrix(FiffStream* p_pStream, fiff_int_t kind,FiffNamedMatrix& mat)
     {
         p_pStream->write_named_matrix(kind, mat);
     }

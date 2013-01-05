@@ -262,10 +262,10 @@ void FiffStreamThread::sendMeasurementInfo(qint32 ID, FiffInfo* p_pFiffInfo)
         //
         if (!have_hpi_result)
         {
-            if (p_pFiffInfo->dev_head_t != NULL)
+            if (!p_pFiffInfo->dev_head_t.isEmpty())
                 t_FiffStreamOut.write_coord_trans(p_pFiffInfo->dev_head_t);
 
-            if (p_pFiffInfo->ctf_head_t != NULL)
+            if (!p_pFiffInfo->ctf_head_t.isEmpty())
                 t_FiffStreamOut.write_coord_trans(p_pFiffInfo->ctf_head_t);
         }
         //

@@ -98,7 +98,7 @@ public:
     /**
     * copy ctor
     */
-    FiffProj(FiffProj* p_pFiffProj);
+    FiffProj(const FiffProj* p_pFiffProj);
 
     //=========================================================================================================
     /**
