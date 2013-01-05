@@ -162,15 +162,15 @@ public:
     MatrixXd  source_nn;
     VectorXd*  sing;
     bool    eigen_leads_weighted;
-    FiffNamedMatrix* eigen_leads;
-    FiffNamedMatrix* eigen_fields;
+    FiffNamedMatrix eigen_leads;
+    FiffNamedMatrix eigen_fields;
     FiffCov* noise_cov;
     FiffCov* source_cov;
     FiffCov* orient_prior;
     FiffCov* depth_prior;
     FiffCov* fmri_prior;
-    MNESourceSpace* src;
-    FiffCoordTrans* mri_head_t;
+    MNESourceSpace src;
+    FiffCoordTrans mri_head_t;
     fiff_int_t nave;
     QList<FiffProj> projs;
     MatrixXd* proj;                     /**< This is the projector to apply to the data. */

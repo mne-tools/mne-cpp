@@ -61,10 +61,10 @@ MNESourceSpace::MNESourceSpace()
 
 //*************************************************************************************************************
 
-MNESourceSpace::MNESourceSpace(MNESourceSpace* p_pMNESourceSpace)
+MNESourceSpace::MNESourceSpace(const MNESourceSpace* p_pMNESourceSpace)
 {
     for(int i = 0; i < p_pMNESourceSpace->hemispheres.size(); ++i)
-        hemispheres.append(new MNEHemisphere(p_pMNESourceSpace->hemispheres.at(i)));
+        hemispheres.append(p_pMNESourceSpace->hemispheres[i]);
 }
 
 
@@ -72,19 +72,19 @@ MNESourceSpace::MNESourceSpace(MNESourceSpace* p_pMNESourceSpace)
 
 MNESourceSpace::~MNESourceSpace()
 {
-    QList<MNEHemisphere*>::iterator i;
-     for (i = hemispheres.begin(); i != hemispheres.end(); ++i)
-         delete *i;
+//    QList<MNEHemisphere*>::iterator i;
+//    for (i = hemispheres.begin(); i != hemispheres.end(); ++i)
+//        delete *i;
 }
 
 
 //*************************************************************************************************************
 
-bool MNESourceSpace::read_source_spaces(FiffStream*& p_pStream, bool add_geom, FiffDirTree*& p_pTree, MNESourceSpace*& p_pSourceSpace)
+bool MNESourceSpace::read_source_spaces(FiffStream*& p_pStream, bool add_geom, FiffDirTree*& p_pTree, MNESourceSpace& p_SourceSpace)
 {
-    if (p_pSourceSpace != NULL)
-        delete p_pSourceSpace;
-    p_pSourceSpace = new MNESourceSpace();
+//    if (p_pSourceSpace != NULL)
+//        delete p_pSourceSpace;
+    p_SourceSpace = MNESourceSpace();
 
 
     //
@@ -121,14 +121,14 @@ bool MNESourceSpace::read_source_spaces(FiffStream*& p_pStream, bool add_geom, F
 
     for(int k = 0; k < spaces.size(); ++k)
     {
-        MNEHemisphere* p_pHemisphere = NULL;
+        MNEHemisphere p_Hemisphere;
         printf("\tReading a source space...");
-        MNESourceSpace::read_source_space(p_pStream, spaces.at(k), p_pHemisphere);
+        MNESourceSpace::read_source_space(p_pStream, spaces.at(k), p_Hemisphere);
         printf("\t[done]\n" );
         if (add_geom)
-            complete_source_space_info(p_pHemisphere);
+            complete_source_space_info(p_Hemisphere);
 
-        p_pSourceSpace->hemispheres.append(p_pHemisphere);
+        p_SourceSpace.hemispheres.append(p_Hemisphere);
 
 //           src(k) = this;
     }
@@ -144,9 +144,9 @@ bool MNESourceSpace::read_source_spaces(FiffStream*& p_pStream, bool add_geom, F
 
 //*************************************************************************************************************
 
-qint32 MNESourceSpace::find_source_space_hemi(MNEHemisphere* p_pHemisphere)
+qint32 MNESourceSpace::find_source_space_hemi(MNEHemisphere& p_Hemisphere)
 {
-    double xave = p_pHemisphere->rr.col(0).sum();
+    double xave = p_Hemisphere.rr.col(0).sum();
 
     qint32 hemi;
     if (xave < 0)
@@ -160,11 +160,11 @@ qint32 MNESourceSpace::find_source_space_hemi(MNEHemisphere* p_pHemisphere)
 
 //*************************************************************************************************************
 
-bool MNESourceSpace::transform_source_space_to(fiff_int_t dest, FiffCoordTrans* trans)
+bool MNESourceSpace::transform_source_space_to(fiff_int_t dest, FiffCoordTrans& trans)
 {
     for(int k = 0; k < this->hemispheres.size(); ++k)
     {
-        if(!this->hemispheres.at(k)->transform_hemisphere_to(dest,trans))
+        if(!this->hemispheres[k].transform_hemisphere_to(dest,trans))
         {
             printf("Could not transform source space.\n");
             return false;
@@ -176,19 +176,17 @@ bool MNESourceSpace::transform_source_space_to(fiff_int_t dest, FiffCoordTrans* 
 
 //*************************************************************************************************************
 
-bool MNESourceSpace::read_source_space(FiffStream* p_pStream, FiffDirTree* p_pTree, MNEHemisphere*& p_pHemisphere)
+bool MNESourceSpace::read_source_space(FiffStream* p_pStream, FiffDirTree* p_pTree, MNEHemisphere& p_Hemisphere)
 {
-    if (p_pHemisphere != NULL)
-        delete p_pHemisphere;
-    p_pHemisphere = new MNEHemisphere();
+    p_Hemisphere = MNEHemisphere();
 
     FIFFLIB::FiffTag* t_pTag = NULL;
 
     //=====================================================================
     if(!p_pTree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_ID, t_pTag))
-        p_pHemisphere->id = FIFFV_MNE_SURF_UNKNOWN;
+        p_Hemisphere.id = FIFFV_MNE_SURF_UNKNOWN;
     else
-        p_pHemisphere->id = *t_pTag->toInt();
+        p_Hemisphere.id = *t_pTag->toInt();
 
 //        qDebug() << "Read SourceSpace ID; type:" << t_pTag->getType() << "value:" << *t_pTag->toInt();
 
@@ -200,20 +198,20 @@ bool MNESourceSpace::read_source_space(FiffStream* p_pStream, FiffDirTree* p_pTr
         return false;
     }
 //        qDebug() << "Number of vertice; type:" << t_pTag->getType() << "value:" << *t_pTag->toInt();
-    p_pHemisphere->np = *t_pTag->toInt();
+    p_Hemisphere.np = *t_pTag->toInt();
 
 
     //=====================================================================
     if(!p_pTree->find_tag(p_pStream, FIFF_BEM_SURF_NTRI, t_pTag))
     {
         if(!p_pTree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NTRI, t_pTag))
-            p_pHemisphere->ntri = 0;
+            p_Hemisphere.ntri = 0;
         else
-            p_pHemisphere->ntri = *t_pTag->toInt();
+            p_Hemisphere.ntri = *t_pTag->toInt();
     }
     else
     {
-        p_pHemisphere->ntri = *t_pTag->toInt();
+        p_Hemisphere.ntri = *t_pTag->toInt();
     }
 //        qDebug() << "Number of Tris; type:" << t_pTag->getType() << "value:" << *t_pTag->toInt();
 
@@ -225,7 +223,7 @@ bool MNESourceSpace::read_source_space(FiffStream* p_pStream, FiffDirTree* p_pTr
         std::cout << "Coordinate frame information not found."; //ToDo: throw error.
         return false;
     }
-    p_pHemisphere->coord_frame = *t_pTag->toInt();
+    p_Hemisphere.coord_frame = *t_pTag->toInt();
 //        qDebug() << "Coord Frame; type:" << t_pTag->getType() << "value:" << *t_pTag->toInt();
 
     //=====================================================================
@@ -239,11 +237,11 @@ bool MNESourceSpace::read_source_space(FiffStream* p_pStream, FiffDirTree* p_pTr
         return false;
     }
 
-    p_pHemisphere->rr = t_pTag->toFloatMatrix().transpose();
-    qint32 rows_rr = p_pHemisphere->rr.rows();
-//        qDebug() << "last element rr: " << p_pHemisphere->rr(rows_rr-1, 0) << p_pHemisphere->rr(rows_rr-1, 1) << p_pHemisphere->rr(rows_rr-1, 2);
+    p_Hemisphere.rr = t_pTag->toFloatMatrix().transpose();
+    qint32 rows_rr = p_Hemisphere.rr.rows();
+//        qDebug() << "last element rr: " << p_Hemisphere.rr(rows_rr-1, 0) << p_Hemisphere.rr(rows_rr-1, 1) << p_Hemisphere.rr(rows_rr-1, 2);
 
-    if (rows_rr != p_pHemisphere->np)
+    if (rows_rr != p_Hemisphere.np)
     {
         p_pStream->device()->close();
         std::cout << "Vertex information is incorrect."; //ToDo: throw error.
@@ -260,10 +258,10 @@ bool MNESourceSpace::read_source_space(FiffStream* p_pStream, FiffDirTree* p_pTr
         return false;
     }
 
-    p_pHemisphere->nn = t_pTag->toFloatMatrix().transpose();
-    qint32 rows_nn = p_pHemisphere->nn.rows();
+    p_Hemisphere.nn = t_pTag->toFloatMatrix().transpose();
+    qint32 rows_nn = p_Hemisphere.nn.rows();
 
-    if (rows_nn != p_pHemisphere->np)
+    if (rows_nn != p_Hemisphere.np)
     {
         p_pStream->device()->close();
         std::cout << "Vertex normal information is incorrect."; //ToDo: throw error.
@@ -273,7 +271,7 @@ bool MNESourceSpace::read_source_space(FiffStream* p_pStream, FiffDirTree* p_pTr
 
 
     //=====================================================================
-    if (p_pHemisphere->ntri > 0)
+    if (p_Hemisphere.ntri > 0)
     {
         if(!p_pTree->find_tag(p_pStream, FIFF_BEM_SURF_TRIANGLES, t_pTag))
         {
@@ -285,16 +283,16 @@ bool MNESourceSpace::read_source_space(FiffStream* p_pStream, FiffDirTree* p_pTr
             }
             else
             {
-                p_pHemisphere->tris = t_pTag->toIntMatrix().transpose();
-                p_pHemisphere->tris -= MatrixXi::Constant(p_pHemisphere->tris.rows(),3,1);//0 based indizes
+                p_Hemisphere.tris = t_pTag->toIntMatrix().transpose();
+                p_Hemisphere.tris -= MatrixXi::Constant(p_Hemisphere.tris.rows(),3,1);//0 based indizes
             }
         }
         else
         {
-            p_pHemisphere->tris = t_pTag->toIntMatrix().transpose();
-            p_pHemisphere->tris -= MatrixXi::Constant(p_pHemisphere->tris.rows(),3,1);//0 based indizes
+            p_Hemisphere.tris = t_pTag->toIntMatrix().transpose();
+            p_Hemisphere.tris -= MatrixXi::Constant(p_Hemisphere.tris.rows(),3,1);//0 based indizes
         }
-        if (p_pHemisphere->tris.rows() != p_pHemisphere->ntri)
+        if (p_Hemisphere.tris.rows() != p_Hemisphere.ntri)
         {
             p_pStream->device()->close();
             std::cout << "Triangulation information is incorrect."; //ToDo: throw error.
@@ -304,9 +302,9 @@ bool MNESourceSpace::read_source_space(FiffStream* p_pStream, FiffDirTree* p_pTr
     else
     {
         MatrixXi p_defaultMatrix(0, 0);
-        p_pHemisphere->tris = p_defaultMatrix;
+        p_Hemisphere.tris = p_defaultMatrix;
     }
-//        qDebug() << "Triangles; type:" << t_pTag->getType() << "rows:" << p_pHemisphere->tris.rows() << "cols:" << p_pHemisphere->tris.cols();
+//        qDebug() << "Triangles; type:" << t_pTag->getType() << "rows:" << p_Hemisphere.tris.rows() << "cols:" << p_Hemisphere.tris.cols();
 
 
     //
@@ -314,40 +312,40 @@ bool MNESourceSpace::read_source_space(FiffStream* p_pStream, FiffDirTree* p_pTr
     //
     if(!p_pTree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NUSE, t_pTag))
     {
-        p_pHemisphere->nuse   = 0;
-        p_pHemisphere->inuse  = VectorXi::Zero(p_pHemisphere->nuse);
+        p_Hemisphere.nuse   = 0;
+        p_Hemisphere.inuse  = VectorXi::Zero(p_Hemisphere.nuse);
         VectorXi p_defaultVector;
-        p_pHemisphere->vertno = p_defaultVector;
+        p_Hemisphere.vertno = p_defaultVector;
     }
     else
     {
-        p_pHemisphere->nuse = *t_pTag->toInt();
+        p_Hemisphere.nuse = *t_pTag->toInt();
         if(!p_pTree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_SELECTION, t_pTag))
         {
             p_pStream->device()->close();
             std::cout << "Source selection information missing."; //ToDo: throw error.
             return false;
         }
-        p_pHemisphere->inuse = VectorXi(Map<VectorXi>(t_pTag->toInt(), t_pTag->size()/4, 1));//use copy constructor, for the sake of easy memory management
+        p_Hemisphere.inuse = VectorXi(Map<VectorXi>(t_pTag->toInt(), t_pTag->size()/4, 1));//use copy constructor, for the sake of easy memory management
 
-        p_pHemisphere->vertno = VectorXi::Zero(p_pHemisphere->nuse);
-        if (p_pHemisphere->inuse.rows() != p_pHemisphere->np)
+        p_Hemisphere.vertno = VectorXi::Zero(p_Hemisphere.nuse);
+        if (p_Hemisphere.inuse.rows() != p_Hemisphere.np)
         {
             p_pStream->device()->close();
             std::cout << "Incorrect number of entries in source space selection."; //ToDo: throw error.
             return false;
         }
         int pp = 0;
-        for (int p = 0; p < p_pHemisphere->np; ++p)
+        for (int p = 0; p < p_Hemisphere.np; ++p)
         {
-            if(p_pHemisphere->inuse(p) == 1)
+            if(p_Hemisphere.inuse(p) == 1)
             {
-                p_pHemisphere->vertno(pp) = p;
+                p_Hemisphere.vertno(pp) = p;
                 ++pp;
             }
         }
     }
-//        qDebug() << "Vertices; type:" << t_pTag->getType() << "nuse:" << p_pHemisphere->nuse;
+//        qDebug() << "Vertices; type:" << t_pTag->getType() << "nuse:" << p_Hemisphere.nuse;
 
     //
     //   Use triangulation
@@ -357,16 +355,16 @@ bool MNESourceSpace::read_source_space(FiffStream* p_pStream, FiffDirTree* p_pTr
     if(!p_pTree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NUSE_TRI, t_pTag1) || !p_pTree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES, t_pTag2))
     {
         MatrixX3i p_defaultMatrix(0, 0);
-        p_pHemisphere->nuse_tri = 0;
-        p_pHemisphere->use_tris = p_defaultMatrix;
+        p_Hemisphere.nuse_tri = 0;
+        p_Hemisphere.use_tris = p_defaultMatrix;
     }
     else
     {
-        p_pHemisphere->nuse_tri = *t_pTag1->toInt();
-        p_pHemisphere->use_tris = t_pTag2->toIntMatrix().transpose();
-        p_pHemisphere->use_tris -= MatrixXi::Constant(p_pHemisphere->use_tris.rows(),3,1); //0 based indizes
+        p_Hemisphere.nuse_tri = *t_pTag1->toInt();
+        p_Hemisphere.use_tris = t_pTag2->toIntMatrix().transpose();
+        p_Hemisphere.use_tris -= MatrixXi::Constant(p_Hemisphere.use_tris.rows(),3,1); //0 based indizes
     }
-//        qDebug() << "triangulation; type:" << t_pTag2->getType() << "use_tris:" << p_pHemisphere->use_tris.rows()<< "x" << p_pHemisphere->use_tris.cols();
+//        qDebug() << "triangulation; type:" << t_pTag2->getType() << "use_tris:" << p_Hemisphere.use_tris.rows()<< "x" << p_Hemisphere.use_tris.cols();
 
     //
     //   Patch-related information
@@ -374,19 +372,19 @@ bool MNESourceSpace::read_source_space(FiffStream* p_pStream, FiffDirTree* p_pTr
     if(!p_pTree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NEAREST, t_pTag1) || !p_pTree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NEAREST_DIST, t_pTag2))
     {
         VectorXi p_defaultVector;
-        p_pHemisphere->nearest = p_defaultVector;
+        p_Hemisphere.nearest = p_defaultVector;
         VectorXd p_defaultFloatVector;
-        p_pHemisphere->nearest_dist = p_defaultFloatVector;
+        p_Hemisphere.nearest_dist = p_defaultFloatVector;
     }
     else
     {
        //res.nearest = tag1.data + 1;
-       p_pHemisphere->nearest = VectorXi(Map<VectorXi>(t_pTag1->toInt(), t_pTag1->size()/4, 1));//use copy constructor, for the sake of easy memory management
-       p_pHemisphere->nearest_dist = VectorXd((Map<VectorXf>(t_pTag2->toFloat(), t_pTag1->size()/4, 1)).cast<double>());//use copy constructor, for the sake of easy memory management
+       p_Hemisphere.nearest = VectorXi(Map<VectorXi>(t_pTag1->toInt(), t_pTag1->size()/4, 1));//use copy constructor, for the sake of easy memory management
+       p_Hemisphere.nearest_dist = VectorXd((Map<VectorXf>(t_pTag2->toFloat(), t_pTag1->size()/4, 1)).cast<double>());//use copy constructor, for the sake of easy memory management
     }
 
-    patch_info(p_pHemisphere->nearest, p_pHemisphere->pinfo);
-    if (p_pHemisphere->pinfo.length() > 0)
+    patch_info(p_Hemisphere.nearest, p_Hemisphere.pinfo);
+    if (p_Hemisphere.pinfo.length() > 0)
     {
        printf("\tPatch information added...");
     }
@@ -394,22 +392,22 @@ bool MNESourceSpace::read_source_space(FiffStream* p_pStream, FiffDirTree* p_pTr
     //
     // Distances
     //
-//    if(p_pHemisphere->dist)
-//        delete p_pHemisphere->dist;
+//    if(p_Hemisphere.dist)
+//        delete p_Hemisphere.dist;
     if(!p_pTree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_DIST, t_pTag1) || !p_pTree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_DIST_LIMIT, t_pTag2))
     {
-       p_pHemisphere->dist = MatrixXd();//NULL;
-       p_pHemisphere->dist_limit = 0;
+       p_Hemisphere.dist = MatrixXd();//NULL;
+       p_Hemisphere.dist_limit = 0;
     }
     else
     {
         qDebug() << "Attention this haven't been debugged! <- Errors are likely";
-        p_pHemisphere->dist       = t_pTag1->toFloatMatrix();
-        p_pHemisphere->dist_limit = *t_pTag1->toFloat();
+        p_Hemisphere.dist       = t_pTag1->toFloatMatrix();
+        p_Hemisphere.dist_limit = *t_pTag1->toFloat();
         //
         //  Add the upper triangle
         //
-        p_pHemisphere->dist += p_pHemisphere->dist.transpose();
+        p_Hemisphere.dist += p_Hemisphere.dist.transpose();
     }
 
     delete t_pTag2;
@@ -485,110 +483,110 @@ bool MNESourceSpace::intPairComparator ( const intpair& l, const intpair& r)
 
 //*************************************************************************************************************
 
-bool MNESourceSpace::complete_source_space_info(MNEHemisphere* p_pHemisphere)
+bool MNESourceSpace::complete_source_space_info(MNEHemisphere& p_Hemisphere)
 {
     //
     //   Main triangulation
     //
     printf("\tCompleting triangulation info...");
-    p_pHemisphere->tri_cent = MatrixX3d::Zero(p_pHemisphere->ntri,3);
-    p_pHemisphere->tri_nn = MatrixX3d::Zero(p_pHemisphere->ntri,3);
-    p_pHemisphere->tri_area = VectorXd::Zero(p_pHemisphere->ntri);
+    p_Hemisphere.tri_cent = MatrixX3d::Zero(p_Hemisphere.ntri,3);
+    p_Hemisphere.tri_nn = MatrixX3d::Zero(p_Hemisphere.ntri,3);
+    p_Hemisphere.tri_area = VectorXd::Zero(p_Hemisphere.ntri);
 
     Matrix3d r;
     Vector3d a, b;
     int k = 0;
     float size = 0;
-    for (qint32 i = 0; i < p_pHemisphere->ntri; ++i)
+    for (qint32 i = 0; i < p_Hemisphere.ntri; ++i)
     {
         for ( qint32 j = 0; j < 3; ++j)
         {
-            k = p_pHemisphere->tris(i, j);
+            k = p_Hemisphere.tris(i, j);
 
-            r(j,0) = p_pHemisphere->rr(k, 0);
-            r(j,1) = p_pHemisphere->rr(k, 1);
-            r(j,2) = p_pHemisphere->rr(k, 2);
+            r(j,0) = p_Hemisphere.rr(k, 0);
+            r(j,1) = p_Hemisphere.rr(k, 1);
+            r(j,2) = p_Hemisphere.rr(k, 2);
 
-            p_pHemisphere->tri_cent(i, 0) += p_pHemisphere->rr(k, 0);
-            p_pHemisphere->tri_cent(i, 1) += p_pHemisphere->rr(k, 1);
-            p_pHemisphere->tri_cent(i, 2) += p_pHemisphere->rr(k, 2);
+            p_Hemisphere.tri_cent(i, 0) += p_Hemisphere.rr(k, 0);
+            p_Hemisphere.tri_cent(i, 1) += p_Hemisphere.rr(k, 1);
+            p_Hemisphere.tri_cent(i, 2) += p_Hemisphere.rr(k, 2);
         }
-        p_pHemisphere->tri_cent.row(i) /= 3.0f;
+        p_Hemisphere.tri_cent.row(i) /= 3.0f;
 
         //cross product {cross((r2-r1),(r3-r1))}
         a = r.row(1) - r.row(0 );
         b = r.row(2) - r.row(0);
-        p_pHemisphere->tri_nn(i,0) = a(1)*b(2)-a(2)*b(1);
-        p_pHemisphere->tri_nn(i,1) = a(2)*b(0)-a(0)*b(2);
-        p_pHemisphere->tri_nn(i,2) = a(0)*b(1)-a(1)*b(0);
+        p_Hemisphere.tri_nn(i,0) = a(1)*b(2)-a(2)*b(1);
+        p_Hemisphere.tri_nn(i,1) = a(2)*b(0)-a(0)*b(2);
+        p_Hemisphere.tri_nn(i,2) = a(0)*b(1)-a(1)*b(0);
 
         //area
-        size = p_pHemisphere->tri_nn.row(i)*p_pHemisphere->tri_nn.row(i).transpose();
+        size = p_Hemisphere.tri_nn.row(i)*p_Hemisphere.tri_nn.row(i).transpose();
         size = std::pow(size, 0.5f );
 
-        p_pHemisphere->tri_area(i) = size/2.0f;
-        p_pHemisphere->tri_nn.row(i) /= size;
+        p_Hemisphere.tri_area(i) = size/2.0f;
+        p_Hemisphere.tri_nn.row(i) /= size;
 
 
     }
     printf("[done]\n");
 
 
-//        qDebug() << "p_pHemisphere->tri_cent:" << p_pHemisphere->tri_cent(0,0) << p_pHemisphere->tri_cent(0,1) << p_pHemisphere->tri_cent(0,2);
-//        qDebug() << "p_pHemisphere->tri_cent:" << p_pHemisphere->tri_cent(2,0) << p_pHemisphere->tri_cent(2,1) << p_pHemisphere->tri_cent(2,2);
+//        qDebug() << "p_Hemisphere.tri_cent:" << p_Hemisphere.tri_cent(0,0) << p_Hemisphere.tri_cent(0,1) << p_Hemisphere.tri_cent(0,2);
+//        qDebug() << "p_Hemisphere.tri_cent:" << p_Hemisphere.tri_cent(2,0) << p_Hemisphere.tri_cent(2,1) << p_Hemisphere.tri_cent(2,2);
 
-//        qDebug() << "p_pHemisphere->tri_nn:" << p_pHemisphere->tri_nn(0,0) << p_pHemisphere->tri_nn(0,1) << p_pHemisphere->tri_nn(0,2);
-//        qDebug() << "p_pHemisphere->tri_nn:" << p_pHemisphere->tri_nn(2,0) << p_pHemisphere->tri_nn(2,1) << p_pHemisphere->tri_nn(2,2);
+//        qDebug() << "p_Hemisphere.tri_nn:" << p_Hemisphere.tri_nn(0,0) << p_Hemisphere.tri_nn(0,1) << p_Hemisphere.tri_nn(0,2);
+//        qDebug() << "p_Hemisphere.tri_nn:" << p_Hemisphere.tri_nn(2,0) << p_Hemisphere.tri_nn(2,1) << p_Hemisphere.tri_nn(2,2);
 
     //
     //   Selected triangles
     //
     printf("\tCompleting selection triangulation info...");
-    if (p_pHemisphere->nuse_tri > 0)
+    if (p_Hemisphere.nuse_tri > 0)
     {
-        p_pHemisphere->use_tri_cent = MatrixX3d::Zero(p_pHemisphere->nuse_tri,3);
-        p_pHemisphere->use_tri_nn = MatrixX3d::Zero(p_pHemisphere->nuse_tri,3);
-        p_pHemisphere->use_tri_area = VectorXd::Zero(p_pHemisphere->nuse_tri);
+        p_Hemisphere.use_tri_cent = MatrixX3d::Zero(p_Hemisphere.nuse_tri,3);
+        p_Hemisphere.use_tri_nn = MatrixX3d::Zero(p_Hemisphere.nuse_tri,3);
+        p_Hemisphere.use_tri_area = VectorXd::Zero(p_Hemisphere.nuse_tri);
 
 
-        for (qint32 i = 0; i < p_pHemisphere->nuse_tri; ++i)
+        for (qint32 i = 0; i < p_Hemisphere.nuse_tri; ++i)
         {
             for ( qint32 j = 0; j < 3; ++j)
             {
-                k = p_pHemisphere->use_tris(i, j);
+                k = p_Hemisphere.use_tris(i, j);
 
-                r(j,0) = p_pHemisphere->rr(k, 0);
-                r(j,1) = p_pHemisphere->rr(k, 1);
-                r(j,2) = p_pHemisphere->rr(k, 2);
+                r(j,0) = p_Hemisphere.rr(k, 0);
+                r(j,1) = p_Hemisphere.rr(k, 1);
+                r(j,2) = p_Hemisphere.rr(k, 2);
 
-                p_pHemisphere->use_tri_cent(i, 0) += p_pHemisphere->rr(k, 0);
-                p_pHemisphere->use_tri_cent(i, 1) += p_pHemisphere->rr(k, 1);
-                p_pHemisphere->use_tri_cent(i, 2) += p_pHemisphere->rr(k, 2);
+                p_Hemisphere.use_tri_cent(i, 0) += p_Hemisphere.rr(k, 0);
+                p_Hemisphere.use_tri_cent(i, 1) += p_Hemisphere.rr(k, 1);
+                p_Hemisphere.use_tri_cent(i, 2) += p_Hemisphere.rr(k, 2);
             }
-            p_pHemisphere->use_tri_cent.row(i) /= 3.0f;
+            p_Hemisphere.use_tri_cent.row(i) /= 3.0f;
 
             //cross product {cross((r2-r1),(r3-r1))}
             a = r.row(1) - r.row(0 );
             b = r.row(2) - r.row(0);
-            p_pHemisphere->use_tri_nn(i,0) = a(1)*b(2)-a(2)*b(1);
-            p_pHemisphere->use_tri_nn(i,1) = a(2)*b(0)-a(0)*b(2);
-            p_pHemisphere->use_tri_nn(i,2) = a(0)*b(1)-a(1)*b(0);
+            p_Hemisphere.use_tri_nn(i,0) = a(1)*b(2)-a(2)*b(1);
+            p_Hemisphere.use_tri_nn(i,1) = a(2)*b(0)-a(0)*b(2);
+            p_Hemisphere.use_tri_nn(i,2) = a(0)*b(1)-a(1)*b(0);
 
             //area
-            size = p_pHemisphere->use_tri_nn.row(i)*p_pHemisphere->use_tri_nn.row(i).transpose();
+            size = p_Hemisphere.use_tri_nn.row(i)*p_Hemisphere.use_tri_nn.row(i).transpose();
             size = std::pow(size, 0.5f );
 
-            p_pHemisphere->use_tri_area(i) = size/2.0f;
+            p_Hemisphere.use_tri_area(i) = size/2.0f;
         }
 
     }
     printf("[done]\n");
 
-//        qDebug() << "p_pHemisphere->use_tri_cent:" << p_pHemisphere->use_tri_cent(0,0) << p_pHemisphere->use_tri_cent(0,1) << p_pHemisphere->use_tri_cent(0,2);
-//        qDebug() << "p_pHemisphere->use_tri_cent:" << p_pHemisphere->use_tri_cent(2,0) << p_pHemisphere->use_tri_cent(2,1) << p_pHemisphere->use_tri_cent(2,2);
+//        qDebug() << "p_Hemisphere.use_tri_cent:" << p_Hemisphere.use_tri_cent(0,0) << p_Hemisphere.use_tri_cent(0,1) << p_Hemisphere.use_tri_cent(0,2);
+//        qDebug() << "p_Hemisphere.use_tri_cent:" << p_Hemisphere.use_tri_cent(2,0) << p_Hemisphere.use_tri_cent(2,1) << p_Hemisphere.use_tri_cent(2,2);
 
-//        qDebug() << "p_pHemisphere->use_tri_nn:" << p_pHemisphere->use_tri_nn(0,0) << p_pHemisphere->use_tri_nn(0,1) << p_pHemisphere->use_tri_nn(0,2);
-//        qDebug() << "p_pHemisphere->use_tri_nn:" << p_pHemisphere->use_tri_nn(2,0) << p_pHemisphere->use_tri_nn(2,1) << p_pHemisphere->use_tri_nn(2,2);
+//        qDebug() << "p_Hemisphere.use_tri_nn:" << p_Hemisphere.use_tri_nn(0,0) << p_Hemisphere.use_tri_nn(0,1) << p_Hemisphere.use_tri_nn(0,2);
+//        qDebug() << "p_Hemisphere.use_tri_nn:" << p_Hemisphere.use_tri_nn(2,0) << p_Hemisphere.use_tri_nn(2,1) << p_Hemisphere.use_tri_nn(2,2);
 
     return true;
 }

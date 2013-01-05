@@ -103,7 +103,7 @@ public:
     bool save_calibrated;
     MatrixXd rowcals;
     MatrixXd colcals;
-    FiffNamedMatrix* data;
+    FiffNamedMatrix data;
 };
 
 } // NAMESPACE

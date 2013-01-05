@@ -229,7 +229,7 @@ public:
     *
     * @return the CTF software compensation data
     */
-    QList<FiffCtfComp*> read_ctf_comp( FiffDirTree* p_pNode, QList<FiffChInfo>& chs);
+    QList<FiffCtfComp> read_ctf_comp( FiffDirTree* p_pNode, QList<FiffChInfo>& chs);
 
     //=========================================================================================================
     /**
@@ -261,7 +261,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool read_named_matrix(FiffDirTree* p_pTree, fiff_int_t matkind, FiffNamedMatrix*& mat);
+    bool read_named_matrix(FiffDirTree* p_pTree, fiff_int_t matkind, FiffNamedMatrix& mat);
 
     //=========================================================================================================
     /**
@@ -386,7 +386,7 @@ public:
     *
     * @param[in] trans  The coordinate transfomation structure
     */
-    void write_coord_trans(FiffCoordTrans* trans);
+    void write_coord_trans(FiffCoordTrans& trans);
 
     //=========================================================================================================
     /**
@@ -398,7 +398,7 @@ public:
     *
     * @param[in] comps  The compensation data to write
     */
-    void write_ctf_comp(QList<FiffCtfComp*>& comps);
+    void write_ctf_comp(QList<FiffCtfComp>& comps);
 
     //=========================================================================================================
     /**
@@ -496,7 +496,7 @@ public:
     * @param[in] kind       The tag kind to use for the data
     * @param[in] data       The data matrix
     */
-    void write_named_matrix(fiff_int_t kind,FiffNamedMatrix* mat);
+    void write_named_matrix(fiff_int_t kind, FiffNamedMatrix& mat);
 
     //=========================================================================================================
     /**

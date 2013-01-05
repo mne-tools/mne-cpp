@@ -120,7 +120,7 @@ public:
     /**
     * Copy ctor
     */
-    MNESourceSpace(MNESourceSpace* p_pMNESourceSpace);
+    MNESourceSpace(const MNESourceSpace* p_pMNESourceSpace);
 
     //=========================================================================================================
     /**
@@ -138,7 +138,7 @@ public:
     *
     * @return the deduced hemisphere id
     */
-    static qint32 find_source_space_hemi(MNEHemisphere* p_pHemisphere);
+    static qint32 find_source_space_hemi(MNEHemisphere& p_Hemisphere);
 
     //=========================================================================================================
     /**
@@ -166,7 +166,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_source_spaces(FiffStream*& p_pStream, bool add_geom, FiffDirTree*& p_pTree, MNESourceSpace*& p_pSourceSpace);
+    static bool read_source_spaces(FiffStream*& p_pStream, bool add_geom, FiffDirTree*& p_pTree, MNESourceSpace& p_SourceSpace);
 
     //=========================================================================================================
     /**
@@ -183,7 +183,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool transform_source_space_to(fiff_int_t dest, FiffCoordTrans* trans);
+    bool transform_source_space_to(fiff_int_t dest, FiffCoordTrans& trans);
 
 private:
     //=========================================================================================================
@@ -198,7 +198,7 @@ private:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_source_space(FiffStream* p_pStream, FiffDirTree* p_pTree, MNEHemisphere*& p_pHemisphere);
+    static bool read_source_space(FiffStream* p_pStream, FiffDirTree* p_pTree, MNEHemisphere& p_Hemisphere);
 
     //=========================================================================================================
     /**
@@ -221,10 +221,10 @@ private:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool complete_source_space_info(MNEHemisphere* p_pHemisphere);
+    static bool complete_source_space_info(MNEHemisphere& p_Hemisphere);
 
 public:
-    QList<MNEHemisphere*> hemispheres;
+    QList<MNEHemisphere> hemispheres;
 };
 
 } // NAMESPACE
