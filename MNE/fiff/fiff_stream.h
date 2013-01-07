@@ -245,7 +245,7 @@ public:
     *
     * @return the to measurement corresponding fiff_dir_tree.
     */
-    FiffDirTree* read_meas_info(FiffDirTree* p_pTree, FiffInfo*& info);
+    FiffDirTree* read_meas_info(FiffDirTree* p_pTree, FiffInfo& info);
 
     //=========================================================================================================
     /**
@@ -352,7 +352,7 @@ public:
     *
     * @return the started fiff file
     */
-    static FiffStream* start_writing_raw(QIODevice* p_pIODevice, FiffInfo* info, MatrixXd*& cals, MatrixXi sel = defaultMatrixXi);
+    static FiffStream* start_writing_raw(QIODevice* p_pIODevice, const FiffInfo& info, MatrixXd*& cals, MatrixXi sel = defaultMatrixXi);
 
     //=========================================================================================================
     /**
@@ -386,7 +386,7 @@ public:
     *
     * @param[in] trans  The coordinate transfomation structure
     */
-    void write_coord_trans(FiffCoordTrans& trans);
+    void write_coord_trans(const FiffCoordTrans& trans);
 
     //=========================================================================================================
     /**
@@ -398,7 +398,7 @@ public:
     *
     * @param[in] comps  The compensation data to write
     */
-    void write_ctf_comp(QList<FiffCtfComp>& comps);
+    void write_ctf_comp(const QList<FiffCtfComp>& comps);
 
     //=========================================================================================================
     /**
@@ -411,7 +411,7 @@ public:
     * @param[in] p_pStream    An open fif file
     * @param[in] dig        The point to write
     */
-    void write_dig_point(FiffDigPoint& dig);
+    void write_dig_point(const FiffDigPoint& dig);
 
     //=========================================================================================================
     /**
@@ -427,7 +427,7 @@ public:
     * @param[in] kind       The tag kind
     * @param[in] id         The id to write
     */
-    void write_id(fiff_int_t kind, FiffId& id = defaultFiffId);
+    void write_id(fiff_int_t kind, const FiffId& id = defaultFiffId);
 
     //=========================================================================================================
     /**
@@ -442,7 +442,7 @@ public:
     * @param[in] data       The integer data pointer
     * @param[in] nel        Number of integers to write (default = 1)
     */
-    void write_int(fiff_int_t kind, fiff_int_t* data, fiff_int_t nel = 1);
+    void write_int(fiff_int_t kind, const fiff_int_t* data, fiff_int_t nel = 1);
 
     //=========================================================================================================
     /**
@@ -456,7 +456,7 @@ public:
     * @param[in] data       The float data pointer
     * @param[in] nel        Number of floats to write (default = 1)
     */
-    void write_float(fiff_int_t kind, float* data, fiff_int_t nel = 1);
+    void write_float(fiff_int_t kind, const float* data, fiff_int_t nel = 1);
 
     //=========================================================================================================
     /**
@@ -483,7 +483,7 @@ public:
     * @param[in] kind       The tag kind
     * @param[in] data       An array of names to create the list from
     */
-    void write_name_list(fiff_int_t kind,QStringList& data);
+    void write_name_list(fiff_int_t kind, const QStringList& data);
 
     //=========================================================================================================
     /**
@@ -496,7 +496,7 @@ public:
     * @param[in] kind       The tag kind to use for the data
     * @param[in] data       The data matrix
     */
-    void write_named_matrix(fiff_int_t kind, FiffNamedMatrix& mat);
+    void write_named_matrix(fiff_int_t kind, const FiffNamedMatrix& mat);
 
     //=========================================================================================================
     /**
@@ -508,7 +508,7 @@ public:
     *
     * @param[in] projs      The compensation data to write
     */
-    void write_proj(QList<FiffProj>& projs);
+    void write_proj(const QList<FiffProj>& projs);
 
     //=========================================================================================================
     /**
@@ -536,7 +536,7 @@ public:
     * @param[in] kind       The tag kind
     * @param[in] data       The string data to write
     */
-    void write_string(fiff_int_t kind, QString& data);
+    void write_string(fiff_int_t kind, const QString& data);
 
     //=========================================================================================================
     /**

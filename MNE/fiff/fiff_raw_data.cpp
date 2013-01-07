@@ -56,7 +56,6 @@ using namespace FIFFLIB;
 
 FiffRawData::FiffRawData()
 : file(NULL)
-, info(NULL)
 , proj(NULL)
 {
 }
@@ -68,8 +67,6 @@ FiffRawData::~FiffRawData()
 {
     if(file)
         delete file;
-    if(info)
-        delete info;
     if(proj)
         delete proj;
 }
@@ -103,11 +100,11 @@ bool FiffRawData::read_raw_segment(MatrixXd*& data, MatrixXd*& times, fiff_int_t
         printf("No data in this range\n");
         return false;
     }
-    printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, ((float)from)/this->info->sfreq, ((float)to)/this->info->sfreq);
+    printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, ((float)from)/this->info.sfreq, ((float)to)/this->info.sfreq);
     //
     //  Initialize the data and calibration vector
     //
-    qint32 nchan = this->info->nchan;
+    qint32 nchan = this->info.nchan;
     qint32 dest  = 0;//1;
     qint32 i, k, r;
 //    MatrixXd cal(nchan,nchan);
@@ -200,7 +197,7 @@ bool FiffRawData::read_raw_segment(MatrixXd*& data, MatrixXd*& times, fiff_int_t
     {
         if (!this->file->device()->open(QIODevice::ReadOnly))
         {
-            printf("Cannot open file %s",this->info->filename.toUtf8().constData());
+            printf("Cannot open file %s",this->info.filename.toUtf8().constData());
         }
         fid = this->file;
     }
@@ -389,7 +386,7 @@ bool FiffRawData::read_raw_segment(MatrixXd*& data, MatrixXd*& times, fiff_int_t
     times = new MatrixXd(1, to-from+1);
 
     for (i = 0; i < times->cols(); ++i)
-        (*times)(0, i) = ((float)(from+i)) / this->info->sfreq;
+        (*times)(0, i) = ((float)(from+i)) / this->info.sfreq;
 
     return true;
 }

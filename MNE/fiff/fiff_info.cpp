@@ -146,7 +146,7 @@ qint32 FiffInfo::get_current_comp()
 
 //*************************************************************************************************************
 
-bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf_comp, bool exclude_comp_chs)
+bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf_comp, bool exclude_comp_chs) const
 {
     qDebug() << "make_compensator not debugged jet";
 
@@ -222,7 +222,7 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
 
 //*************************************************************************************************************
 
-bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXd& this_comp)//private method
+bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXd& this_comp) const//private method
 {
     qDebug() << "make_compensator not debugged jet";
     FiffNamedMatrix this_data;
@@ -593,24 +593,24 @@ MatrixXi FiffInfo::pick_channels(QStringList& ch_names, QStringList& include, QS
 
 //*************************************************************************************************************
 
-FiffInfo* FiffInfo::pick_info(const MatrixXi* sel)
+FiffInfo FiffInfo::pick_info(const MatrixXi* sel) const
 {
-    FiffInfo* res = new FiffInfo(this);
+    FiffInfo res = *this;//new FiffInfo(this);
     if (sel == NULL)
         return res;
 
     //ToDo when pointer List do delation
-    res->chs.clear();
-    res->ch_names.clear();
+    res.chs.clear();
+    res.ch_names.clear();
 
     qint32 idx;
     for(qint32 i = 0; i < sel->cols(); ++i)
     {
         idx = (*sel)(0,i);
-        res->chs.append(this->chs[idx]);
-        res->ch_names.append(this->ch_names[idx]);
+        res.chs.append(this->chs[idx]);
+        res.ch_names.append(this->ch_names[idx]);
     }
-    res->nchan  = sel->cols();
+    res.nchan  = sel->cols();
 
     return res;
 }
