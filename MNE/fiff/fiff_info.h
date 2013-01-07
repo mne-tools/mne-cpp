@@ -118,7 +118,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf_comp, bool exclude_comp_chs = false);
+    bool make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf_comp, bool exclude_comp_chs = false) const;
 
 
     //=========================================================================================================
@@ -200,7 +200,7 @@ public:
     *
     * @return Info modified according to sel
     */
-    FiffInfo* pick_info(const MatrixXi* sel = NULL);
+    FiffInfo pick_info(const MatrixXi* sel = NULL) const;
 
     //=========================================================================================================
     /**
@@ -263,7 +263,7 @@ private:
     *
     * @return true if succeeded, false otherwise
     */
-    bool make_compensator(fiff_int_t kind, MatrixXd& this_comp);
+    bool make_compensator(fiff_int_t kind, MatrixXd& this_comp) const;
 
 
 public: //Public because it's a mne struct

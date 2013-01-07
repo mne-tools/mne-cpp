@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
         delete data;
     data = newData;
 
-    printf("Picked %d channels from the data\n",data->info->nchan);
+    printf("Picked %d channels from the data\n",data->info.nchan);
     printf("Computing inverse...");
     //
     //   Simple matrix multiplication followed by combination of the
@@ -207,8 +207,8 @@ int main(int argc, char *argv[])
     //Results
 //    inv;
 //    sol2;
-    float tmin = ((float)data->evoked[0]->first) / data->info->sfreq;
-    float tstep = 1/data->info->sfreq;
+    float tmin = ((float)data->evoked[0]->first) / data->info.sfreq;
+    float tstep = 1/data->info.sfreq;
 
     std::cout << std::endl << "part ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << sol.block(0,0,10,10) << std::endl;
     printf("tmin = %f s\n", tmin);

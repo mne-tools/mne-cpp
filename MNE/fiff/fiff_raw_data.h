@@ -146,8 +146,8 @@ public:
         //
         //   Convert to samples
         //
-        from = floor(from*this->info->sfreq);
-        to   = ceil(to*this->info->sfreq);
+        from = floor(from*this->info.sfreq);
+        to   = ceil(to*this->info.sfreq);
         //
         //   Read it
         //
@@ -158,7 +158,7 @@ public:
 
 public:
     FiffStream* file;//replaces fid
-    FiffInfo* info;
+    FiffInfo info;
     fiff_int_t first_samp;
     fiff_int_t last_samp;
     MatrixXd   cals;

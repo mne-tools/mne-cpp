@@ -55,7 +55,7 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 FiffEvokedDataSet::FiffEvokedDataSet()
-: info(NULL)
+//: info(NULL)
 {
 
 }
@@ -64,7 +64,7 @@ FiffEvokedDataSet::FiffEvokedDataSet()
 //*************************************************************************************************************
 
 FiffEvokedDataSet::FiffEvokedDataSet(const FiffEvokedDataSet* p_pFiffEvokedDataSet)
-: info(p_pFiffEvokedDataSet->info ? new FiffInfo(p_pFiffEvokedDataSet->info) : NULL)
+: info(p_pFiffEvokedDataSet->info)//p_pFiffEvokedDataSet->info ? new FiffInfo(p_pFiffEvokedDataSet->info) : NULL)
 {
     for(qint32 i = 0; i < p_pFiffEvokedDataSet->evoked.size(); ++i)
     {
@@ -77,8 +77,8 @@ FiffEvokedDataSet::FiffEvokedDataSet(const FiffEvokedDataSet* p_pFiffEvokedDataS
 
 FiffEvokedDataSet::~FiffEvokedDataSet()
 {
-    if (info)
-        delete info;
+//    if (info)
+//        delete info;
 
     QList<FiffEvokedData*>::iterator i;
     for (i = this->evoked.begin(); i != this->evoked.end(); ++i)
@@ -94,7 +94,7 @@ FiffEvokedDataSet* FiffEvokedDataSet::pick_channels_evoked(QStringList& include,
     if(include.size() == 0 && exclude.size() == 0)
         return new FiffEvokedDataSet(this);
 
-    MatrixXi sel = FiffInfo::pick_channels(this->info->ch_names, include, exclude);
+    MatrixXi sel = FiffInfo::pick_channels(this->info.ch_names, include, exclude);
     if (sel.cols() == 0)
     {
         printf("Warning : No channels match the selection.\n");
@@ -105,9 +105,9 @@ FiffEvokedDataSet* FiffEvokedDataSet::pick_channels_evoked(QStringList& include,
     //
     //   Modify the measurement info
     //
-    FiffInfo* info = res->info->pick_info(&sel);
-    if (res->info)
-        delete res->info;
+    FiffInfo info = res->info.pick_info(&sel);
+//    if (res->info)
+//        delete res->info;
     res->info = info;
     //
     //   Create the reduced data set
@@ -167,9 +167,9 @@ bool FiffEvokedDataSet::read_evoked(QIODevice* p_pIODevice, FiffEvokedDataSet*& 
     //
     //   Read the measurement info
     //
-    FiffInfo* info = NULL;
+    FiffInfo info;// = NULL;
     FiffDirTree* meas = t_pStream->read_meas_info(t_pTree, info);
-    info->filename = t_sFileName; //move fname storage to read_meas_info member function
+    info.filename = t_sFileName; //move fname storage to read_meas_info member function
     //
     //   Locate the data of interest
     //
@@ -182,8 +182,8 @@ bool FiffEvokedDataSet::read_evoked(QIODevice* p_pIODevice, FiffEvokedDataSet*& 
             delete t_pTree;
         if(t_pDir)
             delete t_pDir;
-        if(info)
-            delete info;
+//        if(info)
+//            delete info;
 
         printf("Could not find processed data\n");
         return false;
@@ -198,8 +198,8 @@ bool FiffEvokedDataSet::read_evoked(QIODevice* p_pIODevice, FiffEvokedDataSet*& 
             delete t_pTree;
         if(t_pDir)
             delete t_pDir;
-        if(info)
-            delete info;
+//        if(info)
+//            delete info;
         printf("Could not find evoked data");
         return false;
     }
@@ -251,8 +251,8 @@ bool FiffEvokedDataSet::read_evoked(QIODevice* p_pIODevice, FiffEvokedDataSet*& 
             delete t_pTree;
         if(t_pDir)
             delete t_pDir;
-        if(info)
-            delete info;
+//        if(info)
+//            delete info;
         printf("Data set selector out of range\n");
         return false;
     }
@@ -291,8 +291,8 @@ bool FiffEvokedDataSet::read_evoked(QIODevice* p_pIODevice, FiffEvokedDataSet*& 
             delete t_pTree;
         if(t_pDir)
             delete t_pDir;
-        if(info)
-            delete info;
+//        if(info)
+//            delete info;
         printf("Desired data set not found\n");
         return false;
     }
@@ -352,8 +352,8 @@ bool FiffEvokedDataSet::read_evoked(QIODevice* p_pIODevice, FiffEvokedDataSet*& 
                 delete t_pTree;
             if(t_pDir)
                 delete t_pDir;
-            if(info)
-                delete info;
+//            if(info)
+//                delete info;
             printf("Local channel information was not found when it was expected.\n");
             return false;
         }
@@ -365,22 +365,22 @@ bool FiffEvokedDataSet::read_evoked(QIODevice* p_pIODevice, FiffEvokedDataSet*& 
                 delete t_pTree;
             if(t_pDir)
                 delete t_pDir;
-            if(info)
-                delete info;
+//            if(info)
+//                delete info;
             printf("Number of channels and number of channel definitions are different\n");
             return false;
         }
-        info->chs   = chs;
-        info->nchan = nchan;
+        info.chs   = chs;
+        info.nchan = nchan;
         printf("\tFound channel information in evoked data. nchan = %d\n",nchan);
         if (sfreq > 0.0f)
-            info->sfreq = sfreq;
+            info.sfreq = sfreq;
     }
     qint32 nsamp = last-first+1;
     printf("\tFound the data of interest:\n");
-    printf("\t\tt = %10.2f ... %10.2f ms (%s)\n", 1000*(float)first/info->sfreq, 1000*(float)last/info->sfreq,comment.toUtf8().constData());
-    if (info->comps.size() > 0)
-        printf("\t\t%d CTF compensation matrices available\n", info->comps.size());
+    printf("\t\tt = %10.2f ... %10.2f ms (%s)\n", 1000*(float)first/info.sfreq, 1000*(float)last/info.sfreq,comment.toUtf8().constData());
+    if (info.comps.size() > 0)
+        printf("\t\t%d CTF compensation matrices available\n", info.comps.size());
     //
     // Read the data in the aspect block
     //
@@ -417,7 +417,7 @@ bool FiffEvokedDataSet::read_evoked(QIODevice* p_pIODevice, FiffEvokedDataSet*& 
     if (nave == -1)
         nave = 1;
     printf("\t\tnave = %d aspect type = %d\n", nave, aspect_kind);
-    if (nepoch != 1 && nepoch != info->nchan)
+    if (nepoch != 1 && nepoch != info.nchan)
     {
         if(t_pStream)
             delete t_pStream;
@@ -425,9 +425,9 @@ bool FiffEvokedDataSet::read_evoked(QIODevice* p_pIODevice, FiffEvokedDataSet*& 
             delete t_pTree;
         if(t_pDir)
             delete t_pDir;
-        if(info)
-            delete info;
-        printf("Number of epoch tags is unreasonable (nepoch = %d nchan = %d)\n", nepoch, info->nchan);
+//        if(info)
+//            delete info;
+        printf("Number of epoch tags is unreasonable (nepoch = %d nchan = %d)\n", nepoch, info.nchan);
         return false;
     }
     //
@@ -442,7 +442,7 @@ bool FiffEvokedDataSet::read_evoked(QIODevice* p_pIODevice, FiffEvokedDataSet*& 
         //
         //   May need a transpose if the number of channels is one
         //
-        if (all.cols() == 1 && info->nchan == 1)
+        if (all.cols() == 1 && info.nchan == 1)
             all.transposeInPlace();
     }
     else
@@ -471,17 +471,17 @@ bool FiffEvokedDataSet::read_evoked(QIODevice* p_pIODevice, FiffEvokedDataSet*& 
             delete t_pTree;
         if(t_pDir)
             delete t_pDir;
-        if(info)
-            delete info;
+//        if(info)
+//            delete info;
         printf("Incorrect number of samples (%d instead of %d)", all.cols(), nsamp);
         return false;
     }
     //
     //   Calibrate
     //
-    SparseMatrix<double> cals(info->nchan, info->nchan);
-    for(k = 0; k < info->nchan; ++k)
-        cals.insert(k, k) = info->chs[k].cal;
+    SparseMatrix<double> cals(info.nchan, info.nchan);
+    for(k = 0; k < info.nchan; ++k)
+        cals.insert(k, k) = info.chs[k].cal;
     all = cals * all;
     //
     //   Put it all together
@@ -512,7 +512,7 @@ bool FiffEvokedDataSet::read_evoked(QIODevice* p_pIODevice, FiffEvokedDataSet*& 
     data->evoked[0]->times = new MatrixXd(1, last-first+1);
 
     for (k = 0; k < data->evoked[0]->times->cols(); ++k)
-        (*data->evoked[0]->times)(0, k) = ((float)(first+k)) / info->sfreq;
+        (*data->evoked[0]->times)(0, k) = ((float)(first+k)) / info.sfreq;
 
 //    if(data->evoked[0].epochs)
 //        delete data->evoked[0]->epochs;

@@ -219,9 +219,9 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    inline static bool make_compensator(FiffInfo* info, fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf_comp, bool exclude_comp_chs = false)
+    inline static bool make_compensator(const FiffInfo& info, fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf_comp, bool exclude_comp_chs = false)
     {
-        return info->make_compensator(from, to, ctf_comp, exclude_comp_chs);
+        return info.make_compensator(from, to, ctf_comp, exclude_comp_chs);
     }
 
     //=========================================================================================================

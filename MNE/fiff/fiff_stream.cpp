@@ -597,11 +597,11 @@ QList<FiffCtfComp> FiffStream::read_ctf_comp(FiffDirTree* p_pNode, QList<FiffChI
 
 //*************************************************************************************************************
 
-FiffDirTree* FiffStream::read_meas_info(FiffDirTree* p_pTree, FiffInfo*& info)
+FiffDirTree* FiffStream::read_meas_info(FiffDirTree* p_pTree, FiffInfo& info)
 {
-    if (info)
-        delete info;
-    info = NULL;
+//    if (info)
+//        delete info;
+    info = FiffInfo();
     //
     //   Find the desired blocks
     //
@@ -821,11 +821,11 @@ FiffDirTree* FiffStream::read_meas_info(FiffDirTree* p_pTree, FiffInfo*& info)
     //
     //   Put the data together
     //
-    info = new FiffInfo();
+//    info = new FiffInfo();
     if (p_pTree->id.version != -1)
-        info->file_id = p_pTree->id;
+        info.file_id = p_pTree->id;
     else
-        info->file_id.version = -1;
+        info.file_id.version = -1;
 
     //
     //  Make the most appropriate selection for the measurement id
@@ -837,76 +837,76 @@ FiffDirTree* FiffStream::read_meas_info(FiffDirTree* p_pTree, FiffInfo*& info)
             if (meas.at(0)->id.version == -1)
             {
                 if (meas.at(0)->parent_id.version == -1)
-                    info->meas_id = info->file_id;
+                    info.meas_id = info.file_id;
                 else
-                    info->meas_id = meas.at(0)->parent_id;
+                    info.meas_id = meas.at(0)->parent_id;
             }
             else
-                info->meas_id = meas.at(0)->id;
+                info.meas_id = meas.at(0)->id;
         }
         else
-            info->meas_id = meas_info.at(0)->id;
+            info.meas_id = meas_info.at(0)->id;
     }
     else
-        info->meas_id = meas_info.at(0)->parent_id;
+        info.meas_id = meas_info.at(0)->parent_id;
 
     if (meas_date[0] == -1)
     {
-        info->meas_date[0] = info->meas_id.time.secs;
-        info->meas_date[1] = info->meas_id.time.usecs;
+        info.meas_date[0] = info.meas_id.time.secs;
+        info.meas_date[1] = info.meas_id.time.usecs;
     }
     else
     {
-        info->meas_date[0] = meas_date[0];
-        info->meas_date[1] = meas_date[1];
+        info.meas_date[0] = meas_date[0];
+        info.meas_date[1] = meas_date[1];
     }
 
-    info->nchan  = nchan;
-    info->sfreq  = sfreq;
+    info.nchan  = nchan;
+    info.sfreq  = sfreq;
     if (highpass != -1.0f)
-        info->highpass = highpass;
+        info.highpass = highpass;
     else
-        info->highpass = 0.0f;
+        info.highpass = 0.0f;
 
     if (lowpass != -1.0f)
-        info->lowpass = lowpass;
+        info.lowpass = lowpass;
     else
-        info->lowpass = info->sfreq/2.0;
+        info.lowpass = info.sfreq/2.0;
 
     //
     //   Add the channel information and make a list of channel names
     //   for convenience
     //
-    info->chs = chs;
-    for (qint32 c = 0; c < info->nchan; ++c)
-        info->ch_names << info->chs.at(c).ch_name;
+    info.chs = chs;
+    for (qint32 c = 0; c < info.nchan; ++c)
+        info.ch_names << info.chs.at(c).ch_name;
 
     //
     //  Add the coordinate transformations
     //
-    info->dev_head_t = dev_head_t;
-    info->ctf_head_t = ctf_head_t;
-    if ((!info->dev_head_t.isEmpty()) && (!info->ctf_head_t.isEmpty())) //~isempty(info.dev_head_t) && ~isempty(info.ctf_head_t)
+    info.dev_head_t = dev_head_t;
+    info.ctf_head_t = ctf_head_t;
+    if ((!info.dev_head_t.isEmpty()) && (!info.ctf_head_t.isEmpty())) //~isempty(info.dev_head_t) && ~isempty(info.ctf_head_t)
     {
-        info->dev_ctf_t     = info->dev_head_t;
-        info->dev_ctf_t.to = info->ctf_head_t.from;
-        info->dev_ctf_t.trans = ctf_head_t.trans.inverse()*info->dev_ctf_t.trans;
+        info.dev_ctf_t     = info.dev_head_t;
+        info.dev_ctf_t.to = info.ctf_head_t.from;
+        info.dev_ctf_t.trans = ctf_head_t.trans.inverse()*info.dev_ctf_t.trans;
     }
     else
-        info->dev_ctf_t = FiffCoordTrans();
+        info.dev_ctf_t = FiffCoordTrans();
 
     //
     //   All kinds of auxliary stuff
     //
-    info->dig   = dig;
+    info.dig   = dig;
     if (!dig_trans.isEmpty())
-        info->dig_trans = dig_trans;
+        info.dig_trans = dig_trans;
 
-    info->bads  = bads;
-    info->projs = projs;
-    info->comps = comps;
-    info->acq_pars = acq_pars;
-    info->acq_stim = acq_stim;
+    info.bads  = bads;
+    info.projs = projs;
+    info.comps = comps;
+    info.acq_pars = acq_pars;
+    info.acq_stim = acq_stim;
 
     return meas[0];
 }
@@ -1198,7 +1198,7 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData*& data, bool
     //   Read the measurement info
     //
 //        [ info, meas ] = fiff_read_meas_info(fid,tree);
-    FiffInfo* info = NULL;
+    FiffInfo info;// = NULL;
     FiffDirTree* meas = p_pStream->read_meas_info(t_pTree, info);
 
     if (!meas)
@@ -1250,7 +1250,7 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData*& data, bool
     //
     //   Set up the output structure
     //
-    info->filename   = t_sFileName;
+    info.filename   = t_sFileName;
 
     data = new FiffRawData();
     data->file = p_pStream;// fid;
@@ -1262,7 +1262,7 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData*& data, bool
     //
     QList<FiffDirEntry> dir = raw.at(0)->dir;
     fiff_int_t nent = raw.at(0)->nent;
-    fiff_int_t nchan = info->nchan;
+    fiff_int_t nchan = info.nchan;
     fiff_int_t first = 0;
     fiff_int_t first_samp = 0;
     fiff_int_t first_skip   = 0;
@@ -1368,10 +1368,10 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData*& data, bool
     //
     //   Add the calibration factors
     //
-    MatrixXd cals(1,data->info->nchan);
+    MatrixXd cals(1,data->info.nchan);
     cals.setZero();
-    for (qint32 k = 0; k < data->info->nchan; ++k)
-        cals(0,k) = data->info->chs.at(k).range*data->info->chs.at(k).cal;
+    for (qint32 k = 0; k < data->info.nchan; ++k)
+        cals(0,k) = data->info.chs.at(k).range*data->info.chs.at(k).cal;
     //
     data->cals       = cals;
     data->rawdir     = rawdir;
@@ -1380,8 +1380,8 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData*& data, bool
     //
     printf("\tRange : %d ... %d  =  %9.3f ... %9.3f secs\n",
            data->first_samp,data->last_samp,
-           (double)data->first_samp/data->info->sfreq,
-           (double)data->last_samp/data->info->sfreq);
+           (double)data->first_samp/data->info.sfreq,
+           (double)data->last_samp/data->info.sfreq);
     printf("Ready.\n");
     data->file->device()->close();
 
@@ -1439,7 +1439,7 @@ FiffStream* FiffStream::start_file(QIODevice* p_pIODevice)
 
 //*************************************************************************************************************
 
-FiffStream* FiffStream::start_writing_raw(QIODevice* p_pIODevice, FiffInfo* info, MatrixXd*& cals, MatrixXi sel)
+FiffStream* FiffStream::start_writing_raw(QIODevice* p_pIODevice, const FiffInfo& info, MatrixXd*& cals, MatrixXi sel)
 {
     //
     //   We will always write floats
@@ -1449,15 +1449,15 @@ FiffStream* FiffStream::start_writing_raw(QIODevice* p_pIODevice, FiffInfo* info
 
     if(sel.cols() == 0)
     {
-        sel.resize(1,info->nchan);
-        for (k = 0; k < info->nchan; ++k)
+        sel.resize(1,info.nchan);
+        for (k = 0; k < info.nchan; ++k)
             sel(0, k) = k; //+1 when MATLAB notation
     }
 
     QList<FiffChInfo> chs;
 
     for(k = 0; k < sel.cols(); ++k)
-        chs << info->chs.at(sel(0,k));
+        chs << info.chs.at(sel(0,k));
 
     fiff_int_t nchan = chs.size();
     //
@@ -1467,9 +1467,9 @@ FiffStream* FiffStream::start_writing_raw(QIODevice* p_pIODevice, FiffInfo* info
     FiffStream* t_pStream = start_file(p_pIODevice);//1, 2, 3
     t_pStream->start_block(FIFFB_MEAS);//4
     t_pStream->write_id(FIFF_BLOCK_ID);//5
-    if(info->meas_id.version != -1)
+    if(info.meas_id.version != -1)
     {
-        t_pStream->write_id(FIFF_PARENT_BLOCK_ID,info->meas_id);//6
+        t_pStream->write_id(FIFF_PARENT_BLOCK_ID,info.meas_id);//6
     }
     //
     //
@@ -1483,9 +1483,9 @@ FiffStream* FiffStream::start_writing_raw(QIODevice* p_pIODevice, FiffInfo* info
     blocks << FIFFB_SUBJECT << FIFFB_HPI_MEAS << FIFFB_HPI_RESULT << FIFFB_ISOTRAK << FIFFB_PROCESSING_HISTORY;
     bool have_hpi_result = false;
     bool have_isotrak    = false;
-    if (blocks.size() > 0 && !info->filename.isEmpty())
+    if (blocks.size() > 0 && !info.filename.isEmpty())
     {
-        QFile* t_pFile = new QFile(info->filename);//ToDo this has to be adapted for TCPSocket
+        QFile* t_pFile = new QFile(info.filename);//ToDo this has to be adapted for TCPSocket
         FiffStream* t_pStream2 = new FiffStream(t_pFile);
 
         FiffDirTree* t_pTree = NULL;
@@ -1511,14 +1511,14 @@ FiffStream* FiffStream::start_writing_raw(QIODevice* p_pIODevice, FiffInfo* info
     //
     //    megacq parameters
     //
-    if (!info->acq_pars.isEmpty() || !info->acq_stim.isEmpty())
+    if (!info.acq_pars.isEmpty() || !info.acq_stim.isEmpty())
     {
         t_pStream->start_block(FIFFB_DACQ_PARS);
-        if (!info->acq_pars.isEmpty())
-            t_pStream->write_string(FIFF_DACQ_PARS, info->acq_pars);
+        if (!info.acq_pars.isEmpty())
+            t_pStream->write_string(FIFF_DACQ_PARS, info.acq_pars);
 
-        if (!info->acq_stim.isEmpty())
-            t_pStream->write_string(FIFF_DACQ_STIM, info->acq_stim);
+        if (!info.acq_stim.isEmpty())
+            t_pStream->write_string(FIFF_DACQ_STIM, info.acq_stim);
 
         t_pStream->end_block(FIFFB_DACQ_PARS);
     }
@@ -1527,50 +1527,50 @@ FiffStream* FiffStream::start_writing_raw(QIODevice* p_pIODevice, FiffInfo* info
     //
     if (!have_hpi_result)
     {
-        if (!info->dev_head_t.isEmpty())
-            t_pStream->write_coord_trans(info->dev_head_t);
+        if (!info.dev_head_t.isEmpty())
+            t_pStream->write_coord_trans(info.dev_head_t);
 
-        if (!info->ctf_head_t.isEmpty())
-            t_pStream->write_coord_trans(info->ctf_head_t);
+        if (!info.ctf_head_t.isEmpty())
+            t_pStream->write_coord_trans(info.ctf_head_t);
     }
     //
     //    Polhemus data
     //
-    if (info->dig.size() > 0 && !have_isotrak)
+    if (info.dig.size() > 0 && !have_isotrak)
     {
         t_pStream->start_block(FIFFB_ISOTRAK);
-        for (qint32 k = 0; k < info->dig.size(); ++k)
-            t_pStream->write_dig_point(info->dig[k]);
+        for (qint32 k = 0; k < info.dig.size(); ++k)
+            t_pStream->write_dig_point(info.dig[k]);
 
         t_pStream->end_block(FIFFB_ISOTRAK);
     }
     //
     //    Projectors
     //
-    t_pStream->write_proj(info->projs);
+    t_pStream->write_proj(info.projs);
     //
     //    CTF compensation info
     //
-    t_pStream->write_ctf_comp(info->comps);
+    t_pStream->write_ctf_comp(info.comps);
     //
     //    Bad channels
     //
-    if (info->bads.size() > 0)
+    if (info.bads.size() > 0)
     {
         t_pStream->start_block(FIFFB_MNE_BAD_CHANNELS);
-        t_pStream->write_name_list(FIFF_MNE_CH_NAME_LIST,info->bads);
+        t_pStream->write_name_list(FIFF_MNE_CH_NAME_LIST,info.bads);
         t_pStream->end_block(FIFFB_MNE_BAD_CHANNELS);
     }
     //
     //    General
     //
-    t_pStream->write_float(FIFF_SFREQ,&info->sfreq);
-    t_pStream->write_float(FIFF_HIGHPASS,&info->highpass);
-    t_pStream->write_float(FIFF_LOWPASS,&info->lowpass);
+    t_pStream->write_float(FIFF_SFREQ,&info.sfreq);
+    t_pStream->write_float(FIFF_HIGHPASS,&info.highpass);
+    t_pStream->write_float(FIFF_LOWPASS,&info.lowpass);
     t_pStream->write_int(FIFF_NCHAN,&nchan);
     t_pStream->write_int(FIFF_DATA_PACK,&data_type);
-    if (info->meas_date[0] != -1)
-        t_pStream->write_int(FIFF_MEAS_DATE,info->meas_date, 2);
+    if (info.meas_date[0] != -1)
+        t_pStream->write_int(FIFF_MEAS_DATE,info.meas_date, 2);
     //
     //    Channel info
     //
@@ -1715,7 +1715,7 @@ void FiffStream::write_ch_info(FiffChInfo* ch)
 
 //*************************************************************************************************************
 
-void FiffStream::write_coord_trans(FiffCoordTrans& trans)
+void FiffStream::write_coord_trans(const FiffCoordTrans& trans)
 {
     //?typedef struct _fiffCoordTransRec {
     //  fiff_int_t   from;                   /*!< Source coordinate system. */
@@ -1764,7 +1764,7 @@ void FiffStream::write_coord_trans(FiffCoordTrans& trans)
 
 //*************************************************************************************************************
 
-void FiffStream::write_ctf_comp(QList<FiffCtfComp>& comps)
+void FiffStream::write_ctf_comp(const QList<FiffCtfComp>& comps)
 {
     if (comps.size() <= 0)
         return;
@@ -1799,7 +1799,7 @@ void FiffStream::write_ctf_comp(QList<FiffCtfComp>& comps)
 
 //*************************************************************************************************************
 
-void FiffStream::write_dig_point(FiffDigPoint& dig)
+void FiffStream::write_dig_point(const FiffDigPoint& dig)
 {
     //?typedef struct _fiffDigPointRec {
     //  fiff_int_t kind;               /*!< FIFF_POINT_CARDINAL,
@@ -1830,7 +1830,7 @@ void FiffStream::write_dig_point(FiffDigPoint& dig)
 
 //*************************************************************************************************************
 
-void FiffStream::write_float(fiff_int_t kind, float* data, fiff_int_t nel)
+void FiffStream::write_float(fiff_int_t kind, const float* data, fiff_int_t nel)
 {
     qint32 datasize = nel * 4;
 
@@ -1901,9 +1901,10 @@ void FiffStream::write_float_matrix(fiff_int_t kind, const MatrixXd& mat)
 
 //*************************************************************************************************************
 
-void FiffStream::write_id(fiff_int_t kind, FiffId& id)
+void FiffStream::write_id(fiff_int_t kind, const FiffId& id)
 {
-    if(id.version == -1)
+    FiffId t_id = id;
+    if(t_id.version == -1)
     {
         /* initialize random seed: */
         srand ( time(NULL) );
@@ -1914,11 +1915,11 @@ void FiffStream::write_id(fiff_int_t kind, FiffId& id)
         seconds = time (NULL);
 
         //fiff_int_t timezone = 5;      //   Matlab does not know the timezone
-        id.version   = (1 << 16) | 2;   //   Version (1 << 16) | 2
-        id.machid[0] = 65536*rand_1;    //   Machine id is random for now
-        id.machid[1] = 65536*rand_2;    //   Machine id is random for now
-        id.time.secs = (int)seconds;    //seconds since January 1, 1970 //3600*(24*(now-datenum(1970,1,1,0,0,0))+timezone);
-        id.time.usecs = 0;              //   Do not know how we could get this
+        t_id.version   = (1 << 16) | 2;   //   Version (1 << 16) | 2
+        t_id.machid[0] = 65536*rand_1;    //   Machine id is random for now
+        t_id.machid[1] = 65536*rand_2;    //   Machine id is random for now
+        t_id.time.secs = (int)seconds;    //seconds since January 1, 1970 //3600*(24*(now-datenum(1970,1,1,0,0,0))+timezone);
+        t_id.time.usecs = 0;              //   Do not know how we could get this
     }
 
     //
@@ -1935,11 +1936,11 @@ void FiffStream::write_id(fiff_int_t kind, FiffId& id)
     // Collect the bits together for one write
     //
     qint32 data[5];
-    data[0] = id.version;
-    data[1] = id.machid[0];
-    data[2] = id.machid[1];
-    data[3] = id.time.secs;
-    data[4] = id.time.usecs;
+    data[0] = t_id.version;
+    data[1] = t_id.machid[0];
+    data[2] = t_id.machid[1];
+    data[3] = t_id.time.secs;
+    data[4] = t_id.time.usecs;
 
     for(qint32 i = 0; i < 5; ++i)
         *this << data[i];
@@ -1948,7 +1949,7 @@ void FiffStream::write_id(fiff_int_t kind, FiffId& id)
 
 //*************************************************************************************************************
 
-void FiffStream::write_int(fiff_int_t kind, fiff_int_t* data, fiff_int_t nel)
+void FiffStream::write_int(fiff_int_t kind, const fiff_int_t* data, fiff_int_t nel)
 {
     fiff_int_t datasize = nel * 4;
 
@@ -1966,7 +1967,7 @@ void FiffStream::write_int(fiff_int_t kind, fiff_int_t* data, fiff_int_t nel)
 
 //*************************************************************************************************************
 
-void FiffStream::write_name_list(fiff_int_t kind,QStringList& data)
+void FiffStream::write_name_list(fiff_int_t kind, const QStringList& data)
 {
     QString all = data.join(":");
     this->write_string(kind,all);
@@ -1975,7 +1976,7 @@ void FiffStream::write_name_list(fiff_int_t kind,QStringList& data)
 
 //*************************************************************************************************************
 
-void FiffStream::write_named_matrix(fiff_int_t kind,FiffNamedMatrix& mat)
+void FiffStream::write_named_matrix(fiff_int_t kind, const FiffNamedMatrix& mat)
 {
     this->start_block(FIFFB_MNE_NAMED_MATRIX);
     this->write_int(FIFF_MNE_NROW, &mat.nrow);
@@ -1991,7 +1992,7 @@ void FiffStream::write_named_matrix(fiff_int_t kind,FiffNamedMatrix& mat)
 
 //*************************************************************************************************************
 
-void FiffStream::write_proj(QList<FiffProj>& projs)
+void FiffStream::write_proj(const QList<FiffProj>& projs)
 {
     if (projs.size() <= 0)
         return;
@@ -2044,7 +2045,7 @@ bool FiffStream::write_raw_buffer(MatrixXd* buf, MatrixXd* cals)
 
 //*************************************************************************************************************
 
-void FiffStream::write_string(fiff_int_t kind, QString& data)
+void FiffStream::write_string(fiff_int_t kind, const QString& data)
 {
     fiff_int_t datasize = data.size();//size(data,2);
 
