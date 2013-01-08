@@ -141,7 +141,7 @@ public:
                     FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
                     if(t_pTag->kind == FIFF_BLOCK_START && *(t_pTag->toInt()) == FIFFB_PROJ_ITEM)
                     {
-                        FiffProj* proj = NULL;
+                        FiffProj proj;
                         qint32 countProj = p_pFiffInfo->projs.size();
                         while(t_pTag->kind != FIFF_BLOCK_END || *(t_pTag->toInt()) != FIFFB_PROJ_ITEM)
                         {
@@ -149,28 +149,28 @@ public:
                             switch (t_pTag->kind)
                             {
                             case FIFF_NAME: // First proj -> Proj is created
-                                proj = new FiffProj();
+                                proj = FiffProj();
                                 p_pFiffInfo->projs.append(proj);
-                                p_pFiffInfo->projs[countProj]->desc = t_pTag->toString();
+                                p_pFiffInfo->projs[countProj].desc = t_pTag->toString();
                                 break;
                             case FIFF_PROJ_ITEM_KIND:
-                                p_pFiffInfo->projs[countProj]->kind = *(t_pTag->toInt());
+                                p_pFiffInfo->projs[countProj].kind = *(t_pTag->toInt());
                                 break;
                             case FIFF_NCHAN: // First data -> FiffNamedMatrix is created
-                                p_pFiffInfo->projs[countProj]->data = new FiffNamedMatrix();
-                                p_pFiffInfo->projs[countProj]->data->ncol = *(t_pTag->toInt());
+//                                p_pFiffInfo->projs[countProj].data = FiffNamedMatrix();//obsolete
+                                p_pFiffInfo->projs[countProj].data.ncol = *(t_pTag->toInt());
                                 break;
                             case FIFF_PROJ_ITEM_NVEC:
-                                p_pFiffInfo->projs[countProj]->data->nrow = *(t_pTag->toInt());
+                                p_pFiffInfo->projs[countProj].data.nrow = *(t_pTag->toInt());
                                 break;
                             case FIFF_MNE_PROJ_ITEM_ACTIVE:
-                                p_pFiffInfo->projs[countProj]->active = *(t_pTag->toInt());
+                                p_pFiffInfo->projs[countProj].active = *(t_pTag->toInt());
                                 break;
                             case FIFF_PROJ_ITEM_CH_NAME_LIST:
-                                p_pFiffInfo->projs[countProj]->data->col_names = FiffStream::split_name_list(t_pTag->toString());
+                                p_pFiffInfo->projs[countProj].data.col_names = FiffStream::split_name_list(t_pTag->toString());
                                 break;
                             case FIFF_PROJ_ITEM_VECTORS:
-                                p_pFiffInfo->projs[countProj]->data->data = t_pTag->toFloatMatrix();
+                                p_pFiffInfo->projs[countProj].data.data = t_pTag->toFloatMatrix();
                                 break;
                             }
                         }
@@ -187,7 +187,7 @@ public:
                     FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
                     if(t_pTag->kind == FIFF_BLOCK_START && *(t_pTag->toInt()) == FIFFB_MNE_CTF_COMP_DATA)
                     {
-                        FiffCtfComp* comp = NULL;
+                        FiffCtfComp comp;
                         qint32 countComp = p_pFiffInfo->comps.size();
                         while(t_pTag->kind != FIFF_BLOCK_END || *(t_pTag->toInt()) != FIFFB_MNE_CTF_COMP_DATA)
                         {
@@ -195,12 +195,12 @@ public:
                             switch (t_pTag->kind)
                             {
                             case FIFF_MNE_CTF_COMP_KIND: //First comp -> create comp
-                                comp = new FiffCtfComp();
+                                comp = FiffCtfComp();
                                 p_pFiffInfo->comps.append(comp);
-                                p_pFiffInfo->comps[countComp]->ctfkind = *(t_pTag->toInt());
+                                p_pFiffInfo->comps[countComp].ctfkind = *(t_pTag->toInt());
                                 break;
                             case FIFF_MNE_CTF_COMP_CALIBRATED:
-                                p_pFiffInfo->comps[countComp]->save_calibrated = *(t_pTag->toInt());
+                                p_pFiffInfo->comps[countComp].save_calibrated = *(t_pTag->toInt());
                                 break;
 //                            case FIFF_MNE_CTF_COMP_DATA:
 //                                p_pFiffInfo->comps[countComp]->data = *(t_pTag->toNamedMatrix());

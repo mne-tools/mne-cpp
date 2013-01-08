@@ -179,7 +179,7 @@ public:
 
     void prepare_forward(FiffInfo* p_pFiffInfo)
     {
-        QStringList fwdChNames = this->sol->row_names;
+        QStringList fwdChNames = this->sol.row_names;
         QStringList chNames;
         for(qint32 i = 0; i < p_pFiffInfo->ch_names.size(); ++i)
         {
@@ -237,10 +237,10 @@ public:
     fiff_int_t coord_frame;     /**< ToDo... */
     fiff_int_t nsource;         /**< ToDo... */
     fiff_int_t nchan;           /**< ToDo... */
-    FiffNamedMatrix* sol;       /**< ToDo... */
-    FiffNamedMatrix* sol_grad;  /**< ToDo... */
-    FiffCoordTrans* mri_head_t; /**< ToDo... */
-    MNESourceSpace* src;        /**< ToDo... */
+    FiffNamedMatrix sol;        /**< ToDo... */
+    FiffNamedMatrix sol_grad;   /**< ToDo... */
+    FiffCoordTrans mri_head_t;  /**< ToDo... */
+    MNESourceSpace src;         /**< ToDo... */
     MatrixX3d source_rr;        /**< ToDo... */
     MatrixX3d source_nn;        /**< ToDo... */
 

@@ -140,7 +140,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static inline bool copy_tree(FiffStream* p_pStreamIn, FiffId& in_id, QList<FiffDirTree*>& nodes, FiffStream* p_pStreamOut)
+    inline static bool copy_tree(FiffStream* p_pStreamIn, FiffId& in_id, QList<FiffDirTree*>& nodes, FiffStream* p_pStreamOut)
     {
         return FiffDirTree::copy_tree(p_pStreamIn, in_id, nodes, p_pStreamOut);
     }
@@ -158,7 +158,7 @@ public:
     * @param[in] p_pStream the opened fiff file
     * @param[in] kind The block kind to end
     */
-    void end_block(FiffStream* p_pStream, fiff_int_t kind)
+    inline static void end_block(FiffStream* p_pStream, fiff_int_t kind)
     {
         p_pStream->end_block(kind);
     }
@@ -175,7 +175,7 @@ public:
     *
     * @param[in] p_pStream the opened fiff file
     */
-    void end_file(FiffStream* p_pStream)
+    inline static void end_file(FiffStream* p_pStream)
     {
         p_pStream->end_file();
     }
@@ -192,7 +192,7 @@ public:
     *
     * @param[in] p_pStream the opened fiff file
     */
-    void finish_writing_raw(FiffStream* p_pStream)
+    inline static void finish_writing_raw(FiffStream* p_pStream)
     {
         p_pStream->finish_writing_raw();
     }
@@ -212,7 +212,7 @@ public:
     *
     * @return the found nodes
     */
-    static inline QList<FiffDirTree*> dir_tree_find(FiffDirTree* tree, fiff_int_t kind)
+    inline static QList<FiffDirTree*> dir_tree_find(FiffDirTree* tree, fiff_int_t kind)
     {
         return tree->dir_tree_find(kind);
     }
@@ -231,9 +231,9 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static inline bool invert_transform(FiffCoordTrans* p_pTransform)
+    inline static bool invert_transform(FiffCoordTrans& p_Transform)
     {
-        return p_pTransform->invert_transform();
+        return p_Transform.invert_transform();
     }
 
     //=========================================================================================================
@@ -251,7 +251,7 @@ public:
     *
     * @return index of the last read dir entry
     */
-    static inline qint32 make_dir_tree(FiffStream* p_pStream, QList<FiffDirEntry>* p_pDir, FiffDirTree*& p_pTree, qint32 start = 0)
+    inline static qint32 make_dir_tree(FiffStream* p_pStream, QList<FiffDirEntry>* p_pDir, FiffDirTree*& p_pTree, qint32 start = 0)
     {
         return FiffDirTree::make_dir_tree(p_pStream, p_pDir, p_pTree, start);
     }
@@ -339,7 +339,7 @@ public:
     *
     * @return Info modified according to sel
     */
-    inline static FiffInfo* pick_info(FiffInfo* info, const MatrixXi* sel = NULL)
+    inline static FiffInfo pick_info(const FiffInfo* info, const MatrixXi* sel = NULL)
     {
         return info->pick_info(sel);
     }
@@ -404,7 +404,7 @@ public:
     *
     * @return the CTF software compensation data
     */
-    static inline QList<FiffCtfComp*> read_ctf_comp(FiffStream* p_pStream, FiffDirTree* p_pTree, QList<FiffChInfo>& chs)
+    static inline QList<FiffCtfComp> read_ctf_comp(FiffStream* p_pStream, FiffDirTree* p_pTree, QList<FiffChInfo>& chs)
     {
         return p_pStream->read_ctf_comp(p_pTree, chs);
     }
@@ -447,7 +447,7 @@ public:
     *
     * @return the to measurement corresponding fiff_dir_tree.
     */
-    static inline FiffDirTree* read_meas_info(FiffStream* p_pStream, FiffDirTree* p_pTree, FiffInfo*& info)
+    static inline FiffDirTree* read_meas_info(FiffStream* p_pStream, FiffDirTree* p_pTree, FiffInfo& info)
     {
         return p_pStream->read_meas_info(p_pTree, info);
     }
@@ -469,7 +469,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static inline bool read_named_matrix(FiffStream* p_pStream, FiffDirTree* node, fiff_int_t matkind, FiffNamedMatrix*& mat)
+    static inline bool read_named_matrix(FiffStream* p_pStream, FiffDirTree* node, fiff_int_t matkind, FiffNamedMatrix& mat)
     {
         return p_pStream->read_named_matrix(node, matkind, mat);
     }
@@ -489,7 +489,7 @@ public:
     *
     * @return a list of SSP projectors
     */
-    static inline QList<FiffProj*> read_proj(FiffStream* p_pStream, FiffDirTree* p_pNode)
+    static inline QList<FiffProj> read_proj(FiffStream* p_pStream, FiffDirTree* p_pNode)
     {
         return p_pStream->read_proj(p_pNode);
     }
@@ -655,7 +655,7 @@ public:
     *
     * @return the started fiff file
     */
-    inline static FiffStream* start_writing_raw(QIODevice* p_pIODevice, FiffInfo* info, MatrixXd*& cals, MatrixXi sel = defaultMatrixXi)
+    inline static FiffStream* start_writing_raw(QIODevice* p_pIODevice, const FiffInfo& info, MatrixXd*& cals, MatrixXi sel = defaultMatrixXi)
     {
         return FiffStream::start_writing_raw(p_pIODevice, info, cals, sel);
     }
@@ -693,7 +693,7 @@ public:
     * @param[in] p_pStream    An open fif file
     * @param[in] trans      The coordinate transfomation structure
     */
-    inline static void write_coord_trans(FiffStream* p_pStream, FiffCoordTrans* trans)
+    inline static void write_coord_trans(FiffStream* p_pStream, FiffCoordTrans& trans)
     {
         p_pStream->write_coord_trans(trans);
     }
@@ -711,7 +711,7 @@ public:
     * @param[in] p_pStream    An open fif file
     * @param[in] comps      The compensation data to write
     */
-    inline static void write_ctf_comp(FiffStream* p_pStream, QList<FiffCtfComp*>& comps)
+    inline static void write_ctf_comp(FiffStream* p_pStream, QList<FiffCtfComp>& comps)
     {
         p_pStream->write_ctf_comp(comps);
     }
@@ -808,7 +808,7 @@ public:
     * @param[in] kind       The tag kind
     * @param[in] mat        The data matrix
     */
-    inline static void write_float_matrix(FiffStream* p_pStream, fiff_int_t kind, MatrixXd* mat)
+    inline static void write_float_matrix(FiffStream* p_pStream, fiff_int_t kind, MatrixXd& mat)
     {
         p_pStream->write_float_matrix(kind, mat);
     }
@@ -846,7 +846,7 @@ public:
     * @param[in] kind       The tag kind to use for the data
     * @param[in] data       The data matrix
     */
-    inline static void write_named_matrix(FiffStream* p_pStream, fiff_int_t kind,FiffNamedMatrix* mat)
+    inline static void write_named_matrix(FiffStream* p_pStream, fiff_int_t kind,FiffNamedMatrix& mat)
     {
         p_pStream->write_named_matrix(kind, mat);
     }
@@ -864,7 +864,7 @@ public:
     * @param[in] p_pStream    An open fif file
     * @param[in] projs      The compensation data to write
     */
-    inline static void write_proj(FiffStream* p_pStream, QList<FiffProj*>& projs)
+    inline static void write_proj(FiffStream* p_pStream, QList<FiffProj>& projs)
     {
         p_pStream->write_proj(projs);
     }
