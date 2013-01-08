@@ -129,7 +129,7 @@ bool DacqServer::getMeasInfo(FiffInfo*& p_pFiffInfo)
             int nchan = -1;
             QStringList defaultList;
             QStringList names;
-            MatrixXd* data = NULL;
+            MatrixXd data;
             
             fiff_int_t kind;
             bool active;
@@ -166,12 +166,12 @@ bool DacqServer::getMeasInfo(FiffInfo*& p_pFiffInfo)
                         break;
                     case FIFF_PROJ_ITEM_VECTORS:
                         data = t_pTag->toFloatMatrix();
-                        data->transposeInPlace();
+                        data.transposeInPlace();
                         break;
                 }
             }
             
-            FiffNamedMatrix* t_fiffNamedMatrix = new FiffNamedMatrix(nvec, nchan, defaultList, names, data);
+            FiffNamedMatrix t_fiffNamedMatrix(nvec, nchan, defaultList, names, data);
             
             FiffProj* one = new FiffProj(kind, active, desc, t_fiffNamedMatrix);
             
