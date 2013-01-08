@@ -62,7 +62,7 @@ FiffEvokedData::FiffEvokedData()
 , last(-1)
 , comment("")
 , times(NULL)
-, epochs(NULL)
+, epochs(MatrixXd())
 {
 
 }
@@ -78,7 +78,7 @@ FiffEvokedData::FiffEvokedData(const FiffEvokedData* p_pFiffEvokedData)
 , last(p_pFiffEvokedData->last)
 , comment(p_pFiffEvokedData->comment)
 , times(p_pFiffEvokedData->times ? new MatrixXd(*p_pFiffEvokedData->times) : NULL )
-, epochs(p_pFiffEvokedData->epochs ? new MatrixXd(*p_pFiffEvokedData->epochs) : NULL )
+, epochs(p_pFiffEvokedData->epochs)//p_pFiffEvokedData->epochs ? new MatrixXd(*p_pFiffEvokedData->epochs) : NULL )
 {
 
 }
@@ -90,6 +90,6 @@ FiffEvokedData::~FiffEvokedData()
 {
     if (times)
         delete times;
-    if (epochs)
-        delete epochs;
+//    if (epochs)
+//        delete epochs;
 }

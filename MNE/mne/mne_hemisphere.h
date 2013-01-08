@@ -112,7 +112,7 @@ public:
     /**
     * Copy ctor
     */
-    MNEHemisphere(MNEHemisphere* p_pMNEHemisphere);
+    MNEHemisphere(const MNEHemisphere* p_pMNEHemisphere);
 
     //=========================================================================================================
     /**
@@ -124,7 +124,7 @@ public:
     /**
     * Implementation of the mne_transform_source_space_to for a single hemisphere function
     */
-    bool transform_hemisphere_to(fiff_int_t dest, FiffCoordTrans* trans);
+    bool transform_hemisphere_to(fiff_int_t dest, FiffCoordTrans& trans);
 
     //=========================================================================================================
     /**
@@ -156,7 +156,7 @@ public:
     VectorXd nearest_dist;      /**< ToDo... */
     QList<VectorXi> pinfo;      /**< ToDo... */
     float dist_limit;           /**< ToDo... */
-    MatrixXd* dist;             /**< ToDo... */
+    MatrixXd dist;             /**< ToDo... */
     MatrixX3d tri_cent;         /**< ToDo... */
     MatrixX3d tri_nn;           /**< ToDo... */
     VectorXd tri_area;          /**< ToDo... */
@@ -173,7 +173,7 @@ public:
 
 private:
     // Newly added
-    MatrixXf* m_pTriCoords; /**< Holds the rr tri Matrix transformed to geometry data. */
+    MatrixXf m_TriCoords; /**< Holds the rr tri Matrix transformed to geometry data. */
 
     //QGeometryData* m_pGeometryData;
 

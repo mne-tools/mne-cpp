@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
         delete data;
     data = newData;
 
-    printf("Picked %d channels from the data\n",data->info->nchan);
+    printf("Picked %d channels from the data\n",data->info.nchan);
     printf("Computing inverse...");
     //
     //   Simple matrix multiplication followed by combination of the
@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
     qint32 i;
     for(i = 0; i < inv->reginv->rows(); ++i)
         reginv.insert(i,i) = (*inv->reginv)(i,0);
-    MatrixXd trans = reginv*(*inv->eigen_fields->data)*(*inv->whitener)*(*inv->proj)*(*data->evoked[0]->epochs);
+    MatrixXd trans = reginv*inv->eigen_fields.data*(*inv->whitener)*(*inv->proj)*data->evoked[0]->epochs;
     //
     //   Transformation into current distributions by weighting the eigenleads
     //   with the weights computed above
@@ -163,7 +163,7 @@ int main(int argc, char *argv[])
         //     R^0.5 has been already factored in
         //
         printf("(eigenleads already weighted)...");
-        sol = (*inv->eigen_leads->data)*trans;
+        sol = inv->eigen_leads.data*trans;
     }
     else
     {
@@ -172,11 +172,11 @@ int main(int argc, char *argv[])
         //
        printf("(eigenleads need to be weighted)...");
 
-       SparseMatrix<double> sourceCov(inv->source_cov->data->rows(),inv->source_cov->data->rows());
-       for(i = 0; i < inv->source_cov->data->rows(); ++i)
-           sourceCov.insert(i,i) = sqrt((*inv->source_cov->data)(i,0));
+       SparseMatrix<double> sourceCov(inv->source_cov->data.rows(),inv->source_cov->data.rows());
+       for(i = 0; i < inv->source_cov->data.rows(); ++i)
+           sourceCov.insert(i,i) = sqrt(inv->source_cov->data(i,0));
 
-       sol   = sourceCov*(*inv->eigen_leads->data)*trans;
+       sol   = sourceCov*inv->eigen_leads.data*trans;
     }
 
     if (inv->source_ori == FIFFV_MNE_FREE_ORI)
@@ -207,8 +207,8 @@ int main(int argc, char *argv[])
     //Results
 //    inv;
 //    sol2;
-    float tmin = ((float)data->evoked[0]->first) / data->info->sfreq;
-    float tstep = 1/data->info->sfreq;
+    float tmin = ((float)data->evoked[0]->first) / data->info.sfreq;
+    float tstep = 1/data->info.sfreq;
 
     std::cout << std::endl << "part ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << sol.block(0,0,10,10) << std::endl;
     printf("tmin = %f s\n", tmin);

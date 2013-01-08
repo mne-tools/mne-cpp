@@ -118,7 +118,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf_comp, bool exclude_comp_chs = false);
+    bool make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf_comp, bool exclude_comp_chs = false) const;
 
 
     //=========================================================================================================
@@ -150,7 +150,7 @@ public:
     *
     * @return nproj - How many items in the projector
     */
-    static fiff_int_t make_projector(QList<FiffProj*>& projs, QStringList& ch_names, MatrixXd*& proj, QStringList& bads = defaultQStringList, MatrixXd& U = defaultMatrixXd);
+    static fiff_int_t make_projector(QList<FiffProj>& projs, QStringList& ch_names, MatrixXd*& proj, QStringList& bads = defaultQStringList, MatrixXd& U = defaultMatrixXd);
 
 
     //=========================================================================================================
@@ -200,7 +200,7 @@ public:
     *
     * @return Info modified according to sel
     */
-    FiffInfo* pick_info(const MatrixXi* sel = NULL);
+    FiffInfo pick_info(const MatrixXi* sel = NULL) const;
 
     //=========================================================================================================
     /**
@@ -263,7 +263,7 @@ private:
     *
     * @return true if succeeded, false otherwise
     */
-    bool make_compensator(fiff_int_t kind, MatrixXd& this_comp);
+    bool make_compensator(fiff_int_t kind, MatrixXd& this_comp) const;
 
 
 public: //Public because it's a mne struct
@@ -276,14 +276,14 @@ public: //Public because it's a mne struct
     float lowpass;
     QList<FiffChInfo> chs;
     QStringList ch_names;
-    FiffCoordTrans* dev_head_t;
-    FiffCoordTrans* ctf_head_t;
-    FiffCoordTrans* dev_ctf_t;
+    FiffCoordTrans dev_head_t;
+    FiffCoordTrans ctf_head_t;
+    FiffCoordTrans dev_ctf_t;
     QList<FiffDigPoint> dig;
-    FiffCoordTrans* dig_trans;
+    FiffCoordTrans dig_trans;
     QStringList bads;
-    QList<FiffProj*> projs;
-    QList<FiffCtfComp*> comps;
+    QList<FiffProj> projs;
+    QList<FiffCtfComp> comps;
     QString acq_pars;
     QString acq_stim;
     QString filename;
