@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
 
     if(MNE::read_forward_solution(t_pFile, t_ForwardSolution))
     {
-        std::cout << std::endl << "first 10 rows and columns of the Gain Matrix:" << std::endl << t_ForwardSolution->sol->data->block(0,0,10,10) << std::endl;
+        std::cout << std::endl << "first 10 rows and columns of the Gain Matrix:" << std::endl << t_ForwardSolution->sol.data.block(0,0,10,10) << std::endl;
         std::cout << std::endl << "first 10 dipole coordinates:" << std::endl << t_ForwardSolution->source_rr.block(0,0,10,3) << std::endl ;
     }
 

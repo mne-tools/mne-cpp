@@ -56,9 +56,9 @@ using namespace FIFFLIB;
 
 FiffCov::FiffCov()
 : kind(-1)
-, data(NULL)
-, eig(NULL)
-, eigvec(NULL)
+, diag(false)
+, dim(-1)
+, nfree(-1)
 {
 
 }
@@ -71,17 +71,14 @@ FiffCov::FiffCov(const FiffCov* p_pFiffCov)
 , diag(p_pFiffCov->diag)
 , dim(p_pFiffCov->dim)
 , names(p_pFiffCov->names)
-, data(p_pFiffCov->data ? new MatrixXd(*p_pFiffCov->data) : NULL)
+, data(p_pFiffCov->data)
 , bads(p_pFiffCov->bads)
 , nfree(p_pFiffCov->nfree)
-, eig(p_pFiffCov->eig ? new VectorXd(*p_pFiffCov->eig) : NULL)
-, eigvec(p_pFiffCov->eigvec ? new MatrixXd(*p_pFiffCov->eigvec) : NULL)
+, eig(p_pFiffCov->eig)
+, eigvec(p_pFiffCov->eigvec)
 {
     for(qint32 i = 0; i < p_pFiffCov->projs.size(); ++i)
-    {
-        projs.append(new FiffProj(p_pFiffCov->projs[i]));
-    }
-
+        projs.append(p_pFiffCov->projs[i]);
 }
 
 
@@ -89,13 +86,4 @@ FiffCov::FiffCov(const FiffCov* p_pFiffCov)
 
 FiffCov::~FiffCov()
 {
-    if (data)
-        delete data;
-    for (qint32 i = 0; i < projs.size(); ++i)
-        if(projs[i])
-            delete projs[i];
-    if (eig)
-        delete eig;
-    if (eigvec)
-        delete eigvec;
 }

@@ -65,7 +65,7 @@ FiffCoordTrans::FiffCoordTrans()
 
 //*************************************************************************************************************
 
-FiffCoordTrans::FiffCoordTrans(FiffCoordTrans* t_pFiffCoordTrans)
+FiffCoordTrans::FiffCoordTrans(const FiffCoordTrans* t_pFiffCoordTrans)
 {
     if(t_pFiffCoordTrans)
     {
@@ -88,7 +88,6 @@ FiffCoordTrans::FiffCoordTrans(FiffCoordTrans* t_pFiffCoordTrans)
 
 FiffCoordTrans::~FiffCoordTrans()
 {
-
 }
 
 

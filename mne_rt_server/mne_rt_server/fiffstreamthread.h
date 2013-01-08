@@ -118,7 +118,7 @@ private:
 //private slots: --> in Qt 5 not anymore declared as slot
     void startMeas(qint32 ID);
     void stopMeas(qint32 ID);
-    void sendMeasurementInfo(qint32 ID, FiffInfo* p_pFiffInfo);
+    void sendMeasurementInfo(qint32 ID, FiffInfo p_pFiffInfo);
     void sendRawBuffer(Eigen::MatrixXf m_matRawData);
 };
 

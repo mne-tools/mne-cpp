@@ -89,7 +89,7 @@ public:
     /**
     * copy ctor
     */
-    FiffCoordTrans(FiffCoordTrans* t_pFiffCoordTrans);
+    FiffCoordTrans(const FiffCoordTrans* t_pFiffCoordTrans);
 
     //=========================================================================================================
     /**
@@ -108,6 +108,16 @@ public:
     */
     bool invert_transform();
 
+    //=========================================================================================================
+    /**
+    * Returns true if coordinate transform contains no data.
+    *
+    * @return true if coordinate transform is empty.
+    */
+    inline bool isEmpty() const
+    {
+        return this->from < 0;
+    }
 
     //=========================================================================================================
     /**

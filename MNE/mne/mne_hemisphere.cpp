@@ -72,14 +72,14 @@ MNEHemisphere::MNEHemisphere()
 , nearest_dist(VectorXd::Zero(0))
 , pinfo(QList<VectorXi>())
 , dist_limit(-1)
-, dist(NULL)
+, dist(MatrixXd())
 , tri_cent(MatrixX3d::Zero(0,3))
 , tri_nn(MatrixX3d::Zero(0,3))
 , tri_area(VectorXd::Zero(0))
 , use_tri_cent(MatrixX3d::Zero(0,3))
 , use_tri_nn(MatrixX3d::Zero(0,3))
 , use_tri_area(VectorXd::Zero(0))
-, m_pTriCoords(NULL)
+//, m_TriCoords()
 //, m_pGeometryData(NULL)
 {
 }
@@ -87,7 +87,7 @@ MNEHemisphere::MNEHemisphere()
 
 //*************************************************************************************************************
 
-MNEHemisphere::MNEHemisphere(MNEHemisphere* p_pMNEHemisphere)
+MNEHemisphere::MNEHemisphere(const MNEHemisphere* p_pMNEHemisphere)
 : id(p_pMNEHemisphere->id)
 , np(p_pMNEHemisphere->np)
 , ntri(p_pMNEHemisphere->ntri)
@@ -104,14 +104,14 @@ MNEHemisphere::MNEHemisphere(MNEHemisphere* p_pMNEHemisphere)
 , nearest_dist(VectorXd(p_pMNEHemisphere->nearest_dist))
 , pinfo(p_pMNEHemisphere->pinfo)
 , dist_limit(p_pMNEHemisphere->dist_limit)
-, dist(p_pMNEHemisphere->dist ? new MatrixXd(*p_pMNEHemisphere->dist) : NULL)
+, dist(p_pMNEHemisphere->dist)//p_pMNEHemisphere->dist ? new MatrixXd(*p_pMNEHemisphere->dist) : NULL)
 , tri_cent(MatrixX3d(p_pMNEHemisphere->tri_cent))
 , tri_nn(MatrixX3d(p_pMNEHemisphere->tri_nn))
 , tri_area(VectorXd(p_pMNEHemisphere->tri_area))
 , use_tri_cent(MatrixX3d(p_pMNEHemisphere->use_tri_cent))
 , use_tri_nn(MatrixX3d(p_pMNEHemisphere->use_tri_nn))
 , use_tri_area(VectorXd(p_pMNEHemisphere->use_tri_area))
-, m_pTriCoords(p_pMNEHemisphere->m_pTriCoords ? new MatrixXf(*(p_pMNEHemisphere->m_pTriCoords)) : NULL)
+, m_TriCoords(p_pMNEHemisphere->m_TriCoords)//p_pMNEHemisphere->m_TriCoords ? new MatrixXf(*(p_pMNEHemisphere->m_TriCoords)) : NULL)
 , cluster_vertnos(p_pMNEHemisphere->cluster_vertnos)
 , cluster_distances(p_pMNEHemisphere->cluster_distances)
 {
@@ -123,16 +123,16 @@ MNEHemisphere::MNEHemisphere(MNEHemisphere* p_pMNEHemisphere)
 
 MNEHemisphere::~MNEHemisphere()
 {
-    if(m_pTriCoords)
-        delete m_pTriCoords;
-    if(dist)
-        delete dist;
+//    if(m_TriCoords)
+//        delete m_TriCoords;
+//    if(dist)
+//        delete dist;
 }
 
 
 //*************************************************************************************************************
 
-bool MNEHemisphere::transform_hemisphere_to(fiff_int_t dest, FiffCoordTrans* trans)
+bool MNEHemisphere::transform_hemisphere_to(fiff_int_t dest, FiffCoordTrans& trans)
 {
     if (this->coord_frame == dest)
     {
@@ -140,15 +140,15 @@ bool MNEHemisphere::transform_hemisphere_to(fiff_int_t dest, FiffCoordTrans* tra
         return true;
     }
 
-    if (trans->to == this->coord_frame && trans->from == dest)
-        trans->invert_transform();
-    else if(trans->from != this->coord_frame || trans->to != dest)
+    if (trans.to == this->coord_frame && trans.from == dest)
+        trans.invert_transform();
+    else if(trans.from != this->coord_frame || trans.to != dest)
     {
         printf("Cannot transform the source space using this coordinate transformation");//Consider throw
         return false;
     }
 
-    MatrixXd t = trans->trans.block(0,0,3,4);
+    MatrixXd t = trans.trans.block(0,0,3,4);
 //        res             = src;
     this->coord_frame = dest;
     MatrixXd t_rr = MatrixXd::Ones(this->np, 4);
@@ -167,20 +167,20 @@ bool MNEHemisphere::transform_hemisphere_to(fiff_int_t dest, FiffCoordTrans* tra
 
 MatrixXf* MNEHemisphere::getTriCoords(float p_fScaling)
 {
-    if(m_pTriCoords == NULL)
+    if(m_TriCoords.size() == 0)
     {
-        m_pTriCoords = new MatrixXf(3,3*tris.rows());
+        m_TriCoords = MatrixXf(3,3*tris.rows());
         for(qint32 i = 0; i < tris.rows(); ++i)
         {
-            m_pTriCoords->block(0,i*3,3,1) = rr.row( tris(i,0) ).transpose().cast<float>();
-            m_pTriCoords->block(0,i*3+1,3,1) = rr.row( tris(i,1) ).transpose().cast<float>();
-            m_pTriCoords->block(0,i*3+2,3,1) = rr.row( tris(i,2) ).transpose().cast<float>();
+            m_TriCoords.col(i*3) = rr.row( tris(i,0) ).transpose().cast<float>();
+            m_TriCoords.col(i*3+1) = rr.row( tris(i,1) ).transpose().cast<float>();
+            m_TriCoords.col(i*3+2) = rr.row( tris(i,2) ).transpose().cast<float>();
         }
     }
 
-    *m_pTriCoords *= p_fScaling;
+    m_TriCoords *= p_fScaling;
 
-    return m_pTriCoords;
+    return &m_TriCoords;
 }
 
 

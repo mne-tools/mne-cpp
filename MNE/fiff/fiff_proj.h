@@ -98,7 +98,7 @@ public:
     /**
     * copy ctor
     */
-    FiffProj(FiffProj* p_pFiffProj);
+    FiffProj(const FiffProj* p_pFiffProj);
 
     //=========================================================================================================
     /**
@@ -107,7 +107,7 @@ public:
     FiffProj(   fiff_int_t p_kind,
                 bool p_active,
                 QString p_desc,
-                FiffNamedMatrix* p_data);
+                FiffNamedMatrix& p_data);
 
     //=========================================================================================================
     /**
@@ -120,7 +120,7 @@ public:
     bool active;
     QString desc;
 
-    FiffNamedMatrix* data;
+    FiffNamedMatrix data;
 };
 
 } // NAMESPACE

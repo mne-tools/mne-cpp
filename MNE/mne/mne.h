@@ -152,9 +152,9 @@ public:
     *
     * @return the deduced hemisphere id
     */
-    inline static qint32 find_source_space_hemi(MNEHemisphere* p_pHemisphere)
+    inline static qint32 find_source_space_hemi(MNEHemisphere& p_Hemisphere)
     {
-        return MNESourceSpace::find_source_space_hemi(p_pHemisphere);
+        return MNESourceSpace::find_source_space_hemi(p_Hemisphere);
     }
 
     //=========================================================================================================
@@ -219,9 +219,9 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    inline static bool make_compensator(FiffInfo* info, fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf_comp, bool exclude_comp_chs = false)
+    inline static bool make_compensator(const FiffInfo& info, fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf_comp, bool exclude_comp_chs = false)
     {
-        return info->make_compensator(from, to, ctf_comp, exclude_comp_chs);
+        return info.make_compensator(from, to, ctf_comp, exclude_comp_chs);
     }
 
     //=========================================================================================================
@@ -244,7 +244,7 @@ public:
     *
     * @return nproj - How many items in the projector
     */
-    inline static fiff_int_t make_projector(QList<FiffProj*>& projs, QStringList& ch_names, MatrixXd*& proj, QStringList& bads = defaultQStringList, MatrixXd& U = defaultMatrixXd)
+    inline static fiff_int_t make_projector(QList<FiffProj>& projs, QStringList& ch_names, MatrixXd*& proj, QStringList& bads = defaultQStringList, MatrixXd& U = defaultMatrixXd)
     {
         return FiffInfo::make_projector(projs, ch_names, proj, bads, U);
     }
@@ -410,9 +410,9 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_source_spaces(FiffStream*& p_pStream, bool add_geom, FiffDirTree*& p_pTree, MNESourceSpace*& p_pSourceSpace)
+    static bool read_source_spaces(FiffStream*& p_pStream, bool add_geom, FiffDirTree*& p_pTree, MNESourceSpace& p_SourceSpace)
     {
-        return MNESourceSpace::read_source_spaces(p_pStream, add_geom, p_pTree, p_pSourceSpace);
+        return MNESourceSpace::read_source_spaces(p_pStream, add_geom, p_pTree, p_SourceSpace);
     }
 
     //ToDo FiffChInfoList Class
@@ -454,7 +454,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static inline bool transform_source_space_to(MNESourceSpace* p_pMNESourceSpace, fiff_int_t dest, FiffCoordTrans* trans)
+    static inline bool transform_source_space_to(MNESourceSpace* p_pMNESourceSpace, fiff_int_t dest, FiffCoordTrans& trans)
     {
         return p_pMNESourceSpace->transform_source_space_to(dest, trans);
     }

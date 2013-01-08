@@ -98,7 +98,7 @@ public:
                         fiff_int_t p_ncol,
                         QStringList& p_row_names,
                         QStringList& p_col_names,
-                        MatrixXd* p_data);
+                        MatrixXd& p_data);
 
     //=========================================================================================================
     /**
@@ -111,6 +111,17 @@ public:
     * Destroys the fiffTag.
     */
     ~FiffNamedMatrix();
+
+    //=========================================================================================================
+    /**
+    * Returns true if named matrix contains no data.
+    *
+    * @return true if named matrix is empty.
+    */
+    inline bool isEmpty()
+    {
+        return !(this->data.size() > 0);
+    }
 
     //ToDo return the transposed matrix instead of applying it to its members
     //=========================================================================================================
@@ -126,7 +137,7 @@ public:
     fiff_int_t  ncol;
     QStringList row_names;
     QStringList col_names;
-    MatrixXd* data;
+    MatrixXd data;
 };
 
 } // NAMESPACE

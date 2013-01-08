@@ -113,29 +113,29 @@ int main(int argc, char *argv[])
     bool want_stim  = false;
 
 //    MatrixXi picks = Fiff::pick_types(raw->info, want_meg, want_eeg, want_stim, include, raw->info->bads);
-    MatrixXi picks = raw->info->pick_types(want_meg, want_eeg, want_stim, include, raw->info->bads); //Prefer member function
+    MatrixXi picks = raw->info.pick_types(want_meg, want_eeg, want_stim, include, raw->info.bads); //Prefer member function
 
 
     //
     //   Set up projection
     //
     qint32 k = 0;
-    if (raw->info->projs.size() == 0)
+    if (raw->info.projs.size() == 0)
         printf("No projector specified for these data\n");
     else
     {
         //
         //   Activate the projection items
         //
-        for (k = 0; k < raw->info->projs.size(); ++k)
-            raw->info->projs[k]->active = true;
+        for (k = 0; k < raw->info.projs.size(); ++k)
+            raw->info.projs[k].active = true;
 
-        printf("%d projection items activated\n",raw->info->projs.size());
+        printf("%d projection items activated\n",raw->info.projs.size());
         //
         //   Create the projector
         //
 //        fiff_int_t nproj = MNE::make_projector_info(raw->info, raw->proj); Using the member function instead
-        fiff_int_t nproj = raw->info->make_projector_info(raw->proj);
+        fiff_int_t nproj = raw->info.make_projector_info(raw->proj);
 
 
 //        qDebug() << raw->proj.data->data.rows();
@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
     //   Set up the CTF compensator
     //
 //    qint32 current_comp = MNE::get_current_comp(raw->info);
-    qint32 current_comp = raw->info->get_current_comp();
+    qint32 current_comp = raw->info.get_current_comp();
     qint32 dest_comp = -1;
 
     if (current_comp > 0)
@@ -168,10 +168,10 @@ int main(int argc, char *argv[])
     if (current_comp != dest_comp)
     {
         qDebug() << "This part needs to be debugged";
-        if(MNE::make_compensator(raw->info, current_comp, dest_comp, raw->comp))
+        if(MNE::make_compensator(&raw->info, current_comp, dest_comp, raw->comp))
         {
 //            raw->info->chs = MNE::set_current_comp(raw->info->chs,dest_comp);
-            raw->info->set_current_comp(dest_comp);
+            raw->info.set_current_comp(dest_comp);
             printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
         }
         else

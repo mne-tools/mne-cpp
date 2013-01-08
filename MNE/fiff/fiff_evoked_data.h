@@ -113,7 +113,7 @@ public:
     fiff_int_t  last;           /**< ToDo... */
     QString     comment;        /**< ToDo... */
     MatrixXd*   times;          /**< ToDo... */
-    MatrixXd*   epochs;         /**< ToDo... */
+    MatrixXd    epochs;         /**< ToDo... */
 };
 
 } // NAMESPACE
