@@ -231,9 +231,9 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    inline static bool invert_transform(FiffCoordTrans* p_pTransform)
+    inline static bool invert_transform(FiffCoordTrans& p_Transform)
     {
-        return p_pTransform->invert_transform();
+        return p_Transform.invert_transform();
     }
 
     //=========================================================================================================
