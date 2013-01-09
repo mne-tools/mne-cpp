@@ -66,24 +66,6 @@ FiffCov::FiffCov()
 
 //*************************************************************************************************************
 
-FiffCov::FiffCov(const FiffCov* p_pFiffCov)
-: kind(p_pFiffCov->kind)
-, diag(p_pFiffCov->diag)
-, dim(p_pFiffCov->dim)
-, names(p_pFiffCov->names)
-, data(p_pFiffCov->data)
-, bads(p_pFiffCov->bads)
-, nfree(p_pFiffCov->nfree)
-, eig(p_pFiffCov->eig)
-, eigvec(p_pFiffCov->eigvec)
-{
-    for(qint32 i = 0; i < p_pFiffCov->projs.size(); ++i)
-        projs.append(p_pFiffCov->projs[i]);
-}
-
-
-//*************************************************************************************************************
-
 FiffCov::~FiffCov()
 {
 }

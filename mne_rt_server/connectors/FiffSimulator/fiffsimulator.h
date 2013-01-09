@@ -154,9 +154,9 @@ private:
 
     QMutex mutex;
 
-    FiffProducer*   m_pFiffProducer;    /**< Holds the DataProducer.*/
-    FiffRawData*    m_pRawInfo;         /**< Holds the fiff raw measurement information. */
-    QString         m_sResourceDataPath;  /**< Holds the path to the Fiff resource simulation file directory.*/
+    FiffProducer*   m_pFiffProducer;        /**< Holds the DataProducer.*/
+    FiffRawData     m_RawInfo;              /**< Holds the fiff raw measurement information. */
+    QString         m_sResourceDataPath;    /**< Holds the path to the Fiff resource simulation file directory.*/
 
     bool            m_bIsRunning;
 };

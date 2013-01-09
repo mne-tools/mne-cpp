@@ -65,27 +65,6 @@ FiffCoordTrans::FiffCoordTrans()
 
 //*************************************************************************************************************
 
-FiffCoordTrans::FiffCoordTrans(const FiffCoordTrans* t_pFiffCoordTrans)
-{
-    if(t_pFiffCoordTrans)
-    {
-        from = t_pFiffCoordTrans->from;
-        to = t_pFiffCoordTrans->to;
-        trans = MatrixXd(t_pFiffCoordTrans->trans);
-        invtrans = MatrixXd(t_pFiffCoordTrans->invtrans);
-    }
-    else
-    {
-        this->from = -1;
-        this->to = -1;
-        this->trans = MatrixXd::Identity(4,4);
-        this->invtrans = MatrixXd::Identity(4,4);
-    }
-}
-
-
-//*************************************************************************************************************
-
 FiffCoordTrans::~FiffCoordTrans()
 {
 }

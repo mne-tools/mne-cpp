@@ -136,7 +136,7 @@ public:
     *
     * @return the prepared inverse operator
     */
-    MNEInverseOperator* prepare_inverse_operator(qint32 nave ,float lambda2, bool dSPM, bool sLORETA = false);
+    MNEInverseOperator prepare_inverse_operator(qint32 nave ,float lambda2, bool dSPM, bool sLORETA = false);
 
     //=========================================================================================================
     /**
@@ -151,7 +151,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_inverse_operator(QIODevice* p_pIODevice, MNEInverseOperator*& inv);
+    static bool read_inverse_operator(QIODevice& p_pIODevice, MNEInverseOperator& inv);
 
 public:
     fiff_int_t methods;
@@ -160,23 +160,23 @@ public:
     fiff_int_t nchan;
     fiff_int_t coord_frame;
     MatrixXd  source_nn;
-    VectorXd*  sing;
+    VectorXd  sing;
     bool    eigen_leads_weighted;
     FiffNamedMatrix eigen_leads;
     FiffNamedMatrix eigen_fields;
-    FiffCov* noise_cov;
-    FiffCov* source_cov;
-    FiffCov* orient_prior;
-    FiffCov* depth_prior;
-    FiffCov* fmri_prior;
+    FiffCov noise_cov;
+    FiffCov source_cov;
+    FiffCov orient_prior;
+    FiffCov depth_prior;
+    FiffCov fmri_prior;
     MNESourceSpace src;
     FiffCoordTrans mri_head_t;
     fiff_int_t nave;
     QList<FiffProj> projs;
-    MatrixXd* proj;                     /**< This is the projector to apply to the data. */
-    MatrixXd* whitener;                 /**< This whitens the data */
-    VectorXd* reginv;                   /**< This the diagonal matrix implementing. regularization and the inverse */
-    SparseMatrix<double>* noisenorm;    /**< These are the noise-normalization factors */
+    MatrixXd proj;                     /**< This is the projector to apply to the data. */
+    MatrixXd whitener;                 /**< This whitens the data */
+    VectorXd reginv;                   /**< This the diagonal matrix implementing. regularization and the inverse */
+    SparseMatrix<double> noisenorm;    /**< These are the noise-normalization factors */
 };
 
 } // NAMESPACE

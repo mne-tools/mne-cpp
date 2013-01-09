@@ -88,7 +88,6 @@ using namespace MNELIB;
 
 FiffSimulator::FiffSimulator()
 : m_pFiffProducer(new FiffProducer(this))
-, m_pRawInfo(NULL)
 , m_sResourceDataPath("../../mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
 , m_bIsRunning(false)
 {
@@ -150,8 +149,8 @@ void FiffSimulator::init()
         delete m_pRawMatrixBuffer;
     m_pRawMatrixBuffer = NULL;
 
-    if(m_pRawInfo)
-        m_pRawMatrixBuffer = new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_pRawInfo->info.nchan, this->getBufferSampleSize());
+    if(!m_RawInfo.isEmpty())
+        m_pRawMatrixBuffer = new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_RawInfo.info.nchan, this->getBufferSampleSize());
 }
 
 
@@ -201,7 +200,7 @@ bool FiffSimulator::parseCommand(QStringList& p_sListCommand, QByteArray& p_bloc
         if(t_file.exists())
         {
             m_sResourceDataPath = p_sListCommand[1];
-            m_pRawInfo = false;
+            m_RawInfo = FiffRawData();
 
             if (this->readRawInfo())
             {
@@ -256,11 +255,11 @@ bool FiffSimulator::stop()
 void FiffSimulator::requestMeasInfo(qint32 ID)
 {
 
-    if(!m_pRawInfo)
+    if(m_RawInfo.isEmpty())
         readRawInfo();
 
-    if(m_pRawInfo)
-        emit remitMeasInfo(ID, m_pRawInfo->info);
+    if(!m_RawInfo.isEmpty())
+        emit remitMeasInfo(ID, m_RawInfo.info);
 //    else
 //        return NULL;
 }
@@ -307,29 +306,27 @@ void FiffSimulator::requestSetBufferSize(quint32 p_uiBuffSize)
 
 bool FiffSimulator::readRawInfo()
 {
-    if(!m_pRawInfo)
+    if(m_RawInfo.isEmpty())
     {
         QFile* t_pFile = new QFile(m_sResourceDataPath);
 
         mutex.lock();
-        if(!FiffStream::setup_read_raw(t_pFile, m_pRawInfo))
+        if(!FiffStream::setup_read_raw(t_pFile, m_RawInfo))
         {
             printf("Error: Not able to read raw info!\n");
-            if(m_pRawInfo)
-                delete m_pRawInfo;
-            m_pRawInfo = NULL;
+            m_RawInfo = FiffRawData();
 
             delete t_pFile;
             return false;
         }
 
         //delete it here and reopen it in the producer thread
-        delete m_pRawInfo->file;
-        m_pRawInfo->file = NULL;
+        delete m_RawInfo.file;
+        m_RawInfo.file = NULL;
 
         if(m_pRawMatrixBuffer)
             delete m_pRawMatrixBuffer;
-        m_pRawMatrixBuffer = new RawMatrixBuffer(10, m_pRawInfo->info.nchan, getBufferSampleSize());
+        m_pRawMatrixBuffer = new RawMatrixBuffer(10, m_RawInfo.info.nchan, getBufferSampleSize());
 
         mutex.unlock();
 
@@ -346,7 +343,7 @@ void FiffSimulator::run()
 {
     m_bIsRunning = true;
 
-    float t_fSamplingFrequency = m_pRawInfo->info.sfreq;
+    float t_fSamplingFrequency = m_RawInfo.info.sfreq;
     float t_fBuffSampleSize = (float)getBufferSampleSize();
 
     quint32 uiSamplePeriod = (unsigned int) ((t_fBuffSampleSize/t_fSamplingFrequency)*1000000.0f);

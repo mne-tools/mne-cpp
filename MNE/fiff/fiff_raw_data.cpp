@@ -56,8 +56,10 @@ using namespace FIFFLIB;
 
 FiffRawData::FiffRawData()
 : file(NULL)
-, proj(NULL)
+, first_samp(-1)
+, last_samp(-1)
 {
+
 }
 
 
@@ -67,20 +69,15 @@ FiffRawData::~FiffRawData()
 {
     if(file)
         delete file;
-    if(proj)
-        delete proj;
 }
 
 //*************************************************************************************************************
 
-bool FiffRawData::read_raw_segment(MatrixXd*& data, MatrixXd*& times, fiff_int_t from, fiff_int_t to, MatrixXi sel)
+bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t from, fiff_int_t to, MatrixXi sel)
 {
-    if(data)
-        delete data;
-
     bool projAvailable = true;
 
-    if (!this->proj)
+    if (this->proj.size() == 0)
         projAvailable = false;
 
     if(from == -1)
@@ -119,21 +116,21 @@ bool FiffRawData::read_raw_segment(MatrixXd*& data, MatrixXd*& times, fiff_int_t
     //
     if (sel.cols() == 0)
     {
-        data = new MatrixXd(nchan, to-from+1);
+        data = MatrixXd(nchan, to-from+1);
 //            data->setZero();
         if (projAvailable || this->comp.kind != -1)
         {
             if (!projAvailable)
                 mult_full = this->comp.data.data*cal;
             else if (this->comp.kind == -1)
-                mult_full = (*this->proj)*cal;
+                mult_full = this->proj*cal;
             else
-                mult_full = (*this->proj)*this->comp.data.data*cal;
+                mult_full = this->proj*this->comp.data.data*cal;
         }
     }
     else
     {
-        data = new MatrixXd(sel.cols(),to-from+1);
+        data = MatrixXd(sel.cols(),to-from+1);
 //            data->setZero();
 
         MatrixXd selVect(sel.cols(), nchan);
@@ -160,7 +157,7 @@ bool FiffRawData::read_raw_segment(MatrixXd*& data, MatrixXd*& times, fiff_int_t
             else if (this->comp.kind == -1)
             {
                 for( i = 0; i  < sel.cols(); ++i)
-                    selVect.row(i) = this->proj->block(sel(0,i),0,1,nchan);
+                    selVect.row(i) = this->proj.block(sel(0,i),0,1,nchan);
 
                 mult_full = selVect*cal;
             }
@@ -168,7 +165,7 @@ bool FiffRawData::read_raw_segment(MatrixXd*& data, MatrixXd*& times, fiff_int_t
             {
                 qDebug() << "This has to be debugged! #3";
                 for( i = 0; i  < sel.cols(); ++i)
-                    selVect.row(i) = this->proj->block(sel(0,i),0,1,nchan);
+                    selVect.row(i) = this->proj.block(sel(0,i),0,1,nchan);
 
                 mult_full = selVect*this->comp.data.data*cal;
             }
@@ -363,7 +360,7 @@ bool FiffRawData::read_raw_segment(MatrixXd*& data, MatrixXd*& times, fiff_int_t
 //                    for(r = 0; r < data->rows(); ++r)
 //                        for(c = 0; c < picksamp; ++c)
 //                            (*data)(r,dest + c) = one(r,first_pick + c);
-                data->block(0,dest,data->rows(),picksamp) = one.block(0, first_pick, data->rows(), picksamp);
+                data.block(0,dest,data.rows(),picksamp) = one.block(0, first_pick, data.rows(), picksamp);
 
                 dest += picksamp;
             }
@@ -380,13 +377,10 @@ bool FiffRawData::read_raw_segment(MatrixXd*& data, MatrixXd*& times, fiff_int_t
 
 //        fclose(fid);
 
-    if(times)
-        delete times;
+    times = MatrixXd(1, to-from+1);
 
-    times = new MatrixXd(1, to-from+1);
-
-    for (i = 0; i < times->cols(); ++i)
-        (*times)(0, i) = ((float)(from+i)) / this->info.sfreq;
+    for (i = 0; i < times.cols(); ++i)
+        times(0, i) = ((float)(from+i)) / this->info.sfreq;
 
     return true;
 }

@@ -70,7 +70,7 @@ class FIFFSHARED_EXPORT FiffDigPoint {
 public:
     //=========================================================================================================
     /**
-    * ctor
+    * Constructs the digitization point description
     */
     FiffDigPoint();
 
@@ -78,11 +78,11 @@ public:
     /**
     * copy ctor
     */
-    FiffDigPoint(const FiffDigPoint* p_pFiffDigPoint);
+    FiffDigPoint(const FiffDigPoint& p_FiffDigPoint);
 
     //=========================================================================================================
     /**
-    * Destroys the FiffDigPoint.
+    * Destroys the digitization point description
     */
     ~FiffDigPoint();
 
@@ -100,13 +100,13 @@ public:
     fiff_float_t    r[3];           /**< Point location */
     fiff_int_t      coord_frame;    /**< Newly added to stay consistent with fiff MATLAB implementation */
 
+// ### OLD STRUCT ###
 // typedef struct _fiffDigPointRec {
 //  fiff_int_t kind;         /**< FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI, or FIFFV_POINT_EEG *
 //  fiff_int_t ident;        /**< Number identifying this point *
 //  fiff_float_t r[3];       /**< Point location *
 //  fiff_int_t coord_frame;  /**< Newly added to stay consistent with fiff MATLAB implementation *
 // } fiffDigPointRec, *fiffDigPoint; /**< Digitization point description *
-
 // typedef fiffDigPointRec  fiff_dig_point_t;
 };
 

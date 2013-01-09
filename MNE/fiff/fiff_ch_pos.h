@@ -70,13 +70,13 @@ class FIFFSHARED_EXPORT FiffChPos {
 public:
     //=========================================================================================================
     /**
-    * ctor
+    * Constructors the coil position descriptor.
     */
     FiffChPos();
 
     //=========================================================================================================
     /**
-    * Destroys the FiffChPos.
+    * Destroys the coil position descriptor.
     */
     ~FiffChPos();
 
@@ -95,8 +95,8 @@ public:
     fiff_float_t ey[3];        /**< Coil coordinate system y-axis unit vector */
     fiff_float_t ez[3];        /**< Coil coordinate system z-axis unit vector */
 
+// ### OLD STRUCT ###
 // /** Measurement channel position and coil type. *
-
 // typedef struct _fiffChPosRec {
 //  fiff_int_t   coil_type;    /**< What kind of coil. *
 //  fiff_float_t r0[3];        /**< Coil coordinate system origin *

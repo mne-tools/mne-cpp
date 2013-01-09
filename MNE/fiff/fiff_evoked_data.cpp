@@ -61,24 +61,6 @@ FiffEvokedData::FiffEvokedData()
 , first(-1)
 , last(-1)
 , comment("")
-, times(NULL)
-, epochs(MatrixXd())
-{
-
-}
-
-
-//*************************************************************************************************************
-
-FiffEvokedData::FiffEvokedData(const FiffEvokedData* p_pFiffEvokedData)
-: aspect_kind(p_pFiffEvokedData->aspect_kind)
-, is_smsh(p_pFiffEvokedData->is_smsh)
-, nave(p_pFiffEvokedData->nave)
-, first(p_pFiffEvokedData->first)
-, last(p_pFiffEvokedData->last)
-, comment(p_pFiffEvokedData->comment)
-, times(p_pFiffEvokedData->times ? new MatrixXd(*p_pFiffEvokedData->times) : NULL )
-, epochs(p_pFiffEvokedData->epochs)//p_pFiffEvokedData->epochs ? new MatrixXd(*p_pFiffEvokedData->epochs) : NULL )
 {
 
 }
@@ -88,8 +70,5 @@ FiffEvokedData::FiffEvokedData(const FiffEvokedData* p_pFiffEvokedData)
 
 FiffEvokedData::~FiffEvokedData()
 {
-    if (times)
-        delete times;
-//    if (epochs)
-//        delete epochs;
+
 }

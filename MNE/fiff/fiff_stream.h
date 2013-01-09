@@ -214,7 +214,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool read_cov(FiffDirTree* node, fiff_int_t cov_kind, FiffCov*& p_covData);
+    bool read_cov(FiffDirTree* node, fiff_int_t cov_kind, FiffCov& p_covData);
 
     //=========================================================================================================
     /**
@@ -293,7 +293,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool setup_read_raw(QIODevice* p_pIODevice, FiffRawData*& data, bool allow_maxshield = false);
+    static bool setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool allow_maxshield = false);
 
     //=========================================================================================================
     /**
@@ -352,7 +352,7 @@ public:
     *
     * @return the started fiff file
     */
-    static FiffStream* start_writing_raw(QIODevice* p_pIODevice, const FiffInfo& info, MatrixXd*& cals, MatrixXi sel = defaultMatrixXi);
+    static FiffStream* start_writing_raw(QIODevice* p_pIODevice, const FiffInfo& info, MatrixXd& cals, MatrixXi sel = defaultMatrixXi);
 
     //=========================================================================================================
     /**
@@ -523,7 +523,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool write_raw_buffer(MatrixXd* buf, MatrixXd* cals);
+    bool write_raw_buffer(const MatrixXd& buf, const MatrixXd& cals);
 
     //=========================================================================================================
     /**

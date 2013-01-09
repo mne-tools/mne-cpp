@@ -74,33 +74,6 @@ FiffChInfo::FiffChInfo()
 
 //*************************************************************************************************************
 
-FiffChInfo::FiffChInfo(const FiffChInfo* ch)
-: scanno(ch->scanno)
-, logno(ch->logno)
-, kind(ch->kind)
-, range(ch->range)
-, cal(ch->cal)
-, coil_type(ch->coil_type)
-, coord_frame(ch->coord_frame)
-, unit(ch->unit)
-, unit_mul(ch->unit_mul)
-, ch_name(ch->ch_name)
-, loc(Matrix<double,12,1, DontAlign>(ch->loc))
-, coil_trans(Matrix<double,4,4, DontAlign>(ch->coil_trans))
-, eeg_loc(Matrix<double,3,2, DontAlign>(ch->eeg_loc))
-{
-
-
-    Matrix<double,4,4, DontAlign>    coil_trans;  /**< Channel location */
-    Matrix<double,3,2, DontAlign>    eeg_loc;
-    loc.setZero();
-    coil_trans.setZero();
-    eeg_loc.setZero();
-}
-
-
-//*************************************************************************************************************
-
 FiffChInfo::~FiffChInfo()
 {
 

@@ -95,12 +95,6 @@ public:
 
     //=========================================================================================================
     /**
-    * copy ctor
-    */
-    FiffEvokedData(const FiffEvokedData* p_pFiffEvokedData);
-
-    //=========================================================================================================
-    /**
     * Destroys the MNEEvokedData.
     */
     ~FiffEvokedData();
@@ -108,11 +102,11 @@ public:
 public:
     fiff_int_t  aspect_kind;    /**< ToDo... */
     fiff_int_t  is_smsh;        /**< ToDo... */
-    fiff_int_t  nave;           /**< ToDo... */
+    fiff_int_t  nave;           /**< Number of averages. */
     fiff_int_t  first;          /**< ToDo... */
     fiff_int_t  last;           /**< ToDo... */
     QString     comment;        /**< ToDo... */
-    MatrixXd*   times;          /**< ToDo... */
+    MatrixXd    times;          /**< ToDo... */
     MatrixXd    epochs;         /**< ToDo... */
 };
 

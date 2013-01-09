@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiff_ctf_comp.h
+* @file     fiff_dir_entry.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -18,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
@@ -29,77 +29,44 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the FiffCtfComp class declaration.
+* @brief    Contains the implementation of the FiffDirEntry Class.
 *
 */
-
-#ifndef FIFF_CTF_COMP_H
-#define FIFF_CTF_COMP_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "fiff_global.h"
-#include "fiff_types.h"
-#include "fiff_named_matrix.h"
+#include "fiff_dir_entry.h"
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
-//=============================================================================================================
-
-namespace FIFFLIB
-{
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
+using namespace FIFFLIB;
 
 
+//*************************************************************************************************************
 //=============================================================================================================
-/**
-* CTF software compensation data
-*
-* @brief CTF software compensation data
-*/
-class FIFFSHARED_EXPORT FiffCtfComp {
+// DEFINE MEMBER METHODS
+//=============================================================================================================
 
-public:
-    //=========================================================================================================
-    /**
-    * Constructs the CTF software compensation data
-    */
-    FiffCtfComp();
+FiffDirEntry::FiffDirEntry()
+: kind(-1)
+, type(-1)
+, size(-1)
+, pos(-1)
+{
 
-    //=========================================================================================================
-    /**
-    * Destroys the CTF software compensation data.
-    */
-    ~FiffCtfComp();
+}
 
-public:
-    fiff_int_t    ctfkind;  /**< CTF kind. */
-    fiff_int_t    kind;     /**< Fiff kind -> fiff_constants.h */
-    bool save_calibrated;   /**< If data should be safed calibrated. */
-    MatrixXd rowcals;       /**< Row calibrations. */
-    MatrixXd colcals;       /**< Colum calibrations. */
-    FiffNamedMatrix data;   /**< ToDo... */
-};
 
-} // NAMESPACE
+//*************************************************************************************************************
 
-#endif // FIFF_CTF_COMP_H
+FiffDirEntry::~FiffDirEntry()
+{
+
+}

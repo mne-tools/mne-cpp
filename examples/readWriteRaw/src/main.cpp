@@ -84,17 +84,17 @@ int main(int argc, char *argv[])
     QString t_sFileName = "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
 //    QString t_sFile = "./MNE-sample-data/MEG/test_input.fif";
 
-    QFile* t_pFile = new QFile(t_sFileName);
+    QFile t_File(t_sFileName);
 
     QString t_sOutFileName = "./MNE-sample-data/MEG/test_output.fif";
 
-    QFile* t_pOutFile = new QFile(t_sOutFileName);
+    QFile t_OutFile(t_sOutFileName);
 
     //
     //   Setup for reading the raw data
     //
-    FiffRawData* raw = NULL;
-    if(!FiffStream::setup_read_raw(t_pFile, raw))
+    FiffRawData raw;
+    if(!FiffStream::setup_read_raw(&t_File, raw))
     {
         printf("Error during fiff setup raw read");
         return 0;
@@ -109,14 +109,14 @@ int main(int argc, char *argv[])
     QStringList include;
     include << "STI 014";
 
-//    MatrixXi picks = Fiff::pick_types(raw->info, want_meg, want_eeg, want_stim, include, raw->info->bads);
-    MatrixXi picks = raw->info.pick_types(want_meg, want_eeg, want_stim, include, raw->info.bads); // prefer member function
+//    MatrixXi picks = Fiff::pick_types(raw.info, want_meg, want_eeg, want_stim, include, raw.info->bads);
+    MatrixXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads); // prefer member function
     if(picks.cols() == 0)
     {
         include.clear();
         include << "STI101" << "STI201" << "STI301";
-//        picks = Fiff::pick_types(raw->info, want_meg, want_eeg, want_stim, include, raw->info->bads);
-        picks = raw->info.pick_types(want_meg, want_eeg, want_stim, include, raw->info.bads);// prefer member function
+//        picks = Fiff::pick_types(raw.info, want_meg, want_eeg, want_stim, include, raw.info->bads);
+        picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);// prefer member function
         if(picks.cols() == 0)
         {
             printf("channel list may need modification\n");
@@ -124,16 +124,16 @@ int main(int argc, char *argv[])
         }
     }
     //
-    MatrixXd* cals = NULL;
+    MatrixXd cals;
 
-    FiffStream* outfid = Fiff::start_writing_raw(t_pOutFile,raw->info, cals, picks);
+    FiffStream* outfid = Fiff::start_writing_raw(&t_OutFile,raw.info, cals, picks);
     //
     //   Set up the reading parameters
     //
-    fiff_int_t from = raw->first_samp;
-    fiff_int_t to = raw->last_samp;
+    fiff_int_t from = raw.first_samp;
+    fiff_int_t to = raw.last_samp;
     float quantum_sec = 10.0f;//read and write in 10 sec junks
-    fiff_int_t quantum = ceil(quantum_sec*raw->info.sfreq);
+    fiff_int_t quantum = ceil(quantum_sec*raw.info.sfreq);
     //
     //   To read the whole file at once set
     //
@@ -145,8 +145,8 @@ int main(int argc, char *argv[])
     bool first_buffer = true;
 
     fiff_int_t first, last;
-    MatrixXd* data = NULL;
-    MatrixXd* times = NULL;
+    MatrixXd data;
+    MatrixXd times;
 
     for(first = from; first < to; first+=quantum)
     {
@@ -156,9 +156,8 @@ int main(int argc, char *argv[])
             last = to;
         }
 
-        if (!raw->read_raw_segment(data,times,first,last,picks))
+        if (!raw.read_raw_segment(data,times,first,last,picks))
         {
-                delete raw;
                 delete outfid;
                 printf("error during read_raw_segment\n");
                 return -1;
@@ -179,11 +178,7 @@ int main(int argc, char *argv[])
 
     outfid->finish_writing_raw();
 
-
-    delete raw;
     delete outfid;
-    delete t_pOutFile;
-    delete t_pFile;
 
     printf("Finished\n");
 

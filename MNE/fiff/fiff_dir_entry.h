@@ -71,25 +71,15 @@ class FIFFSHARED_EXPORT FiffDirEntry {
 public:
     //=========================================================================================================
     /**
-    * ctor
+    * Constructs the dir entry.
     */
-    FiffDirEntry()
-    : kind(-1)
-    , type(-1)
-    , size(-1)
-    , pos(-1)
-    {
-
-    }
+    FiffDirEntry();
 
     //=========================================================================================================
     /**
-    * Destroys the FiffInfo.
+    * Destroys the dir entry.
     */
-    ~FiffDirEntry()
-    {
-
-    }
+    ~FiffDirEntry();
 
     //=========================================================================================================
     /**
@@ -105,6 +95,7 @@ public:
     fiff_int_t  size;   /**< How many bytes */
     fiff_int_t  pos;    /**< Location in file; Note: the data is located at pos + FIFFC_DATA_OFFSET */
 
+// ### OLD STRUCT ###
 //    /** Directories are composed of these structures. *
 //     typedef struct _fiffDirEntryRec {
 //      fiff_int_t  kind;		/**< Tag number *

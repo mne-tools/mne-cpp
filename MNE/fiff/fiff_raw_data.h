@@ -112,6 +112,17 @@ public:
 
     //=========================================================================================================
     /**
+    * True if fiff raw data are empty.
+    *
+    * @return true if fiff raw data are empty
+    */
+    inline bool isEmpty() const
+    {
+        return first_samp == -1 && this->info.nchan < 0;
+    }
+
+    //=========================================================================================================
+    /**
     * ### MNE toolbox root function ###: Implementation of the fiff_read_raw_segment function
     *
     * Read a specific raw data segment
@@ -124,7 +135,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool read_raw_segment(MatrixXd*& data, MatrixXd*& times, fiff_int_t from = -1, fiff_int_t to = -1, MatrixXi sel = defaultMatrixXi);
+    bool read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t from = -1, fiff_int_t to = -1, MatrixXi sel = defaultMatrixXi);
 
 
     //=========================================================================================================
@@ -141,7 +152,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool read_raw_segment_times(MatrixXd*& data, MatrixXd*& times, float from, float to, MatrixXi sel = defaultMatrixXi)
+    bool read_raw_segment_times(MatrixXd& data, MatrixXd& times, float from, float to, MatrixXi sel = defaultMatrixXi)
     {
         //
         //   Convert to samples
@@ -154,16 +165,14 @@ public:
         return this->read_raw_segment(data, times, (qint32)from, (qint32)to, sel);
     }
 
-
-
 public:
     FiffStream* file;//replaces fid
     FiffInfo info;
     fiff_int_t first_samp;
     fiff_int_t last_samp;
-    MatrixXd   cals;
+    MatrixXd cals;
     QList<FiffRawDir> rawdir;
-    MatrixXd*  proj;
+    MatrixXd proj;
     FiffCtfComp comp;
 };
 

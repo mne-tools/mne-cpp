@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
 
     QString t_sFileName = "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
-    QFile* t_pFile = new QFile(t_sFileName);
+    QFile t_File(t_sFileName);
 
     qint32 event = 1;
     QString t_sEventName = "../../mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif";
@@ -107,8 +107,8 @@ int main(int argc, char *argv[])
     //
     //   Setup for reading the raw data
     //
-    FiffRawData* raw = NULL;
-    if(!FiffStream::setup_read_raw(t_pFile, raw))
+    FiffRawData raw;
+    if(!FiffStream::setup_read_raw(&t_File, raw))
     {
         printf("Error during fiff setup raw read\n");
         return 0;
@@ -120,9 +120,9 @@ int main(int argc, char *argv[])
         //
         // Pick all
         //
-        picks.resize(1,raw->info.nchan);
+        picks.resize(1,raw.info.nchan);
 
-        for(k = 0; k < raw->info.nchan; ++k)
+        for(k = 0; k < raw.info.nchan; ++k)
             picks(0,k) = k;
         //
     }
@@ -134,33 +134,33 @@ int main(int argc, char *argv[])
         bool want_eeg   = false;
         bool want_stim  = false;
 
-//        picks = Fiff::pick_types(raw->info, want_meg, want_eeg, want_stim, include, raw->info.bads);
-        picks = raw->info.pick_types(want_meg, want_eeg, want_stim, include, raw->info.bads);//prefer member function
+//        picks = Fiff::pick_types(raw.info, want_meg, want_eeg, want_stim, include, raw.info.bads);
+        picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);//prefer member function
     }
 
     QStringList ch_names;
     for(k = 0; k < picks.cols(); ++k)
-        ch_names << raw->info.ch_names[picks(0,k)];
+        ch_names << raw.info.ch_names[picks(0,k)];
 
     //
     //   Set up projection
     //
-    if (raw->info.projs.size() == 0)
+    if (raw.info.projs.size() == 0)
         printf("No projector specified for these data\n");
     else
     {
         //
         //   Activate the projection items
         //
-        for (k = 0; k < raw->info.projs.size(); ++k)
-            raw->info.projs[k].active = true;
+        for (k = 0; k < raw.info.projs.size(); ++k)
+            raw.info.projs[k].active = true;
 
-        printf("%d projection items activated\n",raw->info.projs.size());
+        printf("%d projection items activated\n",raw.info.projs.size());
         //
         //   Create the projector
         //
-//        fiff_int_t nproj = MNE::make_projector_info(raw->info, raw->proj); Using the member function instead
-        fiff_int_t nproj = raw->info.make_projector_info(raw->proj);
+//        fiff_int_t nproj = MNE::make_projector_info(raw.info, raw.proj); Using the member function instead
+        fiff_int_t nproj = raw.info.make_projector_info(raw.proj);
 
         if (nproj == 0)
         {
@@ -175,8 +175,8 @@ int main(int argc, char *argv[])
     //
     //   Set up the CTF compensator
     //
-//    qint32 current_comp = MNE::get_current_comp(raw->info);
-    qint32 current_comp = raw->info.get_current_comp();
+//    qint32 current_comp = MNE::get_current_comp(raw.info);
+    qint32 current_comp = raw.info.get_current_comp();
     if (current_comp > 0)
         printf("Current compensation grade : %d\n",current_comp);
 
@@ -186,10 +186,10 @@ int main(int argc, char *argv[])
     if (current_comp != dest_comp)
     {
         qDebug() << "This part needs to be debugged";
-        if(MNE::make_compensator(raw->info, current_comp, dest_comp, raw->comp))
+        if(MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp))
         {
-//            raw->info.chs = MNE::set_current_comp(raw->info.chs,dest_comp);
-            raw->info.set_current_comp(dest_comp);
+//            raw.info.chs = MNE::set_current_comp(raw.info.chs,dest_comp);
+            raw.info.set_current_comp(dest_comp);
             printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
         }
         else
@@ -304,11 +304,11 @@ int main(int argc, char *argv[])
 
 
     fiff_int_t event_samp, from, to;
-    MatrixXd* timesDummy = NULL;
+    MatrixXd timesDummy;
 
     MNEEpochDataList data;
 
-    MNEEpochData* epoch = NULL;
+    MNEEpochData epoch;
 
     MatrixXd times;
 
@@ -318,48 +318,43 @@ int main(int argc, char *argv[])
         //       Read a data segment
         //
         event_samp = events(selected(p),0);
-        from = event_samp + tmin*raw->info.sfreq;
-        to   = event_samp + floor(tmax*raw->info.sfreq + 0.5);
+        from = event_samp + tmin*raw.info.sfreq;
+        to   = event_samp + floor(tmax*raw.info.sfreq + 0.5);
 
-        epoch = new MNEEpochData();
-
-        if(raw->read_raw_segment(epoch->epoch, timesDummy, from, to, picks))
+        if(raw.read_raw_segment(epoch.epoch, timesDummy, from, to, picks))
         {
             if (p == 0)
             {
                 times.resize(1, to-from+1);
                 for (qint32 i = 0; i < times.cols(); ++i)
-                    times(0, i) = ((float)(from-event_samp+i)) / raw->info.sfreq;
+                    times(0, i) = ((float)(from-event_samp+i)) / raw.info.sfreq;
             }
 
-            epoch->event = event;
-            epoch->tmin = ((float)(from)-(float)(raw->first_samp))/raw->info.sfreq;
-            epoch->tmax = ((float)(to)-(float)(raw->first_samp))/raw->info.sfreq;
+            epoch.event = event;
+            epoch.tmin = ((float)(from)-(float)(raw.first_samp))/raw.info.sfreq;
+            epoch.tmax = ((float)(to)-(float)(raw.first_samp))/raw.info.sfreq;
 
             data.append(epoch);//List takes ownwership of the pointer - no delete need
         }
         else
         {
             printf("Can't read the event data segments");
-            delete raw;
             return 0;
         }
     }
 
     if(data.size() > 0)
     {
-        printf("Read %d epochs, %d samples each.\n",data.size(),(qint32)data[0]->epoch->cols());
+        printf("Read %d epochs, %d samples each.\n",data.size(),(qint32)data[0].epoch.cols());
 
         //DEBUG
-        std::cout << data[0]->epoch->block(0,0,10,10) << std::endl;
-        qDebug() << data[0]->epoch->rows() << " x " << data[0]->epoch->cols();
+        std::cout << data[0].epoch.block(0,0,10,10) << std::endl;
+        qDebug() << data[0].epoch.rows() << " x " << data[0].epoch.cols();
 
         std::cout << times.block(0,0,1,10) << std::endl;
         qDebug() << times.rows() << " x " << times.cols();
     }
 
-    delete raw;
-    delete t_pFile;
     delete t_pEventFile;
 
     return a.exec();

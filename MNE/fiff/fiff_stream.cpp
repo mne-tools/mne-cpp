@@ -240,11 +240,9 @@ QStringList FiffStream::read_bad_channels(FiffDirTree* p_pTree)
 
 //*************************************************************************************************************
 
-bool FiffStream::read_cov(FiffDirTree* node, fiff_int_t cov_kind, FiffCov*& p_covData)
+bool FiffStream::read_cov(FiffDirTree* node, fiff_int_t cov_kind, FiffCov& p_covData)
 {
-    if(p_covData)
-        delete p_covData;
-    p_covData = NULL;
+    p_covData = FiffCov();
 
     //
     //   Find all covariance matrices
@@ -397,25 +395,25 @@ bool FiffStream::read_cov(FiffDirTree* node, fiff_int_t cov_kind, FiffCov*& p_co
             //
             //   Put it together
             //
-            p_covData = new FiffCov();
+            p_covData = FiffCov();
 
-            p_covData->kind   = cov_kind;
-            p_covData->diag   = diagmat;
-            p_covData->dim    = dim;
-            p_covData->names  = names;
+            p_covData.kind   = cov_kind;
+            p_covData.diag   = diagmat;
+            p_covData.dim    = dim;
+            p_covData.names  = names;
 
             if(cov_diag)
-                p_covData->data   = MatrixXd(*cov_diag);
+                p_covData.data   = MatrixXd(*cov_diag);
             else if(cov)
-                p_covData->data   = MatrixXd(*cov);
+                p_covData.data   = MatrixXd(*cov);
             else if(cov_sparse)
-                p_covData->data   = MatrixXd(*cov_sparse);
+                p_covData.data   = MatrixXd(*cov_sparse);
 
-            p_covData->projs  = projs;
-            p_covData->bads   = bads;
-            p_covData->nfree  = nfree;
-            p_covData->eig    = eig;
-            p_covData->eigvec = eigvec;
+            p_covData.projs  = projs;
+            p_covData.bads   = bads;
+            p_covData.nfree  = nfree;
+            p_covData.eig    = eig;
+            p_covData.eigvec = eigvec;
 
             if (cov_diag)
                 delete cov_diag;
@@ -1165,11 +1163,11 @@ QList<FiffProj> FiffStream::read_proj(FiffDirTree* p_pNode)
 
 //*************************************************************************************************************
 
-bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData*& data, bool allow_maxshield)
+bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool allow_maxshield)
 {
-    if(data)
-        delete data;
-    data = NULL;
+//    if(data)
+//        delete data;
+//    data = FiffRawData();
 
     //
     //   Open the file
@@ -1252,11 +1250,11 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData*& data, bool
     //
     info.filename   = t_sFileName;
 
-    data = new FiffRawData();
-    data->file = p_pStream;// fid;
-    data->info       = info;
-    data->first_samp = 0;
-    data->last_samp  = 0;
+    data = FiffRawData();
+    data.file = p_pStream;// fid;
+    data.info       = info;
+    data.first_samp = 0;
+    data.last_samp  = 0;
     //
     //   Process the directory
     //
@@ -1288,7 +1286,7 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData*& data, bool
         first_skip = *t_pTag->toInt();
         ++first;
     }
-    data->first_samp = first_samp;
+    data.first_samp = first_samp;
     //
     //   Go through the remaining tags in the directory
     //
@@ -1334,7 +1332,7 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData*& data, bool
             if (first_skip > 0)
             {
                 first_samp += nsamp*first_skip;
-                data->first_samp = first_samp;
+                data.first_samp = first_samp;
                 first_skip = 0;
             }
             //
@@ -1364,26 +1362,26 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData*& data, bool
             ++ndir;
         }
     }
-    data->last_samp  = first_samp - 1;//ToDo -1 right or is that MATLAB syntax
+    data.last_samp  = first_samp - 1;//ToDo -1 right or is that MATLAB syntax
     //
     //   Add the calibration factors
     //
-    MatrixXd cals(1,data->info.nchan);
+    MatrixXd cals(1,data.info.nchan);
     cals.setZero();
-    for (qint32 k = 0; k < data->info.nchan; ++k)
-        cals(0,k) = data->info.chs.at(k).range*data->info.chs.at(k).cal;
+    for (qint32 k = 0; k < data.info.nchan; ++k)
+        cals(0,k) = data.info.chs.at(k).range*data.info.chs[k].cal;
     //
-    data->cals       = cals;
-    data->rawdir     = rawdir;
+    data.cals       = cals;
+    data.rawdir     = rawdir;
     //data->proj       = [];
     //data.comp       = [];
     //
     printf("\tRange : %d ... %d  =  %9.3f ... %9.3f secs\n",
-           data->first_samp,data->last_samp,
-           (double)data->first_samp/data->info.sfreq,
-           (double)data->last_samp/data->info.sfreq);
+           data.first_samp,data.last_samp,
+           (double)data.first_samp/data.info.sfreq,
+           (double)data.last_samp/data.info.sfreq);
     printf("Ready.\n");
-    data->file->device()->close();
+    data.file->device()->close();
 
     if(t_pTree)
         delete t_pTree;
@@ -1439,7 +1437,7 @@ FiffStream* FiffStream::start_file(QIODevice* p_pIODevice)
 
 //*************************************************************************************************************
 
-FiffStream* FiffStream::start_writing_raw(QIODevice* p_pIODevice, const FiffInfo& info, MatrixXd*& cals, MatrixXi sel)
+FiffStream* FiffStream::start_writing_raw(QIODevice* p_pIODevice, const FiffInfo& info, MatrixXd& cals, MatrixXi sel)
 {
     //
     //   We will always write floats
@@ -1574,9 +1572,7 @@ FiffStream* FiffStream::start_writing_raw(QIODevice* p_pIODevice, const FiffInfo
     //
     //    Channel info
     //
-    if (cals)
-        delete cals;
-    cals = new MatrixXd(1,nchan);
+    cals = MatrixXd(1,nchan);
 
     for(k = 0; k < nchan; ++k)
     {
@@ -1585,7 +1581,7 @@ FiffStream* FiffStream::start_writing_raw(QIODevice* p_pIODevice, const FiffInfo
         //
         chs[k].scanno = k+1;//+1 because
         chs[k].range  = 1.0f;//Why? -> cause its already calibrated through reading
-        (*cals)(0,k) = chs[k].cal;
+        cals(0,k) = chs[k].cal;
         t_pStream->write_ch_info(&chs[k]);
     }
     //
@@ -2024,20 +2020,20 @@ void FiffStream::write_proj(const QList<FiffProj>& projs)
 
 //*************************************************************************************************************
 
-bool FiffStream::write_raw_buffer(MatrixXd* buf, MatrixXd* cals)
+bool FiffStream::write_raw_buffer(const MatrixXd& buf, const MatrixXd& cals)
 {
-    if (buf->rows() != cals->cols())
+    if (buf.rows() != cals.cols())
     {
         printf("buffer and calibration sizes do not match\n");
         return false;
     }
 
-    SparseMatrix<double> inv_calsMat(cals->cols(), cals->cols());
+    SparseMatrix<double> inv_calsMat(cals.cols(), cals.cols());
 
-    for(qint32 i = 0; i < cals->cols(); ++i)
-        inv_calsMat.insert(i, i) = 1.0/(*cals)(0,i);
+    for(qint32 i = 0; i < cals.cols(); ++i)
+        inv_calsMat.insert(i, i) = 1.0/cals(0,i);
 
-    MatrixXf tmp = (inv_calsMat*(*buf)).cast<float>();
+    MatrixXf tmp = (inv_calsMat*buf).cast<float>();
     this->write_float(FIFF_DATA_BUFFER,tmp.data(),tmp.rows()*tmp.cols());
     return true;
 }

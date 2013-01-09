@@ -244,7 +244,7 @@ public:
     *
     * @return nproj - How many items in the projector
     */
-    inline static fiff_int_t make_projector(QList<FiffProj>& projs, QStringList& ch_names, MatrixXd*& proj, QStringList& bads = defaultQStringList, MatrixXd& U = defaultMatrixXd)
+    inline static fiff_int_t make_projector(QList<FiffProj>& projs, QStringList& ch_names, MatrixXd& proj, QStringList& bads = defaultQStringList, MatrixXd& U = defaultMatrixXd)
     {
         return FiffInfo::make_projector(projs, ch_names, proj, bads, U);
     }
@@ -264,9 +264,9 @@ public:
     *
     * @return nproj - How many items in the projector
     */
-    static inline qint32 make_projector_info(FiffInfo* info, MatrixXd*& proj)
+    static inline qint32 make_projector_info(FiffInfo& info, MatrixXd& proj)
     {
-        return info->make_projector_info(proj);
+        return info.make_projector_info(proj);
     }
 
     //=========================================================================================================
@@ -305,9 +305,9 @@ public:
     *
     * @return the prepared inverse operator
     */
-    inline static MNEInverseOperator* prepare_inverse_operator(MNEInverseOperator* orig, qint32 nave ,float lambda2, bool dSPM, bool sLORETA = false)
+    inline static MNEInverseOperator prepare_inverse_operator(MNEInverseOperator& orig, qint32 nave ,float lambda2, bool dSPM, bool sLORETA = false)
     {
-        return orig->prepare_inverse_operator(nave, lambda2, dSPM, sLORETA);
+        return orig.prepare_inverse_operator(nave, lambda2, dSPM, sLORETA);
     }
 
 // ToDo Eventlist Class??
@@ -343,7 +343,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    inline static bool read_cov(FiffStream* p_pStream, FiffDirTree* node, fiff_int_t cov_kind, FiffCov*& p_covData)
+    inline static bool read_cov(FiffStream* p_pStream, FiffDirTree* node, fiff_int_t cov_kind, FiffCov& p_covData)
     {
         return p_pStream->read_cov(node, cov_kind, p_covData);
     }
@@ -363,7 +363,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_inverse_operator(QIODevice* p_pIODevice, MNEInverseOperator*& inv)
+    static bool read_inverse_operator(QIODevice& p_pIODevice, MNEInverseOperator& inv)
     {
         return MNEInverseOperator::read_inverse_operator(p_pIODevice, inv);
     }

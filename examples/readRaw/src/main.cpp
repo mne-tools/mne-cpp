@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
 
     QString t_sFileName = "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
-    QFile* t_pFile = new QFile(t_sFileName);
+    QFile t_File(t_sFileName);
 
     float from = 42.956f;
     float to = 320.670f;
@@ -96,8 +96,8 @@ int main(int argc, char *argv[])
     //
     //   Setup for reading the raw data
     //
-    FiffRawData* raw = NULL;
-    if(!FiffStream::setup_read_raw(t_pFile, raw))
+    FiffRawData raw;
+    if(!FiffStream::setup_read_raw(&t_File, raw))
     {
         printf("Error during fiff setup raw read");
         return 0;
@@ -112,35 +112,35 @@ int main(int argc, char *argv[])
     bool want_eeg   = false;
     bool want_stim  = false;
 
-//    MatrixXi picks = Fiff::pick_types(raw->info, want_meg, want_eeg, want_stim, include, raw->info->bads);
-    MatrixXi picks = raw->info.pick_types(want_meg, want_eeg, want_stim, include, raw->info.bads); //Prefer member function
+//    MatrixXi picks = Fiff::pick_types(raw.info, want_meg, want_eeg, want_stim, include, raw.info->bads);
+    MatrixXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads); //Prefer member function
 
 
     //
     //   Set up projection
     //
     qint32 k = 0;
-    if (raw->info.projs.size() == 0)
+    if (raw.info.projs.size() == 0)
         printf("No projector specified for these data\n");
     else
     {
         //
         //   Activate the projection items
         //
-        for (k = 0; k < raw->info.projs.size(); ++k)
-            raw->info.projs[k].active = true;
+        for (k = 0; k < raw.info.projs.size(); ++k)
+            raw.info.projs[k].active = true;
 
-        printf("%d projection items activated\n",raw->info.projs.size());
+        printf("%d projection items activated\n",raw.info.projs.size());
         //
         //   Create the projector
         //
-//        fiff_int_t nproj = MNE::make_projector_info(raw->info, raw->proj); Using the member function instead
-        fiff_int_t nproj = raw->info.make_projector_info(raw->proj);
+//        fiff_int_t nproj = MNE::make_projector_info(raw.info, raw.proj); Using the member function instead
+        fiff_int_t nproj = raw.info.make_projector_info(raw.proj);
 
 
-//        qDebug() << raw->proj.data->data.rows();
-//        qDebug() << raw->proj.data->data.cols();
-//        std::cout << "proj: \n" << raw->proj.data->data.block(0,0,10,10);
+//        qDebug() << raw.proj.data->data.rows();
+//        qDebug() << raw.proj.data->data.cols();
+//        std::cout << "proj: \n" << raw.proj.data->data.block(0,0,10,10);
 
         if (nproj == 0)
         {
@@ -155,8 +155,8 @@ int main(int argc, char *argv[])
     //
     //   Set up the CTF compensator
     //
-//    qint32 current_comp = MNE::get_current_comp(raw->info);
-    qint32 current_comp = raw->info.get_current_comp();
+//    qint32 current_comp = MNE::get_current_comp(raw.info);
+    qint32 current_comp = raw.info.get_current_comp();
     qint32 dest_comp = -1;
 
     if (current_comp > 0)
@@ -168,10 +168,10 @@ int main(int argc, char *argv[])
     if (current_comp != dest_comp)
     {
         qDebug() << "This part needs to be debugged";
-        if(MNE::make_compensator(&raw->info, current_comp, dest_comp, raw->comp))
+        if(MNE::make_compensator(&raw.info, current_comp, dest_comp, raw.comp))
         {
-//            raw->info->chs = MNE::set_current_comp(raw->info->chs,dest_comp);
-            raw->info.set_current_comp(dest_comp);
+//            raw.info->chs = MNE::set_current_comp(raw.info->chs,dest_comp);
+            raw.info.set_current_comp(dest_comp);
             printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
         }
         else
@@ -185,28 +185,24 @@ int main(int argc, char *argv[])
     //   times output argument is optional
     //
     bool readSuccessful = false;
-    MatrixXd* data = NULL;
-    MatrixXd* times = NULL;
+    MatrixXd data;
+    MatrixXd times;
     if (in_samples)
-        readSuccessful = raw->read_raw_segment(data, times, (qint32)from, (qint32)to, picks);
+        readSuccessful = raw.read_raw_segment(data, times, (qint32)from, (qint32)to, picks);
     else
-        readSuccessful = raw->read_raw_segment_times(data, times, from, to, picks);
+        readSuccessful = raw.read_raw_segment_times(data, times, from, to, picks);
 
     if (!readSuccessful)
     {
         printf("Could not read raw segment.\n");
-        delete raw;
         return -1;
     }
 
-    printf("Read %d samples.\n",(qint32)data->cols());
+    printf("Read %d samples.\n",(qint32)data.cols());
 
 
-    std::cout << data->block(0,0,10,10) << std::endl;
+    std::cout << data.block(0,0,10,10) << std::endl;
 
-
-    delete raw;
-    delete t_pFile;
 
     return a.exec();
 }
