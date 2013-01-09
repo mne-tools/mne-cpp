@@ -68,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -614,6 +614,9 @@ Macros</h2></td></tr>
 <tr class="memitem:ad9bf60108f743f25951c1f9de3b1ffe5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad9bf60108f743f25951c1f9de3b1ffe5"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFF_DIG_POINT</b>&#160;&#160;&#160;213</td></tr>
 <tr class="separator:ad9bf60108f743f25951c1f9de3b1ffe5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a03077a05d14a6eb611f8984025c1e6a6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a03077a05d14a6eb611f8984025c1e6a6"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFF_HPI_NCOIL</b>&#160;&#160;&#160;216</td></tr>
+<tr class="separator:a03077a05d14a6eb611f8984025c1e6a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af3ce9998375010df7f0d4ef54fa4b422"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af3ce9998375010df7f0d4ef54fa4b422"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFF_LOWPASS</b>&#160;&#160;&#160;219</td></tr>
 <tr class="separator:af3ce9998375010df7f0d4ef54fa4b422"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -626,6 +629,9 @@ Macros</h2></td></tr>
 <tr class="memitem:a3f62bf9e4a0826383f90c3f2630c07b7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3f62bf9e4a0826383f90c3f2630c07b7"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFF_NAME</b>&#160;&#160;&#160;233</td></tr>
 <tr class="separator:a3f62bf9e4a0826383f90c3f2630c07b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6104dfde9294d7c7ea828db5013561aa"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6104dfde9294d7c7ea828db5013561aa"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFF_LINE_FREQ</b>&#160;&#160;&#160;235</td></tr>
+<tr class="separator:a6104dfde9294d7c7ea828db5013561aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5d1da8bd498c5cedd618ddf3683a5552"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5d1da8bd498c5cedd618ddf3683a5552"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFF_DESCRIPTION</b>&#160;&#160;&#160;FIFF_COMMENT</td></tr>
 <tr class="separator:a5d1da8bd498c5cedd618ddf3683a5552"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1023,6 +1029,12 @@ Macros</h2></td></tr>
 <tr class="separator:a91522ba496e205013d2afae997da626f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5512aa9f3a63d6c8612ba00917c293f5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fiff__constants_8h.html#a5512aa9f3a63d6c8612ba00917c293f5">FIFF_MNE_CTF_COMP_CALIBRATED</a>&#160;&#160;&#160;3582</td></tr>
 <tr class="separator:a5512aa9f3a63d6c8612ba00917c293f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8bccd7a99f96e4f91ed80f6a3110c73c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fiff__constants_8h.html#a8bccd7a99f96e4f91ed80f6a3110c73c">FIFF_MNE_RT_COMMAND</a>&#160;&#160;&#160;3700</td></tr>
+<tr class="separator:a8bccd7a99f96e4f91ed80f6a3110c73c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72b620451e1e54e2461e8dde831f9f2c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fiff__constants_8h.html#a72b620451e1e54e2461e8dde831f9f2c">FIFF_MNE_RT_CLIENT_ID</a>&#160;&#160;&#160;3701</td></tr>
+<tr class="separator:a72b620451e1e54e2461e8dde831f9f2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55e61168958e1e00a300b17682d408c1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fiff__constants_8h.html#a55e61168958e1e00a300b17682d408c1">FIFFB_MNE_RT_MEAS_INFO</a>&#160;&#160;&#160;3710</td></tr>
+<tr class="separator:a55e61168958e1e00a300b17682d408c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa072b144ee3d0001b6eca2b46e379ca0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa072b144ee3d0001b6eca2b46e379ca0"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFFV_MNE_FIXED_ORI</b>&#160;&#160;&#160;1</td></tr>
 <tr class="separator:aa072b144ee3d0001b6eca2b46e379ca0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1356,6 +1368,62 @@ Macros</h2></td></tr>
 <tr class="memitem:a1e2effe47a94b71f78fd6e149f9b5df1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1e2effe47a94b71f78fd6e149f9b5df1"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFFTS_MC_RCS</b>&#160;&#160;&#160;0x00200000</td></tr>
 <tr class="separator:a1e2effe47a94b71f78fd6e149f9b5df1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8444064e1ee6376a2fc6e4991946e8d5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8444064e1ee6376a2fc6e4991946e8d5"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFF_NEW_FILE</b>&#160;&#160;&#160;1</td></tr>
+<tr class="separator:a8444064e1ee6376a2fc6e4991946e8d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e408aad9fcad9b8a031fb949548980b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4e408aad9fcad9b8a031fb949548980b"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFF_CLOSE_FILE</b>&#160;&#160;&#160;2</td></tr>
+<tr class="separator:a4e408aad9fcad9b8a031fb949548980b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab95948130daef35e9f62d3ad1e2d0045"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab95948130daef35e9f62d3ad1e2d0045"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFF_DISCARD_FILE</b>&#160;&#160;&#160;3</td></tr>
+<tr class="separator:ab95948130daef35e9f62d3ad1e2d0045"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54dfdad6bf9732ec55286b19e505974d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a54dfdad6bf9732ec55286b19e505974d"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFF_ERROR_MESSAGE</b>&#160;&#160;&#160;4</td></tr>
+<tr class="separator:a54dfdad6bf9732ec55286b19e505974d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d6dc7c334d060b60af510db9a3de138"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2d6dc7c334d060b60af510db9a3de138"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFF_SUSPEND_READING</b>&#160;&#160;&#160;5</td></tr>
+<tr class="separator:a2d6dc7c334d060b60af510db9a3de138"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab799eb8f4e2c25ebefa48659cf8d3f6d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab799eb8f4e2c25ebefa48659cf8d3f6d"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFF_FATAL_ERROR_MESSAGE</b>&#160;&#160;&#160;6</td></tr>
+<tr class="separator:ab799eb8f4e2c25ebefa48659cf8d3f6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa48d26a60605679392028fe89644912a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa48d26a60605679392028fe89644912a"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFF_CONNECTION_CHECK</b>&#160;&#160;&#160;7</td></tr>
+<tr class="separator:aa48d26a60605679392028fe89644912a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af04ea9aed2685a4ac4fbbcd959c927e5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af04ea9aed2685a4ac4fbbcd959c927e5"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFF_SUSPEND_FILING</b>&#160;&#160;&#160;8</td></tr>
+<tr class="separator:af04ea9aed2685a4ac4fbbcd959c927e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada8c33a826bc483cb90241c7511345c6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ada8c33a826bc483cb90241c7511345c6"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFF_RESUME_FILING</b>&#160;&#160;&#160;9</td></tr>
+<tr class="separator:ada8c33a826bc483cb90241c7511345c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac6c54e1e07ac35116dfadaf9420a44b9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac6c54e1e07ac35116dfadaf9420a44b9"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFF_RAW_PREBASE</b>&#160;&#160;&#160;10</td></tr>
+<tr class="separator:ac6c54e1e07ac35116dfadaf9420a44b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8993e5aabadf9a8118b95949a788622f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8993e5aabadf9a8118b95949a788622f"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFF_RAW_PICK_LIST</b>&#160;&#160;&#160;11</td></tr>
+<tr class="separator:a8993e5aabadf9a8118b95949a788622f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a37fdaf47017cb2c3a76dc84246d53077"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a37fdaf47017cb2c3a76dc84246d53077"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFF_ECHO</b>&#160;&#160;&#160;12</td></tr>
+<tr class="separator:a37fdaf47017cb2c3a76dc84246d53077"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a22654d01d9ded632f65e174eeba48314"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a22654d01d9ded632f65e174eeba48314"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFF_RESUME_READING</b>&#160;&#160;&#160;13</td></tr>
+<tr class="separator:a22654d01d9ded632f65e174eeba48314"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acce84af2a50d18ff829bf082b7ef6c01"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acce84af2a50d18ff829bf082b7ef6c01"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFF_DACQ_SYSTEM_TYPE</b>&#160;&#160;&#160;14</td></tr>
+<tr class="separator:acce84af2a50d18ff829bf082b7ef6c01"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39185211583484295aee54f72fa89b56"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a39185211583484295aee54f72fa89b56"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFF_SELECT_RAW_CH</b>&#160;&#160;&#160;15  /* Instruct rawdisp to select this channel */</td></tr>
+<tr class="separator:a39185211583484295aee54f72fa89b56"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f04c4e07bfb07dfdea9bf7286114764"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFF_PLAYBACK_MODE</b></td></tr>
+<tr class="separator:a3f04c4e07bfb07dfdea9bf7286114764"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a430f7a1629c77a73cd47f5427f68b5e0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a430f7a1629c77a73cd47f5427f68b5e0"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFF_CONTINUE_FILE</b>&#160;&#160;&#160;17  /* Used to inform that data is saved into a continuation file. */</td></tr>
+<tr class="separator:a430f7a1629c77a73cd47f5427f68b5e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a57fd31cb91f50794678e1842b432d906"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a57fd31cb91f50794678e1842b432d906"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFF_JITTER_MAX</b>&#160;&#160;&#160;18  /* Used to tell the jitter in the timing of data packets */</td></tr>
+<tr class="separator:a57fd31cb91f50794678e1842b432d906"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa9227b7575130cbea96be02784365560"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa9227b7575130cbea96be02784365560"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFF_STREAM_SEGMENT</b>&#160;&#160;&#160;19  /* A segment of data stream */</td></tr>
+<tr class="separator:aa9227b7575130cbea96be02784365560"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab2dab64f66d90c002b19c36f906c4f4c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab2dab64f66d90c002b19c36f906c4f4c"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>FIFFV_NATIVE_ENDIAN</b>&#160;&#160;&#160;0        /* This refers to the byte order in the current system */</td></tr>
 <tr class="separator:ab2dab64f66d90c002b19c36f906c4f4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1368,7 +1436,7 @@ Macros</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Contains fiff constants. </p>
-<dl class="section author"><dt>Author</dt><dd>Christoph Dinh <a href="#" onclick="location.href='mai'+'lto:'+'chd'+'in'+'h@n'+'mr'+'.mg'+'h.'+'har'+'va'+'rd.'+'ed'+'u'; return false;">chdin<span style="display: none;">.nosp@m.</span>h@nm<span style="display: none;">.nosp@m.</span>r.mgh<span style="display: none;">.nosp@m.</span>.har<span style="display: none;">.nosp@m.</span>vard.<span style="display: none;">.nosp@m.</span>edu</a>; Matti Hämäläinen <a href="#" onclick="location.href='mai'+'lto:'+'msh'+'@n'+'mr.'+'mg'+'h.h'+'ar'+'var'+'d.'+'edu'; return false;">msh@n<span style="display: none;">.nosp@m.</span>mr.m<span style="display: none;">.nosp@m.</span>gh.ha<span style="display: none;">.nosp@m.</span>rvar<span style="display: none;">.nosp@m.</span>d.edu</a> </dd></dl>
+<dl class="section author"><dt>Author</dt><dd>Christoph Dinh <a href="#" onclick="location.href='mai'+'lto:'+'chd'+'in'+'h@n'+'mr'+'.mg'+'h.'+'har'+'va'+'rd.'+'ed'+'u'; return false;">chdin<span style="display: none;">.nosp@m.</span>h@nm<span style="display: none;">.nosp@m.</span>r.mgh<span style="display: none;">.nosp@m.</span>.har<span style="display: none;">.nosp@m.</span>vard.<span style="display: none;">.nosp@m.</span>edu</a>; Matti Hamalainen <a href="#" onclick="location.href='mai'+'lto:'+'msh'+'@n'+'mr.'+'mg'+'h.h'+'ar'+'var'+'d.'+'edu'; return false;">msh@n<span style="display: none;">.nosp@m.</span>mr.m<span style="display: none;">.nosp@m.</span>gh.ha<span style="display: none;">.nosp@m.</span>rvar<span style="display: none;">.nosp@m.</span>d.edu</a> </dd></dl>
 <dl class="section version"><dt>Version</dt><dd>1.0 </dd></dl>
 <dl class="section date"><dt>Date</dt><dd>July, 2012</dd></dl>
 <h1><a class="anchor" id="LICENSE"></a>
@@ -1395,7 +1463,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Buffer containing measurement data </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00380">380</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00382">382</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1410,7 +1478,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Data skip in buffers </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00381">381</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00383">383</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1425,7 +1493,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Data skip in samples </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00383">383</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00385">385</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1440,7 +1508,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Buffer containing one epoch and channel </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00382">382</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00384">384</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1455,7 +1523,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Coordinate frame employed. Defaults: </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00480">480</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00482">482</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1470,7 +1538,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Full matrix in packed representation (lower triangle) </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00527">527</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00529">529</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1485,7 +1553,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Diagonal matrix </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00528">528</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00530">530</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1500,7 +1568,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Matrix dimension </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00526">526</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00528">528</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1515,7 +1583,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Eigenvalues and eigenvectors of the above </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00529">529</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00531">531</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1530,7 +1598,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>What kind of a covariance matrix </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00525">525</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00527">527</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1545,7 +1613,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Number of degrees of freedom </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00531">531</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00533">533</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1560,7 +1628,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Are the coefficients calibrated? </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00571">571</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00573">573</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1575,7 +1643,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>The compensation data itself </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00570">570</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00572">572</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1590,7 +1658,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>What kind of compensation </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00569">569</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00571">571</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1605,7 +1673,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>The command used to create the file </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00553">553</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00555">555</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1620,7 +1688,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Working directory where the file was created </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00552">552</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00554">554</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1635,7 +1703,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>An event list (for STI 014) </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00558">558</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00560">560</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1648,9 +1716,9 @@ LICENSE</h1>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>This removes the collision with <a class="el" href="fiff__file_8h.html" title="Contains the FiffFile class declaration.">fiff_file.h</a> (used to be 3501) </p>
+<p>This removes the collision with <a class="el" href="fiff__stream_8h.html" title="Contains the FiffStream class declaration.">fiff_stream.h</a> (used to be 3501) </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00485">485</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00487">487</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1665,7 +1733,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Hemisphere association for general purposes </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00559">559</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00561">561</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1680,7 +1748,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>The eigenfields </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00540">540</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00542">542</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1695,7 +1763,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Inverse operator as one matrix </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00543">543</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00545">545</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1710,7 +1778,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>The eigenleads </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00538">538</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00540">540</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1725,7 +1793,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>The eigenleads (already weighted with R^0.5) </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00539">539</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00541">541</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1740,7 +1808,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>The singular values </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00541">541</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00543">543</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1755,7 +1823,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Contains the orientation of one source per row </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00546">546</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00548">548</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1770,7 +1838,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Mapping of closest vertices on the sphere </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00563">563</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00565">565</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1785,7 +1853,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Which subject is this map from </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00564">564</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00566">566</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1800,7 +1868,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Which subject is this map to </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00565">565</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00567">567</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1815,7 +1883,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Which kind of priors have been used for the source covariance matrix </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00542">542</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00544">544</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1830,7 +1898,37 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Is this projection item active? </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00557">557</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00559">559</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a72b620451e1e54e2461e8dde831f9f2c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define FIFF_MNE_RT_CLIENT_ID&#160;&#160;&#160;3701</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Fiff Real-Time mne_t_server client id </p>
+
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00580">580</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a8bccd7a99f96e4f91ed80f6a3110c73c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define FIFF_MNE_RT_COMMAND&#160;&#160;&#160;3700</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Fiff Real-Time Command </p>
+
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00579">579</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1845,7 +1943,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Fixed or free </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00519">519</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00521">521</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1860,7 +1958,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Distances between vertices in use (along the surface) </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00508">508</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00510">510</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1875,7 +1973,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>If distance is above this limit (in the volume) it has not been calculated </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00509">509</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00511">511</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1890,7 +1988,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Identifier </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00496">496</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00498">498</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1905,7 +2003,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Matrix to interpolate a volume source space into a mri volume </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00505">505</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00507">507</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1920,7 +2018,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>MRI file used in the interpolation </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00506">506</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00508">508</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1935,7 +2033,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Nearest source space vertex for all vertices </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00494">494</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00496">496</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1950,7 +2048,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Distance to the Nearest source space vertex for all vertices </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00495">495</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00497">497</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1965,7 +2063,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>The vertex normals </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00490">490</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00492">492</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1980,7 +2078,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>How many vertices </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00491">491</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00493">493</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -1995,7 +2093,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Number of triangles </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00499">499</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00501">501</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2010,7 +2108,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>How many are in use </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00493">493</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00495">495</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2025,7 +2123,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Number of triangles corresponding to the number of vertices in use </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00501">501</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00503">503</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2040,7 +2138,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>The vertices </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00489">489</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00491">491</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2055,7 +2153,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Which are selected to the source space </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00492">492</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00494">494</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2070,7 +2168,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>The triangulation </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00500">500</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00502">502</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2085,7 +2183,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Surface or volume </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00497">497</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00499">499</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2100,7 +2198,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>The triangulation of the used vertices in the source space </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00502">502</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00504">504</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2115,7 +2213,23 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Voxel space dimensions in a volume source space </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00504">504</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00506">506</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a3f04c4e07bfb07dfdea9bf7286114764"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define FIFF_PLAYBACK_MODE</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">16  <span class="comment">/* Tell that we are playing data back from the hard</span></div>
+<div class="line"><span class="comment">                     * disks in the data acquisition front end */</span></div>
+</div><!-- fragment -->
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00785">785</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2130,7 +2244,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Am </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00704">704</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00720">720</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2145,7 +2259,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Am </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00704">704</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00720">720</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2160,7 +2274,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Am/m^2 </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00705">705</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00721">721</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2175,7 +2289,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Am/m^3 </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00706">706</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00722">722</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2190,7 +2304,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>T/m </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00703">703</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00719">719</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2205,7 +2319,22 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>T/m </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00703">703</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00719">719</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a55e61168958e1e00a300b17682d408c1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define FIFFB_MNE_RT_MEAS_INFO&#160;&#160;&#160;3710</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Fiff Real-Time Measurement Info </p>
+
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00585">585</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2220,7 +2349,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Alternating subaverage </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00392">392</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00394">394</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2235,7 +2364,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Normal average of epochs </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00388">388</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00390">390</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2250,7 +2379,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Dipole amplitude curve </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00395">395</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00397">397</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2265,7 +2394,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Power density spectrum </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00394">394</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00396">396</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2280,7 +2409,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>A sample cut out by graph </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00393">393</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00395">395</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2295,7 +2424,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Single epoch cut out from the continuous data </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00390">390</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00392">392</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2310,7 +2439,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Std. error of mean </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00389">389</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00391">391</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2640,7 +2769,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Coordinate transformation descriptor </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00364">364</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00366">366</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2655,7 +2784,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Coordinate transformation descriptor </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00364">364</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00366">366</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2670,7 +2799,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Estimation error in continuous hpi </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00359">359</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00361">361</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2685,7 +2814,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Estimation error in continuous hpi </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00359">359</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00361">361</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2700,7 +2829,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Goodness-of-fit in continuous hpi </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00358">358</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00360">360</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2715,7 +2844,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Goodness-of-fit in continuous hpi </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00358">358</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00360">360</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2730,7 +2859,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Estimated head movement speed in continuous hpi </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00360">360</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00362">362</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2745,7 +2874,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Estimated head movement speed in continuous hpi </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00360">360</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00362">362</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2760,7 +2889,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>CTF device coordinates </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00618">618</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00634">634</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2775,7 +2904,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>CTF head coordinates </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00619">619</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00635">635</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2790,7 +2919,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>FreeSurfer Talairach coordinates </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00625">625</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00641">641</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2805,7 +2934,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>FreeSurfer Talairach coordinates (MNI z &gt; 0) </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00623">623</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00639">639</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2820,7 +2949,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>FreeSurfer Talairach coordinates (MNI z &lt; 0) </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00624">624</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00640">640</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2835,7 +2964,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>MNI Talairach coordinates </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00622">622</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00638">638</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2850,7 +2979,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>The MRI voxel coordinates </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00620">620</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00636">636</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2865,7 +2994,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Surface RAS coordinates with non-zero origin </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00621">621</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00637">637</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2880,7 +3009,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>For Tufts EEG data </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00617">617</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00633">633</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2895,7 +3024,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>EEG [V] </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00603">603</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00619">619</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2910,7 +3039,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Planar gradiometer [T/m] </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00602">602</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00618">618</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2925,7 +3054,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Axial gradiometer or magnetometer [T] </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00601">601</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00617">617</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2940,7 +3069,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>No idea </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00600">600</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00616">616</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2955,7 +3084,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>The depth weighting prior </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00588">588</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00604">604</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2970,7 +3099,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>This is what it should have been called </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00584">584</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00600">600</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -2985,7 +3114,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>The orientation prior </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00589">589</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00605">605</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -3000,7 +3129,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>This will be potentially employed in beamformers </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00587">587</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00603">603</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -3015,7 +3144,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Quaternion param q0 obsolete for unit quaternion </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00351">351</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00353">353</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -3030,7 +3159,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Quaternion param q0 obsolete for unit quaternion </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00351">351</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00353">353</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -3045,7 +3174,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Quaternion param q1 rotation </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00352">352</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00354">354</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -3060,7 +3189,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Quaternion param q1 rotation </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00352">352</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00354">354</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -3075,7 +3204,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Quaternion param q2 rotation </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00353">353</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00355">355</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -3090,7 +3219,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Quaternion param q2 rotation </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00353">353</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00355">355</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -3105,7 +3234,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Quaternion param q3 rotation </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00354">354</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00356">356</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -3120,7 +3249,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Quaternion param q3 rotation </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00354">354</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00356">356</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -3135,7 +3264,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Quaternion param q4 translation </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00355">355</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00357">357</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -3150,7 +3279,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Quaternion param q4 translation </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00355">355</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00357">357</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -3165,7 +3294,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Quaternion param q5 translation </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00356">356</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00358">358</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -3180,7 +3309,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Quaternion param q5 translation </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00356">356</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00358">358</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -3195,7 +3324,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Quaternion param q6 translation </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00357">357</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00359">359</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -3210,7 +3339,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Quaternion param q6 translation </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00357">357</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00359">359</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -3225,7 +3354,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Respiration monitoring </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00347">347</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00349">349</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -3240,7 +3369,7 @@ LICENSE</h1>
 </div><div class="memdoc">
 <p>Respiration monitoring </p>
 
-<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00347">347</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__constants_8h_source.html#l00349">349</a> of file <a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>.</p>
 
 </div>
 </div>
@@ -3292,7 +3421,7 @@ LICENSE</h1>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Oct 15 2012 18:50:57 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jan 9 2013 17:50:06 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

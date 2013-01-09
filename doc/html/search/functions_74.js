@@ -11,14 +11,14 @@ var searchData=
   ['todouble',['toDouble',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a52b6ea8eb82898c8ec5a121e6dc79b5f',1,'FIFFLIB::FiffTag']]],
   ['tofiffid',['toFiffID',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a227960340883c81cbc0614dca1a17dd6',1,'FIFFLIB::FiffTag']]],
   ['tofloat',['toFloat',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#aa36b1845c6f83d65fb73f60205c02849',1,'FIFFLIB::FiffTag']]],
-  ['tofloatmatrix',['toFloatMatrix',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a0737ad664a5a324795492a5b388e4a90',1,'FIFFLIB::FiffTag']]],
+  ['tofloatmatrix',['toFloatMatrix',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a62e3199db07eb1892c6aaf182e171efd',1,'FIFFLIB::FiffTag']]],
   ['toint',['toInt',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a88f8094d1f3b876708bd3d5779a30a49',1,'FIFFLIB::FiffTag']]],
   ['tointmatrix',['toIntMatrix',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#ae6e352d3ff566884190c7ce52896f94d',1,'FIFFLIB::FiffTag']]],
   ['toshort',['toShort',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#ae482976adfb06db70a06cc0071c8628d',1,'FIFFLIB::FiffTag']]],
   ['tostring',['toString',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a2c6b9b9cf0ece41a5b2a7189db336748',1,'FIFFLIB::FiffTag']]],
   ['tounsignedint',['toUnsignedInt',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a483d8147f585de567ee8a64f5a84ee9b',1,'FIFFLIB::FiffTag']]],
   ['tounsignedshort',['toUnsignedShort',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a34644147b22eb4bcb32c3a803fbaf089',1,'FIFFLIB::FiffTag']]],
-  ['transform_5fhemisphere_5fto',['transform_hemisphere_to',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a0668a83d396e9b1b3d7ce63dd45e2bad',1,'MNELIB::MNEHemisphere']]],
-  ['transform_5fsource_5fspace_5fto',['transform_source_space_to',['../class_m_n_e_l_i_b_1_1_m_n_e.html#a1b7cefb798199742979ce479e079def2',1,'MNELIB::MNE::transform_source_space_to()'],['../class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#ab6edd0ccf2a7aa3855b0c0281e48049b',1,'MNELIB::MNESourceSpace::transform_source_space_to()']]],
-  ['transpose_5fnamed_5fmatrix',['transpose_named_matrix',['../class_m_n_e_l_i_b_1_1_m_n_e.html#a0fee75f48ea3c6b7c6cfe4dbb0ae5183',1,'MNELIB::MNE::transpose_named_matrix()'],['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ac99b19637d1b28c40b4ddd9b417bff57',1,'MNELIB::MNEForwardSolution::transpose_named_matrix()']]]
+  ['transform_5fhemisphere_5fto',['transform_hemisphere_to',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a28dfa9032242a4f60364876c0a7ac63b',1,'MNELIB::MNEHemisphere']]],
+  ['transform_5fsource_5fspace_5fto',['transform_source_space_to',['../class_m_n_e_l_i_b_1_1_m_n_e.html#a24942df6f7a4d0869e3fd254e11e67e5',1,'MNELIB::MNE::transform_source_space_to()'],['../class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a38654bb9875091c2cb5a04e2531653d7',1,'MNELIB::MNESourceSpace::transform_source_space_to()']]],
+  ['transpose_5fnamed_5fmatrix',['transpose_named_matrix',['../class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#acfc42a46812792ab7b36a5de046c37b6',1,'FIFFLIB::FiffNamedMatrix::transpose_named_matrix()'],['../class_m_n_e_l_i_b_1_1_m_n_e.html#a1bce4f10a8fec00dc70d460da1b96955',1,'MNELIB::MNE::transpose_named_matrix()']]]
 ];

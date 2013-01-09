@@ -70,7 +70,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -86,6 +86,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -106,6 +107,15 @@ Inheritance diagram for MNELIB::MNEEpochDataList:</div>
 </map>
  </div></div>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a3f4058543a7cc0fb89cede7dbf25590d"><td class="memItemLeft" align="right" valign="top">typedef QSharedPointer<br class="typebreak"/>
+&lt; <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html">MNEEpochDataList</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html#a3f4058543a7cc0fb89cede7dbf25590d">SPtr</a></td></tr>
+<tr class="separator:a3f4058543a7cc0fb89cede7dbf25590d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab87a21f4308e479d0a9846dc1fd75fe"><td class="memItemLeft" align="right" valign="top">typedef QSharedPointer&lt; const <br class="typebreak"/>
+<a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html">MNEEpochDataList</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html#aab87a21f4308e479d0a9846dc1fd75fe">ConstSPtr</a></td></tr>
+<tr class="separator:aab87a21f4308e479d0a9846dc1fd75fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a8fa5934787333011283ae5718b6ce9fe"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html#a8fa5934787333011283ae5718b6ce9fe">MNEEpochDataList</a> ()</td></tr>
@@ -117,8 +127,39 @@ Public Member Functions</h2></td></tr>
 <div class="textblock"><p>epoch data </p>
 <p><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> epoch data, which corresponds to an event </p>
 
-<p>Definition at line <a class="el" href="mne__epoch__data__list_8h_source.html#l00082">82</a> of file <a class="el" href="mne__epoch__data__list_8h_source.html">mne_epoch_data_list.h</a>.</p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<p>Definition at line <a class="el" href="mne__epoch__data__list_8h_source.html#l00083">83</a> of file <a class="el" href="mne__epoch__data__list_8h_source.html">mne_epoch_data_list.h</a>.</p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a class="anchor" id="aab87a21f4308e479d0a9846dc1fd75fe"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef QSharedPointer&lt;const <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html">MNEEpochDataList</a>&gt; <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html#aab87a21f4308e479d0a9846dc1fd75fe">MNELIB::MNEEpochDataList::ConstSPtr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Const shared pointer type for <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html" title="epoch data">MNEEpochDataList</a>. </p>
+
+<p>Definition at line <a class="el" href="mne__epoch__data__list_8h_source.html#l00087">87</a> of file <a class="el" href="mne__epoch__data__list_8h_source.html">mne_epoch_data_list.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a3f4058543a7cc0fb89cede7dbf25590d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef QSharedPointer&lt;<a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html">MNEEpochDataList</a>&gt; <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html#a3f4058543a7cc0fb89cede7dbf25590d">MNELIB::MNEEpochDataList::SPtr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Shared pointer type for <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html" title="epoch data">MNEEpochDataList</a>. </p>
+
+<p>Definition at line <a class="el" href="mne__epoch__data__list_8h_source.html#l00086">86</a> of file <a class="el" href="mne__epoch__data__list_8h_source.html">mne_epoch_data_list.h</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a8fa5934787333011283ae5718b6ce9fe"></a>
 <div class="memitem">
 <div class="memproto">
@@ -149,7 +190,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Destroys the <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html" title="epoch data">MNEEpochData</a>. </p>
+<p>Destroys the <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html" title="epoch data">MNEEpochDataList</a>. </p>
 
 <p>Definition at line <a class="el" href="mne__epoch__data__list_8cpp_source.html#l00065">65</a> of file <a class="el" href="mne__epoch__data__list_8cpp_source.html">mne_epoch_data_list.cpp</a>.</p>
 
@@ -162,7 +203,7 @@ Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Oct 15 2012 18:50:57 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jan 9 2013 17:50:07 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

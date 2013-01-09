@@ -40,6 +40,8 @@ class MNESHARED_EXPORT MNERtDataClient : public QTcpSocket
 {
     Q_OBJECT
 public:
+    typedef QSharedPointer<MNERtDataClient> SPtr;               /**< Shared pointer type for MNERtDataClient. */
+    typedef QSharedPointer<const MNERtDataClient> ConstSPtr;    /**< Const shared pointer type for MNERtDataClient. */
 
     //=========================================================================================================
     /**

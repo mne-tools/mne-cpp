@@ -85,7 +85,7 @@ public:
     *
     * @param [in] uiMaxNumElements length of buffer.
     */
-    CircularBuffer(unsigned int uiMaxNumElements);
+    explicit CircularBuffer(unsigned int uiMaxNumElements);
 
     //=========================================================================================================
     /**

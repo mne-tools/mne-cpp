@@ -70,7 +70,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -86,6 +86,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
@@ -100,6 +101,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <p><code>#include &lt;<a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a3b511f7d645c87e4e0d1781d253bb0e7"><td class="memItemLeft" align="right" valign="top">typedef QSharedPointer<br class="typebreak"/>
+&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a3b511f7d645c87e4e0d1781d253bb0e7">SPtr</a></td></tr>
+<tr class="separator:a3b511f7d645c87e4e0d1781d253bb0e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae620156df88189fcc3a2db5847f083fe"><td class="memItemLeft" align="right" valign="top">typedef QSharedPointer&lt; const <br class="typebreak"/>
+<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ae620156df88189fcc3a2db5847f083fe">ConstSPtr</a></td></tr>
+<tr class="separator:ae620156df88189fcc3a2db5847f083fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a2a5fde08f450de997f5eae02b925c864"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a2a5fde08f450de997f5eae02b925c864">FiffDirTree</a> ()</td></tr>
@@ -108,29 +118,17 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ab1082d0d2debf3f71f67bd7d4d26d6ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:add5047febab5ab74581c1601f41475d3"><td class="memItemLeft" align="right" valign="top">QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#add5047febab5ab74581c1601f41475d3">dir_tree_find</a> (fiff_int_t kind)</td></tr>
 <tr class="separator:add5047febab5ab74581c1601f41475d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af8a6db62d2b101a07d4fa3e85d9b148f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#af8a6db62d2b101a07d4fa3e85d9b148f">find_tag</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, fiff_int_t findkind, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html">FiffTag</a> *&amp;p_pTag)</td></tr>
-<tr class="separator:af8a6db62d2b101a07d4fa3e85d9b148f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a344b8473dad91444ae8c8e83500b554c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a344b8473dad91444ae8c8e83500b554c">find_tag</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, fiff_int_t findkind, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html">FiffTag</a> *&amp;p_pTag)</td></tr>
+<tr class="separator:a344b8473dad91444ae8c8e83500b554c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ace0a94dbb1d7d86bbf5099ec78ec2e0c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ace0a94dbb1d7d86bbf5099ec78ec2e0c">has_tag</a> (fiff_int_t findkind)</td></tr>
 <tr class="separator:ace0a94dbb1d7d86bbf5099ec78ec2e0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5e7689f08bda95d93773786e4c013400"><td class="memItemLeft" align="right" valign="top">QStringList&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a5e7689f08bda95d93773786e4c013400">read_bad_channels</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile)</td></tr>
-<tr class="separator:a5e7689f08bda95d93773786e4c013400"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e5788b42c9aa0513920301e5c890547"><td class="memItemLeft" align="right" valign="top">QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html">FiffCtfComp</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a6e5788b42c9aa0513920301e5c890547">read_ctf_comp</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html">FiffChInfo</a> &gt; &amp;chs)</td></tr>
-<tr class="separator:a6e5788b42c9aa0513920301e5c890547"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a45afd6f994bd40aafc69530223200b56"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a45afd6f994bd40aafc69530223200b56">read_meas_info</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> *&amp;info)</td></tr>
-<tr class="separator:a45afd6f994bd40aafc69530223200b56"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afd304b2b94055c851ddb64e42ca12312"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#afd304b2b94055c851ddb64e42ca12312">read_named_matrix</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, fiff_int_t matkind, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html">FiffNamedMatrix</a> *&amp;mat)</td></tr>
-<tr class="separator:afd304b2b94055c851ddb64e42ca12312"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae2f59b2cfb544a13c6f8c5a8d007bbb4"><td class="memItemLeft" align="right" valign="top">QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html">FiffProj</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ae2f59b2cfb544a13c6f8c5a8d007bbb4">read_proj</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile)</td></tr>
-<tr class="separator:ae2f59b2cfb544a13c6f8c5a8d007bbb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a542e9c1dc1505de4ae66f6932695951a"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a542e9c1dc1505de4ae66f6932695951a">copy_tree</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *fidin, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html">FiffId</a> &amp;in_id, QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> * &gt; &amp;nodes, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *fidout)</td></tr>
-<tr class="separator:a542e9c1dc1505de4ae66f6932695951a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac396e6d384c4b5ebcc2c9a771e9a21d"><td class="memItemLeft" align="right" valign="top">static qint32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#aac396e6d384c4b5ebcc2c9a771e9a21d">make_dir_tree</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_entry.html">FiffDirEntry</a> &gt; *p_pDir, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *&amp;p_pTree, qint32 start=0)</td></tr>
-<tr class="separator:aac396e6d384c4b5ebcc2c9a771e9a21d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad700c42e7c3966fe8005994e06e65667"><td class="memItemLeft" align="right" valign="top">static QStringList&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ad700c42e7c3966fe8005994e06e65667">split_name_list</a> (QString p_sNameList)</td></tr>
-<tr class="separator:ad700c42e7c3966fe8005994e06e65667"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc3cc8b2ab1897b35d4b28e09e85bdb0"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#abc3cc8b2ab1897b35d4b28e09e85bdb0">copy_tree</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *fidin, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html">FiffId</a> &amp;in_id, QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> * &gt; &amp;nodes, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *fidout)</td></tr>
+<tr class="separator:abc3cc8b2ab1897b35d4b28e09e85bdb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a08c1746a1803db7d10686e7455ea7c21"><td class="memItemLeft" align="right" valign="top">static qint32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a08c1746a1803db7d10686e7455ea7c21">make_dir_tree</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_entry.html">FiffDirEntry</a> &gt; *p_pDir, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *&amp;p_pTree, qint32 start=0)</td></tr>
+<tr class="separator:a08c1746a1803db7d10686e7455ea7c21"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -156,7 +154,38 @@ Public Attributes</h2></td></tr>
 <p>Replaces _fiffDirNode struct </p>
 
 <p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00083">83</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a class="anchor" id="ae620156df88189fcc3a2db5847f083fe"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef QSharedPointer&lt;const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a>&gt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ae620156df88189fcc3a2db5847f083fe">FIFFLIB::FiffDirTree::ConstSPtr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Const shared pointer type for <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a>. </p>
+
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00087">87</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a3b511f7d645c87e4e0d1781d253bb0e7"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef QSharedPointer&lt;<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a>&gt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a3b511f7d645c87e4e0d1781d253bb0e7">FIFFLIB::FiffDirTree::SPtr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Shared pointer type for <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a>. </p>
+
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00086">86</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a2a5fde08f450de997f5eae02b925c864"></a>
 <div class="memitem">
 <div class="memproto">
@@ -194,7 +223,7 @@ Public Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a542e9c1dc1505de4ae66f6932695951a"></a>
+<a class="anchor" id="abc3cc8b2ab1897b35d4b28e09e85bdb0"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -204,7 +233,7 @@ Public Attributes</h2></td></tr>
         <tr>
           <td class="memname">bool FiffDirTree::copy_tree </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
           <td class="paramname"><em>fidin</em>, </td>
         </tr>
         <tr>
@@ -222,7 +251,7 @@ Public Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
           <td class="paramname"><em>fidout</em>&#160;</td>
         </tr>
         <tr>
@@ -277,19 +306,19 @@ Public Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>list of the found nodes </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8cpp_source.html#l00263">263</a> of file <a class="el" href="fiff__dir__tree_8cpp_source.html">fiff_dir_tree.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8cpp_source.html#l00259">259</a> of file <a class="el" href="fiff__dir__tree_8cpp_source.html">fiff_dir_tree.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="af8a6db62d2b101a07d4fa3e85d9b148f"></a>
+<a class="anchor" id="a344b8473dad91444ae8c8e83500b554c"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">bool FiffDirTree::find_tag </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -314,7 +343,7 @@ Public Attributes</h2></td></tr>
 <p>Founds a tag of a given kind within a tree, and reeds it from file. Note: In difference to mne-matlab this is not a static function. This is a method of the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a> class, that's why a tree object doesn't need to be handed to the function.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>the opened fif file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>the opened fif file </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">findkind</td><td>the kind which should be found </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">p_pTag</td><td>the found tag</td></tr>
   </table>
@@ -322,7 +351,7 @@ Public Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if found, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8cpp_source.html#l00279">279</a> of file <a class="el" href="fiff__dir__tree_8cpp_source.html">fiff_dir_tree.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8cpp_source.html#l00275">275</a> of file <a class="el" href="fiff__dir__tree_8cpp_source.html">fiff_dir_tree.cpp</a>.</p>
 
 </div>
 </div>
@@ -348,11 +377,11 @@ Public Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true when fiff_dir_tree contains kind </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8cpp_source.html#l00300">300</a> of file <a class="el" href="fiff__dir__tree_8cpp_source.html">fiff_dir_tree.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8cpp_source.html#l00296">296</a> of file <a class="el" href="fiff__dir__tree_8cpp_source.html">fiff_dir_tree.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="aac396e6d384c4b5ebcc2c9a771e9a21d"></a>
+<a class="anchor" id="a08c1746a1803db7d10686e7455ea7c21"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -362,8 +391,8 @@ Public Attributes</h2></td></tr>
         <tr>
           <td class="memname">qint32 FiffDirTree::make_dir_tree </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -399,7 +428,7 @@ Public Attributes</h2></td></tr>
 <p>Create the directory tree structure</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>the opened fiff file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>the opened fiff file </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">p_pDir</td><td>the dir entries of which the tree should be constructed </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">p_pTree</td><td>the created dir tree </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">start</td><td>dir entry to start (optional, by default 0)</td></tr>
@@ -408,217 +437,7 @@ Public Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>index of the last read dir entry </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8cpp_source.html#l00168">168</a> of file <a class="el" href="fiff__dir__tree_8cpp_source.html">fiff_dir_tree.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a5e7689f08bda95d93773786e4c013400"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">QStringList FiffDirTree::read_bad_channels </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>fiff_read_bad_channels</p>
-<h3>MNE toolbox root function</h3>
-<p>Reads the bad channel list from a node if it exists Note: In difference to mne-matlab this is not a static function. This is a method of the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a> class, that's why a tree object doesn't need to be handed to the function.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>The opened fif file to read from</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the bad channel list </dd></dl>
-
-<p>Definition at line <a class="el" href="fiff__dir__tree_8cpp_source.html#l00311">311</a> of file <a class="el" href="fiff__dir__tree_8cpp_source.html">fiff_dir_tree.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a6e5788b42c9aa0513920301e5c890547"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html">FiffCtfComp</a> * &gt; FiffDirTree::read_ctf_comp </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html">FiffChInfo</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>chs</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>fiff_read_ctf_comp</p>
-<h3>MNE toolbox root function</h3>
-<p>Read the CTF software compensation data from the given node</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>The opened fif file to read from </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">chs</td><td>channels with the calibration info</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the CTF software compensation data </dd></dl>
-
-<p>Definition at line <a class="el" href="fiff__dir__tree_8cpp_source.html#l00328">328</a> of file <a class="el" href="fiff__dir__tree_8cpp_source.html">fiff_dir_tree.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a45afd6f994bd40aafc69530223200b56"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> * FiffDirTree::read_meas_info </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> *&amp;&#160;</td>
-          <td class="paramname"><em>info</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>fiff_read_meas_info</p>
-<h3>MNE toolbox root function</h3>
-<p>Read the measurement info Source is assumed to be an open fiff file.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>The opened fif file to read from </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">info</td><td>the read measurement info</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the to measurement corresponding fiff_dir_tree. </dd></dl>
-
-<p>Definition at line <a class="el" href="fiff__dir__tree_8cpp_source.html#l00497">497</a> of file <a class="el" href="fiff__dir__tree_8cpp_source.html">fiff_dir_tree.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="afd304b2b94055c851ddb64e42ca12312"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool FiffDirTree::read_named_matrix </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">fiff_int_t&#160;</td>
-          <td class="paramname"><em>matkind</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html">FiffNamedMatrix</a> *&amp;&#160;</td>
-          <td class="paramname"><em>mat</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>fiff_read_named_matrix</p>
-<h3>MNE toolbox root function</h3>
-<p>Reads a named matrix.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>The opened fif file to read from </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">matkind</td><td>The matrix kind to look for </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">mat</td><td>The named matrix</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
-
-<p>Definition at line <a class="el" href="fiff__dir__tree_8cpp_source.html#l00820">820</a> of file <a class="el" href="fiff__dir__tree_8cpp_source.html">fiff_dir_tree.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ae2f59b2cfb544a13c6f8c5a8d007bbb4"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html">FiffProj</a> * &gt; FiffDirTree::read_proj </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>fiff_read_proj</p>
-<h3>MNE toolbox root function</h3>
-<p>[ projdata ] = fiff_read_proj(fid,node)</p>
-<p>Read the SSP data under a given directory node </p>
-
-<p>Definition at line <a class="el" href="fiff__dir__tree_8cpp_source.html#l00914">914</a> of file <a class="el" href="fiff__dir__tree_8cpp_source.html">fiff_dir_tree.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ad700c42e7c3966fe8005994e06e65667"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">QStringList FiffDirTree::split_name_list </td>
-          <td>(</td>
-          <td class="paramtype">QString&#160;</td>
-          <td class="paramname"><em>p_sNameList</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>fiff_split_name_list</p>
-<h3>MNE toolbox root function</h3>
-<p>Splits a string by looking for seperator ":"</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_sNameList</td><td>string to split</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the splitted string list </dd></dl>
-
-<p>Definition at line <a class="el" href="fiff__dir__tree_8cpp_source.html#l00489">489</a> of file <a class="el" href="fiff__dir__tree_8cpp_source.html">fiff_dir_tree.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8cpp_source.html#l00164">164</a> of file <a class="el" href="fiff__dir__tree_8cpp_source.html">fiff_dir_tree.cpp</a>.</p>
 
 </div>
 </div>
@@ -634,7 +453,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Block type for this directory </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00258">258</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00170">170</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -649,7 +468,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Child nodes </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00264">264</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00176">176</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -664,7 +483,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Directory of tags in this node </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00261">261</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00173">173</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -679,7 +498,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Id of this block if any </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00259">259</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00171">171</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -694,7 +513,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Number of child nodes </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00265">265</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00177">177</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -709,7 +528,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Number of entries in this node </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00262">262</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00174">174</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -724,7 +543,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Number of entries in the directory tree node </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00263">263</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00175">175</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -739,7 +558,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Newly added to stay consistent with MATLAB implementation </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00260">260</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__tree_8h_source.html#l00172">172</a> of file <a class="el" href="fiff__dir__tree_8h_source.html">fiff_dir_tree.h</a>.</p>
 
 </div>
 </div>
@@ -750,7 +569,7 @@ Public Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Oct 15 2012 18:50:57 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jan 9 2013 17:50:07 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

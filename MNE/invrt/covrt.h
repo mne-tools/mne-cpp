@@ -67,6 +67,7 @@
 
 #include <QThread>
 #include <QMutex>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -106,6 +107,9 @@ class INVRTSHARED_EXPORT CovRt : public QThread
 {
     Q_OBJECT
 public:
+    typedef QSharedPointer<CovRt> SPtr;             /**< Shared pointer type for CovRt. */
+    typedef QSharedPointer<const CovRt> ConstSPtr;  /**< Const shared pointer type for CovRt. */
+
 
     explicit CovRt(QObject *parent = 0);
 

@@ -70,7 +70,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -86,6 +86,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir-members.html">List of all members</a>  </div>
@@ -99,6 +100,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <p><code>#include &lt;<a class="el" href="fiff__raw__dir_8h_source.html">fiff_raw_dir.h</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a179eb5d62705e0a6f56d1661669d0144"><td class="memItemLeft" align="right" valign="top">typedef QSharedPointer<br class="typebreak"/>
+&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html">FiffRawDir</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a179eb5d62705e0a6f56d1661669d0144">SPtr</a></td></tr>
+<tr class="separator:a179eb5d62705e0a6f56d1661669d0144"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a608e7d9f44b77d5c1270955aa89e2949"><td class="memItemLeft" align="right" valign="top">typedef QSharedPointer&lt; const <br class="typebreak"/>
+<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html">FiffRawDir</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a608e7d9f44b77d5c1270955aa89e2949">ConstSPtr</a></td></tr>
+<tr class="separator:a608e7d9f44b77d5c1270955aa89e2949"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a4560401eb9389bac6d7f5c5977f205e2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a4560401eb9389bac6d7f5c5977f205e2">FiffRawDir</a> ()</td></tr>
@@ -126,7 +136,38 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nsamp</b></td><
 <p>Special fiff diretory entry for raw data. ToDo: derive this of <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_entry.html" title="Directory entry description.">FiffDirEntry</a>. </p>
 
 <p>Definition at line <a class="el" href="fiff__raw__dir_8h_source.html#l00073">73</a> of file <a class="el" href="fiff__raw__dir_8h_source.html">fiff_raw_dir.h</a>.</p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a class="anchor" id="a608e7d9f44b77d5c1270955aa89e2949"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef QSharedPointer&lt;const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html">FiffRawDir</a>&gt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a608e7d9f44b77d5c1270955aa89e2949">FIFFLIB::FiffRawDir::ConstSPtr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Const shared pointer type for <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html" title="Raw Directory entry.">FiffRawDir</a>. </p>
+
+<p>Definition at line <a class="el" href="fiff__raw__dir_8h_source.html#l00077">77</a> of file <a class="el" href="fiff__raw__dir_8h_source.html">fiff_raw_dir.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a179eb5d62705e0a6f56d1661669d0144"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef QSharedPointer&lt;<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html">FiffRawDir</a>&gt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a179eb5d62705e0a6f56d1661669d0144">FIFFLIB::FiffRawDir::SPtr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Shared pointer type for <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html" title="Raw Directory entry.">FiffRawDir</a>. </p>
+
+<p>Definition at line <a class="el" href="fiff__raw__dir_8h_source.html#l00076">76</a> of file <a class="el" href="fiff__raw__dir_8h_source.html">fiff_raw_dir.h</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a4560401eb9389bac6d7f5c5977f205e2"></a>
 <div class="memitem">
 <div class="memproto">
@@ -170,7 +211,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nsamp</b></td><
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Oct 15 2012 18:50:57 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jan 9 2013 17:50:07 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

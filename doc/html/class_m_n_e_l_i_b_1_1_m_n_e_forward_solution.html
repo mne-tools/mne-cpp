@@ -70,7 +70,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -86,6 +86,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
@@ -100,63 +101,100 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <p><code>#include &lt;<a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a7e95a8381a0f621201981cd6a39ea25c"><td class="memItemLeft" align="right" valign="top">typedef QSharedPointer<br class="typebreak"/>
+&lt; <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">MNEForwardSolution</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a7e95a8381a0f621201981cd6a39ea25c">SPtr</a></td></tr>
+<tr class="separator:a7e95a8381a0f621201981cd6a39ea25c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac205e3b5d9a3fe1a455d3c45e30d7636"><td class="memItemLeft" align="right" valign="top">typedef QSharedPointer&lt; const <br class="typebreak"/>
+<a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">MNEForwardSolution</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ac205e3b5d9a3fe1a455d3c45e30d7636">ConstSPtr</a></td></tr>
+<tr class="separator:ac205e3b5d9a3fe1a455d3c45e30d7636"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a2de172fb859cda6d067d0e931c696fe2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a2de172fb859cda6d067d0e931c696fe2">MNEForwardSolution</a> ()</td></tr>
 <tr class="separator:a2de172fb859cda6d067d0e931c696fe2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1289908ff5dba424ed9ae95c80b38c47"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1289908ff5dba424ed9ae95c80b38c47">MNEForwardSolution</a> (<a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">MNEForwardSolution</a> *p_pMNEForwardSolution)</td></tr>
-<tr class="separator:a1289908ff5dba424ed9ae95c80b38c47"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1fae3a16d80ecef955e86d6ab928f92c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1fae3a16d80ecef955e86d6ab928f92c">MNEForwardSolution</a> (const <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">MNEForwardSolution</a> *p_pMNEForwardSolution)</td></tr>
+<tr class="separator:a1fae3a16d80ecef955e86d6ab928f92c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af7807f7d45b2a21d782ab73aaf117411"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#af7807f7d45b2a21d782ab73aaf117411">~MNEForwardSolution</a> ()</td></tr>
 <tr class="separator:af7807f7d45b2a21d782ab73aaf117411"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb914d6e553b7ebcf6ad654a83d3a5fa"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abb914d6e553b7ebcf6ad654a83d3a5fa"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>cluster_forward_solution</b> (<a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">MNEForwardSolution</a> *p_fwdOut, <a class="el" href="class_f_s_l_i_b_1_1_annotation.html">Annotation</a> *p_pLHAnnotation, <a class="el" href="class_f_s_l_i_b_1_1_annotation.html">Annotation</a> *p_pRHAnnotation, qint32 p_iClusterSize)</td></tr>
+<tr class="separator:abb914d6e553b7ebcf6ad654a83d3a5fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ed9167418ea0a10ead34af9b673e155"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2ed9167418ea0a10ead34af9b673e155"></a>
+VectorXi&#160;</td><td class="memItemRight" valign="bottom"><b>tripletSelection</b> (VectorXi &amp;p_vecIdxSelection)</td></tr>
+<tr class="separator:a2ed9167418ea0a10ead34af9b673e155"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9775238f2f756e9ef4cf6d6ab631eb0c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9775238f2f756e9ef4cf6d6ab631eb0c"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>prepare_forward</b> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> *p_pFiffInfo)</td></tr>
+<tr class="separator:a9775238f2f756e9ef4cf6d6ab631eb0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a2ab526c5c49d9350eb6ee9fbd905fa9f"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a2ab526c5c49d9350eb6ee9fbd905fa9f">read_forward_solution</a> (QString &amp;p_sFileName, <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">MNEForwardSolution</a> *&amp;fwd, bool force_fixed=false, bool surf_ori=false, QStringList &amp;include=defaultQStringList, QStringList &amp;exclude=defaultQStringList)</td></tr>
-<tr class="separator:a2ab526c5c49d9350eb6ee9fbd905fa9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afb312e7470c29a6c0e94a302174cb811"><td class="memItemLeft" align="right" valign="top">static SparseMatrix&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#afb312e7470c29a6c0e94a302174cb811">make_block_diag</a> (MatrixXf &amp;A, qint32 n)</td></tr>
-<tr class="separator:afb312e7470c29a6c0e94a302174cb811"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac99b19637d1b28c40b4ddd9b417bff57"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ac99b19637d1b28c40b4ddd9b417bff57">transpose_named_matrix</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html">FiffNamedMatrix</a> *&amp;mat)</td></tr>
-<tr class="separator:ac99b19637d1b28c40b4ddd9b417bff57"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a360551860b2ddd21c67855f100503f89"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a360551860b2ddd21c67855f100503f89">read_forward_solution</a> (QIODevice *p_pIODevice, <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">MNEForwardSolution</a> *&amp;fwd, bool force_fixed=false, bool surf_ori=false, QStringList &amp;include=defaultQStringList, QStringList &amp;exclude=defaultQStringList)</td></tr>
+<tr class="separator:a360551860b2ddd21c67855f100503f89"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a1988a88297362b6b34b0318577ad162d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1988a88297362b6b34b0318577ad162d"></a>
-fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>source_ori</b></td></tr>
+<tr class="memitem:a1988a88297362b6b34b0318577ad162d"><td class="memItemLeft" align="right" valign="top">fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1988a88297362b6b34b0318577ad162d">source_ori</a></td></tr>
 <tr class="separator:a1988a88297362b6b34b0318577ad162d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8776126f2f4ec08939fb83a61a429348"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8776126f2f4ec08939fb83a61a429348"></a>
-fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>coord_frame</b></td></tr>
+<tr class="memitem:a8776126f2f4ec08939fb83a61a429348"><td class="memItemLeft" align="right" valign="top">fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a8776126f2f4ec08939fb83a61a429348">coord_frame</a></td></tr>
 <tr class="separator:a8776126f2f4ec08939fb83a61a429348"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4bc383d90d8550cda0ad96cf0dfeb988"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4bc383d90d8550cda0ad96cf0dfeb988"></a>
-fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nsource</b></td></tr>
+<tr class="memitem:a4bc383d90d8550cda0ad96cf0dfeb988"><td class="memItemLeft" align="right" valign="top">fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a4bc383d90d8550cda0ad96cf0dfeb988">nsource</a></td></tr>
 <tr class="separator:a4bc383d90d8550cda0ad96cf0dfeb988"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adedb753633d161cdfa28a450ba64ca42"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adedb753633d161cdfa28a450ba64ca42"></a>
-fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nchan</b></td></tr>
+<tr class="memitem:adedb753633d161cdfa28a450ba64ca42"><td class="memItemLeft" align="right" valign="top">fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#adedb753633d161cdfa28a450ba64ca42">nchan</a></td></tr>
 <tr class="separator:adedb753633d161cdfa28a450ba64ca42"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3b93eb7e485e6e6177a17bc5f8c4eb58"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3b93eb7e485e6e6177a17bc5f8c4eb58"></a>
-<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html">FiffNamedMatrix</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>sol</b></td></tr>
-<tr class="separator:a3b93eb7e485e6e6177a17bc5f8c4eb58"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad2fb2c3deea188a1b2d3e5fb026484b8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad2fb2c3deea188a1b2d3e5fb026484b8"></a>
-<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html">FiffNamedMatrix</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>sol_grad</b></td></tr>
-<tr class="separator:ad2fb2c3deea188a1b2d3e5fb026484b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a17bd236b46fd5cb7096a30df6d4f475d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a17bd236b46fd5cb7096a30df6d4f475d"></a>
-<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html">FiffCoordTrans</a>&#160;</td><td class="memItemRight" valign="bottom"><b>mri_head_t</b></td></tr>
+<tr class="memitem:a205f647b33f151f4d9d45233779a84a0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html">FiffNamedMatrix</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a205f647b33f151f4d9d45233779a84a0">sol</a></td></tr>
+<tr class="separator:a205f647b33f151f4d9d45233779a84a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a09e43a6ac3a8b4d02d05f633a4d9c449"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html">FiffNamedMatrix</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a09e43a6ac3a8b4d02d05f633a4d9c449">sol_grad</a></td></tr>
+<tr class="separator:a09e43a6ac3a8b4d02d05f633a4d9c449"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a17bd236b46fd5cb7096a30df6d4f475d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html">FiffCoordTrans</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a17bd236b46fd5cb7096a30df6d4f475d">mri_head_t</a></td></tr>
 <tr class="separator:a17bd236b46fd5cb7096a30df6d4f475d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5655a219aa7a5826893463794e416277"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5655a219aa7a5826893463794e416277"></a>
-<a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html">MNESourceSpace</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>src</b></td></tr>
-<tr class="separator:a5655a219aa7a5826893463794e416277"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a26f0a506b8f0fafc4cfa3860dc8dcc1e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a26f0a506b8f0fafc4cfa3860dc8dcc1e"></a>
-MatrixX3f&#160;</td><td class="memItemRight" valign="bottom"><b>source_rr</b></td></tr>
-<tr class="separator:a26f0a506b8f0fafc4cfa3860dc8dcc1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1f5964654bb0c2f19ff158b6ca312de4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1f5964654bb0c2f19ff158b6ca312de4"></a>
-MatrixX3f&#160;</td><td class="memItemRight" valign="bottom"><b>source_nn</b></td></tr>
-<tr class="separator:a1f5964654bb0c2f19ff158b6ca312de4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d61876581eba25731926eb070d5a1fd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html">MNESourceSpace</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a3d61876581eba25731926eb070d5a1fd">src</a></td></tr>
+<tr class="separator:a3d61876581eba25731926eb070d5a1fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca622bbe1b6ff6d69834fbafd2ae69b5"><td class="memItemLeft" align="right" valign="top">MatrixX3d&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aca622bbe1b6ff6d69834fbafd2ae69b5">source_rr</a></td></tr>
+<tr class="separator:aca622bbe1b6ff6d69834fbafd2ae69b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0070dd5bda4063846fc7bbc9a7b132c2"><td class="memItemLeft" align="right" valign="top">MatrixX3d&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a0070dd5bda4063846fc7bbc9a7b132c2">source_nn</a></td></tr>
+<tr class="separator:a0070dd5bda4063846fc7bbc9a7b132c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a598a41eed229feb0ccd030ed17d77d7d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a598a41eed229feb0ccd030ed17d77d7d">isClustered</a></td></tr>
+<tr class="separator:a598a41eed229feb0ccd030ed17d77d7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The SourceSpace class provides. </p>
 <p>DECLARE CLASS SourceSpace </p>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00112">112</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00121">121</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a class="anchor" id="ac205e3b5d9a3fe1a455d3c45e30d7636"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef QSharedPointer&lt;const <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">MNEForwardSolution</a>&gt; <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ac205e3b5d9a3fe1a455d3c45e30d7636">MNELIB::MNEForwardSolution::ConstSPtr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Const shared pointer type for <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="The SourceSpace class provides.">MNEForwardSolution</a>. </p>
+
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00125">125</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a7e95a8381a0f621201981cd6a39ea25c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef QSharedPointer&lt;<a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">MNEForwardSolution</a>&gt; <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a7e95a8381a0f621201981cd6a39ea25c">MNELIB::MNEForwardSolution::SPtr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Shared pointer type for <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="The SourceSpace class provides.">MNEForwardSolution</a>. </p>
+
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00124">124</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a2de172fb859cda6d067d0e931c696fe2"></a>
 <div class="memitem">
 <div class="memproto">
@@ -171,18 +209,18 @@ MatrixX3f&#160;</td><td class="memItemRight" valign="bottom"><b>source_nn</b></t
 </div><div class="memdoc">
 <p>ctor </p>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00057">57</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00076">76</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a1289908ff5dba424ed9ae95c80b38c47"></a>
+<a class="anchor" id="a1fae3a16d80ecef955e86d6ab928f92c"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">MNEForwardSolution::MNEForwardSolution </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">MNEForwardSolution</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">MNEForwardSolution</a> *&#160;</td>
           <td class="paramname"><em>p_pMNEForwardSolution</em></td><td>)</td>
           <td></td>
         </tr>
@@ -190,7 +228,7 @@ MatrixX3f&#160;</td><td class="memItemRight" valign="bottom"><b>source_nn</b></t
 </div><div class="memdoc">
 <p>Copy ctor </p>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00075">75</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00095">95</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
 
 </div>
 </div>
@@ -208,60 +246,12 @@ MatrixX3f&#160;</td><td class="memItemRight" valign="bottom"><b>source_nn</b></t
 </div><div class="memdoc">
 <p>dtor </p>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00093">93</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00114">114</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="afb312e7470c29a6c0e94a302174cb811"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">SparseMatrix&lt; float &gt; MNEForwardSolution::make_block_diag </td>
-          <td>(</td>
-          <td class="paramtype">MatrixXf &amp;&#160;</td>
-          <td class="paramname"><em>A</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">qint32&#160;</td>
-          <td class="paramname"><em>n</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<h3><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> toolbox root function ###: Implementation of the mne_block_diag function - decoding part</h3>
-<h3><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> toolbox root function ###: Implementation of the mne_block_diag function - encoding part</h3>
-<p>Make a sparse block diagonal matrix</p>
-<p>Returns a sparse block diagonal, diagonalized from the elements in "A". "A" is ma x na, comprising bdn=(na/"n") blocks of submatrices. Each submatrix is ma x "n", and these submatrices are placed down the diagonal of the matrix.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">A</td><td>Matrix which should be diagonlized </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">n</td><td>Columns of the submatrices</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>A sparse block diagonal, diagonalized from the elements in "A". </dd></dl>
-
-<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00694">694</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a2ab526c5c49d9350eb6ee9fbd905fa9f"></a>
+<a class="anchor" id="a360551860b2ddd21c67855f100503f89"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -271,8 +261,8 @@ MatrixX3f&#160;</td><td class="memItemRight" valign="bottom"><b>source_nn</b></t
         <tr>
           <td class="memname">bool MNEForwardSolution::read_forward_solution </td>
           <td>(</td>
-          <td class="paramtype">QString &amp;&#160;</td>
-          <td class="paramname"><em>p_sFileName</em>, </td>
+          <td class="paramtype">QIODevice *&#160;</td>
+          <td class="paramname"><em>p_pIODevice</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -320,7 +310,7 @@ MatrixX3f&#160;</td><td class="memItemRight" valign="bottom"><b>source_nn</b></t
 <p>Reads a forward solution from a fif file</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_sFileName</td><td>The name of the fif file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pIODevice</td><td>A fiff IO device like a fiff QFile or QTCPSocket </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">fwd</td><td>A forward solution from a fif file </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">force_fixed</td><td>Force fixed source orientation mode? (optional) </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">surf_ori</td><td>Use surface based source coordinate system? (optional) </td></tr>
@@ -331,41 +321,173 @@ MatrixX3f&#160;</td><td class="memItemRight" valign="bottom"><b>source_nn</b></t
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00106">106</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00405">405</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ac99b19637d1b28c40b4ddd9b417bff57"></a>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a class="anchor" id="a8776126f2f4ec08939fb83a61a429348"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void MNEForwardSolution::transpose_named_matrix </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html">FiffNamedMatrix</a> *&amp;&#160;</td>
-          <td class="paramname"><em>mat</em></td><td>)</td>
-          <td></td>
+          <td class="memname">fiff_int_t MNELIB::MNEForwardSolution::coord_frame</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
-<h3><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> toolbox root function ###: Implementation of the mne_transpose_named_matrix function</h3>
-<p>Transpose a named matrix (FiffNamedMatrix)</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">mat</td><td>FiffNamedMatrix which shoul be transposed. </td></tr>
-  </table>
-  </dd>
-</dl>
+<p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00824">824</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00240">240</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a598a41eed229feb0ccd030ed17d77d7d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool MNELIB::MNEForwardSolution::isClustered</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Indicates whether fwd conatins a clustered forward solution. </p>
+
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00250">250</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a17bd236b46fd5cb7096a30df6d4f475d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html">FiffCoordTrans</a> MNELIB::MNEForwardSolution::mri_head_t</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>ToDo... </p>
+
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00245">245</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="adedb753633d161cdfa28a450ba64ca42"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">fiff_int_t MNELIB::MNEForwardSolution::nchan</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>ToDo... </p>
+
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00242">242</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a4bc383d90d8550cda0ad96cf0dfeb988"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">fiff_int_t MNELIB::MNEForwardSolution::nsource</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>ToDo... </p>
+
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00241">241</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a205f647b33f151f4d9d45233779a84a0"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html">FiffNamedMatrix</a> MNELIB::MNEForwardSolution::sol</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>ToDo... </p>
+
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00243">243</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a09e43a6ac3a8b4d02d05f633a4d9c449"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html">FiffNamedMatrix</a> MNELIB::MNEForwardSolution::sol_grad</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>ToDo... </p>
+
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00244">244</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a0070dd5bda4063846fc7bbc9a7b132c2"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">MatrixX3d MNELIB::MNEForwardSolution::source_nn</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>ToDo... </p>
+
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00248">248</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a1988a88297362b6b34b0318577ad162d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">fiff_int_t MNELIB::MNEForwardSolution::source_ori</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>ToDo... </p>
+
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00239">239</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aca622bbe1b6ff6d69834fbafd2ae69b5"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">MatrixX3d MNELIB::MNEForwardSolution::source_rr</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>ToDo... </p>
+
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00247">247</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a3d61876581eba25731926eb070d5a1fd"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html">MNESourceSpace</a> MNELIB::MNEForwardSolution::src</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>ToDo... </p>
+
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00246">246</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
 
 </div>
 </div>
@@ -376,7 +498,7 @@ MatrixX3f&#160;</td><td class="memItemRight" valign="bottom"><b>source_nn</b></t
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Oct 15 2012 18:50:57 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jan 9 2013 17:50:07 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

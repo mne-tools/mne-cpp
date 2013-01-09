@@ -70,7 +70,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -86,6 +86,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere-members.html">List of all members</a>  </div>
@@ -99,16 +100,25 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <p><code>#include &lt;<a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a02485b7553439c94d7b9347e15e70592"><td class="memItemLeft" align="right" valign="top">typedef QSharedPointer<br class="typebreak"/>
+&lt; <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a02485b7553439c94d7b9347e15e70592">SPtr</a></td></tr>
+<tr class="separator:a02485b7553439c94d7b9347e15e70592"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4350b9178df33c72619ae1331644b9e1"><td class="memItemLeft" align="right" valign="top">typedef QSharedPointer&lt; const <br class="typebreak"/>
+<a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a4350b9178df33c72619ae1331644b9e1">ConstSPtr</a></td></tr>
+<tr class="separator:a4350b9178df33c72619ae1331644b9e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a2db95fdb67898cbf094338028d01bb0c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a2db95fdb67898cbf094338028d01bb0c">MNEHemisphere</a> ()</td></tr>
 <tr class="separator:a2db95fdb67898cbf094338028d01bb0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8e7724411e7ad01ec7e5f462543af5ab"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a8e7724411e7ad01ec7e5f462543af5ab">MNEHemisphere</a> (<a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a> *p_pMNEHemisphere)</td></tr>
-<tr class="separator:a8e7724411e7ad01ec7e5f462543af5ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaacdd881c760f94f834da68329f08229"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aaacdd881c760f94f834da68329f08229">MNEHemisphere</a> (const <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a> *p_pMNEHemisphere)</td></tr>
+<tr class="separator:aaacdd881c760f94f834da68329f08229"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a29c61433931c07044af051a53a4f08c1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a29c61433931c07044af051a53a4f08c1">~MNEHemisphere</a> ()</td></tr>
 <tr class="separator:a29c61433931c07044af051a53a4f08c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0668a83d396e9b1b3d7ce63dd45e2bad"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a0668a83d396e9b1b3d7ce63dd45e2bad">transform_hemisphere_to</a> (fiff_int_t dest, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html">FiffCoordTrans</a> *trans)</td></tr>
-<tr class="separator:a0668a83d396e9b1b3d7ce63dd45e2bad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28dfa9032242a4f60364876c0a7ac63b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a28dfa9032242a4f60364876c0a7ac63b">transform_hemisphere_to</a> (fiff_int_t dest, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html">FiffCoordTrans</a> &amp;trans)</td></tr>
+<tr class="separator:a28dfa9032242a4f60364876c0a7ac63b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4bef2d6ba08b143eb452d16e2fd6d37d"><td class="memItemLeft" align="right" valign="top">MatrixXf *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a4bef2d6ba08b143eb452d16e2fd6d37d">getTriCoords</a> (float p_fScaling=1.0f)</td></tr>
 <tr class="separator:a4bef2d6ba08b143eb452d16e2fd6d37d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -122,10 +132,10 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a6a322c8dadb0d6e9f19b0065d859e297"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5890e89b80dd7631f4405ef68572e7d4"><td class="memItemLeft" align="right" valign="top">fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a5890e89b80dd7631f4405ef68572e7d4">coord_frame</a></td></tr>
 <tr class="separator:a5890e89b80dd7631f4405ef68572e7d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a676856c816596716661e000e0c7ec4d9"><td class="memItemLeft" align="right" valign="top">MatrixX3f&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a676856c816596716661e000e0c7ec4d9">rr</a></td></tr>
-<tr class="separator:a676856c816596716661e000e0c7ec4d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a92b928637b438f118a00c860e929ecae"><td class="memItemLeft" align="right" valign="top">MatrixX3f&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a92b928637b438f118a00c860e929ecae">nn</a></td></tr>
-<tr class="separator:a92b928637b438f118a00c860e929ecae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9efbc4bbd8c2d4efb8645fb4d1d68ae4"><td class="memItemLeft" align="right" valign="top">MatrixX3d&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a9efbc4bbd8c2d4efb8645fb4d1d68ae4">rr</a></td></tr>
+<tr class="separator:a9efbc4bbd8c2d4efb8645fb4d1d68ae4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a79f826f72f12b0b98c2ce44281201e28"><td class="memItemLeft" align="right" valign="top">MatrixX3d&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a79f826f72f12b0b98c2ce44281201e28">nn</a></td></tr>
+<tr class="separator:a79f826f72f12b0b98c2ce44281201e28"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab2084cf6ed3de33ef78ef11c0e6f83b6"><td class="memItemLeft" align="right" valign="top">MatrixX3i&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab2084cf6ed3de33ef78ef11c0e6f83b6">tris</a></td></tr>
 <tr class="separator:ab2084cf6ed3de33ef78ef11c0e6f83b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a433b5da63208d426f26317f7c0c236c8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a433b5da63208d426f26317f7c0c236c8"></a>
@@ -141,33 +151,68 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 <tr class="separator:ab9eb4c710479364bdd279dd7167257cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac5480868a444c31d040a123f926d537f"><td class="memItemLeft" align="right" valign="top">VectorXi&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ac5480868a444c31d040a123f926d537f">nearest</a></td></tr>
 <tr class="separator:ac5480868a444c31d040a123f926d537f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a131139897f551606c0f88b639851c485"><td class="memItemLeft" align="right" valign="top">VectorXf&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a131139897f551606c0f88b639851c485">nearest_dist</a></td></tr>
-<tr class="separator:a131139897f551606c0f88b639851c485"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf1380e5dffa62b3b3e4cdb44f0be303"><td class="memItemLeft" align="right" valign="top">VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aaf1380e5dffa62b3b3e4cdb44f0be303">nearest_dist</a></td></tr>
+<tr class="separator:aaf1380e5dffa62b3b3e4cdb44f0be303"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4abab64cbb6ff88af3b693a0b98d410d"><td class="memItemLeft" align="right" valign="top">QList&lt; VectorXi &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a4abab64cbb6ff88af3b693a0b98d410d">pinfo</a></td></tr>
 <tr class="separator:a4abab64cbb6ff88af3b693a0b98d410d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae7ab61927a9552e4f8f4004cb75218db"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ae7ab61927a9552e4f8f4004cb75218db">dist_limit</a></td></tr>
 <tr class="separator:ae7ab61927a9552e4f8f4004cb75218db"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a20501104849359fbba57bb97a6b12269"><td class="memItemLeft" align="right" valign="top">MatrixXf&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a20501104849359fbba57bb97a6b12269">dist</a></td></tr>
-<tr class="separator:a20501104849359fbba57bb97a6b12269"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a97a5bdf21c1a81358c17d3a7c49c42d3"><td class="memItemLeft" align="right" valign="top">MatrixX3f&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a97a5bdf21c1a81358c17d3a7c49c42d3">tri_cent</a></td></tr>
-<tr class="separator:a97a5bdf21c1a81358c17d3a7c49c42d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afc5f43df06bf061ef2a486ceb67177c0"><td class="memItemLeft" align="right" valign="top">MatrixX3f&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#afc5f43df06bf061ef2a486ceb67177c0">tri_nn</a></td></tr>
-<tr class="separator:afc5f43df06bf061ef2a486ceb67177c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae281be69d45e11f69f7f348d4365ba46"><td class="memItemLeft" align="right" valign="top">VectorXf&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ae281be69d45e11f69f7f348d4365ba46">tri_area</a></td></tr>
-<tr class="separator:ae281be69d45e11f69f7f348d4365ba46"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f34257307e3c2dc20c8be5c8ac9bdfa"><td class="memItemLeft" align="right" valign="top">MatrixX3f&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a0f34257307e3c2dc20c8be5c8ac9bdfa">use_tri_cent</a></td></tr>
-<tr class="separator:a0f34257307e3c2dc20c8be5c8ac9bdfa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aebac749d2b7474e60ff48ebb3e4a8f68"><td class="memItemLeft" align="right" valign="top">MatrixX3f&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aebac749d2b7474e60ff48ebb3e4a8f68">use_tri_nn</a></td></tr>
-<tr class="separator:aebac749d2b7474e60ff48ebb3e4a8f68"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a37a7d32f6ba59237d2af6a54607e1b6b"><td class="memItemLeft" align="right" valign="top">VectorXf&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a37a7d32f6ba59237d2af6a54607e1b6b">use_tri_area</a></td></tr>
-<tr class="separator:a37a7d32f6ba59237d2af6a54607e1b6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abdb66f07a304610e91f639fca39e4dbc"><td class="memItemLeft" align="right" valign="top">MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#abdb66f07a304610e91f639fca39e4dbc">dist</a></td></tr>
+<tr class="separator:abdb66f07a304610e91f639fca39e4dbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5630622faec837c17580af9509cc716f"><td class="memItemLeft" align="right" valign="top">MatrixX3d&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a5630622faec837c17580af9509cc716f">tri_cent</a></td></tr>
+<tr class="separator:a5630622faec837c17580af9509cc716f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a636e9d74c490eadb60e7fd3a828a74e9"><td class="memItemLeft" align="right" valign="top">MatrixX3d&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a636e9d74c490eadb60e7fd3a828a74e9">tri_nn</a></td></tr>
+<tr class="separator:a636e9d74c490eadb60e7fd3a828a74e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a139bc83d26deda30a6ac4663b9bac838"><td class="memItemLeft" align="right" valign="top">VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a139bc83d26deda30a6ac4663b9bac838">tri_area</a></td></tr>
+<tr class="separator:a139bc83d26deda30a6ac4663b9bac838"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abcdf7fdbdf1b74ca244853ad1eddd2c7"><td class="memItemLeft" align="right" valign="top">MatrixX3d&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#abcdf7fdbdf1b74ca244853ad1eddd2c7">use_tri_cent</a></td></tr>
+<tr class="separator:abcdf7fdbdf1b74ca244853ad1eddd2c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a553c07a84f09d208127e3208c02df639"><td class="memItemLeft" align="right" valign="top">MatrixX3d&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a553c07a84f09d208127e3208c02df639">use_tri_nn</a></td></tr>
+<tr class="separator:a553c07a84f09d208127e3208c02df639"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a20af1d147844772705c759ee287f4160"><td class="memItemLeft" align="right" valign="top">VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a20af1d147844772705c759ee287f4160">use_tri_area</a></td></tr>
+<tr class="separator:a20af1d147844772705c759ee287f4160"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9dc1c1e65425853fc558ac92cbe33306"><td class="memItemLeft" align="right" valign="top">QList&lt; VectorXi &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a9dc1c1e65425853fc558ac92cbe33306">cluster_vertnos</a></td></tr>
+<tr class="separator:a9dc1c1e65425853fc558ac92cbe33306"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2fc83d1ab0a0ac1c4be90c5ebef97f23"><td class="memItemLeft" align="right" valign="top">QList&lt; VectorXd &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a2fc83d1ab0a0ac1c4be90c5ebef97f23">cluster_distances</a></td></tr>
+<tr class="separator:a2fc83d1ab0a0ac1c4be90c5ebef97f23"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The SourceSpace class provides. </p>
 <p>DECLARE CLASS SourceSpace </p>
 
 <p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00103">103</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a class="anchor" id="a4350b9178df33c72619ae1331644b9e1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef QSharedPointer&lt;const <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a>&gt; <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a4350b9178df33c72619ae1331644b9e1">MNELIB::MNEHemisphere::ConstSPtr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Const shared pointer type for <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="The SourceSpace class provides.">MNEHemisphere</a>. </p>
+
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00107">107</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a02485b7553439c94d7b9347e15e70592"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef QSharedPointer&lt;<a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a>&gt; <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a02485b7553439c94d7b9347e15e70592">MNELIB::MNEHemisphere::SPtr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Shared pointer type for <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="The SourceSpace class provides.">MNEHemisphere</a>. </p>
+
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00106">106</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a2db95fdb67898cbf094338028d01bb0c"></a>
 <div class="memitem">
 <div class="memproto">
@@ -186,14 +231,14 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 
 </div>
 </div>
-<a class="anchor" id="a8e7724411e7ad01ec7e5f462543af5ab"></a>
+<a class="anchor" id="aaacdd881c760f94f834da68329f08229"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">MNEHemisphere::MNEHemisphere </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a> *&#160;</td>
           <td class="paramname"><em>p_pMNEHemisphere</em></td><td>)</td>
           <td></td>
         </tr>
@@ -219,7 +264,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>dtor </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8cpp_source.html#l00122">122</a> of file <a class="el" href="mne__hemisphere_8cpp_source.html">mne_hemisphere.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8cpp_source.html#l00124">124</a> of file <a class="el" href="mne__hemisphere_8cpp_source.html">mne_hemisphere.cpp</a>.</p>
 
 </div>
 </div>
@@ -239,11 +284,11 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>Qt 3d geometry information. Data are generated within first call. </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8cpp_source.html#l00169">169</a> of file <a class="el" href="mne__hemisphere_8cpp_source.html">mne_hemisphere.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8cpp_source.html#l00168">168</a> of file <a class="el" href="mne__hemisphere_8cpp_source.html">mne_hemisphere.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a0668a83d396e9b1b3d7ce63dd45e2bad"></a>
+<a class="anchor" id="a28dfa9032242a4f60364876c0a7ac63b"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -256,7 +301,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html">FiffCoordTrans</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html">FiffCoordTrans</a> &amp;&#160;</td>
           <td class="paramname"><em>trans</em>&#160;</td>
         </tr>
         <tr>
@@ -268,11 +313,41 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>Implementation of the mne_transform_source_space_to for a single hemisphere function </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8cpp_source.html#l00136">136</a> of file <a class="el" href="mne__hemisphere_8cpp_source.html">mne_hemisphere.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8cpp_source.html#l00135">135</a> of file <a class="el" href="mne__hemisphere_8cpp_source.html">mne_hemisphere.cpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
+<a class="anchor" id="a2fc83d1ab0a0ac1c4be90c5ebef97f23"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QList&lt;VectorXd&gt; MNELIB::MNEHemisphere::cluster_distances</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Distances to clusters centroid. </p>
+
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00175">175</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a9dc1c1e65425853fc558ac92cbe33306"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QList&lt;VectorXi&gt; MNELIB::MNEHemisphere::cluster_vertnos</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Only used within clustered forward solutions </p>
+
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00174">174</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a5890e89b80dd7631f4405ef68572e7d4"></a>
 <div class="memitem">
 <div class="memproto">
@@ -282,24 +357,24 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The... </p>
+<p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00146">146</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00150">150</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a20501104849359fbba57bb97a6b12269"></a>
+<a class="anchor" id="abdb66f07a304610e91f639fca39e4dbc"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">MatrixXf MNELIB::MNEHemisphere::dist</td>
+          <td class="memname">MatrixXd MNELIB::MNEHemisphere::dist</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The... </p>
+<p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00159">159</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00163">163</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -312,9 +387,9 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The... </p>
+<p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00158">158</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00162">162</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -327,9 +402,9 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Qt 3d geometry information. Data are generated within first call.The ID of ... </p>
+<p>Qt 3d geometry information. Data are generated within first call.ID of ... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00143">143</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00147">147</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -342,9 +417,9 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The... </p>
+<p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00151">151</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00155">155</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -357,39 +432,39 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The... </p>
+<p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00155">155</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00159">159</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a131139897f551606c0f88b639851c485"></a>
+<a class="anchor" id="aaf1380e5dffa62b3b3e4cdb44f0be303"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">VectorXf MNELIB::MNEHemisphere::nearest_dist</td>
+          <td class="memname">VectorXd MNELIB::MNEHemisphere::nearest_dist</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The... </p>
+<p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00156">156</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00160">160</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a92b928637b438f118a00c860e929ecae"></a>
+<a class="anchor" id="a79f826f72f12b0b98c2ce44281201e28"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">MatrixX3f MNELIB::MNEHemisphere::nn</td>
+          <td class="memname">MatrixX3d MNELIB::MNEHemisphere::nn</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The... </p>
+<p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00148">148</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00152">152</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -402,9 +477,9 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The... </p>
+<p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00144">144</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00148">148</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -417,9 +492,9 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The... </p>
+<p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00145">145</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00149">149</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -432,9 +507,9 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The... </p>
+<p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00153">153</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00157">157</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -447,69 +522,69 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The... </p>
-
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00157">157</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a676856c816596716661e000e0c7ec4d9"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">MatrixX3f MNELIB::MNEHemisphere::rr</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>The... </p>
-
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00147">147</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ae281be69d45e11f69f7f348d4365ba46"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VectorXf MNELIB::MNEHemisphere::tri_area</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>The... </p>
-
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00162">162</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a97a5bdf21c1a81358c17d3a7c49c42d3"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">MatrixX3f MNELIB::MNEHemisphere::tri_cent</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>The... </p>
-
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00160">160</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="afc5f43df06bf061ef2a486ceb67177c0"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">MatrixX3f MNELIB::MNEHemisphere::tri_nn</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>The... </p>
+<p>ToDo... </p>
 
 <p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00161">161</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a9efbc4bbd8c2d4efb8645fb4d1d68ae4"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">MatrixX3d MNELIB::MNEHemisphere::rr</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>ToDo... </p>
+
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00151">151</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a139bc83d26deda30a6ac4663b9bac838"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">VectorXd MNELIB::MNEHemisphere::tri_area</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>ToDo... </p>
+
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00166">166</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a5630622faec837c17580af9509cc716f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">MatrixX3d MNELIB::MNEHemisphere::tri_cent</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>ToDo... </p>
+
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00164">164</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a636e9d74c490eadb60e7fd3a828a74e9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">MatrixX3d MNELIB::MNEHemisphere::tri_nn</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>ToDo... </p>
+
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00165">165</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -522,54 +597,54 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The... </p>
+<p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00149">149</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00153">153</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a37a7d32f6ba59237d2af6a54607e1b6b"></a>
+<a class="anchor" id="a20af1d147844772705c759ee287f4160"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">VectorXf MNELIB::MNEHemisphere::use_tri_area</td>
+          <td class="memname">VectorXd MNELIB::MNEHemisphere::use_tri_area</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The... </p>
+<p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00165">165</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00169">169</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a0f34257307e3c2dc20c8be5c8ac9bdfa"></a>
+<a class="anchor" id="abcdf7fdbdf1b74ca244853ad1eddd2c7"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">MatrixX3f MNELIB::MNEHemisphere::use_tri_cent</td>
+          <td class="memname">MatrixX3d MNELIB::MNEHemisphere::use_tri_cent</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The... </p>
+<p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00163">163</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00167">167</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="aebac749d2b7474e60ff48ebb3e4a8f68"></a>
+<a class="anchor" id="a553c07a84f09d208127e3208c02df639"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">MatrixX3f MNELIB::MNEHemisphere::use_tri_nn</td>
+          <td class="memname">MatrixX3d MNELIB::MNEHemisphere::use_tri_nn</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The... </p>
+<p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00164">164</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00168">168</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -582,9 +657,9 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The... </p>
+<p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00154">154</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00158">158</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -597,9 +672,9 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The... </p>
+<p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00152">152</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00156">156</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -610,7 +685,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Oct 15 2012 18:50:57 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jan 9 2013 17:50:07 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

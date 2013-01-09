@@ -32,6 +32,7 @@
 
 #include <QThread>
 #include <QMutex>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -71,6 +72,9 @@ class INVRTSHARED_EXPORT InvRt : public QThread
 {
     Q_OBJECT
 public:
+    typedef QSharedPointer<InvRt> SPtr;             /**< Shared pointer type for InvRt. */
+    typedef QSharedPointer<const InvRt> ConstSPtr;  /**< Const shared pointer type for InvRt. */
+
     explicit InvRt(FiffInfo** p_ppFiffInfo, MNEForwardSolution* p_pFwd, QObject *parent = 0);
 
     //=========================================================================================================

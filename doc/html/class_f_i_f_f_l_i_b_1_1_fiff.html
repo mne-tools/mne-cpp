@@ -70,7 +70,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -103,87 +103,93 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a897e94c38f4685fd74f2543ace9c2213"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a897e94c38f4685fd74f2543ace9c2213">~Fiff</a> ()</td></tr>
 <tr class="separator:a897e94c38f4685fd74f2543ace9c2213"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a62fd1746738ccc51d61c016e5f6d2d58"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a62fd1746738ccc51d61c016e5f6d2d58">end_block</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, fiff_int_t kind)</td></tr>
-<tr class="separator:a62fd1746738ccc51d61c016e5f6d2d58"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a31f2e83ff8c7fcfefbdd247acdd3cf8a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a31f2e83ff8c7fcfefbdd247acdd3cf8a">end_file</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile)</td></tr>
-<tr class="separator:a31f2e83ff8c7fcfefbdd247acdd3cf8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a851de614a99c6dc752fc04c9ba031bad"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a851de614a99c6dc752fc04c9ba031bad">finish_writing_raw</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile)</td></tr>
-<tr class="separator:a851de614a99c6dc752fc04c9ba031bad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a4b1bb8942075c33c2f14b894aafb3c10"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a4b1bb8942075c33c2f14b894aafb3c10">copy_tree</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *fidin, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html">FiffId</a> &amp;in_id, QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> * &gt; &amp;nodes, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *fidout)</td></tr>
-<tr class="separator:a4b1bb8942075c33c2f14b894aafb3c10"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeb74ee8c4cc96a998c8bcbc31316a9d6"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#aeb74ee8c4cc96a998c8bcbc31316a9d6">copy_tree</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStreamIn, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html">FiffId</a> &amp;in_id, QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> * &gt; &amp;nodes, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStreamOut)</td></tr>
+<tr class="separator:aeb74ee8c4cc96a998c8bcbc31316a9d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf5fdbeca3cbb7e2bd7be5d62d175e37"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#aaf5fdbeca3cbb7e2bd7be5d62d175e37">end_block</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, fiff_int_t kind)</td></tr>
+<tr class="separator:aaf5fdbeca3cbb7e2bd7be5d62d175e37"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a694dadabbf0b775d91b5a0477ddc3f98"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a694dadabbf0b775d91b5a0477ddc3f98">end_file</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream)</td></tr>
+<tr class="separator:a694dadabbf0b775d91b5a0477ddc3f98"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab17e3ba59898a0b74b62ce8416450495"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#ab17e3ba59898a0b74b62ce8416450495">finish_writing_raw</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream)</td></tr>
+<tr class="separator:ab17e3ba59898a0b74b62ce8416450495"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae7163b1c6de9c9b1d3bc1ddd8e07c54b"><td class="memItemLeft" align="right" valign="top">static QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#ae7163b1c6de9c9b1d3bc1ddd8e07c54b">dir_tree_find</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *tree, fiff_int_t kind)</td></tr>
 <tr class="separator:ae7163b1c6de9c9b1d3bc1ddd8e07c54b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1af55497cb97a24e81b002202c6592fd"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a1af55497cb97a24e81b002202c6592fd">invert_transform</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html">FiffCoordTrans</a> *p_pTransform)</td></tr>
-<tr class="separator:a1af55497cb97a24e81b002202c6592fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a32f5ee090d2c5fb3f639d624b520e833"><td class="memItemLeft" align="right" valign="top">static qint32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a32f5ee090d2c5fb3f639d624b520e833">make_dir_tree</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_entry.html">FiffDirEntry</a> &gt; *p_pDir, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *&amp;p_pTree, qint32 start=0)</td></tr>
-<tr class="separator:a32f5ee090d2c5fb3f639d624b520e833"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa20496c57326eb62ddec472f74a50ee2"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#aa20496c57326eb62ddec472f74a50ee2">open</a> (QString &amp;p_sFileName, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&amp;p_pFile, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *&amp;p_pTree, QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_entry.html">FiffDirEntry</a> &gt; *&amp;p_pDir)</td></tr>
-<tr class="separator:aa20496c57326eb62ddec472f74a50ee2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af93dc648e4b14ff0fe28e5e5a9067324"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#af93dc648e4b14ff0fe28e5e5a9067324">invert_transform</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html">FiffCoordTrans</a> &amp;p_Transform)</td></tr>
+<tr class="separator:af93dc648e4b14ff0fe28e5e5a9067324"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a88423e8bf89fa77ad890574e11d0c54e"><td class="memItemLeft" align="right" valign="top">static qint32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a88423e8bf89fa77ad890574e11d0c54e">make_dir_tree</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_entry.html">FiffDirEntry</a> &gt; *p_pDir, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *&amp;p_pTree, qint32 start=0)</td></tr>
+<tr class="separator:a88423e8bf89fa77ad890574e11d0c54e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:accff9308aa026617f582bb0e8a1d802b"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#accff9308aa026617f582bb0e8a1d802b">open</a> (QIODevice *p_pIODevice, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&amp;p_pStream, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *&amp;p_pTree, QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_entry.html">FiffDirEntry</a> &gt; *&amp;p_pDir)</td></tr>
+<tr class="separator:accff9308aa026617f582bb0e8a1d802b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abaa02f5dc8bae8c7be0a82546b835341"><td class="memItemLeft" align="right" valign="top">static MatrixXi&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#abaa02f5dc8bae8c7be0a82546b835341">pick_channels</a> (QStringList &amp;ch_names, QStringList &amp;include=defaultQStringList, QStringList &amp;exclude=defaultQStringList)</td></tr>
 <tr class="separator:abaa02f5dc8bae8c7be0a82546b835341"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab41f6d954296f811f692ef25544c1d1"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html">FiffEvokedDataSet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#aab41f6d954296f811f692ef25544c1d1">pick_channels_evoked</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html">FiffEvokedDataSet</a> &amp;orig, QStringList &amp;include=defaultQStringList, QStringList &amp;exclude=defaultQStringList)</td></tr>
+<tr class="separator:aab41f6d954296f811f692ef25544c1d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ff2c6690219c1612a3c6b0f3f265cc1"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a4ff2c6690219c1612a3c6b0f3f265cc1">pick_info</a> (const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> *info, const MatrixXi *sel=NULL)</td></tr>
+<tr class="separator:a4ff2c6690219c1612a3c6b0f3f265cc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8d477e72b315f950d37cd41456b0d584"><td class="memItemLeft" align="right" valign="top">static MatrixXi&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a8d477e72b315f950d37cd41456b0d584">pick_types</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> *info, bool meg, bool eeg=false, bool stim=false, QStringList &amp;include=defaultQStringList, QStringList &amp;exclude=defaultQStringList)</td></tr>
 <tr class="separator:a8d477e72b315f950d37cd41456b0d584"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0693c785b8cb5e370288fd3ce9158fc5"><td class="memItemLeft" align="right" valign="top">static QStringList&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a0693c785b8cb5e370288fd3ce9158fc5">read_bad_channels</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *p_pTree)</td></tr>
-<tr class="separator:a0693c785b8cb5e370288fd3ce9158fc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae0029ccd7bcde6cdb6c5f2d6c1bbd59b"><td class="memItemLeft" align="right" valign="top">static QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html">FiffCtfComp</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#ae0029ccd7bcde6cdb6c5f2d6c1bbd59b">read_ctf_comp</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *p_pNode, QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html">FiffChInfo</a> &gt; &amp;chs)</td></tr>
-<tr class="separator:ae0029ccd7bcde6cdb6c5f2d6c1bbd59b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6bfb47e60dc3698d3b0198e1026a7ed1"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a6bfb47e60dc3698d3b0198e1026a7ed1">read_meas_info</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *p_pTree, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> *&amp;info)</td></tr>
-<tr class="separator:a6bfb47e60dc3698d3b0198e1026a7ed1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2a6375a66f71b7cf9c32305e9e80b890"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a2a6375a66f71b7cf9c32305e9e80b890">read_named_matrix</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *node, fiff_int_t matkind, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html">FiffNamedMatrix</a> *&amp;mat)</td></tr>
-<tr class="separator:a2a6375a66f71b7cf9c32305e9e80b890"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a018748655e9b9564b120b420f810b4a4"><td class="memItemLeft" align="right" valign="top">static QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html">FiffProj</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a018748655e9b9564b120b420f810b4a4">read_proj</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *p_pNode)</td></tr>
-<tr class="separator:a018748655e9b9564b120b420f810b4a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6f5201d122edd6c128c85ac0ce952678"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a6f5201d122edd6c128c85ac0ce952678">read_raw_segment</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html">FiffRawData</a> *raw, MatrixXf *&amp;data, MatrixXf *&amp;times, fiff_int_t from=-1, fiff_int_t to=-1, MatrixXi sel=defaultMatrixXi)</td></tr>
-<tr class="separator:a6f5201d122edd6c128c85ac0ce952678"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac7387ee20dd0c0da78f010e1742bb03d"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#ac7387ee20dd0c0da78f010e1742bb03d">read_tag</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html">FiffTag</a> *&amp;p_pTag, qint64 pos=-1)</td></tr>
-<tr class="separator:ac7387ee20dd0c0da78f010e1742bb03d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a28b6641f99d421519f25ef38ceaef5fc"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a28b6641f99d421519f25ef38ceaef5fc">read_tag_info</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html">FiffTag</a> *&amp;p_pTag)</td></tr>
-<tr class="separator:a28b6641f99d421519f25ef38ceaef5fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6bf2613ce8623d0eff6df138a71bb2e9"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a6bf2613ce8623d0eff6df138a71bb2e9">setup_read_raw</a> (QString t_sFileName, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html">FiffRawData</a> *&amp;data, bool allow_maxshield=false)</td></tr>
-<tr class="separator:a6bf2613ce8623d0eff6df138a71bb2e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4166c1407f658b972f91d42fcd289119"><td class="memItemLeft" align="right" valign="top">static QStringList&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a4166c1407f658b972f91d42fcd289119">read_bad_channels</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *p_pTree)</td></tr>
+<tr class="separator:a4166c1407f658b972f91d42fcd289119"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab4e46bdcca5b1c340fc7a57c1687e8c4"><td class="memItemLeft" align="right" valign="top">static QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html">FiffCtfComp</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#ab4e46bdcca5b1c340fc7a57c1687e8c4">read_ctf_comp</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *p_pTree, QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html">FiffChInfo</a> &gt; &amp;chs)</td></tr>
+<tr class="separator:ab4e46bdcca5b1c340fc7a57c1687e8c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed1466db166fee1d54e9e077f474a615"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#aed1466db166fee1d54e9e077f474a615">read_evoked</a> (QIODevice &amp;p_IODevice, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html">FiffEvokedDataSet</a> &amp;data, fiff_int_t setno=0)</td></tr>
+<tr class="separator:aed1466db166fee1d54e9e077f474a615"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a691e51924ee46f2e502c2a175a195d58"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a691e51924ee46f2e502c2a175a195d58">read_meas_info</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *p_pTree, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> &amp;info)</td></tr>
+<tr class="separator:a691e51924ee46f2e502c2a175a195d58"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65f281cccb94b529e2e8c7a49bb48f2e"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a65f281cccb94b529e2e8c7a49bb48f2e">read_named_matrix</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *node, fiff_int_t matkind, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html">FiffNamedMatrix</a> &amp;mat)</td></tr>
+<tr class="separator:a65f281cccb94b529e2e8c7a49bb48f2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a62e3b51a678608989a38fd805a217a42"><td class="memItemLeft" align="right" valign="top">static QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html">FiffProj</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a62e3b51a678608989a38fd805a217a42">read_proj</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *p_pNode)</td></tr>
+<tr class="separator:a62e3b51a678608989a38fd805a217a42"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ca22cc249d2de3a06f5cf99fbac5e11"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a8ca22cc249d2de3a06f5cf99fbac5e11">read_raw_segment</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html">FiffRawData</a> &amp;raw, MatrixXd &amp;data, MatrixXd &amp;times, fiff_int_t from=-1, fiff_int_t to=-1, MatrixXi sel=defaultMatrixXi)</td></tr>
+<tr class="separator:a8ca22cc249d2de3a06f5cf99fbac5e11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af546b2f83959d5095036a2c3407539bd"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#af546b2f83959d5095036a2c3407539bd">read_tag</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html">FiffTag</a> *&amp;p_pTag, qint64 pos=-1)</td></tr>
+<tr class="separator:af546b2f83959d5095036a2c3407539bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f476db8a93647c6a1aa995727758e79"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a8f476db8a93647c6a1aa995727758e79">read_tag_info</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html">FiffTag</a> *&amp;p_pTag)</td></tr>
+<tr class="separator:a8f476db8a93647c6a1aa995727758e79"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ffb928b0e467e1ae24998dd2d35881f"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a1ffb928b0e467e1ae24998dd2d35881f">setup_read_raw</a> (QIODevice *p_pIODevice, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html">FiffRawData</a> &amp;data, bool allow_maxshield=false)</td></tr>
+<tr class="separator:a1ffb928b0e467e1ae24998dd2d35881f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae603cccb2820e101900377a2c74ba2bb"><td class="memItemLeft" align="right" valign="top">static QStringList&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#ae603cccb2820e101900377a2c74ba2bb">split_name_list</a> (QString p_sNameList)</td></tr>
 <tr class="separator:ae603cccb2820e101900377a2c74ba2bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a10ae01c50e0ba2e31492085652dd8ce4"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a10ae01c50e0ba2e31492085652dd8ce4">start_block</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, fiff_int_t kind)</td></tr>
-<tr class="separator:a10ae01c50e0ba2e31492085652dd8ce4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3f5a0c2e734df239af53be0b3883168e"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a3f5a0c2e734df239af53be0b3883168e">start_file</a> (QString &amp;p_sFileName)</td></tr>
-<tr class="separator:a3f5a0c2e734df239af53be0b3883168e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afdb3c73bc2cce60e1ed996f30a45751a"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#afdb3c73bc2cce60e1ed996f30a45751a">start_writing_raw</a> (QString &amp;p_sFileName, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> *info, MatrixXf *&amp;cals, MatrixXi sel=defaultFileMatrixXi)</td></tr>
-<tr class="separator:afdb3c73bc2cce60e1ed996f30a45751a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afa47ba1c9d60abe846c27625ee3c0c2d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#afa47ba1c9d60abe846c27625ee3c0c2d">write_ch_info</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html">FiffChInfo</a> *ch)</td></tr>
-<tr class="separator:afa47ba1c9d60abe846c27625ee3c0c2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4b1aad192da1308251e77c4429696ea1"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a4b1aad192da1308251e77c4429696ea1">write_coord_trans</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html">FiffCoordTrans</a> &amp;trans)</td></tr>
-<tr class="separator:a4b1aad192da1308251e77c4429696ea1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a152b91cfafec2168ec3bda7a40664d0c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a152b91cfafec2168ec3bda7a40664d0c">write_ctf_comp</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html">FiffCtfComp</a> * &gt; &amp;comps)</td></tr>
-<tr class="separator:a152b91cfafec2168ec3bda7a40664d0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f0b026a207077a019f27ec5f67d38ca"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a0f0b026a207077a019f27ec5f67d38ca">write_dig_point</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dig_point.html">FiffDigPoint</a> &amp;dig)</td></tr>
-<tr class="separator:a0f0b026a207077a019f27ec5f67d38ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aef3b19082f25a87b0c6a191c5cbfc832"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#aef3b19082f25a87b0c6a191c5cbfc832">write_id</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, fiff_int_t kind, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html">FiffId</a> &amp;id=defaultFiffId)</td></tr>
-<tr class="separator:aef3b19082f25a87b0c6a191c5cbfc832"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4893401a96fc0515b9c2841637f462d7"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a4893401a96fc0515b9c2841637f462d7">write_int</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, fiff_int_t kind, fiff_int_t *data, fiff_int_t nel=1)</td></tr>
-<tr class="separator:a4893401a96fc0515b9c2841637f462d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afece1d4252d830ce30b6f47c0618068e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#afece1d4252d830ce30b6f47c0618068e">write_float</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, fiff_int_t kind, float *data, fiff_int_t nel=1)</td></tr>
-<tr class="separator:afece1d4252d830ce30b6f47c0618068e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaaaf5650ce035f7d149fae651f13568f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#aaaaf5650ce035f7d149fae651f13568f">write_float_matrix</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, fiff_int_t kind, MatrixXf &amp;mat)</td></tr>
-<tr class="separator:aaaaf5650ce035f7d149fae651f13568f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a01f5992594d14ea8b39017bb59b7d443"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a01f5992594d14ea8b39017bb59b7d443">write_name_list</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, fiff_int_t kind, QStringList &amp;data)</td></tr>
-<tr class="separator:a01f5992594d14ea8b39017bb59b7d443"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a711766e9f62d73eb57cf4c56ebd1f859"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a711766e9f62d73eb57cf4c56ebd1f859">write_named_matrix</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, fiff_int_t kind, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html">FiffNamedMatrix</a> *mat)</td></tr>
-<tr class="separator:a711766e9f62d73eb57cf4c56ebd1f859"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a174c73876a24ac48ec125d933600ee70"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a174c73876a24ac48ec125d933600ee70">write_proj</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html">FiffProj</a> * &gt; &amp;projs)</td></tr>
-<tr class="separator:a174c73876a24ac48ec125d933600ee70"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab3a5f637a7b7781001a48f08884a13d6"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#ab3a5f637a7b7781001a48f08884a13d6">write_raw_buffer</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, MatrixXf *buf, MatrixXf *cals)</td></tr>
-<tr class="separator:ab3a5f637a7b7781001a48f08884a13d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abf3f9c7cdaa7226b3395f0e4ecb3e768"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#abf3f9c7cdaa7226b3395f0e4ecb3e768">write_string</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *p_pFile, fiff_int_t kind, QString &amp;data)</td></tr>
-<tr class="separator:abf3f9c7cdaa7226b3395f0e4ecb3e768"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b362545638c9d2321fca83b0ed96be6"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a7b362545638c9d2321fca83b0ed96be6">start_block</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, fiff_int_t kind)</td></tr>
+<tr class="separator:a7b362545638c9d2321fca83b0ed96be6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f5004b9ab5a4ceb3fc0bfa4836bfdfa"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a3f5004b9ab5a4ceb3fc0bfa4836bfdfa">start_file</a> (QIODevice *p_pIODevice)</td></tr>
+<tr class="separator:a3f5004b9ab5a4ceb3fc0bfa4836bfdfa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b9222b77231864a645a46cc29b386dc"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a7b9222b77231864a645a46cc29b386dc">start_writing_raw</a> (QIODevice *p_pIODevice, const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> &amp;info, MatrixXd &amp;cals, MatrixXi sel=defaultMatrixXi)</td></tr>
+<tr class="separator:a7b9222b77231864a645a46cc29b386dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7dfe787844197531fdf3d9ee02f429d9"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a7dfe787844197531fdf3d9ee02f429d9">write_ch_info</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html">FiffChInfo</a> *ch)</td></tr>
+<tr class="separator:a7dfe787844197531fdf3d9ee02f429d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abad6a754240320a2c47af07fd6554de3"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#abad6a754240320a2c47af07fd6554de3">write_coord_trans</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html">FiffCoordTrans</a> &amp;trans)</td></tr>
+<tr class="separator:abad6a754240320a2c47af07fd6554de3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a22adea6b594ea39881ba89d6ff5d1c22"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a22adea6b594ea39881ba89d6ff5d1c22">write_ctf_comp</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html">FiffCtfComp</a> &gt; &amp;comps)</td></tr>
+<tr class="separator:a22adea6b594ea39881ba89d6ff5d1c22"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5442f3a87f87d60973c5af51892601b9"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a5442f3a87f87d60973c5af51892601b9">write_dig_point</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dig_point.html">FiffDigPoint</a> &amp;dig)</td></tr>
+<tr class="separator:a5442f3a87f87d60973c5af51892601b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a43d13759a0005db836ea880fb330c3fb"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a43d13759a0005db836ea880fb330c3fb">write_id</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, fiff_int_t kind, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html">FiffId</a> &amp;id=defaultFiffId)</td></tr>
+<tr class="separator:a43d13759a0005db836ea880fb330c3fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a711b2041b15df5fe9bb7de803259c5e4"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a711b2041b15df5fe9bb7de803259c5e4">write_int</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, fiff_int_t kind, fiff_int_t *data, fiff_int_t nel=1)</td></tr>
+<tr class="separator:a711b2041b15df5fe9bb7de803259c5e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29a520458199590a7cb3b7666df60abc"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a29a520458199590a7cb3b7666df60abc">write_float</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, fiff_int_t kind, float *data, fiff_int_t nel=1)</td></tr>
+<tr class="separator:a29a520458199590a7cb3b7666df60abc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae7562650d60e67f027a9f3ad9581f01e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#ae7562650d60e67f027a9f3ad9581f01e">write_float_matrix</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, fiff_int_t kind, MatrixXd &amp;mat)</td></tr>
+<tr class="separator:ae7562650d60e67f027a9f3ad9581f01e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aacf760057d881ed3329b23737aecfcdd"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#aacf760057d881ed3329b23737aecfcdd">write_name_list</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, fiff_int_t kind, QStringList &amp;data)</td></tr>
+<tr class="separator:aacf760057d881ed3329b23737aecfcdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3551fe5314591bb21c8ee856ac413659"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a3551fe5314591bb21c8ee856ac413659">write_named_matrix</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, fiff_int_t kind, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html">FiffNamedMatrix</a> &amp;mat)</td></tr>
+<tr class="separator:a3551fe5314591bb21c8ee856ac413659"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8785b70f07b5a3bccfc63f919b656cae"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a8785b70f07b5a3bccfc63f919b656cae">write_proj</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html">FiffProj</a> &gt; &amp;projs)</td></tr>
+<tr class="separator:a8785b70f07b5a3bccfc63f919b656cae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7fa12132a6a36c381f25b0926c4245e1"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a7fa12132a6a36c381f25b0926c4245e1">write_raw_buffer</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, const MatrixXd &amp;buf, const MatrixXd &amp;cals)</td></tr>
+<tr class="separator:a7fa12132a6a36c381f25b0926c4245e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb52897f63614e65fd940db2af97b74c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#afb52897f63614e65fd940db2af97b74c">write_string</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, fiff_int_t kind, QString &amp;data)</td></tr>
+<tr class="separator:afb52897f63614e65fd940db2af97b74c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html" title="The Fiff class provides static wrapper functions to stay consistent with mne matlab toolbox Note: avo...">Fiff</a> class provides static wrapper functions to stay consistent with mne matlab toolbox Note: avoid using the wrappers, prefer the wrapped methods! </p>
 <p>DECLARE CLASS <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html" title="The Fiff class provides static wrapper functions to stay consistent with mne matlab toolbox Note: avo...">Fiff</a> </p>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00115">115</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00116">116</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a897e94c38f4685fd74f2543ace9c2213"></a>
 <div class="memitem">
@@ -207,12 +213,12 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>dtor </p>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00122">122</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00123">123</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a4b1bb8942075c33c2f14b894aafb3c10"></a>
+<a class="anchor" id="aeb74ee8c4cc96a998c8bcbc31316a9d6"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -222,8 +228,8 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">static bool FIFFLIB::Fiff::copy_tree </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>fidin</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStreamIn</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -240,8 +246,8 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>fidout</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStreamOut</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -257,20 +263,20 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_copy_tree</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a542e9c1dc1505de4ae66f6932695951a">FiffDirTree::copy_tree</a> function</p>
+<p>Wrapper for the static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#abc3cc8b2ab1897b35d4b28e09e85bdb0">FiffDirTree::copy_tree</a> function</p>
 <p>Copies directory subtrees from fidin to fidout</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fidin</td><td>fiff file to copy from </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStreamIn</td><td>fiff file to copy from </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">in_id</td><td>file id description </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">nodes</td><td>subtree directories to be copied </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">fidout</td><td>fiff file to write to</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStreamOut</td><td>fiff file to write to</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00142">142</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00143">143</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -322,7 +328,7 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a62fd1746738ccc51d61c016e5f6d2d58"></a>
+<a class="anchor" id="aaf5fdbeca3cbb7e2bd7be5d62d175e37"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -330,10 +336,10 @@ Static Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void FIFFLIB::Fiff::end_block </td>
+          <td class="memname">static void FIFFLIB::Fiff::end_block </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -349,27 +355,27 @@ Static Public Member Functions</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 <p>fiff_end_block</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a> end_block member function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a> end_block member function</p>
 <p>Writes a FIFF_BLOCK_END tag</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>the opened fiff file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>the opened fiff file </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">kind</td><td>The block kind to end </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00160">160</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00161">161</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a31f2e83ff8c7fcfefbdd247acdd3cf8a"></a>
+<a class="anchor" id="a694dadabbf0b775d91b5a0477ddc3f98"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -377,35 +383,35 @@ Static Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void FIFFLIB::Fiff::end_file </td>
+          <td class="memname">static void FIFFLIB::Fiff::end_file </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStream</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 <p>fiff_end_file</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a> end_file member function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a> end_file member function</p>
 <p>Writes the closing tags to a fif file and closes the file</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>the opened fiff file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>the opened fiff file </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00177">177</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00178">178</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a851de614a99c6dc752fc04c9ba031bad"></a>
+<a class="anchor" id="ab17e3ba59898a0b74b62ce8416450495"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -413,35 +419,35 @@ Static Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void FIFFLIB::Fiff::finish_writing_raw </td>
+          <td class="memname">static void FIFFLIB::Fiff::finish_writing_raw </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStream</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 <p>fiff_finish_writing_raw</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a> finish_writing_raw member function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a> finish_writing_raw member function</p>
 <p>Finishes a raw file by writing all necessary end tags.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>the opened fiff file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>the opened fiff file </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00194">194</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00195">195</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a1af55497cb97a24e81b002202c6592fd"></a>
+<a class="anchor" id="af93dc648e4b14ff0fe28e5e5a9067324"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -451,8 +457,8 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">static bool FIFFLIB::Fiff::invert_transform </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html">FiffCoordTrans</a> *&#160;</td>
-          <td class="paramname"><em>p_pTransform</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html">FiffCoordTrans</a> &amp;&#160;</td>
+          <td class="paramname"><em>p_Transform</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -464,7 +470,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_invert_transform</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#afc1b8e7d1f6c5b9819124670b85446bc">FiffCoordTrans::invert_transform</a> function</p>
+<p>Wrapper for the static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a4a258913a8b23cb3c05858449ff25370">FiffCoordTrans::invert_transform</a> function</p>
 <p>Invert a coordinate transformation</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -478,7 +484,7 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a32f5ee090d2c5fb3f639d624b520e833"></a>
+<a class="anchor" id="a88423e8bf89fa77ad890574e11d0c54e"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -488,8 +494,8 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">static qint32 FIFFLIB::Fiff::make_dir_tree </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -526,7 +532,7 @@ Static Public Member Functions</h2></td></tr>
 <p>Wrapper for the FiffCoordTrans::make_dir_tree static function</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>the opened fiff file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>the opened fiff file </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">p_pDir</td><td>the dir entries of which the tree should be constructed </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">p_pTree</td><td>the created dir tree </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">start</td><td>dir entry to start (optional, by default 0)</td></tr>
@@ -539,7 +545,7 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="aa20496c57326eb62ddec472f74a50ee2"></a>
+<a class="anchor" id="accff9308aa026617f582bb0e8a1d802b"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -549,14 +555,14 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">static bool FIFFLIB::Fiff::open </td>
           <td>(</td>
-          <td class="paramtype">QString &amp;&#160;</td>
-          <td class="paramname"><em>p_sFileName</em>, </td>
+          <td class="paramtype">QIODevice *&#160;</td>
+          <td class="paramname"><em>p_pIODevice</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&amp;&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&amp;&#160;</td>
+          <td class="paramname"><em>p_pStream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -584,12 +590,12 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_open</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a> open member function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a> open member function</p>
 <p>Opens a fif file and provides the directory of tags</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_sFileName</td><td>file name of the file to open </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">p_pFile</td><td>file which is openened </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_sIODevice</td><td>A fiff IO device like a fiff QFile or QTCPSocket </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">p_pStream</td><td>file which is openened </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">p_pTree</td><td>tag directory organized into a tree </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">p_pDir</td><td>the sequential tag directory</td></tr>
   </table>
@@ -653,6 +659,109 @@ Static Public Member Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>the selector matrix (row Vector) </dd></dl>
 
 <p>Definition at line <a class="el" href="fiff_8h_source.html#l00301">301</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aab41f6d954296f811f692ef25544c1d1"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html">FiffEvokedDataSet</a> FIFFLIB::Fiff::pick_channels_evoked </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html">FiffEvokedDataSet</a> &amp;&#160;</td>
+          <td class="paramname"><em>orig</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QStringList &amp;&#160;</td>
+          <td class="paramname"><em>include</em> = <code>defaultQStringList</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QStringList &amp;&#160;</td>
+          <td class="paramname"><em>exclude</em> = <code>defaultQStringList</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>fiff_pick_channels_evoked</p>
+<h3>MNE toolbox root function</h3>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html" title="evoked data">FiffEvokedDataSet</a> pick_channels_evoked member function</p>
+<p>Pick desired channels from evoked-response data</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">orig</td><td>The original data </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">include</td><td>- Channels to include (if empty, include all available) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">exclude</td><td>- Channels to exclude (if empty, do not exclude any)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the desired fiff evoked data set </dd></dl>
+
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00322">322</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a4ff2c6690219c1612a3c6b0f3f265cc1"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> FIFFLIB::Fiff::pick_info </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> *&#160;</td>
+          <td class="paramname"><em>info</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const MatrixXi *&#160;</td>
+          <td class="paramname"><em>sel</em> = <code>NULL</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>fiff_pick_info</p>
+<h3>MNE toolbox root function</h3>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a> pick_info member function</p>
+<p>Pick desired channels from measurement info</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">info</td><td>The original data </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">sel</td><td>List of channels to select</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Info modified according to sel </dd></dl>
+
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00342">342</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -728,11 +837,11 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the selector matrix (row vector) </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00325">325</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00366">366</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a0693c785b8cb5e370288fd3ce9158fc5"></a>
+<a class="anchor" id="a4166c1407f658b972f91d42fcd289119"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -742,8 +851,8 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">static QStringList FIFFLIB::Fiff::read_bad_channels </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -765,22 +874,22 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_read_bad_channels</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a> read_bad_channels member function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a> read_bad_channels member function</p>
 <p>Reads the bad channel list from a node if it exists</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>The opened fif file to read from </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>The opened fif file to read from </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">p_pTree</td><td>The node of interest</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the bad channel list </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00345">345</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00386">386</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ae0029ccd7bcde6cdb6c5f2d6c1bbd59b"></a>
+<a class="anchor" id="ab4e46bdcca5b1c340fc7a57c1687e8c4"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -788,16 +897,16 @@ Static Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static QList&lt;<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html">FiffCtfComp</a>*&gt; FIFFLIB::Fiff::read_ctf_comp </td>
+          <td class="memname">static QList&lt;<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html">FiffCtfComp</a>&gt; FIFFLIB::Fiff::read_ctf_comp </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *&#160;</td>
-          <td class="paramname"><em>p_pNode</em>, </td>
+          <td class="paramname"><em>p_pTree</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -819,11 +928,11 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_read_ctf_comp</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a> read_ctf_comp member function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a> read_ctf_comp member function</p>
 <p>Read the CTF software compensation data from the given node</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>The opened fif file to read from </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>The opened fif file to read from </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">p_pTree</td><td>The node of interest </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">chs</td><td>channels with the calibration info</td></tr>
   </table>
@@ -831,11 +940,66 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the CTF software compensation data </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00366">366</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00407">407</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a6bfb47e60dc3698d3b0198e1026a7ed1"></a>
+<a class="anchor" id="aed1466db166fee1d54e9e077f474a615"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool FIFFLIB::Fiff::read_evoked </td>
+          <td>(</td>
+          <td class="paramtype">QIODevice &amp;&#160;</td>
+          <td class="paramname"><em>p_IODevice</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html">FiffEvokedDataSet</a> &amp;&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">fiff_int_t&#160;</td>
+          <td class="paramname"><em>setno</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>fiff_read_evoked</p>
+<h3>MNE toolbox root function</h3>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html#a5b15f35b63c1771e315f3e55488a92bc">FiffEvokedDataSet::read_evoked</a> static function</p>
+<p>Read one evoked data set</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pIODevice</td><td>A fiff IO device like a fiff QFile or QTCPSocket </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">data</td><td>The read evoked data </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">setno</td><td>the set to pick</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the CTF software compensation data </dd></dl>
+
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00428">428</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a691e51924ee46f2e502c2a175a195d58"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -845,8 +1009,8 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a>* FIFFLIB::Fiff::read_meas_info </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -857,7 +1021,7 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> *&amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> &amp;&#160;</td>
           <td class="paramname"><em>info</em>&#160;</td>
         </tr>
         <tr>
@@ -874,11 +1038,11 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_read_meas_info</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a> read_meas_info member function</p>
-<p>Read the measurement info Source is assumed to be an open fiff file.</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a> read_meas_info member function</p>
+<p>Read the measurement info Source is assumed to be an open fiff stream.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>The opened fif file to read from </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>The opened fiff stream to read from </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">p_pTree</td><td>The node of interest </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">info</td><td>the read measurement info</td></tr>
   </table>
@@ -886,11 +1050,11 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the to measurement corresponding fiff_dir_tree. </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00388">388</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00450">450</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a2a6375a66f71b7cf9c32305e9e80b890"></a>
+<a class="anchor" id="a65f281cccb94b529e2e8c7a49bb48f2e"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -900,8 +1064,8 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">static bool FIFFLIB::Fiff::read_named_matrix </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -918,7 +1082,7 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html">FiffNamedMatrix</a> *&amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html">FiffNamedMatrix</a> &amp;&#160;</td>
           <td class="paramname"><em>mat</em>&#160;</td>
         </tr>
         <tr>
@@ -935,11 +1099,11 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_read_named_matrix</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a> read_named_matrix member function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a> read_named_matrix member function</p>
 <p>Reads a named matrix.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>The opened fif file to read from </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>The opened fif file to read from </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">node</td><td>The node of interest </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">matkind</td><td>The matrix kind to look for </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">mat</td><td>The named matrix</td></tr>
@@ -948,11 +1112,11 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00410">410</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00472">472</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a018748655e9b9564b120b420f810b4a4"></a>
+<a class="anchor" id="a62e3b51a678608989a38fd805a217a42"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -960,10 +1124,10 @@ Static Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static QList&lt;<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html">FiffProj</a>*&gt; FIFFLIB::Fiff::read_proj </td>
+          <td class="memname">static QList&lt;<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html">FiffProj</a>&gt; FIFFLIB::Fiff::read_proj </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -986,14 +1150,21 @@ Static Public Member Functions</h2></td></tr>
 <h3>MNE toolbox root function</h3>
 <p>[ projdata ] = fiff_read_proj(fid,node)</p>
 <p>Read the SSP data under a given directory node</p>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a> read_proj member function</p>
-<p>ToDo </p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a> read_proj member function</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>The opened fif file to read from </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">node</td><td>The node of interest</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a list of SSP projectors </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00427">427</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00492">492</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a6f5201d122edd6c128c85ac0ce952678"></a>
+<a class="anchor" id="a8ca22cc249d2de3a06f5cf99fbac5e11"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1003,19 +1174,19 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">static bool FIFFLIB::Fiff::read_raw_segment </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html">FiffRawData</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html">FiffRawData</a> &amp;&#160;</td>
           <td class="paramname"><em>raw</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">MatrixXf *&amp;&#160;</td>
+          <td class="paramtype">MatrixXd &amp;&#160;</td>
           <td class="paramname"><em>data</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">MatrixXf *&amp;&#160;</td>
+          <td class="paramtype">MatrixXd &amp;&#160;</td>
           <td class="paramname"><em>times</em>, </td>
         </tr>
         <tr>
@@ -1065,11 +1236,11 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00451">451</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00516">516</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ac7387ee20dd0c0da78f010e1742bb03d"></a>
+<a class="anchor" id="af546b2f83959d5095036a2c3407539bd"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1079,8 +1250,8 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">static bool FIFFLIB::Fiff::read_tag </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1108,11 +1279,11 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_read_tag</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#ab85fd00cd7c1a21a6fc021d2a2908c6c">FiffTag::read_tag</a> function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a8de4b8d5dec25923cef3b3a7915e3ed7">FiffTag::read_tag</a> function</p>
 <p>Read one tag from a fif file. if pos is not provided, reading starts from the current file position</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>opened fif file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>opened fif file </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">p_pTag</td><td>the read tag </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">pos</td><td>position of the tag inside the fif file</td></tr>
   </table>
@@ -1120,11 +1291,11 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00473">473</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00538">538</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a28b6641f99d421519f25ef38ceaef5fc"></a>
+<a class="anchor" id="a8f476db8a93647c6a1aa995727758e79"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1134,8 +1305,8 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">static bool FIFFLIB::Fiff::read_tag_info </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1157,22 +1328,22 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_read_tag_info</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a5a423ff14368979ed09adb4763ba53ff">FiffTag::read_tag_info</a> function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a1532742e40d744e5140e8a32df51d0a5">FiffTag::read_tag_info</a> function</p>
 <p>Read tag information of one tag from a fif file. if pos is not provided, reading starts from the current file position</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>opened fif file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>opened fif file </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">p_pTag</td><td>the read tag info</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00494">494</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00559">559</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a6bf2613ce8623d0eff6df138a71bb2e9"></a>
+<a class="anchor" id="a1ffb928b0e467e1ae24998dd2d35881f"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1182,13 +1353,13 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">static bool FIFFLIB::Fiff::setup_read_raw </td>
           <td>(</td>
-          <td class="paramtype">QString&#160;</td>
-          <td class="paramname"><em>t_sFileName</em>, </td>
+          <td class="paramtype">QIODevice *&#160;</td>
+          <td class="paramname"><em>p_pIODevice</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html">FiffRawData</a> *&amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html">FiffRawData</a> &amp;&#160;</td>
           <td class="paramname"><em>data</em>, </td>
         </tr>
         <tr>
@@ -1211,11 +1382,11 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_setup_read_raw</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html#a50e8878aca971407d852fb2a0d81a31d">FiffFile::setup_read_raw</a> static function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#af6ca3c97ea1f8ff0dac73cde04d4957a">FiffStream::setup_read_raw</a> static function</p>
 <p>Read information about raw data file</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">t_sFileName</td><td>Name of the file to read </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pIODevice</td><td>A fiff IO device like a fiff QFile or QTCPSocket </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">data</td><td>The raw data information - contains the opened fiff file </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">allow_maxshield</td><td>Accept unprocessed MaxShield data</td></tr>
   </table>
@@ -1223,7 +1394,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00515">515</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00580">580</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -1250,7 +1421,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_split_name_list</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ad700c42e7c3966fe8005994e06e65667">FiffDirTree::split_name_list</a> static function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#ab076b66501112d4767df3465badf24c1">FiffStream::split_name_list</a> static function</p>
 <p>Splits a string by looking for seperator ":"</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -1260,11 +1431,11 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the splitted string list </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00534">534</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00599">599</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a10ae01c50e0ba2e31492085652dd8ce4"></a>
+<a class="anchor" id="a7b362545638c9d2321fca83b0ed96be6"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1274,8 +1445,8 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">static void FIFFLIB::Fiff::start_block </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1297,21 +1468,21 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_start_block</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a> start_block member function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a> start_block member function</p>
 <p>Writes a FIFF_BLOCK_START tag</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>An open fif file to write to </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>An open fif file to write to </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">kind</td><td>The block kind to start </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00552">552</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00617">617</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a3f5a0c2e734df239af53be0b3883168e"></a>
+<a class="anchor" id="a3f5004b9ab5a4ceb3fc0bfa4836bfdfa"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1319,10 +1490,10 @@ Static Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a>* FIFFLIB::Fiff::start_file </td>
+          <td class="memname">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a>* FIFFLIB::Fiff::start_file </td>
           <td>(</td>
-          <td class="paramtype">QString &amp;&#160;</td>
-          <td class="paramname"><em>p_sFileName</em></td><td>)</td>
+          <td class="paramtype">QIODevice *&#160;</td>
+          <td class="paramname"><em>p_pIODevice</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -1334,21 +1505,21 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_start_file</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html#a4c1ad10e3cd04ee26fc1cd4d2d9118c4">FiffFile::start_file</a> static function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a3b21512402afb9e30283a1566103276f">FiffStream::start_file</a> static function</p>
 <p>Opens a fiff file for writing and writes the compulsory header tags</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">name</td><td>The name of the file to open. It is recommended that the name ends with .fif</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pIODevice</td><td>A fiff IO device like a fiff QFile or QTCPSocket</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The opened file. </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00571">571</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00636">636</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="afdb3c73bc2cce60e1ed996f30a45751a"></a>
+<a class="anchor" id="a7b9222b77231864a645a46cc29b386dc"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1356,28 +1527,28 @@ Static Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a>* FIFFLIB::Fiff::start_writing_raw </td>
+          <td class="memname">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a>* FIFFLIB::Fiff::start_writing_raw </td>
           <td>(</td>
-          <td class="paramtype">QString &amp;&#160;</td>
-          <td class="paramname"><em>p_sFileName</em>, </td>
+          <td class="paramtype">QIODevice *&#160;</td>
+          <td class="paramname"><em>p_pIODevice</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> &amp;&#160;</td>
           <td class="paramname"><em>info</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">MatrixXf *&amp;&#160;</td>
+          <td class="paramtype">MatrixXd &amp;&#160;</td>
           <td class="paramname"><em>cals</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">MatrixXi&#160;</td>
-          <td class="paramname"><em>sel</em> = <code>defaultFileMatrixXi</code>&#160;</td>
+          <td class="paramname"><em>sel</em> = <code>defaultMatrixXi</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1393,11 +1564,11 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_start_writing_raw</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html#a896698ace813817aa9b4ec334abdebad">FiffFile::start_writing_raw</a> static function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a7fc96d71e2c8da37be3b0bb43edde003">FiffStream::start_writing_raw</a> static function</p>
 <p>function [fid,cals] = fiff_start_writing_raw(name,info,sel)</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_sFileName</td><td>filename </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pIODevice</td><td>A fiff IO device like a fiff QFile or QTCPSocket </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">info</td><td>The measurement info block of the source file </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">cals</td><td>Thecalibration matrix </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">sel</td><td>Which channels will be included in the output file (optional)</td></tr>
@@ -1406,11 +1577,11 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the started fiff file </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00593">593</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00658">658</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="afa47ba1c9d60abe846c27625ee3c0c2d"></a>
+<a class="anchor" id="a7dfe787844197531fdf3d9ee02f429d9"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1420,8 +1591,8 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">static void FIFFLIB::Fiff::write_ch_info </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1443,21 +1614,21 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_write_ch_info</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a> write_ch_info member function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a> write_ch_info member function</p>
 <p>Writes a channel information record to a fif file The type, cal, unit, and pos members are explained in Table 9.5 of the MNE manual</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>An open fif file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>An open fif file </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">ch</td><td>The channel information structure to write </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00613">613</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00678">678</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a4b1aad192da1308251e77c4429696ea1"></a>
+<a class="anchor" id="abad6a754240320a2c47af07fd6554de3"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1467,8 +1638,8 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">static void FIFFLIB::Fiff::write_coord_trans </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1490,21 +1661,21 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_write_coord_trans</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a> write_coord_trans member function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a> write_coord_trans member function</p>
 <p>Writes a coordinate transformation structure</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>An open fif file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>An open fif file </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">trans</td><td>The coordinate transfomation structure </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00631">631</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00696">696</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a152b91cfafec2168ec3bda7a40664d0c"></a>
+<a class="anchor" id="a22adea6b594ea39881ba89d6ff5d1c22"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1514,13 +1685,13 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">static void FIFFLIB::Fiff::write_ctf_comp </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html">FiffCtfComp</a> * &gt; &amp;&#160;</td>
+          <td class="paramtype">QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html">FiffCtfComp</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>comps</em>&#160;</td>
         </tr>
         <tr>
@@ -1537,21 +1708,21 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_write_ctf_comp</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a> write_ctf_comp member function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a> write_ctf_comp member function</p>
 <p>Writes the CTF compensation data into a fif file</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>An open fif file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>An open fif file </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">comps</td><td>The compensation data to write </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00649">649</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00714">714</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a0f0b026a207077a019f27ec5f67d38ca"></a>
+<a class="anchor" id="a5442f3a87f87d60973c5af51892601b9"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1561,8 +1732,8 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">static void FIFFLIB::Fiff::write_dig_point </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1584,21 +1755,21 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_write_dig_point</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a> write_dig_point member function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a> write_dig_point member function</p>
 <p>Writes a digitizer data point into a fif file</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>An open fif file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>An open fif file </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">dig</td><td>The point to write </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00667">667</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00732">732</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="afece1d4252d830ce30b6f47c0618068e"></a>
+<a class="anchor" id="a29a520458199590a7cb3b7666df60abc"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1608,8 +1779,8 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">static void FIFFLIB::Fiff::write_float </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1643,11 +1814,11 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_write_float</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a> write_float member function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a> write_float member function</p>
 <p>Writes a single-precision floating point tag to a fif file</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>An open fif file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>An open fif file </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">kind</td><td>Tag kind </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The float data pointer </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">nel</td><td>Number of floats to write (default = 1) </td></tr>
@@ -1655,11 +1826,11 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00727">727</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00792">792</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="aaaaf5650ce035f7d149fae651f13568f"></a>
+<a class="anchor" id="ae7562650d60e67f027a9f3ad9581f01e"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1669,8 +1840,8 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">static void FIFFLIB::Fiff::write_float_matrix </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1681,7 +1852,7 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">MatrixXf &amp;&#160;</td>
+          <td class="paramtype">MatrixXd &amp;&#160;</td>
           <td class="paramname"><em>mat</em>&#160;</td>
         </tr>
         <tr>
@@ -1698,22 +1869,22 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_write_float_matrix</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a> write_float_matrix member function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a> write_float_matrix member function</p>
 <p>Writes a single-precision floating-point matrix tag</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>An open fif file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>An open fif file </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">kind</td><td>The tag kind </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">mat</td><td>The data matrix </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00746">746</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00811">811</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="aef3b19082f25a87b0c6a191c5cbfc832"></a>
+<a class="anchor" id="a43d13759a0005db836ea880fb330c3fb"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1723,8 +1894,8 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">static void FIFFLIB::Fiff::write_id </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1752,22 +1923,22 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_write_id</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a> write_id member function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a> write_id member function</p>
 <p>Writes fiff id If the id argument is missing it will be generated here</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>An open fif file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>An open fif file </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">kind</td><td>The tag kind </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">id</td><td>The id to write </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00687">687</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00752">752</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a4893401a96fc0515b9c2841637f462d7"></a>
+<a class="anchor" id="a711b2041b15df5fe9bb7de803259c5e4"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1777,8 +1948,8 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">static void FIFFLIB::Fiff::write_int </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1812,11 +1983,11 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_write_int</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a> write_int member function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a> write_int member function</p>
 <p>Writes a 32-bit integer tag to a fif file</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>An open fif file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>An open fif file </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">kind</td><td>Tag kind </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The integer data pointer </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">nel</td><td>Number of integers to write (default = 1) </td></tr>
@@ -1824,11 +1995,11 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00707">707</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00772">772</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a01f5992594d14ea8b39017bb59b7d443"></a>
+<a class="anchor" id="aacf760057d881ed3329b23737aecfcdd"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1838,8 +2009,8 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">static void FIFFLIB::Fiff::write_name_list </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1867,22 +2038,22 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_write_name_list</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a> write_name_list member function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a> write_name_list member function</p>
 <p>Writes a colon-separated list of names</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>An open fif file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>An open fif file </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">kind</td><td>The tag kind </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>An array of names to create the list from </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00765">765</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00830">830</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a711766e9f62d73eb57cf4c56ebd1f859"></a>
+<a class="anchor" id="a3551fe5314591bb21c8ee856ac413659"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1892,8 +2063,8 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">static void FIFFLIB::Fiff::write_named_matrix </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1904,7 +2075,7 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html">FiffNamedMatrix</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html">FiffNamedMatrix</a> &amp;&#160;</td>
           <td class="paramname"><em>mat</em>&#160;</td>
         </tr>
         <tr>
@@ -1921,22 +2092,22 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_write_named_matrix</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a> write_named_matrix member function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a> write_named_matrix member function</p>
 <p>Writes a named single-precision floating-point matrix</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>An open fif file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>An open fif file </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">kind</td><td>The tag kind to use for the data </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The data matrix </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00784">784</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00849">849</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a174c73876a24ac48ec125d933600ee70"></a>
+<a class="anchor" id="a8785b70f07b5a3bccfc63f919b656cae"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1946,13 +2117,13 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">static void FIFFLIB::Fiff::write_proj </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html">FiffProj</a> * &gt; &amp;&#160;</td>
+          <td class="paramtype">QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html">FiffProj</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>projs</em>&#160;</td>
         </tr>
         <tr>
@@ -1969,21 +2140,21 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_write_proj</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a> write_proj member function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a> write_proj member function</p>
 <p>Writes the projection data into a fif file</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>An open fif file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>An open fif file </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">projs</td><td>The compensation data to write </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00802">802</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00867">867</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ab3a5f637a7b7781001a48f08884a13d6"></a>
+<a class="anchor" id="a7fa12132a6a36c381f25b0926c4245e1"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1993,19 +2164,19 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">static bool FIFFLIB::Fiff::write_raw_buffer </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">MatrixXf *&#160;</td>
+          <td class="paramtype">const MatrixXd &amp;&#160;</td>
           <td class="paramname"><em>buf</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">MatrixXf *&#160;</td>
+          <td class="paramtype">const MatrixXd &amp;&#160;</td>
           <td class="paramname"><em>cals</em>&#160;</td>
         </tr>
         <tr>
@@ -2022,11 +2193,11 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_write_raw_buffer</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a> write_raw_buffer member function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a> write_raw_buffer member function</p>
 <p>Writes a raw buffer.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>An open fif file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>An open fif file </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">buf</td><td>the buffer to write </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">cals</td><td>calibration factors</td></tr>
   </table>
@@ -2034,11 +2205,11 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00823">823</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00888">888</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="abf3f9c7cdaa7226b3395f0e4ecb3e768"></a>
+<a class="anchor" id="afb52897f63614e65fd940db2af97b74c"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -2048,8 +2219,8 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">static void FIFFLIB::Fiff::write_string </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td>
+          <td class="paramname"><em>p_pStream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -2077,18 +2248,18 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_write_string</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a> write_string member function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a> write_string member function</p>
 <p>Writes a string tag</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>An open fif file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>An open fif file </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">kind</td><td>The tag kind </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The string data to write </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00842">842</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00907">907</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -2098,7 +2269,7 @@ Static Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Oct 15 2012 18:50:57 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jan 9 2013 17:50:07 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

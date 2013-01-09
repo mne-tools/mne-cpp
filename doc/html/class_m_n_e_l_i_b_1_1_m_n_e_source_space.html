@@ -70,7 +70,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -86,6 +86,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
@@ -100,38 +101,78 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <p><code>#include &lt;<a class="el" href="mne__sourcespace_8h_source.html">mne_sourcespace.h</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:ada0354e381b1d4ca00189ed577b32fcb"><td class="memItemLeft" align="right" valign="top">typedef QSharedPointer<br class="typebreak"/>
+&lt; <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html">MNESourceSpace</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#ada0354e381b1d4ca00189ed577b32fcb">SPtr</a></td></tr>
+<tr class="separator:ada0354e381b1d4ca00189ed577b32fcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a57ee055409f6763551ce3193248e2664"><td class="memItemLeft" align="right" valign="top">typedef QSharedPointer&lt; const <br class="typebreak"/>
+<a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html">MNESourceSpace</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a57ee055409f6763551ce3193248e2664">ConstSPtr</a></td></tr>
+<tr class="separator:a57ee055409f6763551ce3193248e2664"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a973304d2448b348bbd8f7c67b045c5b8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a973304d2448b348bbd8f7c67b045c5b8">MNESourceSpace</a> ()</td></tr>
 <tr class="separator:a973304d2448b348bbd8f7c67b045c5b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6fa7c58014fad0197e41093115348d09"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a6fa7c58014fad0197e41093115348d09">MNESourceSpace</a> (<a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html">MNESourceSpace</a> *p_pMNESourceSpace)</td></tr>
-<tr class="separator:a6fa7c58014fad0197e41093115348d09"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4322ecb627167f0eb213f3100e3029f5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a4322ecb627167f0eb213f3100e3029f5">MNESourceSpace</a> (const <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html">MNESourceSpace</a> *p_pMNESourceSpace)</td></tr>
+<tr class="separator:a4322ecb627167f0eb213f3100e3029f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2dcc53eec782e14a65530db6195ec629"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a2dcc53eec782e14a65530db6195ec629">~MNESourceSpace</a> ()</td></tr>
 <tr class="separator:a2dcc53eec782e14a65530db6195ec629"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab6edd0ccf2a7aa3855b0c0281e48049b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#ab6edd0ccf2a7aa3855b0c0281e48049b">transform_source_space_to</a> (fiff_int_t dest, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html">FiffCoordTrans</a> *trans)</td></tr>
-<tr class="separator:ab6edd0ccf2a7aa3855b0c0281e48049b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a38654bb9875091c2cb5a04e2531653d7"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a38654bb9875091c2cb5a04e2531653d7">transform_source_space_to</a> (fiff_int_t dest, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html">FiffCoordTrans</a> &amp;trans)</td></tr>
+<tr class="separator:a38654bb9875091c2cb5a04e2531653d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a73b850bc44b6c1903e5fdac82f9e5189"><td class="memItemLeft" align="right" valign="top">static qint32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a73b850bc44b6c1903e5fdac82f9e5189">find_source_space_hemi</a> (<a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a> *p_pHemisphere)</td></tr>
-<tr class="separator:a73b850bc44b6c1903e5fdac82f9e5189"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f8b00c1ed22ac6d76b5bb94771f37ab"><td class="memItemLeft" align="right" valign="top">static qint32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a2f8b00c1ed22ac6d76b5bb94771f37ab">find_source_space_hemi</a> (<a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a> &amp;p_Hemisphere)</td></tr>
+<tr class="separator:a2f8b00c1ed22ac6d76b5bb94771f37ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af0d09b5ec4c55b41ad33ceaabe8f86f6"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#af0d09b5ec4c55b41ad33ceaabe8f86f6">patch_info</a> (VectorXi &amp;nearest, QList&lt; VectorXi &gt; &amp;pinfo)</td></tr>
 <tr class="separator:af0d09b5ec4c55b41ad33ceaabe8f86f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a01139bcddbfdd83ddf6265e7f05ee349"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a01139bcddbfdd83ddf6265e7f05ee349">read_source_spaces</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&amp;p_pFile, bool add_geom, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *&amp;p_pTree, <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html">MNESourceSpace</a> *&amp;p_pSourceSpace)</td></tr>
-<tr class="separator:a01139bcddbfdd83ddf6265e7f05ee349"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36abb1c252e8ba9caf78a21adc27de44"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a36abb1c252e8ba9caf78a21adc27de44">read_source_spaces</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&amp;p_pStream, bool add_geom, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> *&amp;p_pTree, <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html">MNESourceSpace</a> &amp;p_SourceSpace)</td></tr>
+<tr class="separator:a36abb1c252e8ba9caf78a21adc27de44"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a4cfcd792f457bd16f961bf59e1cb2ae2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4cfcd792f457bd16f961bf59e1cb2ae2"></a>
-QList&lt; <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>hemispheres</b></td></tr>
-<tr class="separator:a4cfcd792f457bd16f961bf59e1cb2ae2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9fc15a02c68b375d0194fc364370336e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9fc15a02c68b375d0194fc364370336e"></a>
+QList&lt; <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>hemispheres</b></td></tr>
+<tr class="separator:a9fc15a02c68b375d0194fc364370336e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The SourceSpace class provides. </p>
 <p>DECLARE CLASS SourceSpace </p>
 
 <p>Definition at line <a class="el" href="mne__sourcespace_8h_source.html#l00111">111</a> of file <a class="el" href="mne__sourcespace_8h_source.html">mne_sourcespace.h</a>.</p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a class="anchor" id="a57ee055409f6763551ce3193248e2664"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef QSharedPointer&lt;const <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html">MNESourceSpace</a>&gt; <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a57ee055409f6763551ce3193248e2664">MNELIB::MNESourceSpace::ConstSPtr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Const shared pointer type for <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html" title="The SourceSpace class provides.">MNESourceSpace</a>. </p>
+
+<p>Definition at line <a class="el" href="mne__sourcespace_8h_source.html#l00115">115</a> of file <a class="el" href="mne__sourcespace_8h_source.html">mne_sourcespace.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ada0354e381b1d4ca00189ed577b32fcb"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef QSharedPointer&lt;<a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html">MNESourceSpace</a>&gt; <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#ada0354e381b1d4ca00189ed577b32fcb">MNELIB::MNESourceSpace::SPtr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Shared pointer type for <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html" title="The SourceSpace class provides.">MNESourceSpace</a>. </p>
+
+<p>Definition at line <a class="el" href="mne__sourcespace_8h_source.html#l00114">114</a> of file <a class="el" href="mne__sourcespace_8h_source.html">mne_sourcespace.h</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a973304d2448b348bbd8f7c67b045c5b8"></a>
 <div class="memitem">
 <div class="memproto">
@@ -150,14 +191,14 @@ QList&lt; <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHe
 
 </div>
 </div>
-<a class="anchor" id="a6fa7c58014fad0197e41093115348d09"></a>
+<a class="anchor" id="a4322ecb627167f0eb213f3100e3029f5"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">MNESourceSpace::MNESourceSpace </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html">MNESourceSpace</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html">MNESourceSpace</a> *&#160;</td>
           <td class="paramname"><em>p_pMNESourceSpace</em></td><td>)</td>
           <td></td>
         </tr>
@@ -188,7 +229,7 @@ QList&lt; <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHe
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a73b850bc44b6c1903e5fdac82f9e5189"></a>
+<a class="anchor" id="a2f8b00c1ed22ac6d76b5bb94771f37ab"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -198,8 +239,8 @@ QList&lt; <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHe
         <tr>
           <td class="memname">qint32 MNESourceSpace::find_source_space_hemi </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a> *&#160;</td>
-          <td class="paramname"><em>p_pHemisphere</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a> &amp;&#160;</td>
+          <td class="paramname"><em>p_Hemisphere</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -219,7 +260,7 @@ QList&lt; <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHe
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the deduced hemisphere id </dd></dl>
 
-<p>Definition at line <a class="el" href="mne__sourcespace_8cpp_source.html#l00146">146</a> of file <a class="el" href="mne__sourcespace_8cpp_source.html">mne_sourcespace.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__sourcespace_8cpp_source.html#l00147">147</a> of file <a class="el" href="mne__sourcespace_8cpp_source.html">mne_sourcespace.cpp</a>.</p>
 
 </div>
 </div>
@@ -265,11 +306,11 @@ QList&lt; <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHe
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="mne__sourcespace_8cpp_source.html#l00426">426</a> of file <a class="el" href="mne__sourcespace_8cpp_source.html">mne_sourcespace.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__sourcespace_8cpp_source.html#l00423">423</a> of file <a class="el" href="mne__sourcespace_8cpp_source.html">mne_sourcespace.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a01139bcddbfdd83ddf6265e7f05ee349"></a>
+<a class="anchor" id="a36abb1c252e8ba9caf78a21adc27de44"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -279,8 +320,8 @@ QList&lt; <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHe
         <tr>
           <td class="memname">bool MNESourceSpace::read_source_spaces </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&amp;&#160;</td>
-          <td class="paramname"><em>p_pFile</em>, </td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&amp;&#160;</td>
+          <td class="paramname"><em>p_pStream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -297,8 +338,8 @@ QList&lt; <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHe
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html">MNESourceSpace</a> *&amp;&#160;</td>
-          <td class="paramname"><em>p_pSourceSpace</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html">MNESourceSpace</a> &amp;&#160;</td>
+          <td class="paramname"><em>p_SourceSpace</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -316,7 +357,7 @@ QList&lt; <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHe
 <p>Reads source spaces from a fif file</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pFile</td><td>The opened fif file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>The opened fif file </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">add_geom</td><td>Add geometry information to the source spaces </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">p_pTree</td><td>Search for the source spaces here </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">p_pSourceSpace</td><td>the read source spaces</td></tr>
@@ -325,16 +366,16 @@ QList&lt; <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHe
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="mne__sourcespace_8cpp_source.html#l00084">84</a> of file <a class="el" href="mne__sourcespace_8cpp_source.html">mne_sourcespace.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__sourcespace_8cpp_source.html#l00083">83</a> of file <a class="el" href="mne__sourcespace_8cpp_source.html">mne_sourcespace.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ab6edd0ccf2a7aa3855b0c0281e48049b"></a>
+<a class="anchor" id="a38654bb9875091c2cb5a04e2531653d7"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void MNESourceSpace::transform_source_space_to </td>
+          <td class="memname">bool MNESourceSpace::transform_source_space_to </td>
           <td>(</td>
           <td class="paramtype">fiff_int_t&#160;</td>
           <td class="paramname"><em>dest</em>, </td>
@@ -342,7 +383,7 @@ QList&lt; <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHe
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html">FiffCoordTrans</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html">FiffCoordTrans</a> &amp;&#160;</td>
           <td class="paramname"><em>trans</em>&#160;</td>
         </tr>
         <tr>
@@ -359,12 +400,13 @@ QList&lt; <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHe
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">dest</td><td>destination check code </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">trans</td><td>transformation information </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">trans</td><td>transformation information</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="mne__sourcespace_8cpp_source.html#l00162">162</a> of file <a class="el" href="mne__sourcespace_8cpp_source.html">mne_sourcespace.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__sourcespace_8cpp_source.html#l00163">163</a> of file <a class="el" href="mne__sourcespace_8cpp_source.html">mne_sourcespace.cpp</a>.</p>
 
 </div>
 </div>
@@ -375,7 +417,7 @@ QList&lt; <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHe
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Oct 15 2012 18:50:57 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jan 9 2013 17:50:07 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

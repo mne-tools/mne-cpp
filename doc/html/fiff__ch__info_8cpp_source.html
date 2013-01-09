@@ -68,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -121,49 +121,22 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;, unit_mul(0)</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;, ch_name(QString(<span class="stringliteral">&quot;&quot;</span>))</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;{</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    loc.setZero();</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a050e29214b5724e324a47c6592466c18">coil_trans</a>.setZero();</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    eeg_loc.setZero();</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a86a15b1f849599c2dae3dc2b976d03c2">loc</a>.setZero();</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a50091ebf8d8d2ffbf119444b0ddb3dde">coil_trans</a>.setZero();</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a8d0f25ed69750580b56814407b8c204b">eeg_loc</a>.setZero();</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;}</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;</div>
-<div class="line"><a name="l00077"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a59074fae7c83657271aafa84a5d43b2a">   77</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a69742331b0d3364e7ac8ace4b754633a">FiffChInfo::FiffChInfo</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html" title="Channel info descriptor.">FiffChInfo</a>* ch)</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;: scanno(ch-&gt;scanno)</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;, logno(ch-&gt;logno)</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;, kind(ch-&gt;kind)</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;, range(ch-&gt;range)</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;, cal(ch-&gt;cal)</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;, coil_type(ch-&gt;coil_type)</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;, coord_frame(ch-&gt;coord_frame)</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;, unit(ch-&gt;unit)</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;, unit_mul(ch-&gt;unit_mul)</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;, ch_name(ch-&gt;ch_name)</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;, loc(Matrix&lt;float,12,1, DontAlign&gt;(ch-&gt;loc))</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;, coil_trans(Matrix&lt;float,4,4, DontAlign&gt;(ch-&gt;coil_trans))</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;, eeg_loc(Matrix&lt;float,3,2, DontAlign&gt;(ch-&gt;eeg_loc))</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;{</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    Matrix&lt;float,4,4, DontAlign&gt;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a050e29214b5724e324a47c6592466c18">coil_trans</a>;  </div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    Matrix&lt;float,3,2, DontAlign&gt;    eeg_loc;</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    loc.setZero();</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    coil_trans.setZero();</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    eeg_loc.setZero();</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;}</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div>
-<div class="line"><a name="l00104"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a41a554f557e9c2f7cb75ff3b4d4627a4">  104</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a41a554f557e9c2f7cb75ff3b4d4627a4">FiffChInfo::~FiffChInfo</a>()</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;{</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;}</div>
+<div class="line"><a name="l00077"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a41a554f557e9c2f7cb75ff3b4d4627a4">   77</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a41a554f557e9c2f7cb75ff3b4d4627a4">FiffChInfo::~FiffChInfo</a>()</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;{</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Oct 15 2012 18:50:56 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jan 9 2013 17:50:06 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

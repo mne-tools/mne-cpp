@@ -1,0 +1,6 @@
+var searchData=
+[
+  ['acq_5fpars',['acq_pars',['../class_f_i_f_f_l_i_b_1_1_fiff_info.html#ac5441674648831c0e691f4022360755e',1,'FIFFLIB::FiffInfo']]],
+  ['acq_5fstim',['acq_stim',['../class_f_i_f_f_l_i_b_1_1_fiff_info.html#a40a96f92d6d21fbd0678c1f6d0abcee0',1,'FIFFLIB::FiffInfo']]],
+  ['aspect_5fkind',['aspect_kind',['../class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#ae5e83afbcb2d328dda14e819c7de7bd7',1,'FIFFLIB::FiffEvokedData']]]
+];

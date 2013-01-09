@@ -96,7 +96,7 @@ public:
     *
     * @param [in] uiMaxNumMatrices  length of buffer.
     */
-    CircularMatrixBuffer(unsigned int uiMaxNumMatrices, unsigned int uiRows, unsigned int uiCols);
+    explicit CircularMatrixBuffer(unsigned int uiMaxNumMatrices, unsigned int uiRows, unsigned int uiCols);
 
     //=========================================================================================================
     /**

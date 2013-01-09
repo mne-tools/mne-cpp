@@ -68,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -94,7 +94,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="mne_8h.html" title="Contains the MNE class declaration, which provides static wrapper functions to stay consistent with m...">mne.h</a>&quot;</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor">#include &quot;../fiff/fiff.h&quot;</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fiff_8h.html" title="Contains the FIFF class declaration, which provides static wrapper functions to stay consistent with ...">fiff/fiff.h</a>&gt;</span></div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor">#include &lt;iostream&gt;</span></div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
@@ -120,16 +120,16 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="comment">// DEFINE MEMBER METHODS</span></div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
-<div class="line"><a name="l00068"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e.html#a463e493763c6a96a1581bca7e9c8e476">   68</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e.html#a463e493763c6a96a1581bca7e9c8e476">MNE::read_events</a>(QString&amp; p_sFileName, MatrixXi&amp; eventlist)</div>
+<div class="line"><a name="l00068"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e.html#ab1866dbba04fc8240d9bc1b5c62e8c21">   68</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e.html#ab1866dbba04fc8240d9bc1b5c62e8c21">MNE::read_events</a>(QIODevice* p_pIODevice, MatrixXi&amp; eventlist)</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;{</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="comment">// Open file</span></div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a>* t_pFile = <span class="keyword">new</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html" title="FIFF File I/O routines.">FiffFile</a>(p_sFileName);</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a>* t_pFile = <span class="keyword">new</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a>(p_pIODevice);</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a>* t_pTree = NULL;</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    QList&lt;FiffDirEntry&gt;* t_pDir = NULL;</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="keywordflow">if</span>(!t_pFile-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html#a80ffc19225f94283f5969179f4788967">open</a>(t_pTree, t_pDir))</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="keywordflow">if</span>(!t_pFile-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a258a185f900706296d8cdcdf2b3fe740">open</a>(t_pTree, t_pDir))</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    {</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        <span class="keywordflow">if</span>(t_pTree)</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;            <span class="keyword">delete</span> t_pTree;</div>
@@ -164,11 +164,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;        pos  = events[0]-&gt;dir[k].pos;</div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;        <span class="keywordflow">if</span> (kind == <a class="code" href="fiff__constants_8h.html#a1cbdbc9febdcd589bf2e1e04fc5d1a0d">FIFF_MNE_EVENT_LIST</a>)</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;        {</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;            <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#ab85fd00cd7c1a21a6fc021d2a2908c6c">FiffTag::read_tag</a>(t_pFile,t_pTag,pos);</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;            <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a8de4b8d5dec25923cef3b3a7915e3ed7">FiffTag::read_tag</a>(t_pFile,t_pTag,pos);</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;            <span class="keywordflow">if</span>(t_pTag-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#acd412f0127525d8749b6606cd87fd5ff">type</a> == FIFFT_UINT)</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;            {</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;                serial_eventlist = t_pTag-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a483d8147f585de567ee8a64f5a84ee9b">toUnsignedInt</a>();</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;                nelem = t_pTag-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a3250cfa33c102f55a98091c19976b412">size</a>/4;</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;                nelem = t_pTag-&gt;size()/4;</div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;            }</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;            <span class="keywordflow">break</span>;</div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        }</div>
@@ -206,7 +206,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Oct 15 2012 18:50:56 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jan 9 2013 17:50:06 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

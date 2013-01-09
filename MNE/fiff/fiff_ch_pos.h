@@ -68,6 +68,9 @@ namespace FIFFLIB
 class FIFFSHARED_EXPORT FiffChPos {
 
 public:
+    typedef QSharedPointer<FiffChPos> SPtr;             /**< Shared pointer type for FiffChPos. */
+    typedef QSharedPointer<const FiffChPos> ConstSPtr;  /**< Const shared pointer type for FiffChPos. */
+
     //=========================================================================================================
     /**
     * Constructors the coil position descriptor.

@@ -98,6 +98,9 @@ using namespace Eigen;
 class FIFFSHARED_EXPORT FiffRawData {
 
 public:
+    typedef QSharedPointer<FiffRawData> SPtr;               /**< Shared pointer type for FiffRawData. */
+    typedef QSharedPointer<const FiffRawData> ConstSPtr;    /**< Const shared pointer type for FiffRawData. */
+
     //=========================================================================================================
     /**
     * ctor

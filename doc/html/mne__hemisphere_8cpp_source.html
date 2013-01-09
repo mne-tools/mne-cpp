@@ -68,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -115,8 +115,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;, np(-1)</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;, ntri(-1)</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;, coord_frame(-1)</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;, rr(MatrixX3f::Zero(0,3))</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;, nn(MatrixX3f::Zero(0,3))</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;, rr(MatrixX3d::Zero(0,3))</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;, nn(MatrixX3d::Zero(0,3))</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;, tris(MatrixX3i::Zero(0,3))</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;, nuse(-1)</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;, inuse(VectorXi::Zero(0))</div>
@@ -124,17 +124,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;, nuse_tri(-1)</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;, use_tris(MatrixX3i::Zero(0,3))</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;, nearest(VectorXi::Zero(0))</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;, nearest_dist(VectorXf::Zero(0))</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;, nearest_dist(VectorXd::Zero(0))</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;, pinfo(QList&lt;VectorXi&gt;())</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;, dist_limit(-1)</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;, dist(MatrixXf::Zero(0,0))</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;, tri_cent(MatrixX3f::Zero(0,3))</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;, tri_nn(MatrixX3f::Zero(0,3))</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;, tri_area(VectorXf::Zero(0))</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;, use_tri_cent(MatrixX3f::Zero(0,3))</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;, use_tri_nn(MatrixX3f::Zero(0,3))</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;, use_tri_area(VectorXf::Zero(0))</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;, m_pTriCoords(NULL)</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;, dist(MatrixXd())</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;, tri_cent(MatrixX3d::Zero(0,3))</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;, tri_nn(MatrixX3d::Zero(0,3))</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;, tri_area(VectorXd::Zero(0))</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;, use_tri_cent(MatrixX3d::Zero(0,3))</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;, use_tri_nn(MatrixX3d::Zero(0,3))</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;, use_tri_area(VectorXd::Zero(0))</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="comment">//, m_TriCoords()</span></div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="comment">//, m_pGeometryData(NULL)</span></div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;{</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;}</div>
@@ -142,13 +142,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
-<div class="line"><a name="l00090"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a8e7724411e7ad01ec7e5f462543af5ab">   90</a></span>&#160;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a2db95fdb67898cbf094338028d01bb0c">MNEHemisphere::MNEHemisphere</a>(<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="The SourceSpace class provides.">MNEHemisphere</a>* p_pMNEHemisphere)</div>
+<div class="line"><a name="l00090"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aaacdd881c760f94f834da68329f08229">   90</a></span>&#160;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a2db95fdb67898cbf094338028d01bb0c">MNEHemisphere::MNEHemisphere</a>(<span class="keyword">const</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="The SourceSpace class provides.">MNEHemisphere</a>* p_pMNEHemisphere)</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;: id(p_pMNEHemisphere-&gt;id)</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;, np(p_pMNEHemisphere-&gt;np)</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;, ntri(p_pMNEHemisphere-&gt;ntri)</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;, coord_frame(p_pMNEHemisphere-&gt;coord_frame)</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;, rr(MatrixX3f(p_pMNEHemisphere-&gt;rr))</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;, nn(MatrixX3f(p_pMNEHemisphere-&gt;nn))</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;, rr(MatrixX3d(p_pMNEHemisphere-&gt;rr))</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;, nn(MatrixX3d(p_pMNEHemisphere-&gt;nn))</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;, tris(MatrixX3i(p_pMNEHemisphere-&gt;tris))</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;, nuse(p_pMNEHemisphere-&gt;nuse)</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;, inuse(VectorXi(p_pMNEHemisphere-&gt;inuse))</div>
@@ -156,109 +156,108 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;, nuse_tri(p_pMNEHemisphere-&gt;nuse_tri)</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;, use_tris(MatrixX3i(p_pMNEHemisphere-&gt;use_tris))</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;, nearest(VectorXi(p_pMNEHemisphere-&gt;nearest))</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;, nearest_dist(VectorXf(p_pMNEHemisphere-&gt;nearest_dist))</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;, nearest_dist(VectorXd(p_pMNEHemisphere-&gt;nearest_dist))</div>
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;, pinfo(p_pMNEHemisphere-&gt;pinfo)</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;, dist_limit(p_pMNEHemisphere-&gt;dist_limit)</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;, dist(MatrixXf(p_pMNEHemisphere-&gt;dist))</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;, tri_cent(MatrixX3f(p_pMNEHemisphere-&gt;tri_cent))</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;, tri_nn(MatrixX3f(p_pMNEHemisphere-&gt;tri_nn))</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;, tri_area(VectorXf(p_pMNEHemisphere-&gt;tri_area))</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;, use_tri_cent(MatrixX3f(p_pMNEHemisphere-&gt;use_tri_cent))</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;, use_tri_nn(MatrixX3f(p_pMNEHemisphere-&gt;use_tri_nn))</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;, use_tri_area(VectorXf(p_pMNEHemisphere-&gt;use_tri_area))</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;, m_pTriCoords(p_pMNEHemisphere-&gt;m_pTriCoords ? new MatrixXf(*(p_pMNEHemisphere-&gt;m_pTriCoords)) : NULL)</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;{</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="comment">//*m_pGeometryData = *p_pMNEHemisphere-&gt;m_pGeometryData;</span></div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;}</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;, dist(p_pMNEHemisphere-&gt;dist)<span class="comment">//p_pMNEHemisphere-&gt;dist ? new MatrixXd(*p_pMNEHemisphere-&gt;dist) : NULL)</span></div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;, tri_cent(MatrixX3d(p_pMNEHemisphere-&gt;tri_cent))</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;, tri_nn(MatrixX3d(p_pMNEHemisphere-&gt;tri_nn))</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;, tri_area(VectorXd(p_pMNEHemisphere-&gt;tri_area))</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;, use_tri_cent(MatrixX3d(p_pMNEHemisphere-&gt;use_tri_cent))</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;, use_tri_nn(MatrixX3d(p_pMNEHemisphere-&gt;use_tri_nn))</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;, use_tri_area(VectorXd(p_pMNEHemisphere-&gt;use_tri_area))</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;, m_TriCoords(p_pMNEHemisphere-&gt;m_TriCoords)<span class="comment">//p_pMNEHemisphere-&gt;m_TriCoords ? new MatrixXf(*(p_pMNEHemisphere-&gt;m_TriCoords)) : NULL)</span></div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;, cluster_vertnos(p_pMNEHemisphere-&gt;cluster_vertnos)</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;, cluster_distances(p_pMNEHemisphere-&gt;cluster_distances)</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;{</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="comment">//*m_pGeometryData = *p_pMNEHemisphere-&gt;m_pGeometryData;</span></div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;}</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;</div>
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;</div>
-<div class="line"><a name="l00122"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a29c61433931c07044af051a53a4f08c1">  122</a></span>&#160;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a29c61433931c07044af051a53a4f08c1">MNEHemisphere::~MNEHemisphere</a>()</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;{</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    qDebug() &lt;&lt; <span class="stringliteral">&quot;MNEHemisphere Destructor&quot;</span>;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <span class="keywordflow">if</span>(m_pTriCoords)</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        <span class="keyword">delete</span> m_pTriCoords;</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="comment">//    if(m_pGeometryData)</span></div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;<span class="comment">//        delete m_pGeometryData;</span></div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;}</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;</div>
+<div class="line"><a name="l00124"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a29c61433931c07044af051a53a4f08c1">  124</a></span>&#160;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a29c61433931c07044af051a53a4f08c1">MNEHemisphere::~MNEHemisphere</a>()</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;{</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="comment">//    if(m_TriCoords)</span></div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="comment">//        delete m_TriCoords;</span></div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="comment">//    if(dist)</span></div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;<span class="comment">//        delete dist;</span></div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;}</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;</div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;</div>
-<div class="line"><a name="l00136"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a0668a83d396e9b1b3d7ce63dd45e2bad">  136</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a0668a83d396e9b1b3d7ce63dd45e2bad">MNEHemisphere::transform_hemisphere_to</a>(fiff_int_t dest, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="Coordinate transformation description.">FiffCoordTrans</a>* trans)</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;{</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    <span class="keywordflow">if</span> (this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a5890e89b80dd7631f4405ef68572e7d4">coord_frame</a> == dest)</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    {</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;<span class="comment">//            res = src;</span></div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    }</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    <span class="keywordflow">if</span> (trans-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a0d4f29ae5b9affe90e2cfadf922e36f7">to</a> == this-&gt;coord_frame &amp;&amp; trans-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ab0cacc34492c4e9842e9de5f59368435">from</a> == dest)</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#afc1b8e7d1f6c5b9819124670b85446bc">FiffCoordTrans::invert_transform</a>(trans);</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(trans-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ab0cacc34492c4e9842e9de5f59368435">from</a> != this-&gt;coord_frame || trans-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a0d4f29ae5b9affe90e2cfadf922e36f7">to</a> != dest)</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    {</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;        printf(<span class="stringliteral">&quot;Cannot transform the source space using this coordinate transformation&quot;</span>);<span class="comment">//Consider throw</span></div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    }</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    MatrixXf t = trans-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a094443e1f367198ef85d57382987afbb">trans</a>.block(0,0,3,4);</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;<span class="comment">//        res             = src;</span></div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a5890e89b80dd7631f4405ef68572e7d4">coord_frame</a> = dest;</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    MatrixXf t_rr = MatrixXf::Ones(this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aed488c023af9e17d490f3abdea867eeb">np</a>, 4);</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    t_rr.block(0, 0, this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aed488c023af9e17d490f3abdea867eeb">np</a>, 3) = this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a676856c816596716661e000e0c7ec4d9">rr</a>;</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    MatrixXf t_nn = MatrixXf::Zero(this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aed488c023af9e17d490f3abdea867eeb">np</a>, 4);</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    t_nn.block(0, 0, this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aed488c023af9e17d490f3abdea867eeb">np</a>, 3) = this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a92b928637b438f118a00c860e929ecae">nn</a>;</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a676856c816596716661e000e0c7ec4d9">rr</a>    = (t*t_rr.transpose()).transpose();</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a92b928637b438f118a00c860e929ecae">nn</a>    = (t*t_nn.transpose()).transpose();</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;}</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;</div>
+<div class="line"><a name="l00135"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a28dfa9032242a4f60364876c0a7ac63b">  135</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a28dfa9032242a4f60364876c0a7ac63b">MNEHemisphere::transform_hemisphere_to</a>(fiff_int_t dest, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="Coordinate transformation description.">FiffCoordTrans</a>&amp; trans)</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;{</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    <span class="keywordflow">if</span> (this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a5890e89b80dd7631f4405ef68572e7d4">coord_frame</a> == dest)</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    {</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;<span class="comment">//            res = src;</span></div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    }</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    <span class="keywordflow">if</span> (trans.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a0d4f29ae5b9affe90e2cfadf922e36f7">to</a> == this-&gt;coord_frame &amp;&amp; trans.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ab0cacc34492c4e9842e9de5f59368435">from</a> == dest)</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;        trans.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a4a258913a8b23cb3c05858449ff25370">invert_transform</a>();</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(trans.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ab0cacc34492c4e9842e9de5f59368435">from</a> != this-&gt;coord_frame || trans.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a0d4f29ae5b9affe90e2cfadf922e36f7">to</a> != dest)</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    {</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;        printf(<span class="stringliteral">&quot;Cannot transform the source space using this coordinate transformation&quot;</span>);<span class="comment">//Consider throw</span></div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    }</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    MatrixXd t = trans.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ae3995f710ab35b5f7687001a4cd4e4b5">trans</a>.block(0,0,3,4);</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;<span class="comment">//        res             = src;</span></div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a5890e89b80dd7631f4405ef68572e7d4">coord_frame</a> = dest;</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    MatrixXd t_rr = MatrixXd::Ones(this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aed488c023af9e17d490f3abdea867eeb">np</a>, 4);</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    t_rr.block(0, 0, this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aed488c023af9e17d490f3abdea867eeb">np</a>, 3) = this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a9efbc4bbd8c2d4efb8645fb4d1d68ae4">rr</a>;</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    MatrixXd t_nn = MatrixXd::Zero(this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aed488c023af9e17d490f3abdea867eeb">np</a>, 4);</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    t_nn.block(0, 0, this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aed488c023af9e17d490f3abdea867eeb">np</a>, 3) = this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a79f826f72f12b0b98c2ce44281201e28">nn</a>;</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a9efbc4bbd8c2d4efb8645fb4d1d68ae4">rr</a>    = (t*t_rr.transpose()).transpose();</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a79f826f72f12b0b98c2ce44281201e28">nn</a>    = (t*t_nn.transpose()).transpose();</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;}</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;</div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;</div>
-<div class="line"><a name="l00169"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a4bef2d6ba08b143eb452d16e2fd6d37d">  169</a></span>&#160;MatrixXf* <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a4bef2d6ba08b143eb452d16e2fd6d37d">MNEHemisphere::getTriCoords</a>(<span class="keywordtype">float</span> p_fScaling)</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;{</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    <span class="keywordflow">if</span>(m_pTriCoords == NULL)</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    {</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        m_pTriCoords = <span class="keyword">new</span> MatrixXf(3,3*<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab2084cf6ed3de33ef78ef11c0e6f83b6">tris</a>.rows());</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        <span class="keywordflow">for</span>(qint32 i = 0; i &lt; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab2084cf6ed3de33ef78ef11c0e6f83b6">tris</a>.rows(); ++i)</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;        {</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;            m_pTriCoords-&gt;block(0,i*3,3,1) = <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a676856c816596716661e000e0c7ec4d9">rr</a>.row( <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab2084cf6ed3de33ef78ef11c0e6f83b6">tris</a>(i,0) ).transpose();</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;            m_pTriCoords-&gt;block(0,i*3+1,3,1) = <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a676856c816596716661e000e0c7ec4d9">rr</a>.row( <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab2084cf6ed3de33ef78ef11c0e6f83b6">tris</a>(i,1) ).transpose();</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;            m_pTriCoords-&gt;block(0,i*3+2,3,1) = <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a676856c816596716661e000e0c7ec4d9">rr</a>.row( <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab2084cf6ed3de33ef78ef11c0e6f83b6">tris</a>(i,2) ).transpose();</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;        }</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    }</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    *m_pTriCoords *= p_fScaling;</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="keywordflow">return</span> m_pTriCoords;</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;}</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;</div>
+<div class="line"><a name="l00168"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a4bef2d6ba08b143eb452d16e2fd6d37d">  168</a></span>&#160;MatrixXf* <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a4bef2d6ba08b143eb452d16e2fd6d37d">MNEHemisphere::getTriCoords</a>(<span class="keywordtype">float</span> p_fScaling)</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;{</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <span class="keywordflow">if</span>(m_TriCoords.size() == 0)</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    {</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        m_TriCoords = MatrixXf(3,3*<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab2084cf6ed3de33ef78ef11c0e6f83b6">tris</a>.rows());</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        <span class="keywordflow">for</span>(qint32 i = 0; i &lt; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab2084cf6ed3de33ef78ef11c0e6f83b6">tris</a>.rows(); ++i)</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        {</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;            m_TriCoords.col(i*3) = <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a9efbc4bbd8c2d4efb8645fb4d1d68ae4">rr</a>.row( <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab2084cf6ed3de33ef78ef11c0e6f83b6">tris</a>(i,0) ).transpose().cast&lt;<span class="keywordtype">float</span>&gt;();</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;            m_TriCoords.col(i*3+1) = <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a9efbc4bbd8c2d4efb8645fb4d1d68ae4">rr</a>.row( <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab2084cf6ed3de33ef78ef11c0e6f83b6">tris</a>(i,1) ).transpose().cast&lt;<span class="keywordtype">float</span>&gt;();</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;            m_TriCoords.col(i*3+2) = <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a9efbc4bbd8c2d4efb8645fb4d1d68ae4">rr</a>.row( <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab2084cf6ed3de33ef78ef11c0e6f83b6">tris</a>(i,2) ).transpose().cast&lt;<span class="keywordtype">float</span>&gt;();</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;        }</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    }</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    m_TriCoords *= p_fScaling;</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    <span class="keywordflow">return</span> &amp;m_TriCoords;</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;}</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;</div>
 <div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;</div>
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;<span class="comment">//QGeometryData* MNEHemisphere::getGeometryData(float p_fScaling)</span></div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;<span class="comment">//{</span></div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;<span class="comment">//    if(m_pGeometryData == NULL)</span></div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;<span class="comment">//    {</span></div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;<span class="comment">//        m_pGeometryData = new QGeometryData();</span></div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;<span class="comment">//        MatrixXf* triCoords = getTriCoords(p_fScaling);</span></div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;<span class="comment">//        m_pGeometryData-&gt;appendVertexArray(QArray&lt;QVector3D&gt;::fromRawData( reinterpret_cast&lt;const QVector3D*&gt;(triCoords-&gt;data()), triCoords-&gt;cols() ));</span></div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;<span class="comment">//    }</span></div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;<span class="comment">//    return m_pGeometryData;</span></div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;<span class="comment">//}</span></div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;<span class="comment">//QGeometryData* MNEHemisphere::getGeometryData(float p_fScaling)</span></div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;<span class="comment">//{</span></div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;<span class="comment">//    if(m_pGeometryData == NULL)</span></div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;<span class="comment">//    {</span></div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;<span class="comment">//        m_pGeometryData = new QGeometryData();</span></div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;<span class="comment">//        MatrixXd* triCoords = getTriCoords(p_fScaling);</span></div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;<span class="comment">//        m_pGeometryData-&gt;appendVertexArray(QArray&lt;QVector3D&gt;::fromRawData( reinterpret_cast&lt;const QVector3D*&gt;(triCoords-&gt;data()), triCoords-&gt;cols() ));</span></div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;<span class="comment">//    }</span></div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;<span class="comment">//    return m_pGeometryData;</span></div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;<span class="comment">//}</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Oct 15 2012 18:50:56 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jan 9 2013 17:50:06 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

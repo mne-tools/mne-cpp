@@ -98,7 +98,8 @@ using namespace FIFFLIB;
 *
 * @brief The MNEMath class provides
 */
-class MNESHARED_EXPORT MNEMath {
+class MNESHARED_EXPORT MNEMath
+{
 public:
     //=========================================================================================================
     /**

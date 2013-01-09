@@ -70,7 +70,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -86,6 +86,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data-members.html">List of all members</a>  </div>
@@ -99,40 +100,51 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <p><code>#include &lt;<a class="el" href="fiff__raw__data_8h_source.html">fiff_raw_data.h</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a0ac8df8cdd67a61eb808bf8246e36f00"><td class="memItemLeft" align="right" valign="top">typedef QSharedPointer<br class="typebreak"/>
+&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html">FiffRawData</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a0ac8df8cdd67a61eb808bf8246e36f00">SPtr</a></td></tr>
+<tr class="separator:a0ac8df8cdd67a61eb808bf8246e36f00"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adea247f53965f4904bc637dcd607e7e5"><td class="memItemLeft" align="right" valign="top">typedef QSharedPointer&lt; const <br class="typebreak"/>
+<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html">FiffRawData</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#adea247f53965f4904bc637dcd607e7e5">ConstSPtr</a></td></tr>
+<tr class="separator:adea247f53965f4904bc637dcd607e7e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ac4f5bbd43f8eea9c61fdcd2e3556bd73"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#ac4f5bbd43f8eea9c61fdcd2e3556bd73">FiffRawData</a> ()</td></tr>
 <tr class="separator:ac4f5bbd43f8eea9c61fdcd2e3556bd73"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab0f75372627777039d42f4f4e31cf233"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#ab0f75372627777039d42f4f4e31cf233">~FiffRawData</a> ()</td></tr>
 <tr class="separator:ab0f75372627777039d42f4f4e31cf233"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa0272943c0ee10d0974493844c90d960"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#aa0272943c0ee10d0974493844c90d960">read_raw_segment</a> (MatrixXf *&amp;data, MatrixXf *&amp;times, fiff_int_t from=-1, fiff_int_t to=-1, MatrixXi sel=defaultMatrixXi)</td></tr>
-<tr class="separator:aa0272943c0ee10d0974493844c90d960"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a36a5ad18a6ed1e05f4a1ee580ac35c99"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a36a5ad18a6ed1e05f4a1ee580ac35c99">read_raw_segment_times</a> (MatrixXf *&amp;data, MatrixXf *&amp;times, float from, float to, MatrixXi sel=defaultMatrixXi)</td></tr>
-<tr class="separator:a36a5ad18a6ed1e05f4a1ee580ac35c99"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af3a3ab05643aaacfe6c41536b712f060"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#af3a3ab05643aaacfe6c41536b712f060">isEmpty</a> () const </td></tr>
+<tr class="separator:af3a3ab05643aaacfe6c41536b712f060"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae35d26f3a713291c8673e2a295447ec9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#ae35d26f3a713291c8673e2a295447ec9">read_raw_segment</a> (MatrixXd &amp;data, MatrixXd &amp;times, fiff_int_t from=-1, fiff_int_t to=-1, MatrixXi sel=defaultMatrixXi)</td></tr>
+<tr class="separator:ae35d26f3a713291c8673e2a295447ec9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96c7f8a279488a12d3380f68ef5b012d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a96c7f8a279488a12d3380f68ef5b012d">read_raw_segment_times</a> (MatrixXd &amp;data, MatrixXd &amp;times, float from, float to, MatrixXi sel=defaultMatrixXi)</td></tr>
+<tr class="separator:a96c7f8a279488a12d3380f68ef5b012d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a80133eca3329cd417036d2dc8ffc118f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a80133eca3329cd417036d2dc8ffc118f"></a>
-<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_file.html">FiffFile</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>file</b></td></tr>
-<tr class="separator:a80133eca3329cd417036d2dc8ffc118f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7ea762bbb7a1514de83f05c7d7b00fcc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7ea762bbb7a1514de83f05c7d7b00fcc"></a>
-<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>info</b></td></tr>
-<tr class="separator:a7ea762bbb7a1514de83f05c7d7b00fcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac5a1cde4e494a65de1dcf7a7d0463a58"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac5a1cde4e494a65de1dcf7a7d0463a58"></a>
+<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>file</b></td></tr>
+<tr class="separator:ac5a1cde4e494a65de1dcf7a7d0463a58"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a30074ee25c17578db14b98a473092061"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a30074ee25c17578db14b98a473092061"></a>
+<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a>&#160;</td><td class="memItemRight" valign="bottom"><b>info</b></td></tr>
+<tr class="separator:a30074ee25c17578db14b98a473092061"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa7f34c5b4601b59bf79945f4cd8f9e4a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa7f34c5b4601b59bf79945f4cd8f9e4a"></a>
 fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>first_samp</b></td></tr>
 <tr class="separator:aa7f34c5b4601b59bf79945f4cd8f9e4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7be676d089d03325fd7c08cc58d17c2f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7be676d089d03325fd7c08cc58d17c2f"></a>
 fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>last_samp</b></td></tr>
 <tr class="separator:a7be676d089d03325fd7c08cc58d17c2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad70d7a5bdc9c653aa35e079b2256d429"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad70d7a5bdc9c653aa35e079b2256d429"></a>
-MatrixXf&#160;</td><td class="memItemRight" valign="bottom"><b>cals</b></td></tr>
-<tr class="separator:ad70d7a5bdc9c653aa35e079b2256d429"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca60160d7aaa770cfe6346ad9264627c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aca60160d7aaa770cfe6346ad9264627c"></a>
+MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><b>cals</b></td></tr>
+<tr class="separator:aca60160d7aaa770cfe6346ad9264627c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa907af5de89694ca190356aec73a796e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa907af5de89694ca190356aec73a796e"></a>
 QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html">FiffRawDir</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>rawdir</b></td></tr>
 <tr class="separator:aa907af5de89694ca190356aec73a796e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af982198192206d1298d7e7e53fdd3587"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af982198192206d1298d7e7e53fdd3587"></a>
-MatrixXf&#160;</td><td class="memItemRight" valign="bottom"><b>proj</b></td></tr>
-<tr class="separator:af982198192206d1298d7e7e53fdd3587"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af67fb04b8b963db4eca1c167359a26d5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af67fb04b8b963db4eca1c167359a26d5"></a>
+MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><b>proj</b></td></tr>
+<tr class="separator:af67fb04b8b963db4eca1c167359a26d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adbe4741e8ec3c9438da36e627995ef1a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adbe4741e8ec3c9438da36e627995ef1a"></a>
 <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html">FiffCtfComp</a>&#160;</td><td class="memItemRight" valign="bottom"><b>comp</b></td></tr>
 <tr class="separator:adbe4741e8ec3c9438da36e627995ef1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -141,8 +153,39 @@ MatrixXf&#160;</td><td class="memItemRight" valign="bottom"><b>proj</b></td></tr
 <div class="textblock"><p>FIFF raw measurement data. </p>
 <p>*Provides fiff raw measurement data, including I/O routines. </p>
 
-<p>Definition at line <a class="el" href="fiff__raw__data_8h_source.html#l00103">103</a> of file <a class="el" href="fiff__raw__data_8h_source.html">fiff_raw_data.h</a>.</p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<p>Definition at line <a class="el" href="fiff__raw__data_8h_source.html#l00098">98</a> of file <a class="el" href="fiff__raw__data_8h_source.html">fiff_raw_data.h</a>.</p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a class="anchor" id="adea247f53965f4904bc637dcd607e7e5"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef QSharedPointer&lt;const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html">FiffRawData</a>&gt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#adea247f53965f4904bc637dcd607e7e5">FIFFLIB::FiffRawData::ConstSPtr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Const shared pointer type for <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html" title="FIFF raw measurement data.">FiffRawData</a>. </p>
+
+<p>Definition at line <a class="el" href="fiff__raw__data_8h_source.html#l00102">102</a> of file <a class="el" href="fiff__raw__data_8h_source.html">fiff_raw_data.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a0ac8df8cdd67a61eb808bf8246e36f00"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef QSharedPointer&lt;<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html">FiffRawData</a>&gt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a0ac8df8cdd67a61eb808bf8246e36f00">FIFFLIB::FiffRawData::SPtr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Shared pointer type for <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html" title="FIFF raw measurement data.">FiffRawData</a>. </p>
+
+<p>Definition at line <a class="el" href="fiff__raw__data_8h_source.html#l00101">101</a> of file <a class="el" href="fiff__raw__data_8h_source.html">fiff_raw_data.h</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="ac4f5bbd43f8eea9c61fdcd2e3556bd73"></a>
 <div class="memitem">
 <div class="memproto">
@@ -175,25 +218,52 @@ MatrixXf&#160;</td><td class="memItemRight" valign="bottom"><b>proj</b></td></tr
 </div><div class="memdoc">
 <p>Destroys the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a>. </p>
 
-<p>Definition at line <a class="el" href="fiff__raw__data_8cpp_source.html#l00067">67</a> of file <a class="el" href="fiff__raw__data_8cpp_source.html">fiff_raw_data.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__raw__data_8cpp_source.html#l00068">68</a> of file <a class="el" href="fiff__raw__data_8cpp_source.html">fiff_raw_data.cpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="aa0272943c0ee10d0974493844c90d960"></a>
+<a class="anchor" id="af3a3ab05643aaacfe6c41536b712f060"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool FIFFLIB::FiffRawData::isEmpty </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>True if fiff raw data are empty.</p>
+<dl class="section return"><dt>Returns</dt><dd>true if fiff raw data are empty </dd></dl>
+
+<p>Definition at line <a class="el" href="fiff__raw__data_8h_source.html#l00122">122</a> of file <a class="el" href="fiff__raw__data_8h_source.html">fiff_raw_data.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ae35d26f3a713291c8673e2a295447ec9"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">bool FiffRawData::read_raw_segment </td>
           <td>(</td>
-          <td class="paramtype">MatrixXf *&amp;&#160;</td>
+          <td class="paramtype">MatrixXd &amp;&#160;</td>
           <td class="paramname"><em>data</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">MatrixXf *&amp;&#160;</td>
+          <td class="paramtype">MatrixXd &amp;&#160;</td>
           <td class="paramname"><em>times</em>, </td>
         </tr>
         <tr>
@@ -235,11 +305,11 @@ MatrixXf&#160;</td><td class="memItemRight" valign="bottom"><b>proj</b></td></tr
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__raw__data_8cpp_source.html#l00077">77</a> of file <a class="el" href="fiff__raw__data_8cpp_source.html">fiff_raw_data.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__raw__data_8cpp_source.html#l00076">76</a> of file <a class="el" href="fiff__raw__data_8cpp_source.html">fiff_raw_data.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a36a5ad18a6ed1e05f4a1ee580ac35c99"></a>
+<a class="anchor" id="a96c7f8a279488a12d3380f68ef5b012d"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -249,13 +319,13 @@ MatrixXf&#160;</td><td class="memItemRight" valign="bottom"><b>proj</b></td></tr
         <tr>
           <td class="memname">bool FIFFLIB::FiffRawData::read_raw_segment_times </td>
           <td>(</td>
-          <td class="paramtype">MatrixXf *&amp;&#160;</td>
+          <td class="paramtype">MatrixXd &amp;&#160;</td>
           <td class="paramname"><em>data</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">MatrixXf *&amp;&#160;</td>
+          <td class="paramtype">MatrixXd &amp;&#160;</td>
           <td class="paramname"><em>times</em>, </td>
         </tr>
         <tr>
@@ -302,7 +372,7 @@ MatrixXf&#160;</td><td class="memItemRight" valign="bottom"><b>proj</b></td></tr
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__raw__data_8h_source.html#l00149">149</a> of file <a class="el" href="fiff__raw__data_8h_source.html">fiff_raw_data.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__raw__data_8h_source.html#l00158">158</a> of file <a class="el" href="fiff__raw__data_8h_source.html">fiff_raw_data.h</a>.</p>
 
 </div>
 </div>
@@ -313,7 +383,7 @@ MatrixXf&#160;</td><td class="memItemRight" valign="bottom"><b>proj</b></td></tr
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Oct 15 2012 18:50:57 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jan 9 2013 17:50:07 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

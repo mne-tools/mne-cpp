@@ -68,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -106,7 +106,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="comment">// Eigen INCLUDES</span></div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">#include &quot;../3rdParty/Eigen/Core&quot;</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">#include &lt;Eigen/Core&gt;</span></div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
@@ -129,31 +129,30 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00079"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html">   79</a></span>&#160;<span class="comment"></span><span class="keyword">class </span>FIFFSHARED_EXPORT <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html" title="CTF software compensation data.">FiffCtfComp</a> {</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html" title="CTF software compensation data.">FiffCtfComp</a>();</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html" title="CTF software compensation data.">FiffCtfComp</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html" title="CTF software compensation data.">FiffCtfComp</a>* comp);</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html" title="CTF software compensation data.">FiffCtfComp</a>();</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    fiff_int_t    ctfkind;</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    fiff_int_t    kind;</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <span class="keywordtype">bool</span> save_calibrated;</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    MatrixXf rowcals;</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    MatrixXf colcals;</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="A named matrix.">FiffNamedMatrix</a>* data;</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;};</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;} <span class="comment">// NAMESPACE</span></div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="preprocessor">#endif // FIFF_CTF_COMP_H</span></div>
+<div class="line"><a name="l00082"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#ac26c66d5600c9e5c7b753e8bfc1a4fe6">   82</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;FiffCtfComp&gt; <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#ac26c66d5600c9e5c7b753e8bfc1a4fe6">SPtr</a>;               </div>
+<div class="line"><a name="l00083"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#ac559e46d7c6bec5a1b4e4e73d2ea5f88">   83</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;const FiffCtfComp&gt; <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#ac559e46d7c6bec5a1b4e4e73d2ea5f88">ConstSPtr</a>;    </div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html" title="CTF software compensation data.">FiffCtfComp</a>();</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html" title="CTF software compensation data.">FiffCtfComp</a>();</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00098"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a657fc151479eee767b672b7dbc0dcfa8">   98</a></span>&#160;    fiff_int_t    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a657fc151479eee767b672b7dbc0dcfa8">ctfkind</a>;  </div>
+<div class="line"><a name="l00099"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a87ce56e229922b8c0b71c0d29a4d8698">   99</a></span>&#160;    fiff_int_t    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a87ce56e229922b8c0b71c0d29a4d8698">kind</a>;     </div>
+<div class="line"><a name="l00100"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a2c42e307469c490de4fcb0b878fdf32c">  100</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a2c42e307469c490de4fcb0b878fdf32c">save_calibrated</a>;   </div>
+<div class="line"><a name="l00101"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a17684e6406f2b16153164cb49b6d570d">  101</a></span>&#160;    MatrixXd <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a17684e6406f2b16153164cb49b6d570d">rowcals</a>;       </div>
+<div class="line"><a name="l00102"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a1ffe25b96898c5f5040350fd175a0650">  102</a></span>&#160;    MatrixXd <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a1ffe25b96898c5f5040350fd175a0650">colcals</a>;       </div>
+<div class="line"><a name="l00103"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a3880ab84d66fbc72f07383feda91583a">  103</a></span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="A named matrix.">FiffNamedMatrix</a> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a3880ab84d66fbc72f07383feda91583a">data</a>;   </div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;};</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;} <span class="comment">// NAMESPACE</span></div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="preprocessor">#endif // FIFF_CTF_COMP_H</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Oct 15 2012 18:50:56 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jan 9 2013 17:50:06 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

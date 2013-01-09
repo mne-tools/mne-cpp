@@ -117,15 +117,18 @@ using namespace Eigen;
 class FIFFSHARED_EXPORT FiffStream : public QDataStream {
 
 public:
+    typedef QSharedPointer<FiffStream> SPtr;            /**< Shared pointer type for FiffStream. */
+    typedef QSharedPointer<const FiffStream> ConstSPtr; /**< Const shared pointer type for FiffStream. */
+
     //=========================================================================================================
     /**
     * ctor
     *
     * @param[in] p_pIODevice    A fiff IO device like a fiff QFile or QTCPSocket
     */
-    FiffStream(QIODevice* p_pIODevice);
+    explicit FiffStream(QIODevice* p_pIODevice);
 
-    FiffStream(QByteArray * a, QIODevice::OpenMode mode);
+    explicit FiffStream(QByteArray * a, QIODevice::OpenMode mode);
 
     //=========================================================================================================
     /**

@@ -68,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -84,8 +84,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
-<a href="#typedef-members">Typedefs</a>  </div>
+<a href="#nested-classes">Classes</a>  </div>
   <div class="headertitle">
 <div class="title">fiff_raw_data.h File Reference</div>  </div>
 </div><!--header-->
@@ -99,10 +98,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <code>#include &quot;<a class="el" href="fiff__proj_8h_source.html">fiff_proj.h</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="fiff__ctf__comp_8h_source.html">fiff_ctf_comp.h</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="fiff__raw__dir_8h_source.html">fiff_raw_dir.h</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="fiff__file_8h_source.html">fiff_file.h</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="fiff__stream_8h_source.html">fiff_stream.h</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="fiff__tag_8h_source.html">fiff_tag.h</a>&quot;</code><br/>
-<code>#include &quot;../3rdParty/Eigen/Core&quot;</code><br/>
-<code>#include &quot;../3rdParty/Eigen/SparseCore&quot;</code><br/>
+<code>#include &lt;Eigen/Core&gt;</code><br/>
+<code>#include &lt;Eigen/SparseCore&gt;</code><br/>
 <code>#include &lt;QFile&gt;</code><br/>
 <code>#include &lt;QList&gt;</code><br/>
 </div>
@@ -113,17 +112,10 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html">FIFFLIB::FiffRawData</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">FIFF raw measurement data.  <a href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
-Typedefs</h2></td></tr>
-<tr class="memitem:a99158d3787c0326a9170eca56740c100"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a99158d3787c0326a9170eca56740c100"></a>
-typedef Matrix&lt; qint16, <br class="typebreak"/>
-Dynamic, Dynamic &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>FIFFLIB::MatrixDau16</b></td></tr>
-<tr class="separator:a99158d3787c0326a9170eca56740c100"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Contains the FiffRawData class declaration. </p>
-<dl class="section author"><dt>Author</dt><dd>Christoph Dinh <a href="#" onclick="location.href='mai'+'lto:'+'chd'+'in'+'h@n'+'mr'+'.mg'+'h.'+'har'+'va'+'rd.'+'ed'+'u'; return false;">chdin<span style="display: none;">.nosp@m.</span>h@nm<span style="display: none;">.nosp@m.</span>r.mgh<span style="display: none;">.nosp@m.</span>.har<span style="display: none;">.nosp@m.</span>vard.<span style="display: none;">.nosp@m.</span>edu</a>; Matti Hämäläinen <a href="#" onclick="location.href='mai'+'lto:'+'msh'+'@n'+'mr.'+'mg'+'h.h'+'ar'+'var'+'d.'+'edu'; return false;">msh@n<span style="display: none;">.nosp@m.</span>mr.m<span style="display: none;">.nosp@m.</span>gh.ha<span style="display: none;">.nosp@m.</span>rvar<span style="display: none;">.nosp@m.</span>d.edu</a> </dd></dl>
+<dl class="section author"><dt>Author</dt><dd>Christoph Dinh <a href="#" onclick="location.href='mai'+'lto:'+'chd'+'in'+'h@n'+'mr'+'.mg'+'h.'+'har'+'va'+'rd.'+'ed'+'u'; return false;">chdin<span style="display: none;">.nosp@m.</span>h@nm<span style="display: none;">.nosp@m.</span>r.mgh<span style="display: none;">.nosp@m.</span>.har<span style="display: none;">.nosp@m.</span>vard.<span style="display: none;">.nosp@m.</span>edu</a>; Matti Hamalainen <a href="#" onclick="location.href='mai'+'lto:'+'msh'+'@n'+'mr.'+'mg'+'h.h'+'ar'+'var'+'d.'+'edu'; return false;">msh@n<span style="display: none;">.nosp@m.</span>mr.m<span style="display: none;">.nosp@m.</span>gh.ha<span style="display: none;">.nosp@m.</span>rvar<span style="display: none;">.nosp@m.</span>d.edu</a> </dd></dl>
 <dl class="section version"><dt>Version</dt><dd>1.0 </dd></dl>
 <dl class="section date"><dt>Date</dt><dd>July, 2012</dd></dl>
 <h1><a class="anchor" id="LICENSE"></a>
@@ -141,7 +133,7 @@ LICENSE</h1>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Oct 15 2012 18:50:57 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jan 9 2013 17:50:07 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

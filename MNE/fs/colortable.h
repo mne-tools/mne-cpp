@@ -9,6 +9,7 @@
 
 #include <QString>
 #include <QStringList>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -38,7 +39,10 @@ using namespace Eigen;
 class Colortable
 {
 public:
-    Colortable();
+    typedef QSharedPointer<Colortable> SPtr;            /**< Shared pointer type for Colortable. */
+    typedef QSharedPointer<const Colortable> ConstSPtr; /**< Const shared pointer type for Colortable. */
+
+    explicit Colortable();
 
     inline VectorXi getAvailableROIs()
     {

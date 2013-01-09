@@ -70,7 +70,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -86,6 +86,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix-members.html">List of all members</a>  </div>
@@ -99,16 +100,29 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <p><code>#include &lt;<a class="el" href="fiff__named__matrix_8h_source.html">fiff_named_matrix.h</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:ae9caf7f441e93dba375b971382c1276b"><td class="memItemLeft" align="right" valign="top">typedef QSharedPointer<br class="typebreak"/>
+&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html">FiffNamedMatrix</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#ae9caf7f441e93dba375b971382c1276b">SPtr</a></td></tr>
+<tr class="separator:ae9caf7f441e93dba375b971382c1276b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9fe78ab48e91a80a62f64f6550c399b"><td class="memItemLeft" align="right" valign="top">typedef QSharedPointer&lt; const <br class="typebreak"/>
+<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html">FiffNamedMatrix</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#ac9fe78ab48e91a80a62f64f6550c399b">ConstSPtr</a></td></tr>
+<tr class="separator:ac9fe78ab48e91a80a62f64f6550c399b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:aab914e6cfc84dc9dffe1773de5750893"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#aab914e6cfc84dc9dffe1773de5750893">FiffNamedMatrix</a> ()</td></tr>
 <tr class="separator:aab914e6cfc84dc9dffe1773de5750893"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a64b82bffa0baa637eba38ebc51a15637"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#a64b82bffa0baa637eba38ebc51a15637">FiffNamedMatrix</a> (fiff_int_t p_nrow, fiff_int_t p_ncol, QStringList &amp;p_row_names, QStringList &amp;p_col_names, MatrixXf &amp;p_data)</td></tr>
-<tr class="separator:a64b82bffa0baa637eba38ebc51a15637"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a006788b0a594065e933ae3cc9139a7bb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#a006788b0a594065e933ae3cc9139a7bb">FiffNamedMatrix</a> (fiff_int_t p_nrow, fiff_int_t p_ncol, QStringList &amp;p_row_names, QStringList &amp;p_col_names, MatrixXd &amp;p_data)</td></tr>
+<tr class="separator:a006788b0a594065e933ae3cc9139a7bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa9ee985cf70aba691e5969bc8001b341"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#aa9ee985cf70aba691e5969bc8001b341">FiffNamedMatrix</a> (const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html">FiffNamedMatrix</a> *p_pFiffNamedMatrix)</td></tr>
 <tr class="separator:aa9ee985cf70aba691e5969bc8001b341"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a17f05c53798ade294f3c5e5685ca8a92"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#a17f05c53798ade294f3c5e5685ca8a92">~FiffNamedMatrix</a> ()</td></tr>
 <tr class="separator:a17f05c53798ade294f3c5e5685ca8a92"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae22e999491b11c7150405a085b7ff02b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#ae22e999491b11c7150405a085b7ff02b">isEmpty</a> ()</td></tr>
+<tr class="separator:ae22e999491b11c7150405a085b7ff02b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acfc42a46812792ab7b36a5de046c37b6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#acfc42a46812792ab7b36a5de046c37b6">transpose_named_matrix</a> ()</td></tr>
+<tr class="separator:acfc42a46812792ab7b36a5de046c37b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -124,16 +138,47 @@ QStringList&#160;</td><td class="memItemRight" valign="bottom"><b>row_names</b><
 <tr class="memitem:a612bfa11eef52ae09de143272a6da84f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a612bfa11eef52ae09de143272a6da84f"></a>
 QStringList&#160;</td><td class="memItemRight" valign="bottom"><b>col_names</b></td></tr>
 <tr class="separator:a612bfa11eef52ae09de143272a6da84f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a917cd78cd2d000cb2084684616614d00"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a917cd78cd2d000cb2084684616614d00"></a>
-MatrixXf&#160;</td><td class="memItemRight" valign="bottom"><b>data</b></td></tr>
-<tr class="separator:a917cd78cd2d000cb2084684616614d00"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acfb5a411f08e711484891c90461766b0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acfb5a411f08e711484891c90461766b0"></a>
+MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><b>data</b></td></tr>
+<tr class="separator:acfb5a411f08e711484891c90461766b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A named matrix. </p>
 <p>A matrix with named rows and cols. ToDo: derive this from Eigen::Matrix </p>
 
 <p>Definition at line <a class="el" href="fiff__named__matrix_8h_source.html#l00084">84</a> of file <a class="el" href="fiff__named__matrix_8h_source.html">fiff_named_matrix.h</a>.</p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a class="anchor" id="ac9fe78ab48e91a80a62f64f6550c399b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef QSharedPointer&lt;const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html">FiffNamedMatrix</a>&gt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#ac9fe78ab48e91a80a62f64f6550c399b">FIFFLIB::FiffNamedMatrix::ConstSPtr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Const shared pointer type for <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="A named matrix.">FiffNamedMatrix</a>. </p>
+
+<p>Definition at line <a class="el" href="fiff__named__matrix_8h_source.html#l00088">88</a> of file <a class="el" href="fiff__named__matrix_8h_source.html">fiff_named_matrix.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ae9caf7f441e93dba375b971382c1276b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef QSharedPointer&lt;<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html">FiffNamedMatrix</a>&gt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#ae9caf7f441e93dba375b971382c1276b">FIFFLIB::FiffNamedMatrix::SPtr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Shared pointer type for <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="A named matrix.">FiffNamedMatrix</a>. </p>
+
+<p>Definition at line <a class="el" href="fiff__named__matrix_8h_source.html#l00087">87</a> of file <a class="el" href="fiff__named__matrix_8h_source.html">fiff_named_matrix.h</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="aab914e6cfc84dc9dffe1773de5750893"></a>
 <div class="memitem">
 <div class="memproto">
@@ -152,9 +197,12 @@ MatrixXf&#160;</td><td class="memItemRight" valign="bottom"><b>data</b></td></tr
 
 </div>
 </div>
-<a class="anchor" id="a64b82bffa0baa637eba38ebc51a15637"></a>
+<a class="anchor" id="a006788b0a594065e933ae3cc9139a7bb"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">FiffNamedMatrix::FiffNamedMatrix </td>
@@ -183,7 +231,7 @@ MatrixXf&#160;</td><td class="memItemRight" valign="bottom"><b>data</b></td></tr
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">MatrixXf &amp;&#160;</td>
+          <td class="paramtype">MatrixXd &amp;&#160;</td>
           <td class="paramname"><em>p_data</em>&#160;</td>
         </tr>
         <tr>
@@ -192,10 +240,15 @@ MatrixXf&#160;</td><td class="memItemRight" valign="bottom"><b>data</b></td></tr
           <td></td><td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>ctor </p>
 
-<p>Definition at line <a class="el" href="fiff__named__matrix_8cpp_source.html#l00066">66</a> of file <a class="el" href="fiff__named__matrix_8cpp_source.html">fiff_named_matrix.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__named__matrix_8cpp_source.html#l00067">67</a> of file <a class="el" href="fiff__named__matrix_8cpp_source.html">fiff_named_matrix.cpp</a>.</p>
 
 </div>
 </div>
@@ -214,7 +267,7 @@ MatrixXf&#160;</td><td class="memItemRight" valign="bottom"><b>data</b></td></tr
 </div><div class="memdoc">
 <p>Copy ctor </p>
 
-<p>Definition at line <a class="el" href="fiff__named__matrix_8cpp_source.html#l00078">78</a> of file <a class="el" href="fiff__named__matrix_8cpp_source.html">fiff_named_matrix.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__named__matrix_8cpp_source.html#l00079">79</a> of file <a class="el" href="fiff__named__matrix_8cpp_source.html">fiff_named_matrix.cpp</a>.</p>
 
 </div>
 </div>
@@ -232,7 +285,54 @@ MatrixXf&#160;</td><td class="memItemRight" valign="bottom"><b>data</b></td></tr
 </div><div class="memdoc">
 <p>Destroys the fiffTag. </p>
 
-<p>Definition at line <a class="el" href="fiff__named__matrix_8cpp_source.html#l00090">90</a> of file <a class="el" href="fiff__named__matrix_8cpp_source.html">fiff_named_matrix.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__named__matrix_8cpp_source.html#l00091">91</a> of file <a class="el" href="fiff__named__matrix_8cpp_source.html">fiff_named_matrix.cpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="ae22e999491b11c7150405a085b7ff02b"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool FIFFLIB::FiffNamedMatrix::isEmpty </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Returns true if named matrix contains no data.</p>
+<dl class="section return"><dt>Returns</dt><dd>true if named matrix is empty. </dd></dl>
+
+<p>Definition at line <a class="el" href="fiff__named__matrix_8h_source.html#l00124">124</a> of file <a class="el" href="fiff__named__matrix_8h_source.html">fiff_named_matrix.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="acfc42a46812792ab7b36a5de046c37b6"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void FiffNamedMatrix::transpose_named_matrix </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<h3>MNE toolbox root function ###: Implementation of the mne_transpose_named_matrix function</h3>
+<p>Transpose a named matrix (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="A named matrix.">FiffNamedMatrix</a>) </p>
+
+<p>Definition at line <a class="el" href="fiff__named__matrix_8cpp_source.html#l00099">99</a> of file <a class="el" href="fiff__named__matrix_8cpp_source.html">fiff_named_matrix.cpp</a>.</p>
 
 </div>
 </div>
@@ -243,7 +343,7 @@ MatrixXf&#160;</td><td class="memItemRight" valign="bottom"><b>data</b></td></tr
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Oct 15 2012 18:50:57 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jan 9 2013 17:50:07 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

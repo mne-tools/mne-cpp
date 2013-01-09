@@ -68,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -94,7 +94,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>Contains the old fiff_type declarations - replace them.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="fiff__constants_8h_source.html">fiff_constants.h</a>&quot;</code><br/>
-<code>#include &quot;../3rdParty/Eigen/Core&quot;</code><br/>
+<code>#include &lt;Eigen/Core&gt;</code><br/>
 <code>#include &lt;QDebug&gt;</code><br/>
 <code>#include &lt;QList&gt;</code><br/>
 <code>#include &lt;QStringList&gt;</code><br/>
@@ -116,6 +116,10 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
+<tr class="memitem:a67219b17cf8c0ed2c6af8012f2e81c4d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a67219b17cf8c0ed2c6af8012f2e81c4d"></a>
+typedef Eigen::Matrix&lt; qint16, <br class="typebreak"/>
+Eigen::Dynamic, Eigen::Dynamic &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>FIFFLIB::MatrixDau16</b></td></tr>
+<tr class="separator:a67219b17cf8c0ed2c6af8012f2e81c4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa91e6803a8c99b6e89fee10691b9794a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa91e6803a8c99b6e89fee10691b9794a"></a>
 typedef unsigned char&#160;</td><td class="memItemRight" valign="bottom"><b>FIFFLIB::fiff_byte_t</b></td></tr>
 <tr class="separator:aa91e6803a8c99b6e89fee10691b9794a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -158,9 +162,9 @@ typedef qint16&#160;</td><td class="memItemRight" valign="bottom"><b>FIFFLIB::fi
 <tr class="memitem:ae6a69facaf19d65ebc9b138ed9bf7a25"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae6a69facaf19d65ebc9b138ed9bf7a25"></a>
 typedef qint32&#160;</td><td class="memItemRight" valign="bottom"><b>FIFFLIB::fiff_julian_t</b></td></tr>
 <tr class="separator:ae6a69facaf19d65ebc9b138ed9bf7a25"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a56715f2d17f93b5004ee34343d72b606"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a56715f2d17f93b5004ee34343d72b606"></a>
-typedef void&#160;</td><td class="memItemRight" valign="bottom"><b>FIFFLIB::fiff_data_t</b></td></tr>
-<tr class="separator:a56715f2d17f93b5004ee34343d72b606"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a48c481b5ad86e657491210703e6aabbe"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a48c481b5ad86e657491210703e6aabbe"></a>
+typedef char&#160;</td><td class="memItemRight" valign="bottom"><b>FIFFLIB::fiff_data_t</b></td></tr>
+<tr class="separator:a48c481b5ad86e657491210703e6aabbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6cb44ddaa34828a452fc5696a1065f5a"><td class="memItemLeft" align="right" valign="top">typedef struct <br class="typebreak"/>
 <a class="el" href="struct_f_i_f_f_l_i_b_1_1__fiff_time_rec.html">FIFFLIB::_fiffTimeRec</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>FIFFLIB::fiffTime</b></td></tr>
 <tr class="separator:a6cb44ddaa34828a452fc5696a1065f5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -199,7 +203,7 @@ typedef struct <br class="typebreak"/>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Contains the old fiff_type declarations - replace them. </p>
-<dl class="section author"><dt>Author</dt><dd>Christoph Dinh <a href="#" onclick="location.href='mai'+'lto:'+'chd'+'in'+'h@n'+'mr'+'.mg'+'h.'+'har'+'va'+'rd.'+'ed'+'u'; return false;">chdin<span style="display: none;">.nosp@m.</span>h@nm<span style="display: none;">.nosp@m.</span>r.mgh<span style="display: none;">.nosp@m.</span>.har<span style="display: none;">.nosp@m.</span>vard.<span style="display: none;">.nosp@m.</span>edu</a>; Matti Hämäläinen <a href="#" onclick="location.href='mai'+'lto:'+'msh'+'@n'+'mr.'+'mg'+'h.h'+'ar'+'var'+'d.'+'edu'; return false;">msh@n<span style="display: none;">.nosp@m.</span>mr.m<span style="display: none;">.nosp@m.</span>gh.ha<span style="display: none;">.nosp@m.</span>rvar<span style="display: none;">.nosp@m.</span>d.edu</a> </dd></dl>
+<dl class="section author"><dt>Author</dt><dd>Christoph Dinh <a href="#" onclick="location.href='mai'+'lto:'+'chd'+'in'+'h@n'+'mr'+'.mg'+'h.'+'har'+'va'+'rd.'+'ed'+'u'; return false;">chdin<span style="display: none;">.nosp@m.</span>h@nm<span style="display: none;">.nosp@m.</span>r.mgh<span style="display: none;">.nosp@m.</span>.har<span style="display: none;">.nosp@m.</span>vard.<span style="display: none;">.nosp@m.</span>edu</a>; Matti Hamalainen <a href="#" onclick="location.href='mai'+'lto:'+'msh'+'@n'+'mr.'+'mg'+'h.h'+'ar'+'var'+'d.'+'edu'; return false;">msh@n<span style="display: none;">.nosp@m.</span>mr.m<span style="display: none;">.nosp@m.</span>gh.ha<span style="display: none;">.nosp@m.</span>rvar<span style="display: none;">.nosp@m.</span>d.edu</a> </dd></dl>
 <dl class="section version"><dt>Version</dt><dd>1.0 </dd></dl>
 <dl class="section date"><dt>Date</dt><dd>July, 2012</dd></dl>
 <h1><a class="anchor" id="LICENSE"></a>
@@ -217,7 +221,7 @@ LICENSE</h1>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Oct 15 2012 18:50:57 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jan 9 2013 17:50:07 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

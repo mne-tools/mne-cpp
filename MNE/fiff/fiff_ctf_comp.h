@@ -79,6 +79,9 @@ using namespace Eigen;
 class FIFFSHARED_EXPORT FiffCtfComp {
 
 public:
+    typedef QSharedPointer<FiffCtfComp> SPtr;               /**< Shared pointer type for FiffCtfComp. */
+    typedef QSharedPointer<const FiffCtfComp> ConstSPtr;    /**< Const shared pointer type for FiffCtfComp. */
+
     //=========================================================================================================
     /**
     * Constructs the CTF software compensation data

@@ -57,6 +57,7 @@
 //=============================================================================================================
 
 #include <QList>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -79,9 +80,11 @@ namespace MNELIB
 *
 * @brief epoch data
 */
-class MNESHARED_EXPORT MNEEpochDataList : public QList<MNEEpochData*>
+class MNESHARED_EXPORT MNEEpochDataList : public QList<MNEEpochData::SPtr>
 {
 public:
+    typedef QSharedPointer<MNEEpochDataList> SPtr;              /**< Shared pointer type for MNEEpochDataList. */
+    typedef QSharedPointer<const MNEEpochDataList> ConstSPtr;   /**< Const shared pointer type for MNEEpochDataList. */
 
     //=========================================================================================================
     /**

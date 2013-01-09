@@ -84,6 +84,9 @@ namespace FIFFLIB
 class FIFFSHARED_EXPORT FiffInfo {
 
 public:
+    typedef QSharedPointer<FiffInfo> SPtr;              /**< Shared pointer type for FiffInfo. */
+    typedef QSharedPointer<const FiffInfo> ConstSPtr;   /**< Const shared pointer type for FiffInfo. */
+
     //=========================================================================================================
     /**
     * ctor
@@ -94,7 +97,7 @@ public:
     /**
     * copy ctor
     */
-    FiffInfo(const FiffInfo* p_pFiffInfo);
+    FiffInfo(const FiffInfo& p_FiffInfo);
 
     //=========================================================================================================
     /**

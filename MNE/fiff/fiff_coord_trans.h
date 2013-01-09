@@ -79,6 +79,9 @@ using namespace Eigen;
 class FIFFSHARED_EXPORT FiffCoordTrans {
 
 public:
+    typedef QSharedPointer<FiffCoordTrans> SPtr;            /**< Shared pointer type for FiffCoordTrans. */
+    typedef QSharedPointer<const FiffCoordTrans> ConstSPtr; /**< Const shared pointer type for FiffCoordTrans. */
+
     //=========================================================================================================
     /**
     * Constructs the coordinate transformation descriptor.

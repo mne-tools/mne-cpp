@@ -171,6 +171,9 @@ const fiff_int_t DATA_TYPE           = 65535;      // ffff
 class FIFFSHARED_EXPORT FiffTag : public QByteArray {
 
 public:
+    typedef QSharedPointer<FiffTag> SPtr;            /**< Shared pointer type for FiffTag. */
+    typedef QSharedPointer<const FiffTag> ConstSPtr; /**< Const shared pointer type for FiffTag. */
+
     //=========================================================================================================
     /**
     * ctor //ToDo add FiffStream to constructor and remove static implementations --> make them members
@@ -181,7 +184,7 @@ public:
     /**
     * copy ctor //ToDo add FiffStream to constructor and remove static implementations --> make them members
     */
-    FiffTag(FiffTag* p_pFiffTag);
+    FiffTag(const FiffTag* p_pFiffTag);
 
     //=========================================================================================================
     /**

@@ -1,10 +1,15 @@
 var searchData=
 [
-  ['end_5fblock',['end_block',['../class_f_i_f_f_l_i_b_1_1_fiff.html#a62fd1746738ccc51d61c016e5f6d2d58',1,'FIFFLIB::Fiff::end_block()'],['../class_f_i_f_f_l_i_b_1_1_fiff_file.html#a883c8e228c477cf322a613389b95eaf9',1,'FIFFLIB::FiffFile::end_block()']]],
-  ['end_5ffile',['end_file',['../class_f_i_f_f_l_i_b_1_1_fiff.html#a31f2e83ff8c7fcfefbdd247acdd3cf8a',1,'FIFFLIB::Fiff::end_file()'],['../class_f_i_f_f_l_i_b_1_1_fiff_file.html#a209a29b88afaaec65d2d7cd66ef7506f',1,'FIFFLIB::FiffFile::end_file()']]],
+  ['eeg_5floc',['eeg_loc',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a8d0f25ed69750580b56814407b8c204b',1,'FIFFLIB::FiffChInfo']]],
+  ['eig',['eig',['../class_f_i_f_f_l_i_b_1_1_fiff_cov.html#a39fc29400ff48ad9ef062ba701eab5aa',1,'FIFFLIB::FiffCov']]],
+  ['eigvec',['eigvec',['../class_f_i_f_f_l_i_b_1_1_fiff_cov.html#ab3292fd27b3ab9f10c64dc0b8fd3e12e',1,'FIFFLIB::FiffCov']]],
+  ['end_5fblock',['end_block',['../class_f_i_f_f_l_i_b_1_1_fiff.html#aaf5fdbeca3cbb7e2bd7be5d62d175e37',1,'FIFFLIB::Fiff::end_block()'],['../class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a904df8f48da1564a8d5a975a22aa6b54',1,'FIFFLIB::FiffStream::end_block()']]],
+  ['end_5ffile',['end_file',['../class_f_i_f_f_l_i_b_1_1_fiff.html#a694dadabbf0b775d91b5a0477ddc3f98',1,'FIFFLIB::Fiff::end_file()'],['../class_f_i_f_f_l_i_b_1_1_fiff_stream.html#ae1aa8744d83c7aee9dc57c2f9c9919a8',1,'FIFFLIB::FiffStream::end_file()']]],
   ['endian',['endian',['../struct_f_i_f_f_l_i_b_1_1__fiff__data__ref.html#adf1ace9f1a93518db18b26e97b11929a',1,'FIFFLIB::_fiff_data_ref']]],
-  ['epoch',['epoch',['../class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html#a3c0a436770b95be62152bced43a7aac7',1,'MNELIB::MNEEpochData']]],
+  ['epoch',['epoch',['../class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html#ae4a5960195809fd713fc6ecef9b53731',1,'MNELIB::MNEEpochData']]],
+  ['epochs',['epochs',['../class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a3299c9d7a7c3fc8d874eec57aa141343',1,'FIFFLIB::FiffEvokedData']]],
   ['event',['event',['../class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html#a17777212048bda9f08419a4056a96fa6',1,'MNELIB::MNEEpochData']]],
+  ['evoked',['evoked',['../class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html#af18e09a699c779634826c071320c9ab7',1,'FIFFLIB::FiffEvokedDataSet']]],
   ['ex',['ex',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#a3384bdc6bec84189fc61ad275127dc2f',1,'FIFFLIB::FiffChPos']]],
   ['ey',['ey',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#aa637edd56f2bf5a062c5c8e3b0200ebc',1,'FIFFLIB::FiffChPos']]],
   ['ez',['ez',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#aee3694181745e0a287bee5d4535ea774',1,'FIFFLIB::FiffChPos']]]

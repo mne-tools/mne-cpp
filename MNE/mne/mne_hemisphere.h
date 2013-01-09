@@ -100,8 +100,12 @@ using namespace FIFFLIB;
 *
 * @brief The SourceSpace class provides
 */
-class MNESHARED_EXPORT MNEHemisphere {
+class MNESHARED_EXPORT MNEHemisphere
+{
 public:
+    typedef QSharedPointer<MNEHemisphere> SPtr;             /**< Shared pointer type for MNEHemisphere. */
+    typedef QSharedPointer<const MNEHemisphere> ConstSPtr;  /**< Const shared pointer type for MNEHemisphere. */
+
     //=========================================================================================================
     /**
     * ctor
