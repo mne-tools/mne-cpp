@@ -111,7 +111,7 @@ public:
     }
 
 public:
-    MatrixXd*   epoch;  /**< the data */
+    MatrixXd    epoch;  /**< the data */
     fiff_int_t  event;  /**< the event code */
     float       tmin;   /**< minimal time */
     float       tmax;   /**< maximal time */

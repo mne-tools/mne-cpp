@@ -99,7 +99,7 @@ MNEForwardSolution::MNEForwardSolution(const MNEForwardSolution* p_pMNEForwardSo
 , nchan(p_pMNEForwardSolution->nchan)
 , sol(p_pMNEForwardSolution->sol)//p_pMNEForwardSolution->sol ? new FiffNamedMatrix(p_pMNEForwardSolution->sol) : NULL)
 , sol_grad(p_pMNEForwardSolution->sol_grad)//p_pMNEForwardSolution->sol_grad ? new FiffNamedMatrix(p_pMNEForwardSolution->sol_grad) : NULL)
-, mri_head_t( new FiffCoordTrans(p_pMNEForwardSolution->mri_head_t) )
+, mri_head_t(p_pMNEForwardSolution->mri_head_t)// new FiffCoordTrans(p_pMNEForwardSolution->mri_head_t) )
 , src(p_pMNEForwardSolution->src)//p_pMNEForwardSolution->src ? new MNESourceSpace(p_pMNEForwardSolution->src) : NULL)
 , source_rr(MatrixX3d(p_pMNEForwardSolution->source_rr))
 , source_nn(MatrixX3d(p_pMNEForwardSolution->source_nn))

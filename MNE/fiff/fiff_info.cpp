@@ -64,10 +64,10 @@ using namespace Eigen;
 //=============================================================================================================
 
 FiffInfo::FiffInfo()
-: dev_head_t(NULL)
-, ctf_head_t(NULL)
-, dev_ctf_t(NULL)
-, dig_trans(NULL)
+: nchan(-1)
+, sfreq(-1.0)
+, highpass(-1.0)
+, lowpass(-1.0)
 , acq_pars("")
 , acq_stim("")
 , filename("")
@@ -100,10 +100,10 @@ FiffInfo::FiffInfo(const FiffInfo* p_pFiffInfo)
 
     qint32 i;
     for(i = 0; i < p_pFiffInfo->chs.size(); ++i)
-        chs.append(FiffChInfo(&p_pFiffInfo->chs[i]));
+        chs.append(p_pFiffInfo->chs[i]);
 
     for(i = 0; i < p_pFiffInfo->dig.size(); ++i)
-        dig.append(FiffDigPoint(&p_pFiffInfo->dig[i]));
+        dig.append(FiffDigPoint(p_pFiffInfo->dig[i]));
 
     for(i = 0; i < p_pFiffInfo->projs.size(); ++i)
         projs.append(p_pFiffInfo->projs[i]);
@@ -295,7 +295,7 @@ bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXd& this_comp) const//pri
 
 //*************************************************************************************************************
 
-fiff_int_t FiffInfo::make_projector(QList<FiffProj>& projs, QStringList& ch_names, MatrixXd*& proj, QStringList& bads, MatrixXd& U)
+fiff_int_t FiffInfo::make_projector(QList<FiffProj>& projs, QStringList& ch_names, MatrixXd& proj, QStringList& bads, MatrixXd& U)
 {
     fiff_int_t nchan = ch_names.size();
     if (nchan == 0)
@@ -304,10 +304,9 @@ fiff_int_t FiffInfo::make_projector(QList<FiffProj>& projs, QStringList& ch_name
         return 0;
     }
 
-    if(proj)
-        delete proj;
-
-    proj = new MatrixXd(MatrixXd::Identity(nchan,nchan));
+//    if(proj)
+//        delete proj;
+    proj = MatrixXd::Identity(nchan,nchan);
     fiff_int_t nproj = 0;
 
     //
@@ -453,7 +452,7 @@ fiff_int_t FiffInfo::make_projector(QList<FiffProj>& projs, QStringList& ch_name
     //
     //   Here is the celebrated result
     //
-    *proj -= U*U.transpose();
+    proj -= U*U.transpose();
     nproj = nvec;
 
     return nproj;
@@ -680,7 +679,7 @@ QList<FiffChInfo> FiffInfo::set_current_comp(QList<FiffChInfo>& chs, fiff_int_t 
 
     for(k = 0; k < chs.size(); ++k)
     {
-        new_chs.append(FiffChInfo(&chs[k]));
+        new_chs.append(chs[k]);
     }
 
     qint32 lower_half = 65535;// hex2dec('FFFF');

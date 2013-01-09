@@ -99,15 +99,15 @@ void FiffProducer::run()
     m_bIsRunning = true;
 
     // reopen file in this thread
-    QFile* t_pFile = new QFile(m_pFiffSimulator->m_pRawInfo->info.filename);
+    QFile* t_pFile = new QFile(m_pFiffSimulator->m_RawInfo.info.filename);
     FiffStream* p_pStream = new FiffStream(t_pFile);
-    m_pFiffSimulator->m_pRawInfo->file = p_pStream;
+    m_pFiffSimulator->m_RawInfo.file = p_pStream;
 
     //
     //   Set up the reading parameters
     //
-    fiff_int_t from = m_pFiffSimulator->m_pRawInfo->first_samp;
-    fiff_int_t to = m_pFiffSimulator->m_pRawInfo->last_samp;
+    fiff_int_t from = m_pFiffSimulator->m_RawInfo.first_samp;
+    fiff_int_t to = m_pFiffSimulator->m_RawInfo.last_samp;
 //    float quantum_sec = (float)uiSamplePeriod/1000000.0f; //read and write in 10 sec junks
     fiff_int_t quantum = m_pFiffSimulator->getBufferSampleSize();//ceil(quantum_sec*m_pFiffSimulator->m_pRawInfo->info->sfreq);
 
@@ -123,19 +123,19 @@ void FiffProducer::run()
     //
 
     fiff_int_t first, last;
-    MatrixXd* data = NULL;
-    MatrixXd* times = NULL;
+    MatrixXd data;
+    MatrixXd times;
 
     first = from;
 
-    qint32 nchan = m_pFiffSimulator->m_pRawInfo->info.nchan;
+    qint32 nchan = m_pFiffSimulator->m_RawInfo.info.nchan;
 
     MatrixXd cals(1,nchan);
 
     SparseMatrix<double> inv_calsMat(nchan, nchan);
 
     for(qint32 i = 0; i < nchan; ++i)
-        inv_calsMat.insert(i, i) = 1.0f/m_pFiffSimulator->m_pRawInfo->info.chs[i].cal;
+        inv_calsMat.insert(i, i) = 1.0f/m_pFiffSimulator->m_RawInfo.info.chs[i].cal;
 
     //Not good cause production time is not accurate
     //loading and thread sleep is longer than thread sleep time - better to have a extra loading thread
@@ -154,12 +154,12 @@ void FiffProducer::run()
             last = to;
         }
 
-        if (!m_pFiffSimulator->m_pRawInfo->read_raw_segment(data,times,first,last))
+        if (!m_pFiffSimulator->m_RawInfo.read_raw_segment(data,times,first,last))
         {
             printf("error during read_raw_segment\n");
         }
 
-        MatrixXf tmp = (inv_calsMat*(*data)).cast<float>();
+        MatrixXf tmp = (inv_calsMat*data).cast<float>();
 
         if(t_bRestart)
         {
@@ -171,12 +171,12 @@ void FiffProducer::run()
             first = from;
             last = first+t_iDiff-1;
 
-            if (!m_pFiffSimulator->m_pRawInfo->read_raw_segment(data,times,first,last))
+            if (!m_pFiffSimulator->m_RawInfo.read_raw_segment(data,times,first,last))
             {
                 printf("error during read_raw_segment\n");
             }
 
-            MatrixXf tmp2 = (inv_calsMat*(*data)).cast<float>();
+            MatrixXf tmp2 = (inv_calsMat*data).cast<float>();
 
             MatrixXf tmp3(tmp.rows(), tmp.cols()+tmp2.cols());
 
@@ -198,6 +198,6 @@ void FiffProducer::run()
     }
 
     // close datastream in this thread
-    delete m_pFiffSimulator->m_pRawInfo->file;
-    m_pFiffSimulator->m_pRawInfo->file = NULL;
+    delete m_pFiffSimulator->m_RawInfo.file;
+    m_pFiffSimulator->m_RawInfo.file = NULL;
 }

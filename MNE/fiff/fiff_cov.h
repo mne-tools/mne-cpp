@@ -88,33 +88,27 @@ class FIFFSHARED_EXPORT FiffCov
 public:
     //=========================================================================================================
     /**
-    * ctor
+    * Constructs the covariance data matrix.
     */
     FiffCov();
 
     //=========================================================================================================
     /**
-    * copy ctor
-    */
-    FiffCov(const FiffCov* p_pFiffCov);
-
-    //=========================================================================================================
-    /**
-    * Destroys the MNECov.
+    * Destroys the covariance data matrix.
     */
     ~FiffCov();
 
 public:
-    fiff_int_t  kind;       /**< ToDo... */
-    bool diag;              /**< ToDo... */
-    fiff_int_t dim;         /**< ToDo... */
-    QStringList names;      /**< ToDo... */
-    MatrixXd data;         /**< ToDo... */
-    QList<FiffProj> projs; /**< ToDo... */
-    QStringList bads;       /**< ToDo... */
-    fiff_int_t nfree;       /**< ToDo... */
-    VectorXd eig;          /**< ToDo... */
-    MatrixXd eigvec;       /**< ToDo... */
+    fiff_int_t  kind;       /**< Covariance kind -> fiff_constants.h */
+    bool diag;              /**< If the covariance is stored in a diagonal order. */
+    fiff_int_t dim;         /**< Dimension of the covariance (dim x dim). */
+    QStringList names;      /**< Channel names. */
+    MatrixXd data;          /**< Covariance data */
+    QList<FiffProj> projs;  /**< List of available ssp projectors. */
+    QStringList bads;       /**< List of bad channels. */
+    fiff_int_t nfree;       /**< ToDo */
+    VectorXd eig;           /**< Vector of eigenvalues. */
+    MatrixXd eigvec;        /**< Matrix of eigenvectors. */
 };
 
 } // NAMESPACE

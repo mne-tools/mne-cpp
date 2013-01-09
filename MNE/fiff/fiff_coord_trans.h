@@ -81,19 +81,13 @@ class FIFFSHARED_EXPORT FiffCoordTrans {
 public:
     //=========================================================================================================
     /**
-    * ctor
+    * Constructs the coordinate transformation descriptor.
     */
     FiffCoordTrans();
 
     //=========================================================================================================
     /**
-    * copy ctor
-    */
-    FiffCoordTrans(const FiffCoordTrans* t_pFiffCoordTrans);
-
-    //=========================================================================================================
-    /**
-    * Destroys the fiffTag.
+    * Destroys the coordinate transformation descriptor.
     */
     ~FiffCoordTrans();
 
@@ -128,14 +122,13 @@ public:
     inline static qint32 storageSize();
 
 public:
-    //EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     fiff_int_t  from;   /**< Source coordinate system. */
     fiff_int_t  to;     /**< Destination coordinate system. */
     Matrix<double, 4,4, DontAlign>   trans;      /**< The forward transform */
     Matrix<double, 4,4, DontAlign>   invtrans;   /**< The inverse transform */
 
+// ### OLD STRUCT ###
 // Coordinate transformation descriptor
-
 // typedef struct _fiffCoordTransRec {
 //  fiff_int_t   from;                    /< Source coordinate system. /
 //  fiff_int_t   to;                      /< Destination coordinate system. /

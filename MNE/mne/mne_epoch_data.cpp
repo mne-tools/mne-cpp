@@ -55,8 +55,7 @@ using namespace MNELIB;
 //=============================================================================================================
 
 MNEEpochData::MNEEpochData()
-: epoch(NULL)
-, event(-1)
+: event(-1)
 , tmin(-1)
 , tmax(-1)
 {
@@ -68,6 +67,5 @@ MNEEpochData::MNEEpochData()
 
 MNEEpochData::~MNEEpochData()
 {
-    if (epoch)
-        delete epoch;
+
 }

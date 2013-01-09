@@ -129,7 +129,7 @@ public:
     *
     * @return the desired fiff evoked data set
     */
-    FiffEvokedDataSet* pick_channels_evoked(QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
+    FiffEvokedDataSet pick_channels_evoked(QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
 
     //=========================================================================================================
     /**
@@ -147,11 +147,11 @@ public:
     *
     * @return the CTF software compensation data
     */
-    static bool read_evoked(QIODevice* p_pIODevice, FiffEvokedDataSet*& data, fiff_int_t setno = 0);
+    static bool read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& data, fiff_int_t setno = 0);
 
 public:
     FiffInfo                info;   /**< ToDo... */
-    QList<FiffEvokedData*>  evoked; /**< ToDo... */
+    QList<FiffEvokedData>  evoked; /**< ToDo... */
 };
 
 } // NAMESPACE

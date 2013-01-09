@@ -150,7 +150,7 @@ public:
     *
     * @return nproj - How many items in the projector
     */
-    static fiff_int_t make_projector(QList<FiffProj>& projs, QStringList& ch_names, MatrixXd*& proj, QStringList& bads = defaultQStringList, MatrixXd& U = defaultMatrixXd);
+    static fiff_int_t make_projector(QList<FiffProj>& projs, QStringList& ch_names, MatrixXd& proj, QStringList& bads = defaultQStringList, MatrixXd& U = defaultMatrixXd);
 
 
     //=========================================================================================================
@@ -166,7 +166,7 @@ public:
     *
     * @return nproj - How many items in the projector
     */
-    inline qint32 make_projector_info(MatrixXd*& proj)
+    inline qint32 make_projector_info(MatrixXd& proj)
     {
         return make_projector(this->projs,this->ch_names, proj, this->bads);
     }
@@ -267,26 +267,26 @@ private:
 
 
 public: //Public because it's a mne struct
-    FiffId      file_id;
-    FiffId      meas_id;
-    fiff_int_t  meas_date[2];
-    fiff_int_t  nchan;
-    float sfreq;
-    float highpass;
-    float lowpass;
-    QList<FiffChInfo> chs;
-    QStringList ch_names;
-    FiffCoordTrans dev_head_t;
-    FiffCoordTrans ctf_head_t;
-    FiffCoordTrans dev_ctf_t;
-    QList<FiffDigPoint> dig;
-    FiffCoordTrans dig_trans;
-    QStringList bads;
-    QList<FiffProj> projs;
-    QList<FiffCtfComp> comps;
-    QString acq_pars;
-    QString acq_stim;
-    QString filename;
+    FiffId      file_id;        /**< File ID. */
+    FiffId      meas_id;        /**< Measurement ID. */
+    fiff_int_t  meas_date[2];   /**< Measurement date. */
+    fiff_int_t  nchan;          /**< Number of channels. */
+    float sfreq;                /**< Sample frequency. */
+    float highpass;             /**< Highpass frequency. */
+    float lowpass;              /**< Lowpass frequency. */
+    QList<FiffChInfo> chs;      /**< List of all channel info descriptors. */
+    QStringList ch_names;       /**< List of all channel names. */
+    FiffCoordTrans dev_head_t;  /**< ToDo... */
+    FiffCoordTrans ctf_head_t;  /**< ToDo... */
+    FiffCoordTrans dev_ctf_t;   /**< ToDo... */
+    QList<FiffDigPoint> dig;    /**< List of all digitization point descriptors. */
+    FiffCoordTrans dig_trans;   /**< ToDo... */
+    QStringList bads;           /**< List of bad channels. */
+    QList<FiffProj> projs;      /**< List of available SSP projectors. */
+    QList<FiffCtfComp> comps;   /**< List of available CTF software compensators. */
+    QString acq_pars;           /**< ToDo... */
+    QString acq_stim;           /**< ToDo... */
+    QString filename;           /**< Filename when the info is read of a fiff file. */
 };
 
 } // NAMESPACE

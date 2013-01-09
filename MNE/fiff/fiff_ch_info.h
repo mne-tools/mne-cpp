@@ -80,19 +80,13 @@ class FIFFSHARED_EXPORT FiffChInfo {
 public:
     //=========================================================================================================
     /**
-    * ctor
+    * Constructs the channel info descriptor.
     */
     FiffChInfo();
 
     //=========================================================================================================
     /**
-    * Copy ctor
-    */
-    FiffChInfo(const FiffChInfo* ch);
-
-    //=========================================================================================================
-    /**
-    * Destroys the FiffChInfoRec.
+    * Destroys the channel info descriptor.
     */
     ~FiffChInfo();
 
@@ -105,7 +99,6 @@ public:
     inline static qint32 storageSize();
 
 public:
-    //EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     fiff_int_t    scanno;       /**< Scanning order number 1*/
     fiff_int_t    logno;        /**< Logical channel # 1*/
     fiff_int_t    kind;         /**< Kind of channel 1*/
@@ -114,16 +107,18 @@ public:
 
     fiff_int_t coil_type;       /**< Which kind of coil. */
 
-    Matrix<double,12,1, DontAlign>  loc;
-    Matrix<double,4,4, DontAlign>   coil_trans;  /**< Channel location */
-    Matrix<double,3,2, DontAlign>   eeg_loc;
-    fiff_int_t                      coord_frame;
+    Matrix<double,12,1, DontAlign>  loc;            /**< Channel (MEG) location */
+    Matrix<double,4,4, DontAlign>   coil_trans;     /**< ToDo... */
+    Matrix<double,3,2, DontAlign>   eeg_loc;        /**< Channel location */
+    fiff_int_t                      coord_frame;    /**< Coordinate Frame */
 
-    //    fiff_ch_pos_t chpos;        /**< Channel location 15*/
+//    fiff_ch_pos_t chpos;        /**< Channel location 15*/
+
     fiff_int_t    unit;         /**< Unit of measurement 1*/
     fiff_int_t    unit_mul;     /**< Unit multiplier exponent 1*/
     QString       ch_name;      /**< Descriptive name for the channel 16*/
 
+// ### OLD STRUCT ###
 // typedef struct _fiffChInfoRec {
 //     fiff_int_t    scanNo;		/**< Scanning order number *
 //     fiff_int_t    logNo;		/**< Logical channel # *

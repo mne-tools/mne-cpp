@@ -68,7 +68,7 @@ FiffEvokedDataSet::FiffEvokedDataSet(const FiffEvokedDataSet* p_pFiffEvokedDataS
 {
     for(qint32 i = 0; i < p_pFiffEvokedDataSet->evoked.size(); ++i)
     {
-        evoked.append(new FiffEvokedData(p_pFiffEvokedDataSet->evoked[i]));
+        evoked.append(p_pFiffEvokedDataSet->evoked[i]);
     }
 }
 
@@ -80,16 +80,16 @@ FiffEvokedDataSet::~FiffEvokedDataSet()
 //    if (info)
 //        delete info;
 
-    QList<FiffEvokedData*>::iterator i;
-    for (i = this->evoked.begin(); i != this->evoked.end(); ++i)
-        if (*i)
-            delete *i;
+//    QList<FiffEvokedData*>::iterator i;
+//    for (i = this->evoked.begin(); i != this->evoked.end(); ++i)
+//        if (*i)
+//            delete *i;
 }
 
 
 //*************************************************************************************************************
 
-FiffEvokedDataSet* FiffEvokedDataSet::pick_channels_evoked(QStringList& include, QStringList& exclude)
+FiffEvokedDataSet FiffEvokedDataSet::pick_channels_evoked(QStringList& include, QStringList& exclude)
 {
     if(include.size() == 0 && exclude.size() == 0)
         return new FiffEvokedDataSet(this);
@@ -116,14 +116,14 @@ FiffEvokedDataSet* FiffEvokedDataSet::pick_channels_evoked(QStringList& include,
     qint32 k, l;
     for(k = 0; k < res->evoked.size(); ++k)
     {
-        if(selBlock.rows() != sel.cols() || selBlock.cols() != res->evoked[k]->epochs.cols())
-            selBlock.resize(sel.cols(), res->evoked[k]->epochs.cols());
+        if(selBlock.rows() != sel.cols() || selBlock.cols() != res->evoked[k].epochs.cols())
+            selBlock.resize(sel.cols(), res->evoked[k].epochs.cols());
         for(l = 0; l < sel.cols(); ++l)
         {
-            selBlock.block(l,0,1,selBlock.cols()) = res->evoked[k]->epochs.block(sel(0,l),0,1,selBlock.cols());
+            selBlock.block(l,0,1,selBlock.cols()) = res->evoked[k].epochs.block(sel(0,l),0,1,selBlock.cols());
         }
-        res->evoked[k]->epochs.resize(sel.cols(), res->evoked[k]->epochs.cols());
-        res->evoked[k]->epochs = selBlock;
+        res->evoked[k].epochs.resize(sel.cols(), res->evoked[k].epochs.cols());
+        res->evoked[k].epochs = selBlock;
     }
 
     return res;
@@ -132,11 +132,9 @@ FiffEvokedDataSet* FiffEvokedDataSet::pick_channels_evoked(QStringList& include,
 
 //*************************************************************************************************************
 
-bool FiffEvokedDataSet::read_evoked(QIODevice* p_pIODevice, FiffEvokedDataSet*& data, fiff_int_t setno)
+bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& data, fiff_int_t setno)
 {
-    if(data)
-        delete data;
-    data = NULL;
+    data = FiffEvokedDataSet();
 
     if (setno < 0)
     {
@@ -146,7 +144,7 @@ bool FiffEvokedDataSet::read_evoked(QIODevice* p_pIODevice, FiffEvokedDataSet*& 
     //
     //   Open the file
     //
-    FiffStream* t_pStream = new FiffStream(p_pIODevice);
+    FiffStream* t_pStream = new FiffStream(&p_IODevice);
     QString t_sFileName = t_pStream->streamName();
 
     printf("Reading %s ...\n",t_sFileName.toUtf8().constData());
@@ -473,7 +471,7 @@ bool FiffEvokedDataSet::read_evoked(QIODevice* p_pIODevice, FiffEvokedDataSet*& 
             delete t_pDir;
 //        if(info)
 //            delete info;
-        printf("Incorrect number of samples (%d instead of %d)", all.cols(), nsamp);
+        printf("Incorrect number of samples (%d instead of %d)", (int)all.cols(), nsamp);
         return false;
     }
     //
@@ -487,36 +485,34 @@ bool FiffEvokedDataSet::read_evoked(QIODevice* p_pIODevice, FiffEvokedDataSet*& 
     //   Put it all together
     //
     data = new FiffEvokedDataSet();
-    data->info = info;
+    data.info = info;
 
-//        if(data->evoked)
-//            delete data->evoked;
-    data->evoked.append(new FiffEvokedData());
-    data->evoked[0]->aspect_kind = aspect_kind;
-    data->evoked[0]->is_smsh     = is_smsh(0,setno);
+//        if(data.evoked)
+//            delete data.evoked;
+    data.evoked.append(FiffEvokedData());
+    data.evoked[0].aspect_kind = aspect_kind;
+    data.evoked[0].is_smsh     = is_smsh(0,setno);
     if (nave != -1)
-        data->evoked[0]->nave = nave;
+        data.evoked[0].nave = nave;
     else
-        data->evoked[0]->nave  = 1;
+        data.evoked[0].nave  = 1;
 
-    data->evoked[0]->first = first;
-    data->evoked[0]->last  = last;
+    data.evoked[0].first = first;
+    data.evoked[0].last  = last;
     if (!comment.isEmpty())
-        data->evoked[0]->comment = comment;
+        data.evoked[0].comment = comment;
     //
     //   Times for convenience and the actual epoch data
     //
 
-    if(data->evoked[0]->times)
-        delete data->evoked[0]->times;
-    data->evoked[0]->times = new MatrixXd(1, last-first+1);
+    data.evoked[0].times = MatrixXd(1, last-first+1);
 
-    for (k = 0; k < data->evoked[0]->times->cols(); ++k)
-        (*data->evoked[0]->times)(0, k) = ((float)(first+k)) / info.sfreq;
+    for (k = 0; k < data.evoked[0].times.cols(); ++k)
+        data.evoked[0].times(0, k) = ((float)(first+k)) / info.sfreq;
 
-//    if(data->evoked[0].epochs)
-//        delete data->evoked[0]->epochs;
-    data->evoked[0]->epochs = all;
+//    if(data.evoked[0].epochs)
+//        delete data.evoked[0]->epochs;
+    data.evoked[0].epochs = all;
 
     if(t_pStream)
         delete t_pStream;

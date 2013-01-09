@@ -319,9 +319,9 @@ public:
     *
     * @return the desired fiff evoked data set
     */
-    inline static FiffEvokedDataSet* pick_channels_evoked(FiffEvokedDataSet* orig, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList)
+    inline static FiffEvokedDataSet pick_channels_evoked(FiffEvokedDataSet& orig, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList)
     {
-        return orig->pick_channels_evoked(include, exclude);
+        return orig.pick_channels_evoked(include, exclude);
     }
 
     //=========================================================================================================
@@ -425,9 +425,9 @@ public:
     *
     * @return the CTF software compensation data
     */
-    static inline bool read_evoked(QIODevice* p_pIODevice, FiffEvokedDataSet*& data, fiff_int_t setno = 0)
+    static inline bool read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& data, fiff_int_t setno = 0)
     {
-        return FiffEvokedDataSet::read_evoked(p_pIODevice, data, setno);
+        return FiffEvokedDataSet::read_evoked(p_IODevice, data, setno);
     }
 
     //=========================================================================================================
@@ -513,9 +513,9 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    inline static bool read_raw_segment(FiffRawData* raw, MatrixXd*& data, MatrixXd*& times, fiff_int_t from = -1, fiff_int_t to = -1, MatrixXi sel = defaultMatrixXi)
+    inline static bool read_raw_segment(FiffRawData& raw, MatrixXd& data, MatrixXd& times, fiff_int_t from = -1, fiff_int_t to = -1, MatrixXi sel = defaultMatrixXi)
     {
-        return raw->read_raw_segment(data, times, from, to, sel);
+        return raw.read_raw_segment(data, times, from, to, sel);
     }
 
     //=========================================================================================================
@@ -577,7 +577,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    inline static bool setup_read_raw(QIODevice* p_pIODevice, FiffRawData*& data, bool allow_maxshield = false)
+    inline static bool setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool allow_maxshield = false)
     {
         return FiffStream::setup_read_raw(p_pIODevice, data, allow_maxshield);
     }
@@ -655,7 +655,7 @@ public:
     *
     * @return the started fiff file
     */
-    inline static FiffStream* start_writing_raw(QIODevice* p_pIODevice, const FiffInfo& info, MatrixXd*& cals, MatrixXi sel = defaultMatrixXi)
+    inline static FiffStream* start_writing_raw(QIODevice* p_pIODevice, const FiffInfo& info, MatrixXd& cals, MatrixXi sel = defaultMatrixXi)
     {
         return FiffStream::start_writing_raw(p_pIODevice, info, cals, sel);
     }
@@ -885,7 +885,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    inline static bool write_raw_buffer(FiffStream* p_pStream, MatrixXd* buf, MatrixXd* cals)
+    inline static bool write_raw_buffer(FiffStream* p_pStream, const MatrixXd& buf, const MatrixXd& cals)
     {
         return p_pStream->write_raw_buffer(buf, cals);
     }

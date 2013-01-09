@@ -80,7 +80,8 @@ SOURCES += fiff.cpp \
     fiff_evoked_data_set.cpp \
     fiff_evoked_data.cpp \
     fiff_cov.cpp \
-    fiff_stream.cpp
+    fiff_stream.cpp \
+    fiff_dir_entry.cpp
 
 HEADERS += fiff.h \
     fiff_global.h \
