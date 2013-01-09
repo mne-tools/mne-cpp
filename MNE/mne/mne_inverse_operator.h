@@ -101,8 +101,10 @@ using namespace Eigen;
 */
 class MNESHARED_EXPORT MNEInverseOperator
 {
-
 public:
+    typedef QSharedPointer<MNEInverseOperator> SPtr;            /**< Shared pointer type for MNEInverseOperator. */
+    typedef QSharedPointer<const MNEInverseOperator> ConstSPtr; /**< Const shared pointer type for MNEInverseOperator. */
+
     //=========================================================================================================
     /**
     * ctor

@@ -15,6 +15,7 @@
 //=============================================================================================================
 
 #include <QString>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -45,6 +46,9 @@ using namespace Eigen;
 class MNEMATHSHARED_EXPORT KMeans
 {
 public:
+    typedef QSharedPointer<KMeans> SPtr;            /**< Shared pointer type for KMeans. */
+    typedef QSharedPointer<const KMeans> ConstSPtr; /**< Const shared pointer type for KMeans. */
+
     //distance {'sqeuclidean','cityblock','cosine','correlation','hamming'};
     //startNames = {'uniform','sample','cluster'};
     //emptyactNames = {'error','drop','singleton'};

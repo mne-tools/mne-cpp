@@ -73,6 +73,9 @@ namespace FIFFLIB
 class FIFFSHARED_EXPORT FiffRawDir {
 
 public:
+    typedef QSharedPointer<FiffRawDir> SPtr;            /**< Shared pointer type for FiffRawDir. */
+    typedef QSharedPointer<const FiffRawDir> ConstSPtr; /**< Const shared pointer type for FiffRawDir. */
+
     //=========================================================================================================
     /**
     * ctor

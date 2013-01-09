@@ -51,6 +51,7 @@
 //=============================================================================================================
 
 #include <QSet>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -70,12 +71,15 @@ class Subject;
 class IObserver
 {
 public:
+    typedef QSharedPointer<IObserver> SPtr;             /**< Shared pointer type for IObserver. */
+    typedef QSharedPointer<const IObserver> ConstSPtr;  /**< Const shared pointer type for IObserver. */
 
     //=========================================================================================================
     /**
     * Destroys the IObserver.
     */
     virtual ~IObserver() {};
+
     //=========================================================================================================
     /**
     * Updates the IObserver.
@@ -95,6 +99,8 @@ public:
 class GENERICSSHARED_EXPORT Subject
 {
 public:
+    typedef QSharedPointer<Subject> SPtr;               /**< Shared pointer type for Subject. */
+    typedef QSharedPointer<const Subject> ConstSPtr;    /**< Const shared pointer type for Subject. */
 
     //=========================================================================================================
     /**

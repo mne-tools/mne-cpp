@@ -183,10 +183,10 @@ typedef struct _fiff_event_bits {
 /** Structure for external file references */
 
 typedef struct _fiff_data_ref {
-    fiff_int_t      type;		/**< Type of the data */
-    fiff_int_t      endian;          /**< Are the data in the little or big endian byte order */
-    fiff_long_t     size;		/**< Size of the data, can be over 2 GB  */
-    fiff_long_t     offset;		/**< Offset to the data in the external file  */
+    fiff_int_t      type;       /**< Type of the data */
+    fiff_int_t      endian;     /**< Are the data in the little or big endian byte order */
+    fiff_long_t     size;       /**< Size of the data, can be over 2 GB  */
+    fiff_long_t     offset;     /**< Offset to the data in the external file  */
 } *fiffDataRef,fiffDataRefRec;
 
 }//NAMESPACE

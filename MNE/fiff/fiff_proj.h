@@ -88,11 +88,14 @@ using namespace Eigen;
 class FIFFSHARED_EXPORT FiffProj {
 
 public:
+    typedef QSharedPointer<FiffProj> SPtr;              /**< Shared pointer type for FiffProj. */
+    typedef QSharedPointer<const FiffProj> ConstSPtr;   /**< Const shared pointer type for FiffProj. */
+
     //=========================================================================================================
     /**
     * ctor
     */
-    FiffProj();
+    explicit FiffProj();
 
     //=========================================================================================================
     /**
@@ -104,10 +107,10 @@ public:
     /**
     * ctor
     */
-    FiffProj(   fiff_int_t p_kind,
-                bool p_active,
-                QString p_desc,
-                FiffNamedMatrix& p_data);
+    explicit FiffProj(  fiff_int_t p_kind,
+                        bool p_active,
+                        QString p_desc,
+                        FiffNamedMatrix& p_data);
 
     //=========================================================================================================
     /**

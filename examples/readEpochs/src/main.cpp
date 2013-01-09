@@ -336,7 +336,7 @@ int main(int argc, char *argv[])
             epoch->tmin = ((float)(from)-(float)(raw.first_samp))/raw.info.sfreq;
             epoch->tmax = ((float)(to)-(float)(raw.first_samp))/raw.info.sfreq;
 
-            data.append(epoch);//List takes ownwership of the pointer - no delete need
+            data.append(MNEEpochData::SPtr(epoch));//List takes ownwership of the pointer - no delete need
         }
         else
         {

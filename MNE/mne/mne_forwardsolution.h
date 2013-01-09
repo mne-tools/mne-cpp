@@ -118,8 +118,11 @@ using namespace FSLIB;
 *
 * @brief The SourceSpace class provides
 */
-class MNESHARED_EXPORT MNEForwardSolution {
+class MNESHARED_EXPORT MNEForwardSolution
+{
 public:
+    typedef QSharedPointer<MNEForwardSolution> SPtr;            /**< Shared pointer type for MNEForwardSolution. */
+    typedef QSharedPointer<const MNEForwardSolution> ConstSPtr; /**< Const shared pointer type for MNEForwardSolution. */
 
     //=========================================================================================================
     /**

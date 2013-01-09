@@ -78,6 +78,9 @@ using namespace Eigen;
 class FIFFSHARED_EXPORT FiffChInfo {
 
 public:
+    typedef QSharedPointer<FiffChInfo> SPtr;            /**< Shared pointer type for FiffChInfo. */
+    typedef QSharedPointer<const FiffChInfo> ConstSPtr; /**< Const shared pointer type for FiffChInfo. */
+
     //=========================================================================================================
     /**
     * Constructs the channel info descriptor.

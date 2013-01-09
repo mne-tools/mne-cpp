@@ -69,6 +69,9 @@ namespace FIFFLIB
 class FIFFSHARED_EXPORT FiffDirEntry {
 
 public:
+    typedef QSharedPointer<FiffDirEntry> SPtr;              /**< Shared pointer type for FiffDirEntry. */
+    typedef QSharedPointer<const FiffDirEntry> ConstSPtr;   /**< Const shared pointer type for FiffDirEntry. */
+
     //=========================================================================================================
     /**
     * Constructs the dir entry.

@@ -51,6 +51,7 @@
 //=============================================================================================================
 
 #include <QString>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -92,11 +93,14 @@ class FSSHARED_EXPORT Annotation
 {
 
 public:
+    typedef QSharedPointer<Annotation> SPtr;            /**< Shared pointer type for Annotation. */
+    typedef QSharedPointer<const Annotation> ConstSPtr; /**< Const shared pointer type for Annotation. */
+
     //=========================================================================================================
     /**
     * ToDo..
     */
-    Annotation(QString& t_sFileName);
+    explicit Annotation(QString& t_sFileName);
 
     //=========================================================================================================
     /**

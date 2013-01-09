@@ -84,6 +84,9 @@ using namespace Eigen;
 class FIFFSHARED_EXPORT FiffNamedMatrix {
 
 public:
+    typedef QSharedPointer<FiffNamedMatrix> SPtr;               /**< Shared pointer type for FiffNamedMatrix. */
+    typedef QSharedPointer<const FiffNamedMatrix> ConstSPtr;    /**< Const shared pointer type for FiffNamedMatrix. */
+
     //=========================================================================================================
     /**
     * ctor
@@ -94,11 +97,11 @@ public:
     /**
     * ctor
     */
-    FiffNamedMatrix(    fiff_int_t p_nrow,
-                        fiff_int_t p_ncol,
-                        QStringList& p_row_names,
-                        QStringList& p_col_names,
-                        MatrixXd& p_data);
+    explicit FiffNamedMatrix(   fiff_int_t p_nrow,
+                                fiff_int_t p_ncol,
+                                QStringList& p_row_names,
+                                QStringList& p_col_names,
+                                MatrixXd& p_data);
 
     //=========================================================================================================
     /**

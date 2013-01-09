@@ -87,6 +87,9 @@ class FIFFSHARED_EXPORT FiffEvokedData
 {
 
 public:
+    typedef QSharedPointer<FiffEvokedData> SPtr;               /**< Shared pointer type for FiffEvokedData. */
+    typedef QSharedPointer<const FiffEvokedData> ConstSPtr;    /**< Const shared pointer type for FiffEvokedData. */
+
     //=========================================================================================================
     /**
     * ctor

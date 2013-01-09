@@ -84,8 +84,10 @@ using namespace Eigen;
 */
 class FIFFSHARED_EXPORT FiffCov
 {
-
 public:
+    typedef QSharedPointer<FiffCov> SPtr;               /**< Shared pointer type for FiffCov. */
+    typedef QSharedPointer<const FiffCov> ConstSPtr;    /**< Const shared pointer type for FiffCov. */
+
     //=========================================================================================================
     /**
     * Constructs the covariance data matrix.

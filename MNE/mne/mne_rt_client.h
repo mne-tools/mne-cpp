@@ -103,6 +103,8 @@ class MNESHARED_EXPORT MNERtClient : public QThread
 {
     Q_OBJECT
 public:
+    typedef QSharedPointer<MNERtClient> SPtr;               /**< Shared pointer type for MNERtClient. */
+    typedef QSharedPointer<const MNERtClient> ConstSPtr;    /**< Const shared pointer type for MNERtClient. */
 
     //=========================================================================================================
     /**

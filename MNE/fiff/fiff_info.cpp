@@ -78,38 +78,38 @@ FiffInfo::FiffInfo()
 
 //*************************************************************************************************************
 
-FiffInfo::FiffInfo(const FiffInfo* p_pFiffInfo)
-: file_id(FiffId(&p_pFiffInfo->file_id))
-, meas_id(FiffId(&p_pFiffInfo->meas_id))
-, nchan(p_pFiffInfo->nchan)
-, sfreq(p_pFiffInfo->sfreq)
-, highpass(p_pFiffInfo->highpass)
-, lowpass(p_pFiffInfo->lowpass)
-, dev_head_t(p_pFiffInfo->dev_head_t)
-, ctf_head_t(p_pFiffInfo->ctf_head_t)
-, dev_ctf_t(p_pFiffInfo->dev_ctf_t)
-, dig_trans(p_pFiffInfo->dig_trans)
-, ch_names(p_pFiffInfo->ch_names)
-, bads(p_pFiffInfo->bads)
-, acq_pars(p_pFiffInfo->acq_pars)
-, acq_stim(p_pFiffInfo->acq_stim)
-, filename(p_pFiffInfo->filename)
+FiffInfo::FiffInfo(const FiffInfo& p_FiffInfo)
+: file_id(FiffId(&p_FiffInfo.file_id))
+, meas_id(FiffId(&p_FiffInfo.meas_id))
+, nchan(p_FiffInfo.nchan)
+, sfreq(p_FiffInfo.sfreq)
+, highpass(p_FiffInfo.highpass)
+, lowpass(p_FiffInfo.lowpass)
+, dev_head_t(p_FiffInfo.dev_head_t)
+, ctf_head_t(p_FiffInfo.ctf_head_t)
+, dev_ctf_t(p_FiffInfo.dev_ctf_t)
+, dig_trans(p_FiffInfo.dig_trans)
+, ch_names(p_FiffInfo.ch_names)
+, bads(p_FiffInfo.bads)
+, acq_pars(p_FiffInfo.acq_pars)
+, acq_stim(p_FiffInfo.acq_stim)
+, filename(p_FiffInfo.filename)
 {
-    meas_date[0] = p_pFiffInfo->meas_date[0];
-    meas_date[1] = p_pFiffInfo->meas_date[1];
+    meas_date[0] = p_FiffInfo.meas_date[0];
+    meas_date[1] = p_FiffInfo.meas_date[1];
 
     qint32 i;
-    for(i = 0; i < p_pFiffInfo->chs.size(); ++i)
-        chs.append(p_pFiffInfo->chs[i]);
+    for(i = 0; i < p_FiffInfo.chs.size(); ++i)
+        chs.append(p_FiffInfo.chs[i]);
 
-    for(i = 0; i < p_pFiffInfo->dig.size(); ++i)
-        dig.append(FiffDigPoint(p_pFiffInfo->dig[i]));
+    for(i = 0; i < p_FiffInfo.dig.size(); ++i)
+        dig.append(FiffDigPoint(p_FiffInfo.dig[i]));
 
-    for(i = 0; i < p_pFiffInfo->projs.size(); ++i)
-        projs.append(p_pFiffInfo->projs[i]);
+    for(i = 0; i < p_FiffInfo.projs.size(); ++i)
+        projs.append(p_FiffInfo.projs[i]);
 
-    for(i = 0; i < p_pFiffInfo->comps.size(); ++i)
-        comps.append(p_pFiffInfo->comps[i]);
+    for(i = 0; i < p_FiffInfo.comps.size(); ++i)
+        comps.append(p_FiffInfo.comps[i]);
 }
 
 

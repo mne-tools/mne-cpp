@@ -108,8 +108,12 @@ typedef std::pair<int,int> intpair;
 *
 * @brief The SourceSpace class provides
 */
-class MNESHARED_EXPORT MNESourceSpace {
+class MNESHARED_EXPORT MNESourceSpace
+{
 public:
+    typedef QSharedPointer<MNESourceSpace> SPtr;            /**< Shared pointer type for MNESourceSpace. */
+    typedef QSharedPointer<const MNESourceSpace> ConstSPtr; /**< Const shared pointer type for MNESourceSpace. */
+
     //=========================================================================================================
     /**
     * ctor

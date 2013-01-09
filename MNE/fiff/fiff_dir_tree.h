@@ -83,6 +83,9 @@ class FiffStream;
 class FIFFSHARED_EXPORT FiffDirTree {
 
 public:
+    typedef QSharedPointer<FiffDirTree> SPtr;               /**< Shared pointer type for FiffDirTree. */
+    typedef QSharedPointer<const FiffDirTree> ConstSPtr;    /**< Const shared pointer type for FiffDirTree. */
+
     //=========================================================================================================
     /**
     * ctor

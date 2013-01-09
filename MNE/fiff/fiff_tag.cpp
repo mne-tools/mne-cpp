@@ -81,7 +81,7 @@ FiffTag::FiffTag()
 
 //*************************************************************************************************************
 
-FiffTag::FiffTag(FiffTag* p_pFiffTag)
+FiffTag::FiffTag(const FiffTag* p_pFiffTag)
 : kind(p_pFiffTag->kind)
 , type(p_pFiffTag->type)
 , next(p_pFiffTag->next)

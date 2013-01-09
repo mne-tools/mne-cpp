@@ -70,6 +70,9 @@ namespace FIFFLIB
 class FIFFSHARED_EXPORT FiffId {
 
 public:
+    typedef QSharedPointer<FiffId> SPtr;            /**< Shared pointer type for FiffId. */
+    typedef QSharedPointer<const FiffId> ConstSPtr; /**< Const shared pointer type for FiffId. */
+
     //=========================================================================================================
     /**
     * ctor
