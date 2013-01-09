@@ -64,9 +64,9 @@ MNEEpochDataList::MNEEpochDataList()
 
 MNEEpochDataList::~MNEEpochDataList()
 {
-//    MNEEpochDataList::iterator i;
-//    for( i = this->begin(); i!=this->end(); ++i) {
-//        if (*i)
-//            delete (*i);
-//    }
+    MNEEpochDataList::iterator i;
+    for( i = this->begin(); i!=this->end(); ++i) {
+        if (*i)
+            delete (*i);
+    }
 }
