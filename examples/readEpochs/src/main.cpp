@@ -308,7 +308,7 @@ int main(int argc, char *argv[])
 
     MNEEpochDataList data;
 
-    MNEEpochData epoch;
+    MNEEpochData* epoch = NULL;
 
     MatrixXd times;
 
@@ -321,7 +321,9 @@ int main(int argc, char *argv[])
         from = event_samp + tmin*raw.info.sfreq;
         to   = event_samp + floor(tmax*raw.info.sfreq + 0.5);
 
-        if(raw.read_raw_segment(epoch.epoch, timesDummy, from, to, picks))
+        epoch = new MNEEpochData();
+
+        if(raw.read_raw_segment(epoch->epoch, timesDummy, from, to, picks))
         {
             if (p == 0)
             {
@@ -330,9 +332,9 @@ int main(int argc, char *argv[])
                     times(0, i) = ((float)(from-event_samp+i)) / raw.info.sfreq;
             }
 
-            epoch.event = event;
-            epoch.tmin = ((float)(from)-(float)(raw.first_samp))/raw.info.sfreq;
-            epoch.tmax = ((float)(to)-(float)(raw.first_samp))/raw.info.sfreq;
+            epoch->event = event;
+            epoch->tmin = ((float)(from)-(float)(raw.first_samp))/raw.info.sfreq;
+            epoch->tmax = ((float)(to)-(float)(raw.first_samp))/raw.info.sfreq;
 
             data.append(epoch);//List takes ownwership of the pointer - no delete need
         }
@@ -345,11 +347,11 @@ int main(int argc, char *argv[])
 
     if(data.size() > 0)
     {
-        printf("Read %d epochs, %d samples each.\n",data.size(),(qint32)data[0].epoch.cols());
+        printf("Read %d epochs, %d samples each.\n",data.size(),(qint32)data[0]->epoch.cols());
 
         //DEBUG
-        std::cout << data[0].epoch.block(0,0,10,10) << std::endl;
-        qDebug() << data[0].epoch.rows() << " x " << data[0].epoch.cols();
+        std::cout << data[0]->epoch.block(0,0,10,10) << std::endl;
+        qDebug() << data[0]->epoch.rows() << " x " << data[0]->epoch.cols();
 
         std::cout << times.block(0,0,1,10) << std::endl;
         qDebug() << times.rows() << " x " << times.cols();

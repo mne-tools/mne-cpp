@@ -79,7 +79,7 @@ namespace MNELIB
 *
 * @brief epoch data
 */
-class MNESHARED_EXPORT MNEEpochDataList : public QList<MNEEpochData>
+class MNESHARED_EXPORT MNEEpochDataList : public QList<MNEEpochData*>
 {
 public:
 
