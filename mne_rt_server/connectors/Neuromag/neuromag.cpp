@@ -192,7 +192,7 @@ bool Neuromag::stop()
 void Neuromag::releaseMeasInfo()
 {
     if(m_pInfo)
-        emit remitMeasInfo(m_iID, m_pInfo);
+        emit remitMeasInfo(m_iID, *m_pInfo);
 }
 
 
