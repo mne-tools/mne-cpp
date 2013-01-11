@@ -79,8 +79,9 @@ FiffInfo::FiffInfo()
 //*************************************************************************************************************
 
 FiffInfo::FiffInfo(const FiffInfo& p_FiffInfo)
-: file_id(FiffId(&p_FiffInfo.file_id))
-, meas_id(FiffId(&p_FiffInfo.meas_id))
+: QSharedData(p_FiffInfo)
+, file_id(FiffId(p_FiffInfo.file_id))
+, meas_id(FiffId(p_FiffInfo.meas_id))
 , nchan(p_FiffInfo.nchan)
 , sfreq(p_FiffInfo.sfreq)
 , highpass(p_FiffInfo.highpass)
@@ -118,6 +119,33 @@ FiffInfo::FiffInfo(const FiffInfo& p_FiffInfo)
 FiffInfo::~FiffInfo()
 {
 
+}
+
+
+//*************************************************************************************************************
+
+void FiffInfo::clear()
+{
+    file_id.clear();
+    meas_id.clear();
+    meas_date[0] = -1;
+    nchan = -1;
+    sfreq = -1.0;
+    highpass = -1.0;
+    lowpass = -1.0;
+    chs.clear();
+    ch_names.clear();
+    dev_head_t.clear();
+    ctf_head_t.clear();
+    dev_ctf_t.clear();
+    dig.clear();
+    dig_trans.clear();
+    bads.clear();
+    projs.clear();
+    comps.clear();
+    acq_pars = "";
+    acq_stim = "";
+    filename = "";
 }
 
 

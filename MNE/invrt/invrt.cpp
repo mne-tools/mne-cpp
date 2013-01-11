@@ -63,9 +63,9 @@ using namespace INVRTLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-InvRt::InvRt(FiffInfo** p_ppFiffInfo, MNEForwardSolution* p_pFwd, QObject *parent)
+InvRt::InvRt(FiffInfo::SPtr p_pFiffInfo, MNEForwardSolution* p_pFwd, QObject *parent)
 : QThread(parent)
-, m_ppFiffInfo(p_ppFiffInfo)
+, m_pFiffInfo(p_pFiffInfo)
 , m_pFwd(p_pFwd)
 {
 }

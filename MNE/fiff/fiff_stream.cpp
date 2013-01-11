@@ -599,7 +599,7 @@ FiffDirTree* FiffStream::read_meas_info(FiffDirTree* p_pTree, FiffInfo& info)
 {
 //    if (info)
 //        delete info;
-    info = FiffInfo();
+    info.clear();
     //
     //   Find the desired blocks
     //
@@ -1196,8 +1196,8 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool 
     //   Read the measurement info
     //
 //        [ info, meas ] = fiff_read_meas_info(fid,tree);
-    FiffInfo info;// = NULL;
-    FiffDirTree* meas = p_pStream->read_meas_info(t_pTree, info);
+    FiffInfo::SDPtr info(new FiffInfo);// = NULL;
+    FiffDirTree* meas = p_pStream->read_meas_info(t_pTree, *info.data());
 
     if (!meas)
         return false; //ToDo garbage collecting
@@ -1248,11 +1248,11 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool 
     //
     //   Set up the output structure
     //
-    info.filename   = t_sFileName;
+    info->filename   = t_sFileName;
 
     data = FiffRawData();
     data.file = p_pStream;// fid;
-    data.info       = info;
+    data.info = info;
     data.first_samp = 0;
     data.last_samp  = 0;
     //
@@ -1260,7 +1260,7 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool 
     //
     QList<FiffDirEntry> dir = raw.at(0)->dir;
     fiff_int_t nent = raw.at(0)->nent;
-    fiff_int_t nchan = info.nchan;
+    fiff_int_t nchan = info->nchan;
     fiff_int_t first = 0;
     fiff_int_t first_samp = 0;
     fiff_int_t first_skip   = 0;
@@ -1366,10 +1366,10 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool 
     //
     //   Add the calibration factors
     //
-    MatrixXd cals(1,data.info.nchan);
+    MatrixXd cals(1,data.info->nchan);
     cals.setZero();
-    for (qint32 k = 0; k < data.info.nchan; ++k)
-        cals(0,k) = data.info.chs.at(k).range*data.info.chs[k].cal;
+    for (qint32 k = 0; k < data.info->nchan; ++k)
+        cals(0,k) = data.info->chs.at(k).range*data.info->chs[k].cal;
     //
     data.cals       = cals;
     data.rawdir     = rawdir;
@@ -1378,8 +1378,8 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool 
     //
     printf("\tRange : %d ... %d  =  %9.3f ... %9.3f secs\n",
            data.first_samp,data.last_samp,
-           (double)data.first_samp/data.info.sfreq,
-           (double)data.last_samp/data.info.sfreq);
+           (double)data.first_samp/data.info->sfreq,
+           (double)data.last_samp/data.info->sfreq);
     printf("Ready.\n");
     data.file->device()->close();
 

@@ -150,7 +150,7 @@ void FiffSimulator::init()
     m_pRawMatrixBuffer = NULL;
 
     if(!m_RawInfo.isEmpty())
-        m_pRawMatrixBuffer = new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_RawInfo.info.nchan, this->getBufferSampleSize());
+        m_pRawMatrixBuffer = new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_RawInfo.info->nchan, this->getBufferSampleSize());
 }
 
 
@@ -326,7 +326,7 @@ bool FiffSimulator::readRawInfo()
 
         if(m_pRawMatrixBuffer)
             delete m_pRawMatrixBuffer;
-        m_pRawMatrixBuffer = new RawMatrixBuffer(10, m_RawInfo.info.nchan, getBufferSampleSize());
+        m_pRawMatrixBuffer = new RawMatrixBuffer(10, m_RawInfo.info->nchan, getBufferSampleSize());
 
         mutex.unlock();
 
@@ -343,7 +343,7 @@ void FiffSimulator::run()
 {
     m_bIsRunning = true;
 
-    float t_fSamplingFrequency = m_RawInfo.info.sfreq;
+    float t_fSamplingFrequency = m_RawInfo.info->sfreq;
     float t_fBuffSampleSize = (float)getBufferSampleSize();
 
     quint32 uiSamplePeriod = (unsigned int) ((t_fBuffSampleSize/t_fSamplingFrequency)*1000000.0f);

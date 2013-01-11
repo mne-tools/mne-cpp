@@ -69,7 +69,7 @@ MNERtClient::MNERtClient(QString p_sRtServerHostname, QObject *parent)
 : QThread(parent)
 , m_bIsRunning(false)
 , m_sRtServerHostName(p_sRtServerHostname)
-, m_pFiffInfo(NULL)
+, m_pFiffInfo(new FiffInfo)
 {
 }
 
@@ -79,8 +79,6 @@ MNERtClient::MNERtClient(QString p_sRtServerHostname, QObject *parent)
 MNERtClient::~MNERtClient()
 {
     stop();
-    if(m_pFiffInfo)
-        delete m_pFiffInfo;
 }
 
 
@@ -122,9 +120,7 @@ void MNERtClient::run()
     // read meas info
     t_cmdClient.requestMeasInfo(clientId);
 
-    if(m_pFiffInfo)
-        delete m_pFiffInfo;
-    m_pFiffInfo = t_dataClient.readInfo();
+    m_pFiffInfo = new FiffInfo(t_dataClient.readInfo());
 
     // start measurement
     t_cmdClient.requestMeas(clientId);

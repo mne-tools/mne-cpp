@@ -263,9 +263,9 @@ QByteArray FiffStreamServer::parseToId(QString& p_sRawId, qint32& p_iParsedId)
 
 //*************************************************************************************************************
 
-void FiffStreamServer::forwardMeasInfo(qint32 ID, FiffInfo p_pFiffInfo)
+void FiffStreamServer::forwardMeasInfo(qint32 ID, FiffInfo::SDPtr p_FiffInfo)
 {
-    emit remitMeasInfo(ID, p_pFiffInfo);
+    emit remitMeasInfo(ID, p_FiffInfo);
 }
 
 

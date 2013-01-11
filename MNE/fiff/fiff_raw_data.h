@@ -109,6 +109,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Copy constructor.
+    *
+    * @param[in] p_FiffRawData   FIFF raw measurement which should be copied
+    */
+    FiffRawData(const FiffRawData &p_FiffRawData);
+
+    //=========================================================================================================
+    /**
     * Destroys the FiffInfo.
     */
     ~FiffRawData();
@@ -121,7 +129,7 @@ public:
     */
     inline bool isEmpty() const
     {
-        return first_samp == -1 && this->info.nchan < 0;
+        return first_samp == -1 && !info.data();
     }
 
     //=========================================================================================================
@@ -160,8 +168,8 @@ public:
         //
         //   Convert to samples
         //
-        from = floor(from*this->info.sfreq);
-        to   = ceil(to*this->info.sfreq);
+        from = floor(from*this->info->sfreq);
+        to   = ceil(to*this->info->sfreq);
         //
         //   Read it
         //
@@ -170,7 +178,7 @@ public:
 
 public:
     FiffStream* file;//replaces fid
-    FiffInfo info;
+    FiffInfo::SDPtr info;
     fiff_int_t first_samp;
     fiff_int_t last_samp;
     MatrixXd cals;
