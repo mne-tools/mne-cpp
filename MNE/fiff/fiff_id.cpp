@@ -66,13 +66,13 @@ FiffId::FiffId()
 
 //*************************************************************************************************************
 
-FiffId::FiffId(const FiffId* p_pFiffId)
-: version(p_pFiffId->version)
+FiffId::FiffId(const FiffId& p_FiffId)
+: version(p_FiffId.version)
 {
-    machid[0] = p_pFiffId->machid[0];
-    machid[1] = p_pFiffId->machid[1];
-    time.secs = p_pFiffId->time.secs;
-    time.usecs = p_pFiffId->time.usecs;
+    machid[0] = p_FiffId.machid[0];
+    machid[1] = p_FiffId.machid[1];
+    time.secs = p_FiffId.time.secs;
+    time.usecs = p_FiffId.time.usecs;
 }
 
 
@@ -81,4 +81,16 @@ FiffId::FiffId(const FiffId* p_pFiffId)
 FiffId::~FiffId()
 {
 
+}
+
+
+//*************************************************************************************************************
+
+void FiffId::clear()
+{
+    version = -1;
+    machid[0] = -1;
+    machid[1] = -1;
+    time.secs = -1;
+    time.usecs = -1;
 }

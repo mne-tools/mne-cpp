@@ -120,9 +120,9 @@ int main(int argc, char *argv[])
         //
         // Pick all
         //
-        picks.resize(1,raw.info.nchan);
+        picks.resize(1,raw.info->nchan);
 
-        for(k = 0; k < raw.info.nchan; ++k)
+        for(k = 0; k < raw.info->nchan; ++k)
             picks(0,k) = k;
         //
     }
@@ -134,33 +134,33 @@ int main(int argc, char *argv[])
         bool want_eeg   = false;
         bool want_stim  = false;
 
-//        picks = Fiff::pick_types(raw.info, want_meg, want_eeg, want_stim, include, raw.info.bads);
-        picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);//prefer member function
+//        picks = Fiff::pick_types(raw.info, want_meg, want_eeg, want_stim, include, raw.info->bads);
+        picks = raw.info->pick_types(want_meg, want_eeg, want_stim, include, raw.info->bads);//prefer member function
     }
 
     QStringList ch_names;
     for(k = 0; k < picks.cols(); ++k)
-        ch_names << raw.info.ch_names[picks(0,k)];
+        ch_names << raw.info->ch_names[picks(0,k)];
 
     //
     //   Set up projection
     //
-    if (raw.info.projs.size() == 0)
+    if (raw.info->projs.size() == 0)
         printf("No projector specified for these data\n");
     else
     {
         //
         //   Activate the projection items
         //
-        for (k = 0; k < raw.info.projs.size(); ++k)
-            raw.info.projs[k].active = true;
+        for (k = 0; k < raw.info->projs.size(); ++k)
+            raw.info->projs[k].active = true;
 
-        printf("%d projection items activated\n",raw.info.projs.size());
+        printf("%d projection items activated\n",raw.info->projs.size());
         //
         //   Create the projector
         //
 //        fiff_int_t nproj = MNE::make_projector_info(raw.info, raw.proj); Using the member function instead
-        fiff_int_t nproj = raw.info.make_projector_info(raw.proj);
+        fiff_int_t nproj = raw.info->make_projector_info(raw.proj);
 
         if (nproj == 0)
         {
@@ -176,7 +176,7 @@ int main(int argc, char *argv[])
     //   Set up the CTF compensator
     //
 //    qint32 current_comp = MNE::get_current_comp(raw.info);
-    qint32 current_comp = raw.info.get_current_comp();
+    qint32 current_comp = raw.info->get_current_comp();
     if (current_comp > 0)
         printf("Current compensation grade : %d\n",current_comp);
 
@@ -186,10 +186,10 @@ int main(int argc, char *argv[])
     if (current_comp != dest_comp)
     {
         qDebug() << "This part needs to be debugged";
-        if(MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp))
+        if(MNE::make_compensator(*raw.info.data(), current_comp, dest_comp, raw.comp))
         {
-//            raw.info.chs = MNE::set_current_comp(raw.info.chs,dest_comp);
-            raw.info.set_current_comp(dest_comp);
+//            raw.info->chs = MNE::set_current_comp(raw.info->chs,dest_comp);
+            raw.info->set_current_comp(dest_comp);
             printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
         }
         else
@@ -256,7 +256,7 @@ int main(int argc, char *argv[])
 //            //
 //            for p = 1:size(events,1)
 //                if events(p,1) < 0
-//                    events(p,1) = events(p,2)*raw.info.sfreq;
+//                    events(p,1) = events(p,2)*raw.info->sfreq;
 //                end
 //            end
 //            //
@@ -318,8 +318,8 @@ int main(int argc, char *argv[])
         //       Read a data segment
         //
         event_samp = events(selected(p),0);
-        from = event_samp + tmin*raw.info.sfreq;
-        to   = event_samp + floor(tmax*raw.info.sfreq + 0.5);
+        from = event_samp + tmin*raw.info->sfreq;
+        to   = event_samp + floor(tmax*raw.info->sfreq + 0.5);
 
         epoch = new MNEEpochData();
 
@@ -329,12 +329,12 @@ int main(int argc, char *argv[])
             {
                 times.resize(1, to-from+1);
                 for (qint32 i = 0; i < times.cols(); ++i)
-                    times(0, i) = ((float)(from-event_samp+i)) / raw.info.sfreq;
+                    times(0, i) = ((float)(from-event_samp+i)) / raw.info->sfreq;
             }
 
             epoch->event = event;
-            epoch->tmin = ((float)(from)-(float)(raw.first_samp))/raw.info.sfreq;
-            epoch->tmax = ((float)(to)-(float)(raw.first_samp))/raw.info.sfreq;
+            epoch->tmin = ((float)(from)-(float)(raw.first_samp))/raw.info->sfreq;
+            epoch->tmax = ((float)(to)-(float)(raw.first_samp))/raw.info->sfreq;
 
             data.append(MNEEpochData::SPtr(epoch));//List takes ownwership of the pointer - no delete need
         }

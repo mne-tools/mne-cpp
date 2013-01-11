@@ -153,8 +153,8 @@ public:
     static bool read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& data, fiff_int_t setno = 0);
 
 public:
-    FiffInfo                info;   /**< ToDo... */
-    QList<FiffEvokedData>  evoked; /**< ToDo... */
+    FiffInfo::SDPtr        info;   /**< FIFF measurement information */
+    QList<FiffEvokedData>  evoked; /**< List of Fiff Evoked Data */
 };
 
 } // NAMESPACE

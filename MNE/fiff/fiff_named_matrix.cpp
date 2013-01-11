@@ -76,7 +76,8 @@ FiffNamedMatrix::FiffNamedMatrix(fiff_int_t p_nrow, fiff_int_t p_ncol, QStringLi
 //*************************************************************************************************************
 
 FiffNamedMatrix::FiffNamedMatrix(const FiffNamedMatrix& p_FiffNamedMatrix)
-: nrow(p_FiffNamedMatrix.nrow)
+: QSharedData(p_FiffNamedMatrix)
+, nrow(p_FiffNamedMatrix.nrow)
 , ncol(p_FiffNamedMatrix.ncol)
 , row_names(p_FiffNamedMatrix.row_names)
 , col_names(p_FiffNamedMatrix.col_names)

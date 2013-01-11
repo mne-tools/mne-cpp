@@ -44,7 +44,6 @@ using namespace FSLIB;
 
 SourceLab::SourceLab(QObject *parent)
 : QThread(parent)
-, m_ppFiffInfo(NULL)
 , m_pFwd(NULL)
 , m_bIsRunning(false)
 , m_bIsRawBufferInit(false)
@@ -93,9 +92,9 @@ SourceLab::SourceLab(QObject *parent)
             m_pCovRt, &CovRt::receiveDataSegment);
     m_pCovRt->start();
 
-    m_ppFiffInfo = m_pRtClient->getFiffInfo();
+    m_pFiffInfo = FiffInfo::SPtr(new FiffInfo(*m_pRtClient->getFiffInfo().data()));
 
-    m_pInvRt = new InvRt(m_ppFiffInfo, m_pFwd, this);
+    m_pInvRt = new InvRt(m_pFiffInfo, m_pFwd, this);
     connect(m_pCovRt, &CovRt::covCalculated,
             m_pInvRt, &InvRt::receiveNoiseCov);
     m_pInvRt->start();
@@ -165,7 +164,7 @@ void SourceLab::run()
 
     while(m_bIsRunning)
     {
-        if(m_bIsRawBufferInit && m_pRtClient->getFiffInfo())
+        if(m_bIsRawBufferInit && m_pRtClient->getFiffInfo().data())
         {
             MatrixXf rawSegment = m_pRawMatrixBuffer->pop();
 //            qDebug() << "Received Buffer " << count;

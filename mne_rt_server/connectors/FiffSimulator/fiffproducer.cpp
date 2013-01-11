@@ -99,7 +99,7 @@ void FiffProducer::run()
     m_bIsRunning = true;
 
     // reopen file in this thread
-    QFile* t_pFile = new QFile(m_pFiffSimulator->m_RawInfo.info.filename);
+    QFile* t_pFile = new QFile(m_pFiffSimulator->m_RawInfo.info->filename);
     FiffStream* p_pStream = new FiffStream(t_pFile);
     m_pFiffSimulator->m_RawInfo.file = p_pStream;
 
@@ -128,14 +128,14 @@ void FiffProducer::run()
 
     first = from;
 
-    qint32 nchan = m_pFiffSimulator->m_RawInfo.info.nchan;
+    qint32 nchan = m_pFiffSimulator->m_RawInfo.info->nchan;
 
     MatrixXd cals(1,nchan);
 
     SparseMatrix<double> inv_calsMat(nchan, nchan);
 
     for(qint32 i = 0; i < nchan; ++i)
-        inv_calsMat.insert(i, i) = 1.0f/m_pFiffSimulator->m_RawInfo.info.chs[i].cal;
+        inv_calsMat.insert(i, i) = 1.0f/m_pFiffSimulator->m_RawInfo.info->chs[i].cal;
 
     //Not good cause production time is not accurate
     //loading and thread sleep is longer than thread sleep time - better to have a extra loading thread

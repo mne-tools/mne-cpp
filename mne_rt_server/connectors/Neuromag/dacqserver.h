@@ -172,7 +172,7 @@ private:
     bool m_bSetBuffersizeRequest;
 
 
-    bool getMeasInfo(FiffInfo*& p_pFiffInfo);
+    bool getMeasInfo(FiffInfo& p_FiffInfo);
 
     Neuromag* m_pNeuromag;
 

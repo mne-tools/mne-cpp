@@ -178,7 +178,7 @@ public:
     QByteArray setActiveConnector(qint32 ID);
 
 signals:
-    void sendMeasInfo(qint32, FIFFLIB::FiffInfo*);
+    void sendMeasInfo(qint32, FIFFLIB::FiffInfo::SDPtr);
     void setBufferSize(qint32 ID);
     void startMeasConnector();
     void stopMeasConnector();

@@ -126,9 +126,9 @@ public:
     /**
     * Request Fiff Info
     */
-    inline FiffInfo** getFiffInfo()
+    inline FiffInfo::SDPtr getFiffInfo()
     {
-        return &m_pFiffInfo;
+        return m_pFiffInfo;
     }
 
     //=========================================================================================================
@@ -155,7 +155,7 @@ private:
 
     QString     m_sRtServerHostName;    /**< The IP Adress of mne_rt_server.*/
 
-    FiffInfo*   m_pFiffInfo;
+    FiffInfo::SDPtr m_pFiffInfo;
 
 signals:
     void rawBufferReceived(Eigen::MatrixXf p_rawBuffer);

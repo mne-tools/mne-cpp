@@ -155,10 +155,9 @@ private:
 
     QMutex mutex;
 
-
     DacqServer*     m_pDacqServer;
 
-    FiffInfo*       m_pInfo;
+    FiffInfo::SDPtr m_pInfo;
 
     int             m_iID;
 

@@ -75,7 +75,7 @@ public:
     typedef QSharedPointer<InvRt> SPtr;             /**< Shared pointer type for InvRt. */
     typedef QSharedPointer<const InvRt> ConstSPtr;  /**< Const shared pointer type for InvRt. */
 
-    explicit InvRt(FiffInfo** p_ppFiffInfo, MNEForwardSolution* p_pFwd, QObject *parent = 0);
+    explicit InvRt(FiffInfo::SPtr p_pFiffInfo, MNEForwardSolution* p_pFwd, QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -108,7 +108,7 @@ private:
 
     MatrixXf    m_noiseCov;
 
-    FiffInfo**          m_ppFiffInfo;
+    FiffInfo::SPtr      m_pFiffInfo;
     MNEForwardSolution* m_pFwd;
 
 signals:

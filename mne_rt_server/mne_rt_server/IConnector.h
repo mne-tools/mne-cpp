@@ -237,7 +237,7 @@ public:
     virtual void requestSetBufferSize(quint32 p_uiBuffSize) = 0;
 
 signals:
-    void remitMeasInfo(qint32, FIFFLIB::FiffInfo);
+    void remitMeasInfo(qint32, FIFFLIB::FiffInfo::SDPtr);
 
     void remitRawBuffer(Eigen::MatrixXf);
 
