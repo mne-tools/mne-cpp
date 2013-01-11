@@ -57,7 +57,6 @@ using namespace FIFFLIB;
 FiffNamedMatrix::FiffNamedMatrix()
 : nrow(-1)
 , ncol(-1)
-, data(MatrixXd())
 {
 }
 
@@ -76,12 +75,12 @@ FiffNamedMatrix::FiffNamedMatrix(fiff_int_t p_nrow, fiff_int_t p_ncol, QStringLi
 
 //*************************************************************************************************************
 
-FiffNamedMatrix::FiffNamedMatrix(const FiffNamedMatrix* p_pFiffNamedMatrix)
-: nrow(p_pFiffNamedMatrix->nrow)
-, ncol(p_pFiffNamedMatrix->ncol)
-, row_names(p_pFiffNamedMatrix->row_names)
-, col_names(p_pFiffNamedMatrix->col_names)
-, data(p_pFiffNamedMatrix->data)
+FiffNamedMatrix::FiffNamedMatrix(const FiffNamedMatrix& p_FiffNamedMatrix)
+: nrow(p_FiffNamedMatrix.nrow)
+, ncol(p_FiffNamedMatrix.ncol)
+, row_names(p_FiffNamedMatrix.row_names)
+, col_names(p_FiffNamedMatrix.col_names)
+, data(p_FiffNamedMatrix.data)
 {
 }
 
@@ -91,6 +90,18 @@ FiffNamedMatrix::FiffNamedMatrix(const FiffNamedMatrix* p_pFiffNamedMatrix)
 FiffNamedMatrix::~FiffNamedMatrix()
 {
 
+}
+
+
+//*************************************************************************************************************
+
+void FiffNamedMatrix::clear()
+{
+    nrow = -1;
+    ncol = -1;
+    row_names.clear();
+    col_names.clear();
+    data = MatrixXd();
 }
 
 

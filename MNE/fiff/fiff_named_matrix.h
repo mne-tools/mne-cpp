@@ -55,6 +55,7 @@
 #include <QList>
 #include <QFile>
 #include <QStringList>
+#include <QSharedData>
 #include <QDebug>
 
 
@@ -81,21 +82,28 @@ using namespace Eigen;
 *
 * @brief A named matrix
 */
-class FIFFSHARED_EXPORT FiffNamedMatrix {
-
+class FIFFSHARED_EXPORT FiffNamedMatrix : public QSharedData
+{
 public:
     typedef QSharedPointer<FiffNamedMatrix> SPtr;               /**< Shared pointer type for FiffNamedMatrix. */
     typedef QSharedPointer<const FiffNamedMatrix> ConstSPtr;    /**< Const shared pointer type for FiffNamedMatrix. */
+    typedef QSharedDataPointer<FiffNamedMatrix> SDPtr;       /**< Shared data pointer type for FiffNamedMatrix. */
 
     //=========================================================================================================
     /**
-    * ctor
+    * Default constructor.
     */
     FiffNamedMatrix();
 
     //=========================================================================================================
     /**
-    * ctor
+    * Constructs named matrix with given parameters. (No plausibility check is performed)
+    *
+    * @param[in] p_nrow         Number of rows
+    * @param[in] p_ncol         Number of cols
+    * @param[in] p_row_names    Row names
+    * @param[in] p_col_names    Column names
+    * @param[in] p_data         Data of the named matrix
     */
     explicit FiffNamedMatrix(   fiff_int_t p_nrow,
                                 fiff_int_t p_ncol,
@@ -105,15 +113,23 @@ public:
 
     //=========================================================================================================
     /**
-    * Copy ctor
+    * Copy constructor.
+    *
+    * @param[in] p_FiffNamedMatrix  Named matrix which should be copied
     */
-    FiffNamedMatrix(const FiffNamedMatrix* p_pFiffNamedMatrix);
+    FiffNamedMatrix(const FiffNamedMatrix& p_FiffNamedMatrix);
 
     //=========================================================================================================
     /**
     * Destroys the fiffTag.
     */
     ~FiffNamedMatrix();
+
+    //=========================================================================================================
+    /**
+    * Initializes the named matrix.
+    */
+    void clear();
 
     //=========================================================================================================
     /**
@@ -135,6 +151,14 @@ public:
     */
     void transpose_named_matrix();
 
+//    //=========================================================================================================
+//    /**
+//    * Assignment Operator
+//    *
+//    * @return rhs   named matrix which hould be assigned.
+//    */
+//    inline FiffNamedMatrix& operator=(const FiffNamedMatrix& rhs);
+
 public:
     fiff_int_t nrow;
     fiff_int_t  ncol;
@@ -142,6 +166,27 @@ public:
     QStringList col_names;
     MatrixXd data;
 };
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE INLINE MEMBER METHODS
+//=============================================================================================================
+
+//inline FiffNamedMatrix& FiffNamedMatrix::operator=(const FiffNamedMatrix& rhs)
+//{
+//    // Check for self-assignment!
+//    if (this == &rhs)
+//        return *this;
+//    //Else
+//    nrow = rhs.nrow;
+//    ncol = rhs.ncol;
+//    row_names = rhs.row_names;
+//    col_names = rhs.col_names;
+//    data = rhs.data;
+
+//    return *this;
+//}
 
 } // NAMESPACE
 
