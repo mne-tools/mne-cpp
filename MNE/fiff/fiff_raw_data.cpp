@@ -121,11 +121,11 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
         if (projAvailable || this->comp.kind != -1)
         {
             if (!projAvailable)
-                mult_full = this->comp.data.data*cal;
+                mult_full = this->comp.data->data*cal;
             else if (this->comp.kind == -1)
                 mult_full = this->proj*cal;
             else
-                mult_full = this->proj*this->comp.data.data*cal;
+                mult_full = this->proj*this->comp.data->data*cal;
         }
     }
     else
@@ -151,7 +151,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
             {
                 qDebug() << "This has to be debugged! #1";
                 for( i = 0; i  < sel.cols(); ++i)
-                    selVect.row(i) = this->comp.data.data.block(sel(0,i),0,1,nchan);
+                    selVect.row(i) = this->comp.data->data.block(sel(0,i),0,1,nchan);
                 mult_full = selVect*cal;
             }
             else if (this->comp.kind == -1)
@@ -167,7 +167,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
                 for( i = 0; i  < sel.cols(); ++i)
                     selVect.row(i) = this->proj.block(sel(0,i),0,1,nchan);
 
-                mult_full = selVect*this->comp.data.data*cal;
+                mult_full = selVect*this->comp.data->data*cal;
             }
         }
     }

@@ -82,11 +82,12 @@ using namespace Eigen;
 *
 * @brief covariance data
 */
-class FIFFSHARED_EXPORT FiffCov
+class FIFFSHARED_EXPORT FiffCov : public QSharedData
 {
 public:
     typedef QSharedPointer<FiffCov> SPtr;               /**< Shared pointer type for FiffCov. */
     typedef QSharedPointer<const FiffCov> ConstSPtr;    /**< Const shared pointer type for FiffCov. */
+    typedef QSharedDataPointer<FiffCov> SDPtr;       /**< Shared data pointer type for FiffCov. */
 
     //=========================================================================================================
     /**
@@ -96,9 +97,31 @@ public:
 
     //=========================================================================================================
     /**
+    * Copy constructor.
+    *
+    * @param[in] p_FiffCov   Covariance data matrix which should be copied
+    */
+    FiffCov(const FiffCov &p_FiffCov);
+
+    //=========================================================================================================
+    /**
     * Destroys the covariance data matrix.
     */
     ~FiffCov();
+
+    //=========================================================================================================
+    /**
+    * Initializes the covariance data matrix.
+    */
+    void clear();
+
+//    //=========================================================================================================
+//    /**
+//    * Assignment Operator
+//    *
+//    * @return rhs   covariance data matrix which hould be assigned.
+//    */
+//    inline FiffCov& operator=(const FiffCov& rhs);
 
 public:
     fiff_int_t  kind;       /**< Covariance kind -> fiff_constants.h */
@@ -112,6 +135,33 @@ public:
     VectorXd eig;           /**< Vector of eigenvalues. */
     MatrixXd eigvec;        /**< Matrix of eigenvectors. */
 };
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE INLINE MEMBER METHODS
+//=============================================================================================================
+
+//inline FiffCov& FiffCov::operator=(const FiffCov& rhs)
+//{
+//    // Check for self-assignment!
+//    if (this == &rhs)
+//        return *this;
+//    //Else
+//    kind = rhs.kind;
+//    diag = rhs.diag;
+//    dim = rhs.dim;
+//    names = rhs.names;
+//    data = rhs.data;
+
+//    projs = rhs.projs;
+//    bads = rhs.bads;
+//    nfree = rhs.nfree;
+//    eig = rhs.eig;
+//    eigvec = rhs.eigvec;
+
+//    return *this;
+//}
 
 } // NAMESPACE
 

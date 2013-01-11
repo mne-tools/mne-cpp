@@ -58,7 +58,22 @@ FiffCtfComp::FiffCtfComp()
 : ctfkind(-1)
 , kind (-1)
 , save_calibrated(false)
+, data(new FiffNamedMatrix())
 {
+}
+
+
+//*************************************************************************************************************
+
+FiffCtfComp::FiffCtfComp(const FiffCtfComp &p_FiffCtfComp)
+: ctfkind(p_FiffCtfComp.ctfkind)
+, kind(p_FiffCtfComp.kind)
+, save_calibrated(p_FiffCtfComp.save_calibrated)
+, rowcals(p_FiffCtfComp.rowcals)
+, colcals(p_FiffCtfComp.colcals)
+, data(p_FiffCtfComp.data)
+{
+
 }
 
 
@@ -67,4 +82,17 @@ FiffCtfComp::FiffCtfComp()
 FiffCtfComp::~FiffCtfComp()
 {
 
+}
+
+
+//*************************************************************************************************************
+
+void FiffCtfComp::clear()
+{
+    ctfkind = -1;
+    kind = -1;
+    save_calibrated = false;
+    rowcals = MatrixXd();
+    colcals = MatrixXd();
+    data = FiffNamedMatrix::SDPtr(new FiffNamedMatrix());
 }

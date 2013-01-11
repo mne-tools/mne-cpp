@@ -90,17 +90,31 @@ public:
 
     //=========================================================================================================
     /**
+    * Copy constructor.
+    *
+    * @param[in] p_FiffCtfComp   CTF software compensation data which should be copied
+    */
+    FiffCtfComp(const FiffCtfComp &p_FiffCtfComp);
+
+    //=========================================================================================================
+    /**
     * Destroys the CTF software compensation data.
     */
     ~FiffCtfComp();
 
+    //=========================================================================================================
+    /**
+    * Initializes the CTF software compensation data.
+    */
+    void clear();
+
 public:
-    fiff_int_t    ctfkind;  /**< CTF kind. */
-    fiff_int_t    kind;     /**< Fiff kind -> fiff_constants.h */
-    bool save_calibrated;   /**< If data should be safed calibrated. */
-    MatrixXd rowcals;       /**< Row calibrations. */
-    MatrixXd colcals;       /**< Colum calibrations. */
-    FiffNamedMatrix data;   /**< ToDo... */
+    fiff_int_t    ctfkind;          /**< CTF kind. */
+    fiff_int_t    kind;             /**< Fiff kind -> fiff_constants.h */
+    bool save_calibrated;           /**< If data should be safed calibrated. */
+    MatrixXd rowcals;               /**< Row calibrations. */
+    MatrixXd colcals;               /**< Colum calibrations. */
+    FiffNamedMatrix::SDPtr data;    /**< ToDo... */
 };
 
 } // NAMESPACE

@@ -58,6 +58,7 @@ FiffProj::FiffProj()
 : kind(-1)
 , active(false)
 , desc("")
+, data(new FiffNamedMatrix)
 {
 
 }
@@ -65,11 +66,11 @@ FiffProj::FiffProj()
 
 //*************************************************************************************************************
 
-FiffProj::FiffProj(const FiffProj* p_pFiffProj)
-: kind(p_pFiffProj->kind)
-, active(p_pFiffProj->active)
-, desc(p_pFiffProj->desc)
-, data(p_pFiffProj->data)
+FiffProj::FiffProj(const FiffProj& p_FiffProj)
+: kind(p_FiffProj.kind)
+, active(p_FiffProj.active)
+, desc(p_FiffProj.desc)
+, data(p_FiffProj.data)
 {
 
 }
@@ -81,7 +82,7 @@ FiffProj::FiffProj( fiff_int_t p_kind, bool p_active, QString p_desc, FiffNamedM
 : kind(p_kind)
 , active(p_active)
 , desc(p_desc)
-, data(p_data)
+, data(new FiffNamedMatrix(p_data))
 {
 
 }

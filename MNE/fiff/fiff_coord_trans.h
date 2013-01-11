@@ -18,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
@@ -72,12 +72,12 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* Replaces fiffCoordTransRec which had a size of 104
+* Coordinate transformation description which replaces fiffCoordTransRec which had a size of 104
 *
 * @brief Coordinate transformation description.
 */
-class FIFFSHARED_EXPORT FiffCoordTrans {
-
+class FIFFSHARED_EXPORT FiffCoordTrans
+{
 public:
     typedef QSharedPointer<FiffCoordTrans> SPtr;            /**< Shared pointer type for FiffCoordTrans. */
     typedef QSharedPointer<const FiffCoordTrans> ConstSPtr; /**< Const shared pointer type for FiffCoordTrans. */
@@ -90,9 +90,23 @@ public:
 
     //=========================================================================================================
     /**
+    * Copy constructor.
+    *
+    * @param[in] p_FiffCoordTrans   Coordinate transformation description which should be copied
+    */
+    FiffCoordTrans(const FiffCoordTrans &p_FiffCoordTrans);
+
+    //=========================================================================================================
+    /**
     * Destroys the coordinate transformation descriptor.
     */
     ~FiffCoordTrans();
+
+    //=========================================================================================================
+    /**
+    * Initializes the coordinate transformation descriptor.
+    */
+    void clear();
 
     //=========================================================================================================
     /**

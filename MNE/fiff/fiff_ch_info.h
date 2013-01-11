@@ -18,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
@@ -75,8 +75,8 @@ using namespace Eigen;
 *
 * @brief Channel info descriptor.
 */
-class FIFFSHARED_EXPORT FiffChInfo {
-
+class FIFFSHARED_EXPORT FiffChInfo
+{
 public:
     typedef QSharedPointer<FiffChInfo> SPtr;            /**< Shared pointer type for FiffChInfo. */
     typedef QSharedPointer<const FiffChInfo> ConstSPtr; /**< Const shared pointer type for FiffChInfo. */
@@ -86,6 +86,14 @@ public:
     * Constructs the channel info descriptor.
     */
     FiffChInfo();
+
+    //=========================================================================================================
+    /**
+    * Copy constructor.
+    *
+    * @param[in] p_FiffChInfo   Channel Info descriptor which should be copied
+    */
+    FiffChInfo(const FiffChInfo &p_FiffChInfo);
 
     //=========================================================================================================
     /**

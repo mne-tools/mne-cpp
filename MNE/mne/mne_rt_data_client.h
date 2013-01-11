@@ -160,19 +160,19 @@ public:
                                 break;
                             case FIFF_NCHAN: // First data -> FiffNamedMatrix is created
 //                                p_pFiffInfo->projs[countProj].data = FiffNamedMatrix();//obsolete
-                                p_pFiffInfo->projs[countProj].data.ncol = *(t_pTag->toInt());
+                                p_pFiffInfo->projs[countProj].data->ncol = *(t_pTag->toInt());
                                 break;
                             case FIFF_PROJ_ITEM_NVEC:
-                                p_pFiffInfo->projs[countProj].data.nrow = *(t_pTag->toInt());
+                                p_pFiffInfo->projs[countProj].data->nrow = *(t_pTag->toInt());
                                 break;
                             case FIFF_MNE_PROJ_ITEM_ACTIVE:
                                 p_pFiffInfo->projs[countProj].active = *(t_pTag->toInt());
                                 break;
                             case FIFF_PROJ_ITEM_CH_NAME_LIST:
-                                p_pFiffInfo->projs[countProj].data.col_names = FiffStream::split_name_list(t_pTag->toString());
+                                p_pFiffInfo->projs[countProj].data->col_names = FiffStream::split_name_list(t_pTag->toString());
                                 break;
                             case FIFF_PROJ_ITEM_VECTORS:
-                                p_pFiffInfo->projs[countProj].data.data = t_pTag->toFloatMatrix();
+                                p_pFiffInfo->projs[countProj].data->data = t_pTag->toFloatMatrix();
                                 break;
                             }
                         }

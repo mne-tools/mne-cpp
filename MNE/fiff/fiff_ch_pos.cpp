@@ -18,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
@@ -57,10 +57,28 @@ using namespace FIFFLIB;
 FiffChPos::FiffChPos()
 : coil_type(-1)
 {
-    r0[0] = -1;
-    ex[0] = -1;
-    ey[0] = -1;
-    ez[0] = -1;
+    for(qint32 i = 0; i < 3; ++i)
+    {
+        r0[i] = -1;
+        ex[i] = -1;
+        ey[i] = -1;
+        ey[i] = -1;
+    }
+}
+
+
+//*************************************************************************************************************
+
+FiffChPos::FiffChPos(const FiffChPos &p_FiffChPos)
+: coil_type(p_FiffChPos.coil_type)
+{
+    for(qint32 i = 0; i < 3; ++i)
+    {
+        r0[i] = r0[i];
+        ex[i] = ex[i];
+        ey[i] = ey[i];
+        ey[i] = ez[i];
+    }
 }
 
 

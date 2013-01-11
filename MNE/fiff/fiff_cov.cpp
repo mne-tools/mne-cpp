@@ -66,6 +66,42 @@ FiffCov::FiffCov()
 
 //*************************************************************************************************************
 
+FiffCov::FiffCov(const FiffCov &p_FiffCov)
+: QSharedData(p_FiffCov)
+, kind(p_FiffCov.kind)
+, diag(p_FiffCov.diag)
+, dim(p_FiffCov.dim)
+, names(p_FiffCov.names)
+, data(p_FiffCov.data)
+, projs(p_FiffCov.projs)
+, bads(p_FiffCov.bads)
+, nfree(p_FiffCov.nfree)
+, eig(p_FiffCov.eig)
+, eigvec(p_FiffCov.eigvec)
+{
+
+}
+
+
+//*************************************************************************************************************
+
 FiffCov::~FiffCov()
 {
+}
+
+
+//*************************************************************************************************************
+
+void FiffCov::clear()
+{
+    kind = -1;
+    diag = false;
+    dim = -1;
+    names.clear();
+    data = MatrixXd();
+    projs.clear();
+    bads.clear();
+    nfree = -1;
+    eig = VectorXd();
+    eigvec = MatrixXd();
 }

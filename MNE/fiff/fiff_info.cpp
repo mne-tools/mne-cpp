@@ -155,11 +155,11 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
     qDebug() << "Todo add all need ctf variables.";
 //    if(ctf_comp.data)
 //        delete ctf_comp.data;
-    ctf_comp.data = FiffNamedMatrix();
+    ctf_comp.data->clear();
 
     if (from == to)
     {
-        ctf_comp.data.data = MatrixXd::Zero(this->nchan, this->nchan);
+        ctf_comp.data->data = MatrixXd::Zero(this->nchan, this->nchan);
         return false;
     }
 
@@ -212,9 +212,9 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
             return false;
         }
 
-        ctf_comp.data.data.resize(npick,this->nchan);
+        ctf_comp.data->data.resize(npick,this->nchan);
         for (k = 0; k < npick; ++k)
-            ctf_comp.data.data.row(k) = comp_tmp.block(pick(k), 0, 1, this->nchan);
+            ctf_comp.data->data.row(k) = comp_tmp.block(pick(k), 0, 1, this->nchan);
     }
     return true;
 }
@@ -225,7 +225,7 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
 bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXd& this_comp) const//private method
 {
     qDebug() << "make_compensator not debugged jet";
-    FiffNamedMatrix this_data;
+    FiffNamedMatrix::SDPtr this_data;
     MatrixXd presel, postsel;
     qint32 k, col, c, ch, row, row_ch, channelAvailable;
     for (k = 0; k < this->comps.size(); ++k)
@@ -235,13 +235,13 @@ bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXd& this_comp) const//pri
             //
             //   Create the preselector
             //
-            presel  = MatrixXd::Zero(this_data.ncol,this->nchan);
-            for(col = 0; col < this_data.ncol; ++col)
+            presel  = MatrixXd::Zero(this_data->ncol,this->nchan);
+            for(col = 0; col < this_data->ncol; ++col)
             {
                 channelAvailable = 0;
                 for (c = 0; c < this->ch_names.size(); ++c)
                 {
-                    if (QString::compare(this_data.col_names.at(col),this->ch_names.at(c)) == 0)
+                    if (QString::compare(this_data->col_names.at(col),this->ch_names.at(c)) == 0)
                     {
                         ++channelAvailable;
                         ch = c;
@@ -249,12 +249,12 @@ bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXd& this_comp) const//pri
                 }
                 if (channelAvailable == 0)
                 {
-                    printf("Channel %s is not available in data\n",this_data.col_names.at(col).toUtf8().constData());
+                    printf("Channel %s is not available in data\n",this_data->col_names.at(col).toUtf8().constData());
                     return false;
                 }
                 else if (channelAvailable > 1)
                 {
-                    printf("Ambiguous channel %s",this_data.col_names.at(col).toUtf8().constData());
+                    printf("Ambiguous channel %s",this_data->col_names.at(col).toUtf8().constData());
                     return false;
                 }
                 presel(col,ch) = 1.0;
@@ -262,13 +262,13 @@ bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXd& this_comp) const//pri
             //
             //   Create the postselector
             //
-            postsel = MatrixXd::Zero(this->nchan,this_data.nrow);
+            postsel = MatrixXd::Zero(this->nchan,this_data->nrow);
             for (c = 0; c  < this->nchan; ++c)
             {
                 channelAvailable = 0;
-                for (row = 0; row < this_data.row_names.size(); ++row)
+                for (row = 0; row < this_data->row_names.size(); ++row)
                 {
-                    if (QString::compare(this_data.col_names.at(c),this->ch_names.at(row)) == 0)
+                    if (QString::compare(this_data->col_names.at(c),this->ch_names.at(row)) == 0)
                     {
                         ++channelAvailable;
                         row_ch = row;
@@ -284,7 +284,7 @@ bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXd& this_comp) const//pri
                     postsel(c,row_ch) = 1.0;
                 }
             }
-            this_comp = postsel*this_data.data*presel;
+            this_comp = postsel*this_data->data*presel;
             return true;
         }
     }
@@ -323,7 +323,7 @@ fiff_int_t FiffInfo::make_projector(QList<FiffProj>& projs, QStringList& ch_name
         if (projs[k].active)
         {
             ++nactive;
-            nvec += projs[k].data.nrow;
+            nvec += projs[k].data->nrow;
         }
     }
 
@@ -354,10 +354,10 @@ fiff_int_t FiffInfo::make_projector(QList<FiffProj>& projs, QStringList& ch_name
             FiffProj one = projs[k];
 
             QMap<QString, int> uniqueMap;
-            for(l = 0; l < one.data.col_names.size(); ++l)
-                uniqueMap[one.data.col_names[l] ] = 0;
+            for(l = 0; l < one.data->col_names.size(); ++l)
+                uniqueMap[one.data->col_names[l] ] = 0;
 
-            if (one.data.col_names.size() != uniqueMap.keys().size())
+            if (one.data->col_names.size() != uniqueMap.keys().size())
             {
                 printf("Channel name list in projection item %d contains duplicate items");
                 return 0;
@@ -370,9 +370,9 @@ fiff_int_t FiffInfo::make_projector(QList<FiffProj>& projs, QStringList& ch_name
             p = 0;
             for (c = 0; c < nchan; ++c)
             {
-                for (i = 0; i < one.data.col_names.size(); ++i)
+                for (i = 0; i < one.data->col_names.size(); ++i)
                 {
-                    if (QString::compare(ch_names.at(c),one.data.col_names.at(i)) == 0)
+                    if (QString::compare(ch_names.at(c),one.data->col_names.at(i)) == 0)
                     {
                         isBad = false;
                         for (j = 0; j < bads.size(); ++j)
@@ -400,14 +400,14 @@ fiff_int_t FiffInfo::make_projector(QList<FiffProj>& projs, QStringList& ch_name
             //
             if (sel.cols() > 0)
             {
-                for (v = 0; v < one.data.nrow; ++v)
+                for (v = 0; v < one.data->nrow; ++v)
                     for (i = 0; i < p; ++i)
-                        vecs(sel(0,i),nvec+v) = one.data.data(v,vecSel(i));
+                        vecs(sel(0,i),nvec+v) = one.data->data(v,vecSel(i));
                 //
                 //   Rescale for more straightforward detection of small singular values
                 //
 
-                for (v = 0; v < one.data.nrow; ++v)
+                for (v = 0; v < one.data->nrow; ++v)
                 {
                     onesize = sqrt((vecs.col(nvec+v).transpose()*vecs.col(nvec+v))(0,0));
                     if (onesize > 0.0)
@@ -416,7 +416,7 @@ fiff_int_t FiffInfo::make_projector(QList<FiffProj>& projs, QStringList& ch_name
                         ++nonzero;
                     }
                 }
-                nvec += one.data.nrow;
+                nvec += one.data->nrow;
             }
         }
     }
