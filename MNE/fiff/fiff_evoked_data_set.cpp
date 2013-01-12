@@ -147,15 +147,15 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
     QString t_sFileName = t_pStream->streamName();
 
     printf("Reading %s ...\n",t_sFileName.toUtf8().constData());
-    FiffDirTree* t_pTree = NULL;
+    FiffDirTree::SPtr t_pTree;
     QList<FiffDirEntry>* t_pDir = NULL;
 
     if(!t_pStream->open(t_pTree, t_pDir))
     {
         if(t_pStream)
             delete t_pStream;
-        if(t_pTree)
-            delete t_pTree;
+//        if(t_pTree)
+//            delete t_pTree;
         if(t_pDir)
             delete t_pDir;
 
@@ -165,18 +165,20 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
     //   Read the measurement info
     //
     FiffInfo::SDPtr info(new FiffInfo);// = NULL;
-    FiffDirTree* meas = t_pStream->read_meas_info(t_pTree, *info.data());
+    FiffDirTree::SPtr meas;
+    if(!t_pStream->read_meas_info(t_pTree, *info.data(), meas))
+        return false;
     info->filename = t_sFileName; //move fname storage to read_meas_info member function
     //
     //   Locate the data of interest
     //
-    QList<FiffDirTree*> processed = meas->dir_tree_find(FIFFB_PROCESSED_DATA);
+    QList<FiffDirTree::SPtr> processed = meas->dir_tree_find(FIFFB_PROCESSED_DATA);
     if (processed.size() == 0)
     {
         if(t_pStream)
             delete t_pStream;
-        if(t_pTree)
-            delete t_pTree;
+//        if(t_pTree)
+//            delete t_pTree;
         if(t_pDir)
             delete t_pDir;
 //        if(info)
@@ -186,13 +188,13 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
         return false;
     }
     //
-    QList<FiffDirTree*> evoked = meas->dir_tree_find(FIFFB_EVOKED);
+    QList<FiffDirTree::SPtr> evoked = meas->dir_tree_find(FIFFB_EVOKED);
     if (evoked.size() == 0)
     {
         if(t_pStream)
             delete t_pStream;
-        if(t_pTree)
-            delete t_pTree;
+//        if(t_pTree)
+//            delete t_pTree;
         if(t_pDir)
             delete t_pDir;
 //        if(info)
@@ -207,9 +209,9 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
     fiff_int_t nsaspects = 0;
     qint32 oldsize = 0;
     MatrixXi is_smsh(1,0);
-    QList< QList<FiffDirTree*> > sets_aspects;
+    QList< QList<FiffDirTree::SPtr> > sets_aspects;
     QList< qint32 > sets_naspect;
-    QList<FiffDirTree*> saspects;
+    QList<FiffDirTree::SPtr> saspects;
     qint32 k;
     for (k = 0; k < evoked.size(); ++k)
     {
@@ -244,8 +246,8 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
     {
         if(t_pStream)
             delete t_pStream;
-        if(t_pTree)
-            delete t_pTree;
+//        if(t_pTree)
+//            delete t_pTree;
         if(t_pDir)
             delete t_pDir;
 //        if(info)
@@ -259,8 +261,8 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
     qint32 p = 0;
     qint32 a = 0;
     bool goon = true;
-    FiffDirTree* my_evoked = NULL;
-    FiffDirTree* my_aspect = NULL;
+    FiffDirTree::SPtr my_evoked;
+    FiffDirTree::SPtr my_aspect;
     for(k = 0; k < evoked.size(); ++k)
     {
         for (a = 0; a < sets_naspect[k]; ++a)
@@ -280,12 +282,12 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
     //
     //   The desired data should have been found but better to check
     //
-    if (my_evoked == NULL || my_aspect == NULL)
+    if (my_evoked->isEmpty() || my_aspect->isEmpty())
     {
         if(t_pStream)
             delete t_pStream;
-        if(t_pTree)
-            delete t_pTree;
+//        if(t_pTree)
+//            delete t_pTree;
         if(t_pDir)
             delete t_pDir;
 //        if(info)
@@ -345,8 +347,8 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
         {
             if(t_pStream)
                 delete t_pStream;
-            if(t_pTree)
-                delete t_pTree;
+//            if(t_pTree)
+//                delete t_pTree;
             if(t_pDir)
                 delete t_pDir;
 //            if(info)
@@ -358,8 +360,8 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
         {
             if(t_pStream)
                 delete t_pStream;
-            if(t_pTree)
-                delete t_pTree;
+//            if(t_pTree)
+//                delete t_pTree;
             if(t_pDir)
                 delete t_pDir;
 //            if(info)
@@ -418,8 +420,8 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
     {
         if(t_pStream)
             delete t_pStream;
-        if(t_pTree)
-            delete t_pTree;
+//        if(t_pTree)
+//            delete t_pTree;
         if(t_pDir)
             delete t_pDir;
 //        if(info)
@@ -464,8 +466,8 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
     {
         if(t_pStream)
             delete t_pStream;
-        if(t_pTree)
-            delete t_pTree;
+//        if(t_pTree)
+//            delete t_pTree;
         if(t_pDir)
             delete t_pDir;
 //        if(info)
@@ -515,8 +517,8 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
 
     if(t_pStream)
         delete t_pStream;
-    if(t_pTree)
-        delete t_pTree;
+//    if(t_pTree)
+//        delete t_pTree;
     if(t_pDir)
         delete t_pDir;
 

@@ -115,14 +115,6 @@ public:
     */
     void clear();
 
-//    //=========================================================================================================
-//    /**
-//    * Assignment Operator
-//    *
-//    * @return rhs   covariance data matrix which hould be assigned.
-//    */
-//    inline FiffCov& operator=(const FiffCov& rhs);
-
 public:
     fiff_int_t  kind;       /**< Covariance kind -> fiff_constants.h */
     bool diag;              /**< If the covariance is stored in a diagonal order. */
@@ -135,33 +127,6 @@ public:
     VectorXd eig;           /**< Vector of eigenvalues. */
     MatrixXd eigvec;        /**< Matrix of eigenvectors. */
 };
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE INLINE MEMBER METHODS
-//=============================================================================================================
-
-//inline FiffCov& FiffCov::operator=(const FiffCov& rhs)
-//{
-//    // Check for self-assignment!
-//    if (this == &rhs)
-//        return *this;
-//    //Else
-//    kind = rhs.kind;
-//    diag = rhs.diag;
-//    dim = rhs.dim;
-//    names = rhs.names;
-//    data = rhs.data;
-
-//    projs = rhs.projs;
-//    bads = rhs.bads;
-//    nfree = rhs.nfree;
-//    eig = rhs.eig;
-//    eigvec = rhs.eigvec;
-
-//    return *this;
-//}
 
 } // NAMESPACE
 

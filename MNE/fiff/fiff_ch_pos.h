@@ -81,7 +81,7 @@ public:
     /**
     * Copy constructor.
     *
-    * @param[in] FiffChPos  Coil position descriptor which should be copied
+    * @param[in] p_FiffChPos  Coil position descriptor which should be copied
     */
     FiffChPos(const FiffChPos &p_FiffChPos);
 

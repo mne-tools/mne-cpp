@@ -65,8 +65,8 @@ namespace FIFFLIB
 *
 * @brief Digitization point description
 */
-class FIFFSHARED_EXPORT FiffDigPoint {
-
+class FIFFSHARED_EXPORT FiffDigPoint
+{
 public:
     typedef QSharedPointer<FiffDigPoint> SPtr;              /**< Shared pointer type for FiffDigPoint. */
     typedef QSharedPointer<const FiffDigPoint> ConstSPtr;   /**< Const shared pointer type for FiffDigPoint. */
@@ -79,7 +79,9 @@ public:
 
     //=========================================================================================================
     /**
-    * copy ctor
+    * Copy constructor.
+    *
+    * @param[in] p_FiffDigPoint   Digitization point descriptor which should be copied
     */
     FiffDigPoint(const FiffDigPoint& p_FiffDigPoint);
 

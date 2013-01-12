@@ -45,11 +45,7 @@
 #include "fiff_constants.h"
 #include "fiff_types.h"
 #include "fiff_dir_entry.h"
-#include "fiff_tag.h"
-#include "fiff_ctf_comp.h"
-#include "fiff_proj.h"
-#include "fiff_info.h"
-#include "fiff_stream.h"
+#include "fiff_id.h"
 
 
 //*************************************************************************************************************
@@ -61,6 +57,7 @@
 #include <QList>
 #include <QStringList>
 #include <QDebug>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -72,6 +69,7 @@ namespace FIFFLIB
 {
 
 class FiffStream;
+class FiffTag;
 
 
 //=============================================================================================================
@@ -88,9 +86,17 @@ public:
 
     //=========================================================================================================
     /**
-    * ctor
+    * Constructors the directory tree structure.
     */
     FiffDirTree();
+
+    //=========================================================================================================
+    /**
+    * Copy constructor.
+    *
+    * @param[in] p_FiffDirTree  Directory tree structure which should be copied
+    */
+    FiffDirTree(const FiffDirTree &p_FiffDirTree);
 
     //=========================================================================================================
     /**
@@ -111,7 +117,18 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool copy_tree(FiffStream* fidin, FiffId& in_id, QList<FiffDirTree*>& nodes, FiffStream* fidout);
+    static bool copy_tree(FiffStream* fidin, FiffId& in_id, QList<FiffDirTree::SPtr>& nodes, FiffStream* fidout);
+
+    //=========================================================================================================
+    /**
+    * Returns true if directory tree structure contains no data.
+    *
+    * @return true if directory tree structure is empty.
+    */
+    inline bool isEmpty() const
+    {
+        return this->nent <= 0;
+    }
 
     //=========================================================================================================
     /**
@@ -126,7 +143,7 @@ public:
     *
     * @return index of the last read dir entry
     */
-    static qint32 make_dir_tree(FiffStream* p_pStream, QList<FiffDirEntry>* p_pDir, FiffDirTree*& p_pTree, qint32 start = 0);
+    static qint32 make_dir_tree(FiffStream* p_pStream, QList<FiffDirEntry>* p_pDir, FiffDirTree::SPtr& p_pTree, qint32 start = 0);
 
     //=========================================================================================================
     /**
@@ -138,7 +155,7 @@ public:
     *
     * @return list of the found nodes
     */
-    QList<FiffDirTree*> dir_tree_find(fiff_int_t kind);
+    QList<FiffDirTree::SPtr> dir_tree_find(fiff_int_t kind) const;
 
     //=========================================================================================================
     /**
@@ -167,14 +184,14 @@ public:
     bool has_tag(fiff_int_t findkind);
 
 public:
-    fiff_int_t              block;      /**< Block type for this directory */
-    FiffId                  id;         /**< Id of this block if any */
-    FiffId                  parent_id;  /**< Newly added to stay consistent with MATLAB implementation */
-    QList<FiffDirEntry>     dir;        /**< Directory of tags in this node */
-    fiff_int_t              nent;       /**< Number of entries in this node */
-    fiff_int_t              nent_tree;  /**< Number of entries in the directory tree node */
-    QList<FiffDirTree*>     children;   /**< Child nodes */
-    fiff_int_t              nchild;     /**< Number of child nodes */
+    fiff_int_t                  block;      /**< Block type for this directory */
+    FiffId                      id;         /**< Id of this block if any */
+    FiffId                      parent_id;  /**< Newly added to stay consistent with MATLAB implementation */
+    QList<FiffDirEntry>         dir;        /**< Directory of tags in this node */
+    fiff_int_t                  nent;       /**< Number of entries in this node */
+    fiff_int_t                  nent_tree;  /**< Number of entries in the directory tree node */
+    QList<FiffDirTree::SPtr>    children;   /**< Child nodes */
+    fiff_int_t                  nchild;     /**< Number of child nodes */
 
 // typedef struct _fiffDirNode {
 //  int                 type;    /**< Block type for this directory *

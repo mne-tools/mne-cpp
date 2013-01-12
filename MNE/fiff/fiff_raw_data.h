@@ -123,6 +123,12 @@ public:
 
     //=========================================================================================================
     /**
+    * Initializes the fiff raw measurement data.
+    */
+    void clear();
+
+    //=========================================================================================================
+    /**
     * True if fiff raw data are empty.
     *
     * @return true if fiff raw data are empty
@@ -177,7 +183,7 @@ public:
     }
 
 public:
-    FiffStream* file;//replaces fid
+    FiffStream* file;//replaces fid //ToDo replace this by SPtr
     FiffInfo::SDPtr info;
     fiff_int_t first_samp;
     fiff_int_t last_samp;

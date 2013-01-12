@@ -39,6 +39,11 @@
 //=============================================================================================================
 
 #include "fiff_dir_tree.h"
+#include "fiff_stream.h"
+//#include "fiff_tag.h"
+//#include "fiff_ctf_comp.h"
+//#include "fiff_proj.h"
+//#include "fiff_info.h"
 
 
 //*************************************************************************************************************
@@ -65,18 +70,34 @@ FiffDirTree::FiffDirTree()
 
 //*************************************************************************************************************
 
-FiffDirTree::~FiffDirTree()
+FiffDirTree::FiffDirTree(const FiffDirTree &p_FiffDirTree)
+: block(p_FiffDirTree.block)
+, id(p_FiffDirTree.id)
+, parent_id(p_FiffDirTree.parent_id)
+, dir(p_FiffDirTree.dir)
+, nent(p_FiffDirTree.nent)
+, nent_tree(p_FiffDirTree.nent_tree)
+, children(p_FiffDirTree.children)
+, nchild(p_FiffDirTree.nchild)
 {
-    QList<FiffDirTree*>::iterator i;
-    for (i = this->children.begin(); i != this->children.end(); ++i)
-        if (*i)
-            delete *i;
+
 }
 
 
 //*************************************************************************************************************
 
-bool FiffDirTree::copy_tree(FiffStream* fidin, FiffId& in_id, QList<FiffDirTree*>& nodes, FiffStream* fidout)
+FiffDirTree::~FiffDirTree()
+{
+//    QList<FiffDirTree*>::iterator i;
+//    for (i = this->children.begin(); i != this->children.end(); ++i)
+//        if (*i)
+//            delete *i;
+}
+
+
+//*************************************************************************************************************
+
+bool FiffDirTree::copy_tree(FiffStream* fidin, FiffId& in_id, QList<FiffDirTree::SPtr>& nodes, FiffStream* fidout)
 {
     if(nodes.size() <= 0)
         return false;
@@ -149,7 +170,7 @@ bool FiffDirTree::copy_tree(FiffStream* fidin, FiffId& in_id, QList<FiffDirTree*
         }
         for(p = 0; p < nodes[k]->nchild; ++p)
         {
-            QList<FiffDirTree*> childList;
+            QList<FiffDirTree::SPtr> childList;
             childList << nodes[k]->children[p];
             FiffDirTree::copy_tree(fidin, in_id, childList, fidout);
         }
@@ -161,11 +182,11 @@ bool FiffDirTree::copy_tree(FiffStream* fidin, FiffId& in_id, QList<FiffDirTree*
 
 //*************************************************************************************************************
 
-qint32 FiffDirTree::make_dir_tree(FiffStream* p_pStream, QList<FiffDirEntry>* p_pDir, FiffDirTree*& p_pTree, qint32 start)
+qint32 FiffDirTree::make_dir_tree(FiffStream* p_pStream, QList<FiffDirEntry>* p_pDir, FiffDirTree::SPtr& p_pTree, qint32 start)
 {
-    if (p_pTree != NULL)
-        delete p_pTree;
-    p_pTree = new FiffDirTree();
+//    if (p_pTree != NULL)
+//        delete p_pTree;
+    p_pTree = FiffDirTree::SPtr(new FiffDirTree());
 
     FIFFLIB::FiffTag* t_pTag = NULL;
 
@@ -194,7 +215,7 @@ qint32 FiffDirTree::make_dir_tree(FiffStream* p_pStream, QList<FiffDirEntry>* p_
         {
             if (current != start)
             {
-                FiffDirTree* p_pChildTree = NULL;
+                FiffDirTree::SPtr p_pChildTree;
                 current = FiffDirTree::make_dir_tree(p_pStream,p_pDir,p_pChildTree, current);
                 ++p_pTree->nchild;
                 p_pTree->children.append(p_pChildTree);
@@ -256,13 +277,13 @@ qint32 FiffDirTree::make_dir_tree(FiffStream* p_pStream, QList<FiffDirEntry>* p_
 
 //*************************************************************************************************************
 
-QList<FiffDirTree*> FiffDirTree::dir_tree_find(fiff_int_t kind)
+QList<FiffDirTree::SPtr> FiffDirTree::dir_tree_find(fiff_int_t kind) const
 {
-    QList<FiffDirTree*> nodes;
+    QList<FiffDirTree::SPtr> nodes;
     if(this->block == kind)
-        nodes.append(this);
+        nodes.append(FiffDirTree::SPtr(new FiffDirTree(*this)));
 
-    QList<FiffDirTree*>::iterator i;
+    QList<FiffDirTree::SPtr>::const_iterator i;
     for (i = this->children.begin(); i != this->children.end(); ++i)
         nodes.append((*i)->dir_tree_find(kind));
 

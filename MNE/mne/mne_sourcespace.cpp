@@ -80,7 +80,7 @@ MNESourceSpace::~MNESourceSpace()
 
 //*************************************************************************************************************
 
-bool MNESourceSpace::read_source_spaces(FiffStream*& p_pStream, bool add_geom, FiffDirTree*& p_pTree, MNESourceSpace& p_SourceSpace)
+bool MNESourceSpace::read_source_spaces(FiffStream*& p_pStream, bool add_geom, FiffDirTree::SPtr& p_pTree, MNESourceSpace& p_SourceSpace)
 {
 //    if (p_pSourceSpace != NULL)
 //        delete p_pSourceSpace;
@@ -110,7 +110,7 @@ bool MNESourceSpace::read_source_spaces(FiffStream*& p_pStream, bool add_geom, F
     //
     //   Find all source spaces
     //
-    QList<FiffDirTree*> spaces = p_pTree->dir_tree_find(FIFFB_MNE_SOURCE_SPACE);
+    QList<FiffDirTree::SPtr> spaces = p_pTree->dir_tree_find(FIFFB_MNE_SOURCE_SPACE);
     if (spaces.size() == 0)
     {
         if(open_here)
@@ -123,7 +123,7 @@ bool MNESourceSpace::read_source_spaces(FiffStream*& p_pStream, bool add_geom, F
     {
         MNEHemisphere p_Hemisphere;
         printf("\tReading a source space...");
-        MNESourceSpace::read_source_space(p_pStream, spaces.at(k), p_Hemisphere);
+        MNESourceSpace::read_source_space(p_pStream, spaces[k], p_Hemisphere);
         printf("\t[done]\n" );
         if (add_geom)
             complete_source_space_info(p_Hemisphere);
@@ -176,7 +176,7 @@ bool MNESourceSpace::transform_source_space_to(fiff_int_t dest, FiffCoordTrans& 
 
 //*************************************************************************************************************
 
-bool MNESourceSpace::read_source_space(FiffStream* p_pStream, FiffDirTree* p_pTree, MNEHemisphere& p_Hemisphere)
+bool MNESourceSpace::read_source_space(FiffStream* p_pStream, const FiffDirTree::SPtr p_pTree, MNEHemisphere& p_Hemisphere)
 {
     p_Hemisphere = MNEHemisphere();
 
