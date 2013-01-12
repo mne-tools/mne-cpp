@@ -99,12 +99,12 @@ DacqServer::~DacqServer()
 
 //*************************************************************************************************************
 
-bool DacqServer::getMeasInfo(FiffInfo& p_FiffInfo)
+bool DacqServer::getMeasInfo(FiffInfo::SDPtr& p_pFiffInfo)
 {
 
 //    if (p_pFiffInfo)
 //        delete p_pFiffInfo;
-    p_FiffInfo.clear();
+    p_pFiffInfo->clear();
 
 #ifdef DACQ_AUTOSTART
     m_pCollectorSock->server_stop();
@@ -173,9 +173,9 @@ bool DacqServer::getMeasInfo(FiffInfo& p_FiffInfo)
             
             FiffNamedMatrix t_fiffNamedMatrix(nvec, nchan, defaultList, names, data);
             
-            FiffProj* one = new FiffProj(kind, active, desc, t_fiffNamedMatrix);
+            FiffProj one(kind, active, desc, t_fiffNamedMatrix);
             
-            p_FiffInfo.projs.append(one);
+            p_pFiffInfo->projs.append(one);
             
             printf("[done]\r\n");   
         }
@@ -189,34 +189,34 @@ bool DacqServer::getMeasInfo(FiffInfo& p_FiffInfo)
                 break;
             case FIFFB_PROCESSED_DATA:
                 printf("Measurement ID... ");
-                p_FiffInfo.meas_id = t_pTag->toFiffID();
+                p_pFiffInfo->meas_id = t_pTag->toFiffID();
                 printf("[done]\r\n");  
                 break;
             case FIFF_MEAS_DATE:
                 printf("\tMeasurement date... ");
-                p_FiffInfo.meas_date[0] = t_pTag->toInt()[0];
-                p_FiffInfo.meas_date[1] = t_pTag->toInt()[1];
+                p_pFiffInfo->meas_date[0] = t_pTag->toInt()[0];
+                p_pFiffInfo->meas_date[1] = t_pTag->toInt()[1];
                 printf("[done]\r\n"); 
                 break;
             case FIFF_NCHAN:
                 printf("\tNumber of channels... ");
-                p_FiffInfo.nchan = *(t_pTag->toInt());
-                printf("%d... [done]\r\n", p_FiffInfo.nchan);
+                p_pFiffInfo->nchan = *(t_pTag->toInt());
+                printf("%d... [done]\r\n", p_pFiffInfo->nchan);
                 break;
             case FIFF_SFREQ:
                 printf("\tSampling frequency... ");
-                p_FiffInfo.sfreq = *(t_pTag->toFloat());
-                printf("%f... [done]\r\n", p_FiffInfo.sfreq);
+                p_pFiffInfo->sfreq = *(t_pTag->toFloat());
+                printf("%f... [done]\r\n", p_pFiffInfo->sfreq);
                 break;
             case FIFF_LOWPASS:
                 printf("\tLowpass frequency... ");
-                p_FiffInfo.lowpass = *(t_pTag->toFloat());
-                printf("%f Hz... [done]\r\n", p_FiffInfo.lowpass);
+                p_pFiffInfo->lowpass = *(t_pTag->toFloat());
+                printf("%f Hz... [done]\r\n", p_pFiffInfo->lowpass);
                 break;
             case FIFF_HIGHPASS:
                 printf("\tHighpass frequency... ");
-                p_FiffInfo.highpass = *(t_pTag->toFloat());
-                printf("%f Hz... [done]\r\n", p_FiffInfo.highpass);
+                p_pFiffInfo->highpass = *(t_pTag->toFloat());
+                printf("%f Hz... [done]\r\n", p_pFiffInfo->highpass);
                 break;
 //            case FIFF_LINE_FREQ:
 //                qDebug() << "FIFF_LINE_FREQ " << *(t_pTag->toFloat());
@@ -226,7 +226,7 @@ bool DacqServer::getMeasInfo(FiffInfo& p_FiffInfo)
 //                break;
             case FIFF_CH_INFO:
 //                qDebug() << "Processed FIFF_CH_INFO";
-                p_FiffInfo.chs.append( t_pTag->toChInfo() );
+                p_pFiffInfo->chs.append( t_pTag->toChInfo() );
                 break;
             case FIFF_BLOCK_END:
                 switch(*(t_pTag->toInt()))
@@ -250,10 +250,10 @@ bool DacqServer::getMeasInfo(FiffInfo& p_FiffInfo)
     delete t_pTag;
 
     printf("\tProcessing channels... ");
-    for(qint32 i = 0; i < p_FiffInfo.chs.size(); ++i)
-        p_FiffInfo.ch_names.append(p_FiffInfo.chs[i].ch_name);
+    for(qint32 i = 0; i < p_pFiffInfo->chs.size(); ++i)
+        p_pFiffInfo->ch_names.append(p_pFiffInfo->chs[i].ch_name);
 
-    printf("[done]\r\n", p_FiffInfo.chs.size());
+    printf("[done]\r\n", p_pFiffInfo->chs.size());
     
     printf("measurement info read.\r\n");   
 
