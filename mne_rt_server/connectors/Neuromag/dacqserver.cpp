@@ -359,7 +359,7 @@ void DacqServer::run()
     //
     // Requesting new header info: read it every time a measurement starts or a measurement info is requested
     //
-    if(m_pNeuromag->m_pInfo == NULL || m_bMeasInfoRequest)
+    if(m_pNeuromag->m_pInfo->isEmpty() || m_bMeasInfoRequest)
     {
         m_pNeuromag->mutex.lock();
         if(getMeasInfo(m_pNeuromag->m_pInfo))
