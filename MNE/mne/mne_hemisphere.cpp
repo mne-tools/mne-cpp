@@ -70,7 +70,6 @@ MNEHemisphere::MNEHemisphere()
 , use_tris(MatrixX3i::Zero(0,3))
 , nearest(VectorXi::Zero(0))
 , nearest_dist(VectorXd::Zero(0))
-, pinfo(QList<VectorXi>())
 , dist_limit(-1)
 , dist(MatrixXd())
 , tri_cent(MatrixX3d::Zero(0,3))
@@ -87,35 +86,35 @@ MNEHemisphere::MNEHemisphere()
 
 //*************************************************************************************************************
 
-MNEHemisphere::MNEHemisphere(const MNEHemisphere* p_pMNEHemisphere)
-: id(p_pMNEHemisphere->id)
-, np(p_pMNEHemisphere->np)
-, ntri(p_pMNEHemisphere->ntri)
-, coord_frame(p_pMNEHemisphere->coord_frame)
-, rr(MatrixX3d(p_pMNEHemisphere->rr))
-, nn(MatrixX3d(p_pMNEHemisphere->nn))
-, tris(MatrixX3i(p_pMNEHemisphere->tris))
-, nuse(p_pMNEHemisphere->nuse)
-, inuse(VectorXi(p_pMNEHemisphere->inuse))
-, vertno(VectorXi(p_pMNEHemisphere->vertno))
-, nuse_tri(p_pMNEHemisphere->nuse_tri)
-, use_tris(MatrixX3i(p_pMNEHemisphere->use_tris))
-, nearest(VectorXi(p_pMNEHemisphere->nearest))
-, nearest_dist(VectorXd(p_pMNEHemisphere->nearest_dist))
-, pinfo(p_pMNEHemisphere->pinfo)
-, dist_limit(p_pMNEHemisphere->dist_limit)
-, dist(p_pMNEHemisphere->dist)//p_pMNEHemisphere->dist ? new MatrixXd(*p_pMNEHemisphere->dist) : NULL)
-, tri_cent(MatrixX3d(p_pMNEHemisphere->tri_cent))
-, tri_nn(MatrixX3d(p_pMNEHemisphere->tri_nn))
-, tri_area(VectorXd(p_pMNEHemisphere->tri_area))
-, use_tri_cent(MatrixX3d(p_pMNEHemisphere->use_tri_cent))
-, use_tri_nn(MatrixX3d(p_pMNEHemisphere->use_tri_nn))
-, use_tri_area(VectorXd(p_pMNEHemisphere->use_tri_area))
-, m_TriCoords(p_pMNEHemisphere->m_TriCoords)//p_pMNEHemisphere->m_TriCoords ? new MatrixXf(*(p_pMNEHemisphere->m_TriCoords)) : NULL)
-, cluster_vertnos(p_pMNEHemisphere->cluster_vertnos)
-, cluster_distances(p_pMNEHemisphere->cluster_distances)
+MNEHemisphere::MNEHemisphere(const MNEHemisphere& p_MNEHemisphere)
+: id(p_MNEHemisphere.id)
+, np(p_MNEHemisphere.np)
+, ntri(p_MNEHemisphere.ntri)
+, coord_frame(p_MNEHemisphere.coord_frame)
+, rr(p_MNEHemisphere.rr)
+, nn(p_MNEHemisphere.nn)
+, tris(p_MNEHemisphere.tris)
+, nuse(p_MNEHemisphere.nuse)
+, inuse(p_MNEHemisphere.inuse)
+, vertno(p_MNEHemisphere.vertno)
+, nuse_tri(p_MNEHemisphere.nuse_tri)
+, use_tris(p_MNEHemisphere.use_tris)
+, nearest(p_MNEHemisphere.nearest)
+, nearest_dist(p_MNEHemisphere.nearest_dist)
+, pinfo(p_MNEHemisphere.pinfo)
+, dist_limit(p_MNEHemisphere.dist_limit)
+, dist(p_MNEHemisphere.dist)
+, tri_cent(p_MNEHemisphere.tri_cent)
+, tri_nn(p_MNEHemisphere.tri_nn)
+, tri_area(p_MNEHemisphere.tri_area)
+, use_tri_cent(p_MNEHemisphere.use_tri_cent)
+, use_tri_nn(p_MNEHemisphere.use_tri_nn)
+, use_tri_area(p_MNEHemisphere.use_tri_area)
+, m_TriCoords(p_MNEHemisphere.m_TriCoords)
+, cluster_vertnos(p_MNEHemisphere.cluster_vertnos)
+, cluster_distances(p_MNEHemisphere.cluster_distances)
 {
-    //*m_pGeometryData = *p_pMNEHemisphere->m_pGeometryData;
+    //*m_pGeometryData = *p_MNEHemisphere.m_pGeometryData;
 }
 
 
@@ -128,6 +127,43 @@ MNEHemisphere::~MNEHemisphere()
 //    if(dist)
 //        delete dist;
 }
+
+
+//*************************************************************************************************************
+
+void MNEHemisphere::clear()
+{
+    id = -1;
+    np = -1;
+    ntri = -1;
+    coord_frame = -1;
+    rr = MatrixX3d::Zero(0,3);
+    nn = MatrixX3d::Zero(0,3);
+    tris = MatrixX3i::Zero(0,3);
+    nuse = -1;
+    inuse = VectorXi::Zero(0);
+    vertno = VectorXi::Zero(0);
+    nuse_tri = -1;
+    use_tris = MatrixX3i::Zero(0,3);
+    nearest = VectorXi::Zero(0);
+    nearest_dist = VectorXd::Zero(0);
+    pinfo.clear();
+    dist_limit = -1;
+    dist = MatrixXd();
+    tri_cent = MatrixX3d::Zero(0,3);
+    tri_nn = MatrixX3d::Zero(0,3);
+    tri_area = VectorXd::Zero(0);
+    use_tri_cent = MatrixX3d::Zero(0,3);
+    use_tri_nn = MatrixX3d::Zero(0,3);
+    use_tri_area = VectorXd::Zero(0);
+
+    cluster_vertnos.clear();
+    cluster_distances.clear();
+
+    m_TriCoords = MatrixXf();
+}
+
+
 
 
 //*************************************************************************************************************

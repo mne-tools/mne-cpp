@@ -337,15 +337,15 @@ public:
     * Reads a covariance matrix from a fiff file
     *
     * @param [in] p_pStream     an open fiff file
-    * @param [in] p_pNode       look for the matrix in here
+    * @param [in] p_Node        look for the matrix in here
     * @param [in] cov_kind      what kind of a covariance matrix do we want?
     * @param [out] p_covData    the read covariance matrix
     *
     * @return true if succeeded, false otherwise
     */
-    inline static bool read_cov(FiffStream* p_pStream, FiffDirTree::SPtr p_pNode, fiff_int_t cov_kind, FiffCov& p_covData)
+    inline static bool read_cov(FiffStream* p_pStream, FiffDirTree& p_Node, fiff_int_t cov_kind, FiffCov& p_covData)
     {
-        return p_pStream->read_cov(p_pNode, cov_kind, p_covData);
+        return p_pStream->read_cov(p_Node, cov_kind, p_covData);
     }
 
     //=========================================================================================================
@@ -378,7 +378,7 @@ public:
     *
     * Reads a forward solution from a fif file
     *
-    * @param [in] p_pIODevice   A fiff IO device like a fiff QFile or QTCPSocket
+    * @param [in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
     * @param [out] fwd A forward solution from a fif file
     * @param [in] force_fixed   Force fixed source orientation mode? (optional)
     * @param [in] surf_ori      Use surface based source coordinate system? (optional)
@@ -387,9 +387,9 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static inline bool read_forward_solution(QIODevice* p_pIODevice, MNEForwardSolution*& fwd, bool force_fixed = false, bool surf_ori = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList)
+    static inline bool read_forward_solution(QIODevice& p_IODevice, MNEForwardSolution*& fwd, bool force_fixed = false, bool surf_ori = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList)
     {
-        return MNEForwardSolution::read_forward_solution(p_pIODevice, fwd, force_fixed, surf_ori, include, exclude);
+        return MNEForwardSolution::read_forward_solution(p_IODevice, fwd, force_fixed, surf_ori, include, exclude);
     }
 
     //=========================================================================================================
@@ -402,17 +402,17 @@ public:
     *
     * Reads source spaces from a fif file
     *
-    * @param [in] p_pStream   The open fiff file
-    * @param [in] add_geom  Add geometry information to the source spaces
-    * @param [in] p_pTree   Search for the source spaces here
+    * @param [in] p_pStream         The open fiff file
+    * @param [in] add_geom          Add geometry information to the source spaces
+    * @param [in] p_Tree            Search for the source spaces here
     *
-    * @param [out] p_pSourceSpace     The read source spaces
+    * @param [out] p_pSourceSpace   The read source spaces
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_source_spaces(FiffStream*& p_pStream, bool add_geom, FiffDirTree::SPtr& p_pTree, MNESourceSpace& p_SourceSpace)
+    static bool read_source_spaces(FiffStream*& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNESourceSpace& p_SourceSpace)
     {
-        return MNESourceSpace::read_source_spaces(p_pStream, add_geom, p_pTree, p_SourceSpace);
+        return MNESourceSpace::read_source_spaces(p_pStream, add_geom, p_Tree, p_SourceSpace);
     }
 
     //ToDo FiffChInfoList Class

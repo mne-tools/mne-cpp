@@ -91,19 +91,21 @@ public:
 
     //=========================================================================================================
     /**
-    * ctor
+    * Constructors the fiff measurement file information.
     */
     FiffInfo();
 
     //=========================================================================================================
     /**
-    * copy ctor
+    * Copy constructor.
+    *
+    * @param[in] p_FiffInfo  FIFF measurement information which should be copied
     */
     FiffInfo(const FiffInfo& p_FiffInfo);
 
     //=========================================================================================================
     /**
-    * Destroys the FiffInfo.
+    * Destroys the fiff measurement file information.
     */
     ~FiffInfo();
 

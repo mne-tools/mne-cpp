@@ -88,11 +88,10 @@ int main(int argc, char *argv[])
 
     QString t_sFileName = "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
 
-    QFile* t_pFile = new QFile(t_sFileName);
+    QFile t_File(t_sFileName);
 
-    if(!MNEForwardSolution::read_forward_solution(t_pFile, t_pFwd))
+    if(!MNEForwardSolution::read_forward_solution(t_File, t_pFwd))
     {
-        delete t_pFile;
         if(t_pFwd)
             delete t_pFwd;
         return -1;
@@ -100,9 +99,6 @@ int main(int argc, char *argv[])
 
     qDebug() << "ToDo....\n";
 
-
-
-    delete t_pFile;
     delete t_pFwd;
 
     return a.exec();

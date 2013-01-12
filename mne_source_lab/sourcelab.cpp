@@ -51,11 +51,10 @@ SourceLab::SourceLab(QObject *parent)
 {
     QString t_sFileName = "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
 
-    QFile* t_pFile = new QFile(t_sFileName);
+    QFile t_File(t_sFileName);
 
-    if(!MNEForwardSolution::read_forward_solution(t_pFile, m_pFwd))
+    if(!MNEForwardSolution::read_forward_solution(t_File, m_pFwd))
     {
-        delete t_pFile;
         if(m_pFwd)
             delete m_pFwd;
 //        return -1;
@@ -75,7 +74,7 @@ SourceLab::SourceLab(QObject *parent)
 
     m_pFwd->cluster_forward_solution(t_pFwdClustered, t_pLHAnnotation, t_pRHAnnotation, 40);
 
-    delete t_pFile;
+//    delete t_pFile;
 //    delete t_pFwd;
 
 

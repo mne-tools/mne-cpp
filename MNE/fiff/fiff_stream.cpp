@@ -135,7 +135,7 @@ void FiffStream::finish_writing_raw()
 
 //*************************************************************************************************************
 
-bool FiffStream::open(FiffDirTree::SPtr& p_pTree, QList<FiffDirEntry>*& p_pDir)
+bool FiffStream::open(FiffDirTree& p_Tree, QList<FiffDirEntry>& p_Dir)
 {
     QString t_sFileName = this->streamName();
 
@@ -178,15 +178,15 @@ bool FiffStream::open(FiffDirTree::SPtr& p_pTree, QList<FiffDirEntry>*& p_pDir)
     //
     printf("\nCreating tag directory for %s...", t_sFileName.toUtf8().constData());
 
-    if (p_pDir)
-        delete p_pDir;
-    p_pDir = new QList<FiffDirEntry>;
+//    if (p_pDir)
+//        delete p_pDir;
+    p_Dir.clear();// = new QList<FiffDirEntry>;
 
     qint32 dirpos = *t_pTag->toInt();
     if (dirpos > 0)
     {
         FiffTag::read_tag(this, t_pTag, dirpos);
-        *p_pDir = t_pTag->toDirEntry();
+        p_Dir = t_pTag->toDirEntry();
     }
     else
     {
@@ -201,7 +201,7 @@ bool FiffStream::open(FiffDirTree::SPtr& p_pTree, QList<FiffDirEntry>*& p_pDir)
             t_fiffDirEntry.kind = t_pTag->kind;
             t_fiffDirEntry.type = t_pTag->type;
             t_fiffDirEntry.size = t_pTag->size();
-            p_pDir->append(t_fiffDirEntry);
+            p_Dir.append(t_fiffDirEntry);
         }
     }
     delete t_pTag;
@@ -209,7 +209,7 @@ bool FiffStream::open(FiffDirTree::SPtr& p_pTree, QList<FiffDirEntry>*& p_pDir)
     //   Create the directory tree structure
     //
 
-    FiffDirTree::make_dir_tree(this, p_pDir, p_pTree);
+    FiffDirTree::make_dir_tree(this, p_Dir, p_Tree);
 
     printf("[done]\n");
 
@@ -223,16 +223,19 @@ bool FiffStream::open(FiffDirTree::SPtr& p_pTree, QList<FiffDirEntry>*& p_pDir)
 
 //*************************************************************************************************************
 
-QStringList FiffStream::read_bad_channels(const FiffDirTree::SPtr p_pNode)
+QStringList FiffStream::read_bad_channels(const FiffDirTree& p_Node)
 {
-    QList<FiffDirTree::SPtr> node = p_pNode->dir_tree_find(FIFFB_MNE_BAD_CHANNELS);
+    QList<FiffDirTree> node = p_Node.dir_tree_find(FIFFB_MNE_BAD_CHANNELS);
     FIFFLIB::FiffTag* t_pTag = NULL;
 
     QStringList bads;
 
     if (node.size() > 0)
-        if(node[0]->find_tag(this, FIFF_MNE_CH_NAME_LIST, t_pTag))
+        if(node[0].find_tag(this, FIFF_MNE_CH_NAME_LIST, t_pTag))
             bads = split_name_list(t_pTag->toString());
+
+    if(t_pTag)
+        delete t_pTag;
 
     return bads;
 }
@@ -240,14 +243,14 @@ QStringList FiffStream::read_bad_channels(const FiffDirTree::SPtr p_pNode)
 
 //*************************************************************************************************************
 
-bool FiffStream::read_cov(FiffDirTree::SPtr p_pNode, fiff_int_t cov_kind, FiffCov& p_covData)
+bool FiffStream::read_cov(const FiffDirTree& p_Node, fiff_int_t cov_kind, FiffCov& p_covData)
 {
     p_covData.clear();
 
     //
     //   Find all covariance matrices
     //
-    QList<FiffDirTree::SPtr> covs = p_pNode->dir_tree_find(FIFFB_MNE_COV);
+    QList<FiffDirTree> covs = p_Node.dir_tree_find(FIFFB_MNE_COV);
     if (covs.size() == 0)
     {
         printf("No covariance matrices found");
@@ -270,10 +273,10 @@ bool FiffStream::read_cov(FiffDirTree::SPtr p_pNode, fiff_int_t cov_kind, FiffCo
     QStringList bads;
     for(p = 0; p < covs.size(); ++p)
     {
-        success = covs[p]->find_tag(this, FIFF_MNE_COV_KIND, tag);
+        success = covs[p].find_tag(this, FIFF_MNE_COV_KIND, tag);
         if (success && *tag->toInt() == cov_kind)
         {
-            FiffDirTree::SPtr current = covs[p];
+            FiffDirTree* current = &covs[p];
             //
             //   Find all the necessary data
             //
@@ -387,11 +390,11 @@ bool FiffStream::read_cov(FiffDirTree::SPtr p_pNode, fiff_int_t cov_kind, FiffCo
             //
             //   Read the projection operator
             //
-            QList<FiffProj> projs = this->read_proj(current);
+            QList<FiffProj> projs = this->read_proj(*current);
             //
             //   Read the bad channel list
             //
-            bads = this->read_bad_channels(current);
+            bads = this->read_bad_channels(*current);
             //
             //   Put it together
             //
@@ -436,22 +439,22 @@ bool FiffStream::read_cov(FiffDirTree::SPtr p_pNode, fiff_int_t cov_kind, FiffCo
 
 //*************************************************************************************************************
 
-QList<FiffCtfComp> FiffStream::read_ctf_comp(FiffDirTree::SPtr p_pNode, QList<FiffChInfo>& chs)
+QList<FiffCtfComp> FiffStream::read_ctf_comp(const FiffDirTree& p_Node, const QList<FiffChInfo>& p_Chs)
 {
     QList<FiffCtfComp> compdata;
-    QList<FiffDirTree::SPtr> t_qListComps = p_pNode->dir_tree_find(FIFFB_MNE_CTF_COMP_DATA);
+    QList<FiffDirTree> t_qListComps = p_Node.dir_tree_find(FIFFB_MNE_CTF_COMP_DATA);
 
     qint32 i, k, p, col, row;
     fiff_int_t kind, pos;
     FiffTag* t_pTag = NULL;
     for (k = 0; k < t_qListComps.size(); ++k)
     {
-        FiffDirTree::SPtr node = t_qListComps.at(k);
+        FiffDirTree* node = &t_qListComps[k];
         //
         //   Read the data we need
         //
         FiffNamedMatrix::SDPtr mat(new FiffNamedMatrix());
-        this->read_named_matrix(node, FIFF_MNE_CTF_COMP_DATA, *mat.data());
+        this->read_named_matrix(*node, FIFF_MNE_CTF_COMP_DATA, *mat.data());
         for(p = 0; p < node->nent; ++p)
         {
             kind = node->dir.at(p).kind;
@@ -513,8 +516,8 @@ QList<FiffCtfComp> FiffStream::read_ctf_comp(FiffDirTree::SPtr p_pNode, QList<Fi
             //   Do the columns first
             //
             QStringList ch_names;
-            for (p  = 0; p < chs.size(); ++p)
-                ch_names.append(chs.at(p).ch_name);
+            for (p  = 0; p < p_Chs.size(); ++p)
+                ch_names.append(p_Chs[p].ch_name);
 
             qint32 count;
             MatrixXd col_cals(mat->data.cols(), 1);
@@ -542,7 +545,7 @@ QList<FiffCtfComp> FiffStream::read_ctf_comp(FiffDirTree::SPtr p_pNode, QList<Fi
                     delete t_pTag;
                     return compdata;
                 }
-                col_cals(col,0) = 1.0f/(chs.at(p).range*chs.at(p).cal);
+                col_cals(col,0) = 1.0f/(p_Chs[p].range*p_Chs[p].cal);
             }
             //
             //    Then the rows
@@ -574,7 +577,7 @@ QList<FiffCtfComp> FiffStream::read_ctf_comp(FiffDirTree::SPtr p_pNode, QList<Fi
                     return compdata;
                 }
 
-                row_cals(row, 0) = chs.at(p).range*chs.at(p).cal;
+                row_cals(row, 0) = p_Chs[p].range*p_Chs[p].cal;
             }
             mat->data           = row_cals.asDiagonal()* mat->data *col_cals.asDiagonal();
             one.rowcals         = row_cals;
@@ -595,7 +598,7 @@ QList<FiffCtfComp> FiffStream::read_ctf_comp(FiffDirTree::SPtr p_pNode, QList<Fi
 
 //*************************************************************************************************************
 
-bool FiffStream::read_meas_info(FiffDirTree::SPtr p_pNode, FiffInfo& info, FiffDirTree::SPtr& p_pNodeInfo)
+bool FiffStream::read_meas_info(const FiffDirTree& p_Node, FiffInfo& info, FiffDirTree& p_NodeInfo)
 {
 //    if (info)
 //        delete info;
@@ -603,7 +606,7 @@ bool FiffStream::read_meas_info(FiffDirTree::SPtr p_pNode, FiffInfo& info, FiffD
     //
     //   Find the desired blocks
     //
-    QList<FiffDirTree::SPtr> meas = p_pNode->dir_tree_find(FIFFB_MEAS);
+    QList<FiffDirTree> meas = p_Node.dir_tree_find(FIFFB_MEAS);
 
     if (meas.size() == 0)
     {
@@ -611,7 +614,7 @@ bool FiffStream::read_meas_info(FiffDirTree::SPtr p_pNode, FiffInfo& info, FiffD
         return false;
     }
     //
-    QList<FiffDirTree::SPtr> meas_info = meas[0]->dir_tree_find(FIFFB_MEAS_INFO);
+    QList<FiffDirTree> meas_info = meas[0].dir_tree_find(FIFFB_MEAS_INFO);
     if (meas_info.count() == 0)
     {
         printf("Could not find measurement info\n");
@@ -642,10 +645,10 @@ bool FiffStream::read_meas_info(FiffDirTree::SPtr p_pNode, FiffInfo& info, FiffD
     fiff_int_t kind = -1;
     fiff_int_t pos = -1;
 
-    for (qint32 k = 0; k < meas_info.at(0)->nent; ++k)
+    for (qint32 k = 0; k < meas_info[0].nent; ++k)
     {
-        kind = meas_info.at(0)->dir.at(k).kind;
-        pos  = meas_info.at(0)->dir.at(k).pos;
+        kind = meas_info[0].dir[k].kind;
+        pos  = meas_info[0].dir[k].pos;
         switch (kind)
         {
             case FIFF_NCHAN:
@@ -714,13 +717,13 @@ bool FiffStream::read_meas_info(FiffDirTree::SPtr p_pNode, FiffInfo& info, FiffD
 
     if (dev_head_t.isEmpty() || ctf_head_t.isEmpty()) //if isempty(dev_head_t) || isempty(ctf_head_t)
     {
-        QList<FiffDirTree::SPtr> hpi_result = meas_info[0]->dir_tree_find(FIFFB_HPI_RESULT);
+        QList<FiffDirTree> hpi_result = meas_info[0].dir_tree_find(FIFFB_HPI_RESULT);
         if (hpi_result.size() == 1)
         {
-            for( qint32 k = 0; k < hpi_result[0]->nent; ++k)
+            for( qint32 k = 0; k < hpi_result[0].nent; ++k)
             {
-                kind = hpi_result.at(0)->dir.at(k).kind;
-                pos  = hpi_result.at(0)->dir.at(k).pos;
+                kind = hpi_result[0].dir[k].kind;
+                pos  = hpi_result[0].dir[k].pos;
                 if (kind == FIFF_COORD_TRANS)
                 {
                     FiffTag::read_tag(this, t_pTag, pos);
@@ -736,7 +739,7 @@ bool FiffStream::read_meas_info(FiffDirTree::SPtr p_pNode, FiffInfo& info, FiffD
     //
     //   Locate the Polhemus data
     //
-    QList<FiffDirTree::SPtr> isotrak = meas_info[0]->dir_tree_find(FIFFB_ISOTRAK);
+    QList<FiffDirTree> isotrak = meas_info[0].dir_tree_find(FIFFB_ISOTRAK);
 
     QList<FiffDigPoint> dig;// = struct('kind',{},'ident',{},'r',{},'coord_frame',{});
     fiff_int_t coord_frame = FIFFV_COORD_HEAD;
@@ -745,10 +748,10 @@ bool FiffStream::read_meas_info(FiffDirTree::SPtr p_pNode, FiffInfo& info, FiffD
 
     if (isotrak.size() == 1)
     {
-        for (k = 0; k < isotrak.at(0)->nent; ++k)
+        for (k = 0; k < isotrak[0].nent; ++k)
         {
-            kind = isotrak.at(0)->dir.at(k).kind;
-            pos  = isotrak.at(0)->dir.at(k).pos;
+            kind = isotrak[0].dir[k].kind;
+            pos  = isotrak[0].dir[k].pos;
             if (kind == FIFF_DIG_POINT)
             {
                 FiffTag::read_tag(this, t_pTag, pos);
@@ -783,15 +786,15 @@ bool FiffStream::read_meas_info(FiffDirTree::SPtr p_pNode, FiffInfo& info, FiffD
     //
     //   Locate the acquisition information
     //
-    QList<FiffDirTree::SPtr> acqpars = meas_info[0]->dir_tree_find(FIFFB_DACQ_PARS);
+    QList<FiffDirTree> acqpars = meas_info[0].dir_tree_find(FIFFB_DACQ_PARS);
     QString acq_pars;
     QString acq_stim;
     if (acqpars.size() == 1)
     {
-        for( k = 0; k < acqpars.at(0)->nent; ++k)
+        for( k = 0; k < acqpars[0].nent; ++k)
         {
-            kind = acqpars.at(0)->dir.at(k).kind;
-            pos  = acqpars.at(0)->dir.at(k).pos;
+            kind = acqpars[0].dir.at(k).kind;
+            pos  = acqpars[0].dir.at(k).pos;
             if (kind == FIFF_DACQ_PARS)
             {
                 FiffTag::read_tag(this, t_pTag, pos);
@@ -815,38 +818,38 @@ bool FiffStream::read_meas_info(FiffDirTree::SPtr p_pNode, FiffInfo& info, FiffD
     //
     //   Load the bad channel list
     //
-    QStringList bads = this->read_bad_channels(p_pNode);
+    QStringList bads = this->read_bad_channels(p_Node);
     //
     //   Put the data together
     //
 //    info = new FiffInfo();
-    if (p_pNode->id.version != -1)
-        info.file_id = p_pNode->id;
+    if (p_Node.id.version != -1)
+        info.file_id = p_Node.id;
     else
         info.file_id.version = -1;
 
     //
     //  Make the most appropriate selection for the measurement id
     //
-    if (meas_info[0]->parent_id.version == -1)
+    if (meas_info[0].parent_id.version == -1)
     {
-        if (meas_info[0]->id.version == -1)
+        if (meas_info[0].id.version == -1)
         {
-            if (meas[0]->id.version == -1)
+            if (meas[0].id.version == -1)
             {
-                if (meas[0]->parent_id.version == -1)
+                if (meas[0].parent_id.version == -1)
                     info.meas_id = info.file_id;
                 else
-                    info.meas_id = meas.at(0)->parent_id;
+                    info.meas_id = meas[0].parent_id;
             }
             else
-                info.meas_id = meas.at(0)->id;
+                info.meas_id = meas[0].id;
         }
         else
-            info.meas_id = meas_info.at(0)->id;
+            info.meas_id = meas_info[0].id;
     }
     else
-        info.meas_id = meas_info.at(0)->parent_id;
+        info.meas_id = meas_info[0].parent_id;
 
     if (meas_date[0] == -1)
     {
@@ -906,32 +909,33 @@ bool FiffStream::read_meas_info(FiffDirTree::SPtr p_pNode, FiffInfo& info, FiffD
     info.acq_pars = acq_pars;
     info.acq_stim = acq_stim;
 
-    p_pNodeInfo = meas[0];
+    p_NodeInfo = meas[0];
     return true;
 }
 
 
 //*************************************************************************************************************
 
-bool FiffStream::read_named_matrix(FiffDirTree::SPtr node, fiff_int_t matkind, FiffNamedMatrix& mat)
+bool FiffStream::read_named_matrix(const FiffDirTree& p_Node, fiff_int_t matkind, FiffNamedMatrix& mat)
 {
 //    if (mat != NULL)
 //        delete mat;
     mat.clear();
 
+    FiffDirTree node = p_Node;
     //
     //   Descend one level if necessary
     //
     bool found_it = false;
-    if (node->block != FIFFB_MNE_NAMED_MATRIX)
+    if (node.block != FIFFB_MNE_NAMED_MATRIX)
     {
-        for (int k = 0; k < node->nchild; ++k)
+        for (int k = 0; k < node.nchild; ++k)
         {
-            if (node->children.at(k)->block == FIFFB_MNE_NAMED_MATRIX)
+            if (node.children[k].block == FIFFB_MNE_NAMED_MATRIX)
             {
-                if(node->children.at(k)->has_tag(matkind))
+                if(node.children[k].has_tag(matkind))
                 {
-                    node = node->children.at(k);
+                    node = node.children[k];
                     found_it = true;
                     break;
                 }
@@ -945,7 +949,7 @@ bool FiffStream::read_named_matrix(FiffDirTree::SPtr node, fiff_int_t matkind, F
     }
     else
     {
-        if (!node->has_tag(matkind))
+        if (!node.has_tag(matkind))
         {
             printf("Desired named matrix (kind = %d) not available",matkind);
             return false;
@@ -956,7 +960,7 @@ bool FiffStream::read_named_matrix(FiffDirTree::SPtr node, fiff_int_t matkind, F
     //
     //   Read everything we need
     //
-    if(!node->find_tag(this, matkind, t_pTag))
+    if(!node.find_tag(this, matkind, t_pTag))
     {
         printf("Matrix data missing.\n");
         return false;
@@ -971,13 +975,13 @@ bool FiffStream::read_named_matrix(FiffDirTree::SPtr node, fiff_int_t matkind, F
     mat.nrow = mat.data.rows();
     mat.ncol = mat.data.cols();
 
-    if(node->find_tag(this, FIFF_MNE_NROW, t_pTag))
+    if(node.find_tag(this, FIFF_MNE_NROW, t_pTag))
         if (*t_pTag->toInt() != mat.nrow)
         {
             printf("Number of rows in matrix data and FIFF_MNE_NROW tag do not match");
             return false;
         }
-    if(node->find_tag(this, FIFF_MNE_NCOL, t_pTag))
+    if(node.find_tag(this, FIFF_MNE_NCOL, t_pTag))
         if (*t_pTag->toInt() != mat.ncol)
         {
             printf("Number of columns in matrix data and FIFF_MNE_NCOL tag do not match");
@@ -985,11 +989,11 @@ bool FiffStream::read_named_matrix(FiffDirTree::SPtr node, fiff_int_t matkind, F
         }
 
     QString row_names;
-    if(node->find_tag(this, FIFF_MNE_ROW_NAMES, t_pTag))
+    if(node.find_tag(this, FIFF_MNE_ROW_NAMES, t_pTag))
         row_names = t_pTag->toString();
 
     QString col_names;
-    if(node->find_tag(this, FIFF_MNE_COL_NAMES, t_pTag))
+    if(node.find_tag(this, FIFF_MNE_COL_NAMES, t_pTag))
         col_names = t_pTag->toString();
 
     //
@@ -1007,32 +1011,32 @@ bool FiffStream::read_named_matrix(FiffDirTree::SPtr node, fiff_int_t matkind, F
 
 //*************************************************************************************************************
 
-QList<FiffProj> FiffStream::read_proj(FiffDirTree::SPtr p_pNode)
+QList<FiffProj> FiffStream::read_proj(const FiffDirTree& p_Node)
 {
     QList<FiffProj> projdata;// = struct('kind',{},'active',{},'desc',{},'data',{});
     //
     //   Locate the projection data
     //
-    QList<FiffDirTree::SPtr> t_qListNodes = p_pNode->dir_tree_find(FIFFB_PROJ);
+    QList<FiffDirTree> t_qListNodes = p_Node.dir_tree_find(FIFFB_PROJ);
     if ( t_qListNodes.size() == 0 )
         return projdata;
 
 
     FIFFLIB::FiffTag* t_pTag = NULL;
-    t_qListNodes.at(0)->find_tag(this, FIFF_NCHAN, t_pTag);
+    t_qListNodes[0].find_tag(this, FIFF_NCHAN, t_pTag);
     fiff_int_t global_nchan;
     if (t_pTag)
         global_nchan = *t_pTag->toInt();
 
 
     fiff_int_t nchan;
-    QList<FiffDirTree::SPtr> t_qListItems = t_qListNodes[0]->dir_tree_find(FIFFB_PROJ_ITEM);
+    QList<FiffDirTree> t_qListItems = t_qListNodes[0].dir_tree_find(FIFFB_PROJ_ITEM);
     for ( qint32 i = 0; i < t_qListItems.size(); ++i)
     {
         //
         //   Find all desired tags in one item
         //
-        FiffDirTree::SPtr t_pFiffDirTreeItem = t_qListItems[i];
+        FiffDirTree* t_pFiffDirTreeItem = &t_qListItems[i];
         t_pFiffDirTreeItem->find_tag(this, FIFF_NCHAN, t_pTag);
         if (t_pTag)
             nchan = *t_pTag->toInt();
@@ -1177,17 +1181,17 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool 
 
     printf("Opening raw data %s...\n",t_sFileName.toUtf8().constData());
 
-    FiffDirTree::SPtr t_pTree;
-    QList<FiffDirEntry>* t_pDir = NULL;
+    FiffDirTree t_Tree;
+    QList<FiffDirEntry> t_Dir;
 
-    if(!p_pStream->open(t_pTree, t_pDir))
+    if(!p_pStream->open(t_Tree, t_Dir))
     {
         if(p_pStream)
             delete p_pStream;
 //        if(t_pTree)
 //            delete t_pTree;
-        if(t_pDir)
-            delete t_pDir;
+//        if(t_pDir)
+//            delete t_pDir;
 
         return false;
     }
@@ -1197,23 +1201,23 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool 
     //
 //        [ info, meas ] = fiff_read_meas_info(fid,tree);
     FiffInfo::SDPtr info(new FiffInfo);// = NULL;
-    FiffDirTree::SPtr meas;
-    if(!p_pStream->read_meas_info(t_pTree, *info.data(), meas))
+    FiffDirTree meas;
+    if(!p_pStream->read_meas_info(t_Tree, *info.data(), meas))
         return false;
 
     //
     //   Locate the data of interest
     //
-    QList<FiffDirTree::SPtr> raw = meas->dir_tree_find(FIFFB_RAW_DATA);
+    QList<FiffDirTree> raw = meas.dir_tree_find(FIFFB_RAW_DATA);
     if (raw.size() == 0)
     {
-        raw = meas->dir_tree_find(FIFFB_CONTINUOUS_DATA);
+        raw = meas.dir_tree_find(FIFFB_CONTINUOUS_DATA);
         if(allow_maxshield)
         {
 //            for (qint32 i = 0; i < raw.size(); ++i)
 //                if(raw[i])
 //                    delete raw[i];
-            raw = meas->dir_tree_find(FIFFB_SMSH_RAW_DATA);
+            raw = meas.dir_tree_find(FIFFB_SMSH_RAW_DATA);
             if (raw.size() == 0)
             {
                 printf("No raw data in %s\n", t_sFileName.toUtf8().constData());
@@ -1221,8 +1225,8 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool 
                     delete p_pStream;
 //                if(t_pTree)
 //                    delete t_pTree;
-                if(t_pDir)
-                    delete t_pDir;
+//                if(t_pDir)
+//                    delete t_pDir;
 
                 return false;
             }
@@ -1236,8 +1240,8 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool 
                     delete p_pStream;
 //                if(t_pTree)
 //                    delete t_pTree;
-                if(t_pDir)
-                    delete t_pDir;
+//                if(t_pDir)
+//                    delete t_pDir;
 
                 return false;
             }
@@ -1257,19 +1261,19 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool 
     //   Process the directory
     //
 
-    QList<FiffDirEntry> dir = raw[0]->dir;
-    fiff_int_t nent = raw[0]->nent;
+    QList<FiffDirEntry> dir = raw[0].dir;
+    fiff_int_t nent = raw[0].nent;
     fiff_int_t nchan = info->nchan;
     fiff_int_t first = 0;
     fiff_int_t first_samp = 0;
-    fiff_int_t first_skip   = 0;
+    fiff_int_t first_skip = 0;
     //
     //  Get first sample tag if it is there
     //
     FiffTag* t_pTag = NULL;
     if (dir[first].kind == FIFF_FIRST_SAMPLE)
     {
-        FiffTag::read_tag(p_pStream, t_pTag, dir.at(first).pos);
+        FiffTag::read_tag(p_pStream, t_pTag, dir[first].pos);
         first_samp = *t_pTag->toInt();
         ++first;
     }
@@ -1282,7 +1286,7 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool 
         //
         //  This first skip can be applied only after we know the buffer size
         //
-        FiffTag::read_tag(p_pStream, t_pTag, dir.at(first).pos);
+        FiffTag::read_tag(p_pStream, t_pTag, dir[first].pos);
         first_skip = *t_pTag->toInt();
         ++first;
     }
@@ -1385,8 +1389,8 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool 
 
 //    if(t_pTree)
 //        delete t_pTree;
-    if(t_pDir)
-        delete t_pDir;
+//    if(t_pDir)
+//        delete t_pDir;
 
     return true;
 }
@@ -1486,14 +1490,14 @@ FiffStream* FiffStream::start_writing_raw(QIODevice* p_pIODevice, const FiffInfo
         QFile* t_pFile = new QFile(info.filename);//ToDo this has to be adapted for TCPSocket
         FiffStream* t_pStream2 = new FiffStream(t_pFile);
 
-        FiffDirTree::SPtr t_pTree;
-        QList<FiffDirEntry>* t_pDir = NULL;
-        t_pStream2->open(t_pTree, t_pDir);
+        FiffDirTree t_Tree;
+        QList<FiffDirEntry> t_Dir;
+        t_pStream2->open(t_Tree, t_Dir);
 
         for(qint32 k = 0; k < blocks.size(); ++k)
         {
-            QList<FiffDirTree::SPtr> nodes = t_pTree->dir_tree_find(blocks.at(k));
-            FiffDirTree::copy_tree(t_pStream2,t_pTree->id,nodes,t_pStream);
+            QList<FiffDirTree> nodes = t_Tree.dir_tree_find(blocks[k]);
+            FiffDirTree::copy_tree(t_pStream2,t_Tree.id,nodes,t_pStream);
             if(blocks[k] == FIFFB_HPI_RESULT && nodes.size() > 0)
                 have_hpi_result = true;
 
@@ -1501,7 +1505,7 @@ FiffStream* FiffStream::start_writing_raw(QIODevice* p_pIODevice, const FiffInfo
                 have_isotrak = true;
         }
 
-        delete t_pDir;
+//        delete t_pDir;
 //        delete t_pTree;
         delete t_pStream2;
         t_pStream2 = NULL;
