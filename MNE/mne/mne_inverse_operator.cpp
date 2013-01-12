@@ -321,15 +321,15 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //
     FiffStream* t_pStream = new FiffStream(&p_IODevice);
     printf("Reading inverse operator decomposition from %s...\n",t_pStream->streamName().toUtf8().constData());
-    FiffDirTree* t_pTree = NULL;
+    FiffDirTree::SPtr t_pTree;
     QList<FiffDirEntry>* t_pDir = NULL;
 
     if(!t_pStream->open(t_pTree, t_pDir))
     {
         if(t_pStream)
             delete t_pStream;
-        if(t_pTree)
-            delete t_pTree;
+//        if(t_pTree)
+//            delete t_pTree;
         if(t_pDir)
             delete t_pDir;
 
@@ -338,30 +338,30 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //
     //   Find all inverse operators
     //
-    QList <FiffDirTree *> invs_list = t_pTree->dir_tree_find(FIFFB_MNE_INVERSE_SOLUTION);
+    QList <FiffDirTree::SPtr> invs_list = t_pTree->dir_tree_find(FIFFB_MNE_INVERSE_SOLUTION);
     if ( invs_list.size()== 0)
     {
         printf("No inverse solutions in %s\n", t_pStream->streamName().toUtf8().constData());
         if(t_pStream)
             delete t_pStream;
-        if(t_pTree)
-            delete t_pTree;
+//        if(t_pTree)
+//            delete t_pTree;
         if(t_pDir)
             delete t_pDir;
         return false;
     }
-    FiffDirTree* invs = invs_list[0];
+    FiffDirTree::SPtr invs = invs_list[0];
     //
     //   Parent MRI data
     //
-    QList <FiffDirTree *> parent_mri = t_pTree->dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
+    QList <FiffDirTree::SPtr> parent_mri = t_pTree->dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
     if (parent_mri.size() == 0)
     {
         printf("No parent MRI information in %s", t_pStream->streamName().toUtf8().constData());
         if(t_pStream)
             delete t_pStream;
-        if(t_pTree)
-            delete t_pTree;
+//        if(t_pTree)
+//            delete t_pTree;
         if(t_pDir)
             delete t_pDir;
         return false;
@@ -378,8 +378,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
             delete t_pTag;
         if(t_pStream)
             delete t_pStream;
-        if(t_pTree)
-            delete t_pTree;
+//        if(t_pTree)
+//            delete t_pTree;
         if(t_pDir)
             delete t_pDir;
         return false;
@@ -395,8 +395,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
             delete t_pTag;
         if(t_pStream)
             delete t_pStream;
-        if(t_pTree)
-            delete t_pTree;
+//        if(t_pTree)
+//            delete t_pTree;
         if(t_pDir)
             delete t_pDir;
         return false;
@@ -410,8 +410,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
             delete t_pTag;
         if(t_pStream)
             delete t_pStream;
-        if(t_pTree)
-            delete t_pTree;
+//        if(t_pTree)
+//            delete t_pTree;
         if(t_pDir)
             delete t_pDir;
         return false;
@@ -428,8 +428,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
             delete t_pTag;
         if(t_pStream)
             delete t_pStream;
-        if(t_pTree)
-            delete t_pTree;
+//        if(t_pTree)
+//            delete t_pTree;
         if(t_pDir)
             delete t_pDir;
         return false;
@@ -445,8 +445,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
             delete t_pTag;
         if(t_pStream)
             delete t_pStream;
-        if(t_pTree)
-            delete t_pTree;
+//        if(t_pTree)
+//            delete t_pTree;
         if(t_pDir)
             delete t_pDir;
         return false;
@@ -469,8 +469,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
             delete t_pTag;
         if(t_pStream)
             delete t_pStream;
-        if(t_pTree)
-            delete t_pTree;
+//        if(t_pTree)
+//            delete t_pTree;
         if(t_pDir)
             delete t_pDir;
         return false;
@@ -494,8 +494,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
                 delete t_pTag;
             if(t_pStream)
                 delete t_pStream;
-            if(t_pTree)
-                delete t_pTree;
+//            if(t_pTree)
+//                delete t_pTree;
             if(t_pDir)
                 delete t_pDir;
             return false;
@@ -514,8 +514,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
             delete t_pTag;
         if(t_pStream)
             delete t_pStream;
-        if(t_pTree)
-            delete t_pTree;
+//        if(t_pTree)
+//            delete t_pTree;
         if(t_pDir)
             delete t_pDir;
         return false;
@@ -535,8 +535,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
             delete t_pTag;
         if(t_pStream)
             delete t_pStream;
-        if(t_pTree)
-            delete t_pTree;
+//        if(t_pTree)
+//            delete t_pTree;
         if(t_pDir)
             delete t_pDir;
         return false;
@@ -553,8 +553,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
             delete t_pTag;
         if(t_pStream)
             delete t_pStream;
-        if(t_pTree)
-            delete t_pTree;
+//        if(t_pTree)
+//            delete t_pTree;
         if(t_pDir)
             delete t_pDir;
         return false;
@@ -595,8 +595,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
             delete t_pTag;
         if(t_pStream)
             delete t_pStream;
-        if(t_pTree)
-            delete t_pTree;
+//        if(t_pTree)
+//            delete t_pTree;
         if(t_pDir)
             delete t_pDir;
         return false;
@@ -614,8 +614,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
             delete t_pTag;
         if(t_pStream)
             delete t_pStream;
-        if(t_pTree)
-            delete t_pTree;
+//        if(t_pTree)
+//            delete t_pTree;
         if(t_pDir)
             delete t_pDir;
         return false;
@@ -635,8 +635,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
                     delete t_pTag;
                 if(t_pStream)
                     delete t_pStream;
-                if(t_pTree)
-                    delete t_pTree;
+//                if(t_pTree)
+//                    delete t_pTree;
                 if(t_pDir)
                     delete t_pDir;
                 return false;
@@ -655,8 +655,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
             delete t_pTag;
         if(t_pStream)
             delete t_pStream;
-        if(t_pTree)
-            delete t_pTree;
+//        if(t_pTree)
+//            delete t_pTree;
         if(t_pDir)
             delete t_pDir;
     }
@@ -689,8 +689,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
         delete t_pTag;
     if(t_pStream)
         delete t_pStream;
-    if(t_pTree)
-        delete t_pTree;
+//    if(t_pTree)
+//        delete t_pTree;
     if(t_pDir)
         delete t_pDir;
 

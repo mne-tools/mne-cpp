@@ -405,7 +405,7 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
 bool MNEForwardSolution::read_forward_solution(QIODevice* p_pIODevice, MNEForwardSolution*& fwd, bool force_fixed, bool surf_ori, QStringList& include, QStringList& exclude)
 {
     FiffStream* t_pStream = new FiffStream(p_pIODevice);
-    FiffDirTree* t_pTree = NULL;
+    FiffDirTree::SPtr t_pTree;
     QList<FiffDirEntry>* t_pDir = NULL;
 
     printf("Reading forward solution from %s...\n", t_pStream->streamName().toUtf8().constData());
@@ -415,7 +415,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice* p_pIODevice, MNEForwar
     //
     //   Find all forward solutions
     //
-    QList<FiffDirTree*> fwds = t_pTree->dir_tree_find(FIFFB_MNE_FORWARD_SOLUTION);
+    QList<FiffDirTree::SPtr> fwds = t_pTree->dir_tree_find(FIFFB_MNE_FORWARD_SOLUTION);
 
     if (fwds.size() == 0)
     {
@@ -424,8 +424,8 @@ bool MNEForwardSolution::read_forward_solution(QIODevice* p_pIODevice, MNEForwar
         //garbage collecting
         if(t_pDir)
             delete t_pDir;
-        if(t_pTree)
-            delete t_pTree;
+//        if(t_pTree)
+//            delete t_pTree;
         if(t_pStream)
             delete t_pStream;
         return false;
@@ -433,7 +433,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice* p_pIODevice, MNEForwar
     //
     //   Parent MRI data
     //
-    QList<FiffDirTree*> parent_mri = t_pTree->dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
+    QList<FiffDirTree::SPtr> parent_mri = t_pTree->dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
     if (parent_mri.size() == 0)
     {
         t_pStream->device()->close();
@@ -441,8 +441,8 @@ bool MNEForwardSolution::read_forward_solution(QIODevice* p_pIODevice, MNEForwar
         //garbage collecting
         if(t_pDir)
             delete t_pDir;
-        if(t_pTree)
-            delete t_pTree;
+//        if(t_pTree)
+//            delete t_pTree;
         if(t_pStream)
             delete t_pStream;
         return false;
@@ -457,8 +457,8 @@ bool MNEForwardSolution::read_forward_solution(QIODevice* p_pIODevice, MNEForwar
         //garbage collecting
         if(t_pDir)
             delete t_pDir;
-        if(t_pTree)
-            delete t_pTree;
+//        if(t_pTree)
+//            delete t_pTree;
         if(t_pStream)
             delete t_pStream;
 //        if(t_SourceSpace)
@@ -480,8 +480,8 @@ bool MNEForwardSolution::read_forward_solution(QIODevice* p_pIODevice, MNEForwar
     //   Locate and read the forward solutions
     //
     FIFFLIB::FiffTag* t_pTag = NULL;
-    FiffDirTree* megnode = NULL;
-    FiffDirTree* eegnode = NULL;
+    FiffDirTree::SPtr megnode;
+    FiffDirTree::SPtr eegnode;
     for(int k = 0; k < fwds.size(); ++k)
     {
         if(!fwds.at(k)->find_tag(t_pStream, FIFF_MNE_INCLUDED_METHODS, t_pTag))
@@ -491,8 +491,8 @@ bool MNEForwardSolution::read_forward_solution(QIODevice* p_pIODevice, MNEForwar
             //garbage collecting
             if(t_pDir)
                 delete t_pDir;
-            if(t_pTree)
-                delete t_pTree;
+//            if(t_pTree)
+//                delete t_pTree;
             if(t_pStream)
                 delete t_pStream;
 //            if(t_SourceSpace)
@@ -502,7 +502,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice* p_pIODevice, MNEForwar
         if (*t_pTag->toInt() == FIFFV_MNE_MEG)
         {
             printf("MEG solution found\n");
-            megnode = fwds.at(k);
+            megnode = fwds[k];
         }
         else if(*t_pTag->toInt() == FIFFV_MNE_EEG)
         {
@@ -550,8 +550,8 @@ bool MNEForwardSolution::read_forward_solution(QIODevice* p_pIODevice, MNEForwar
             //garbage collecting
             if(t_pDir)
                 delete t_pDir;
-            if(t_pTree)
-                delete t_pTree;
+//            if(t_pTree)
+//                delete t_pTree;
             if(t_pStream)
                 delete t_pStream;
 //            if(t_SourceSpace)
@@ -595,8 +595,8 @@ bool MNEForwardSolution::read_forward_solution(QIODevice* p_pIODevice, MNEForwar
         //garbage collecting
         if(t_pDir)
             delete t_pDir;
-        if(t_pTree)
-            delete t_pTree;
+//        if(t_pTree)
+//            delete t_pTree;
         if(t_pStream)
             delete t_pStream;
 //        if(t_SourceSpace)
@@ -627,8 +627,8 @@ bool MNEForwardSolution::read_forward_solution(QIODevice* p_pIODevice, MNEForwar
                 //garbage collecting
                 if(t_pDir)
                     delete t_pDir;
-                if(t_pTree)
-                    delete t_pTree;
+//                if(t_pTree)
+//                    delete t_pTree;
                 if(t_pStream)
                     delete t_pStream;
 //                if(t_SourceSpace)
@@ -916,8 +916,8 @@ bool MNEForwardSolution::read_forward_solution(QIODevice* p_pIODevice, MNEForwar
 //        delete eegfwd; // don't delete the eegfwd because fwd->src is pointing to source space (not copied for the sake of speed)
     if(t_pDir)
         delete t_pDir;
-    if(t_pTree)
-        delete t_pTree;
+//    if(t_pTree)
+//        delete t_pTree;
     if(t_pStream)
         delete t_pStream;
 //    if(t_SourceSpace)
@@ -931,7 +931,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice* p_pIODevice, MNEForwar
 
 //*************************************************************************************************************
 
-bool MNEForwardSolution::read_one(FiffStream* p_pStream, FiffDirTree* node, MNEForwardSolution*& one)
+bool MNEForwardSolution::read_one(FiffStream* p_pStream, FiffDirTree::SPtr node, MNEForwardSolution*& one)
 {
     if (one != NULL)
         delete one;

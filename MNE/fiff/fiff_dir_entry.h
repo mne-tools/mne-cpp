@@ -66,8 +66,8 @@ namespace FIFFLIB
 * @brief Directory entry description.
 **/
 
-class FIFFSHARED_EXPORT FiffDirEntry {
-
+class FIFFSHARED_EXPORT FiffDirEntry
+{
 public:
     typedef QSharedPointer<FiffDirEntry> SPtr;              /**< Shared pointer type for FiffDirEntry. */
     typedef QSharedPointer<const FiffDirEntry> ConstSPtr;   /**< Const shared pointer type for FiffDirEntry. */
@@ -77,6 +77,14 @@ public:
     * Constructs the dir entry.
     */
     FiffDirEntry();
+
+    //=========================================================================================================
+    /**
+    * Copy constructor.
+    *
+    * @param[in] p_FiffDirEntry   Dir Entry which should be copied
+    */
+    FiffDirEntry(const FiffDirEntry& p_FiffDirEntry);
 
     //=========================================================================================================
     /**

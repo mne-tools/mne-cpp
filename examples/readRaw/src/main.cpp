@@ -97,11 +97,13 @@ int main(int argc, char *argv[])
     //   Setup for reading the raw data
     //
     FiffRawData raw;
+        qDebug() << "HERE1";
     if(!FiffStream::setup_read_raw(&t_File, raw))
     {
         printf("Error during fiff setup raw read");
         return 0;
     }
+        qDebug() << "HERE2";
     //
     //   Set up pick list: MEG + STI 014 - bad channels
     //

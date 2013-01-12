@@ -233,7 +233,7 @@ private:
     *
     * @return True if succeeded, false otherwise
     */
-    static bool read_one(FiffStream* p_pStream, FiffDirTree* node, MNEForwardSolution*& one);
+    static bool read_one(FiffStream* p_pStream, FiffDirTree::SPtr node, MNEForwardSolution*& one);
 
 public:
     fiff_int_t source_ori;      /**< ToDo... */

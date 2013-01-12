@@ -56,6 +56,7 @@ using namespace FIFFLIB;
 
 FiffRawData::FiffRawData()
 : file(NULL)
+, info(new FiffInfo())
 , first_samp(-1)
 , last_samp(-1)
 {
@@ -86,6 +87,21 @@ FiffRawData::~FiffRawData()
     if(file)
         delete file;
 }
+
+
+//*************************************************************************************************************
+
+void FiffRawData::clear()
+{
+    info = new FiffInfo();
+    first_samp = -1;
+    last_samp = -1;
+    cals = MatrixXd();
+    rawdir.clear();
+    proj = MatrixXd();
+    comp.clear();
+}
+
 
 //*************************************************************************************************************
 

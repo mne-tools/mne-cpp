@@ -71,13 +71,13 @@ bool MNE::read_events(QIODevice* p_pIODevice, MatrixXi& eventlist)
     // Open file
     //
     FiffStream* t_pFile = new FiffStream(p_pIODevice);
-    FiffDirTree* t_pTree = NULL;
+    FiffDirTree::SPtr t_pTree;
     QList<FiffDirEntry>* t_pDir = NULL;
 
     if(!t_pFile->open(t_pTree, t_pDir))
     {
-        if(t_pTree)
-            delete t_pTree;
+//        if(t_pTree)
+//            delete t_pTree;
 
         if(t_pDir)
             delete t_pDir;
@@ -88,13 +88,13 @@ bool MNE::read_events(QIODevice* p_pIODevice, MatrixXi& eventlist)
     //
     //   Find the desired block
     //
-    QList<FiffDirTree*> events = t_pTree->dir_tree_find(FIFFB_MNE_EVENTS);
+    QList<FiffDirTree::SPtr> events = t_pTree->dir_tree_find(FIFFB_MNE_EVENTS);
 
     if (events.size() == 0)
     {
         printf("Could not find event data\n");
         delete t_pFile;
-        delete t_pTree;
+//        delete t_pTree;
         delete t_pDir;
         return false;
     }
@@ -122,7 +122,7 @@ bool MNE::read_events(QIODevice* p_pIODevice, MatrixXi& eventlist)
     if(serial_eventlist == NULL)
     {
         delete t_pFile;
-        delete t_pTree;
+//        delete t_pTree;
         delete t_pDir;
         delete t_pTag;
         printf("Could not find any events\n");
@@ -140,7 +140,7 @@ bool MNE::read_events(QIODevice* p_pIODevice, MatrixXi& eventlist)
     }
 
     delete t_pFile;
-    delete t_pTree;
+//    delete t_pTree;
     delete t_pDir;
     delete t_pTag;
     return true;

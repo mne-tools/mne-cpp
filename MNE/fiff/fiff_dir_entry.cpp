@@ -66,6 +66,18 @@ FiffDirEntry::FiffDirEntry()
 
 //*************************************************************************************************************
 
+FiffDirEntry::FiffDirEntry(const FiffDirEntry& p_FiffDirEntry)
+: kind(p_FiffDirEntry.kind)
+, type(p_FiffDirEntry.type)
+, size(p_FiffDirEntry.size)
+, pos(p_FiffDirEntry.pos)
+{
+
+}
+
+
+//*************************************************************************************************************
+
 FiffDirEntry::~FiffDirEntry()
 {
 

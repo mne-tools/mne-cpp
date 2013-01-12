@@ -44,15 +44,16 @@
 #include "fiff_global.h"
 #include "fiff_types.h"
 #include "fiff_id.h"
-#include "fiff_dir_entry.h"
+//#include "fiff_dir_entry.h"
 #include "fiff_coord_trans.h"
-#include "fiff_proj.h"
-#include "fiff_ctf_comp.h"
+//#include "fiff_proj.h"
+//#include "fiff_ctf_comp.h"
 #include "fiff_ch_info.h"
 #include "fiff_dig_point.h"
-#include "fiff_info.h"
+//#include "fiff_info.h"
 #include "fiff_raw_data.h"
 #include "fiff_cov.h"
+#include "fiff_dir_tree.h"
 
 
 //*************************************************************************************************************
@@ -91,7 +92,11 @@
 namespace FIFFLIB
 {
 
-class FiffDirTree;
+//*************************************************************************************************************
+//=============================================================================================================
+// Forward Declarations
+//=============================================================================================================
+
 class FiffStream;
 class FiffTag;
 class FiffRawData;
@@ -114,8 +119,8 @@ using namespace Eigen;
 * @brief FIFF File I/O routines.
 **/
 
-class FIFFSHARED_EXPORT FiffStream : public QDataStream {
-
+class FIFFSHARED_EXPORT FiffStream : public QDataStream
+{
 public:
     typedef QSharedPointer<FiffStream> SPtr;            /**< Shared pointer type for FiffStream. */
     typedef QSharedPointer<const FiffStream> ConstSPtr; /**< Const shared pointer type for FiffStream. */
@@ -185,7 +190,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool open(FiffDirTree*& p_pTree, QList<FiffDirEntry>*& p_pDir);
+    bool open(FiffDirTree::SPtr& p_pTree, QList<FiffDirEntry>*& p_pDir);
 
     //=========================================================================================================
     /**
@@ -197,11 +202,11 @@ public:
     * Note: In difference to mne-matlab this is not a static function. This is a method of the FiffDirTree
     *       class, that's why a tree object doesn't need to be handed to the function.
     *
-    * @param[in] p_pTree The node of interest
+    * @param[in] p_pNode The node of interest
     *
     * @return the bad channel list
     */
-    QStringList read_bad_channels(FiffDirTree* p_pTree);
+    QStringList read_bad_channels(const FiffDirTree::SPtr p_pNode);
 
     //=========================================================================================================
     /**
@@ -211,13 +216,13 @@ public:
     *
     * Reads a covariance matrix from a fiff file
     *
-    * @param [in] node          look for the matrix in here
+    * @param [in] p_pNode          look for the matrix in here
     * @param [in] cov_kind      what kind of a covariance matrix do we want?
     * @param [out] p_covData    the read covariance matrix
     *
     * @return true if succeeded, false otherwise
     */
-    bool read_cov(FiffDirTree* node, fiff_int_t cov_kind, FiffCov& p_covData);
+    bool read_cov(FiffDirTree::SPtr p_pNode, fiff_int_t cov_kind, FiffCov& p_covData);
 
     //=========================================================================================================
     /**
@@ -227,12 +232,12 @@ public:
     *
     * Read the CTF software compensation data from the given node
     *
-    * @param[in] p_pTree    The node of interest
+    * @param[in] p_pNode    The node of interest
     * @param[in] chs        channels with the calibration info
     *
     * @return the CTF software compensation data
     */
-    QList<FiffCtfComp> read_ctf_comp( FiffDirTree* p_pNode, QList<FiffChInfo>& chs);
+    QList<FiffCtfComp> read_ctf_comp( FiffDirTree::SPtr p_pNode, QList<FiffChInfo>& chs);
 
     //=========================================================================================================
     /**
@@ -243,12 +248,13 @@ public:
     * Read the measurement info
     * Source is assumed to be an open fiff file.
     *
-    * @param[in] p_pTree    The node of interest
-    * @param[out] info      the read measurement info
+    * @param[in] p_pNode       The node of interest
+    * @param[out] info      The read measurement info
+    * @param[out] p_pNodeInfo  The to measurement corresponding fiff_dir_tree.
     *
     * @return the to measurement corresponding fiff_dir_tree.
     */
-    FiffDirTree* read_meas_info(FiffDirTree* p_pTree, FiffInfo& info);
+    bool read_meas_info(const FiffDirTree::SPtr p_pNode, FiffInfo& info, FiffDirTree::SPtr& p_pNodeInfo);
 
     //=========================================================================================================
     /**
@@ -258,13 +264,13 @@ public:
     *
     * Reads a named matrix.
     *
-    * @param[in] p_pTree    The node of interest
+    * @param[in] node       The node of interest
     * @param[in] matkind    The matrix kind to look for
     * @param[out] mat       The named matrix
     *
     * @return true if succeeded, false otherwise
     */
-    bool read_named_matrix(FiffDirTree* p_pTree, fiff_int_t matkind, FiffNamedMatrix& mat);
+    bool read_named_matrix(FiffDirTree::SPtr node, fiff_int_t matkind, FiffNamedMatrix& mat);
 
     //=========================================================================================================
     /**
@@ -276,11 +282,11 @@ public:
     *
     * Read the SSP data under a given directory node
     *
-    * @param[in] p_pTree    The node of interest
+    * @param[in] p_pNode    The node of interest
     *
     * @return a list of SSP projectors
     */
-    QList<FiffProj> read_proj(FiffDirTree* p_pTree);
+    QList<FiffProj> read_proj(FiffDirTree::SPtr p_pNode);
 
     //=========================================================================================================
     /**
