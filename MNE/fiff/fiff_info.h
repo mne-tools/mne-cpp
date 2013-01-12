@@ -115,6 +115,17 @@ public:
 
     //=========================================================================================================
     /**
+    * True if FIFF measurement file information is empty.
+    *
+    * @return true if FIFF measurement file information is empty
+    */
+    inline bool isEmpty() const
+    {
+        return this->nchan <= 0;
+    }
+
+    //=========================================================================================================
+    /**
     * mne_make_compensator
     *
     * ### MNE toolbox root function ### Implementation of the mne_make_compensator function

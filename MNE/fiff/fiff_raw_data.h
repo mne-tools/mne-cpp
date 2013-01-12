@@ -135,7 +135,7 @@ public:
     */
     inline bool isEmpty() const
     {
-        return first_samp == -1 && !info.data();
+        return first_samp == -1 && info->isEmpty();
     }
 
     //=========================================================================================================
