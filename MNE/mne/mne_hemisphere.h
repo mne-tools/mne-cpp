@@ -108,21 +108,29 @@ public:
 
     //=========================================================================================================
     /**
-    * ctor
+    * Constructors the hemisphere source space.
     */
     MNEHemisphere();
 
     //=========================================================================================================
     /**
-    * Copy ctor
+    * Copy constructor.
+    *
+    * @param[in] p_MNEHemisphere  Hemisphere source space which should be copied
     */
-    MNEHemisphere(const MNEHemisphere* p_pMNEHemisphere);
+    MNEHemisphere(const MNEHemisphere& p_MNEHemisphere);
 
     //=========================================================================================================
     /**
-    * dtor
+    * Destroys the hemisphere source space.
     */
     ~MNEHemisphere();
+
+    //=========================================================================================================
+    /**
+    * Initializes the hemisphere source space.
+    */
+    void clear();
 
     //=========================================================================================================
     /**

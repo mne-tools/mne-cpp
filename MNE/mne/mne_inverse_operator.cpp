@@ -321,24 +321,24 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //
     FiffStream* t_pStream = new FiffStream(&p_IODevice);
     printf("Reading inverse operator decomposition from %s...\n",t_pStream->streamName().toUtf8().constData());
-    FiffDirTree::SPtr t_pTree;
-    QList<FiffDirEntry>* t_pDir = NULL;
+    FiffDirTree t_Tree;
+    QList<FiffDirEntry> t_Dir;
 
-    if(!t_pStream->open(t_pTree, t_pDir))
+    if(!t_pStream->open(t_Tree, t_Dir))
     {
         if(t_pStream)
             delete t_pStream;
 //        if(t_pTree)
 //            delete t_pTree;
-        if(t_pDir)
-            delete t_pDir;
+//        if(t_pDir)
+//            delete t_pDir;
 
         return false;
     }
     //
     //   Find all inverse operators
     //
-    QList <FiffDirTree::SPtr> invs_list = t_pTree->dir_tree_find(FIFFB_MNE_INVERSE_SOLUTION);
+    QList <FiffDirTree> invs_list = t_Tree.dir_tree_find(FIFFB_MNE_INVERSE_SOLUTION);
     if ( invs_list.size()== 0)
     {
         printf("No inverse solutions in %s\n", t_pStream->streamName().toUtf8().constData());
@@ -346,15 +346,15 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
             delete t_pStream;
 //        if(t_pTree)
 //            delete t_pTree;
-        if(t_pDir)
-            delete t_pDir;
+//        if(t_pDir)
+//            delete t_pDir;
         return false;
     }
-    FiffDirTree::SPtr invs = invs_list[0];
+    FiffDirTree* invs = &invs_list[0];
     //
     //   Parent MRI data
     //
-    QList <FiffDirTree::SPtr> parent_mri = t_pTree->dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
+    QList <FiffDirTree> parent_mri = t_Tree.dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
     if (parent_mri.size() == 0)
     {
         printf("No parent MRI information in %s", t_pStream->streamName().toUtf8().constData());
@@ -362,8 +362,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
             delete t_pStream;
 //        if(t_pTree)
 //            delete t_pTree;
-        if(t_pDir)
-            delete t_pDir;
+//        if(t_pDir)
+//            delete t_pDir;
         return false;
     }
     printf("\tReading inverse operator info...");
@@ -380,8 +380,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
             delete t_pStream;
 //        if(t_pTree)
 //            delete t_pTree;
-        if(t_pDir)
-            delete t_pDir;
+//        if(t_pDir)
+//            delete t_pDir;
         return false;
     }
 
@@ -397,8 +397,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
             delete t_pStream;
 //        if(t_pTree)
 //            delete t_pTree;
-        if(t_pDir)
-            delete t_pDir;
+//        if(t_pDir)
+//            delete t_pDir;
         return false;
     }
     inv.source_ori = *t_pTag->toInt();
@@ -412,8 +412,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
             delete t_pStream;
 //        if(t_pTree)
 //            delete t_pTree;
-        if(t_pDir)
-            delete t_pDir;
+//        if(t_pDir)
+//            delete t_pDir;
         return false;
     }
     inv.nsource = *t_pTag->toInt();
@@ -430,8 +430,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
             delete t_pStream;
 //        if(t_pTree)
 //            delete t_pTree;
-        if(t_pDir)
-            delete t_pDir;
+//        if(t_pDir)
+//            delete t_pDir;
         return false;
     }
     inv.coord_frame = *t_pTag->toInt();
@@ -447,8 +447,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
             delete t_pStream;
 //        if(t_pTree)
 //            delete t_pTree;
-        if(t_pDir)
-            delete t_pDir;
+//        if(t_pDir)
+//            delete t_pDir;
         return false;
     }
 
@@ -471,8 +471,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
             delete t_pStream;
 //        if(t_pTree)
 //            delete t_pTree;
-        if(t_pDir)
-            delete t_pDir;
+//        if(t_pDir)
+//            delete t_pDir;
         return false;
     }
 
@@ -484,10 +484,10 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //   The eigenleads and eigenfields
     //
     inv.eigen_leads_weighted = false;
-    if(!Fiff::read_named_matrix(t_pStream, invs, FIFF_MNE_INVERSE_LEADS, *inv.eigen_leads.data()))
+    if(!Fiff::read_named_matrix(t_pStream, *invs, FIFF_MNE_INVERSE_LEADS, *inv.eigen_leads.data()))
     {
         inv.eigen_leads_weighted = true;
-        if(!Fiff::read_named_matrix(t_pStream, invs, FIFF_MNE_INVERSE_LEADS_WEIGHTED, *inv.eigen_leads.data()))
+        if(!Fiff::read_named_matrix(t_pStream, *invs, FIFF_MNE_INVERSE_LEADS_WEIGHTED, *inv.eigen_leads.data()))
         {
             printf("Error reading eigenleads named matrix.\n");
             if(t_pTag)
@@ -496,8 +496,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
                 delete t_pStream;
 //            if(t_pTree)
 //                delete t_pTree;
-            if(t_pDir)
-                delete t_pDir;
+//            if(t_pDir)
+//                delete t_pDir;
             return false;
         }
     }
@@ -507,7 +507,7 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     inv.eigen_leads->transpose_named_matrix();
 
 
-    if(!Fiff::read_named_matrix(t_pStream, invs, FIFF_MNE_INVERSE_FIELDS, *inv.eigen_fields.data()))
+    if(!Fiff::read_named_matrix(t_pStream, *invs, FIFF_MNE_INVERSE_FIELDS, *inv.eigen_fields.data()))
     {
         printf("Error reading eigenfields named matrix.\n");
         if(t_pTag)
@@ -516,15 +516,15 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
             delete t_pStream;
 //        if(t_pTree)
 //            delete t_pTree;
-        if(t_pDir)
-            delete t_pDir;
+//        if(t_pDir)
+//            delete t_pDir;
         return false;
     }
     printf("[done]\n");
     //
     //   Read the covariance matrices
     //
-    if(t_pStream->read_cov(invs, FIFFV_MNE_NOISE_COV, *inv.noise_cov.data()))
+    if(t_pStream->read_cov(*invs, FIFFV_MNE_NOISE_COV, *inv.noise_cov.data()))
     {
         printf("\tNoise covariance matrix read.\n");
     }
@@ -537,12 +537,12 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
             delete t_pStream;
 //        if(t_pTree)
 //            delete t_pTree;
-        if(t_pDir)
-            delete t_pDir;
+//        if(t_pDir)
+//            delete t_pDir;
         return false;
     }
 
-    if(t_pStream->read_cov(invs, FIFFV_MNE_SOURCE_COV, *inv.source_cov.data()))
+    if(t_pStream->read_cov(*invs, FIFFV_MNE_SOURCE_COV, *inv.source_cov.data()))
     {
         printf("\tSource covariance matrix read.\n");
     }
@@ -555,21 +555,21 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
             delete t_pStream;
 //        if(t_pTree)
 //            delete t_pTree;
-        if(t_pDir)
-            delete t_pDir;
+//        if(t_pDir)
+//            delete t_pDir;
         return false;
     }
     //
     //   Read the various priors
     //
-    if(t_pStream->read_cov(invs, FIFFV_MNE_ORIENT_PRIOR_COV, *inv.orient_prior.data()))
+    if(t_pStream->read_cov(*invs, FIFFV_MNE_ORIENT_PRIOR_COV, *inv.orient_prior.data()))
     {
         printf("\tOrientation priors read.\n");
     }
     else
         inv.orient_prior->clear();
 
-    if(t_pStream->read_cov(invs, FIFFV_MNE_DEPTH_PRIOR_COV, *inv.depth_prior.data()))
+    if(t_pStream->read_cov(*invs, FIFFV_MNE_DEPTH_PRIOR_COV, *inv.depth_prior.data()))
     {
         printf("\tDepth priors read.\n");
     }
@@ -577,7 +577,7 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     {
         inv.depth_prior->clear();
     }
-    if(t_pStream->read_cov(invs, FIFFV_MNE_FMRI_PRIOR_COV, *inv.fmri_prior.data()))
+    if(t_pStream->read_cov(*invs, FIFFV_MNE_FMRI_PRIOR_COV, *inv.fmri_prior.data()))
     {
         printf("\tfMRI priors read.\n");
     }
@@ -588,7 +588,7 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //
     //   Read the source spaces
     //
-    if(!MNESourceSpace::read_source_spaces(t_pStream, false, t_pTree, inv.src))
+    if(!MNESourceSpace::read_source_spaces(t_pStream, false, t_Tree, inv.src))
     {
         printf("\tError: Could not read the source spaces.\n");
         if(t_pTag)
@@ -597,8 +597,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
             delete t_pStream;
 //        if(t_pTree)
 //            delete t_pTree;
-        if(t_pDir)
-            delete t_pDir;
+//        if(t_pDir)
+//            delete t_pDir;
         return false;
     }
     for (qint32 k = 0; k < inv.src.hemispheres.size(); ++k)
@@ -607,7 +607,7 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //   Get the MRI <-> head coordinate transformation
     //
     FiffCoordTrans mri_head_t;// = NULL;
-    if (!parent_mri[0]->find_tag(t_pStream, FIFF_COORD_TRANS, t_pTag))
+    if (!parent_mri[0].find_tag(t_pStream, FIFF_COORD_TRANS, t_pTag))
     {
         printf("MRI/head coordinate transformation not found\n");
         if(t_pTag)
@@ -616,8 +616,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
             delete t_pStream;
 //        if(t_pTree)
 //            delete t_pTree;
-        if(t_pDir)
-            delete t_pDir;
+//        if(t_pDir)
+//            delete t_pDir;
         return false;
     }
     else
@@ -637,8 +637,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
                     delete t_pStream;
 //                if(t_pTree)
 //                    delete t_pTree;
-                if(t_pDir)
-                    delete t_pDir;
+//                if(t_pDir)
+//                    delete t_pDir;
                 return false;
             }
         }
@@ -657,8 +657,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
             delete t_pStream;
 //        if(t_pTree)
 //            delete t_pTree;
-        if(t_pDir)
-            delete t_pDir;
+//        if(t_pDir)
+//            delete t_pDir;
     }
     //
     //  Number of averages is initially one
@@ -667,7 +667,7 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //
     //  We also need the SSP operator
     //
-    inv.projs     = t_pStream->read_proj(t_pTree);
+    inv.projs     = t_pStream->read_proj(t_Tree);
     //
     //  Some empty fields to be filled in later
     //
@@ -691,8 +691,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
         delete t_pStream;
 //    if(t_pTree)
 //        delete t_pTree;
-    if(t_pDir)
-        delete t_pDir;
+//    if(t_pDir)
+//        delete t_pDir;
 
     return true;
 }

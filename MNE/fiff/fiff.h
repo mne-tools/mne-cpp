@@ -135,12 +135,12 @@ public:
     *
     * @param[in] p_pStreamIn    fiff file to copy from
     * @param[in] in_id          file id description
-    * @param[out] p_Nodes         subtree directories to be copied
+    * @param[out] p_Nodes       subtree directories to be copied
     * @param[in] p_pStreamOut   fiff file to write to
     *
     * @return true if succeeded, false otherwise
     */
-    inline static bool copy_tree(FiffStream* p_pStreamIn, FiffId& in_id, QList<FiffDirTree::SPtr>& p_Nodes, FiffStream* p_pStreamOut)
+    inline static bool copy_tree(FiffStream* p_pStreamIn, FiffId& in_id, QList<FiffDirTree>& p_Nodes, FiffStream* p_pStreamOut)
     {
         return FiffDirTree::copy_tree(p_pStreamIn, in_id, p_Nodes, p_pStreamOut);
     }
@@ -207,14 +207,14 @@ public:
     *
     * Find nodes of the given kind from a directory tree structure
     *
-    * @param[in] p_pNode    The directory tree structure
+    * @param[in] p_Node     The directory tree structure
     * @param[in] p_kind     The given kind
     *
     * @return the found nodes
     */
-    inline static QList<FiffDirTree::SPtr> dir_tree_find(FiffDirTree::SPtr p_pNode, fiff_int_t p_kind)
+    inline static QList<FiffDirTree> dir_tree_find(FiffDirTree& p_Node, fiff_int_t p_kind)
     {
-        return p_pNode->dir_tree_find(p_kind);
+        return p_Node.dir_tree_find(p_kind);
     }
 
     //=========================================================================================================
@@ -245,15 +245,15 @@ public:
     * Wrapper for the FiffCoordTrans::make_dir_tree static function
     *
     * @param[in] p_pStream the opened fiff file
-    * @param[in] p_pDir the dir entries of which the tree should be constructed
-    * @param[out] p_pTree the created dir tree
+    * @param[in] p_Dir the dir entries of which the tree should be constructed
+    * @param[out] p_Tree the created dir tree
     * @param[in] start dir entry to start (optional, by default 0)
     *
     * @return index of the last read dir entry
     */
-    inline static qint32 make_dir_tree(FiffStream* p_pStream, QList<FiffDirEntry>* p_pDir, FiffDirTree::SPtr& p_pTree, qint32 start = 0)
+    inline static qint32 make_dir_tree(FiffStream* p_pStream, QList<FiffDirEntry>& p_Dir, FiffDirTree& p_Tree, qint32 start = 0)
     {
-        return FiffDirTree::make_dir_tree(p_pStream, p_pDir, p_pTree, start);
+        return FiffDirTree::make_dir_tree(p_pStream, p_Dir, p_Tree, start);
     }
 
     //=========================================================================================================
@@ -268,19 +268,19 @@ public:
     *
     * @param[in] p_sIODevice    A fiff IO device like a fiff QFile or QTCPSocket
     * @param[out] p_pStream     file which is openened
-    * @param[out] p_pTree       tag directory organized into a tree
-    * @param[out] p_pDir        the sequential tag directory
+    * @param[out] p_Tree       tag directory organized into a tree
+    * @param[out] p_Dir        the sequential tag directory
     *
     * @return true if succeeded, false otherwise
     */
-    static bool open(QIODevice* p_pIODevice, FiffStream*& p_pStream, FiffDirTree::SPtr& p_pTree, QList<FiffDirEntry>*& p_pDir)
+    static bool open(QIODevice* p_pIODevice, FiffStream*& p_pStream, FiffDirTree& p_Tree, QList<FiffDirEntry>& p_Dir)
     {
         if(p_pStream)
             delete p_pStream;
 
         p_pStream = new FiffStream(p_pIODevice);
 
-        return p_pStream->open(p_pTree, p_pDir);
+        return p_pStream->open(p_Tree, p_Dir);
     }
 
     //=========================================================================================================
@@ -379,13 +379,13 @@ public:
     * Reads the bad channel list from a node if it exists
     *
     * @param[in] p_pStream  The opened fif file to read from
-    * @param[in] p_pNode    The node of interest
+    * @param[in] p_Node    The node of interest
     *
     * @return the bad channel list
     */
-    static inline QStringList read_bad_channels(FiffStream* p_pStream, FiffDirTree::SPtr p_pNode)
+    static inline QStringList read_bad_channels(FiffStream* p_pStream, FiffDirTree& p_Node)
     {
-        return p_pStream->read_bad_channels(p_pNode);
+        return p_pStream->read_bad_channels(p_Node);
     }
 
     //=========================================================================================================
@@ -399,14 +399,14 @@ public:
     * Read the CTF software compensation data from the given node
     *
     * @param[in] p_pStream    The opened fif file to read from
-    * @param[in] p_pNode    The node of interest
-    * @param[in] chs        channels with the calibration info
+    * @param[in] p_Node    The node of interest
+    * @param[in] p_Chs        channels with the calibration info
     *
     * @return the CTF software compensation data
     */
-    static inline QList<FiffCtfComp> read_ctf_comp(FiffStream* p_pStream, FiffDirTree::SPtr p_pNode, QList<FiffChInfo>& chs)
+    static inline QList<FiffCtfComp> read_ctf_comp(FiffStream* p_pStream, const FiffDirTree& p_Node, const QList<FiffChInfo>& p_Chs)
     {
-        return p_pStream->read_ctf_comp(p_pNode, chs);
+        return p_pStream->read_ctf_comp(p_Node, p_Chs);
     }
 
     //=========================================================================================================
@@ -441,16 +441,16 @@ public:
     * Read the measurement info
     * Source is assumed to be an open fiff stream.
     *
-    * @param[in] p_pStream  The opened fiff stream to read from
-    * @param[in] p_pTree    The node of interest
-    * @param[out] info      The read measurement info
-    * @param[out] node      The to measurement corresponding fiff_dir_tree.
+    * @param[in] p_pStream      The opened fiff stream to read from
+    * @param[in] p_Node         The node of interest
+    * @param[out] p_Info        The read measurement info
+    * @param[out] p_NodeInfo    The to measurement corresponding fiff_dir_tree.
     *
     * @return true if succeeded, false otherwise
     */
-    static inline bool read_meas_info(FiffStream* p_pStream, FiffDirTree::SPtr p_pTree, FiffInfo& info, FiffDirTree::SPtr node)
+    static inline bool read_meas_info(FiffStream* p_pStream, FiffDirTree& p_Node, FiffInfo& p_Info, FiffDirTree& p_NodeInfo)
     {
-        return p_pStream->read_meas_info(p_pTree, info, node);
+        return p_pStream->read_meas_info(p_Node, p_Info, p_NodeInfo);
     }
 
     //=========================================================================================================
@@ -463,16 +463,16 @@ public:
     *
     * Reads a named matrix.
     *
-    * @param[in] p_pStream    The opened fif file to read from
-    * @param[in] node       The node of interest
-    * @param[in] matkind    The matrix kind to look for
-    * @param[out] mat       The named matrix
+    * @param[in] p_pStream      The opened fif file to read from
+    * @param[in] p_Node         The node of interest
+    * @param[in] matkind        The matrix kind to look for
+    * @param[out] mat           The named matrix
     *
     * @return true if succeeded, false otherwise
     */
-    static inline bool read_named_matrix(FiffStream* p_pStream, FiffDirTree::SPtr node, fiff_int_t matkind, FiffNamedMatrix& mat)
+    static inline bool read_named_matrix(FiffStream* p_pStream, const FiffDirTree& p_Node, fiff_int_t matkind, FiffNamedMatrix& mat)
     {
-        return p_pStream->read_named_matrix(node, matkind, mat);
+        return p_pStream->read_named_matrix(p_Node, matkind, mat);
     }
 
     //=========================================================================================================
@@ -490,9 +490,9 @@ public:
     *
     * @return a list of SSP projectors
     */
-    static inline QList<FiffProj> read_proj(FiffStream* p_pStream, FiffDirTree::SPtr p_pNode)
+    static inline QList<FiffProj> read_proj(FiffStream* p_pStream, const FiffDirTree& p_Node)
     {
-        return p_pStream->read_proj(p_pNode);
+        return p_pStream->read_proj(p_Node);
     }
 
     //=========================================================================================================

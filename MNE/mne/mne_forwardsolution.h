@@ -164,7 +164,7 @@ public:
     *
     * Reads a forward solution from a fif file
     *
-    * @param [in] p_pIODevice   A fiff IO device like a fiff QFile or QTCPSocket
+    * @param [in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
     * @param [out] fwd          A forward solution from a fif file
     * @param [in] force_fixed   Force fixed source orientation mode? (optional)
     * @param [in] surf_ori      Use surface based source coordinate system? (optional)
@@ -173,7 +173,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_forward_solution(QIODevice* p_pIODevice, MNEForwardSolution*& fwd, bool force_fixed = false, bool surf_ori = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
+    static bool read_forward_solution(QIODevice& p_IODevice, MNEForwardSolution*& fwd, bool force_fixed = false, bool surf_ori = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
 
 
 
@@ -227,13 +227,13 @@ private:
     *
     * Reads all interesting stuff for one forward solution
     *
-    * @param[in] p_pStream The opened fif file to read from
-    * @param[in] node The forward solution node
-    * @param[out] one The read forward solution
+    * @param[in] p_pStream  The opened fif file to read from
+    * @param[in] p_Node     The forward solution node
+    * @param[out] one       The read forward solution
     *
     * @return True if succeeded, false otherwise
     */
-    static bool read_one(FiffStream* p_pStream, FiffDirTree::SPtr node, MNEForwardSolution*& one);
+    static bool read_one(FiffStream* p_pStream, const FiffDirTree& p_Node, MNEForwardSolution*& one);
 
 public:
     fiff_int_t source_ori;      /**< ToDo... */

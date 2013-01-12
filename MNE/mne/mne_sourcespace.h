@@ -163,14 +163,14 @@ public:
     *
     * Reads source spaces from a fif file
     *
-    * @param [in] p_pStream   The opened fif file
-    * @param [in] add_geom  Add geometry information to the source spaces
-    * @param [in] p_pTree   Search for the source spaces here
+    * @param [in] p_pStream         The opened fif file
+    * @param [in] add_geom          Add geometry information to the source spaces
+    * @param [in, out] p_Tree       Search for the source spaces here
     * @param [out] p_pSourceSpace   the read source spaces
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_source_spaces(FiffStream*& p_pStream, bool add_geom, FiffDirTree::SPtr& p_pTree, MNESourceSpace& p_SourceSpace);
+    static bool read_source_spaces(FiffStream*& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNESourceSpace& p_SourceSpace);
 
     //=========================================================================================================
     /**
@@ -196,13 +196,13 @@ private:
     *
     * Reads a single source space (hemisphere)
     *
-    * @param [in] p_pStream           The opened fif file
-    * @param [in] p_pTree           Search for the source space here
+    * @param [in] p_pStream         The opened fif file
+    * @param [in] p_Tree            Search for the source space here
     * @param [out] p_pHemisphere    The read source space (hemisphere)
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_source_space(FiffStream* p_pStream, const FiffDirTree::SPtr p_pTree, MNEHemisphere& p_Hemisphere);
+    static bool read_source_space(FiffStream* p_pStream, const FiffDirTree& p_Tree, MNEHemisphere& p_Hemisphere);
 
     //=========================================================================================================
     /**
