@@ -115,7 +115,6 @@ void FiffStream::end_file()
 {
     fiff_int_t datasize = 0;
 
-//    QDataStream out(this);   // we will serialize the data into the file
     *this << (qint32)FIFF_NOP;
     *this << (qint32)FIFFT_VOID;
     *this << (qint32)datasize;
@@ -178,10 +177,7 @@ bool FiffStream::open(FiffDirTree& p_Tree, QList<FiffDirEntry>& p_Dir)
     //
     printf("\nCreating tag directory for %s...", t_sFileName.toUtf8().constData());
 
-//    if (p_pDir)
-//        delete p_pDir;
-    p_Dir.clear();// = new QList<FiffDirEntry>;
-
+    p_Dir.clear();
     qint32 dirpos = *t_pTag->toInt();
     if (dirpos > 0)
     {
@@ -265,11 +261,11 @@ bool FiffStream::read_cov(const FiffDirTree& p_Node, fiff_int_t cov_kind, FiffCo
     fiff_int_t dim, nfree, nn;
     QStringList names;
     bool diagmat = false;
-    VectorXd eig;// = NULL;
-    MatrixXd eigvec;// = NULL;
-    VectorXd* cov_diag = NULL;
-    VectorXd* cov = NULL;
-    VectorXd* cov_sparse = NULL;
+    VectorXd eig;
+    MatrixXd eigvec;
+    VectorXd cov_diag;
+    VectorXd cov;
+    VectorXd cov_sparse;
     QStringList bads;
     for(p = 0; p < covs.size(); ++p)
     {
@@ -314,11 +310,11 @@ bool FiffStream::read_cov(const FiffDirTree& p_Node, fiff_int_t cov_kind, FiffCo
                     //
                     if (tag->type == FIFFT_DOUBLE)
                     {
-                        cov_diag = new VectorXd(Map<VectorXd>(tag->toDouble(),dim));
+                        cov_diag = Map<VectorXd>(tag->toDouble(),dim);
                     }
                     else if (tag->type == FIFFT_FLOAT)
                     {
-                        cov_diag = new VectorXd(Map<VectorXf>(tag->toFloat(),dim).cast<double>());
+                        cov_diag = Map<VectorXf>(tag->toFloat(),dim).cast<double>();
                     }
                     else {
                         printf("Illegal data type for covariance matrix\n");
@@ -335,11 +331,11 @@ bool FiffStream::read_cov(const FiffDirTree& p_Node, fiff_int_t cov_kind, FiffCo
                 nn = dim*(dim+1)/2;
                 if (tag->type == FIFFT_DOUBLE)
                 {
-                    cov =  new VectorXd(Map<VectorXd>(tag->toDouble(),nn));
+                    cov =  Map<VectorXd>(tag->toDouble(),nn);
                 }
                 else if (tag->type == FIFFT_FLOAT)
                 {
-                    cov = new VectorXd(Map<VectorXf>(tag->toFloat(),nn).cast<double>());
+                    cov = Map<VectorXf>(tag->toFloat(),nn).cast<double>();
                 }
                 else
                 {
@@ -405,25 +401,18 @@ bool FiffStream::read_cov(const FiffDirTree& p_Node, fiff_int_t cov_kind, FiffCo
             p_covData.dim    = dim;
             p_covData.names  = names;
 
-            if(cov_diag)
-                p_covData.data   = MatrixXd(*cov_diag);
-            else if(cov)
-                p_covData.data   = MatrixXd(*cov);
-            else if(cov_sparse)
-                p_covData.data   = MatrixXd(*cov_sparse);
+            if(cov_diag.size() > 0)
+                p_covData.data   = cov_diag;
+            else if(cov.size() > 0)
+                p_covData.data   = cov;
+            else if(cov_sparse.size() > 0)
+                p_covData.data   = cov_sparse;
 
             p_covData.projs  = projs;
             p_covData.bads   = bads;
             p_covData.nfree  = nfree;
             p_covData.eig    = eig;
             p_covData.eigvec = eigvec;
-
-            if (cov_diag)
-                delete cov_diag;
-            if (cov)
-                delete cov;
-            if (cov_sparse)
-                delete cov_sparse;
 
             if (tag)
                 delete tag;
@@ -693,29 +682,25 @@ bool FiffStream::read_meas_info(const FiffDirTree& p_Node, FiffInfo& info, FiffD
     if (nchan < 0)
     {
         printf("Number of channels in not defined\n");
-//        delete meas[0];
         return false;
     }
     if (sfreq < 0)
     {
         printf("Sampling frequency is not defined\n");
-//        delete meas[0];
         return false;
     }
     if (chs.size() == 0)
     {
         printf("Channel information not defined\n");
-//        delete meas[0];
         return false;
     }
     if (chs.size() != nchan)
     {
         printf("Incorrect number of channel definitions found\n");
-//        delete meas[0];
         return false;
     }
 
-    if (dev_head_t.isEmpty() || ctf_head_t.isEmpty()) //if isempty(dev_head_t) || isempty(ctf_head_t)
+    if (dev_head_t.isEmpty() || ctf_head_t.isEmpty())
     {
         QList<FiffDirTree> hpi_result = meas_info[0].dir_tree_find(FIFFB_HPI_RESULT);
         if (hpi_result.size() == 1)
@@ -741,9 +726,9 @@ bool FiffStream::read_meas_info(const FiffDirTree& p_Node, FiffInfo& info, FiffD
     //
     QList<FiffDirTree> isotrak = meas_info[0].dir_tree_find(FIFFB_ISOTRAK);
 
-    QList<FiffDigPoint> dig;// = struct('kind',{},'ident',{},'r',{},'coord_frame',{});
+    QList<FiffDigPoint> dig;
     fiff_int_t coord_frame = FIFFV_COORD_HEAD;
-    FiffCoordTrans dig_trans;// = NULL;
+    FiffCoordTrans dig_trans;
     qint32 k = 0;
 
     if (isotrak.size() == 1)
@@ -778,10 +763,8 @@ bool FiffStream::read_meas_info(const FiffDirTree& p_Node, FiffInfo& info, FiffD
         dig[k].coord_frame = coord_frame;
 
     if (!dig_trans.isEmpty()) //if exist('dig_trans','var')
-    {
         if (dig_trans.from != coord_frame && dig_trans.to != coord_frame)
-            dig_trans.clear();//NULL; //clear('dig_trans');
-    }
+            dig_trans.clear();
 
     //
     //   Locate the acquisition information
@@ -918,8 +901,6 @@ bool FiffStream::read_meas_info(const FiffDirTree& p_Node, FiffInfo& info, FiffD
 
 bool FiffStream::read_named_matrix(const FiffDirTree& p_Node, fiff_int_t matkind, FiffNamedMatrix& mat)
 {
-//    if (mat != NULL)
-//        delete mat;
     mat.clear();
 
     FiffDirTree node = p_Node;
@@ -1127,7 +1108,6 @@ QList<FiffProj> FiffStream::read_proj(const FiffDirTree& p_Node)
         if (data.cols() != names.size())
         {
             printf("Number of channel names does not match the size of data matrix\n");
-//            delete data;
             return projdata;
         }
 
@@ -1138,7 +1118,6 @@ QList<FiffProj> FiffStream::read_proj(const FiffDirTree& p_Node)
         //
         QStringList defaultList;
         FiffNamedMatrix t_fiffNamedMatrix(nvec, nchan, defaultList, names, data);
-//        delete data;
 
         FiffProj one(kind, active, desc, t_fiffNamedMatrix);
         //
@@ -1169,10 +1148,6 @@ QList<FiffProj> FiffStream::read_proj(const FiffDirTree& p_Node)
 
 bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool allow_maxshield)
 {
-//    if(data)
-//        delete data;
-//    data = FiffRawData();
-
     //
     //   Open the file
     //
@@ -1188,18 +1163,12 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool 
     {
         if(p_pStream)
             delete p_pStream;
-//        if(t_pTree)
-//            delete t_pTree;
-//        if(t_pDir)
-//            delete t_pDir;
-
         return false;
     }
 
     //
     //   Read the measurement info
     //
-//        [ info, meas ] = fiff_read_meas_info(fid,tree);
     FiffInfo::SDPtr info(new FiffInfo);// = NULL;
     FiffDirTree meas;
     if(!p_pStream->read_meas_info(t_Tree, *info.data(), meas))
@@ -1223,11 +1192,6 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool 
                 printf("No raw data in %s\n", t_sFileName.toUtf8().constData());
                 if(p_pStream)
                     delete p_pStream;
-//                if(t_pTree)
-//                    delete t_pTree;
-//                if(t_pDir)
-//                    delete t_pDir;
-
                 return false;
             }
         }
@@ -1238,11 +1202,6 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool 
                 printf("No raw data in %s\n", t_sFileName.toUtf8().constData());
                 if(p_pStream)
                     delete p_pStream;
-//                if(t_pTree)
-//                    delete t_pTree;
-//                if(t_pDir)
-//                    delete t_pDir;
-
                 return false;
             }
         }
@@ -1387,11 +1346,6 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool 
     printf("Ready.\n");
     data.file->device()->close();
 
-//    if(t_pTree)
-//        delete t_pTree;
-//    if(t_pDir)
-//        delete t_pDir;
-
     return true;
 }
 
@@ -1505,8 +1459,6 @@ FiffStream* FiffStream::start_writing_raw(QIODevice* p_pIODevice, const FiffInfo
                 have_isotrak = true;
         }
 
-//        delete t_pDir;
-//        delete t_pTree;
         delete t_pStream2;
         t_pStream2 = NULL;
     }
@@ -1639,10 +1591,7 @@ void FiffStream::write_ch_info(FiffChInfo* ch)
     //  fiff_int_t    unit_mul;      /*!< Unit multiplier exponent */
     //  fiff_char_t   ch_name[16];   /*!< Descriptive name for the channel */
     //} fiffChInfoRec,*fiffChInfo;   /*!< Description of one channel */
-
     fiff_int_t datasize= 4*13 + 4*7 + 16;
-
-//    QDataStream out(this);   // we will serialize the data into the file
 
     *this << (qint32)FIFF_CH_INFO;
     *this << (qint32)FIFFT_CH_INFO_STRUCT;
@@ -1655,23 +1604,6 @@ void FiffStream::write_ch_info(FiffChInfo* ch)
     *this << (qint32)ch->scanno;
     *this << (qint32)ch->logno;
     *this << (qint32)ch->kind;
-
-//    int iData = 0;
-//    iData = *(int *)&ch->range;
-//    *this << iData;
-//    iData = *(int *)&ch->cal;
-//    *this << iData;
-
-//    //
-//    //   fiffChPosRec follows
-//    //
-//    *this << (qint32)ch->coil_type;
-//    qint32 i;
-//    for(i = 0; i < 12; ++i)
-//    {
-//        iData = *(int *)&ch->loc(i,0);
-//        *this << iData;
-//    }
 
     *this << ch->range;
     *this << ch->cal;
@@ -1725,10 +1657,7 @@ void FiffStream::write_coord_trans(const FiffCoordTrans& trans)
     //  fiff_float_t invrot[3][3];           /*!< The inverse transform (rotation part) */
     //  fiff_float_t invmove[3];             /*!< The inverse transform (translation part) */
     //} *fiffCoordTrans, fiffCoordTransRec;  /*!< Coordinate transformation descriptor */
-
     fiff_int_t datasize = 4*2*12 + 4*2;
-
-//    QDataStream out(this);   // we will serialize the data into the file
 
     *this << (qint32)FIFF_COORD_TRANS;
     *this << (qint32)FIFFT_COORD_TRANS_STRUCT;
@@ -1806,10 +1735,7 @@ void FiffStream::write_dig_point(const FiffDigPoint& dig)
     //  fiff_int_t ident;              /*!< Number identifying this point */
     //  fiff_float_t r[3];             /*!< Point location */
     //} *fiffDigPoint,fiffDigPointRec; /*!< Digitization point description */
-
     fiff_int_t datasize = 5*4;
-
-//    QDataStream out(this);   // we will serialize the data into the file
 
     *this << (qint32)FIFF_DIG_POINT;
     *this << (qint32)FIFFT_DIG_POINT_STRUCT;
@@ -1832,24 +1758,12 @@ void FiffStream::write_float(fiff_int_t kind, const float* data, fiff_int_t nel)
 {
     qint32 datasize = nel * 4;
 
-//    QDataStream out(this);   // we will serialize the data into the file
-
     *this << (qint32)kind;
     *this << (qint32)FIFFT_FLOAT;
     *this << (qint32)datasize;
     *this << (qint32)FIFFV_NEXT_SEQ;
 
-
 //    this->setFloatingPointPrecision(QDataStream::SinglePrecision);
-
-
-    // Old style
-//    qint32 iData = 0;
-//    for(qint32 i = 0; i < nel; ++i)
-//    {
-//        iData = *(qint32 *)&data[i];
-//        *this << iData;
-//    }
 
     for(qint32 i = 0; i < nel; ++i)
         *this << data[i];
@@ -1867,23 +1781,12 @@ void FiffStream::write_float_matrix(fiff_int_t kind, const MatrixXd& mat)
 
     fiff_int_t datasize = 4*numel + 4*3;
 
-
-//    QDataStream out(this);   // we will serialize the data into the file
-
     *this << (qint32)kind;
     *this << (qint32)FIFFT_MATRIX_FLOAT;
     *this << (qint32)datasize;
     *this << (qint32)FIFFV_NEXT_SEQ;
 
     qint32 i;
-    // Old style with float --> now we do have doubles as input
-//    int iData = 0;
-//    for(i = 0; i < numel; ++i)
-//    {
-//        iData = *(int *)&mat->data()[i];
-//        *this << iData;
-//    }
-
     for(i = 0; i < numel; ++i)
         *this << (float)mat.data()[i];
 
@@ -1924,8 +1827,6 @@ void FiffStream::write_id(fiff_int_t kind, const FiffId& id)
     //
     fiff_int_t datasize = 5*4;                       //   The id comprises five integers
 
-//    QDataStream out(this);   // we will serialize the data into the file
-
     *this << (qint32)kind;
     *this << (qint32)FIFFT_ID_STRUCT;
     *this << (qint32)datasize;
@@ -1950,8 +1851,6 @@ void FiffStream::write_id(fiff_int_t kind, const FiffId& id)
 void FiffStream::write_int(fiff_int_t kind, const fiff_int_t* data, fiff_int_t nel)
 {
     fiff_int_t datasize = nel * 4;
-
-//    QDataStream out(this);   // we will serialize the data into the file
 
     *this << (qint32)kind;
     *this << (qint32)FIFFT_INT;
@@ -2045,10 +1944,7 @@ bool FiffStream::write_raw_buffer(const MatrixXd& buf, const MatrixXd& cals)
 
 void FiffStream::write_string(fiff_int_t kind, const QString& data)
 {
-    fiff_int_t datasize = data.size();//size(data,2);
-
-//    QDataStream out(this);   // we will serialize the data into the file
-
+    fiff_int_t datasize = data.size();
     *this << (qint32)kind;
     *this << (qint32)FIFFT_STRING;
     *this << (qint32)datasize;
@@ -2062,10 +1958,7 @@ void FiffStream::write_string(fiff_int_t kind, const QString& data)
 
 void FiffStream::write_rt_command(fiff_int_t command, QString& data)
 {
-    fiff_int_t datasize = data.size();//size(data,2);
-
-//    QDataStream out(this);   // we will serialize the data into the file
-
+    fiff_int_t datasize = data.size();
     *this << (qint32)FIFF_MNE_RT_COMMAND;
     *this << (qint32)FIFFT_VOID;
     *this << 4+(qint32)datasize;

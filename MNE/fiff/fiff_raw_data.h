@@ -103,7 +103,7 @@ public:
 
     //=========================================================================================================
     /**
-    * ctor
+    * Default constructor.
     */
     FiffRawData();
 
@@ -111,7 +111,7 @@ public:
     /**
     * Copy constructor.
     *
-    * @param[in] p_FiffRawData   FIFF raw measurement which should be copied
+    * @param[in] p_FiffRawData  FIFF raw measurement which should be copied
     */
     FiffRawData(const FiffRawData &p_FiffRawData);
 
@@ -152,8 +152,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t from = -1, fiff_int_t to = -1, MatrixXi sel = defaultMatrixXi);
-
+    bool read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t from = -1, fiff_int_t to = -1, const MatrixXi& sel = defaultMatrixXi);
 
     //=========================================================================================================
     /**
@@ -169,28 +168,17 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool read_raw_segment_times(MatrixXd& data, MatrixXd& times, float from, float to, MatrixXi sel = defaultMatrixXi)
-    {
-        //
-        //   Convert to samples
-        //
-        from = floor(from*this->info->sfreq);
-        to   = ceil(to*this->info->sfreq);
-        //
-        //   Read it
-        //
-        return this->read_raw_segment(data, times, (qint32)from, (qint32)to, sel);
-    }
+    bool read_raw_segment_times(MatrixXd& data, MatrixXd& times, float from, float to, const MatrixXi& sel = defaultMatrixXi);
 
 public:
-    FiffStream* file;//replaces fid //ToDo replace this by SPtr
-    FiffInfo::SDPtr info;
-    fiff_int_t first_samp;
-    fiff_int_t last_samp;
-    MatrixXd cals;
-    QList<FiffRawDir> rawdir;
-    MatrixXd proj;
-    FiffCtfComp comp;
+    FiffStream* file;           /**< replaces fid, ToDo replace this by SPtr */
+    FiffInfo::SDPtr info;       /**< Fiff measurement information */
+    fiff_int_t first_samp;      /**< ToDo... */
+    fiff_int_t last_samp;       /**< ToDo... */
+    MatrixXd cals;              /**< Calibration matrix */
+    QList<FiffRawDir> rawdir;   /**< Special fiff diretory entry for raw data. */
+    MatrixXd proj;              /**< ToDo... */
+    FiffCtfComp comp;           /**< ToDo... */
 };
 
 } // NAMESPACE

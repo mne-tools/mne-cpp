@@ -63,13 +63,11 @@ FiffEvokedDataSet::FiffEvokedDataSet()
 
 //*************************************************************************************************************
 
-FiffEvokedDataSet::FiffEvokedDataSet(const FiffEvokedDataSet* p_pFiffEvokedDataSet)
-: info(p_pFiffEvokedDataSet->info)//p_pFiffEvokedDataSet->info ? new FiffInfo(p_pFiffEvokedDataSet->info) : NULL)
+FiffEvokedDataSet::FiffEvokedDataSet(const FiffEvokedDataSet& p_FiffEvokedDataSet)
+: info(p_FiffEvokedDataSet.info)
+, evoked(p_FiffEvokedDataSet.evoked)
 {
-    for(qint32 i = 0; i < p_pFiffEvokedDataSet->evoked.size(); ++i)
-    {
-        evoked.append(p_pFiffEvokedDataSet->evoked[i]);
-    }
+
 }
 
 
@@ -77,13 +75,16 @@ FiffEvokedDataSet::FiffEvokedDataSet(const FiffEvokedDataSet* p_pFiffEvokedDataS
 
 FiffEvokedDataSet::~FiffEvokedDataSet()
 {
-//    if (info)
-//        delete info;
 
-//    QList<FiffEvokedData*>::iterator i;
-//    for (i = this->evoked.begin(); i != this->evoked.end(); ++i)
-//        if (*i)
-//            delete *i;
+}
+
+
+//*************************************************************************************************************
+
+void FiffEvokedDataSet::clear()
+{
+    info = new FiffInfo();
+    evoked.clear();
 }
 
 
@@ -92,37 +93,37 @@ FiffEvokedDataSet::~FiffEvokedDataSet()
 FiffEvokedDataSet FiffEvokedDataSet::pick_channels_evoked(QStringList& include, QStringList& exclude)
 {
     if(include.size() == 0 && exclude.size() == 0)
-        return new FiffEvokedDataSet(this);
+        return FiffEvokedDataSet(*this);
 
     MatrixXi sel = FiffInfo::pick_channels(this->info->ch_names, include, exclude);
     if (sel.cols() == 0)
     {
         printf("Warning : No channels match the selection.\n");
-        return new FiffEvokedDataSet(this);
+        return FiffEvokedDataSet(*this);
     }
 
-    FiffEvokedDataSet* res = new FiffEvokedDataSet(this);
+    FiffEvokedDataSet res(*this);
     //
     //   Modify the measurement info
     //
 //    if (res->info)
 //        delete res->info;
-    res->info = new FiffInfo(res->info->pick_info(&sel));
+    res.info = new FiffInfo(res.info->pick_info(&sel));
     //
     //   Create the reduced data set
     //
     MatrixXd selBlock(1,1);
     qint32 k, l;
-    for(k = 0; k < res->evoked.size(); ++k)
+    for(k = 0; k < res.evoked.size(); ++k)
     {
-        if(selBlock.rows() != sel.cols() || selBlock.cols() != res->evoked[k].epochs.cols())
-            selBlock.resize(sel.cols(), res->evoked[k].epochs.cols());
+        if(selBlock.rows() != sel.cols() || selBlock.cols() != res.evoked[k]->epochs.cols())
+            selBlock.resize(sel.cols(), res.evoked[k]->epochs.cols());
         for(l = 0; l < sel.cols(); ++l)
         {
-            selBlock.block(l,0,1,selBlock.cols()) = res->evoked[k].epochs.block(sel(0,l),0,1,selBlock.cols());
+            selBlock.block(l,0,1,selBlock.cols()) = res.evoked[k]->epochs.block(sel(0,l),0,1,selBlock.cols());
         }
-        res->evoked[k].epochs.resize(sel.cols(), res->evoked[k].epochs.cols());
-        res->evoked[k].epochs = selBlock;
+        res.evoked[k]->epochs.resize(sel.cols(), res.evoked[k]->epochs.cols());
+        res.evoked[k]->epochs = selBlock;
     }
 
     return res;
@@ -133,7 +134,7 @@ FiffEvokedDataSet FiffEvokedDataSet::pick_channels_evoked(QStringList& include, 
 
 bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& data, fiff_int_t setno)
 {
-    data = FiffEvokedDataSet();
+    data.clear();
 
     if (setno < 0)
     {
@@ -154,11 +155,6 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
     {
         if(t_pStream)
             delete t_pStream;
-//        if(t_pTree)
-//            delete t_pTree;
-//        if(t_pDir)
-//            delete t_pDir;
-
         return false;
     }
     //
@@ -177,13 +173,6 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
     {
         if(t_pStream)
             delete t_pStream;
-//        if(t_pTree)
-//            delete t_pTree;
-//        if(t_pDir)
-//            delete t_pDir;
-//        if(info)
-//            delete info;
-
         printf("Could not find processed data\n");
         return false;
     }
@@ -193,12 +182,6 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
     {
         if(t_pStream)
             delete t_pStream;
-//        if(t_pTree)
-//            delete t_pTree;
-//        if(t_pDir)
-//            delete t_pDir;
-//        if(info)
-//            delete info;
         printf("Could not find evoked data");
         return false;
     }
@@ -246,12 +229,6 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
     {
         if(t_pStream)
             delete t_pStream;
-//        if(t_pTree)
-//            delete t_pTree;
-//        if(t_pDir)
-//            delete t_pDir;
-//        if(info)
-//            delete info;
         printf("Data set selector out of range\n");
         return false;
     }
@@ -286,12 +263,6 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
     {
         if(t_pStream)
             delete t_pStream;
-//        if(t_pTree)
-//            delete t_pTree;
-//        if(t_pDir)
-//            delete t_pDir;
-//        if(info)
-//            delete info;
         printf("Desired data set not found\n");
         return false;
     }
@@ -347,12 +318,6 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
         {
             if(t_pStream)
                 delete t_pStream;
-//            if(t_pTree)
-//                delete t_pTree;
-//            if(t_pDir)
-//                delete t_pDir;
-//            if(info)
-//                delete info;
             printf("Local channel information was not found when it was expected.\n");
             return false;
         }
@@ -360,12 +325,6 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
         {
             if(t_pStream)
                 delete t_pStream;
-//            if(t_pTree)
-//                delete t_pTree;
-//            if(t_pDir)
-//                delete t_pDir;
-//            if(info)
-//                delete info;
             printf("Number of channels and number of channel definitions are different\n");
             return false;
         }
@@ -420,12 +379,6 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
     {
         if(t_pStream)
             delete t_pStream;
-//        if(t_pTree)
-//            delete t_pTree;
-//        if(t_pDir)
-//            delete t_pDir;
-//        if(info)
-//            delete info;
         printf("Number of epoch tags is unreasonable (nepoch = %d nchan = %d)\n", nepoch, info->nchan);
         return false;
     }
@@ -459,19 +412,12 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
             tmp.transposeInPlace();
             all.conservativeResize(oldsize+tmp.rows(), all.cols());
             all.block(oldsize, 0, tmp.rows(), tmp.cols()) = tmp;
-//            delete tmp;
         }
     }
     if (all.cols() != nsamp)
     {
         if(t_pStream)
             delete t_pStream;
-//        if(t_pTree)
-//            delete t_pTree;
-//        if(t_pDir)
-//            delete t_pDir;
-//        if(info)
-//            delete info;
         printf("Incorrect number of samples (%d instead of %d)", (int)all.cols(), nsamp);
         return false;
     }
@@ -485,42 +431,37 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
     //
     //   Put it all together
     //
-    data = new FiffEvokedDataSet();
     data.info = info;
 
 //        if(data.evoked)
 //            delete data.evoked;
-    data.evoked.append(FiffEvokedData());
-    data.evoked[0].aspect_kind = aspect_kind;
-    data.evoked[0].is_smsh     = is_smsh(0,setno);
+    data.evoked.append(FiffEvokedData::SDPtr(new FiffEvokedData()));
+    data.evoked[0]->aspect_kind = aspect_kind;
+    data.evoked[0]->is_smsh     = is_smsh(0,setno);
     if (nave != -1)
-        data.evoked[0].nave = nave;
+        data.evoked[0]->nave = nave;
     else
-        data.evoked[0].nave  = 1;
+        data.evoked[0]->nave  = 1;
 
-    data.evoked[0].first = first;
-    data.evoked[0].last  = last;
+    data.evoked[0]->first = first;
+    data.evoked[0]->last  = last;
     if (!comment.isEmpty())
-        data.evoked[0].comment = comment;
+        data.evoked[0]->comment = comment;
     //
     //   Times for convenience and the actual epoch data
     //
 
-    data.evoked[0].times = MatrixXd(1, last-first+1);
+    data.evoked[0]->times = MatrixXd(1, last-first+1);
 
-    for (k = 0; k < data.evoked[0].times.cols(); ++k)
-        data.evoked[0].times(0, k) = ((float)(first+k)) / info->sfreq;
+    for (k = 0; k < data.evoked[0]->times.cols(); ++k)
+        data.evoked[0]->times(0, k) = ((float)(first+k)) / info->sfreq;
 
 //    if(data.evoked[0].epochs)
 //        delete data.evoked[0]->epochs;
-    data.evoked[0].epochs = all;
+    data.evoked[0]->epochs = all;
 
     if(t_pStream)
         delete t_pStream;
-//    if(t_pTree)
-//        delete t_pTree;
-//    if(t_pDir)
-//        delete t_pDir;
 
     return true;
 }

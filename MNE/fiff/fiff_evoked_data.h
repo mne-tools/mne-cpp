@@ -62,6 +62,14 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <QSharedData>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // DEFINE NAMESPACE MNELIB
 //=============================================================================================================
 
@@ -83,18 +91,26 @@ using namespace Eigen;
 *
 * @brief evoked data
 */
-class FIFFSHARED_EXPORT FiffEvokedData
+class FIFFSHARED_EXPORT FiffEvokedData : public QSharedData
 {
-
 public:
-    typedef QSharedPointer<FiffEvokedData> SPtr;               /**< Shared pointer type for FiffEvokedData. */
-    typedef QSharedPointer<const FiffEvokedData> ConstSPtr;    /**< Const shared pointer type for FiffEvokedData. */
+    typedef QSharedPointer<FiffEvokedData> SPtr;            /**< Shared pointer type for FiffEvokedData. */
+    typedef QSharedPointer<const FiffEvokedData> ConstSPtr; /**< Const shared pointer type for FiffEvokedData. */
+    typedef QSharedDataPointer<FiffEvokedData> SDPtr;       /**< Shared data pointer type for FiffEvokedDataSet. */
 
     //=========================================================================================================
     /**
-    * ctor
+    * Constructs fiff evoked data.
     */
     FiffEvokedData();
+
+    //=========================================================================================================
+    /**
+    * Copy constructor.
+    *
+    * @param[in] p_FiffEvokedData  Fiff evoked data which should be copied
+    */
+    FiffEvokedData(const FiffEvokedData &p_FiffEvokedData);
 
     //=========================================================================================================
     /**

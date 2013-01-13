@@ -93,19 +93,21 @@ public:
 
     //=========================================================================================================
     /**
-    * ctor
+    * Default constructor.
     */
-    explicit FiffProj();
+    FiffProj();
 
     //=========================================================================================================
     /**
-    * copy ctor
+    * Copy constructor.
+    *
+    * @param[in] p_FiffProj  SSP projector data which should be copied
     */
-    FiffProj(const FiffProj& p_pFiffProj);
+    FiffProj(const FiffProj& p_FiffProj);
 
     //=========================================================================================================
     /**
-    * ctor
+    * Constructor
     */
     explicit FiffProj(  fiff_int_t p_kind,
                         bool p_active,
@@ -119,11 +121,11 @@ public:
     ~FiffProj();
 
 public:
-    fiff_int_t kind;
-    bool active;
-    QString desc;
+    fiff_int_t kind;                /**< Fiff kind */
+    bool active;                    /**< If fiff projector active */
+    QString desc;                   /**< Projector description */
 
-    FiffNamedMatrix::SDPtr data;
+    FiffNamedMatrix::SDPtr data;    /**< Projector data */
 };
 
 } // NAMESPACE

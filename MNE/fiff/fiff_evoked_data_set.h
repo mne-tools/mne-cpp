@@ -90,7 +90,7 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* MNE evoked data
+* Fiff evoked data
 *
 * @brief evoked data
 */
@@ -103,21 +103,29 @@ public:
 
     //=========================================================================================================
     /**
-    * ctor
+    * Constructs a fiff evoked data set.
     */
     FiffEvokedDataSet();
 
     //=========================================================================================================
     /**
-    * copy ctor
+    * Copy constructor.
+    *
+    * @param[in] p_FiffEvokedDataSet    Fiff evoked data set which should be copied
     */
-    FiffEvokedDataSet(const FiffEvokedDataSet* p_pFiffEvokedDataSet);
+    FiffEvokedDataSet(const FiffEvokedDataSet& p_FiffEvokedDataSet);
 
     //=========================================================================================================
     /**
-    * Destroys the FiffEvokedDataSet.
+    * Destroys the fiff evoked data set.
     */
     ~FiffEvokedDataSet();
+
+    //=========================================================================================================
+    /**
+    * Initializes FIFF measurement informationfiff evoked data set.
+    */
+    void clear();
 
     //=========================================================================================================
     /**
@@ -153,8 +161,8 @@ public:
     static bool read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& data, fiff_int_t setno = 0);
 
 public:
-    FiffInfo::SDPtr        info;   /**< FIFF measurement information */
-    QList<FiffEvokedData>  evoked; /**< List of Fiff Evoked Data */
+    FiffInfo::SDPtr                 info;   /**< FIFF measurement information */
+    QList<FiffEvokedData::SDPtr>    evoked; /**< List of Fiff Evoked Data */
 };
 
 } // NAMESPACE

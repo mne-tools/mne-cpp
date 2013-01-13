@@ -105,7 +105,7 @@ void FiffRawData::clear()
 
 //*************************************************************************************************************
 
-bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t from, fiff_int_t to, MatrixXi sel)
+bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t from, fiff_int_t to, const MatrixXi& sel)
 {
     bool projAvailable = true;
 
@@ -415,4 +415,20 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
         times(0, i) = ((float)(from+i)) / this->info->sfreq;
 
     return true;
+}
+
+
+//*************************************************************************************************************
+
+bool FiffRawData::read_raw_segment_times(MatrixXd& data, MatrixXd& times, float from, float to, const MatrixXi& sel)
+{
+    //
+    //   Convert to samples
+    //
+    from = floor(from*this->info->sfreq);
+    to   = ceil(to*this->info->sfreq);
+    //
+    //   Read it
+    //
+    return this->read_raw_segment(data, times, (qint32)from, (qint32)to, sel);
 }

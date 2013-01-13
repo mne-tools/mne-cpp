@@ -75,7 +75,6 @@ FiffTag::FiffTag()
 : m_pComplexFloatData(NULL)
 , m_pComplexDoubleData(NULL)
 {
-//    this->data() = NULL;
 }
 
 
@@ -104,8 +103,6 @@ FiffTag::FiffTag(const FiffTag* p_pFiffTag)
 
 FiffTag::~FiffTag()
 {
-//    if(this->data)
-//        delete this->data;
     if(this->m_pComplexFloatData)
         delete this->m_pComplexFloatData;
     if(this->m_pComplexDoubleData)
@@ -121,9 +118,6 @@ bool FiffTag::read_tag_data(FiffStream* p_pStream, FiffTag*& p_pTag, qint64 pos)
     {
         p_pStream->device()->seek(pos);
     }
-
-//    QDataStream t_DataStream(p_pStream);
-    p_pStream->setByteOrder(QDataStream::BigEndian);
 
     if (p_pTag == NULL)
         return false;
@@ -146,12 +140,8 @@ bool FiffTag::read_tag_data(FiffStream* p_pStream, FiffTag*& p_pTag, qint64 pos)
 
 //*************************************************************************************************************
 
-//ToDo: Split read_tag into read_tag_info & read_tag_data
-
 bool FiffTag::read_tag_info(FiffStream* p_pStream, FiffTag*& p_pTag, bool p_bDoSkip)
 {
-//    QDataStream t_DataStream(p_pStream);
-
     if (p_pTag != NULL)
         delete p_pTag;
     p_pTag = new FiffTag();
@@ -226,9 +216,6 @@ bool FiffTag::read_tag(FiffStream* p_pStream, FiffTag*& p_pTag, qint64 pos)
         p_pStream->device()->seek(pos);
     }
 
-//    QDataStream t_DataStream(p_pStream);
-    p_pStream->setByteOrder(QDataStream::BigEndian);
-
     if (p_pTag != NULL)
         delete p_pTag;
     p_pTag = new FiffTag();
@@ -282,13 +269,11 @@ bool FiffTag::isMatrix() const
 
 //*************************************************************************************************************
 
-bool FiffTag::getMatrixDimensions(qint32& p_ndim, qint32*& p_pDims) const
+bool FiffTag::getMatrixDimensions(qint32& p_ndim, QVector<qint32>& p_Dims) const
 {
+    p_Dims.clear();
     if(!this->isMatrix() || this->data() == NULL)
     {
-        if (p_pDims)
-            delete p_pDims;
-        p_pDims = NULL;
         p_ndim = 0;
         return false;
     }
@@ -300,15 +285,10 @@ bool FiffTag::getMatrixDimensions(qint32& p_ndim, qint32*& p_pDims) const
 
     p_ndim = t_pInt32[(this->size()-4)/4];
 
-
-    if (p_pDims)
-        delete p_pDims;
-    p_pDims = new qint32[p_ndim];
-
     int j = 0;
     for(int i = p_ndim+1; i > 1; --i)
     {
-        p_pDims[j] = t_pInt32[(this->size()-(i*4))/4];
+        p_Dims.append(t_pInt32[(this->size()-(i*4))/4]);
         ++j;
     }
     return true;
@@ -464,6 +444,26 @@ fiff_int_t FiffTag::swap_int (fiff_int_t source)
 
 //*************************************************************************************************************
 
+void FiffTag::swap_intp (fiff_int_t *source)
+
+{
+  unsigned char *csource =  (unsigned char *)(source);
+
+  unsigned char c;
+
+  c = csource[3];
+  csource[3] = csource[0];
+  csource[0] = c;
+  c = csource[2];
+  csource[2] = csource[1];
+  csource[1] = c;
+
+  return;
+}
+
+
+//*************************************************************************************************************
+
 fiff_long_t FiffTag::swap_long (fiff_long_t source)
 
 {
@@ -508,26 +508,6 @@ void FiffTag::swap_longp (fiff_long_t *source)
     csource[4] = c;
 
     return;
-}
-
-
-//*************************************************************************************************************
-
-void FiffTag::swap_intp (fiff_int_t *source)
-
-{
-  unsigned char *csource =  (unsigned char *)(source);
-
-  unsigned char c;
-
-  c = csource[3];
-  csource[3] = csource[0];
-  csource[0] = c;
-  c = csource[2];
-  csource[2] = csource[1];
-  csource[1] = c;
-
-  return;
 }
 
 
@@ -783,23 +763,7 @@ void FiffTag::convert_matrix_to_file_data(FiffTag* tag)
 }
 
 
-
-
-
 //*************************************************************************************************************
-
-/*
- * Data type conversions for the little endian systems.
- */
-
-/*! Machine dependent data type conversions (tag info only)
- *
- * from_endian defines the byte order of the input
- * to_endian   defines the byte order of the output
- *
- * Either of these may be specified as FIFFV_LITTLE_ENDIAN, FIFFV_BIG_ENDIAN, or FIFFV_NATIVE_ENDIAN.
- * The last choice means that the native byte order value will be substituted here before proceeding
- */
 //ToDo remove this function by swapping -> define little endian big endian, QByteArray
 void FiffTag::convert_tag_data(FiffTag* tag, int from_endian, int to_endian)
 {
@@ -1056,9 +1020,6 @@ void FiffTag::convert_tag_data(FiffTag* tag, int from_endian, int to_endian)
 
 //*************************************************************************************************************
 //fiff_type_spec
-/*
- * These return information about a fiff type.
- */
 
 fiff_int_t FiffTag::fiff_type_fundamental(fiff_int_t type)
 {
@@ -1080,8 +1041,3 @@ fiff_int_t FiffTag::fiff_type_matrix_coding(fiff_int_t type)
 {
     return type & FIFFTS_MC_MASK;
 }
-
-
-
-
-

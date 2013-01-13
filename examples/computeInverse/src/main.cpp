@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
     //   Set up the inverse according to the parameters
     //
     if (nave < 0)
-        nave = data.evoked[0].nave;
+        nave = data.evoked[0]->nave;
 
     MNEInverseOperator inv = inv_raw.prepare_inverse_operator(nave,lambda2,dSPM,sLORETA);
     //
@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
     qint32 i;
     for(i = 0; i < inv.reginv.rows(); ++i)
         reginv.insert(i,i) = inv.reginv(i,0);
-    MatrixXd trans = reginv*inv.eigen_fields->data*inv.whitener*inv.proj*data.evoked[0].epochs;
+    MatrixXd trans = reginv*inv.eigen_fields->data*inv.whitener*inv.proj*data.evoked[0]->epochs;
     //
     //   Transformation into current distributions by weighting the eigenleads
     //   with the weights computed above
@@ -206,7 +206,7 @@ int main(int argc, char *argv[])
     //Results
 //    inv;
 //    sol2;
-    float tmin = ((float)data.evoked[0].first) / data.info->sfreq;
+    float tmin = ((float)data.evoked[0]->first) / data.info->sfreq;
     float tstep = 1/data.info->sfreq;
 
     std::cout << std::endl << "part ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << sol.block(0,0,10,10) << std::endl;

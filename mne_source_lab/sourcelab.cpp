@@ -57,7 +57,6 @@ SourceLab::SourceLab(QObject *parent)
     {
         if(m_pFwd)
             delete m_pFwd;
-//        return -1;
         return;
     }
 
@@ -73,10 +72,6 @@ SourceLab::SourceLab(QObject *parent)
     Annotation* t_pRHAnnotation= new Annotation(t_sRHAnnotFileName);
 
     m_pFwd->cluster_forward_solution(t_pFwdClustered, t_pLHAnnotation, t_pRHAnnotation, 40);
-
-//    delete t_pFile;
-//    delete t_pFwd;
-
 
     qRegisterMetaType<MatrixXf>("MatrixXf");
     qRegisterMetaType<MNEInverseOperator>("MNEInverseOperator");
@@ -106,8 +101,6 @@ SourceLab::~SourceLab()
 {
     if(m_pRtClient)
         delete m_pRtClient;
-//    if(m_ppFiffInfo)
-//        delete m_ppFiffInfo;
     if(m_pRawMatrixBuffer)
         delete m_pRawMatrixBuffer;
 }

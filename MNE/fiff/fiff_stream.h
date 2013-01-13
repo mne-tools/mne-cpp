@@ -127,12 +127,19 @@ public:
 
     //=========================================================================================================
     /**
-    * ctor
+    * Constructs a fiff stream that uses the I/O device p_pIODevice.
     *
     * @param[in] p_pIODevice    A fiff IO device like a fiff QFile or QTCPSocket
     */
     explicit FiffStream(QIODevice* p_pIODevice);
 
+    //=========================================================================================================
+    /**
+    * Constructs a fiff stream that operates on a byte array, a. The mode describes how the device is to be used.
+    *
+    * @param[in] a      The byte array
+    * @param[in] mode   The open mode
+    */
     explicit FiffStream(QByteArray * a, QIODevice::OpenMode mode);
 
     //=========================================================================================================
