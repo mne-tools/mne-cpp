@@ -29,11 +29,11 @@ var searchData=
   ['mne_5fsourcespace_2ecpp',['mne_sourcespace.cpp',['../mne__sourcespace_8cpp.html',1,'']]],
   ['mne_5fsourcespace_2eh',['mne_sourcespace.h',['../mne__sourcespace_8h.html',1,'']]],
   ['mneepochdata',['MNEEpochData',['../class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html',1,'MNELIB']]],
-  ['mneepochdata',['MNEEpochData',['../class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html#a9d2ede1e6a3e539eca6c6274e1c16023',1,'MNELIB::MNEEpochData']]],
+  ['mneepochdata',['MNEEpochData',['../class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html#a9d2ede1e6a3e539eca6c6274e1c16023',1,'MNELIB::MNEEpochData::MNEEpochData()'],['../class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html#ae256b68be18e463687b4ef64717f31ea',1,'MNELIB::MNEEpochData::MNEEpochData(const MNEEpochData &amp;p_MNEEpochData)']]],
   ['mneepochdatalist',['MNEEpochDataList',['../class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html#a8fa5934787333011283ae5718b6ce9fe',1,'MNELIB::MNEEpochDataList']]],
   ['mneepochdatalist',['MNEEpochDataList',['../class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html',1,'MNELIB']]],
   ['mneforwardsolution',['MNEForwardSolution',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html',1,'MNELIB']]],
-  ['mneforwardsolution',['MNEForwardSolution',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a2de172fb859cda6d067d0e931c696fe2',1,'MNELIB::MNEForwardSolution::MNEForwardSolution()'],['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1fae3a16d80ecef955e86d6ab928f92c',1,'MNELIB::MNEForwardSolution::MNEForwardSolution(const MNEForwardSolution *p_pMNEForwardSolution)']]],
+  ['mneforwardsolution',['MNEForwardSolution',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a2de172fb859cda6d067d0e931c696fe2',1,'MNELIB::MNEForwardSolution::MNEForwardSolution()'],['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a6ef22fe83750566317dee5be5422e34b',1,'MNELIB::MNEForwardSolution::MNEForwardSolution(const MNEForwardSolution &amp;p_pMNEForwardSolution)']]],
   ['mnehemisphere',['MNEHemisphere',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a2db95fdb67898cbf094338028d01bb0c',1,'MNELIB::MNEHemisphere::MNEHemisphere()'],['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a588ac45ffacfab154c05f863252df52e',1,'MNELIB::MNEHemisphere::MNEHemisphere(const MNEHemisphere &amp;p_MNEHemisphere)']]],
   ['mnehemisphere',['MNEHemisphere',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html',1,'MNELIB']]],
   ['mneinverseoperator',['MNEInverseOperator',['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a04cfac3beac1c70cf2df93b4ef85565e',1,'MNELIB::MNEInverseOperator::MNEInverseOperator()'],['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a5e60ff956487cc7531ada880926ca5a0',1,'MNELIB::MNEInverseOperator::MNEInverseOperator(const MNEInverseOperator *p_pMNEInverseOperator)']]],
@@ -44,6 +44,6 @@ var searchData=
   ['mnertcmdclient',['MNERtCmdClient',['../class_m_n_e_l_i_b_1_1_m_n_e_rt_cmd_client.html',1,'MNELIB']]],
   ['mnertdataclient',['MNERtDataClient',['../class_m_n_e_l_i_b_1_1_m_n_e_rt_data_client.html',1,'MNELIB']]],
   ['mnesourcespace',['MNESourceSpace',['../class_m_n_e_l_i_b_1_1_m_n_e_source_space.html',1,'MNELIB']]],
-  ['mnesourcespace',['MNESourceSpace',['../class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a973304d2448b348bbd8f7c67b045c5b8',1,'MNELIB::MNESourceSpace::MNESourceSpace()'],['../class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a4322ecb627167f0eb213f3100e3029f5',1,'MNELIB::MNESourceSpace::MNESourceSpace(const MNESourceSpace *p_pMNESourceSpace)']]],
+  ['mnesourcespace',['MNESourceSpace',['../class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a973304d2448b348bbd8f7c67b045c5b8',1,'MNELIB::MNESourceSpace::MNESourceSpace()'],['../class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a6f4b6968b3018599c0add9b7888f9b64',1,'MNELIB::MNESourceSpace::MNESourceSpace(const MNESourceSpace &amp;p_MNESourceSpace)']]],
   ['mri_5fhead_5ft',['mri_head_t',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a17bd236b46fd5cb7096a30df6d4f475d',1,'MNELIB::MNEForwardSolution']]]
 ];

@@ -114,7 +114,7 @@ public:
     bool save_calibrated;           /**< If data should be safed calibrated. */
     MatrixXd rowcals;               /**< Row calibrations. */
     MatrixXd colcals;               /**< Colum calibrations. */
-    FiffNamedMatrix::SDPtr data;    /**< ToDo... */
+    FiffNamedMatrix::SDPtr data;    /**< Compensation data. */
 };
 
 } // NAMESPACE

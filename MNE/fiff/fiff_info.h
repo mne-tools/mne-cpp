@@ -299,16 +299,16 @@ public: //Public because it's a mne struct
     float lowpass;              /**< Lowpass frequency. */
     QList<FiffChInfo> chs;      /**< List of all channel info descriptors. */
     QStringList ch_names;       /**< List of all channel names. */
-    FiffCoordTrans dev_head_t;  /**< ToDo... */
-    FiffCoordTrans ctf_head_t;  /**< ToDo... */
-    FiffCoordTrans dev_ctf_t;   /**< ToDo... */
+    FiffCoordTrans dev_head_t;  /**< Coordinate transformation ToDo... */
+    FiffCoordTrans ctf_head_t;  /**< Coordinate transformation ToDo... */
+    FiffCoordTrans dev_ctf_t;   /**< Coordinate transformation ToDo... */
     QList<FiffDigPoint> dig;    /**< List of all digitization point descriptors. */
-    FiffCoordTrans dig_trans;   /**< ToDo... */
+    FiffCoordTrans dig_trans;   /**< Coordinate transformation ToDo... */
     QStringList bads;           /**< List of bad channels. */
     QList<FiffProj> projs;      /**< List of available SSP projectors. */
     QList<FiffCtfComp> comps;   /**< List of available CTF software compensators. */
-    QString acq_pars;           /**< ToDo... */
-    QString acq_stim;           /**< ToDo... */
+    QString acq_pars;           /**< Acquisition information ToDo... */
+    QString acq_stim;           /**< Acquisition information ToDo... */
     QString filename;           /**< Filename when the info is read of a fiff file. */
 };
 

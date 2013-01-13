@@ -87,7 +87,7 @@ class FIFFSHARED_EXPORT FiffNamedMatrix : public QSharedData
 public:
     typedef QSharedPointer<FiffNamedMatrix> SPtr;               /**< Shared pointer type for FiffNamedMatrix. */
     typedef QSharedPointer<const FiffNamedMatrix> ConstSPtr;    /**< Const shared pointer type for FiffNamedMatrix. */
-    typedef QSharedDataPointer<FiffNamedMatrix> SDPtr;       /**< Shared data pointer type for FiffNamedMatrix. */
+    typedef QSharedDataPointer<FiffNamedMatrix> SDPtr;          /**< Shared data pointer type for FiffNamedMatrix. */
 
     //=========================================================================================================
     /**

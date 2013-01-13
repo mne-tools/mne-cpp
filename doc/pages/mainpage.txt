@@ -2,7 +2,7 @@
  *
  * \section intro_sec Introduction
  *
- * Fast MNE Qt 5 based C++ library (pre-alpha state)
+ * Fast MNE Qt 5 based C++ library (beta)
  *
  * \section get_the_code_sec Getting the latest code
  *
@@ -11,11 +11,11 @@
  *    git clone git://github.com/mne-tools/mne-cpp.git
  *
  * If you don't have git installed, you can download a zip or tarball
- * of the latest code: <a href="http://github.com/mne-tools/mne-cpp/archives/master"><b>http://github.com/mne-tools/mne-cpp/archives/master</b></a>
+ * of the latest code: <a href="https://github.com/mne-tools/mne-cpp"><b>https://github.com/mne-tools/mne-cpp</b></a>
  *
  * \section building_sec Building
  *
- * To build the mne libraries <a href="http://releases.qt-project.org/qt5.0/beta1/"><b>Qt5 beta</b></a> is required.
+ * To build the mne libraries <a href="http://qt-project.org/downloads/"><b>Qt5</b></a> is required.
  *
  * Build and install Qt5.
  *
@@ -25,17 +25,17 @@
  * Make the libraries and examples by running:
  *	make
  *
- * Tip: It's convinient to use the Qt Creator of the <a href="http://qt.nokia.com/downloads/"><b>QtSDK</b></a> to build the libraries.
+ * Tip: It's convinient to use the Qt Creator of the <a href="http://qt-project.org/downloads/"><b>QtSDK</b></a> to build the libraries.
  *
  *
  * \section dependencies_sec Dependencies
  *
- * <a href="http://releases.qt-project.org/qt5.0/beta1/"><b>Qt5 beta</b></a>
+ * <a href="http://qt-project.org/downloads/"><b>Qt5</b></a>
  * 
  * 
  * \section mailing_list_sec Mailing list
  * 
- * <a href="http://releases.qt-project.org/qt5.0/beta1/"><b>http://mail.nmr.mgh.harvard.edu/mailman/listinfo/mne_analysis</b></a>
+ * <a href="http://mail.nmr.mgh.harvard.edu/mailman/listinfo/mne_analysis"><b>http://mail.nmr.mgh.harvard.edu/mailman/listinfo/mne_analysis</b></a>
  *
  *
  * \section workflow_contribute_sec Workflow to contribute
