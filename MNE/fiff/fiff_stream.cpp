@@ -42,6 +42,9 @@
 #include "fiff_stream.h"
 #include "fiff_tag.h"
 #include "fiff_dir_tree.h"
+#include "fiff_ctf_comp.h"
+#include "fiff_info.h"
+#include "fiff_raw_data.h"
 
 
 //*************************************************************************************************************
@@ -50,7 +53,6 @@
 //=============================================================================================================
 
 #include <QFile>
-
 
 
 //*************************************************************************************************************
@@ -1151,7 +1153,7 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool 
     //
     //   Open the file
     //
-    FiffStream* p_pStream = new FiffStream(p_pIODevice);
+    FiffStream::SPtr p_pStream = FiffStream::SPtr(new FiffStream(p_pIODevice));
     QString t_sFileName = p_pStream->streamName();
 
     printf("Opening raw data %s...\n",t_sFileName.toUtf8().constData());
@@ -1160,11 +1162,7 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool 
     QList<FiffDirEntry> t_Dir;
 
     if(!p_pStream->open(t_Tree, t_Dir))
-    {
-        if(p_pStream)
-            delete p_pStream;
         return false;
-    }
 
     //
     //   Read the measurement info
@@ -1190,8 +1188,6 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool 
             if (raw.size() == 0)
             {
                 printf("No raw data in %s\n", t_sFileName.toUtf8().constData());
-                if(p_pStream)
-                    delete p_pStream;
                 return false;
             }
         }
@@ -1200,8 +1196,6 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool 
             if (raw.size() == 0)
             {
                 printf("No raw data in %s\n", t_sFileName.toUtf8().constData());
-                if(p_pStream)
-                    delete p_pStream;
                 return false;
             }
         }
@@ -1232,7 +1226,7 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool 
     FiffTag* t_pTag = NULL;
     if (dir[first].kind == FIFF_FIRST_SAMPLE)
     {
-        FiffTag::read_tag(p_pStream, t_pTag, dir[first].pos);
+        FiffTag::read_tag(p_pStream.data(), t_pTag, dir[first].pos);
         first_samp = *t_pTag->toInt();
         ++first;
     }
@@ -1245,7 +1239,7 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool 
         //
         //  This first skip can be applied only after we know the buffer size
         //
-        FiffTag::read_tag(p_pStream, t_pTag, dir[first].pos);
+        FiffTag::read_tag(p_pStream.data(), t_pTag, dir[first].pos);
         first_skip = *t_pTag->toInt();
         ++first;
     }
@@ -1263,7 +1257,7 @@ bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool 
         FiffDirEntry ent = dir.at(k);
         if (ent.kind == FIFF_DATA_SKIP)
         {
-            FiffTag::read_tag(p_pStream, t_pTag, ent.pos);
+            FiffTag::read_tag(p_pStream.data(), t_pTag, ent.pos);
             nskip = *t_pTag->toInt();
         }
         else if(ent.kind == FIFF_DATA_BUFFER)

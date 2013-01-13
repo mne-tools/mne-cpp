@@ -73,26 +73,17 @@ using namespace DISPLIB;
 
 GeometryView::GeometryView(QWindow *parent)
 : QGLView(parent)
-, t_ForwardSolution(0)
 , hemisphere(0)
 , scene(0)
 {
     QString t_sFile = "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
-
-    QFile* t_pFile = new QFile(t_sFile);
-
-    if(!MNE::read_forward_solution(t_pFile, t_ForwardSolution))
-    {
-        if( t_ForwardSolution )
-            delete t_ForwardSolution;
-
-        t_ForwardSolution = NULL;
-    }
+    QFile t_File(t_sFile);
+    if(!MNE::read_forward_solution(t_File, t_ForwardSolution))
+        t_ForwardSolution.clear();
 
     hemisphereFrontalCamera = new QGLCamera(this);
     hemisphereFrontalCamera->setAdjustForAspectRatio(false);
 
-    delete t_pFile;
 }
 
 //*************************************************************************************************************
@@ -106,7 +97,7 @@ GeometryView::~GeometryView()
 
 void GeometryView::initializeGL(QGLPainter *painter)
 {
-    if(t_ForwardSolution)
+    if(!t_ForwardSolution.isEmpty())
     {
         // in the constructor construct a builder on the stack
         QGLBuilder builder;
@@ -120,7 +111,7 @@ void GeometryView::initializeGL(QGLPainter *painter)
         {
             QGeometryData tri;
 
-            MatrixXf* triCoords = t_ForwardSolution->src->hemispheres.at(0)->getTriCoords(fac);
+            MatrixXf* triCoords = t_ForwardSolution.src.hemispheres[0].getTriCoords(fac);
 
             tri.appendVertexArray(QArray<QVector3D>::fromRawData( reinterpret_cast<const QVector3D*>(triCoords->data()), triCoords->cols() ));
 
@@ -133,7 +124,7 @@ void GeometryView::initializeGL(QGLPainter *painter)
         {
             QGeometryData tri;
 
-            MatrixXf* triCoords = t_ForwardSolution->src->hemispheres.at(1)->getTriCoords(fac);
+            MatrixXf* triCoords = t_ForwardSolution.src.hemispheres[1].getTriCoords(fac);
 
             tri.appendVertexArray(QArray<QVector3D>::fromRawData( reinterpret_cast<const QVector3D*>(triCoords->data()), triCoords->cols()));
 
@@ -184,7 +175,7 @@ void GeometryView::initializeGL(QGLPainter *painter)
 
 void GeometryView::paintGL(QGLPainter *painter)
 {
-    if(t_ForwardSolution)
+    if(!t_ForwardSolution.isEmpty())
     {
     //    painter->modelViewMatrix().rotate(45.0f, 1.0f, 1.0f, 1.0f);
 
