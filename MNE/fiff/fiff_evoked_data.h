@@ -119,14 +119,14 @@ public:
     ~FiffEvokedData();
 
 public:
-    fiff_int_t  aspect_kind;    /**< ToDo... */
+    fiff_int_t  aspect_kind;    /**< Aspect identifier */
     fiff_int_t  is_smsh;        /**< ToDo... */
-    fiff_int_t  nave;           /**< Number of averages. */
-    fiff_int_t  first;          /**< ToDo... */
-    fiff_int_t  last;           /**< ToDo... */
-    QString     comment;        /**< ToDo... */
-    MatrixXd    times;          /**< ToDo... */
-    MatrixXd    epochs;         /**< ToDo... */
+    fiff_int_t  nave;           /**< Number of averaged epochs. */
+    fiff_int_t  first;          /**< First time sample. */
+    fiff_int_t  last;           /**< Last time sample. */
+    QString     comment;        /**< Comment on dataset. Can be the condition. */
+    MatrixXd    times;          /**< Array of time instants in seconds. */
+    MatrixXd    epochs;         /**< 2D array of shape [nChannels x nTimes]; Evoked response. */
 };
 
 } // NAMESPACE

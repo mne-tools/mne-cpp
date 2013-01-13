@@ -123,7 +123,7 @@ public:
     MatrixXd data;          /**< Covariance data */
     QList<FiffProj> projs;  /**< List of available ssp projectors. */
     QStringList bads;       /**< List of bad channels. */
-    fiff_int_t nfree;       /**< ToDo */
+    fiff_int_t nfree;       /**< Number of degrees of freedom. */
     VectorXd eig;           /**< Vector of eigenvalues. */
     MatrixXd eigvec;        /**< Matrix of eigenvectors. */
 };

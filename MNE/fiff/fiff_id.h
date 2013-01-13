@@ -64,7 +64,7 @@ namespace FIFFLIB
 * These universially unique identifiers are also used to identify blocks within the files.
 * Replaces fiffIdRec which had a size of 5*4 = 20
 *
-* @brief A file ID.
+* @brief Universially unique identifier.
 **/
 
 class FIFFSHARED_EXPORT FiffId {
@@ -75,19 +75,21 @@ public:
 
     //=========================================================================================================
     /**
-    * ctor
+    * Default Constructor
     */
     FiffId();
 
     //=========================================================================================================
     /**
-    * copy ctor
+    * Copy constructor.
+    *
+    * @param[in] p_FiffId   Universially unique identifier which should be copied
     */
-    FiffId(const FiffId& p_pFiffId);
+    FiffId(const FiffId& p_FiffId);
 
     //=========================================================================================================
     /**
-    * Destroys the FiffInfo.
+    * Destroys the universially unique identifier.
     */
     ~FiffId();
 

@@ -116,10 +116,14 @@ public:
     fiff_float_t  range;        /**< Voltmeter range (-1 = auto ranging) 1*/
     fiff_float_t  cal;          /**< Calibration from volts to units used 1*/
 
-    fiff_int_t coil_type;       /**< Which kind of coil. */
+    fiff_int_t coil_type;       /**< What kind of coil. */
 
-    Matrix<double,12,1, DontAlign>  loc;            /**< Channel (MEG) location */
-    Matrix<double,4,4, DontAlign>   coil_trans;     /**< ToDo... */
+    Matrix<double,12,1, DontAlign>  loc;            /**< Channel (MEG) location:
+                                                     *   3x Coil coordinate system origin;
+                                                     *   3x Coil coordinate system x-axis unit vector;
+                                                     *   3x Coil coordinate system y-axis unit vector;
+                                                     *   3x Coil coordinate system z-axis unit vector*/
+    Matrix<double,4,4, DontAlign>   coil_trans;     /**< Coil coordinate system transformation */
     Matrix<double,3,2, DontAlign>   eeg_loc;        /**< Channel location */
     fiff_int_t                      coord_frame;    /**< Coordinate Frame */
 

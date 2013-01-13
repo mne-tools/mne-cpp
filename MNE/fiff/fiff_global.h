@@ -51,9 +51,9 @@
 //=============================================================================================================
 
 #if defined(FIFF_LIBRARY)
-#  define FIFFSHARED_EXPORT Q_DECL_EXPORT
+#  define FIFFSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define FIFFSHARED_EXPORT Q_DECL_IMPORT
+#  define FIFFSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
 #endif // FIFF_GLOBAL_H
