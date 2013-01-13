@@ -9,5 +9,12 @@ var searchData=
   ['stop',['stop',['../class_i_n_v_r_t_l_i_b_1_1_cov_rt.html#ae240fd7f41f02da3ea602f31ecfe4c6d',1,'INVRTLIB::CovRt::stop()'],['../class_i_n_v_r_t_l_i_b_1_1_inv_rt.html#a75e4f4ff462263e0f0ce7eb3fcb1c8b8',1,'INVRTLIB::InvRt::stop()'],['../class_m_n_e_l_i_b_1_1_m_n_e_rt_client.html#a7b48d0bfb822f4034d7fcabc3d3571bd',1,'MNELIB::MNERtClient::stop()']]],
   ['storagesize',['storageSize',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a4be2fe9f3da7eb281eba9bb6eeb0a88b',1,'FIFFLIB::FiffChInfo::storageSize()'],['../class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#ad8d89c66e45b15d6f1e9a99c15f4701c',1,'FIFFLIB::FiffChPos::storageSize()'],['../class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a0dbac71c0787f5448e31857bca6a5982',1,'FIFFLIB::FiffCoordTrans::storageSize()'],['../class_f_i_f_f_l_i_b_1_1_fiff_dig_point.html#a0938d9f260c72a18071d120f4dc1102a',1,'FIFFLIB::FiffDigPoint::storageSize()'],['../class_f_i_f_f_l_i_b_1_1_fiff_dir_entry.html#a0913172782f416c6c54ec3af3e9ad567',1,'FIFFLIB::FiffDirEntry::storageSize()'],['../class_f_i_f_f_l_i_b_1_1_fiff_id.html#ac34e1aaa29ad3313bfa1b6c01bd7590e',1,'FIFFLIB::FiffId::storageSize()']]],
   ['streamname',['streamName',['../class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aaef2f46402149d34b308bbaf6ecb95e8',1,'FIFFLIB::FiffStream']]],
-  ['subject',['Subject',['../class_subject.html#ab468044832c824c6d6c2f46272655207',1,'Subject']]]
+  ['subject',['Subject',['../class_subject.html#ab468044832c824c6d6c2f46272655207',1,'Subject']]],
+  ['swap_5fdoublep',['swap_doublep',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#add924a30b73126aae31830ddeda4bf29',1,'FIFFLIB::FiffTag']]],
+  ['swap_5ffloatp',['swap_floatp',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a971f244fee4bf1ef506da38b167acc80',1,'FIFFLIB::FiffTag']]],
+  ['swap_5fint',['swap_int',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#af5402cc3fcc9015ef6c1a09ae5b3e912',1,'FIFFLIB::FiffTag']]],
+  ['swap_5fintp',['swap_intp',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#aa2e3b36602129b8f952ee43fe3da9cfe',1,'FIFFLIB::FiffTag']]],
+  ['swap_5flong',['swap_long',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#abc60634cdaf382a6a1522947175d7c9e',1,'FIFFLIB::FiffTag']]],
+  ['swap_5flongp',['swap_longp',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a6d570fa8360a019910bf8c0edef8df66',1,'FIFFLIB::FiffTag']]],
+  ['swap_5fshort',['swap_short',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a925f6947a2e13ea493fee076e2ecf1f5',1,'FIFFLIB::FiffTag']]]
 ];

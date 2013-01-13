@@ -120,27 +120,49 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
-<div class="line"><a name="l00068"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ab2819e752190b2fd0f27cdef66906ee3">   68</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ab2819e752190b2fd0f27cdef66906ee3">FiffCoordTrans::~FiffCoordTrans</a>()</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;{</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;}</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;</div>
-<div class="line"><a name="l00075"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a4a258913a8b23cb3c05858449ff25370">   75</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a4a258913a8b23cb3c05858449ff25370">FiffCoordTrans::invert_transform</a>()</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;{</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    fiff_int_t from_new = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a0d4f29ae5b9affe90e2cfadf922e36f7">to</a>;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a0d4f29ae5b9affe90e2cfadf922e36f7">to</a>    = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ab0cacc34492c4e9842e9de5f59368435">from</a>;</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ab0cacc34492c4e9842e9de5f59368435">from</a>  = from_new;</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ae3995f710ab35b5f7687001a4cd4e4b5">trans</a> = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ae3995f710ab35b5f7687001a4cd4e4b5">trans</a>.inverse();</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a37187e80f7c026fbbb74b663f8153d21">invtrans</a> = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a37187e80f7c026fbbb74b663f8153d21">invtrans</a>.inverse();</div>
+<div class="line"><a name="l00068"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a2e61ae5ce7bbcb1e99a70d2ae82e4529">   68</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a76eeba5b0c9c6bf9f8fb7df9eaa8dbb5">FiffCoordTrans::FiffCoordTrans</a>(<span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="Coordinate transformation description.">FiffCoordTrans</a> &amp;p_FiffCoordTrans)</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;: from(p_FiffCoordTrans.from)</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;, to(p_FiffCoordTrans.to)</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;, trans(p_FiffCoordTrans.trans)</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;, invtrans(p_FiffCoordTrans.invtrans)</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;{</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;}</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;</div>
+<div class="line"><a name="l00079"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ab2819e752190b2fd0f27cdef66906ee3">   79</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ab2819e752190b2fd0f27cdef66906ee3">FiffCoordTrans::~FiffCoordTrans</a>()</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;{</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;}</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;}</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div>
+<div class="line"><a name="l00086"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ae2fe4e310a2c902fac26b547cad3a5f2">   86</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ae2fe4e310a2c902fac26b547cad3a5f2">FiffCoordTrans::clear</a>()</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;{</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ab0cacc34492c4e9842e9de5f59368435">from</a> = -1;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a0d4f29ae5b9affe90e2cfadf922e36f7">to</a> = -1;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ae3995f710ab35b5f7687001a4cd4e4b5">trans</a>.setIdentity();</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a37187e80f7c026fbbb74b663f8153d21">invtrans</a>.setIdentity();</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;}</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;</div>
+<div class="line"><a name="l00097"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a4a258913a8b23cb3c05858449ff25370">   97</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a4a258913a8b23cb3c05858449ff25370">FiffCoordTrans::invert_transform</a>()</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;{</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    fiff_int_t from_new = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a0d4f29ae5b9affe90e2cfadf922e36f7">to</a>;</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a0d4f29ae5b9affe90e2cfadf922e36f7">to</a>    = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ab0cacc34492c4e9842e9de5f59368435">from</a>;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ab0cacc34492c4e9842e9de5f59368435">from</a>  = from_new;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ae3995f710ab35b5f7687001a4cd4e4b5">trans</a> = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ae3995f710ab35b5f7687001a4cd4e4b5">trans</a>.inverse();</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a37187e80f7c026fbbb74b663f8153d21">invtrans</a> = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a37187e80f7c026fbbb74b663f8153d21">invtrans</a>.inverse();</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jan 9 2013 17:50:06 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jan 12 2013 20:22:36 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

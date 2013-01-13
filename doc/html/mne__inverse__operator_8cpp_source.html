@@ -118,13 +118,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="comment">//, source_nn(MatrixXd())//NULL)</span></div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="comment">//, sing(NULL)</span></div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;, eigen_leads_weighted(false)</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="comment">//, eigen_leads(FiffNamedMatrix())//NULL)</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="comment">//, eigen_fields(NULL)</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="comment">//, noise_cov(NULL)</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="comment">//, source_cov(NULL)</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="comment">//, orient_prior(NULL)</span></div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment">//, depth_prior(NULL)</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment">//, fmri_prior(NULL)</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;, eigen_leads(new <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="A named matrix.">FiffNamedMatrix</a>)</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;, eigen_fields(new <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="A named matrix.">FiffNamedMatrix</a>)</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;, noise_cov(new <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html" title="covariance data">FiffCov</a>)</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;, source_cov(new <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html" title="covariance data">FiffCov</a>)</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;, orient_prior(new <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html" title="covariance data">FiffCov</a>)</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;, depth_prior(new <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html" title="covariance data">FiffCov</a>)</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;, fmri_prior(new <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html" title="covariance data">FiffCov</a>)</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment">//, src(NULL)</span></div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="comment">//, mri_head_t(NULL)</span></div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;, nave(-1)</div>
@@ -149,11 +149,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;, eigen_leads_weighted(p_pMNEInverseOperator-&gt;eigen_leads_weighted)</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;, eigen_leads(p_pMNEInverseOperator-&gt;eigen_leads)<span class="comment">//p_pMNEInverseOperator-&gt;eigen_leads ? new FiffNamedMatrix(p_pMNEInverseOperator-&gt;eigen_leads) : NULL)</span></div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;, eigen_fields(p_pMNEInverseOperator-&gt;eigen_fields)<span class="comment">//p_pMNEInverseOperator-&gt;eigen_fields ? new FiffNamedMatrix(p_pMNEInverseOperator-&gt;eigen_fields) : NULL)</span></div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;, noise_cov(p_pMNEInverseOperator-&gt;noise_cov)<span class="comment">//p_pMNEInverseOperator-&gt;noise_cov ? new FiffCov(p_pMNEInverseOperator-&gt;noise_cov) : NULL)</span></div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;, source_cov(p_pMNEInverseOperator-&gt;source_cov)<span class="comment">//p_pMNEInverseOperator-&gt;source_cov ? new FiffCov(p_pMNEInverseOperator-&gt;source_cov) : NULL)</span></div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;, orient_prior(p_pMNEInverseOperator-&gt;orient_prior)<span class="comment">//p_pMNEInverseOperator-&gt;orient_prior ? new FiffCov(p_pMNEInverseOperator-&gt;orient_prior) : NULL)</span></div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;, depth_prior(p_pMNEInverseOperator-&gt;depth_prior)<span class="comment">//p_pMNEInverseOperator-&gt;depth_prior ? new FiffCov(p_pMNEInverseOperator-&gt;depth_prior) : NULL)</span></div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;, fmri_prior(p_pMNEInverseOperator-&gt;fmri_prior)<span class="comment">//p_pMNEInverseOperator-&gt;fmri_prior ? new FiffCov(p_pMNEInverseOperator-&gt;fmri_prior) : NULL)</span></div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;, noise_cov(p_pMNEInverseOperator-&gt;noise_cov)</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;, source_cov(p_pMNEInverseOperator-&gt;source_cov)</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;, orient_prior(p_pMNEInverseOperator-&gt;orient_prior)</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;, depth_prior(p_pMNEInverseOperator-&gt;depth_prior)</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;, fmri_prior(p_pMNEInverseOperator-&gt;fmri_prior)</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;, src(p_pMNEInverseOperator-&gt;src) <span class="comment">//p_pMNEInverseOperator-&gt;src ? new MNESourceSpace(p_pMNEInverseOperator-&gt;src) : NULL)</span></div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;, mri_head_t(p_pMNEInverseOperator-&gt;mri_head_t)<span class="comment">//p_pMNEInverseOperator-&gt;mri_head_t ? new FiffCoordTrans(p_pMNEInverseOperator-&gt;mri_head_t) : NULL)</span></div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;, nave(p_pMNEInverseOperator-&gt;nave)</div>
@@ -219,12 +219,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <span class="comment">//   Scale some of the stuff</span></div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <span class="keywordtype">float</span> scale     = ((float)inv.nave)/((float)nave);</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    inv.noise_cov.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html#abe1ba2fbc88bfd5125224d5e1e92ff04">data</a>  *= scale;</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    inv.noise_cov.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html#a39fc29400ff48ad9ef062ba701eab5aa">eig</a>   *= scale;</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    inv.source_cov.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html#abe1ba2fbc88bfd5125224d5e1e92ff04">data</a> *= scale;</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    inv.noise_cov-&gt;data  *= scale;</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    inv.noise_cov-&gt;eig   *= scale;</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    inv.source_cov-&gt;data *= scale;</div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    <span class="keywordflow">if</span> (inv.eigen_leads_weighted)</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        inv.eigen_leads.data *= sqrt(scale);</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        inv.eigen_leads-&gt;data *= sqrt(scale);</div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    printf(<span class="stringliteral">&quot;\tScaled noise and source covariance from nave = %d to nave = %d\n&quot;</span>,inv.nave,nave);</div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    inv.nave = nave;</div>
@@ -240,7 +240,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="comment">//   Create the projection operator</span></div>
 <div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    qint32 ncomp = <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ab75b63118732c2a099cda1f886e93a30">FiffInfo::make_projector</a>(inv.projs, inv.noise_cov.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html#ac4727db648bc2652e98162e917611605">names</a>, inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a314a40b85f4ebf901abf56832649bd86">proj</a>);</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    qint32 ncomp = <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ab75b63118732c2a099cda1f886e93a30">FiffInfo::make_projector</a>(inv.projs, inv.noise_cov-&gt;names, inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a314a40b85f4ebf901abf56832649bd86">proj</a>);</div>
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    <span class="keywordflow">if</span> (ncomp &gt; 0)</div>
 <div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;        printf(<span class="stringliteral">&quot;\tCreated an SSP operator (subspace dimension = %d)\n&quot;</span>,ncomp);</div>
 <div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;</div>
@@ -249,37 +249,37 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;<span class="comment">//    if(inv.whitener)</span></div>
 <div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;<span class="comment">//        delete inv.whitener;</span></div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#abf082cb145b566cd250b32305d5bacd1">whitener</a> = MatrixXd::Zero(inv.noise_cov.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html#a2626d9dc2dc519268629bf997f6b2dcb">dim</a>, inv.noise_cov.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html#a2626d9dc2dc519268629bf997f6b2dcb">dim</a>);</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#abf082cb145b566cd250b32305d5bacd1">whitener</a> = MatrixXd::Zero(inv.noise_cov-&gt;dim, inv.noise_cov-&gt;dim);</div>
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;</div>
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    qint32 nnzero, k;</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    <span class="keywordflow">if</span> (inv.noise_cov.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html#ad579bf4edee630f06fe0b0c4b8bc7838">diag</a> == 0)</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    <span class="keywordflow">if</span> (inv.noise_cov-&gt;diag == 0)</div>
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    {</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        <span class="comment">//</span></div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;        <span class="comment">//   Omit the zeroes due to projection</span></div>
 <div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;        <span class="comment">//</span></div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;        nnzero = 0;</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;        <span class="keywordflow">for</span> (k = ncomp; k &lt; inv.noise_cov.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html#a2626d9dc2dc519268629bf997f6b2dcb">dim</a>; ++k)</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;        <span class="keywordflow">for</span> (k = ncomp; k &lt; inv.noise_cov-&gt;dim; ++k)</div>
 <div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;        {</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;            <span class="keywordflow">if</span> (inv.noise_cov.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html#a39fc29400ff48ad9ef062ba701eab5aa">eig</a>[k] &gt; 0)</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;            <span class="keywordflow">if</span> (inv.noise_cov-&gt;eig[k] &gt; 0)</div>
 <div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;            {</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;                inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#abf082cb145b566cd250b32305d5bacd1">whitener</a>(k,k) = 1.0/sqrt(inv.noise_cov.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html#a39fc29400ff48ad9ef062ba701eab5aa">eig</a>[k]);</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;                inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#abf082cb145b566cd250b32305d5bacd1">whitener</a>(k,k) = 1.0/sqrt(inv.noise_cov-&gt;eig[k]);</div>
 <div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;                ++nnzero;</div>
 <div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;            }</div>
 <div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;        }</div>
 <div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;        <span class="comment">//</span></div>
 <div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;        <span class="comment">//   Rows of eigvec are the eigenvectors</span></div>
 <div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;        <span class="comment">//</span></div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;        inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#abf082cb145b566cd250b32305d5bacd1">whitener</a> *= inv.noise_cov.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html#ab3292fd27b3ab9f10c64dc0b8fd3e12e">eigvec</a>;</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        printf(<span class="stringliteral">&quot;\tCreated the whitener using a full noise covariance matrix (%d small eigenvalues omitted)\n&quot;</span>, inv.noise_cov.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html#a2626d9dc2dc519268629bf997f6b2dcb">dim</a> - nnzero);</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;        inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#abf082cb145b566cd250b32305d5bacd1">whitener</a> *= inv.noise_cov-&gt;eigvec;</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        printf(<span class="stringliteral">&quot;\tCreated the whitener using a full noise covariance matrix (%d small eigenvalues omitted)\n&quot;</span>, inv.noise_cov-&gt;dim - nnzero);</div>
 <div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    }</div>
 <div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    {</div>
 <div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;        <span class="comment">//</span></div>
 <div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;        <span class="comment">//   No need to omit the zeroes due to projection</span></div>
 <div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;        <span class="comment">//</span></div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;        <span class="keywordflow">for</span> (k = 0; k &lt; inv.noise_cov.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html#a2626d9dc2dc519268629bf997f6b2dcb">dim</a>; ++k)</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;            inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#abf082cb145b566cd250b32305d5bacd1">whitener</a>(k,k) = 1.0/sqrt(inv.noise_cov.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html#abe1ba2fbc88bfd5125224d5e1e92ff04">data</a>(k,0));</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;        <span class="keywordflow">for</span> (k = 0; k &lt; inv.noise_cov-&gt;dim; ++k)</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;            inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#abf082cb145b566cd250b32305d5bacd1">whitener</a>(k,k) = 1.0/sqrt(inv.noise_cov-&gt;data(k,0));</div>
 <div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;</div>
 <div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;        printf(<span class="stringliteral">&quot;\tCreated the whitener using a diagonal noise covariance matrix (%d small eigenvalues discarded)\n&quot;</span>,ncomp);</div>
 <div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    }</div>
@@ -288,7 +288,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    <span class="keywordflow">if</span> (dSPM || sLORETA)</div>
 <div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    {</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;        VectorXd* noise_norm = <span class="keyword">new</span> VectorXd(VectorXd::Zero(inv.eigen_leads.nrow));</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;        VectorXd* noise_norm = <span class="keyword">new</span> VectorXd(VectorXd::Zero(inv.eigen_leads-&gt;nrow));</div>
 <div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;        VectorXd* noise_weight = NULL;</div>
 <div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;        <span class="keywordflow">if</span> (dSPM)</div>
 <div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;        {</div>
@@ -304,19 +304,19 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        VectorXd one;</div>
 <div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        <span class="keywordflow">if</span> (inv.eigen_leads_weighted)</div>
 <div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        {</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;           <span class="keywordflow">for</span> (k = 0; k &lt; inv.eigen_leads.nrow; ++k)</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;           <span class="keywordflow">for</span> (k = 0; k &lt; inv.eigen_leads-&gt;nrow; ++k)</div>
 <div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;           {</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;              one = inv.eigen_leads.data.block(k,0,1,inv.eigen_leads.data.cols()).cwiseProduct(*noise_weight);</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;              one = inv.eigen_leads-&gt;data.block(k,0,1,inv.eigen_leads-&gt;data.cols()).cwiseProduct(*noise_weight);</div>
 <div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;              (*noise_norm)[k] = sqrt(one.dot(one));</div>
 <div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;           }</div>
 <div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;        }</div>
 <div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;        <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;        {</div>
 <div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;            <span class="keywordtype">float</span> c;</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;            <span class="keywordflow">for</span> (k = 0; k &lt; inv.eigen_leads.nrow; ++k)</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;            <span class="keywordflow">for</span> (k = 0; k &lt; inv.eigen_leads-&gt;nrow; ++k)</div>
 <div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;            {</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;                c = sqrt(inv.source_cov.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html#abe1ba2fbc88bfd5125224d5e1e92ff04">data</a>(k,0));</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;                one = c*(inv.eigen_leads.data.block(k,0,1,inv.eigen_leads.data.cols()).transpose()).cwiseProduct(*noise_weight);<span class="comment">//ToDo eigenleads data -&gt; pointer</span></div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;                c = sqrt(inv.source_cov-&gt;data(k,0));</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;                one = c*(inv.eigen_leads-&gt;data.block(k,0,1,inv.eigen_leads-&gt;data.cols()).transpose()).cwiseProduct(*noise_weight);<span class="comment">//ToDo eigenleads data -&gt; pointer</span></div>
 <div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;                (*noise_norm)[k] = sqrt(one.dot(one));</div>
 <div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;            }</div>
 <div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;        }</div>
@@ -376,49 +376,49 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a>* t_pStream = <span class="keyword">new</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a>(&amp;p_IODevice);</div>
 <div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;    printf(<span class="stringliteral">&quot;Reading inverse operator decomposition from %s...\n&quot;</span>,t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aaef2f46402149d34b308bbaf6ecb95e8">streamName</a>().toUtf8().constData());</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a>* t_pTree = NULL;</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;    QList&lt;FiffDirEntry&gt;* t_pDir = NULL;</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a> t_Tree;</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;    QList&lt;FiffDirEntry&gt; t_Dir;</div>
 <div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    <span class="keywordflow">if</span>(!t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a258a185f900706296d8cdcdf2b3fe740">open</a>(t_pTree, t_pDir))</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    <span class="keywordflow">if</span>(!t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aa6a81dd8a8a58e5c9c5034b3062106ed">open</a>(t_Tree, t_Dir))</div>
 <div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;    {</div>
 <div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
 <div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;        <span class="keywordflow">if</span>(t_pTree)</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;            <span class="keyword">delete</span> t_pTree;</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;        <span class="keywordflow">if</span>(t_pDir)</div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;            <span class="keyword">delete</span> t_pDir;</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;<span class="comment">//        if(t_pTree)</span></div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;<span class="comment">//            delete t_pTree;</span></div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;<span class="comment">//        if(t_pDir)</span></div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;<span class="comment">//            delete t_pDir;</span></div>
 <div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;</div>
 <div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;    }</div>
 <div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;    <span class="comment">//   Find all inverse operators</span></div>
 <div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;    QList &lt;FiffDirTree *&gt; invs_list = t_pTree-&gt;dir_tree_find(FIFFB_MNE_INVERSE_SOLUTION);</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;    QList &lt;FiffDirTree&gt; invs_list = t_Tree.dir_tree_find(FIFFB_MNE_INVERSE_SOLUTION);</div>
 <div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;    <span class="keywordflow">if</span> ( invs_list.size()== 0)</div>
 <div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;    {</div>
 <div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;        printf(<span class="stringliteral">&quot;No inverse solutions in %s\n&quot;</span>, t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aaef2f46402149d34b308bbaf6ecb95e8">streamName</a>().toUtf8().constData());</div>
 <div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
 <div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;        <span class="keywordflow">if</span>(t_pTree)</div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;            <span class="keyword">delete</span> t_pTree;</div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;        <span class="keywordflow">if</span>(t_pDir)</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;            <span class="keyword">delete</span> t_pDir;</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;<span class="comment">//        if(t_pTree)</span></div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;<span class="comment">//            delete t_pTree;</span></div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;<span class="comment">//        if(t_pDir)</span></div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;<span class="comment">//            delete t_pDir;</span></div>
 <div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;    }</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a>* invs = invs_list[0];</div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a>* invs = &amp;invs_list[0];</div>
 <div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;    <span class="comment">//   Parent MRI data</span></div>
 <div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;    QList &lt;FiffDirTree *&gt; parent_mri = t_pTree-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#add5047febab5ab74581c1601f41475d3">dir_tree_find</a>(FIFFB_MNE_PARENT_MRI_FILE);</div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;    QList &lt;FiffDirTree&gt; parent_mri = t_Tree.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a70da2b06043102864248454470946a81">dir_tree_find</a>(FIFFB_MNE_PARENT_MRI_FILE);</div>
 <div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;    <span class="keywordflow">if</span> (parent_mri.size() == 0)</div>
 <div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;    {</div>
 <div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;        printf(<span class="stringliteral">&quot;No parent MRI information in %s&quot;</span>, t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aaef2f46402149d34b308bbaf6ecb95e8">streamName</a>().toUtf8().constData());</div>
 <div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
 <div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;        <span class="keywordflow">if</span>(t_pTree)</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;            <span class="keyword">delete</span> t_pTree;</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;        <span class="keywordflow">if</span>(t_pDir)</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;            <span class="keyword">delete</span> t_pDir;</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;<span class="comment">//        if(t_pTree)</span></div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;<span class="comment">//            delete t_pTree;</span></div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;<span class="comment">//        if(t_pDir)</span></div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;<span class="comment">//            delete t_pDir;</span></div>
 <div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;    }</div>
 <div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;    printf(<span class="stringliteral">&quot;\tReading inverse operator info...&quot;</span>);</div>
@@ -426,49 +426,49 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;    <span class="comment">//   Methods and source orientations</span></div>
 <div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html" title="FIFF data tag.">FiffTag</a>* t_pTag = NULL;</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;    <span class="keywordflow">if</span> (!invs-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a344b8473dad91444ae8c8e83500b554c">find_tag</a>(t_pStream, FIFF_MNE_INCLUDED_METHODS, t_pTag))</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;    <span class="keywordflow">if</span> (!invs-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a887f9cb482001d8d41f6504ff2f6308d">find_tag</a>(t_pStream, FIFF_MNE_INCLUDED_METHODS, t_pTag))</div>
 <div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;    {</div>
 <div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;        printf(<span class="stringliteral">&quot;Modalities not found\n&quot;</span>);</div>
 <div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;        <span class="keywordflow">if</span>(t_pTag)</div>
 <div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;            <span class="keyword">delete</span> t_pTag;</div>
 <div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
 <div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;        <span class="keywordflow">if</span>(t_pTree)</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;            <span class="keyword">delete</span> t_pTree;</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;        <span class="keywordflow">if</span>(t_pDir)</div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;            <span class="keyword">delete</span> t_pDir;</div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;<span class="comment">//        if(t_pTree)</span></div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;<span class="comment">//            delete t_pTree;</span></div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;<span class="comment">//        if(t_pDir)</span></div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;<span class="comment">//            delete t_pDir;</span></div>
 <div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;    }</div>
 <div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;</div>
 <div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;    inv = <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a04cfac3beac1c70cf2df93b4ef85565e">MNEInverseOperator</a>();</div>
 <div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;    inv.methods = *t_pTag-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a88f8094d1f3b876708bd3d5779a30a49">toInt</a>();</div>
 <div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;    <span class="keywordflow">if</span> (!invs-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a344b8473dad91444ae8c8e83500b554c">find_tag</a>(t_pStream, <a class="code" href="fiff__constants_8h.html#a3271879db122798d290ee16bf50c72be">FIFF_MNE_SOURCE_ORIENTATION</a>, t_pTag))</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;    <span class="keywordflow">if</span> (!invs-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a887f9cb482001d8d41f6504ff2f6308d">find_tag</a>(t_pStream, <a class="code" href="fiff__constants_8h.html#a3271879db122798d290ee16bf50c72be">FIFF_MNE_SOURCE_ORIENTATION</a>, t_pTag))</div>
 <div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;    {</div>
 <div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;        printf(<span class="stringliteral">&quot;Source orientation constraints not found\n&quot;</span>);</div>
 <div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;        <span class="keywordflow">if</span>(t_pTag)</div>
 <div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;            <span class="keyword">delete</span> t_pTag;</div>
 <div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
 <div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;        <span class="keywordflow">if</span>(t_pTree)</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;            <span class="keyword">delete</span> t_pTree;</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;        <span class="keywordflow">if</span>(t_pDir)</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;            <span class="keyword">delete</span> t_pDir;</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;<span class="comment">//        if(t_pTree)</span></div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;<span class="comment">//            delete t_pTree;</span></div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;<span class="comment">//        if(t_pDir)</span></div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;<span class="comment">//            delete t_pDir;</span></div>
 <div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;    }</div>
 <div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;    inv.source_ori = *t_pTag-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a88f8094d1f3b876708bd3d5779a30a49">toInt</a>();</div>
 <div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;    <span class="keywordflow">if</span> (!invs-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a344b8473dad91444ae8c8e83500b554c">find_tag</a>(t_pStream, <a class="code" href="fiff__constants_8h.html#a95d9fd959918262db89fc80cbc6023f1">FIFF_MNE_SOURCE_SPACE_NPOINTS</a>, t_pTag))</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;    <span class="keywordflow">if</span> (!invs-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a887f9cb482001d8d41f6504ff2f6308d">find_tag</a>(t_pStream, <a class="code" href="fiff__constants_8h.html#a95d9fd959918262db89fc80cbc6023f1">FIFF_MNE_SOURCE_SPACE_NPOINTS</a>, t_pTag))</div>
 <div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;    {</div>
 <div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;        printf(<span class="stringliteral">&quot;Number of sources not found\n&quot;</span>);</div>
 <div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;        <span class="keywordflow">if</span>(t_pTag)</div>
 <div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;            <span class="keyword">delete</span> t_pTag;</div>
 <div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
 <div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;        <span class="keywordflow">if</span>(t_pTree)</div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;            <span class="keyword">delete</span> t_pTree;</div>
-<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;        <span class="keywordflow">if</span>(t_pDir)</div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;            <span class="keyword">delete</span> t_pDir;</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;<span class="comment">//        if(t_pTree)</span></div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;<span class="comment">//            delete t_pTree;</span></div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;<span class="comment">//        if(t_pDir)</span></div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;<span class="comment">//            delete t_pDir;</span></div>
 <div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;    }</div>
 <div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;    inv.nsource = *t_pTag-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a88f8094d1f3b876708bd3d5779a30a49">toInt</a>();</div>
@@ -476,34 +476,34 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;    <span class="comment">//   Coordinate frame</span></div>
 <div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;    <span class="keywordflow">if</span> (!invs-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a344b8473dad91444ae8c8e83500b554c">find_tag</a>(t_pStream, <a class="code" href="fiff__constants_8h.html#a2ab63fa8acb70b4809ec6fa4944b7bc2">FIFF_MNE_COORD_FRAME</a>, t_pTag))</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;    <span class="keywordflow">if</span> (!invs-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a887f9cb482001d8d41f6504ff2f6308d">find_tag</a>(t_pStream, <a class="code" href="fiff__constants_8h.html#a2ab63fa8acb70b4809ec6fa4944b7bc2">FIFF_MNE_COORD_FRAME</a>, t_pTag))</div>
 <div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;    {</div>
 <div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;        printf(<span class="stringliteral">&quot;Coordinate frame tag not found\n&quot;</span>);</div>
 <div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;        <span class="keywordflow">if</span>(t_pTag)</div>
 <div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;            <span class="keyword">delete</span> t_pTag;</div>
 <div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
 <div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;        <span class="keywordflow">if</span>(t_pTree)</div>
-<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;            <span class="keyword">delete</span> t_pTree;</div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;        <span class="keywordflow">if</span>(t_pDir)</div>
-<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;            <span class="keyword">delete</span> t_pDir;</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;<span class="comment">//        if(t_pTree)</span></div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;<span class="comment">//            delete t_pTree;</span></div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;<span class="comment">//        if(t_pDir)</span></div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;<span class="comment">//            delete t_pDir;</span></div>
 <div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;    }</div>
 <div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;    inv.coord_frame = *t_pTag-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a88f8094d1f3b876708bd3d5779a30a49">toInt</a>();</div>
 <div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;    <span class="comment">//   The actual source orientation vectors</span></div>
 <div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;    <span class="keywordflow">if</span> (!invs-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a344b8473dad91444ae8c8e83500b554c">find_tag</a>(t_pStream, <a class="code" href="fiff__constants_8h.html#a23b3b0968c7ae392a2e50561dcf81090">FIFF_MNE_INVERSE_SOURCE_ORIENTATIONS</a>, t_pTag))</div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;    <span class="keywordflow">if</span> (!invs-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a887f9cb482001d8d41f6504ff2f6308d">find_tag</a>(t_pStream, <a class="code" href="fiff__constants_8h.html#a23b3b0968c7ae392a2e50561dcf81090">FIFF_MNE_INVERSE_SOURCE_ORIENTATIONS</a>, t_pTag))</div>
 <div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;    {</div>
 <div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;        printf(<span class="stringliteral">&quot;Source orientation information not found\n&quot;</span>);</div>
 <div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;        <span class="keywordflow">if</span>(t_pTag)</div>
 <div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;            <span class="keyword">delete</span> t_pTag;</div>
 <div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
 <div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;        <span class="keywordflow">if</span>(t_pTree)</div>
-<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;            <span class="keyword">delete</span> t_pTree;</div>
-<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;        <span class="keywordflow">if</span>(t_pDir)</div>
-<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;            <span class="keyword">delete</span> t_pDir;</div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;<span class="comment">//        if(t_pTree)</span></div>
+<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;<span class="comment">//            delete t_pTree;</span></div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;<span class="comment">//        if(t_pDir)</span></div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;<span class="comment">//            delete t_pDir;</span></div>
 <div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;    }</div>
 <div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;</div>
@@ -517,17 +517,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;    <span class="comment">//   The SVD decomposition...</span></div>
 <div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;    printf(<span class="stringliteral">&quot;\tReading inverse operator decomposition...&quot;</span>);</div>
-<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;    <span class="keywordflow">if</span> (!invs-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a344b8473dad91444ae8c8e83500b554c">find_tag</a>(t_pStream, <a class="code" href="fiff__constants_8h.html#acf9c57d8b406b1ac21f08664ddff0e08">FIFF_MNE_INVERSE_SING</a>, t_pTag))</div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;    <span class="keywordflow">if</span> (!invs-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a887f9cb482001d8d41f6504ff2f6308d">find_tag</a>(t_pStream, <a class="code" href="fiff__constants_8h.html#acf9c57d8b406b1ac21f08664ddff0e08">FIFF_MNE_INVERSE_SING</a>, t_pTag))</div>
 <div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;    {</div>
 <div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;        printf(<span class="stringliteral">&quot;Singular values not found\n&quot;</span>);</div>
 <div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;        <span class="keywordflow">if</span>(t_pTag)</div>
 <div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;            <span class="keyword">delete</span> t_pTag;</div>
 <div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
 <div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;        <span class="keywordflow">if</span>(t_pTree)</div>
-<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;            <span class="keyword">delete</span> t_pTree;</div>
-<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;        <span class="keywordflow">if</span>(t_pDir)</div>
-<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;            <span class="keyword">delete</span> t_pDir;</div>
+<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;<span class="comment">//        if(t_pTree)</span></div>
+<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;<span class="comment">//            delete t_pTree;</span></div>
+<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;<span class="comment">//        if(t_pDir)</span></div>
+<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;<span class="comment">//            delete t_pDir;</span></div>
 <div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;    }</div>
 <div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;</div>
@@ -539,47 +539,47 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;    <span class="comment">//   The eigenleads and eigenfields</span></div>
 <div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;    inv.eigen_leads_weighted = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a65f281cccb94b529e2e8c7a49bb48f2e">Fiff::read_named_matrix</a>(t_pStream, invs, <a class="code" href="fiff__constants_8h.html#a0b7cf8c987b2f44ee394b4b28ad90403">FIFF_MNE_INVERSE_LEADS</a>, inv.eigen_leads))</div>
+<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff.html#acf2ac5f58740a306ff182e285829a421">Fiff::read_named_matrix</a>(t_pStream, *invs, <a class="code" href="fiff__constants_8h.html#a0b7cf8c987b2f44ee394b4b28ad90403">FIFF_MNE_INVERSE_LEADS</a>, *inv.eigen_leads.data()))</div>
 <div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;    {</div>
 <div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;        inv.eigen_leads_weighted = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;        <span class="keywordflow">if</span>(!<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a65f281cccb94b529e2e8c7a49bb48f2e">Fiff::read_named_matrix</a>(t_pStream, invs, <a class="code" href="fiff__constants_8h.html#a818ac5cd521c8282f075147b14395be5">FIFF_MNE_INVERSE_LEADS_WEIGHTED</a>, inv.eigen_leads))</div>
+<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;        <span class="keywordflow">if</span>(!<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff.html#acf2ac5f58740a306ff182e285829a421">Fiff::read_named_matrix</a>(t_pStream, *invs, <a class="code" href="fiff__constants_8h.html#a818ac5cd521c8282f075147b14395be5">FIFF_MNE_INVERSE_LEADS_WEIGHTED</a>, *inv.eigen_leads.data()))</div>
 <div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;        {</div>
 <div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;            printf(<span class="stringliteral">&quot;Error reading eigenleads named matrix.\n&quot;</span>);</div>
 <div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;            <span class="keywordflow">if</span>(t_pTag)</div>
 <div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;                <span class="keyword">delete</span> t_pTag;</div>
 <div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;            <span class="keywordflow">if</span>(t_pStream)</div>
 <div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;                <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;            <span class="keywordflow">if</span>(t_pTree)</div>
-<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;                <span class="keyword">delete</span> t_pTree;</div>
-<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;            <span class="keywordflow">if</span>(t_pDir)</div>
-<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;                <span class="keyword">delete</span> t_pDir;</div>
+<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;<span class="comment">//            if(t_pTree)</span></div>
+<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;<span class="comment">//                delete t_pTree;</span></div>
+<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;<span class="comment">//            if(t_pDir)</span></div>
+<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;<span class="comment">//                delete t_pDir;</span></div>
 <div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;        }</div>
 <div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;    }</div>
 <div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;    <span class="comment">//   Having the eigenleads as columns is better for the inverse calculations</span></div>
 <div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;    inv.eigen_leads.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#acfc42a46812792ab7b36a5de046c37b6">transpose_named_matrix</a>();</div>
+<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;    inv.eigen_leads-&gt;transpose_named_matrix();</div>
 <div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;</div>
 <div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;</div>
-<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a65f281cccb94b529e2e8c7a49bb48f2e">Fiff::read_named_matrix</a>(t_pStream, invs, <a class="code" href="fiff__constants_8h.html#a07b44259f38a66719104e562dc823030">FIFF_MNE_INVERSE_FIELDS</a>, inv.eigen_fields))</div>
+<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff.html#acf2ac5f58740a306ff182e285829a421">Fiff::read_named_matrix</a>(t_pStream, *invs, <a class="code" href="fiff__constants_8h.html#a07b44259f38a66719104e562dc823030">FIFF_MNE_INVERSE_FIELDS</a>, *inv.eigen_fields.data()))</div>
 <div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;    {</div>
 <div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;        printf(<span class="stringliteral">&quot;Error reading eigenfields named matrix.\n&quot;</span>);</div>
 <div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;        <span class="keywordflow">if</span>(t_pTag)</div>
 <div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;            <span class="keyword">delete</span> t_pTag;</div>
 <div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
 <div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;        <span class="keywordflow">if</span>(t_pTree)</div>
-<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;            <span class="keyword">delete</span> t_pTree;</div>
-<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;        <span class="keywordflow">if</span>(t_pDir)</div>
-<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;            <span class="keyword">delete</span> t_pDir;</div>
+<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;<span class="comment">//        if(t_pTree)</span></div>
+<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;<span class="comment">//            delete t_pTree;</span></div>
+<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;<span class="comment">//        if(t_pDir)</span></div>
+<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;<span class="comment">//            delete t_pDir;</span></div>
 <div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;    }</div>
 <div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;    printf(<span class="stringliteral">&quot;[done]\n&quot;</span>);</div>
 <div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;    <span class="comment">//   Read the covariance matrices</span></div>
 <div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;    <span class="keywordflow">if</span>(t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a2a61287a990431f1be18a238e958162c">read_cov</a>(invs, <a class="code" href="fiff__constants_8h.html#a6911436eca83244fc1682319df22a967">FIFFV_MNE_NOISE_COV</a>, inv.noise_cov))</div>
+<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;    <span class="keywordflow">if</span>(t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a1e0d80049ea5ff4b65629db24d27f8c1">read_cov</a>(*invs, <a class="code" href="fiff__constants_8h.html#a6911436eca83244fc1682319df22a967">FIFFV_MNE_NOISE_COV</a>, *inv.noise_cov.data()))</div>
 <div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;    {</div>
 <div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;        printf(<span class="stringliteral">&quot;\tNoise covariance matrix read.\n&quot;</span>);</div>
 <div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;    }</div>
@@ -590,14 +590,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;            <span class="keyword">delete</span> t_pTag;</div>
 <div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
 <div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;        <span class="keywordflow">if</span>(t_pTree)</div>
-<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;            <span class="keyword">delete</span> t_pTree;</div>
-<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;        <span class="keywordflow">if</span>(t_pDir)</div>
-<div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;            <span class="keyword">delete</span> t_pDir;</div>
+<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;<span class="comment">//        if(t_pTree)</span></div>
+<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;<span class="comment">//            delete t_pTree;</span></div>
+<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;<span class="comment">//        if(t_pDir)</span></div>
+<div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;<span class="comment">//            delete t_pDir;</span></div>
 <div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160;    }</div>
 <div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160;</div>
-<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;    <span class="keywordflow">if</span>(t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a2a61287a990431f1be18a238e958162c">read_cov</a>(invs, FIFFV_MNE_SOURCE_COV, inv.source_cov))</div>
+<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;    <span class="keywordflow">if</span>(t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a1e0d80049ea5ff4b65629db24d27f8c1">read_cov</a>(*invs, FIFFV_MNE_SOURCE_COV, *inv.source_cov.data()))</div>
 <div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;    {</div>
 <div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;        printf(<span class="stringliteral">&quot;\tSource covariance matrix read.\n&quot;</span>);</div>
 <div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160;    }</div>
@@ -608,52 +608,52 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160;            <span class="keyword">delete</span> t_pTag;</div>
 <div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
 <div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;        <span class="keywordflow">if</span>(t_pTree)</div>
-<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;            <span class="keyword">delete</span> t_pTree;</div>
-<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;        <span class="keywordflow">if</span>(t_pDir)</div>
-<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;            <span class="keyword">delete</span> t_pDir;</div>
+<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;<span class="comment">//        if(t_pTree)</span></div>
+<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;<span class="comment">//            delete t_pTree;</span></div>
+<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;<span class="comment">//        if(t_pDir)</span></div>
+<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;<span class="comment">//            delete t_pDir;</span></div>
 <div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;    }</div>
 <div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;    <span class="comment">//   Read the various priors</span></div>
 <div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;    <span class="keywordflow">if</span>(t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a2a61287a990431f1be18a238e958162c">read_cov</a>(invs, <a class="code" href="fiff__constants_8h.html#ae62c2adb55799c9d615060b58f7043a3">FIFFV_MNE_ORIENT_PRIOR_COV</a>, inv.orient_prior))</div>
+<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;    <span class="keywordflow">if</span>(t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a1e0d80049ea5ff4b65629db24d27f8c1">read_cov</a>(*invs, <a class="code" href="fiff__constants_8h.html#ae62c2adb55799c9d615060b58f7043a3">FIFFV_MNE_ORIENT_PRIOR_COV</a>, *inv.orient_prior.data()))</div>
 <div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;    {</div>
 <div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;        printf(<span class="stringliteral">&quot;\tOrientation priors read.\n&quot;</span>);</div>
 <div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;    }</div>
 <div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;        inv.orient_prior = <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html" title="covariance data">FiffCov</a>();</div>
+<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;        inv.orient_prior-&gt;clear();</div>
 <div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;</div>
-<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;    <span class="keywordflow">if</span>(t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a2a61287a990431f1be18a238e958162c">read_cov</a>(invs, <a class="code" href="fiff__constants_8h.html#af3eb09a421703c3f071c2a03a073c743">FIFFV_MNE_DEPTH_PRIOR_COV</a>, inv.depth_prior))</div>
+<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;    <span class="keywordflow">if</span>(t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a1e0d80049ea5ff4b65629db24d27f8c1">read_cov</a>(*invs, <a class="code" href="fiff__constants_8h.html#af3eb09a421703c3f071c2a03a073c743">FIFFV_MNE_DEPTH_PRIOR_COV</a>, *inv.depth_prior.data()))</div>
 <div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;    {</div>
 <div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;        printf(<span class="stringliteral">&quot;\tDepth priors read.\n&quot;</span>);</div>
 <div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;    }</div>
 <div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;    <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;    {</div>
-<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;        inv.depth_prior = <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html" title="covariance data">FiffCov</a>();</div>
+<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;        inv.depth_prior-&gt;clear();</div>
 <div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;    }</div>
-<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;    <span class="keywordflow">if</span>(t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a2a61287a990431f1be18a238e958162c">read_cov</a>(invs, FIFFV_MNE_FMRI_PRIOR_COV, inv.fmri_prior))</div>
+<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;    <span class="keywordflow">if</span>(t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a1e0d80049ea5ff4b65629db24d27f8c1">read_cov</a>(*invs, FIFFV_MNE_FMRI_PRIOR_COV, *inv.fmri_prior.data()))</div>
 <div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;    {</div>
 <div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;        printf(<span class="stringliteral">&quot;\tfMRI priors read.\n&quot;</span>);</div>
 <div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;    }</div>
 <div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;    <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;    {</div>
-<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;        inv.fmri_prior = <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html" title="covariance data">FiffCov</a>();</div>
+<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;        inv.fmri_prior-&gt;clear();</div>
 <div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;    }</div>
 <div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;    <span class="comment">//   Read the source spaces</span></div>
 <div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a36abb1c252e8ba9caf78a21adc27de44">MNESourceSpace::read_source_spaces</a>(t_pStream, <span class="keyword">false</span>, t_pTree, inv.src))</div>
+<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a55956b9f004c9c7aab463afa403c0da7">MNESourceSpace::read_source_spaces</a>(t_pStream, <span class="keyword">false</span>, t_Tree, inv.src))</div>
 <div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;    {</div>
 <div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;        printf(<span class="stringliteral">&quot;\tError: Could not read the source spaces.\n&quot;</span>);</div>
 <div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;        <span class="keywordflow">if</span>(t_pTag)</div>
 <div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;            <span class="keyword">delete</span> t_pTag;</div>
 <div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
 <div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;        <span class="keywordflow">if</span>(t_pTree)</div>
-<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;            <span class="keyword">delete</span> t_pTree;</div>
-<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;        <span class="keywordflow">if</span>(t_pDir)</div>
-<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;            <span class="keyword">delete</span> t_pDir;</div>
+<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;<span class="comment">//        if(t_pTree)</span></div>
+<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;<span class="comment">//            delete t_pTree;</span></div>
+<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;<span class="comment">//        if(t_pDir)</span></div>
+<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;<span class="comment">//            delete t_pDir;</span></div>
 <div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;    }</div>
 <div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;    <span class="keywordflow">for</span> (qint32 k = 0; k &lt; inv.src.hemispheres.size(); ++k)</div>
@@ -662,17 +662,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;    <span class="comment">//   Get the MRI &lt;-&gt; head coordinate transformation</span></div>
 <div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="Coordinate transformation description.">FiffCoordTrans</a> mri_head_t;<span class="comment">// = NULL;</span></div>
-<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;    <span class="keywordflow">if</span> (!parent_mri[0]-&gt;find_tag(t_pStream, FIFF_COORD_TRANS, t_pTag))</div>
+<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;    <span class="keywordflow">if</span> (!parent_mri[0].find_tag(t_pStream, FIFF_COORD_TRANS, t_pTag))</div>
 <div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;    {</div>
 <div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;        printf(<span class="stringliteral">&quot;MRI/head coordinate transformation not found\n&quot;</span>);</div>
 <div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;        <span class="keywordflow">if</span>(t_pTag)</div>
 <div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;            <span class="keyword">delete</span> t_pTag;</div>
 <div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
 <div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;        <span class="keywordflow">if</span>(t_pTree)</div>
-<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;            <span class="keyword">delete</span> t_pTree;</div>
-<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;        <span class="keywordflow">if</span>(t_pDir)</div>
-<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;            <span class="keyword">delete</span> t_pDir;</div>
+<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;<span class="comment">//        if(t_pTree)</span></div>
+<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;<span class="comment">//            delete t_pTree;</span></div>
+<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;<span class="comment">//        if(t_pDir)</span></div>
+<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;<span class="comment">//            delete t_pDir;</span></div>
 <div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;    }</div>
 <div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;    <span class="keywordflow">else</span></div>
@@ -690,10 +690,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;                    <span class="keyword">delete</span> t_pTag;</div>
 <div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;                <span class="keywordflow">if</span>(t_pStream)</div>
 <div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;                    <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;                <span class="keywordflow">if</span>(t_pTree)</div>
-<div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;                    <span class="keyword">delete</span> t_pTree;</div>
-<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;                <span class="keywordflow">if</span>(t_pDir)</div>
-<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;                    <span class="keyword">delete</span> t_pDir;</div>
+<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;<span class="comment">//                if(t_pTree)</span></div>
+<div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;<span class="comment">//                    delete t_pTree;</span></div>
+<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;<span class="comment">//                if(t_pDir)</span></div>
+<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;<span class="comment">//                    delete t_pDir;</span></div>
 <div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;                <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;            }</div>
 <div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;        }</div>
@@ -710,10 +710,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;            <span class="keyword">delete</span> t_pTag;</div>
 <div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
 <div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;        <span class="keywordflow">if</span>(t_pTree)</div>
-<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;            <span class="keyword">delete</span> t_pTree;</div>
-<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;        <span class="keywordflow">if</span>(t_pDir)</div>
-<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;            <span class="keyword">delete</span> t_pDir;</div>
+<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;<span class="comment">//        if(t_pTree)</span></div>
+<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;<span class="comment">//            delete t_pTree;</span></div>
+<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;<span class="comment">//        if(t_pDir)</span></div>
+<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;<span class="comment">//            delete t_pDir;</span></div>
 <div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;    }</div>
 <div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;    <span class="comment">//  Number of averages is initially one</span></div>
@@ -722,7 +722,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;    <span class="comment">//  We also need the SSP operator</span></div>
 <div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;    inv.projs     = t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#abcc4ad41b0fdcfcae0ca96643b316b9c">read_proj</a>(t_pTree);</div>
+<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;    inv.projs     = t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a0bc3172cfee00571ee3d63de335b3eb2">read_proj</a>(t_Tree);</div>
 <div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;    <span class="comment">//  Some empty fields to be filled in later</span></div>
 <div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;    <span class="comment">//</span></div>
@@ -744,17 +744,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;        <span class="keyword">delete</span> t_pTag;</div>
 <div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;    <span class="keywordflow">if</span>(t_pStream)</div>
 <div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;        <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;    <span class="keywordflow">if</span>(t_pTree)</div>
-<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;        <span class="keyword">delete</span> t_pTree;</div>
-<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;    <span class="keywordflow">if</span>(t_pDir)</div>
-<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;        <span class="keyword">delete</span> t_pDir;</div>
+<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;<span class="comment">//    if(t_pTree)</span></div>
+<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;<span class="comment">//        delete t_pTree;</span></div>
+<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;<span class="comment">//    if(t_pDir)</span></div>
+<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;<span class="comment">//        delete t_pDir;</span></div>
 <div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;</div>
 <div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jan 9 2013 17:50:06 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jan 12 2013 20:22:36 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

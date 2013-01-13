@@ -117,9 +117,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="comment">// DEFINE MEMBER METHODS</span></div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;InvRt::InvRt(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a>** p_ppFiffInfo, <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="The SourceSpace class provides.">MNEForwardSolution</a>* p_pFwd, QObject *parent)</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;InvRt::InvRt(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#abfce6128814de61b3fdd324a97918338">FiffInfo::SPtr</a> p_pFiffInfo, <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="The SourceSpace class provides.">MNEForwardSolution</a>* p_pFwd, QObject *parent)</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;: QThread(parent)</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;, m_ppFiffInfo(p_ppFiffInfo)</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;, m_pFiffInfo(p_pFiffInfo)</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;, m_pFwd(p_pFwd)</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;{</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;}</div>
@@ -173,7 +173,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jan 9 2013 17:50:06 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jan 12 2013 20:22:36 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

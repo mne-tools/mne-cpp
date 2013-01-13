@@ -122,7 +122,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;: QThread(parent)</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;, m_bIsRunning(false)</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;, m_sRtServerHostName(p_sRtServerHostname)</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;, m_pFiffInfo(NULL)</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;, m_pFiffInfo(new <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a>)</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;{</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;}</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;</div>
@@ -132,87 +132,83 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00079"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_rt_client.html#a859a52e1ac9406283e25440b661eb35b">   79</a></span>&#160;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_rt_client.html#a859a52e1ac9406283e25440b661eb35b">MNERtClient::~MNERtClient</a>()</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;{</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_rt_client.html#a7b48d0bfb822f4034d7fcabc3d3571bd">stop</a>();</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="keywordflow">if</span>(m_pFiffInfo)</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        <span class="keyword">delete</span> m_pFiffInfo;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;}</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;}</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
-<div class="line"><a name="l00089"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_rt_client.html#a7b48d0bfb822f4034d7fcabc3d3571bd">   89</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_rt_client.html#a7b48d0bfb822f4034d7fcabc3d3571bd">MNERtClient::stop</a>()</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;{</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    m_bIsRunning = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    QThread::wait();</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;}</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;</div>
+<div class="line"><a name="l00087"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_rt_client.html#a7b48d0bfb822f4034d7fcabc3d3571bd">   87</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_rt_client.html#a7b48d0bfb822f4034d7fcabc3d3571bd">MNERtClient::stop</a>()</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;{</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    m_bIsRunning = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    QThread::wait();</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;}</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;</div>
-<div class="line"><a name="l00100"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_rt_client.html#af73859641916338fde071bd51901c391">  100</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_rt_client.html#af73859641916338fde071bd51901c391">MNERtClient::run</a>()</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;{</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    m_bIsRunning = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_rt_cmd_client.html">MNERtCmdClient</a> t_cmdClient;</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    t_cmdClient.connectToHost(m_sRtServerHostName);</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    t_cmdClient.waitForConnected();</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_rt_data_client.html">MNERtDataClient</a> t_dataClient;</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    t_dataClient.connectToHost(m_sRtServerHostName);</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    t_dataClient.waitForConnected();</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="comment">// set data client alias -&gt; for convinience (optional)</span></div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    t_dataClient.setClientAlias(<span class="stringliteral">&quot;mne_source_lab&quot;</span>); <span class="comment">// used in option 2 later on</span></div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="comment">//    // example commands</span></div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="comment">//    qDebug() &lt;&lt; t_cmdClient.sendCommand(&quot;help&quot;);</span></div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;<span class="comment">//    qDebug() &lt;&lt; t_cmdClient.sendCommand(&quot;clist&quot;);</span></div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="comment">//    qDebug() &lt;&lt; t_cmdClient.sendCommand(&quot;conlist&quot;);</span></div>
+<div class="line"><a name="l00098"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_rt_client.html#af73859641916338fde071bd51901c391">   98</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_rt_client.html#af73859641916338fde071bd51901c391">MNERtClient::run</a>()</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;{</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    m_bIsRunning = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_rt_cmd_client.html">MNERtCmdClient</a> t_cmdClient;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    t_cmdClient.connectToHost(m_sRtServerHostName);</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    t_cmdClient.waitForConnected();</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_rt_data_client.html">MNERtDataClient</a> t_dataClient;</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    t_dataClient.connectToHost(m_sRtServerHostName);</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    t_dataClient.waitForConnected();</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <span class="comment">// set data client alias -&gt; for convinience (optional)</span></div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    t_dataClient.setClientAlias(<span class="stringliteral">&quot;mne_source_lab&quot;</span>); <span class="comment">// used in option 2 later on</span></div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="comment">//    // example commands</span></div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="comment">//    qDebug() &lt;&lt; t_cmdClient.sendCommand(&quot;help&quot;);</span></div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="comment">//    qDebug() &lt;&lt; t_cmdClient.sendCommand(&quot;clist&quot;);</span></div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="comment">//    qDebug() &lt;&lt; t_cmdClient.sendCommand(&quot;conlist&quot;);</span></div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    qint32 clientId = t_dataClient.getClientId();</div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    qint32 clientId = t_dataClient.getClientId();</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="comment">// read meas info</span></div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    t_cmdClient.requestMeasInfo(clientId);</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <span class="comment">// read meas info</span></div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    t_cmdClient.requestMeasInfo(clientId);</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    m_pFiffInfo = <span class="keyword">new</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a>(t_dataClient.readInfo());</div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <span class="keywordflow">if</span>(m_pFiffInfo)</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        <span class="keyword">delete</span> m_pFiffInfo;</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    m_pFiffInfo = t_dataClient.readInfo();</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="comment">// start measurement</span></div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    t_cmdClient.requestMeas(clientId);</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <span class="comment">// start measurement</span></div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    t_cmdClient.requestMeas(clientId);</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    MatrixXf t_matRawBuffer;</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    fiff_int_t kind;</div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    MatrixXf t_matRawBuffer;</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    fiff_int_t kind;</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    qint32 from = 0;</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    qint32 to = -1;</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    qint32 from = 0;</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    qint32 to = -1;</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <span class="keywordflow">while</span>(m_bIsRunning)</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    {</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;        t_dataClient.readRawBuffer(m_pFiffInfo-&gt;nchan, t_matRawBuffer, kind);</div>
 <div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    <span class="keywordflow">while</span>(m_bIsRunning)</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    {</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;        t_dataClient.readRawBuffer(m_pFiffInfo-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ae55d6c0b6aaab5ef4265e4204f72a396">nchan</a>, t_matRawBuffer, kind);</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;        <span class="keywordflow">if</span>(kind == <a class="code" href="fiff__constants_8h.html#a0136b998f6acc7a0a02f8c46a7300d59">FIFF_DATA_BUFFER</a>)</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;        {</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;            to += t_matRawBuffer.cols();</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;            printf(<span class="stringliteral">&quot;Reading %d ... %d  =  %9.3f ... %9.3f secs...&quot;</span>, from, to, ((<span class="keywordtype">float</span>)from)/m_pFiffInfo-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a963c80bf73b01ed07eb1a31540cf308c">sfreq</a>, ((<span class="keywordtype">float</span>)to)/m_pFiffInfo-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a963c80bf73b01ed07eb1a31540cf308c">sfreq</a>);</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;            from += t_matRawBuffer.cols();</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;            emit rawBufferReceived(t_matRawBuffer);</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        }</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="fiff__constants_8h.html#a0136b998f6acc7a0a02f8c46a7300d59">FIFF_DATA_BUFFER</a> == FIFF_BLOCK_END)</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;            m_bIsRunning = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;        <span class="keywordflow">if</span>(kind == <a class="code" href="fiff__constants_8h.html#a0136b998f6acc7a0a02f8c46a7300d59">FIFF_DATA_BUFFER</a>)</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;        {</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;            to += t_matRawBuffer.cols();</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;            printf(<span class="stringliteral">&quot;Reading %d ... %d  =  %9.3f ... %9.3f secs...&quot;</span>, from, to, ((<span class="keywordtype">float</span>)from)/m_pFiffInfo-&gt;sfreq, ((<span class="keywordtype">float</span>)to)/m_pFiffInfo-&gt;sfreq);</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;            from += t_matRawBuffer.cols();</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;            emit rawBufferReceived(t_matRawBuffer);</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;        }</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="fiff__constants_8h.html#a0136b998f6acc7a0a02f8c46a7300d59">FIFF_DATA_BUFFER</a> == FIFF_BLOCK_END)</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;            m_bIsRunning = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        printf(<span class="stringliteral">&quot;[done]\n&quot;</span>);</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    }</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;</div>
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;        printf(<span class="stringliteral">&quot;[done]\n&quot;</span>);</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    }</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;}</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jan 9 2013 17:50:06 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jan 12 2013 20:22:36 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

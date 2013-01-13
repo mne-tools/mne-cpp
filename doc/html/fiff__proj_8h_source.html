@@ -141,35 +141,34 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00091"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html#a7a9709e0797cc30508c3a394ee13cf9e">   91</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;FiffProj&gt; <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html#a7a9709e0797cc30508c3a394ee13cf9e">SPtr</a>;              </div>
 <div class="line"><a name="l00092"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html#a2a6c76ee4b9ee6c57e410b88af897ac5">   92</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;const FiffProj&gt; <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html#a2a6c76ee4b9ee6c57e410b88af897ac5">ConstSPtr</a>;   </div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="comment"></span>    <span class="keyword">explicit</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html" title="SSP projector data.">FiffProj</a>();</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html" title="SSP projector data.">FiffProj</a>();</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html" title="SSP projector data.">FiffProj</a>(<span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html" title="SSP projector data.">FiffProj</a>* p_pFiffProj);</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="comment"></span>    <span class="keyword">explicit</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html" title="SSP projector data.">FiffProj</a>(  fiff_int_t p_kind,</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;                        <span class="keywordtype">bool</span> p_active,</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;                        QString p_desc,</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;                        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="A named matrix.">FiffNamedMatrix</a>&amp; p_data);</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html" title="SSP projector data.">FiffProj</a>();</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    fiff_int_t kind;</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="keywordtype">bool</span> active;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    QString desc;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="A named matrix.">FiffNamedMatrix</a> data;</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;};</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;} <span class="comment">// NAMESPACE</span></div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html" title="SSP projector data.">FiffProj</a>(<span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html" title="SSP projector data.">FiffProj</a>&amp; p_FiffProj);</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="comment"></span>    <span class="keyword">explicit</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html" title="SSP projector data.">FiffProj</a>(  fiff_int_t p_kind,</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;                        <span class="keywordtype">bool</span> p_active,</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;                        QString p_desc,</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;                        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="A named matrix.">FiffNamedMatrix</a>&amp; p_data);</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html" title="SSP projector data.">FiffProj</a>();</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00124"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html#a02031295a2d7618ff26fd39965406afe">  124</a></span>&#160;    fiff_int_t <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html#a02031295a2d7618ff26fd39965406afe">kind</a>;                </div>
+<div class="line"><a name="l00125"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html#aa5593133aaf0bde0ac5c5c18685a14d1">  125</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html#aa5593133aaf0bde0ac5c5c18685a14d1">active</a>;                    </div>
+<div class="line"><a name="l00126"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html#a461ef684d1ef47740f56b4c1b0e84181">  126</a></span>&#160;    QString <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html#a461ef684d1ef47740f56b4c1b0e84181">desc</a>;                   </div>
+<div class="line"><a name="l00128"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html#a01a8b9aef8636730c851226a12dce03e">  128</a></span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#a013471cfe5f75de645b42e1bc71f0651">FiffNamedMatrix::SDPtr</a> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html#a01a8b9aef8636730c851226a12dce03e">data</a>;    </div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;};</div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="preprocessor">#endif // FIFF_PROJ_H</span></div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;} <span class="comment">// NAMESPACE</span></div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;<span class="preprocessor">#endif // FIFF_PROJ_H</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jan 9 2013 17:50:06 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jan 12 2013 20:22:36 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

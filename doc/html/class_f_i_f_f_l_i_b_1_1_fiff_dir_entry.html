@@ -114,6 +114,8 @@ Public Types</h2></td></tr>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ae158f7e6fccd6dba2c1fa340d05b4a59"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_entry.html#ae158f7e6fccd6dba2c1fa340d05b4a59">FiffDirEntry</a> ()</td></tr>
 <tr class="separator:ae158f7e6fccd6dba2c1fa340d05b4a59"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab011f06341d6e0ad0a93257b2dab85a0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_entry.html#ab011f06341d6e0ad0a93257b2dab85a0">FiffDirEntry</a> (const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_entry.html">FiffDirEntry</a> &amp;p_FiffDirEntry)</td></tr>
+<tr class="separator:ab011f06341d6e0ad0a93257b2dab85a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a82ab561798daac9cc0bacc7448e4c723"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_entry.html#a82ab561798daac9cc0bacc7448e4c723">~FiffDirEntry</a> ()</td></tr>
 <tr class="separator:a82ab561798daac9cc0bacc7448e4c723"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -188,6 +190,31 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="ab011f06341d6e0ad0a93257b2dab85a0"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">FiffDirEntry::FiffDirEntry </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_entry.html">FiffDirEntry</a> &amp;&#160;</td>
+          <td class="paramname"><em>p_FiffDirEntry</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Copy constructor.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_FiffDirEntry</td><td>Dir Entry which should be copied </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="fiff__dir__entry_8cpp_source.html#l00069">69</a> of file <a class="el" href="fiff__dir__entry_8cpp_source.html">fiff_dir_entry.cpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a82ab561798daac9cc0bacc7448e4c723"></a>
 <div class="memitem">
 <div class="memproto">
@@ -202,7 +229,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Destroys the dir entry. </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__entry_8cpp_source.html#l00069">69</a> of file <a class="el" href="fiff__dir__entry_8cpp_source.html">fiff_dir_entry.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__entry_8cpp_source.html#l00081">81</a> of file <a class="el" href="fiff__dir__entry_8cpp_source.html">fiff_dir_entry.cpp</a>.</p>
 
 </div>
 </div>
@@ -230,7 +257,7 @@ Public Attributes</h2></td></tr>
 <p>Size of the old struct (fiffDirEntryRec) 4*int = 4*4 = 16</p>
 <dl class="section return"><dt>Returns</dt><dd>the size of the old struct fiffDirEntryRec. </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__dir__entry_8h_source.html#l00121">121</a> of file <a class="el" href="fiff__dir__entry_8h_source.html">fiff_dir_entry.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__entry_8h_source.html#l00129">129</a> of file <a class="el" href="fiff__dir__entry_8h_source.html">fiff_dir_entry.h</a>.</p>
 
 </div>
 </div>
@@ -246,7 +273,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Tag number </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__entry_8h_source.html#l00096">96</a> of file <a class="el" href="fiff__dir__entry_8h_source.html">fiff_dir_entry.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__entry_8h_source.html#l00104">104</a> of file <a class="el" href="fiff__dir__entry_8h_source.html">fiff_dir_entry.h</a>.</p>
 
 </div>
 </div>
@@ -261,7 +288,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Location in file; Note: the data is located at pos + FIFFC_DATA_OFFSET </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__entry_8h_source.html#l00099">99</a> of file <a class="el" href="fiff__dir__entry_8h_source.html">fiff_dir_entry.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__entry_8h_source.html#l00107">107</a> of file <a class="el" href="fiff__dir__entry_8h_source.html">fiff_dir_entry.h</a>.</p>
 
 </div>
 </div>
@@ -276,7 +303,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>How many bytes </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__entry_8h_source.html#l00098">98</a> of file <a class="el" href="fiff__dir__entry_8h_source.html">fiff_dir_entry.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__entry_8h_source.html#l00106">106</a> of file <a class="el" href="fiff__dir__entry_8h_source.html">fiff_dir_entry.h</a>.</p>
 
 </div>
 </div>
@@ -291,7 +318,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Data type </p>
 
-<p>Definition at line <a class="el" href="fiff__dir__entry_8h_source.html#l00097">97</a> of file <a class="el" href="fiff__dir__entry_8h_source.html">fiff_dir_entry.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__dir__entry_8h_source.html#l00105">105</a> of file <a class="el" href="fiff__dir__entry_8h_source.html">fiff_dir_entry.h</a>.</p>
 
 </div>
 </div>
@@ -302,7 +329,7 @@ Public Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jan 9 2013 17:50:07 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jan 12 2013 20:22:37 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

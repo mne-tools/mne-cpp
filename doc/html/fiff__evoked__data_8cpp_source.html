@@ -123,14 +123,31 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;</div>
-<div class="line"><a name="l00071"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#aed3314cbe4d740b9cfd8e63895108e97">   71</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#aed3314cbe4d740b9cfd8e63895108e97">FiffEvokedData::~FiffEvokedData</a>()</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;{</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;}</div>
+<div class="line"><a name="l00071"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#ab2a32511d4af5207d8baf2f38f3eb935">   71</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a11f461692c37ca37568738efad2bc570">FiffEvokedData::FiffEvokedData</a>(<span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html" title="evoked data">FiffEvokedData</a> &amp;p_FiffEvokedData)</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;: QSharedData(p_FiffEvokedData)</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;, aspect_kind(p_FiffEvokedData.aspect_kind)</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;, is_smsh(p_FiffEvokedData.is_smsh)</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;, nave(p_FiffEvokedData.nave)</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;, first(p_FiffEvokedData.first)</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;, last(p_FiffEvokedData.last)</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;, comment(p_FiffEvokedData.comment)</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;, times(p_FiffEvokedData.times)</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;, epochs(p_FiffEvokedData.epochs)</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;{</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;}</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;</div>
+<div class="line"><a name="l00088"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#aed3314cbe4d740b9cfd8e63895108e97">   88</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#aed3314cbe4d740b9cfd8e63895108e97">FiffEvokedData::~FiffEvokedData</a>()</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;{</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jan 9 2013 17:50:06 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jan 12 2013 20:22:36 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

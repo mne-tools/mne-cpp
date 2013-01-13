@@ -116,6 +116,7 @@
 #include <QByteArray>
 #include <QFile>
 #include <QList>
+#include <QVector>
 #include <QDebug>
 
 
@@ -142,15 +143,6 @@ using namespace Eigen;
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-//=============================================================================================================
-/**
-* DECLARE CLASS Fiff
-*
-* @brief The Fiff class provides...
-*/
-
-
 //
 //   The magic hexadecimal values
 //
@@ -159,8 +151,6 @@ const fiff_int_t MATRIX_CODING_DENSE = 16384;      // 4000
 const fiff_int_t MATRIX_CODING_CCS   = 16400;      // 4010
 const fiff_int_t MATRIX_CODING_RCS   = 16416;      // 4020
 const fiff_int_t DATA_TYPE           = 65535;      // ffff
-//
-
 
 //=============================================================================================================
 /**
@@ -235,7 +225,6 @@ public:
     */
     static bool read_rt_tag(FiffStream* p_pStream, FiffTag*& p_pTag);
 
-
     //=========================================================================================================
     /**
     * ### MNE toolbox root function ###: Implementation of the fiff_read_tag function
@@ -253,31 +242,44 @@ public:
 
     //=========================================================================================================
     /**
+    * Provides information about matrix coding
     *
+    * @return Matrix coding
     */
     fiff_int_t getMatrixCoding() const;
 
     //=========================================================================================================
     /**
+    * Provides information if tag contains a matrix
     *
+    * @return true if tag contains a matrix
     */
     bool isMatrix() const;
 
     //=========================================================================================================
     /**
+    * Returns matrix dimensions
     *
+    * @param[out] p_ndim    number of dimensions
+    * @param[out] p_pDims   vector containing the size of each dimension
+    *
+    * @return true if dimensions are available
     */
-    bool getMatrixDimensions(qint32& p_ndim, qint32*& p_pDims) const;
+    bool getMatrixDimensions(qint32& p_ndim, QVector<qint32>& p_Dims) const;
 
     //=========================================================================================================
     /**
+    * Provides the tag type information
     *
+    * @return the tag type
     */
     fiff_int_t getType() const;
 
     //=========================================================================================================
     /**
+    * Type information as a string
     *
+    * @return the tag type information
     */
     QString getInfo() const;
 
@@ -287,66 +289,98 @@ public:
     //=========================================================================================================
     /**
     * to Byte
+    * Fast access; Data are deleted if tag gets deleted, and wise versa
+    *
+    * @return type cast of the tag data pointer
     */
     inline quint8* toByte();
 
     //=========================================================================================================
     /**
     * to unsigned Short
+    * Fast access; Data are deleted if tag gets deleted, and wise versa
+    *
+    * @return type cast of the tag data pointer
     */
     inline quint16* toUnsignedShort();
 
     //=========================================================================================================
     /**
     * to Short
+    * Fast access; Data are deleted if tag gets deleted, and wise versa
+    *
+    * @return type cast of the tag data pointer
     */
     inline qint16* toShort();
 
     //=========================================================================================================
     /**
     * to Int
+    * Fast access; Data are deleted if tag gets deleted, and wise versa
+    *
+    * @return type cast of the tag data pointer
     */
     inline quint32* toUnsignedInt();
 
     //=========================================================================================================
     /**
     * to Int
+    * Fast access; Data are deleted if tag gets deleted, and wise versa
+    *
+    * @return type cast of the tag data pointer
     */
     inline qint32* toInt();
 
     //=========================================================================================================
     /**
     * to Float
+    * Fast access; Data are deleted if tag gets deleted, and wise versa
+    *
+    * @return type cast of the tag data pointer
     */
     inline float* toFloat();
 
     //=========================================================================================================
     /**
     * to Double
+    * Fast access; Data are deleted if tag gets deleted, and wise versa
+    *
+    * @return type cast of the tag data pointer
     */
     inline double* toDouble();
 
     //=========================================================================================================
     /**
     * to String
+    *
+    * @return converts data to a string
     */
     inline QString toString();
 
     //=========================================================================================================
     /**
     * to DauPack16
+    * Fast access; Data are deleted if tag gets deleted, and wise versa
+    *
+    * @return type cast of the tag data pointer
     */
     inline qint16* toDauPack16();
 
     //=========================================================================================================
     /**
-    * to complex float - pointer has to be deleted ater use
+    * to complex float
+    * Allocates new memory - pointer has to be deleted ater use
+    *
+    * @return complex float array
     */
     inline std::complex<float>* toComplexFloat();
 
     //=========================================================================================================
     /**
-    * to complex double - pointer has to be deleted ater use
+    * to complex double
+    * Allocates new memory - pointer has to be deleted ater use
+    *
+    * @return complex double array
     */
     inline std::complex<double>* toComplexDouble();
 
@@ -355,26 +389,33 @@ public:
     //
     //=========================================================================================================
     /**
-    * to fiff ID Struct
+    * to fiff ID
+    *
+    * @return Fiff universially unique identifier
     */
     inline FiffId toFiffID() const;
 
     //=========================================================================================================
     /**
-    * to fiff DIG POINT STRUCT
+    * to fiff DIG POINT
+    *
+    * @return Fiff point descriptor
     */
     inline FiffDigPoint toDigPoint() const;
 
     //=========================================================================================================
     /**
-    * to fiff COORD TRANS STRUCT
+    * to fiff COORD TRANS
+    *
+    * @return Fiff coordinate transformation descriptor
     */
     inline FiffCoordTrans toCoordTrans() const;
 
-
     //=========================================================================================================
     /**
-    * to fiff CH INFO STRUCT
+    * to fiff CH INFO
+    *
+    * @return Fiff channel info descriptor.
     */
     inline FiffChInfo toChInfo() const;
 
@@ -385,10 +426,11 @@ public:
 //    */
 //    inline fiff_coord_trans_t toCoordTrans() const;
 
-
     //=========================================================================================================
     /**
-    * to fiff DIR ENTRY STRUCT
+    * to fiff DIR ENTRY
+    *
+    * @return List of directory entry descriptors
     */
     inline QList<FiffDirEntry> toDirEntry() const;
 
@@ -427,9 +469,10 @@ public:
     //=========================================================================================================
     /**
     * to fiff FIFFT INT MATRIX
+    *
+    * @return Integer matrix
     */
     inline MatrixXi toIntMatrix() const;
-
 
     //=========================================================================================================
     /**
@@ -437,49 +480,153 @@ public:
     *
     * parses a fiff float matrix and returns a double matrix to make sure only double is used
     *
-    * @return a pointer to a double matrix wich is newly created from the parsed float -> has to be destroyed
+    * @return a double matrix wich is newly created from the parsed float
     */
     inline MatrixXd toFloatMatrix() const;
 
-
-
-
-
-
-
-
+    //
     //from fiff_combat.c
-
+    //
+    //=========================================================================================================
+    /**
+    * swap short
+    *
+    * @param[in] source     short to swap
+    *
+    * @return swapped short
+    */
     static short swap_short (fiff_short_t source);
 
+    //=========================================================================================================
+    /**
+    * swap integer
+    *
+    * @param[in] source     integer to swap
+    *
+    * @return swapped integer
+    */
     static fiff_int_t swap_int (fiff_int_t source);
 
-    static fiff_long_t swap_long (fiff_long_t source);
-
-    static void swap_longp (fiff_long_t *source);
-
+    //=========================================================================================================
+    /**
+    * swap integer
+    *
+    * @param[in, out] source     integer to swap
+    *
+    * @return swapped integer
+    */
     static void swap_intp (fiff_int_t *source);
 
+    //=========================================================================================================
+    /**
+    * swap long
+    *
+    * @param[in] source     long to swap
+    *
+    * @return swapped long
+    */
+    static fiff_long_t swap_long (fiff_long_t source);
+
+    //=========================================================================================================
+    /**
+    * swap long
+    *
+    * @param[in, out] source     long to swap
+    *
+    * @return swapped long
+    */
+    static void swap_longp (fiff_long_t *source);
+
+    //=========================================================================================================
+    /**
+    * swap float
+    *
+    * @param[in, out] source     float to swap
+    *
+    * @return swapped float
+    */
     static void swap_floatp (float *source);
 
+    //=========================================================================================================
+    /**
+    * swap double
+    *
+    * @param[in, out] source     double to swap
+    *
+    * @return swapped double
+    */
     static void swap_doublep(double *source);
 
+    //=========================================================================================================
+    /**
+    * Convert coil position descriptor
+    *
+    * @param[in, out] pos    coil position descriptor to convert
+    */
     static void convert_ch_pos(FiffChPos* pos);
 
 //    static void fiff_convert_tag_info(FiffTag*& tag);
 
+    //=========================================================================================================
+    /**
+    * Convert matrix data read from a file inside a fiff tag
+    *
+    * @param[in, out] tag    matrix data to convert
+    */
     static void convert_matrix_from_file_data(FiffTag* tag);
 
+    //=========================================================================================================
+    /**
+    * Convert matrix data before writing to a file inside a fiff tag
+    *
+    * @param[in, out] tag    matrix data to convert
+    */
     static void convert_matrix_to_file_data(FiffTag* tag);
 
+    //
+    // Data type conversions for the little endian systems.
+    //
+    //=========================================================================================================
+    /**
+    * Machine dependent data type conversions (tag info only)
+    *
+    * from_endian defines the byte order of the input
+    * to_endian   defines the byte order of the output
+    *
+    * Either of these may be specified as FIFFV_LITTLE_ENDIAN, FIFFV_BIG_ENDIAN, or FIFFV_NATIVE_ENDIAN.
+    * The last choice means that the native byte order value will be substituted here before proceeding
+    *
+    * @param[in, out] tag       matrix data to convert
+    * @param[in] from_endian    from endian encoding
+    * @param[in] to_endian      to endian encoding
+    */
     static void convert_tag_data(FiffTag* tag, int from_endian, int to_endian);
 
-    //from fiff_type_spec.c
-
+    //
+    // from fiff_type_spec.c
+    //
+    //=========================================================================================================
+    /**
+    * These return information about a fiff type.
+    *
+    * @return fiff type
+    */
     static fiff_int_t fiff_type_fundamental(fiff_int_t type);
 
+    //=========================================================================================================
+    /**
+    * These return information about fiff type base.
+    *
+    * @return fiff type
+    */
     static fiff_int_t fiff_type_base(fiff_int_t type);
 
+    //=========================================================================================================
+    /**
+    * These return information about the matrix coding.
+    *
+    * @return matrix coding
+    */
     static fiff_int_t fiff_type_matrix_coding(fiff_int_t type);
 
 
@@ -502,8 +649,7 @@ private:
 
     std::complex<double>* m_pComplexDoubleData;
 
-};   /**< FIFF data tag */
-
+};
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -621,6 +767,8 @@ inline std::complex<float>* FiffTag::toComplexFloat()
     else if(this->m_pComplexFloatData == NULL)
     {
         float* t_pFloat = (float*)this->data();
+        qDebug() << "ToDo toComplexFloat";
+        //ToDo check this for arrays which contains more than one value
         this->m_pComplexFloatData = new std::complex<float>(t_pFloat[0],t_pFloat[1]);
     }
     return m_pComplexFloatData;
@@ -636,6 +784,8 @@ inline std::complex<double>* FiffTag::toComplexDouble()
     else if(this->m_pComplexDoubleData == NULL)
     {
         double* t_pDouble = (double*)this->data();
+        qDebug() << "ToDo toComplexDouble";
+        //ToDo check this for arrays which contains more than one value
         this->m_pComplexDoubleData = new std::complex<double>(t_pDouble[0],t_pDouble[1]);
     }
     return m_pComplexDoubleData;
@@ -858,29 +1008,22 @@ inline QList<FiffDirEntry> FiffTag::toDirEntry() const
 
 inline MatrixXi FiffTag::toIntMatrix() const
 {
-//        qDebug() << "toIntMatrix";
-
-    MatrixXi p_defaultMatrix(0, 0);
-
     if(!this->isMatrix() || this->getType() != FIFFT_INT || this->data() == NULL)
-        return p_defaultMatrix;
+        return MatrixXi();
 
     qint32 ndim;
-    qint32* pDims = NULL;
-    this->getMatrixDimensions(ndim, pDims);
+    QVector<qint32> dims;
+    this->getMatrixDimensions(ndim, dims);
 
     if (ndim != 2)
     {
-        delete pDims;
         printf("Only two-dimensional matrices are supported at this time");
-        return p_defaultMatrix;
+        return MatrixXi();
     }
 
     //MatrixXd p_Matrix = Map<MatrixXd>( (float*)this->data,p_dims[0], p_dims[1]);
     // --> Use copy constructor instead --> slower performance but higher memory management reliability
-    MatrixXi p_Matrix(Map<MatrixXi>( (int*)this->data(),pDims[0], pDims[1]));
-
-    delete[] pDims;
+    MatrixXi p_Matrix(Map<MatrixXi>( (int*)this->data(),dims[0], dims[1]));
 
     return p_Matrix;
 }
@@ -890,22 +1033,18 @@ inline MatrixXi FiffTag::toIntMatrix() const
 
 inline MatrixXd FiffTag::toFloatMatrix() const
 {
-//        qDebug() << "toFloatMatrix";
-
     if(!this->isMatrix() || this->getType() != FIFFT_FLOAT || this->data() == NULL)
         return MatrixXd();//NULL;
 
 
     qint32 ndim;
-    qint32* pDims = NULL;
-    this->getMatrixDimensions(ndim, pDims);
+    QVector<qint32> dims;
+    this->getMatrixDimensions(ndim, dims);
 
 //        qDebug() << "toFloatMatrix" << ndim << pDims[0] << pDims[1];
 
-
     if (ndim != 2)
     {
-        delete pDims;
         printf("Only two-dimensional matrices are supported at this time");
         return MatrixXd();//NULL;
     }
@@ -914,9 +1053,7 @@ inline MatrixXd FiffTag::toFloatMatrix() const
     // --> Use copy constructor instead --> slower performance but higher memory management reliability
 //    MatrixXd* p_pMatrix = new MatrixXd((Map<MatrixXf>( (float*)this->data(),pDims[0], pDims[1])).cast<double>());
 
-    MatrixXd p_Matrix((Map<MatrixXf>( (float*)this->data(),pDims[0], pDims[1])).cast<double>());
-
-    delete[] pDims;
+    MatrixXd p_Matrix((Map<MatrixXf>( (float*)this->data(),dims[0], dims[1])).cast<double>());
 
     return p_Matrix;
 }

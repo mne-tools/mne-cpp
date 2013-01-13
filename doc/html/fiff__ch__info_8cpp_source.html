@@ -121,22 +121,41 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;, unit_mul(0)</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;, ch_name(QString(<span class="stringliteral">&quot;&quot;</span>))</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;{</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a86a15b1f849599c2dae3dc2b976d03c2">loc</a>.setZero();</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a50091ebf8d8d2ffbf119444b0ddb3dde">coil_trans</a>.setZero();</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a8d0f25ed69750580b56814407b8c204b">eeg_loc</a>.setZero();</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;}</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;}</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;</div>
-<div class="line"><a name="l00077"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a41a554f557e9c2f7cb75ff3b4d4627a4">   77</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a41a554f557e9c2f7cb75ff3b4d4627a4">FiffChInfo::~FiffChInfo</a>()</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;{</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;}</div>
+<div class="line"><a name="l00075"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a45f7f2a0f7fc0ab4f71e1d97705f2226">   75</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a69742331b0d3364e7ac8ace4b754633a">FiffChInfo::FiffChInfo</a>(<span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html" title="Channel info descriptor.">FiffChInfo</a> &amp;p_FiffChInfo)</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;: scanno(p_FiffChInfo.scanno)</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;, logno(p_FiffChInfo.logno)</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;, kind(p_FiffChInfo.kind)</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;, range(p_FiffChInfo.range)</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;, cal(p_FiffChInfo.cal)</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;, coil_type(p_FiffChInfo.coil_type)</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;, loc(p_FiffChInfo.loc)</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;, coil_trans(p_FiffChInfo.coil_trans)</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;, eeg_loc(p_FiffChInfo.eeg_loc)</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;, coord_frame(p_FiffChInfo.coord_frame)</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;, unit(p_FiffChInfo.unit)</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;, unit_mul(p_FiffChInfo.unit_mul)</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;, ch_name(p_FiffChInfo.ch_name)</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;{</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;}</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;</div>
+<div class="line"><a name="l00096"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a41a554f557e9c2f7cb75ff3b4d4627a4">   96</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a41a554f557e9c2f7cb75ff3b4d4627a4">FiffChInfo::~FiffChInfo</a>()</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;{</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jan 9 2013 17:50:06 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jan 12 2013 20:22:36 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>

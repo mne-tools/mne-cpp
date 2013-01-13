@@ -78,21 +78,29 @@ public:
 
     //=========================================================================================================
     /**
-    * ctor
+    * Default constructor
     */
     FiffRawDir();
 
     //=========================================================================================================
     /**
-    * Destroys the FiffRawDir.
+    * Copy constructor.
+    *
+    * @param[in] p_FiffRawDir   Raw directory entry which should be copied
+    */
+    FiffRawDir(const FiffRawDir &p_FiffRawDir);
+
+    //=========================================================================================================
+    /**
+    * Destroys the raw Directory entry.
     */
     ~FiffRawDir();
 
 public:
-    FiffDirEntry  ent;
-    fiff_int_t  first;
-    fiff_int_t  last;
-    fiff_int_t  nsamp;
+    FiffDirEntry  ent;  /**< ToDo... */
+    fiff_int_t  first;  /**< ToDo... */
+    fiff_int_t  last;   /**< ToDo... */
+    fiff_int_t  nsamp;  /**< ToDo... */
 };
 
 } // NAMESPACE

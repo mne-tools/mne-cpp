@@ -2,6 +2,7 @@ var searchData=
 [
   ['acq_5fpars',['acq_pars',['../class_f_i_f_f_l_i_b_1_1_fiff_info.html#ac5441674648831c0e691f4022360755e',1,'FIFFLIB::FiffInfo']]],
   ['acq_5fstim',['acq_stim',['../class_f_i_f_f_l_i_b_1_1_fiff_info.html#a40a96f92d6d21fbd0678c1f6d0abcee0',1,'FIFFLIB::FiffInfo']]],
+  ['active',['active',['../class_f_i_f_f_l_i_b_1_1_fiff_proj.html#aa5593133aaf0bde0ac5c5c18685a14d1',1,'FIFFLIB::FiffProj']]],
   ['annotation',['Annotation',['../class_f_s_l_i_b_1_1_annotation.html',1,'FSLIB']]],
   ['annotation',['Annotation',['../class_f_s_l_i_b_1_1_annotation.html#a8050c5a867ef2c4f6aa18fc5c2766742',1,'FSLIB::Annotation']]],
   ['annotation_2ecpp',['annotation.cpp',['../annotation_8cpp.html',1,'']]],

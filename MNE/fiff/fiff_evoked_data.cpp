@@ -68,6 +68,23 @@ FiffEvokedData::FiffEvokedData()
 
 //*************************************************************************************************************
 
+FiffEvokedData::FiffEvokedData(const FiffEvokedData &p_FiffEvokedData)
+: QSharedData(p_FiffEvokedData)
+, aspect_kind(p_FiffEvokedData.aspect_kind)
+, is_smsh(p_FiffEvokedData.is_smsh)
+, nave(p_FiffEvokedData.nave)
+, first(p_FiffEvokedData.first)
+, last(p_FiffEvokedData.last)
+, comment(p_FiffEvokedData.comment)
+, times(p_FiffEvokedData.times)
+, epochs(p_FiffEvokedData.epochs)
+{
+
+}
+
+
+//*************************************************************************************************************
+
 FiffEvokedData::~FiffEvokedData()
 {
 

@@ -121,7 +121,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the fiffTag.
+    * Destroys the named matrix.
     */
     ~FiffNamedMatrix();
 
@@ -160,11 +160,11 @@ public:
 //    inline FiffNamedMatrix& operator=(const FiffNamedMatrix& rhs);
 
 public:
-    fiff_int_t nrow;
-    fiff_int_t  ncol;
-    QStringList row_names;
-    QStringList col_names;
-    MatrixXd data;
+    fiff_int_t nrow;        /**< Number of rows */
+    fiff_int_t  ncol;       /**< Number of columns */
+    QStringList row_names;  /**< Row names */
+    QStringList col_names;  /**< Column names */
+    MatrixXd data;          /**< Matrix data */
 };
 
 

@@ -113,10 +113,12 @@ Public Types</h2></td></tr>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a2db95fdb67898cbf094338028d01bb0c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a2db95fdb67898cbf094338028d01bb0c">MNEHemisphere</a> ()</td></tr>
 <tr class="separator:a2db95fdb67898cbf094338028d01bb0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaacdd881c760f94f834da68329f08229"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aaacdd881c760f94f834da68329f08229">MNEHemisphere</a> (const <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a> *p_pMNEHemisphere)</td></tr>
-<tr class="separator:aaacdd881c760f94f834da68329f08229"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a588ac45ffacfab154c05f863252df52e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a588ac45ffacfab154c05f863252df52e">MNEHemisphere</a> (const <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a> &amp;p_MNEHemisphere)</td></tr>
+<tr class="separator:a588ac45ffacfab154c05f863252df52e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a29c61433931c07044af051a53a4f08c1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a29c61433931c07044af051a53a4f08c1">~MNEHemisphere</a> ()</td></tr>
 <tr class="separator:a29c61433931c07044af051a53a4f08c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6024518e9dc0ee496db6a44d007e4c58"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a6024518e9dc0ee496db6a44d007e4c58">clear</a> ()</td></tr>
+<tr class="separator:a6024518e9dc0ee496db6a44d007e4c58"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a28dfa9032242a4f60364876c0a7ac63b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a28dfa9032242a4f60364876c0a7ac63b">transform_hemisphere_to</a> (fiff_int_t dest, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html">FiffCoordTrans</a> &amp;trans)</td></tr>
 <tr class="separator:a28dfa9032242a4f60364876c0a7ac63b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4bef2d6ba08b143eb452d16e2fd6d37d"><td class="memItemLeft" align="right" valign="top">MatrixXf *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a4bef2d6ba08b143eb452d16e2fd6d37d">getTriCoords</a> (float p_fScaling=1.0f)</td></tr>
@@ -225,28 +227,34 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
         </tr>
       </table>
 </div><div class="memdoc">
-<p>ctor </p>
+<p>Constructors the hemisphere source space. </p>
 
 <p>Definition at line <a class="el" href="mne__hemisphere_8cpp_source.html#l00058">58</a> of file <a class="el" href="mne__hemisphere_8cpp_source.html">mne_hemisphere.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="aaacdd881c760f94f834da68329f08229"></a>
+<a class="anchor" id="a588ac45ffacfab154c05f863252df52e"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">MNEHemisphere::MNEHemisphere </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a> *&#160;</td>
-          <td class="paramname"><em>p_pMNEHemisphere</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a> &amp;&#160;</td>
+          <td class="paramname"><em>p_MNEHemisphere</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Copy ctor </p>
+<p>Copy constructor.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_MNEHemisphere</td><td>Hemisphere source space which should be copied </td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8cpp_source.html#l00090">90</a> of file <a class="el" href="mne__hemisphere_8cpp_source.html">mne_hemisphere.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8cpp_source.html#l00089">89</a> of file <a class="el" href="mne__hemisphere_8cpp_source.html">mne_hemisphere.cpp</a>.</p>
 
 </div>
 </div>
@@ -262,13 +270,31 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
         </tr>
       </table>
 </div><div class="memdoc">
-<p>dtor </p>
+<p>Destroys the hemisphere source space. </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8cpp_source.html#l00124">124</a> of file <a class="el" href="mne__hemisphere_8cpp_source.html">mne_hemisphere.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8cpp_source.html#l00123">123</a> of file <a class="el" href="mne__hemisphere_8cpp_source.html">mne_hemisphere.cpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a6024518e9dc0ee496db6a44d007e4c58"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MNEHemisphere::clear </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Initializes the hemisphere source space. </p>
+
+<p>Definition at line <a class="el" href="mne__hemisphere_8cpp_source.html#l00134">134</a> of file <a class="el" href="mne__hemisphere_8cpp_source.html">mne_hemisphere.cpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a4bef2d6ba08b143eb452d16e2fd6d37d"></a>
 <div class="memitem">
 <div class="memproto">
@@ -284,7 +310,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>Qt 3d geometry information. Data are generated within first call. </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8cpp_source.html#l00168">168</a> of file <a class="el" href="mne__hemisphere_8cpp_source.html">mne_hemisphere.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8cpp_source.html#l00204">204</a> of file <a class="el" href="mne__hemisphere_8cpp_source.html">mne_hemisphere.cpp</a>.</p>
 
 </div>
 </div>
@@ -313,7 +339,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>Implementation of the mne_transform_source_space_to for a single hemisphere function </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8cpp_source.html#l00135">135</a> of file <a class="el" href="mne__hemisphere_8cpp_source.html">mne_hemisphere.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8cpp_source.html#l00171">171</a> of file <a class="el" href="mne__hemisphere_8cpp_source.html">mne_hemisphere.cpp</a>.</p>
 
 </div>
 </div>
@@ -329,7 +355,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>Distances to clusters centroid. </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00175">175</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00183">183</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -344,7 +370,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>Only used within clustered forward solutions </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00174">174</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00182">182</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -359,7 +385,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00150">150</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00158">158</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -374,7 +400,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00163">163</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00171">171</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -389,7 +415,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00162">162</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00170">170</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -404,7 +430,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>Qt 3d geometry information. Data are generated within first call.ID of ... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00147">147</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00155">155</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -419,7 +445,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00155">155</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00163">163</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -434,7 +460,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00159">159</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00167">167</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -449,7 +475,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00160">160</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00168">168</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -464,7 +490,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00152">152</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00160">160</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -479,7 +505,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00148">148</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00156">156</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -494,7 +520,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00149">149</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00157">157</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -509,7 +535,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00157">157</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00165">165</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -524,7 +550,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00161">161</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00169">169</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -539,7 +565,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00151">151</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00159">159</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -554,7 +580,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00166">166</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00174">174</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -569,7 +595,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00164">164</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00172">172</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -584,7 +610,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00165">165</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00173">173</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -599,7 +625,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00153">153</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00161">161</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -614,7 +640,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00169">169</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00177">177</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -629,7 +655,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00167">167</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00175">175</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -644,7 +670,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00168">168</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00176">176</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -659,7 +685,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00158">158</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00166">166</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -674,7 +700,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><div class="memdoc">
 <p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00156">156</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00164">164</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -685,7 +711,7 @@ fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><b>nuse</b></td></
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jan 9 2013 17:50:07 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jan 12 2013 20:22:38 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.2
 </small></address>
