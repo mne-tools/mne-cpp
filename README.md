@@ -1,13 +1,13 @@
 mne-cpp (beta)
 ==================
 
-MNE Qt 5 based C++ library (beta)
+MNE Qt 5 based C++ library (beta status)
 
 
 Getting the latest code
 =========================
 
-To get the latest code using git, simply type::
+To get the latest code using git, simply type:
 
     git clone git://github.com/mne-tools/mne-cpp.git
 

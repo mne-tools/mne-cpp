@@ -40,7 +40,7 @@
 
 #include "fiff_dir_tree.h"
 #include "fiff_stream.h"
-//#include "fiff_tag.h"
+#include "fiff_tag.h"
 //#include "fiff_ctf_comp.h"
 //#include "fiff_proj.h"
 //#include "fiff_info.h"

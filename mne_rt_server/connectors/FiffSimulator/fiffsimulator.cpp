@@ -308,29 +308,25 @@ bool FiffSimulator::readRawInfo()
 {
     if(m_RawInfo.isEmpty())
     {
-        QFile* t_pFile = new QFile(m_sResourceDataPath);
+        QFile t_File(m_sResourceDataPath);
 
         mutex.lock();
-        if(!FiffStream::setup_read_raw(t_pFile, m_RawInfo))
+        if(!FiffStream::setup_read_raw(&t_File, m_RawInfo))
         {
             printf("Error: Not able to read raw info!\n");
-            m_RawInfo = FiffRawData();
-
-            delete t_pFile;
+            m_RawInfo.clear();
             return false;
         }
 
         //delete it here and reopen it in the producer thread
-        delete m_RawInfo.file;
-        m_RawInfo.file = NULL;
+//        delete m_RawInfo.file;
+//        m_RawInfo.file = NULL;
 
         if(m_pRawMatrixBuffer)
             delete m_pRawMatrixBuffer;
         m_pRawMatrixBuffer = new RawMatrixBuffer(10, m_RawInfo.info->nchan, getBufferSampleSize());
 
         mutex.unlock();
-
-        delete t_pFile;
     }
 
     return true;

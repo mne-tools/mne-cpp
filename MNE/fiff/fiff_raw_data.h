@@ -42,13 +42,9 @@
 //=============================================================================================================
 
 #include "fiff_global.h"
-#include "fiff_types.h"
 #include "fiff_info.h"
-#include "fiff_proj.h"
-#include "fiff_ctf_comp.h"
 #include "fiff_raw_dir.h"
 #include "fiff_stream.h"
-#include "fiff_tag.h"
 
 
 //*************************************************************************************************************
@@ -78,7 +74,6 @@ namespace FIFFLIB
 {
 
 class FiffRawData;
-class FiffStream;
 
 
 //*************************************************************************************************************
@@ -171,7 +166,7 @@ public:
     bool read_raw_segment_times(MatrixXd& data, MatrixXd& times, float from, float to, const MatrixXi& sel = defaultMatrixXi);
 
 public:
-    FiffStream* file;           /**< replaces fid, ToDo replace this by SPtr */
+    FiffStream::SPtr file;      /**< replaces fid */
     FiffInfo::SDPtr info;       /**< Fiff measurement information */
     fiff_int_t first_samp;      /**< Do we have a skip ToDo... */
     fiff_int_t last_samp;       /**< Do we have a skip ToDo... */

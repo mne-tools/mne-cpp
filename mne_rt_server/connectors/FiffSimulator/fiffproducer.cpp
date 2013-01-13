@@ -99,8 +99,8 @@ void FiffProducer::run()
     m_bIsRunning = true;
 
     // reopen file in this thread
-    QFile* t_pFile = new QFile(m_pFiffSimulator->m_RawInfo.info->filename);
-    FiffStream* p_pStream = new FiffStream(t_pFile);
+    QFile t_File(m_pFiffSimulator->m_RawInfo.info->filename);
+    FiffStream::SPtr p_pStream = FiffStream::SPtr(new FiffStream(&t_File));
     m_pFiffSimulator->m_RawInfo.file = p_pStream;
 
     //
@@ -198,6 +198,6 @@ void FiffProducer::run()
     }
 
     // close datastream in this thread
-    delete m_pFiffSimulator->m_RawInfo.file;
-    m_pFiffSimulator->m_RawInfo.file = NULL;
+//    delete m_pFiffSimulator->m_RawInfo.file;
+//    m_pFiffSimulator->m_RawInfo.file = NULL;
 }

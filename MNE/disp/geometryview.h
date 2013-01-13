@@ -95,7 +95,7 @@ protected:
     void paintGL(QGLPainter *painter);
 
 private:
-    MNEForwardSolution* t_ForwardSolution;
+    MNEForwardSolution t_ForwardSolution;
 
     QGLLightModel *hemisphereLightModel;
     QGLLightParameters *lightParameters;

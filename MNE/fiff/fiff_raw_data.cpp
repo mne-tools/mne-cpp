@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include "fiff_raw_data.h"
+#include "fiff_tag.h"
 
 
 //*************************************************************************************************************
@@ -55,8 +56,7 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 FiffRawData::FiffRawData()
-: file(NULL)
-, info(new FiffInfo())
+: info(new FiffInfo())
 , first_samp(-1)
 , last_samp(-1)
 {
@@ -84,8 +84,7 @@ FiffRawData::FiffRawData(const FiffRawData &p_FiffRawData)
 
 FiffRawData::~FiffRawData()
 {
-    if(file)
-        delete file;
+
 }
 
 
@@ -221,7 +220,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
 
     //
 
-    FiffStream* fid = NULL;
+    FiffStream::SPtr fid;
     if (!this->file->device()->isOpen())
     {
         if (!this->file->device()->open(QIODevice::ReadOnly))
@@ -264,7 +263,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
             else
             {
                 FIFFLIB::FiffTag* t_pTag = NULL;
-                FiffTag::read_tag(fid, t_pTag, thisRawDir.ent.pos);
+                FiffTag::read_tag(fid.data(), t_pTag, thisRawDir.ent.pos);
                 //
                 //   Depending on the state of the projection and selection
                 //   we proceed a little bit differently

@@ -51,7 +51,7 @@
 #include "fiff_ch_info.h"
 #include "fiff_dig_point.h"
 //#include "fiff_info.h"
-#include "fiff_raw_data.h"
+//#include "fiff_raw_data.h"
 #include "fiff_cov.h"
 #include "fiff_dir_tree.h"
 
@@ -99,7 +99,10 @@ namespace FIFFLIB
 
 class FiffStream;
 class FiffTag;
+class FiffCtfComp;
 class FiffRawData;
+class FiffInfo;
+
 
 static FiffId defaultFiffId;
 
