@@ -38,8 +38,15 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "mnelibtests.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
 #include <iostream>
-#include <mne/mne.h>
 
 
 //*************************************************************************************************************
@@ -55,7 +62,28 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace MNEUNITTESTS;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Methods
+//=============================================================================================================
+
+void testStart(QString& p_TestName)
+{
+    printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    printf(">>> %s\n\n", p_TestName.toLatin1().constData());
+}
+
+
+//*************************************************************************************************************
+
+void testEnd(QString& p_TestName, bool p_TestResult)
+{
+    printf("\n<<< %s: %s\n", p_TestName.toLatin1().constData(), p_TestResult ? "ok" : "failed");
+    printf("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
+}
 
 
 //*************************************************************************************************************
@@ -75,16 +103,14 @@ using namespace MNELIB;
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-
-    QString t_sFileName = "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
-    QFile t_File(t_sFileName);
-
-    MNEForwardSolution t_ForwardSolution;
-    if(MNE::read_forward_solution(t_File, t_ForwardSolution))
-    {
-        std::cout << std::endl << "first 10 rows and columns of the Gain Matrix:" << std::endl << t_ForwardSolution.sol->data.block(0,0,10,10) << std::endl;
-        std::cout << std::endl << "first 10 dipole coordinates:" << std::endl << t_ForwardSolution.source_rr.block(0,0,10,3) << std::endl ;
-    }
-
+    bool testResult;
+    QString testName;
+    //
+    // Read FWD test
+    //
+    testName = QString("Read FWD test");
+    testStart(testName);
+    testResult = MNELibTests::checkFwdRead();
+    testEnd(testName,testResult);
     return a.exec();
 }
