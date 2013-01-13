@@ -105,12 +105,13 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
     bool testResult;
     QString testName;
+    MNELibTests t_MneLibTests;
     //
     // Read FWD test
     //
-    testName = QString("Read FWD test");
+    testName = QString("Read FWD");
     testStart(testName);
-    testResult = MNELibTests::checkFwdRead();
+    testResult = t_MneLibTests.checkFwdRead();
     testEnd(testName,testResult);
     return a.exec();
 }
