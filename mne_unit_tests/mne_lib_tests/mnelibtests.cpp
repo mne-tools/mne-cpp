@@ -63,6 +63,15 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
+MNELibTests::MNELibTests(QObject *parent)
+: QObject(parent)
+{
+
+}
+
+
+//*************************************************************************************************************
+
 bool MNELibTests::checkFwdRead()
 {
 
@@ -73,5 +82,8 @@ bool MNELibTests::checkFwdRead()
     if(MNE::read_forward_solution(t_File, t_ForwardSolution))
         return true;//ToDo som more checks
     else
+    {
+        emit checkupFailed(1);
         return false;
+    }
 }

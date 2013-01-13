@@ -36,6 +36,15 @@
 #ifndef MNELIBTESTS_H
 #define MNELIBTESTS_H
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QObject>
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE MNEUNITTESTS
@@ -59,16 +68,30 @@ namespace MNEUNITTESTS
 *
 * @brief Checkup routines for the MNE library
 */
-class MNELibTests
+class MNELibTests : public QObject
 {
+    Q_OBJECT
 public:
     //=========================================================================================================
     /**
+    * Default constructor.
+    *
+    * @param[in] parent     Qt parent object
+    */
+    explicit MNELibTests(QObject *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Test ID #1
+    *
     * Checks forward solution reading functionality
     *
     * @return true if successful false otherwise
     */
-    static bool checkFwdRead();
+    bool checkFwdRead();
+
+signals:
+    void checkupFailed(int ID);
 
 };
 
