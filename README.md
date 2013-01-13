@@ -1,7 +1,7 @@
-mne-cpp (pre-alpha)
+mne-cpp (beta)
 ==================
 
-MNE Qt 5 based C++ library (pre-alpha state)
+MNE Qt 5 based C++ library (beta)
 
 
 Getting the latest code
@@ -12,13 +12,13 @@ To get the latest code using git, simply type::
     git clone git://github.com/mne-tools/mne-cpp.git
 
 If you don't have git installed, you can download a zip or tarball
-of the latest code: http://github.com/mne-tools/mne-cpp/archives/master
+of the latest code: https://github.com/mne-tools/mne-cpp
 
 
 Building
 ==========
 
-To build the mne libraries `Qt5 beta <http://releases.qt-project.org/qt5.0/beta1/>`_ is required.
+To build the mne libraries [Qt5](http://qt-project.org/downloads) is required.
 
     Build and install Qt5.
 
@@ -32,13 +32,13 @@ Make the libraries and examples by running:
 
     make
 
-Tip: It's convinient to use the Qt Creator of the `QtSDK <http://qt-project.org/downloads>`_ to build the libraries.
+Tip: It's convinient to use the Qt Creator of the [QtSDK](http://qt-project.org/downloads) to build the libraries.
 
 
 Dependencies
 ============
 
-`Qt5 beta <http://releases.qt-project.org/qt5.0/beta1/>`_
+[Qt5](http://qt-project.org/downloads)
 
 
 Mailing list
@@ -50,9 +50,7 @@ http://mail.nmr.mgh.harvard.edu/mailman/listinfo/mne_analysis
 Workflow to contribute
 =========================
 
-To contribute to MNE-cpp, first create an account on `github
-<http://github.com/>`_. Once this is done, fork the `mne-cpp repository
-<http://github.com/mne-tools/mne-cpp>`_ to have you own repository,
+To contribute to MNE-cpp, first create an account on [github](http://github.com/). Once this is done, fork the [mne-cpp repository](http://github.com/mne-tools/mne-cpp) to have you own repository,
 clone it using 'git clone' on the computers where you want to work. Make
 your changes in your clone, push them to your github account, test them
 on several computer, and when you are happy with them, send a pull
