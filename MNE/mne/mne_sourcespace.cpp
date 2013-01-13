@@ -61,10 +61,10 @@ MNESourceSpace::MNESourceSpace()
 
 //*************************************************************************************************************
 
-MNESourceSpace::MNESourceSpace(const MNESourceSpace* p_pMNESourceSpace)
+MNESourceSpace::MNESourceSpace(const MNESourceSpace &p_MNESourceSpace)
+: hemispheres(p_MNESourceSpace.hemispheres)
 {
-    for(int i = 0; i < p_pMNESourceSpace->hemispheres.size(); ++i)
-        hemispheres.append(p_pMNESourceSpace->hemispheres[i]);
+
 }
 
 
@@ -72,9 +72,15 @@ MNESourceSpace::MNESourceSpace(const MNESourceSpace* p_pMNESourceSpace)
 
 MNESourceSpace::~MNESourceSpace()
 {
-//    QList<MNEHemisphere*>::iterator i;
-//    for (i = hemispheres.begin(); i != hemispheres.end(); ++i)
-//        delete *i;
+
+}
+
+
+//*************************************************************************************************************
+
+void MNESourceSpace::clear()
+{
+    hemispheres.clear();
 }
 
 

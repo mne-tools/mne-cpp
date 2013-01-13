@@ -74,10 +74,10 @@ using namespace FSLIB;
 //=============================================================================================================
 
 MNEForwardSolution::MNEForwardSolution()
-: source_ori(0)
-, coord_frame(0)
-, nsource(0)
-, nchan(0)
+: source_ori(-1)
+, coord_frame(-1)
+, nsource(-1)
+, nchan(-1)
 , sol(new FiffNamedMatrix)
 , sol_grad(new FiffNamedMatrix)
 //, mri_head_t(NULL)
@@ -92,18 +92,18 @@ MNEForwardSolution::MNEForwardSolution()
 
 //*************************************************************************************************************
 
-MNEForwardSolution::MNEForwardSolution(const MNEForwardSolution* p_pMNEForwardSolution)
-: source_ori(p_pMNEForwardSolution->source_ori)
-, coord_frame(p_pMNEForwardSolution->coord_frame)
-, nsource(p_pMNEForwardSolution->nsource)
-, nchan(p_pMNEForwardSolution->nchan)
-, sol(p_pMNEForwardSolution->sol)//p_pMNEForwardSolution->sol ? new FiffNamedMatrix(p_pMNEForwardSolution->sol) : NULL)
-, sol_grad(p_pMNEForwardSolution->sol_grad)//p_pMNEForwardSolution->sol_grad ? new FiffNamedMatrix(p_pMNEForwardSolution->sol_grad) : NULL)
-, mri_head_t(p_pMNEForwardSolution->mri_head_t)// new FiffCoordTrans(p_pMNEForwardSolution->mri_head_t) )
-, src(p_pMNEForwardSolution->src)//p_pMNEForwardSolution->src ? new MNESourceSpace(p_pMNEForwardSolution->src) : NULL)
-, source_rr(MatrixX3d(p_pMNEForwardSolution->source_rr))
-, source_nn(MatrixX3d(p_pMNEForwardSolution->source_nn))
-, isClustered(p_pMNEForwardSolution->isClustered)
+MNEForwardSolution::MNEForwardSolution(const MNEForwardSolution& p_MNEForwardSolution)
+: source_ori(p_MNEForwardSolution.source_ori)
+, coord_frame(p_MNEForwardSolution.coord_frame)
+, nsource(p_MNEForwardSolution.nsource)
+, nchan(p_MNEForwardSolution.nchan)
+, sol(p_MNEForwardSolution.sol)
+, sol_grad(p_MNEForwardSolution.sol_grad)
+, mri_head_t(p_MNEForwardSolution.mri_head_t)
+, src(p_MNEForwardSolution.src)
+, source_rr(p_MNEForwardSolution.source_rr)
+, source_nn(p_MNEForwardSolution.source_nn)
+, isClustered(p_MNEForwardSolution.isClustered)
 {
 
 }
@@ -113,28 +113,37 @@ MNEForwardSolution::MNEForwardSolution(const MNEForwardSolution* p_pMNEForwardSo
 
 MNEForwardSolution::~MNEForwardSolution()
 {
-//    if(sol)
-//        delete sol;
-//    if(sol_grad)
-//        delete sol_grad;
-//    if(mri_head_t)
-//        delete mri_head_t;
-//    if(src)
-//        delete src;
+
 }
 
 
 //*************************************************************************************************************
 
-bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, Annotation* p_pLHAnnotation, Annotation* p_pRHAnnotation, qint32 p_iClusterSize)
+void MNEForwardSolution::clear()
 {
-    if(p_fwdOut)
-        delete p_fwdOut;
-    p_fwdOut = new MNEForwardSolution(this);
+    source_ori = -1;
+    coord_frame = -1;
+    nsource = -1;
+    nchan = -1;
+    sol = FiffNamedMatrix::SDPtr(new FiffNamedMatrix());
+    sol_grad = FiffNamedMatrix::SDPtr(new FiffNamedMatrix());
+    mri_head_t.clear();
+    src.clear();
+    source_rr = MatrixX3d();
+    source_nn = MatrixX3d();
+    isClustered = false;
+}
 
-    QList<Annotation*> t_listAnnotation;
-    t_listAnnotation.append(p_pLHAnnotation);
-    t_listAnnotation.append(p_pRHAnnotation);
+
+//*************************************************************************************************************
+
+bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution &p_fwdOut, const Annotation &p_LHAnnotation, const Annotation &p_RHAnnotation, qint32 p_iClusterSize)
+{
+    p_fwdOut = MNEForwardSolution(*this);
+
+    QList<Annotation> t_listAnnotation;
+    t_listAnnotation.append(p_LHAnnotation);
+    t_listAnnotation.append(p_RHAnnotation);
 
     //
     // Check consisty
@@ -214,14 +223,14 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
         else
             printf("Cluster Right Hemisphere\n");
 
-        Colortable* t_pCurrentColorTable = t_listAnnotation[h]->getColortable();
-        VectorXi label = t_pCurrentColorTable->getAvailableROIs();
+        Colortable t_CurrentColorTable = t_listAnnotation[h].getColortable();
+        VectorXi label = t_CurrentColorTable.getAvailableROIs();
 
         // Get label for every vertice
         VectorXi vertno_labeled = VectorXi::Zero(this->src.hemispheres[h].vertno.rows());
 
         for(qint32 i = 0; i < vertno_labeled.rows(); ++i)
-            vertno_labeled[i] = (*t_listAnnotation[h]->getLabel())[this->src.hemispheres[h].vertno[i]];
+            vertno_labeled[i] = t_listAnnotation[h].getLabel()[this->src.hemispheres[h].vertno[i]];
 
         MatrixXd t_LF_partial;
         for (qint32 i = 0; i < label.rows(); ++i)
@@ -229,7 +238,7 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
 
             if (label[i] != 0)
             {
-                QString curr_name = t_pCurrentColorTable->struct_names[i];//obj.label2AtlasName(label(i));
+                QString curr_name = t_CurrentColorTable.struct_names[i];//obj.label2AtlasName(label(i));
                 printf("\tCluster %d / %d %s...", i+1, label.rows(), curr_name.toUtf8().constData());
 
                 //
@@ -314,8 +323,8 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
                             }
                         }
                         clusterIdcs.conservativeResize(nClusterIdcs);
-                        p_fwdOut->src.hemispheres[h].cluster_vertnos.append(clusterIdcs);
-                        p_fwdOut->src.hemispheres[h].cluster_distances.append(clusterDistance);
+                        p_fwdOut.src.hemispheres[h].cluster_vertnos.append(clusterIdcs);
+                        p_fwdOut.src.hemispheres[h].cluster_distances.append(clusterDistance);
                     }
 
                     //
@@ -346,10 +355,10 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
 
                             // Take the closest coordinates
                             qint32 sel_idx = idcs[j_min];
-                            p_fwdOut->src.hemispheres[h].rr.row(count) = this->src.hemispheres[h].rr.row(sel_idx);
-                            p_fwdOut->src.hemispheres[h].nn.row(count) = MatrixXd::Zero(1,3);
+                            p_fwdOut.src.hemispheres[h].rr.row(count) = this->src.hemispheres[h].rr.row(sel_idx);
+                            p_fwdOut.src.hemispheres[h].nn.row(count) = MatrixXd::Zero(1,3);
 
-                            p_fwdOut->src.hemispheres[h].vertno[count] = this->src.hemispheres[h].vertno[sel_idx];
+                            p_fwdOut.src.hemispheres[h].vertno[count] = this->src.hemispheres[h].vertno[sel_idx];
                             ++count;
                         }
                     }
@@ -362,39 +371,39 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
             }
         }
 
-        p_fwdOut->src.hemispheres[h].rr.conservativeResize(count, 3);
-        p_fwdOut->src.hemispheres[h].nn.conservativeResize(count, 3);
-        p_fwdOut->src.hemispheres[h].vertno.conservativeResize(count);
+        p_fwdOut.src.hemispheres[h].rr.conservativeResize(count, 3);
+        p_fwdOut.src.hemispheres[h].nn.conservativeResize(count, 3);
+        p_fwdOut.src.hemispheres[h].vertno.conservativeResize(count);
 
-        p_fwdOut->src.hemispheres[h].nuse_tri = 0;
-        p_fwdOut->src.hemispheres[h].use_tris = MatrixX3i(0,3);
+        p_fwdOut.src.hemispheres[h].nuse_tri = 0;
+        p_fwdOut.src.hemispheres[h].use_tris = MatrixX3i(0,3);
 
 
-        if(p_fwdOut->src.hemispheres[h].rr.rows() > 0 && p_fwdOut->src.hemispheres[h].rr.cols() > 0)
+        if(p_fwdOut.src.hemispheres[h].rr.rows() > 0 && p_fwdOut.src.hemispheres[h].rr.cols() > 0)
         {
             if(h == 0)
             {
-                p_fwdOut->source_rr = MatrixX3d(0,3);
-                p_fwdOut->source_nn = MatrixX3d(0,3);
+                p_fwdOut.source_rr = MatrixX3d(0,3);
+                p_fwdOut.source_nn = MatrixX3d(0,3);
             }
 
-            p_fwdOut->source_rr.conservativeResize(p_fwdOut->source_rr.rows() + p_fwdOut->src.hemispheres[h].rr.rows(),3);
-            p_fwdOut->source_rr.block(p_fwdOut->source_rr.rows() -  p_fwdOut->src.hemispheres[h].rr.rows(), 0,  p_fwdOut->src.hemispheres[h].rr.rows(), 3) = p_fwdOut->src.hemispheres[h].rr;
+            p_fwdOut.source_rr.conservativeResize(p_fwdOut.source_rr.rows() + p_fwdOut.src.hemispheres[h].rr.rows(),3);
+            p_fwdOut.source_rr.block(p_fwdOut.source_rr.rows() -  p_fwdOut.src.hemispheres[h].rr.rows(), 0,  p_fwdOut.src.hemispheres[h].rr.rows(), 3) = p_fwdOut.src.hemispheres[h].rr;
 
-            p_fwdOut->source_nn.conservativeResize(p_fwdOut->source_nn.rows() + p_fwdOut->src.hemispheres[h].nn.rows(),3);
-            p_fwdOut->source_nn.block(p_fwdOut->source_nn.rows() -  p_fwdOut->src.hemispheres[h].nn.rows(), 0,  p_fwdOut->src.hemispheres[h].nn.rows(), 3) = p_fwdOut->src.hemispheres[h].nn;
+            p_fwdOut.source_nn.conservativeResize(p_fwdOut.source_nn.rows() + p_fwdOut.src.hemispheres[h].nn.rows(),3);
+            p_fwdOut.source_nn.block(p_fwdOut.source_nn.rows() -  p_fwdOut.src.hemispheres[h].nn.rows(), 0,  p_fwdOut.src.hemispheres[h].nn.rows(), 3) = p_fwdOut.src.hemispheres[h].nn;
         }
 
         printf("[done]\n");
     }
 
     // set new fwd solution;
-    p_fwdOut->sol->data = t_LF_new;
-    p_fwdOut->sol->ncol = t_LF_new.cols();
+    p_fwdOut.sol->data = t_LF_new;
+    p_fwdOut.sol->ncol = t_LF_new.cols();
 
-    p_fwdOut->nsource = p_fwdOut->sol->ncol/3;
+    p_fwdOut.nsource = p_fwdOut.sol->ncol/3;
 
-    p_fwdOut->isClustered = true;
+    p_fwdOut.isClustered = true;
 
     return true;
 }
@@ -402,7 +411,7 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution *p_fwdOut, 
 
 //*************************************************************************************************************
 
-bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForwardSolution*& fwd, bool force_fixed, bool surf_ori, QStringList& include, QStringList& exclude)
+bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForwardSolution& fwd, bool force_fixed, bool surf_ori, QStringList& include, QStringList& exclude)
 {
     FiffStream* t_pStream = new FiffStream(&p_IODevice);
     FiffDirTree t_Tree;
@@ -422,10 +431,6 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
         t_pStream->device()->close();
         std::cout << "No forward solutions in " << t_pStream->streamName().toUtf8().constData(); // ToDo throw error
         //garbage collecting
-//        if(t_pDir)
-//            delete t_pDir;
-//        if(t_pTree)
-//            delete t_pTree;
         if(t_pStream)
             delete t_pStream;
         return false;
@@ -439,10 +444,6 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
         t_pStream->device()->close();
         std::cout << "No parent MRI information in " << t_pStream->streamName().toUtf8().constData(); // ToDo throw error
         //garbage collecting
-//        if(t_pDir)
-//            delete t_pDir;
-//        if(t_pTree)
-//            delete t_pTree;
         if(t_pStream)
             delete t_pStream;
         return false;
@@ -455,14 +456,8 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
         std::cout << "Could not read the source spaces\n"; // ToDo throw error
         //ToDo error(me,'Could not read the source spaces (%s)',mne_omit_first_line(lasterr));
         //garbage collecting
-//        if(t_pDir)
-//            delete t_pDir;
-//        if(t_pTree)
-//            delete t_pTree;
         if(t_pStream)
             delete t_pStream;
-//        if(t_SourceSpace)
-//            delete t_SourceSpace;
         return false;
     }
 
@@ -489,14 +484,8 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
             t_pStream->device()->close();
             std::cout << "Methods not listed for one of the forward solutions\n"; // ToDo throw error
             //garbage collecting
-//            if(t_pDir)
-//                delete t_pDir;
-//            if(t_pTree)
-//                delete t_pTree;
             if(t_pStream)
                 delete t_pStream;
-//            if(t_SourceSpace)
-//                delete t_SourceSpace;
             return false;
         }
         if (*t_pTag->toInt() == FIFFV_MNE_MEG)
@@ -511,76 +500,68 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
         }
     }
 
-    MNEForwardSolution* megfwd = NULL;
+    MNEForwardSolution megfwd;
     QString ori;
     if (read_one(t_pStream, megnode, megfwd))
     {
-        if (megfwd->source_ori == FIFFV_MNE_FIXED_ORI)
+        if (megfwd.source_ori == FIFFV_MNE_FIXED_ORI)
             ori = QString("fixed");
         else
             ori = QString("free");
-        printf("\tRead MEG forward solution (%d sources, %d channels, %s orientations)\n", megfwd->nsource,megfwd->nchan,ori.toUtf8().constData());
+        printf("\tRead MEG forward solution (%d sources, %d channels, %s orientations)\n", megfwd.nsource,megfwd.nchan,ori.toUtf8().constData());
     }
-    MNEForwardSolution* eegfwd = NULL;
+    MNEForwardSolution eegfwd;
     if (read_one(t_pStream, eegnode, eegfwd))
     {
-        if (eegfwd->source_ori == FIFFV_MNE_FIXED_ORI)
+        if (eegfwd.source_ori == FIFFV_MNE_FIXED_ORI)
             ori = QString("fixed");
         else
             ori = QString("free");
-        printf("\tRead EEG forward solution (%d sources, %d channels, %s orientations)\n", eegfwd->nsource,eegfwd->nchan,ori.toUtf8().constData());
+        printf("\tRead EEG forward solution (%d sources, %d channels, %s orientations)\n", eegfwd.nsource,eegfwd.nchan,ori.toUtf8().constData());
     }
 
     //
     //   Merge the MEG and EEG solutions together
     //
-    if (fwd != NULL)
-        delete fwd;
-    fwd = NULL;
+    fwd.clear();
 
-    if (megfwd && eegfwd)
+    if (!megfwd.isEmpty() && !eegfwd.isEmpty())
     {
-        if (megfwd->sol->data.cols() != eegfwd->sol->data.cols() ||
-                megfwd->source_ori != eegfwd->source_ori ||
-                megfwd->nsource != eegfwd->nsource ||
-                megfwd->coord_frame != eegfwd->coord_frame)
+        if (megfwd.sol->data.cols() != eegfwd.sol->data.cols() ||
+                megfwd.source_ori != eegfwd.source_ori ||
+                megfwd.nsource != eegfwd.nsource ||
+                megfwd.coord_frame != eegfwd.coord_frame)
         {
             t_pStream->device()->close();
             std::cout << "The MEG and EEG forward solutions do not match\n"; // ToDo throw error
             //garbage collecting
-//            if(t_pDir)
-//                delete t_pDir;
-//            if(t_pTree)
-//                delete t_pTree;
             if(t_pStream)
                 delete t_pStream;
-//            if(t_SourceSpace)
-//                delete t_SourceSpace;
             return false;
         }
 
-        fwd = new MNEForwardSolution(megfwd);
-        fwd->sol->data = MatrixXd(megfwd->sol->nrow + eegfwd->sol->nrow, megfwd->sol->ncol);
+        fwd = MNEForwardSolution(megfwd);
+        fwd.sol->data = MatrixXd(megfwd.sol->nrow + eegfwd.sol->nrow, megfwd.sol->ncol);
 
-        fwd->sol->data.block(0,0,megfwd->sol->nrow,megfwd->sol->ncol) = megfwd->sol->data;
-        fwd->sol->data.block(megfwd->sol->nrow,0,eegfwd->sol->nrow,eegfwd->sol->ncol) = eegfwd->sol->data;
-        fwd->sol->nrow = megfwd->sol->nrow + eegfwd->sol->nrow;
-        fwd->sol->row_names.append(eegfwd->sol->row_names);
+        fwd.sol->data.block(0,0,megfwd.sol->nrow,megfwd.sol->ncol) = megfwd.sol->data;
+        fwd.sol->data.block(megfwd.sol->nrow,0,eegfwd.sol->nrow,eegfwd.sol->ncol) = eegfwd.sol->data;
+        fwd.sol->nrow = megfwd.sol->nrow + eegfwd.sol->nrow;
+        fwd.sol->row_names.append(eegfwd.sol->row_names);
 
-        if (!fwd->sol_grad->isEmpty())
+        if (!fwd.sol_grad->isEmpty())
         {
-            fwd->sol_grad->data.resize(megfwd->sol_grad->data.rows() + eegfwd->sol_grad->data.rows(), megfwd->sol_grad->data.cols());
+            fwd.sol_grad->data.resize(megfwd.sol_grad->data.rows() + eegfwd.sol_grad->data.rows(), megfwd.sol_grad->data.cols());
 
-            fwd->sol->data.block(0,0,megfwd->sol_grad->data.rows(),megfwd->sol_grad->data.cols()) = megfwd->sol_grad->data;
-            fwd->sol->data.block(megfwd->sol_grad->data.rows(),0,eegfwd->sol_grad->data.rows(),eegfwd->sol_grad->data.cols()) = eegfwd->sol_grad->data;
+            fwd.sol->data.block(0,0,megfwd.sol_grad->data.rows(),megfwd.sol_grad->data.cols()) = megfwd.sol_grad->data;
+            fwd.sol->data.block(megfwd.sol_grad->data.rows(),0,eegfwd.sol_grad->data.rows(),eegfwd.sol_grad->data.cols()) = eegfwd.sol_grad->data;
 
-            fwd->sol_grad->nrow      = megfwd->sol_grad->nrow + eegfwd->sol_grad->nrow;
-            fwd->sol_grad->row_names.append(eegfwd->sol_grad->row_names);
+            fwd.sol_grad->nrow      = megfwd.sol_grad->nrow + eegfwd.sol_grad->nrow;
+            fwd.sol_grad->row_names.append(eegfwd.sol_grad->row_names);
         }
-        fwd->nchan  = megfwd->nchan + eegfwd->nchan;
+        fwd.nchan  = megfwd.nchan + eegfwd.nchan;
         printf("\tMEG and EEG forward solutions combined\n");
     }
-    else if (megfwd)
+    else if (!megfwd.isEmpty())
         fwd = megfwd; //new MNEForwardSolution(megfwd);//not copied for the sake of speed
     else
         fwd = eegfwd; //new MNEForwardSolution(eegfwd);//not copied for the sake of speed
@@ -607,20 +588,20 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
     }
     else
     {
-//        if(fwd->mri_head_t)
-//            delete fwd->mri_head_t;
-        fwd->mri_head_t = t_pTag->toCoordTrans();
-//            std::cout << "Transformation\n" << fwd->mri_head_t.trans << std::endl;
-//            std::cout << "from " << fwd->mri_head_t.from << " to " << fwd->mri_head_t.to << std::endl;
+//        if(fwd.mri_head_t)
+//            delete fwd.mri_head_t;
+        fwd.mri_head_t = t_pTag->toCoordTrans();
+//            std::cout << "Transformation\n" << fwd.mri_head_t.trans << std::endl;
+//            std::cout << "from " << fwd.mri_head_t.from << " to " << fwd.mri_head_t.to << std::endl;
 
-//            std::cout << "inverse Transformation\n" << fwd->mri_head_t.invtrans << std::endl;
+//            std::cout << "inverse Transformation\n" << fwd.mri_head_t.invtrans << std::endl;
 //            std::cout << "size " << sizeof(FiffCoordTrans) << std::endl;
 //            std::cout << "size " << sizeof(fiffCoordTransRec) << std::endl;
 
-        if (fwd->mri_head_t.from != FIFFV_COORD_MRI || fwd->mri_head_t.to != FIFFV_COORD_HEAD)
+        if (fwd.mri_head_t.from != FIFFV_COORD_MRI || fwd.mri_head_t.to != FIFFV_COORD_HEAD)
         {
-            fwd->mri_head_t.invert_transform();
-            if (fwd->mri_head_t.from != FIFFV_COORD_MRI || fwd->mri_head_t.to != FIFFV_COORD_HEAD)
+            fwd.mri_head_t.invert_transform();
+            if (fwd.mri_head_t.from != FIFFV_COORD_MRI || fwd.mri_head_t.to != FIFFV_COORD_HEAD)
             {
                 t_pStream->device()->close();
                 std::cout << "MRI/head coordinate transformation not found\n"; // ToDo throw error
@@ -645,7 +626,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
     //   Transform the source spaces to the correct coordinate frame
     //   if necessary
     //
-    if (fwd->coord_frame != FIFFV_COORD_MRI && fwd->coord_frame != FIFFV_COORD_HEAD)
+    if (fwd.coord_frame != FIFFV_COORD_MRI && fwd.coord_frame != FIFFV_COORD_HEAD)
     {
         std::cout << "Only forward solutions computed in MRI or head coordinates are acceptable";
         return false;
@@ -653,54 +634,54 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
 
     //
     qint32 nuse = 0;
-    t_SourceSpace.transform_source_space_to(fwd->coord_frame,fwd->mri_head_t);
+    t_SourceSpace.transform_source_space_to(fwd.coord_frame,fwd.mri_head_t);
     for(int k = 0; k < t_SourceSpace.hemispheres.size(); ++k)
         nuse += t_SourceSpace.hemispheres[k].nuse;
 
-    if (nuse != fwd->nsource)
+    if (nuse != fwd.nsource)
         throw("Source spaces do not match the forward solution.\n");
 
     printf("\tSource spaces transformed to the forward solution coordinate frame\n");
-    fwd->src = t_SourceSpace; //not new MNESourceSpace(t_SourceSpace); for sake of speed
+    fwd.src = t_SourceSpace; //not new MNESourceSpace(t_SourceSpace); for sake of speed
     //
     //   Handle the source locations and orientations
     //
-    if (fwd->source_ori == FIFFV_MNE_FIXED_ORI || force_fixed == true)
+    if (fwd.source_ori == FIFFV_MNE_FIXED_ORI || force_fixed == true)
     {
         nuse = 0;
-        fwd->source_rr = MatrixXd::Zero(fwd->nsource,3);
-        fwd->source_nn = MatrixXd::Zero(fwd->nsource,3);
+        fwd.source_rr = MatrixXd::Zero(fwd.nsource,3);
+        fwd.source_nn = MatrixXd::Zero(fwd.nsource,3);
         for(qint32 k = 0; k < t_SourceSpace.hemispheres.size();++k)
         {
             for(qint32 q = 0; q < t_SourceSpace.hemispheres[k].nuse; ++q)
             {
-                fwd->source_rr.block(q,0,1,3) = t_SourceSpace.hemispheres[k].rr.block(t_SourceSpace.hemispheres[k].vertno(q),0,1,3);
-                fwd->source_nn.block(q,0,1,3) = t_SourceSpace.hemispheres[k].nn.block(t_SourceSpace.hemispheres[k].vertno(q),0,1,3);
+                fwd.source_rr.block(q,0,1,3) = t_SourceSpace.hemispheres[k].rr.block(t_SourceSpace.hemispheres[k].vertno(q),0,1,3);
+                fwd.source_nn.block(q,0,1,3) = t_SourceSpace.hemispheres[k].nn.block(t_SourceSpace.hemispheres[k].vertno(q),0,1,3);
             }
             nuse += t_SourceSpace.hemispheres[k].nuse;
         }
         //
         //   Modify the forward solution for fixed source orientations
         //
-        if (fwd->source_ori != FIFFV_MNE_FIXED_ORI)
+        if (fwd.source_ori != FIFFV_MNE_FIXED_ORI)
         {
             printf("\tChanging to fixed-orientation forward solution...");
 
-            MatrixXd tmp = fwd->source_nn.transpose();
+            MatrixXd tmp = fwd.source_nn.transpose();
             SparseMatrix<double>* fix_rot = MNEMath::make_block_diag(&tmp,1);
-            fwd->sol->data *= (*fix_rot);
-            fwd->sol->ncol  = fwd->nsource;
-            fwd->source_ori = FIFFV_MNE_FIXED_ORI;
+            fwd.sol->data *= (*fix_rot);
+            fwd.sol->ncol  = fwd.nsource;
+            fwd.source_ori = FIFFV_MNE_FIXED_ORI;
 
-            if (!fwd->sol_grad->isEmpty())
+            if (!fwd.sol_grad->isEmpty())
             {
                 SparseMatrix<double> t_matKron;
                 SparseMatrix<double> t_eye(3,3);
                 for (qint32 i = 0; i < 3; ++i)
                     t_eye.insert(i,i) = 1.0f;
                 kroneckerProduct(*fix_rot,t_eye,t_matKron);//kron(fix_rot,eye(3));
-                fwd->sol_grad->data *= t_matKron;
-                fwd->sol_grad->ncol   = 3*fwd->nsource;
+                fwd.sol_grad->data *= t_matKron;
+                fwd.sol_grad->ncol   = 3*fwd.nsource;
             }
             delete fix_rot;
             printf("[done]\n");
@@ -716,8 +697,8 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
             printf("\tConverting to surface-based source orientations...");
             nuse = 0;
             qint32 pp = 0;
-            fwd->source_rr = MatrixXd::Zero(fwd->nsource,3);
-            fwd->source_nn = MatrixXd::Zero(fwd->nsource*3,3);
+            fwd.source_rr = MatrixXd::Zero(fwd.nsource,3);
+            fwd.source_nn = MatrixXd::Zero(fwd.nsource*3,3);
 
             printf(" (Warning: Rotating the source coordinate system haven't been verified --> Singular Vectors U are different from MATLAB!) ");
 
@@ -725,7 +706,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
             {
 
                 for (qint32 q = 0; q < t_SourceSpace.hemispheres[k].nuse; ++q)
-                    fwd->source_rr.block(q+nuse,0,1,3) = t_SourceSpace.hemispheres[k].rr.block(t_SourceSpace.hemispheres[k].vertno(q),0,1,3);
+                    fwd.source_rr.block(q+nuse,0,1,3) = t_SourceSpace.hemispheres[k].rr.block(t_SourceSpace.hemispheres[k].vertno(q),0,1,3);
 
                 for (qint32 p = 0; p < t_SourceSpace.hemispheres[k].nuse; ++p)
                 {
@@ -748,25 +729,25 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
                         U *= -1;
                     }
 
-                    fwd->source_nn.block(pp, 0, 3, 3) = U.transpose();
+                    fwd.source_nn.block(pp, 0, 3, 3) = U.transpose();
 
                     pp += 3;
                 }
                 nuse += t_SourceSpace.hemispheres[k].nuse;
             }
-            MatrixXd tmp = fwd->source_nn.transpose();
+            MatrixXd tmp = fwd.source_nn.transpose();
             SparseMatrix<double>* surf_rot = MNEMath::make_block_diag(&tmp,3);
 
-            fwd->sol->data *= *surf_rot;
+            fwd.sol->data *= *surf_rot;
 
-            if (!fwd->sol_grad->isEmpty())
+            if (!fwd.sol_grad->isEmpty())
             {
                 SparseMatrix<double> t_matKron;
                 SparseMatrix<double> t_eye(3,3);
                 for (qint32 i = 0; i < 3; ++i)
                     t_eye.insert(i,i) = 1.0f;
                 kroneckerProduct(*surf_rot,t_eye,t_matKron);//kron(surf_rot,eye(3));
-                fwd->sol_grad->data *= t_matKron;
+                fwd.sol_grad->data *= t_matKron;
             }
             delete surf_rot;
             printf("[done]\n");
@@ -775,18 +756,18 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
         {
             printf("\tCartesian source orientations...");
             nuse = 0;
-            fwd->source_rr = MatrixXd::Zero(fwd->nsource,3);
+            fwd.source_rr = MatrixXd::Zero(fwd.nsource,3);
             for(int k = 0; k < t_SourceSpace.hemispheres.size(); ++k)
             {
                 for (qint32 q = 0; q < t_SourceSpace.hemispheres[k].nuse; ++q)
-                    fwd->source_rr.block(q+nuse,0,1,3) = t_SourceSpace.hemispheres[k].rr.block(t_SourceSpace.hemispheres[k].vertno(q),0,1,3);
+                    fwd.source_rr.block(q+nuse,0,1,3) = t_SourceSpace.hemispheres[k].rr.block(t_SourceSpace.hemispheres[k].vertno(q),0,1,3);
 
                 nuse += t_SourceSpace.hemispheres[k].nuse;
             }
 
-            MatrixXd t_ones = MatrixXd::Ones(fwd->nsource,1);
+            MatrixXd t_ones = MatrixXd::Ones(fwd.nsource,1);
             Matrix3d t_eye = Matrix3d::Identity();
-            kroneckerProduct(t_ones,t_eye,fwd->source_nn);
+            kroneckerProduct(t_ones,t_eye,fwd.source_nn);
 
             printf("[done]\n");
         }
@@ -802,15 +783,15 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
         //
         RowVectorXi pick;
         if (include.size() == 0)
-            pick = RowVectorXi::Ones(fwd->nchan);
+            pick = RowVectorXi::Ones(fwd.nchan);
         else
         {
-            pick = RowVectorXi::Zero(fwd->nchan);
+            pick = RowVectorXi::Zero(fwd.nchan);
             for(qint32 k = 0; k < include.size(); ++k)
             {
                 QList<int> c;
-                for(qint32 l = 0; l < fwd->sol->row_names.size(); ++l)
-                    if(fwd->sol->row_names.at(l).contains(include.at(k),Qt::CaseInsensitive))
+                for(qint32 l = 0; l < fwd.sol->row_names.size(); ++l)
+                    if(fwd.sol->row_names.at(l).contains(include.at(k),Qt::CaseInsensitive))
                         pick(l) = 1;
 
 //                    c = strmatch(include{k},fwd.sol->row_names,'exact');
@@ -827,8 +808,8 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
             for(qint32 k = 0; k < exclude.size(); ++k)
             {
                 QList<int> c;
-                for(qint32 l = 0; l < fwd->sol->row_names.size(); ++l)
-                    if(fwd->sol->row_names.at(l).contains(exclude.at(k),Qt::CaseInsensitive))
+                for(qint32 l = 0; l < fwd.sol->row_names.size(); ++l)
+                    if(fwd.sol->row_names.at(l).contains(exclude.at(k),Qt::CaseInsensitive))
                         pick(l) = 0;
 
 //                    c = strmatch(exclude{k},fwd.sol->row_names,'exact');
@@ -842,8 +823,8 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
             for(qint32 k = 0; k < bads.size(); ++k)
             {
                 QList<int> c;
-                for(qint32 l = 0; l < fwd->sol->row_names.size(); ++l)
-                    if(fwd->sol->row_names.at(l).contains(bads.at(k),Qt::CaseInsensitive))
+                for(qint32 l = 0; l < fwd.sol->row_names.size(); ++l)
+                    if(fwd.sol->row_names.at(l).contains(bads.at(k),Qt::CaseInsensitive))
                         pick(l) = 0;
 
 //                    c = strmatch(bads{k},fwd.sol->row_names,'exact');
@@ -862,47 +843,47 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
         //   Create the selector
         //
         qint32 p = 0;
-        MatrixXd t_solData(nuse,fwd->sol->data.cols());
+        MatrixXd t_solData(nuse,fwd.sol->data.cols());
         QStringList t_solRowNames;
 
         MatrixXd t_solGradData;// = NULL;
         QStringList t_solGradRowNames;
 
-        if (!fwd->sol_grad->isEmpty())
-            t_solGradData.resize(nuse, fwd->sol_grad->data.cols());
+        if (!fwd.sol_grad->isEmpty())
+            t_solGradData.resize(nuse, fwd.sol_grad->data.cols());
 
-        for(qint32 k = 0; k < fwd->nchan; ++k)
+        for(qint32 k = 0; k < fwd.nchan; ++k)
         {
             if(pick(k) > 0)
             {
-                t_solData.block(p, 0, 1, fwd->sol->data.cols()) = fwd->sol->data.block(k, 0, 1, fwd->sol->data.cols());
-                t_solRowNames.append(fwd->sol->row_names.at(k));
+                t_solData.block(p, 0, 1, fwd.sol->data.cols()) = fwd.sol->data.block(k, 0, 1, fwd.sol->data.cols());
+                t_solRowNames.append(fwd.sol->row_names.at(k));
 
-                if (!fwd->sol_grad->isEmpty())
+                if (!fwd.sol_grad->isEmpty())
                 {
-                    t_solGradData.block(p, 0, 1, fwd->sol_grad->data.cols()) = fwd->sol_grad->data.block(k, 0, 1, fwd->sol_grad->data.cols());
-                    t_solGradRowNames.append(fwd->sol_grad->row_names.at(k));
+                    t_solGradData.block(p, 0, 1, fwd.sol_grad->data.cols()) = fwd.sol_grad->data.block(k, 0, 1, fwd.sol_grad->data.cols());
+                    t_solGradRowNames.append(fwd.sol_grad->row_names.at(k));
                 }
 
                 ++p;
             }
         }
-        printf("\t%d out of %d channels remain after picking\n",nuse,fwd->nchan);
+        printf("\t%d out of %d channels remain after picking\n",nuse,fwd.nchan);
         //
         //   Pick the correct rows of the forward operator
         //
-        fwd->nchan          = nuse;
-//        if(fwd->sol->data)
-//            delete fwd->sol->data;
-        fwd->sol->data      = t_solData;
-        fwd->sol->nrow      = nuse;
-        fwd->sol->row_names = t_solRowNames;
+        fwd.nchan          = nuse;
+//        if(fwd.sol->data)
+//            delete fwd.sol->data;
+        fwd.sol->data      = t_solData;
+        fwd.sol->nrow      = nuse;
+        fwd.sol->row_names = t_solRowNames;
 
-        if (!fwd->sol_grad->isEmpty())
+        if (!fwd.sol_grad->isEmpty())
         {
-            fwd->sol_grad->data      = t_solGradData;
-            fwd->sol_grad->nrow      = nuse;
-            fwd->sol_grad->row_names = t_solGradRowNames;
+            fwd.sol_grad->data      = t_solGradData;
+            fwd.sol_grad->nrow      = nuse;
+            fwd.sol_grad->row_names = t_solGradRowNames;
         }
     }
 
@@ -910,18 +891,8 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
     t_pStream->device()->close();
 
     //garbage collecting
-//    if (megfwd)
-//        delete megfwd; // don't delete the megfwd because fwd->src is pointing to source space (not copied for the sake of speed)
-//    if (eegfwd)
-//        delete eegfwd; // don't delete the eegfwd because fwd->src is pointing to source space (not copied for the sake of speed)
-//    if(t_pDir)
-//        delete t_pDir;
-//    if(t_pTree)
-//        delete t_pTree;
     if(t_pStream)
         delete t_pStream;
-//    if(t_SourceSpace)
-//        delete t_SourceSpace; // don't delete the SourceSpace because fwd->src is pointing to source space (not copied for the sake of speed)
     if(t_pTag)
         delete t_pTag;
 
@@ -931,18 +902,15 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
 
 //*************************************************************************************************************
 
-bool MNEForwardSolution::read_one(FiffStream* p_pStream, const FiffDirTree& p_Node, MNEForwardSolution*& one)
+bool MNEForwardSolution::read_one(FiffStream* p_pStream, const FiffDirTree& p_Node, MNEForwardSolution& one)
 {
-    if (one != NULL)
-        delete one;
-    one = NULL;
     //
     //   Read all interesting stuff for one forward solution
     //
     if(p_Node.isEmpty())
         return false;
 
-    one = new MNEForwardSolution();
+    one.clear();
     FIFFLIB::FiffTag* t_pTag = NULL;
 
     if(!p_Node.find_tag(p_pStream, FIFF_MNE_SOURCE_ORIENTATION, t_pTag))
@@ -952,7 +920,7 @@ bool MNEForwardSolution::read_one(FiffStream* p_pStream, const FiffDirTree& p_No
         return false;
     }
 
-    one->source_ori = *t_pTag->toInt();
+    one.source_ori = *t_pTag->toInt();
 
     if(!p_Node.find_tag(p_pStream, FIFF_MNE_COORD_FRAME, t_pTag))
     {
@@ -961,7 +929,7 @@ bool MNEForwardSolution::read_one(FiffStream* p_pStream, const FiffDirTree& p_No
         return false;
     }
 
-    one->coord_frame = *t_pTag->toInt();
+    one.coord_frame = *t_pTag->toInt();
 
     if(!p_Node.find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NPOINTS, t_pTag))
     {
@@ -970,7 +938,7 @@ bool MNEForwardSolution::read_one(FiffStream* p_pStream, const FiffDirTree& p_No
         return false;
     }
 
-    one->nsource = *t_pTag->toInt();
+    one.nsource = *t_pTag->toInt();
 
     if(!p_Node.find_tag(p_pStream, FIFF_NCHAN, t_pTag))
     {
@@ -979,10 +947,10 @@ bool MNEForwardSolution::read_one(FiffStream* p_pStream, const FiffDirTree& p_No
         return false;
     }
 
-    one->nchan = *t_pTag->toInt();
+    one.nchan = *t_pTag->toInt();
 
-    if(p_pStream->read_named_matrix(p_Node, FIFF_MNE_FORWARD_SOLUTION, *one->sol.data()))
-        one->sol->transpose_named_matrix();
+    if(p_pStream->read_named_matrix(p_Node, FIFF_MNE_FORWARD_SOLUTION, *one.sol.data()))
+        one.sol->transpose_named_matrix();
     else
     {
         p_pStream->device()->close();
@@ -991,24 +959,24 @@ bool MNEForwardSolution::read_one(FiffStream* p_pStream, const FiffDirTree& p_No
         return false;
     }
 
-    if(p_pStream->read_named_matrix(p_Node, FIFF_MNE_FORWARD_SOLUTION_GRAD, *one->sol_grad.data()))
-        one->sol_grad->transpose_named_matrix();
+    if(p_pStream->read_named_matrix(p_Node, FIFF_MNE_FORWARD_SOLUTION_GRAD, *one.sol_grad.data()))
+        one.sol_grad->transpose_named_matrix();
     else
-        one->sol_grad->clear();
+        one.sol_grad->clear();
 
 
-    if (one->sol->data.rows() != one->nchan ||
-            (one->sol->data.cols() != one->nsource && one->sol->data.cols() != 3*one->nsource))
+    if (one.sol->data.rows() != one.nchan ||
+            (one.sol->data.cols() != one.nsource && one.sol->data.cols() != 3*one.nsource))
     {
         p_pStream->device()->close();
         printf("Forward solution matrix has wrong dimensions.\n"); //ToDo: throw error.
         //error(me,'Forward solution matrix has wrong dimensions');
         return false;
     }
-    if (!one->sol_grad->isEmpty())
+    if (!one.sol_grad->isEmpty())
     {
-        if (one->sol_grad->data.rows() != one->nchan ||
-                (one->sol_grad->data.cols() != 3*one->nsource && one->sol_grad->data.cols() != 3*3*one->nsource))
+        if (one.sol_grad->data.rows() != one.nchan ||
+                (one.sol_grad->data.cols() != 3*one.nsource && one.sol_grad->data.cols() != 3*3*one.nsource))
         {
             p_pStream->device()->close();
             printf("Forward solution gradient matrix has wrong dimensions.\n"); //ToDo: throw error.

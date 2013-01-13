@@ -122,15 +122,23 @@ public:
 
     //=========================================================================================================
     /**
-    * Copy ctor
+    * Copy constructor.
+    *
+    * @param[in] p_MNESourceSpace   MNE forward solution
     */
-    MNESourceSpace(const MNESourceSpace* p_pMNESourceSpace);
+    MNESourceSpace(const MNESourceSpace& p_MNESourceSpace);
 
     //=========================================================================================================
     /**
     * dtor
     */
     ~MNESourceSpace();
+
+    //=========================================================================================================
+    /**
+    * Initializes MNE source space.
+    */
+    void clear();
 
     //=========================================================================================================
     /**
@@ -228,7 +236,7 @@ private:
     static bool complete_source_space_info(MNEHemisphere& p_Hemisphere);
 
 public:
-    QList<MNEHemisphere> hemispheres;
+    QList<MNEHemisphere> hemispheres;   /**< List of the hemispheres containing the source space information. */
 };
 
 } // NAMESPACE

@@ -43,6 +43,7 @@
 //=============================================================================================================
 
 #include "fs_global.h"
+#include "colortable.h"
 
 
 //*************************************************************************************************************
@@ -83,11 +84,9 @@ using namespace Eigen;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class Colortable;
-
 //=============================================================================================================
 /**
-* ToDo...
+* Free surfer annotation
 */
 class FSSHARED_EXPORT Annotation
 {
@@ -100,7 +99,7 @@ public:
     /**
     * ToDo..
     */
-    explicit Annotation(QString& t_sFileName);
+    explicit Annotation(QString& p_sFileName);
 
     //=========================================================================================================
     /**
@@ -112,27 +111,27 @@ public:
     /**
     * ToDo..
     */
-    VectorXi* getVertices()
+    VectorXi& getVertices()
     {
-        return m_pVertices;
+        return m_Vertices;
     }
 
     //=========================================================================================================
     /**
     * ToDo..
     */
-    VectorXi* getLabel()
+    VectorXi& getLabel()
     {
-        return m_pLabel;
+        return m_Label;
     }
 
     //=========================================================================================================
     /**
     * ToDo..
     */
-    Colortable* getColortable()
+    Colortable getColortable()
     {
-        return m_pColortable;
+        return m_Colortable;
     }
 
     void read_annotation(QString& t_sFileName);
@@ -140,10 +139,10 @@ public:
 private:
     QString m_sFileName;
 
-    VectorXi* m_pVertices;
-    VectorXi* m_pLabel;
+    VectorXi m_Vertices;
+    VectorXi m_Label;
 
-    Colortable* m_pColortable;
+    Colortable m_Colortable;
 };
 
 } // NAMESPACE
