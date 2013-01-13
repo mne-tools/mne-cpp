@@ -44,6 +44,13 @@ public:
 
     explicit Colortable();
 
+    //=========================================================================================================
+    /**
+    * Initializes colortable.
+    */
+    void clear();
+
+
     inline VectorXi getAvailableROIs()
     {
         VectorXi p_vecRois;
@@ -53,11 +60,11 @@ public:
         return p_vecRois;
     }
 
-QString orig_tab;
-qint32 numEntries;
-QStringList struct_names;
-MatrixXi table;
-
+public:
+    QString orig_tab;
+    qint32 numEntries;
+    QStringList struct_names;
+    MatrixXi table;
 };
 
 } // NAMESPACE

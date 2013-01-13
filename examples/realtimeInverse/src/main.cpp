@@ -84,22 +84,14 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    MNEForwardSolution* t_pFwd = NULL;
-
     QString t_sFileName = "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
-
     QFile t_File(t_sFileName);
 
-    if(!MNEForwardSolution::read_forward_solution(t_File, t_pFwd))
-    {
-        if(t_pFwd)
-            delete t_pFwd;
+    MNEForwardSolution t_Fwd;
+    if(!MNEForwardSolution::read_forward_solution(t_File, t_Fwd))
         return -1;
-    }
 
     qDebug() << "ToDo....\n";
-
-    delete t_pFwd;
 
     return a.exec();
 }

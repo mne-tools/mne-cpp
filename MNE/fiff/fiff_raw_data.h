@@ -95,8 +95,8 @@ using namespace Eigen;
 *
 * @brief FIFF raw measurement data
 */
-class FIFFSHARED_EXPORT FiffRawData {
-
+class FIFFSHARED_EXPORT FiffRawData
+{
 public:
     typedef QSharedPointer<FiffRawData> SPtr;               /**< Shared pointer type for FiffRawData. */
     typedef QSharedPointer<const FiffRawData> ConstSPtr;    /**< Const shared pointer type for FiffRawData. */

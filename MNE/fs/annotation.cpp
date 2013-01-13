@@ -40,7 +40,6 @@
 //=============================================================================================================
 
 #include "annotation.h"
-#include "colortable.h"
 
 
 //*************************************************************************************************************
@@ -68,11 +67,8 @@ using namespace FSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Annotation::Annotation(QString& t_sFileName)
-: m_sFileName(t_sFileName)
-, m_pVertices(NULL)
-, m_pLabel(NULL)
-, m_pColortable(NULL)
+Annotation::Annotation(QString& p_sFileName)
+: m_sFileName(p_sFileName)
 {
     read_annotation(m_sFileName);
 }
@@ -82,12 +78,7 @@ Annotation::Annotation(QString& t_sFileName)
 
 Annotation::~Annotation()
 {
-    if(m_pVertices)
-        delete m_pVertices;
-    if(m_pLabel)
-        delete m_pLabel;
-    if(m_pColortable)
-        delete m_pColortable;
+
 }
 
 
@@ -110,17 +101,13 @@ void Annotation::read_annotation(QString& t_sFileName)
     qint32 numEl;
     t_Stream >> numEl;
 
-    if(m_pVertices)
-        delete m_pVertices;
-    m_pVertices = new VectorXi(numEl);
-    if(m_pLabel)
-        delete m_pLabel;
-    m_pLabel = new VectorXi(numEl);
+    m_Vertices = VectorXi(numEl);
+    m_Label = VectorXi(numEl);
 
     for(qint32 i = 0; i < numEl; ++i)
     {
-        t_Stream >> (*m_pVertices)[i];
-        t_Stream >> (*m_pLabel)[i];
+        t_Stream >> m_Vertices[i];
+        t_Stream >> m_Label[i];
     }
 
 //    std::cout << "Vertices" << std::endl << m_pVertices->block(0,0,10,1) << std::endl;
@@ -130,10 +117,7 @@ void Annotation::read_annotation(QString& t_sFileName)
     t_Stream >> hasColortable;
     if (hasColortable)
     {
-        if(m_pColortable)
-            delete m_pColortable;
-
-        m_pColortable = new Colortable();
+        m_Colortable.clear();
 
         //Read colortable
         qint32 numEntries;
@@ -143,17 +127,17 @@ void Annotation::read_annotation(QString& t_sFileName)
         {
 
             printf("\tReading from Original Version\n");
-            m_pColortable->numEntries = numEntries;
+            m_Colortable.numEntries = numEntries;
             t_Stream >> len;
             QByteArray tmp;
             tmp.resize(len);
             t_Stream.readRawData(tmp.data(),len);
-            m_pColortable->orig_tab = tmp;
+            m_Colortable.orig_tab = tmp;
 
             for(qint32 i = 0; i < numEntries; ++i)
-                m_pColortable->struct_names.append("");
+                m_Colortable.struct_names.append("");
 
-            m_pColortable->table = MatrixXi(numEntries,5);
+            m_Colortable.table = MatrixXi(numEntries,5);
 
             for(qint32 i = 0; i < numEntries; ++i)
             {
@@ -161,15 +145,15 @@ void Annotation::read_annotation(QString& t_sFileName)
                 tmp.resize(len);
                 t_Stream.readRawData(tmp.data(),len);
 
-                m_pColortable->struct_names[i]= tmp;
+                m_Colortable.struct_names[i]= tmp;
 
                 for(qint32 j = 0; j < 4; ++j)
-                    t_Stream >> m_pColortable->table(i,j);
+                    t_Stream >> m_Colortable.table(i,j);
 
-                m_pColortable->table(i,4) = m_pColortable->table(i,0)
-                        + m_pColortable->table(i,1) * 256       //(2^8)
-                        + m_pColortable->table(i,2) * 65536     //(2^16)
-                        + m_pColortable->table(i,3) * 16777216; //(2^24);
+                m_Colortable.table(i,4) = m_Colortable.table(i,0)
+                        + m_Colortable.table(i,1) * 256       //(2^8)
+                        + m_Colortable.table(i,2) * 65536     //(2^16)
+                        + m_Colortable.table(i,3) * 16777216; //(2^24);
             }
         }
         else
@@ -181,18 +165,18 @@ void Annotation::read_annotation(QString& t_sFileName)
                 printf("\tReading from version %d\n", version);
 
             t_Stream >> numEntries;
-            m_pColortable->numEntries = numEntries;
+            m_Colortable.numEntries = numEntries;
 
             t_Stream >> len;
             QByteArray tmp;
             tmp.resize(len);
             t_Stream.readRawData(tmp.data(),len);
-            m_pColortable->orig_tab = tmp;
+            m_Colortable.orig_tab = tmp;
 
             for(qint32 i = 0; i < numEntries; ++i)
-                m_pColortable->struct_names.append("");
+                m_Colortable.struct_names.append("");
 
-            m_pColortable->table = MatrixXi(numEntries,5);
+            m_Colortable.table = MatrixXi(numEntries,5);
 
             qint32 numEntriesToRead;
             t_Stream >> numEntriesToRead;
@@ -205,25 +189,25 @@ void Annotation::read_annotation(QString& t_sFileName)
                 if (structure < 0)
                     printf("\tError! Read entry, index %d\n", structure);
 
-                if(!m_pColortable->struct_names.at(structure).isEmpty())
+                if(!m_Colortable.struct_names[structure].isEmpty())
                     printf("Error! Duplicate Structure %d", structure);
 
                 t_Stream >> len;
                 tmp.resize(len);
                 t_Stream.readRawData(tmp.data(),len);
 
-                m_pColortable->struct_names[structure]= tmp;
+                m_Colortable.struct_names[structure]= tmp;
 
                 for(qint32 j = 0; j < 4; ++j)
-                    t_Stream >> m_pColortable->table(structure,j);
+                    t_Stream >> m_Colortable.table(structure,j);
 
-                m_pColortable->table(structure,4) = m_pColortable->table(structure,0)
-                        + m_pColortable->table(structure,1) * 256       //(2^8)
-                        + m_pColortable->table(structure,2) * 65536     //(2^16)
-                        + m_pColortable->table(structure,3) * 16777216; //(2^24);
+                m_Colortable.table(structure,4) = m_Colortable.table(structure,0)
+                        + m_Colortable.table(structure,1) * 256       //(2^8)
+                        + m_Colortable.table(structure,2) * 65536     //(2^16)
+                        + m_Colortable.table(structure,3) * 16777216; //(2^24);
             }
         }
-        printf("\tcolortable with %d entries read\n\t(originally %s)\n", m_pColortable->numEntries, m_pColortable->orig_tab.toUtf8().constData());
+        printf("\tcolortable with %d entries read\n\t(originally %s)\n", m_Colortable.numEntries, m_Colortable.orig_tab.toUtf8().constData());
     }
     else
     {

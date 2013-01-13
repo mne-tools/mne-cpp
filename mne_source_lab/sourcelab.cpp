@@ -44,7 +44,7 @@ using namespace FSLIB;
 
 SourceLab::SourceLab(QObject *parent)
 : QThread(parent)
-, m_pFwd(NULL)
+, m_pFwd(MNEForwardSolution::SPtr(new MNEForwardSolution()))
 , m_bIsRunning(false)
 , m_bIsRawBufferInit(false)
 , m_pRawMatrixBuffer(NULL)
@@ -53,25 +53,20 @@ SourceLab::SourceLab(QObject *parent)
 
     QFile t_File(t_sFileName);
 
-    if(!MNEForwardSolution::read_forward_solution(t_File, m_pFwd))
-    {
-        if(m_pFwd)
-            delete m_pFwd;
+    if(!MNEForwardSolution::read_forward_solution(t_File, *m_pFwd))
         return;
-    }
 
     //Cluster the forward solution
 
-    MNEForwardSolution* t_pFwdClustered = NULL;
-
     QString t_sLHAnnotFileName = "./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot";
-    Annotation* t_pLHAnnotation= new Annotation(t_sLHAnnotFileName);
+    Annotation t_LHAnnotation(t_sLHAnnotFileName);
 
 
     QString t_sRHAnnotFileName = "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot";
-    Annotation* t_pRHAnnotation= new Annotation(t_sRHAnnotFileName);
+    Annotation t_RHAnnotation(t_sRHAnnotFileName);
 
-    m_pFwd->cluster_forward_solution(t_pFwdClustered, t_pLHAnnotation, t_pRHAnnotation, 40);
+    MNEForwardSolution t_FwdClustered;
+    m_pFwd->cluster_forward_solution(t_FwdClustered, t_LHAnnotation, t_RHAnnotation, 40);
 
     qRegisterMetaType<MatrixXf>("MatrixXf");
     qRegisterMetaType<MNEInverseOperator>("MNEInverseOperator");

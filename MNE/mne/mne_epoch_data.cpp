@@ -65,6 +65,17 @@ MNEEpochData::MNEEpochData()
 
 //*************************************************************************************************************
 
+MNEEpochData::MNEEpochData(const MNEEpochData &p_MNEEpochData)
+: epoch(p_MNEEpochData.epoch)
+, event(p_MNEEpochData.event)
+, tmin(p_MNEEpochData.tmin)
+, tmax(p_MNEEpochData.tmax)
+{
+
+}
+
+//*************************************************************************************************************
+
 MNEEpochData::~MNEEpochData()
 {
 

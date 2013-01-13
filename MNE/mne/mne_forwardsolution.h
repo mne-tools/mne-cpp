@@ -114,9 +114,9 @@ using namespace FSLIB;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS SourceSpace
+* MNE forward solution
 *
-* @brief The SourceSpace class provides
+* @brief MNE forward solution
 */
 class MNESHARED_EXPORT MNEForwardSolution
 {
@@ -126,24 +126,54 @@ public:
 
     //=========================================================================================================
     /**
-    * ctor
+    * Default constructor.
     */
     MNEForwardSolution();
 
     //=========================================================================================================
     /**
-    * Copy ctor
+    * Copy constructor.
+    *
+    * @param[in] p_MNEForwardSolution   MNE forward solution
     */
-    MNEForwardSolution(const MNEForwardSolution* p_pMNEForwardSolution);
+    MNEForwardSolution(const MNEForwardSolution& p_pMNEForwardSolution);
 
     //=========================================================================================================
     /**
-    * dtor
+    * Destroys the MNEForwardSolution.
     */
     ~MNEForwardSolution();
 
+    //=========================================================================================================
+    /**
+    * Initializes the MNE forward solution.
+    */
+    void clear();
 
-    bool cluster_forward_solution( MNEForwardSolution* p_fwdOut, Annotation* p_pLHAnnotation, Annotation* p_pRHAnnotation, qint32 p_iClusterSize);
+    //=========================================================================================================
+    /**
+    * Cluster the forward solution and stores the result to p_fwdOut.
+    * The clustering is done by using the provided annotations
+    *
+    * @param[out] p_fwdOut          clustered MNE forward solution
+    * @param[in] p_LHAnnotation     Annotation of the left hemisphere
+    * @param[in] p_RHAnnotation     Annotation of the right hemisphere
+    * @param[in] p_iClusterSize     Maximal cluster size per roi
+    *
+    * @return true if succeeded, false otherwise
+    */
+    bool cluster_forward_solution(MNEForwardSolution &p_fwdOut, const Annotation &p_LHAnnotation, const Annotation &p_RHAnnotation, qint32 p_iClusterSize);
+
+    //=========================================================================================================
+    /**
+    * True if FIFF measurement file information is empty.
+    *
+    * @return true if FIFF measurement file information is empty
+    */
+    inline bool isEmpty() const
+    {
+        return this->nchan <= 0;
+    }
 
 
     VectorXi tripletSelection(VectorXi& p_vecIdxSelection)
@@ -173,9 +203,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_forward_solution(QIODevice& p_IODevice, MNEForwardSolution*& fwd, bool force_fixed = false, bool surf_ori = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
-
-
+    static bool read_forward_solution(QIODevice& p_IODevice, MNEForwardSolution& fwd, bool force_fixed = false, bool surf_ori = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
 
 
 
@@ -215,11 +243,6 @@ public:
 
     }
 
-
-
-
-
-
 private:
     //=========================================================================================================
     /**
@@ -233,19 +256,19 @@ private:
     *
     * @return True if succeeded, false otherwise
     */
-    static bool read_one(FiffStream* p_pStream, const FiffDirTree& p_Node, MNEForwardSolution*& one);
+    static bool read_one(FiffStream* p_pStream, const FiffDirTree& p_Node, MNEForwardSolution& one);
 
 public:
-    fiff_int_t source_ori;      /**< ToDo... */
-    fiff_int_t coord_frame;     /**< ToDo... */
-    fiff_int_t nsource;         /**< ToDo... */
-    fiff_int_t nchan;           /**< ToDo... */
-    FiffNamedMatrix::SDPtr sol;        /**< ToDo... */
-    FiffNamedMatrix::SDPtr sol_grad;   /**< ToDo... */
-    FiffCoordTrans mri_head_t;  /**< ToDo... */
-    MNESourceSpace src;         /**< ToDo... */
-    MatrixX3d source_rr;        /**< ToDo... */
-    MatrixX3d source_nn;        /**< ToDo... */
+    fiff_int_t source_ori;              /**< ToDo... */
+    fiff_int_t coord_frame;             /**< ToDo... */
+    fiff_int_t nsource;                 /**< ToDo... */
+    fiff_int_t nchan;                   /**< ToDo... */
+    FiffNamedMatrix::SDPtr sol;         /**< ToDo... */
+    FiffNamedMatrix::SDPtr sol_grad;    /**< ToDo... */
+    FiffCoordTrans mri_head_t;          /**< ToDo... */
+    MNESourceSpace src;                 /**< ToDo... */
+    MatrixX3d source_rr;                /**< ToDo... */
+    MatrixX3d source_nn;                /**< ToDo... */
 
     bool isClustered;           /**< Indicates whether fwd conatins a clustered forward solution. */
 };
