@@ -1,6 +1,7 @@
 var searchData=
 [
   ['cal',['cal',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a280ad3b0f38b3f8ecee6669aa652885d',1,'FIFFLIB::FiffChInfo']]],
+  ['calculate',['calculate',['../class_m_n_e_m_a_t_h_l_i_b_1_1_k_means.html#ab2badf8b28e66501808d7c9ea7db0fb1',1,'MNEMATHLIB::KMeans']]],
   ['cals',['cals',['../class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#aca60160d7aaa770cfe6346ad9264627c',1,'FIFFLIB::FiffRawData']]],
   ['ch_5fname',['ch_name',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#ab3cf2e116d285cdab2313b9adb9ee3bd',1,'FIFFLIB::FiffChInfo']]],
   ['ch_5fnames',['ch_names',['../class_f_i_f_f_l_i_b_1_1_fiff_info.html#a1397170741832d3f9df9935798ef4cc7',1,'FIFFLIB::FiffInfo']]],
@@ -22,8 +23,8 @@ var searchData=
   ['coil_5ftype',['coil_type',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#aa6c5dd28c8c0d442aeb073188785185b',1,'FIFFLIB::FiffChInfo::coil_type()'],['../class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#a7875d73688cc6722db13386709b91760',1,'FIFFLIB::FiffChPos::coil_type()']]],
   ['col_5fnames',['col_names',['../class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#a612bfa11eef52ae09de143272a6da84f',1,'FIFFLIB::FiffNamedMatrix']]],
   ['colcals',['colcals',['../class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a1ffe25b96898c5f5040350fd175a0650',1,'FIFFLIB::FiffCtfComp']]],
-  ['colortable',['Colortable',['../class_f_s_l_i_b_1_1_colortable.html#a754b35c17624ea9d547c850268cff11b',1,'FSLIB::Colortable']]],
   ['colortable',['Colortable',['../class_f_s_l_i_b_1_1_colortable.html',1,'FSLIB']]],
+  ['colortable',['Colortable',['../class_f_s_l_i_b_1_1_colortable.html#a754b35c17624ea9d547c850268cff11b',1,'FSLIB::Colortable']]],
   ['colortable_2ecpp',['colortable.cpp',['../colortable_8cpp.html',1,'']]],
   ['colortable_2eh',['colortable.h',['../colortable_8h.html',1,'']]],
   ['combine_5fxyz',['combine_xyz',['../class_m_n_e_l_i_b_1_1_m_n_e.html#a730256c44026e9d64551d85fc649488d',1,'MNELIB::MNE::combine_xyz()'],['../class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#a2b01df2e1093da85ab5edb2ba9354a14',1,'MNEMATHLIB::MNEMath::combine_xyz()']]],

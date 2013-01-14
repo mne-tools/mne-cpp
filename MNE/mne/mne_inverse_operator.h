@@ -94,9 +94,9 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* MNE inverse operator
+* Inverse operator
 *
-* @brief MNE inverse operator
+* @brief Inverse operator
 */
 class MNESHARED_EXPORT MNEInverseOperator
 {

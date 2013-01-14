@@ -114,9 +114,9 @@ using namespace FSLIB;
 
 //=============================================================================================================
 /**
-* MNE forward solution
+* Forward solution
 *
-* @brief MNE forward solution
+* @brief Forward solution
 */
 class MNESHARED_EXPORT MNEForwardSolution
 {

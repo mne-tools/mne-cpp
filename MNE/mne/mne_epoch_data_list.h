@@ -76,9 +76,9 @@ namespace MNELIB
 
 //=============================================================================================================
 /**
-* MNE epoch data, which corresponds to an event
+* Epoch data list, which corresponds to a set of events
 *
-* @brief epoch data
+* @brief Epoch data list
 */
 class MNESHARED_EXPORT MNEEpochDataList : public QList<MNEEpochData::SPtr>
 {

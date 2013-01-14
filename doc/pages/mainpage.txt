@@ -1,4 +1,4 @@
-/*! \mainpage MNE-CPP Documentation
+/*! \mainpage MNE-CPP (MNE1) Documentation
  *
  * \section intro_sec Introduction
  *
@@ -56,7 +56,7 @@
  *  This software is OSI Certified Open Source Software.
  *  OSI Certified is a certification mark of the Open Source Initiative.
  *
- *  Copyright (c) 2011, Christoph Dinh, Matti Hamalainen.
+ *  Copyright (C) 2013, \ref authors_sec of MNE-cpp.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -85,6 +85,12 @@
  *  (including negligence or otherwise) arising in any way out of the use
  *  of this software, even if advised of the possibility of such
  *  damage.</i>
+ *
+ * \section authors_sec Authors
+ *
+ * \li Christoph Dinh chdinh@nmr.mgh.harvard.edu 2012
+ * \li Matti Hamalainen msh@nmr.mgh.harvard.edu 2012
+ * \li Christof Pieloth 2012
  *
  */
 

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_math.cpp
+* @file     mnemath.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the MNEMath Class.
+* @brief    Implementation of the MNEMath Class.
 *
 */
 

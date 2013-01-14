@@ -20,5 +20,8 @@ var searchData=
   ['mne_5frt_5fdata_5fclient_2ecpp',['mne_rt_data_client.cpp',['../mne__rt__data__client_8cpp.html',1,'']]],
   ['mne_5frt_5fdata_5fclient_2eh',['mne_rt_data_client.h',['../mne__rt__data__client_8h.html',1,'']]],
   ['mne_5fsourcespace_2ecpp',['mne_sourcespace.cpp',['../mne__sourcespace_8cpp.html',1,'']]],
-  ['mne_5fsourcespace_2eh',['mne_sourcespace.h',['../mne__sourcespace_8h.html',1,'']]]
+  ['mne_5fsourcespace_2eh',['mne_sourcespace.h',['../mne__sourcespace_8h.html',1,'']]],
+  ['mnemath_2ecpp',['mnemath.cpp',['../mnemath_8cpp.html',1,'']]],
+  ['mnemath_2eh',['mnemath.h',['../mnemath_8h.html',1,'']]],
+  ['mnemath_5fglobal_2eh',['mnemath_global.h',['../mnemath__global_8h.html',1,'']]]
 ];

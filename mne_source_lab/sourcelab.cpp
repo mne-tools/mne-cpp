@@ -76,17 +76,17 @@ SourceLab::SourceLab(QObject *parent)
             this, &SourceLab::receiveRawBuffer);
     this->start();
 
-    m_pCovRt = new CovRt(this);
+    m_pRtCov = new RtCov(this);
     connect(m_pRtClient, &MNERtClient::rawBufferReceived,
-            m_pCovRt, &CovRt::receiveDataSegment);
-    m_pCovRt->start();
+            m_pRtCov, &RtCov::receiveDataSegment);
+    m_pRtCov->start();
 
     m_pFiffInfo = FiffInfo::SPtr(new FiffInfo(*m_pRtClient->getFiffInfo().data()));
 
-    m_pInvRt = new InvRt(m_pFiffInfo, m_pFwd, this);
-    connect(m_pCovRt, &CovRt::covCalculated,
-            m_pInvRt, &InvRt::receiveNoiseCov);
-    m_pInvRt->start();
+    m_pRtInv = new RtInv(m_pFiffInfo, m_pFwd, this);
+    connect(m_pRtCov, &RtCov::covCalculated,
+            m_pRtInv, &RtInv::receiveNoiseCov);
+    m_pRtInv->start();
 }
 
 

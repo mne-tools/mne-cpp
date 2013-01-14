@@ -86,7 +86,7 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* MNE epoch data, which corresponds to an event
+* Epoch data, which corresponds to an event
 *
 * @brief epoch data
 */

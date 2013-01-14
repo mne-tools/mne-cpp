@@ -1,0 +1,12 @@
+#ifndef RTCOMMANDS_GLOBAL_H
+#define RTCOMMANDS_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(RTCOMMANDS_LIBRARY)
+#  define RTCOMMANDSSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define RTCOMMANDSSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // RTCOMMANDS_GLOBAL_H

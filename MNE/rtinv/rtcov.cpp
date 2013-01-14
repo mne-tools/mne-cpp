@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     covrt.cpp
+* @file     rtcov.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 *
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the CovRt Class.
+* @brief     implementation of the RtCov Class.
 *
 */
 
@@ -40,7 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "covrt.h"
+#include "rtcov.h"
 
 #include <iostream>
 
@@ -58,7 +58,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVRTLIB;
+using namespace RTINVLIB;
 
 
 //*************************************************************************************************************
@@ -66,7 +66,7 @@ using namespace INVRTLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CovRt::CovRt(QObject *parent)
+RtCov::RtCov(QObject *parent)
 : QThread(parent)
 , m_bIsRunning(false)
 , m_bIsRawBufferInit(false)
@@ -79,7 +79,7 @@ CovRt::CovRt(QObject *parent)
 
 //*************************************************************************************************************
 
-CovRt::~CovRt()
+RtCov::~RtCov()
 {
     stop();
     if(m_pRawMatrixBuffer)
@@ -89,7 +89,7 @@ CovRt::~CovRt()
 
 //*************************************************************************************************************
 
-void CovRt::receiveDataSegment(MatrixXf p_DataSegment)
+void RtCov::receiveDataSegment(MatrixXf p_DataSegment)
 {
 //    if(m_pRawMatrixBuffer) // ToDo handle change buffersize
 
@@ -108,7 +108,7 @@ void CovRt::receiveDataSegment(MatrixXf p_DataSegment)
 
 //*************************************************************************************************************
 
-bool CovRt::stop()
+bool RtCov::stop()
 {
     m_bIsRunning = false;
     QThread::wait();
@@ -119,7 +119,7 @@ bool CovRt::stop()
 
 //*************************************************************************************************************
 
-void CovRt::run()
+void RtCov::run()
 {
     m_bIsRunning = true;
 

@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ToDo Documentation...
+* @brief    MNESourceSpace class implementation.
 *
 */
 
