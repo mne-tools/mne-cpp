@@ -136,7 +136,7 @@ public:
     *
     * @param[in] p_MNEForwardSolution   MNE forward solution
     */
-    MNEForwardSolution(const MNEForwardSolution& p_pMNEForwardSolution);
+    MNEForwardSolution(const MNEForwardSolution &p_MNEForwardSolution);
 
     //=========================================================================================================
     /**
@@ -175,17 +175,20 @@ public:
         return this->nchan <= 0;
     }
 
-
-    VectorXi tripletSelection(VectorXi& p_vecIdxSelection)
-    {
-        MatrixXi triSelect = p_vecIdxSelection.transpose().replicate(3,1).array() * 3;//repmat((p_vecIdxSelection - 1) * 3 + 1, 3, 1);
-        triSelect.row(1).array() += 1;
-        triSelect.row(2).array() += 2;
-        VectorXi retTriSelect(triSelect.cols()*3);
-        for(int i = 0; i < triSelect.cols(); ++i)
-            retTriSelect.block(i*3,0,3,1) = triSelect.col(i);
-        return retTriSelect;
-    } // tripletSelection
+    //=========================================================================================================
+    /**
+    *
+    */
+//    VectorXi tripletSelection(VectorXi& p_vecIdxSelection)
+//    {
+//        MatrixXi triSelect = p_vecIdxSelection.transpose().replicate(3,1).array() * 3;//repmat((p_vecIdxSelection - 1) * 3 + 1, 3, 1);
+//        triSelect.row(1).array() += 1;
+//        triSelect.row(2).array() += 2;
+//        VectorXi retTriSelect(triSelect.cols()*3);
+//        for(int i = 0; i < triSelect.cols(); ++i)
+//            retTriSelect.block(i*3,0,3,1) = triSelect.col(i);
+//        return retTriSelect;
+//    } // tripletSelection
 
 
     //=========================================================================================================
@@ -206,42 +209,46 @@ public:
     static bool read_forward_solution(QIODevice& p_IODevice, MNEForwardSolution& fwd, bool force_fixed = false, bool surf_ori = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
 
 
+//    //=========================================================================================================
+//    /**
+//    * Prepares a forward solution, Bad channels, after clustering etc ToDo...
+//    *
+//    * @param [in] p_FiffInfo   Fif measurement info
+//    *
+//    */
+//    void prepare_forward(const FiffInfo& p_FiffInfo)
+//    {
+//        QStringList fwdChNames = this->sol->row_names;
+//        QStringList chNames;
+//        for(qint32 i = 0; i < p_FiffInfo.ch_names.size(); ++i)
+//        {
+//            bool inBads = false;
+//            bool inFwd = false;
 
+//            for(qint32 j = 0; j < p_FiffInfo.bads.size(); ++j)
+//            {
+//                if(QString::compare(p_FiffInfo.bads[j], p_FiffInfo.ch_names[i]) == 0)
+//                {
+//                    inBads = true;
+//                    break;
+//                }
+//            }
 
-    void prepare_forward(FiffInfo* p_pFiffInfo)
-    {
-        QStringList fwdChNames = this->sol->row_names;
-        QStringList chNames;
-        for(qint32 i = 0; i < p_pFiffInfo->ch_names.size(); ++i)
-        {
-            bool inBads = false;
-            bool inFwd = false;
+//            for(qint32 j = 0; j < fwdChNames.size(); ++j)
+//            {
+//                if(QString::compare(fwdChNames[j], p_FiffInfo.ch_names[i]) == 0)
+//                {
+//                    inFwd = true;
+//                    break;
+//                }
+//            }
 
-            for(qint32 j = 0; j < p_pFiffInfo->bads.size(); ++j)
-            {
-                if(QString::compare(p_pFiffInfo->bads[j], p_pFiffInfo->ch_names[i]) == 0)
-                {
-                    inBads = true;
-                    break;
-                }
-            }
+//            if(!inBads && inFwd)
+//                chNames.append(p_FiffInfo.ch_names[i]);
+//        }
 
-            for(qint32 j = 0; j < fwdChNames.size(); ++j)
-            {
-                if(QString::compare(fwdChNames[j], p_pFiffInfo->ch_names[i]) == 0)
-                {
-                    inFwd = true;
-                    break;
-                }
-            }
-
-            if(!inBads && inFwd)
-                chNames.append(p_pFiffInfo->ch_names[i]);
-        }
-
-        qint32 nchan = chNames.size();
-
-    }
+//        qint32 nchan = chNames.size();
+//    }
 
 private:
     //=========================================================================================================
@@ -259,18 +266,18 @@ private:
     static bool read_one(FiffStream* p_pStream, const FiffDirTree& p_Node, MNEForwardSolution& one);
 
 public:
-    fiff_int_t source_ori;              /**< ToDo... */
-    fiff_int_t coord_frame;             /**< ToDo... */
-    fiff_int_t nsource;                 /**< ToDo... */
-    fiff_int_t nchan;                   /**< ToDo... */
-    FiffNamedMatrix::SDPtr sol;         /**< ToDo... */
+    fiff_int_t source_ori;              /**< Source orientation: fixed or free */
+    fiff_int_t coord_frame;             /**< Coil coordinate system definition */
+    fiff_int_t nsource;                 /**< Number of source dipoles */
+    fiff_int_t nchan;                   /**< Number of channels */
+    FiffNamedMatrix::SDPtr sol;         /**< Forward solution */
     FiffNamedMatrix::SDPtr sol_grad;    /**< ToDo... */
-    FiffCoordTrans mri_head_t;          /**< ToDo... */
-    MNESourceSpace src;                 /**< ToDo... */
-    MatrixX3d source_rr;                /**< ToDo... */
-    MatrixX3d source_nn;                /**< ToDo... */
+    FiffCoordTrans mri_head_t;          /**< MRI head coordinate transformation */
+    MNESourceSpace src;                 /**< Geomertic description of the source spaces (hemispheres) */
+    MatrixX3d source_rr;                /**< Source locations */
+    MatrixX3d source_nn;                /**< Source normals (number depends on fixed or free orientation) */
 
-    bool isClustered;           /**< Indicates whether fwd conatins a clustered forward solution. */
+    bool isClustered;   /**< Indicates whether fwd conatins a clustered forward solution. */
 };
 
 } // NAMESPACE

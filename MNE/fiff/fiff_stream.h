@@ -44,14 +44,9 @@
 #include "fiff_global.h"
 #include "fiff_types.h"
 #include "fiff_id.h"
-//#include "fiff_dir_entry.h"
 #include "fiff_coord_trans.h"
-//#include "fiff_proj.h"
-//#include "fiff_ctf_comp.h"
 #include "fiff_ch_info.h"
 #include "fiff_dig_point.h"
-//#include "fiff_info.h"
-//#include "fiff_raw_data.h"
 #include "fiff_cov.h"
 #include "fiff_dir_tree.h"
 
@@ -564,7 +559,7 @@ public:
     * @param[in] command    The real time command
     * @param[in] data       The string data to write
     */
-    void write_rt_command(fiff_int_t command, QString& data);
+    void write_rt_command(fiff_int_t command, const QString& data);
 };
 
 } // NAMESPACE

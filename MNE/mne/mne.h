@@ -48,7 +48,6 @@
 #include "mne_forwardsolution.h"
 #include "mne_hemisphere.h"
 #include "mne_sourcespace.h"
-#include "mne_math.h"
 
 
 //*************************************************************************************************************
@@ -58,6 +57,9 @@
 
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_cov.h>
+
+
+#include <mnemath/mnemath.h>
 
 
 //*************************************************************************************************************
@@ -81,7 +83,7 @@ namespace MNELIB
 // USED NAMESPACES
 //=============================================================================================================
 
-//using namespace SOURCELAB;
+using namespace MNEMATHLIB;
 using namespace FIFFLIB;
 
 

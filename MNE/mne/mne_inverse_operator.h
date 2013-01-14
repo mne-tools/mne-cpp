@@ -44,7 +44,6 @@
 
 #include "mne_global.h"
 #include "mne_sourcespace.h"
-#include "mne_math.h"
 
 
 //*************************************************************************************************************
@@ -56,6 +55,8 @@
 #include <fiff/fiff_named_matrix.h>
 #include <fiff/fiff_proj.h>
 #include <fiff/fiff_cov.h>
+
+#include <mnemath/mnemath.h>
 
 
 //*************************************************************************************************************
@@ -72,8 +73,6 @@
 //=============================================================================================================
 
 #include <QList>
-
-
 
 
 //*************************************************************************************************************
@@ -95,9 +94,9 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* MNE epoch data, which corresponds to an event
+* MNE inverse operator
 *
-* @brief epoch data
+* @brief MNE inverse operator
 */
 class MNESHARED_EXPORT MNEInverseOperator
 {
@@ -107,15 +106,17 @@ public:
 
     //=========================================================================================================
     /**
-    * ctor
+    * Default constructor
     */
     MNEInverseOperator();
 
     //=========================================================================================================
     /**
-    * Copy ctor
+    * Copy constructor.
+    *
+    * @param[in] p_MNEInverseOperator   MNE forward solution
     */
-    MNEInverseOperator(const MNEInverseOperator* p_pMNEInverseOperator);
+    MNEInverseOperator(const MNEInverseOperator &p_MNEInverseOperator);
 
     //=========================================================================================================
     /**
@@ -156,29 +157,29 @@ public:
     static bool read_inverse_operator(QIODevice& p_pIODevice, MNEInverseOperator& inv);
 
 public:
-    fiff_int_t methods;
-    fiff_int_t source_ori;
-    fiff_int_t nsource;
-    fiff_int_t nchan;
-    fiff_int_t coord_frame;
-    MatrixXd  source_nn;
-    VectorXd  sing;
-    bool    eigen_leads_weighted;
-    FiffNamedMatrix::SDPtr eigen_leads;
-    FiffNamedMatrix::SDPtr eigen_fields;
-    FiffCov::SDPtr noise_cov;
-    FiffCov::SDPtr source_cov;
-    FiffCov::SDPtr orient_prior;
-    FiffCov::SDPtr depth_prior;
-    FiffCov::SDPtr fmri_prior;
-    MNESourceSpace src;
-    FiffCoordTrans mri_head_t;
-    fiff_int_t nave;
-    QList<FiffProj> projs;
-    MatrixXd proj;                     /**< This is the projector to apply to the data. */
-    MatrixXd whitener;                 /**< This whitens the data */
-    VectorXd reginv;                   /**< This the diagonal matrix implementing. regularization and the inverse */
-    SparseMatrix<double> noisenorm;    /**< These are the noise-normalization factors */
+    fiff_int_t methods;                     /**< MEG, EEG or both */
+    fiff_int_t source_ori;                  /**< Source orientation: f */
+    fiff_int_t nsource;                     /**< Number of source points. */
+    fiff_int_t nchan;                       /**< Number of channels. */
+    fiff_int_t coord_frame;                 /**< Coordinate system definition */
+    MatrixXd  source_nn;                    /**< Source normals. */
+    VectorXd  sing;                         /**< Singular values */
+    bool    eigen_leads_weighted;           /**< If eigen lead are weighted. */
+    FiffNamedMatrix::SDPtr eigen_leads;     /**< Eigen leads */
+    FiffNamedMatrix::SDPtr eigen_fields;    /**< Eigen fields */
+    FiffCov::SDPtr noise_cov;               /**< Noise covariance matrix. */
+    FiffCov::SDPtr source_cov;              /**< Source covariance matrix. */
+    FiffCov::SDPtr orient_prior;            /**< Orientation priors */
+    FiffCov::SDPtr depth_prior;             /**< Depth priors */
+    FiffCov::SDPtr fmri_prior;              /**< fMRI priors */
+    MNESourceSpace src;                     /**< Source Space */
+    FiffCoordTrans mri_head_t;              /**< MRI head coordinate transformation */
+    fiff_int_t nave;                        /**< Number of averages used to regularize the solution. Set to 1 on single Epoch by default.*/
+    QList<FiffProj> projs;                  /**< SSP operator */
+    MatrixXd proj;                          /**< The projector to apply to the data. */
+    MatrixXd whitener;                      /**< Whitens the data */
+    VectorXd reginv;                        /**< The diagonal matrix implementing. regularization and the inverse */
+    SparseMatrix<double> noisenorm;         /**< These are the noise-normalization factors */
 };
 
 } // NAMESPACE

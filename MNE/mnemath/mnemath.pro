@@ -61,10 +61,12 @@ win32 {
     QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
 }
 
-SOURCES += kmeans.cpp
+SOURCES += kmeans.cpp \
+    mnemath.cpp
 
 HEADERS +=  kmeans.h\
-            mnemath_global.h
+            mnemath_global.h \
+    mnemath.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

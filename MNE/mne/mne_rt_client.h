@@ -96,8 +96,9 @@ using namespace FIFFLIB;
 
 //=============================================================================================================
 /**
-* DECLARE MNE RT CLIENT CLASS
-* @brief The MNERtClient class provides an interface to communicate with a running mne_rt_server.
+* The MNE real-time client class provides an interface to communicate with a running mne_rt_server.
+*
+* @brief MNE real-time client
 */
 class MNESHARED_EXPORT MNERtClient : public QThread
 {
@@ -108,7 +109,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the RtClient.
+    * Creates the real-time client.
     *
     * @param[in] p_sRtServerHostname    The IP address of the mne_rt_server
     * @param[in] parent                 Parent QObject (optional)
@@ -117,7 +118,7 @@ public:
     
     //=========================================================================================================
     /**
-    * Destroys the RtClient.
+    * Destroys the real time client.
     */
     ~MNERtClient();
 
@@ -149,16 +150,13 @@ protected:
     virtual void run();
 
 private:
-    QMutex      mutex;
-
+    QMutex      mutex;                  /**< Provides access serialization between threads*/
     bool        m_bIsRunning;           /**< Holds whether RtClient is running.*/
-
     QString     m_sRtServerHostName;    /**< The IP Adress of mne_rt_server.*/
-
-    FiffInfo::SDPtr m_pFiffInfo;
+    FiffInfo::SDPtr m_pFiffInfo;        /**< Fiff measurement info.*/
 
 signals:
-    void rawBufferReceived(Eigen::MatrixXf p_rawBuffer);
+    void rawBufferReceived(Eigen::MatrixXf p_rawBuffer);    /**< Emits a received raw buffer - ToDo change the emits to fiff raw data.*/
 };
 
 } // NAMESPACE

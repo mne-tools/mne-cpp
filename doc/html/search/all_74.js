@@ -26,7 +26,7 @@ var searchData=
   ['tounsignedint',['toUnsignedInt',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a483d8147f585de567ee8a64f5a84ee9b',1,'FIFFLIB::FiffTag']]],
   ['tounsignedshort',['toUnsignedShort',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a34644147b22eb4bcb32c3a803fbaf089',1,'FIFFLIB::FiffTag']]],
   ['trans',['trans',['../class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ae3995f710ab35b5f7687001a4cd4e4b5',1,'FIFFLIB::FiffCoordTrans']]],
-  ['transform_5fhemisphere_5fto',['transform_hemisphere_to',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a28dfa9032242a4f60364876c0a7ac63b',1,'MNELIB::MNEHemisphere']]],
+  ['transform_5fhemisphere_5fto',['transform_hemisphere_to',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a65d5329ce3b7bfefd30e2a7bf43fa654',1,'MNELIB::MNEHemisphere']]],
   ['transform_5fsource_5fspace_5fto',['transform_source_space_to',['../class_m_n_e_l_i_b_1_1_m_n_e.html#a24942df6f7a4d0869e3fd254e11e67e5',1,'MNELIB::MNE::transform_source_space_to()'],['../class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a38654bb9875091c2cb5a04e2531653d7',1,'MNELIB::MNESourceSpace::transform_source_space_to()']]],
   ['transpose_5fnamed_5fmatrix',['transpose_named_matrix',['../class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#acfc42a46812792ab7b36a5de046c37b6',1,'FIFFLIB::FiffNamedMatrix::transpose_named_matrix()'],['../class_m_n_e_l_i_b_1_1_m_n_e.html#a1bce4f10a8fec00dc70d460da1b96955',1,'MNELIB::MNE::transpose_named_matrix()']]],
   ['tri_5farea',['tri_area',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a139bc83d26deda30a6ac4663b9bac838',1,'MNELIB::MNEHemisphere']]],

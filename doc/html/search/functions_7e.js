@@ -31,7 +31,7 @@ var searchData=
   ['_7emneforwardsolution',['~MNEForwardSolution',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#af7807f7d45b2a21d782ab73aaf117411',1,'MNELIB::MNEForwardSolution']]],
   ['_7emnehemisphere',['~MNEHemisphere',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a29c61433931c07044af051a53a4f08c1',1,'MNELIB::MNEHemisphere']]],
   ['_7emneinverseoperator',['~MNEInverseOperator',['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ad67ea2b10e4a96c86ac1887af2430fcf',1,'MNELIB::MNEInverseOperator']]],
-  ['_7emnemath',['~MNEMath',['../class_m_n_e_l_i_b_1_1_m_n_e_math.html#ab92f723e9723b170b5c5b3095137bd18',1,'MNELIB::MNEMath']]],
+  ['_7emnemath',['~MNEMath',['../class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#ac5118943876966b509ae7eacaae0df60',1,'MNEMATHLIB::MNEMath']]],
   ['_7emnertclient',['~MNERtClient',['../class_m_n_e_l_i_b_1_1_m_n_e_rt_client.html#a859a52e1ac9406283e25440b661eb35b',1,'MNELIB::MNERtClient']]],
   ['_7emnesourcespace',['~MNESourceSpace',['../class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a2dcc53eec782e14a65530db6195ec629',1,'MNELIB::MNESourceSpace']]],
   ['_7esubject',['~Subject',['../class_subject.html#a7c4f522850f718466e5be7eb55ba1969',1,'Subject']]]

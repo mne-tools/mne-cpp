@@ -2,6 +2,9 @@ var searchData=
 [
   ['eeg_5floc',['eeg_loc',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a8d0f25ed69750580b56814407b8c204b',1,'FIFFLIB::FiffChInfo']]],
   ['eig',['eig',['../class_f_i_f_f_l_i_b_1_1_fiff_cov.html#a39fc29400ff48ad9ef062ba701eab5aa',1,'FIFFLIB::FiffCov']]],
+  ['eigen_5ffields',['eigen_fields',['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#afb102fbfd585dede44d1bf1c0069ad9a',1,'MNELIB::MNEInverseOperator']]],
+  ['eigen_5fleads',['eigen_leads',['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a2dc0c2da948869c91bb9d5ecf96a94ca',1,'MNELIB::MNEInverseOperator']]],
+  ['eigen_5fleads_5fweighted',['eigen_leads_weighted',['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a5d27190215db612df4141865f4340e07',1,'MNELIB::MNEInverseOperator']]],
   ['eigvec',['eigvec',['../class_f_i_f_f_l_i_b_1_1_fiff_cov.html#ab3292fd27b3ab9f10c64dc0b8fd3e12e',1,'FIFFLIB::FiffCov']]],
   ['end_5fblock',['end_block',['../class_f_i_f_f_l_i_b_1_1_fiff.html#aaf5fdbeca3cbb7e2bd7be5d62d175e37',1,'FIFFLIB::Fiff::end_block()'],['../class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a904df8f48da1564a8d5a975a22aa6b54',1,'FIFFLIB::FiffStream::end_block()']]],
   ['end_5ffile',['end_file',['../class_f_i_f_f_l_i_b_1_1_fiff.html#a694dadabbf0b775d91b5a0477ddc3f98',1,'FIFFLIB::Fiff::end_file()'],['../class_f_i_f_f_l_i_b_1_1_fiff_stream.html#ae1aa8744d83c7aee9dc57c2f9c9919a8',1,'FIFFLIB::FiffStream::end_file()']]],

@@ -94,6 +94,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">MNELIB::MNERtDataClient Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> real-time data client.  
+ <a href="class_m_n_e_l_i_b_1_1_m_n_e_rt_data_client.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="mne__rt__data__client_8h_source.html">mne_rt_data_client.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for MNELIB::MNERtDataClient:</div>
 <div class="dyncontent">
@@ -114,28 +119,24 @@ Public Types</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ad5bd498e50340c21573a4c955ff7ac57"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad5bd498e50340c21573a4c955ff7ac57"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>MNERtDataClient</b> (QObject *parent=0)</td></tr>
+<tr class="memitem:ad5bd498e50340c21573a4c955ff7ac57"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_rt_data_client.html#ad5bd498e50340c21573a4c955ff7ac57">MNERtDataClient</a> (QObject *parent=0)</td></tr>
 <tr class="separator:ad5bd498e50340c21573a4c955ff7ac57"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acb70ff37a7336bb1dfa629033299c7e2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acb70ff37a7336bb1dfa629033299c7e2"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>connectToHost</b> (QString &amp;p_sRtServerHostName)</td></tr>
-<tr class="separator:acb70ff37a7336bb1dfa629033299c7e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afb88007eb104bef6b9356cbb3605b48f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afb88007eb104bef6b9356cbb3605b48f"></a>
-<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a>&#160;</td><td class="memItemRight" valign="bottom"><b>readInfo</b> ()</td></tr>
+<tr class="memitem:a04e7b2d60c1a2c8f723c0f1ac2e95d54"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_rt_data_client.html#a04e7b2d60c1a2c8f723c0f1ac2e95d54">connectToHost</a> (const QString &amp;p_sRtServerHostName)</td></tr>
+<tr class="separator:a04e7b2d60c1a2c8f723c0f1ac2e95d54"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb543037b7d1c68d0d573b54f553ac9f"><td class="memItemLeft" align="right" valign="top">qint32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_rt_data_client.html#acb543037b7d1c68d0d573b54f553ac9f">getClientId</a> ()</td></tr>
+<tr class="separator:acb543037b7d1c68d0d573b54f553ac9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb88007eb104bef6b9356cbb3605b48f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_rt_data_client.html#afb88007eb104bef6b9356cbb3605b48f">readInfo</a> ()</td></tr>
 <tr class="separator:afb88007eb104bef6b9356cbb3605b48f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8251c87d950045ecc8055402b83d8c9f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8251c87d950045ecc8055402b83d8c9f"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>readRawBuffer</b> (qint32 p_nChannels, MatrixXf &amp;data, fiff_int_t &amp;kind)</td></tr>
+<tr class="memitem:a8251c87d950045ecc8055402b83d8c9f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_rt_data_client.html#a8251c87d950045ecc8055402b83d8c9f">readRawBuffer</a> (qint32 p_nChannels, MatrixXf &amp;data, fiff_int_t &amp;kind)</td></tr>
 <tr class="separator:a8251c87d950045ecc8055402b83d8c9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae7de66aa7ae93a77fcbd4af6847a17f6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae7de66aa7ae93a77fcbd4af6847a17f6"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setClientAlias</b> (QString p_sAlias)</td></tr>
-<tr class="separator:ae7de66aa7ae93a77fcbd4af6847a17f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acfb8cf96e93621050cf9a33437914e2e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acfb8cf96e93621050cf9a33437914e2e"></a>
-qint32&#160;</td><td class="memItemRight" valign="bottom"><b>getClientId</b> ()</td></tr>
-<tr class="separator:acfb8cf96e93621050cf9a33437914e2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5db30c819a8edcfb02731097fb61a32d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_rt_data_client.html#a5db30c819a8edcfb02731097fb61a32d">setClientAlias</a> (const QString &amp;p_sAlias)</td></tr>
+<tr class="separator:a5db30c819a8edcfb02731097fb61a32d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock">
-<p>Definition at line <a class="el" href="mne__rt__data__client_8h_source.html#l00039">39</a> of file <a class="el" href="mne__rt__data__client_8h_source.html">mne_rt_data_client.h</a>.</p>
+<div class="textblock"><p><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> real-time data client. </p>
+<p>The <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> real-time data client class provides an interface to communicate with the data port 4218 of a running mne_rt_server. </p>
+
+<p>Definition at line <a class="el" href="mne__rt__data__client_8h_source.html#l00090">90</a> of file <a class="el" href="mne__rt__data__client_8h_source.html">mne_rt_data_client.h</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a class="anchor" id="a58a6e31d5621583ad1d0947f46652204"></a>
 <div class="memitem">
@@ -146,9 +147,9 @@ qint32&#160;</td><td class="memItemRight" valign="bottom"><b>getClientId</b> ()<
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Const shared pointer type for <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_rt_data_client.html">MNERtDataClient</a>. </p>
+<p>Const shared pointer type for <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_rt_data_client.html" title="MNE real-time data client.">MNERtDataClient</a>. </p>
 
-<p>Definition at line <a class="el" href="mne__rt__data__client_8h_source.html#l00044">44</a> of file <a class="el" href="mne__rt__data__client_8h_source.html">mne_rt_data_client.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__rt__data__client_8h_source.html#l00095">95</a> of file <a class="el" href="mne__rt__data__client_8h_source.html">mne_rt_data_client.h</a>.</p>
 
 </div>
 </div>
@@ -161,9 +162,175 @@ qint32&#160;</td><td class="memItemRight" valign="bottom"><b>getClientId</b> ()<
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Shared pointer type for <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_rt_data_client.html">MNERtDataClient</a>. </p>
+<p>Shared pointer type for <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_rt_data_client.html" title="MNE real-time data client.">MNERtDataClient</a>. </p>
 
-<p>Definition at line <a class="el" href="mne__rt__data__client_8h_source.html#l00043">43</a> of file <a class="el" href="mne__rt__data__client_8h_source.html">mne_rt_data_client.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__rt__data__client_8h_source.html#l00094">94</a> of file <a class="el" href="mne__rt__data__client_8h_source.html">mne_rt_data_client.h</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="ad5bd498e50340c21573a4c955ff7ac57"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">MNERtDataClient::MNERtDataClient </td>
+          <td>(</td>
+          <td class="paramtype">QObject *&#160;</td>
+          <td class="paramname"><em>parent</em> = <code>0</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Creates the real-time data client.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">parent</td><td>Parent QObject (optional) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="mne__rt__data__client_8cpp_source.html#l00059">59</a> of file <a class="el" href="mne__rt__data__client_8cpp_source.html">mne_rt_data_client.cpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a04e7b2d60c1a2c8f723c0f1ac2e95d54"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MNERtDataClient::connectToHost </td>
+          <td>(</td>
+          <td class="paramtype">const QString &amp;&#160;</td>
+          <td class="paramname"><em>p_sRtServerHostName</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Connect to a mne_rt_server using port 4218</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_sRtServerHostname</td><td>The IP address of the mne_rt_server </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="mne__rt__data__client_8cpp_source.html#l00069">69</a> of file <a class="el" href="mne__rt__data__client_8cpp_source.html">mne_rt_data_client.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="acb543037b7d1c68d0d573b54f553ac9f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">qint32 MNERtDataClient::getClientId </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Requests the ID at mne_rt_server and returns it</p>
+<dl class="section return"><dt>Returns</dt><dd>the requested id </dd></dl>
+
+<p>Definition at line <a class="el" href="mne__rt__data__client_8cpp_source.html#l00077">77</a> of file <a class="el" href="mne__rt__data__client_8cpp_source.html">mne_rt_data_client.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="afb88007eb104bef6b9356cbb3605b48f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> MNERtDataClient::readInfo </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Reads fiff measurement information of a data the connection</p>
+<dl class="section return"><dt>Returns</dt><dd>the read fiff measurement information </dd></dl>
+
+<p>Definition at line <a class="el" href="mne__rt__data__client_8cpp_source.html#l00104">104</a> of file <a class="el" href="mne__rt__data__client_8cpp_source.html">mne_rt_data_client.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a8251c87d950045ecc8055402b83d8c9f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MNERtDataClient::readRawBuffer </td>
+          <td>(</td>
+          <td class="paramtype">qint32&#160;</td>
+          <td class="paramname"><em>p_nChannels</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">MatrixXf &amp;&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">fiff_int_t &amp;&#160;</td>
+          <td class="paramname"><em>kind</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Reads fiff measurement information of a data the connection</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_nChannels</td><td>Number of channels to reshape the received data </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">data</td><td>The read data - ToDo change this to raw buffer data object </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">kind</td><td>Data kind </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="mne__rt__data__client_8cpp_source.html#l00308">308</a> of file <a class="el" href="mne__rt__data__client_8cpp_source.html">mne_rt_data_client.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a5db30c819a8edcfb02731097fb61a32d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MNERtDataClient::setClientAlias </td>
+          <td>(</td>
+          <td class="paramtype">const QString &amp;&#160;</td>
+          <td class="paramname"><em>p_sAlias</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Sets the alias of the data client</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_sAlias</td><td>The alias of the data client </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="mne__rt__data__client_8cpp_source.html#l00334">334</a> of file <a class="el" href="mne__rt__data__client_8cpp_source.html">mne_rt_data_client.cpp</a>.</p>
 
 </div>
 </div>
@@ -174,7 +341,7 @@ qint32&#160;</td><td class="memItemRight" valign="bottom"><b>getClientId</b> ()<
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Jan 13 2013 15:48:30 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Jan 13 2013 22:54:26 for mne-cpp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

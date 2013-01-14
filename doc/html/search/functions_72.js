@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['rawbufferreceived',['rawBufferReceived',['../class_m_n_e_l_i_b_1_1_m_n_e_rt_client.html#ac296d196ba7654eb5bba457c2f01fb66',1,'MNELIB::MNERtClient']]],
   ['read_5fbad_5fchannels',['read_bad_channels',['../class_f_i_f_f_l_i_b_1_1_fiff.html#ac852f6b4dbd3d810630640edbebe9c5c',1,'FIFFLIB::Fiff::read_bad_channels()'],['../class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a68c53ab6d013e6d822335f77acb0ef83',1,'FIFFLIB::FiffStream::read_bad_channels()']]],
   ['read_5fcov',['read_cov',['../class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a1e0d80049ea5ff4b65629db24d27f8c1',1,'FIFFLIB::FiffStream::read_cov()'],['../class_m_n_e_l_i_b_1_1_m_n_e.html#aac923889cf65dff09d62f5015b72cc02',1,'MNELIB::MNE::read_cov()']]],
   ['read_5fctf_5fcomp',['read_ctf_comp',['../class_f_i_f_f_l_i_b_1_1_fiff.html#ad2090de5c120c96da8567ee8f36a4c51',1,'FIFFLIB::Fiff::read_ctf_comp()'],['../class_f_i_f_f_l_i_b_1_1_fiff_stream.html#ac392858ed4912a2868ccc42ebdab4c42',1,'FIFFLIB::FiffStream::read_ctf_comp()']]],
@@ -17,5 +18,9 @@ var searchData=
   ['read_5ftag',['read_tag',['../class_f_i_f_f_l_i_b_1_1_fiff.html#af546b2f83959d5095036a2c3407539bd',1,'FIFFLIB::Fiff::read_tag()'],['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a8de4b8d5dec25923cef3b3a7915e3ed7',1,'FIFFLIB::FiffTag::read_tag()']]],
   ['read_5ftag_5fdata',['read_tag_data',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#aeea93066e104549fd6b12d9356206c2d',1,'FIFFLIB::FiffTag']]],
   ['read_5ftag_5finfo',['read_tag_info',['../class_f_i_f_f_l_i_b_1_1_fiff.html#a8f476db8a93647c6a1aa995727758e79',1,'FIFFLIB::Fiff::read_tag_info()'],['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a1532742e40d744e5140e8a32df51d0a5',1,'FIFFLIB::FiffTag::read_tag_info()']]],
+  ['readinfo',['readInfo',['../class_m_n_e_l_i_b_1_1_m_n_e_rt_data_client.html#afb88007eb104bef6b9356cbb3605b48f',1,'MNELIB::MNERtDataClient']]],
+  ['readrawbuffer',['readRawBuffer',['../class_m_n_e_l_i_b_1_1_m_n_e_rt_data_client.html#a8251c87d950045ecc8055402b83d8c9f',1,'MNELIB::MNERtDataClient']]],
+  ['requestmeas',['requestMeas',['../class_m_n_e_l_i_b_1_1_m_n_e_rt_cmd_client.html#a5e7df87fd2ae5849d48007b9d5078388',1,'MNELIB::MNERtCmdClient::requestMeas(qint32 p_id)'],['../class_m_n_e_l_i_b_1_1_m_n_e_rt_cmd_client.html#a95a4ed489b8b2ceb49d9353987f9d78b',1,'MNELIB::MNERtCmdClient::requestMeas(QString p_Alias)']]],
+  ['requestmeasinfo',['requestMeasInfo',['../class_m_n_e_l_i_b_1_1_m_n_e_rt_cmd_client.html#af3c068da73f57e1a8d4d09ce41da1e8d',1,'MNELIB::MNERtCmdClient::requestMeasInfo(qint32 p_id)'],['../class_m_n_e_l_i_b_1_1_m_n_e_rt_cmd_client.html#a8f87c0175fc7298b8fd73cdec502bd9b',1,'MNELIB::MNERtCmdClient::requestMeasInfo(const QString &amp;p_Alias)']]],
   ['run',['run',['../class_i_n_v_r_t_l_i_b_1_1_cov_rt.html#ab19a78fd73404c7a438d98bcd4fd618f',1,'INVRTLIB::CovRt::run()'],['../class_i_n_v_r_t_l_i_b_1_1_inv_rt.html#a4d0fbee0b398161cb30275bc52c60097',1,'INVRTLIB::InvRt::run()'],['../class_m_n_e_l_i_b_1_1_m_n_e_rt_client.html#af73859641916338fde071bd51901c391',1,'MNELIB::MNERtClient::run()']]]
 ];
