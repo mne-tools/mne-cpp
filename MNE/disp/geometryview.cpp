@@ -111,9 +111,9 @@ void GeometryView::initializeGL(QGLPainter *painter)
         {
             QGeometryData tri;
 
-            MatrixXf* triCoords = t_ForwardSolution.src.hemispheres[0].getTriCoords(fac);
+            MatrixXf triCoords = t_ForwardSolution.src.hemispheres[0].getTriCoords(fac);
 
-            tri.appendVertexArray(QArray<QVector3D>::fromRawData( reinterpret_cast<const QVector3D*>(triCoords->data()), triCoords->cols() ));
+            tri.appendVertexArray(QArray<QVector3D>::fromRawData( reinterpret_cast<const QVector3D*>(triCoords.data()), triCoords.cols() ));
 
             //builder << *(t_ForwardSolution->src->hemispheres.at(0)->getGeometryData(fac));
             //builder.addTriangles(*t_ForwardSolution->src->hemispheres.at(0)->getGeometry(fac));
@@ -124,9 +124,9 @@ void GeometryView::initializeGL(QGLPainter *painter)
         {
             QGeometryData tri;
 
-            MatrixXf* triCoords = t_ForwardSolution.src.hemispheres[1].getTriCoords(fac);
+            MatrixXf triCoords = t_ForwardSolution.src.hemispheres[1].getTriCoords(fac);
 
-            tri.appendVertexArray(QArray<QVector3D>::fromRawData( reinterpret_cast<const QVector3D*>(triCoords->data()), triCoords->cols()));
+            tri.appendVertexArray(QArray<QVector3D>::fromRawData( reinterpret_cast<const QVector3D*>(triCoords.data()), triCoords.cols()));
 
             builder.addTriangles(tri);// << tri;
         }

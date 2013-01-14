@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ToDo Documentation...
+* @brief    Contains the MNEHemisphere class declaration.
 *
 */
 
@@ -68,8 +68,6 @@
 
 #include <QList>
 
-//#include <QGeometryData> //ToDo: This has to be excluded otherwise, always qt3d is needed
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -96,9 +94,9 @@ using namespace FIFFLIB;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS SourceSpace
+* Hemisphere source space geometry information
 *
-* @brief The SourceSpace class provides
+* @brief MNEHemisphere provides geometry information
 */
 class MNESHARED_EXPORT MNEHemisphere
 {
@@ -116,7 +114,7 @@ public:
     /**
     * Copy constructor.
     *
-    * @param[in] p_MNEHemisphere  Hemisphere source space which should be copied
+    * @param[in] p_MNEHemisphere    Hemisphere source space which should be copied
     */
     MNEHemisphere(const MNEHemisphere& p_MNEHemisphere);
 
@@ -134,15 +132,29 @@ public:
 
     //=========================================================================================================
     /**
+    * mne_transform_source_space_to
+    *
+    * ### MNE toolbox root function ###
+    *
     * Implementation of the mne_transform_source_space_to for a single hemisphere function
+    * Transform source space data to the desired coordinate system.
+    *
+    * @param[in] dest       The id of the destination coordinate system (FIFFV_COORD_...)
+    * @param[in] p_Trans    The coordinate transformation structure to use
+    *
+    * @return true if succeeded, false otherwise
     */
-    bool transform_hemisphere_to(fiff_int_t dest, FiffCoordTrans& trans);
+    bool transform_hemisphere_to(fiff_int_t dest, const FiffCoordTrans &p_Trans);
 
     //=========================================================================================================
     /**
     * Qt 3d geometry information. Data are generated within first call.
+    *
+    * @param[in] p_fScaling  Scale factor of the returned geometry tri model.
+    *
+    * @return the geometry model
     */
-    MatrixXf* getTriCoords(float p_fScaling = 1.0f);
+    MatrixXf& getTriCoords(float p_fScaling = 1.0f);
 
     //=========================================================================================================
     /**
@@ -151,44 +163,36 @@ public:
     //QGeometryData* getGeometryData(float p_fScaling = 1.0f);
 
 public:
-    // MNE Suite
-    fiff_int_t id;              /**< ID of ... */
-    fiff_int_t np;              /**< ToDo... */
-    fiff_int_t ntri;            /**< ToDo... */
-    fiff_int_t coord_frame;     /**< ToDo... */
-    MatrixX3d rr;               /**< ToDo... */
-    MatrixX3d nn;               /**< ToDo... */
-    MatrixX3i tris;             /**< ToDo... */
-    fiff_int_t nuse;
-    VectorXi inuse;             /**< ToDo... */
-    VectorXi vertno;            /**< ToDo... */
-    qint32 nuse_tri;            /**< ToDo... */
-    MatrixX3i use_tris;         /**< ToDo... */
-    VectorXi nearest;           /**< ToDo... */
-    VectorXd nearest_dist;      /**< ToDo... */
-    QList<VectorXi> pinfo;      /**< ToDo... */
-    float dist_limit;           /**< ToDo... */
-    MatrixXd dist;             /**< ToDo... */
-    MatrixX3d tri_cent;         /**< ToDo... */
-    MatrixX3d tri_nn;           /**< ToDo... */
-    VectorXd tri_area;          /**< ToDo... */
-    MatrixX3d use_tri_cent;     /**< ToDo... */
-    MatrixX3d use_tri_nn;       /**< ToDo... */
-    VectorXd use_tri_area;      /**< ToDo... */
-//    dist;
-//    dist_limit;
-
+    fiff_int_t id;              /**< Id information */
+    fiff_int_t np;              /**< Number of source points */
+    fiff_int_t ntri;            /**< Number of available triangles */
+    fiff_int_t coord_frame;     /**< Coil coordinate system definition */
+    MatrixX3d rr;               /**< Source locations of available dipoles. */
+    MatrixX3d nn;               /**< Source normals of the used dipoles. */
+    MatrixX3i tris;             /**< Triangles */
+    fiff_int_t nuse;            /**< Number of used dipoles. */
+    VectorXi inuse;             /**< Used source points indicated by 1, 0 otherwise */
+    VectorXi vertno;            /**< Zero based (different to MATLAB) indices of the used vertices*/
+    qint32 nuse_tri;            /**< Number of used triangles. */
+    MatrixX3i use_tris;         /**< Triangle information of the used triangles. */
+    VectorXi nearest;           /**< All indeces mapped to the indeces of the used vertices (using option -cps during mne_setup_source_space) */
+    VectorXd nearest_dist;      /**< Distance to the nearest vertices (using option -cps during mne_setup_source_space). */
+    QList<VectorXi> pinfo;      /**< Patch information (using option -cps during mne_setup_source_space) */
+    float dist_limit;           /**< ToDo... (using option -cps during mne_setup_source_space) */
+    MatrixXd dist;              /**< ToDo... (using option -cps during mne_setup_source_space) */
+    MatrixX3d tri_cent;         /**< Triangle centers */
+    MatrixX3d tri_nn;           /**< Triangle normals */
+    VectorXd tri_area;          /**< Triangle areas */
+    MatrixX3d use_tri_cent;     /**< Triangle centers of used triangles */
+    MatrixX3d use_tri_nn;       /**< Triangle normals of used triangles */
+    VectorXd use_tri_area;      /**< Triangle areas of used triangles */
 
     QList<VectorXi> cluster_vertnos;    /**< Only used within clustered forward solutions */
     QList<VectorXd> cluster_distances;  /**< Distances to clusters centroid. */
 
-
 private:
     // Newly added
     MatrixXf m_TriCoords; /**< Holds the rr tri Matrix transformed to geometry data. */
-
-    //QGeometryData* m_pGeometryData;
-
 
 };
 

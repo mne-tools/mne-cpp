@@ -82,7 +82,6 @@ SOURCES +=  mne.cpp \
             mne_inverse_operator.cpp \
             mne_epoch_data.cpp \
             mne_epoch_data_list.cpp \
-            mne_math.cpp \
             mne_rt_cmd_client.cpp \
             mne_rt_data_client.cpp \
             mne_rt_client.cpp
@@ -96,7 +95,6 @@ HEADERS +=  mne.h \
             mne_inverse_operator.h \
             mne_epoch_data.h \
             mne_epoch_data_list.h \
-            mne_math.h \
             mne_rt_cmd_client.h \
             mne_rt_data_client.h \
             mne_rt_client.h

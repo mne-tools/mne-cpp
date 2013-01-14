@@ -1,8 +1,60 @@
+//=============================================================================================================
+/**
+* @file     mne_rt_data_client.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           To Be continued...
+*
+* @version  1.0
+* @date     July, 2012
+*
+* @section  LICENSE
+*
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    Contains the implementation of the MNERtDataClient Class.
+*
+*/
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
 #include "mne_rt_data_client.h"
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
 using namespace MNELIB;
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
 
 MNERtDataClient::MNERtDataClient(QObject *parent)
 : QTcpSocket(parent)
@@ -14,9 +66,36 @@ MNERtDataClient::MNERtDataClient(QObject *parent)
 
 //*************************************************************************************************************
 
-void MNERtDataClient::connectToHost(QString& p_sRtServerHostName)
+void MNERtDataClient::connectToHost(const QString& p_sRtServerHostName)
 {
     QTcpSocket::connectToHost(p_sRtServerHostName, 4218);
+}
+
+
+//*************************************************************************************************************
+
+qint32 MNERtDataClient::getClientId()
+{
+    if(m_clientID == -1)
+    {
+//            sendFiffCommand(1);//MNE_RT.MNE_RT_GET_CLIENT_ID)
+
+        FiffStream t_fiffStream(this);
+
+        QString t_sCommand("");
+        t_fiffStream.write_rt_command(1, t_sCommand);
+
+
+        this->waitForReadyRead(100);
+        // ID is send as answer
+        FiffTag* t_pTag = NULL;
+        FiffTag::read_tag(&t_fiffStream, t_pTag);
+        if (t_pTag->kind == FIFF_MNE_RT_CLIENT_ID)
+            m_clientID = *t_pTag->toInt();
+
+        delete t_pTag;
+    }
+    return m_clientID;
 }
 
 
@@ -247,4 +326,14 @@ void MNERtDataClient::readRawBuffer(qint32 p_nChannels, MatrixXf& data, fiff_int
     }
 //        else
 //            data = tag.data;
+}
+
+
+//*************************************************************************************************************
+
+void MNERtDataClient::setClientAlias(const QString &p_sAlias)
+{
+    FiffStream t_fiffStream(this);
+    t_fiffStream.write_rt_command(2, p_sAlias);//MNE_RT.MNE_RT_SET_CLIENT_ALIAS, alias);
+    this->flush();
 }

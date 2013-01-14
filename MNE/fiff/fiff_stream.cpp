@@ -1950,7 +1950,7 @@ void FiffStream::write_string(fiff_int_t kind, const QString& data)
 
 //*************************************************************************************************************
 
-void FiffStream::write_rt_command(fiff_int_t command, QString& data)
+void FiffStream::write_rt_command(fiff_int_t command, const QString& data)
 {
     fiff_int_t datasize = data.size();
     *this << (qint32)FIFF_MNE_RT_COMMAND;

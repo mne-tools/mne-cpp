@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ToDo Documentation...
+* @brief    Contains the MNEHemisphere class implementation.
 *
 */
 
@@ -122,10 +122,7 @@ MNEHemisphere::MNEHemisphere(const MNEHemisphere& p_MNEHemisphere)
 
 MNEHemisphere::~MNEHemisphere()
 {
-//    if(m_TriCoords)
-//        delete m_TriCoords;
-//    if(dist)
-//        delete dist;
+
 }
 
 
@@ -168,8 +165,10 @@ void MNEHemisphere::clear()
 
 //*************************************************************************************************************
 
-bool MNEHemisphere::transform_hemisphere_to(fiff_int_t dest, FiffCoordTrans& trans)
+bool MNEHemisphere::transform_hemisphere_to(fiff_int_t dest, const FiffCoordTrans &p_Trans)
 {
+    FiffCoordTrans trans(p_Trans);
+
     if (this->coord_frame == dest)
     {
 //            res = src;
@@ -201,7 +200,7 @@ bool MNEHemisphere::transform_hemisphere_to(fiff_int_t dest, FiffCoordTrans& tra
 
 //*************************************************************************************************************
 
-MatrixXf* MNEHemisphere::getTriCoords(float p_fScaling)
+MatrixXf& MNEHemisphere::getTriCoords(float p_fScaling)
 {
     if(m_TriCoords.size() == 0)
     {
@@ -216,7 +215,7 @@ MatrixXf* MNEHemisphere::getTriCoords(float p_fScaling)
 
     m_TriCoords *= p_fScaling;
 
-    return &m_TriCoords;
+    return m_TriCoords;
 }
 
 

@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ToDo Documentation...
+* @brief    Contains the MNEForwardSolution class implementation
 *
 */
 
@@ -39,7 +39,8 @@
 //=============================================================================================================
 
 #include "mne_forwardsolution.h"
-#include "mne_math.h"
+
+#include <mnemath/mnemath.h>
 
 
 //*************************************************************************************************************
@@ -92,7 +93,7 @@ MNEForwardSolution::MNEForwardSolution()
 
 //*************************************************************************************************************
 
-MNEForwardSolution::MNEForwardSolution(const MNEForwardSolution& p_MNEForwardSolution)
+MNEForwardSolution::MNEForwardSolution(const MNEForwardSolution &p_MNEForwardSolution)
 : source_ori(p_MNEForwardSolution.source_ori)
 , coord_frame(p_MNEForwardSolution.coord_frame)
 , nsource(p_MNEForwardSolution.nsource)
@@ -278,10 +279,6 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution &p_fwdOut, 
 
                     t_LF_partial = MatrixXd::Zero(nSens,nClusters*3);
 
-
-
-
-
                     // Reshape Input data -> sources rows; sensors columns
                     MatrixXd t_sensLF(t_LF.cols()/3, 3*nSens);
                     for(qint32 j = 0; j < nSens; ++j)
@@ -420,7 +417,6 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
     printf("Reading forward solution from %s...\n", t_pStream->streamName().toUtf8().constData());
     if(!t_pStream->open(t_Tree, t_Dir))
         return false;
-
     //
     //   Find all forward solutions
     //
@@ -574,14 +570,8 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
         t_pStream->device()->close();
         std::cout << "MRI/head coordinate transformation not found\n"; // ToDo throw error
         //garbage collecting
-//        if(t_pDir)
-//            delete t_pDir;
-//        if(t_pTree)
-//            delete t_pTree;
         if(t_pStream)
             delete t_pStream;
-//        if(t_SourceSpace)
-//            delete t_SourceSpace;
         if(t_pTag)
             delete t_pTag;
         return false;
@@ -606,14 +596,8 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
                 t_pStream->device()->close();
                 std::cout << "MRI/head coordinate transformation not found\n"; // ToDo throw error
                 //garbage collecting
-//                if(t_pDir)
-//                    delete t_pDir;
-//                if(t_pTree)
-//                    delete t_pTree;
                 if(t_pStream)
                     delete t_pStream;
-//                if(t_SourceSpace)
-//                    delete t_SourceSpace;
                 if(t_pTag)
                     delete t_pTag;
                 return false;
@@ -889,8 +873,6 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
 
     //garbage collecting
     t_pStream->device()->close();
-
-    //garbage collecting
     if(t_pStream)
         delete t_pStream;
     if(t_pTag)

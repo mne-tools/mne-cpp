@@ -116,7 +116,7 @@ public:
 
     //=========================================================================================================
     /**
-    * ctor
+    * Default constructor
     */
     MNESourceSpace();
 
@@ -126,11 +126,11 @@ public:
     *
     * @param[in] p_MNESourceSpace   MNE forward solution
     */
-    MNESourceSpace(const MNESourceSpace& p_MNESourceSpace);
+    MNESourceSpace(const MNESourceSpace &p_MNESourceSpace);
 
     //=========================================================================================================
     /**
-    * dtor
+    * Destroys the MNE forward solution
     */
     ~MNESourceSpace();
 

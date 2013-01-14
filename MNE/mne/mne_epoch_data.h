@@ -121,7 +121,9 @@ public:
     /**
     * Comparison of two Epoch data
     *
-    *@
+    * @param[in] MED_other     Epoch data to compare with
+    *
+    * @return true if equal; false otherwise
     */
     bool operator== (const MNEEpochData& MED_other) const
     {
@@ -129,10 +131,10 @@ public:
     }
 
 public:
-    MatrixXd    epoch;  /**< the data */
-    fiff_int_t  event;  /**< the event code */
-    float       tmin;   /**< minimal time */
-    float       tmax;   /**< maximal time */
+    MatrixXd    epoch;  /**< The data */
+    fiff_int_t  event;  /**< The event code */
+    float       tmin;   /**< New start time (must be >= 0). */
+    float       tmax;   /**< New end time of the data (cannot exceed data duration). */
 
 };
 
