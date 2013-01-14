@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the neuromag library export/import macros.
+* @brief     neuromag library export/import macros.
 *
 */
 

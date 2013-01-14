@@ -12,6 +12,7 @@ var searchData=
   ['mne_5fhemisphere_2ecpp',['mne_hemisphere.cpp',['../mne__hemisphere_8cpp.html',1,'']]],
   ['mne_5fhemisphere_2eh',['mne_hemisphere.h',['../mne__hemisphere_8h.html',1,'']]],
   ['mne_5finverse_5foperator_2ecpp',['mne_inverse_operator.cpp',['../mne__inverse__operator_8cpp.html',1,'']]],
+  ['mne_5finverse_5foperator_2eh',['mne_inverse_operator.h',['../mne__inverse__operator_8h.html',1,'']]],
   ['mne_5frt_5fclient_2ecpp',['mne_rt_client.cpp',['../mne__rt__client_8cpp.html',1,'']]],
   ['mne_5frt_5fclient_2eh',['mne_rt_client.h',['../mne__rt__client_8h.html',1,'']]],
   ['mne_5frt_5fcmd_5fclient_2ecpp',['mne_rt_cmd_client.cpp',['../mne__rt__cmd__client_8cpp.html',1,'']]],

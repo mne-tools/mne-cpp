@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the MNEEpochData class declaration.
+* @brief     MNEEpochData class declaration.
 *
 */
 

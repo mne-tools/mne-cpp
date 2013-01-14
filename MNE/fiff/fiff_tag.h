@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the FiffTag class declaration, which provides fiff tag I/O and processing methods.
+* @brief    FiffTag class declaration, which provides fiff tag I/O and processing methods.
 *
 */
 

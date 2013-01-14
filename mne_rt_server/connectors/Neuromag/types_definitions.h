@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the Neuromag Types and Defines.
+* @brief     Neuromag Types and Defines.
 *
 */
 

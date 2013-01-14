@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the MNERtCmdClient Class.
+* @brief     declaration of the MNERtCmdClient Class.
 *
 */
 

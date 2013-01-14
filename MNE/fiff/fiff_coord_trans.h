@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the FiffCoordTrans class declaration.
+* @brief    FiffCoordTrans class declaration.
 *
 */
 

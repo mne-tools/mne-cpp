@@ -1,6 +1,7 @@
 var searchData=
 [
   ['rawbufferreceived',['rawBufferReceived',['../class_m_n_e_l_i_b_1_1_m_n_e_rt_client.html#ac296d196ba7654eb5bba457c2f01fb66',1,'MNELIB::MNERtClient']]],
+  ['read_5fannotation',['read_annotation',['../class_f_s_l_i_b_1_1_annotation.html#a67e59e98afeae35f9a5e4fd962de37cc',1,'FSLIB::Annotation']]],
   ['read_5fbad_5fchannels',['read_bad_channels',['../class_f_i_f_f_l_i_b_1_1_fiff.html#ac852f6b4dbd3d810630640edbebe9c5c',1,'FIFFLIB::Fiff::read_bad_channels()'],['../class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a68c53ab6d013e6d822335f77acb0ef83',1,'FIFFLIB::FiffStream::read_bad_channels()']]],
   ['read_5fcov',['read_cov',['../class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a1e0d80049ea5ff4b65629db24d27f8c1',1,'FIFFLIB::FiffStream::read_cov()'],['../class_m_n_e_l_i_b_1_1_m_n_e.html#aac923889cf65dff09d62f5015b72cc02',1,'MNELIB::MNE::read_cov()']]],
   ['read_5fctf_5fcomp',['read_ctf_comp',['../class_f_i_f_f_l_i_b_1_1_fiff.html#ad2090de5c120c96da8567ee8f36a4c51',1,'FIFFLIB::Fiff::read_ctf_comp()'],['../class_f_i_f_f_l_i_b_1_1_fiff_stream.html#ac392858ed4912a2868ccc42ebdab4c42',1,'FIFFLIB::FiffStream::read_ctf_comp()']]],

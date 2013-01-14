@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the FiffChInfo class declaration.
+* @brief     FiffChInfo class declaration.
 *
 */
 

@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the FiffDigPoint class declaration.
+* @brief    FiffDigPoint class declaration.
 *
 */
 

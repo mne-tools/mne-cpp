@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the CircularBuffer class declaration
+* @brief     CircularBuffer class declaration
 *
 */
 

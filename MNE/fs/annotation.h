@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ToDo Documentation...
+* @brief    Annotation class declaration
 *
 */
 
@@ -84,9 +84,12 @@ using namespace Eigen;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+
 //=============================================================================================================
 /**
-* Free surfer annotation
+* Free surfer annotation contains vertix label relations and a color/name lookup table
+*
+* @brief Free surfer annotation
 */
 class FSSHARED_EXPORT Annotation
 {
@@ -97,52 +100,66 @@ public:
 
     //=========================================================================================================
     /**
-    * ToDo..
+    * Construts the annotation by reading it of the given file.
+    *
+    * @param[in] p_sFileName    Annotation file
     */
     explicit Annotation(QString& p_sFileName);
 
     //=========================================================================================================
     /**
-    * ToDo..
+    * Destroys the annotation.
     */
     ~Annotation();
 
     //=========================================================================================================
     /**
-    * ToDo..
+    * Returns the vertix indeces
+    *
+    * @return vertix indeces
     */
-    VectorXi& getVertices()
+    inline VectorXi& getVertices()
     {
         return m_Vertices;
     }
 
     //=========================================================================================================
     /**
-    * ToDo..
+    * Returns the vertix labels
+    *
+    * @return vertix labels
     */
-    VectorXi& getLabel()
+    inline VectorXi& getLabel()
     {
         return m_Label;
     }
 
     //=========================================================================================================
     /**
-    * ToDo..
+    * Returns the coloratable containing the label based nomenclature
+    *
+    * @return colortable
     */
-    Colortable getColortable()
+    inline Colortable& getColortable()
     {
         return m_Colortable;
     }
 
-    void read_annotation(QString& t_sFileName);
+    //=========================================================================================================
+    /**
+    * Reads an annotation of a file
+    *
+    * @param[in] p_sFileName    Annotation file
+    */
+    void read_annotation(const QString& p_sFileName);
 
 private:
-    QString m_sFileName;
+    QString m_sFileName;        /**< Annotation file */
 
-    VectorXi m_Vertices;
-    VectorXi m_Label;
+    VectorXi m_Vertices;        /**< Vertice indeces */
+    VectorXi m_Label;           /**< Vertice labels */
 
-    Colortable m_Colortable;
+    Colortable m_Colortable;    /**< Lookup table label colors & names */
 };
 
 } // NAMESPACE

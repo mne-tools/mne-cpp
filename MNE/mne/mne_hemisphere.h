@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the MNEHemisphere class declaration.
+* @brief     MNEHemisphere class declaration.
 *
 */
 

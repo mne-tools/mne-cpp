@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ToDo Documentation...
+* @brief    Implementation of the Annotation class.
 *
 */
 
@@ -84,7 +84,7 @@ Annotation::~Annotation()
 
 //*************************************************************************************************************
 
-void Annotation::read_annotation(QString& t_sFileName)
+void Annotation::read_annotation(const QString& t_sFileName)
 {
     printf("Reading annotation...\n");
     QFile t_File(t_sFileName);

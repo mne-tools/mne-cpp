@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the FiffStream class declaration
+* @brief    FiffStream class declaration
 *
 */
 

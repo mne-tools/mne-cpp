@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the InvRt Class.
+* @brief     implementation of the InvRt Class.
 *
 */
 

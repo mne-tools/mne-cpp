@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the CovRt Class.
+* @brief     implementation of the CovRt Class.
 *
 */
 

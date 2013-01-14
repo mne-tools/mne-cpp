@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the FiffId class declaration.
+* @brief    FiffId class declaration.
 *
 */
 

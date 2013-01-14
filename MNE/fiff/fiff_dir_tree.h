@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the FiffDirTree class declaration, which provides fiff dir tree processing methods.
+* @brief    FiffDirTree class declaration, which provides fiff dir tree processing methods.
 *
 */
 

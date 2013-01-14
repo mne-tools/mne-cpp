@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the fiff library export/import macros.
+* @brief     fiff library export/import macros.
 *
 */
 

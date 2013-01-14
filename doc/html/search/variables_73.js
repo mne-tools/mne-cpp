@@ -12,5 +12,6 @@ var searchData=
   ['source_5fnn',['source_nn',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a0070dd5bda4063846fc7bbc9a7b132c2',1,'MNELIB::MNEForwardSolution::source_nn()'],['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a1c4585dec95150caae294c7000184cdc',1,'MNELIB::MNEInverseOperator::source_nn()']]],
   ['source_5fori',['source_ori',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1988a88297362b6b34b0318577ad162d',1,'MNELIB::MNEForwardSolution::source_ori()'],['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ad9be3e35de623862f76a69aa5f3bfbf2',1,'MNELIB::MNEInverseOperator::source_ori()']]],
   ['source_5frr',['source_rr',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aca622bbe1b6ff6d69834fbafd2ae69b5',1,'MNELIB::MNEForwardSolution']]],
-  ['src',['src',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a3d61876581eba25731926eb070d5a1fd',1,'MNELIB::MNEForwardSolution::src()'],['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a8074f2dd4963041afbe819487d0e3bd2',1,'MNELIB::MNEInverseOperator::src()']]]
+  ['src',['src',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a3d61876581eba25731926eb070d5a1fd',1,'MNELIB::MNEForwardSolution::src()'],['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a8074f2dd4963041afbe819487d0e3bd2',1,'MNELIB::MNEInverseOperator::src()']]],
+  ['struct_5fnames',['struct_names',['../class_f_s_l_i_b_1_1_colortable.html#ab7804162918de82c37e9bac3943ff98e',1,'FSLIB::Colortable']]]
 ];

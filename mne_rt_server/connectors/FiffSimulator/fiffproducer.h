@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DataProducer Class.
+* @brief     declaration of the DataProducer Class.
 *
 */
 

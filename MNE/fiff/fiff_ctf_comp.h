@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the FiffCtfComp class declaration.
+* @brief    FiffCtfComp class declaration.
 *
 */
 

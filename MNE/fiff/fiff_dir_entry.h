@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the FiffDirEntry class declaration.
+* @brief    FiffDirEntry class declaration.
 *
 */
 

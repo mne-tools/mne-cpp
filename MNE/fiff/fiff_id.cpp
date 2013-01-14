@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the FiffId Class.
+* @brief    Implementation of the FiffId Class.
 *
 */
 

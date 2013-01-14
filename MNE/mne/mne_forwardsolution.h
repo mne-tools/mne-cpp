@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the MNEForwardSolution class declaration, which provides the forward solution including
+* @brief     MNEForwardSolution class declaration, which provides the forward solution including
 *           the source space (MNESourceSpace).
 *
 */

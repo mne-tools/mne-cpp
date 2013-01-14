@@ -116,5 +116,6 @@ var searchData=
   ['fiffv_5fresp_5fch',['FIFFV_RESP_CH',['../fiff__constants_8h.html#a6bc6aa2e10642b9c0a8bc7c3b04f9baf',1,'FIFFV_RESP_CH():&#160;fiff_constants.h'],['../fiff__constants_8h.html#a6bc6aa2e10642b9c0a8bc7c3b04f9baf',1,'FIFFV_RESP_CH():&#160;fiff_constants.h']]],
   ['fiffv_5fxfit_5fmap_5fsurf_5fhead',['FIFFV_XFIT_MAP_SURF_HEAD',['../fiff__constants_8h.html#ab3e18eb022ce873657008ffa57108135',1,'fiff_constants.h']]],
   ['fiffv_5fxfit_5fmap_5fsurf_5fsensors',['FIFFV_XFIT_MAP_SURF_SENSORS',['../fiff__constants_8h.html#a8d16c77b005a61113366b84b266ecd8f',1,'fiff_constants.h']]],
-  ['fiffv_5fxfit_5fmap_5fsurf_5fsphere',['FIFFV_XFIT_MAP_SURF_SPHERE',['../fiff__constants_8h.html#a1a40d2a550fec9643cb3040bdb3a3541',1,'fiff_constants.h']]]
+  ['fiffv_5fxfit_5fmap_5fsurf_5fsphere',['FIFFV_XFIT_MAP_SURF_SPHERE',['../fiff__constants_8h.html#a1a40d2a550fec9643cb3040bdb3a3541',1,'fiff_constants.h']]],
+  ['fsshared_5fexport',['FSSHARED_EXPORT',['../fs__global_8h.html#a8e4f08d490ea850b4b6631d7772df965',1,'fs_global.h']]]
 ];

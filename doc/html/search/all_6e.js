@@ -21,6 +21,7 @@ var searchData=
   ['nsamp',['nsamp',['../class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1',1,'FIFFLIB::FiffRawDir']]],
   ['nsource',['nsource',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a4bc383d90d8550cda0ad96cf0dfeb988',1,'MNELIB::MNEForwardSolution::nsource()'],['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a46e0b1b46763a8b6f90158af33f2b119',1,'MNELIB::MNEInverseOperator::nsource()']]],
   ['ntri',['ntri',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a6a322c8dadb0d6e9f19b0065d859e297',1,'MNELIB::MNEHemisphere']]],
+  ['numentries',['numEntries',['../class_f_s_l_i_b_1_1_colortable.html#acec8d20347807b29cf3f6b5a9047ebdd',1,'FSLIB::Colortable']]],
   ['nuse',['nuse',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a433b5da63208d426f26317f7c0c236c8',1,'MNELIB::MNEHemisphere']]],
   ['nuse_5ftri',['nuse_tri',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a3cd7edb277a5b79e169dec04e2ea38ba',1,'MNELIB::MNEHemisphere']]]
 ];
