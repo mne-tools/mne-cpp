@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the Neuromag Class.
+* @brief     implementation of the Neuromag Class.
 *
 */
 

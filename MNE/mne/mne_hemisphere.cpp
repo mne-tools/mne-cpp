@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the MNEHemisphere class implementation.
+* @brief     MNEHemisphere class implementation.
 *
 */
 

@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the FiffDirTree Class.
+* @brief    Implementation of the FiffDirTree Class.
 *
 */
 

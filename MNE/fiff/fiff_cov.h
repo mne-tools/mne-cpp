@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the FiffCov class declaration.
+* @brief    FiffCov class declaration.
 *
 */
 

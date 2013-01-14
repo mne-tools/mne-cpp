@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the MNEMath class declaration.
+* @brief     MNEMath class declaration.
 *
 */
 

@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the FiffInfo Class.
+* @brief    Implementation of the FiffInfo Class.
 *
 */
 

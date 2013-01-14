@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the generics library export/import macros.
+* @brief     generics library export/import macros.
 *
 */
 

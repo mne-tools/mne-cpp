@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the MNEForwardSolution class implementation
+* @brief     MNEForwardSolution class implementation
 *
 */
 

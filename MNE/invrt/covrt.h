@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the CovRt class declaration.
+* @brief     CovRt class declaration.
 *
 */
 

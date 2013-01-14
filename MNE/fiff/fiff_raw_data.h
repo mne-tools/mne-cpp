@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the FiffRawData class declaration.
+* @brief    FiffRawData class declaration.
 *
 */
 

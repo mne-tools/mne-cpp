@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the FiffNamedMatrix class declaration.
+* @brief    FiffNamedMatrix class declaration.
 *
 */
 

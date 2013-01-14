@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the mne library export/import macros.
+* @brief     mne library export/import macros.
 *
 */
 

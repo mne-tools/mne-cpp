@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_epoch_data.h
+* @file     mne_inverse_operator.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the MNEInverseOperator class declaration.
+* @brief     MNEInverseOperator class declaration.
 *
 */
 

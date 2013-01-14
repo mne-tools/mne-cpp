@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the MNERtClient Class.
+* @brief     implementation of the MNERtClient Class.
 *
 */
 

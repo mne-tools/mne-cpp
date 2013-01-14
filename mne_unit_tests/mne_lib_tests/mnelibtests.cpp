@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the MNELibTests Class checkup routines.
+* @brief     implementation of the MNELibTests Class checkup routines.
 *
 */
 

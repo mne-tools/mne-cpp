@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the FIFFEvokedData Class.
+* @brief    Implementation of the FIFFEvokedData Class.
 *
 */
 

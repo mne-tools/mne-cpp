@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the FIFF class declaration, which provides static wrapper functions to stay consistent
+* @brief    FIFF class declaration, which provides static wrapper functions to stay consistent
 *           with mne matlab toolbox - Note: avoid using the wrappers, prefer the wrapped methods! Its
 *           sufficient to include this header to have access to all Fiff classes.
 *

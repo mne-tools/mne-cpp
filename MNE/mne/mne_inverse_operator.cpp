@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the MNEInverseOperator Class.
+* @brief    Implementation of the MNEInverseOperator Class.
 *
 */
 

@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the old fiff_type declarations - replace them.
+* @brief    Old fiff_type declarations - replace them.
 *
 */
 

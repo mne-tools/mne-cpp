@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains fiff constants
+* @brief    Fiff constants
 *
 */
 
@@ -545,7 +545,7 @@ namespace FIFFLIB
 #define FIFF_MNE_INVERSE_FULL               3544     /**< Inverse operator as one matrix*/
                                    // This matrix includes the whitening operator as well
                                // The regularization is applied
-#define FIFF_MNE_INVERSE_SOURCE_ORIENTATIONS 3545    /**< Contains the orientation of one source per row*/
+#define FIFF_MNE_INVERSE_SOURCE_ORIENTATIONS 3545    /**<  orientation of one source per row*/
                                // The source orientations must be expressed in the coordinate system
                                // given by FIFF_MNE_COORD_FRAME
     //

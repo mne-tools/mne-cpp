@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the FiffEvokedDataSet Class.
+* @brief    Implementation of the FiffEvokedDataSet Class.
 *
 */
 
