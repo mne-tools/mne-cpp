@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_math.h
+* @file     mnemath.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     MNEMath class declaration.
+* @brief    MNEMath class declaration.
 *
 */
 
-#ifndef MNE_MATH_H
-#define MNE_MATH_H
+#ifndef MNEMATH_H
+#define MNEMATH_H
 
 //ToDo move this to the new MNE math library
 
@@ -94,7 +94,7 @@ class MNEMATHSHARED_EXPORT MNEMath
 public:
     //=========================================================================================================
     /**
-    * dtor
+    * Destroys the MNEMath object
     */
     virtual ~MNEMath()
     { }
@@ -113,10 +113,10 @@ public:
     */
     static VectorXd* combine_xyz(const VectorXd& vec);
 
-    //=========================================================================================================
-    /**
-    * ### MNE toolbox root function ###: Implementation of the mne_block_diag function - decoding part
-    */
+//    //=========================================================================================================
+//    /**
+//    * ### MNE toolbox root function ###: Implementation of the mne_block_diag function - decoding part
+//    */
 //    static inline MatrixXd extract_block_diag(MatrixXd& A, qint32 n);
 
     //=========================================================================================================
@@ -140,4 +140,4 @@ public:
 
 } // NAMESPACE
 
-#endif // MNE_MATH_H
+#endif // MNEMATH_H

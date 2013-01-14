@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ToDo Documentation...
+* @brief    Implementation of the KMeans class
 *
 */
 
@@ -90,8 +90,7 @@ KMeans::KMeans(QString distance, QString start, qint32 replicates, QString empty
 
 //*************************************************************************************************************
 
-bool KMeans::calculate(    MatrixXd X, qint32 kClusters,
-                            VectorXi& idx, MatrixXd& C, VectorXd& sumD, MatrixXd& D)
+bool KMeans::calculate( MatrixXd X, qint32 kClusters, VectorXi& idx, MatrixXd& C, VectorXd& sumD, MatrixXd& D)
 {
     if (kClusters < 1)
         return false;
@@ -200,7 +199,7 @@ bool KMeans::calculate(    MatrixXd X, qint32 kClusters,
 
         // Compute the distance from every point to each cluster centroid and the
         // initial assignment of points to clusters
-        D = distfun(X, C, 0);
+        D = distfun(X, C);//, 0);
         idx = VectorXi::Zero(D.rows());
         d = VectorXd::Zero(D.rows());
 
@@ -247,7 +246,7 @@ bool KMeans::calculate(    MatrixXd X, qint32 kClusters,
                 }
             }
 
-            MatrixXd D_tmp = distfun(X, C_tmp, iter);
+            MatrixXd D_tmp = distfun(X, C_tmp);//, iter);
             count = 0;
             for(qint32 i = 0; i < nonempties.rows(); ++i)
             {
@@ -323,7 +322,7 @@ bool KMeans::calculate(    MatrixXd X, qint32 kClusters,
 
 //*************************************************************************************************************
 
-bool KMeans::batchUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx)
+bool KMeans::batchUpdate(const MatrixXd& X, MatrixXd& C, VectorXi& idx)
 {
     // Every point moved, every cluster will need an update
     qint32 i = 0;
@@ -356,7 +355,7 @@ bool KMeans::batchUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx)
         MatrixXd C_new;
         VectorXi m_new;
         KMeans::gcentroids(X, idx, changed, C_new, m_new);
-        MatrixXd D_new = distfun(X, C_new, iter);
+        MatrixXd D_new = distfun(X, C_new);//, iter);
 
         for(qint32 i = 0; i < changed.rows(); ++i)
         {
@@ -510,7 +509,7 @@ bool KMeans::batchUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx)
 
 //*************************************************************************************************************
 
-bool KMeans::onlineUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx)
+bool KMeans::onlineUpdate(const MatrixXd& X, MatrixXd& C, VectorXi& idx)
 {
     // Initialize some cluster information prior to phase two
     MatrixXd Xmid1;
@@ -874,7 +873,7 @@ bool KMeans::onlineUpdate(MatrixXd& X, MatrixXd& C, VectorXi& idx)
 
 //*************************************************************************************************************
 //DISTFUN Calculate point to cluster centroid distances.
-MatrixXd KMeans::distfun(MatrixXd& X, MatrixXd& C, qint32 iter)
+MatrixXd KMeans::distfun(const MatrixXd& X, MatrixXd& C)//, qint32 iter)
 {
     MatrixXd D = MatrixXd::Zero(n,C.rows());
     qint32 nclusts = C.rows();
@@ -931,7 +930,7 @@ MatrixXd KMeans::distfun(MatrixXd& X, MatrixXd& C, qint32 iter)
 
 //*************************************************************************************************************
 //GCENTROIDS Centroids and counts stratified by group.
-void KMeans::gcentroids(MatrixXd& X, VectorXi& index, VectorXi& clusts,
+void KMeans::gcentroids(const MatrixXd& X, const VectorXi& index, const VectorXi& clusts,
                                           MatrixXd& centroids, VectorXi& counts)
 {
     qint32 num = clusts.rows();

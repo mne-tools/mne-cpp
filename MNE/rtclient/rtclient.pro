@@ -1,7 +1,8 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mne_source_lab.pro
+# @file     rtclient.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+#           Christof Pieloth;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
 # @date     July, 2012
@@ -29,53 +30,61 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    ToDo Documentation...
+# @brief    This project file builds the rtclient library.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../mne-cpp.pri)
+include(../../mne-cpp.pri)
 
-TEMPLATE = app
+TEMPLATE = lib
 
-VERSION = $${MNE_CPP_VERSION}
-
-QT       += core
-QT       += network
 QT       -= gui
 
-CONFIG   += console
-CONFIG   -= app_bundle
+DEFINES += RTCLIENT_LIBRARY
 
-TARGET = mne_source_lab
-
+TARGET = RtClient
+TARGET = $$join(TARGET,,MNE$$MNE_LIB_VERSION,)
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}MneMathd \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Fsd \
-            -lMNE$${MNE_LIB_VERSION}RtInvd \
             -lMNE$${MNE_LIB_VERSION}Genericsd
+
 }
 else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}MneMath \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
-            -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Fs \
-            -lMNE$${MNE_LIB_VERSION}RtInv \
             -lMNE$${MNE_LIB_VERSION}Generics
 }
 
-DESTDIR = $${PWD}/../bin
+DESTDIR = $${MNE_LIBRARY_DIR}
 
-SOURCES +=  main.cpp \
-            sourcelab.cpp \
+#
+# win32: copy dll's to bin dir
+# unix: add lib folder to LD_LIBRARY_PATH
+#
+win32 {
+    FILE = $${DESTDIR}/$${TARGET}.dll
+    BINDIR = $${DESTDIR}/../bin
+    FILE ~= s,/,\\,g
+    BINDIR ~= s,/,\\,g
+    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
+}
+
+SOURCES += \
+
+HEADERS +=  \
+	rtclient_global.h \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
-HEADERS += sourcelab.h \
+# Install headers to include directory
+header_files.files = ./*.h
+header_files.path = $${MNE_INCLUDE_DIR}/rtclient
+
+INSTALLS += header_files

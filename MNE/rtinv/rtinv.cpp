@@ -1,8 +1,9 @@
 //=============================================================================================================
 /**
-* @file     covrt.h
+* @file     rtinv.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*
 * @version  1.0
 * @date     July, 2012
 *
@@ -29,35 +30,16 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     CovRt class declaration.
+* @brief     implementation of the RtInv Class.
 *
 */
-
-#ifndef COVRT_H
-#define COVRT_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "invrt_global.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFF INCLUDES
-//=============================================================================================================
-
-#include <fiff/fiff_cov.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Generics INCLUDES
-//=============================================================================================================
-
-#include <generics/circularmatrixbuffer.h>
+#include "rtinv.h"
 
 
 //*************************************************************************************************************
@@ -65,26 +47,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QThread>
-#include <QMutex>
-#include <QSharedPointer>
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE INVRTLIB
-//=============================================================================================================
-
-namespace INVRTLIB
-{
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -92,70 +56,63 @@ namespace INVRTLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
-using namespace IOBuffer;
-using namespace FIFFLIB;
+using namespace RTINVLIB;
 
-
+//*************************************************************************************************************
 //=============================================================================================================
-/**
-* DECLARE CLASS CovRt
-*
-* @brief The CovRt class provides...
-*/
-class INVRTSHARED_EXPORT CovRt : public QThread
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+RtInv::RtInv(FiffInfo::SPtr p_pFiffInfo, MNEForwardSolution::SPtr p_pFwd, QObject *parent)
+: QThread(parent)
+, m_pFiffInfo(p_pFiffInfo)
+, m_pFwd(p_pFwd)
 {
-    Q_OBJECT
-public:
-    typedef QSharedPointer<CovRt> SPtr;             /**< Shared pointer type for CovRt. */
-    typedef QSharedPointer<const CovRt> ConstSPtr;  /**< Const shared pointer type for CovRt. */
+}
 
 
-    explicit CovRt(QObject *parent = 0);
+//*************************************************************************************************************
 
-    //=========================================================================================================
-    /**
-    * Destroys the CovRt.
-    */
-    ~CovRt();
+RtInv::~RtInv()
+{
+    stop();
+}
 
-    void receiveDataSegment(MatrixXf p_DataSegment);
 
-    //=========================================================================================================
-    /**
-    * Stops the CovRt by stopping the producer's thread.
-    *
-    * @return true if succeeded, false otherwise
-    */
-    virtual bool stop();
+//*************************************************************************************************************
 
-protected:
-    //=========================================================================================================
-    /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
-    virtual void run();
+void RtInv::receiveNoiseCov(MatrixXf p_noiseCov)
+{
+    mutex.lock();
+    qDebug() << "Received Cov";
+    std::cout << "Covariance:\n" << p_noiseCov.block(0,0,10,10) << std::endl;
 
-private:
-    QMutex      mutex;
-    bool        m_bIsRunning;           /**< Holds whether CovRt is running.*/
-    bool        m_bIsRawBufferInit;
+    //Use here a circular buffer
+    m_noiseCov = p_noiseCov;
+    mutex.unlock();
+}
 
-    quint32      m_iMaxSamples;
 
-    RawMatrixBuffer* m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
+//*************************************************************************************************************
 
-signals:
-    void covCalculated(Eigen::MatrixXf p_Cov);
-};
+bool RtInv::stop()
+{
+    m_bIsRunning = false;
+    QThread::wait();
 
-} // NAMESPACE
+    return true;
+}
 
-#ifndef metatype_matrixxf
-#define metatype_matrixxf
-Q_DECLARE_METATYPE(Eigen::MatrixXf);
-#endif
 
-#endif // COVRT_H
+//*************************************************************************************************************
+
+void RtInv::run()
+{
+    m_bIsRunning = true;
+
+    while(m_bIsRunning)
+    {
+
+
+    }
+}

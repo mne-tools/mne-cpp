@@ -1,14 +1,15 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     invrt.pro
+# @file     rtcommands.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+#           Christof Pieloth;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
 # @date     July, 2012
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2012, Christoph Dinh, Christof Pieloth and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -29,7 +30,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the invrt library.
+# @brief    This project file builds the rtcommands library.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -39,9 +40,9 @@ TEMPLATE = lib
 
 QT       -= gui
 
-DEFINES += INVRT_LIBRARY
+DEFINES += RTCOMMANDS_LIBRARY
 
-TARGET = InvRt
+TARGET = RtCommands
 TARGET = $$join(TARGET,,MNE$$MNE_LIB_VERSION,)
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -74,18 +75,16 @@ win32 {
     QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
 }
 
-SOURCES += invrt.cpp \
-    covrt.cpp
+SOURCES += \
 
-HEADERS +=  invrt.h\
-            invrt_global.h \
-            covrt.h
+HEADERS +=  \
+     rtcommands_global.h \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 # Install headers to include directory
 header_files.files = ./*.h
-header_files.path = $${MNE_INCLUDE_DIR}/invrt
+header_files.path = $${MNE_INCLUDE_DIR}/rtcommands
 
 INSTALLS += header_files

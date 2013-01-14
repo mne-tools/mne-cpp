@@ -38,12 +38,15 @@ include(../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += generics \
-    fiff \
     fs \
+    fiff \
     mnemath \
     mne \
-    invrt \
+#    rtcommands \
+#    rtclient \
+    rtinv \
 
+#qtHaveModule(3d): SUBDIRS += disp
 contains(Qt3D_available, true) {
     message(Qt3D available: disp library configured!)
     SUBDIRS += disp \ #Qt3D is missing - figure out if module is available

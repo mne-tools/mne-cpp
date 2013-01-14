@@ -83,9 +83,9 @@ using namespace FIFFLIB;
 
 //=============================================================================================================
 /**
-* The MNE real-time data client class provides an interface to communicate with the data port 4218 of a running mne_rt_server.
+* The real-time data client class provides an interface to communicate with the data port 4218 of a running mne_rt_server.
 *
-* @brief MNE real-time data client
+* @brief Real-time data client
 */
 class MNESHARED_EXPORT MNERtDataClient : public QTcpSocket
 {

@@ -96,7 +96,7 @@ using namespace FIFFLIB;
 /**
 * Hemisphere source space geometry information
 *
-* @brief MNEHemisphere provides geometry information
+* @brief Hemisphere provides geometry information
 */
 class MNESHARED_EXPORT MNEHemisphere
 {

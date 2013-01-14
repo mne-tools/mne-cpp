@@ -67,9 +67,9 @@ namespace MNELIB
 
 //=============================================================================================================
 /**
-* The MNE real-time command client class provides an interface to communicate with the command port 4217 of a running mne_rt_server.
+* The real-time command client class provides an interface to communicate with the command port 4217 of a running mne_rt_server.
 *
-* @brief MNE real-time client
+* @brief Real-time command client
 */
 class MNESHARED_EXPORT MNERtCmdClient : public QTcpSocket
 {

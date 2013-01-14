@@ -13,8 +13,8 @@
 // INVRT INCLUDES
 //=============================================================================================================
 
-#include <invrt/covrt.h>
-#include <invrt/invrt.h>
+#include <rtinv/rtcov.h>
+#include <rtinv/rtinv.h>
 
 
 //*************************************************************************************************************
@@ -59,7 +59,7 @@
 using namespace IOBuffer;
 using namespace FIFFLIB;
 using namespace MNELIB;
-using namespace INVRTLIB;
+using namespace RTINVLIB;
 
 
 class SourceLab : public QThread
@@ -97,9 +97,9 @@ signals:
 
 private:
     MNERtClient*    m_pRtClient;
-    CovRt*          m_pCovRt;
+    RtCov*          m_pRtCov;
 
-    InvRt*          m_pInvRt;
+    RtInv*          m_pRtInv;
 
 
     FiffInfo::SPtr              m_pFiffInfo;        /**< Holds the fiff raw measurement information. */

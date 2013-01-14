@@ -1,12 +1,12 @@
-#ifndef INVRT_H
-#define INVRT_H
+#ifndef RTINV_H
+#define RTINV_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "invrt_global.h"
+#include "rtinv_global.h"
 
 
 //*************************************************************************************************************
@@ -45,10 +45,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE INVRTLIB
+// DEFINE NAMESPACE RtInvLIB
 //=============================================================================================================
 
-namespace INVRTLIB
+namespace RTINVLIB
 {
 
 
@@ -64,30 +64,30 @@ using namespace MNELIB;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS InvRt
+* DECLARE CLASS RtInv
 *
-* @brief The InvRt class provides...
+* @brief The RtInv class provides...
 */
-class INVRTSHARED_EXPORT InvRt : public QThread
+class RTINVSHARED_EXPORT RtInv : public QThread
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<InvRt> SPtr;             /**< Shared pointer type for InvRt. */
-    typedef QSharedPointer<const InvRt> ConstSPtr;  /**< Const shared pointer type for InvRt. */
+    typedef QSharedPointer<RtInv> SPtr;             /**< Shared pointer type for RtInv. */
+    typedef QSharedPointer<const RtInv> ConstSPtr;  /**< Const shared pointer type for RtInv. */
 
-    explicit InvRt(FiffInfo::SPtr p_pFiffInfo, MNEForwardSolution::SPtr p_pFwd, QObject *parent = 0);
+    explicit RtInv(FiffInfo::SPtr p_pFiffInfo, MNEForwardSolution::SPtr p_pFwd, QObject *parent = 0);
 
     //=========================================================================================================
     /**
     * Destroys the CovRt.
     */
-    ~InvRt();
+    ~RtInv();
 
     void receiveNoiseCov(MatrixXf p_noiseCov);
 
     //=========================================================================================================
     /**
-    * Stops the InvRt by stopping the producer's thread.
+    * Stops the RtInv by stopping the producer's thread.
     *
     * @return true if succeeded, false otherwise
     */
@@ -104,7 +104,7 @@ protected:
 
 private:
     QMutex      mutex;
-    bool        m_bIsRunning;           /**< Holds whether InvRt is running.*/
+    bool        m_bIsRunning;           /**< Holds whether RtInv is running.*/
 
     MatrixXf    m_noiseCov;
 
@@ -122,4 +122,4 @@ signals:
 Q_DECLARE_METATYPE(MNELIB::MNEInverseOperator);
 #endif
 
-#endif // INVRT_H
+#endif // RTINV_H

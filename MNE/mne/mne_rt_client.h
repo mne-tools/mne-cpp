@@ -96,9 +96,9 @@ using namespace FIFFLIB;
 
 //=============================================================================================================
 /**
-* The MNE real-time client class provides an interface to communicate with a running mne_rt_server.
+* The real-time client class provides an interface to communicate with a running mne_rt_server.
 *
-* @brief MNE real-time client
+* @brief Real-time client
 */
 class MNESHARED_EXPORT MNERtClient : public QThread
 {

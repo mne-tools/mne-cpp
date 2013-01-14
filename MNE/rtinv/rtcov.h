@@ -1,9 +1,8 @@
 //=============================================================================================================
 /**
-* @file     invrt.cpp
+* @file     rtcov.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2012
 *
@@ -30,16 +29,35 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the InvRt Class.
+* @brief     RtCov class declaration.
 *
 */
+
+#ifndef RTCOV_H
+#define RTCOV_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "invrt.h"
+#include "rtinv_global.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FIFF INCLUDES
+//=============================================================================================================
+
+#include <fiff/fiff_cov.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Generics INCLUDES
+//=============================================================================================================
+
+#include <generics/circularmatrixbuffer.h>
 
 
 //*************************************************************************************************************
@@ -47,8 +65,26 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QThread>
+#include <QMutex>
+#include <QSharedPointer>
 
-#include <QDebug>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE INVRTLIB
+//=============================================================================================================
+
+namespace RTINVLIB
+{
 
 
 //*************************************************************************************************************
@@ -56,63 +92,70 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVRTLIB;
+using namespace Eigen;
+using namespace IOBuffer;
+using namespace FIFFLIB;
 
-//*************************************************************************************************************
+
 //=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-InvRt::InvRt(FiffInfo::SPtr p_pFiffInfo, MNEForwardSolution::SPtr p_pFwd, QObject *parent)
-: QThread(parent)
-, m_pFiffInfo(p_pFiffInfo)
-, m_pFwd(p_pFwd)
+/**
+* DECLARE CLASS RtCov
+*
+* @brief The RtCov class provides...
+*/
+class RTINVSHARED_EXPORT RtCov : public QThread
 {
-}
+    Q_OBJECT
+public:
+    typedef QSharedPointer<RtCov> SPtr;             /**< Shared pointer type for RtCov. */
+    typedef QSharedPointer<const RtCov> ConstSPtr;  /**< Const shared pointer type for RtCov. */
 
 
-//*************************************************************************************************************
+    explicit RtCov(QObject *parent = 0);
 
-InvRt::~InvRt()
-{
-    stop();
-}
+    //=========================================================================================================
+    /**
+    * Destroys the RtCov.
+    */
+    ~RtCov();
 
+    void receiveDataSegment(MatrixXf p_DataSegment);
 
-//*************************************************************************************************************
+    //=========================================================================================================
+    /**
+    * Stops the RtCov by stopping the producer's thread.
+    *
+    * @return true if succeeded, false otherwise
+    */
+    virtual bool stop();
 
-void InvRt::receiveNoiseCov(MatrixXf p_noiseCov)
-{
-    mutex.lock();
-    qDebug() << "Received Cov";
-    std::cout << "Covariance:\n" << p_noiseCov.block(0,0,10,10) << std::endl;
+protected:
+    //=========================================================================================================
+    /**
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread.
+    */
+    virtual void run();
 
-    //Use here a circular buffer
-    m_noiseCov = p_noiseCov;
-    mutex.unlock();
-}
+private:
+    QMutex      mutex;
+    bool        m_bIsRunning;           /**< Holds whether RtCov is running.*/
+    bool        m_bIsRawBufferInit;
 
+    quint32      m_iMaxSamples;
 
-//*************************************************************************************************************
+    RawMatrixBuffer* m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
 
-bool InvRt::stop()
-{
-    m_bIsRunning = false;
-    QThread::wait();
+signals:
+    void covCalculated(Eigen::MatrixXf p_Cov);
+};
 
-    return true;
-}
+} // NAMESPACE
 
+#ifndef metatype_matrixxf
+#define metatype_matrixxf
+Q_DECLARE_METATYPE(Eigen::MatrixXf);
+#endif
 
-//*************************************************************************************************************
-
-void InvRt::run()
-{
-    m_bIsRunning = true;
-
-    while(m_bIsRunning)
-    {
-
-
-    }
-}
+#endif // RTCOV_H

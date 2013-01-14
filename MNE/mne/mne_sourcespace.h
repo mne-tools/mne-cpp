@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ToDo Documentation...
+* @brief    MNESourceSpace class declaration.
 *
 */
 
@@ -104,9 +104,9 @@ typedef std::pair<int,int> intpair;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS SourceSpace
+* Source Space descritpion
 *
-* @brief The SourceSpace class provides
+* @brief Source Space descritpion
 */
 class MNESHARED_EXPORT MNESourceSpace
 {
