@@ -1,8 +1,8 @@
 //=============================================================================================================
 /**
-* @file     neuromag.h
+* @file     collectorsocket.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
 * @date     July, 2012
 *
@@ -29,24 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the Neuromag Class.
+* @brief     implementation of the CollectorSocket Class.
 *
 */
 
-#ifndef NEUROMAG_H
-#define NEUROMAG_H
+#ifndef COLLECTORSOCKET_H
+#define COLLECTORSOCKET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "neuromag_global.h"
-#include "../../mne_rt_server/IConnector.h"
-
-#include <fiff/fiff_info.h>
-
-//#include "circularbuffer.h"
+#include "types_definitions.h"
 
 
 //*************************************************************************************************************
@@ -54,118 +49,132 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QString>
-#include <QMutex>
+#include <QTcpSocket>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE NeuromagPlugin
+// DEFINE NAMESPACE ArtemisPlugin
 //=============================================================================================================
 
-namespace NeuromagPlugin
+namespace ArtemisPlugin
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace MSERVER;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class DacqServer;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS Neuromag
+* DECLARE CLASS CollectorSocket
 *
-* @brief The Neuromag class provides an Elekta Neuromag connector.
+* @brief The CollectorSocket class provides ....
 */
-class NEUROMAGSHARED_EXPORT Neuromag : public IConnector
+class CollectorSocket : public QTcpSocket
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_rt_server/1.0" FILE "neuromag.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MSERVER::IConnector)
-
-
-    friend class DacqServer;
 
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a Neuromag Connector.
+    * Constructs a acquisition Server.
     */
-    Neuromag();
+    CollectorSocket(QObject *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Open the collector control connection
+    *
+    * @return
+    */
+    bool open();
+
+    //=========================================================================================================
+    /**
+    * Close the collector connection
+    *
+    * @return
+    */
+//    int close();
+
+
+    inline bool isMeasuring()
+    {
+        return m_bIsMeasuring;
+    }
+
+    //=========================================================================================================
+    /**
+    * Query the current buffer length of the Elekta acquisition system
+    *
+    * @return
+    */
+    int getMaxBuflen();
 
 
     //=========================================================================================================
     /**
-    * Destroys the Neuromag Connector.
+    * Set the desired maximum buffer length
     *
+    * @return
     */
-    virtual ~Neuromag();
-
-    virtual QByteArray availableCommands();
-
-    virtual ConnectorID getConnectorID() const;
-
-    virtual const char* getName() const;
+    int setMaxBuflen(int maxbuflen);
 
 
-    virtual bool parseCommand(QStringList& p_qCommandList, QByteArray& p_blockOutputInfo);
+    // new client.c to qt functions
+    //=========================================================================================================
+    /**
+    *
+    *
+    * @return
+    */
+    bool server_command(const QString& p_sCommand);
 
 
-    virtual bool start();
+    //=========================================================================================================
+    /**
+    *
+    *
+    * @return
+    */
+    bool server_login(const QString& p_sCollectorPass, const QString& p_sMyName);
 
-    virtual bool stop();
+
+    //=========================================================================================================
+    /**
+    *
+    *
+    * @return
+    */
+    bool server_send(QString& p_sDataSend, QByteArray& p_dataOut, int p_iInputFlag = DACQ_DRAIN_INPUT);
 
 
-    void releaseMeasInfo();
+    //=========================================================================================================
+    /**
+    *
+    *
+    * @return
+    */
+    bool server_start();
 
-//public slots: --> in Qt 5 not anymore declared as slot
 
-    virtual void requestMeasInfo(qint32 ID);
+    //=========================================================================================================
+    /**
+    *
+    *
+    * @return
+//    */
+    bool server_stop();
 
-    virtual void requestMeas();
 
-    virtual void requestMeasStop();
-
-    virtual void requestSetBufferSize(quint32 p_uiBuffSize);
-
-protected:
-    virtual void run();
 
 private:
-    //=========================================================================================================
-    /**
-    * Initialise the FiffSimulator.
-    */
-    void init();
 
+    QString     m_sCollectorHost;
 
-    QMutex mutex;
-
-    DacqServer*     m_pDacqServer;
-
-    FiffInfo::SDPtr m_pInfo;
-
-    int             m_iID;
-
-    bool            m_bIsRunning;
+    bool        m_bIsMeasuring;
 
 
 };
 
 } // NAMESPACE
 
-#endif // NEUROMAG_H
+#endif // COLLECTORSOCKET_H
