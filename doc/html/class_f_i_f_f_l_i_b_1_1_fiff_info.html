@@ -420,7 +420,7 @@ Public Attributes</h2></td></tr>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">from</td><td>compensation in the input data </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">to</td><td>desired compensation in the output </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">comp</td><td>Compensation Matrix </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ctf_comp</td><td>Compensation Matrix </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">exclude_comp_chs</td><td>exclude compensation channels from the output (optional)</td></tr>
   </table>
   </dd>
@@ -525,14 +525,13 @@ Public Attributes</h2></td></tr>
 <p>Make a SSP operator using the meas info</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">info</td><td><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html" title="The Fiff class provides static wrapper functions to stay consistent with mne matlab toolbox Note: avo...">Fiff</a> measurement info </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">proj</td><td>The projection operator to apply to the data</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>nproj - How many items in the projector </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00192">192</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00191">191</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
 
 </div>
 </div>
@@ -707,7 +706,7 @@ Public Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00252">252</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00251">251</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
 
 </div>
 </div>
@@ -771,7 +770,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Acquisition information ToDo... </p>
 
-<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00310">310</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00309">309</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
 
 </div>
 </div>
@@ -786,7 +785,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Acquisition information ToDo... </p>
 
-<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00311">311</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00310">310</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
 
 </div>
 </div>
@@ -801,7 +800,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>List of bad channels. </p>
 
-<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00307">307</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00306">306</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
 
 </div>
 </div>
@@ -816,7 +815,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>List of all channel names. </p>
 
-<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00301">301</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00300">300</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
 
 </div>
 </div>
@@ -831,7 +830,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>List of all channel info descriptors. </p>
 
-<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00300">300</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00299">299</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
 
 </div>
 </div>
@@ -846,7 +845,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>List of available CTF software compensators. </p>
 
-<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00309">309</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00308">308</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
 
 </div>
 </div>
@@ -861,7 +860,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Coordinate transformation ToDo... </p>
 
-<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00303">303</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00302">302</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
 
 </div>
 </div>
@@ -876,7 +875,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Coordinate transformation ToDo... </p>
 
-<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00304">304</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00303">303</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
 
 </div>
 </div>
@@ -891,7 +890,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Coordinate transformation ToDo... </p>
 
-<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00302">302</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00301">301</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
 
 </div>
 </div>
@@ -906,7 +905,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>List of all digitization point descriptors. </p>
 
-<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00305">305</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00304">304</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
 
 </div>
 </div>
@@ -921,7 +920,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Coordinate transformation ToDo... </p>
 
-<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00306">306</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00305">305</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
 
 </div>
 </div>
@@ -936,7 +935,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>File ID. </p>
 
-<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00293">293</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00292">292</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
 
 </div>
 </div>
@@ -951,7 +950,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Filename when the info is read of a fiff file. </p>
 
-<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00312">312</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00311">311</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
 
 </div>
 </div>
@@ -966,7 +965,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Highpass frequency. </p>
 
-<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00298">298</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00297">297</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
 
 </div>
 </div>
@@ -981,7 +980,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Lowpass frequency. </p>
 
-<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00299">299</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00298">298</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
 
 </div>
 </div>
@@ -996,7 +995,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Measurement date. </p>
 
-<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00295">295</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00294">294</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
 
 </div>
 </div>
@@ -1011,7 +1010,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Measurement ID. </p>
 
-<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00294">294</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00293">293</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
 
 </div>
 </div>
@@ -1026,7 +1025,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Number of channels. </p>
 
-<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00296">296</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00295">295</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
 
 </div>
 </div>
@@ -1041,7 +1040,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>List of available SSP projectors. </p>
 
-<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00308">308</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00307">307</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
 
 </div>
 </div>
@@ -1056,7 +1055,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Sample frequency. </p>
 
-<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00297">297</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info_8h_source.html#l00296">296</a> of file <a class="el" href="fiff__info_8h_source.html">fiff_info.h</a>.</p>
 
 </div>
 </div>
@@ -1067,7 +1066,7 @@ Public Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Jan 14 2013 15:00:01 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Jan 14 2013 19:01:06 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

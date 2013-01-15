@@ -7,10 +7,11 @@ var searchData=
   ['cluster_5fforward_5fsolution',['cluster_forward_solution',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a82b3a26bd1c400b55b0076caefc6361e',1,'MNELIB::MNEForwardSolution']]],
   ['colortable',['Colortable',['../class_f_s_l_i_b_1_1_colortable.html#a754b35c17624ea9d547c850268cff11b',1,'FSLIB::Colortable']]],
   ['combine_5fxyz',['combine_xyz',['../class_m_n_e_l_i_b_1_1_m_n_e.html#a730256c44026e9d64551d85fc649488d',1,'MNELIB::MNE::combine_xyz()'],['../class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#a2b01df2e1093da85ab5edb2ba9354a14',1,'MNEMATHLIB::MNEMath::combine_xyz()']]],
-  ['connecttohost',['connectToHost',['../class_m_n_e_l_i_b_1_1_m_n_e_rt_cmd_client.html#a344bc7a638b2e8fb74b484b5715b85b4',1,'MNELIB::MNERtCmdClient::connectToHost()'],['../class_m_n_e_l_i_b_1_1_m_n_e_rt_data_client.html#a04e7b2d60c1a2c8f723c0f1ac2e95d54',1,'MNELIB::MNERtDataClient::connectToHost()']]],
+  ['connecttohost',['connectToHost',['../class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#a0c8d242f64593da6a1a2b65cd9f10ca3',1,'RTCLIENTLIB::RtCmdClient::connectToHost()'],['../class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_data_client.html#a09105978e05d2d83174b91758d8ea7f8',1,'RTCLIENTLIB::RtDataClient::connectToHost()']]],
   ['convert_5fch_5fpos',['convert_ch_pos',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#aed450229fd35acf53e826b1a4095fdf6',1,'FIFFLIB::FiffTag']]],
   ['convert_5fmatrix_5ffrom_5ffile_5fdata',['convert_matrix_from_file_data',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a539291aa70bcf77160528cfe41a4b771',1,'FIFFLIB::FiffTag']]],
   ['convert_5fmatrix_5fto_5ffile_5fdata',['convert_matrix_to_file_data',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#adf497a51c08b658c0f15885b9cdca44c',1,'FIFFLIB::FiffTag']]],
   ['convert_5ftag_5fdata',['convert_tag_data',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a62f14624acb557bbc23839b8478b460e',1,'FIFFLIB::FiffTag']]],
-  ['copy_5ftree',['copy_tree',['../class_f_i_f_f_l_i_b_1_1_fiff.html#a802c7b00fb4ac55d7d51494d65aac732',1,'FIFFLIB::Fiff::copy_tree()'],['../class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a334b1d1d89e627cf8f9afe210fc3ad01',1,'FIFFLIB::FiffDirTree::copy_tree()']]]
+  ['copy_5ftree',['copy_tree',['../class_f_i_f_f_l_i_b_1_1_fiff.html#a802c7b00fb4ac55d7d51494d65aac732',1,'FIFFLIB::Fiff::copy_tree()'],['../class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a334b1d1d89e627cf8f9afe210fc3ad01',1,'FIFFLIB::FiffDirTree::copy_tree()']]],
+  ['covcalculated',['covCalculated',['../class_r_t_i_n_v_l_i_b_1_1_rt_cov.html#a025cee2787cf81c352e3d53836a42093',1,'RTINVLIB::RtCov']]]
 ];

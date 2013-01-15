@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_rt_cmd_client.cpp
+* @file     rtcmdclient.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 *           To Be continued...
@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the MNERtCmdClient Class.
+* @brief     implementation of the RtCmdClient Class.
 *
 */
 
@@ -40,7 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_rt_cmd_client.h"
+#include "rtcmdclient.h"
 
 
 //*************************************************************************************************************
@@ -48,7 +48,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace RTCLIENTLIB;
 
 
 //*************************************************************************************************************
@@ -56,7 +56,7 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MNERtCmdClient::MNERtCmdClient(QObject *parent)
+RtCmdClient::RtCmdClient(QObject *parent)
 : QTcpSocket(parent)
 {
 
@@ -65,7 +65,7 @@ MNERtCmdClient::MNERtCmdClient(QObject *parent)
 
 //*************************************************************************************************************
 
-void MNERtCmdClient::connectToHost(QString &p_sRtServerHostName)
+void RtCmdClient::connectToHost(QString &p_sRtServerHostName)
 {
     QTcpSocket::connectToHost(p_sRtServerHostName, 4217);
 }
@@ -73,7 +73,7 @@ void MNERtCmdClient::connectToHost(QString &p_sRtServerHostName)
 
 //*************************************************************************************************************
 
-QString MNERtCmdClient::sendCommand(const QString &p_sCommand)
+QString RtCmdClient::sendCommand(const QString &p_sCommand)
 {
     QString t_sCommand = QString("%1\n").arg(p_sCommand);
     QString p_sReply;
@@ -97,7 +97,7 @@ QString MNERtCmdClient::sendCommand(const QString &p_sCommand)
 
 //*************************************************************************************************************
 
-void MNERtCmdClient::requestMeasInfo(qint32 p_id)
+void RtCmdClient::requestMeasInfo(qint32 p_id)
 {
     QString t_sCommand = QString("measinfo %1").arg(p_id);
     this->sendCommand(t_sCommand);
@@ -106,7 +106,7 @@ void MNERtCmdClient::requestMeasInfo(qint32 p_id)
 
 //*************************************************************************************************************
 
-void MNERtCmdClient::requestMeasInfo(const QString &p_Alias)
+void RtCmdClient::requestMeasInfo(const QString &p_Alias)
 {
     QString t_sCommand = QString("measinfo %1").arg(p_Alias);
     this->sendCommand(t_sCommand);
@@ -115,7 +115,7 @@ void MNERtCmdClient::requestMeasInfo(const QString &p_Alias)
 
 //*************************************************************************************************************
 
-void MNERtCmdClient::requestMeas(qint32 p_id)
+void RtCmdClient::requestMeas(qint32 p_id)
 {
     QString t_sCommand = QString("meas %1").arg(p_id);
     this->sendCommand(t_sCommand);
@@ -124,7 +124,7 @@ void MNERtCmdClient::requestMeas(qint32 p_id)
 
 //*************************************************************************************************************
 
-void MNERtCmdClient::requestMeas(QString p_Alias)
+void RtCmdClient::requestMeas(QString p_Alias)
 {
     QString t_sCommand = QString("meas %1").arg(p_Alias);
     this->sendCommand(t_sCommand);
@@ -133,7 +133,7 @@ void MNERtCmdClient::requestMeas(QString p_Alias)
 
 //*************************************************************************************************************
 
-void MNERtCmdClient::stopAll()
+void RtCmdClient::stopAll()
 {
     QString t_sCommand = QString("stop-all");
     this->sendCommand(t_sCommand);

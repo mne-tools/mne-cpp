@@ -75,29 +75,24 @@ win32 {
     QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
 }
 
-SOURCES +=  mne.cpp \
-            mne_sourcespace.cpp \
-            mne_forwardsolution.cpp \
-            mne_hemisphere.cpp \
-            mne_inverse_operator.cpp \
-            mne_epoch_data.cpp \
-            mne_epoch_data_list.cpp \
-            mne_rt_cmd_client.cpp \
-            mne_rt_data_client.cpp \
-            mne_rt_client.cpp
+SOURCES += \
+    mne.cpp \
+    mne_sourcespace.cpp \
+    mne_forwardsolution.cpp \
+    mne_hemisphere.cpp \
+    mne_inverse_operator.cpp \
+    mne_epoch_data.cpp \
+    mne_epoch_data_list.cpp
 
-HEADERS +=  mne.h \
-            mne_global.h \
-#            hpcmatrix.h \
-            mne_sourcespace.h \
-            mne_hemisphere.h \
-            mne_forwardsolution.h \
-            mne_inverse_operator.h \
-            mne_epoch_data.h \
-            mne_epoch_data_list.h \
-            mne_rt_cmd_client.h \
-            mne_rt_data_client.h \
-            mne_rt_client.h
+HEADERS += \
+    mne.h \
+    mne_global.h \
+    mne_sourcespace.h \
+    mne_hemisphere.h \
+    mne_forwardsolution.h \
+    mne_inverse_operator.h \
+    mne_epoch_data.h \
+    mne_epoch_data_list.h \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

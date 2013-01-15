@@ -287,7 +287,7 @@ public:
     *
     * Read the SSP data under a given directory node
     *
-    * @param[in] const p_Node    The node of interest
+    * @param[in] p_Node    The node of interest
     *
     * @return a list of SSP projectors
     */
@@ -422,7 +422,6 @@ public:
     *
     * Writes a digitizer data point into a fif file
     *
-    * @param[in] p_pStream    An open fif file
     * @param[in] dig        The point to write
     */
     void write_dig_point(const FiffDigPoint& dig);
@@ -451,7 +450,6 @@ public:
     *
     * Writes a 32-bit integer tag to a fif file
     *
-    * @param[in] p_pStream    An open fif file
     * @param[in] kind       Tag kind
     * @param[in] data       The integer data pointer
     * @param[in] nel        Number of integers to write (default = 1)
@@ -508,7 +506,7 @@ public:
     * Writes a named single-precision floating-point matrix
     *
     * @param[in] kind       The tag kind to use for the data
-    * @param[in] data       The data matrix
+    * @param[in] mat        The data matrix
     */
     void write_named_matrix(fiff_int_t kind, const FiffNamedMatrix& mat);
 

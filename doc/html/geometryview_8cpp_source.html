@@ -94,7 +94,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="comment">// INCLUDES</span></div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="geometryview_8h.html" title="ToDo Documentation...">geometryview.h</a>&quot;</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="geometryview_8h.html" title="Declaration of the GeometryView Class.">geometryview.h</a>&quot;</span></div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
@@ -127,15 +127,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment">// DEFINE MEMBER METHODS</span></div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;GeometryView::GeometryView(QWindow *parent)</div>
+<div class="line"><a name="l00074"></a><span class="lineno"><a class="code" href="class_d_i_s_p_l_i_b_1_1_geometry_view.html#a4d825a6fb8c46d2158107c56af28d1b4">   74</a></span>&#160;<a class="code" href="class_d_i_s_p_l_i_b_1_1_geometry_view.html#a4d825a6fb8c46d2158107c56af28d1b4">GeometryView::GeometryView</a>(QWindow *parent)</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;: QGLView(parent)</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;, hemisphere(0)</div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;, scene(0)</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;{</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    QString t_sFile = <span class="stringliteral">&quot;./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif&quot;</span>;</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    QFile t_File(t_sFile);</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="keywordflow">if</span>(!MNE::read_forward_solution(t_File, t_ForwardSolution))</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        t_ForwardSolution.clear();</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e.html#a223889c9e5c2896af6799a37eaf97e79">MNE::read_forward_solution</a>(t_File, t_ForwardSolution))</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        t_ForwardSolution.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a26ec00124c5a421dc1d863a9af4f1b44">clear</a>();</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    hemisphereFrontalCamera = <span class="keyword">new</span> QGLCamera(<span class="keyword">this</span>);</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    hemisphereFrontalCamera-&gt;setAdjustForAspectRatio(<span class="keyword">false</span>);</div>
@@ -144,14 +144,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;GeometryView::~GeometryView()</div>
+<div class="line"><a name="l00091"></a><span class="lineno"><a class="code" href="class_d_i_s_p_l_i_b_1_1_geometry_view.html#ab4bb78457615996a1be0c44add508ff9">   91</a></span>&#160;<a class="code" href="class_d_i_s_p_l_i_b_1_1_geometry_view.html#ab4bb78457615996a1be0c44add508ff9">GeometryView::~GeometryView</a>()</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;{</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="keyword">delete</span> hemisphere;</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;}</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="keywordtype">void</span> GeometryView::initializeGL(QGLPainter *painter)</div>
+<div class="line"><a name="l00098"></a><span class="lineno"><a class="code" href="class_d_i_s_p_l_i_b_1_1_geometry_view.html#a816a10949d2879546377239cc72f9cd7">   98</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_d_i_s_p_l_i_b_1_1_geometry_view.html#a816a10949d2879546377239cc72f9cd7">GeometryView::initializeGL</a>(QGLPainter *painter)</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;{</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <span class="keywordflow">if</span>(!t_ForwardSolution.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1c81b86cc30d53927ba032543507cdd8">isEmpty</a>())</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    {</div>
@@ -229,7 +229,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;</div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;<span class="keywordtype">void</span> GeometryView::paintGL(QGLPainter *painter)</div>
+<div class="line"><a name="l00176"></a><span class="lineno"><a class="code" href="class_d_i_s_p_l_i_b_1_1_geometry_view.html#a394ff6a0626e1cc306d40df437a34718">  176</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_d_i_s_p_l_i_b_1_1_geometry_view.html#a394ff6a0626e1cc306d40df437a34718">GeometryView::paintGL</a>(QGLPainter *painter)</div>
 <div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;{</div>
 <div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <span class="keywordflow">if</span>(!t_ForwardSolution.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1c81b86cc30d53927ba032543507cdd8">isEmpty</a>())</div>
 <div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    {</div>
@@ -251,7 +251,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Jan 14 2013 15:00:00 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Jan 14 2013 19:01:05 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

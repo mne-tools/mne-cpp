@@ -13,6 +13,7 @@ var searchData=
   ['dir',['dir',['../class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#aea407f354fd58a8691e22ca7ae448ede',1,'FIFFLIB::FiffDirTree']]],
   ['dir_5ftree_5ffind',['dir_tree_find',['../class_f_i_f_f_l_i_b_1_1_fiff.html#a52b8164a528038c9565ab41caca3ff54',1,'FIFFLIB::Fiff::dir_tree_find()'],['../class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a70da2b06043102864248454470946a81',1,'FIFFLIB::FiffDirTree::dir_tree_find()']]],
   ['disp_5fglobal_2eh',['disp_global.h',['../disp__global_8h.html',1,'']]],
+  ['dispshared_5fexport',['DISPSHARED_EXPORT',['../disp__global_8h.html#aded49b96c9ac1f92dc1381a1d7845c28',1,'disp_global.h']]],
   ['dist',['dist',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#abdb66f07a304610e91f639fca39e4dbc',1,'MNELIB::MNEHemisphere']]],
   ['dist_5flimit',['dist_limit',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ae7ab61927a9552e4f8f4004cb75218db',1,'MNELIB::MNEHemisphere']]]
 ];

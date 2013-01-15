@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ToDo Documentation...
+* @brief    Declaration of the GeometryView Class.
 *
 */
 
@@ -47,20 +47,19 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include "qglview.h"
-
-#include <QGeometryData>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // MNE INCLUDES
 //=============================================================================================================
 
 #include <mne/mne.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include "qglview.h"
+#include <QGeometryData>
 
 
 //*************************************************************************************************************
@@ -83,28 +82,59 @@ using namespace MNELIB;
 //class QGLSceneNode;
 //QT_END_NAMESPACE
 
+//=============================================================================================================
+/**
+* stereoscopic 3D geoemtry view
+*
+* @brief Geometry View
+*/
 class DISPSHARED_EXPORT GeometryView : public QGLView
 {
     Q_OBJECT
 public:
+
+    //=========================================================================================================
+    /**
+    * Creates the geometry view.
+    *
+    * @param[in] parent     Parent QObject (optional)
+    */
     GeometryView(QWindow *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Destroys the geometry view.
+    */
     ~GeometryView();
 
 protected:
+    //=========================================================================================================
+    /**
+    * Initializes the current GL context represented by painter.
+    *
+    * @param[in] painter    GL painter which should be initialized
+    */
     void initializeGL(QGLPainter *painter);
+
+    //=========================================================================================================
+    /**
+    * Paints the scene onto painter. The color and depth buffers will have already been cleared, and the camera() position set.
+    *
+    * @param[in] painter    GL painter which is updated
+    */
     void paintGL(QGLPainter *painter);
 
 private:
-    MNEForwardSolution t_ForwardSolution;
+    MNEForwardSolution t_ForwardSolution;   /**< Holds the forward soultion -> ToDo change this to shraed data pointer */
 
-    QGLLightModel *hemisphereLightModel;
-    QGLLightParameters *lightParameters;
+    QGLLightModel *hemisphereLightModel;    /**< The selected light model. */
+    QGLLightParameters *lightParameters;    /**< The selected light parameters. */
 
-    QGeometryData data;
-    QGLSceneNode *hemisphere;
-    QGLSceneNode *scene;
+    QGeometryData data;                     /**< The geometry data. */
+    QGLSceneNode *hemisphere;               /**< Scene node of the hemisphere models. */
+    QGLSceneNode *scene;                    /**< Node of the scene. */
 
-    QGLCamera *hemisphereFrontalCamera;
+    QGLCamera *hemisphereFrontalCamera;     /**< Hemisphere frontal camera. */
 };
 
 } // NAMESPACE

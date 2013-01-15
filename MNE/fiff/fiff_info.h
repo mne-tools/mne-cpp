@@ -136,7 +136,7 @@ public:
     *
     * @param[in] from               compensation in the input data
     * @param[in] to                 desired compensation in the output
-    * @param[out] comp              Compensation Matrix
+    * @param[out] ctf_comp          Compensation Matrix
     * @param[in] exclude_comp_chs   exclude compensation channels from the output (optional)
     *
     * @return true if succeeded, false otherwise
@@ -184,7 +184,6 @@ public:
     *
     * Make a SSP operator using the meas info
     *
-    * @param[in] info       Fiff measurement info
     * @param[out] proj      The projection operator to apply to the data
     *
     * @return nproj - How many items in the projector

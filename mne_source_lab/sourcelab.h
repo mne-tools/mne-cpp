@@ -30,7 +30,7 @@
 // MNE INCLUDES
 //=============================================================================================================
 
-#include <mne/mne_rt_client.h>
+#include <rtclient/rtclient.h>
 #include <mne/mne_forwardsolution.h>
 
 
@@ -59,6 +59,7 @@
 using namespace IOBuffer;
 using namespace FIFFLIB;
 using namespace MNELIB;
+using namespace RTCLIENTLIB;
 using namespace RTINVLIB;
 
 
@@ -96,7 +97,7 @@ signals:
     void closeSourceLab();
 
 private:
-    MNERtClient*    m_pRtClient;
+    RtClient*       m_pRtClient;
     RtCov*          m_pRtCov;
 
     RtInv*          m_pRtInv;

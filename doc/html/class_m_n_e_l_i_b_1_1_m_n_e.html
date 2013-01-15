@@ -125,8 +125,8 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:a8da88839a7739af8b44830889a563900"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a41ae710883145388abeb0d678f8be88e"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html">MNEInverseOperator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html#a41ae710883145388abeb0d678f8be88e">prepare_inverse_operator</a> (<a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html">MNEInverseOperator</a> &amp;orig, qint32 nave, float lambda2, bool dSPM, bool sLORETA=false)</td></tr>
 <tr class="separator:a41ae710883145388abeb0d678f8be88e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab1866dbba04fc8240d9bc1b5c62e8c21"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html#ab1866dbba04fc8240d9bc1b5c62e8c21">read_events</a> (QIODevice *p_pIODevice, MatrixXi &amp;eventlist)</td></tr>
-<tr class="separator:ab1866dbba04fc8240d9bc1b5c62e8c21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d050e551ed49d58ef705745baf90918"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html#a3d050e551ed49d58ef705745baf90918">read_events</a> (QIODevice &amp;p_IODevice, MatrixXi &amp;eventlist)</td></tr>
+<tr class="separator:a3d050e551ed49d58ef705745baf90918"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aac923889cf65dff09d62f5015b72cc02"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html#aac923889cf65dff09d62f5015b72cc02">read_cov</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> &amp;p_Node, fiff_int_t cov_kind, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html">FiffCov</a> &amp;p_covData)</td></tr>
 <tr class="separator:aac923889cf65dff09d62f5015b72cc02"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a160abcaa87d4726d3afe3a6645ff4abe"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html#a160abcaa87d4726d3afe3a6645ff4abe">read_inverse_operator</a> (QIODevice &amp;p_pIODevice, <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html">MNEInverseOperator</a> &amp;inv)</td></tr>
@@ -241,7 +241,7 @@ Static Public Member Functions</h2></td></tr>
 <p>Returns the hemisphere id (FIFFV_MNE_SURF_LEFT_HEMI or FIFFV_MNE_SURF_RIGHT_HEMI) for a source space.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pHemisphere</td><td>the hemisphere to investigate</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_Hemisphere</td><td>The hemisphere to investigate</td></tr>
   </table>
   </dd>
 </dl>
@@ -395,7 +395,7 @@ Static Public Member Functions</h2></td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">info</td><td>measurement info as returned by the fif reading routines </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">from</td><td>compensation in the input data </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">to</td><td>desired compensation in the output </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">comp</td><td>Compensation Matrix </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ctf_comp</td><td>Compensation Matrix </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">exclude_comp_chs</td><td>exclude compensation channels from the output (optional)</td></tr>
   </table>
   </dd>
@@ -701,7 +701,7 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ab1866dbba04fc8240d9bc1b5c62e8c21"></a>
+<a class="anchor" id="a3d050e551ed49d58ef705745baf90918"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -711,8 +711,8 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">bool MNE::read_events </td>
           <td>(</td>
-          <td class="paramtype">QIODevice *&#160;</td>
-          <td class="paramname"><em>p_pIODevice</em>, </td>
+          <td class="paramtype">QIODevice &amp;&#160;</td>
+          <td class="paramname"><em>p_IODevice</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -737,7 +737,7 @@ Static Public Member Functions</h2></td></tr>
 <p>Read an event list from a fif file</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_sFileName</td><td>The name of the file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_IODevice</td><td>The I/O device to read from </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">eventlist</td><td>The read eventlist m x 3; with m events; colum: 1 - position in samples, 3 - eventcode</td></tr>
   </table>
   </dd>
@@ -924,7 +924,7 @@ Static Public Member Functions</h2></td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>The open fiff file </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">add_geom</td><td>Add geometry information to the source spaces </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">p_Tree</td><td>Search for the source spaces here</td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">p_pSourceSpace</td><td>The read source spaces</td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">p_SourceSpace</td><td>The read source spaces</td></tr>
   </table>
   </dd>
 </dl>
@@ -1080,7 +1080,7 @@ Static Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Jan 14 2013 15:00:01 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Jan 14 2013 19:01:06 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

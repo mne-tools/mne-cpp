@@ -227,7 +227,7 @@ public:
     *
     * Invert a coordinate transformation
     *
-    * @param[in] p_pTransform the transformation which should be inverted
+    * @param[in] p_Transform    The transformation which should be inverted
     *
     * @return true if succeeded, false otherwise
     */
@@ -266,7 +266,7 @@ public:
     *
     * Opens a fif file and provides the directory of tags
     *
-    * @param[in] p_sIODevice    A fiff IO device like a fiff QFile or QTCPSocket
+    * @param[in] p_pIODevice    A fiff IO device like a fiff QFile or QTCPSocket
     * @param[out] p_pStream     file which is openened
     * @param[out] p_Tree       tag directory organized into a tree
     * @param[out] p_Dir        the sequential tag directory
@@ -419,7 +419,7 @@ public:
     *
     * Read one evoked data set
     *
-    * @param[in] p_pIODevice    A fiff IO device like a fiff QFile or QTCPSocket
+    * @param[in] p_IODevice     A fiff IO device like a fiff QFile or QTCPSocket
     * @param[out] data          The read evoked data
     * @param[in] setno          the set to pick
     *
@@ -486,7 +486,7 @@ public:
     * Wrapper for the FiffStream read_proj member function
     *
     * @param[in] p_pStream    The opened fif file to read from
-    * @param[in] node       The node of interest
+    * @param[in] p_Node       The node of interest
     *
     * @return a list of SSP projectors
     */
@@ -843,9 +843,9 @@ public:
     *
     * Writes a named single-precision floating-point matrix
     *
-    * @param[in] p_pStream    An open fif file
+    * @param[in] p_pStream  An open fif file
     * @param[in] kind       The tag kind to use for the data
-    * @param[in] data       The data matrix
+    * @param[in] mat        The data matrix
     */
     inline static void write_named_matrix(FiffStream* p_pStream, fiff_int_t kind,FiffNamedMatrix& mat)
     {

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_rt_data_client.cpp
+* @file     rtdataclient.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 *           To Be continued...
@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the MNERtDataClient Class.
+* @brief     implementation of the RtDataClient Class.
 *
 */
 
@@ -40,7 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_rt_data_client.h"
+#include "rtdataclient.h"
 
 
 //*************************************************************************************************************
@@ -48,7 +48,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace RTCLIENTLIB;
 
 
 //*************************************************************************************************************
@@ -56,7 +56,7 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MNERtDataClient::MNERtDataClient(QObject *parent)
+RtDataClient::RtDataClient(QObject *parent)
 : QTcpSocket(parent)
 , m_clientID(-1)
 {
@@ -66,7 +66,7 @@ MNERtDataClient::MNERtDataClient(QObject *parent)
 
 //*************************************************************************************************************
 
-void MNERtDataClient::connectToHost(const QString& p_sRtServerHostName)
+void RtDataClient::connectToHost(const QString& p_sRtServerHostName)
 {
     QTcpSocket::connectToHost(p_sRtServerHostName, 4218);
 }
@@ -74,7 +74,7 @@ void MNERtDataClient::connectToHost(const QString& p_sRtServerHostName)
 
 //*************************************************************************************************************
 
-qint32 MNERtDataClient::getClientId()
+qint32 RtDataClient::getClientId()
 {
     if(m_clientID == -1)
     {
@@ -101,7 +101,7 @@ qint32 MNERtDataClient::getClientId()
 
 //*************************************************************************************************************
 
-FiffInfo MNERtDataClient::readInfo()
+FiffInfo RtDataClient::readInfo()
 {
     FiffInfo p_FiffInfo;
     bool t_bReadMeasBlockStart = false;
@@ -305,7 +305,7 @@ FiffInfo MNERtDataClient::readInfo()
 
 //*************************************************************************************************************
 
-void MNERtDataClient::readRawBuffer(qint32 p_nChannels, MatrixXf& data, fiff_int_t& kind)
+void RtDataClient::readRawBuffer(qint32 p_nChannels, MatrixXf& data, fiff_int_t& kind)
 {
 //        data = [];
 
@@ -331,7 +331,7 @@ void MNERtDataClient::readRawBuffer(qint32 p_nChannels, MatrixXf& data, fiff_int
 
 //*************************************************************************************************************
 
-void MNERtDataClient::setClientAlias(const QString &p_sAlias)
+void RtDataClient::setClientAlias(const QString &p_sAlias)
 {
     FiffStream t_fiffStream(this);
     t_fiffStream.write_rt_command(2, p_sAlias);//MNE_RT.MNE_RT_SET_CLIENT_ALIAS, alias);

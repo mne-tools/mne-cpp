@@ -81,9 +81,9 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* TEMPLATE CIRCULAR BUFFER
+* Circular Matrix buffer provides a template for thread safe circular matrix buffers.
 *
-* @brief The TEMPLATE CIRCULAR BUFFER provides a template for thread safe circular buffers.
+* @brief The circular matrix buffer
 */
 template<typename _Tp>
 class CircularMatrixBuffer
@@ -95,6 +95,8 @@ public:
     * length of buffer = uiMaxNumMatrizes*rows*cols
     *
     * @param [in] uiMaxNumMatrices  length of buffer.
+    * @param [in] uiRows            Number of rows.
+    * @param [in] uiCols            Number of columns.
     */
     explicit CircularMatrixBuffer(unsigned int uiMaxNumMatrices, unsigned int uiRows, unsigned int uiCols);
 
@@ -109,7 +111,6 @@ public:
     * Adds a whole matrix at the end buffer.
     *
     * @param [in] pMatrix pointer to a Matrix which should be apend to the end.
-    * @param [in] size number of elements containing the array.
     */
     inline void push(const Matrix<_Tp, Dynamic, Dynamic>* pMatrix);
 
@@ -136,6 +137,7 @@ private:
     * @return the mapped index.
     */
     inline unsigned int mapIndex(int& index);
+
     unsigned int    m_uiMaxNumMatrices;         /**< Holds the maximal number of matrices.*/
     unsigned int    m_uiRows;                   /**< Holds the number rows.*/
     unsigned int    m_uiCols;                   /**< Holds the number cols.*/

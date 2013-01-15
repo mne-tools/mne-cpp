@@ -475,7 +475,7 @@ Static Public Member Functions</h2></td></tr>
 <p>Invert a coordinate transformation</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pTransform</td><td>the transformation which should be inverted</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_Transform</td><td>The transformation which should be inverted</td></tr>
   </table>
   </dd>
 </dl>
@@ -595,7 +595,7 @@ Static Public Member Functions</h2></td></tr>
 <p>Opens a fif file and provides the directory of tags</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_sIODevice</td><td>A fiff IO device like a fiff QFile or QTCPSocket </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pIODevice</td><td>A fiff IO device like a fiff QFile or QTCPSocket </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">p_pStream</td><td>file which is openened </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">p_Tree</td><td>tag directory organized into a tree </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">p_Dir</td><td>the sequential tag directory</td></tr>
@@ -988,7 +988,7 @@ Static Public Member Functions</h2></td></tr>
 <p>Read one evoked data set</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pIODevice</td><td>A fiff IO device like a fiff QFile or QTCPSocket </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_IODevice</td><td>A fiff IO device like a fiff QFile or QTCPSocket </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">data</td><td>The read evoked data </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">setno</td><td>the set to pick</td></tr>
   </table>
@@ -1162,7 +1162,7 @@ Static Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>The opened fif file to read from </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">node</td><td>The node of interest</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_Node</td><td>The node of interest</td></tr>
   </table>
   </dd>
 </dl>
@@ -2106,7 +2106,7 @@ Static Public Member Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">p_pStream</td><td>An open fif file </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">kind</td><td>The tag kind to use for the data </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The data matrix </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">mat</td><td>The data matrix </td></tr>
   </table>
   </dd>
 </dl>
@@ -2277,7 +2277,7 @@ Static Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Jan 14 2013 15:00:01 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Jan 14 2013 19:01:06 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

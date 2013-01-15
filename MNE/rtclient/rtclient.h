@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_rt_cmd_client.h
+* @file     rtclient.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 *           To Be continued...
@@ -31,20 +31,27 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     declaration of the MNERtCmdClient Class.
+* @brief     declaration of the RtClient Class.
 *
 */
 
-#ifndef MNE_RT_CMD_CLIENT_H
-#define MNE_RT_CMD_CLIENT_H
-
+#ifndef RTCLIENT_H
+#define RTCLIENT_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // MNE INCLUDES
 //=============================================================================================================
 
-#include "mne_global.h"
+#include "rtclient_global.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FIFF INCLUDES
+//=============================================================================================================
+
+#include <fiff/fiff_info.h>
 
 
 //*************************************************************************************************************
@@ -52,102 +59,111 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QTcpSocket>
-#include <QDataStream>
+#include <QThread>
+#include <QMutex>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// Eigen INCLUDES
 //=============================================================================================================
 
-namespace MNELIB
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE RTCLIENTLIB
+//=============================================================================================================
+
+namespace RTCLIENTLIB
 {
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace Eigen;
+using namespace FIFFLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
 
 //=============================================================================================================
 /**
-* The real-time command client class provides an interface to communicate with the command port 4217 of a running mne_rt_server.
+* The real-time client class provides an interface to communicate with a running mne_rt_server.
 *
-* @brief Real-time command client
+* @brief Real-time client
 */
-class MNESHARED_EXPORT MNERtCmdClient : public QTcpSocket
+class RTCLIENTSHARED_EXPORT RtClient : public QThread
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<MNERtCmdClient> SPtr;            /**< Shared pointer type for MNERtCmdClient. */
-    typedef QSharedPointer<const MNERtCmdClient> ConstSPtr; /**< Const shared pointer type for MNERtCmdClient. */
+    typedef QSharedPointer<RtClient> SPtr;               /**< Shared pointer type for MNERtClient. */
+    typedef QSharedPointer<const RtClient> ConstSPtr;    /**< Const shared pointer type for MNERtClient. */
 
     //=========================================================================================================
     /**
-    * Creates the real-time command client.
-    *
-    * @param[in] parent     Parent QObject (optional)
-    */
-    explicit MNERtCmdClient(QObject *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Connect to a mne_rt_server using port 4217
+    * Creates the real-time client.
     *
     * @param[in] p_sRtServerHostname    The IP address of the mne_rt_server
+    * @param[in] parent                 Parent QObject (optional)
     */
-    void connectToHost(QString &p_sRtServerHostName);
+    explicit RtClient(QString p_sRtServerHostname,QObject *parent = 0);
+    
+    //=========================================================================================================
+    /**
+    * Destroys the real time client.
+    */
+    ~RtClient();
+
 
     //=========================================================================================================
     /**
-    * Sends a command to a connected mne_rt_server
-    *
-    * @param[in] p_sCommand    The command to send
-    *
-    * @return mne_rt_server reply
+    * Request Fiff Info
     */
-    QString sendCommand(const QString &p_sCommand);
+    inline FiffInfo::SDPtr getFiffInfo()
+    {
+        return m_pFiffInfo;
+    }
 
     //=========================================================================================================
     /**
-    * Request measurement information to send it to a specified (id) client
+    * Stops the RtClient by stopping the producer's thread.
     *
-    * @param[in] p_id   ID of the client to send the measurement information to
+    * @return true if succeeded, false otherwise
     */
-    void requestMeasInfo(qint32 p_id);
+    virtual bool stop();
 
+protected:
     //=========================================================================================================
     /**
-    * Request measurement information to send it to a specified (alias) client
-    *
-    * @param[in] p_Alias    Alias of the client to send the measurement information to
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread.
     */
-    void requestMeasInfo(const QString &p_Alias);
+    virtual void run();
 
-    //=========================================================================================================
-    /**
-    * Request measurement and send raw data to a specified (id) client
-    *
-    * @param[in] p_id   ID of the client to send the measurement to
-    */
-    void requestMeas(qint32 p_id);
-
-    //=========================================================================================================
-    /**
-    * Request measurement and send raw data to a specified (alias) client
-    *
-    * @param[in] p_Alias   Alias of the client to send the measurement to
-    */
-    void requestMeas(QString p_Alias);
-
-    //=========================================================================================================
-    /**
-    * stop data acquistion and sending measurements to all clients
-    */
-    void stopAll();
+private:
+    QMutex      mutex;                  /**< Provides access serialization between threads*/
+    bool        m_bIsRunning;           /**< Holds whether RtClient is running.*/
+    QString     m_sRtServerHostName;    /**< The IP Adress of mne_rt_server.*/
+    FiffInfo::SDPtr m_pFiffInfo;        /**< Fiff measurement info.*/
 
 signals:
-    
-public slots:
-    
+    void rawBufferReceived(Eigen::MatrixXf p_rawBuffer);    /**< Emits a received raw buffer - ToDo change the emits to fiff raw data.*/
 };
 
 } // NAMESPACE
 
-#endif // MNE_RT_CMD_CLIENT_H
+#ifndef metatype_matrixxf
+#define metatype_matrixxf
+Q_DECLARE_METATYPE(Eigen::MatrixXf);    /**< Provides QT META type declaration of the Eigen::MatrixXf type. For signal/slot usage.*/
+#endif
+
+#endif // RTCLIENT_H

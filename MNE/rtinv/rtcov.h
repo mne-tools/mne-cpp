@@ -99,9 +99,9 @@ using namespace FIFFLIB;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RtCov
+* Real-time covariance estimation
 *
-* @brief The RtCov class provides...
+* @brief Real-time covariance estimation
 */
 class RTINVSHARED_EXPORT RtCov : public QThread
 {
@@ -110,15 +110,26 @@ public:
     typedef QSharedPointer<RtCov> SPtr;             /**< Shared pointer type for RtCov. */
     typedef QSharedPointer<const RtCov> ConstSPtr;  /**< Const shared pointer type for RtCov. */
 
-
+    //=========================================================================================================
+    /**
+    * Creates the real-time covariance estimation object.
+    *
+    * @param[in] parent     Parent QObject (optional)
+    */
     explicit RtCov(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RtCov.
+    * Destroys the Real-time covariance estimation object.
     */
     ~RtCov();
 
+    //=========================================================================================================
+    /**
+    * Slot to receive incoming data.
+    *
+    * @param[in] p_DataSegment  Data to estimate the covariance from -> ToDo Replace this by shared data pointer
+    */
     void receiveDataSegment(MatrixXf p_DataSegment);
 
     //=========================================================================================================
@@ -139,15 +150,21 @@ protected:
     virtual void run();
 
 private:
-    QMutex      mutex;
-    bool        m_bIsRunning;           /**< Holds whether RtCov is running.*/
-    bool        m_bIsRawBufferInit;
+    QMutex      mutex;                  /**< Provides access serialization between threads*/
+    bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
+    bool        m_bIsRawBufferInit;     /**< If raw buffer is initialized.*/
 
-    quint32      m_iMaxSamples;
+    quint32      m_iMaxSamples;         /**< Maximal amount of samples received, before covariance is estimated.*/
 
     RawMatrixBuffer* m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
 
 signals:
+    //=========================================================================================================
+    /**
+    * Signal which is emitted when a new covariance Matrix is estimated.
+    *
+    * @param[out] p_Cov  The covariance matrix -> ToDo replace this by fiffCov Shared Data Pointer.
+    */
     void covCalculated(Eigen::MatrixXf p_Cov);
 };
 
@@ -155,7 +172,7 @@ signals:
 
 #ifndef metatype_matrixxf
 #define metatype_matrixxf
-Q_DECLARE_METATYPE(Eigen::MatrixXf);
+Q_DECLARE_METATYPE(Eigen::MatrixXf);    /**< Provides QT META type declaration of the Eigen::MatrixXf type. For signal/slot usage.*/
 #endif
 
 #endif // RTCOV_H
