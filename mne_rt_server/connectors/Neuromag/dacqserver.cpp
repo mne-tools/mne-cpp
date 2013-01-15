@@ -99,7 +99,7 @@ DacqServer::~DacqServer()
 
 //*************************************************************************************************************
 
-bool DacqServer::getMeasInfo(FiffInfo::SDPtr p_pFiffInfo)
+bool DacqServer::getMeasInfo(FiffInfo::SDPtr& p_pFiffInfo)
 {
 
 //    if (p_pFiffInfo)
@@ -394,7 +394,6 @@ void DacqServer::run()
 
     while(m_bIsRunning)
     {
-        
         if(m_bMeasRequest)
         {
             if (m_pShmemSock->receive_tag(t_pTag) == -1)
