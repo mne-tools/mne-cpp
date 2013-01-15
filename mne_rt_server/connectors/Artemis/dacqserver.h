@@ -91,13 +91,13 @@ class ShmemSocket;
 /**
 * DECLARE CLASS DacqServer
 *
-* @brief The DacqServer class provides a Neuromag MEG connector.
+* @brief The DacqServer class provides a Artemis MEG connector.
 */
 class DacqServer : public QThread
 {
     Q_OBJECT
 
-    friend class Neuromag;
+    friend class Artemis;
 
 public:
 
