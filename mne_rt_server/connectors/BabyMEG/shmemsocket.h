@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dacqserver.h
+* @file     collectorsocket.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
@@ -29,13 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the DacqServer Class.
+* @brief     implementation of the CollectorSocket Class.
 *
 */
 
-
-#ifndef DACQSERVER_H
-#define DACQSERVER_H
+#ifndef SHMEMSOCKET_H
+#define SHMEMSOCKET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -43,7 +42,6 @@
 //=============================================================================================================
 
 #include "types_definitions.h"
-#include <fiff/fiff_info.h>
 #include <fiff/fiff_tag.h>
 
 
@@ -52,19 +50,15 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QThread>
-
-#include <QTcpSocket>
-
-#include <QByteArray>
+#include <QObject>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE ArtemisPlugin
+// DEFINE NAMESPACE BabyMEGPlugin
 //=============================================================================================================
 
-namespace ArtemisPlugin
+namespace BabyMEGPlugin
 {
 
 
@@ -81,105 +75,197 @@ using namespace FIFFLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class Artemis;
-class CollectorSocket;
-class ShmemSocket;
-//class FiffInfo;
+//class FiffTag;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS DacqServer
+* DECLARE CLASS ShmemSocket
 *
-* @brief The DacqServer class provides a Artemis MEG connector.
+* @brief The ShmemSocket class provides...
 */
-class DacqServer : public QThread
+
+class ShmemSocket : public QObject
 {
     Q_OBJECT
-
-    friend class Artemis;
-
 public:
+    explicit ShmemSocket(QObject *parent = 0);
 
+    virtual ~ShmemSocket();
+
+
+    // client_socket.c
     //=========================================================================================================
     /**
-    * Constructs a acquisition Server.
+    * Receive one tag from the data server.
+    *
+    * This routine reads a message from the data server
+    * socket and grabs the data. The data may actually
+    * be in a shared memory segment noted in the message.
+    *
+    * The id parameter is needed for two purposes. The
+    * data transfer mechanism varies depending on the client
+    * number. Clients with id above 10000 use shared memory
+    * transfer while other used a regular file to transfer the
+    * data.It is needed also if the conndedtion needs to be
+    * closed after an error.
+    *
+    * @param[in] p_pTag ToDo
+    *
+    * \return Status OK or FAIL.
     */
-    explicit DacqServer(Artemis* p_pArtemis, QObject * parent = 0);
-    
-    
+    int receive_tag (FiffTag*& p_pTag );
+
+    //ToDo Connect is different? to: telnet localhost collector ???
     //=========================================================================================================
     /**
-    * Constructs a acquisition Server.
-    */
-    ~DacqServer();
-
-    
-public slots: //--> in Qt 5 not anymore declared as slot
-
-    void readCollectorMsg();
-
-
-signals:
-
-    void measInfoAvailable();
-
-
-protected:
-    //=========================================================================================================
-    /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
-    virtual void run();
-
-private:
-
-    //=========================================================================================================
-    /**
-    * Quit function
+    * Connect to the data server process
     *
     * @return
     */
-//    void clean_up();
+    bool connect_client ();
+
+    //=========================================================================================================
+    /**
+    * Disconnect from the data server process
+    *
+    * @return
+    */
+    int disconnect_client ();
+
+    //=========================================================================================================
+    /*
+    * Select tags that we are not interested in!
+    *
+    */
+    void set_data_filter (int *kinds, int nkind);
+
+    //=========================================================================================================
+    /**
+    *
+    * @return
+    */
+    void close_socket ();
+
+    //=========================================================================================================
+    /**
+    *
+    * @return
+    */
+    int connect_disconnect (int sock,int id);
+
+    //=========================================================================================================
+    /**
+    * Filter out some large data blocks
+    * which are not of interest
+    *
+    * @return
+    */
+    int interesting_data (int kind);
 
 
 
-    //newly written stuff ported to qt
-//    QString         m_sCollectorHost;
-    CollectorSocket*    m_pCollectorSock;
+
+private:
+
+    // shmem.c
+    //=========================================================================================================
+    /**
+    *
+    * @return
+    */
+    dacqShmBlock get_shmem();
+
+    //=========================================================================================================
+    /**
+    * Initialize data acquisition shared memory segment
+    *
+    * @return
+    */
+    int init_shmem();
 
 
-    ShmemSocket*        m_pShmemSock;
+    //=========================================================================================================
+    /**
+    * Release the shared memory
+    *
+    * @return
+    */
+    int release_shmem();
+
+
+    //=========================================================================================================
+    /**
+    *
+    * @return
+    */
+    FILE* open_fif (char *name);
+
+
+    //=========================================================================================================
+    /**
+    *
+    *
+    * fd        File to read from
+    * pos       Position in file
+    * size      How long
+    * data);    Put data here
+    * @return
+    */
+    int read_fif (FILE *fd, long pos, size_t size, char *data);
+
+
+
+private:
+
+    int* filter_kinds;  /**< Filter these tags */
+    int nfilt;          /**< How many are they */
+
+    int shmid;
+    dacqShmBlock shmptr;
+
+
+
+
+    int     m_iShmemSock;
+    int     m_iShmemId;
+
+
+
+
+    FILE   *fd;		/* The temporary file */
+    FILE   *shmem_fd;
+    char   *filename;
+
+    long read_loc;
+    FILE *read_fd;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
-
-
-
-
-
-
-
-
-
-//dacqserver
-
-    bool m_bIsRunning;
-
-    bool m_bMeasInfoRequest;
-    bool m_bMeasRequest;
-    bool m_bMeasStopRequest;
-    bool m_bSetBuffersizeRequest;
-
-
-    bool getMeasInfo(FiffInfo::SDPtr& p_pFiffInfo);
-
-    Artemis* m_pArtemis;
-
-
+signals:
+    
+public slots:
+    
 };
 
 } // NAMESPACE
 
-
-#endif // DACQSERVER_H
+#endif // SHMEMSOCKET_H

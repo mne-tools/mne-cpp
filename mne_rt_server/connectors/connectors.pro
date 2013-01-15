@@ -42,7 +42,7 @@ SUBDIRS += \
 unix{
     SUBDIRS += \
         Neuromag \
-	Artemis
+        BabyMEG
 }
 
 CONFIG += ordered

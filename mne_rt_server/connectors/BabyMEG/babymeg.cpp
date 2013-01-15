@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     artemis.cpp
+* @file     BabyMEG.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the Artemis Class.
+* @brief     implementation of the BabyMEG Class.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "artemis.h"
+#include "babymeg.h"
 #include "dacqserver.h"
 
 
@@ -76,7 +76,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ArtemisPlugin;
+using namespace BabyMEGPlugin;
 using namespace FIFFLIB;
 using namespace MNELIB;
 
@@ -86,7 +86,7 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Artemis::Artemis()
+BabyMEG::BabyMEG()
 : m_pDacqServer(new DacqServer(this))
 , m_pInfo(new FiffInfo())
 , m_bIsRunning(false)
@@ -101,9 +101,9 @@ Artemis::Artemis()
 
 //*************************************************************************************************************
 
-Artemis::~Artemis()
+BabyMEG::~BabyMEG()
 {
-    qDebug() << "Destroy Artemis::~Artemis()";
+    qDebug() << "Destroy BabyMEG::~BabyMEG()";
 
     delete m_pDacqServer;
 
@@ -114,7 +114,7 @@ Artemis::~Artemis()
 
 //*************************************************************************************************************
 
-QByteArray Artemis::availableCommands()
+QByteArray BabyMEG::availableCommands()
 {
     QByteArray t_blockCmdInfoList;
 
@@ -126,23 +126,23 @@ QByteArray Artemis::availableCommands()
 
 //*************************************************************************************************************
 
-ConnectorID Artemis::getConnectorID() const
+ConnectorID BabyMEG::getConnectorID() const
 {
-    return _Artemis;
+    return _BABYMEG;
 }
 
 
 //*************************************************************************************************************
 
-const char* Artemis::getName() const
+const char* BabyMEG::getName() const
 {
-    return "Artemis Connector";
+    return "BabyMEG Connector";
 }
 
 
 //*************************************************************************************************************
 
-void Artemis::init()
+void BabyMEG::init()
 {
 
 }
@@ -150,7 +150,7 @@ void Artemis::init()
 
 //*************************************************************************************************************
 
-bool Artemis::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo)
+bool BabyMEG::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo)
 {
     bool success = false;
 
@@ -160,7 +160,7 @@ bool Artemis::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutpu
 
 //*************************************************************************************************************
 
-bool Artemis::start()
+bool BabyMEG::start()
 {
     // Start thread
     m_pDacqServer->start();
@@ -173,7 +173,7 @@ bool Artemis::start()
 
 //*************************************************************************************************************
 
-bool Artemis::stop()
+bool BabyMEG::stop()
 {
     m_bIsRunning = false;
     QThread::wait();//ToDo: This thread will never be terminated when circular buffer is blocking the thread (happens when circularbuffer is empty)
@@ -181,7 +181,7 @@ bool Artemis::stop()
     m_pDacqServer->m_bIsRunning = false;
     m_pDacqServer->wait();
 
-    qDebug() << "bool Artemis::stop()";
+    qDebug() << "bool BabyMEG::stop()";
 
     return true;
 }
@@ -189,7 +189,7 @@ bool Artemis::stop()
 
 //*************************************************************************************************************
 
-void Artemis::releaseMeasInfo()
+void BabyMEG::releaseMeasInfo()
 {
     if(!m_pInfo->isEmpty())
         emit remitMeasInfo(m_iID, m_pInfo);
@@ -198,7 +198,7 @@ void Artemis::releaseMeasInfo()
 
 //*************************************************************************************************************
 
-void Artemis::requestMeasInfo(qint32 ID)
+void BabyMEG::requestMeasInfo(qint32 ID)
 {
     m_iID = ID;
 
@@ -227,9 +227,9 @@ void Artemis::requestMeasInfo(qint32 ID)
 
 //*************************************************************************************************************
 
-void Artemis::requestMeas()
+void BabyMEG::requestMeas()
 {
-    qDebug() << "void Artemis::requestMeas()";
+    qDebug() << "void BabyMEG::requestMeas()";
 
     m_pDacqServer->m_bMeasRequest = true;
     this->start();
@@ -238,7 +238,7 @@ void Artemis::requestMeas()
 
 //*************************************************************************************************************
 
-void Artemis::requestMeasStop()
+void BabyMEG::requestMeasStop()
 {
     this->stop();
 }
@@ -246,11 +246,11 @@ void Artemis::requestMeasStop()
 
 //*************************************************************************************************************
 
-void Artemis::requestSetBufferSize(quint32 p_uiBuffSize)
+void BabyMEG::requestSetBufferSize(quint32 p_uiBuffSize)
 {
     if(p_uiBuffSize > 0)
     {
-        qDebug() << "void Artemis::setBufferSize: " << p_uiBuffSize;
+        qDebug() << "void BabyMEG::setBufferSize: " << p_uiBuffSize;
 
         this->stop();
 
@@ -263,7 +263,7 @@ void Artemis::requestSetBufferSize(quint32 p_uiBuffSize)
 
 //*************************************************************************************************************
 
-void Artemis::run()
+void BabyMEG::run()
 {
     m_bIsRunning = true;
 

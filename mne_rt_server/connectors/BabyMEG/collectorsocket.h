@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef SHMEMSOCKET_H
-#define SHMEMSOCKET_H
+#ifndef COLLECTORSOCKET_H
+#define COLLECTORSOCKET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -42,7 +42,6 @@
 //=============================================================================================================
 
 #include "types_definitions.h"
-#include <fiff/fiff_tag.h>
 
 
 //*************************************************************************************************************
@@ -50,222 +49,132 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QObject>
+#include <QTcpSocket>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE ArtemisPlugin
+// DEFINE NAMESPACE BabyMEGPlugin
 //=============================================================================================================
 
-namespace ArtemisPlugin
+namespace BabyMEGPlugin
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace FIFFLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-//class FiffTag;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ShmemSocket
+* DECLARE CLASS CollectorSocket
 *
-* @brief The ShmemSocket class provides...
+* @brief The CollectorSocket class provides ....
 */
-
-class ShmemSocket : public QObject
+class CollectorSocket : public QTcpSocket
 {
     Q_OBJECT
+
 public:
-    explicit ShmemSocket(QObject *parent = 0);
 
-    virtual ~ShmemSocket();
-
-
-    // client_socket.c
     //=========================================================================================================
     /**
-    * Receive one tag from the data server.
-    *
-    * This routine reads a message from the data server
-    * socket and grabs the data. The data may actually
-    * be in a shared memory segment noted in the message.
-    *
-    * The id parameter is needed for two purposes. The
-    * data transfer mechanism varies depending on the client
-    * number. Clients with id above 10000 use shared memory
-    * transfer while other used a regular file to transfer the
-    * data.It is needed also if the conndedtion needs to be
-    * closed after an error.
-    *
-    * @param[in] p_pTag ToDo
-    *
-    * \return Status OK or FAIL.
+    * Constructs a acquisition Server.
     */
-    int receive_tag (FiffTag*& p_pTag );
+    CollectorSocket(QObject *parent = 0);
 
-    //ToDo Connect is different? to: telnet localhost collector ???
     //=========================================================================================================
     /**
-    * Connect to the data server process
+    * Open the collector control connection
     *
     * @return
     */
-    bool connect_client ();
+    bool open();
 
     //=========================================================================================================
     /**
-    * Disconnect from the data server process
+    * Close the collector connection
     *
     * @return
     */
-    int disconnect_client ();
+//    int close();
+
+
+    inline bool isMeasuring()
+    {
+        return m_bIsMeasuring;
+    }
 
     //=========================================================================================================
-    /*
-    * Select tags that we are not interested in!
+    /**
+    * Query the current buffer length of the Elekta acquisition system
     *
+    * @return
     */
-    void set_data_filter (int *kinds, int nkind);
+    int getMaxBuflen();
+
+
+    //=========================================================================================================
+    /**
+    * Set the desired maximum buffer length
+    *
+    * @return
+    */
+    int setMaxBuflen(int maxbuflen);
+
+
+    // new client.c to qt functions
+    //=========================================================================================================
+    /**
+    *
+    *
+    * @return
+    */
+    bool server_command(const QString& p_sCommand);
+
 
     //=========================================================================================================
     /**
     *
+    *
     * @return
     */
-    void close_socket ();
+    bool server_login(const QString& p_sCollectorPass, const QString& p_sMyName);
+
 
     //=========================================================================================================
     /**
     *
-    * @return
-    */
-    int connect_disconnect (int sock,int id);
-
-    //=========================================================================================================
-    /**
-    * Filter out some large data blocks
-    * which are not of interest
     *
     * @return
     */
-    int interesting_data (int kind);
+    bool server_send(QString& p_sDataSend, QByteArray& p_dataOut, int p_iInputFlag = DACQ_DRAIN_INPUT);
 
+
+    //=========================================================================================================
+    /**
+    *
+    *
+    * @return
+    */
+    bool server_start();
+
+
+    //=========================================================================================================
+    /**
+    *
+    *
+    * @return
+//    */
+    bool server_stop();
 
 
 
 private:
 
-    // shmem.c
-    //=========================================================================================================
-    /**
-    *
-    * @return
-    */
-    dacqShmBlock get_shmem();
+    QString     m_sCollectorHost;
 
-    //=========================================================================================================
-    /**
-    * Initialize data acquisition shared memory segment
-    *
-    * @return
-    */
-    int init_shmem();
+    bool        m_bIsMeasuring;
 
 
-    //=========================================================================================================
-    /**
-    * Release the shared memory
-    *
-    * @return
-    */
-    int release_shmem();
-
-
-    //=========================================================================================================
-    /**
-    *
-    * @return
-    */
-    FILE* open_fif (char *name);
-
-
-    //=========================================================================================================
-    /**
-    *
-    *
-    * fd        File to read from
-    * pos       Position in file
-    * size      How long
-    * data);    Put data here
-    * @return
-    */
-    int read_fif (FILE *fd, long pos, size_t size, char *data);
-
-
-
-private:
-
-    int* filter_kinds;  /**< Filter these tags */
-    int nfilt;          /**< How many are they */
-
-    int shmid;
-    dacqShmBlock shmptr;
-
-
-
-
-    int     m_iShmemSock;
-    int     m_iShmemId;
-
-
-
-
-    FILE   *fd;		/* The temporary file */
-    FILE   *shmem_fd;
-    char   *filename;
-
-    long read_loc;
-    FILE *read_fd;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-signals:
-    
-public slots:
-    
 };
 
 } // NAMESPACE
 
-#endif // SHMEMSOCKET_H
+#endif // COLLECTORSOCKET_H

@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Neuromag Types and Defines.
+* @brief     BabyMEG Types and Defines.
 *
 */
 
@@ -39,10 +39,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE ArtemisPlugin
+// DEFINE NAMESPACE BabyMEGPlugin
 //=============================================================================================================
 
-namespace ArtemisPlugin
+namespace BabyMEGPlugin
 {
 
 

@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "dacqserver.h"
-#include "artemis.h"
+#include "babymeg.h"
 #include "collectorsocket.h"
 #include "shmemsocket.h"
 #include "../../../MNE/fiff/fiff_constants.h"
@@ -62,7 +62,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ArtemisPlugin;
+using namespace BabyMEGPlugin;
 
 
 //*************************************************************************************************************
@@ -70,9 +70,9 @@ using namespace ArtemisPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DacqServer::DacqServer(Artemis* p_pArtemis, QObject * parent)
+DacqServer::DacqServer(BabyMEG* p_pBabyMEG, QObject * parent)
 : QThread(parent)
-, m_pArtemis(p_pArtemis)
+, m_pBabyMEG(p_pBabyMEG)
 , m_pCollectorSock(NULL)
 , m_pShmemSock(NULL)
 , m_bIsRunning(false)
@@ -282,7 +282,7 @@ void DacqServer::run()
     m_bIsRunning = true;
 
     connect(this, &DacqServer::measInfoAvailable,
-            m_pArtemis, &Artemis::releaseMeasInfo);
+            m_pBabyMEG, &BabyMEG::releaseMeasInfo);
 
 
     if(m_pCollectorSock)
@@ -292,30 +292,30 @@ void DacqServer::run()
     //
     // Make sure the buffer size is at least as big as the minimal buffer size
     //
-    if(m_pArtemis->getBufferSampleSize() < MIN_BUFLEN)
-        m_pArtemis->setBufferSampleSize(MIN_BUFLEN);
+    if(m_pBabyMEG->getBufferSampleSize() < MIN_BUFLEN)
+        m_pBabyMEG->setBufferSampleSize(MIN_BUFLEN);
 
     int  t_iOriginalMaxBuflen = 1500;// set the standard size as long as we can't get it without setting it
     // this doesn't work without reseting it
     //        t_iOriginalMaxBuflen = collector_getMaxBuflen();
     //        if (t_iOriginalMaxBuflen < 1) {
-    //            printf("Could not query the current Artemis buffer length\r\n");//dacq_log("Could not query the current Artemis buffer length\n");
+    //            printf("Could not query the current BabyMEG buffer length\r\n");//dacq_log("Could not query the current BabyMEG buffer length\n");
     //            collector_close();
     //            return;
     //        }
-    if (m_pArtemis->getBufferSampleSize() < MIN_BUFLEN) {
-        fprintf(stderr, "%s: Too small Artemis buffer length requested, should be at least %d\n", m_pArtemis->getBufferSampleSize(), MIN_BUFLEN);
+    if (m_pBabyMEG->getBufferSampleSize() < MIN_BUFLEN) {
+        fprintf(stderr, "%s: Too small BabyMEG buffer length requested, should be at least %d\n", m_pBabyMEG->getBufferSampleSize(), MIN_BUFLEN);
         return;
     }
     else {
-        /* Connect to the Elekta Artemis acquisition control server, change the buffer length and exit*/
+        /* Connect to the Elekta BabyMEG acquisition control server, change the buffer length and exit*/
         if (!m_pCollectorSock->open()) {
-            printf("Cannot change the Artemis buffer length: Could not open collector connection\n");//dacq_log("Cannot change the Artemis buffer length: Could not open collector connection\n");
+            printf("Cannot change the BabyMEG buffer length: Could not open collector connection\n");//dacq_log("Cannot change the BabyMEG buffer length: Could not open collector connection\n");
             return;
         }
-        printf("Changing the Artemis buffer length to %d... ", m_pArtemis->getBufferSampleSize());//dacq_log("Changing the Artemis buffer length to %d\n", newMaxBuflen);
-        if (m_pCollectorSock->setMaxBuflen(m_pArtemis->getBufferSampleSize())) {
-            printf("Setting a new Artemis buffer length failed\r\n");//dacq_log("Setting a new Artemis buffer length failed\n");
+        printf("Changing the BabyMEG buffer length to %d... ", m_pBabyMEG->getBufferSampleSize());//dacq_log("Changing the BabyMEG buffer length to %d\n", newMaxBuflen);
+        if (m_pCollectorSock->setMaxBuflen(m_pBabyMEG->getBufferSampleSize())) {
+            printf("Setting a new BabyMEG buffer length failed\r\n");//dacq_log("Setting a new BabyMEG buffer length failed\n");
             m_pCollectorSock->close();
             return;
         }
@@ -332,7 +332,7 @@ void DacqServer::run()
 
     m_pShmemSock->set_data_filter (NULL, 0);
 
-    /* Connect to the Elekta Artemis shared memory system */
+    /* Connect to the Elekta BabyMEG shared memory system */
     if (!m_pShmemSock->connect_client()) {
         printf("Could not connect!\r\n");//dacq_log("Could not connect!\n");
         return;//(2);
@@ -359,10 +359,10 @@ void DacqServer::run()
     //
     // Requesting new header info: read it every time a measurement starts or a measurement info is requested
     //
-    if(m_pArtemis->m_pInfo->isEmpty() || m_bMeasInfoRequest)
+    if(m_pBabyMEG->m_pInfo->isEmpty() || m_bMeasInfoRequest)
     {
-        m_pArtemis->mutex.lock();
-        if(getMeasInfo(m_pArtemis->m_pInfo))
+        m_pBabyMEG->mutex.lock();
+        if(getMeasInfo(m_pBabyMEG->m_pInfo))
         {
             if(m_bMeasInfoRequest)
             {
@@ -371,21 +371,21 @@ void DacqServer::run()
             }
 
             // Reset Buffer Size
-            if(m_pArtemis->m_pRawMatrixBuffer)
-                delete m_pArtemis->m_pRawMatrixBuffer;
-            m_pArtemis->m_pRawMatrixBuffer = NULL;
+            if(m_pBabyMEG->m_pRawMatrixBuffer)
+                delete m_pBabyMEG->m_pRawMatrixBuffer;
+            m_pBabyMEG->m_pRawMatrixBuffer = NULL;
 
-            if(!m_pArtemis->m_pInfo->isEmpty())
-                m_pArtemis->m_pRawMatrixBuffer = new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_pArtemis->m_pInfo->nchan, m_pArtemis->getBufferSampleSize());
+            if(!m_pBabyMEG->m_pInfo->isEmpty())
+                m_pBabyMEG->m_pRawMatrixBuffer = new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_pBabyMEG->m_pInfo->nchan, m_pBabyMEG->getBufferSampleSize());
         }
         else
             m_bIsRunning = false;
-        m_pArtemis->mutex.unlock();
+        m_pBabyMEG->mutex.unlock();
     }
 
 
     //
-    // Control measurement start through Artemis connector. ToDo: in Case Realtime measurement should be performed during normal acqusition process, change this!!
+    // Control measurement start through BabyMEG connector. ToDo: in Case Realtime measurement should be performed during normal acqusition process, change this!!
     //
 #ifdef DACQ_AUTOSTART
     if(m_bMeasRequest)
@@ -405,10 +405,10 @@ void DacqServer::run()
             break;
         }
 
-        if (nchan < 0 && !m_pArtemis->m_pInfo->isEmpty())
+        if (nchan < 0 && !m_pBabyMEG->m_pInfo->isEmpty())
         {
-            nchan = m_pArtemis->m_pInfo->nchan;
-            sfreq = m_pArtemis->m_pInfo->sfreq;
+            nchan = m_pBabyMEG->m_pInfo->nchan;
+            sfreq = m_pBabyMEG->m_pInfo->sfreq;
         }
 
 
@@ -417,14 +417,14 @@ void DacqServer::run()
             case FIFF_DATA_BUFFER:
                 if(nchan > 0)
                 {
-                    t_nSamplesNew = t_nSamples + m_pArtemis->getBufferSampleSize() - 1;
+                    t_nSamplesNew = t_nSamples + m_pBabyMEG->getBufferSampleSize() - 1;
                     printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", t_nSamples, t_nSamplesNew, ((float)t_nSamples) / sfreq, ((float)t_nSamplesNew) / sfreq );
-                    t_nSamples += m_pArtemis->getBufferSampleSize();
+                    t_nSamples += m_pBabyMEG->getBufferSampleSize();
                     
-                    MatrixXf* t_pMatrix = new MatrixXf( (Map<MatrixXi>( (int*) t_pTag->data(), nchan, m_pArtemis->getBufferSampleSize())).cast<float>());
+                    MatrixXf* t_pMatrix = new MatrixXf( (Map<MatrixXi>( (int*) t_pTag->data(), nchan, m_pBabyMEG->getBufferSampleSize())).cast<float>());
 
 //                    std::cout << "Matrix Xf " << t_pMatrix->block(0,0,1,4);
-                    m_pArtemis->m_pRawMatrixBuffer->push(t_pMatrix);
+                    m_pBabyMEG->m_pRawMatrixBuffer->push(t_pMatrix);
 
                     delete t_pMatrix;
                     printf(" [done]\r\n");
