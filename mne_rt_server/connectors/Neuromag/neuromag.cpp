@@ -88,6 +88,7 @@ using namespace MNELIB;
 
 Neuromag::Neuromag()
 : m_pDacqServer(new DacqServer(this))
+, m_pInfo(new FiffInfo())
 , m_bIsRunning(false)
 , m_iID(-1)
 {
@@ -190,7 +191,7 @@ bool Neuromag::stop()
 
 void Neuromag::releaseMeasInfo()
 {
-    if(m_pInfo.data())
+    if(!m_pInfo->isEmpty())
         emit remitMeasInfo(m_iID, m_pInfo);
 }
 
@@ -201,7 +202,7 @@ void Neuromag::requestMeasInfo(qint32 ID)
 {
     m_iID = ID;
 
-    if(m_pInfo.data())
+    if(!m_pInfo->isEmpty())
         releaseMeasInfo();
     else
     {

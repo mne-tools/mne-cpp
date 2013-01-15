@@ -99,7 +99,7 @@ DacqServer::~DacqServer()
 
 //*************************************************************************************************************
 
-bool DacqServer::getMeasInfo(FiffInfo::SDPtr& p_pFiffInfo)
+bool DacqServer::getMeasInfo(FiffInfo::SDPtr p_pFiffInfo)
 {
 
 //    if (p_pFiffInfo)
@@ -375,7 +375,7 @@ void DacqServer::run()
                 delete m_pNeuromag->m_pRawMatrixBuffer;
             m_pNeuromag->m_pRawMatrixBuffer = NULL;
 
-            if(m_pNeuromag->m_pInfo)
+            if(!m_pNeuromag->m_pInfo->isEmpty())
                 m_pNeuromag->m_pRawMatrixBuffer = new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_pNeuromag->m_pInfo->nchan, m_pNeuromag->getBufferSampleSize());
         }
         else
@@ -406,7 +406,7 @@ void DacqServer::run()
             break;
         }
 
-        if (nchan < 0 && m_pNeuromag->m_pInfo)
+        if (nchan < 0 && !m_pNeuromag->m_pInfo->isEmpty())
         {
             nchan = m_pNeuromag->m_pInfo->nchan;
             sfreq = m_pNeuromag->m_pInfo->sfreq;
