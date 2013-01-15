@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     neuromag.h
+* @file     artemis.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,19 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the Neuromag Class.
+* @brief     implementation of the Artemis Class.
 *
 */
 
-#ifndef NEUROMAG_H
-#define NEUROMAG_H
+#ifndef ARTEMIS_H
+#define ARTEMIS_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "neuromag_global.h"
+#include "artemis_global.h"
 #include "../../mne_rt_server/IConnector.h"
 
 #include <fiff/fiff_info.h>
@@ -60,10 +60,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE NeuromagPlugin
+// DEFINE NAMESPACE ArtemisPlugin
 //=============================================================================================================
 
-namespace NeuromagPlugin
+namespace ArtemisPlugin
 {
 
 
@@ -85,14 +85,14 @@ class DacqServer;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS Neuromag
+* DECLARE CLASS Artemis
 *
-* @brief The Neuromag class provides an Elekta Neuromag connector.
+* @brief The Artemis class provides a BabyMEG connector.
 */
-class NEUROMAGSHARED_EXPORT Neuromag : public IConnector
+class ARTEMISSHARED_EXPORT Artemis : public IConnector
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_rt_server/1.0" FILE "neuromag.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "mne_rt_server/1.0" FILE "artemis.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MSERVER::IConnector)
 
@@ -103,17 +103,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a Neuromag Connector.
+    * Constructs a Artemis Connector.
     */
-    Neuromag();
+    Artemis();
 
 
     //=========================================================================================================
     /**
-    * Destroys the Neuromag Connector.
+    * Destroys the Artemis Connector.
     *
     */
-    virtual ~Neuromag();
+    virtual ~Artemis();
 
     virtual QByteArray availableCommands();
 
@@ -148,7 +148,7 @@ protected:
 private:
     //=========================================================================================================
     /**
-    * Initialise the FiffSimulator.
+    * Initialise the Artemis connector.
     */
     void init();
 
@@ -168,4 +168,4 @@ private:
 
 } // NAMESPACE
 
-#endif // NEUROMAG_H
+#endif // ARTEMIS_H

@@ -1,8 +1,8 @@
 //=============================================================================================================
 /**
-* @file     neuromag.h
+* @file     collectorsocket.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
 * @date     July, 2012
 *
@@ -29,24 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the Neuromag Class.
+* @brief     implementation of the CollectorSocket Class.
 *
 */
 
-#ifndef NEUROMAG_H
-#define NEUROMAG_H
+#ifndef SHMEMSOCKET_H
+#define SHMEMSOCKET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "neuromag_global.h"
-#include "../../mne_rt_server/IConnector.h"
-
-#include <fiff/fiff_info.h>
-
-//#include "circularbuffer.h"
+#include "types_definitions.h"
+#include <fiff/fiff_tag.h>
 
 
 //*************************************************************************************************************
@@ -54,16 +50,15 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QString>
-#include <QMutex>
+#include <QObject>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE NeuromagPlugin
+// DEFINE NAMESPACE ArtemisPlugin
 //=============================================================================================================
 
-namespace NeuromagPlugin
+namespace ArtemisPlugin
 {
 
 
@@ -72,7 +67,7 @@ namespace NeuromagPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MSERVER;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -80,92 +75,197 @@ using namespace MSERVER;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class DacqServer;
+//class FiffTag;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS Neuromag
+* DECLARE CLASS ShmemSocket
 *
-* @brief The Neuromag class provides an Elekta Neuromag connector.
+* @brief The ShmemSocket class provides...
 */
-class NEUROMAGSHARED_EXPORT Neuromag : public IConnector
+
+class ShmemSocket : public QObject
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_rt_server/1.0" FILE "neuromag.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MSERVER::IConnector)
-
-
-    friend class DacqServer;
-
 public:
+    explicit ShmemSocket(QObject *parent = 0);
 
+    virtual ~ShmemSocket();
+
+
+    // client_socket.c
     //=========================================================================================================
     /**
-    * Constructs a Neuromag Connector.
+    * Receive one tag from the data server.
+    *
+    * This routine reads a message from the data server
+    * socket and grabs the data. The data may actually
+    * be in a shared memory segment noted in the message.
+    *
+    * The id parameter is needed for two purposes. The
+    * data transfer mechanism varies depending on the client
+    * number. Clients with id above 10000 use shared memory
+    * transfer while other used a regular file to transfer the
+    * data.It is needed also if the conndedtion needs to be
+    * closed after an error.
+    *
+    * @param[in] p_pTag ToDo
+    *
+    * \return Status OK or FAIL.
     */
-    Neuromag();
+    int receive_tag (FiffTag*& p_pTag );
 
+    //ToDo Connect is different? to: telnet localhost collector ???
+    //=========================================================================================================
+    /**
+    * Connect to the data server process
+    *
+    * @return
+    */
+    bool connect_client ();
 
     //=========================================================================================================
     /**
-    * Destroys the Neuromag Connector.
+    * Disconnect from the data server process
+    *
+    * @return
+    */
+    int disconnect_client ();
+
+    //=========================================================================================================
+    /*
+    * Select tags that we are not interested in!
     *
     */
-    virtual ~Neuromag();
+    void set_data_filter (int *kinds, int nkind);
 
-    virtual QByteArray availableCommands();
-
-    virtual ConnectorID getConnectorID() const;
-
-    virtual const char* getName() const;
-
-
-    virtual bool parseCommand(QStringList& p_qCommandList, QByteArray& p_blockOutputInfo);
-
-
-    virtual bool start();
-
-    virtual bool stop();
-
-
-    void releaseMeasInfo();
-
-//public slots: --> in Qt 5 not anymore declared as slot
-
-    virtual void requestMeasInfo(qint32 ID);
-
-    virtual void requestMeas();
-
-    virtual void requestMeasStop();
-
-    virtual void requestSetBufferSize(quint32 p_uiBuffSize);
-
-protected:
-    virtual void run();
-
-private:
     //=========================================================================================================
     /**
-    * Initialise the FiffSimulator.
+    *
+    * @return
     */
-    void init();
+    void close_socket ();
+
+    //=========================================================================================================
+    /**
+    *
+    * @return
+    */
+    int connect_disconnect (int sock,int id);
+
+    //=========================================================================================================
+    /**
+    * Filter out some large data blocks
+    * which are not of interest
+    *
+    * @return
+    */
+    int interesting_data (int kind);
 
 
-    QMutex mutex;
-
-    DacqServer*     m_pDacqServer;
-
-    FiffInfo::SDPtr m_pInfo;
-
-    int             m_iID;
-
-    bool            m_bIsRunning;
 
 
+private:
+
+    // shmem.c
+    //=========================================================================================================
+    /**
+    *
+    * @return
+    */
+    dacqShmBlock get_shmem();
+
+    //=========================================================================================================
+    /**
+    * Initialize data acquisition shared memory segment
+    *
+    * @return
+    */
+    int init_shmem();
+
+
+    //=========================================================================================================
+    /**
+    * Release the shared memory
+    *
+    * @return
+    */
+    int release_shmem();
+
+
+    //=========================================================================================================
+    /**
+    *
+    * @return
+    */
+    FILE* open_fif (char *name);
+
+
+    //=========================================================================================================
+    /**
+    *
+    *
+    * fd        File to read from
+    * pos       Position in file
+    * size      How long
+    * data);    Put data here
+    * @return
+    */
+    int read_fif (FILE *fd, long pos, size_t size, char *data);
+
+
+
+private:
+
+    int* filter_kinds;  /**< Filter these tags */
+    int nfilt;          /**< How many are they */
+
+    int shmid;
+    dacqShmBlock shmptr;
+
+
+
+
+    int     m_iShmemSock;
+    int     m_iShmemId;
+
+
+
+
+    FILE   *fd;		/* The temporary file */
+    FILE   *shmem_fd;
+    char   *filename;
+
+    long read_loc;
+    FILE *read_fd;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+signals:
+    
+public slots:
+    
 };
 
 } // NAMESPACE
 
-#endif // NEUROMAG_H
+#endif // SHMEMSOCKET_H

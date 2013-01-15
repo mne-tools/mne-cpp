@@ -41,7 +41,8 @@ SUBDIRS += \
 # Build Neuromag Plugin only for Unix Systems - cause of unix specific shmem commands
 unix{
     SUBDIRS += \
-        Neuromag
+        Neuromag \
+	Artemis
 }
 
 CONFIG += ordered

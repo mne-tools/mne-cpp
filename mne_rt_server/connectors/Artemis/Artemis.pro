@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     Neuromag.pro
+# @file     Artemis.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the neuromag plug-in.
+# @brief    This project file generates the makefile for the artemis plug-in.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -39,14 +39,14 @@ TEMPLATE = lib
 
 CONFIG += plugin
 
-DEFINES += NEUROMAG_LIBRARY
+DEFINES += ARTEMIS_LIBRARY
 
 #DEFINES += DACQ_OLD_CONNECTION_SCHEME # HP-UX
 
 QT += network
 QT -= gui
 
-TARGET = Neuromag
+TARGET = Artemis
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -79,15 +79,14 @@ win32 {
 }
 
 
-
-
-SOURCES += neuromag.cpp \
+SOURCES += artemis.cpp \
     dacqserver.cpp \
     collectorsocket.cpp \
     shmemsocket.cpp
 
-HEADERS += neuromag.h\
-    neuromag_global.h \
+HEADERS += \
+    artemis.h\
+    artemis_global.h \
     ../../mne_rt_server/IConnector.h \  #IConnector is a Q_OBJECT and the resulting moc file needs to be known -> that's why inclution is important!
     types_definitions.h \
     dacqserver.h \
@@ -97,7 +96,7 @@ HEADERS += neuromag.h\
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
-OTHER_FILES += neuromag.json
+OTHER_FILES += artemis.json
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $${PWD}
