@@ -1,8 +1,8 @@
 //=============================================================================================================
 /**
-* @file     artemis.h
+* @file     dacqserver.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
 * @date     July, 2012
 *
@@ -29,24 +29,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the Artemis Class.
+* @brief     implementation of the DacqServer Class.
 *
 */
 
-#ifndef ARTEMIS_H
-#define ARTEMIS_H
+
+#ifndef DACQSERVER_H
+#define DACQSERVER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "artemis_global.h"
-#include "../../mne_rt_server/IConnector.h"
-
+#include "types_definitions.h"
 #include <fiff/fiff_info.h>
-
-//#include "circularbuffer.h"
+#include <fiff/fiff_tag.h>
 
 
 //*************************************************************************************************************
@@ -54,16 +52,19 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QString>
-#include <QMutex>
+#include <QThread>
+
+#include <QTcpSocket>
+
+#include <QByteArray>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE ArtemisPlugin
+// DEFINE NAMESPACE BabyMEGPlugin
 //=============================================================================================================
 
-namespace ArtemisPlugin
+namespace BabyMEGPlugin
 {
 
 
@@ -72,7 +73,7 @@ namespace ArtemisPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MSERVER;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -80,92 +81,105 @@ using namespace MSERVER;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class DacqServer;
+class BabyMEG;
+class CollectorSocket;
+class ShmemSocket;
+//class FiffInfo;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS Artemis
+* DECLARE CLASS DacqServer
 *
-* @brief The Artemis class provides a BabyMEG connector.
+* @brief The DacqServer class provides a BabyMEG MEG connector.
 */
-class ARTEMISSHARED_EXPORT Artemis : public IConnector
+class DacqServer : public QThread
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_rt_server/1.0" FILE "artemis.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MSERVER::IConnector)
 
-
-    friend class DacqServer;
+    friend class BabyMEG;
 
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a Artemis Connector.
+    * Constructs a acquisition Server.
     */
-    Artemis();
-
-
+    explicit DacqServer(BabyMEG* p_pBabyMEG, QObject * parent = 0);
+    
+    
     //=========================================================================================================
     /**
-    * Destroys the Artemis Connector.
-    *
+    * Constructs a acquisition Server.
     */
-    virtual ~Artemis();
+    ~DacqServer();
 
-    virtual QByteArray availableCommands();
+    
+public slots: //--> in Qt 5 not anymore declared as slot
 
-    virtual ConnectorID getConnectorID() const;
-
-    virtual const char* getName() const;
-
-
-    virtual bool parseCommand(QStringList& p_qCommandList, QByteArray& p_blockOutputInfo);
+    void readCollectorMsg();
 
 
-    virtual bool start();
+signals:
 
-    virtual bool stop();
+    void measInfoAvailable();
 
-
-    void releaseMeasInfo();
-
-//public slots: --> in Qt 5 not anymore declared as slot
-
-    virtual void requestMeasInfo(qint32 ID);
-
-    virtual void requestMeas();
-
-    virtual void requestMeasStop();
-
-    virtual void requestSetBufferSize(quint32 p_uiBuffSize);
 
 protected:
+    //=========================================================================================================
+    /**
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread.
+    */
     virtual void run();
 
 private:
+
     //=========================================================================================================
     /**
-    * Initialise the Artemis connector.
+    * Quit function
+    *
+    * @return
     */
-    void init();
+//    void clean_up();
 
 
-    QMutex mutex;
 
-    DacqServer*     m_pDacqServer;
+    //newly written stuff ported to qt
+//    QString         m_sCollectorHost;
+    CollectorSocket*    m_pCollectorSock;
 
-    FiffInfo::SDPtr m_pInfo;
 
-    int             m_iID;
+    ShmemSocket*        m_pShmemSock;
+    
 
-    bool            m_bIsRunning;
+
+
+
+
+
+
+
+
+//dacqserver
+
+    bool m_bIsRunning;
+
+    bool m_bMeasInfoRequest;
+    bool m_bMeasRequest;
+    bool m_bMeasStopRequest;
+    bool m_bSetBuffersizeRequest;
+
+
+    bool getMeasInfo(FiffInfo::SDPtr& p_pFiffInfo);
+
+    BabyMEG* m_pBabyMEG;
 
 
 };
 
 } // NAMESPACE
 
-#endif // ARTEMIS_H
+
+#endif // DACQSERVER_H

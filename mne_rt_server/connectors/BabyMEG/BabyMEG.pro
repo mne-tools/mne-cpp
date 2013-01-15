@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     Artemis.pro
+# @file     BabyMEG.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the artemis plug-in.
+# @brief    This project file generates the makefile for the BabyMEG plug-in.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -39,14 +39,14 @@ TEMPLATE = lib
 
 CONFIG += plugin
 
-DEFINES += ARTEMIS_LIBRARY
+DEFINES += BABYMEG_LIBRARY
 
 #DEFINES += DACQ_OLD_CONNECTION_SCHEME # HP-UX
 
 QT += network
 QT -= gui
 
-TARGET = Artemis
+TARGET = BabyMEG
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -79,19 +79,20 @@ win32 {
 }
 
 
-SOURCES += artemis.cpp \
+SOURCES += \
     dacqserver.cpp \
     collectorsocket.cpp \
-    shmemsocket.cpp
+    shmemsocket.cpp \
+    babymeg.cpp
 
 HEADERS += \
-    artemis.h\
-    artemis_global.h \
     ../../mne_rt_server/IConnector.h \  #IConnector is a Q_OBJECT and the resulting moc file needs to be known -> that's why inclution is important!
     types_definitions.h \
     dacqserver.h \
     collectorsocket.h \
-    shmemsocket.h
+    shmemsocket.h \
+    babymeg.h \
+    babymeg_global.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     neuromag_global.h
+* @file     babymeg_global.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     artemis library export/import macros.
+* @brief     BabyMEG library export/import macros.
 *
 */
 
-#ifndef ARTEMIS_GLOBAL_H
-#define ARTEMIS_GLOBAL_H
+#ifndef BABYMEG_GLOBAL_H
+#define BABYMEG_GLOBAL_H
 
 
 //*************************************************************************************************************
@@ -50,10 +50,10 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(ARTEMIS_LIBRARY)
-#  define ARTEMISSHARED_EXPORT Q_DECL_EXPORT  /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#if defined(BABYMEG_LIBRARY)
+#  define BABYMEGSHARED_EXPORT Q_DECL_EXPORT  /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define ARTEMISSHARED_EXPORT Q_DECL_IMPORT  /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define BABYMEGSHARED_EXPORT Q_DECL_IMPORT  /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-#endif // ARTEMIS_GLOBAL_H
+#endif // BABYMEG_GLOBAL_H

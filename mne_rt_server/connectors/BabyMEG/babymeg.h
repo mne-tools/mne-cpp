@@ -1,8 +1,8 @@
 //=============================================================================================================
 /**
-* @file     collectorsocket.h
+* @file     BabyMEG.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2012
 *
@@ -29,19 +29,24 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the CollectorSocket Class.
+* @brief     implementation of the BabyMEG Class.
 *
 */
 
-#ifndef COLLECTORSOCKET_H
-#define COLLECTORSOCKET_H
+#ifndef BABYMEG_H
+#define BABYMEG_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "types_definitions.h"
+#include "babymeg_global.h"
+#include "../../mne_rt_server/IConnector.h"
+
+#include <fiff/fiff_info.h>
+
+//#include "circularbuffer.h"
 
 
 //*************************************************************************************************************
@@ -49,132 +54,118 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QTcpSocket>
+#include <QString>
+#include <QMutex>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE ArtemisPlugin
+// DEFINE NAMESPACE BabyMEGPlugin
 //=============================================================================================================
 
-namespace ArtemisPlugin
+namespace BabyMEGPlugin
 {
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace MSERVER;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class DacqServer;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS CollectorSocket
+* DECLARE CLASS BabyMEG
 *
-* @brief The CollectorSocket class provides ....
+* @brief The BabyMEG class provides a BabyMEG connector.
 */
-class CollectorSocket : public QTcpSocket
+class BABYMEGSHARED_EXPORT BabyMEG : public IConnector
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "mne_rt_server/1.0" FILE "babymeg.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
+    Q_INTERFACES(MSERVER::IConnector)
+
+
+    friend class DacqServer;
 
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a acquisition Server.
+    * Constructs a BabyMEG Connector.
     */
-    CollectorSocket(QObject *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Open the collector control connection
-    *
-    * @return
-    */
-    bool open();
-
-    //=========================================================================================================
-    /**
-    * Close the collector connection
-    *
-    * @return
-    */
-//    int close();
-
-
-    inline bool isMeasuring()
-    {
-        return m_bIsMeasuring;
-    }
-
-    //=========================================================================================================
-    /**
-    * Query the current buffer length of the Elekta acquisition system
-    *
-    * @return
-    */
-    int getMaxBuflen();
+    BabyMEG();
 
 
     //=========================================================================================================
     /**
-    * Set the desired maximum buffer length
+    * Destroys the BabyMEG Connector.
     *
-    * @return
     */
-    int setMaxBuflen(int maxbuflen);
+    virtual ~BabyMEG();
+
+    virtual QByteArray availableCommands();
+
+    virtual ConnectorID getConnectorID() const;
+
+    virtual const char* getName() const;
 
 
-    // new client.c to qt functions
-    //=========================================================================================================
-    /**
-    *
-    *
-    * @return
-    */
-    bool server_command(const QString& p_sCommand);
+    virtual bool parseCommand(QStringList& p_qCommandList, QByteArray& p_blockOutputInfo);
 
 
-    //=========================================================================================================
-    /**
-    *
-    *
-    * @return
-    */
-    bool server_login(const QString& p_sCollectorPass, const QString& p_sMyName);
+    virtual bool start();
+
+    virtual bool stop();
 
 
-    //=========================================================================================================
-    /**
-    *
-    *
-    * @return
-    */
-    bool server_send(QString& p_sDataSend, QByteArray& p_dataOut, int p_iInputFlag = DACQ_DRAIN_INPUT);
+    void releaseMeasInfo();
 
+//public slots: --> in Qt 5 not anymore declared as slot
 
-    //=========================================================================================================
-    /**
-    *
-    *
-    * @return
-    */
-    bool server_start();
+    virtual void requestMeasInfo(qint32 ID);
 
+    virtual void requestMeas();
 
-    //=========================================================================================================
-    /**
-    *
-    *
-    * @return
-//    */
-    bool server_stop();
+    virtual void requestMeasStop();
 
+    virtual void requestSetBufferSize(quint32 p_uiBuffSize);
 
+protected:
+    virtual void run();
 
 private:
+    //=========================================================================================================
+    /**
+    * Initialise the BabyMEG connector.
+    */
+    void init();
 
-    QString     m_sCollectorHost;
 
-    bool        m_bIsMeasuring;
+    QMutex mutex;
+
+    DacqServer*     m_pDacqServer;
+
+    FiffInfo::SDPtr m_pInfo;
+
+    int             m_iID;
+
+    bool            m_bIsRunning;
 
 
 };
 
 } // NAMESPACE
 
-#endif // COLLECTORSOCKET_H
+#endif // BABYMEG_H
