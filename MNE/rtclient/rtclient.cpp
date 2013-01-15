@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_rt_client.cpp
+* @file     rtclient.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 *           To Be continued...
@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the MNERtClient Class.
+* @brief     implementation of the RtClient Class.
 *
 */
 
@@ -40,9 +40,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_rt_client.h"
-#include "mne_rt_cmd_client.h"
-#include "mne_rt_data_client.h"
+#include "rtclient.h"
+#include "rtcmdclient.h"
+#include "rtdataclient.h"
 
 
 //*************************************************************************************************************
@@ -50,7 +50,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace RTCLIENTLIB;
 
 
 //*************************************************************************************************************
@@ -58,7 +58,7 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MNERtClient::MNERtClient(QString p_sRtServerHostname, QObject *parent)
+RtClient::RtClient(QString p_sRtServerHostname, QObject *parent)
 : QThread(parent)
 , m_bIsRunning(false)
 , m_sRtServerHostName(p_sRtServerHostname)
@@ -69,7 +69,7 @@ MNERtClient::MNERtClient(QString p_sRtServerHostname, QObject *parent)
 
 //*************************************************************************************************************
 
-MNERtClient::~MNERtClient()
+RtClient::~RtClient()
 {
     stop();
 }
@@ -77,7 +77,7 @@ MNERtClient::~MNERtClient()
 
 //*************************************************************************************************************
 
-bool MNERtClient::stop()
+bool RtClient::stop()
 {
     m_bIsRunning = false;
     QThread::wait();
@@ -88,15 +88,15 @@ bool MNERtClient::stop()
 
 //*************************************************************************************************************
 
-void MNERtClient::run()
+void RtClient::run()
 {
     m_bIsRunning = true;
 
-    MNERtCmdClient t_cmdClient;
+    RtCmdClient t_cmdClient;
     t_cmdClient.connectToHost(m_sRtServerHostName);
     t_cmdClient.waitForConnected();
 
-    MNERtDataClient t_dataClient;
+    RtDataClient t_dataClient;
     t_dataClient.connectToHost(m_sRtServerHostName);
     t_dataClient.waitForConnected();
 

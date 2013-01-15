@@ -146,11 +146,11 @@ using namespace Eigen;
 //
 //   The magic hexadecimal values
 //
-const fiff_int_t IS_MATRIX           = 4294901760; // ffff0000
-const fiff_int_t MATRIX_CODING_DENSE = 16384;      // 4000
-const fiff_int_t MATRIX_CODING_CCS   = 16400;      // 4010
-const fiff_int_t MATRIX_CODING_RCS   = 16416;      // 4020
-const fiff_int_t DATA_TYPE           = 65535;      // ffff
+const fiff_int_t IS_MATRIX           = 4294901760; /**< Is Matrix encoding. ffff0000 */
+const fiff_int_t MATRIX_CODING_DENSE = 16384;      /**< MATRIX_CODING_DENSE encoding. 4000 */
+const fiff_int_t MATRIX_CODING_CCS   = 16400;      /**< MATRIX_CODING_CCS encoding. 4010 */
+const fiff_int_t MATRIX_CODING_RCS   = 16416;      /**< MATRIX_CODING_RCS encoding. 4020 */
+const fiff_int_t DATA_TYPE           = 65535;      /**< DATA_TYPE encoding. ffff */
 
 //=============================================================================================================
 /**
@@ -219,7 +219,6 @@ public:
     *
     * @param[in] p_pStream opened fif file
     * @param[out] p_pTag the read tag
-    * @param[in] pos position of the tag inside the fif file
     *
     * @return true if succeeded, false otherwise
     */
@@ -261,7 +260,7 @@ public:
     * Returns matrix dimensions
     *
     * @param[out] p_ndim    number of dimensions
-    * @param[out] p_pDims   vector containing the size of each dimension
+    * @param[out] p_Dims    vector containing the size of each dimension
     *
     * @return true if dimensions are available
     */

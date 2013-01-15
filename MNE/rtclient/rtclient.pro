@@ -38,7 +38,8 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       -= gui
+QT += network
+QT -= gui
 
 DEFINES += RTCLIENT_LIBRARY
 
@@ -51,13 +52,10 @@ CONFIG(debug, debug|release) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Genericsd
-
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Generics
 }
 
@@ -76,9 +74,15 @@ win32 {
 }
 
 SOURCES += \
+    rtclient.cpp \
+    rtdataclient.cpp \
+    rtcmdclient.cpp
 
 HEADERS +=  \
-	rtclient_global.h \
+    rtclient_global.h \
+    rtclient.h \
+    rtcmdclient.h \
+    rtdataclient.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

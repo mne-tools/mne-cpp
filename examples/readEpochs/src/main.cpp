@@ -202,8 +202,8 @@ int main(int argc, char *argv[])
     //
     //  Read the events
     //
+    QFile t_EventFile;
     MatrixXi events;
-    QFile* t_pEventFile = NULL;
     if (t_sEventName.size() == 0)
     {
         p = t_sFileName.indexOf(".fif");
@@ -218,8 +218,8 @@ int main(int argc, char *argv[])
         }
 //        events = mne_read_events(t_sEventName);
 
-        t_pEventFile = new QFile(t_sEventName);
-        MNE::read_events(t_pEventFile, events);
+        t_EventFile.setFileName(t_sEventName);
+        MNE::read_events(t_EventFile, events);
         printf("Events read from %s\n",t_sEventName.toUtf8().constData());
     }
     else
@@ -230,8 +230,8 @@ int main(int argc, char *argv[])
         p = t_sFileName.indexOf(".fif");
         if (p > 0)
         {
-            t_pEventFile = new QFile(t_sEventName);
-            if(!MNE::read_events(t_pEventFile, events))
+            t_EventFile.setFileName(t_sEventName);
+            if(!MNE::read_events(t_EventFile, events))
             {
                 printf("Error while read events.\n");
                 return 0;
@@ -357,8 +357,6 @@ int main(int argc, char *argv[])
         std::cout << times.block(0,0,1,10) << std::endl;
         qDebug() << times.rows() << " x " << times.cols();
     }
-
-    delete t_pEventFile;
 
     return a.exec();
 }

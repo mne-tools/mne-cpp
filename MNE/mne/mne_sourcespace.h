@@ -94,7 +94,7 @@ using namespace FIFFLIB;
 // TYPEDEFS
 //=============================================================================================================
 
-typedef std::pair<int,int> intpair;
+typedef std::pair<int,int> intpair;     /**< Typedef of a pair of ints. */
 
 
 //*************************************************************************************************************
@@ -146,7 +146,7 @@ public:
     *
     * Returns the hemisphere id ( FIFFV_MNE_SURF_LEFT_HEMI or FIFFV_MNE_SURF_RIGHT_HEMI) for a source space.
     *
-    * @param[in] p_pHemisphere the hemisphere to investigate
+    * @param[in] p_Hemisphere the hemisphere to investigate
     *
     * @return the deduced hemisphere id
     */
@@ -174,7 +174,7 @@ public:
     * @param [in] p_pStream         The opened fif file
     * @param [in] add_geom          Add geometry information to the source spaces
     * @param [in, out] p_Tree       Search for the source spaces here
-    * @param [out] p_pSourceSpace   the read source spaces
+    * @param [out] p_SourceSpace    The read source spaces
     *
     * @return true if succeeded, false otherwise
     */

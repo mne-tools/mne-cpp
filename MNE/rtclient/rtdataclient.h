@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_rt_data_client.h
+* @file     rtdataclient.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 *           To Be continued...
@@ -31,19 +31,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     declaration of the MNERtDataClient Class.
+* @brief     declaration of the RtDataClient Class.
 *
 */
 
-#ifndef MNE_RT_DATA_CLIENT_H
-#define MNE_RT_DATA_CLIENT_H
+#ifndef RTDATACLIENT_H
+#define RTDATACLIENT_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // MNE INCLUDES
 //=============================================================================================================
 
-#include "mne_global.h"
+#include "rtclient_global.h"
 
 
 //*************************************************************************************************************
@@ -66,10 +66,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE RTCLIENTLIB
 //=============================================================================================================
 
-namespace MNELIB
+namespace RTCLIENTLIB
 {
 
 
@@ -87,12 +87,12 @@ using namespace FIFFLIB;
 *
 * @brief Real-time data client
 */
-class MNESHARED_EXPORT MNERtDataClient : public QTcpSocket
+class RTCLIENTSHARED_EXPORT RtDataClient : public QTcpSocket
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<MNERtDataClient> SPtr;               /**< Shared pointer type for MNERtDataClient. */
-    typedef QSharedPointer<const MNERtDataClient> ConstSPtr;    /**< Const shared pointer type for MNERtDataClient. */
+    typedef QSharedPointer<RtDataClient> SPtr;               /**< Shared pointer type for RtDataClient. */
+    typedef QSharedPointer<const RtDataClient> ConstSPtr;    /**< Const shared pointer type for RtDataClient. */
 
     //=========================================================================================================
     /**
@@ -100,13 +100,13 @@ public:
     *
     * @param[in] parent     Parent QObject (optional)
     */
-    explicit MNERtDataClient(QObject *parent = 0);
+    explicit RtDataClient(QObject *parent = 0);
 
     //=========================================================================================================
     /**
     * Connect to a mne_rt_server using port 4218
     *
-    * @param[in] p_sRtServerHostname    The IP address of the mne_rt_server
+    * @param[in] p_sRtServerHostName    The IP address of the mne_rt_server
     */
     void connectToHost(const QString& p_sRtServerHostName);
 
@@ -155,4 +155,4 @@ public slots:
 
 } // NAMESPACE
 
-#endif // MNE_RT_DATA_CLIENT_H
+#endif // RTDATACLIENT_H

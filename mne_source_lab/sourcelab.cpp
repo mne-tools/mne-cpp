@@ -71,13 +71,13 @@ SourceLab::SourceLab(QObject *parent)
     qRegisterMetaType<MatrixXf>("MatrixXf");
     qRegisterMetaType<MNEInverseOperator>("MNEInverseOperator");
 
-    m_pRtClient = new MNERtClient("127.0.0.1", this);
-    connect(m_pRtClient, &MNERtClient::rawBufferReceived,
+    m_pRtClient = new RtClient("127.0.0.1", this);
+    connect(m_pRtClient, &RtClient::rawBufferReceived,
             this, &SourceLab::receiveRawBuffer);
     this->start();
 
     m_pRtCov = new RtCov(this);
-    connect(m_pRtClient, &MNERtClient::rawBufferReceived,
+    connect(m_pRtClient, &RtClient::rawBufferReceived,
             m_pRtCov, &RtCov::receiveDataSegment);
     m_pRtCov->start();
 

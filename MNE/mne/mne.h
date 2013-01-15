@@ -150,7 +150,7 @@ public:
     *
     * Returns the hemisphere id (FIFFV_MNE_SURF_LEFT_HEMI or FIFFV_MNE_SURF_RIGHT_HEMI) for a source space.
     *
-    * @param[in] p_pHemisphere the hemisphere to investigate
+    * @param[in] p_Hemisphere   The hemisphere to investigate
     *
     * @return the deduced hemisphere id
     */
@@ -216,7 +216,7 @@ public:
     * @param[in] info               measurement info as returned by the fif reading routines
     * @param[in] from               compensation in the input data
     * @param[in] to                 desired compensation in the output
-    * @param[out] comp              Compensation Matrix
+    * @param[out] ctf_comp          Compensation Matrix
     * @param[in] exclude_comp_chs   exclude compensation channels from the output (optional)
     *
     * @return true if succeeded, false otherwise
@@ -321,12 +321,12 @@ public:
     *
     * Read an event list from a fif file
     *
-    * @param [in] p_sFileName   The name of the file
+    * @param [in] p_IODevice   The I/O device to read from
     * @param [out] eventlist    The read eventlist m x 3; with m events; colum: 1 - position in samples, 3 - eventcode
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_events(QIODevice* p_pIODevice, MatrixXi& eventlist);
+    static bool read_events(QIODevice &p_IODevice, MatrixXi& eventlist);
 
     //=========================================================================================================
     /**
@@ -408,7 +408,7 @@ public:
     * @param [in] add_geom          Add geometry information to the source spaces
     * @param [in] p_Tree            Search for the source spaces here
     *
-    * @param [out] p_pSourceSpace   The read source spaces
+    * @param [out] p_SourceSpace    The read source spaces
     *
     * @return true if succeeded, false otherwise
     */

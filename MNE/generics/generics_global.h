@@ -51,9 +51,9 @@
 //=============================================================================================================
 
 #if defined(GENERICS_LIBRARY)
-#  define GENERICSSHARED_EXPORT Q_DECL_EXPORT
+#  define GENERICSSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define GENERICSSHARED_EXPORT Q_DECL_IMPORT
+#  define GENERICSSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
 #endif // GENERICS_GLOBAL_H

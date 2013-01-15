@@ -1,7 +1,7 @@
 Acknowledgement
 ===============
 
-Except the authors of mne-cpp we want to ackowledge:
+Except the authors of mne-cpp we want to acknowledge:
 
 People
 ------
