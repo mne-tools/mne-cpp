@@ -86,7 +86,7 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Neuromag::Neuromag()
+Artemis::Artemis()
 : m_pDacqServer(new DacqServer(this))
 , m_pInfo(new FiffInfo())
 , m_bIsRunning(false)
@@ -101,9 +101,9 @@ Neuromag::Neuromag()
 
 //*************************************************************************************************************
 
-Neuromag::~Neuromag()
+Artemis::~Artemis()
 {
-    qDebug() << "Destroy Neuromag::~Neuromag()";
+    qDebug() << "Destroy Artemis::~Artemis()";
 
     delete m_pDacqServer;
 
@@ -114,7 +114,7 @@ Neuromag::~Neuromag()
 
 //*************************************************************************************************************
 
-QByteArray Neuromag::availableCommands()
+QByteArray Artemis::availableCommands()
 {
     QByteArray t_blockCmdInfoList;
 
@@ -126,23 +126,23 @@ QByteArray Neuromag::availableCommands()
 
 //*************************************************************************************************************
 
-ConnectorID Neuromag::getConnectorID() const
+ConnectorID Artemis::getConnectorID() const
 {
-    return _NEUROMAG;
+    return _Artemis;
 }
 
 
 //*************************************************************************************************************
 
-const char* Neuromag::getName() const
+const char* Artemis::getName() const
 {
-    return "Neuromag Connector";
+    return "Artemis Connector";
 }
 
 
 //*************************************************************************************************************
 
-void Neuromag::init()
+void Artemis::init()
 {
 
 }
@@ -150,7 +150,7 @@ void Neuromag::init()
 
 //*************************************************************************************************************
 
-bool Neuromag::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo)
+bool Artemis::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo)
 {
     bool success = false;
 
@@ -160,7 +160,7 @@ bool Neuromag::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutp
 
 //*************************************************************************************************************
 
-bool Neuromag::start()
+bool Artemis::start()
 {
     // Start thread
     m_pDacqServer->start();
@@ -173,7 +173,7 @@ bool Neuromag::start()
 
 //*************************************************************************************************************
 
-bool Neuromag::stop()
+bool Artemis::stop()
 {
     m_bIsRunning = false;
     QThread::wait();//ToDo: This thread will never be terminated when circular buffer is blocking the thread (happens when circularbuffer is empty)
@@ -181,7 +181,7 @@ bool Neuromag::stop()
     m_pDacqServer->m_bIsRunning = false;
     m_pDacqServer->wait();
 
-    qDebug() << "bool Neuromag::stop()";
+    qDebug() << "bool Artemis::stop()";
 
     return true;
 }
@@ -189,7 +189,7 @@ bool Neuromag::stop()
 
 //*************************************************************************************************************
 
-void Neuromag::releaseMeasInfo()
+void Artemis::releaseMeasInfo()
 {
     if(!m_pInfo->isEmpty())
         emit remitMeasInfo(m_iID, m_pInfo);
@@ -198,7 +198,7 @@ void Neuromag::releaseMeasInfo()
 
 //*************************************************************************************************************
 
-void Neuromag::requestMeasInfo(qint32 ID)
+void Artemis::requestMeasInfo(qint32 ID)
 {
     m_iID = ID;
 
@@ -227,9 +227,9 @@ void Neuromag::requestMeasInfo(qint32 ID)
 
 //*************************************************************************************************************
 
-void Neuromag::requestMeas()
+void Artemis::requestMeas()
 {
-    qDebug() << "void Neuromag::requestMeas()";
+    qDebug() << "void Artemis::requestMeas()";
 
     m_pDacqServer->m_bMeasRequest = true;
     this->start();
@@ -238,7 +238,7 @@ void Neuromag::requestMeas()
 
 //*************************************************************************************************************
 
-void Neuromag::requestMeasStop()
+void Artemis::requestMeasStop()
 {
     this->stop();
 }
@@ -246,11 +246,11 @@ void Neuromag::requestMeasStop()
 
 //*************************************************************************************************************
 
-void Neuromag::requestSetBufferSize(quint32 p_uiBuffSize)
+void Artemis::requestSetBufferSize(quint32 p_uiBuffSize)
 {
     if(p_uiBuffSize > 0)
     {
-        qDebug() << "void Neuromag::setBufferSize: " << p_uiBuffSize;
+        qDebug() << "void Artemis::setBufferSize: " << p_uiBuffSize;
 
         this->stop();
 
@@ -263,7 +263,7 @@ void Neuromag::requestSetBufferSize(quint32 p_uiBuffSize)
 
 //*************************************************************************************************************
 
-void Neuromag::run()
+void Artemis::run()
 {
     m_bIsRunning = true;
 
