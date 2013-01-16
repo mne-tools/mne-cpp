@@ -132,10 +132,10 @@ void FiffProducer::run()
 
     MatrixXd cals(1,nchan);
 
-    SparseMatrix<double> inv_calsMat(nchan, nchan);
+//    SparseMatrix<double> inv_calsMat(nchan, nchan);
 
-    for(qint32 i = 0; i < nchan; ++i)
-        inv_calsMat.insert(i, i) = 1.0f/m_pFiffSimulator->m_RawInfo.info->chs[i].cal;
+//    for(qint32 i = 0; i < nchan; ++i)
+//        inv_calsMat.insert(i, i) = 1.0f/m_pFiffSimulator->m_RawInfo.info->chs[i].cal;
 
     //Not good cause production time is not accurate
     //loading and thread sleep is longer than thread sleep time - better to have a extra loading thread
@@ -159,7 +159,7 @@ void FiffProducer::run()
             printf("error during read_raw_segment\n");
         }
 
-        MatrixXf tmp = (inv_calsMat*data).cast<float>();
+        MatrixXf tmp = data.cast<float>();//(inv_calsMat*data).cast<float>();
 
         if(t_bRestart)
         {
@@ -176,7 +176,7 @@ void FiffProducer::run()
                 printf("error during read_raw_segment\n");
             }
 
-            MatrixXf tmp2 = (inv_calsMat*data).cast<float>();
+            MatrixXf tmp2 = data.cast<float>();//(inv_calsMat*data).cast<float>();
 
             MatrixXf tmp3(tmp.rows(), tmp.cols()+tmp2.cols());
 
@@ -192,7 +192,6 @@ void FiffProducer::run()
         {
             first += quantum;
         }
-
 
         m_pFiffSimulator->m_pRawMatrixBuffer->push(&tmp);
     }
