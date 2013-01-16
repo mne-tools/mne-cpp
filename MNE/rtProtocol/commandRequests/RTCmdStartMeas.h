@@ -2,41 +2,40 @@
  * @author  Christof Pieloth
  */
 
-#ifndef RTCMDMEASINFO_H_
-#define RTCMDMEASINFO_H_
+#ifndef RTCMDSTARTMEAS_H_
+#define RTCMDSTARTMEAS_H_
 
 #include <QSharedPointer>
-#include <QString>
 
 #include "RTCommandRequest.h"
 
 namespace RTSTREAMING
 {
     /**
-     * Request for measurement information.
+     * Requests for streaming data.
      */
-    class RTCmdMeasInfo: public RTSTREAMING::RTCommandRequest
+    class RTCmdStartMeas: public RTSTREAMING::RTCommandRequest
     {
     public:
-        typedef QSharedPointer< RTCmdMeasInfo > SPtr;
-        typedef QSharedPointer< const RTCmdMeasInfo > ConstSPtr;
+        typedef QSharedPointer< RTCmdStartMeas > SPtr;
+        typedef QSharedPointer< const RTCmdStartMeas > ConstSPtr;
 
         static const int NO_CLIENT_ID; /**< Return value if no ID is set. */
 
-        RTCmdMeasInfo();
-        virtual ~RTCmdMeasInfo();
+        RTCmdStartMeas();
+        virtual ~RTCmdStartMeas();
 
         virtual QString getHelpText() const;
 
         /**
          * Returns the Client ID.
          *
-         * @return ID of the client who should receive the information or NO_CLIENT_ID if no ID is set.
+         * @return ID of the client who should receive the data or NO_CLIENT_ID if no ID is set.
          */
         int getClientId() const;
 
         /**
-         * Sets the ID of the client who should receive the information.
+         * Sets the ID of the client who should receive the data.
          * The ID is added to the argument list.
          *
          * @param id Client ID
@@ -45,4 +44,4 @@ namespace RTSTREAMING
     };
 
 } /* namespace RTSTREAMING */
-#endif /* RTCMDMEASINFO_H_ */
+#endif /* RTCMDSTARTMEAS_H_ */
