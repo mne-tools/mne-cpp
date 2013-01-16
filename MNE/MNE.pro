@@ -42,8 +42,8 @@ SUBDIRS += generics \
     fiff \
     mnemath \
     mne \
-#    rtcommands \
-    rtclient \
+    rtProtocol \
+    rtClient \
     rtinv \
 
 #qtHaveModule(3d): SUBDIRS += disp

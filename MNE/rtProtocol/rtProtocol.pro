@@ -1,15 +1,15 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     rtclient.pro
+# @file     rtProtocol.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Christof Pieloth;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     July, 2012
+# @date     January, 2013
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2012, Christoph Dinh, Christof Pieloth and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -30,7 +30,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the rtclient library.
+# @brief    This project file builds the rtProtocol library.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -38,12 +38,11 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT += network
-QT -= gui
+QT       -= gui
 
-DEFINES += RTCLIENT_LIBRARY
+DEFINES += RTPROTOCOl_LIBRARY
 
-TARGET = RtClient
+TARGET = RtProtocol
 TARGET = $$join(TARGET,,MNE$$MNE_LIB_VERSION,)
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -51,12 +50,15 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Genericsd
+#    LIBS += -lMNE$${MNE_LIB_VERSION}Fiffd \
+#            -lMNE$${MNE_LIB_VERSION}Mned \
+#            -lMNE$${MNE_LIB_VERSION}Genericsd
+
 }
 else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Generics
+#    LIBS += -lMNE$${MNE_LIB_VERSION}Fiff \
+#            -lMNE$${MNE_LIB_VERSION}Mne \
+#            -lMNE$${MNE_LIB_VERSION}Generics
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}
@@ -73,22 +75,17 @@ win32 {
     QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
 }
 
-SOURCES += \
-    rtclient.cpp \
-    rtdataclient.cpp \
-    rtcmdclient.cpp
+SOURCES += ./*.cpp
+SOURCES += ./commandRequests/*.cpp
 
-HEADERS +=  \
-    rtclient_global.h \
-    rtclient.h \
-    rtcmdclient.h \
-    rtdataclient.h
+HEADERS +=  ./*.h
+HEADERS +=  ./commandRequests/*.h
 
-INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
-INCLUDEPATH += $${MNE_INCLUDE_DIR}
+# INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+# INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 # Install headers to include directory
 header_files.files = ./*.h
-header_files.path = $${MNE_INCLUDE_DIR}/rtclient
+header_files.path = $${MNE_INCLUDE_DIR}/rtProtocol
 
 INSTALLS += header_files
