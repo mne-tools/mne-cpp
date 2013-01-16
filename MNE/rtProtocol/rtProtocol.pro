@@ -88,4 +88,8 @@ HEADERS +=  ./commandRequests/*.h
 header_files.files = ./*.h
 header_files.path = $${MNE_INCLUDE_DIR}/rtProtocol
 
+header_files_cmds.files = commandRequests/*.h
+header_files_cmds.path = $${MNE_INCLUDE_DIR}/rtProtocol/commandRequests
+
 INSTALLS += header_files
+INSTALLS += header_files_cmds
