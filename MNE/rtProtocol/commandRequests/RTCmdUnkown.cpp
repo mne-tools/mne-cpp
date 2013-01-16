@@ -7,7 +7,7 @@
 
 namespace RTSTREAMING
 {
-    const CommandT COMMAND = "UNKOWN";
+    const CommandT RTCmdUnkown::COMMAND = "UNKOWN";
 
     RTCmdUnkown::RTCmdUnkown() :
                     RTCommandRequest( COMMAND )

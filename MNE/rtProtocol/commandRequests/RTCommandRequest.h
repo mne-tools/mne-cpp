@@ -31,6 +31,8 @@ namespace RTSTREAMING
          */
         virtual CommandT getCommand() const;
 
+        virtual bool isCommand(const CommandT& cmd) const;
+
         /**
          * Gets a help text for that command.
          *

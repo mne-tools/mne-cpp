@@ -2,37 +2,39 @@
  * @author  Christof Pieloth
  */
 
-#include "RTDefaultCommands.h"
-#include "RTCmdMeasInfo.h"
+#include "../RTDefaultCommands.h"
+
+#include "RTCmdSelCon.h"
 
 namespace RTSTREAMING
 {
-    const int RTCmdMeasInfo::NO_CLIENT_ID = -1;
 
-    RTCmdMeasInfo::RTCmdMeasInfo() :
-                    RTCommandRequest( Command::REQUEST_MEASUREMENT_INFO )
+    const int RTCmdSelCon::NO_CONNECTOR_ID = -1;
+
+    RTCmdSelCon::RTCmdSelCon() :
+                    RTCommandRequest( Command::SELECT_CONNECTOR )
     {
     }
 
-    RTCmdMeasInfo::~RTCmdMeasInfo()
+    RTCmdSelCon::~RTCmdSelCon()
     {
     }
 
-    QString RTCmdMeasInfo::getHelpText() const
+    QString RTCmdSelCon::getHelpText() const
     {
         QString help = m_cmd;
         help.append( ARG_SEPARATOR );
-        help.append( "[ID/Alias]" );
+        help.append( "[Connector ID]" );
         help.append( DESC_SEPARATOR );
-        help.append( "Sends measurement info to a specified client." );
+        help.append( "Selects a new connector, if a measurement is running it will be stopped." );
         return help;
     }
 
-    int RTCmdMeasInfo::getClientId() const
+    int RTCmdSelCon::getConnectorId() const
     {
         if( m_args.empty() )
         {
-            return NO_CLIENT_ID;
+            return NO_CONNECTOR_ID;
         }
 
         CommandArgT strId = m_args.front();
@@ -45,14 +47,13 @@ namespace RTSTREAMING
         }
         else
         {
-            return NO_CLIENT_ID;
+            return NO_CONNECTOR_ID;
         }
     }
 
-    void RTCmdMeasInfo::setClientId( int id )
+    void RTCmdSelCon::setConnectorId( int id )
     {
         m_args.clear();
         m_args.push_back( CommandArgT::number( id ) );
     }
-
 } /* namespace RTSTREAMING */

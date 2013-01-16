@@ -2,33 +2,34 @@
  * @author  Christof Pieloth
  */
 
-#include "RTDefaultCommands.h"
-#include "RTCmdMeasInfo.h"
+#include "../RTDefaultCommands.h"
+#include "RTCmdStartMeas.h"
 
 namespace RTSTREAMING
 {
-    const int RTCmdMeasInfo::NO_CLIENT_ID = -1;
+    const int RTCmdStartMeas::NO_CLIENT_ID = -1;
 
-    RTCmdMeasInfo::RTCmdMeasInfo() :
-                    RTCommandRequest( Command::REQUEST_MEASUREMENT_INFO )
+    RTCmdStartMeas::RTCmdStartMeas() :
+                    RTCommandRequest( Command::START_MEASUREMENT )
     {
     }
 
-    RTCmdMeasInfo::~RTCmdMeasInfo()
+    RTCmdStartMeas::~RTCmdStartMeas()
     {
     }
 
-    QString RTCmdMeasInfo::getHelpText() const
+    QString RTCmdStartMeas::getHelpText() const
     {
         QString help = m_cmd;
         help.append( ARG_SEPARATOR );
-        help.append( "[ID/Alias]" );
+        help.append( "[Client ID]" );
         help.append( DESC_SEPARATOR );
-        help.append( "Sends measurement info to a specified client." );
+        help.append(
+                        "Adds specified FiffStreamClient to raw data buffer receivers. If acquisition is not already started, it is triggered." );
         return help;
     }
 
-    int RTCmdMeasInfo::getClientId() const
+    int RTCmdStartMeas::getClientId() const
     {
         if( m_args.empty() )
         {
@@ -49,7 +50,7 @@ namespace RTSTREAMING
         }
     }
 
-    void RTCmdMeasInfo::setClientId( int id )
+    void RTCmdStartMeas::setClientId( int id )
     {
         m_args.clear();
         m_args.push_back( CommandArgT::number( id ) );

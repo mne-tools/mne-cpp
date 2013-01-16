@@ -7,8 +7,12 @@
 #include "../RTDefaultCommands.h"
 
 #include "RTCommandRequest.h"
+#include "RTCmdConList.h"
 #include "RTCmdHelp.h"
 #include "RTCmdMeasInfo.h"
+#include "RTCmdSelCon.h"
+#include "RTCmdStartMeas.h"
+#include "RTCmdStopAll.h"
 #include "RTCmdUnkown.h"
 
 namespace RTSTREAMING
@@ -25,6 +29,11 @@ namespace RTSTREAMING
     CommandT RTCommandRequest::getCommand() const
     {
         return m_cmd;
+    }
+
+    bool RTCommandRequest::isCommand( const CommandT& cmd ) const
+    {
+        return m_cmd.compare( cmd ) == 0;
     }
 
     CommandArgListT RTCommandRequest::getArguments() const
@@ -94,6 +103,12 @@ namespace RTSTREAMING
     {
         RTCommandRequest::SPtr request;
 
+        if( Command::REQUEST_CONNECTORS.compare( cmd ) == 0 )
+        {
+            request = RTCmdConList::SPtr( new RTCmdConList() );
+            return request;
+        }
+
         if( Command::HELP.compare( cmd ) == 0 )
         {
             request = RTCmdHelp::SPtr( new RTCmdHelp() );
@@ -102,6 +117,21 @@ namespace RTSTREAMING
         if( Command::REQUEST_MEASUREMENT_INFO.compare( cmd ) == 0 )
         {
             request = RTCmdMeasInfo::SPtr( new RTCmdMeasInfo() );
+            return request;
+        }
+        if( Command::SELECT_CONNECTOR.compare( cmd ) == 0 )
+        {
+            request = RTCmdSelCon::SPtr( new RTCmdSelCon() );
+            return request;
+        }
+        if( Command::START_MEASUREMENT.compare( cmd ) == 0 )
+        {
+            request = RTCmdStartMeas::SPtr( new RTCmdStartMeas() );
+            return request;
+        }
+        if( Command::STOP_ALL_MEASUREMENTS.compare( cmd ) == 0 )
+        {
+            request = RTCmdStopAll::SPtr( new RTCmdStopAll() );
             return request;
         }
         // TODO(pieloth): Create instance of all default commands
