@@ -8,14 +8,14 @@
 #include <QSharedPointer>
 #include <QString>
 
-#include "RTCommandRequest.h"
+#include "RTCmdBase.h"
 
 namespace RTSTREAMING
 {
     /**
      * Request for measurement information.
      */
-    class RTCmdMeasInfo: public RTSTREAMING::RTCommandRequest
+    class RTCmdMeasInfo: public RTSTREAMING::RTCmdBase
     {
     public:
         typedef QSharedPointer< RTCmdMeasInfo > SPtr;

@@ -2,14 +2,14 @@
  * @author  Christof Pieloth
  */
 
-#include "RTDefaultCommands.h"
+#include "../RTDefaultCommands.h"
 #include "RTCmdHelp.h"
 
 namespace RTSTREAMING
 {
 
     RTCmdHelp::RTCmdHelp() :
-                    RTCommandRequest( Command::HELP )
+                    RTCmdBase( Command::HELP )
     {
     }
 

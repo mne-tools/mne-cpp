@@ -2,12 +2,13 @@
  * @author  Christof Pieloth
  */
 
-#ifndef RTCOMMANDREQUEST_H_
-#define RTCOMMANDREQUEST_H_
+#ifndef RTCMDBASE_H_
+#define RTCMDBASE_H_
 
 #include <QSharedPointer>
 #include <QString>
 
+#include "../RTCommandRequest.h"
 #include "../RTProtocolDefinitions.h"
 
 namespace RTSTREAMING
@@ -15,14 +16,14 @@ namespace RTSTREAMING
     /**
      * Abstract base class for all command requests. Derived class can add type-safe getter and setter for the argument list.
      */
-    class RTCommandRequest
+    class RTCmdBase : public RTCommandRequest
     {
     public:
-        typedef QSharedPointer< RTCommandRequest > SPtr;
-        typedef QSharedPointer< const RTCommandRequest > ConstSPtr;
+        typedef QSharedPointer< RTCmdBase > SPtr;
+        typedef QSharedPointer< const RTCmdBase > ConstSPtr;
 
-        explicit RTCommandRequest( CommandT cmd );
-        virtual ~RTCommandRequest();
+        explicit RTCmdBase( CommandT cmd );
+        virtual ~RTCmdBase();
 
         /**
          * Gets the command of the request.
@@ -99,4 +100,4 @@ namespace RTSTREAMING
         CommandArgListT m_args; /**< Argument list. */
     };
 } /* namespace RTSTREAMING */
-#endif /* RTCOMMANDREQUEST_H_ */
+#endif /* RTCMDBASE_H_ */

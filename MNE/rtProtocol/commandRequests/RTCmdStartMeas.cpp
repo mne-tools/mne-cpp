@@ -10,7 +10,7 @@ namespace RTSTREAMING
     const int RTCmdStartMeas::NO_CLIENT_ID = -1;
 
     RTCmdStartMeas::RTCmdStartMeas() :
-                    RTCommandRequest( Command::START_MEASUREMENT )
+                    RTCmdBase( Command::START_MEASUREMENT )
     {
     }
 

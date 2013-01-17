@@ -2,7 +2,7 @@
  * @author  Christof Pieloth
  */
 
-#include "RTDefaultCommands.h"
+#include "../RTDefaultCommands.h"
 #include "RTCmdMeasInfo.h"
 
 namespace RTSTREAMING
@@ -10,7 +10,7 @@ namespace RTSTREAMING
     const int RTCmdMeasInfo::NO_CLIENT_ID = -1;
 
     RTCmdMeasInfo::RTCmdMeasInfo() :
-                    RTCommandRequest( Command::REQUEST_MEASUREMENT_INFO )
+                    RTCmdBase( Command::REQUEST_MEASUREMENT_INFO )
     {
     }
 

@@ -9,7 +9,7 @@ namespace RTSTREAMING
 {
 
     RTCmdConList::RTCmdConList() :
-                    RTCommandRequest( Command::REQUEST_CONNECTORS )
+                    RTCmdBase( Command::REQUEST_CONNECTORS )
     {
     }
 

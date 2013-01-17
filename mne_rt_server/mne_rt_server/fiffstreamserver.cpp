@@ -37,7 +37,7 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-#include <rtProtocol/commandRequests/RTCommandRequest.h>
+#include <rtProtocol/RTCommandRequest.h>
 #include <rtProtocol/commandRequests/RTCmdMeasInfo.h>
 #include <rtProtocol/RTDefaultCommands.h>
 #include <rtProtocol/RTProtocolDefinitions.h> // TODO(pieloth): Remove when string parsing is done by rtProtocol
@@ -98,7 +98,8 @@ bool FiffStreamServer::parseCommand( QStringList& p_sListCommand, QByteArray& p_
     QString rawRequest = p_sListCommand.join( RTSTREAMING::ARG_SEPARATOR );
     rawRequest.append(RTSTREAMING::ETX);
     RTSTREAMING::RTCommandRequest::SPtr request;
-    request = RTSTREAMING::RTCommandRequest::parseRequest( rawRequest );
+    // TODO(pieloth): use some kind of factory or expandable CommandRequestManager.
+    request = RTSTREAMING::RTCmdBase::parseRequest( rawRequest );
     // TODO(pieloth): use of request->getCommand(); in cout stream!
     const std::string cmd = request->getCommand().toStdString();
 

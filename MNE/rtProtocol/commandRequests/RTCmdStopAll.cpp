@@ -9,7 +9,7 @@ namespace RTSTREAMING
 {
 
     RTCmdStopAll::RTCmdStopAll() :
-                    RTCommandRequest( Command::STOP_ALL_MEASUREMENTS )
+                    RTCmdBase( Command::STOP_ALL_MEASUREMENTS )
     {
     }
 

@@ -7,14 +7,14 @@
 
 #include <QSharedPointer>
 
-#include "RTCommandRequest.h"
+#include "RTCmdBase.h"
 
 namespace RTSTREAMING
 {
     /**
      * Request for connector selection.
      */
-    class RTCmdSelCon: public RTSTREAMING::RTCommandRequest
+    class RTCmdSelCon: public RTSTREAMING::RTCmdBase
     {
     public:
         typedef QSharedPointer< RTCmdSelCon > SPtr;

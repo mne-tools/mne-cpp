@@ -8,14 +8,14 @@
 #include <QSharedPointer>
 #include <QString>
 
-#include "RTCommandRequest.h"
+#include "RTCmdBase.h"
 
 namespace RTSTREAMING
 {
     /**
      * Request for help message.
      */
-    class RTCmdHelp: public RTSTREAMING::RTCommandRequest
+    class RTCmdHelp: public RTSTREAMING::RTCmdBase
     {
     public:
         typedef QSharedPointer< RTCmdHelp > SPtr;

@@ -7,12 +7,12 @@
 
 #include <QSharedPointer>
 
-#include "RTCommandRequest.h"
+#include "RTCmdBase.h"
 
 namespace RTSTREAMING
 {
 
-    class RTCmdStopAll: public RTSTREAMING::RTCommandRequest
+    class RTCmdStopAll: public RTSTREAMING::RTCmdBase
     {
     public:
         typedef QSharedPointer< RTCmdStopAll > SPtr;

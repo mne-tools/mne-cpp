@@ -11,7 +11,7 @@
 
 namespace RTSTREAMING
 {
-    class RTCommandRequest;
+    class RTCmdBase;
 
     /**
      * This namespace bundles all available commands.
