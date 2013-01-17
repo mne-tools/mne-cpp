@@ -130,6 +130,10 @@ protected:
 private:
     MNEForwardSolution t_ForwardSolution;   /**< Holds the forward soultion -> ToDo change this to shraed data pointer */
 
+    bool m_bStereo;
+
+    qint32 testCount;
+
     QGLLightModel *m_pLightModel;    /**< The selected light model. */
     QGLLightParameters *m_pLightParametersScene;    /**< The selected light parameters. */
 

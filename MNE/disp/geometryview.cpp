@@ -73,6 +73,7 @@ using namespace DISPLIB;
 
 GeometryView::GeometryView(QWindow *parent)
 : QGLView(parent)
+, m_bStereo(true)
 , m_pSceneNodeBrain(0)
 , m_pSceneNode(0)
 {
@@ -178,7 +179,10 @@ void GeometryView::initializeGL(QGLPainter *painter)
                         g = m_vecAnnotation[h]->getColortable().table(k,1);
                         b = m_vecAnnotation[h]->getColortable().table(k,2);
 
-                        t_pMaterialROI->setDiffuseColor(QColor(r,g,b,255));
+                        t_pMaterialROI->setColor(QColor(r,g,b,200));
+//                        t_pMaterialROI->setEmittedLight(QColor(100,100,100,255));
+//                        t_pMaterialROI->setSpecularColor(QColor(10,10,10,20));
+
 
                         index = palette->addMaterial(t_pMaterialROI);
                         builder.currentNode()->setMaterialIndex(index);
@@ -208,13 +212,16 @@ void GeometryView::initializeGL(QGLPainter *painter)
         m_pLightParametersScene->setPosition(QVector3D(0.0f, 0.0f, 3.0f));
         painter->setMainLight(m_pLightParametersScene);
 
+        testCount = 0;
 
         //
         // Set stereo type
         //
-        this->setStereoType(QGLView::RedCyanAnaglyph);
-        camera()->setEyeSeparation(0.4f);
-        m_pCameraFrontal->setEyeSeparation(0.1f);
+        if (m_bStereo) {
+            this->setStereoType(QGLView::RedCyanAnaglyph);
+            camera()->setEyeSeparation(0.4f);
+            m_pCameraFrontal->setEyeSeparation(0.1f);
+        }
 
     }
 
@@ -224,23 +231,32 @@ void GeometryView::initializeGL(QGLPainter *painter)
 
 void GeometryView::paintGL(QGLPainter *painter)
 {
-    if(!t_ForwardSolution.isEmpty())
-    {
+
+
+    ++testCount;
+
+    glEnable(GL_BLEND); // enable transparency
+
     //    painter->modelViewMatrix().rotate(45.0f, 1.0f, 1.0f, 1.0f);
 
-        painter->modelViewMatrix().push();
-        painter->projectionMatrix().push();
 
-        painter->setStandardEffect(QGL::LitMaterial);
+
+    painter->modelViewMatrix().push();
+    painter->projectionMatrix().push();
+
+    painter->setStandardEffect(QGL::LitMaterial);
 //        painter->setCamera(m_pCameraFrontal);
-        painter->setLightModel(m_pLightModel);
+    painter->setLightModel(m_pLightModel);
 
 //        material.bind(painter);
 //        material.prepareToDraw(painter, painter->attributes());
 
-        m_pSceneNode->draw(painter);
 
-        painter->modelViewMatrix().pop();
-        painter->projectionMatrix().pop();
-    }
+    m_pSceneNode->palette()->material(15)->setSpecularColor(QColor((testCount%10)*28,(testCount%10)*28,(testCount%10)*28,1));
+
+    m_pSceneNode->draw(painter);
+
+
+    painter->modelViewMatrix().pop();
+    painter->projectionMatrix().pop();
 }
