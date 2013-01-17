@@ -2,7 +2,7 @@
  * @author  Christof Pieloth
  */
 
-#include "RTDefaultCommands.h"
+#include "../RTDefaultCommands.h"
 #include "RTCmdUnkown.h"
 
 namespace RTSTREAMING
@@ -10,7 +10,7 @@ namespace RTSTREAMING
     const CommandT RTCmdUnkown::COMMAND = "UNKOWN";
 
     RTCmdUnkown::RTCmdUnkown() :
-                    RTCommandRequest( COMMAND )
+                    RTCmdBase( COMMAND )
     {
     }
 

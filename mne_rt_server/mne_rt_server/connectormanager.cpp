@@ -44,7 +44,7 @@
 
 #include "IConnector.h"
 
-#include <rtProtocol/commandRequests/RTCommandRequest.h>
+#include <rtProtocol/RTCommandRequest.h>
 #include <rtProtocol/commandRequests/RTCmdMeasInfo.h>
 #include <rtProtocol/commandRequests/RTCmdSelCon.h>
 #include <rtProtocol/commandRequests/RTCmdStartMeas.h>
@@ -375,7 +375,8 @@ bool ConnectorManager::parseCommand( QStringList& p_sListCommand, QByteArray& p_
     QString rawRequest = p_sListCommand.join( RTSTREAMING::ARG_SEPARATOR );
     rawRequest.append( RTSTREAMING::ETX );
     RTSTREAMING::RTCommandRequest::SPtr request;
-    request = RTSTREAMING::RTCommandRequest::parseRequest( rawRequest );
+    // TODO(pieloth): use some kind of factory or expandable CommandRequestManager.
+    request = RTSTREAMING::RTCmdBase::parseRequest( rawRequest );
     // TODO(pieloth): use of request->getCommand(); in cout stream!
     const std::string cmd = request->getCommand().toStdString();
 

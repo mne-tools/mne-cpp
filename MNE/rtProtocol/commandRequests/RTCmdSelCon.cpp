@@ -12,7 +12,7 @@ namespace RTSTREAMING
     const int RTCmdSelCon::NO_CONNECTOR_ID = -1;
 
     RTCmdSelCon::RTCmdSelCon() :
-                    RTCommandRequest( Command::SELECT_CONNECTOR )
+                    RTCmdBase( Command::SELECT_CONNECTOR )
     {
     }
 

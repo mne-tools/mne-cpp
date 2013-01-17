@@ -8,14 +8,14 @@
 #include <QSharedPointer>
 #include <QString>
 
-#include "RTCommandRequest.h"
+#include "RTCmdBase.h"
 
 namespace RTSTREAMING
 {
     /**
      * Default request class for unknown commands.
      */
-    class RTCmdUnkown: public RTSTREAMING::RTCommandRequest
+    class RTCmdUnkown: public RTSTREAMING::RTCmdBase
     {
     public:
         typedef QSharedPointer< RTCmdUnkown > SPtr;

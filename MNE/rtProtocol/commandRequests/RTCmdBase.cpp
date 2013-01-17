@@ -4,8 +4,9 @@
 
 #include "../RTProtocolDefinitions.h"
 #include "../RTDefaultCommands.h"
+#include "../RTCommandRequest.h"
 
-#include "RTCommandRequest.h"
+#include "RTCmdBase.h"
 #include "RTCmdConList.h"
 #include "RTCmdHelp.h"
 #include "RTCmdMeasInfo.h"
@@ -16,47 +17,47 @@
 
 namespace RTSTREAMING
 {
-RTCommandRequest::RTCommandRequest(CommandT cmd) :
+RTCmdBase::RTCmdBase(CommandT cmd) :
         m_cmd(cmd)
 {
 }
 
-RTCommandRequest::~RTCommandRequest()
+RTCmdBase::~RTCmdBase()
 {
 }
 
-CommandT RTCommandRequest::getCommand() const
+CommandT RTCmdBase::getCommand() const
 {
     return m_cmd;
 }
 
-bool RTCommandRequest::isCommand(const CommandT& cmd) const
+bool RTCmdBase::isCommand(const CommandT& cmd) const
 {
     return m_cmd.compare(cmd) == 0;
 }
 
-CommandArgListT RTCommandRequest::getArguments() const
+CommandArgListT RTCmdBase::getArguments() const
 {
     return m_args;
 }
 
-void RTCommandRequest::setArguments(CommandArgListT args)
+void RTCmdBase::setArguments(CommandArgListT args)
 {
     m_args = args;
 }
 
-void RTCommandRequest::addArgument(CommandArgT arg)
+void RTCmdBase::addArgument(CommandArgT arg)
 {
     m_args.push_back(arg);
 }
 
-CommandRequestT RTCommandRequest::getRequest()
+CommandRequestT RTCmdBase::getRequest()
 {
     CommandRequestT req = createCommandRequest(m_cmd, m_args);
     return req;
 }
 
-RTCommandRequest::SPtr RTCommandRequest::parseRequest(
+RTCommandRequest::SPtr RTCmdBase::parseRequest(
         const CommandRequestT& req)
 {
     RTCommandRequest::SPtr cmdRequest = RTCmdUnkown::SPtr(new RTCmdUnkown());
@@ -68,13 +69,13 @@ RTCommandRequest::SPtr RTCommandRequest::parseRequest(
         return cmdRequest;
     }
 
-    cmdRequest = RTCommandRequest::getDefaultCommandInstance(cmd);
+    cmdRequest = RTCmdBase::getDefaultCommandInstance(cmd);
     cmdRequest->setArguments(args);
 
     return cmdRequest;
 }
 
-RTCommandRequest::SPtr RTCommandRequest::getDefaultCommandInstance(
+RTCommandRequest::SPtr RTCmdBase::getDefaultCommandInstance(
         const CommandT& cmd)
 {
     RTCommandRequest::SPtr request;
@@ -124,7 +125,7 @@ std::list<RTCommandRequest::SPtr> getDefaultCommandRequests()
     std::list<CommandT>::iterator it = cmdList.begin();
     for (; it != cmdList.end(); ++it)
     {
-        reqList.push_back(RTCommandRequest::getDefaultCommandInstance(*it));
+        reqList.push_back(RTCmdBase::getDefaultCommandInstance(*it));
     }
     return reqList;
 }
