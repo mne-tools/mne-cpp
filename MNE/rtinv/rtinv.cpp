@@ -80,15 +80,13 @@ RtInv::~RtInv()
 
 
 //*************************************************************************************************************
-
+//ToDo use shared pointer for public slot
 void RtInv::receiveNoiseCov(FiffCov p_NoiseCov)
 {
     mutex.lock();
-    qDebug() << "Received Cov";
-    std::cout << "Covariance:\n" << p_NoiseCov.data.block(0,0,2,10) << std::endl;
-
     //Use here a circular buffer
-//    m_NoiseCov = FiffCov(p_NoiseCov);
+    m_vecNoiseCov.push_back(FiffCov::SDPtr(new FiffCov(p_NoiseCov)));
+
     mutex.unlock();
 }
 
@@ -112,7 +110,15 @@ void RtInv::run()
 
     while(m_bIsRunning)
     {
+        if(m_vecNoiseCov.size() > 0)
+        {
+            qDebug() << "Inverse operator";
 
+            FiffCov::SDPtr t_NoiseCov(new FiffCov(m_vecNoiseCov[0]->prepare_noise_cov(*m_pFiffInfo.data(), m_pFiffInfo->ch_names)));
+            m_vecNoiseCov.pop_front();
 
+//            prepare_noise_cov;
+
+        }
     }
 }

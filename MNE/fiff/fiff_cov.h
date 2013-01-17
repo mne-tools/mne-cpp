@@ -50,6 +50,7 @@
 
 #include "fiff_types.h"
 #include "fiff_proj.h"
+#include "fiff_info.h"
 
 
 //*************************************************************************************************************
@@ -114,6 +115,17 @@ public:
     * Initializes the covariance data matrix.
     */
     void clear();
+
+    //=========================================================================================================
+    /**
+    * Prepare noise covariance matrix. Before creating inverse operator.
+    *
+    * @param[in] p_Info     measurement info
+    * @param[in] p_ChNames  Channels which should be taken into account
+    *
+    * @return the prepared noise covariance matrix
+    */
+    FiffCov prepare_noise_cov(FiffInfo& p_Info, QStringList& p_ChNames);
 
 public:
     fiff_int_t  kind;       /**< Covariance kind -> fiff_constants.h */

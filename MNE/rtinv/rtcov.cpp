@@ -169,7 +169,6 @@ void RtCov::run()
                 cov.bads  = m_pFiffInfo->bads;
                 cov.nfree  = n_samples;
 
-                std::cout << "before Covariance:\n" << cov.data.block(0,0,2,10) << std::endl;
                 emit covCalculated(cov);
 
                 cov.clear();

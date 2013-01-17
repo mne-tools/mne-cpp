@@ -105,3 +105,27 @@ void FiffCov::clear()
     eig = VectorXd();
     eigvec = MatrixXd();
 }
+
+
+//*************************************************************************************************************
+
+FiffCov FiffCov::prepare_noise_cov(FiffInfo& p_Info, QStringList& p_ChNames)
+{
+    FiffCov p_NoiseCov(*this);
+
+    VectorXi C_ch_idx = VectorXi::Zero(p_NoiseCov.names.size());
+
+
+    MatrixXd proj;
+    qint32 ncomp = p_Info.make_projector_info(proj);
+
+    //Create the projection operator
+    if (ncomp > 0)
+        printf("Created an SSP operator (subspace dimension = %d)\n", ncomp);
+
+
+    qDebug()  << "ncomp " << ncomp;
+
+
+    return p_NoiseCov;
+}
