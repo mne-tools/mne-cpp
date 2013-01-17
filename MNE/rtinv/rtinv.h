@@ -155,7 +155,7 @@ private:
     QMutex      mutex;                  /**< Provides access serialization between threads. */
     bool        m_bIsRunning;           /**< Holds whether RtInv is running. */
 
-    FiffCov     m_NoiseCov;             /**< Noise covariance matrix. */
+    QVector<FiffCov::SDPtr> m_vecNoiseCov;/**< Noise covariance matrix. */
 
     FiffInfo::SPtr      m_pFiffInfo;    /**< Holds the fiff measurement information. */
     MNEForwardSolution::SPtr m_pFwd;    /**< Holds the forward solution. */

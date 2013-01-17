@@ -156,10 +156,11 @@ public:
     */
     qint32 get_current_comp();
 
-
     //=========================================================================================================
     /**
     * mne_make_projector
+    *
+    * ToDo move this to fiff_proj; Before: check if info is needed and if make_projector_info should be also moved.
     *
     * ### MNE toolbox root function ### Implementation of the mne_make_projector function
     *
@@ -174,7 +175,6 @@ public:
     * @return nproj - How many items in the projector
     */
     static fiff_int_t make_projector(QList<FiffProj>& projs, QStringList& ch_names, MatrixXd& proj, QStringList& bads = defaultQStringList, MatrixXd& U = defaultMatrixXd);
-
 
     //=========================================================================================================
     /**
