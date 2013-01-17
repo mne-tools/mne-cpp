@@ -70,20 +70,22 @@ SourceLab::SourceLab(QObject *parent)
 
     qRegisterMetaType<MatrixXf>("MatrixXf");
     qRegisterMetaType<MNEInverseOperator>("MNEInverseOperator");
+    qRegisterMetaType<FiffCov>("FiffCov");
 
     m_pRtClient = new RtClient("127.0.0.1", this);
     connect(m_pRtClient, &RtClient::rawBufferReceived,
             this, &SourceLab::receiveRawBuffer);
     this->start();
 
-    m_pRtCov = new RtCov(this);
+    m_pFiffInfo = FiffInfo::SPtr(new FiffInfo(*m_pRtClient->getFiffInfo().data()));
+
+    m_pRtInv = new RtInv(m_pFiffInfo, m_pFwd, this);
+
+    m_pRtCov = new RtCov(m_pFiffInfo, this);
     connect(m_pRtClient, &RtClient::rawBufferReceived,
             m_pRtCov, &RtCov::receiveDataSegment);
     m_pRtCov->start();
 
-    m_pFiffInfo = FiffInfo::SPtr(new FiffInfo(*m_pRtClient->getFiffInfo().data()));
-
-    m_pRtInv = new RtInv(m_pFiffInfo, m_pFwd, this);
     connect(m_pRtCov, &RtCov::covCalculated,
             m_pRtInv, &RtInv::receiveNoiseCov);
     m_pRtInv->start();
