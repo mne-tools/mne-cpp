@@ -132,7 +132,7 @@ public:
     *
     * @param[in] p_noiseCov     Noise covariance estiamtion -> ToDo Replace this by fiffCov shared data pointer
     */
-    void receiveNoiseCov(MatrixXf p_noiseCov);
+    void receiveNoiseCov(FiffCov p_noiseCov);
 
     //=========================================================================================================
     /**
@@ -155,7 +155,7 @@ private:
     QMutex      mutex;                  /**< Provides access serialization between threads. */
     bool        m_bIsRunning;           /**< Holds whether RtInv is running. */
 
-    MatrixXf    m_noiseCov;             /**< Noise covariance matrix. */
+    FiffCov     m_NoiseCov;             /**< Noise covariance matrix. */
 
     FiffInfo::SPtr      m_pFiffInfo;    /**< Holds the fiff measurement information. */
     MNEForwardSolution::SPtr m_pFwd;    /**< Holds the forward solution. */

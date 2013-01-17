@@ -81,14 +81,14 @@ RtInv::~RtInv()
 
 //*************************************************************************************************************
 
-void RtInv::receiveNoiseCov(MatrixXf p_noiseCov)
+void RtInv::receiveNoiseCov(FiffCov p_NoiseCov)
 {
     mutex.lock();
     qDebug() << "Received Cov";
-    std::cout << "Covariance:\n" << p_noiseCov.block(0,0,10,10) << std::endl;
+    std::cout << "Covariance:\n" << p_NoiseCov.data.block(0,0,2,10) << std::endl;
 
     //Use here a circular buffer
-    m_noiseCov = p_noiseCov;
+//    m_NoiseCov = FiffCov(p_NoiseCov);
     mutex.unlock();
 }
 

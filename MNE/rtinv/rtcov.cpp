@@ -43,6 +43,7 @@
 #include "rtcov.h"
 
 #include <iostream>
+#include <fiff/fiff_cov.h>
 
 
 //*************************************************************************************************************
@@ -59,6 +60,7 @@
 //=============================================================================================================
 
 using namespace RTINVLIB;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -66,8 +68,9 @@ using namespace RTINVLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtCov::RtCov(QObject *parent)
+RtCov::RtCov(FiffInfo::SPtr p_pFiffInfo, QObject *parent)
 : QThread(parent)
+, m_pFiffInfo(p_pFiffInfo)
 , m_bIsRunning(false)
 , m_bIsRawBufferInit(false)
 , m_pRawMatrixBuffer(NULL)
@@ -124,50 +127,53 @@ void RtCov::run()
     m_bIsRunning = true;
 
 
-    quint32 samples = 0;
+    quint32 n_samples = 0;
 
-    MatrixXf cov;
-    VectorXf mu;
+    FiffCov cov;
+    VectorXd mu;
 
     while(m_bIsRunning)
     {
         if(m_bIsRawBufferInit)
         {
-            MatrixXf rawSegment = m_pRawMatrixBuffer->pop();
+            MatrixXd rawSegment = m_pRawMatrixBuffer->pop().cast<double>();
 
-            if(samples == 0)
+            if(n_samples == 0)
             {
                 mu = rawSegment.rowwise().sum();
-                cov = rawSegment * rawSegment.transpose();
+                cov.data = rawSegment * rawSegment.transpose();
             }
             else
             {
                 mu.array() += rawSegment.rowwise().sum().array();
-                cov += rawSegment * rawSegment.transpose();
+                cov.data += rawSegment * rawSegment.transpose();
             }
-            samples += rawSegment.cols();
+            n_samples += rawSegment.cols();
 
-            if(samples > m_iMaxSamples)
+            if(n_samples > m_iMaxSamples)
             {
-                mu /= (float)samples;
-                cov.array() -= samples * (mu * mu.transpose()).array();
-                cov.array() /= (samples - 1);
+                mu /= (float)n_samples;
+                cov.data.array() -= n_samples * (mu * mu.transpose()).array();
+                cov.data.array() /= (n_samples - 1);
 
 //                std::cout << "Covariance:\n" << cov.block(0,0,10,10) << std::endl;
 
-
-//                FiffCov finalCov;
-
-//                finalCov.kind = FIFFV_MNE_NOISE_COV;
-//                finalCov.diag = false;
-//                finalCov.dim = cov.rows();
-////                finalCov.names =
-//                finalCov.data = new MatrixXf(cov);
+                cov.kind = FIFFV_MNE_NOISE_COV;
+                cov.diag = false;
+                cov.dim = cov.data.rows();
 
 
+                //ToDo do picks
+                cov.names = m_pFiffInfo->ch_names;
+                cov.projs = m_pFiffInfo->projs;
+                cov.bads  = m_pFiffInfo->bads;
+                cov.nfree  = n_samples;
+
+                std::cout << "before Covariance:\n" << cov.data.block(0,0,2,10) << std::endl;
                 emit covCalculated(cov);
 
-                samples = 0;
+                cov.clear();
+                n_samples = 0;
             }
 
 
