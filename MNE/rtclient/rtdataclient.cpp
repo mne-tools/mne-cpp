@@ -299,6 +299,14 @@ FiffInfo RtDataClient::readInfo()
             t_bReadMeasBlockEnd = true;
         }
     }
+
+    //
+    //   Add the channel information and make a list of channel names
+    //   for convenience
+    //
+    for (qint32 c = 0; c < p_FiffInfo.nchan; ++c)
+        p_FiffInfo.ch_names << p_FiffInfo.chs[c].ch_name;
+
     return p_FiffInfo;
 }
 
