@@ -7,7 +7,7 @@
 
 #include <QSharedPointer>
 
-#include "ICommandResponse.h"
+#include "../ICommandResponse.h"
 
 namespace RTSTREAMING
 {

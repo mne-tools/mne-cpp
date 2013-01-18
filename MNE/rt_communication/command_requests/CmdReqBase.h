@@ -5,7 +5,7 @@
 #ifndef CMDREQBASE_H_
 #define CMDREQBASE_H_
 
-#include "ICommandRequest.h"
+#include "../ICommandRequest.h"
 
 namespace RTSTREAMING
 {
