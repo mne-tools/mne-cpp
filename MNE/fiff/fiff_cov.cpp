@@ -40,6 +40,8 @@
 
 #include "fiff_cov.h"
 
+#include <iostream>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -114,18 +116,69 @@ FiffCov FiffCov::prepare_noise_cov(FiffInfo& p_Info, QStringList& p_ChNames)
     FiffCov p_NoiseCov(*this);
 
     VectorXi C_ch_idx = VectorXi::Zero(p_NoiseCov.names.size());
+    qint32 count = 0;
+    for(qint32 i = 0; i < p_ChNames.size(); ++i)
+    {
+        qint32 idx = p_NoiseCov.names.indexOf(p_ChNames[i]);
+        if(idx > -1)
+        {
+            C_ch_idx[count] = idx;
+            ++count;
+        }
+    }
+    C_ch_idx.conservativeResize(count);
 
+    MatrixXd C(count, count);
+    for(qint32 i = 0; i < count; ++i)
+        for(qint32 j = 0; j < count; ++j)
+            C(i,j) = p_NoiseCov.data(C_ch_idx(i), C_ch_idx(j));
 
     MatrixXd proj;
     qint32 ncomp = p_Info.make_projector_info(proj);
 
     //Create the projection operator
     if (ncomp > 0)
+    {
         printf("Created an SSP operator (subspace dimension = %d)\n", ncomp);
 
+        C = proj * (C * proj.transpose());
+    }
+
+    MatrixXi pick_meg = p_Info.pick_types(true, false, false, defaultQStringList, p_Info.bads);
+    MatrixXi pick_eeg = p_Info.pick_types(false, true, false, defaultQStringList, p_Info.bads);
+
+    QStringList meg_names, eeg_names;
+
+    for(qint32 i = 0; i < pick_meg.size(); ++i)
+        meg_names << p_Info.chs[pick_meg(0,i)].ch_name;
+    VectorXi C_meg_idx = VectorXi::Zero(p_NoiseCov.names.size());
+    count = 0;
+    for(qint32 k = 0; k < C.rows(); ++k)
+    {
+        if(meg_names.indexOf(p_ChNames[k]) > -1)
+        {
+            C_meg_idx(count) = k;
+            ++count;
+        }
+    }
+    C_meg_idx.conservativeResize(count);
+
+    //
+    for(qint32 i = 0; i < pick_eeg.size(); ++i)
+        eeg_names << p_Info.chs[pick_eeg(0,i)].ch_name;
+    VectorXi C_eeg_idx = VectorXi::Zero(p_NoiseCov.names.size());
+    count = 0;
+    for(qint32 k = 0; k < C.rows(); ++k)
+    {
+        if(eeg_names.indexOf(p_ChNames[k]) > -1)
+        {
+            C_eeg_idx(count) = k;
+            ++count;
+        }
+    }
+    C_eeg_idx.conservativeResize(count);
 
     qDebug()  << "ncomp " << ncomp;
-
 
     return p_NoiseCov;
 }

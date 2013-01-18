@@ -77,6 +77,18 @@ SourceLab::SourceLab(QObject *parent)
             this, &SourceLab::receiveRawBuffer);
     this->start();
 
+    // ToDo --> rtclient emit FiffInfoAvailable signal and call a slot here
+    //DIRTY HACK - following code has to be moved -> it waits until FiffInfo is available
+    bool t_bFiffInfoAvailable = false;
+    while(!t_bFiffInfoAvailable)
+    {
+        mutex.lock();
+        if(m_pRtClient->getFiffInfo().data()->ch_names.size() > 0)
+            t_bFiffInfoAvailable = true;
+        mutex.unlock();
+        sleep(1.0);
+    }
+
     m_pFiffInfo = FiffInfo::SPtr(new FiffInfo(*m_pRtClient->getFiffInfo().data()));
 
     m_pRtInv = new RtInv(m_pFiffInfo, m_pFwd, this);
