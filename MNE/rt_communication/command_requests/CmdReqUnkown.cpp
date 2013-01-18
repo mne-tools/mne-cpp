@@ -7,6 +7,8 @@
 namespace RTSTREAMING
 {
 
+const ICommandRequest::CommandT CmdReqUnkown::COMMAND = "UNKOWN";
+
 CmdReqUnkown::CmdReqUnkown() :
         CmdReqBase(CmdReqUnkown::COMMAND)
 {

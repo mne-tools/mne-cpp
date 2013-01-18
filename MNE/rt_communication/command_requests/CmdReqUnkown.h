@@ -30,7 +30,5 @@ public:
     virtual CommandRequestT getRequestPacket() const;
 };
 
-const ICommandRequest::CommandT CmdReqUnkown::COMMAND = "UNKOWN";
-
 } /* namespace RTSTREAMING */
 #endif /* CMDREQUNKOWN_H_ */
