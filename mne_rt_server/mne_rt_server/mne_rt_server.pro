@@ -55,14 +55,16 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Genericsd \
-            -lMNE$${MNE_LIB_VERSION}RtProtocld
+            -lMNE$${MNE_LIB_VERSION}RtProtocld \
+            -lMNE$${MNE_LIB_VERSION}RtCommunicationd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}MneMath \
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Generics \
-            -lMNE$${MNE_LIB_VERSION}RtProtocol
+            -lMNE$${MNE_LIB_VERSION}RtProtocol \
+            -lMNE$${MNE_LIB_VERSION}RtCommunication
 }
 
 DESTDIR = $${PWD}/../../bin
@@ -74,7 +76,8 @@ SOURCES += \
     fiffstreamserver.cpp \
     fiffstreamthread.cpp \
     commandserver.cpp \
-    commandthread.cpp
+    commandthread.cpp \
+    ./*.cpp
 
 
 HEADERS += \
@@ -88,7 +91,8 @@ HEADERS += \
     commandserver.h \
     commandthread.h \
     mne_rt_commands.h \
-    ICommandParser.h
+    ICommandParser.h \
+    ./*.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
