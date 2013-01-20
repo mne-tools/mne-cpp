@@ -84,9 +84,6 @@ int main(int argc, char *argv[])
 
 
 
-
-
-
 //    GeometryView view;
 
 //    if (view.stereoType() != QGLView::RedCyanAnaglyph)

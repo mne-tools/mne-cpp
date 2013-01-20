@@ -208,7 +208,7 @@ public:
     *
     * @return the selector matrix (row Vector)
     */
-    static MatrixXi pick_channels(QStringList& ch_names, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
+    static RowVectorXi pick_channels(const QStringList& ch_names, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList);
 
     //=========================================================================================================
     /**
@@ -230,6 +230,7 @@ public:
     *
     * ### MNE toolbox root function ###
     *
+    * ToDo meg: differ also between grad & mag
     * Create a selector to pick desired channel types from data
     *
     * @param[in] meg        Include MEG channels
@@ -240,7 +241,7 @@ public:
     *
     * @return the selector matrix (row vector)
     */
-    MatrixXi pick_types(bool meg, bool eeg = false, bool stim = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
+    RowVectorXi pick_types(bool meg, bool eeg = false, bool stim = false, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
 
     //=========================================================================================================
     /**
