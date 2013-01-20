@@ -215,7 +215,7 @@ public:
 
     //=========================================================================================================
     /**
-    * mne_read_cov
+    * mne_read_cov - also for mne_read_noise_cov
     *
     * ### MNE toolbox root function ###
     *

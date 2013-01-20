@@ -94,7 +94,7 @@ void MNEMath::get_whitener(MatrixXd& A, bool pca, QString& ch_type, VectorXd& ei
     // whitening operator
     qint32 rnk = MNEMath::rank(A);
     SelfAdjointEigenSolver<MatrixXd> t_eigenSolver(A);
-    qDebug() << "heck whether eigvec has to be transposed.";
+    qDebug() << "check whether eigvec has to be transposed.";
     eig = t_eigenSolver.eigenvalues();
     for(qint32 i = rnk; i < eig.size(); ++i)
         eig(i) = 0;

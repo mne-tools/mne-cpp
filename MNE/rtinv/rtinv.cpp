@@ -112,6 +112,12 @@ void RtInv::run()
     {
         if(m_vecNoiseCov.size() > 0)
         {
+
+            // Restrict forward solution as necessary for MEG
+            MNEForwardSolution forward_meg = m_pFwd->pick_types_forward(*m_pFiffInfo.data(), true, false);
+
+            //Put this inside make_inverse_operator
+
             qDebug() << "Inverse operator";
 
             FiffCov::SDPtr t_NoiseCov(new FiffCov(m_vecNoiseCov[0]->prepare_noise_cov(*m_pFiffInfo.data(), m_pFiffInfo->ch_names)));
