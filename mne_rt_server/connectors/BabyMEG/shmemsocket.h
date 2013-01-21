@@ -1,8 +1,8 @@
 //=============================================================================================================
 /**
-* @file     connectormanager.h
+* @file     collectorsocket.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
 * @date     July, 2012
 *
@@ -29,29 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the ConnectorManager Class.
+* @brief     implementation of the CollectorSocket Class.
 *
 */
 
-#ifndef CONNECTORMANAGER_H
-#define CONNECTORMANAGER_H
-
+#ifndef SHMEMSOCKET_H
+#define SHMEMSOCKET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "IConnector.h"
-#include "ICommandParser.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Fiff INCLUDES
-//=============================================================================================================
-
-#include <fiff/fiff_info.h>
+#include "types_definitions.h"
+#include <fiff/fiff_tag.h>
 
 
 //*************************************************************************************************************
@@ -59,17 +50,17 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QVector>
-#include <QPluginLoader>
+#include <QObject>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MSERVER
+// DEFINE NAMESPACE BabyMEGPlugin
 //=============================================================================================================
 
-namespace MSERVER
+namespace BabyMEGPlugin
 {
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -81,127 +72,200 @@ using namespace FIFFLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Function Pointers
-//=============================================================================================================
-
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class FiffStreamServer;
+//class FiffTag;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ConnectorManager
+* DECLARE CLASS ShmemSocket
 *
-* @brief The ConnectorManager class provides a dynamic module loader. As well as the handling of the loaded modules.
+* @brief The ShmemSocket class provides...
 */
-class ConnectorManager : public QPluginLoader, ICommandParser
+
+class ShmemSocket : public QObject
 {
     Q_OBJECT
-
 public:
+    explicit ShmemSocket(QObject *parent = 0);
 
+    virtual ~ShmemSocket();
+
+
+    // client_socket.c
     //=========================================================================================================
     /**
-    * Constructs a ConnectorManager with the given parent.
+    * Receive one tag from the data server.
     *
-    * @param [in] parent pointer to parent Object. (It's normally the default value.)
-    */
-    ConnectorManager(FiffStreamServer* p_pFiffStreamServer, QObject* parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the ConnectorManager.
-    */
-    virtual ~ConnectorManager();
-
-    //=========================================================================================================
-    /**
-    * Loads modules from given directory.
+    * This routine reads a message from the data server
+    * socket and grabs the data. The data may actually
+    * be in a shared memory segment noted in the message.
     *
-    * @param dir the module directory.
-    */
-    void loadConnectors(const QString& dir);
-
-//    //=========================================================================================================
-//    /**
-//    * Parses the command or sends the command to the active connector.
-//    *
-//    * @param[in] p_qCommandList the command.
-//    * @param[out] p_blockOutputInfo the bytearray which contains parsing information to be send back to CommandClient.
-//    *
-//    * @return true if successful, false otherwise
-//    */
-//    bool parseConnectorCommand(QStringList& p_qCommandList, QByteArray& p_blockOutputInfo);
-
-    virtual QByteArray availableCommands();
-
-    static void clearConnectorActivation();
-
-    void connectActiveConnector();
-
-    void disconnectActiveConnector();
-
-    //=========================================================================================================
-    /**
-    * Returns vector containing active ISensor modules.
+    * The id parameter is needed for two purposes. The
+    * data transfer mechanism varies depending on the client
+    * number. Clients with id above 10000 use shared memory
+    * transfer while other used a regular file to transfer the
+    * data.It is needed also if the conndedtion needs to be
+    * closed after an error.
     *
-    * @return reference to vector containing active ISensor modules.
-    */
-    IConnector* getActiveConnector();
-
-    //=========================================================================================================
-    /**
-    * Returns vector containing all modules.
+    * @param[in] p_pTag ToDo
     *
-    * @return reference to vector containing all modules.
+    * \return Status OK or FAIL.
     */
-    static inline const QVector<IConnector*>& getConnectors();
+    int receive_tag (FiffTag*& p_pTag );
+
+    //ToDo Connect is different? to: telnet localhost collector ???
+    //=========================================================================================================
+    /**
+    * Connect to the data server process
+    *
+    * @return
+    */
+    bool connect_client ();
 
     //=========================================================================================================
     /**
-    * Prints a list of all connectors and their status
+    * Disconnect from the data server process
+    *
+    * @return
     */
-    QByteArray getConnectorList() const;
+    int disconnect_client ();
 
-    virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
+    //=========================================================================================================
+    /*
+    * Select tags that we are not interested in!
+    *
+    */
+    void set_data_filter (int *kinds, int nkind);
 
     //=========================================================================================================
     /**
-    * ToDo
+    *
+    * @return
     */
-    QByteArray setActiveConnector(qint32 ID);
+    void close_socket ();
 
-signals:
-    void sendMeasInfo(qint32, FIFFLIB::FiffInfo::SDPtr);
-    void setBufferSize(qint32 ID);
-    void startMeasConnector();
-    void stopMeasConnector();
+    //=========================================================================================================
+    /**
+    *
+    * @return
+    */
+    int connect_disconnect (int sock,int id);
+
+    //=========================================================================================================
+    /**
+    * Filter out some large data blocks
+    * which are not of interest
+    *
+    * @return
+    */
+    int interesting_data (int kind);
+
+
+
 
 private:
-    static QVector<IConnector*> s_vecConnectors;       /**< Holds vector of all modules. */
+
+    // shmem.c
+    //=========================================================================================================
+    /**
+    *
+    * @return
+    */
+    dacqShmBlock get_shmem();
+
+    //=========================================================================================================
+    /**
+    * Initialize data acquisition shared memory segment
+    *
+    * @return
+    */
+    int init_shmem();
 
 
-    FiffStreamServer* m_pFiffStreamServer;
+    //=========================================================================================================
+    /**
+    * Release the shared memory
+    *
+    * @return
+    */
+    int release_shmem();
 
+
+    //=========================================================================================================
+    /**
+    *
+    * @return
+    */
+    FILE* open_fif (char *name);
+
+
+    //=========================================================================================================
+    /**
+    *
+    *
+    * fd        File to read from
+    * pos       Position in file
+    * size      How long
+    * data);    Put data here
+    * @return
+    */
+    int read_fif (FILE *fd, long pos, size_t size, char *data);
+
+
+
+private:
+
+    int* filter_kinds;  /**< Filter these tags */
+    int nfilt;          /**< How many are they */
+
+    int shmid;
+    dacqShmBlock shmptr;
+
+
+
+
+    int     m_iShmemSock;
+    int     m_iShmemId;
+
+
+
+
+    FILE   *fd;		/* The temporary file */
+    FILE   *shmem_fd;
+    char   *filename;
+
+    long read_loc;
+    FILE *read_fd;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+signals:
+    
+public slots:
+    
 };
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-inline const QVector<IConnector*>& ConnectorManager::getConnectors()
-{
-    return s_vecConnectors;
-}
 
 } // NAMESPACE
 
-#endif // CONNECTORMANAGER_H
+#endif // SHMEMSOCKET_H

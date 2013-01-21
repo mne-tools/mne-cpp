@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     commandserver.h
+* @file     babymeg_global.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,19 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the CommandServer Class.
+* @brief     BabyMEG library export/import macros.
 *
 */
 
-#ifndef COMMANDSERVER_H
-#define COMMANDSERVER_H
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "ICommandParser.h"
+#ifndef BABYMEG_GLOBAL_H
+#define BABYMEG_GLOBAL_H
 
 
 //*************************************************************************************************************
@@ -49,72 +42,18 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QStringList>
-#include <QTcpServer>
+#include <QtCore/qglobal.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MSERVER
+// PREPROCESSOR DEFINES
 //=============================================================================================================
 
-namespace MSERVER
-{
+#if defined(BABYMEG_LIBRARY)
+#  define BABYMEGSHARED_EXPORT Q_DECL_EXPORT  /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#else
+#  define BABYMEGSHARED_EXPORT Q_DECL_IMPORT  /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#endif
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-
-
-//=============================================================================================================
-/**
-* DECLARE CLASS CommandServer
-*
-* @brief The CommandServer class provides
-*/
-class CommandServer : public QTcpServer, ICommandParser
-{
-    Q_OBJECT
-
-public:
-    CommandServer(QObject *parent = 0);
-
-    ~CommandServer();
-
-    virtual QByteArray availableCommands();
-
-    void incommingCommand(QString p_sCommand, qint32 p_iThreadID);
-
-    virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
-
-    void registerCommandParser(ICommandParser* p_pCommandParser);
-
-signals:
-    void replyCommand(QByteArray p_blockReply, qint32 p_iID);
-
-//    void stopMeasConnector();
-//    void startMeasFiffStreamClient(qint32 ID);
-    void closeCommandThreads();
-
-protected:
-    void incomingConnection(qintptr socketDescriptor);
-
-private:
-
-    QList<ICommandParser*> m_qListParser;
-
-    qint32 m_iThreadCount;
-
-};
-
-} // NAMESPACE
-
-#endif //INSTRUCTIONSERVER_H
+#endif // BABYMEG_GLOBAL_H

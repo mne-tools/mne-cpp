@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     commandserver.h
+* @file     BabyMEG.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,19 +29,24 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the CommandServer Class.
+* @brief     implementation of the BabyMEG Class.
 *
 */
 
-#ifndef COMMANDSERVER_H
-#define COMMANDSERVER_H
+#ifndef BABYMEG_H
+#define BABYMEG_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "ICommandParser.h"
+#include "babymeg_global.h"
+#include "../../mne_rt_server/IConnector.h"
+
+#include <fiff/fiff_info.h>
+
+//#include "circularbuffer.h"
 
 
 //*************************************************************************************************************
@@ -49,22 +54,25 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QStringList>
-#include <QTcpServer>
+#include <QString>
+#include <QMutex>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MSERVER
+// DEFINE NAMESPACE BabyMEGPlugin
 //=============================================================================================================
 
-namespace MSERVER
+namespace BabyMEGPlugin
 {
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
+
+using namespace MSERVER;
 
 
 //*************************************************************************************************************
@@ -72,49 +80,92 @@ namespace MSERVER
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class DacqServer;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS CommandServer
+* DECLARE CLASS BabyMEG
 *
-* @brief The CommandServer class provides
+* @brief The BabyMEG class provides a BabyMEG connector.
 */
-class CommandServer : public QTcpServer, ICommandParser
+class BABYMEGSHARED_EXPORT BabyMEG : public IConnector
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "mne_rt_server/1.0" FILE "babymeg.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
+    Q_INTERFACES(MSERVER::IConnector)
+
+
+    friend class DacqServer;
 
 public:
-    CommandServer(QObject *parent = 0);
 
-    ~CommandServer();
+    //=========================================================================================================
+    /**
+    * Constructs a BabyMEG Connector.
+    */
+    BabyMEG();
+
+
+    //=========================================================================================================
+    /**
+    * Destroys the BabyMEG Connector.
+    *
+    */
+    virtual ~BabyMEG();
 
     virtual QByteArray availableCommands();
 
-    void incommingCommand(QString p_sCommand, qint32 p_iThreadID);
+    virtual ConnectorID getConnectorID() const;
 
-    virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
+    virtual const char* getName() const;
 
-    void registerCommandParser(ICommandParser* p_pCommandParser);
 
-signals:
-    void replyCommand(QByteArray p_blockReply, qint32 p_iID);
+    virtual bool parseCommand(QStringList& p_qCommandList, QByteArray& p_blockOutputInfo);
 
-//    void stopMeasConnector();
-//    void startMeasFiffStreamClient(qint32 ID);
-    void closeCommandThreads();
+
+    virtual bool start();
+
+    virtual bool stop();
+
+
+    void releaseMeasInfo();
+
+//public slots: --> in Qt 5 not anymore declared as slot
+
+    virtual void requestMeasInfo(qint32 ID);
+
+    virtual void requestMeas();
+
+    virtual void requestMeasStop();
+
+    virtual void requestSetBufferSize(quint32 p_uiBuffSize);
 
 protected:
-    void incomingConnection(qintptr socketDescriptor);
+    virtual void run();
 
 private:
+    //=========================================================================================================
+    /**
+    * Initialise the BabyMEG connector.
+    */
+    void init();
 
-    QList<ICommandParser*> m_qListParser;
 
-    qint32 m_iThreadCount;
+    QMutex mutex;
+
+    DacqServer*     m_pDacqServer;
+
+    FiffInfo::SDPtr m_pInfo;
+
+    int             m_iID;
+
+    bool            m_bIsRunning;
+
 
 };
 
 } // NAMESPACE
 
-#endif //INSTRUCTIONSERVER_H
+#endif // BABYMEG_H

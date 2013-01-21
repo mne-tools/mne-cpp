@@ -42,7 +42,6 @@ SUBDIRS += generics \
     fiff \
     mneMath \
     mne \
-    rtProtocol \
     rtClient \
     rtInv \
     rtCommunication

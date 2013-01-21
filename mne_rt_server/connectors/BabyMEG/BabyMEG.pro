@@ -1,15 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     rtProtocol.pro
+# @file     BabyMEG.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-#           Christof Pieloth;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     January, 2013
+# @date     July, 2012
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh, Christof Pieloth and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -30,66 +29,75 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the rtProtocol library.
+# @brief    This project file generates the makefile for the BabyMEG plug-in.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../../mne-cpp.pri)
+include(../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       -= gui
+CONFIG += plugin
 
-DEFINES += RTPROTOCOL_LIBRARY
+DEFINES += BABYMEG_LIBRARY
 
-TARGET = RtProtocol
-TARGET = $$join(TARGET,,MNE$$MNE_LIB_VERSION,)
+#DEFINES += DACQ_OLD_CONNECTION_SCHEME # HP-UX
+
+QT += network
+QT -= gui
+
+TARGET = BabyMEG
+
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
-CONFIG(debug, debug|release) {
-#    LIBS += -lMNE$${MNE_LIB_VERSION}Fiffd \
-#            -lMNE$${MNE_LIB_VERSION}Mned \
-#            -lMNE$${MNE_LIB_VERSION}Genericsd
 
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Genericsd
 }
 else {
-#    LIBS += -lMNE$${MNE_LIB_VERSION}Fiff \
-#            -lMNE$${MNE_LIB_VERSION}Mne \
-#            -lMNE$${MNE_LIB_VERSION}Generics
+    LIBS += -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Generics
 }
 
-DESTDIR = $${MNE_LIBRARY_DIR}
 
-#
-# win32: copy dll's to bin dir
-# unix: add lib folder to LD_LIBRARY_PATH
-#
+unix:DESTDIR = $${PWD}/../../../bin/mne_rt_server_plugins
+
+win32:DESTDIR = $${PWD}/../../../lib
+
 win32 {
     FILE = $${DESTDIR}/$${TARGET}.dll
-    BINDIR = $${DESTDIR}/../bin
+    PLUGINDIR = $${DESTDIR}/../bin/mne_rt_server_plugins
     FILE ~= s,/,\\,g
-    BINDIR ~= s,/,\\,g
-    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
+    PLUGINDIR ~= s,/,\\,g
+    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${PLUGINDIR}) $$escape_expand(\\n\\t)
 }
 
-SOURCES += ./*.cpp
-SOURCES += ./commandRequests/*.cpp
 
-HEADERS +=  ./*.h
-HEADERS +=  ./commandRequests/*.h
+SOURCES += \
+    dacqserver.cpp \
+    collectorsocket.cpp \
+    shmemsocket.cpp \
+    babymeg.cpp
 
-# INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
-# INCLUDEPATH += $${MNE_INCLUDE_DIR}
+HEADERS += \
+    ../../mne_rt_server/IConnector.h \  #IConnector is a Q_OBJECT and the resulting moc file needs to be known -> that's why inclution is important!
+    types_definitions.h \
+    dacqserver.h \
+    collectorsocket.h \
+    shmemsocket.h \
+    babymeg.h \
+    babymeg_global.h
 
-# Install headers to include directory
-header_files.files = ./*.h
-header_files.path = $${MNE_INCLUDE_DIR}/rtProtocol
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
-header_files_cmds.files = commandRequests/*.h
-header_files_cmds.path = $${MNE_INCLUDE_DIR}/rtProtocol/commandRequests
+OTHER_FILES += artemis.json
 
-INSTALLS += header_files
-INSTALLS += header_files_cmds
+# Put generated form headers into the origin --> cause other src is pointing at them
+UI_DIR = $${PWD}

@@ -311,6 +311,7 @@ bool FiffSimulator::readRawInfo()
         QFile t_File(m_sResourceDataPath);
 
         mutex.lock();
+
         if(!FiffStream::setup_read_raw(&t_File, m_RawInfo))
         {
             printf("Error: Not able to read raw info!\n");
@@ -318,10 +319,92 @@ bool FiffSimulator::readRawInfo()
             return false;
         }
 
-        //delete it here and reopen it in the producer thread
-//        delete m_RawInfo.file;
-//        m_RawInfo.file = NULL;
+//        bool in_samples = false;
+//
+//        bool keep_comp = true;
+//
+//        //
+//        //   Set up pick list: MEG + STI 014 - bad channels
+//        //
+//        //
+//        QStringList include;
+//        include << "STI 014";
+//        bool want_meg   = true;
+//        bool want_eeg   = true;
+//        bool want_stim  = true;
 
+//    //    MatrixXi picks = Fiff::pick_types(m_RawInfo.info, want_meg, want_eeg, want_stim, include, m_RawInfo.info->bads);
+//        MatrixXi picks = m_RawInfo.info->pick_types(want_meg, want_eeg, want_stim, include, m_RawInfo.info->bads); //Prefer member function
+
+
+//        //
+//        //   Set up projection
+//        //
+//        qint32 k = 0;
+//        if (m_RawInfo.info->projs.size() == 0)
+//            printf("No projector specified for these data\n");
+//        else
+//        {
+//            //
+//            //   Activate the projection items
+//            //
+//            for (k = 0; k < m_RawInfo.info->projs.size(); ++k)
+//                m_RawInfo.info->projs[k].active = true;
+
+//            printf("%d projection items activated\n",m_RawInfo.info->projs.size());
+//            //
+//            //   Create the projector
+//            //
+//    //        fiff_int_t nproj = MNE::make_projector_info(m_RawInfo.info, m_RawInfo.proj); Using the member function instead
+//            fiff_int_t nproj = m_RawInfo.info->make_projector_info(m_RawInfo.proj);
+
+
+//    //        qDebug() << m_RawInfo.proj.data->data.rows();
+//    //        qDebug() << m_RawInfo.proj.data->data.cols();
+//    //        std::cout << "proj: \n" << m_RawInfo.proj.data->data.block(0,0,10,10);
+
+//            if (nproj == 0)
+//            {
+//                printf("The projection vectors do not apply to these channels\n");
+//            }
+//            else
+//            {
+//                printf("Created an SSP operator (subspace dimension = %d)\n",nproj);
+//            }
+//        }
+
+//        //
+//        //   Set up the CTF compensator
+//        //
+//    //    qint32 current_comp = MNE::get_current_comp(m_RawInfo.info);
+//        qint32 current_comp = m_RawInfo.info->get_current_comp();
+//        qint32 dest_comp = -1;
+
+//        if (current_comp > 0)
+//            printf("Current compensation grade : %d\n",current_comp);
+
+//        if (keep_comp)
+//            dest_comp = current_comp;
+
+//        if (current_comp != dest_comp)
+//        {
+//            qDebug() << "This part needs to be debugged";
+//            if(MNE::make_compensator(*m_RawInfo.info.data(), current_comp, dest_comp, m_RawInfo.comp))
+//            {
+//    //            m_RawInfo.info->chs = MNE::set_current_comp(m_RawInfo.info->chs,dest_comp);
+//                m_RawInfo.info->set_current_comp(dest_comp);
+//                printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
+//            }
+//            else
+//            {
+//                printf("Could not make the compensator\n");
+//                return -1;
+//            }
+//        }
+
+        //
+        // Create circular buffer to transfer data form producer to simulator
+        //
         if(m_pRawMatrixBuffer)
             delete m_pRawMatrixBuffer;
         m_pRawMatrixBuffer = new RawMatrixBuffer(10, m_RawInfo.info->nchan, getBufferSampleSize());

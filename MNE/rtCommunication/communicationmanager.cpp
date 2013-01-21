@@ -4,9 +4,6 @@
 // Includes
 //=============================================================================================================
 
-#include "ICommand.h"
-
-#include "ICommand.h"
 #include "communicationmanager.h"
 
 
@@ -41,4 +38,4 @@ CommunicationManager::CommunicationManager()
 // STATIC DEFINITIONS
 //=============================================================================================================
 
-QVector< ICommand::SPrt > ConnectorManager::s_vecConnectors;
+QVector< ICommand::SPtr > CommunicationManager::s_vecCommands;
