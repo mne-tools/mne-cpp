@@ -8,7 +8,7 @@
 #include <QObject>
 #include <QSharedPointer>
 
-namespace RTSTREAMING
+namespace RTCOMMUNICATIONLIB
 {
 /**
  * Interface for a command response. This is usually sent from server to client.

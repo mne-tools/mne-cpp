@@ -5,16 +5,19 @@
 #ifndef ICOMMANDREQUEST_H_
 #define ICOMMANDREQUEST_H_
 
-#include <QObject>
+#include "ICommand.h"
+
+
+
 #include <QSharedPointer>
 #include <QString>
 
-namespace RTSTREAMING
+namespace RTCOMMUNICATIONLIB
 {
 /**
  * Interface for a command request. This is usually sent from client to server.
  */
-class ICommandRequest: public QObject
+class ICommandRequest: public ICommand
 {
 Q_OBJECT
 public:
@@ -67,6 +70,6 @@ signals:
 
 // Each implementation should have this static variable.
 // const ICommandRequest::CommandT MyRequest::COMMAND = "mycommand";
-}
+} // NAMESPACE
 
-#endif /* ICOMMANDREQUEST_H_ */
+#endif // ICOMMANDREQUEST_H

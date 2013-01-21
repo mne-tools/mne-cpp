@@ -2,10 +2,9 @@
  * @author  Christof Pieloth
  */
 
-#include "CmdReqBase.h"
+#include "cmdreqbase.h"
 
-namespace RTSTREAMING
-{
+using namespace RTCOMMUNICATIONLIB;
 
 CmdReqBase::CmdReqBase(CommandT cmd)
 {
@@ -20,5 +19,3 @@ ICommandRequest::CommandT CmdReqBase::getCommand() const
 {
     return m_cmd;
 }
-
-} /* namespace RTSTREAMING */

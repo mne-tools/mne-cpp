@@ -40,11 +40,12 @@ TEMPLATE = subdirs
 SUBDIRS += generics \
     fs \
     fiff \
-    mnemath \
+    mneMath \
     mne \
     rtProtocol \
     rtClient \
-    rtinv \
+    rtInv \
+    rtCommunication
 
 #qtHaveModule(3d): SUBDIRS += disp
 contains(Qt3D_available, true) {

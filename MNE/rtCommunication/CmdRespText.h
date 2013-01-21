@@ -7,14 +7,14 @@
 
 #include <QSharedPointer>
 
-#include "../ICommandResponse.h"
+#include "ICommandResponse.h"
 
-namespace RTSTREAMING
+namespace RTCOMMUNICATIONLIB
 {
 /**
  * A response object to send simple string to the client.
  */
-class CmdRespText: public RTSTREAMING::ICommandResponse
+class CmdRespText: public ICommandResponse
 {
 public:
     typedef QSharedPointer<CmdRespText> SPtr;

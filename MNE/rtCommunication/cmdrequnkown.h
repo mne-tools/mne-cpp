@@ -7,14 +7,14 @@
 
 #include <QSharedPointer>
 
-#include "CmdReqBase.h"
+#include "cmdreqbase.h"
 
-namespace RTSTREAMING
+namespace RTCOMMUNICATIONLIB
 {
 /**
  * This request object is used as a fallback type, when a command could not be identified/parsed.
  */
-class CmdReqUnkown: public RTSTREAMING::CmdReqBase
+class CmdReqUnkown: public CmdReqBase
 {
 public:
     typedef QSharedPointer<CmdReqUnkown> SPtr;

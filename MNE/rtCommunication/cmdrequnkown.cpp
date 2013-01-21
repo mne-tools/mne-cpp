@@ -2,10 +2,9 @@
  * @author  Christof Pieloth
  */
 
-#include "CmdReqUnkown.h"
+#include "cmdrequnkown.h"
 
-namespace RTSTREAMING
-{
+using namespace RTCOMMUNICATIONLIB;
 
 const ICommandRequest::CommandT CmdReqUnkown::COMMAND = "UNKOWN";
 
@@ -29,4 +28,3 @@ ICommandRequest::CommandRequestT CmdReqUnkown::getRequestPacket() const
     return "unknown";
 }
 
-} /* namespace RTSTREAMING */

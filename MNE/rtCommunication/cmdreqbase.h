@@ -2,17 +2,17 @@
  * @author Christof Pieloth
  */
 
-#ifndef CMDREQBASE_H_
-#define CMDREQBASE_H_
+#ifndef CMDREQBASE_H
+#define CMDREQBASE_H
 
-#include "../ICommandRequest.h"
+#include "ICommandRequest.h"
 
-namespace RTSTREAMING
+namespace RTCOMMUNICATIONLIB
 {
 /**
  * Abstract base class for requests. Implements getCommand() at the moment.
  */
-class CmdReqBase: public RTSTREAMING::ICommandRequest
+class CmdReqBase: public ICommandRequest
 {
 public:
     typedef QSharedPointer<CmdReqBase> SPtr;
@@ -29,5 +29,6 @@ protected:
     CommandT m_cmd;
 };
 
-} /* namespace RTSTREAMING */
+} // Namespace
+
 #endif /* CMDREQBASE_H_ */

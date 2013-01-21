@@ -3,10 +3,9 @@
  */
 
 
-#include "CmdRespText.h"
+#include "cmdresptext.h"
 
-namespace RTSTREAMING
-{
+using namespace RTCOMMUNICATIONLIB;
 
 CmdRespText::CmdRespText(CommandResponseT resp) : m_cmdResp(resp)
 {
@@ -21,4 +20,3 @@ ICommandResponse::CommandResponseT CmdRespText::getResponsePacket() const
     return m_cmdResp;
 }
 
-} /* namespace RTSTREAMING */

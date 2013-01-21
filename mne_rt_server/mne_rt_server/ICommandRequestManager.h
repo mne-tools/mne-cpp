@@ -8,7 +8,7 @@
 #include <QSet>
 #include <QSharedPointer>
 
-#include <rt_communication/ICommandRequest.h>
+#include <rtCommunication/ICommandRequest.h>
 
 namespace RTSTREAMING
 {
