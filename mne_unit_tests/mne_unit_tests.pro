@@ -36,6 +36,7 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    mne_lib_tests
+    mne_lib_tests \
+    mne_rt_tests
 
 CONFIG += ordered

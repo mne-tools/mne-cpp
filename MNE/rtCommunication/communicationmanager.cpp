@@ -13,6 +13,7 @@
 //=============================================================================================================
 
 #include <QVector>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -28,8 +29,9 @@ using namespace RTCOMMUNICATIONLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CommunicationManager::CommunicationManager()
+CommunicationManager::CommunicationManager(QByteArray &p_jsonDoc)
 {
+    m_jsonDocumentOrigin = QJsonDocument::fromJson(p_jsonDoc);
 }
 
 

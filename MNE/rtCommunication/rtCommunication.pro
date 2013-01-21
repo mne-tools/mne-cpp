@@ -89,7 +89,8 @@ HEADERS += \
     cmdrequnkown.h \
     cmdreqbase.h \
     communicationmanager.h \
-    ICommand.h
+    ICommand.h \
+    rtcommunication_global.h
 
 
 # INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

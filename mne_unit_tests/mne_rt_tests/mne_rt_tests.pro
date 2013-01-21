@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mne_lib_tests.pro
+# @file     mne_rt_tests.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for mne_lib_tests for algorithm validation.
+# @brief    This project file generates the makefile for mne_rt_tests for rt validation.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -43,7 +43,7 @@ QT -= gui
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = mne_lib_tests
+TARGET = mne_rt_tests
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -51,28 +51,18 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}MneMathd \
-            -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Genericsd
+    LIBS += -lMNE$${MNE_LIB_VERSION}RtCommunicationd \
 }
 else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}MneMath \
-            -lMNE$${MNE_LIB_VERSION}Mne \
-            -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Generics
+    LIBS += -lMNE$${MNE_LIB_VERSION}RtCommunication \
 }
 
 DESTDIR = $${PWD}/../../bin
 
 SOURCES += \
     main.cpp \
-    mnelibtests.cpp
-
 
 HEADERS += \
-    mnelibtests.h
-
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
