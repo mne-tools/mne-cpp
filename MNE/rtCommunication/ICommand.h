@@ -62,6 +62,10 @@ public:
 
 signals:
 
+
+private:
+
+
 };
 
 } // NAMESPACE
