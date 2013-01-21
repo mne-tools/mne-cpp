@@ -1,42 +1,43 @@
 //=============================================================================================================
 /**
- * @file     connectormanager.cpp
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
- * @version  1.0
- * @date     July, 2012
- *
- * @section  LICENSE
- *
- * Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief     implementation of the ConnectorManager Class.
- *
- */
+* @file     connectormanager.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @version  1.0
+* @date     July, 2012
+*
+* @section  LICENSE
+*
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief     implementation of the ConnectorManager Class.
+*
+*/
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+
 #include "connectormanager.h"
 #include "mne_rt_server.h"
 #include "commandserver.h"
@@ -44,20 +45,14 @@
 
 #include "IConnector.h"
 
-#include <rtProtocol/RTCommandRequest.h>
-#include <rtProtocol/commandRequests/RTCmdMeasInfo.h>
-#include <rtProtocol/commandRequests/RTCmdSelCon.h>
-#include <rtProtocol/commandRequests/RTCmdStartMeas.h>
-#include <rtProtocol/commandRequests/RTCmdStopAll.h>
-#include <rtProtocol/RTDefaultCommands.h>
-#include <rtProtocol/RTProtocolDefinitions.h> // TODO(pieloth): Remove when string parsing is done by rtProtocol
+
 //*************************************************************************************************************
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
 #include <iostream>
-#include <string>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -72,6 +67,7 @@
 
 #include <QDebug>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -79,25 +75,29 @@
 
 using namespace MSERVER;
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ConnectorManager::ConnectorManager( FiffStreamServer* p_pFiffStreamServer, QObject *parent ) :
-                QPluginLoader( parent ), m_pFiffStreamServer( p_pFiffStreamServer )
+ConnectorManager::ConnectorManager(FiffStreamServer* p_pFiffStreamServer, QObject *parent)
+: QPluginLoader(parent)
+, m_pFiffStreamServer(p_pFiffStreamServer)
 {
 
 }
+
 
 //*************************************************************************************************************
 
 ConnectorManager::~ConnectorManager()
 {
-    QVector< IConnector* >::const_iterator it = s_vecConnectors.begin();
-    for( ; it != s_vecConnectors.end(); ++it )
-        delete ( *it );
+    QVector<IConnector*>::const_iterator it = s_vecConnectors.begin();
+    for( ; it != s_vecConnectors.end(); ++it)
+        delete (*it);
 }
+
 
 //*************************************************************************************************************
 
@@ -107,30 +107,31 @@ QByteArray ConnectorManager::availableCommands()
 
     IConnector* t_pCurrentConnector = getActiveConnector();
 
-    t_blockCmdInfoList.append(
-                    "\tbufsize  [samples]\tsets the buffer size of the FiffStreamClient\r\n\t\t\t\traw data buffers\r\n" );
+    t_blockCmdInfoList.append("\tbufsize  [samples]\tsets the buffer size of the FiffStreamClient\r\n\t\t\t\traw data buffers\r\n");
 
-    if( t_pCurrentConnector )
-        t_blockCmdInfoList.append( t_pCurrentConnector->availableCommands() );
+    if(t_pCurrentConnector)
+        t_blockCmdInfoList.append(t_pCurrentConnector->availableCommands());
     else
-        t_blockCmdInfoList.append( "No connector commands available - no connector active.\r\n" );
+        t_blockCmdInfoList.append("No connector commands available - no connector active.\r\n");
 
     return t_blockCmdInfoList;
 }
+
 
 //*************************************************************************************************************
 
 void ConnectorManager::clearConnectorActivation()
 {
     // deactivate activated connectors
-    if( s_vecConnectors.size() > 0 )
+    if(s_vecConnectors.size() > 0)
     {
-        QVector< IConnector* >::const_iterator it = s_vecConnectors.begin();
-        for( ; it != s_vecConnectors.end(); ++it )
-            if( ( *it )->isActive() )
-                ( *it )->setStatus( false );
+        QVector<IConnector*>::const_iterator it = s_vecConnectors.begin();
+        for( ; it != s_vecConnectors.end(); ++it)
+            if((*it)->isActive())
+                (*it)->setStatus(false);
     }
 }
+
 
 //*************************************************************************************************************
 
@@ -138,7 +139,7 @@ void ConnectorManager::connectActiveConnector()
 {
     IConnector* t_activeConnector = ConnectorManager::getActiveConnector();
 
-    if( t_activeConnector )
+    if(t_activeConnector)
     {
         // use signal slots instead of call backs
         //Consulting the Signal/Slot documentation describes why the Signal/Slot approach is better:
@@ -156,34 +157,38 @@ void ConnectorManager::connectActiveConnector()
         // Meas Info
         //
         // connect command server and connector manager
-        QObject::connect( this->m_pFiffStreamServer, &FiffStreamServer::requestMeasInfo, t_activeConnector,
-                        &IConnector::requestMeasInfo );
+        QObject::connect(   this->m_pFiffStreamServer, &FiffStreamServer::requestMeasInfo,
+                            t_activeConnector, &IConnector::requestMeasInfo);
 
         // connect connector manager and fiff stream server
-        QObject::connect( t_activeConnector, &IConnector::remitMeasInfo, this->m_pFiffStreamServer,
-                        &FiffStreamServer::forwardMeasInfo );
+        QObject::connect(   t_activeConnector, &IConnector::remitMeasInfo,
+                            this->m_pFiffStreamServer, &FiffStreamServer::forwardMeasInfo);
 
         //
         // Raw Data
         //
         // connect command server and connector manager
-        QObject::connect( this, &ConnectorManager::startMeasConnector, t_activeConnector, &IConnector::requestMeas );
+        QObject::connect(   this, &ConnectorManager::startMeasConnector,
+                            t_activeConnector, &IConnector::requestMeas);
         // connect connector manager and fiff stream server
-        QObject::connect( t_activeConnector, &IConnector::remitRawBuffer, this->m_pFiffStreamServer,
-                        &FiffStreamServer::forwardRawBuffer );
+        QObject::connect(   t_activeConnector, &IConnector::remitRawBuffer,
+                            this->m_pFiffStreamServer, &FiffStreamServer::forwardRawBuffer);
         // connect command server and connector manager
-        QObject::connect( this, &ConnectorManager::stopMeasConnector, t_activeConnector, &IConnector::requestMeasStop );
+        QObject::connect(   this, &ConnectorManager::stopMeasConnector,
+                            t_activeConnector, &IConnector::requestMeasStop);
 
         //
         // Reset Raw Buffer Size
         //
-        QObject::connect( this, &ConnectorManager::setBufferSize, t_activeConnector, &IConnector::requestSetBufferSize );
+        QObject::connect(   this, &ConnectorManager::setBufferSize,
+                            t_activeConnector, &IConnector::requestSetBufferSize);
     }
     else
     {
-        printf( "Error: Can't connect, no connector active!\n" );
+        printf("Error: Can't connect, no connector active!\n");
     }
 }
+
 
 //*************************************************************************************************************
 
@@ -191,7 +196,7 @@ void ConnectorManager::disconnectActiveConnector()
 {
     IConnector* t_activeConnector = ConnectorManager::getActiveConnector();
 
-    if( t_activeConnector )
+    if(t_activeConnector)
     {
         // use signal slots instead of call backs
         //Consulting the Signal/Slot documentation describes why the Signal/Slot approach is better:
@@ -208,11 +213,12 @@ void ConnectorManager::disconnectActiveConnector()
         //
         // Meas Info
         //
-        this->disconnect( t_activeConnector );
+        this->disconnect(t_activeConnector);
         //
-        t_activeConnector->disconnect( this->m_pFiffStreamServer );
+        t_activeConnector->disconnect(this->m_pFiffStreamServer);
 
-        this->m_pFiffStreamServer->disconnect( t_activeConnector );
+        this->m_pFiffStreamServer->disconnect(t_activeConnector);
+
 
         //
         // Raw Data
@@ -230,104 +236,104 @@ void ConnectorManager::disconnectActiveConnector()
     }
     else
     {
-        printf( "Error: Can't connect, no connector active!\n" );
+        printf("Error: Can't connect, no connector active!\n");
     }
 }
+
 
 //*************************************************************************************************************
 
 IConnector* ConnectorManager::getActiveConnector()
 {
-    QVector< IConnector* >::const_iterator it = s_vecConnectors.begin();
-    for( ; it != s_vecConnectors.end(); ++it )
+    QVector<IConnector*>::const_iterator it = s_vecConnectors.begin();
+    for( ; it != s_vecConnectors.end(); ++it)
     {
-        if( ( *it )->isActive() )
+        if((*it)->isActive())
             return *it;
     }
 
     return NULL;
 }
 
+
 //*************************************************************************************************************
 
 QByteArray ConnectorManager::getConnectorList() const
 {
     QByteArray t_blockConnectorList;
-    if( s_vecConnectors.size() > 0 )
+    if(s_vecConnectors.size() > 0)
     {
-        QVector< IConnector* >::const_iterator it = s_vecConnectors.begin();
-        for( ; it != s_vecConnectors.end(); ++it )
+        QVector<IConnector*>::const_iterator it = s_vecConnectors.begin();
+        for( ; it != s_vecConnectors.end(); ++it)
         {
-            if( ( *it )->isActive() )
-                t_blockConnectorList.append(
-                                QString( "  *  (%1) %2\r\n" ).arg( ( *it )->getConnectorID() ).arg( ( *it )->getName() ) );
+            if((*it)->isActive())
+                t_blockConnectorList.append(QString("  *  (%1) %2\r\n").arg((*it)->getConnectorID()).arg((*it)->getName()));
             else
-                t_blockConnectorList.append(
-                                QString( "     (%1) %2\r\n" ).arg( ( *it )->getConnectorID() ).arg( ( *it )->getName() ) );
+                t_blockConnectorList.append(QString("     (%1) %2\r\n").arg((*it)->getConnectorID()).arg((*it)->getName()));
         }
     }
     else
-        t_blockConnectorList.append( " - no connector loaded - \r\n" );
+        t_blockConnectorList.append(" - no connector loaded - \r\n");
 
-    t_blockConnectorList.append( "\r\n" );
+    t_blockConnectorList.append("\r\n");
     return t_blockConnectorList;
 }
 
+
 //*************************************************************************************************************
 
-void ConnectorManager::loadConnectors( const QString& dir )
+void ConnectorManager::loadConnectors(const QString& dir)
 {
     clearConnectorActivation();
 
-    QDir ConnectorsDir( dir );
+    QDir ConnectorsDir(dir);
 
-    printf( "Loading connectors in directory... %s\n", ConnectorsDir.path().toUtf8().constData() );
+    printf("Loading connectors in directory... %s\n", ConnectorsDir.path().toUtf8().constData() );
 
-    foreach(QString fileName, ConnectorsDir.entryList(QDir::Files)){
-    if(fileName.compare("README") == 0 || fileName.compare("plugin.cfg") == 0)
-    continue;
-
-    this->setFileName(ConnectorsDir.absoluteFilePath(fileName));
-    QObject *pConnector = this->instance();
-
-    printf("\tLoading %s... ", fileName.toUtf8().constData() );
-
-    // IModule
-    if(pConnector)
+    foreach(QString fileName, ConnectorsDir.entryList(QDir::Files))
     {
-        IConnector* t_pIConnector = qobject_cast<IConnector*>(pConnector);
-        t_pIConnector->setStatus(false);
-        s_vecConnectors.push_back(t_pIConnector);
-        printf("[done]\n");
-    }
-    else
-    {
-        printf("failed!\n");
-    }
-}
+        if(fileName.compare("README") == 0 || fileName.compare("plugin.cfg") == 0)
+            continue;
 
-//
-// search config for default connector
-//
+        this->setFileName(ConnectorsDir.absoluteFilePath(fileName));
+        QObject *pConnector = this->instance();
+
+        printf("\tLoading %s... ", fileName.toUtf8().constData() );
+
+        // IModule
+        if(pConnector)
+        {
+            IConnector* t_pIConnector = qobject_cast<IConnector*>(pConnector);
+            t_pIConnector->setStatus(false);
+            s_vecConnectors.push_back(t_pIConnector);
+            printf("[done]\n");
+        }
+        else
+        {
+            printf("failed!\n");
+        }
+    }
+
+    //
+    // search config for default connector
+    //
     qint32 configConnector = -1;
-    QString configFileName( "plugin.cfg" );
-    QFile configFile( dir + "/" + configFileName );
-    if( !configFile.open( QIODevice::ReadOnly ) )
-    {
-        printf( "Not able to read config file... %s\n", configFile.fileName().toUtf8().constData() );
+    QString configFileName("plugin.cfg");
+    QFile configFile(dir+"/"+configFileName);
+    if(!configFile.open(QIODevice::ReadOnly)) {
+        printf("Not able to read config file... %s\n", configFile.fileName().toUtf8().constData());
     }
     else
     {
-        printf( "\tReading %s... ", configFileName.toUtf8().constData() );
+        printf("\tReading %s... ", configFileName.toUtf8().constData());
 
-        QTextStream in( &configFile );
+        QTextStream in(&configFile);
         QString line = in.readLine();
         QStringList list;
-        while( !line.isNull() )
-        {
-            list = line.split( ":" );
+        while (!line.isNull()) {
+            list = line.split(":");
 
-            if( list[0].simplified().compare( "defaultConnector" ) == 0 )
+            if(list[0].simplified().compare("defaultConnector") == 0)
             {
                 configConnector = list[1].simplified().toInt();
                 break;
@@ -335,202 +341,190 @@ void ConnectorManager::loadConnectors( const QString& dir )
             line = in.readLine();
         }
     }
-    if( s_vecConnectors.size() > 0 )
+    if(s_vecConnectors.size() > 0)
     {
 
         bool activated = false;
 
-        if( configConnector != -1 )
+        if( configConnector != -1)
         {
-            for( qint32 i = 0; i < s_vecConnectors.size(); ++i )
+            for(qint32 i = 0; i < s_vecConnectors.size(); ++i)
             {
-                if( s_vecConnectors[i]->getConnectorID() == configConnector )
+                if(s_vecConnectors[i]->getConnectorID() == configConnector)
                 {
-                    s_vecConnectors[i]->setStatus( true );
-                    printf( "activate %s... ", s_vecConnectors[i]->getName() );
+                    s_vecConnectors[i]->setStatus(true);
+                    printf("activate %s... ", s_vecConnectors[i]->getName());
                     activated = true;
                     break;
                 }
             }
         }
-        printf( "[done]\n" );
+        printf("[done]\n");
 
         //default
-        if( !activated )
-            s_vecConnectors[0]->setStatus( true );
+        if(!activated)
+            s_vecConnectors[0]->setStatus(true);
     }
 
     //print
-    printf( "Connector list\n" );
-    printf( getConnectorList().data() );
+    printf("Connector list\n");
+    printf(getConnectorList().data());
 }
+
 
 //*************************************************************************************************************
 
-bool ConnectorManager::parseCommand( QStringList& p_sListCommand, QByteArray& p_blockOutputInfo )
+bool ConnectorManager::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo)
 {
     bool success = false;
-
-    // TODO(pieloth): use of QString instead of QStringList. All string conversion should be done by rtProtocol!
-    QString rawRequest = p_sListCommand.join( RTSTREAMING::ARG_SEPARATOR );
-    rawRequest.append( RTSTREAMING::ETX );
-    RTSTREAMING::RTCommandRequest::SPtr request;
-    // TODO(pieloth): use some kind of factory or expandable CommandRequestManager.
-    request = RTSTREAMING::RTCmdBase::parseRequest( rawRequest );
-    // TODO(pieloth): use of request->getCommand(); in cout stream!
-    const std::string cmd = request->getCommand().toStdString();
-
-    // conlist //
-    if( request->isCommand( RTSTREAMING::Command::REQUEST_CONNECTORS ) )
+    if(p_sListCommand[0].compare("meas",Qt::CaseInsensitive) == 0)
     {
-        std::cout << cmd << std::endl;
-        p_blockOutputInfo.append( this->getConnectorList() );
-        return true;
-    }
-
-    // meas //
-    if( request->isCommand( RTSTREAMING::Command::START_MEASUREMENT ) )
-    {
-        RTSTREAMING::RTCmdStartMeas::SPtr req = request.dynamicCast< RTSTREAMING::RTCmdStartMeas >();
-        const int id = req->getClientId();
-        if( id != RTSTREAMING::RTCmdStartMeas::NO_CLIENT_ID )
+        //
+        // meas
+        //
+        if(p_sListCommand.size() > 1)
         {
-            std::cout << cmd << " " << id << std::endl;
             emit startMeasConnector();
 
-            QString str = QString( "\tstart connector\r\n\n" );
-            p_blockOutputInfo.append( str );
-            return true;
+            QString str = QString("\tstart connector\r\n\n");
+            p_blockOutputInfo.append(str);
         }
-        else
-        {
-            std::cout << cmd << ": Wrong client id!" << std::endl;
-            return false;
-        }
+        success = true;
     }
-
-    // selcon //
-    if( request->isCommand( RTSTREAMING::Command::SELECT_CONNECTOR ) )
+    else if(p_sListCommand[0].compare("bufsize",Qt::CaseInsensitive) == 0)
     {
-        RTSTREAMING::RTCmdSelCon::SPtr req = request.dynamicCast< RTSTREAMING::RTCmdSelCon >();
-        const int id = req->getConnectorId();
-        if( id != RTSTREAMING::RTCmdSelCon::NO_CONNECTOR_ID )
-        {
-            std::cout << cmd << " " << id << std::endl;
-            p_blockOutputInfo.append( this->setActiveConnector( id ) );
-            return true;
-        }
-        else
-        {
-            std::cout << cmd << ": Wrong client id!" << std::endl;
-            return false;
-        }
-    }
-
-    // stop-all //
-    if( request->isCommand( RTSTREAMING::Command::STOP_ALL_MEASUREMENTS ) )
-    {
-        emit stopMeasConnector();
-
-        QString str = QString( "\tstop all Connectors\r\n\n" );
-        p_blockOutputInfo.append( str );
-
-        return true;
-    }
-
-    // TODO(pieloth): Request class for bufsize
-    // bufsize //
-    if( p_sListCommand[0].compare( "bufsize", Qt::CaseInsensitive ) == 0 )
-    {
-        if( p_sListCommand.size() > 1 )
+        //
+        // bufsize
+        //
+        if(p_sListCommand.size() > 1)
         {
             bool ok;
-            quint32 t_uiBuffSize = p_sListCommand[1].toInt( &ok );
+            quint32 t_uiBuffSize = p_sListCommand[1].toInt(&ok);
 
-            if( ok && t_uiBuffSize > 0 )
+            if(ok && t_uiBuffSize > 0)
             {
-                printf( "bufsize %d\n", t_uiBuffSize );
+                printf("bufsize %d\n", t_uiBuffSize);
 
-                emit setBufferSize( t_uiBuffSize );
+                emit setBufferSize(t_uiBuffSize);
 
-                QString str =
-                                QString( "\tSet %1 buffer sample size to %2 samples\r\n\n" ).arg(
-                                                getActiveConnector()->getName() ).arg( t_uiBuffSize );
-                p_blockOutputInfo.append( str );
+                QString str = QString("\tSet %1 buffer sample size to %2 samples\r\n\n").arg(getActiveConnector()->getName()).arg(t_uiBuffSize);
+                p_blockOutputInfo.append(str);
             }
             else
             {
-                p_blockOutputInfo.append( "\tBuffer size not set\r\n\n" );
+                p_blockOutputInfo.append("\tBuffer size not set\r\n\n");
             }
         }
-        return true;
+        success = true;
     }
+    else if(p_sListCommand[0].compare("conlist",Qt::CaseInsensitive) == 0)
+    {
+        //
+        // conlist
+        //
+        printf("conlist\n");
+        p_blockOutputInfo.append(this->getConnectorList());
+        success = true;
+    }
+    else if(p_sListCommand[0].compare("selcon",Qt::CaseInsensitive) == 0)
+    {
+        //
+        // selcon
+        //
+        if(p_sListCommand.size() > 1)
+        {
+            bool t_isInt;
+            qint32 t_id = p_sListCommand[1].toInt(&t_isInt);
+            printf("selcon %d\r\n", t_id);
+            if(t_isInt)
+            {
+                p_blockOutputInfo.append(this->setActiveConnector(t_id));
+            }
+        }
+        success = true;
+    }
+    else if(p_sListCommand[0].compare("stop-all",Qt::CaseInsensitive) == 0)
+    {
+        //
+        // stop-all
+        //
+        emit stopMeasConnector();
 
-    //
-    // Forward to active connector
-    // Connector
-    //
-    IConnector* t_pConnector = this->getActiveConnector();
+        QString str = QString("\tstop all Connectors\r\n\n");
+        p_blockOutputInfo.append(str);
 
-    if( t_pConnector )
-        success = t_pConnector->parseCommand( p_sListCommand, p_blockOutputInfo );
+        success = true;
+    }
     else
-        success = false;
+    {
+        //
+        // Forward to active connector
+        // Connector
+        //
+        IConnector* t_pConnector = this->getActiveConnector();
+
+        if(t_pConnector)
+            success = t_pConnector->parseCommand(p_sListCommand, p_blockOutputInfo);
+        else
+            success = false;
+    }
 
     return success;
 }
 
+
 //*************************************************************************************************************
 
-QByteArray ConnectorManager::setActiveConnector( qint32 ID )
+QByteArray ConnectorManager::setActiveConnector(qint32 ID)
 {
     QByteArray p_blockClientList;
     QString str;
 
-    if( ID != getActiveConnector()->getConnectorID() )
+    if(ID != getActiveConnector()->getConnectorID())
     {
         IConnector* t_pNewActiveConnector = NULL;
-        QVector< IConnector* >::const_iterator it = s_vecConnectors.begin();
-        for( ; it != s_vecConnectors.end(); ++it )
-            if( ( *it )->getConnectorID() == ID )
+        QVector<IConnector*>::const_iterator it = s_vecConnectors.begin();
+        for( ; it != s_vecConnectors.end(); ++it)
+            if((*it)->getConnectorID() == ID)
                 t_pNewActiveConnector = *it;
 
-        if( t_pNewActiveConnector )
+        if (t_pNewActiveConnector)
         {
 
-            IConnector* t_pActiveConnector = getActiveConnector();
+           IConnector* t_pActiveConnector = getActiveConnector();
 
-            //Stop and disconnect active connector
-            t_pActiveConnector->stop();
-            this->disconnectActiveConnector();
-            t_pActiveConnector->setStatus( false );
+           //Stop and disconnect active connector
+           t_pActiveConnector->stop();
+           this->disconnectActiveConnector();
+           t_pActiveConnector->setStatus(false);
 
-            //set new active connector
-            t_pNewActiveConnector->setStatus( true );
-            this->connectActiveConnector();
+           //set new active connector
+           t_pNewActiveConnector->setStatus(true);
+           this->connectActiveConnector();
 
-            str = QString( "\t%1 activated. ToDo...\r\n\n" ).arg( t_pNewActiveConnector->getName() );
-            p_blockClientList.append( str );
+            str = QString("\t%1 activated. ToDo...\r\n\n").arg(t_pNewActiveConnector->getName());
+            p_blockClientList.append(str);
         }
         else
         {
-            str = QString( "\tID %1 doesn't match a connector ID.\r\n\n" ).arg( ID );
-            p_blockClientList.append( str );
-            p_blockClientList.append( getConnectorList() );
+            str = QString("\tID %1 doesn't match a connector ID.\r\n\n").arg(ID);
+            p_blockClientList.append(str);
+            p_blockClientList.append(getConnectorList());
         }
     }
     else
     {
-        str = QString( "\t%1 is already active.\r\n\n" ).arg( getActiveConnector()->getName() );
-        p_blockClientList.append( str );
+        str = QString("\t%1 is already active.\r\n\n").arg(getActiveConnector()->getName());
+        p_blockClientList.append(str);
     }
 
     return p_blockClientList;
 }
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // STATIC DEFINITIONS
 //=============================================================================================================
 
-QVector< IConnector* > ConnectorManager::s_vecConnectors;
+QVector<IConnector*>    ConnectorManager::  s_vecConnectors;

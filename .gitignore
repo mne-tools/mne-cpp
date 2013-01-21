@@ -68,3 +68,4 @@ Makefile
 .cproject
 .project
 .settings
+/bin/MNE-sample-data/*.txt

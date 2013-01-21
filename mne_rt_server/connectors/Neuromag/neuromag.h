@@ -87,7 +87,7 @@ class DacqServer;
 /**
 * DECLARE CLASS Neuromag
 *
-* @brief The Neuromag class provides a Fiff data simulator.
+* @brief The Neuromag class provides an Elekta Neuromag connector.
 */
 class NEUROMAGSHARED_EXPORT Neuromag : public IConnector
 {

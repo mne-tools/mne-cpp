@@ -1,8 +1,8 @@
 //=============================================================================================================
 /**
-* @file     commandserver.h
+* @file     dacqserver.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
 * @date     July, 2012
 *
@@ -29,19 +29,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the CommandServer Class.
+* @brief     implementation of the DacqServer Class.
 *
 */
 
-#ifndef COMMANDSERVER_H
-#define COMMANDSERVER_H
+
+#ifndef DACQSERVER_H
+#define DACQSERVER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "ICommandParser.h"
+#include "types_definitions.h"
+#include <fiff/fiff_info.h>
+#include <fiff/fiff_tag.h>
 
 
 //*************************************************************************************************************
@@ -49,22 +52,28 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QStringList>
-#include <QTcpServer>
+#include <QThread>
+
+#include <QTcpSocket>
+
+#include <QByteArray>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MSERVER
+// DEFINE NAMESPACE BabyMEGPlugin
 //=============================================================================================================
 
-namespace MSERVER
+namespace BabyMEGPlugin
 {
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
+
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -72,49 +81,105 @@ namespace MSERVER
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class BabyMEG;
+class CollectorSocket;
+class ShmemSocket;
+//class FiffInfo;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS CommandServer
+* DECLARE CLASS DacqServer
 *
-* @brief The CommandServer class provides
+* @brief The DacqServer class provides a BabyMEG MEG connector.
 */
-class CommandServer : public QTcpServer, ICommandParser
+class DacqServer : public QThread
 {
     Q_OBJECT
 
+    friend class BabyMEG;
+
 public:
-    CommandServer(QObject *parent = 0);
 
-    ~CommandServer();
+    //=========================================================================================================
+    /**
+    * Constructs a acquisition Server.
+    */
+    explicit DacqServer(BabyMEG* p_pBabyMEG, QObject * parent = 0);
+    
+    
+    //=========================================================================================================
+    /**
+    * Constructs a acquisition Server.
+    */
+    ~DacqServer();
 
-    virtual QByteArray availableCommands();
+    
+public slots: //--> in Qt 5 not anymore declared as slot
 
-    void incommingCommand(QString p_sCommand, qint32 p_iThreadID);
+    void readCollectorMsg();
 
-    virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
-
-    void registerCommandParser(ICommandParser* p_pCommandParser);
 
 signals:
-    void replyCommand(QByteArray p_blockReply, qint32 p_iID);
 
-//    void stopMeasConnector();
-//    void startMeasFiffStreamClient(qint32 ID);
-    void closeCommandThreads();
+    void measInfoAvailable();
+
 
 protected:
-    void incomingConnection(qintptr socketDescriptor);
+    //=========================================================================================================
+    /**
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread.
+    */
+    virtual void run();
 
 private:
 
-    QList<ICommandParser*> m_qListParser;
+    //=========================================================================================================
+    /**
+    * Quit function
+    *
+    * @return
+    */
+//    void clean_up();
 
-    qint32 m_iThreadCount;
+
+
+    //newly written stuff ported to qt
+//    QString         m_sCollectorHost;
+    CollectorSocket*    m_pCollectorSock;
+
+
+    ShmemSocket*        m_pShmemSock;
+    
+
+
+
+
+
+
+
+
+
+//dacqserver
+
+    bool m_bIsRunning;
+
+    bool m_bMeasInfoRequest;
+    bool m_bMeasRequest;
+    bool m_bMeasStopRequest;
+    bool m_bSetBuffersizeRequest;
+
+
+    bool getMeasInfo(FiffInfo::SDPtr& p_pFiffInfo);
+
+    BabyMEG* m_pBabyMEG;
+
 
 };
 
 } // NAMESPACE
 
-#endif //INSTRUCTIONSERVER_H
+
+#endif // DACQSERVER_H

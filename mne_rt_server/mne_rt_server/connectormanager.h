@@ -1,84 +1,207 @@
+//=============================================================================================================
 /**
- * @author  Christof Pieloth
- */
+* @file     connectormanager.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @version  1.0
+* @date     July, 2012
+*
+* @section  LICENSE
+*
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief     implementation of the ConnectorManager Class.
+*
+*/
 
-#ifndef CONNECTORMANAGER_H_
-#define CONNECTORMANAGER_H_
+#ifndef CONNECTORMANAGER_H
+#define CONNECTORMANAGER_H
 
-#include <QHash>
-#include <QSharedPointer>
 
-#include "IConnectornew.h"
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
 
-namespace RTSTREAMING
+#include "IConnector.h"
+#include "ICommandParser.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Fiff INCLUDES
+//=============================================================================================================
+
+#include <fiff/fiff_info.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QVector>
+#include <QPluginLoader>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MSERVER
+//=============================================================================================================
+
+namespace MSERVER
 {
-// TODO(cpieloth): ATTENTION Old CommandServer exists,
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace FIFFLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Function Pointers
+//=============================================================================================================
+
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class FiffStreamServer;
+
+
+//=============================================================================================================
 /**
- * The connector manager for the server. This manager loads all available connectors and provides access to these.
- * This class is a singleton, because there should exist only one connector manager instance.
- */
-class ConnectorManager
+* DECLARE CLASS ConnectorManager
+*
+* @brief The ConnectorManager class provides a dynamic module loader. As well as the handling of the loaded modules.
+*/
+class ConnectorManager : public QPluginLoader, ICommandParser
 {
+    Q_OBJECT
+
 public:
-    typedef QSharedPointer<ConnectorManager> SPtr;
-    typedef QSharedPointer<const ConnectorManager> ConstSPtr;
 
+    //=========================================================================================================
     /**
-     * Gets a instance of the connector manager. If no instance was created, a new one is created.
-     *
-     * @return  A instance of a connector manager.
-     */
-    static ConnectorManager::SPtr getInstance();
+    * Constructs a ConnectorManager with the given parent.
+    *
+    * @param [in] parent pointer to parent Object. (It's normally the default value.)
+    */
+    ConnectorManager(FiffStreamServer* p_pFiffStreamServer, QObject* parent = 0);
 
+    //=========================================================================================================
+    /**
+    * Destroys the ConnectorManager.
+    */
     virtual ~ConnectorManager();
 
+    //=========================================================================================================
     /**
-     * Gets the default connector for the basic server interaction.
-     *
-     * @return  A default connector.
-     */
-    IConnector_new::SPtr getDefaultConnector() const;
+    * Loads modules from given directory.
+    *
+    * @param dir the module directory.
+    */
+    void loadConnectors(const QString& dir);
 
-    /**
-     * Loads all connectors with the help of Qt's plugin system.
-     */
-    void loadConnectors();
+//    //=========================================================================================================
+//    /**
+//    * Parses the command or sends the command to the active connector.
+//    *
+//    * @param[in] p_qCommandList the command.
+//    * @param[out] p_blockOutputInfo the bytearray which contains parsing information to be send back to CommandClient.
+//    *
+//    * @return true if successful, false otherwise
+//    */
+//    bool parseConnectorCommand(QStringList& p_qCommandList, QByteArray& p_blockOutputInfo);
 
-    /**
-     * Stops all connectors and removes them from the internal list.
-     */
-    void detatchConnectors();
+    virtual QByteArray availableCommands();
 
-    /**
-     * Returns all available connectors, except the default connector.
-     *
-     * @return  A map<ID, Connector>.
-     */
-    QHash<int, IConnector_new::SPtr> getAvailableConnectors() const;
+    static void clearConnectorActivation();
 
-    /**
-     * Selects an available connector.
-     *
-     * @return  true if connector was found, else false.
-     */
-    bool selectConnector(int id);
+    void connectActiveConnector();
 
+    void disconnectActiveConnector();
+
+    //=========================================================================================================
     /**
-     * Gets the selected connector.
-     *
-     * @return  Selected connector.
-     */
-    IConnector_new::SPtr getSelectedConnector() const;
+    * Returns vector containing active ISensor modules.
+    *
+    * @return reference to vector containing active ISensor modules.
+    */
+    IConnector* getActiveConnector();
+
+    //=========================================================================================================
+    /**
+    * Returns vector containing all modules.
+    *
+    * @return reference to vector containing all modules.
+    */
+    static inline const QVector<IConnector*>& getConnectors();
+
+    //=========================================================================================================
+    /**
+    * Prints a list of all connectors and their status
+    */
+    QByteArray getConnectorList() const;
+
+    virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
+
+    //=========================================================================================================
+    /**
+    * ToDo
+    */
+    QByteArray setActiveConnector(qint32 ID);
+
+signals:
+    void sendMeasInfo(qint32, FIFFLIB::FiffInfo::SDPtr);
+    void setBufferSize(qint32 ID);
+    void startMeasConnector();
+    void stopMeasConnector();
 
 private:
-    ConnectorManager();
-    static ConnectorManager::SPtr m_instance; /**< Singleton instance. */
+    static QVector<IConnector*> s_vecConnectors;       /**< Holds vector of all modules. */
 
-    IConnector_new::SPtr m_defaultConnector;
 
-    int m_selectedConnector;
-    QHash<int, IConnector_new::SPtr> m_connectors;
+    FiffStreamServer* m_pFiffStreamServer;
+
 };
 
-} /* namespace RTSTREAMING */
-#endif /* CONNECTORMANAGER_H_ */
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline const QVector<IConnector*>& ConnectorManager::getConnectors()
+{
+    return s_vecConnectors;
+}
+
+} // NAMESPACE
+
+#endif // CONNECTORMANAGER_H

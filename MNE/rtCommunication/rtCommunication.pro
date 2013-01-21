@@ -85,11 +85,6 @@ SOURCES += \
 HEADERS += \
     ICommandResponse.h \
     ICommandRequest.h \
-    commandRequests/cmdrequnkown.h \
-    commandRequests/cmdreqbase.h \
-    commandResponses/cmdresptext.h \
-    ICommandResponse.h \
-    ICommandRequest.h \
     cmdresptext.h \
     cmdrequnkown.h \
     cmdreqbase.h \

@@ -1,8 +1,8 @@
 //=============================================================================================================
 /**
-* @file     commandserver.h
+* @file     collectorsocket.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
 * @date     July, 2012
 *
@@ -29,19 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the CommandServer Class.
+* @brief     implementation of the CollectorSocket Class.
 *
 */
 
-#ifndef COMMANDSERVER_H
-#define COMMANDSERVER_H
+#ifndef COLLECTORSOCKET_H
+#define COLLECTORSOCKET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "ICommandParser.h"
+#include "types_definitions.h"
 
 
 //*************************************************************************************************************
@@ -49,72 +49,132 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QStringList>
-#include <QTcpServer>
+#include <QTcpSocket>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MSERVER
+// DEFINE NAMESPACE BabyMEGPlugin
 //=============================================================================================================
 
-namespace MSERVER
+namespace BabyMEGPlugin
 {
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS CommandServer
+* DECLARE CLASS CollectorSocket
 *
-* @brief The CommandServer class provides
+* @brief The CollectorSocket class provides ....
 */
-class CommandServer : public QTcpServer, ICommandParser
+class CollectorSocket : public QTcpSocket
 {
     Q_OBJECT
 
 public:
-    CommandServer(QObject *parent = 0);
 
-    ~CommandServer();
+    //=========================================================================================================
+    /**
+    * Constructs a acquisition Server.
+    */
+    CollectorSocket(QObject *parent = 0);
 
-    virtual QByteArray availableCommands();
+    //=========================================================================================================
+    /**
+    * Open the collector control connection
+    *
+    * @return
+    */
+    bool open();
 
-    void incommingCommand(QString p_sCommand, qint32 p_iThreadID);
+    //=========================================================================================================
+    /**
+    * Close the collector connection
+    *
+    * @return
+    */
+//    int close();
 
-    virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
 
-    void registerCommandParser(ICommandParser* p_pCommandParser);
+    inline bool isMeasuring()
+    {
+        return m_bIsMeasuring;
+    }
 
-signals:
-    void replyCommand(QByteArray p_blockReply, qint32 p_iID);
+    //=========================================================================================================
+    /**
+    * Query the current buffer length of the Elekta acquisition system
+    *
+    * @return
+    */
+    int getMaxBuflen();
 
-//    void stopMeasConnector();
-//    void startMeasFiffStreamClient(qint32 ID);
-    void closeCommandThreads();
 
-protected:
-    void incomingConnection(qintptr socketDescriptor);
+    //=========================================================================================================
+    /**
+    * Set the desired maximum buffer length
+    *
+    * @return
+    */
+    int setMaxBuflen(int maxbuflen);
+
+
+    // new client.c to qt functions
+    //=========================================================================================================
+    /**
+    *
+    *
+    * @return
+    */
+    bool server_command(const QString& p_sCommand);
+
+
+    //=========================================================================================================
+    /**
+    *
+    *
+    * @return
+    */
+    bool server_login(const QString& p_sCollectorPass, const QString& p_sMyName);
+
+
+    //=========================================================================================================
+    /**
+    *
+    *
+    * @return
+    */
+    bool server_send(QString& p_sDataSend, QByteArray& p_dataOut, int p_iInputFlag = DACQ_DRAIN_INPUT);
+
+
+    //=========================================================================================================
+    /**
+    *
+    *
+    * @return
+    */
+    bool server_start();
+
+
+    //=========================================================================================================
+    /**
+    *
+    *
+    * @return
+//    */
+    bool server_stop();
+
+
 
 private:
 
-    QList<ICommandParser*> m_qListParser;
+    QString     m_sCollectorHost;
 
-    qint32 m_iThreadCount;
+    bool        m_bIsMeasuring;
+
 
 };
 
 } // NAMESPACE
 
-#endif //INSTRUCTIONSERVER_H
+#endif // COLLECTORSOCKET_H
