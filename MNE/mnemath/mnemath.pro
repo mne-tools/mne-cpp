@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mnemath.pro
+# @file     mneMath.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the mne_math library.
+# @brief    This project file builds the MneMath library.
 #
 #--------------------------------------------------------------------------------------------------------------
 

@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     rt_communication.pro
+# @file     rtCommunication.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Christof Pieloth;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,7 +30,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the rtProtocol library.
+# @brief    This project file builds the RtCommunication library.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -75,27 +75,33 @@ win32 {
     QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
 }
 
-# SOURCES += ./*.cpp
-SOURCES += ./command_requests/*.cpp
-SOURCES += ./command_responses/*.cpp
+SOURCES += \
+    cmdresptext.cpp \ # list here all files explicitly to have better qtcreator support -> e.g. qt creator handles file renames only with explicit naming
+    cmdrequnkown.cpp \
+    cmdreqbase.cpp \
+    communicationmanager.cpp
 
-HEADERS +=  ./*.h
-HEADERS +=  ./command_requests/*.h
-HEADERS +=  ./command_responses/*.h
+
+HEADERS += \
+    ICommandResponse.h \
+    ICommandRequest.h \
+    commandRequests/cmdrequnkown.h \
+    commandRequests/cmdreqbase.h \
+    commandResponses/cmdresptext.h \
+    ICommandResponse.h \
+    ICommandRequest.h \
+    cmdresptext.h \
+    cmdrequnkown.h \
+    cmdreqbase.h \
+    communicationmanager.h \
+    ICommand.h
+
 
 # INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 # INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 # Install headers to include directory
 header_files.files = ./*.h
-header_files.path = $${MNE_INCLUDE_DIR}/rt_communication
-
-header_files_req.files = command_requests/*.h
-header_files_req.path = $${MNE_INCLUDE_DIR}/rt_communication/command_requests
-
-header_files_resp.files = command_responses/*.h
-header_files_resp.path = $${MNE_INCLUDE_DIR}/rt_communication/command_responses
+header_files.path = $${MNE_INCLUDE_DIR}/rtCommunication
 
 INSTALLS += header_files
-INSTALLS += header_files_req
-INSTALLS += header_files_resp
