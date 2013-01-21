@@ -30,7 +30,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the rtclient library.
+# @brief    This project file builds the rtClient library.
 #
 #--------------------------------------------------------------------------------------------------------------
 
