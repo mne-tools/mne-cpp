@@ -9,11 +9,9 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QMap>
-
 #include <QObject>
 #include <QSharedPointer>
-#include <QString>
+#include <QVariant>
 
 
 
@@ -64,14 +62,12 @@ signals:
 
 
 private:
+    QString             m_sCommandName;
+    QList<QVariant>     m_listParameters;
 
 
 };
 
 } // NAMESPACE
-
-
-
-
 
 #endif // ICOMMAND_H
