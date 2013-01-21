@@ -93,13 +93,23 @@ int main(int argc, char *argv[])
     bool testResult;
 
     QString jsonTestCommand = "{"
-                      "  \"encoding\": \"UTF-8\","
-                      "  \"name\": \"Neuromag\","
-                      "  \"Commands\": {"
-                      "    \"help\": [ \"param1\", \"param2\", \"param3\" ],"
-                      "    \"start\": [ \"param1\", \"param2\", \"param3\" ]"
-                      "  }"
-                      "}";
+                        "  \"encoding\": \"UTF-8\","
+                        "  \"name\": \"Neuromag\","
+                        "  \"Commands\": {"
+                        "     \"help\": ["
+                        "         {"
+                        "             \"param1\": \"int\","
+                        "             \"param2\": \"string\""
+                        "         }"
+                        "     ],"
+                        "     \"start\": ["
+                        "         {"
+                        "             \"param1\": \"int\","
+                        "             \"param2\": \"string\""
+                        "         }"
+                        "     ]"
+                        "  }"
+                        "}";
 
 
 
