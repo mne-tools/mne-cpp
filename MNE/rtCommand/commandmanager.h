@@ -49,6 +49,14 @@ class RTCOMMANDSHARED_EXPORT CommandManager
 public:
     CommandManager(QByteArray &p_jsonDoc);
 
+
+    inline bool hasCommand(QString & p_sCommand) const
+    {
+        return s_mapCommands.contains(p_sCommand);
+    }
+
+
+
 //private:
     void insertJsonCommands(QJsonDocument &p_jsonDocument);
 

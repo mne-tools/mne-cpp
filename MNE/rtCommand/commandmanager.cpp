@@ -49,19 +49,9 @@ void CommandManager::insertJsonCommands(QJsonDocument &p_jsonDocument)
     else
         return;
 
-//    qDebug() << "Size " << t_jsonObjectCommand.size();
-
     QJsonObject::Iterator it;
     for(it = t_jsonObjectCommand.begin(); it != t_jsonObjectCommand.end(); ++it)
-    {
-//        qDebug() << it.key();
-//        qDebug() << it.value().toObject().value(QString("parameters")).toObject();
-
-//        qDebug() << "Parse Command";
         s_mapCommands.insert(it.key(), Command::fromQJsonObject(it.key(), it.value().toObject()));
-    }
-
-
 
 }
 
