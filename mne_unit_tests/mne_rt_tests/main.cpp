@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
             "           \"parameters\": {"
             "               \"id\": {"
             "                   \"description\": \"id descr\","
-            "                   \"typeId\": 1 "
+            "                   \"typeId\": 3 "
             "               },"
             "               \"id2\": {"
             "                   \"description\": \"id2 descr\","
@@ -124,6 +124,15 @@ int main(int argc, char *argv[])
     qDebug() << "Contains help? " << t_comManager.hasCommand(QString("help"));
     qDebug() << "Contains test? " << t_comManager.hasCommand(QString("test"));
     qDebug() << "Contains start? " << t_comManager.hasCommand(QString("start"));
+
+
+    qDebug() << t_comManager["help"].toJsonObject();
+//    qDebug() << t_comManager.toJsonObject();
+
+    qDebug() << t_comManager["help"]["id"];
+
+    qDebug() << t_comManager["help"]["id2"];
+
 
 //    qDebug() << t_comManager.m_jsonDocumentOrigin.object().value(QString("commands")).toObject();
 

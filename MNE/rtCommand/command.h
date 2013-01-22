@@ -17,7 +17,7 @@
 //=============================================================================================================
 
 #include <QObject>
-#include <QVector>
+#include <QList>
 #include <QString>
 #include <QVariant>
 #include <QJsonObject>
@@ -43,35 +43,56 @@ public:
     typedef QSharedPointer<Command> SPtr;
     typedef QSharedPointer<const Command> ConstSPtr;
 
+    //=========================================================================================================
+    /**
+    * Default constructor.
+    *
+    * @param[in] parent                 Parent QObject (optional)
+    */
+    Command(QObject *parent = 0);
 
-    Command();
+    //=========================================================================================================
+    /**
+    * Constructor which parses a command stored in a json object
+    *
+    * @param[in] p_sCommand         Command
+    * @param[in] p_qCommandContent  Content encapsulated in a JsonObject
+    */
+    explicit Command(QString &p_sCommand, QJsonObject &p_qCommandContent);
 
+    //=========================================================================================================
+    /**
+    * Constructor which parses a command stored in a json object
+    *
+    * @param[in] p_sCommand                 Command
+    * @param[in] p_sDescription             Command description
+    * @param[in] p_mapParameters            Parameter names + values/types.
+    * @param[in] p_vecParameterDescriptions Parameter descriptions;
+    */
+    explicit Command(const QString &p_sCommand, const QString &p_sDescription,
+                     const QMap<QString, QVariant> &p_mapParameters, const QList<QString> &p_vecParameterDescriptions);
 
+    //=========================================================================================================
+    /**
+    * Copy constructor.
+    *
+    * @param[in] p_Command      Command to be copied
+    */
     Command(const Command &p_Command);
 
-
+    //=========================================================================================================
+    /**
+    * Destroys the command
+    */
     virtual ~Command();
 
-
     //=========================================================================================================
     /**
-    * Parses a command.
-    *
-    * @param[in] p_sCommandName     Command name
-    * @param[in] p_qCommandContent  Content
-    *
-    * @return Parsed command
-    */
-    static Command fromQJsonObject(QString &p_sCommandName, QJsonObject &p_qCommandContent);
-
-
-    //=========================================================================================================
-    /**
-    * Gets the short command for this request. Can be used to identify the concrete implementation.
+    * Short command for this request
     *
     * @return Short command representation.
     */
-    inline QString getCommand() const
+    inline QString command() const
     {
         return m_sCommand;
     }
@@ -89,13 +110,13 @@ public:
 
     //=========================================================================================================
     /**
-    * Gets the number of parameters.
+    * Returns the number of parameters.
     *
     * @return number of parameters.
     */
-    inline quint32 paramNumber() const
+    inline quint32 count() const
     {
-        return m_vecParamNames.size();
+        return m_mapParameters.size();
     }
 
     //=========================================================================================================
@@ -104,46 +125,77 @@ public:
     *
     * @return parameter descriptions
     */
-    inline QVector<QString> paramDescriptions() const
+    inline QList<QString> pDescriptions() const
     {
         return m_vecParamDescriptions;
     }
 
-
-//    //=========================================================================================================
-//    /**
-//     * Creates a ready-to-send object for the client. This method hides the JSON serialization.
-//     *
-//     * @return Request data to send to the server.
-//     */
-//    virtual QByteArray getCommandToJSON() const = 0;
-
-    // In your implementation you should add some getter and setter for arguments.
-
-    Command& operator= (const Command &rh)
+    //=========================================================================================================
+    /**
+    * Get parameter names
+    *
+    * @return parameter names
+    */
+    inline QList<QString> pNames() const
     {
-        if (this != &rh) // protect against invalid self-assignment
-        {
-            m_sCommand = rh.m_sCommand;
-            m_sDescription = rh.m_sDescription;
-            m_vecParamNames = rh.m_vecParamNames;
-            m_vecParamDescriptions = rh.m_vecParamDescriptions;
-            m_vecParamValue = rh.m_vecParamValue;
-        }
-        // to support chained assignment operators (a=b=c), always return *this
-        return *this;
+        return m_mapParameters.keys();
     }
 
+    //=========================================================================================================
+    /**
+    * Returns parameter values
+    *
+    * @return parameter values
+    */
+    inline QList<QVariant> pValues() const
+    {
+        return m_mapParameters.values();
+    }
+
+    //=========================================================================================================
+    /**
+    * Creates a JSON Command Object
+    *
+    * @return Command converted to a JSON Object.
+    */
+    QJsonObject toJsonObject() const;
+
+    //=========================================================================================================
+    /**
+    * Assignment Operator
+    *
+    * @param[in] rhs     Command which should be assigned.
+    */
+    Command& operator= (const Command &rhs);
+
+    //=========================================================================================================
+    /**
+    * Subscript operator []
+    *
+    * @param key    the parameter name.
+    *
+    * @return Parameter value related to the parameter name.
+    */
+    QVariant& operator[] (const QString &key);
+
+    //=========================================================================================================
+    /**
+    * Subscript operator []
+    *
+    * @param key    the parameter name.
+    *
+    * @return Parameter value related to the parameter name.
+    */
+    const QVariant operator[] (const QString &key) const;
+
 signals:
-    void triggered(Command);
-    void received(Command);
+
 
 public:
     QString             m_sCommand;
     QString             m_sDescription;
-    QVector<QString>    m_vecParamNames;
-    QVector<QString>    m_vecParamDescriptions;
-    QVector<QVariant>   m_vecParamValue;
+    QMap<QString, QVariant> m_mapParameters;
+    QList<QString>    m_vecParamDescriptions;
 };
 
 } // NAMESPACE

@@ -51,9 +51,39 @@ void CommandManager::insertJsonCommands(QJsonDocument &p_jsonDocument)
 
     QJsonObject::Iterator it;
     for(it = t_jsonObjectCommand.begin(); it != t_jsonObjectCommand.end(); ++it)
-        s_mapCommands.insert(it.key(), Command::fromQJsonObject(it.key(), it.value().toObject()));
-
+        s_mapCommands.insert(it.key(), Command(it.key(), it.value().toObject()));//Attention overwrites existing items
 }
+
+
+//*************************************************************************************************************
+
+QJsonObject CommandManager::toJsonObject() const
+{
+    QJsonObject p_jsonCommandsObject;
+
+    QMap<QString, Command>::Iterator it;
+    for(it = s_mapCommands.begin(); it != s_mapCommands.end(); ++it)
+        p_jsonCommandsObject.insert(it.key(),QJsonValue(it.value().toJsonObject()));
+
+    return p_jsonCommandsObject;
+}
+
+
+//*************************************************************************************************************
+
+Command& CommandManager::operator[] (const QString &key)
+{
+    return s_mapCommands[key];
+}
+
+
+//*************************************************************************************************************
+
+const Command& CommandManager::operator[] (const QString &key) const
+{
+    return s_mapCommands[key];
+}
+
 
 
 //*************************************************************************************************************
