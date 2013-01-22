@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     rtCommunication.pro
+# @file     rtCommand.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Christof Pieloth;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -40,9 +40,9 @@ TEMPLATE = lib
 
 QT       -= gui
 
-DEFINES += RTCOMMUNICATION_LIBRARY
+DEFINES += RTCOMMAND_LIBRARY
 
-TARGET = RtCommunication
+TARGET = RtCommand
 TARGET = $$join(TARGET,,MNE$$MNE_LIB_VERSION,)
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -50,15 +50,10 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-#    LIBS += -lMNE$${MNE_LIB_VERSION}Fiffd \
-#            -lMNE$${MNE_LIB_VERSION}Mned \
-#            -lMNE$${MNE_LIB_VERSION}Genericsd
 
 }
 else {
-#    LIBS += -lMNE$${MNE_LIB_VERSION}Fiff \
-#            -lMNE$${MNE_LIB_VERSION}Mne \
-#            -lMNE$${MNE_LIB_VERSION}Generics
+
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}
@@ -76,21 +71,14 @@ win32 {
 }
 
 SOURCES += \
-    cmdresptext.cpp \ # list here all files explicitly to have better qtcreator support -> e.g. qt creator handles file renames only with explicit naming
-    cmdrequnkown.cpp \
-    cmdreqbase.cpp \
-    communicationmanager.cpp
+    command.cpp \
+    commandmanager.cpp
 
 
 HEADERS += \
-    ICommandResponse.h \
-    ICommandRequest.h \
-    cmdresptext.h \
-    cmdrequnkown.h \
-    cmdreqbase.h \
-    communicationmanager.h \
-    ICommand.h \
-    rtcommunication_global.h
+    command.h \
+    commandmanager.h \
+    rtcommand_global.h
 
 
 # INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
