@@ -104,11 +104,11 @@ int main(int argc, char *argv[])
             "           \"parameters\": {"
             "               \"id\": {"
             "                   \"description\": \"id descr\","
-            "                   \"type\": 1 "
+            "                   \"typeId\": 1 "
             "               },"
             "               \"id2\": {"
             "                   \"description\": \"id2 descr\","
-            "                   \"type\": 1 "
+            "                   \"typeId\": 2 "
             "               }"
             "           }"
             "       },"
@@ -120,6 +120,10 @@ int main(int argc, char *argv[])
             "}";
 
     CommandManager t_comManager(jsonTestCommand.toLatin1());
+
+    qDebug() << "Contains help? " << t_comManager.hasCommand(QString("help"));
+    qDebug() << "Contains test? " << t_comManager.hasCommand(QString("test"));
+    qDebug() << "Contains start? " << t_comManager.hasCommand(QString("start"));
 
 //    qDebug() << t_comManager.m_jsonDocumentOrigin.object().value(QString("commands")).toObject();
 

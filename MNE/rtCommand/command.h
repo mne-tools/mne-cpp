@@ -17,11 +17,11 @@
 //=============================================================================================================
 
 #include <QObject>
+#include <QVector>
 #include <QString>
 #include <QVariant>
 #include <QJsonObject>
 #include <QSharedPointer>
-#include <QMap>
 #include <QDebug>
 #include <QPair>
 
@@ -65,21 +65,50 @@ public:
     static Command fromQJsonObject(QString &p_sCommandName, QJsonObject &p_qCommandContent);
 
 
-//    //=========================================================================================================
-//    /**
-//     * Gets the short command for this request. Can be used to identify the concrete implementation.
-//     *
-//     * @return Short command representation.
-//     */
-//    virtual QString getCommand() const = 0;
+    //=========================================================================================================
+    /**
+    * Gets the short command for this request. Can be used to identify the concrete implementation.
+    *
+    * @return Short command representation.
+    */
+    inline QString getCommand() const
+    {
+        return m_sCommand;
+    }
 
-//    //=========================================================================================================
-//    /**
-//     * Gets the help text or description of this command.
-//     *
-//     * @return  Help text.
-//     */
-//    virtual QString getHelpText() const = 0;
+    //=========================================================================================================
+    /**
+     * Gets the help text or description of this command.
+     *
+     * @return  Help text.
+     */
+    inline QString description() const
+    {
+        return m_sDescription;
+    }
+
+    //=========================================================================================================
+    /**
+    * Gets the number of parameters.
+    *
+    * @return number of parameters.
+    */
+    inline quint32 paramNumber() const
+    {
+        return m_vecParamNames.size();
+    }
+
+    //=========================================================================================================
+    /**
+    * Get parameter descriptions
+    *
+    * @return parameter descriptions
+    */
+    inline QVector<QString> paramDescriptions() const
+    {
+        return m_vecParamDescriptions;
+    }
+
 
 //    //=========================================================================================================
 //    /**
@@ -95,10 +124,10 @@ public:
     {
         if (this != &rh) // protect against invalid self-assignment
         {
-            m_sCommandName = rh.m_sCommandName;
+            m_sCommand = rh.m_sCommand;
             m_sDescription = rh.m_sDescription;
             m_vecParamNames = rh.m_vecParamNames;
-            m_vecParamDescription = rh.m_vecParamDescription;
+            m_vecParamDescriptions = rh.m_vecParamDescriptions;
             m_vecParamValue = rh.m_vecParamValue;
         }
         // to support chained assignment operators (a=b=c), always return *this
@@ -110,10 +139,10 @@ signals:
     void received(Command);
 
 public:
-    QString             m_sCommandName;
+    QString             m_sCommand;
     QString             m_sDescription;
     QVector<QString>    m_vecParamNames;
-    QVector<QString>    m_vecParamDescription;
+    QVector<QString>    m_vecParamDescriptions;
     QVector<QVariant>   m_vecParamValue;
 };
 
