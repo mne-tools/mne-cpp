@@ -44,7 +44,7 @@ SUBDIRS += generics \
     mne \
     rtClient \
     rtInv \
-    rtCommunication
+    rtCommand
 
 #qtHaveModule(3d): SUBDIRS += disp
 contains(Qt3D_available, true) {

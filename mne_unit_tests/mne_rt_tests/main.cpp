@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <rtCommunication/communicationmanager.h>
+#include <rtCommand/commandmanager.h>
 
 
 //*************************************************************************************************************
@@ -56,6 +56,7 @@
 
 #include <QtCore/QCoreApplication>
 #include <QDebug>
+#include <QJsonObject>
 
 
 //*************************************************************************************************************
@@ -64,7 +65,7 @@
 //=============================================================================================================
 
 //using namespace MNEUNITTESTS;
-using namespace RTCOMMUNICATIONLIB;
+using namespace RTCOMMANDLIB;
 
 
 //*************************************************************************************************************
@@ -92,30 +93,37 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
     bool testResult;
 
-    QString jsonTestCommand = "{"
-                        "  \"encoding\": \"UTF-8\","
-                        "  \"name\": \"Neuromag\","
-                        "  \"Commands\": {"
-                        "     \"help\": ["
-                        "         {"
-                        "             \"param1\": \"int\","
-                        "             \"param2\": \"string\""
-                        "         }"
-                        "     ],"
-                        "     \"start\": ["
-                        "         {"
-                        "             \"param1\": \"int\","
-                        "             \"param2\": \"string\""
-                        "         }"
-                        "     ]"
-                        "  }"
-                        "}";
+    QString jsonTestCommand =
+            "{"
+            "   \"encoding\": \"UTF-8\","
+            "   \"device\": \"Neuromag\","
+            "   \"description\": \"Vector View\","
+            "   \"commands\": {"
+            "       \"help\": {"
+            "           \"description\": \"available commands\","
+            "           \"parameters\": {"
+            "               \"id\": {"
+            "                   \"description\": \"id descr\","
+            "                   \"type\": 1 "
+            "               },"
+            "               \"id2\": {"
+            "                   \"description\": \"id2 descr\","
+            "                   \"type\": 1 "
+            "               }"
+            "           }"
+            "       },"
+            "       \"start\": {"
+            "           \"description\": \"starts the measurement\","
+            "           \"parameters\": {}"
+            "       }"
+            "    }"
+            "}";
 
+    CommandManager t_comManager(jsonTestCommand.toLatin1());
 
+//    qDebug() << t_comManager.m_jsonDocumentOrigin.object().value(QString("commands")).toObject();
 
-    CommunicationManager t_comManager(jsonTestCommand.toLatin1());
-
-    qDebug() << t_comManager.m_jsonDocumentOrigin.toJson();
+//    qDebug() << t_comManager.m_jsonDocumentOrigin.toJson();
 
     return a.exec();
 }
