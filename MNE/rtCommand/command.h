@@ -154,6 +154,21 @@ public:
 
     //=========================================================================================================
     /**
+    * slot which performs parameter check before the received signal is emmited
+    * If parameter check is passed, values are assigned to this object instance.
+    *
+    * @param p_Command  Command which was received and has to be checked before it's emmited.
+    */
+    void receive(Command &p_Command);
+
+    //=========================================================================================================
+    /**
+    * slot which performs parameter check before the triggered signal is emmited
+    */
+    void send();
+
+    //=========================================================================================================
+    /**
     * Creates a JSON Command Object
     *
     * @return Command converted to a JSON Object.
