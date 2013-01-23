@@ -189,7 +189,8 @@ public:
     const QVariant operator[] (const QString &key) const;
 
 signals:
-
+    void triggered(Command);
+    void received(Command);
 
 public:
     QString             m_sCommand;

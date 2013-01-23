@@ -91,7 +91,6 @@ using namespace RTCOMMANDLIB;
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    bool testResult;
 
     QString jsonTestCommand =
             "{"
@@ -132,6 +131,14 @@ int main(int argc, char *argv[])
     qDebug() << t_comManager["help"]["id"];
 
     qDebug() << t_comManager["help"]["id2"];
+
+
+    CommandManager t_comManager2;
+
+    qDebug() << "Even comManager is not copied. Does it still contains help? " << t_comManager2.hasCommand(QString("help")) << " GOOD :-) it's still there.";
+
+
+
 
 
 //    qDebug() << t_comManager.m_jsonDocumentOrigin.object().value(QString("commands")).toObject();

@@ -49,13 +49,33 @@ class RTCOMMANDSHARED_EXPORT CommandManager : public QObject
 {
 Q_OBJECT
 public:
-    CommandManager(QByteArray &p_jsonDoc);
 
+    CommandManager(QObject *parent = 0);
 
-    inline bool hasCommand(QString & p_sCommand) const
+    CommandManager(QByteArray &p_jsonDoc, QObject *parent = 0);
+
+    virtual ~CommandManager();
+
+    //=========================================================================================================
+    /**
+    * Checks if a command is managed;
+    *
+    * @param p_sCommand     COmmand to check.
+    *
+    * @return true if part of command manager, false otherwise
+    */
+    inline bool hasCommand(QString &p_sCommand) const
     {
         return s_mapCommands.contains(p_sCommand);
     }
+
+    //=========================================================================================================
+    /**
+    * Parses a CLI command or JSON command (list). And emits a command received when its a valid command.
+    *
+    * @param p_sInput     Input to parse.
+    */
+    void parse(QString &p_sInput);
 
     //=========================================================================================================
     /**
@@ -89,20 +109,21 @@ public:
     /**
     * Attention overwrites existing items
     */
-    void insertJsonCommands(QJsonDocument &p_jsonDocument);
+    static void insertJsonCommands(QJsonDocument &p_jsonDocument);
 
 private:
-
     QJsonDocument m_jsonDocumentOrigin;
 
     static QMap<QString, Command> s_mapCommands;       /**< Holds static map of all available commands. Attention this is allocated statically! Lifetime extends across entire run of the programm. Accessible from all over the programm. */
 
 signals:
-    void newCommandsAvailable();//(QStringList)
+    void commandsInserted();//(QStringList)
 
-    void triggered(Command);
-    void received(Command);
+//    void triggered(Command);
+//    void received(Command);
 
+    void cliReply(QString);
+    void jsonReply(QString);
 };
 
 } // NAMESPACE
