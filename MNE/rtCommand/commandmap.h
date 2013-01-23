@@ -1,5 +1,5 @@
-#ifndef COMMUNICATIONMANAGER_H
-#define COMMUNICATIONMANAGER_H
+#ifndef COMMANDMAP_H
+#define COMMANDMAP_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -8,7 +8,7 @@
 
 #include "rtcommand_global.h"
 #include "command.h"
-#include "commandmap.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -16,7 +16,8 @@
 //=============================================================================================================
 
 #include <QObject>
-#include <QJsonDocument>
+#include <QMap>
+#include <QJsonObject>
 
 
 //*************************************************************************************************************
@@ -44,36 +45,36 @@ namespace RTCOMMANDLIB
 /**
 *
 */
-class RTCOMMANDSHARED_EXPORT CommandManager : public QObject
+class RTCOMMANDSHARED_EXPORT CommandMap : public QObject
 {
     Q_OBJECT
 public:
-    CommandManager(QObject *parent = 0);
-
-    CommandManager(QByteArray &p_jsonDoc, QObject *parent = 0);
-
-    virtual ~CommandManager();
+    CommandMap(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Checks if a command is managed;
+    * Returns true if the map contains a command item with key p_sCommand; otherwise returns false.
     *
-    * @param p_sCommand     COmmand to check.
-    *
-    * @return true if part of command manager, false otherwise
+    *@param p_sKey  Command key word.
     */
-    inline bool hasCommand(QString &p_sCommand) const
-    {
-        return s_commandMap.contains(p_sCommand);
-    }
+    bool contains(const QString &p_sKey) const;
 
     //=========================================================================================================
     /**
-    * Parses a CLI command or JSON command (list). And emits a command received when its a valid command.
+    * Inserts a new command and emmits dataChanged signal.
     *
-    * @param p_sInput     Input to parse.
+    * @param p_sKey     Command key word.
+    * @param p_Command  Command content.
     */
-    void parse(QString &p_sInput);
+    void insert(const QString &p_sKey, const Command &p_Command);
+
+    //=========================================================================================================
+    /**
+    * Inserts a map of new commands and emmits dataChanged signal.
+    *
+    * @param p_qMapCommands    the command key word.
+    */
+    void insert(const QMap<QString,Command> &p_qMapCommands);
 
     //=========================================================================================================
     /**
@@ -103,30 +104,14 @@ public:
     */
     const Command& operator[] (const QString &key) const;
 
-    //=========================================================================================================
-    /**
-    * Attention overwrites existing items
-    */
-    static void insertJsonCommands(QJsonDocument &p_jsonDocument);
+signals:
+    void dataChanged();
 
 private:
+    QMap<QString, Command> m_qMapCommands;       /**< Holds static map of all available commands. Attention this is allocated statically! Lifetime extends across entire run of the programm. Accessible from all over the programm. */
 
-    QJsonDocument m_jsonDocumentOrigin;
-
-    static CommandMap s_commandMap;     /**< Holds static map as an internal lookuptable of all available commands.
-                                             Attention this is allocated statically! Lifetime extends across entire run of the programm.
-                                             Accessible from all CommandManager instances. */
-
-signals:
-    void commandsInserted();//(QStringList)
-
-//    void triggered(Command);
-//    void received(Command);
-
-    void cliReply(QString);
-    void jsonReply(QString);
 };
 
 } // NAMESPACE
 
-#endif // COMMUNICATIONMANAGER_H
+#endif // COMMANDMAP_H

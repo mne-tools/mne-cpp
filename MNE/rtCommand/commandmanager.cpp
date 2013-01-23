@@ -67,9 +67,14 @@ void CommandManager::insertJsonCommands(QJsonDocument &p_jsonDocument)
     else
         return;
 
+    QMap<QString, Command> t_qMapCommands;
     QJsonObject::Iterator it;
     for(it = t_jsonObjectCommand.begin(); it != t_jsonObjectCommand.end(); ++it)
-        s_mapCommands.insert(it.key(), Command(it.key(), it.value().toObject()));//Attention overwrites existing items
+        t_qMapCommands.insert(it.key(), Command(it.key(), it.value().toObject()));
+
+    //Do insertion in one step to, have only one dataUpdate emmited;
+    //Attention overwrites existing items
+    s_commandMap.insert(t_qMapCommands);
 }
 
 
@@ -92,13 +97,7 @@ void parse(QString &p_sInput)
 
 QJsonObject CommandManager::toJsonObject() const
 {
-    QJsonObject p_jsonCommandsObject;
-
-    QMap<QString, Command>::Iterator it;
-    for(it = s_mapCommands.begin(); it != s_mapCommands.end(); ++it)
-        p_jsonCommandsObject.insert(it.key(),QJsonValue(it.value().toJsonObject()));
-
-    return p_jsonCommandsObject;
+    return s_commandMap.toJsonObject();
 }
 
 
@@ -106,7 +105,7 @@ QJsonObject CommandManager::toJsonObject() const
 
 Command& CommandManager::operator[] (const QString &key)
 {
-    return s_mapCommands[key];
+    return s_commandMap[key];
 }
 
 
@@ -114,7 +113,7 @@ Command& CommandManager::operator[] (const QString &key)
 
 const Command& CommandManager::operator[] (const QString &key) const
 {
-    return s_mapCommands[key];
+    return s_commandMap[key];
 }
 
 
@@ -124,4 +123,4 @@ const Command& CommandManager::operator[] (const QString &key) const
 // STATIC DEFINITIONS
 //=============================================================================================================
 
-QMap<QString, Command> CommandManager::s_mapCommands;
+CommandMap CommandManager::s_commandMap;

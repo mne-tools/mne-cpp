@@ -72,13 +72,15 @@ win32 {
 
 SOURCES += \
     command.cpp \
-    commandmanager.cpp
+    commandmanager.cpp \
+    commandmap.cpp
 
 
 HEADERS += \
     command.h \
     commandmanager.h \
-    rtcommand_global.h
+    rtcommand_global.h \
+    commandmap.h
 
 
 # INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
