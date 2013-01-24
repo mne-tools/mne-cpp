@@ -30,10 +30,11 @@ using namespace RTCOMMANDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Command::Command(QObject *parent)
+Command::Command(bool p_bIsJson, QObject *parent)
 : QObject(parent)
 , m_sCommand("")
 , m_sDescription("")
+, m_bIsJson(p_bIsJson)
 {
 
 }
@@ -41,8 +42,9 @@ Command::Command(QObject *parent)
 
 //*************************************************************************************************************
 
-Command::Command(const QString &p_sCommand, const QJsonObject &p_qCommandDescription, QObject *parent)
+Command::Command(const QString &p_sCommand, const QJsonObject &p_qCommandDescription, bool p_bIsJson, QObject *parent)
 : QObject(parent)
+, m_bIsJson(p_bIsJson)
 {
     this->m_sCommand = p_sCommand;
     this->m_sDescription = p_qCommandDescription.value(QString("description")).toString();
@@ -63,10 +65,11 @@ Command::Command(const QString &p_sCommand, const QJsonObject &p_qCommandDescrip
 
 //*************************************************************************************************************
 
-Command::Command(const QString &p_sCommand, const QString &p_sDescription, QObject *parent)
+Command::Command(const QString &p_sCommand, const QString &p_sDescription, bool p_bIsJson, QObject *parent)
 : QObject(parent)
 , m_sCommand(p_sCommand)
 , m_sDescription(p_sDescription)
+, m_bIsJson(p_bIsJson)
 {
 
 }
@@ -75,10 +78,11 @@ Command::Command(const QString &p_sCommand, const QString &p_sDescription, QObje
 //*************************************************************************************************************
 
 Command::Command(   const QString &p_sCommand, const QString &p_sDescription,
-                    const QMap<QString, QVariant> &p_mapParameters, QObject *parent)
+                    const QMap<QString, QVariant> &p_mapParameters, bool p_bIsJson, QObject *parent)
 : QObject(parent)
 , m_sCommand(p_sCommand)
 , m_sDescription(p_sDescription)
+, m_bIsJson(p_bIsJson)
 {
     m_mapParameters = p_mapParameters;
 
@@ -90,10 +94,11 @@ Command::Command(   const QString &p_sCommand, const QString &p_sDescription,
 //*************************************************************************************************************
 
 Command::Command(   const QString &p_sCommand, const QString &p_sDescription,
-                    const QMap<QString, QVariant> &p_mapParameters, const QList<QString> &p_vecParameterDescriptions, QObject *parent)
+                    const QMap<QString, QVariant> &p_mapParameters, const QList<QString> &p_vecParameterDescriptions, bool p_bIsJson, QObject *parent)
 : QObject(parent)
 , m_sCommand(p_sCommand)
 , m_sDescription(p_sDescription)
+, m_bIsJson(p_bIsJson)
 {
     if(p_mapParameters.size() == p_vecParameterDescriptions.size())
     {
@@ -116,6 +121,7 @@ Command::Command(const Command &p_Command)
 , m_sDescription(p_Command.m_sDescription)
 , m_mapParameters(p_Command.m_mapParameters)
 , m_vecParamDescriptions(p_Command.m_vecParamDescriptions)
+, m_bIsJson(p_Command.m_bIsJson)
 {
 
 }
@@ -164,6 +170,29 @@ QJsonObject Command::toJsonObject() const
     return p_jsonCommandObject;
 }
 
+
+
+//*************************************************************************************************************
+
+QStringList Command::toStringList() const
+{
+    QStringList p_stringCommandList;
+
+    p_stringCommandList << m_sCommand;
+
+    QString t_sParameters;
+    for(qint32 i = 0; i < m_vecParamDescriptions.size(); ++i)
+    {
+        t_sParameters.append("[");
+        t_sParameters.append(m_vecParamDescriptions[i]);
+        t_sParameters.append("]");
+    }
+    p_stringCommandList << t_sParameters;
+
+    p_stringCommandList << m_sDescription;
+
+    return p_stringCommandList;
+}
 
 //*************************************************************************************************************
 

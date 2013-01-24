@@ -5,6 +5,7 @@
 //=============================================================================================================
 
 #include "commandmap.h"
+#include <math.h>
 
 
 //*************************************************************************************************************
@@ -81,6 +82,35 @@ QJsonObject CommandMap::toJsonObject() const
 
     return p_jsonCommandsObject;
 }
+
+
+//*************************************************************************************************************
+
+QString CommandMap::toString() const
+{
+    QString t_sOutput("");
+
+    QMap<QString, Command>::ConstIterator it;
+    for(it = m_qMapCommands.begin(); it != m_qMapCommands.end(); ++it)
+    {
+        QStringList t_sCommandList = it.value().toStringList();
+        QString t_sCommand;
+        t_sCommand.append(QString("\t%1").arg(t_sCommandList[0]));
+
+        for(qint32 i = 0; i < 2 - (int)floor((double)t_sCommandList[0].size()/8.0); ++i)
+            t_sCommand.append(QString("\t"));
+        t_sCommand.append(t_sCommandList[1]);
+
+        for(qint32 i = 0; i < 3 - (int)floor((double)t_sCommandList[1].size()/8.0); ++i)
+            t_sCommand.append(QString("\t"));
+        t_sCommand.append(QString("%1\n\r").arg(t_sCommandList[2]));
+
+        t_sOutput.append(t_sCommand);
+    }
+
+    return t_sOutput;
+}
+
 
 //*************************************************************************************************************
 

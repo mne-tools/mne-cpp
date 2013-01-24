@@ -24,6 +24,7 @@
 #include <QSharedPointer>
 #include <QDebug>
 #include <QPair>
+#include <QStringList>
 
 
 //*************************************************************************************************************
@@ -47,9 +48,10 @@ public:
     /**
     * Default constructor.
     *
-    * @param[in] parent                 Parent QObject (optional)
+    * @param[in] p_bIsJson      If is received/should be send as JSON (optional, default true)
+    * @param[in] parent         Parent QObject (optional)
     */
-    Command(QObject *parent = 0);
+    Command(bool p_bIsJson = true, QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -57,28 +59,34 @@ public:
     *
     * @param[in] p_sCommand         Command
     * @param[in] p_qCommandContent  Content encapsulated in a JsonObject
+    * @param[in] p_bIsJson          If is received/should be send as JSON (optional, default true)
+    * @param[in] parent             Parent QObject (optional)
     */
-    explicit Command(const QString &p_sCommand, const QJsonObject &p_qCommandContent, QObject *parent = 0);
+    explicit Command(const QString &p_sCommand, const QJsonObject &p_qCommandContent, bool p_bIsJson = true, QObject *parent = 0);
 
     //=========================================================================================================
     /**
     * Constructs a command without parameters
     *
-    * @param[in] p_sCommand                 Command
-    * @param[in] p_sDescription             Command description
+    * @param[in] p_sCommand         Command
+    * @param[in] p_sDescription     Command description
+    * @param[in] p_bIsJson          If is received/should be send as JSON (optional, default true)
+    * @param[in] parent             Parent QObject (optional)
     */
-    explicit Command(const QString &p_sCommand, const QString &p_sDescription, QObject *parent = 0);
+    explicit Command(const QString &p_sCommand, const QString &p_sDescription, bool p_bIsJson = true, QObject *parent = 0);
 
     //=========================================================================================================
     /**
     * Constructor which assembles a command from single parts
     *
-    * @param[in] p_sCommand                 Command
-    * @param[in] p_sDescription             Command description
-    * @param[in] p_mapParameters            Parameter names + values/types.
+    * @param[in] p_sCommand         Command
+    * @param[in] p_sDescription     Command description
+    * @param[in] p_mapParameters    Parameter names + values/types.
+    * @param[in] p_bIsJson          If is received/should be send as JSON (optional, default true)
+    * @param[in] parent             Parent QObject (optional)
     */
     explicit Command(const QString &p_sCommand, const QString &p_sDescription,
-                     const QMap<QString, QVariant> &p_mapParameters, QObject *parent = 0);
+                     const QMap<QString, QVariant> &p_mapParameters, bool p_bIsJson = true, QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -90,7 +98,7 @@ public:
     * @param[in] p_vecParameterDescriptions Parameter descriptions;
     */
     explicit Command(const QString &p_sCommand, const QString &p_sDescription,
-                     const QMap<QString, QVariant> &p_mapParameters, const QList<QString> &p_vecParameterDescriptions, QObject *parent = 0);
+                     const QMap<QString, QVariant> &p_mapParameters, const QList<QString> &p_vecParameterDescriptions, bool p_bIsJson = true, QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -119,6 +127,17 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the number of parameters.
+    *
+    * @return number of parameters.
+    */
+    inline quint32 count() const
+    {
+        return m_mapParameters.size();
+    }
+
+    //=========================================================================================================
+    /**
      * Gets the help text or description of this command.
      *
      * @return  Help text.
@@ -130,13 +149,13 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the number of parameters.
+    * If received command was Json fomratted or triggered command should be Json formatted.
     *
-    * @return number of parameters.
+    * @return Json formatted.
     */
-    inline quint32 count() const
+    inline bool& isJson()
     {
-        return m_mapParameters.size();
+        return m_bIsJson;
     }
 
     //=========================================================================================================
@@ -197,6 +216,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Creates a StringList with three items. First item is the command, second the parameter list and thrid the description.
+    *
+    * @return Command as a StringList.
+    */
+    QStringList toStringList() const;
+
+    //=========================================================================================================
+    /**
     * Assignment Operator
     *
     * @param[in] rhs     Command which should be assigned.
@@ -228,10 +255,11 @@ signals:
     void received();
 
 public:
+    bool                m_bIsJson;
     QString             m_sCommand;
     QString             m_sDescription;
     QMap<QString, QVariant> m_mapParameters;
-    QList<QString>    m_vecParamDescriptions;
+    QList<QString>      m_vecParamDescriptions;
 };
 
 } // NAMESPACE

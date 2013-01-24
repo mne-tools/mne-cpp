@@ -88,11 +88,30 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns number of available commands.
+    *
+    * @return number of available commands.
+    */
+    inline qint32 size()
+    {
+        return m_qMapCommands.size();
+    }
+
+    //=========================================================================================================
+    /**
     * Creates an object of JSON Command Objects
     *
     * @return JSON Command Objects converted to a JSON Object.
     */
     QJsonObject toJsonObject() const;
+
+    //=========================================================================================================
+    /**
+    * Formats commands for e.g. command line output.
+    *
+    * @return Commands with parameters and descriptions.
+    */
+    QString toString() const;
 
     //=========================================================================================================
     /**

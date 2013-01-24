@@ -159,6 +159,14 @@ QJsonObject CommandManager::toJsonObject() const
 
 //*************************************************************************************************************
 
+QString CommandManager::toString() const
+{
+    return s_commandMap.toString();
+}
+
+
+//*************************************************************************************************************
+
 Command& CommandManager::operator[] (const QString &key)
 {
     return s_commandMap[key];
