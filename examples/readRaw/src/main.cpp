@@ -112,9 +112,7 @@ int main(int argc, char *argv[])
     bool want_eeg   = false;
     bool want_stim  = false;
 
-//    MatrixXi picks = Fiff::pick_types(raw.info, want_meg, want_eeg, want_stim, include, raw.info->bads);
-    MatrixXi picks = raw.info->pick_types(want_meg, want_eeg, want_stim, include, raw.info->bads); //Prefer member function
-
+    RowVectorXi picks = raw.info->pick_types(want_meg, want_eeg, want_stim, include, raw.info->bads);
 
     //
     //   Set up projection
@@ -134,28 +132,17 @@ int main(int argc, char *argv[])
         //
         //   Create the projector
         //
-//        fiff_int_t nproj = MNE::make_projector_info(raw.info, raw.proj); Using the member function instead
         fiff_int_t nproj = raw.info->make_projector_info(raw.proj);
 
-
-//        qDebug() << raw.proj.data->data.rows();
-//        qDebug() << raw.proj.data->data.cols();
-//        std::cout << "proj: \n" << raw.proj.data->data.block(0,0,10,10);
-
         if (nproj == 0)
-        {
             printf("The projection vectors do not apply to these channels\n");
-        }
         else
-        {
             printf("Created an SSP operator (subspace dimension = %d)\n",nproj);
-        }
     }
 
     //
     //   Set up the CTF compensator
     //
-//    qint32 current_comp = MNE::get_current_comp(raw.info);
     qint32 current_comp = raw.info->get_current_comp();
     qint32 dest_comp = -1;
 
@@ -170,7 +157,6 @@ int main(int argc, char *argv[])
         qDebug() << "This part needs to be debugged";
         if(MNE::make_compensator(*raw.info.data(), current_comp, dest_comp, raw.comp))
         {
-//            raw.info->chs = MNE::set_current_comp(raw.info->chs,dest_comp);
             raw.info->set_current_comp(dest_comp);
             printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
         }

@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mne_rt_server.pro
+# @file     mne_lib_tests.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile to build the core app.
+# @brief    This project file generates the makefile for mne_lib_tests for algorithm validation.
 #
 #--------------------------------------------------------------------------------------------------------------
 

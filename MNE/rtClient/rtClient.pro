@@ -1,7 +1,8 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     rtinv.pro
+# @file     rtClient.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+#           Christof Pieloth;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
 # @date     July, 2012
@@ -29,7 +30,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the rtinv library.
+# @brief    This project file builds the rtClient library.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -37,11 +38,12 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       -= gui
+QT += network
+QT -= gui
 
-DEFINES += RTINV_LIBRARY
+DEFINES += RTCLIENT_LIBRARY
 
-TARGET = RtInv
+TARGET = RtClient
 TARGET = $$join(TARGET,,MNE$$MNE_LIB_VERSION,)
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -50,13 +52,10 @@ CONFIG(debug, debug|release) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Genericsd
-
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Generics
 }
 
@@ -75,19 +74,21 @@ win32 {
 }
 
 SOURCES += \
-        rtinv.cpp \
-        rtcov.cpp \
+    rtclient.cpp \
+    rtdataclient.cpp \
+    rtcmdclient.cpp
 
 HEADERS +=  \
-        rtinv.h\
-        rtinv_global.h \
-        rtcov.h
+    rtclient_global.h \
+    rtclient.h \
+    rtcmdclient.h \
+    rtdataclient.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 # Install headers to include directory
 header_files.files = ./*.h
-header_files.path = $${MNE_INCLUDE_DIR}/rtinv
+header_files.path = $${MNE_INCLUDE_DIR}/rtclient
 
 INSTALLS += header_files

@@ -62,7 +62,10 @@
 /mne_rt_server/MATLAB
 /mne_rt_server/ex_matlab/*.asv
 /*.5pre1
+Makefile
 
 # IDE settings
 .cproject
 .project
+.settings
+/bin/MNE-sample-data/*.txt

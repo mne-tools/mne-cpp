@@ -1,14 +1,15 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mnemath.pro
+# @file     rtCommand.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+#           Christof Pieloth;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     July, 2012
+# @date     January, 2013
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2012, Christoph Dinh, Christof Pieloth and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -29,7 +30,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the mne_math library.
+# @brief    This project file builds the RtCommunication library.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -39,12 +40,20 @@ TEMPLATE = lib
 
 QT       -= gui
 
-DEFINES += MNEMATH_LIBRARY
+DEFINES += RTCOMMAND_LIBRARY
 
-TARGET = MneMath
+TARGET = RtCommand
 TARGET = $$join(TARGET,,MNE$$MNE_LIB_VERSION,)
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
+}
+
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+
+}
+else {
+
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}
@@ -61,18 +70,24 @@ win32 {
     QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
 }
 
-SOURCES += kmeans.cpp \
-    mnemath.cpp
+SOURCES += \
+    command.cpp \
+    commandmanager.cpp \
+    commandmap.cpp
 
-HEADERS +=  kmeans.h\
-            mnemath_global.h \
-    mnemath.h
 
-INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
-INCLUDEPATH += $${MNE_INCLUDE_DIR}
+HEADERS += \
+    command.h \
+    commandmanager.h \
+    rtcommand_global.h \
+    commandmap.h
+
+
+# INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+# INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 # Install headers to include directory
 header_files.files = ./*.h
-header_files.path = $${MNE_INCLUDE_DIR}/mnemath
+header_files.path = $${MNE_INCLUDE_DIR}/rtCommunication
 
 INSTALLS += header_files
