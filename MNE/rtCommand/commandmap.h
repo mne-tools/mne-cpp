@@ -61,6 +61,16 @@ public:
 
     //=========================================================================================================
     /**
+    * Insert a command without parameters
+    * Attention existing items are overwritten.
+    *
+    * @param p_sKey             Command key word.
+    * @param p_sDescription     Command description.
+    */
+    void insert(const QString &p_sKey, const QString &p_sDescription);
+
+    //=========================================================================================================
+    /**
     * Inserts a new command and emmits dataChanged signal.
     *
     * @param p_sKey     Command key word.
@@ -72,9 +82,9 @@ public:
     /**
     * Inserts a map of new commands and emmits dataChanged signal.
     *
-    * @param p_qMapCommands    the command key word.
+    * @param p_qCommandMap    the command key word.
     */
-    void insert(const QMap<QString,Command> &p_qMapCommands);
+    void insert(const CommandMap &p_qCommandMap);
 
     //=========================================================================================================
     /**
@@ -105,7 +115,7 @@ public:
     const Command& operator[] (const QString &key) const;
 
 signals:
-    void dataChanged();
+    void commandMapChanged();
 
 private:
     QMap<QString, Command> m_qMapCommands;       /**< Holds static map of all available commands. Attention this is allocated statically! Lifetime extends across entire run of the programm. Accessible from all over the programm. */

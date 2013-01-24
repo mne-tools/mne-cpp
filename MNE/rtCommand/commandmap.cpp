@@ -37,26 +37,35 @@ bool CommandMap::contains(const QString &p_sKey) const
 
 //*************************************************************************************************************
 
-void CommandMap::insert(const QString &p_sKey, const Command &p_Command)
+void CommandMap::insert(const QString &p_sKey, const QString &p_sDescription)
 {
-    m_qMapCommands.insert(p_sKey, p_Command);
-    emit dataChanged();
+    Command t_command(p_sKey, p_sDescription);
+    insert(p_sKey, t_command);
 }
 
 
 //*************************************************************************************************************
 
-void CommandMap::insert(const QMap<QString,Command> &p_qMapCommands)
+void CommandMap::insert(const QString &p_sKey, const Command &p_Command)
+{
+    m_qMapCommands.insert(p_sKey, p_Command);
+    emit commandMapChanged();
+}
+
+
+//*************************************************************************************************************
+
+void CommandMap::insert(const CommandMap &p_qCommandMap)
 {
     QMap<QString,Command>::ConstIterator it;
-    for(it = p_qMapCommands.begin(); it != p_qMapCommands.end(); ++it)
+    for(it = p_qCommandMap.m_qMapCommands.begin(); it != p_qCommandMap.m_qMapCommands.end(); ++it)
     {
         if(!m_qMapCommands.contains(it.key()))
             m_qMapCommands.insert(it.key(), it.value());
         else
             printf("Warning: CommandMap contains command %s already. Insertion skipped.\n", it.key().toLatin1().constData());
     }
-    emit dataChanged();
+    emit commandMapChanged();
 }
 
 

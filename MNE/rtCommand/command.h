@@ -58,11 +58,31 @@ public:
     * @param[in] p_sCommand         Command
     * @param[in] p_qCommandContent  Content encapsulated in a JsonObject
     */
-    explicit Command(QString &p_sCommand, QJsonObject &p_qCommandContent);
+    explicit Command(const QString &p_sCommand, const QJsonObject &p_qCommandContent, QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Constructor which parses a command stored in a json object
+    * Constructs a command without parameters
+    *
+    * @param[in] p_sCommand                 Command
+    * @param[in] p_sDescription             Command description
+    */
+    explicit Command(const QString &p_sCommand, const QString &p_sDescription, QObject *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Constructor which assembles a command from single parts
+    *
+    * @param[in] p_sCommand                 Command
+    * @param[in] p_sDescription             Command description
+    * @param[in] p_mapParameters            Parameter names + values/types.
+    */
+    explicit Command(const QString &p_sCommand, const QString &p_sDescription,
+                     const QMap<QString, QVariant> &p_mapParameters, QObject *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Constructor which assembles a command from single parts
     *
     * @param[in] p_sCommand                 Command
     * @param[in] p_sDescription             Command description
@@ -70,7 +90,7 @@ public:
     * @param[in] p_vecParameterDescriptions Parameter descriptions;
     */
     explicit Command(const QString &p_sCommand, const QString &p_sDescription,
-                     const QMap<QString, QVariant> &p_mapParameters, const QList<QString> &p_vecParameterDescriptions);
+                     const QMap<QString, QVariant> &p_mapParameters, const QList<QString> &p_vecParameterDescriptions, QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -204,8 +224,8 @@ public:
     const QVariant operator[] (const QString &key) const;
 
 signals:
-    void triggered(Command);
-    void received(Command);
+    void triggered();
+    void received();
 
 public:
     QString             m_sCommand;

@@ -55,7 +55,10 @@
 //=============================================================================================================
 
 #include <QtCore/QCoreApplication>
+#include <QVariant>
+#include <QMetaType>
 #include <QDebug>
+#include <QObject>
 #include <QJsonObject>
 
 
@@ -66,6 +69,60 @@
 
 //using namespace MNEUNITTESTS;
 using namespace RTCOMMANDLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DataParserTest
+//=============================================================================================================
+
+class DataParserTest //: public QObject
+{
+//Q_OBJECT
+public:
+    DataParserTest()
+    : m_commandManager("DataParserTest")
+    {
+        CommandMap t_commandMap;
+
+        QMap<QString, QVariant> t_qMap;
+        QList<QString> t_qIdDescription;
+
+        t_qMap.insert("id", QVariant(QVariant::String));
+        t_qIdDescription.append("ID/Alias");
+
+        t_commandMap.insert("measinfo", Command("measinfo", "sends the measurement info to the specified FiffStreamClient.", t_qMap, t_qIdDescription));
+        t_commandMap.insert("meas", Command("meas", "adds specified FiffStreamClient to raw data buffer receivers. If acquisition is not already strated, it is triggered.", t_qMap, t_qIdDescription));
+        t_commandMap.insert("stop", Command("stop", "removes specified FiffStreamClient from raw data buffer receivers.", t_qMap, t_qIdDescription));
+        t_qMap.clear();t_qIdDescription.clear();
+        t_commandMap.insert("stop-all", "stops the whole acquisition process.");
+
+        t_commandMap.insert("conlist", "prints and sends all available connectors");
+
+        t_qMap.insert("ConID", QVariant(QVariant::Int));
+        t_qIdDescription.append("Connector ID");
+        t_commandMap.insert("conlist", Command("conlist", "prints and sends all available connectors", t_qMap, t_qIdDescription));
+
+        t_commandMap.insert("help", "prints and sends this list");
+
+        t_commandMap.insert("close", "closes mne_rt_server");
+
+        m_commandManager.insertCommand(t_commandMap);
+
+//        QObject::connect(&m_commandManager["help"], &Command::received, this, &DataParserTest::helpReceived);
+    }
+
+    void helpReceived()
+    {
+        qDebug() << "Help triggered";
+    }
+
+private:
+    CommandManager m_commandManager;
+
+
+
+};
 
 
 //*************************************************************************************************************
@@ -92,13 +149,15 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
+    DataParserTest testParser;
+
     QString jsonTestCommand =
             "{"
             "   \"encoding\": \"UTF-8\","
             "   \"device\": \"Neuromag\","
             "   \"description\": \"Vector View\","
             "   \"commands\": {"
-            "       \"help\": {"
+            "       \"com1\": {"
             "           \"description\": \"available commands\","
             "           \"parameters\": {"
             "               \"id\": {"
@@ -111,18 +170,22 @@ int main(int argc, char *argv[])
             "               }"
             "           }"
             "       },"
-            "       \"start\": {"
+            "       \"com2\": {"
             "           \"description\": \"starts the measurement\","
             "           \"parameters\": {}"
             "       }"
             "    }"
             "}";
 
-    CommandManager t_comManager(jsonTestCommand.toLatin1());
+
+
+    CommandManager t_comManager2("test2");
+
+    CommandManager t_comManager(jsonTestCommand.toLatin1(), "test1");
 
     qDebug() << "Contains help? " << t_comManager.hasCommand(QString("help"));
     qDebug() << "Contains test? " << t_comManager.hasCommand(QString("test"));
-    qDebug() << "Contains start? " << t_comManager.hasCommand(QString("start"));
+    qDebug() << "Contains meas? " << t_comManager.hasCommand(QString("meas"));
 
 
     qDebug() << t_comManager["help"].toJsonObject();
@@ -133,12 +196,11 @@ int main(int argc, char *argv[])
     qDebug() << t_comManager["help"]["id2"];
 
 
-    CommandManager t_comManager2;
-
     qDebug() << "Even comManager is not copied. Does it still contains help? " << t_comManager2.hasCommand(QString("help")) << " GOOD :-) it's still there.";
 
 
 
+//    t_comManager2.insertJsonCommands();
 
 
 //    qDebug() << t_comManager.m_jsonDocumentOrigin.object().value(QString("commands")).toObject();
