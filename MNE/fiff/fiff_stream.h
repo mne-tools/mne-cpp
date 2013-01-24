@@ -75,8 +75,14 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QFile>
+#include <QByteArray>
 #include <QDataStream>
+#include <QFile>
+#include <QIODevice>
+#include <QList>
+#include <QSharedPointer>
+#include <QString>
+#include <QStringList>
 
 
 //*************************************************************************************************************

@@ -51,6 +51,7 @@
 // Qt INCLUDES
 //=============================================================================================================
 
+#include <QSharedPointer>
 #include <QString>
 #include <QStringList>
 

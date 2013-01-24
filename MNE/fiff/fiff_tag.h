@@ -112,12 +112,13 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDataStream>
 #include <QByteArray>
+#include <QDataStream>
+#include <QDebug>
 #include <QFile>
 #include <QList>
+#include <QSharedPointer>
 #include <QVector>
-#include <QDebug>
 
 
 //*************************************************************************************************************
