@@ -61,6 +61,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QSharedPointer>
+#include <QString>
 #include <QTcpSocket>
 
 
