@@ -77,34 +77,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Creates an object of JSON Command Objects
-    *
-    * @return JSON Command Objects converted to a JSON Object.
-    */
-    QJsonObject toJsonObject() const;
-
-    //=========================================================================================================
-    /**
-    * Subscript operator []
-    *
-    * @param key    the command key word.
-    *
-    * @return Command object related to command key word.
-    */
-    Command& operator[] (const QString &key);
-
-    //=========================================================================================================
-    /**
-    * Subscript operator []
-    *
-    * @param key    the command key word.
-    *
-    * @return Command object related to command key word.
-    */
-    const Command& operator[] (const QString &key) const;
-
-    //=========================================================================================================
-    /**
     * Insert commands containing in a json document.
     * Attention existing items are overwritten.
     *
@@ -129,6 +101,42 @@ public:
     * @param p_jsonDocument    JSON document containing commands.
     */
     void insertCommand(const QString &p_sKey, const QString &p_sDescription);
+
+    //=========================================================================================================
+    /**
+    * Creates an object of JSON Command Objects
+    *
+    * @return JSON Command Objects converted to a JSON Object.
+    */
+    QJsonObject toJsonObject() const;
+
+    //=========================================================================================================
+    /**
+    * Formats commands for e.g. command line output.
+    *
+    * @return Commands with parameters and descriptions.
+    */
+    QString toString() const;
+
+    //=========================================================================================================
+    /**
+    * Subscript operator []
+    *
+    * @param key    the command key word.
+    *
+    * @return Command object related to command key word.
+    */
+    Command& operator[] (const QString &key);
+
+    //=========================================================================================================
+    /**
+    * Subscript operator []
+    *
+    * @param key    the command key word.
+    *
+    * @return Command object related to command key word.
+    */
+    const Command& operator[] (const QString &key) const;
 
 private:
     void testSlot();

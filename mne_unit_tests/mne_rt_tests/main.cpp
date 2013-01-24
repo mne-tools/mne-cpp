@@ -95,17 +95,17 @@ public:
         t_commandMap.insert("meas", Command("meas", "adds specified FiffStreamClient to raw data buffer receivers. If acquisition is not already strated, it is triggered.", t_qMap, t_qIdDescription));
         t_commandMap.insert("stop", Command("stop", "removes specified FiffStreamClient from raw data buffer receivers.", t_qMap, t_qIdDescription));
         t_qMap.clear();t_qIdDescription.clear();
-        t_commandMap.insert("stop-all", "stops the whole acquisition process.");
+        t_commandMap.insert(QString("stop-all"), QString("stops the whole acquisition process."));
 
-        t_commandMap.insert("conlist", "prints and sends all available connectors");
+        t_commandMap.insert(QString("conlist"), QString("prints and sends all available connectors"));
 
         t_qMap.insert("ConID", QVariant(QVariant::Int));
         t_qIdDescription.append("Connector ID");
         t_commandMap.insert("conlist", Command("conlist", "prints and sends all available connectors", t_qMap, t_qIdDescription));
 
-        t_commandMap.insert("help", "prints and sends this list");
+        t_commandMap.insert(QString("help"), QString("prints and sends this list"));
 
-        t_commandMap.insert("close", "closes mne_rt_server");
+        t_commandMap.insert(QString("close"), QString("closes mne_rt_server"));
 
         m_commandManager.insertCommand(t_commandMap);
 
@@ -195,10 +195,14 @@ int main(int argc, char *argv[])
 
     qDebug() << t_comManager["help"]["id2"];
 
-
     qDebug() << "Even comManager is not copied. Does it still contains help? " << t_comManager2.hasCommand(QString("help")) << " GOOD :-) it's still there.";
 
+    qDebug() << t_comManager2["help"].toStringList();
 
+    qDebug() << t_comManager2["com1"].toStringList();
+
+
+    qDebug() << t_comManager2.toString();
 
 //    t_comManager2.insertJsonCommands();
 
