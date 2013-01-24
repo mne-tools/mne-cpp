@@ -115,6 +115,8 @@ QByteArray CommandServer::availableCommands()
 }
 
 
+//*************************************************************************************************************
+
 void CommandServer::incommingCommand(QString p_sCommand, qint32 p_iThreadID)
 {
 

@@ -48,9 +48,9 @@ class RTCOMMANDSHARED_EXPORT CommandManager : public QObject
 {
     Q_OBJECT
 public:
-    CommandManager(QObject *parent = 0);
+    CommandManager(const QString test, QObject *parent = 0);
 
-    CommandManager(QByteArray &p_jsonDoc, QObject *parent = 0);
+    CommandManager(const QByteArray &p_jsonDoc, const QString test,  QObject *parent = 0);
 
     virtual ~CommandManager();
 
@@ -62,7 +62,7 @@ public:
     *
     * @return true if part of command manager, false otherwise
     */
-    inline bool hasCommand(QString &p_sCommand) const
+    inline bool hasCommand(const QString &p_sCommand) const
     {
         return s_commandMap.contains(p_sCommand);
     }
@@ -73,7 +73,7 @@ public:
     *
     * @param p_sInput     Input to parse.
     */
-    void parse(QString &p_sInput);
+    bool parse(const QString &p_sInput);
 
     //=========================================================================================================
     /**
@@ -105,11 +105,37 @@ public:
 
     //=========================================================================================================
     /**
-    * Attention overwrites existing items
+    * Insert commands containing in a json document.
+    * Attention existing items are overwritten.
+    *
+    * @param p_jsonDocument    JSON document containing commands.
     */
-    static void insertJsonCommands(QJsonDocument &p_jsonDocument);
+    void insertCommand(const QJsonDocument &p_jsonDocument);
+
+    //=========================================================================================================
+    /**
+    * Insert commands of a json document.
+    * Attention existing items are overwritten.
+    *
+    * @param p_commandMap   command map which should be inserted.
+    */
+    void insertCommand(const CommandMap &p_commandMap);
+
+    //=========================================================================================================
+    /**
+    * Insert a single command.
+    * Attention existing items are overwritten.
+    *
+    * @param p_jsonDocument    JSON document containing commands.
+    */
+    void insertCommand(const QString &p_sKey, const QString &p_sDescription);
 
 private:
+    void testSlot();
+
+    QString m_sTest;
+
+    void init();
 
     QJsonDocument m_jsonDocumentOrigin;
 
@@ -118,7 +144,7 @@ private:
                                              Accessible from all CommandManager instances. */
 
 signals:
-    void commandsInserted();//(QStringList)
+    void commandMapChanged();//(QStringList)
 
 //    void triggered(Command);
 //    void received(Command);

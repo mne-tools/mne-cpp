@@ -13,6 +13,7 @@
 //=============================================================================================================
 
 #include <QVector>
+#include <QString>
 #include <QDebug>
 
 
@@ -30,7 +31,7 @@ using namespace RTCOMMANDLIB;
 //=============================================================================================================
 
 Command::Command(QObject *parent)
-    : QObject(parent)
+: QObject(parent)
 , m_sCommand("")
 , m_sDescription("")
 {
@@ -40,7 +41,8 @@ Command::Command(QObject *parent)
 
 //*************************************************************************************************************
 
-Command::Command(QString &p_sCommand, QJsonObject &p_qCommandDescription)
+Command::Command(const QString &p_sCommand, const QJsonObject &p_qCommandDescription, QObject *parent)
+: QObject(parent)
 {
     this->m_sCommand = p_sCommand;
     this->m_sDescription = p_qCommandDescription.value(QString("description")).toString();
@@ -61,9 +63,36 @@ Command::Command(QString &p_sCommand, QJsonObject &p_qCommandDescription)
 
 //*************************************************************************************************************
 
+Command::Command(const QString &p_sCommand, const QString &p_sDescription, QObject *parent)
+: QObject(parent)
+, m_sCommand(p_sCommand)
+, m_sDescription(p_sDescription)
+{
+
+}
+
+
+//*************************************************************************************************************
+
 Command::Command(   const QString &p_sCommand, const QString &p_sDescription,
-                    const QMap<QString, QVariant> &p_mapParameters, const QList<QString> &p_vecParameterDescriptions)
-: m_sCommand(p_sCommand)
+                    const QMap<QString, QVariant> &p_mapParameters, QObject *parent)
+: QObject(parent)
+, m_sCommand(p_sCommand)
+, m_sDescription(p_sDescription)
+{
+    m_mapParameters = p_mapParameters;
+
+    for(qint32 i = 0; i < m_mapParameters.size(); ++i)
+        m_vecParamDescriptions.append("");
+}
+
+
+//*************************************************************************************************************
+
+Command::Command(   const QString &p_sCommand, const QString &p_sDescription,
+                    const QMap<QString, QVariant> &p_mapParameters, const QList<QString> &p_vecParameterDescriptions, QObject *parent)
+: QObject(parent)
+, m_sCommand(p_sCommand)
 , m_sDescription(p_sDescription)
 {
     if(p_mapParameters.size() == p_vecParameterDescriptions.size())
@@ -82,7 +111,8 @@ Command::Command(   const QString &p_sCommand, const QString &p_sDescription,
 //*************************************************************************************************************
 
 Command::Command(const Command &p_Command)
-: m_sCommand(p_Command.m_sCommand)
+: QObject(p_Command.parent())
+, m_sCommand(p_Command.m_sCommand)
 , m_sDescription(p_Command.m_sDescription)
 , m_mapParameters(p_Command.m_mapParameters)
 , m_vecParamDescriptions(p_Command.m_vecParamDescriptions)
@@ -95,6 +125,22 @@ Command::Command(const Command &p_Command)
 
 Command::~Command()
 {
+}
+
+
+//*************************************************************************************************************
+
+void Command::receive(Command &p_Command)
+{
+    if(QString::compare(this->m_sCommand, p_Command.m_sCommand) == 0 && p_Command.m_mapParameters.size() == this->m_mapParameters.size())
+    {
+        for(qint32 i = 0; i < this->m_mapParameters.size(); ++i)
+            if(this->m_mapParameters.values()[i].type() != p_Command.m_mapParameters.values()[i].type())
+                return;
+        this->m_mapParameters.values() = p_Command.m_mapParameters.values();
+
+        emit this->received();
+    }
 }
 
 
