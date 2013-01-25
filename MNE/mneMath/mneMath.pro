@@ -73,6 +73,6 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 # Install headers to include directory
 header_files.files = ./*.h
-header_files.path = $${MNE_INCLUDE_DIR}/mnemath
+header_files.path = $${MNE_INCLUDE_DIR}/mneMath
 
 INSTALLS += header_files

@@ -88,6 +88,6 @@ HEADERS += \
 
 # Install headers to include directory
 header_files.files = ./*.h
-header_files.path = $${MNE_INCLUDE_DIR}/rtCommunication
+header_files.path = $${MNE_INCLUDE_DIR}/rtCommand
 
 INSTALLS += header_files
