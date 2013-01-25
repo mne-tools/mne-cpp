@@ -49,6 +49,7 @@ CommandManager::CommandManager(const QByteArray &p_jsonDoc, const QString test, 
     init();
 
     m_jsonDocumentOrigin = QJsonDocument::fromJson(p_jsonDoc);
+
     insertCommand(m_jsonDocumentOrigin);
 }
 
@@ -141,6 +142,35 @@ bool CommandManager::parse(const QString &p_sInput)
         if(this->hasCommand(t_qCommandList[0]))
         {
             qDebug() << "Command found";
+            if(t_qCommandList.size() == 1) //No parameters
+                parsedCommand = Command(t_qCommandList[0], QString(""), false);
+            else
+            {
+                // check if number of parameters is right
+                if(t_qCommandList.size()-1 == s_commandMap[t_qCommandList[0]].pValues().size())
+                {
+                    //Parse Parameters
+                    for(qint32 i = 1; i < t_qCommandList.size(); ++i)
+                    {
+                        QVariant::Type t_type = s_commandMap[t_qCommandList[0]].pValues()[i - 1].type();
+
+                        QVariant t_param(t_qCommandList[i]);
+
+                        if(t_param.canConvert(t_type) && t_param.convert(t_type))
+                            s_commandMap[t_qCommandList[0]].pValues()[i - 1] = t_param;
+                        else
+                            return false;
+                    }
+                }
+                else
+                    return false;
+            }
+
+            s_commandMap[t_qCommandList[0]].verify(parsedCommand);
+
+            qDebug() << "Command parsed";
+
+
             return true;
         }
     }

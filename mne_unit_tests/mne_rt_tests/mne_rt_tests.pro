@@ -61,8 +61,10 @@ DESTDIR = $${PWD}/../../bin
 
 SOURCES += \
     main.cpp \
+    dataparsertest.cpp
 
 HEADERS += \
+    dataparsertest.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

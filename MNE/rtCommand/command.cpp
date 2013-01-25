@@ -55,10 +55,11 @@ Command::Command(const QString &p_sCommand, const QJsonObject &p_qCommandDescrip
 
     for(it = t_jsonObjectParameter.begin(); it != t_jsonObjectParameter.end(); ++it)
     {
+        QJsonValue t_jsonValueType = it.value().toObject().value(QString("type"));
+        QVariant::Type t_type = QVariant::nameToType(t_jsonValueType.toString().toLatin1().constData());
+
+        this->m_mapParameters.insert(it.key(), QVariant(t_type));
         this->m_vecParamDescriptions.push_back(it.value().toObject().value(QString("description")).toString());
-        QVariant::Type type(static_cast<QVariant::Type>((int)it.value().toObject().value(QString("typeId")).toDouble()));
-        this->m_mapParameters.insert(it.key(), QVariant(type));
-//        qDebug() << "Type: " <<  this->m_vecParamValue[this->m_vecParamValue.size()-1].type();
     }
 }
 
@@ -136,10 +137,14 @@ Command::~Command()
 
 //*************************************************************************************************************
 
-void Command::receive(Command &p_Command)
+void Command::verify(const Command &p_Command)
 {
+    qDebug() << "in Verify" << this->m_sCommand << " the other " << p_Command.m_sCommand;
+    qDebug() << "Number " << p_Command.m_mapParameters.size() << " the other " << this->m_mapParameters.size();
     if(QString::compare(this->m_sCommand, p_Command.m_sCommand) == 0 && p_Command.m_mapParameters.size() == this->m_mapParameters.size())
     {
+        qDebug() << "QString::compared";
+
         for(qint32 i = 0; i < this->m_mapParameters.size(); ++i)
             if(this->m_mapParameters.values()[i].type() != p_Command.m_mapParameters.values()[i].type())
                 return;
@@ -214,7 +219,10 @@ Command& Command::operator= (const Command &rhs)
 
 QVariant& Command::operator[] (const QString &key)
 {
-    return m_mapParameters[key];
+    if(m_mapParameters.contains(key))
+        return m_mapParameters[key];
+    else
+        return defaultVariant;
 }
 
 
