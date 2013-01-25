@@ -44,7 +44,6 @@
 #include "ICommandParser.h"
 
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -54,6 +53,7 @@
 #include <QtPlugin>
 #include <QByteArray>
 #include <QStringList>
+#include <QJsonObject>
 
 
 //*************************************************************************************************************
@@ -211,8 +211,16 @@ public:
     virtual bool stop() = 0;
 
 
-
     inline void setBufferSampleSize(quint32 p_uiBuffSize);
+
+
+    //=========================================================================================================
+    /**
+    * Sets itsmeta data of the plugin after it was laoded by the pluginmanager.
+    *
+    * @param [in] status the new activation status of the module.
+    */
+    inline void setMetaData(QJsonObject& p_MetaData);
 
     //=========================================================================================================
     /**
@@ -254,7 +262,10 @@ protected:
 
     RawMatrixBuffer* m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
 
+    QJsonObject m_qJsonObjectMetaData;      /**< The meta data of the plugin defined in Q_PLUGIN_METADATA and the corresponding json file. */
+
 private:
+
     bool        m_bStatus;                  /**< Holds the activation status. */
     quint32     m_uiBufferSampleSize;       /**< Number of Buffer Sample Size */
 };
@@ -284,6 +295,14 @@ inline void IConnector::setBufferSampleSize(quint32 p_uiBuffSize)
 {
     if(p_uiBuffSize > 0)
         m_uiBufferSampleSize = p_uiBuffSize;
+}
+
+
+//*************************************************************************************************************
+
+inline void IConnector::setMetaData(QJsonObject& p_MetaData)
+{
+    m_qJsonObjectMetaData = p_MetaData;
 }
 
 

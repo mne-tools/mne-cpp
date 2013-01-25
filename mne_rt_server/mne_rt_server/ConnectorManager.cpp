@@ -305,13 +305,15 @@ void ConnectorManager::loadConnectors(const QString& dir)
         {
             IConnector* t_pIConnector = qobject_cast<IConnector*>(pConnector);
             t_pIConnector->setStatus(false);
+
+            //Add the curent plugin meta data
+            t_pIConnector->setMetaData(this->metaData());
+
             s_vecConnectors.push_back(t_pIConnector);
             printf("[done]\n");
         }
         else
-        {
             printf("failed!\n");
-        }
     }
 
     //
@@ -369,9 +371,6 @@ void ConnectorManager::loadConnectors(const QString& dir)
     //print
     printf("Connector list\n");
     printf(getConnectorList().data());
-
-
-    qDebug() << this->metaData();
 }
 
 
