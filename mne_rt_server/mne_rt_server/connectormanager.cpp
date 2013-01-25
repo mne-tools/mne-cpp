@@ -369,6 +369,9 @@ void ConnectorManager::loadConnectors(const QString& dir)
     //print
     printf("Connector list\n");
     printf(getConnectorList().data());
+
+
+    qDebug() << this->metaData();
 }
 
 
