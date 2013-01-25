@@ -88,6 +88,6 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 # Install headers to include directory
 header_files.files = ./*.h
-header_files.path = $${MNE_INCLUDE_DIR}/rtinv
+header_files.path = $${MNE_INCLUDE_DIR}/rtInv
 
 INSTALLS += header_files
