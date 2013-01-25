@@ -1,3 +1,7 @@
 {
-    "Keys": [ "neuromag" ]
+    "encoding": "UTF-8",
+    "device": "Neuromag",
+    "description": "Vector View",
+    "commands": {
+    }
 }

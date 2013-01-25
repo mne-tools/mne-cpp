@@ -15,7 +15,7 @@ public:
 
     void helpReceived()
     {
-        qDebug() << "Help triggered in DataParserTest";
+        qDebug() << "STILLL Help triggered in DataParserTest";
     }
 
 private:

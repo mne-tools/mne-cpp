@@ -156,6 +156,9 @@ int main(int argc, char *argv[])
 
     qDebug() << t_comManager2.toString();
 
+    qDebug() << t_comManager2.toString();
+
+
 
     t_comManager2.parse(QString("help"));
 

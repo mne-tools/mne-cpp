@@ -1,3 +1,25 @@
 {
-    "Keys": [ "fiff" ]  
+    "encoding": "UTF-8",
+    "device": "FiffSimulator",
+    "description": "Fiff file simulator",
+    "commands": {
+        "simfile": {
+            "description": "the fiff file which should be used as simulation file.",
+            "parameters": {
+                "file": {
+                    "description": "file",
+                    "type": "QString"
+                }
+            }
+        },
+        "bufsize": {
+            "description": "sets the buffer size of the FiffStreamClient raw data buffers",
+            "parameters": {
+                "samples": {
+                    "description": "samples",
+                    "type": "uint"
+                }
+            }
+        }
+    }
 }

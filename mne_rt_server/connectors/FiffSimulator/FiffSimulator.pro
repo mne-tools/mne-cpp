@@ -90,7 +90,7 @@ HEADERS += fiffsimulator.h\
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
-OTHER_FILES += fiffconnector.json
+OTHER_FILES += fiffsimulator.json
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $${PWD}
