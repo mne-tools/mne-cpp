@@ -34,6 +34,9 @@
 
 namespace RTCOMMANDLIB
 {
+
+static QVariant defaultVariant;
+
 /**
  * Interface for a command request. This is usually sent from client to server.
  */
@@ -198,7 +201,7 @@ public:
     *
     * @param p_Command  Command which was received and has to be checked before it's emmited.
     */
-    void receive(Command &p_Command);
+    void verify(const Command &p_Command);
 
     //=========================================================================================================
     /**

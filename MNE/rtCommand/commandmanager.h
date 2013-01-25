@@ -48,9 +48,9 @@ class RTCOMMANDSHARED_EXPORT CommandManager : public QObject
 {
     Q_OBJECT
 public:
-    CommandManager(const QString test, QObject *parent = 0);
+    explicit CommandManager(const QString test = QString("test"), QObject *parent = 0);
 
-    CommandManager(const QByteArray &p_jsonDoc, const QString test,  QObject *parent = 0);
+    explicit CommandManager(const QByteArray &p_jsonDoc, const QString test = QString("test"),  QObject *parent = 0);
 
     virtual ~CommandManager();
 

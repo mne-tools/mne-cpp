@@ -41,7 +41,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "ICommandParser.h"
+#include "ICommandParser.h" // ToDo remove this
+#include <rtCommand/commandmanager.h>
 
 
 //*************************************************************************************************************
@@ -66,6 +67,8 @@ namespace MSERVER
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace RTCOMMANDLIB;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -89,9 +92,12 @@ public:
 
     ~CommandServer();
 
+
     virtual QByteArray availableCommands();
 
     void incommingCommand(QString p_sCommand, qint32 p_iThreadID);
+
+    void init();
 
     virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
 
@@ -108,8 +114,8 @@ protected:
     void incomingConnection(qintptr socketDescriptor);
 
 private:
-
-    QList<ICommandParser*> m_qListParser;
+    QList<ICommandParser*> m_qListParser; //remove this
+    CommandManager m_commandManager; //replace by the new command manager
 
     qint32 m_iThreadCount;
 
