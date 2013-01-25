@@ -139,12 +139,8 @@ Command::~Command()
 
 void Command::verify(const Command &p_Command)
 {
-    qDebug() << "in Verify" << this->m_sCommand << " the other " << p_Command.m_sCommand;
-    qDebug() << "Number " << p_Command.m_mapParameters.size() << " the other " << this->m_mapParameters.size();
     if(QString::compare(this->m_sCommand, p_Command.m_sCommand) == 0 && p_Command.m_mapParameters.size() == this->m_mapParameters.size())
     {
-        qDebug() << "QString::compared";
-
         for(qint32 i = 0; i < this->m_mapParameters.size(); ++i)
             if(this->m_mapParameters.values()[i].type() != p_Command.m_mapParameters.values()[i].type())
                 return;

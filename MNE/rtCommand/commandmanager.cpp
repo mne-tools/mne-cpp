@@ -141,7 +141,6 @@ bool CommandManager::parse(const QString &p_sInput)
 
         if(this->hasCommand(t_qCommandList[0]))
         {
-            qDebug() << "Command found";
             if(t_qCommandList.size() == 1) //No parameters
                 parsedCommand = Command(t_qCommandList[0], QString(""), false);
             else
@@ -149,6 +148,7 @@ bool CommandManager::parse(const QString &p_sInput)
                 // check if number of parameters is right
                 if(t_qCommandList.size()-1 == s_commandMap[t_qCommandList[0]].pValues().size())
                 {
+                    qDebug() << "Parameter parsing";
                     //Parse Parameters
                     for(qint32 i = 1; i < t_qCommandList.size(); ++i)
                     {
@@ -167,8 +167,6 @@ bool CommandManager::parse(const QString &p_sInput)
             }
 
             s_commandMap[t_qCommandList[0]].verify(parsedCommand);
-
-            qDebug() << "Command parsed";
 
 
             return true;
