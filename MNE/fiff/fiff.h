@@ -82,12 +82,12 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QFile>
 #include <QDataStream>
+#include <QDebug>
+#include <QFile>
+#include <QIODevice>
 #include <QList>
 #include <QStringList>
-
-#include <QDebug>
 
 
 //*************************************************************************************************************
