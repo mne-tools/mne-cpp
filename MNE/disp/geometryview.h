@@ -44,6 +44,7 @@
 
 #include "disp_global.h"
 
+#include <fs/annotation.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -60,6 +61,7 @@
 
 #include "qglview.h"
 #include <QGeometryData>
+#include <QGLColorMaterial>
 
 
 //*************************************************************************************************************
@@ -76,6 +78,7 @@ namespace DISPLIB
 //=============================================================================================================
 
 using namespace MNELIB;
+using namespace FSLIB;
 
 
 //QT_BEGIN_NAMESPACE
@@ -127,14 +130,21 @@ protected:
 private:
     MNEForwardSolution t_ForwardSolution;   /**< Holds the forward soultion -> ToDo change this to shraed data pointer */
 
-    QGLLightModel *hemisphereLightModel;    /**< The selected light model. */
-    QGLLightParameters *lightParameters;    /**< The selected light parameters. */
+    bool m_bStereo;
 
-    QGeometryData data;                     /**< The geometry data. */
-    QGLSceneNode *hemisphere;               /**< Scene node of the hemisphere models. */
-    QGLSceneNode *scene;                    /**< Node of the scene. */
+    qint32 testCount;
 
-    QGLCamera *hemisphereFrontalCamera;     /**< Hemisphere frontal camera. */
+    QGLLightModel *m_pLightModel;    /**< The selected light model. */
+    QGLLightParameters *m_pLightParametersScene;    /**< The selected light parameters. */
+
+    QGLColorMaterial material;
+
+    QVector<Annotation::SPtr> m_vecAnnotation;
+
+    QGLSceneNode *m_pSceneNodeBrain;               /**< Scene node of the hemisphere models. */
+    QGLSceneNode *m_pSceneNode;                    /**< Node of the scene. */
+
+    QGLCamera *m_pCameraFrontal;     /**< frontal camera. */
 };
 
 } // NAMESPACE
