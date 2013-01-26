@@ -50,10 +50,10 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd
 }
 else {
-
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}
@@ -73,18 +73,20 @@ win32 {
 SOURCES += \
     command.cpp \
     commandmanager.cpp \
-    commandmap.cpp
+    commandmap.cpp \
+    commandparser.cpp
 
 
 HEADERS += \
     command.h \
     commandmanager.h \
     rtcommand_global.h \
-    commandmap.h
+    commandmap.h \
+    commandparser.h
 
 
 # INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
-# INCLUDEPATH += $${MNE_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 # Install headers to include directory
 header_files.files = ./*.h
