@@ -65,7 +65,26 @@ void CommandManager::testSlot()
 
 CommandManager::~CommandManager()
 {
-    //ToDo Remove here commands which where inserted into the static command list
+    //Disconnect all connections which are created with the help of this manager.
+    this->disconnectAll();
+
+    //Remove commands which where inserted into the static command list
+
+
+}
+
+
+//*************************************************************************************************************
+
+void CommandManager::disconnectAll()
+{
+    //Disconnect Slots
+    QMap<QString, QMetaObject::Connection>::Iterator it;
+    for(it = m_qMapSlots.begin(); it != m_qMapSlots.end(); ++it)
+        QObject::disconnect(it.value());
+    //Disconnect Signals
+    for(it = m_qMapSignals.begin(); it != m_qMapSignals.end(); ++it)
+        QObject::disconnect(it.value());
 }
 
 

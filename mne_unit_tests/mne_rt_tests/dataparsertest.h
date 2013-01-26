@@ -13,9 +13,10 @@ class DataParserTest : public QObject
 public:
     explicit DataParserTest(QObject *parent = 0);
 
-    void helpReceived()
+    void helpReceived(Command test)
     {
         qDebug() << "STILLL Help triggered in DataParserTest";
+        qDebug() << "Command: " << test.command();
     }
 
 private:

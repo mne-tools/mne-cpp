@@ -30,5 +30,7 @@ DataParserTest::DataParserTest(QObject *parent)
 
     m_commandManager.insertCommand(t_commandMap);
 
-    QObject::connect(&m_commandManager["help"], &Command::received, this, &DataParserTest::helpReceived);
+    m_commandManager.connectSlot(QString("help"), this, &DataParserTest::helpReceived);
+
+//    QObject::connect(&m_commandManager["help"], &Command::received, this, &DataParserTest::helpReceived);
 }

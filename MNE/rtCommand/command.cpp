@@ -146,8 +146,16 @@ void Command::verify(const Command &p_Command)
                 return;
         this->m_mapParameters.values() = p_Command.m_mapParameters.values();
 
-        emit this->received();
+        emit this->received(*this);
     }
+}
+
+
+//*************************************************************************************************************
+
+void Command::send()
+{
+    emit this->triggered(*this);
 }
 
 

@@ -196,7 +196,7 @@ public:
 
     //=========================================================================================================
     /**
-    * slot which performs parameter check before the received signal is emmited
+    * Receiver slot which performs parameter check before the received signal is emmited
     * If parameter check is passed, values are assigned to this object instance.
     *
     * @param p_Command  Command which was received and has to be checked before it's emmited.
@@ -205,7 +205,7 @@ public:
 
     //=========================================================================================================
     /**
-    * slot which performs parameter check before the triggered signal is emmited
+    * Sender slot which performs parameter check before the triggered signal is emmited
     */
     void send();
 
@@ -254,8 +254,8 @@ public:
     const QVariant operator[] (const QString &key) const;
 
 signals:
-    void triggered();
-    void received();
+    void triggered(Command);
+    void received(Command);
 
 public:
     bool                m_bIsJson;
