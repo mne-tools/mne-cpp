@@ -1,3 +1,7 @@
 {
-    "Keys": [ "neuromag" ]
+    "encoding": "UTF-8",
+    "device": "BabyMEG",
+    "description": "Baby MEG 2.0",
+    "commands": {
+    }
 }

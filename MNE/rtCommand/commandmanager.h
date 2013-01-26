@@ -56,6 +56,58 @@ public:
 
     //=========================================================================================================
     /**
+    * This creates a managed slot connection to a received signal of a specified command.
+    * Even its possible to connect a slot directly to a command signal - it'shighly recommended to use this managed connection.
+    *
+    * @param p_sCommand     Command to connect to.
+    * @param receiver       Object which provides the slot.
+    * @param slot           Member function to connect commands signal to.
+    *
+    * @return true if successfull, false otherwise
+    */
+    template <typename Func2>
+    bool connectSlot(QString &p_sCommand, const typename QtPrivate::FunctionPointer<Func2>::Object *receiver, Func2 slot)
+    {
+        if(!this->hasCommand(p_sCommand))
+            return false;
+
+        QMetaObject::Connection t_qConnection = QObject::connect(&s_commandMap[p_sCommand], &Command::received, receiver, slot);
+        m_qMapSlots.insertMulti(p_sCommand, t_qConnection);
+
+        return true;
+    }
+
+    //=========================================================================================================
+    /**
+    * This creates a managed signal connection to trigger a specified command.
+    * Even its possible to connect a signal directly to a command slot - it'shighly recommended to use this managed connection.
+    *
+    * @param p_sCommand     Command to connect to.
+    * @param sender         Object which provides the signal.
+    * @param signal         Member function to connect commands signal to.
+    *
+    * @return true if successfull, false otherwise
+    */
+    template <typename Func1>
+    bool connectSignal(QString &p_sCommand, const typename QtPrivate::FunctionPointer<Func1>::Object *sender, Func1 signal)
+    {
+        if(!this->hasCommand(p_sCommand))
+            return false;
+
+        QMetaObject::Connection t_qConnection = QObject::connect(sender, signal, &s_commandMap[p_sCommand], &Command::send);
+        m_qMapSignals.insertMulti(p_sCommand, t_qConnection);
+
+        return true;
+    }
+
+    //=========================================================================================================
+    /**
+    * Disconnects all managed signals and slots.
+    */
+    void disconnectAll();
+
+    //=========================================================================================================
+    /**
     * Checks if a command is managed;
     *
     * @param p_sCommand     COmmand to check.
@@ -146,6 +198,9 @@ private:
     void init();
 
     QJsonDocument m_jsonDocumentOrigin;
+
+    QMap<QString, QMetaObject::Connection> m_qMapSlots;
+    QMap<QString, QMetaObject::Connection> m_qMapSignals;
 
     static CommandMap s_commandMap;     /**< Holds static map as an internal lookuptable of all available commands.
                                              Attention this is allocated statically! Lifetime extends across entire run of the programm.
