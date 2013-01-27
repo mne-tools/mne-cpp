@@ -191,11 +191,15 @@ public:
 
 
 
-
+    //=========================================================================================================
+    /**
+     * Inherited by ICommand
+     *
+     * @return  emits received
+     */
     virtual void execute()
     {
-        //ToDo emit triggered
-        return;
+        emit this->executed(*this);
     }
 
     //=========================================================================================================
@@ -242,18 +246,18 @@ public:
         return m_mapParameters.values();
     }
 
-    //=========================================================================================================
-    /**
-    * Receiver slot which performs parameter check before the received signal is emmited
-    * If parameter check is passed, values are assigned to this object instance.
-    *
-    * @param p_Command  Command which was received and has to be checked before it's emmited.
-    */
-    void verify(const Command &p_Command);
+//    //=========================================================================================================
+//    /**
+//    * Receiver slot which performs parameter check before the received signal is emmited
+//    * If parameter check is passed, values are assigned to this object instance.
+//    *
+//    * @param p_Command  Command which was received and has to be checked before it's emmited.
+//    */
+//    void verify(const Command &p_Command);
 
     //=========================================================================================================
     /**
-    * Sender slot which performs parameter check before the triggered signal is emmited
+    * Sender slot which emmits triggered signal
     */
     void send();
 
@@ -302,8 +306,8 @@ public:
     const QVariant operator[] (const QString &key) const;
 
 signals:
+    void executed(Command);
     void triggered(Command);
-    void received(Command);
 
 public:
     bool                m_bIsJson;
