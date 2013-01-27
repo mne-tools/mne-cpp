@@ -78,6 +78,8 @@ public:
     //=========================================================================================================
     /**
     * Default constructor.
+    *
+    * @param[in] parent             Parent QObject (optional)
     */
     explicit RawCommand(QObject *parent = 0);
 
@@ -90,6 +92,16 @@ public:
     * @param[in] parent             Parent QObject (optional)
     */
     explicit RawCommand(const QString &p_sCommand, bool p_bIsJson = true, QObject *parent = 0);
+
+
+    //=========================================================================================================
+    /**
+    * Copy constructor.
+    *
+    * @param[in] p_rawCommand   RawCommand which should be copied.
+    */
+    explicit RawCommand(const RawCommand &p_rawCommand);
+
 
     //=========================================================================================================
     /**

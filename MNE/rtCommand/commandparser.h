@@ -69,7 +69,15 @@ class RTCOMMANDSHARED_EXPORT CommandParser : public QObject, public Subject
 {
     Q_OBJECT
 public:
-    CommandParser();
+
+
+    //=========================================================================================================
+    /**
+    * Default constructor
+    *
+    * @param[in] parent     Parent QObject (optional)
+    */
+    explicit CommandParser(QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -78,6 +86,16 @@ public:
     * @param p_sInput     Input to parse.
     */
     bool parse(const QString &p_sInput);
+
+
+    //=========================================================================================================
+    /**
+    * Returns the stored RawCommand
+    *
+    * @return the stored RawCommand
+    */
+    inline RawCommand& getRawCommand();
+
 
 signals:
     //=========================================================================================================
@@ -91,6 +109,16 @@ signals:
 private:
     RawCommand m_rawCommand;
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+RawCommand& CommandParser::getRawCommand()
+{
+    return m_rawCommand;
+}
 
 } // NAMESPACE
 

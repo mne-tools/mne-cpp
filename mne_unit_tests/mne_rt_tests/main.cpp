@@ -39,6 +39,8 @@
 //=============================================================================================================
 
 #include "dataparsertest.h"
+
+#include <rtCommand/commandparser.h>
 #include <rtCommand/commandmanager.h>
 
 
@@ -135,6 +137,9 @@ int main(int argc, char *argv[])
 
     CommandManager t_comManager(jsonTestCommand.toLatin1(), "test1");
 
+
+    qDebug() << "####################### FORMAT #######################";
+
     qDebug() << "Contains help? " << t_comManager.hasCommand(QString("help"));
     qDebug() << "Contains test? " << t_comManager.hasCommand(QString("test"));
     qDebug() << "Contains meas? " << t_comManager.hasCommand(QString("meas"));
@@ -152,15 +157,21 @@ int main(int argc, char *argv[])
     qDebug() << t_comManager2["help"].toStringList();
 
     qDebug() << t_comManager2["com1"].toStringList();
-
-
     qDebug() << t_comManager2.toString();
-
     qDebug() << t_comManager2.toString();
+    qDebug() << "####################### FORMAT #######################";
 
 
+    //Command Parser
+    CommandParser t_Parser;
 
-    t_comManager2.parse(QString("help"));
+    t_Parser.attach(&testParser.getCommandManager());
+    t_Parser.attach(&t_comManager);
+    t_Parser.attach(&t_comManager2);
+
+    t_Parser.parse(QString("help"));
+
+//    t_comManager2.parse(QString("help"));
 
 //    t_comManager2.insertJsonCommands();
 

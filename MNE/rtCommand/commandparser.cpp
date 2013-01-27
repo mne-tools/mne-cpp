@@ -63,7 +63,8 @@ using namespace RTCOMMANDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CommandParser::CommandParser()
+CommandParser::CommandParser(QObject *parent)
+: QObject(parent)
 {
 }
 

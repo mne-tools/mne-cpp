@@ -9,6 +9,7 @@
 #include "rtcommand_global.h"
 #include "command.h"
 #include "commandmap.h"
+#include "commandparser.h"
 
 #include <generics/observerpattern.h>
 
@@ -74,8 +75,8 @@ public:
         if(!this->hasCommand(p_sCommand))
             return false;
 
-        QMetaObject::Connection t_qConnection = QObject::connect(&s_commandMap[p_sCommand], &Command::received, receiver, slot);
-        m_qMapSlots.insertMulti(p_sCommand, t_qConnection);
+        QMetaObject::Connection qConnection = QObject::connect(&m_commandMap[p_sCommand], &Command::received, receiver, slot);
+        m_qMapSlots.insertMulti(p_sCommand, qConnection);
 
         return true;
     }
@@ -119,7 +120,7 @@ public:
     */
     inline bool hasCommand(const QString &p_sCommand) const
     {
-        return s_commandMap.contains(p_sCommand);
+        return m_commandMap.contains(p_sCommand);
     }
 
     //=========================================================================================================
@@ -175,14 +176,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Updates the IObserver.
+    * Updates the IObserver (CommandManager) when a new command was received.
     *
-    * @param [in] pSubject pointer to the subject where observer is attached to.
+    * @param [in] pSubject  pointer to the subject (CommandParser) to which observer (CommandManager) is attached to.
     */
-    virtual void update(Subject* pSubject)
-    {
-
-    }
+    virtual void update(Subject* pSubject);
 
     //=========================================================================================================
     /**
@@ -216,9 +214,7 @@ private:
     QMap<QString, QMetaObject::Connection> m_qMapSlots;
     QMap<QString, QMetaObject::Connection> m_qMapSignals;
 
-    static CommandMap s_commandMap;     /**< Holds static map as an internal lookuptable of all available commands.
-                                             Attention this is allocated statically! Lifetime extends across entire run of the programm.
-                                             Accessible from all CommandManager instances. */
+    CommandMap m_commandMap;     /**< Holds map as an internal lookuptable of available commands. */
 
 signals:
     void commandMapChanged();//(QStringList)

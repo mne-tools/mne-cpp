@@ -5,6 +5,7 @@
 //=============================================================================================================
 
 #include "commandmanager.h"
+#include "rawcommand.h"
 
 
 //*************************************************************************************************************
@@ -92,7 +93,7 @@ void CommandManager::disconnectAll()
 
 void CommandManager::init()
 {
-    QObject::connect(&s_commandMap, &CommandMap::commandMapChanged, this, &CommandManager::commandMapChanged);
+    QObject::connect(&m_commandMap, &CommandMap::commandMapChanged, this, &CommandManager::commandMapChanged);
 
     QObject::connect(this, &CommandManager::commandMapChanged, this, &CommandManager::testSlot);
 
@@ -117,7 +118,7 @@ void CommandManager::insertCommand(const QJsonDocument &p_jsonDocument)
 
     //Do insertion in one step to, have only one dataUpdate emmited;
     //Attention overwrites existing items
-    s_commandMap.insert(t_qCommandMap);
+    m_commandMap.insert(t_qCommandMap);
 }
 
 
@@ -125,14 +126,14 @@ void CommandManager::insertCommand(const QJsonDocument &p_jsonDocument)
 
 void CommandManager::insertCommand(const CommandMap &p_commandMap)
 {
-    s_commandMap.insert(p_commandMap);
+    m_commandMap.insert(p_commandMap);
 }
 
 //*************************************************************************************************************
 
 void CommandManager::insertCommand(const QString &p_sKey, const QString &p_sDescription)
 {
-    s_commandMap.insert(p_sKey, p_sDescription);
+    m_commandMap.insert(p_sKey, p_sDescription);
 }
 
 
@@ -165,18 +166,18 @@ bool CommandManager::parse(const QString &p_sInput)
             else
             {
                 // check if number of parameters is right
-                if(t_qCommandList.size()-1 == s_commandMap[t_qCommandList[0]].pValues().size())
+                if(t_qCommandList.size()-1 == m_commandMap[t_qCommandList[0]].pValues().size())
                 {
                     qDebug() << "Parameter parsing";
                     //Parse Parameters
                     for(qint32 i = 1; i < t_qCommandList.size(); ++i)
                     {
-                        QVariant::Type t_type = s_commandMap[t_qCommandList[0]].pValues()[i - 1].type();
+                        QVariant::Type t_type = m_commandMap[t_qCommandList[0]].pValues()[i - 1].type();
 
                         QVariant t_param(t_qCommandList[i]);
 
                         if(t_param.canConvert(t_type) && t_param.convert(t_type))
-                            s_commandMap[t_qCommandList[0]].pValues()[i - 1] = t_param;
+                            m_commandMap[t_qCommandList[0]].pValues()[i - 1] = t_param;
                         else
                             return false;
                     }
@@ -185,7 +186,7 @@ bool CommandManager::parse(const QString &p_sInput)
                     return false;
             }
 
-            s_commandMap[t_qCommandList[0]].verify(parsedCommand);
+            m_commandMap[t_qCommandList[0]].verify(parsedCommand);
 
 
             return true;
@@ -200,7 +201,7 @@ bool CommandManager::parse(const QString &p_sInput)
 
 QJsonObject CommandManager::toJsonObject() const
 {
-    return s_commandMap.toJsonObject();
+    return m_commandMap.toJsonObject();
 }
 
 
@@ -208,7 +209,122 @@ QJsonObject CommandManager::toJsonObject() const
 
 QString CommandManager::toString() const
 {
-    return s_commandMap.toString();
+    return m_commandMap.toString();
+}
+
+
+//*************************************************************************************************************
+
+void CommandManager::update(Subject* pSubject)
+{
+    CommandParser* pCommandParser = static_cast<CommandParser*>(pSubject);
+    qDebug() << "in update method";
+    qDebug() << "Received:" << pCommandParser->getRawCommand().command();
+
+    qDebug() << "Number Paremeters:" << pCommandParser->getRawCommand().count();
+
+
+    RawCommand rawCommand(pCommandParser->getRawCommand());
+    QString sCommandName = rawCommand.command();
+
+    if(this->hasCommand(sCommandName))
+    {
+        Command parsedCommand(sCommandName, QString(""), rawCommand.isJson());
+
+        // check if number of parameters is right
+        if(rawCommand.count() == m_commandMap[sCommandName].count())
+        {
+            qDebug() << "Parameter parsing";
+            //Parse Parameters
+            for(qint32 i = 1; i < rawCommand.count(); ++i)
+            {
+                QVariant::Type type = m_commandMap[sCommandName].pValues()[i].type();
+
+                QVariant qVariantParam(rawCommand.pValues()[i]);
+
+                if(qVariantParam.canConvert(type) && qVariantParam.convert(type))
+                    m_commandMap[sCommandName].pValues()[i] = qVariantParam;
+                else
+                    return;
+            }
+        }
+        else
+            return;
+
+        m_commandMap[sCommandName].verify(parsedCommand);
+    }
+
+
+
+
+
+
+
+
+//    if(p_sInput.size() <= 0)
+//        return false;
+//    //Check if JSON format;
+//    bool isJson  = false;
+//    if(QString::compare(p_sInput.at(0), QString("{")) == 0)
+//        isJson = true;
+
+//    if(isJson)
+//    {
+//        Command parsedCommand;
+//        qDebug() << "JSON commands recognized";
+//    }
+//    else
+//    {
+//        Command parsedCommand;
+
+//        QStringList t_qCommandList = sInput.split(" ");
+
+//        if(this->hasCommand(t_qCommandList[0]))
+//        {
+//            if(t_qCommandList.size() == 1) //No parameters
+//                parsedCommand = Command(t_qCommandList[0], QString(""), false);
+//            else
+//            {
+//                // check if number of parameters is right
+//                if(t_qCommandList.size()-1 == m_commandMap[t_qCommandList[0]].pValues().size())
+//                {
+//                    qDebug() << "Parameter parsing";
+//                    //Parse Parameters
+//                    for(qint32 i = 1; i < t_qCommandList.size(); ++i)
+//                    {
+//                        QVariant::Type t_type = m_commandMap[t_qCommandList[0]].pValues()[i - 1].type();
+
+//                        QVariant t_param(t_qCommandList[i]);
+
+//                        if(t_param.canConvert(t_type) && t_param.convert(t_type))
+//                            m_commandMap[t_qCommandList[0]].pValues()[i - 1] = t_param;
+//                        else
+//                            return false;
+//                    }
+//                }
+//                else
+//                    return false;
+//            }
+
+//            m_commandMap[t_qCommandList[0]].verify(parsedCommand);
+
+
+//            return true;
+//        }
+//    }
+
+//    return false;
+
+
+
+
+
+
+
+
+
+
+
 }
 
 
@@ -216,7 +332,7 @@ QString CommandManager::toString() const
 
 Command& CommandManager::operator[] (const QString &key)
 {
-    return s_commandMap[key];
+    return m_commandMap[key];
 }
 
 
@@ -224,12 +340,6 @@ Command& CommandManager::operator[] (const QString &key)
 
 const Command& CommandManager::operator[] (const QString &key) const
 {
-    return s_commandMap[key];
+    return m_commandMap[key];
 }
 
-//*************************************************************************************************************
-//=============================================================================================================
-// STATIC DEFINITIONS
-//=============================================================================================================
-
-CommandMap CommandManager::s_commandMap;

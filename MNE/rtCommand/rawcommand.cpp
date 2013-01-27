@@ -72,6 +72,18 @@ RawCommand::RawCommand(const QString &p_sCommand, bool p_bIsJson, QObject *paren
 
 //*************************************************************************************************************
 
+RawCommand::RawCommand(const RawCommand &p_rawCommand)
+: QObject(p_rawCommand.parent())
+, m_sCommand(p_rawCommand.m_sCommand)
+, m_bIsJson(p_rawCommand.m_bIsJson)
+, m_qListRawParameters(p_rawCommand.m_qListRawParameters)
+{
+
+}
+
+
+//*************************************************************************************************************
+
 void RawCommand::execute()
 {
     emit executed(m_qListRawParameters);
