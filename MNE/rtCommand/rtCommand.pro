@@ -74,7 +74,8 @@ SOURCES += \
     command.cpp \
     commandmanager.cpp \
     commandmap.cpp \
-    commandparser.cpp
+    commandparser.cpp \
+    rawcommand.cpp
 
 
 HEADERS += \
@@ -82,7 +83,8 @@ HEADERS += \
     commandmanager.h \
     rtcommand_global.h \
     commandmap.h \
-    commandparser.h
+    commandparser.h \
+    rawcommand.h
 
 
 # INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

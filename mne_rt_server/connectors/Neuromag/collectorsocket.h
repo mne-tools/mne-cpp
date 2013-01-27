@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the CollectorSocket Class.
+* @brief     declaration of the CollectorSocket Class.
 *
 */
 

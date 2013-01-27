@@ -69,7 +69,8 @@ SOURCES += \
 HEADERS += generics_global.h \
     circularmatrixbuffer.h \
     circularbuffer.h \
-    observerpattern.h
+    observerpattern.h \
+    commandpattern.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

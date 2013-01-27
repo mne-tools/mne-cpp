@@ -1,4 +1,37 @@
-
+//=============================================================================================================
+/**
+* @file     command.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @version  1.0
+* @date     July, 2012
+*
+* @section  LICENSE
+*
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    Declaration of the Command Class.
+*
+*/
 
 #ifndef COMMAND_H
 #define COMMAND_H
@@ -9,6 +42,8 @@
 //=============================================================================================================
 
 #include "rtcommand_global.h"
+
+#include <generics/commandpattern.h>
 
 
 //*************************************************************************************************************
@@ -37,10 +72,14 @@ namespace RTCOMMANDLIB
 
 static QVariant defaultVariant;
 
+
+//=============================================================================================================
 /**
- * Interface for a command request. This is usually sent from client to server.
- */
-class RTCOMMANDSHARED_EXPORT Command: public QObject
+* Command, which includes beside command name also command parameters
+*
+* @brief Command
+*/
+class RTCOMMANDSHARED_EXPORT Command: public QObject, public ICommand
 {
 Q_OBJECT
 public:
@@ -49,7 +88,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
+    * constructor.
     *
     * @param[in] p_bIsJson      If is received/should be send as JSON (optional, default true)
     * @param[in] parent         Parent QObject (optional)
@@ -148,6 +187,15 @@ public:
     inline QString description() const
     {
         return m_sDescription;
+    }
+
+
+
+
+    virtual void execute()
+    {
+        //ToDo emit triggered
+        return;
     }
 
     //=========================================================================================================

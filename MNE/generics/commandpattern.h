@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     commandparser.h
+* @file     commandpattern.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the CommandParser Class.
+* @brief    Contains declarations of the command design pattern: ICommand interface.
 *
 */
 
-#ifndef COMMANDPARSER_H
-#define COMMANDPARSER_H
+#ifndef COMMANDPATTERN_H
+#define COMMANDPATTERN_H
 
 
 //*************************************************************************************************************
@@ -42,56 +42,47 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rtcommand_global.h"
-#include "rawcommand.h"
-
-#include <generics/observerpattern.h>
+#include "generics_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// QT STL INCLUDES
 //=============================================================================================================
 
-#include <QObject>
-#include <QVector>
+#include <QSharedPointer>
 
 
-//*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RTCOMMANDLIB
-//=============================================================================================================
-
-namespace RTCOMMANDLIB
+/**
+* Declare interface command
+*
+* @brief The ICommand interface provides the base class of every command of the command design pattern.
+*/
+class ICommand
 {
-
-class RTCOMMANDSHARED_EXPORT CommandParser : public QObject, public Subject
-{
-    Q_OBJECT
 public:
-    CommandParser();
+    typedef QSharedPointer<ICommand> SPtr;             /**< Shared pointer type for ICommand. */
+    typedef QSharedPointer<const ICommand> ConstSPtr;  /**< Const shared pointer type for ICommand. */
 
     //=========================================================================================================
     /**
-    * Parses a CLI command or JSON command (list) and notifies all attached observers (command managers)
-    *
-    * @param p_sInput     Input to parse.
+    * Destroys the ICommand.
     */
-    bool parse(const QString &p_sInput);
+    virtual ~ICommand() {};
 
-signals:
     //=========================================================================================================
     /**
-    * Response channel which is used by attached observers (command managers) to send data back to subject
-    *
-    *@param p_sResponse      Observer response/data.
+    * Executes the ICommand.
     */
-    void response(QString p_sResponse);
-
-private:
-    RawCommand m_rawCommand;
+    virtual void execute() = 0;
 };
 
-} // NAMESPACE
+//Invoker
+//--> Use signal/slot
 
-#endif // COMMANDPARSER_H
+//Receiver
+//--> Use signal/slot
+
+
+#endif // COMMANDPATTERN_H
