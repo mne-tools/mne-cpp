@@ -51,10 +51,12 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}RtCommandd \
+    LIBS += -lMNE$${MNE_LIB_VERSION}RtGenericsd \
+            -lMNE$${MNE_LIB_VERSION}RtCommandd \
 }
 else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}RtCommand \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lMNE$${MNE_LIB_VERSION}RtCommand \
 }
 
 DESTDIR = $${PWD}/../../bin
