@@ -133,9 +133,9 @@ int main(int argc, char *argv[])
                     "    }"
                     "}";
 
-    CommandManager t_comManager2(QString("test2"));
+    CommandManager t_comManager2;
 
-    CommandManager t_comManager(jsonTestCommand.toLatin1(), "test1");
+    CommandManager t_comManager(jsonTestCommand.toLatin1());
 
 
     qDebug() << "####################### FORMAT #######################";

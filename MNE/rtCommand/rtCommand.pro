@@ -73,7 +73,6 @@ win32 {
 SOURCES += \
     command.cpp \
     commandmanager.cpp \
-    commandmap.cpp \
     commandparser.cpp \
     rawcommand.cpp
 
@@ -82,7 +81,6 @@ HEADERS += \
     command.h \
     commandmanager.h \
     rtcommand_global.h \
-    commandmap.h \
     commandparser.h \
     rawcommand.h
 

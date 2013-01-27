@@ -8,7 +8,6 @@
 
 #include "rtcommand_global.h"
 #include "command.h"
-#include "commandmap.h"
 #include "commandparser.h"
 
 #include <generics/observerpattern.h>
@@ -52,15 +51,15 @@ class RTCOMMANDSHARED_EXPORT CommandManager : public QObject, public IObserver
 {
     Q_OBJECT
 public:
-    explicit CommandManager(const QString test = QString("test"), QObject *parent = 0);
+    explicit CommandManager(QObject *parent = 0);
 
-    explicit CommandManager(const QByteArray &p_jsonDoc, const QString test = QString("test"),  QObject *parent = 0);
+    explicit CommandManager(const QByteArray &p_jsonDoc, QObject *parent = 0);
 
     virtual ~CommandManager();
 
     //=========================================================================================================
     /**
-    * This creates a managed slot connection to a received signal of a specified command.
+    * This creates a managed slot connection to a signal of a specified command executed.
     * Even its possible to connect a slot directly to a command signal - it'shighly recommended to use this managed connection.
     *
     * @param p_sCommand     Command to connect to.
@@ -75,7 +74,7 @@ public:
         if(!this->hasCommand(p_sCommand))
             return false;
 
-        QMetaObject::Connection qConnection = QObject::connect(&m_commandMap[p_sCommand], &Command::received, receiver, slot);
+        QMetaObject::Connection qConnection = QObject::connect(&m_qMapCommands[p_sCommand], &Command::executed, receiver, slot);
         m_qMapSlots.insertMulti(p_sCommand, qConnection);
 
         return true;
@@ -120,43 +119,35 @@ public:
     */
     inline bool hasCommand(const QString &p_sCommand) const
     {
-        return m_commandMap.contains(p_sCommand);
+        return m_qMapCommands.contains(p_sCommand);
     }
 
     //=========================================================================================================
     /**
-    * Parses a CLI command or JSON command (list). And emits a command received when its a valid command.
-    *
-    * @param p_sInput     Input to parse.
-    */
-    bool parse(const QString &p_sInput);
-
-    //=========================================================================================================
-    /**
-    * Insert commands containing in a json document.
+    * Inserts commands encoded in a json document.
     * Attention existing items are overwritten.
     *
     * @param p_jsonDocument    JSON document containing commands.
     */
-    void insertCommand(const QJsonDocument &p_jsonDocument);
+    void insert(const QJsonDocument &p_jsonDocument);
 
     //=========================================================================================================
     /**
-    * Insert commands of a json document.
-    * Attention existing items are overwritten.
-    *
-    * @param p_commandMap   command map which should be inserted.
-    */
-    void insertCommand(const CommandMap &p_commandMap);
-
-    //=========================================================================================================
-    /**
-    * Insert a single command.
+    * Inserts a single command.
     * Attention existing items are overwritten.
     *
     * @param p_jsonDocument    JSON document containing commands.
     */
-    void insertCommand(const QString &p_sKey, const QString &p_sDescription);
+    void insert(const QString &p_sKey, const QString &p_sDescription);
+
+    //=========================================================================================================
+    /**
+    * Inserts a new command and emmits dataChanged signal.
+    *
+    * @param p_sKey     Command key word.
+    * @param p_Command  Command content.
+    */
+    void insert(const QString &p_sKey, const Command &p_Command);
 
     //=========================================================================================================
     /**
@@ -178,13 +169,13 @@ public:
     /**
     * Updates the IObserver (CommandManager) when a new command was received.
     *
-    * @param [in] pSubject  pointer to the subject (CommandParser) to which observer (CommandManager) is attached to.
+    * @param [in] p_pSubject  pointer to the subject (CommandParser) to which observer (CommandManager) is attached to.
     */
-    virtual void update(Subject* pSubject);
+    virtual void update(Subject* p_pSubject);
 
     //=========================================================================================================
     /**
-    * Subscript operator []
+    * Subscript operator [] to access commands by command name
     *
     * @param key    the command key word.
     *
@@ -194,7 +185,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Subscript operator []
+    * Subscript operator [] to access commands by command name
     *
     * @param key    the command key word.
     *
@@ -203,10 +194,10 @@ public:
     const Command& operator[] (const QString &key) const;
 
 private:
-    void testSlot();
-
-    QString m_sTest;
-
+    //=========================================================================================================
+    /**
+    * Initializes the command manager by connecting internal signal/slots
+    */
     void init();
 
     QJsonDocument m_jsonDocumentOrigin;
@@ -214,7 +205,8 @@ private:
     QMap<QString, QMetaObject::Connection> m_qMapSlots;
     QMap<QString, QMetaObject::Connection> m_qMapSignals;
 
-    CommandMap m_commandMap;     /**< Holds map as an internal lookuptable of available commands. */
+
+    QMap<QString, Command> m_qMapCommands;       /**< Holds a map as an internal lookuptable of available commands. */
 
 signals:
     void commandMapChanged();//(QStringList)
