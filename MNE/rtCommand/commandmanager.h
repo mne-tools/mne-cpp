@@ -10,6 +10,9 @@
 #include "command.h"
 #include "commandmap.h"
 
+#include <generics/observerpattern.h>
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt Includes
@@ -44,7 +47,7 @@ namespace RTCOMMANDLIB
 /**
 *
 */
-class RTCOMMANDSHARED_EXPORT CommandManager : public QObject
+class RTCOMMANDSHARED_EXPORT CommandManager : public QObject, public IObserver
 {
     Q_OBJECT
 public:
@@ -169,6 +172,17 @@ public:
     * @return Commands with parameters and descriptions.
     */
     QString toString() const;
+
+    //=========================================================================================================
+    /**
+    * Updates the IObserver.
+    *
+    * @param [in] pSubject pointer to the subject where observer is attached to.
+    */
+    virtual void update(Subject* pSubject)
+    {
+
+    }
 
     //=========================================================================================================
     /**

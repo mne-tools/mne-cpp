@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     commandparser.h
+* @file     rawcommand.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,69 +29,65 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the CommandParser Class.
+* @brief     implementation of the RawCommand Class.
 *
 */
 
-#ifndef COMMANDPARSER_H
-#define COMMANDPARSER_H
-
-
 //*************************************************************************************************************
 //=============================================================================================================
-// INCLUDES
+// Includes
 //=============================================================================================================
 
-#include "rtcommand_global.h"
 #include "rawcommand.h"
 
-#include <generics/observerpattern.h>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace RTCOMMANDLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-#include <QObject>
-#include <QVector>
+RawCommand::RawCommand(QObject *parent)
+: QObject(parent)
+{
+}
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE RTCOMMANDLIB
-//=============================================================================================================
 
-namespace RTCOMMANDLIB
+RawCommand::RawCommand(const QString &p_sCommand, bool p_bIsJson, QObject *parent)
+: QObject(parent)
+, m_sCommand(p_sCommand)
+, m_bIsJson(p_bIsJson)
 {
+}
 
-class RTCOMMANDSHARED_EXPORT CommandParser : public QObject, public Subject
+
+//*************************************************************************************************************
+
+void RawCommand::execute()
 {
-    Q_OBJECT
-public:
-    CommandParser();
+    emit executed(m_qListRawParameters);
+}
 
-    //=========================================================================================================
-    /**
-    * Parses a CLI command or JSON command (list) and notifies all attached observers (command managers)
-    *
-    * @param p_sInput     Input to parse.
-    */
-    bool parse(const QString &p_sInput);
 
-signals:
-    //=========================================================================================================
-    /**
-    * Response channel which is used by attached observers (command managers) to send data back to subject
-    *
-    *@param p_sResponse      Observer response/data.
-    */
-    void response(QString p_sResponse);
+//*************************************************************************************************************
 
-private:
-    RawCommand m_rawCommand;
-};
-
-} // NAMESPACE
-
-#endif // COMMANDPARSER_H
+RawCommand& RawCommand::operator= (const RawCommand &rhs)
+{
+    if (this != &rhs) // protect against invalid self-assignment
+    {
+        m_sCommand = rhs.m_sCommand;
+        m_bIsJson = rhs.m_bIsJson;
+        m_qListRawParameters = rhs.m_qListRawParameters;
+    }
+    // to support chained assignment operators (a=b=c), always return *this
+    return *this;
+}

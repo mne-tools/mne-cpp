@@ -1,8 +1,8 @@
 //=============================================================================================================
 /**
-* @file     dacqserver.h
+* @file     rawcommand.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2012
 *
@@ -29,157 +29,159 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     declaration of the DacqServer Class.
+* @brief    Declaration of the RawCommand Class.
 *
 */
 
-
-#ifndef DACQSERVER_H
-#define DACQSERVER_H
+#ifndef RAWCOMMAND_H
+#define RAWCOMMAND_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "types_definitions.h"
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_tag.h>
+#include "rtcommand_global.h"
+
+#include <generics/commandpattern.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include <QThread>
-
-#include <QTcpSocket>
-
-#include <QByteArray>
+#include <QObject>
+#include <QList>
+#include <QVariant>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE NeuromagPlugin
+// DEFINE NAMESPACE RTCOMMANDLIB
 //=============================================================================================================
 
-namespace NeuromagPlugin
+namespace RTCOMMANDLIB
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace FIFFLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class Neuromag;
-class CollectorSocket;
-class ShmemSocket;
-//class FiffInfo;
-
 
 //=============================================================================================================
 /**
-* DECLARE CLASS DacqServer
+* RawCommand, which includes beside command name also command parameters. The parameter type is not jet specified.
 *
-* @brief The DacqServer class provides a Neuromag MEG connector.
+* @brief RawCommand
 */
-class DacqServer : public QThread
+class RTCOMMANDSHARED_EXPORT RawCommand : public QObject, public ICommand
 {
-    Q_OBJECT
-
-    friend class Neuromag;
-
+Q_OBJECT
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a acquisition Server.
+    * Default constructor.
     */
-    explicit DacqServer(Neuromag* p_pNeuromag, QObject * parent = 0);
-    
-    
+    explicit RawCommand(QObject *parent = 0);
+
     //=========================================================================================================
     /**
-    * Constructs a acquisition Server.
+    * Constructor which parses a command stored in a json object
+    *
+    * @param[in] p_sCommand         Command
+    * @param[in] p_bIsJson          If is received/should be send as JSON (optional, default true)
+    * @param[in] parent             Parent QObject (optional)
     */
-    ~DacqServer();
+    explicit RawCommand(const QString &p_sCommand, bool p_bIsJson = true, QObject *parent = 0);
 
-    
-public slots: //--> in Qt 5 not anymore declared as slot
+    //=========================================================================================================
+    /**
+    * Command name
+    *
+    * @return short command representation.
+    */
+    inline QString command() const;
 
-    void readCollectorMsg();
+    //=========================================================================================================
+    /**
+    * Returns the number of parameters.
+    *
+    * @return number of parameters.
+    */
+    inline quint32 count() const;
 
+    virtual void execute();
+
+    //=========================================================================================================
+    /**
+    * Returns wether the received command was in Json format.
+    *
+    * @return true if received command was in Json format, false otherwise.
+    */
+    inline bool isJson() const;
+
+    //=========================================================================================================
+    /**
+    * Returns parameter values
+    *
+    * @return parameter values
+    */
+    inline QList<QString>& pValues();
+
+    //=========================================================================================================
+    /**
+    * Assignment Operator
+    *
+    * @param[in] rhs    RawCommand which should be assigned.
+    */
+    RawCommand& operator= (const RawCommand &rhs);
 
 signals:
-
-    void measInfoAvailable();
-
-
-protected:
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
+    * Signal which is emitted when command patterns execute method is processed.
     */
-    virtual void run();
+    void executed(QList<QString> p_listParameters);
 
 private:
+    QString m_sCommand;
+    bool m_bIsJson;
 
-    //=========================================================================================================
-    /**
-    * Quit function
-    *
-    * @return
-    */
-//    void clean_up();
-
-
-
-    //newly written stuff ported to qt
-//    QString         m_sCollectorHost;
-    CollectorSocket*    m_pCollectorSock;
-
-
-    ShmemSocket*        m_pShmemSock;
-    
-
-
-
-
-
-
-
-
-
-//dacqserver
-
-    bool m_bIsRunning;
-
-    bool m_bMeasInfoRequest;
-    bool m_bMeasRequest;
-    bool m_bMeasStopRequest;
-    bool m_bSetBuffersizeRequest;
-
-
-    bool getMeasInfo(FiffInfo::SDPtr& p_pFiffInfo);
-
-    Neuromag* m_pNeuromag;
-
+    QList<QString> m_qListRawParameters;    /**< Raw parameters. Their type is not specified jet.*/
 
 };
 
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+QString RawCommand::command() const
+{
+    return m_sCommand;
+}
+
+
+//*************************************************************************************************************
+
+quint32 RawCommand::count() const
+{
+    return m_qListRawParameters.size();
+}
+
+
+//*************************************************************************************************************
+
+bool RawCommand::isJson() const
+{
+    return m_bIsJson;
+}
+
+
+//*************************************************************************************************************
+
+QList<QString>& RawCommand::pValues()
+{
+    return m_qListRawParameters;
+}
+
 } // NAMESPACE
 
-
-#endif // DACQSERVER_H
+#endif // RAWCOMMAND_H

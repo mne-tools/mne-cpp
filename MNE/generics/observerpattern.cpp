@@ -64,7 +64,7 @@ void Subject::attach(IObserver* pObserver)
 
 void Subject::detach(IObserver* pObserver)
 {
-	m_Observers.erase(m_Observers.find(pObserver));
+    m_Observers.erase(m_Observers.find(pObserver));
     //m_Observers.erase(observer); //C++ <set> STL implementation
 }
 
@@ -73,12 +73,12 @@ void Subject::detach(IObserver* pObserver)
 
 void Subject::notify()
 {
-	if(notifyEnabled)
-	{
-		t_Observers::const_iterator it = m_Observers.begin();
-		for( ; it != m_Observers.end(); ++it)
-			(*it)->update(this);
-	}
+    if(notifyEnabled)
+    {
+        t_Observers::const_iterator it = m_Observers.begin();
+        for( ; it != m_Observers.end(); ++it)
+            (*it)->update(this);
+    }
 }
 
 //*************************************************************************************************************

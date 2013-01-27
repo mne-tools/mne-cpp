@@ -80,9 +80,9 @@ class FiffSimulator;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ECGProducer
+* DECLARE CLASS FiffProducer
 *
-* @brief The ECGProducer class provides a ECG data producer for a given sampling rate.
+* @brief The FiffProducer class provides a ECG data producer for a given sampling rate.
 */
 class FiffProducer : public QThread
 {
