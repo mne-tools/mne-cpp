@@ -51,9 +51,9 @@ class RTCOMMANDSHARED_EXPORT CommandManager : public QObject, public IObserver
 {
     Q_OBJECT
 public:
-    explicit CommandManager(QObject *parent = 0);
+    explicit CommandManager(bool p_bIsActive = true, QObject *parent = 0);
 
-    explicit CommandManager(const QByteArray &p_jsonDoc, QObject *parent = 0);
+    explicit CommandManager(const QByteArray &p_jsonDoc, bool p_bIsActive = true, QObject *parent = 0);
 
     virtual ~CommandManager();
 
@@ -149,6 +149,23 @@ public:
     */
     void insert(const QString &p_sKey, const Command &p_Command);
 
+
+    //=========================================================================================================
+    /**
+    * Returns if CommandManager is active. If true, this manager parses incomming commands.
+    *
+    * @return if true, incomming commands are parsed.
+    */
+    inline bool isActive() const;
+
+    //=========================================================================================================
+    /**
+    * Sets the activation status of the CommandManager.
+    *
+    * @param [in] status the new activation status of the CommandManager.
+    */
+    inline void setStatus(bool status);
+
     //=========================================================================================================
     /**
     * Creates an object of JSON Command Objects
@@ -202,6 +219,8 @@ private:
 
     QJsonDocument m_jsonDocumentOrigin;
 
+    bool m_bIsActive;
+
     QMap<QString, QMetaObject::Connection> m_qMapSlots;
     QMap<QString, QMetaObject::Connection> m_qMapSignals;
 
@@ -217,6 +236,24 @@ signals:
     void cliReply(QString);
     void jsonReply(QString);
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+bool CommandManager::isActive() const
+{
+    return m_bIsActive;
+}
+
+
+//*************************************************************************************************************
+
+void CommandManager::setStatus(bool status)
+{
+    m_bIsActive = status;
+}
 
 } // NAMESPACE
 

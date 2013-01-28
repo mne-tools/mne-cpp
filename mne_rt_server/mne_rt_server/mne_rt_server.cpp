@@ -104,12 +104,16 @@ MNERTServer::MNERTServer()
     m_pConnectorManager->connectActiveConnector();
 
     //Register Fiff Sream Server for command parsing
-    m_pCommandServer->registerCommandParser((ICommandParser*)m_pFiffStreamServer);
+    m_pCommandServer->registerCommandParser((ICommandParser*)m_pFiffStreamServer);//OLD
+    m_pCommandServer->registerCommandManager(m_pFiffStreamServer->getCommandManager());//NEW
 
     //Register Connector Manager for command parsing
-    m_pCommandServer->registerCommandParser((ICommandParser*)m_pConnectorManager);
+    m_pCommandServer->registerCommandParser((ICommandParser*)m_pConnectorManager);//OLD
+    m_pCommandServer->registerCommandManager(m_pConnectorManager->getCommandManager());//NEW
 
-
+    //Register Command Managers of loaded connectors
+    for(qint32 i = 0; i < m_pConnectorManager->getConnectors().size(); ++i)
+        m_pCommandServer->registerCommandManager(m_pConnectorManager->getConnectors()[i]->getCommandManager());
 
     // ### Run everything ###
     //

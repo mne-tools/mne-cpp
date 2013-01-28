@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include "ICommandParser.h" // ToDo remove this
+#include <rtCommand/commandparser.h>
 #include <rtCommand/commandmanager.h>
 
 
@@ -99,9 +100,20 @@ public:
 
     void init();
 
+    //Rename this to prepare before parse -> parsing is done within command parser
     virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
 
+    //OLD
     void registerCommandParser(ICommandParser* p_pCommandParser);
+
+    //New
+    //=========================================================================================================
+    /**
+    * Registers a CommandManager (Observer) at CommandParser (Subject) to include in the chain of notifications
+    *
+    * @param p_commandManager   Command Manager to register.
+    */
+    void registerCommandManager(CommandManager &p_commandManager);
 
 signals:
     void replyCommand(QByteArray p_blockReply, qint32 p_iID);
@@ -114,10 +126,15 @@ protected:
     void incomingConnection(qintptr socketDescriptor);
 
 private:
-    QList<ICommandParser*> m_qListParser; //remove this
-    CommandManager m_commandManager; //replace by the new command manager
 
     qint32 m_iThreadCount;
+
+    //OLD
+    QList<ICommandParser*> m_qListParser; //remove this
+
+    //NEW
+    CommandParser m_commandParser;
+    CommandManager m_commandManager;
 
 };
 
