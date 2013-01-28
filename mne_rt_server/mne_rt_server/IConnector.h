@@ -40,7 +40,7 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-
+//ToDO Remove this - OLD
 #include "ICommandParser.h"
 
 
@@ -58,18 +58,13 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Fiff INCLUDES
+// INCLUDES
 //=============================================================================================================
 
 #include <fiff/fiff_info.h>
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Generics INCLUDES
-//=============================================================================================================
-
 #include <generics/circularmatrixbuffer.h>
+#include <rtCommand/commandmanager.h>
 
 
 //*************************************************************************************************************
@@ -121,6 +116,7 @@ enum ConnectorID
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace RTCOMMANDLIB;
 using namespace Eigen;
 using namespace IOBuffer;
 
@@ -131,7 +127,7 @@ using namespace IOBuffer;
 *
 * @brief The IConnector class is the interface class of all modules.
 */
-class IConnector : public QThread, ICommandParser
+class IConnector : public QThread, public ICommandParser //REMOVE this OLD
 {
     Q_OBJECT
 
@@ -151,6 +147,13 @@ public:
     */
     virtual QByteArray availableCommands() = 0;
 
+    //=========================================================================================================
+    /**
+    * Returns the CommandManager
+    *
+    * @return the CommandManager.
+    */
+    inline CommandManager& getCommandManager();
 
     //=========================================================================================================
     /**
@@ -170,6 +173,9 @@ public:
     */
     virtual const char* getName() const = 0;
 
+
+
+
     inline quint32 getBufferSampleSize();
 
 
@@ -181,8 +187,6 @@ public:
     * @return true if module is activated.
     */
     inline bool isActive() const;
-
-
 
     //=========================================================================================================
     /**
@@ -264,9 +268,11 @@ protected:
 
     QJsonObject m_qJsonObjectMetaData;      /**< The meta data of the plugin defined in Q_PLUGIN_METADATA and the corresponding json file. */
 
+    CommandManager m_commandManager;        /**< The CommandManager of the connector. */
+
 private:
 
-    bool        m_bStatus;                  /**< Holds the activation status. */
+    bool        m_bIsActive;                /**< Holds the activation status. */
     quint32     m_uiBufferSampleSize;       /**< Number of Buffer Sample Size */
 };
 
@@ -283,9 +289,17 @@ inline quint32 IConnector::getBufferSampleSize()
 
 //*************************************************************************************************************
 
+inline CommandManager& IConnector::getCommandManager()
+{
+    return m_commandManager;
+}
+
+
+//*************************************************************************************************************
+
 inline bool IConnector::isActive() const
 {
-    return m_bStatus;
+    return m_bIsActive;
 }
 
 
@@ -310,12 +324,15 @@ inline void IConnector::setMetaData(QJsonObject& p_MetaData)
 
 inline void IConnector::setStatus(bool status)
 {
-    m_bStatus = status;
+    m_bIsActive = status;
+    m_commandManager.setStatus(status);
 }
 
 } //Namespace
 
+#ifndef IConnector_iid
 #define IConnector_iid "mne_rt_server/1.0"
+#endif
 Q_DECLARE_INTERFACE(MSERVER::IConnector, IConnector_iid)
 
 #endif //ICONNECTOR_H

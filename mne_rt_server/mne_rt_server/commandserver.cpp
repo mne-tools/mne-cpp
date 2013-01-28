@@ -76,6 +76,7 @@ CommandServer::CommandServer(QObject *parent)
 , m_iThreadCount(0)
 {
     this->init();
+    m_commandParser.attach(&m_commandManager);
 }
 
 
@@ -234,9 +235,17 @@ void CommandServer::incomingConnection(qintptr socketDescriptor)
 
 
 //*************************************************************************************************************
-
+//OLD remove this
 void CommandServer::registerCommandParser(ICommandParser* p_pCommandParser)
 {
     m_qListParser.append(p_pCommandParser);
+}
+
+
+//*************************************************************************************************************
+// NEW
+void CommandServer::registerCommandManager(CommandManager &p_commandManager)
+{
+    m_commandParser.attach(&p_commandManager);
 }
 

@@ -32,8 +32,9 @@ using namespace RTCOMMANDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CommandManager::CommandManager(QObject *parent)
+CommandManager::CommandManager(bool p_bIsActive, QObject *parent)
 : QObject(parent)
+, m_bIsActive(p_bIsActive)
 {
     init();
 }
@@ -41,8 +42,9 @@ CommandManager::CommandManager(QObject *parent)
 
 //*************************************************************************************************************
 
-CommandManager::CommandManager(const QByteArray &p_jsonDoc, QObject *parent)
+CommandManager::CommandManager(const QByteArray &p_jsonDoc, bool p_bIsActive, QObject *parent)
 : QObject(parent)
+, m_bIsActive(p_bIsActive)
 {
     init();
 
@@ -128,67 +130,6 @@ void CommandManager::insert(const QString &p_sKey, const Command &p_Command)
     emit commandMapChanged();
 }
 
-
-////*************************************************************************************************************
-
-//bool CommandManager::parse(const QString &p_sInput)
-//{
-//    if(p_sInput.size() <= 0)
-//        return false;
-//    //Check if JSON format;
-//    bool isJson  = false;
-//    if(QString::compare(p_sInput.at(0), QString("{")) == 0)
-//        isJson = true;
-
-//    if(isJson)
-//    {
-//        Command parsedCommand;
-//        qDebug() << "JSON commands recognized";
-//    }
-//    else
-//    {
-//        Command parsedCommand;
-
-//        QStringList t_qCommandList = p_sInput.split(" ");
-
-//        if(this->hasCommand(t_qCommandList[0]))
-//        {
-//            if(t_qCommandList.size() == 1) //No parameters
-//                parsedCommand = Command(t_qCommandList[0], QString(""), false);
-//            else
-//            {
-//                // check if number of parameters is right
-//                if(t_qCommandList.size()-1 == m_commandMap[t_qCommandList[0]].pValues().size())
-//                {
-//                    qDebug() << "Parameter parsing";
-//                    //Parse Parameters
-//                    for(qint32 i = 1; i < t_qCommandList.size(); ++i)
-//                    {
-//                        QVariant::Type t_type = m_commandMap[t_qCommandList[0]].pValues()[i - 1].type();
-
-//                        QVariant t_param(t_qCommandList[i]);
-
-//                        if(t_param.canConvert(t_type) && t_param.convert(t_type))
-//                            m_commandMap[t_qCommandList[0]].pValues()[i - 1] = t_param;
-//                        else
-//                            return false;
-//                    }
-//                }
-//                else
-//                    return false;
-//            }
-
-//            m_commandMap[t_qCommandList[0]].verify(parsedCommand);
-
-
-//            return true;
-//        }
-//    }
-
-//    return false;
-//}
-
-
 //*************************************************************************************************************
 
 QJsonObject CommandManager::toJsonObject() const
@@ -235,12 +176,16 @@ QString CommandManager::toString() const
 
 void CommandManager::update(Subject* p_pSubject)
 {
+    // If Manager is not active do not parse commands
+    if(!m_bIsActive)
+        return;
+
     CommandParser* t_pCommandParser = static_cast<CommandParser*>(p_pSubject);
 
     RawCommand t_rawCommand(t_pCommandParser->getRawCommand());
     QString t_sCommandName = t_rawCommand.command();
 
-    if(!this->hasCommand(t_sCommandName))//ToDo is Active
+    if(!this->hasCommand(t_sCommandName))
         return;
 
     // check if number of parameters is right

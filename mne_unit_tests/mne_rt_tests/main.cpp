@@ -140,25 +140,25 @@ int main(int argc, char *argv[])
 
     qDebug() << "####################### FORMAT #######################";
 
-    qDebug() << "Contains help? " << t_comManager.hasCommand(QString("help"));
-    qDebug() << "Contains test? " << t_comManager.hasCommand(QString("test"));
-    qDebug() << "Contains meas? " << t_comManager.hasCommand(QString("meas"));
+    qDebug() << "Contains help? " << testParser.getCommandManager().hasCommand(QString("help"));
+    qDebug() << "Contains test? " << testParser.getCommandManager().hasCommand(QString("test"));
+    qDebug() << "Contains meas? " << testParser.getCommandManager().hasCommand(QString("meas"));
 
 
-    qDebug() << t_comManager["help"].toJsonObject();
+    qDebug() << testParser.getCommandManager()["help"].toJsonObject();
 //    qDebug() << t_comManager.toJsonObject();
 
-    qDebug() << "HELP " << t_comManager["help"]["id"];
+    qDebug() << "HELP " << testParser.getCommandManager()["help"]["id"];
 
-    qDebug() << "HELP " << t_comManager["help"]["id2"];
+    qDebug() << "HELP " << testParser.getCommandManager()["help"]["id2"];
 
-    qDebug() << "Even comManager is not copied. Does it still contains help? " << t_comManager2.hasCommand(QString("help")) << " GOOD :-) it's still there.";
+    qDebug() << "Even comManager is not copied. Does it still contains help? " << testParser.getCommandManager().hasCommand(QString("help")) << " GOOD :-) it's still there.";
 
-    qDebug() << t_comManager2["help"].toStringList();
+    qDebug() << testParser.getCommandManager()["help"].toStringList();
 
-    qDebug() << t_comManager2["com1"].toStringList();
-    qDebug() << t_comManager2.toString();
-    qDebug() << t_comManager2.toString();
+    qDebug() << testParser.getCommandManager()["com1"].toStringList();
+    qDebug() << testParser.getCommandManager().toString();
+    qDebug() << testParser.getCommandManager().toString();
     qDebug() << "####################### FORMAT #######################";
 
 

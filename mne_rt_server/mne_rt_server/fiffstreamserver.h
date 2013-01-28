@@ -40,16 +40,17 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-
+//OLD remove this
 #include "ICommandParser.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FIFF INCLUDES
+// MNELIB INCLUDES
 //=============================================================================================================
 
 #include <fiff/fiff_info.h>
+#include <rtCommand/commandmanager.h>
 
 
 //*************************************************************************************************************
@@ -75,6 +76,7 @@ namespace MSERVER
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace RTCOMMANDLIB;
 
 
 //*************************************************************************************************************
@@ -90,7 +92,7 @@ class FiffStreamThread;
 *
 * @brief The FiffStreamServer class provides
 */
-class FiffStreamServer : public QTcpServer, ICommandParser
+class FiffStreamServer : public QTcpServer, public ICommandParser //OLD remove this
 {
     Q_OBJECT
 
@@ -116,6 +118,13 @@ public:
     */
     inline FiffStreamThread* getClient(qint32 id);
 
+    //=========================================================================================================
+    /**
+    * Returns the CommandManager
+    *
+    * @return the CommandManager.
+    */
+    inline CommandManager& getCommandManager();
 
 
     virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
@@ -148,8 +157,11 @@ protected:
 private:
     QByteArray parseToId(QString& p_sRawId, qint32& p_iParsedId);
 
+    CommandManager m_commandManager;        /**< The CommandManager of the connector. */
+
     QMap<qint32, FiffStreamThread*> m_qClientList;
     qint32                          m_iNextClientId;
+
 
 };
 
@@ -162,6 +174,14 @@ private:
 FiffStreamThread* FiffStreamServer::getClient(qint32 id)
 {
     return m_qClientList[id];
+}
+
+
+//*************************************************************************************************************
+
+inline CommandManager& FiffStreamServer::getCommandManager()
+{
+    return m_commandManager;
 }
 
 } // NAMESPACE

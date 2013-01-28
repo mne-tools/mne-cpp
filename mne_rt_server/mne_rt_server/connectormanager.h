@@ -48,10 +48,11 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Fiff INCLUDES
+// MNELIB INCLUDES
 //=============================================================================================================
 
 #include <fiff/fiff_info.h>
+#include <rtCommand/commandmanager.h>
 
 
 //*************************************************************************************************************
@@ -77,13 +78,13 @@ namespace MSERVER
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace RTCOMMANDLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Function Pointers
 //=============================================================================================================
-
 
 
 //*************************************************************************************************************
@@ -100,7 +101,7 @@ class FiffStreamServer;
 *
 * @brief The ConnectorManager class provides a dynamic module loader. As well as the handling of the loaded modules.
 */
-class ConnectorManager : public QPluginLoader, ICommandParser
+class ConnectorManager : public QPluginLoader, public ICommandParser//OLD Remove this
 {
     Q_OBJECT
 
@@ -157,6 +158,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the CommandManager
+    *
+    * @return the CommandManager.
+    */
+    inline CommandManager& getCommandManager();
+
+    //=========================================================================================================
+    /**
     * Returns vector containing all modules.
     *
     * @return reference to vector containing all modules.
@@ -186,6 +195,7 @@ signals:
 private:
     static QVector<IConnector*> s_vecConnectors;       /**< Holds vector of all modules. */
 
+    CommandManager m_commandManager;        /**< The CommandManager of the connector. */
 
     FiffStreamServer* m_pFiffStreamServer;
 
@@ -200,6 +210,14 @@ private:
 inline const QVector<IConnector*>& ConnectorManager::getConnectors()
 {
     return s_vecConnectors;
+}
+
+
+//*************************************************************************************************************
+
+inline CommandManager& ConnectorManager::getCommandManager()
+{
+    return m_commandManager;
 }
 
 } // NAMESPACE
