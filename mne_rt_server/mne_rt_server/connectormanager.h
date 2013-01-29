@@ -123,6 +123,12 @@ public:
 
     //=========================================================================================================
     /**
+    * Inits the command server.
+    */
+    void init();
+
+    //=========================================================================================================
+    /**
     * Loads modules from given directory.
     *
     * @param dir the module directory.
@@ -193,6 +199,19 @@ signals:
     void stopMeasConnector();
 
 private:
+
+    //SLOTS
+    //=========================================================================================================
+    /**
+    * Sets the buffer size of the raw data buffers
+    *
+    * @param p_command  The set buffer size command.
+    */
+    void comBufsize(Command p_command);
+
+
+
+
     static QVector<IConnector*> s_vecConnectors;       /**< Holds vector of all modules. */
 
     CommandManager m_commandManager;        /**< The CommandManager of the connector. */

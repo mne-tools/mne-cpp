@@ -71,6 +71,9 @@ CommandManager::~CommandManager()
 
 void CommandManager::disconnectAll()
 {
+
+    //DIsconnect reply channel
+    QObject::disconnect(m_conReplyChannel);
     //Disconnect Slots
     QMap<QString, QMetaObject::Connection>::Iterator it;
     for(it = m_qMapSlots.begin(); it != m_qMapSlots.end(); ++it)
@@ -104,7 +107,7 @@ void CommandManager::insert(const QJsonDocument &p_jsonDocument)
     for(it = t_jsonObjectCommand.begin(); it != t_jsonObjectCommand.end(); ++it)
     {
         if(!m_qMapCommands.contains(it.key()))
-            m_qMapCommands.insert(it.key(), Command(it.key(), it.value().toObject()));
+            m_qMapCommands.insert(it.key(), Command(it.key(), it.value().toObject(), this));
         else
             printf("Warning: CommandMap contains command %s already. Insertion skipped.\n", it.key().toLatin1().constData());
     }
@@ -117,16 +120,18 @@ void CommandManager::insert(const QJsonDocument &p_jsonDocument)
 
 void CommandManager::insert(const QString &p_sKey, const QString &p_sDescription)
 {
-    Command t_command(p_sKey, p_sDescription);
+    Command t_command(p_sKey, p_sDescription, this);
     insert(p_sKey, t_command);
 }
 
 
 //*************************************************************************************************************
 
-void CommandManager::insert(const QString &p_sKey, const Command &p_Command)
+void CommandManager::insert(const QString &p_sKey, const Command &p_command)
 {
-    m_qMapCommands.insert(p_sKey, p_Command);
+    Command t_command(p_command);
+    t_command.setParent(this);
+    m_qMapCommands.insert(p_sKey, t_command);
     emit commandMapChanged();
 }
 
@@ -189,19 +194,19 @@ void CommandManager::update(Subject* p_pSubject)
         return;
 
     // check if number of parameters is right
-    if(t_rawCommand.count() == m_qMapCommands[t_sCommandName].count())
+    if(t_rawCommand.count() >= m_qMapCommands[t_sCommandName].count())
     {
         m_qMapCommands[t_sCommandName].isJson() = t_rawCommand.isJson();
 
         //Parse Parameters
-        for(quint32 i = 1; i < t_rawCommand.count(); ++i)
+        for(quint32 i = 0; i < m_qMapCommands[t_sCommandName].count(); ++i)
         {
-            QVariant::Type t_type = m_qMapCommands[t_sCommandName].pValues()[i].type();
+            QVariant::Type t_type = m_qMapCommands[t_sCommandName][i].type();
 
             QVariant t_qVariantParam(t_rawCommand.pValues()[i]);
 
             if(t_qVariantParam.canConvert(t_type) && t_qVariantParam.convert(t_type))
-                m_qMapCommands[t_sCommandName].pValues()[i] = t_qVariantParam;
+                m_qMapCommands[t_sCommandName][i] = t_qVariantParam;
             else
                 return;
         }
@@ -288,7 +293,7 @@ Command& CommandManager::operator[] (const QString &key)
 
 //*************************************************************************************************************
 
-const Command& CommandManager::operator[] (const QString &key) const
+const Command CommandManager::operator[] (const QString &key) const
 {
     return m_qMapCommands[key];
 }

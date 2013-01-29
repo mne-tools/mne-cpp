@@ -102,6 +102,8 @@ public:
     typedef QSharedPointer<Subject> SPtr;               /**< Shared pointer type for Subject. */
     typedef QSharedPointer<const Subject> ConstSPtr;    /**< Const shared pointer type for Subject. */
 
+    typedef QSet<IObserver*>    t_Observers;            /**< Defines a new IObserver set type. */
+
     //=========================================================================================================
     /**
     * Destroys the Subject.
@@ -140,6 +142,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns attached observers.
+
+    * @return attached observers.
+    */
+    inline t_Observers& observers();
+
+    //=========================================================================================================
+    /**
     * Returns number of attached observers.
     * ToDo only for debug purpose -> could be removed
     *
@@ -155,8 +165,18 @@ protected:
     Subject() {};
 
 private:
-    typedef QSet<IObserver*>    t_Observers;	/**< Defines a new IObserver set type. */
-    t_Observers                 m_Observers;	/**< Holds the attached observers.*/
+    t_Observers                 m_Observers;    /**< Holds the attached observers.*/
 };
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline Subject::t_Observers& Subject::observers()
+{
+    return m_Observers;
+}
 
 #endif // OBSERVERPATTERN_H

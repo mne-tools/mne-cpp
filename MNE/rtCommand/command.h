@@ -93,7 +93,7 @@ public:
     * @param[in] p_bIsJson      If is received/should be send as JSON (optional, default true)
     * @param[in] parent         Parent QObject (optional)
     */
-    Command(bool p_bIsJson = true, QObject *parent = 0);
+    explicit Command(bool p_bIsJson = true, QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -123,12 +123,13 @@ public:
     *
     * @param[in] p_sCommand         Command
     * @param[in] p_sDescription     Command description
-    * @param[in] p_mapParameters    Parameter names + values/types.
+    * @param[in] p_qListParamNames  Parameter names
+    * @param[in] p_qListParamValues Parameter values/types.
     * @param[in] p_bIsJson          If is received/should be send as JSON (optional, default true)
     * @param[in] parent             Parent QObject (optional)
     */
     explicit Command(const QString &p_sCommand, const QString &p_sDescription,
-                     const QMap<QString, QVariant> &p_mapParameters, bool p_bIsJson = true, QObject *parent = 0);
+                     const QStringList &p_qListParamNames, const QList<QVariant> &p_qListParamValues, bool p_bIsJson = true, QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -136,11 +137,12 @@ public:
     *
     * @param[in] p_sCommand                 Command
     * @param[in] p_sDescription             Command description
-    * @param[in] p_mapParameters            Parameter names + values/types.
+    * @param[in] p_qListParamNames          Parameter names
+    * @param[in] p_qListParamValues         Parameter values/types.
     * @param[in] p_vecParameterDescriptions Parameter descriptions;
     */
     explicit Command(const QString &p_sCommand, const QString &p_sDescription,
-                     const QMap<QString, QVariant> &p_mapParameters, const QList<QString> &p_vecParameterDescriptions, bool p_bIsJson = true, QObject *parent = 0);
+                     const QStringList &p_qListParamNames, const QList<QVariant> &p_qListParamValues, const QStringList &p_vecParameterDescriptions, bool p_bIsJson = true, QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -162,10 +164,7 @@ public:
     *
     * @return Short command representation.
     */
-    inline QString command() const
-    {
-        return m_sCommand;
-    }
+    inline QString command() const;
 
     //=========================================================================================================
     /**
@@ -173,10 +172,7 @@ public:
     *
     * @return number of parameters.
     */
-    inline quint32 count() const
-    {
-        return m_mapParameters.size();
-    }
+    inline quint32 count() const;
 
     //=========================================================================================================
     /**
@@ -184,12 +180,7 @@ public:
      *
      * @return  Help text.
      */
-    inline QString description() const
-    {
-        return m_sDescription;
-    }
-
-
+    inline QString description() const;
 
     //=========================================================================================================
     /**
@@ -197,10 +188,7 @@ public:
      *
      * @return  emits received
      */
-    virtual void execute()
-    {
-        emit this->executed(*this);
-    }
+    virtual void execute();
 
     //=========================================================================================================
     /**
@@ -208,10 +196,7 @@ public:
     *
     * @return Json formatted.
     */
-    inline bool& isJson()
-    {
-        return m_bIsJson;
-    }
+    inline bool& isJson();
 
     //=========================================================================================================
     /**
@@ -219,10 +204,7 @@ public:
     *
     * @return parameter descriptions
     */
-    inline QList<QString> pDescriptions() const
-    {
-        return m_vecParamDescriptions;
-    }
+    inline QList<QString> pDescriptions() const;
 
     //=========================================================================================================
     /**
@@ -230,10 +212,7 @@ public:
     *
     * @return parameter names
     */
-    inline QList<QString> pNames() const
-    {
-        return m_mapParameters.keys();
-    }
+    inline QList<QString> pNames() const;
 
     //=========================================================================================================
     /**
@@ -241,10 +220,7 @@ public:
     *
     * @return parameter values
     */
-    inline QList<QVariant> pValues() const
-    {
-        return m_mapParameters.values();
-    }
+    inline QList<QVariant>& pValues();
 
 //    //=========================================================================================================
 //    /**
@@ -254,6 +230,14 @@ public:
 //    * @param p_Command  Command which was received and has to be checked before it's emmited.
 //    */
 //    void verify(const Command &p_Command);
+
+    //=========================================================================================================
+    /**
+    * Inherited command reply channel.
+    *
+    * @param p_sReply   command reply
+    */
+    void reply(const QString &p_sReply);
 
     //=========================================================================================================
     /**
@@ -287,13 +271,23 @@ public:
 
     //=========================================================================================================
     /**
-    * Subscript operator []
+    * Subscript operator [] to access parameter values by name
     *
     * @param key    the parameter name.
     *
     * @return Parameter value related to the parameter name.
     */
     QVariant& operator[] (const QString &key);
+
+    //=========================================================================================================
+    /**
+    * Subscript operator [] to access parameter values by index
+    *
+    * @param idx    the parameter index.
+    *
+    * @return Parameter value related to the parameter index.
+    */
+    QVariant& operator[] (const qint32 &idx);
 
     //=========================================================================================================
     /**
@@ -306,16 +300,87 @@ public:
     const QVariant operator[] (const QString &key) const;
 
 signals:
-    void executed(Command);
-    void triggered(Command);
+    //=========================================================================================================
+    /**
+    * Signal which is emitted when command patterns execute method is processed.
+    *
+    * @param[in] p_command  the executed command.
+    */
+    void executed(Command p_command);
+
+    //=========================================================================================================
+    /**
+    * Signal which is emitted when send method is processed.
+    *
+    * @param[in] p_command      Command which should be send.
+    */
+    void triggered(Command p_command);
 
 public:
     bool                m_bIsJson;
     QString             m_sCommand;
     QString             m_sDescription;
-    QMap<QString, QVariant> m_mapParameters;
-    QList<QString>      m_vecParamDescriptions;
+    QStringList         m_qListParamNames;
+    QList<QVariant>     m_qListParamValues;
+    QStringList         m_qListParamDescriptions;
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline QString Command::command() const
+{
+    return m_sCommand;
+}
+
+
+//*************************************************************************************************************
+
+inline quint32 Command::count() const
+{
+    return m_qListParamValues.size();
+}
+
+
+//*************************************************************************************************************
+
+inline QString Command::description() const
+{
+    return m_sDescription;
+}
+
+
+//*************************************************************************************************************
+
+inline bool& Command::isJson()
+{
+    return m_bIsJson;
+}
+
+
+//*************************************************************************************************************
+
+inline QList<QString> Command::pDescriptions() const
+{
+    return m_qListParamDescriptions;
+}
+
+//*************************************************************************************************************
+
+inline QList<QString> Command::pNames() const
+{
+    return m_qListParamNames;
+}
+
+//*************************************************************************************************************
+
+inline QList<QVariant>& Command::pValues()
+{
+    return m_qListParamValues;
+}
+
 
 } // NAMESPACE
 

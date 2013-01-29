@@ -69,16 +69,7 @@ public:
     * @return true if successfull, false otherwise
     */
     template <typename Func2>
-    bool connectSlot(QString &p_sCommand, const typename QtPrivate::FunctionPointer<Func2>::Object *receiver, Func2 slot)
-    {
-        if(!this->hasCommand(p_sCommand))
-            return false;
-
-        QMetaObject::Connection qConnection = QObject::connect(&m_qMapCommands[p_sCommand], &Command::executed, receiver, slot);
-        m_qMapSlots.insertMulti(p_sCommand, qConnection);
-
-        return true;
-    }
+    bool connectSlot(QString &p_sCommand, const typename QtPrivate::FunctionPointer<Func2>::Object *receiver, Func2 slot);
 
     //=========================================================================================================
     /**
@@ -92,16 +83,7 @@ public:
     * @return true if successfull, false otherwise
     */
     template <typename Func1>
-    bool connectSignal(QString &p_sCommand, const typename QtPrivate::FunctionPointer<Func1>::Object *sender, Func1 signal)
-    {
-        if(!this->hasCommand(p_sCommand))
-            return false;
-
-        QMetaObject::Connection t_qConnection = QObject::connect(sender, signal, &s_commandMap[p_sCommand], &Command::send);
-        m_qMapSignals.insertMulti(p_sCommand, t_qConnection);
-
-        return true;
-    }
+    bool connectSignal(QString &p_sCommand, const typename QtPrivate::FunctionPointer<Func1>::Object *sender, Func1 signal);
 
     //=========================================================================================================
     /**
@@ -117,10 +99,7 @@ public:
     *
     * @return true if part of command manager, false otherwise
     */
-    inline bool hasCommand(const QString &p_sCommand) const
-    {
-        return m_qMapCommands.contains(p_sCommand);
-    }
+    inline bool hasCommand(const QString &p_sCommand) const;
 
     //=========================================================================================================
     /**
@@ -145,10 +124,9 @@ public:
     * Inserts a new command and emmits dataChanged signal.
     *
     * @param p_sKey     Command key word.
-    * @param p_Command  Command content.
+    * @param p_command  Command content. Attention CommandManager takes ownership of that command by reseting commad's parent;
     */
-    void insert(const QString &p_sKey, const Command &p_Command);
-
+    void insert(const QString &p_sKey, const Command &p_command);
 
     //=========================================================================================================
     /**
@@ -157,6 +135,19 @@ public:
     * @return if true, incomming commands are parsed.
     */
     inline bool isActive() const;
+
+    //=========================================================================================================
+    /**
+    * Register reply Channel
+    *
+    * @param p_sCommand     Command to connect to.
+    * @param receiver       Object which provides the slot.
+    * @param slot           Member function to connect commands signal to.
+    *
+    * @return true if successfull, false otherwise
+    */
+    template <typename Func2>
+    bool registerResponseChannel(const typename QtPrivate::FunctionPointer<Func2>::Object *receiver, Func2 slot);
 
     //=========================================================================================================
     /**
@@ -208,7 +199,7 @@ public:
     *
     * @return Command object related to command key word.
     */
-    const Command& operator[] (const QString &key) const;
+    const Command operator[] (const QString &key) const;
 
 private:
     //=========================================================================================================
@@ -225,6 +216,9 @@ private:
     QMap<QString, QMetaObject::Connection> m_qMapSignals;
 
 
+    QMetaObject::Connection m_conReplyChannel;
+
+
     QMap<QString, Command> m_qMapCommands;       /**< Holds a map as an internal lookuptable of available commands. */
 
 signals:
@@ -233,16 +227,70 @@ signals:
 //    void triggered(Command);
 //    void received(Command);
 
-    void cliReply(QString);
-    void jsonReply(QString);
+    //=========================================================================================================
+    /**
+    * Is triggered when a reply is available. Commands are the emmiters of this signal -> access trough parent.
+    *
+    * @param p_sReply   the plain or JSON formatted reply
+    */
+    void response(QString p_sReply);
 };
 
 //*************************************************************************************************************
 //=============================================================================================================
-// INLINE DEFINITIONS
+// INLINE DEFINITIONS & TEMPLATES
 //=============================================================================================================
 
-bool CommandManager::isActive() const
+template <typename Func2>
+bool CommandManager::connectSlot(QString &p_sCommand, const typename QtPrivate::FunctionPointer<Func2>::Object *receiver, Func2 slot)
+{
+    if(!this->hasCommand(p_sCommand))
+        return false;
+
+    QMetaObject::Connection qConnection = QObject::connect(&m_qMapCommands[p_sCommand], &Command::executed, receiver, slot);
+    m_qMapSlots.insertMulti(p_sCommand, qConnection);
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+template <typename Func1>
+bool CommandManager::connectSignal(QString &p_sCommand, const typename QtPrivate::FunctionPointer<Func1>::Object *sender, Func1 signal)
+{
+    if(!this->hasCommand(p_sCommand))
+        return false;
+
+    QMetaObject::Connection t_qConnection = QObject::connect(sender, signal, &s_commandMap[p_sCommand], &Command::send);
+    m_qMapSignals.insertMulti(p_sCommand, t_qConnection);
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+template <typename Func2>
+bool CommandManager::registerResponseChannel(const typename QtPrivate::FunctionPointer<Func2>::Object *receiver, Func2 slot)
+{
+    QObject::disconnect(m_conReplyChannel);
+    m_conReplyChannel = QObject::connect(this, &CommandManager::response, receiver, slot);
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+inline bool CommandManager::hasCommand(const QString &p_sCommand) const
+{
+    return m_qMapCommands.contains(p_sCommand);
+}
+
+
+//*************************************************************************************************************
+
+inline bool CommandManager::isActive() const
 {
     return m_bIsActive;
 }
@@ -250,7 +298,7 @@ bool CommandManager::isActive() const
 
 //*************************************************************************************************************
 
-void CommandManager::setStatus(bool status)
+inline void CommandManager::setStatus(bool status)
 {
     m_bIsActive = status;
 }

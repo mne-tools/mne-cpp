@@ -96,8 +96,16 @@ public:
 
     virtual QByteArray availableCommands();
 
+
+
+
+
     void incommingCommand(QString p_sCommand, qint32 p_iThreadID);
 
+    //=========================================================================================================
+    /**
+    * Inits the CommandServer.
+    */
     void init();
 
     //Rename this to prepare before parse -> parsing is done within command parser
@@ -115,6 +123,10 @@ public:
     */
     void registerCommandManager(CommandManager &p_commandManager);
 
+
+
+    void replyCommandNew(QString p_sReply);
+
 signals:
     void replyCommand(QByteArray p_blockReply, qint32 p_iID);
 
@@ -126,6 +138,22 @@ protected:
     void incomingConnection(qintptr socketDescriptor);
 
 private:
+
+    //SLOTS
+    //=========================================================================================================
+    /**
+    * Closes mne_rt_server
+    */
+    void comClose();
+
+    //=========================================================================================================
+    /**
+    * Is called when signal help is executed.
+    */
+    void comHelp();
+
+
+
 
     qint32 m_iThreadCount;
 

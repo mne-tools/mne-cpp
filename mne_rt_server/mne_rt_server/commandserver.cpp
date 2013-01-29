@@ -75,8 +75,10 @@ CommandServer::CommandServer(QObject *parent)
 : QTcpServer(parent)
 , m_iThreadCount(0)
 {
+
     this->init();
-    m_commandParser.attach(&m_commandManager);
+
+    QObject::connect(&m_commandParser, &CommandParser::response, this, &CommandServer::replyCommandNew);
 }
 
 
@@ -139,6 +141,42 @@ void CommandServer::incommingCommand(QString p_sCommand, qint32 p_iThreadID)
 
     //send reply
     emit replyCommand(t_blockReply, p_iThreadID);
+
+//    //NEW
+//    qDebug() << "################### NEW ###################";
+//    m_commandParser.parse(p_sCommand);
+}
+
+
+//*************************************************************************************************************
+
+void CommandServer::comClose()
+{
+    //
+    // Closes mne_rt_server
+    //
+    printf("close NEW\n");
+    emit qobject_cast<MNERTServer*>(this->parent())->closeServer();
+}
+
+
+//*************************************************************************************************************
+
+void CommandServer::comHelp()
+{
+
+    //
+    // Help
+    //
+    printf("help NEW\n");
+    Subject::t_Observers::Iterator it;
+    for(it = m_commandParser.observers().begin(); it != m_commandParser.observers().end(); ++it)
+    {
+        CommandManager* t_pCommandManager = static_cast<CommandManager*> (*it);
+        printf("NEW %s\n", t_pCommandManager->toString().toLatin1().constData());
+//        qDebug() << "NEW\n" << t_pCommandManager->toString();
+    }
+    m_commandManager["help"].reply("Was in Help");
 }
 
 
@@ -146,36 +184,45 @@ void CommandServer::incommingCommand(QString p_sCommand, qint32 p_iThreadID)
 
 void CommandServer::init()
 {
+    //insert commands
+    QStringList t_qListParamNames;
+    QList<QVariant> t_qListParamValues;
+    QStringList t_qListParamDescription;
 
-    QMap<QString, QVariant> t_qMap;
-    QList<QString> t_qListDescription;
+    t_qListParamNames.append("id");
+    t_qListParamValues.append(QVariant(QVariant::String));
+    t_qListParamDescription.append("ID/Alias");
 
-    t_qMap.insert("id", QVariant(QVariant::String));
-    t_qListDescription.append("ID/Alias");
-
-    m_commandManager.insert("measinfo", Command("measinfo", "sends the measurement info to the specified FiffStreamClient.", t_qMap, t_qListDescription));
-    m_commandManager.insert("meas", Command("meas", "adds specified FiffStreamClient to raw data buffer receivers. If acquisition is not already strated, it is triggered.", t_qMap, t_qListDescription));
-    m_commandManager.insert("stop", Command("stop", "removes specified FiffStreamClient from raw data buffer receivers.", t_qMap, t_qListDescription));
-    t_qMap.clear();t_qListDescription.clear();
+    m_commandManager.insert("measinfo", Command("measinfo", "sends the measurement info to the specified FiffStreamClient.", t_qListParamNames, t_qListParamValues, t_qListParamDescription));
+    m_commandManager.insert("meas", Command("meas", "adds specified FiffStreamClient to raw data buffer receivers. If acquisition is not already strated, it is triggered.", t_qListParamNames, t_qListParamValues, t_qListParamDescription));
+    m_commandManager.insert("stop", Command("stop", "removes specified FiffStreamClient from raw data buffer receivers.", t_qListParamNames, t_qListParamValues, t_qListParamDescription));
+    t_qListParamNames.clear(); t_qListParamValues.clear();t_qListParamDescription.clear();
     m_commandManager.insert(QString("stop-all"), QString("stops the whole acquisition process."));
 
     m_commandManager.insert(QString("conlist"), QString("prints and sends all available connectors"));
 
-    t_qMap.insert("ConID", QVariant(QVariant::Int));
-    t_qListDescription.append("Connector ID");
-    m_commandManager.insert("conlist", Command("conlist", "prints and sends all available connectors", t_qMap, t_qListDescription));
+    t_qListParamNames.append("ConID");
+    t_qListParamValues.append(QVariant(QVariant::Int));
+    t_qListParamDescription.append("Connector ID");
+    m_commandManager.insert("conlist", Command("conlist", "prints and sends all available connectors", t_qListParamNames, t_qListParamValues, t_qListParamDescription));
 
     m_commandManager.insert(QString("help"), QString("prints and sends this list"));
 
     m_commandManager.insert(QString("close"), QString("closes mne_rt_server"));
 
+    //Register the own command manager
+    this->registerCommandManager(m_commandManager);
+
+    //Connect slots
+    m_commandManager.connectSlot(QString("help"), this, &CommandServer::comHelp);
 }
 
 
 //*************************************************************************************************************
-
+//OLD
 bool CommandServer::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo)
 {
+    //OLD
     bool success = false;
 
     if(p_sListCommand[0].compare("help",Qt::CaseInsensitive) == 0)
@@ -246,6 +293,16 @@ void CommandServer::registerCommandParser(ICommandParser* p_pCommandParser)
 // NEW
 void CommandServer::registerCommandManager(CommandManager &p_commandManager)
 {
+    //Attach Observer to Subject
     m_commandParser.attach(&p_commandManager);
+    //Register Reply Channel
+    p_commandManager.registerResponseChannel(&m_commandParser, &CommandParser::response);
 }
 
+
+//*************************************************************************************************************
+
+void CommandServer::replyCommandNew(QString p_sReply)
+{
+    qDebug() << "void CommandServer::replyCommandNew(QString p_sReply)\n\t" << p_sReply;
+}
