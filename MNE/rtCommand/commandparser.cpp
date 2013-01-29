@@ -48,6 +48,8 @@
 
 #include <QDebug>
 #include <QStringList>
+#include <QJsonObject>
+#include <QJsonDocument>
 
 
 //*************************************************************************************************************
@@ -84,6 +86,34 @@ bool CommandParser::parse(const QString &p_sInput)
     {
 //        RawCommand parsedCommand;
         qDebug() << "JSON commands recognized";
+
+        QJsonObject t_jsonObjectCommand;
+        QJsonObject t_jsonObjectParameters;
+        QJsonDocument t_jsonDocument(QJsonDocument::fromJson(p_sInput.toLatin1()));
+
+        //Switch to command object
+        if(t_jsonDocument.isObject() && t_jsonDocument.object().value(QString("commands")) != QJsonValue::Undefined)
+            t_jsonObjectCommand = t_jsonDocument.object().value(QString("commands")).toObject();
+        else
+            return false;
+
+        //iterate over commands
+        QJsonObject::Iterator it;
+        QJsonObject::Iterator itParam;
+        for(it = t_jsonObjectCommand.begin(); it != t_jsonObjectCommand.end(); ++it)
+        {
+            m_rawCommand = RawCommand(it.key(), true);
+            t_jsonObjectParameters = it.value().toObject();
+
+            //append the parameters
+            for(itParam= t_jsonObjectParameters.begin(); itParam != t_jsonObjectParameters.end(); ++itParam)
+            {
+                //ToDo do a cross check with the param naming and key
+                m_rawCommand.pValues().append(itParam.value().toString());
+//                qDebug() << itParam.key() << " + " << itParam.value().toString();
+            }
+            notify();
+        }
     }
     else
     {
@@ -99,8 +129,7 @@ bool CommandParser::parse(const QString &p_sInput)
         }
 
         notify();
-        return true;
     }
 
-    return false;
+    return true;
 }

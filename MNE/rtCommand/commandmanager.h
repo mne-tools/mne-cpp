@@ -53,9 +53,23 @@ class RTCOMMANDSHARED_EXPORT CommandManager : public QObject, public IObserver
 public:
     explicit CommandManager(bool p_bIsActive = true, QObject *parent = 0);
 
-    explicit CommandManager(const QByteArray &p_jsonDoc, bool p_bIsActive = true, QObject *parent = 0);
+    explicit CommandManager(const QByteArray &p_qByteArrayJsonDoc, bool p_bIsActive = true, QObject *parent = 0);
+
+    explicit CommandManager(const QJsonDocument &p_jsonDoc, bool p_bIsActive = true, QObject *parent = 0);
+
 
     virtual ~CommandManager();
+
+    //=========================================================================================================
+    /**
+    * Returns the lookup table of all available commands.
+    *
+    * @return the command lookup table
+    */
+    inline QMap<QString, Command>& commandMap()
+    {
+        return m_qMapCommands;
+    }
 
     //=========================================================================================================
     /**
@@ -165,13 +179,13 @@ public:
     */
     QJsonObject toJsonObject() const;
 
-    //=========================================================================================================
-    /**
-    * Formats commands for e.g. command line output.
-    *
-    * @return Commands with parameters and descriptions.
-    */
-    QString toString() const;
+//    //=========================================================================================================
+//    /**
+//    * Formats commands for e.g. command line output.
+//    *
+//    * @return Commands with parameters and descriptions.
+//    */
+//    QString toString() const;
 
     //=========================================================================================================
     /**

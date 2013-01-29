@@ -142,9 +142,9 @@ void CommandServer::incommingCommand(QString p_sCommand, qint32 p_iThreadID)
     //send reply
     emit replyCommand(t_blockReply, p_iThreadID);
 
-//    //NEW
-//    qDebug() << "################### NEW ###################";
-//    m_commandParser.parse(p_sCommand);
+    //NEW
+    qDebug() << "################### NEW ###################";
+    m_commandParser.parse(p_sCommand);
 }
 
 
@@ -173,7 +173,10 @@ void CommandServer::comHelp()
     for(it = m_commandParser.observers().begin(); it != m_commandParser.observers().end(); ++it)
     {
         CommandManager* t_pCommandManager = static_cast<CommandManager*> (*it);
-        printf("NEW %s\n", t_pCommandManager->toString().toLatin1().constData());
+
+        qDebug() << t_pCommandManager->toJsonObject();
+
+//        printf("NEW %s\n", t_pCommandManager->toString().toLatin1().constData());
 //        qDebug() << "NEW\n" << t_pCommandManager->toString();
     }
     m_commandManager["help"].reply("Was in Help");
@@ -185,36 +188,102 @@ void CommandServer::comHelp()
 void CommandServer::init()
 {
     //insert commands
-    QStringList t_qListParamNames;
-    QList<QVariant> t_qListParamValues;
-    QStringList t_qListParamDescription;
 
-    t_qListParamNames.append("id");
-    t_qListParamValues.append(QVariant(QVariant::String));
-    t_qListParamDescription.append("ID/Alias");
+//    //OPTION 1
+//    QStringList t_qListParamNames;
+//    QList<QVariant> t_qListParamValues;
+//    QStringList t_qListParamDescription;
 
-    m_commandManager.insert("measinfo", Command("measinfo", "sends the measurement info to the specified FiffStreamClient.", t_qListParamNames, t_qListParamValues, t_qListParamDescription));
-    m_commandManager.insert("meas", Command("meas", "adds specified FiffStreamClient to raw data buffer receivers. If acquisition is not already strated, it is triggered.", t_qListParamNames, t_qListParamValues, t_qListParamDescription));
-    m_commandManager.insert("stop", Command("stop", "removes specified FiffStreamClient from raw data buffer receivers.", t_qListParamNames, t_qListParamValues, t_qListParamDescription));
-    t_qListParamNames.clear(); t_qListParamValues.clear();t_qListParamDescription.clear();
-    m_commandManager.insert(QString("stop-all"), QString("stops the whole acquisition process."));
+//    t_qListParamNames.append("id");
+//    t_qListParamValues.append(QVariant(QVariant::String));
+//    t_qListParamDescription.append("ID/Alias");
 
-    m_commandManager.insert(QString("conlist"), QString("prints and sends all available connectors"));
+//    m_commandManager.insert("measinfo", Command("measinfo", "sends the measurement info to the specified FiffStreamClient.", t_qListParamNames, t_qListParamValues, t_qListParamDescription));
+//    m_commandManager.insert("meas", Command("meas", "adds specified FiffStreamClient to raw data buffer receivers. If acquisition is not already strated, it is triggered.", t_qListParamNames, t_qListParamValues, t_qListParamDescription));
+//    m_commandManager.insert("stop", Command("stop", "removes specified FiffStreamClient from raw data buffer receivers.", t_qListParamNames, t_qListParamValues, t_qListParamDescription));
+//    t_qListParamNames.clear(); t_qListParamValues.clear();t_qListParamDescription.clear();
+//    m_commandManager.insert(QString("stop-all"), QString("stops the whole acquisition process."));
 
-    t_qListParamNames.append("ConID");
-    t_qListParamValues.append(QVariant(QVariant::Int));
-    t_qListParamDescription.append("Connector ID");
-    m_commandManager.insert("conlist", Command("conlist", "prints and sends all available connectors", t_qListParamNames, t_qListParamValues, t_qListParamDescription));
+//    m_commandManager.insert(QString("conlist"), QString("prints and sends all available connectors"));
 
-    m_commandManager.insert(QString("help"), QString("prints and sends this list"));
+//    t_qListParamNames.append("ConID");
+//    t_qListParamValues.append(QVariant(QVariant::Int));
+//    t_qListParamDescription.append("Connector ID");
+//    m_commandManager.insert("\tselcon", Command("\tselcon", "selects a new connector, if a measurement is running it will be stopped.", t_qListParamNames, t_qListParamValues, t_qListParamDescription));
 
-    m_commandManager.insert(QString("close"), QString("closes mne_rt_server"));
+//    m_commandManager.insert(QString("help"), QString("prints and sends this list"));
+
+//    m_commandManager.insert(QString("close"), QString("closes mne_rt_server"));
+
+    //OPTION 2
+    QString t_sJsonCommand =
+                    "{"
+                    "   \"commands\": {"
+                    "       \"measinfo\": {"
+                    "           \"description\": \"Sends the measurement info to the specified FiffStreamClient.\","
+                    "           \"parameters\": {"
+                    "               \"id\": {"
+                    "                   \"description\": \"ID/Alias\","
+                    "                   \"type\": \"QString\" "
+                    "               }"
+                    "           }"
+                    "       },"
+                    "       \"meas\": {"
+                    "           \"description\": \"Adds specified FiffStreamClient to raw data buffer receivers. If acquisition is not already strated, it is triggered.\","
+                    "           \"parameters\": {"
+                    "               \"id\": {"
+                    "                   \"description\": \"ID/Alias\","
+                    "                   \"type\": \"QString\" "
+                    "               }"
+                    "           }"
+                    "       },"
+                    "       \"stop\": {"
+                    "           \"description\": \"Removes specified FiffStreamClient from raw data buffer receivers.\","
+                    "           \"parameters\": {"
+                    "               \"id\": {"
+                    "                   \"description\": \"ID/Alias\","
+                    "                   \"type\": \"QString\" "
+                    "               }"
+                    "           }"
+                    "       },"
+                    "       \"stop-all\": {"
+                    "           \"description\": \"Stops the whole acquisition process.\","
+                    "           \"parameters\": {}"
+                    "       },"
+                    "       \"conlist\": {"
+                    "           \"description\": \"Prints and sends all available connectors.\","
+                    "           \"parameters\": {}"
+                    "       },"
+                    "       \"selcon\": {"
+                    "           \"description\": \"Selects a new connector, if a measurement is running it will be stopped.\","
+                    "           \"parameters\": {"
+                    "               \"ConID\": {"
+                    "                   \"description\": \"Connector ID\","
+                    "                   \"type\": \"int\" "
+                    "               }"
+                    "           }"
+                    "       },"
+                    "       \"help\": {"
+                    "           \"description\": \"Prints and sends this list.\","
+                    "           \"parameters\": {}"
+                    "       },"
+                    "       \"close\": {"
+                    "           \"description\": \"Closes mne_rt_server.\","
+                    "           \"parameters\": {}"
+                    "       }"
+                    "    }"
+                    "}";
+
+    QJsonDocument t_jsonDocumentOrigin = QJsonDocument::fromJson(t_sJsonCommand.toLatin1());
+    m_commandManager.insert(t_jsonDocumentOrigin);
+
 
     //Register the own command manager
     this->registerCommandManager(m_commandManager);
 
     //Connect slots
     m_commandManager.connectSlot(QString("help"), this, &CommandServer::comHelp);
+    m_commandManager.connectSlot(QString("close"), this, &CommandServer::comClose);
 }
 
 
