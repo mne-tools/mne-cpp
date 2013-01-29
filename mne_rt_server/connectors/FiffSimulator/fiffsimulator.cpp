@@ -289,14 +289,19 @@ void FiffSimulator::requestSetBufferSize(quint32 p_uiBuffSize)
 {
     if(p_uiBuffSize > 0)
     {
+        bool t_bWasRunning = m_bIsRunning;
 //        qDebug() << "void FiffSimulator::requestSetBufferSize: " << p_uiBuffSize;
 
-        m_pFiffProducer->stop();
-        this->stop();
+        if(m_bIsRunning)
+        {
+            m_pFiffProducer->stop();
+            this->stop();
+        }
 
         this->setBufferSampleSize(p_uiBuffSize);
 
-        this->start();
+        if(t_bWasRunning)
+            this->start();
 
     }
 }

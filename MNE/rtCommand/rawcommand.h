@@ -102,7 +102,6 @@ public:
     */
     explicit RawCommand(const RawCommand &p_rawCommand);
 
-
     //=========================================================================================================
     /**
     * Command name
@@ -149,8 +148,10 @@ signals:
     //=========================================================================================================
     /**
     * Signal which is emitted when command patterns execute method is processed.
+    *
+    * @param[in] p_qListParameters    Parameter List.
     */
-    void executed(QList<QString> p_listParameters);
+    void executed(QList<QString> p_qListParameters);
 
 private:
     QString m_sCommand;

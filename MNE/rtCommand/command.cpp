@@ -5,6 +5,7 @@
 //=============================================================================================================
 
 #include "command.h"
+#include "commandmanager.h"
 
 
 //*************************************************************************************************************
@@ -58,8 +59,9 @@ Command::Command(const QString &p_sCommand, const QJsonObject &p_qCommandDescrip
         QJsonValue t_jsonValueType = it.value().toObject().value(QString("type"));
         QVariant::Type t_type = QVariant::nameToType(t_jsonValueType.toString().toLatin1().constData());
 
-        this->m_mapParameters.insert(it.key(), QVariant(t_type));
-        this->m_vecParamDescriptions.push_back(it.value().toObject().value(QString("description")).toString());
+        this->m_qListParamNames.push_back(it.key());
+        this->m_qListParamValues.push_back(QVariant(t_type));
+        this->m_qListParamDescriptions.push_back(it.value().toObject().value(QString("description")).toString());
     }
 }
 
@@ -79,32 +81,34 @@ Command::Command(const QString &p_sCommand, const QString &p_sDescription, bool 
 //*************************************************************************************************************
 
 Command::Command(   const QString &p_sCommand, const QString &p_sDescription,
-                    const QMap<QString, QVariant> &p_mapParameters, bool p_bIsJson, QObject *parent)
+                    const QStringList &p_qListParamNames, const QList<QVariant> &p_qListParamValues, bool p_bIsJson, QObject *parent)
 : QObject(parent)
 , m_sCommand(p_sCommand)
 , m_sDescription(p_sDescription)
 , m_bIsJson(p_bIsJson)
 {
-    m_mapParameters = p_mapParameters;
+    m_qListParamNames = p_qListParamNames;
+    m_qListParamValues = p_qListParamValues;
 
-    for(qint32 i = 0; i < m_mapParameters.size(); ++i)
-        m_vecParamDescriptions.append("");
+    for(qint32 i = 0; i < p_qListParamValues.size(); ++i)
+        m_qListParamDescriptions.append("");
 }
 
 
 //*************************************************************************************************************
 
 Command::Command(   const QString &p_sCommand, const QString &p_sDescription,
-                    const QMap<QString, QVariant> &p_mapParameters, const QList<QString> &p_vecParameterDescriptions, bool p_bIsJson, QObject *parent)
+                    const QStringList &p_qListParamNames, const QList<QVariant> &p_qListParamValues, const QStringList &p_vecParameterDescriptions, bool p_bIsJson, QObject *parent)
 : QObject(parent)
 , m_sCommand(p_sCommand)
 , m_sDescription(p_sDescription)
 , m_bIsJson(p_bIsJson)
 {
-    if(p_mapParameters.size() == p_vecParameterDescriptions.size())
+    if(p_qListParamNames.size() == p_qListParamValues.size() == p_vecParameterDescriptions.size())
     {
-        m_mapParameters = p_mapParameters;
-        m_vecParamDescriptions = p_vecParameterDescriptions;
+        m_qListParamNames = p_qListParamNames;
+        m_qListParamValues = p_qListParamValues;
+        m_qListParamDescriptions = p_vecParameterDescriptions;
     }
     else
     {
@@ -120,8 +124,9 @@ Command::Command(const Command &p_Command)
 : QObject(p_Command.parent())
 , m_sCommand(p_Command.m_sCommand)
 , m_sDescription(p_Command.m_sDescription)
-, m_mapParameters(p_Command.m_mapParameters)
-, m_vecParamDescriptions(p_Command.m_vecParamDescriptions)
+, m_qListParamNames(p_Command.m_qListParamNames)
+, m_qListParamValues(p_Command.m_qListParamValues)
+, m_qListParamDescriptions(p_Command.m_qListParamDescriptions)
 , m_bIsJson(p_Command.m_bIsJson)
 {
 
@@ -132,6 +137,14 @@ Command::Command(const Command &p_Command)
 
 Command::~Command()
 {
+}
+
+
+//*************************************************************************************************************
+
+void Command::execute()
+{
+    emit this->executed(*this);
 }
 
 
@@ -153,6 +166,18 @@ Command::~Command()
 
 //*************************************************************************************************************
 
+void Command::reply(const QString &p_sReply)
+{
+    //ToDO parse reply to plain or JSON;
+
+    CommandManager* t_commandManager = static_cast<CommandManager*> (this->parent());
+    if(t_commandManager)
+        emit t_commandManager->response(p_sReply);
+}
+
+
+//*************************************************************************************************************
+
 void Command::send()
 {
     emit this->triggered(*this);
@@ -167,12 +192,12 @@ QJsonObject Command::toJsonObject() const
     p_jsonCommandObject.insert("description", QJsonValue(m_sDescription));
 
     QJsonObject t_jsonAllParametersObject;
-    for(qint32 i = 0; i < m_mapParameters.size(); ++i)
+    for(qint32 i = 0; i < m_qListParamValues.size(); ++i)
     {
         QJsonObject t_jsonParameterObject;
-        t_jsonParameterObject.insert("description",QJsonValue(m_vecParamDescriptions[i]));
-        t_jsonParameterObject.insert("typeId",QJsonValue(static_cast<int> (m_mapParameters.values()[i].type())));
-        t_jsonAllParametersObject.insert(m_mapParameters.keys()[i], QJsonValue(t_jsonParameterObject));
+        t_jsonParameterObject.insert("description",QJsonValue(m_qListParamDescriptions[i]));
+        t_jsonParameterObject.insert("type",QJsonValue(static_cast<int> (m_qListParamValues[i].type())));//ToDo type as clear text
+        t_jsonAllParametersObject.insert(m_qListParamNames[i], QJsonValue(t_jsonParameterObject));
     }
     p_jsonCommandObject.insert("parameters", QJsonValue(t_jsonAllParametersObject));
 
@@ -190,10 +215,10 @@ QStringList Command::toStringList() const
     p_stringCommandList << m_sCommand;
 
     QString t_sParameters;
-    for(qint32 i = 0; i < m_vecParamDescriptions.size(); ++i)
+    for(qint32 i = 0; i < m_qListParamDescriptions.size(); ++i)
     {
         t_sParameters.append("[");
-        t_sParameters.append(m_vecParamDescriptions[i]);
+        t_sParameters.append(m_qListParamDescriptions[i]);
         t_sParameters.append("]");
     }
     p_stringCommandList << t_sParameters;
@@ -211,8 +236,9 @@ Command& Command::operator= (const Command &rhs)
     {
         m_sCommand = rhs.m_sCommand;
         m_sDescription = rhs.m_sDescription;
-        m_mapParameters = rhs.m_mapParameters;
-        m_vecParamDescriptions = rhs.m_vecParamDescriptions;
+        m_qListParamNames = rhs.m_qListParamNames;
+        m_qListParamValues = rhs.m_qListParamValues;
+        m_qListParamDescriptions = rhs.m_qListParamDescriptions;
     }
     // to support chained assignment operators (a=b=c), always return *this
     return *this;
@@ -223,8 +249,19 @@ Command& Command::operator= (const Command &rhs)
 
 QVariant& Command::operator[] (const QString &key)
 {
-    if(m_mapParameters.contains(key))
-        return m_mapParameters[key];
+    if(m_qListParamNames.contains(key))
+        return m_qListParamValues[m_qListParamNames.indexOf(key)];
+    else
+        return defaultVariant;
+}
+
+
+//*************************************************************************************************************
+
+QVariant& Command::operator[] (const qint32 &idx)
+{
+    if(m_qListParamValues.size() > idx)
+        return m_qListParamValues[idx];
     else
         return defaultVariant;
 }
@@ -234,5 +271,8 @@ QVariant& Command::operator[] (const QString &key)
 
 const QVariant Command::operator[] (const QString &key) const
 {
-    return m_mapParameters[key];
+    if(m_qListParamNames.contains(key))
+        return m_qListParamValues[m_qListParamNames.indexOf(key)];
+    else
+        return defaultVariant;
 }

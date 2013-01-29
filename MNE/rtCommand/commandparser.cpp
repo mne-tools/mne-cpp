@@ -93,7 +93,6 @@ bool CommandParser::parse(const QString &p_sInput)
 
         if(t_qCommandList.size() > 1) //Parameter parsing
         {
-            qDebug() << "Parameter parsing";
             //Parse Parameters
             for(qint32 i = 1; i < t_qCommandList.size(); ++i)
                 m_rawCommand.pValues().append(t_qCommandList[i]);

@@ -85,7 +85,7 @@ ConnectorManager::ConnectorManager(FiffStreamServer* p_pFiffStreamServer, QObjec
 : QPluginLoader(parent)
 , m_pFiffStreamServer(p_pFiffStreamServer)
 {
-
+    init();
 }
 
 
@@ -129,6 +129,30 @@ void ConnectorManager::clearConnectorActivation()
         for( ; it != s_vecConnectors.end(); ++it)
             if((*it)->isActive())
                 (*it)->setStatus(false);
+    }
+}
+
+
+//*************************************************************************************************************
+//NEW
+void ConnectorManager::comBufsize(Command p_command)
+{
+    qDebug() << "NEW comBufsize Command: " << p_command.command();
+
+    qDebug() << "NEW comBufsize Value: " << p_command.pValues().at(0);
+
+    if(!(p_command.pValues().size() > 0))
+        return;
+
+    quint32 t_uiBuffSize = (quint32)p_command.pValues()[0].toInt();
+
+    if(t_uiBuffSize > 0)
+    {
+        printf("bufsize %d\n", t_uiBuffSize);
+
+        emit setBufferSize(t_uiBuffSize);
+
+        m_commandManager["bufsize"].reply(QString("NEW Set %1 buffer sample size to %2 samples\r\n\n").arg(getActiveConnector()->getName()).arg(t_uiBuffSize));
     }
 }
 
@@ -277,6 +301,26 @@ QByteArray ConnectorManager::getConnectorList() const
 
     t_blockConnectorList.append("\r\n");
     return t_blockConnectorList;
+}
+
+//*************************************************************************************************************
+
+void ConnectorManager::init()
+{
+    //insert commands
+    QStringList t_qListParamNames;
+    QList<QVariant> t_qListParamValues;
+    QStringList t_qListParamDescription;
+
+    t_qListParamNames.push_back("samples");
+    t_qListParamValues.push_back(QVariant(QVariant::Int));
+    t_qListParamDescription.append("samples");
+
+    m_commandManager.insert("bufsize", Command("bufsize", "Sets the buffer size of the raw data buffers.", t_qListParamNames, t_qListParamValues, t_qListParamDescription));
+    t_qListParamNames.clear();t_qListParamValues.clear();t_qListParamDescription.clear();
+
+    //Connect slots
+    m_commandManager.connectSlot(QString("bufsize"), this, &ConnectorManager::comBufsize);
 }
 
 
