@@ -308,16 +308,39 @@ QByteArray ConnectorManager::getConnectorList() const
 void ConnectorManager::init()
 {
     //insert commands
-    QStringList t_qListParamNames;
-    QList<QVariant> t_qListParamValues;
-    QStringList t_qListParamDescription;
 
-    t_qListParamNames.push_back("samples");
-    t_qListParamValues.push_back(QVariant(QVariant::Int));
-    t_qListParamDescription.append("samples");
+//    //OPTION 1
+//    QStringList t_qListParamNames;
+//    QList<QVariant> t_qListParamValues;
+//    QStringList t_qListParamDescription;
 
-    m_commandManager.insert("bufsize", Command("bufsize", "Sets the buffer size of the raw data buffers.", t_qListParamNames, t_qListParamValues, t_qListParamDescription));
-    t_qListParamNames.clear();t_qListParamValues.clear();t_qListParamDescription.clear();
+//    t_qListParamNames.push_back("samples");
+//    t_qListParamValues.push_back(QVariant(QVariant::Int));
+//    t_qListParamDescription.append("samples");
+
+//    m_commandManager.insert("bufsize", Command("bufsize", "Sets the buffer size of the raw data buffers.", t_qListParamNames, t_qListParamValues, t_qListParamDescription));
+//    t_qListParamNames.clear();t_qListParamValues.clear();t_qListParamDescription.clear();
+
+
+    //OPTION 2
+    QString t_sJsonCommand =
+                    "{"
+                    "   \"commands\": {"
+                    "       \"bufsize\": {"
+                    "           \"description\": \"Sets the buffer size of the raw data buffers.\","
+                    "           \"parameters\": {"
+                    "               \"samples\": {"
+                    "                   \"description\": \"samples\","
+                    "                   \"type\": \"int\" "
+                    "               }"
+                    "           }"
+                    "       }"
+                    "    }"
+                    "}";
+
+    QJsonDocument t_jsonDocumentOrigin = QJsonDocument::fromJson(t_sJsonCommand.toLatin1());
+    m_commandManager.insert(t_jsonDocumentOrigin);
+
 
     //Connect slots
     m_commandManager.connectSlot(QString("bufsize"), this, &ConnectorManager::comBufsize);

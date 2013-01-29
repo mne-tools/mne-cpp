@@ -157,8 +157,8 @@ int main(int argc, char *argv[])
     qDebug() << testParser.getCommandManager()["help"].toStringList();
 
     qDebug() << testParser.getCommandManager()["com1"].toStringList();
-    qDebug() << testParser.getCommandManager().toString();
-    qDebug() << testParser.getCommandManager().toString();
+//    qDebug() << testParser.getCommandManager().toString();
+//    qDebug() << testParser.getCommandManager().toString();
     qDebug() << "####################### FORMAT #######################";
 
 
