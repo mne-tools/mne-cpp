@@ -121,7 +121,7 @@ void CommandManager::insert(const QJsonDocument &p_jsonDocument)
     for(it = t_jsonObjectCommand.begin(); it != t_jsonObjectCommand.end(); ++it)
     {
         if(!m_qMapCommands.contains(it.key()))
-            m_qMapCommands.insert(it.key(), Command(it.key(), it.value().toObject(), this));
+            m_qMapCommands.insert(it.key(), Command(it.key(), it.value().toObject(), true, this));
         else
             printf("Warning: CommandMap contains command %s already. Insertion skipped.\n", it.key().toLatin1().constData());
     }
@@ -134,7 +134,7 @@ void CommandManager::insert(const QJsonDocument &p_jsonDocument)
 
 void CommandManager::insert(const QString &p_sKey, const QString &p_sDescription)
 {
-    Command t_command(p_sKey, p_sDescription, this);
+    Command t_command(p_sKey, p_sDescription, false, this);
     insert(p_sKey, t_command);
 }
 
@@ -149,18 +149,18 @@ void CommandManager::insert(const QString &p_sKey, const Command &p_command)
     emit commandMapChanged();
 }
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-QJsonObject CommandManager::toJsonObject() const
-{
-    QJsonObject p_jsonCommandsObject;
+//QJsonObject CommandManager::toJsonObject() const
+//{
+//    QJsonObject p_jsonCommandsObject;
 
-    QMap<QString, Command>::ConstIterator it;
-    for(it = m_qMapCommands.begin(); it != m_qMapCommands.end(); ++it)
-        p_jsonCommandsObject.insert(it.key(),QJsonValue(it.value().toJsonObject()));
+//    QMap<QString, Command>::ConstIterator it;
+//    for(it = m_qMapCommands.begin(); it != m_qMapCommands.end(); ++it)
+//        p_jsonCommandsObject.insert(it.key(),QJsonValue(it.value().toJsonObject()));
 
-    return p_jsonCommandsObject;
-}
+//    return p_jsonCommandsObject;
+//}
 
 
 ////*************************************************************************************************************

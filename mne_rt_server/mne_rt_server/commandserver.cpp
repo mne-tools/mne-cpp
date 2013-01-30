@@ -103,7 +103,7 @@ QByteArray CommandServer::availableCommands()
     t_blockCmdInfoList.append("\n\tconlist\t\t\tprints and sends all available connectors\r\n");
     t_blockCmdInfoList.append("\tselcon   [ConID]\tselects a new connector, if a measurement is running it will be stopped.\r\n");
 
-    t_blockCmdInfoList.append("\n\thelp\t\t\tprints and sends this list\r\n");
+//    t_blockCmdInfoList.append("\n\thelp\t\t\tprints and sends this list\r\n");
 
     t_blockCmdInfoList.append("\n\tclose\t\t\tcloses mne_rt_server\r\n\n");
 
@@ -144,6 +144,7 @@ void CommandServer::incommingCommand(QString p_sCommand, qint32 p_iThreadID)
 
     //NEW
     qDebug() << "################### NEW ###################";
+    //ToDo add parse request to a set with id
     m_commandParser.parse(p_sCommand);
 }
 
@@ -162,24 +163,115 @@ void CommandServer::comClose()
 
 //*************************************************************************************************************
 
-void CommandServer::comHelp()
+void CommandServer::comHelp(Command p_command)
 {
-
+    bool t_bCommandIsJson = p_command.isJson();
     //
-    // Help
+    // Generate help
     //
     printf("help NEW\n");
-    Subject::t_Observers::Iterator it;
-    for(it = m_commandParser.observers().begin(); it != m_commandParser.observers().end(); ++it)
+    Subject::t_Observers::Iterator itObservers;
+
+    //Map to store all commands & merging multi occurence
+    QMap<QString, Command> t_qMapCommands;
+
+    QMap<QString, Command>::ConstIterator itCommands;
+
+    for(itObservers = m_commandParser.observers().begin(); itObservers != m_commandParser.observers().end(); ++itObservers)
     {
-        CommandManager* t_pCommandManager = static_cast<CommandManager*> (*it);
+        CommandManager* t_pCommandManager = static_cast<CommandManager*> (*itObservers);
 
-        qDebug() << t_pCommandManager->toJsonObject();
-
-//        printf("NEW %s\n", t_pCommandManager->toString().toLatin1().constData());
-//        qDebug() << "NEW\n" << t_pCommandManager->toString();
+        for(itCommands = t_pCommandManager->commandMap().begin(); itCommands != t_pCommandManager->commandMap().end(); ++itCommands)
+        {
+            if(t_qMapCommands.keys().contains(itCommands.key()))
+            {
+                //ToDo merge
+                qDebug() << "Merge has to be performed.";
+            }
+            else
+                t_qMapCommands.insert(itCommands.key(), itCommands.value());
+        }
     }
-    m_commandManager["help"].reply("Was in Help");
+
+    //
+    //create JSON help object
+    //
+    QJsonObject t_qJsonObjectCommands;
+
+    for(itCommands = t_qMapCommands.begin(); itCommands != t_qMapCommands.end(); ++itCommands)
+        t_qJsonObjectCommands.insert(itCommands.key(),QJsonValue(itCommands.value().toJsonObject()));
+    QJsonObject t_qJsonObjectRoot;
+    t_qJsonObjectRoot.insert("commands", t_qJsonObjectCommands);
+    QJsonDocument p_qJsonDocument(t_qJsonObjectRoot);
+
+    //
+    //create string formatted help and print
+    //
+    QString p_sOutput("");
+
+    qint32 t_maxSize = 72;
+    qint32 t_maxSizeCommand = 0;
+    qint32 t_maxSizeParameters = 0;
+    qint32 t_maxSizeDescriptions = 0;
+
+    //get max sizes
+    for(itCommands = t_qMapCommands.begin(); itCommands != t_qMapCommands.end(); ++itCommands)
+    {
+        QStringList t_sCommandList = itCommands.value().toStringList();
+
+        if(t_sCommandList[0].size() > t_maxSizeCommand)
+            t_maxSizeCommand = t_sCommandList[0].size();
+
+        if(t_sCommandList[1].size() > t_maxSizeParameters)
+            t_maxSizeParameters = t_sCommandList[1].size();
+    }
+
+    t_maxSizeDescriptions = t_maxSizeCommand + t_maxSizeParameters + 2;
+    t_maxSizeDescriptions = t_maxSizeDescriptions < t_maxSize ? t_maxSize - t_maxSizeDescriptions : 20;
+
+    //Format output
+    for(itCommands = t_qMapCommands.begin(); itCommands != t_qMapCommands.end(); ++itCommands)
+    {
+        QStringList t_sCommandList = itCommands.value().toStringList();
+        QString t_sCommand;
+        qint32 i = 0;
+        //Command
+        t_sCommand.append(QString("\t%1 ").arg(t_sCommandList[0]));
+        //Spaces
+        for(i = 0; i < t_maxSizeCommand - t_sCommandList[0].size(); ++i)
+            t_sCommand.append(QString(" "));
+        //Parameters
+        t_sCommand.append(QString("%1 ").arg(t_sCommandList[1]));
+        //Spaces
+        for(i = 0; i < t_maxSizeParameters - t_sCommandList[1].size(); ++i)
+            t_sCommand.append(QString(" "));
+        //Description
+        qint32 lines = (int)ceil((double)t_sCommandList[2].size() / (double)t_maxSizeDescriptions);
+        for(i = 0; i < lines; ++i)
+        {
+            t_sCommand.append(QString("%1").arg(t_sCommandList[2].mid(i * t_maxSizeDescriptions, t_maxSizeDescriptions)));
+            t_sCommand.append(QString("\n\r"));
+            //Spaces
+            if(i < lines-1)
+            {
+                t_sCommand.append(QString("\t"));
+                for(qint32 j = 0; j < t_maxSizeCommand + t_maxSizeParameters + 2; ++j)
+                    t_sCommand.append(QString(" "));
+            }
+        }
+        p_sOutput.append(t_sCommand);
+    }
+
+    //print commands
+    printf("%s\n\r", p_sOutput.toLatin1().constData());
+
+    //
+    //send reply
+    //
+    if(t_bCommandIsJson)
+        m_commandManager["help"].reply(p_qJsonDocument.toJson());
+    else
+        m_commandManager["help"].reply(p_sOutput);
 }
 
 
@@ -229,7 +321,7 @@ void CommandServer::init()
                     "           }"
                     "       },"
                     "       \"meas\": {"
-                    "           \"description\": \"Adds specified FiffStreamClient to raw data buffer receivers. If acquisition is not already strated, it is triggered.\","
+                    "           \"description\": \"Adds specified FiffStreamClient to raw data buffer receivers. If acquisition is not already started, it is triggered.\","
                     "           \"parameters\": {"
                     "               \"id\": {"
                     "                   \"description\": \"ID/Alias\","
@@ -294,16 +386,17 @@ bool CommandServer::parseCommand(QStringList& p_sListCommand, QByteArray& p_bloc
     //OLD
     bool success = false;
 
-    if(p_sListCommand[0].compare("help",Qt::CaseInsensitive) == 0)
-    {
-        //
-        // Help
-        //
-        printf("help\n");
-        p_blockOutputInfo.append(this->availableCommands());
-        success = true;
-    }
-    else if(p_sListCommand[0].compare("close",Qt::CaseInsensitive) == 0)
+//    if(p_sListCommand[0].compare("help",Qt::CaseInsensitive) == 0)
+//    {
+//        //
+//        // Help
+//        //
+//        printf("help\n");
+//        p_blockOutputInfo.append(this->availableCommands());
+//        success = true;
+//    }
+//    else
+    if(p_sListCommand[0].compare("close",Qt::CaseInsensitive) == 0)
     {
         //
         // Closes mne_rt_server
@@ -373,5 +466,10 @@ void CommandServer::registerCommandManager(CommandManager &p_commandManager)
 
 void CommandServer::replyCommandNew(QString p_sReply)
 {
-    qDebug() << "void CommandServer::replyCommandNew(QString p_sReply)\n\t" << p_sReply;
+    qint32 t_iThreadID = 0; //Remove this id from stored set
+
+    QByteArray t_blockReply;
+    t_blockReply.append(p_sReply);
+
+    emit replyCommand(t_blockReply, t_iThreadID);
 }
