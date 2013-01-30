@@ -235,7 +235,7 @@ public:
     /**
     * Inherited command reply channel.
     *
-    * @param p_sReply   command reply
+    * @param[in] p_sReply   command reply
     */
     void reply(const QString &p_sReply);
 
@@ -273,7 +273,7 @@ public:
     /**
     * Subscript operator [] to access parameter values by name
     *
-    * @param key    the parameter name.
+    * @param[in] key    the parameter name.
     *
     * @return Parameter value related to the parameter name.
     */
@@ -283,7 +283,7 @@ public:
     /**
     * Subscript operator [] to access parameter values by index
     *
-    * @param idx    the parameter index.
+    * @param[in] idx    the parameter index.
     *
     * @return Parameter value related to the parameter index.
     */
@@ -293,7 +293,7 @@ public:
     /**
     * Subscript operator []
     *
-    * @param key    the parameter name.
+    * @param[in] key    the parameter name.
     *
     * @return Parameter value related to the parameter name.
     */

@@ -191,7 +191,7 @@ public:
     /**
     * Updates the IObserver (CommandManager) when a new command was received.
     *
-    * @param [in] p_pSubject  pointer to the subject (CommandParser) to which observer (CommandManager) is attached to.
+    * @param[in] p_pSubject  pointer to the subject (CommandParser) to which observer (CommandManager) is attached to.
     */
     virtual void update(Subject* p_pSubject);
 
@@ -199,7 +199,7 @@ public:
     /**
     * Subscript operator [] to access commands by command name
     *
-    * @param key    the command key word.
+    * @param[in] key    the command key word.
     *
     * @return Command object related to command key word.
     */
@@ -246,8 +246,9 @@ signals:
     * Is triggered when a reply is available. Commands are the emmiters of this signal -> access trough parent.
     *
     * @param p_sReply   the plain or JSON formatted reply
+    *@param p_command   Command which send the response
     */
-    void response(QString p_sReply);
+    void response(QString p_sReply, Command p_command);
 };
 
 //*************************************************************************************************************

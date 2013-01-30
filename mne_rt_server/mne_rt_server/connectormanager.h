@@ -43,7 +43,6 @@
 //=============================================================================================================
 
 #include "IConnector.h"
-#include "ICommandParser.h"
 
 
 //*************************************************************************************************************
@@ -101,7 +100,7 @@ class FiffStreamServer;
 *
 * @brief The ConnectorManager class provides a dynamic module loader. As well as the handling of the loaded modules.
 */
-class ConnectorManager : public QPluginLoader, public ICommandParser//OLD Remove this
+class ConnectorManager : public QPluginLoader
 {
     Q_OBJECT
 
@@ -134,19 +133,6 @@ public:
     * @param dir the module directory.
     */
     void loadConnectors(const QString& dir);
-
-//    //=========================================================================================================
-//    /**
-//    * Parses the command or sends the command to the active connector.
-//    *
-//    * @param[in] p_qCommandList the command.
-//    * @param[out] p_blockOutputInfo the bytearray which contains parsing information to be send back to CommandClient.
-//    *
-//    * @return true if successful, false otherwise
-//    */
-//    bool parseConnectorCommand(QStringList& p_qCommandList, QByteArray& p_blockOutputInfo);
-
-    virtual QByteArray availableCommands();
 
     static void clearConnectorActivation();
 
@@ -184,8 +170,6 @@ public:
     */
     QByteArray getConnectorList() const;
 
-    virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
-
     //=========================================================================================================
     /**
     * ToDo
@@ -203,18 +187,42 @@ private:
     //SLOTS
     //=========================================================================================================
     /**
-    * Sets the buffer size of the raw data buffers
+    * Sends the connector list
     *
-    * @param p_command  The set buffer size command.
+    * @param p_command  The connector list command.
     */
-    void comBufsize(Command p_command);
+    void comConlist(Command p_command);
+
+    //=========================================================================================================
+    /**
+    * Selects a connector
+    *
+    * @param p_command  The select connector command.
+    */
+    void comSelcon(Command p_command);
+
+    //=========================================================================================================
+    /**
+    * Starts the Measurement
+    *
+    * @param p_command  The start command.
+    */
+    void comStart(Command p_command);//comMeas
+
+    //=========================================================================================================
+    /**
+    * Stops all connectors
+    *
+    * @param p_command  The stop all command.
+    */
+    void comStopAll(Command p_command);
 
 
 
 
     static QVector<IConnector*> s_vecConnectors;       /**< Holds vector of all modules. */
 
-    CommandManager m_commandManager;        /**< The CommandManager of the connector. */
+    CommandManager m_commandManager;                    /**< The CommandManager of the connector. */
 
     FiffStreamServer* m_pFiffStreamServer;
 

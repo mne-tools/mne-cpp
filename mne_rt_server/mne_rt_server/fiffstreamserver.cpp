@@ -81,125 +81,125 @@ FiffStreamServer::~FiffStreamServer()
 }
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-QByteArray FiffStreamServer::availableCommands()
-{
-    QByteArray t_blockCmdInfoList;
-    t_blockCmdInfoList.append("\tclist\t\t\tprints and sends all available FiffStreamClients\r\n");
-    return t_blockCmdInfoList;
-}
+//QByteArray FiffStreamServer::availableCommands()
+//{
+//    QByteArray t_blockCmdInfoList;
+//    t_blockCmdInfoList.append("\tclist\t\t\tprints and sends all available FiffStreamClients\r\n");
+//    return t_blockCmdInfoList;
+//}
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-bool FiffStreamServer::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo)
-{
-    bool success = false;
+//bool FiffStreamServer::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo)
+//{
+//    bool success = false;
 
-    if(p_sListCommand[0].compare("clist",Qt::CaseInsensitive) == 0)
-    {
-        //
-        // client list
-        //
-        printf("clist\n");
+//    if(p_sListCommand[0].compare("clist",Qt::CaseInsensitive) == 0)
+//    {
+//        //
+//        // client list
+//        //
+//        printf("clist\n");
 
-        p_blockOutputInfo.append("\tID\tAlias\r\n");
-        QMap<qint32, FiffStreamThread*>::iterator i;
-        for (i = this->m_qClientList.begin(); i != this->m_qClientList.end(); ++i)
-        {
-            QString str = QString("\t%1\t%2\r\n").arg(i.key()).arg(i.value()->getAlias());
-            p_blockOutputInfo.append(str);
-        }
-        p_blockOutputInfo.append("\n");
-        success = true;
-    }
-    else if(p_sListCommand[0].compare("measinfo",Qt::CaseInsensitive) == 0)
-    {
-        //
-        // Measurement Info
-        //
-        if(p_sListCommand.size() > 1)
-        {
-            qint32 t_id = -1;
+//        p_blockOutputInfo.append("\tID\tAlias\r\n");
+//        QMap<qint32, FiffStreamThread*>::iterator i;
+//        for (i = this->m_qClientList.begin(); i != this->m_qClientList.end(); ++i)
+//        {
+//            QString str = QString("\t%1\t%2\r\n").arg(i.key()).arg(i.value()->getAlias());
+//            p_blockOutputInfo.append(str);
+//        }
+//        p_blockOutputInfo.append("\n");
+//        success = true;
+//    }
+//    else if(p_sListCommand[0].compare("measinfo",Qt::CaseInsensitive) == 0)
+//    {
+//        //
+//        // Measurement Info
+//        //
+//        if(p_sListCommand.size() > 1)
+//        {
+//            qint32 t_id = -1;
+////            p_blockOutputInfo.append(parseToId(p_sListCommand[1],t_id));
+
+//            bool t_isInt;
+//            t_id = p_sListCommand[1].toInt(&t_isInt);
+
+//            if(t_isInt)// ToDo Check whether ID is correct --> move this parsing to fiff stream server
+//            {
+//                printf("measinfo %d\r\n", t_id);
+//            }
+//            if(t_id != -1)
+//            {
+//                emit requestMeasInfo(t_id);//requestMeasInfo(t_id);
+
+//                QString str = QString("\tsend measurement info to FiffStreamClient (ID: %1)\r\n\n").arg(t_id);
+//                p_blockOutputInfo.append(str);
+//                success = true;
+//            }
+//        }
+//    }
+//    else if(p_sListCommand[0].compare("meas",Qt::CaseInsensitive) == 0)
+//    {
+//        //
+//        // meas
+//        //
+//        if(p_sListCommand.size() > 1)
+//        {
+//            qint32 t_id = -1;
 //            p_blockOutputInfo.append(parseToId(p_sListCommand[1],t_id));
 
-            bool t_isInt;
-            t_id = p_sListCommand[1].toInt(&t_isInt);
+//            printf("meas %d\n", t_id);
+//            if(t_id != -1)
+//            {
+//                emit startMeasFiffStreamClient(t_id);
 
-            if(t_isInt)// ToDo Check whether ID is correct --> move this parsing to fiff stream server
-            {
-                printf("measinfo %d\r\n", t_id);
-            }
-            if(t_id != -1)
-            {
-                emit requestMeasInfo(t_id);//requestMeasInfo(t_id);
+//                QString str = QString("\tFiffStreamClient (ID: %1) is now set to accept raw buffers\r\n\n").arg(t_id);
+//                p_blockOutputInfo.append(str);
+//            }
+//        }
+//        success = true;
+//    }
+//    else if(p_sListCommand[0].compare("stop",Qt::CaseInsensitive) == 0)
+//    {
+//        //
+//        // stop
+//        //
 
-                QString str = QString("\tsend measurement info to FiffStreamClient (ID: %1)\r\n\n").arg(t_id);
-                p_blockOutputInfo.append(str);
-                success = true;
-            }
-        }
-    }
-    else if(p_sListCommand[0].compare("meas",Qt::CaseInsensitive) == 0)
-    {
-        //
-        // meas
-        //
-        if(p_sListCommand.size() > 1)
-        {
-            qint32 t_id = -1;
-            p_blockOutputInfo.append(parseToId(p_sListCommand[1],t_id));
+//        if(p_sListCommand.size() > 1)
+//        {
+//            qint32 t_id = -1;
+//            p_blockOutputInfo.append(parseToId(p_sListCommand[1],t_id));
 
-            printf("meas %d\n", t_id);
-            if(t_id != -1)
-            {
-                emit startMeasFiffStreamClient(t_id);
+//            printf("stop %d\n", t_id);
 
-                QString str = QString("\tFiffStreamClient (ID: %1) is now set to accept raw buffers\r\n\n").arg(t_id);
-                p_blockOutputInfo.append(str);
-            }
-        }
-        success = true;
-    }
-    else if(p_sListCommand[0].compare("stop",Qt::CaseInsensitive) == 0)
-    {
-        //
-        // stop
-        //
+//            if(t_id != -1)
+//            {
+//                emit stopMeasFiffStreamClient(t_id);//emit requestStopMeas(t_id);
 
-        if(p_sListCommand.size() > 1)
-        {
-            qint32 t_id = -1;
-            p_blockOutputInfo.append(parseToId(p_sListCommand[1],t_id));
+//                QString str = QString("\tstop FiffStreamClient (ID: %1) from receiving raw Buffers.\r\n\n").arg(t_id);
+//                p_blockOutputInfo.append(str);
+//            }
+//        }
+//        success = true;
+//    }
+//    else if(p_sListCommand[0].compare("stop-all",Qt::CaseInsensitive) == 0)
+//    {
+//        //
+//        // stop-all
+//        //
+//        emit stopMeasFiffStreamClient(-1);
 
-            printf("stop %d\n", t_id);
+//        QString str = QString("\tstop all FiffStreamClients from receiving raw buffers\r\n\n");
+//        p_blockOutputInfo.append(str);
 
-            if(t_id != -1)
-            {
-                emit stopMeasFiffStreamClient(t_id);//emit requestStopMeas(t_id);
+//        success = true;
+//    }
 
-                QString str = QString("\tstop FiffStreamClient (ID: %1) from receiving raw Buffers.\r\n\n").arg(t_id);
-                p_blockOutputInfo.append(str);
-            }
-        }
-        success = true;
-    }
-    else if(p_sListCommand[0].compare("stop-all",Qt::CaseInsensitive) == 0)
-    {
-        //
-        // stop-all
-        //
-        emit stopMeasFiffStreamClient(-1);
-
-        QString str = QString("\tstop all FiffStreamClients from receiving raw buffers\r\n\n");
-        p_blockOutputInfo.append(str);
-
-        success = true;
-    }
-
-    return success;
-}
+//    return success;
+//}
 
 
 //*************************************************************************************************************

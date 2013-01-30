@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "commandparser.h"
-
+#include "commandmanager.h";
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -73,10 +73,28 @@ CommandParser::CommandParser(QObject *parent)
 
 //*************************************************************************************************************
 
-bool CommandParser::parse(const QString &p_sInput)
+bool CommandParser::exists(const QString& p_sCommand)
+{
+    Subject::t_Observers::Iterator itObservers;
+    for(itObservers = this->observers().begin(); itObservers != this->observers().end(); ++itObservers)
+    {
+        CommandManager* t_pCommandManager = static_cast<CommandManager*> (*itObservers);
+        if(t_pCommandManager->hasCommand(p_sCommand))
+            return true;
+    }
+    return false;
+}
+
+
+//*************************************************************************************************************
+
+bool CommandParser::parse(const QString &p_sInput, QStringList &p_qListCommandsParsed)
 {
     if(p_sInput.size() <= 0)
         return false;
+
+    p_qListCommandsParsed.clear();
+
     //Check if JSON format;
     bool isJson  = false;
     if(QString::compare(p_sInput.at(0), QString("{")) == 0)
@@ -101,24 +119,42 @@ bool CommandParser::parse(const QString &p_sInput)
         QJsonObject::Iterator itParam;
         for(it = t_jsonObjectCommand.begin(); it != t_jsonObjectCommand.end(); ++it)
         {
-            m_rawCommand = RawCommand(it.key(), true);
-            t_jsonObjectParameters = it.value().toObject();
+            //Print Command
+            printf("%s\n", it.key().toLatin1().constData());
 
-            //append the parameters
-            for(itParam= t_jsonObjectParameters.begin(); itParam != t_jsonObjectParameters.end(); ++itParam)
+            if(exists(it.key()))
             {
-                //ToDo do a cross check with the param naming and key
-                m_rawCommand.pValues().append(itParam.value().toString());
-//                qDebug() << itParam.key() << " + " << itParam.value().toString();
+                m_rawCommand = RawCommand(it.key(), true);
+                t_jsonObjectParameters = it.value().toObject();
+
+                // push command to processed commands
+                p_qListCommandsParsed.push_back(it.key());
+
+                //append the parameters
+                for(itParam= t_jsonObjectParameters.begin(); itParam != t_jsonObjectParameters.end(); ++itParam)
+                {
+                    //ToDo do a cross check with the param naming and key
+                    m_rawCommand.pValues().append(itParam.value().toString());
+//                    qDebug() << itParam.key() << " + " << itParam.value().toString();
+                }
+                notify();
             }
-            notify();
         }
     }
     else
     {
         QStringList t_qCommandList = p_sInput.split(" ");
 
+        //Print command
+        printf("%s\n", t_qCommandList[0].toLatin1().constData());
+
+        if(!exists(t_qCommandList[0]))
+            return false;
+
         m_rawCommand = RawCommand(t_qCommandList[0], false);
+
+        // push command to processed commands
+        p_qListCommandsParsed.push_back(t_qCommandList[0]);
 
         if(t_qCommandList.size() > 1) //Parameter parsing
         {

@@ -44,6 +44,7 @@
 
 #include "rtcommand_global.h"
 #include "rawcommand.h"
+#include "command.h"
 
 #include <generics/observerpattern.h>
 
@@ -55,6 +56,7 @@
 
 #include <QObject>
 #include <QVector>
+#include <QMultiMap>
 
 
 //*************************************************************************************************************
@@ -81,12 +83,22 @@ public:
 
     //=========================================================================================================
     /**
+    * Checks if a command exists
+    *
+    * @param[in] p_sCommand     Command to check.
+    *
+    * @return true if command exists, false otherwise.
+    */
+    bool exists(const QString& p_sCommand);
+
+    //=========================================================================================================
+    /**
     * Parses a CLI command or JSON command (list) and notifies all attached observers (command managers)
     *
-    * @param p_sInput     Input to parse.
+    * @param[in] p_sInput               Input to parse.
+    * @param[out] p_qListCommandsParsed  List of parsed commands.
     */
-    bool parse(const QString &p_sInput);
-
+    bool parse(const QString &p_sInput, QStringList &p_qListCommandsParsed);
 
     //=========================================================================================================
     /**
@@ -102,9 +114,10 @@ signals:
     /**
     * Response channel which is used by attached observers (command managers) to send data back to subject
     *
-    *@param p_sResponse      Observer response/data.
+    *@param[in] p_sResponse     Observer response/data.
+    *@param[in] p_command       Command which send the response
     */
-    void response(QString p_sResponse);
+    void response(QString p_sResponse, Command p_command);
 
 private:
     RawCommand m_rawCommand;

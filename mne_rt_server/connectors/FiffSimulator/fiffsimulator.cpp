@@ -110,19 +110,19 @@ FiffSimulator::~FiffSimulator()
 }
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-QByteArray FiffSimulator::availableCommands()
-{
-    QByteArray t_blockCmdInfoList;
+//QByteArray FiffSimulator::availableCommands()
+//{
+//    QByteArray t_blockCmdInfoList;
 
-//    t_blockCmdInfoList.append(QString("\t### %1 connector###\r\n").arg(this->getName()));
+////    t_blockCmdInfoList.append(QString("\t### %1 connector###\r\n").arg(this->getName()));
 
-    t_blockCmdInfoList.append(QString("\tsimfile  [file]\t\t%1: the fiff file which should be used as simulation file.\r\n").arg(this->getName()));
-    t_blockCmdInfoList.append(QString("\tbufsize  [samples]\t%1: sets the buffer size of the FiffStreamClient\r\n\t\t\t\traw data buffers\r\n").arg(this->getName()));
+//    t_blockCmdInfoList.append(QString("\tsimfile  [file]\t\t%1: the fiff file which should be used as simulation file.\r\n").arg(this->getName()));
+//    t_blockCmdInfoList.append(QString("\tbufsize  [samples]\t%1: sets the buffer size of the FiffStreamClient\r\n\t\t\t\traw data buffers\r\n").arg(this->getName()));
 
-    return t_blockCmdInfoList;
-}
+//    return t_blockCmdInfoList;
+//}
 
 
 //*************************************************************************************************************
@@ -154,74 +154,74 @@ void FiffSimulator::init()
 }
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-bool FiffSimulator::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo)
-{
-    bool success = false;
+//bool FiffSimulator::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo)
+//{
+//    bool success = false;
 
 
-    if(p_sListCommand[0].compare("bufsize",Qt::CaseInsensitive) == 0)
-    {
-        //
-        // bufsize
-        //
-        if(p_sListCommand.size() > 1)
-        {
-            bool ok;
-            quint32 t_uiBuffSize = p_sListCommand[1].toInt(&ok);
+//    if(p_sListCommand[0].compare("bufsize",Qt::CaseInsensitive) == 0)
+//    {
+//        //
+//        // bufsize
+//        //
+//        if(p_sListCommand.size() > 1)
+//        {
+//            bool ok;
+//            quint32 t_uiBuffSize = p_sListCommand[1].toInt(&ok);
 
-            if(ok && t_uiBuffSize > 0)
-            {
-                printf("bufsize %d\n", t_uiBuffSize);
+//            if(ok && t_uiBuffSize > 0)
+//            {
+//                printf("bufsize %d\n", t_uiBuffSize);
 
-                requestSetBufferSize(t_uiBuffSize);
+//                requestSetBufferSize(t_uiBuffSize);
 
-                QString str = QString("\tSet %1 buffer sample size to %2 samples\r\n\n").arg(getName()).arg(t_uiBuffSize);
-                p_blockOutputInfo.append(str);
-            }
-            else
-            {
-                p_blockOutputInfo.append("\tBuffer size not set\r\n\n");
-            }
-        }
-        success = true;
-    } else if(p_sListCommand[0].compare("simfile",Qt::CaseInsensitive) == 0)
-    {
-        //
-        // simulation file
-        //
-        printf("simfile\r\n");
+//                QString str = QString("\tSet %1 buffer sample size to %2 samples\r\n\n").arg(getName()).arg(t_uiBuffSize);
+//                p_blockOutputInfo.append(str);
+//            }
+//            else
+//            {
+//                p_blockOutputInfo.append("\tBuffer size not set\r\n\n");
+//            }
+//        }
+//        success = true;
+//    } else if(p_sListCommand[0].compare("simfile",Qt::CaseInsensitive) == 0)
+//    {
+//        //
+//        // simulation file
+//        //
+//        printf("simfile\r\n");
 
-        QFile t_file(p_sListCommand[1]);
+//        QFile t_file(p_sListCommand[1]);
 
-        QString t_sResourceDataPathOld = m_sResourceDataPath;
+//        QString t_sResourceDataPathOld = m_sResourceDataPath;
 
-        if(t_file.exists())
-        {
-            m_sResourceDataPath = p_sListCommand[1];
-            m_RawInfo = FiffRawData();
+//        if(t_file.exists())
+//        {
+//            m_sResourceDataPath = p_sListCommand[1];
+//            m_RawInfo = FiffRawData();
 
-            if (this->readRawInfo())
-            {
-                m_pFiffProducer->stop();
-                this->stop();
+//            if (this->readRawInfo())
+//            {
+//                m_pFiffProducer->stop();
+//                this->stop();
 
-                p_blockOutputInfo.append("New simulation file set succefully.\r\n");
-            }
-            else
-            {
-                qDebug() << "Don't set new file";
-                m_sResourceDataPath = t_sResourceDataPathOld;
+//                p_blockOutputInfo.append("New simulation file set succefully.\r\n");
+//            }
+//            else
+//            {
+//                qDebug() << "Don't set new file";
+//                m_sResourceDataPath = t_sResourceDataPathOld;
 
-                p_blockOutputInfo.append("Simulation file not set.\r\n");
-            }
-        }
-        success = true;
-    }
+//                p_blockOutputInfo.append("Simulation file not set.\r\n");
+//            }
+//        }
+//        success = true;
+//    }
 
-    return success;
-}
+//    return success;
+//}
 
 
 //*************************************************************************************************************
