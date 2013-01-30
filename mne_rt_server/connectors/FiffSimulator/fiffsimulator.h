@@ -114,15 +114,9 @@ public:
     */
     virtual ~FiffSimulator();
 
-    virtual QByteArray availableCommands();
-
     virtual ConnectorID getConnectorID() const;
 
     virtual const char* getName() const;
-
-
-    virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
-
 
     virtual void requestSetBufferSize(quint32 p_uiBuffSize);
 
@@ -144,6 +138,15 @@ protected:
     virtual void run();
 
 private:
+
+    //Slots
+
+
+
+
+
+
+
     //=========================================================================================================
     /**
     * Initialise the FiffSimulator.

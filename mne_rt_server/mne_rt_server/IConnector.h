@@ -40,8 +40,11 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-//ToDO Remove this - OLD
-#include "ICommandParser.h"
+
+#include <fiff/fiff_info.h>
+
+#include <generics/circularmatrixbuffer.h>
+#include <rtCommand/commandmanager.h>
 
 
 //*************************************************************************************************************
@@ -54,17 +57,6 @@
 #include <QByteArray>
 #include <QStringList>
 #include <QJsonObject>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include <fiff/fiff_info.h>
-
-#include <generics/circularmatrixbuffer.h>
-#include <rtCommand/commandmanager.h>
 
 
 //*************************************************************************************************************
@@ -127,7 +119,7 @@ using namespace IOBuffer;
 *
 * @brief The IConnector class is the interface class of all modules.
 */
-class IConnector : public QThread, public ICommandParser //REMOVE this OLD
+class IConnector : public QThread
 {
     Q_OBJECT
 
@@ -138,14 +130,6 @@ public:
     * Destroys the IConnector.
     */
     virtual ~IConnector() {};
-
-    //=========================================================================================================
-    /**
-    * Returns the available IConnector commands.
-    *
-    * @return the available IConnector commands.
-    */
-    virtual QByteArray availableCommands() = 0;
 
     //=========================================================================================================
     /**
@@ -174,11 +158,7 @@ public:
     virtual const char* getName() const = 0;
 
 
-
-
     inline quint32 getBufferSampleSize();
-
-
 
     //=========================================================================================================
     /**
@@ -187,14 +167,6 @@ public:
     * @return true if module is activated.
     */
     inline bool isActive() const;
-
-    //=========================================================================================================
-    /**
-    * Parses the incomming command.
-    *
-    * @return true if successful parsed, false otherwise
-    */
-    virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo) = 0;
 
     //=========================================================================================================
     /**
@@ -214,9 +186,7 @@ public:
     */
     virtual bool stop() = 0;
 
-
     inline void setBufferSampleSize(quint32 p_uiBuffSize);
-
 
     //=========================================================================================================
     /**

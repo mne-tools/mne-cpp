@@ -171,7 +171,7 @@ void Command::reply(const QString &p_sReply)
     CommandManager* t_commandManager = static_cast<CommandManager*> (this->parent());
 
     if(t_commandManager)
-        emit t_commandManager->response(p_sReply);
+        emit t_commandManager->response(p_sReply, *this);
 }
 
 

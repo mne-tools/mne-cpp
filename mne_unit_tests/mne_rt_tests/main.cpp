@@ -169,7 +169,9 @@ int main(int argc, char *argv[])
     t_Parser.attach(&t_comManager);
     t_Parser.attach(&t_comManager2);
 
-    t_Parser.parse(QString("help"));
+    QStringList t_qListParsedCommands;
+
+    t_Parser.parse(QString("help"), t_qListParsedCommands);
 
 //    t_comManager2.parse(QString("help"));
 

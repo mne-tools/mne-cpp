@@ -41,7 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "ICommandParser.h" // ToDo remove this
+//#include "ICommandParser.h" // ToDo remove this
 #include <rtCommand/commandparser.h>
 #include <rtCommand/commandmanager.h>
 
@@ -84,7 +84,7 @@ using namespace RTCOMMANDLIB;
 *
 * @brief The CommandServer class provides
 */
-class CommandServer : public QTcpServer, ICommandParser
+class CommandServer : public QTcpServer//, ICommandParser
 {
     Q_OBJECT
 
@@ -94,11 +94,7 @@ public:
     ~CommandServer();
 
 
-    virtual QByteArray availableCommands();
-
-
-
-
+//    virtual QByteArray availableCommands();
 
     void incommingCommand(QString p_sCommand, qint32 p_iThreadID);
 
@@ -108,11 +104,11 @@ public:
     */
     void init();
 
-    //Rename this to prepare before parse -> parsing is done within command parser
-    virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
+//    //Rename this to prepare before parse -> parsing is done within command parser
+//    virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
 
-    //OLD
-    void registerCommandParser(ICommandParser* p_pCommandParser);
+//    //OLD
+//    void registerCommandParser(ICommandParser* p_pCommandParser);
 
     //New
     //=========================================================================================================
@@ -125,7 +121,7 @@ public:
 
 
 
-    void replyCommandNew(QString p_sReply);
+    void replyCommandNew(QString p_sReply, Command p_command);
 
 signals:
     void replyCommand(QByteArray p_blockReply, qint32 p_iID);
@@ -157,12 +153,15 @@ private:
 
     qint32 m_iThreadCount;
 
-    //OLD
-    QList<ICommandParser*> m_qListParser; //remove this
+//    //OLD
+//    QList<ICommandParser*> m_qListParser; //remove this
 
     //NEW
     CommandParser m_commandParser;
     CommandManager m_commandManager;
+
+//    QMultiMap<QString, qint32> m_qMultiMapCommandThreadID;//This is need when commands are processed by different threads; currently its only one command per time processed by one thread --> m_iCurrentCommandThreadID
+    qint32 m_iCurrentCommandThreadID;
 
 };
 

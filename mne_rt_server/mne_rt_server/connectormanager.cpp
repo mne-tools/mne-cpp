@@ -101,25 +101,6 @@ ConnectorManager::~ConnectorManager()
 
 //*************************************************************************************************************
 
-QByteArray ConnectorManager::availableCommands()
-{
-    QByteArray t_blockCmdInfoList;
-
-    IConnector* t_pCurrentConnector = getActiveConnector();
-
-    t_blockCmdInfoList.append("\tbufsize  [samples]\tsets the buffer size of the FiffStreamClient\r\n\t\t\t\traw data buffers\r\n");
-
-    if(t_pCurrentConnector)
-        t_blockCmdInfoList.append(t_pCurrentConnector->availableCommands());
-    else
-        t_blockCmdInfoList.append("No connector commands available - no connector active.\r\n");
-
-    return t_blockCmdInfoList;
-}
-
-
-//*************************************************************************************************************
-
 void ConnectorManager::clearConnectorActivation()
 {
     // deactivate activated connectors
@@ -134,26 +115,40 @@ void ConnectorManager::clearConnectorActivation()
 
 
 //*************************************************************************************************************
-//NEW
-void ConnectorManager::comBufsize(Command p_command)
+
+void ConnectorManager::comConlist(Command p_command)
 {
-    qDebug() << "NEW comBufsize Command: " << p_command.command();
+    //ToDO JSON
+    m_commandManager["conlist"].reply(this->getConnectorList());
+}
 
-    qDebug() << "NEW comBufsize Value: " << p_command.pValues().at(0);
 
-    if(!(p_command.pValues().size() > 0))
-        return;
+//*************************************************************************************************************
 
-    quint32 t_uiBuffSize = (quint32)p_command.pValues()[0].toInt();
+void ConnectorManager::comSelcon(Command p_command)
+{
+    bool t_isInt;
+    qint32 t_id = p_command.pValues()[0].toInt();
+    if(t_isInt)
+        m_commandManager["selcon"].reply(this->setActiveConnector(t_id));
+}
 
-    if(t_uiBuffSize > 0)
-    {
-        printf("bufsize %d\n", t_uiBuffSize);
 
-        emit setBufferSize(t_uiBuffSize);
+//*************************************************************************************************************
 
-        m_commandManager["bufsize"].reply(QString("NEW Set %1 buffer sample size to %2 samples\r\n\n").arg(getActiveConnector()->getName()).arg(t_uiBuffSize));
-    }
+void ConnectorManager::comStart(Command p_command)//comMeas
+{
+    emit startMeasConnector();
+    m_commandManager["start"].reply("Starting active connector.\n");
+}
+
+
+//*************************************************************************************************************
+
+void ConnectorManager::comStopAll(Command p_command)
+{
+    emit stopMeasConnector();
+    m_commandManager["stop-all"].reply("Stoping all connectors.\r\n");
 }
 
 
@@ -243,7 +238,6 @@ void ConnectorManager::disconnectActiveConnector()
 
         this->m_pFiffStreamServer->disconnect(t_activeConnector);
 
-
         //
         // Raw Data
         //
@@ -308,42 +302,47 @@ QByteArray ConnectorManager::getConnectorList() const
 void ConnectorManager::init()
 {
     //insert commands
-
-//    //OPTION 1
-//    QStringList t_qListParamNames;
-//    QList<QVariant> t_qListParamValues;
-//    QStringList t_qListParamDescription;
-
-//    t_qListParamNames.push_back("samples");
-//    t_qListParamValues.push_back(QVariant(QVariant::Int));
-//    t_qListParamDescription.append("samples");
-
-//    m_commandManager.insert("bufsize", Command("bufsize", "Sets the buffer size of the raw data buffers.", t_qListParamNames, t_qListParamValues, t_qListParamDescription));
-//    t_qListParamNames.clear();t_qListParamValues.clear();t_qListParamDescription.clear();
-
-
-    //OPTION 2
     QString t_sJsonCommand =
                     "{"
                     "   \"commands\": {"
-                    "       \"bufsize\": {"
-                    "           \"description\": \"Sets the buffer size of the raw data buffers.\","
+                    "       \"conlist\": {"
+                    "           \"description\": \"Prints and sends all available connectors.\","
+                    "           \"parameters\": {}"
+                    "        },"
+                    "       \"selcon\": {"
+                    "           \"description\": \"Selects a new connector, if a measurement is running it will be stopped.\","
                     "           \"parameters\": {"
-                    "               \"samples\": {"
-                    "                   \"description\": \"samples\","
+                    "               \"ConID\": {"
+                    "                   \"description\": \"Connector ID\","
                     "                   \"type\": \"int\" "
                     "               }"
                     "           }"
-                    "       }"
+                    "        },"
+                    "       \"start\": {"
+                    "           \"description\": \"Adds specified FiffStreamClient to raw data buffer receivers. If acquisition is not already started, it is triggered.\","
+                    "           \"parameters\": {"
+                    "               \"id\": {"
+                    "                   \"description\": \"ID/Alias\","
+                    "                   \"type\": \"QString\" "
+                    "               }"
+                    "           }"
+                    "        },"
+                    "       \"stop-all\": {"
+                    "           \"description\": \"Stops the whole acquisition process.\","
+                    "           \"parameters\": {}"
+                    "        }"
                     "    }"
                     "}";
+
 
     QJsonDocument t_jsonDocumentOrigin = QJsonDocument::fromJson(t_sJsonCommand.toLatin1());
     m_commandManager.insert(t_jsonDocumentOrigin);
 
-
     //Connect slots
-    m_commandManager.connectSlot(QString("bufsize"), this, &ConnectorManager::comBufsize);
+    m_commandManager.connectSlot(QString("conlist"), this, &ConnectorManager::comConlist);
+    m_commandManager.connectSlot(QString("selcon"), this, &ConnectorManager::comSelcon);
+    m_commandManager.connectSlot(QString("start"), this, &ConnectorManager::comStart);
+    m_commandManager.connectSlot(QString("stop-all"), this, &ConnectorManager::comStopAll);
 }
 
 
@@ -375,6 +374,8 @@ void ConnectorManager::loadConnectors(const QString& dir)
 
             //Add the curent plugin meta data
             t_pIConnector->setMetaData(this->metaData());
+
+            qDebug() << this->metaData();
 
             s_vecConnectors.push_back(t_pIConnector);
             printf("[done]\n");
@@ -438,107 +439,6 @@ void ConnectorManager::loadConnectors(const QString& dir)
     //print
     printf("Connector list\n");
     printf(getConnectorList().data());
-}
-
-
-//*************************************************************************************************************
-
-bool ConnectorManager::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo)
-{
-    bool success = false;
-    if(p_sListCommand[0].compare("meas",Qt::CaseInsensitive) == 0)
-    {
-        //
-        // meas
-        //
-        if(p_sListCommand.size() > 1)
-        {
-            emit startMeasConnector();
-
-            QString str = QString("\tstart connector\r\n\n");
-            p_blockOutputInfo.append(str);
-        }
-        success = true;
-    }
-    else if(p_sListCommand[0].compare("bufsize",Qt::CaseInsensitive) == 0)
-    {
-        //
-        // bufsize
-        //
-        if(p_sListCommand.size() > 1)
-        {
-            bool ok;
-            quint32 t_uiBuffSize = p_sListCommand[1].toInt(&ok);
-
-            if(ok && t_uiBuffSize > 0)
-            {
-                printf("bufsize %d\n", t_uiBuffSize);
-
-                emit setBufferSize(t_uiBuffSize);
-
-                QString str = QString("\tSet %1 buffer sample size to %2 samples\r\n\n").arg(getActiveConnector()->getName()).arg(t_uiBuffSize);
-                p_blockOutputInfo.append(str);
-            }
-            else
-            {
-                p_blockOutputInfo.append("\tBuffer size not set\r\n\n");
-            }
-        }
-        success = true;
-    }
-    else if(p_sListCommand[0].compare("conlist",Qt::CaseInsensitive) == 0)
-    {
-        //
-        // conlist
-        //
-        printf("conlist\n");
-        p_blockOutputInfo.append(this->getConnectorList());
-        success = true;
-    }
-    else if(p_sListCommand[0].compare("selcon",Qt::CaseInsensitive) == 0)
-    {
-        //
-        // selcon
-        //
-        if(p_sListCommand.size() > 1)
-        {
-            bool t_isInt;
-            qint32 t_id = p_sListCommand[1].toInt(&t_isInt);
-            printf("selcon %d\r\n", t_id);
-            if(t_isInt)
-            {
-                p_blockOutputInfo.append(this->setActiveConnector(t_id));
-            }
-        }
-        success = true;
-    }
-    else if(p_sListCommand[0].compare("stop-all",Qt::CaseInsensitive) == 0)
-    {
-        //
-        // stop-all
-        //
-        emit stopMeasConnector();
-
-        QString str = QString("\tstop all Connectors\r\n\n");
-        p_blockOutputInfo.append(str);
-
-        success = true;
-    }
-    else
-    {
-        //
-        // Forward to active connector
-        // Connector
-        //
-        IConnector* t_pConnector = this->getActiveConnector();
-
-        if(t_pConnector)
-            success = t_pConnector->parseCommand(p_sListCommand, p_blockOutputInfo);
-        else
-            success = false;
-    }
-
-    return success;
 }
 
 

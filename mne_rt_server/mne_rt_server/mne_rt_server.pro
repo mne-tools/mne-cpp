@@ -87,8 +87,7 @@ HEADERS += \
     fiffstreamthread.h \
     commandserver.h \
     commandthread.h \
-    mne_rt_commands.h \
-    ICommandParser.h
+    mne_rt_commands.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

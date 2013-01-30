@@ -38,15 +38,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-//OLD remove this
-#include "ICommandParser.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MNELIB INCLUDES
+// MNE INCLUDES
 //=============================================================================================================
 
 #include <fiff/fiff_info.h>
@@ -92,7 +84,7 @@ class FiffStreamThread;
 *
 * @brief The FiffStreamServer class provides
 */
-class FiffStreamServer : public QTcpServer, public ICommandParser //OLD remove this
+class FiffStreamServer : public QTcpServer//, public ICommandParser //OLD remove this
 {
     Q_OBJECT
 
@@ -109,7 +101,7 @@ public:
     ~FiffStreamServer();
 
 
-    virtual QByteArray availableCommands();
+//    virtual QByteArray availableCommands();
 
 
     //=========================================================================================================
@@ -127,7 +119,7 @@ public:
     inline CommandManager& getCommandManager();
 
 
-    virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
+//    virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
 
 
 //    //=========================================================================================================
