@@ -150,7 +150,7 @@ private:
     /**
     * Is called when signal help is executed.
     */
-    void comHelp();
+    void comHelp(Command p_command);
 
 
 

@@ -84,8 +84,7 @@ bool CommandParser::parse(const QString &p_sInput)
 
     if(isJson)
     {
-//        RawCommand parsedCommand;
-        qDebug() << "JSON commands recognized";
+        qDebug() << "JSON command recognized";
 
         QJsonObject t_jsonObjectCommand;
         QJsonObject t_jsonObjectParameters;

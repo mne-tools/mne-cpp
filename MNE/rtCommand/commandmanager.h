@@ -171,13 +171,13 @@ public:
     */
     inline void setStatus(bool status);
 
-    //=========================================================================================================
-    /**
-    * Creates an object of JSON Command Objects
-    *
-    * @return JSON Command Objects converted to a JSON Object.
-    */
-    QJsonObject toJsonObject() const;
+//    //=========================================================================================================
+//    /**
+//    * Creates an object of JSON Command Objects
+//    *
+//    * @return JSON Command Objects converted to a JSON Object.
+//    */
+//    QJsonObject toJsonObject() const;
 
 //    //=========================================================================================================
 //    /**

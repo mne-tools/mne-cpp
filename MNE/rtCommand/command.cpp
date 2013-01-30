@@ -168,9 +168,8 @@ void Command::execute()
 
 void Command::reply(const QString &p_sReply)
 {
-    //ToDO parse reply to plain or JSON;
-
     CommandManager* t_commandManager = static_cast<CommandManager*> (this->parent());
+
     if(t_commandManager)
         emit t_commandManager->response(p_sReply);
 }
@@ -196,14 +195,13 @@ QJsonObject Command::toJsonObject() const
     {
         QJsonObject t_jsonParameterObject;
         t_jsonParameterObject.insert("description",QJsonValue(m_qListParamDescriptions[i]));
-        t_jsonParameterObject.insert("type",QJsonValue(static_cast<int> (m_qListParamValues[i].type())));//ToDo type as clear text
+        t_jsonParameterObject.insert("type",QString(m_qListParamValues[i].typeName()));
         t_jsonAllParametersObject.insert(m_qListParamNames[i], QJsonValue(t_jsonParameterObject));
     }
     p_jsonCommandObject.insert("parameters", QJsonValue(t_jsonAllParametersObject));
 
     return p_jsonCommandObject;
 }
-
 
 
 //*************************************************************************************************************
