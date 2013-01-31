@@ -65,7 +65,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MSERVER;
+using namespace RTSERVER;
 using namespace FIFFLIB;
 
 
@@ -90,9 +90,9 @@ FiffStreamThread::FiffStreamThread(qint32 id, int socketDescriptor, QObject *par
 FiffStreamThread::~FiffStreamThread()
 {
     //Remove from client list
-    FiffStreamServer* t_pFiffStreamServer = qobject_cast<FiffStreamServer*>(this->parent());
-    if(t_pFiffStreamServer)
-        t_pFiffStreamServer->m_qClientList.remove(m_iDataClientId);
+    FiffStreaRTSERVER* t_pFiffStreaRTSERVER = qobject_cast<FiffStreaRTSERVER*>(this->parent());
+    if(t_pFiffStreaRTSERVER)
+        t_pFiffStreaRTSERVER->m_qClientList.remove(m_iDataClientId);
 
     m_bIsRunning = false;
     QThread::wait();
@@ -355,15 +355,15 @@ void FiffStreamThread::run()
 {
     m_bIsRunning = true;
 
-    FiffStreamServer* t_pParentServer = qobject_cast<FiffStreamServer*>(this->parent());
+    FiffStreaRTSERVER* t_pParentServer = qobject_cast<FiffStreaRTSERVER*>(this->parent());
 
-    connect(t_pParentServer, &FiffStreamServer::remitMeasInfo,
+    connect(t_pParentServer, &FiffStreaRTSERVER::remitMeasInfo,
             this, &FiffStreamThread::sendMeasurementInfo);
-    connect(t_pParentServer, &FiffStreamServer::remitRawBuffer,
+    connect(t_pParentServer, &FiffStreaRTSERVER::remitRawBuffer,
             this, &FiffStreamThread::sendRawBuffer);
-    connect(t_pParentServer, &FiffStreamServer::startMeasFiffStreamClient,
+    connect(t_pParentServer, &FiffStreaRTSERVER::startMeasFiffStreamClient,
             this, &FiffStreamThread::startMeas);
-    connect(t_pParentServer, &FiffStreamServer::stopMeasFiffStreamClient,
+    connect(t_pParentServer, &FiffStreaRTSERVER::stopMeasFiffStreamClient,
             this, &FiffStreamThread::stopMeas);
 
     QTcpSocket t_qTcpSocket;

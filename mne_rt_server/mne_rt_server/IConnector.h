@@ -69,10 +69,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MSERVER
+// DEFINE NAMESPACE RTSERVER
 //=============================================================================================================
 
-namespace MSERVER
+namespace RTSERVER
 {
 
 
@@ -308,6 +308,6 @@ inline void IConnector::setStatus(bool status)
 #ifndef IConnector_iid
 #define IConnector_iid "mne_rt_server/1.0"
 #endif
-Q_DECLARE_INTERFACE(MSERVER::IConnector, IConnector_iid)
+Q_DECLARE_INTERFACE(RTSERVER::IConnector, IConnector_iid)
 
 #endif //ICONNECTOR_H

@@ -41,7 +41,6 @@
 // INCLUDES
 //=============================================================================================================
 
-//#include "ICommandParser.h" // ToDo remove this
 #include <rtCommand/commandparser.h>
 #include <rtCommand/commandmanager.h>
 
@@ -57,10 +56,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MSERVER
+// DEFINE NAMESPACE RTSERVER
 //=============================================================================================================
 
-namespace MSERVER
+namespace RTSERVER
 {
 
 //*************************************************************************************************************
@@ -76,94 +75,107 @@ using namespace RTCOMMANDLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-
-
 //=============================================================================================================
 /**
-* DECLARE CLASS CommandServer
+* Command Server which manages command connections in seperate threads
 *
-* @brief The CommandServer class provides
+* @brief CommandServer manages threaded command connections
 */
-class CommandServer : public QTcpServer//, ICommandParser
+class CommandServer : public QTcpServer
 {
     Q_OBJECT
-
 public:
+
+    //=========================================================================================================
+    /**
+    * Constructs a CommandServer
+    *
+    * @param[in] parent         Parent QObject (optional)
+    */
     CommandServer(QObject *parent = 0);
 
-    ~CommandServer();
+    //=========================================================================================================
+    /**
+    * Destructor
+    */
+    virtual ~CommandServer();
 
+    //=========================================================================================================
+    /**
+    * Returns the command parser.
+    *
+    * @return the command parser.
+    */
+    inline CommandParser& getCommandParser();
 
-//    virtual QByteArray availableCommands();
-
+    //=========================================================================================================
+    /**
+    * Slot which is called when a new command is available.
+    *
+    * @param[in] p_sCommand     Raw command
+    * @param[in] p_iThreadID    ID of the thread which received the command.
+    */
     void incommingCommand(QString p_sCommand, qint32 p_iThreadID);
 
     //=========================================================================================================
     /**
-    * Inits the CommandServer.
-    */
-    void init();
-
-//    //Rename this to prepare before parse -> parsing is done within command parser
-//    virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
-
-//    //OLD
-//    void registerCommandParser(ICommandParser* p_pCommandParser);
-
-    //New
-    //=========================================================================================================
-    /**
     * Registers a CommandManager (Observer) at CommandParser (Subject) to include in the chain of notifications
     *
-    * @param p_commandManager   Command Manager to register.
+    * @param[in] p_commandManager   Command Manager to register.
     */
     void registerCommandManager(CommandManager &p_commandManager);
 
-
-
-    void replyCommandNew(QString p_sReply, Command p_command);
+    //=========================================================================================================
+    /**
+    * Is called to prepare the reply
+    *
+    * @param[in] p_sReply   The reply which should be send back
+    * @param[in] p_command  Comman which evoked the reply
+    */
+    void prepareReply(QString p_sReply, Command p_command);
 
 signals:
+    //=========================================================================================================
+    /**
+    * Reply to a command
+    *
+    * @param[in] p_blockReply   The reply data
+    * @param[in] p_iID          ID of the client thread to identify the target.
+    */
     void replyCommand(QByteArray p_blockReply, qint32 p_iID);
 
-//    void stopMeasConnector();
-//    void startMeasFiffStreamClient(qint32 ID);
+    //=========================================================================================================
+    /**
+    * Signal which triggers closing all command clients
+    */
     void closeCommandThreads();
 
 protected:
+    //=========================================================================================================
+    /**
+    * Slot which handels incomming connections.
+    */
     void incomingConnection(qintptr socketDescriptor);
 
 private:
+    qint32 m_iThreadCount;              /**< Is incresed each time a new command client connects to mne_rt_server. */
 
-    //SLOTS
-    //=========================================================================================================
-    /**
-    * Closes mne_rt_server
-    */
-    void comClose();
-
-    //=========================================================================================================
-    /**
-    * Is called when signal help is executed.
-    */
-    void comHelp(Command p_command);
-
-
-
-
-    qint32 m_iThreadCount;
-
-//    //OLD
-//    QList<ICommandParser*> m_qListParser; //remove this
-
-    //NEW
-    CommandParser m_commandParser;
-    CommandManager m_commandManager;
+    CommandParser m_commandParser;      /**< Command parser. */
 
 //    QMultiMap<QString, qint32> m_qMultiMapCommandThreadID;//This is need when commands are processed by different threads; currently its only one command per time processed by one thread --> m_iCurrentCommandThreadID
-    qint32 m_iCurrentCommandThreadID;
-
+    qint32 m_iCurrentCommandThreadID;   /**< Command Thread ID of the current command. */
 };
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline CommandParser& CommandServer::getCommandParser()
+{
+    return m_commandParser;
+}
 
 } // NAMESPACE
 

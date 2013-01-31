@@ -83,7 +83,7 @@ HEADERS += \
     connectormanager.h \
     mne_rt_server.h \
     mne_rt_server.h \
-    fiffstreamserver.h \
+    fiffstreaRTSERVER.h \
     fiffstreamthread.h \
     commandserver.h \
     commandthread.h \

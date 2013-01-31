@@ -45,6 +45,8 @@
 
 #include "IConnector.h"
 
+#include <rtCommand/commandmanager.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -73,7 +75,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MSERVER;
+using namespace RTSERVER;
 
 
 //*************************************************************************************************************
@@ -81,11 +83,11 @@ using namespace MSERVER;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ConnectorManager::ConnectorManager(FiffStreamServer* p_pFiffStreamServer, QObject *parent)
+ConnectorManager::ConnectorManager(FiffStreaRTSERVER* p_pFiffStreaRTSERVER, QObject *parent)
 : QPluginLoader(parent)
-, m_pFiffStreamServer(p_pFiffStreamServer)
+, m_pFiffStreaRTSERVER(p_pFiffStreaRTSERVER)
 {
-    init();
+
 }
 
 
@@ -119,7 +121,7 @@ void ConnectorManager::clearConnectorActivation()
 void ConnectorManager::comConlist(Command p_command)
 {
     //ToDO JSON
-    m_commandManager["conlist"].reply(this->getConnectorList());
+    qobject_cast<MNERTServer*> (this->parent())->getCommandManager()["conlist"].reply(this->getConnectorList());
 }
 
 
@@ -130,7 +132,7 @@ void ConnectorManager::comSelcon(Command p_command)
     bool t_isInt;
     qint32 t_id = p_command.pValues()[0].toInt();
     if(t_isInt)
-        m_commandManager["selcon"].reply(this->setActiveConnector(t_id));
+        qobject_cast<MNERTServer*> (this->parent())->getCommandManager()["selcon"].reply(this->setActiveConnector(t_id));
 }
 
 
@@ -139,7 +141,7 @@ void ConnectorManager::comSelcon(Command p_command)
 void ConnectorManager::comStart(Command p_command)//comMeas
 {
     emit startMeasConnector();
-    m_commandManager["start"].reply("Starting active connector.\n");
+    qobject_cast<MNERTServer*>(this->parent())->getCommandManager()["start"].reply("Starting active connector.\n");
 }
 
 
@@ -148,7 +150,7 @@ void ConnectorManager::comStart(Command p_command)//comMeas
 void ConnectorManager::comStopAll(Command p_command)
 {
     emit stopMeasConnector();
-    m_commandManager["stop-all"].reply("Stoping all connectors.\r\n");
+    qobject_cast<MNERTServer*>(this->parent())->getCommandManager()["stop-all"].reply("Stoping all connectors.\r\n");
 }
 
 
@@ -176,12 +178,12 @@ void ConnectorManager::connectActiveConnector()
         // Meas Info
         //
         // connect command server and connector manager
-        QObject::connect(   this->m_pFiffStreamServer, &FiffStreamServer::requestMeasInfo,
+        QObject::connect(   this->m_pFiffStreaRTSERVER, &FiffStreaRTSERVER::requestMeasInfo,
                             t_activeConnector, &IConnector::requestMeasInfo);
 
         // connect connector manager and fiff stream server
         QObject::connect(   t_activeConnector, &IConnector::remitMeasInfo,
-                            this->m_pFiffStreamServer, &FiffStreamServer::forwardMeasInfo);
+                            this->m_pFiffStreaRTSERVER, &FiffStreaRTSERVER::forwardMeasInfo);
 
         //
         // Raw Data
@@ -191,7 +193,7 @@ void ConnectorManager::connectActiveConnector()
                             t_activeConnector, &IConnector::requestMeas);
         // connect connector manager and fiff stream server
         QObject::connect(   t_activeConnector, &IConnector::remitRawBuffer,
-                            this->m_pFiffStreamServer, &FiffStreamServer::forwardRawBuffer);
+                            this->m_pFiffStreaRTSERVER, &FiffStreaRTSERVER::forwardRawBuffer);
         // connect command server and connector manager
         QObject::connect(   this, &ConnectorManager::stopMeasConnector,
                             t_activeConnector, &IConnector::requestMeasStop);
@@ -234,16 +236,16 @@ void ConnectorManager::disconnectActiveConnector()
         //
         this->disconnect(t_activeConnector);
         //
-        t_activeConnector->disconnect(this->m_pFiffStreamServer);
+        t_activeConnector->disconnect(this->m_pFiffStreaRTSERVER);
 
-        this->m_pFiffStreamServer->disconnect(t_activeConnector);
+        this->m_pFiffStreaRTSERVER->disconnect(t_activeConnector);
 
         //
         // Raw Data
         //
 //        t_pMNERTServer->m_pCommandServer->disconnect(t_activeConnector);
         //
-//        t_activeConnector->disconnect(t_pMNERTServer->m_pFiffStreamServer);
+//        t_activeConnector->disconnect(t_pMNERTServer->m_pFiffStreaRTSERVER);
         // connect command server and connector manager
 //        t_pMNERTServer->m_pCommandServer->disconnect(t_activeConnector);
 
@@ -299,50 +301,15 @@ QByteArray ConnectorManager::getConnectorList() const
 
 //*************************************************************************************************************
 
-void ConnectorManager::init()
+void ConnectorManager::connectCommands()
 {
-    //insert commands
-    QString t_sJsonCommand =
-                    "{"
-                    "   \"commands\": {"
-                    "       \"conlist\": {"
-                    "           \"description\": \"Prints and sends all available connectors.\","
-                    "           \"parameters\": {}"
-                    "        },"
-                    "       \"selcon\": {"
-                    "           \"description\": \"Selects a new connector, if a measurement is running it will be stopped.\","
-                    "           \"parameters\": {"
-                    "               \"ConID\": {"
-                    "                   \"description\": \"Connector ID\","
-                    "                   \"type\": \"int\" "
-                    "               }"
-                    "           }"
-                    "        },"
-                    "       \"start\": {"
-                    "           \"description\": \"Adds specified FiffStreamClient to raw data buffer receivers. If acquisition is not already started, it is triggered.\","
-                    "           \"parameters\": {"
-                    "               \"id\": {"
-                    "                   \"description\": \"ID/Alias\","
-                    "                   \"type\": \"QString\" "
-                    "               }"
-                    "           }"
-                    "        },"
-                    "       \"stop-all\": {"
-                    "           \"description\": \"Stops the whole acquisition process.\","
-                    "           \"parameters\": {}"
-                    "        }"
-                    "    }"
-                    "}";
-
-
-    QJsonDocument t_jsonDocumentOrigin = QJsonDocument::fromJson(t_sJsonCommand.toLatin1());
-    m_commandManager.insert(t_jsonDocumentOrigin);
-
     //Connect slots
-    m_commandManager.connectSlot(QString("conlist"), this, &ConnectorManager::comConlist);
-    m_commandManager.connectSlot(QString("selcon"), this, &ConnectorManager::comSelcon);
-    m_commandManager.connectSlot(QString("start"), this, &ConnectorManager::comStart);
-    m_commandManager.connectSlot(QString("stop-all"), this, &ConnectorManager::comStopAll);
+    MNERTServer* t_pMNERTServer = qobject_cast<MNERTServer*> (this->parent());
+
+    t_pMNERTServer->getCommandManager().connectSlot(QString("conlist"), this, &ConnectorManager::comConlist);
+    t_pMNERTServer->getCommandManager().connectSlot(QString("selcon"), this, &ConnectorManager::comSelcon);
+    t_pMNERTServer->getCommandManager().connectSlot(QString("start"), this, &ConnectorManager::comStart);
+    t_pMNERTServer->getCommandManager().connectSlot(QString("stop-all"), this, &ConnectorManager::comStopAll);
 }
 
 
