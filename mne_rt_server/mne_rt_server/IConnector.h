@@ -42,8 +42,6 @@
 //=============================================================================================================
 
 #include <fiff/fiff_info.h>
-
-#include <generics/circularmatrixbuffer.h>
 #include <rtCommand/commandmanager.h>
 
 
@@ -110,7 +108,6 @@ enum ConnectorID
 using namespace FIFFLIB;
 using namespace RTCOMMANDLIB;
 using namespace Eigen;
-using namespace IOBuffer;
 
 
 //=========================================================================================================
@@ -122,9 +119,7 @@ using namespace IOBuffer;
 class IConnector : public QThread
 {
     Q_OBJECT
-
 public:
-
     //=========================================================================================================
     /**
     * Destroys the IConnector.
@@ -163,9 +158,6 @@ public:
     */
     virtual const char* getName() const = 0;
 
-
-    inline quint32 getBufferSampleSize();
-
     //=========================================================================================================
     /**
     * Returns the activation status of the module.
@@ -192,8 +184,6 @@ public:
     */
     virtual bool stop() = 0;
 
-    inline void setBufferSampleSize(quint32 p_uiBuffSize);
-
     //=========================================================================================================
     /**
     * Sets itsmeta data of the plugin after it was laoded by the pluginmanager.
@@ -206,24 +196,17 @@ public:
     /**
     * Sets the activation status of the module.
     *
-    * @param [in] status the new activation status of the module.
+    * @param [in] status    the new activation status of the module.
     */
     inline void setStatus(bool status);
 
-    //public slots: --> in Qt 5 not anymore declared as slot
     //=========================================================================================================
     /**
-    * Returns the FiffInfo.
+    * Request FiffInfo to be released.
     *
-    * @return ToDo
+    * @param [in] ID    ID of the data client to send to. ToDo Remove this - do this processing somewhere else
     */
-    virtual void requestMeasInfo(qint32 ID) = 0;
-
-    virtual void requestMeas() = 0;
-
-    virtual void requestMeasStop() = 0;
-
-    virtual void requestSetBufferSize(quint32 p_uiBuffSize) = 0;
+    virtual void info(qint32 ID) = 0;
 
 signals:
     void remitMeasInfo(qint32, FIFFLIB::FiffInfo::SDPtr);
@@ -240,29 +223,18 @@ protected:
     */
     virtual void run() = 0;
 
-    RawMatrixBuffer* m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
-
     QJsonObject     m_qJsonObjectMetaData;  /**< The meta data of the plugin defined in Q_PLUGIN_METADATA and the corresponding json file. */
 
     CommandManager  m_commandManager;       /**< The CommandManager of the connector. */
 
 private:
     bool        m_bIsActive;                /**< Holds the activation status. */
-    quint32     m_uiBufferSampleSize;       /**< Number of Buffer Sample Size */
 };
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
-inline quint32 IConnector::getBufferSampleSize()
-{
-    return m_uiBufferSampleSize;
-}
-
-
-//*************************************************************************************************************
 
 inline CommandManager& IConnector::getCommandManager()
 {
@@ -275,15 +247,6 @@ inline CommandManager& IConnector::getCommandManager()
 inline bool IConnector::isActive() const
 {
     return m_bIsActive;
-}
-
-
-//*************************************************************************************************************
-
-inline void IConnector::setBufferSampleSize(quint32 p_uiBuffSize)
-{
-    if(p_uiBuffSize > 0)
-        m_uiBufferSampleSize = p_uiBuffSize;
 }
 
 

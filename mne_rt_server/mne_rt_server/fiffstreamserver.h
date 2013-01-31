@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiffstreaRTSERVER.h
+* @file     fiffstreamserver.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the FiffStreaRTSERVER Class.
+* @brief     implementation of the FiffStreamServer Class.
 *
 */
 
-#ifndef FIFFSTREARTSERVER_H
-#define FIFFSTREARTSERVER_H
+#ifndef FIFFSTREAMSERVER_H
+#define FIFFSTREAMSERVER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -80,11 +80,11 @@ class FiffStreamThread;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FiffStreaRTSERVER
+* DECLARE CLASS FiffStreamServer
 *
-* @brief The FiffStreaRTSERVER class provides
+* @brief The FiffStreamServer class provides
 */
-class FiffStreaRTSERVER : public QTcpServer//, public ICommandParser //OLD remove this
+class FiffStreamServer : public QTcpServer//, public ICommandParser //OLD remove this
 {
     Q_OBJECT
 
@@ -92,13 +92,13 @@ class FiffStreaRTSERVER : public QTcpServer//, public ICommandParser //OLD remov
 
 public:
 
-    FiffStreaRTSERVER(QObject *parent = 0);
+    FiffStreamServer(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the FiffStreaRTSERVER.
+    * Destroys the FiffStreamServer.
     */
-    ~FiffStreaRTSERVER();
+    ~FiffStreamServer();
 
     //=========================================================================================================
     /**
@@ -134,7 +134,7 @@ signals:
     void remitMeasInfo(qint32 ID, FIFFLIB::FiffInfo::SDPtr p_FiffInfo);
     void remitRawBuffer(Eigen::MatrixXf);
 
-    void closeFiffStreaRTSERVER();
+    void closeFiffStreamServer();
 
 protected:
     void incomingConnection(qintptr socketDescriptor);
@@ -194,11 +194,11 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-FiffStreamThread* FiffStreaRTSERVER::getClient(qint32 id)
+FiffStreamThread* FiffStreamServer::getClient(qint32 id)
 {
     return m_qClientList[id];
 }
 
 } // NAMESPACE
 
-#endif //FIFFSTREARTSERVER_H
+#endif //FIFFSTREAMSERVER_H

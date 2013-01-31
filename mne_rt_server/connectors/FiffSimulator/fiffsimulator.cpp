@@ -90,9 +90,9 @@ FiffSimulator::FiffSimulator()
 : m_pFiffProducer(new FiffProducer(this))
 , m_sResourceDataPath("../../mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
 , m_bIsRunning(false)
+, m_uiBufferSampleSize(1000)
+, m_pRawMatrixBuffer(NULL)
 {
-    this->setBufferSampleSize(1000);
-    m_pRawMatrixBuffer = NULL;
     this->init();
 }
 
@@ -137,7 +137,18 @@ void FiffSimulator::comBufsize(Command p_command)
     {
 //        printf("bufsize %d\n", t_uiBuffSize);
 
-        requestSetBufferSize(t_uiBuffSize);
+            bool t_bWasRunning = m_bIsRunning;
+
+            if(m_bIsRunning)
+            {
+                m_pFiffProducer->stop();
+                this->stop();
+            }
+
+            m_uiBufferSampleSize = t_uiBuffSize;
+
+            if(t_bWasRunning)
+                this->start();
 
         QString str = QString("\tSet %1 buffer sample size to %2 samples\r\n\n").arg(getName()).arg(t_uiBuffSize);
 
@@ -217,78 +228,8 @@ void FiffSimulator::init()
     m_pRawMatrixBuffer = NULL;
 
     if(!m_RawInfo.isEmpty())
-        m_pRawMatrixBuffer = new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_RawInfo.info->nchan, this->getBufferSampleSize());
+        m_pRawMatrixBuffer = new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_RawInfo.info->nchan, this->m_uiBufferSampleSize);
 }
-
-
-////*************************************************************************************************************
-
-//bool FiffSimulator::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo)
-//{
-//    bool success = false;
-
-
-//    if(p_sListCommand[0].compare("bufsize",Qt::CaseInsensitive) == 0)
-//    {
-//        //
-//        // bufsize
-//        //
-//        if(p_sListCommand.size() > 1)
-//        {
-//            bool ok;
-//            quint32 t_uiBuffSize = p_sListCommand[1].toInt(&ok);
-
-//            if(ok && t_uiBuffSize > 0)
-//            {
-//                printf("bufsize %d\n", t_uiBuffSize);
-
-//                requestSetBufferSize(t_uiBuffSize);
-
-//                QString str = QString("\tSet %1 buffer sample size to %2 samples\r\n\n").arg(getName()).arg(t_uiBuffSize);
-//                p_blockOutputInfo.append(str);
-//            }
-//            else
-//            {
-//                p_blockOutputInfo.append("\tBuffer size not set\r\n\n");
-//            }
-//        }
-//        success = true;
-//    } else if(p_sListCommand[0].compare("simfile",Qt::CaseInsensitive) == 0)
-//    {
-//        //
-//        // simulation file
-//        //
-//        printf("simfile\r\n");
-
-//        QFile t_file(p_sListCommand[1]);
-
-//        QString t_sResourceDataPathOld = m_sResourceDataPath;
-
-//        if(t_file.exists())
-//        {
-//            m_sResourceDataPath = p_sListCommand[1];
-//            m_RawInfo = FiffRawData();
-
-//            if (this->readRawInfo())
-//            {
-//                m_pFiffProducer->stop();
-//                this->stop();
-
-//                p_blockOutputInfo.append("New simulation file set succefully.\r\n");
-//            }
-//            else
-//            {
-//                qDebug() << "Don't set new file";
-//                m_sResourceDataPath = t_sResourceDataPathOld;
-
-//                p_blockOutputInfo.append("Simulation file not set.\r\n");
-//            }
-//        }
-//        success = true;
-//    }
-
-//    return success;
-//}
 
 
 //*************************************************************************************************************
@@ -310,6 +251,7 @@ bool FiffSimulator::start()
 
 bool FiffSimulator::stop()
 {
+    this->m_pFiffProducer->stop();
     m_bIsRunning = false;
     QThread::wait();
 
@@ -319,7 +261,7 @@ bool FiffSimulator::stop()
 
 //*************************************************************************************************************
 
-void FiffSimulator::requestMeasInfo(qint32 ID)
+void FiffSimulator::info(qint32 ID)
 {
 
     if(m_RawInfo.isEmpty())
@@ -327,50 +269,6 @@ void FiffSimulator::requestMeasInfo(qint32 ID)
 
     if(!m_RawInfo.isEmpty())
         emit remitMeasInfo(ID, m_RawInfo.info);
-//    else
-//        return NULL;
-}
-
-
-//*************************************************************************************************************
-
-void FiffSimulator::requestMeas()
-{
-    this->m_pFiffProducer->start();
-    this->start();
-}
-
-
-//*************************************************************************************************************
-
-void FiffSimulator::requestMeasStop()
-{
-    this->m_pFiffProducer->stop();
-    this->stop();
-}
-
-
-//*************************************************************************************************************
-
-void FiffSimulator::requestSetBufferSize(quint32 p_uiBuffSize)
-{
-    if(p_uiBuffSize > 0)
-    {
-        bool t_bWasRunning = m_bIsRunning;
-//        qDebug() << "void FiffSimulator::requestSetBufferSize: " << p_uiBuffSize;
-
-        if(m_bIsRunning)
-        {
-            m_pFiffProducer->stop();
-            this->stop();
-        }
-
-        this->setBufferSampleSize(p_uiBuffSize);
-
-        if(t_bWasRunning)
-            this->start();
-
-    }
 }
 
 
@@ -479,7 +377,7 @@ bool FiffSimulator::readRawInfo()
         //
         if(m_pRawMatrixBuffer)
             delete m_pRawMatrixBuffer;
-        m_pRawMatrixBuffer = new RawMatrixBuffer(10, m_RawInfo.info->nchan, getBufferSampleSize());
+        m_pRawMatrixBuffer = new RawMatrixBuffer(10, m_RawInfo.info->nchan, m_uiBufferSampleSize);
 
         mutex.unlock();
     }
@@ -495,7 +393,7 @@ void FiffSimulator::run()
     m_bIsRunning = true;
 
     float t_fSamplingFrequency = m_RawInfo.info->sfreq;
-    float t_fBuffSampleSize = (float)getBufferSampleSize();
+    float t_fBuffSampleSize = (float)m_uiBufferSampleSize;
 
     quint32 uiSamplePeriod = (unsigned int) ((t_fBuffSampleSize/t_fSamplingFrequency)*1000000.0f);
     quint32 count = 0;

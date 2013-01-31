@@ -78,9 +78,9 @@ const char* connectorDir = "/mne_rt_server_plugins";        /**< holds directory
 //=============================================================================================================
 
 MNERTServer::MNERTServer()
-: m_fiffStreaRTSERVER(this)
+: m_fiffStreamServer(this)
 , m_commandServer(this)
-, m_connectorManager(&m_fiffStreaRTSERVER, this)
+, m_connectorManager(&m_fiffStreamServer, this)
 {
     qRegisterMetaType<MatrixXf>("MatrixXf");
 
@@ -93,7 +93,7 @@ MNERTServer::MNERTServer()
     m_connectorManager.connectCommands();
 
     // fiff stream server
-    m_fiffStreaRTSERVER.connectCommands();
+    m_fiffStreamServer.connectCommands();
 
     // command manager
     m_commandServer.registerCommandManager(this->getCommandManager());
@@ -109,14 +109,14 @@ MNERTServer::MNERTServer()
     //
     // Meas Info
     //
-//    QObject::connect(   this->m_pFiffStreaRTSERVER, &FiffStreaRTSERVER::requestMeasInfo,
+//    QObject::connect(   this->m_pFiffStreamServer, &FiffStreamServer::requestMeasInfo,
 //                        this->m_pConnectorManager, &ConnectorManager::forwardMeasInfoRequest);
 
     m_connectorManager.connectActiveConnector();
 
     //Register Fiff Sream Server for command parsing
-//    m_pCommandServer->registerCommandParser((ICommandParser*)m_pFiffStreaRTSERVER);//OLD
-//    m_commandServer.registerCommandManager(m_fiffStreaRTSERVER.getCommandManager());//NEW
+//    m_pCommandServer->registerCommandParser((ICommandParser*)m_pFiffStreamServer);//OLD
+//    m_commandServer.registerCommandManager(m_fiffStreamServer.getCommandManager());//NEW
 
     //Register Command Managers of loaded connectors
     for(qint32 i = 0; i < m_connectorManager.getConnectors().size(); ++i)
@@ -133,8 +133,8 @@ MNERTServer::MNERTServer()
     //
     // Run data server
     //
-    if (!m_fiffStreaRTSERVER.listen(QHostAddress::Any, 4218)) {
-        printf("Unable to start the fiff stream server: %s\n", m_fiffStreaRTSERVER.errorString().toUtf8().constData());
+    if (!m_fiffStreamServer.listen(QHostAddress::Any, 4218)) {
+        printf("Unable to start the fiff stream server: %s\n", m_fiffStreamServer.errorString().toUtf8().constData());
         return;
     }
 
@@ -152,7 +152,7 @@ MNERTServer::MNERTServer()
     if (ipAddress.isEmpty())
         ipAddress = QHostAddress(QHostAddress::LocalHost).toString();
 
-    printf("mne_rt_server is running on\n\tIP:\t\t%s\n\tcommand port:\t%d\n\tfiff data port:\t%d\n\n",ipAddress.toUtf8().constData(), m_commandServer.serverPort(), m_fiffStreaRTSERVER.serverPort());
+    printf("mne_rt_server is running on\n\tIP:\t\t%s\n\tcommand port:\t%d\n\tfiff data port:\t%d\n\n",ipAddress.toUtf8().constData(), m_commandServer.serverPort(), m_fiffStreamServer.serverPort());
 }
 
 
