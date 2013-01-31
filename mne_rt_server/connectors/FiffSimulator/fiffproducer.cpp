@@ -109,7 +109,7 @@ void FiffProducer::run()
     fiff_int_t from = m_pFiffSimulator->m_RawInfo.first_samp;
     fiff_int_t to = m_pFiffSimulator->m_RawInfo.last_samp;
 //    float quantum_sec = (float)uiSamplePeriod/1000000.0f; //read and write in 10 sec junks
-    fiff_int_t quantum = m_pFiffSimulator->getBufferSampleSize();//ceil(quantum_sec*m_pFiffSimulator->m_pRawInfo->info->sfreq);
+    fiff_int_t quantum = m_pFiffSimulator->m_uiBufferSampleSize;//ceil(quantum_sec*m_pFiffSimulator->m_pRawInfo->info->sfreq);
 
     qDebug() << "quantum " << quantum;
 

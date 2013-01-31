@@ -83,11 +83,6 @@ using namespace RTCOMMANDLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class CommandServer;
-class FiffStreaRTSERVER;
-class ConnectorManager;
-
-
 //=============================================================================================================
 /**
 * DECLARE CLASS MNERTServer
@@ -138,7 +133,7 @@ private:
 
 
 
-    FiffStreaRTSERVER    m_fiffStreaRTSERVER;     /**< Fiff stream server. */
+    FiffStreamServer    m_fiffStreamServer;     /**< Fiff stream server. */
     CommandServer       m_commandServer;        /**< Command server. */
 
     ConnectorManager    m_connectorManager;     /**< Connector manager. */

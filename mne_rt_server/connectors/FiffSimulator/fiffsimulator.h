@@ -44,9 +44,14 @@
 #include "fiffsimulator_global.h"
 #include "../../mne_rt_server/IConnector.h"
 
-#include <fiff/fiff_raw_data.h>
 
-//#include "circularbuffer.h"
+//*************************************************************************************************************
+//=============================================================================================================
+// MNE INCLUDES
+//=============================================================================================================
+
+#include <fiff/fiff_raw_data.h>
+#include <generics/circularmatrixbuffer.h>
 
 
 //*************************************************************************************************************
@@ -73,7 +78,7 @@ namespace FiffSimulatorPlugin
 //=============================================================================================================
 
 using namespace RTSERVER;
-
+using namespace IOBuffer;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -120,21 +125,11 @@ public:
 
     virtual const char* getName() const;
 
-    virtual void requestSetBufferSize(quint32 p_uiBuffSize);
+    virtual void info(qint32 ID);
 
     virtual bool start();
 
     virtual bool stop();
-
-
-//public slots: --> in Qt 5 not anymore declared as slot
-
-    virtual void requestMeasInfo(qint32 ID);
-
-    virtual void requestMeas();
-
-    virtual void requestMeasStop();
-
 
 protected:
     virtual void run();
@@ -173,6 +168,10 @@ private:
     FiffProducer*   m_pFiffProducer;        /**< Holds the DataProducer.*/
     FiffRawData     m_RawInfo;              /**< Holds the fiff raw measurement information. */
     QString         m_sResourceDataPath;    /**< Holds the path to the Fiff resource simulation file directory.*/
+    quint32         m_uiBufferSampleSize;   /**< Sample size of the buffer */
+
+    RawMatrixBuffer* m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
+
 
     bool            m_bIsRunning;
 };

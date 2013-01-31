@@ -83,9 +83,9 @@ using namespace RTSERVER;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ConnectorManager::ConnectorManager(FiffStreaRTSERVER* p_pFiffStreaRTSERVER, QObject *parent)
+ConnectorManager::ConnectorManager(FiffStreamServer* p_pFiffStreamServer, QObject *parent)
 : QPluginLoader(parent)
-, m_pFiffStreaRTSERVER(p_pFiffStreaRTSERVER)
+, m_pFiffStreamServer(p_pFiffStreamServer)
 {
 
 }
@@ -140,7 +140,7 @@ void ConnectorManager::comSelcon(Command p_command)
 
 void ConnectorManager::comStart(Command p_command)//comMeas
 {
-    emit startMeasConnector();
+    getActiveConnector()->start();
     qobject_cast<MNERTServer*>(this->parent())->getCommandManager()["start"].reply("Starting active connector.\n");
 }
 
@@ -149,7 +149,7 @@ void ConnectorManager::comStart(Command p_command)//comMeas
 
 void ConnectorManager::comStopAll(Command p_command)
 {
-    emit stopMeasConnector();
+    getActiveConnector()->stop();
     qobject_cast<MNERTServer*>(this->parent())->getCommandManager()["stop-all"].reply("Stoping all connectors.\r\n");
 }
 
@@ -178,31 +178,21 @@ void ConnectorManager::connectActiveConnector()
         // Meas Info
         //
         // connect command server and connector manager
-        QObject::connect(   this->m_pFiffStreaRTSERVER, &FiffStreaRTSERVER::requestMeasInfo,
-                            t_activeConnector, &IConnector::requestMeasInfo);
+        QObject::connect(   this->m_pFiffStreamServer, &FiffStreamServer::requestMeasInfo,
+                            t_activeConnector, &IConnector::info);
 
         // connect connector manager and fiff stream server
         QObject::connect(   t_activeConnector, &IConnector::remitMeasInfo,
-                            this->m_pFiffStreaRTSERVER, &FiffStreaRTSERVER::forwardMeasInfo);
+                            this->m_pFiffStreamServer, &FiffStreamServer::forwardMeasInfo);
 
         //
         // Raw Data
         //
         // connect command server and connector manager
-        QObject::connect(   this, &ConnectorManager::startMeasConnector,
-                            t_activeConnector, &IConnector::requestMeas);
+
         // connect connector manager and fiff stream server
         QObject::connect(   t_activeConnector, &IConnector::remitRawBuffer,
-                            this->m_pFiffStreaRTSERVER, &FiffStreaRTSERVER::forwardRawBuffer);
-        // connect command server and connector manager
-        QObject::connect(   this, &ConnectorManager::stopMeasConnector,
-                            t_activeConnector, &IConnector::requestMeasStop);
-
-        //
-        // Reset Raw Buffer Size
-        //
-        QObject::connect(   this, &ConnectorManager::setBufferSize,
-                            t_activeConnector, &IConnector::requestSetBufferSize);
+                            this->m_pFiffStreamServer, &FiffStreamServer::forwardRawBuffer);
     }
     else
     {
@@ -236,16 +226,16 @@ void ConnectorManager::disconnectActiveConnector()
         //
         this->disconnect(t_activeConnector);
         //
-        t_activeConnector->disconnect(this->m_pFiffStreaRTSERVER);
+        t_activeConnector->disconnect(this->m_pFiffStreamServer);
 
-        this->m_pFiffStreaRTSERVER->disconnect(t_activeConnector);
+        this->m_pFiffStreamServer->disconnect(t_activeConnector);
 
         //
         // Raw Data
         //
 //        t_pMNERTServer->m_pCommandServer->disconnect(t_activeConnector);
         //
-//        t_activeConnector->disconnect(t_pMNERTServer->m_pFiffStreaRTSERVER);
+//        t_activeConnector->disconnect(t_pMNERTServer->m_pFiffStreamServer);
         // connect command server and connector manager
 //        t_pMNERTServer->m_pCommandServer->disconnect(t_activeConnector);
 

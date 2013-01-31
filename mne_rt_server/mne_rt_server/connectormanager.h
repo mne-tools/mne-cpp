@@ -90,7 +90,7 @@ using namespace RTCOMMANDLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class FiffStreaRTSERVER;
+class FiffStreamServer;
 
 
 //=============================================================================================================
@@ -111,7 +111,7 @@ public:
     *
     * @param [in] parent pointer to parent Object. (It's normally the default value.)
     */
-    ConnectorManager(FiffStreaRTSERVER* p_pFiffStreaRTSERVER, QObject* parent = 0);
+    ConnectorManager(FiffStreamServer* p_pFiffStreamServer, QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -169,9 +169,9 @@ public:
 
 signals:
     void sendMeasInfo(qint32, FIFFLIB::FiffInfo::SDPtr);
-    void setBufferSize(qint32 ID);
-    void startMeasConnector();
-    void stopMeasConnector();
+//    void setBufferSize(qint32 ID);
+//    void startMeasConnector();
+//    void stopMeasConnector();
 
 private:
 
@@ -213,7 +213,7 @@ private:
 
     static QVector<IConnector*> s_vecConnectors;       /**< Holds vector of all modules. */
 
-    FiffStreaRTSERVER* m_pFiffStreaRTSERVER;
+    FiffStreamServer* m_pFiffStreamServer;
 };
 
 
