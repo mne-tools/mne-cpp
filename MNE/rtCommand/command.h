@@ -88,7 +88,7 @@ public:
 
     //=========================================================================================================
     /**
-    * constructor.
+    * Constructs a Command
     *
     * @param[in] p_bIsJson      If is received/should be send as JSON (optional, default true)
     * @param[in] parent         Parent QObject (optional)

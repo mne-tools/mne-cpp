@@ -38,6 +38,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -80,7 +81,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_fba7b6d30909f9ec66000534e18b073e.html">MNE</a></li><li class="navelem"><a class="el" href="dir_02d6b00d369dfdccb62582dcf5f74964.html">fiff</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_d9f91708cdb6d7bc2d9cf00ef2519886.html">MNE</a></li><li class="navelem"><a class="el" href="dir_29694eefdfa67cc3d137c6f7c2283a3a.html">fiff</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -103,70 +104,78 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="comment">// DEFINE NAMESPACE FIFFLIB</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="comment">// Qt INCLUDES</span></div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="keyword">namespace </span>FIFFLIB</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;{</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="preprocessor">#include &lt;QSharedPointer&gt;</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="comment">// USED NAMESPACES</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="comment">// DEFINE NAMESPACE FIFFLIB</span></div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html">   70</a></span>&#160;<span class="comment"></span><span class="keyword">class </span><a class="code" href="fiff__global_8h.html#aab6c6e9f74ed9d6762feab45287c6ad8">FIFFSHARED_EXPORT</a> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html" title="Universially unique identifier.">FiffId</a> {</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00073"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#a14e7a78dd9f8e911117e659414bcb7f3">   73</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;FiffId&gt; <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#a14e7a78dd9f8e911117e659414bcb7f3">SPtr</a>;            </div>
-<div class="line"><a name="l00074"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#abbf9ff7870047fe10c4ff9935610cada">   74</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;const FiffId&gt; <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#abbf9ff7870047fe10c4ff9935610cada">ConstSPtr</a>; </div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html" title="Universially unique identifier.">FiffId</a>();</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html" title="Universially unique identifier.">FiffId</a>(<span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html" title="Universially unique identifier.">FiffId</a>&amp; p_FiffId);</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="keyword">namespace </span>FIFFLIB</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;{</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="comment">// USED NAMESPACES</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html">   78</a></span>&#160;<span class="comment"></span><span class="keyword">class </span><a class="code" href="fiff__global_8h.html#aab6c6e9f74ed9d6762feab45287c6ad8">FIFFSHARED_EXPORT</a> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html" title="Universially unique identifier.">FiffId</a> {</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00081"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#a14e7a78dd9f8e911117e659414bcb7f3">   81</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;FiffId&gt; <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#a14e7a78dd9f8e911117e659414bcb7f3">SPtr</a>;            </div>
+<div class="line"><a name="l00082"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#abbf9ff7870047fe10c4ff9935610cada">   82</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;const FiffId&gt; <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#abbf9ff7870047fe10c4ff9935610cada">ConstSPtr</a>; </div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html" title="Universially unique identifier.">FiffId</a>();</div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html" title="Universially unique identifier.">FiffId</a>();</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> clear();</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="comment"></span>    <span class="keyword">inline</span> <span class="keyword">static</span> qint32 storageSize();</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html" title="Universially unique identifier.">FiffId</a>(<span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html" title="Universially unique identifier.">FiffId</a>&amp; p_FiffId);</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html" title="Universially unique identifier.">FiffId</a>();</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> clear();</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00111"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#ace3ce06929c786230382642f8ef596d3">  111</a></span>&#160;    fiff_int_t <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#ace3ce06929c786230382642f8ef596d3">version</a>;     </div>
-<div class="line"><a name="l00112"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#a021e8aaacbaa01474e3a9c5b9cdc4d24">  112</a></span>&#160;    fiff_int_t machid[2];   </div>
-<div class="line"><a name="l00113"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#a93dc35d7aa0034b38b9443906303fe6c">  113</a></span>&#160;    <a class="code" href="struct_f_i_f_f_l_i_b_1_1__fiff_time_rec.html">fiffTimeRec</a> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#a93dc35d7aa0034b38b9443906303fe6c">time</a>;       </div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="comment">// typedef struct _fiffIdRec {</span></div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;<span class="comment">//  fiff_int_t version;     /**&lt; File version *</span></div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="comment">//  fiff_int_t machid[2];   /**&lt; Unique machine ID *</span></div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="comment">//  fiffTimeRec time;       /**&lt; Time of the ID creation *</span></div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;<span class="comment">//} fiffIdRec,*fiffId;     /**&lt; This is the file identifier *</span></div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;<span class="comment">// typedef fiffIdRec fiff_id_t;</span></div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;};</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="comment">// INLINE DEFINITIONS</span></div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;</div>
-<div class="line"><a name="l00131"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#ac34e1aaa29ad3313bfa1b6c01bd7590e">  131</a></span>&#160;<span class="keyword">inline</span> qint32 <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#ac34e1aaa29ad3313bfa1b6c01bd7590e">FiffId::storageSize</a>()</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;{</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="keywordflow">return</span> 20;</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;}</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;} <span class="comment">// NAMESPACE</span></div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;<span class="preprocessor">#endif // FIFF_ID_H</span></div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="comment"></span>    <span class="keyword">inline</span> <span class="keyword">static</span> qint32 storageSize();</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00119"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#ace3ce06929c786230382642f8ef596d3">  119</a></span>&#160;    fiff_int_t <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#ace3ce06929c786230382642f8ef596d3">version</a>;     </div>
+<div class="line"><a name="l00120"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#a021e8aaacbaa01474e3a9c5b9cdc4d24">  120</a></span>&#160;    fiff_int_t machid[2];   </div>
+<div class="line"><a name="l00121"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#a93dc35d7aa0034b38b9443906303fe6c">  121</a></span>&#160;    <a class="code" href="struct_f_i_f_f_l_i_b_1_1__fiff_time_rec.html">fiffTimeRec</a> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#a93dc35d7aa0034b38b9443906303fe6c">time</a>;       </div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;<span class="comment">// typedef struct _fiffIdRec {</span></div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;<span class="comment">//  fiff_int_t version;     /**&lt; File version *</span></div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="comment">//  fiff_int_t machid[2];   /**&lt; Unique machine ID *</span></div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="comment">//  fiffTimeRec time;       /**&lt; Time of the ID creation *</span></div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="comment">//} fiffIdRec,*fiffId;     /**&lt; This is the file identifier *</span></div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;<span class="comment">// typedef fiffIdRec fiff_id_t;</span></div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;};</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;<span class="comment">// INLINE DEFINITIONS</span></div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;</div>
+<div class="line"><a name="l00139"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#ac34e1aaa29ad3313bfa1b6c01bd7590e">  139</a></span>&#160;<span class="keyword">inline</span> qint32 <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#ac34e1aaa29ad3313bfa1b6c01bd7590e">FiffId::storageSize</a>()</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;{</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    <span class="keywordflow">return</span> 20;</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;}</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;} <span class="comment">// NAMESPACE</span></div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;<span class="preprocessor">#endif // FIFF_ID_H</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Jan 14 2013 19:01:05 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jan 31 2013 17:09:07 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

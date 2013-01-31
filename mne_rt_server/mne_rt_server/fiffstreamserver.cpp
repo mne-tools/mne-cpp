@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiffstreamserver.cpp
+* @file     fiffstreaRTSERVER.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the FiffStreamServer Class.
+* @brief     implementation of the FiffStreaRTSERVER Class.
 *
 */
 
@@ -40,6 +40,8 @@
 
 #include "fiffstreamserver.h"
 #include "fiffstreamthread.h"
+
+#include "mne_rt_server.h"
 
 
 //*************************************************************************************************************
@@ -55,7 +57,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MSERVER;
+using namespace RTSERVER;
 using namespace FIFFLIB;
 
 
@@ -64,36 +66,25 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FiffStreamServer::FiffStreamServer(QObject *parent)
+FiffStreaRTSERVER::FiffStreaRTSERVER(QObject *parent)
 : QTcpServer(parent)
 , m_iNextClientId(0)
 {
-    init();
+
 }
 
 
 //*************************************************************************************************************
 
-FiffStreamServer::~FiffStreamServer()
+FiffStreaRTSERVER::~FiffStreaRTSERVER()
 {
-    emit closeFiffStreamServer();
-//    clearClients();
+    emit closeFiffStreaRTSERVER();
 }
-
-
-////*************************************************************************************************************
-
-//QByteArray FiffStreamServer::availableCommands()
-//{
-//    QByteArray t_blockCmdInfoList;
-//    t_blockCmdInfoList.append("\tclist\t\t\tprints and sends all available FiffStreamClients\r\n");
-//    return t_blockCmdInfoList;
-//}
 
 
 //*************************************************************************************************************
 
-void FiffStreamServer::comClist(Command p_command)
+void FiffStreaRTSERVER::comClist(Command p_command)
 {
     QString t_sOutput("");
     t_sOutput.append("\tID\tAlias\r\n");
@@ -104,13 +95,13 @@ void FiffStreamServer::comClist(Command p_command)
         t_sOutput.append(str);
     }
     t_sOutput.append("\n");
-    m_commandManager["clist"].reply(t_sOutput);
+    qobject_cast<MNERTServer*>(this->parent())->getCommandManager()["clist"].reply(t_sOutput);
 }
 
 
 //*************************************************************************************************************
 
-void FiffStreamServer::comMeasinfo(Command p_command)
+void FiffStreaRTSERVER::comMeasinfo(Command p_command)
 {
     qint32 t_id = -1;
 //            p_blockOutputInfo.append(parseToId(p_sListCommand[1],t_id));
@@ -122,14 +113,14 @@ void FiffStreamServer::comMeasinfo(Command p_command)
         emit requestMeasInfo(t_id);//requestMeasInfo(t_id);
 
         QString str = QString("\tsend measurement info to FiffStreamClient (ID: %1)\r\n\n").arg(t_id);
-        m_commandManager["measinfo"].reply(str);
+        qobject_cast<MNERTServer*>(this->parent())->getCommandManager()["measinfo"].reply(str);
     }
 }
 
 
 //*************************************************************************************************************
 
-void FiffStreamServer::comStart(Command p_command)
+void FiffStreaRTSERVER::comStart(Command p_command)
 {
     qint32 t_id = -1;
     QString t_sOutput("");
@@ -142,13 +133,13 @@ void FiffStreamServer::comStart(Command p_command)
         QString str = QString("\tFiffStreamClient (ID: %1) is now set to accept raw buffers\r\n\n").arg(t_id);
         t_sOutput.append(str);
     }
-    m_commandManager["start"].reply(t_sOutput);
+    qobject_cast<MNERTServer*>(this->parent())->getCommandManager()["start"].reply(t_sOutput);
 }
 
 
 //*************************************************************************************************************
 
-void FiffStreamServer::comStop(Command p_command)
+void FiffStreaRTSERVER::comStop(Command p_command)
 {
     qint32 t_id = -1;
     QString t_sOutput("");
@@ -161,80 +152,38 @@ void FiffStreamServer::comStop(Command p_command)
         QString str = QString("\tstop FiffStreamClient (ID: %1) from receiving raw Buffers.\r\n\n").arg(t_id);
         t_sOutput.append(str);
     }
-    m_commandManager["stop"].reply(t_sOutput);
+    qobject_cast<MNERTServer*>(this->parent())->getCommandManager()["stop"].reply(t_sOutput);
 }
 
 
 //*************************************************************************************************************
 
-void FiffStreamServer::comStopAll(Command p_command)
+void FiffStreaRTSERVER::comStopAll(Command p_command)
 {
     emit stopMeasFiffStreamClient(-1);
     QString str = QString("\tstop all FiffStreamClients from receiving raw buffers\r\n\n");
-    m_commandManager["stop"].reply(str);
+    qobject_cast<MNERTServer*>(this->parent())->getCommandManager()["stop-all"].reply(str);
 }
 
 
 //*************************************************************************************************************
 
-void FiffStreamServer::init()
+void FiffStreaRTSERVER::connectCommands()
 {
-    QString t_sJsonCommand =
-                    "{"
-                    "   \"commands\": {"
-                    "       \"clist\": {"
-                    "           \"description\": \"Prints and sends all available FiffStreamClients.\","
-                    "           \"parameters\": {}"
-                    "        },"
-                    "       \"measinfo\": {"
-                    "           \"description\": \"Sends the measurement info to the specified FiffStreamClient.\","
-                    "           \"parameters\": {"
-                    "               \"id\": {"
-                    "                   \"description\": \"ID/Alias\","
-                    "                   \"type\": \"QString\" "
-                    "               }"
-                    "           }"
-                    "       },"
-                    "       \"start\": {"
-                    "           \"description\": \"Adds specified FiffStreamClient to raw data buffer receivers. If acquisition is not already started, it is triggered.\","
-                    "           \"parameters\": {"
-                    "               \"id\": {"
-                    "                   \"description\": \"ID/Alias\","
-                    "                   \"type\": \"QString\" "
-                    "               }"
-                    "           }"
-                    "        },"
-                    "       \"stop\": {"
-                    "           \"description\": \"Removes specified FiffStreamClient from raw data buffer receivers.\","
-                    "           \"parameters\": {"
-                    "               \"id\": {"
-                    "                   \"description\": \"ID/Alias\","
-                    "                   \"type\": \"QString\" "
-                    "               }"
-                    "           }"
-                    "        },"
-                    "       \"stop-all\": {"
-                    "           \"description\": \"Stops the whole acquisition process.\","
-                    "           \"parameters\": {}"
-                    "        }"
-                    "    }"
-                    "}";
-
-    QJsonDocument t_jsonDocumentOrigin = QJsonDocument::fromJson(t_sJsonCommand.toLatin1());
-    m_commandManager.insert(t_jsonDocumentOrigin);
-
     //Connect slots
-    m_commandManager.connectSlot(QString("clist"), this, &FiffStreamServer::comClist);
-    m_commandManager.connectSlot(QString("measinfo"), this, &FiffStreamServer::comMeasinfo);
-    m_commandManager.connectSlot(QString("start"), this, &FiffStreamServer::comStart);
-    m_commandManager.connectSlot(QString("stop"), this, &FiffStreamServer::comStop);
-    m_commandManager.connectSlot(QString("stop-all"), this, &FiffStreamServer::comStopAll);
+    MNERTServer* t_pMNERTServer = qobject_cast<MNERTServer*> (this->parent());
+
+    t_pMNERTServer->getCommandManager().connectSlot(QString("clist"), this, &FiffStreaRTSERVER::comClist);
+    t_pMNERTServer->getCommandManager().connectSlot(QString("measinfo"), this, &FiffStreaRTSERVER::comMeasinfo);
+    t_pMNERTServer->getCommandManager().connectSlot(QString("start"), this, &FiffStreaRTSERVER::comStart);
+    t_pMNERTServer->getCommandManager().connectSlot(QString("stop"), this, &FiffStreaRTSERVER::comStop);
+    t_pMNERTServer->getCommandManager().connectSlot(QString("stop-all"), this, &FiffStreaRTSERVER::comStopAll);
 }
 
 
 ////*************************************************************************************************************
 
-//bool FiffStreamServer::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo)
+//bool FiffStreaRTSERVER::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo)
 //{
 //    bool success = false;
 
@@ -345,7 +294,7 @@ void FiffStreamServer::init()
 
 //*************************************************************************************************************
 
-QByteArray FiffStreamServer::parseToId(QString& p_sRawId, qint32& p_iParsedId)
+QByteArray FiffStreaRTSERVER::parseToId(QString& p_sRawId, qint32& p_iParsedId)
 {
     p_iParsedId = -1;
     QByteArray t_blockCmdIdInfo;
@@ -390,7 +339,7 @@ QByteArray FiffStreamServer::parseToId(QString& p_sRawId, qint32& p_iParsedId)
 
 //*************************************************************************************************************
 
-//void FiffStreamServer::clearClients()
+//void FiffStreaRTSERVER::clearClients()
 //{
 //    QMap<qint32, FiffStreamThread*>::const_iterator i = m_qClientList.constBegin();
 //    while (i != m_qClientList.constEnd()) {
@@ -404,7 +353,7 @@ QByteArray FiffStreamServer::parseToId(QString& p_sRawId, qint32& p_iParsedId)
 
 //*************************************************************************************************************
 
-void FiffStreamServer::forwardMeasInfo(qint32 ID, FiffInfo::SDPtr p_FiffInfo)
+void FiffStreaRTSERVER::forwardMeasInfo(qint32 ID, FiffInfo::SDPtr p_FiffInfo)
 {
     emit remitMeasInfo(ID, p_FiffInfo);
 }
@@ -412,7 +361,7 @@ void FiffStreamServer::forwardMeasInfo(qint32 ID, FiffInfo::SDPtr p_FiffInfo)
 
 //*************************************************************************************************************
 //ToDo increase preformance --> try inline
-void FiffStreamServer::forwardRawBuffer(Eigen::MatrixXf m_matRawData)
+void FiffStreaRTSERVER::forwardRawBuffer(Eigen::MatrixXf m_matRawData)
 {
     emit remitRawBuffer(m_matRawData);
 }
@@ -421,7 +370,7 @@ void FiffStreamServer::forwardRawBuffer(Eigen::MatrixXf m_matRawData)
 
 //*************************************************************************************************************
 
-void FiffStreamServer::incomingConnection(qintptr socketDescriptor)
+void FiffStreaRTSERVER::incomingConnection(qintptr socketDescriptor)
 {
     FiffStreamThread* t_pStreamThread = new FiffStreamThread(m_iNextClientId, socketDescriptor, this);
 
@@ -430,7 +379,7 @@ void FiffStreamServer::incomingConnection(qintptr socketDescriptor)
 
     //when thread has finished it gets deleted
     connect(t_pStreamThread, SIGNAL(finished()), t_pStreamThread, SLOT(deleteLater()));
-    connect(this, SIGNAL(closeFiffStreamServer()), t_pStreamThread, SLOT(deleteLater()));
+    connect(this, SIGNAL(closeFiffStreaRTSERVER()), t_pStreamThread, SLOT(deleteLater()));
 
     t_pStreamThread->start();
 }

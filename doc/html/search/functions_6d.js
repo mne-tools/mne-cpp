@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['main',['main',['../main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97',1,'main.cpp']]],
   ['make_5fblock_5fdiag',['make_block_diag',['../class_m_n_e_l_i_b_1_1_m_n_e.html#a5415c6e20b896963fc08fb99f9abf929',1,'MNELIB::MNE::make_block_diag()'],['../class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#ab47b1124fd5f078f070bfd84257791dc',1,'MNEMATHLIB::MNEMath::make_block_diag()']]],
   ['make_5fcompensator',['make_compensator',['../class_f_i_f_f_l_i_b_1_1_fiff_info.html#ae06f9e30af317e74beb4de6c69863475',1,'FIFFLIB::FiffInfo::make_compensator()'],['../class_m_n_e_l_i_b_1_1_m_n_e.html#a36e13e5e42b4eb92cb4703dc7410bfc8',1,'MNELIB::MNE::make_compensator()']]],
   ['make_5fdir_5ftree',['make_dir_tree',['../class_f_i_f_f_l_i_b_1_1_fiff.html#aab064fce03e142d745915132549d5682',1,'FIFFLIB::Fiff::make_dir_tree()'],['../class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a617d30cdbaba04567bee3a4ee0c327d0',1,'FIFFLIB::FiffDirTree::make_dir_tree()']]],

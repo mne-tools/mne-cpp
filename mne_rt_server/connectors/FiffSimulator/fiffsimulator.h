@@ -72,7 +72,7 @@ namespace FiffSimulatorPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MSERVER;
+using namespace RTSERVER;
 
 
 //*************************************************************************************************************
@@ -94,7 +94,7 @@ class FIFFSIMULATORSHARED_EXPORT FiffSimulator : public IConnector
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "mne_rt_server/1.0" FILE "fiffsimulator.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MSERVER::IConnector)
+    Q_INTERFACES(RTSERVER::IConnector)
 
 
     friend class FiffProducer;

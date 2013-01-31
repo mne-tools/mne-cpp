@@ -51,7 +51,6 @@
 //=============================================================================================================
 
 #include <fiff/fiff_info.h>
-#include <rtCommand/commandmanager.h>
 
 
 //*************************************************************************************************************
@@ -65,10 +64,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MSERVER
+// DEFINE NAMESPACE RTSERVER
 //=============================================================================================================
 
-namespace MSERVER
+namespace RTSERVER
 {
 
 //*************************************************************************************************************
@@ -91,7 +90,7 @@ using namespace RTCOMMANDLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class FiffStreamServer;
+class FiffStreaRTSERVER;
 
 
 //=============================================================================================================
@@ -112,7 +111,7 @@ public:
     *
     * @param [in] parent pointer to parent Object. (It's normally the default value.)
     */
-    ConnectorManager(FiffStreamServer* p_pFiffStreamServer, QObject* parent = 0);
+    ConnectorManager(FiffStreaRTSERVER* p_pFiffStreaRTSERVER, QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -122,9 +121,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Inits the command server.
+    * Connect connector manager to mne_rt_server commands
     */
-    void init();
+    void connectCommands();
 
     //=========================================================================================================
     /**
@@ -147,14 +146,6 @@ public:
     * @return reference to vector containing active ISensor modules.
     */
     IConnector* getActiveConnector();
-
-    //=========================================================================================================
-    /**
-    * Returns the CommandManager
-    *
-    * @return the CommandManager.
-    */
-    inline CommandManager& getCommandManager();
 
     //=========================================================================================================
     /**
@@ -222,10 +213,7 @@ private:
 
     static QVector<IConnector*> s_vecConnectors;       /**< Holds vector of all modules. */
 
-    CommandManager m_commandManager;                    /**< The CommandManager of the connector. */
-
-    FiffStreamServer* m_pFiffStreamServer;
-
+    FiffStreaRTSERVER* m_pFiffStreaRTSERVER;
 };
 
 
@@ -237,14 +225,6 @@ private:
 inline const QVector<IConnector*>& ConnectorManager::getConnectors()
 {
     return s_vecConnectors;
-}
-
-
-//*************************************************************************************************************
-
-inline CommandManager& ConnectorManager::getCommandManager()
-{
-    return m_commandManager;
 }
 
 } // NAMESPACE

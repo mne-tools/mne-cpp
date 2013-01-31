@@ -38,6 +38,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -80,7 +81,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_fba7b6d30909f9ec66000534e18b073e.html">MNE</a></li><li class="navelem"><a class="el" href="dir_02d6b00d369dfdccb62582dcf5f74964.html">fiff</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_d9f91708cdb6d7bc2d9cf00ef2519886.html">MNE</a></li><li class="navelem"><a class="el" href="dir_29694eefdfa67cc3d137c6f7c2283a3a.html">fiff</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -95,86 +96,83 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="comment">// INCLUDES</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="comment">// FIFF INCLUDES</span></div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="fiff__global_8h.html" title="Fiff library export/import macros.">fiff_global.h</a>&quot;</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="comment">// FIFF INCLUDES</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="fiff__types_8h.html" title="Old fiff_type declarations - replace them.">fiff_types.h</a>&quot;</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="fiff__types_8h.html" title="Old fiff_type declarations - replace them.">fiff_types.h</a>&quot;</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="comment">// Eigen INCLUDES</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="comment">// Eigen INCLUDES</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">#include &lt;Eigen/Core&gt;</span></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">#include &lt;Eigen/Core&gt;</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="comment">// Qt INCLUDES</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="comment">// Eigen INCLUDES</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">#include &lt;QSharedData&gt;</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor">#include &lt;QSharedDataPointer&gt;</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor">#include &lt;QSharedPointer&gt;</span></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor">#include &lt;QString&gt;</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">#include &lt;QSharedData&gt;</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment">// DEFINE NAMESPACE MNELIB</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="comment">// DEFINE NAMESPACE MNELIB</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="keyword">namespace </span>FIFFLIB</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;{</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="keyword">namespace </span>FIFFLIB</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;{</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="comment">// USED NAMESPACES</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="comment">// USED NAMESPACES</span></div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="keyword">using namespace </span>FIFFLIB;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="keyword">using namespace </span>Eigen;</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="keyword">using namespace </span>FIFFLIB;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="keyword">using namespace </span>Eigen;</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00094"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html">   94</a></span>&#160;<span class="comment"></span><span class="keyword">class </span><a class="code" href="fiff__global_8h.html#aab6c6e9f74ed9d6762feab45287c6ad8">FIFFSHARED_EXPORT</a> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html" title="evoked data">FiffEvokedData</a> : <span class="keyword">public</span> QSharedData</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;{</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00097"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a45db461c68f20acb1137db39875da00e">   97</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;FiffEvokedData&gt; <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a45db461c68f20acb1137db39875da00e">SPtr</a>;            </div>
-<div class="line"><a name="l00098"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#acec7ebc934f78d47700b6d02d54ab3d1">   98</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;const FiffEvokedData&gt; <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#acec7ebc934f78d47700b6d02d54ab3d1">ConstSPtr</a>; </div>
-<div class="line"><a name="l00099"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a342455d72815756aa6871a50a846b633">   99</a></span>&#160;    <span class="keyword">typedef</span> QSharedDataPointer&lt;FiffEvokedData&gt; <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a342455d72815756aa6871a50a846b633">SDPtr</a>;       </div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html" title="evoked data">FiffEvokedData</a>();</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html" title="evoked data">FiffEvokedData</a>(<span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html" title="evoked data">FiffEvokedData</a> &amp;p_FiffEvokedData);</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html" title="evoked data">FiffEvokedData</a>();</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00122"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#ae5e83afbcb2d328dda14e819c7de7bd7">  122</a></span>&#160;    fiff_int_t  <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#ae5e83afbcb2d328dda14e819c7de7bd7">aspect_kind</a>;    </div>
-<div class="line"><a name="l00123"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a2ff42f4fe529941d64602616b497115c">  123</a></span>&#160;    fiff_int_t  <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a2ff42f4fe529941d64602616b497115c">is_smsh</a>;        </div>
-<div class="line"><a name="l00124"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#abaff5b4b0089398fbf06a9f1f7424277">  124</a></span>&#160;    fiff_int_t  <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#abaff5b4b0089398fbf06a9f1f7424277">nave</a>;           </div>
-<div class="line"><a name="l00125"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a5173be35a94819207ebc2d8f8b7357f5">  125</a></span>&#160;    fiff_int_t  <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a5173be35a94819207ebc2d8f8b7357f5">first</a>;          </div>
-<div class="line"><a name="l00126"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a3802df270ad391e23fa1388fff4da779">  126</a></span>&#160;    fiff_int_t  <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a3802df270ad391e23fa1388fff4da779">last</a>;           </div>
-<div class="line"><a name="l00127"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#ae2a5e6a5d3079bc363709a87fa60b980">  127</a></span>&#160;    QString     <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#ae2a5e6a5d3079bc363709a87fa60b980">comment</a>;        </div>
-<div class="line"><a name="l00128"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#aa0eb73f0d5e1ab2dd9f9efbe3506e661">  128</a></span>&#160;    MatrixXd    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#aa0eb73f0d5e1ab2dd9f9efbe3506e661">times</a>;          </div>
-<div class="line"><a name="l00129"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a3299c9d7a7c3fc8d874eec57aa141343">  129</a></span>&#160;    MatrixXd    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a3299c9d7a7c3fc8d874eec57aa141343">epochs</a>;         </div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;};</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;} <span class="comment">// NAMESPACE</span></div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;<span class="preprocessor">#endif // FIFF_EVOKED_DATA_H</span></div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00091"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html">   91</a></span>&#160;<span class="comment"></span><span class="keyword">class </span><a class="code" href="fiff__global_8h.html#aab6c6e9f74ed9d6762feab45287c6ad8">FIFFSHARED_EXPORT</a> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html" title="evoked data">FiffEvokedData</a> : <span class="keyword">public</span> QSharedData</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;{</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00094"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a45db461c68f20acb1137db39875da00e">   94</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;FiffEvokedData&gt; <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a45db461c68f20acb1137db39875da00e">SPtr</a>;            </div>
+<div class="line"><a name="l00095"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#acec7ebc934f78d47700b6d02d54ab3d1">   95</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;const FiffEvokedData&gt; <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#acec7ebc934f78d47700b6d02d54ab3d1">ConstSPtr</a>; </div>
+<div class="line"><a name="l00096"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a342455d72815756aa6871a50a846b633">   96</a></span>&#160;    <span class="keyword">typedef</span> QSharedDataPointer&lt;FiffEvokedData&gt; <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a342455d72815756aa6871a50a846b633">SDPtr</a>;       </div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html" title="evoked data">FiffEvokedData</a>();</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html" title="evoked data">FiffEvokedData</a>(<span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html" title="evoked data">FiffEvokedData</a> &amp;p_FiffEvokedData);</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html" title="evoked data">FiffEvokedData</a>();</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00119"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#ae5e83afbcb2d328dda14e819c7de7bd7">  119</a></span>&#160;    fiff_int_t  <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#ae5e83afbcb2d328dda14e819c7de7bd7">aspect_kind</a>;    </div>
+<div class="line"><a name="l00120"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a2ff42f4fe529941d64602616b497115c">  120</a></span>&#160;    fiff_int_t  <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a2ff42f4fe529941d64602616b497115c">is_smsh</a>;        </div>
+<div class="line"><a name="l00121"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#abaff5b4b0089398fbf06a9f1f7424277">  121</a></span>&#160;    fiff_int_t  <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#abaff5b4b0089398fbf06a9f1f7424277">nave</a>;           </div>
+<div class="line"><a name="l00122"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a5173be35a94819207ebc2d8f8b7357f5">  122</a></span>&#160;    fiff_int_t  <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a5173be35a94819207ebc2d8f8b7357f5">first</a>;          </div>
+<div class="line"><a name="l00123"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a3802df270ad391e23fa1388fff4da779">  123</a></span>&#160;    fiff_int_t  <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a3802df270ad391e23fa1388fff4da779">last</a>;           </div>
+<div class="line"><a name="l00124"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#ae2a5e6a5d3079bc363709a87fa60b980">  124</a></span>&#160;    QString     <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#ae2a5e6a5d3079bc363709a87fa60b980">comment</a>;        </div>
+<div class="line"><a name="l00125"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#aa0eb73f0d5e1ab2dd9f9efbe3506e661">  125</a></span>&#160;    MatrixXd    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#aa0eb73f0d5e1ab2dd9f9efbe3506e661">times</a>;          </div>
+<div class="line"><a name="l00126"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a3299c9d7a7c3fc8d874eec57aa141343">  126</a></span>&#160;    MatrixXd    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a3299c9d7a7c3fc8d874eec57aa141343">epochs</a>;         </div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;};</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;} <span class="comment">// NAMESPACE</span></div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="preprocessor">#endif // FIFF_EVOKED_DATA_H</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Jan 14 2013 19:01:05 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jan 31 2013 17:09:07 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

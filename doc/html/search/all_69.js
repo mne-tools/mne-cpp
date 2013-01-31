@@ -1,16 +1,29 @@
 var searchData=
 [
+  ['icommand',['ICommand',['../class_i_command.html',1,'']]],
+  ['iconnector',['IConnector',['../class_r_t_s_e_r_v_e_r_1_1_i_connector.html',1,'RTSERVER']]],
+  ['iconnector_2eh',['IConnector.h',['../_i_connector_8h.html',1,'']]],
   ['id',['id',['../class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a90124c28555f4b58de04f116730b1c59',1,'FIFFLIB::FiffDirTree::id()'],['../struct_f_i_f_f_l_i_b_1_1__fiff_layer_rec.html#a2311b6dc29cb9e7cf7fda0984b6e210e',1,'FIFFLIB::_fiffLayerRec::id()'],['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a8a3b109a01a3750900d1d80369dacaa1',1,'MNELIB::MNEHemisphere::id()']]],
   ['ident',['ident',['../class_f_i_f_f_l_i_b_1_1_fiff_dig_point.html#a849e835b867dfe73d3685227df6b1ac0',1,'FIFFLIB::FiffDigPoint::ident()'],['../struct_f_i_f_f_l_i_b_1_1__fiff_dig_string_rec.html#a45eeef4e32dd11f645d46a179f8f66b4',1,'FIFFLIB::_fiffDigStringRec::ident()']]],
+  ['incomingconnection',['incomingConnection',['../class_r_t_s_e_r_v_e_r_1_1_command_server.html#a89a88685f91944c69c67296936134ae3',1,'RTSERVER::CommandServer']]],
+  ['incommingcommand',['incommingCommand',['../class_r_t_s_e_r_v_e_r_1_1_command_server.html#ab039eb65ba2c9404c68b972e7a018e3d',1,'RTSERVER::CommandServer']]],
   ['info',['info',['../class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html#a96c1bda04068951fcd921fbc0462e7ae',1,'FIFFLIB::FiffEvokedDataSet::info()'],['../class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#aae42b413ebc3499af43fe149a7132fe6',1,'FIFFLIB::FiffRawData::info()']]],
+  ['init',['init',['../class_r_t_s_e_r_v_e_r_1_1_m_n_e_r_t_server.html#ad0675ed97f74d462687174f0ed01b414',1,'RTSERVER::MNERTServer']]],
   ['initializegl',['initializeGL',['../class_d_i_s_p_l_i_b_1_1_geometry_view.html#a816a10949d2879546377239cc72f9cd7',1,'DISPLIB::GeometryView']]],
+  ['insert',['insert',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_manager.html#af782ff4c95a70b36de448a66f3049bfe',1,'RTCOMMANDLIB::CommandManager::insert(const QJsonDocument &amp;p_jsonDocument)'],['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_manager.html#aa585a7736267b00c4c5aec780bbf01d6',1,'RTCOMMANDLIB::CommandManager::insert(const QString &amp;p_sKey, const QString &amp;p_sDescription)'],['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_manager.html#a2f5c8a4f97446d7721a62937b2c36af9',1,'RTCOMMANDLIB::CommandManager::insert(const QString &amp;p_sKey, const Command &amp;p_command)']]],
+  ['interesting_5fdata',['interesting_data',['../class_baby_m_e_g_plugin_1_1_shmem_socket.html#a8150ff70b1bc6554d24f07e25eda3a41',1,'BabyMEGPlugin::ShmemSocket::interesting_data()'],['../class_neuromag_plugin_1_1_shmem_socket.html#a8150ff70b1bc6554d24f07e25eda3a41',1,'NeuromagPlugin::ShmemSocket::interesting_data()']]],
   ['inuse',['inuse',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a1a7ba6a83b5b474df998aaf25eb6ade1',1,'MNELIB::MNEHemisphere']]],
   ['invert_5ftransform',['invert_transform',['../class_f_i_f_f_l_i_b_1_1_fiff.html#af93dc648e4b14ff0fe28e5e5a9067324',1,'FIFFLIB::Fiff::invert_transform()'],['../class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a4a258913a8b23cb3c05858449ff25370',1,'FIFFLIB::FiffCoordTrans::invert_transform()']]],
   ['invoperatoravailable',['invOperatorAvailable',['../class_r_t_i_n_v_l_i_b_1_1_rt_inv.html#a8b3d4b89a5de54644472274e44ee392b',1,'RTINVLIB::RtInv']]],
   ['invtrans',['invtrans',['../class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a37187e80f7c026fbbb74b663f8153d21',1,'FIFFLIB::FiffCoordTrans']]],
   ['iobserver',['IObserver',['../class_i_observer.html',1,'']]],
   ['is_5fsmsh',['is_smsh',['../class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a2ff42f4fe529941d64602616b497115c',1,'FIFFLIB::FiffEvokedData']]],
+  ['isactive',['isActive',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_manager.html#af9827e31c75f2557cd7dfbce0a6af8ed',1,'RTCOMMANDLIB::CommandManager::isActive()'],['../class_r_t_s_e_r_v_e_r_1_1_i_connector.html#a173b3673ba30e4dfc978cc5d56ebbc2b',1,'RTSERVER::IConnector::isActive()']]],
   ['isclustered',['isClustered',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a598a41eed229feb0ccd030ed17d77d7d',1,'MNELIB::MNEForwardSolution']]],
   ['isempty',['isEmpty',['../class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ac23a4cd08fe45a1ebee372749068fe3d',1,'FIFFLIB::FiffCoordTrans::isEmpty()'],['../class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a2a052c82246da140eac2a98a313a2154',1,'FIFFLIB::FiffDirTree::isEmpty()'],['../class_f_i_f_f_l_i_b_1_1_fiff_info.html#a6da525bc622f2bc1220d7ad591782c5b',1,'FIFFLIB::FiffInfo::isEmpty()'],['../class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#ae22e999491b11c7150405a085b7ff02b',1,'FIFFLIB::FiffNamedMatrix::isEmpty()'],['../class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#af3a3ab05643aaacfe6c41536b712f060',1,'FIFFLIB::FiffRawData::isEmpty()'],['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1c81b86cc30d53927ba032543507cdd8',1,'MNELIB::MNEForwardSolution::isEmpty()']]],
-  ['ismatrix',['isMatrix',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a009922177ea505a3b1f0a12ddb097a39',1,'FIFFLIB::FiffTag']]]
+  ['iserver',['IServer',['../class_r_t_s_e_r_v_e_r_1_1_i_server.html',1,'RTSERVER']]],
+  ['iserver_2eh',['IServer.h',['../_i_server_8h.html',1,'']]],
+  ['isjson',['isJson',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html#a94c7073037d47654af022aa1ec4045cd',1,'RTCOMMANDLIB::Command::isJson()'],['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_raw_command.html#a0eefeb5db1651664f7d58aeddd249bb7',1,'RTCOMMANDLIB::RawCommand::isJson()']]],
+  ['ismatrix',['isMatrix',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a009922177ea505a3b1f0a12ddb097a39',1,'FIFFLIB::FiffTag']]],
+  ['ismeasuring',['isMeasuring',['../class_baby_m_e_g_plugin_1_1_collector_socket.html#abbbe78af5bde3305e2cc791a94074dd2',1,'BabyMEGPlugin::CollectorSocket::isMeasuring()'],['../class_neuromag_plugin_1_1_collector_socket.html#aa265a3662c985d9d3510206b8427663a',1,'NeuromagPlugin::CollectorSocket::isMeasuring()']]]
 ];

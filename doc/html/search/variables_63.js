@@ -15,6 +15,7 @@ var searchData=
   ['comment',['comment',['../class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#ae2a5e6a5d3079bc363709a87fa60b980',1,'FIFFLIB::FiffEvokedData']]],
   ['comp',['comp',['../class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#adbe4741e8ec3c9438da36e627995ef1a',1,'FIFFLIB::FiffRawData']]],
   ['comps',['comps',['../class_f_i_f_f_l_i_b_1_1_fiff_info.html#abe1b8e3c8986cba9e001f96480f905e9',1,'FIFFLIB::FiffInfo']]],
+  ['connectordir',['connectorDir',['../mne__rt__server_8cpp.html#a8cb247957906e47d5eefe168f3d1390d',1,'mne_rt_server.cpp']]],
   ['coord_5fframe',['coord_frame',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#adc4ceed70642eaf96e92eed073737b74',1,'FIFFLIB::FiffChInfo::coord_frame()'],['../class_f_i_f_f_l_i_b_1_1_fiff_dig_point.html#a96eeede21a4454fae095d0b3aca8cb0a',1,'FIFFLIB::FiffDigPoint::coord_frame()'],['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a8776126f2f4ec08939fb83a61a429348',1,'MNELIB::MNEForwardSolution::coord_frame()'],['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a5890e89b80dd7631f4405ef68572e7d4',1,'MNELIB::MNEHemisphere::coord_frame()'],['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a2e42af80e3698692e08313cf591bce52',1,'MNELIB::MNEInverseOperator::coord_frame()']]],
   ['ctf_5fhead_5ft',['ctf_head_t',['../class_f_i_f_f_l_i_b_1_1_fiff_info.html#aea65ff187f4b616cfec4bf0882d10b31',1,'FIFFLIB::FiffInfo']]],
   ['ctfkind',['ctfkind',['../class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a657fc151479eee767b672b7dbc0dcfa8',1,'FIFFLIB::FiffCtfComp']]]

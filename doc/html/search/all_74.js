@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['t_5fobservers',['t_Observers',['../class_subject.html#aa075d2b541bc57fd8292f0e754cd5b3e',1,'Subject']]],
   ['table',['table',['../class_f_s_l_i_b_1_1_colortable.html#a4987ee030edf7db8b5ed9e1974dd8456',1,'FSLIB::Colortable']]],
   ['time',['time',['../class_f_i_f_f_l_i_b_1_1_fiff_id.html#a93dc35d7aa0034b38b9443906303fe6c',1,'FIFFLIB::FiffId']]],
   ['times',['times',['../class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#aa0eb73f0d5e1ab2dd9f9efbe3506e661',1,'FIFFLIB::FiffEvokedData']]],
@@ -22,8 +23,10 @@ var searchData=
   ['tofloatmatrix',['toFloatMatrix',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a62e3199db07eb1892c6aaf182e171efd',1,'FIFFLIB::FiffTag']]],
   ['toint',['toInt',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a88f8094d1f3b876708bd3d5779a30a49',1,'FIFFLIB::FiffTag']]],
   ['tointmatrix',['toIntMatrix',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#ae6e352d3ff566884190c7ce52896f94d',1,'FIFFLIB::FiffTag']]],
+  ['tojsonobject',['toJsonObject',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html#a5ec7afa7dd94358a01ee72329a190486',1,'RTCOMMANDLIB::Command']]],
   ['toshort',['toShort',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#ae482976adfb06db70a06cc0071c8628d',1,'FIFFLIB::FiffTag']]],
   ['tostring',['toString',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a2c6b9b9cf0ece41a5b2a7189db336748',1,'FIFFLIB::FiffTag']]],
+  ['tostringlist',['toStringList',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html#a8ee44ab89ed72a1006ab1fc434d5f124',1,'RTCOMMANDLIB::Command']]],
   ['tounsignedint',['toUnsignedInt',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a483d8147f585de567ee8a64f5a84ee9b',1,'FIFFLIB::FiffTag']]],
   ['tounsignedshort',['toUnsignedShort',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a34644147b22eb4bcb32c3a803fbaf089',1,'FIFFLIB::FiffTag']]],
   ['trans',['trans',['../class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ae3995f710ab35b5f7687001a4cd4e4b5',1,'FIFFLIB::FiffCoordTrans']]],
@@ -33,6 +36,7 @@ var searchData=
   ['tri_5farea',['tri_area',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a139bc83d26deda30a6ac4663b9bac838',1,'MNELIB::MNEHemisphere']]],
   ['tri_5fcent',['tri_cent',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a5630622faec837c17580af9509cc716f',1,'MNELIB::MNEHemisphere']]],
   ['tri_5fnn',['tri_nn',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a636e9d74c490eadb60e7fd3a828a74e9',1,'MNELIB::MNEHemisphere']]],
+  ['triggered',['triggered',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html#a0b4384401d4fe72b8bdad44f33a59e29',1,'RTCOMMANDLIB::Command']]],
   ['tris',['tris',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab2084cf6ed3de33ef78ef11c0e6f83b6',1,'MNELIB::MNEHemisphere']]],
   ['type',['type',['../class_f_i_f_f_l_i_b_1_1_fiff_dir_entry.html#a365e3bf2f5b6d8ef1865db8a1731a50b',1,'FIFFLIB::FiffDirEntry::type()'],['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#acd412f0127525d8749b6606cd87fd5ff',1,'FIFFLIB::FiffTag::type()'],['../struct_f_i_f_f_l_i_b_1_1__fiff__data__ref.html#ad6543d32696c0e71fc3efa96e4172675',1,'FIFFLIB::_fiff_data_ref::type()']]]
 ];
