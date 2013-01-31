@@ -189,7 +189,7 @@ private:
     /**
     * Sends the connector list
     *
-    * @param p_command  The connector list command.
+    * @param[in] p_command  The connector list command.
     */
     void comConlist(Command p_command);
 
@@ -197,7 +197,7 @@ private:
     /**
     * Selects a connector
     *
-    * @param p_command  The select connector command.
+    * @param[in] p_command  The select connector command.
     */
     void comSelcon(Command p_command);
 
@@ -205,7 +205,7 @@ private:
     /**
     * Starts the Measurement
     *
-    * @param p_command  The start command.
+    * @param[in] p_command  The start command.
     */
     void comStart(Command p_command);//comMeas
 
@@ -213,7 +213,7 @@ private:
     /**
     * Stops all connectors
     *
-    * @param p_command  The stop all command.
+    * @param[in] p_command  The stop all command.
     */
     void comStopAll(Command p_command);
 

@@ -118,6 +118,11 @@ public:
     */
     inline CommandManager& getCommandManager();
 
+    //=========================================================================================================
+    /**
+    * Init the fiff stream server.
+    */
+    void init();
 
 //    virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
 
@@ -147,6 +152,49 @@ protected:
     void incomingConnection(qintptr socketDescriptor);
 
 private:
+    //SLOTS
+    //=========================================================================================================
+    /**
+    * Fiff data client list
+    *
+    * @param[in] p_command  The connector list command.
+    */
+    void comClist(Command p_command);
+
+    //=========================================================================================================
+    /**
+    * specifies to which client to send the requested fiff info
+    *
+    * @param[in] p_command  The select connector command.
+    */
+    void comMeasinfo(Command p_command);
+
+    //=========================================================================================================
+    /**
+    * Starts the Measurement of a specified client
+    *
+    * @param[in] p_command  The start command.
+    */
+    void comStart(Command p_command);//comMeas
+
+    //=========================================================================================================
+    /**
+    * Stops a fiff data client from receiving further data
+    *
+    * @param[in] p_command  The stop command.
+    */
+    void comStop(Command p_command);
+
+    //=========================================================================================================
+    /**
+    * Stops all connectors
+    *
+    * @param[in] p_command  The stop all command.
+    */
+    void comStopAll(Command p_command);
+
+
+
     QByteArray parseToId(QString& p_sRawId, qint32& p_iParsedId);
 
     CommandManager m_commandManager;        /**< The CommandManager of the connector. */

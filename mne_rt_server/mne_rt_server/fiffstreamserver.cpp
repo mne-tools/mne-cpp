@@ -68,7 +68,7 @@ FiffStreamServer::FiffStreamServer(QObject *parent)
 : QTcpServer(parent)
 , m_iNextClientId(0)
 {
-
+    init();
 }
 
 
@@ -89,6 +89,147 @@ FiffStreamServer::~FiffStreamServer()
 //    t_blockCmdInfoList.append("\tclist\t\t\tprints and sends all available FiffStreamClients\r\n");
 //    return t_blockCmdInfoList;
 //}
+
+
+//*************************************************************************************************************
+
+void FiffStreamServer::comClist(Command p_command)
+{
+    QString t_sOutput("");
+    t_sOutput.append("\tID\tAlias\r\n");
+    QMap<qint32, FiffStreamThread*>::iterator i;
+    for (i = this->m_qClientList.begin(); i != this->m_qClientList.end(); ++i)
+    {
+        QString str = QString("\t%1\t%2\r\n").arg(i.key()).arg(i.value()->getAlias());
+        t_sOutput.append(str);
+    }
+    t_sOutput.append("\n");
+    m_commandManager["clist"].reply(t_sOutput);
+}
+
+
+//*************************************************************************************************************
+
+void FiffStreamServer::comMeasinfo(Command p_command)
+{
+    qint32 t_id = -1;
+//            p_blockOutputInfo.append(parseToId(p_sListCommand[1],t_id));
+
+    t_id = p_command.pValues()[0].toInt();
+
+    if(t_id != -1)
+    {
+        emit requestMeasInfo(t_id);//requestMeasInfo(t_id);
+
+        QString str = QString("\tsend measurement info to FiffStreamClient (ID: %1)\r\n\n").arg(t_id);
+        m_commandManager["measinfo"].reply(str);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void FiffStreamServer::comStart(Command p_command)
+{
+    qint32 t_id = -1;
+    QString t_sOutput("");
+    t_sOutput.append(parseToId(p_command.pValues()[0].toString(),t_id));
+
+    if(t_id != -1)
+    {
+        emit startMeasFiffStreamClient(t_id);
+
+        QString str = QString("\tFiffStreamClient (ID: %1) is now set to accept raw buffers\r\n\n").arg(t_id);
+        t_sOutput.append(str);
+    }
+    m_commandManager["start"].reply(t_sOutput);
+}
+
+
+//*************************************************************************************************************
+
+void FiffStreamServer::comStop(Command p_command)
+{
+    qint32 t_id = -1;
+    QString t_sOutput("");
+    t_sOutput.append(parseToId(p_command.pValues()[0].toString(),t_id));
+
+    if(t_id != -1)
+    {
+        emit stopMeasFiffStreamClient(t_id);//emit requestStopMeas(t_id);
+
+        QString str = QString("\tstop FiffStreamClient (ID: %1) from receiving raw Buffers.\r\n\n").arg(t_id);
+        t_sOutput.append(str);
+    }
+    m_commandManager["stop"].reply(t_sOutput);
+}
+
+
+//*************************************************************************************************************
+
+void FiffStreamServer::comStopAll(Command p_command)
+{
+    emit stopMeasFiffStreamClient(-1);
+    QString str = QString("\tstop all FiffStreamClients from receiving raw buffers\r\n\n");
+    m_commandManager["stop"].reply(str);
+}
+
+
+//*************************************************************************************************************
+
+void FiffStreamServer::init()
+{
+    QString t_sJsonCommand =
+                    "{"
+                    "   \"commands\": {"
+                    "       \"clist\": {"
+                    "           \"description\": \"Prints and sends all available FiffStreamClients.\","
+                    "           \"parameters\": {}"
+                    "        },"
+                    "       \"measinfo\": {"
+                    "           \"description\": \"Sends the measurement info to the specified FiffStreamClient.\","
+                    "           \"parameters\": {"
+                    "               \"id\": {"
+                    "                   \"description\": \"ID/Alias\","
+                    "                   \"type\": \"QString\" "
+                    "               }"
+                    "           }"
+                    "       },"
+                    "       \"start\": {"
+                    "           \"description\": \"Adds specified FiffStreamClient to raw data buffer receivers. If acquisition is not already started, it is triggered.\","
+                    "           \"parameters\": {"
+                    "               \"id\": {"
+                    "                   \"description\": \"ID/Alias\","
+                    "                   \"type\": \"QString\" "
+                    "               }"
+                    "           }"
+                    "        },"
+                    "       \"stop\": {"
+                    "           \"description\": \"Removes specified FiffStreamClient from raw data buffer receivers.\","
+                    "           \"parameters\": {"
+                    "               \"id\": {"
+                    "                   \"description\": \"ID/Alias\","
+                    "                   \"type\": \"QString\" "
+                    "               }"
+                    "           }"
+                    "        },"
+                    "       \"stop-all\": {"
+                    "           \"description\": \"Stops the whole acquisition process.\","
+                    "           \"parameters\": {}"
+                    "        }"
+                    "    }"
+                    "}";
+
+    QJsonDocument t_jsonDocumentOrigin = QJsonDocument::fromJson(t_sJsonCommand.toLatin1());
+    m_commandManager.insert(t_jsonDocumentOrigin);
+
+    //Connect slots
+    m_commandManager.connectSlot(QString("clist"), this, &FiffStreamServer::comClist);
+    m_commandManager.connectSlot(QString("measinfo"), this, &FiffStreamServer::comMeasinfo);
+    m_commandManager.connectSlot(QString("start"), this, &FiffStreamServer::comStart);
+    m_commandManager.connectSlot(QString("stop"), this, &FiffStreamServer::comStop);
+    m_commandManager.connectSlot(QString("stop-all"), this, &FiffStreamServer::comStopAll);
+}
 
 
 ////*************************************************************************************************************

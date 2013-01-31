@@ -373,9 +373,11 @@ void ConnectorManager::loadConnectors(const QString& dir)
             t_pIConnector->setStatus(false);
 
             //Add the curent plugin meta data
-            t_pIConnector->setMetaData(this->metaData());
-
-            qDebug() << this->metaData();
+            QJsonObject t_qJsonObjectMetaData = this->metaData().value("MetaData").toObject();
+            t_pIConnector->setMetaData(t_qJsonObjectMetaData);
+            QJsonDocument t_jsonDocumentOrigin(t_qJsonObjectMetaData);
+            t_pIConnector->getCommandManager().insert(t_jsonDocumentOrigin);
+            t_pIConnector->connectCommandManager();
 
             s_vecConnectors.push_back(t_pIConnector);
             printf("[done]\n");
