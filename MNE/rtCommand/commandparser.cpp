@@ -120,7 +120,7 @@ bool CommandParser::parse(const QString &p_sInput, QStringList &p_qListCommandsP
         for(it = t_jsonObjectCommand.begin(); it != t_jsonObjectCommand.end(); ++it)
         {
             //Print Command
-            printf("%s\n", it.key().toLatin1().constData());
+            printf("%s", it.key().toLatin1().constData());
 
             if(exists(it.key()))
             {
@@ -133,12 +133,14 @@ bool CommandParser::parse(const QString &p_sInput, QStringList &p_qListCommandsP
                 //append the parameters
                 for(itParam= t_jsonObjectParameters.begin(); itParam != t_jsonObjectParameters.end(); ++itParam)
                 {
+                    printf(" %s", itParam.value().toString().toLatin1().constData());
                     //ToDo do a cross check with the param naming and key
                     m_rawCommand.pValues().append(itParam.value().toString());
 //                    qDebug() << itParam.key() << " + " << itParam.value().toString();
                 }
                 notify();
             }
+            printf("\r\n");
         }
     }
     else
@@ -146,10 +148,13 @@ bool CommandParser::parse(const QString &p_sInput, QStringList &p_qListCommandsP
         QStringList t_qCommandList = p_sInput.split(" ");
 
         //Print command
-        printf("%s\n", t_qCommandList[0].toLatin1().constData());
+        printf("%s", t_qCommandList[0].toLatin1().constData());
 
         if(!exists(t_qCommandList[0]))
+        {
+            printf("\r\n");
             return false;
+        }
 
         m_rawCommand = RawCommand(t_qCommandList[0], false);
 
@@ -160,9 +165,12 @@ bool CommandParser::parse(const QString &p_sInput, QStringList &p_qListCommandsP
         {
             //Parse Parameters
             for(qint32 i = 1; i < t_qCommandList.size(); ++i)
+            {
+                printf(" %s", t_qCommandList[i].toLatin1().constData());
                 m_rawCommand.pValues().append(t_qCommandList[i]);
+            }
         }
-
+        printf("\r\n");
         notify();
     }
 

@@ -141,6 +141,12 @@ public:
 
     //=========================================================================================================
     /**
+    * Connects the command manager to the available slots.
+    */
+    virtual void connectCommandManager() = 0;
+
+    //=========================================================================================================
+    /**
     * Returns the unique connector id
     * Pure virtual method.
     *
@@ -236,12 +242,11 @@ protected:
 
     RawMatrixBuffer* m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
 
-    QJsonObject m_qJsonObjectMetaData;      /**< The meta data of the plugin defined in Q_PLUGIN_METADATA and the corresponding json file. */
+    QJsonObject     m_qJsonObjectMetaData;  /**< The meta data of the plugin defined in Q_PLUGIN_METADATA and the corresponding json file. */
 
-    CommandManager m_commandManager;        /**< The CommandManager of the connector. */
+    CommandManager  m_commandManager;       /**< The CommandManager of the connector. */
 
 private:
-
     bool        m_bIsActive;                /**< Holds the activation status. */
     quint32     m_uiBufferSampleSize;       /**< Number of Buffer Sample Size */
 };

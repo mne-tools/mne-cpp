@@ -114,6 +114,8 @@ public:
     */
     virtual ~FiffSimulator();
 
+    virtual void connectCommandManager();
+
     virtual ConnectorID getConnectorID() const;
 
     virtual const char* getName() const;
@@ -140,12 +142,23 @@ protected:
 private:
 
     //Slots
+    //=========================================================================================================
+    /**
+    * Sets the buffer sample size
+    *
+    * @param[in] p_command  The buffer sample size command.
+    */
+    void comBufsize(Command p_command);
 
+    //=========================================================================================================
+    /**
+    * Sets the fiff simulation file
+    *
+    * @param[in] p_command  The fiff simulation file command.
+    */
+    void comSimfile(Command p_command);
 
-
-
-
-
+    //////////
 
     //=========================================================================================================
     /**

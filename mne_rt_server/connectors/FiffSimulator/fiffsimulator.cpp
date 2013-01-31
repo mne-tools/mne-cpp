@@ -127,6 +127,73 @@ FiffSimulator::~FiffSimulator()
 
 //*************************************************************************************************************
 
+void FiffSimulator::comBufsize(Command p_command)
+{
+    //ToDO JSON
+
+    quint32 t_uiBuffSize = p_command.pValues()[0].toUInt();
+
+    if(t_uiBuffSize > 0)
+    {
+//        printf("bufsize %d\n", t_uiBuffSize);
+
+        requestSetBufferSize(t_uiBuffSize);
+
+        QString str = QString("\tSet %1 buffer sample size to %2 samples\r\n\n").arg(getName()).arg(t_uiBuffSize);
+
+        m_commandManager["bufsize"].reply(str);
+    }
+    else
+        m_commandManager["bufsize"].reply("Buffer size not set\r\n");
+}
+
+
+//*************************************************************************************************************
+
+void FiffSimulator::comSimfile(Command p_command)
+{
+    //
+    // simulation file
+    //
+    QFile t_file(p_command.pValues()[0].toString());
+
+    QString t_sResourceDataPathOld = m_sResourceDataPath;
+
+    if(t_file.exists())
+    {
+        m_sResourceDataPath = p_command.pValues()[0].toString();
+        m_RawInfo = FiffRawData();
+
+        if (this->readRawInfo())
+        {
+            m_pFiffProducer->stop();
+            this->stop();
+
+            m_commandManager["simfile"].reply("New simulation file set succefully.\r\n");
+        }
+        else
+        {
+            qDebug() << "Didn't set new file";
+            m_sResourceDataPath = t_sResourceDataPathOld;
+
+            m_commandManager["simfile"].reply("Simulation file not set.\r\n");
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void FiffSimulator::connectCommandManager()
+{
+    //Connect slots
+    m_commandManager.connectSlot(QString("bufsize"), this, &FiffSimulator::comBufsize);
+    m_commandManager.connectSlot(QString("simfile"), this, &FiffSimulator::comSimfile);
+}
+
+
+//*************************************************************************************************************
+
 ConnectorID FiffSimulator::getConnectorID() const
 {
     return _FIFFSIMULATOR;
