@@ -124,7 +124,8 @@ void FiffStreamServer::comStart(Command p_command)
 {
     qint32 t_id = -1;
     QString t_sOutput("");
-    t_sOutput.append(parseToId(p_command.pValues()[0].toString(),t_id));
+    QString t_sAlias(p_command.pValues()[0].toString());
+    t_sOutput.append(parseToId(t_sAlias,t_id));
 
     if(t_id != -1)
     {
@@ -143,7 +144,8 @@ void FiffStreamServer::comStop(Command p_command)
 {
     qint32 t_id = -1;
     QString t_sOutput("");
-    t_sOutput.append(parseToId(p_command.pValues()[0].toString(),t_id));
+    QString t_sAlias(p_command.pValues()[0].toString());
+    t_sOutput.append(parseToId(t_sAlias,t_id));
 
     if(t_id != -1)
     {
