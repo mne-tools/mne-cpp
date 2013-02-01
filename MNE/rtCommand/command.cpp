@@ -148,22 +148,6 @@ void Command::execute()
 }
 
 
-////*************************************************************************************************************
-
-//void Command::verify(const Command &p_Command)
-//{
-//    if(QString::compare(this->m_sCommand, p_Command.m_sCommand) == 0 && p_Command.m_mapParameters.size() == this->m_mapParameters.size())
-//    {
-//        for(qint32 i = 0; i < this->m_mapParameters.size(); ++i)
-//            if(this->m_mapParameters.values()[i].type() != p_Command.m_mapParameters.values()[i].type())
-//                return;
-//        this->m_mapParameters.values() = p_Command.m_mapParameters.values();
-
-//        emit this->received(*this);
-//    }
-//}
-
-
 //*************************************************************************************************************
 
 void Command::reply(const QString &p_sReply)

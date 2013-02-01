@@ -173,11 +173,17 @@ void FiffStreamServer::connectCommands()
     //Connect slots
     MNERTServer* t_pMNERTServer = qobject_cast<MNERTServer*> (this->parent());
 
-    t_pMNERTServer->getCommandManager().connectSlot(QString("clist"), this, &FiffStreamServer::comClist);
-    t_pMNERTServer->getCommandManager().connectSlot(QString("measinfo"), this, &FiffStreamServer::comMeasinfo);
-    t_pMNERTServer->getCommandManager().connectSlot(QString("start"), this, &FiffStreamServer::comStart);
-    t_pMNERTServer->getCommandManager().connectSlot(QString("stop"), this, &FiffStreamServer::comStop);
-    t_pMNERTServer->getCommandManager().connectSlot(QString("stop-all"), this, &FiffStreamServer::comStopAll);
+    QObject::connect(&t_pMNERTServer->getCommandManager()["clist"], &Command::executed, this, &FiffStreamServer::comClist);
+    QObject::connect(&t_pMNERTServer->getCommandManager()["measinfo"], &Command::executed, this, &FiffStreamServer::comMeasinfo);
+    QObject::connect(&t_pMNERTServer->getCommandManager()["start"], &Command::executed, this, &FiffStreamServer::comStart);
+    QObject::connect(&t_pMNERTServer->getCommandManager()["stop"], &Command::executed, this, &FiffStreamServer::comStop);
+    QObject::connect(&t_pMNERTServer->getCommandManager()["stop-all"], &Command::executed, this, &FiffStreamServer::comStopAll);
+
+//    t_pMNERTServer->getCommandManager().connectSlot(QString("clist"), this, &FiffStreamServer::comClist);
+//    t_pMNERTServer->getCommandManager().connectSlot(QString("measinfo"), this, &FiffStreamServer::comMeasinfo);
+//    t_pMNERTServer->getCommandManager().connectSlot(QString("start"), this, &FiffStreamServer::comStart);
+//    t_pMNERTServer->getCommandManager().connectSlot(QString("stop"), this, &FiffStreamServer::comStop);
+//    t_pMNERTServer->getCommandManager().connectSlot(QString("stop-all"), this, &FiffStreamServer::comStopAll);
 }
 
 

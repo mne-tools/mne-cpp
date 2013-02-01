@@ -30,7 +30,5 @@ DataParserTest::DataParserTest(QObject *parent)
     m_commandManager.insert(QString("close"), QString("closes mne_rt_server"));
 
 
-    m_commandManager.connectSlot(QString("help"), this, &DataParserTest::helpReceived);
-
-//    QObject::connect(&m_commandManager["help"], &Command::received, this, &DataParserTest::helpReceived);
+    QObject::connect(&m_commandManager["help"], &Command::executed, this, &DataParserTest::helpReceived);
 }

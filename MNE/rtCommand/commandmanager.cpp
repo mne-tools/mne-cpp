@@ -72,7 +72,7 @@ CommandManager::CommandManager(const QJsonDocument &p_jsonDoc, bool p_bIsActive,
 CommandManager::~CommandManager()
 {
     //Disconnect all connections which are created with the help of this manager.
-    this->disconnectAll();
+//    this->disconnectAll();
 
     //Remove commands which where inserted into the static command list
 
@@ -80,21 +80,21 @@ CommandManager::~CommandManager()
 }
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-void CommandManager::disconnectAll()
-{
+//void CommandManager::disconnectAll()
+//{
 
-    //DIsconnect reply channel
-    QObject::disconnect(m_conReplyChannel);
-    //Disconnect Slots
-    QMap<QString, QMetaObject::Connection>::Iterator it;
-    for(it = m_qMapSlots.begin(); it != m_qMapSlots.end(); ++it)
-        QObject::disconnect(it.value());
-    //Disconnect Signals
-    for(it = m_qMapSignals.begin(); it != m_qMapSignals.end(); ++it)
-        QObject::disconnect(it.value());
-}
+//    //Disconnect reply channel
+//    QObject::disconnect(m_conReplyChannel);
+//    //Disconnect Slots
+////    QMap<QString, QMetaObject::Connection>::Iterator it;
+////    for(it = m_qMapSlots.begin(); it != m_qMapSlots.end(); ++it)
+////        QObject::disconnect(it.value());
+////    //Disconnect Signals
+////    for(it = m_qMapSignals.begin(); it != m_qMapSignals.end(); ++it)
+////        QObject::disconnect(it.value());
+//}
 
 
 //*************************************************************************************************************
