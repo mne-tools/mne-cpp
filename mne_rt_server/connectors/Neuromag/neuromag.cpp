@@ -91,11 +91,10 @@ Neuromag::Neuromag()
 , m_pInfo(new FiffInfo())
 , m_bIsRunning(false)
 , m_iID(-1)
+, m_uiBufferSampleSize(100)
+, m_pRawMatrixBuffer(NULL)
 {
-    this->setBufferSampleSize(100);
-    m_pRawMatrixBuffer = NULL;
     this->init();
-//    this->start();
 }
 
 
@@ -254,7 +253,7 @@ void Neuromag::requestSetBufferSize(quint32 p_uiBuffSize)
 
         this->stop();
 
-        this->setBufferSampleSize(p_uiBuffSize);
+        m_uiBufferSampleSize = p_uiBuffSize;
 
         this->start();
     }
