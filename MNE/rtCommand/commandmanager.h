@@ -277,7 +277,7 @@ bool CommandManager::connectSignal(QString &p_sCommand, const typename QtPrivate
     if(!this->hasCommand(p_sCommand))
         return false;
 
-    QMetaObject::Connection t_qConnection = QObject::connect(sender, signal, &s_commandMap[p_sCommand], &Command::send);
+    QMetaObject::Connection t_qConnection = QObject::connect(sender, signal, &m_qMapCommands[p_sCommand], &Command::send);
     m_qMapSignals.insertMulti(p_sCommand, t_qConnection);
 
     return true;
