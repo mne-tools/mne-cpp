@@ -44,9 +44,16 @@
 #include "neuromag_global.h"
 #include "../../mne_rt_server/IConnector.h"
 
-#include <fiff/fiff_info.h>
 
-//#include "circularbuffer.h"
+//*************************************************************************************************************
+//=============================================================================================================
+// MNE INCLUDES
+//=============================================================================================================
+
+#include <fiff/fiff_raw_data.h>
+#include <generics/circularmatrixbuffer.h>
+
+#include <fiff/fiff_info.h>
 
 
 //*************************************************************************************************************
@@ -73,6 +80,7 @@ namespace NeuromagPlugin
 //=============================================================================================================
 
 using namespace RTSERVER;
+using namespace IOBuffer;
 
 
 //*************************************************************************************************************
@@ -95,7 +103,6 @@ class NEUROMAGSHARED_EXPORT Neuromag : public IConnector
     Q_PLUGIN_METADATA(IID "mne_rt_server/1.0" FILE "neuromag.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(RTSERVER::IConnector)
-
 
     friend class DacqServer;
 
@@ -161,8 +168,15 @@ private:
 
     int             m_iID;
 
-    bool            m_bIsRunning;
+    quint32         m_uiBufferSampleSize;   /**< Sample size of the buffer */
 
+    RawMatrixBuffer* m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
+
+
+
+
+
+    bool            m_bIsRunning;
 
 };
 

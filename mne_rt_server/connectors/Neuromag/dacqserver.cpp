@@ -292,8 +292,8 @@ void DacqServer::run()
     //
     // Make sure the buffer size is at least as big as the minimal buffer size
     //
-    if(m_pNeuromag->getBufferSampleSize() < MIN_BUFLEN)
-        m_pNeuromag->setBufferSampleSize(MIN_BUFLEN);
+    if(m_pNeuromag->m_uiBufferSampleSize < MIN_BUFLEN)
+        m_pNeuromag->m_uiBufferSampleSize = MIN_BUFLEN;
 
     int  t_iOriginalMaxBuflen = 1500;// set the standard size as long as we can't get it without setting it
     // this doesn't work without reseting it
@@ -303,8 +303,8 @@ void DacqServer::run()
     //            collector_close();
     //            return;
     //        }
-    if (m_pNeuromag->getBufferSampleSize() < MIN_BUFLEN) {
-        fprintf(stderr, "%s: Too small Neuromag buffer length requested, should be at least %d\n", m_pNeuromag->getBufferSampleSize(), MIN_BUFLEN);
+    if (m_pNeuromag->m_uiBufferSampleSize < MIN_BUFLEN) {
+        fprintf(stderr, "%s: Too small Neuromag buffer length requested, should be at least %d\n", m_pNeuromag->m_uiBufferSampleSize, MIN_BUFLEN);
         return;
     }
     else {
@@ -313,8 +313,8 @@ void DacqServer::run()
             printf("Cannot change the Neuromag buffer length: Could not open collector connection\n");//dacq_log("Cannot change the Neuromag buffer length: Could not open collector connection\n");
             return;
         }
-        printf("Changing the Neuromag buffer length to %d... ", m_pNeuromag->getBufferSampleSize());//dacq_log("Changing the Neuromag buffer length to %d\n", newMaxBuflen);
-        if (m_pCollectorSock->setMaxBuflen(m_pNeuromag->getBufferSampleSize())) {
+        printf("Changing the Neuromag buffer length to %d... ", m_pNeuromag->m_uiBufferSampleSize);//dacq_log("Changing the Neuromag buffer length to %d\n", newMaxBuflen);
+        if (m_pCollectorSock->setMaxBuflen(m_pNeuromag->m_uiBufferSampleSize)) {
             printf("Setting a new Neuromag buffer length failed\r\n");//dacq_log("Setting a new Neuromag buffer length failed\n");
             m_pCollectorSock->close();
             return;
@@ -376,7 +376,7 @@ void DacqServer::run()
             m_pNeuromag->m_pRawMatrixBuffer = NULL;
 
             if(!m_pNeuromag->m_pInfo->isEmpty())
-                m_pNeuromag->m_pRawMatrixBuffer = new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_pNeuromag->m_pInfo->nchan, m_pNeuromag->getBufferSampleSize());
+                m_pNeuromag->m_pRawMatrixBuffer = new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_pNeuromag->m_pInfo->nchan, m_pNeuromag->m_uiBufferSampleSize);
         }
         else
             m_bIsRunning = false;
@@ -417,11 +417,11 @@ void DacqServer::run()
             case FIFF_DATA_BUFFER:
                 if(nchan > 0)
                 {
-                    t_nSamplesNew = t_nSamples + m_pNeuromag->getBufferSampleSize() - 1;
+                    t_nSamplesNew = t_nSamples + m_pNeuromag->m_uiBufferSampleSize - 1;
                     printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", t_nSamples, t_nSamplesNew, ((float)t_nSamples) / sfreq, ((float)t_nSamplesNew) / sfreq );
-                    t_nSamples += m_pNeuromag->getBufferSampleSize();
+                    t_nSamples += m_pNeuromag->m_uiBufferSampleSize;
                     
-                    MatrixXf* t_pMatrix = new MatrixXf( (Map<MatrixXi>( (int*) t_pTag->data(), nchan, m_pNeuromag->getBufferSampleSize())).cast<float>());
+                    MatrixXf* t_pMatrix = new MatrixXf( (Map<MatrixXi>( (int*) t_pTag->data(), nchan, m_pNeuromag->m_uiBufferSampleSize)).cast<float>());
 
 //                    std::cout << "Matrix Xf " << t_pMatrix->block(0,0,1,4);
                     m_pNeuromag->m_pRawMatrixBuffer->push(t_pMatrix);
