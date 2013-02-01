@@ -379,8 +379,8 @@ void MNERTServer::init()
     m_commandManager.insert(t_jsonDocumentOrigin);
 
     //connect slots
-    m_commandManager.connectSlot(QString("help"), this, &MNERTServer::comHelp);
-    m_commandManager.connectSlot(QString("close"), this, &MNERTServer::comClose);
+    QObject::connect(&m_commandManager["help"], &Command::executed, this, &MNERTServer::comHelp);
+    QObject::connect(&m_commandManager["close"], &Command::executed, this, &MNERTServer::comClose);
 }
 
 

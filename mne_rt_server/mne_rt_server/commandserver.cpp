@@ -137,7 +137,8 @@ void CommandServer::registerCommandManager(CommandManager &p_commandManager)
     //Attach Observer to Subject
     m_commandParser.attach(&p_commandManager);
     //Register Reply Channel
-    p_commandManager.registerResponseChannel(&m_commandParser, &CommandParser::response);
+//    p_commandManager.registerResponseChannel(&m_commandParser, &CommandParser::response);
+    QObject::connect(&p_commandManager, &CommandManager::response, &m_commandParser, &CommandParser::response);
 }
 
 

@@ -222,15 +222,6 @@ public:
     */
     inline QList<QVariant>& pValues();
 
-//    //=========================================================================================================
-//    /**
-//    * Receiver slot which performs parameter check before the received signal is emmited
-//    * If parameter check is passed, values are assigned to this object instance.
-//    *
-//    * @param p_Command  Command which was received and has to be checked before it's emmited.
-//    */
-//    void verify(const Command &p_Command);
-
     //=========================================================================================================
     /**
     * Inherited command reply channel.

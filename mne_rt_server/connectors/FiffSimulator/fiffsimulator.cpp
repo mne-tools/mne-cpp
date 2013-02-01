@@ -198,8 +198,8 @@ void FiffSimulator::comSimfile(Command p_command)
 void FiffSimulator::connectCommandManager()
 {
     //Connect slots
-    m_commandManager.connectSlot(QString("bufsize"), this, &FiffSimulator::comBufsize);
-    m_commandManager.connectSlot(QString("simfile"), this, &FiffSimulator::comSimfile);
+    QObject::connect(&m_commandManager["bufsize"], &Command::executed, this, &FiffSimulator::comBufsize);
+    QObject::connect(&m_commandManager["simfile"], &Command::executed, this, &FiffSimulator::comSimfile);
 }
 
 

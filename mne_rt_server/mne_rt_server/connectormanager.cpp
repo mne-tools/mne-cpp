@@ -296,10 +296,10 @@ void ConnectorManager::connectCommands()
     //Connect slots
     MNERTServer* t_pMNERTServer = qobject_cast<MNERTServer*> (this->parent());
 
-    t_pMNERTServer->getCommandManager().connectSlot(QString("conlist"), this, &ConnectorManager::comConlist);
-    t_pMNERTServer->getCommandManager().connectSlot(QString("selcon"), this, &ConnectorManager::comSelcon);
-    t_pMNERTServer->getCommandManager().connectSlot(QString("start"), this, &ConnectorManager::comStart);
-    t_pMNERTServer->getCommandManager().connectSlot(QString("stop-all"), this, &ConnectorManager::comStopAll);
+    QObject::connect(&t_pMNERTServer->getCommandManager()["conlist"], &Command::executed, this, &ConnectorManager::comConlist);
+    QObject::connect(&t_pMNERTServer->getCommandManager()["selcon"], &Command::executed, this, &ConnectorManager::comSelcon);
+    QObject::connect(&t_pMNERTServer->getCommandManager()["start"], &Command::executed, this, &ConnectorManager::comStart);
+    QObject::connect(&t_pMNERTServer->getCommandManager()["stop-all"], &Command::executed, this, &ConnectorManager::comStopAll);
 }
 
 
