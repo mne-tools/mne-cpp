@@ -172,7 +172,6 @@ private:
 
     RawMatrixBuffer* m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
 
-
     bool            m_bIsRunning;
 };
 
