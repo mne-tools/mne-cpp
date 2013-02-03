@@ -122,15 +122,13 @@ public:
     */
     virtual ~Neuromag();
 
-    virtual QByteArray availableCommands();
+    virtual void connectCommandManager();
 
     virtual ConnectorID getConnectorID() const;
 
     virtual const char* getName() const;
 
-
-    virtual bool parseCommand(QStringList& p_qCommandList, QByteArray& p_blockOutputInfo);
-
+    virtual void info(qint32 ID);
 
     virtual bool start();
 
@@ -140,14 +138,6 @@ public:
     void releaseMeasInfo();
 
 //public slots: --> in Qt 5 not anymore declared as slot
-
-    virtual void requestMeasInfo(qint32 ID);
-
-    virtual void requestMeas();
-
-    virtual void requestMeasStop();
-
-    virtual void requestSetBufferSize(quint32 p_uiBuffSize);
 
 protected:
     virtual void run();
@@ -171,10 +161,6 @@ private:
     quint32         m_uiBufferSampleSize;   /**< Sample size of the buffer */
 
     RawMatrixBuffer* m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
-
-
-
-
 
     bool            m_bIsRunning;
 
