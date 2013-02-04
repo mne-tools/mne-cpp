@@ -110,6 +110,10 @@ void RtClient::run()
 
     qint32 clientId = t_dataClient.getClientId();
 
+    // requestCommands
+    t_cmdClient.requestCommands();
+
+
     // read meas info
     t_cmdClient.requestMeasInfo(clientId);
 

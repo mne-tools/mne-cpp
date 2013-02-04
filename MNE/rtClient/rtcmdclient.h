@@ -117,6 +117,12 @@ public:
 
     //=========================================================================================================
     /**
+    * Request available commands from mne_rt_server
+    */
+    void requestCommands();
+
+    //=========================================================================================================
+    /**
     * Request measurement information to send it to a specified (id) client
     *
     * @param[in] p_id   ID of the client to send the measurement information to
