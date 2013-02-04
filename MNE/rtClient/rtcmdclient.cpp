@@ -117,7 +117,7 @@ void RtCmdClient::requestMeasInfo(const QString &p_Alias)
 
 void RtCmdClient::requestMeas(qint32 p_id)
 {
-    QString t_sCommand = QString("meas %1").arg(p_id);
+    QString t_sCommand = QString("start %1").arg(p_id);
     this->sendCommand(t_sCommand);
 }
 
@@ -126,7 +126,7 @@ void RtCmdClient::requestMeas(qint32 p_id)
 
 void RtCmdClient::requestMeas(QString p_Alias)
 {
-    QString t_sCommand = QString("meas %1").arg(p_Alias);
+    QString t_sCommand = QString("start %1").arg(p_Alias);
     this->sendCommand(t_sCommand);
 }
 
@@ -137,4 +137,20 @@ void RtCmdClient::stopAll()
 {
     QString t_sCommand = QString("stop-all");
     this->sendCommand(t_sCommand);
+}
+
+
+//*************************************************************************************************************
+
+Command& RtCmdClient::operator[] (const QString &key)
+{
+    return m_commandManager[key];
+}
+
+
+//*************************************************************************************************************
+
+const Command RtCmdClient::operator[] (const QString &key) const
+{
+    return m_commandManager[key];
 }
