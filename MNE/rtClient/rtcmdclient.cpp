@@ -97,6 +97,27 @@ QString RtCmdClient::sendCommand(const QString &p_sCommand)
 
 //*************************************************************************************************************
 
+void RtCmdClient::requestCommands()
+{
+    QString t_sCommand =
+            "{"
+            "   \"commands\": {"
+            "       \"help\": {"
+            "        }"
+            "    }"
+            "}";
+
+    QByteArray t_sJsonCommands = this->sendCommand(t_sCommand).toLatin1();
+
+    QJsonDocument t_jsonDocumentOrigin = QJsonDocument::fromJson(t_sJsonCommands);
+    m_commandManager.insert(t_jsonDocumentOrigin);
+
+    qDebug() << "Received Commands" << m_commandManager.commandMap().keys();
+}
+
+
+//*************************************************************************************************************
+
 void RtCmdClient::requestMeasInfo(qint32 p_id)
 {
     QString t_sCommand = QString("measinfo %1").arg(p_id);

@@ -210,6 +210,7 @@ QStringList Command::toStringList() const
     return p_stringCommandList;
 }
 
+
 //*************************************************************************************************************
 
 Command& Command::operator= (const Command &rhs)
