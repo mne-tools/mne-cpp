@@ -1,7 +1,16 @@
 {
     "encoding": "UTF-8",
     "device": "Neuromag",
-    "description": "Vector View",
+    "description": "Vector View 306",
     "commands": {
+        "bufsize": {
+            "description": "Sets the buffer size of the FiffStreamClient raw data buffer.",
+            "parameters": {
+                "samples": {
+                    "description": "samples",
+                    "type": "uint"
+                }
+            }
+        }
     }
 }

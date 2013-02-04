@@ -113,13 +113,39 @@ Neuromag::~Neuromag()
 
 //*************************************************************************************************************
 
-QByteArray Neuromag::availableCommands()
+void Neuromag::comBufsize(Command p_command)
 {
-    QByteArray t_blockCmdInfoList;
+    quint32 t_uiBuffSize = p_command.pValues()[0].toUInt();
 
-//    t_blockCmdInfoList.append(QString("\t### %1 connector###\r\n").arg(this->getName()));
+    if(t_uiBuffSize > 0)
+    {
+        qDebug() << "void Neuromag::setBufferSize: " << t_uiBuffSize;
 
-    return t_blockCmdInfoList;
+        bool t_bWasRunning = m_bIsRunning;
+
+        if(m_bIsRunning)
+            this->stop();
+
+        m_uiBufferSampleSize = t_uiBuffSize;
+
+        if(t_bWasRunning)
+            this->start();
+
+        QString str = QString("\tSet %1 buffer sample size to %2 samples\r\n\n").arg(getName()).arg(t_uiBuffSize);
+
+        m_commandManager["bufsize"].reply(str);
+    }
+    else
+        m_commandManager["bufsize"].reply("Buffer size not set\r\n");
+}
+
+
+//*************************************************************************************************************
+
+void Neuromag::connectCommandManager()
+{
+    //Connect slots
+    QObject::connect(&m_commandManager["bufsize"], &Command::executed, this, &Neuromag::comBufsize);
 }
 
 
@@ -149,55 +175,7 @@ void Neuromag::init()
 
 //*************************************************************************************************************
 
-bool Neuromag::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo)
-{
-    bool success = false;
-
-    return success;
-}
-
-
-//*************************************************************************************************************
-
-bool Neuromag::start()
-{
-    // Start thread
-    m_pDacqServer->start();
-
-    QThread::start();
-
-    return true;
-}
-
-
-//*************************************************************************************************************
-
-bool Neuromag::stop()
-{
-    m_bIsRunning = false;
-    QThread::wait();//ToDo: This thread will never be terminated when circular buffer is blocking the thread (happens when circularbuffer is empty)
-    
-    m_pDacqServer->m_bIsRunning = false;
-    m_pDacqServer->wait();
-
-    qDebug() << "bool Neuromag::stop()";
-
-    return true;
-}
-
-
-//*************************************************************************************************************
-
-void Neuromag::releaseMeasInfo()
-{
-    if(!m_pInfo->isEmpty())
-        emit remitMeasInfo(m_iID, m_pInfo);
-}
-
-
-//*************************************************************************************************************
-
-void Neuromag::requestMeasInfo(qint32 ID)
+void Neuromag::info(qint32 ID)
 {
     m_iID = ID;
 
@@ -226,37 +204,42 @@ void Neuromag::requestMeasInfo(qint32 ID)
 
 //*************************************************************************************************************
 
-void Neuromag::requestMeas()
+void Neuromag::releaseMeasInfo()
 {
-    qDebug() << "void Neuromag::requestMeas()";
+    if(!m_pInfo->isEmpty())
+        emit remitMeasInfo(m_iID, m_pInfo);
+}
+
+//*************************************************************************************************************
+
+bool Neuromag::start()
+{
+    qDebug() << "bool Neuromag::start()";
 
     m_pDacqServer->m_bMeasRequest = true;
-    this->start();
+
+    // Start thread
+    m_pDacqServer->start();
+
+    QThread::start();
+
+    return true;
 }
 
 
 //*************************************************************************************************************
 
-void Neuromag::requestMeasStop()
+bool Neuromag::stop()
 {
-    this->stop();
-}
+    m_bIsRunning = false;
+    QThread::wait();//ToDo: This thread will never be terminated when circular buffer is blocking the thread (happens when circularbuffer is empty)
+    
+    m_pDacqServer->m_bIsRunning = false;
+    m_pDacqServer->wait();
 
+    qDebug() << "bool Neuromag::stop()";
 
-//*************************************************************************************************************
-
-void Neuromag::requestSetBufferSize(quint32 p_uiBuffSize)
-{
-    if(p_uiBuffSize > 0)
-    {
-        qDebug() << "void Neuromag::setBufferSize: " << p_uiBuffSize;
-
-        this->stop();
-
-        m_uiBufferSampleSize = p_uiBuffSize;
-
-        this->start();
-    }
+    return true;
 }
 
 

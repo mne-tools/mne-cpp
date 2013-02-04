@@ -143,6 +143,16 @@ protected:
     virtual void run();
 
 private:
+
+    //Slots
+    //=========================================================================================================
+    /**
+    * Sets the buffer sample size
+    *
+    * @param[in] p_command  The buffer sample size command.
+    */
+    void comBufsize(Command p_command);
+
     //=========================================================================================================
     /**
     * Initialise the FiffSimulator.
