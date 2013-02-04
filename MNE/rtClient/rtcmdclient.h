@@ -45,6 +45,8 @@
 //=============================================================================================================
 
 #include "rtclient_global.h"
+#include <rtCommand/commandmanager.h>
+#include <rtCommand/command.h>
 
 
 //*************************************************************************************************************
@@ -66,6 +68,13 @@
 namespace RTCLIENTLIB
 {
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace RTCOMMANDLIB;
 
 //=============================================================================================================
 /**
@@ -144,10 +153,31 @@ public:
     */
     void stopAll();
 
+    //=========================================================================================================
+    /**
+    * Subscript operator [] to access commands by command name
+    *
+    * @param[in] key    the command key word.
+    *
+    * @return Command object related to command key word.
+    */
+    Command& operator[] (const QString &key);
+
+    //=========================================================================================================
+    /**
+    * Subscript operator [] to access commands by command name
+    *
+    * @param key    the command key word.
+    *
+    * @return Command object related to command key word.
+    */
+    const Command operator[] (const QString &key) const;
 signals:
-    
-public slots:
-    
+
+
+private:
+    CommandManager m_commandManager;
+
 };
 
 } // NAMESPACE

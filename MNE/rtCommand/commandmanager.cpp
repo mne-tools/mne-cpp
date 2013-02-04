@@ -80,23 +80,6 @@ CommandManager::~CommandManager()
 }
 
 
-////*************************************************************************************************************
-
-//void CommandManager::disconnectAll()
-//{
-
-//    //Disconnect reply channel
-//    QObject::disconnect(m_conReplyChannel);
-//    //Disconnect Slots
-////    QMap<QString, QMetaObject::Connection>::Iterator it;
-////    for(it = m_qMapSlots.begin(); it != m_qMapSlots.end(); ++it)
-////        QObject::disconnect(it.value());
-////    //Disconnect Signals
-////    for(it = m_qMapSignals.begin(); it != m_qMapSignals.end(); ++it)
-////        QObject::disconnect(it.value());
-//}
-
-
 //*************************************************************************************************************
 
 void CommandManager::init()
@@ -149,47 +132,6 @@ void CommandManager::insert(const QString &p_sKey, const Command &p_command)
     emit commandMapChanged();
 }
 
-////*************************************************************************************************************
-
-//QJsonObject CommandManager::toJsonObject() const
-//{
-//    QJsonObject p_jsonCommandsObject;
-
-//    QMap<QString, Command>::ConstIterator it;
-//    for(it = m_qMapCommands.begin(); it != m_qMapCommands.end(); ++it)
-//        p_jsonCommandsObject.insert(it.key(),QJsonValue(it.value().toJsonObject()));
-
-//    return p_jsonCommandsObject;
-//}
-
-
-////*************************************************************************************************************
-
-//QString CommandManager::toString() const
-//{
-//    QString p_sOutput("");
-
-//    QMap<QString, Command>::ConstIterator it;
-//    for(it = m_qMapCommands.begin(); it != m_qMapCommands.end(); ++it)
-//    {
-//        QStringList t_sCommandList = it.value().toStringList();
-//        QString t_sCommand;
-//        t_sCommand.append(QString("\t%1").arg(t_sCommandList[0]));
-
-//        for(qint32 i = 0; i < 2 - (int)floor((double)t_sCommandList[0].size()/8.0); ++i)
-//            t_sCommand.append(QString("\t"));
-//        t_sCommand.append(t_sCommandList[1]);
-
-//        for(qint32 i = 0; i < 3 - (int)floor((double)t_sCommandList[1].size()/8.0); ++i)
-//            t_sCommand.append(QString("\t"));
-//        t_sCommand.append(QString("%1\n\r").arg(t_sCommandList[2]));
-
-//        p_sOutput.append(t_sCommand);
-//    }
-
-//    return p_sOutput;
-//}
-
 
 //*************************************************************************************************************
 
@@ -227,73 +169,6 @@ void CommandManager::update(Subject* p_pSubject)
 
         m_qMapCommands[t_sCommandName].execute();
     }
-
-
-
-//    if(p_sInput.size() <= 0)
-//        return false;
-//    //Check if JSON format;
-//    bool isJson  = false;
-//    if(QString::compare(p_sInput.at(0), QString("{")) == 0)
-//        isJson = true;
-
-//    if(isJson)
-//    {
-//        Command parsedCommand;
-//        qDebug() << "JSON commands recognized";
-//    }
-//    else
-//    {
-//        Command parsedCommand;
-
-//        QStringList t_qCommandList = sInput.split(" ");
-
-//        if(this->hasCommand(t_qCommandList[0]))
-//        {
-//            if(t_qCommandList.size() == 1) //No parameters
-//                parsedCommand = Command(t_qCommandList[0], QString(""), false);
-//            else
-//            {
-//                // check if number of parameters is right
-//                if(t_qCommandList.size()-1 == m_commandMap[t_qCommandList[0]].pValues().size())
-//                {
-//                    qDebug() << "Parameter parsing";
-//                    //Parse Parameters
-//                    for(qint32 i = 1; i < t_qCommandList.size(); ++i)
-//                    {
-//                        QVariant::Type t_type = m_commandMap[t_qCommandList[0]].pValues()[i - 1].type();
-
-//                        QVariant t_param(t_qCommandList[i]);
-
-//                        if(t_param.canConvert(t_type) && t_param.convert(t_type))
-//                            m_commandMap[t_qCommandList[0]].pValues()[i - 1] = t_param;
-//                        else
-//                            return false;
-//                    }
-//                }
-//                else
-//                    return false;
-//            }
-
-//            m_commandMap[t_qCommandList[0]].verify(parsedCommand);
-
-
-//            return true;
-//        }
-//    }
-
-//    return false;
-
-
-
-
-
-
-
-
-
-
-
 }
 
 
@@ -311,4 +186,3 @@ const Command CommandManager::operator[] (const QString &key) const
 {
     return m_qMapCommands[key];
 }
-

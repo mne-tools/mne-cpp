@@ -57,7 +57,6 @@ public:
 
     explicit CommandManager(const QJsonDocument &p_jsonDoc, bool p_bIsActive = true, QObject *parent = 0);
 
-
     virtual ~CommandManager();
 
     //=========================================================================================================
@@ -70,40 +69,6 @@ public:
     {
         return m_qMapCommands;
     }
-
-//    //=========================================================================================================
-//    /**
-//    * This creates a managed slot connection to a signal of a specified command executed.
-//    * Even its possible to connect a slot directly to a command signal - it'shighly recommended to use this managed connection.
-//    *
-//    * @param p_sCommand     Command to connect to.
-//    * @param receiver       Object which provides the slot.
-//    * @param slot           Member function to connect commands signal to.
-//    *
-//    * @return true if successfull, false otherwise
-//    */
-//    template <typename Func2>
-//    bool connectSlot(QString &p_sCommand, const typename QtPrivate::FunctionPointer<Func2>::Object *receiver, Func2 slot);
-
-//    //=========================================================================================================
-//    /**
-//    * This creates a managed signal connection to trigger a specified command.
-//    * Even its possible to connect a signal directly to a command slot - it'shighly recommended to use this managed connection.
-//    *
-//    * @param p_sCommand     Command to connect to.
-//    * @param sender         Object which provides the signal.
-//    * @param signal         Member function to connect commands signal to.
-//    *
-//    * @return true if successfull, false otherwise
-//    */
-//    template <typename Func1>
-//    bool connectSignal(QString &p_sCommand, const typename QtPrivate::FunctionPointer<Func1>::Object *sender, Func1 signal);
-
-//    //=========================================================================================================
-//    /**
-//    * Disconnects all managed signals and slots.
-//    */
-//    void disconnectAll();
 
     //=========================================================================================================
     /**
@@ -150,19 +115,6 @@ public:
     */
     inline bool isActive() const;
 
-//    //=========================================================================================================
-//    /**
-//    * Register reply Channel
-//    *
-//    * @param p_sCommand     Command to connect to.
-//    * @param receiver       Object which provides the slot.
-//    * @param slot           Member function to connect commands signal to.
-//    *
-//    * @return true if successfull, false otherwise
-//    */
-//    template <typename Func2>
-//    bool registerResponseChannel(const typename QtPrivate::FunctionPointer<Func2>::Object *receiver, Func2 slot);
-
     //=========================================================================================================
     /**
     * Sets the activation status of the CommandManager.
@@ -170,22 +122,6 @@ public:
     * @param [in] status the new activation status of the CommandManager.
     */
     inline void setStatus(bool status);
-
-//    //=========================================================================================================
-//    /**
-//    * Creates an object of JSON Command Objects
-//    *
-//    * @return JSON Command Objects converted to a JSON Object.
-//    */
-//    QJsonObject toJsonObject() const;
-
-//    //=========================================================================================================
-//    /**
-//    * Formats commands for e.g. command line output.
-//    *
-//    * @return Commands with parameters and descriptions.
-//    */
-//    QString toString() const;
 
     //=========================================================================================================
     /**
@@ -226,12 +162,7 @@ private:
 
     bool m_bIsActive;
 
-//    QMap<QString, QMetaObject::Connection> m_qMapSlots;
-//    QMap<QString, QMetaObject::Connection> m_qMapSignals;
-
-
     QMetaObject::Connection m_conReplyChannel;      /**< The reply channel of the command manager. */
-
 
     QMap<QString, Command> m_qMapCommands;          /**< Holds a map as an internal lookuptable of available commands. */
 
@@ -255,47 +186,6 @@ signals:
 //=============================================================================================================
 // INLINE DEFINITIONS & TEMPLATES
 //=============================================================================================================
-
-//template <typename Func2>
-//bool CommandManager::connectSlot(QString &p_sCommand, const typename QtPrivate::FunctionPointer<Func2>::Object *receiver, Func2 slot)
-//{
-//    if(!this->hasCommand(p_sCommand))
-//        return false;
-
-//    QMetaObject::Connection qConnection = QObject::connect(&m_qMapCommands[p_sCommand], &Command::executed, receiver, slot);
-//    m_qMapSlots.insertMulti(p_sCommand, qConnection);
-
-//    return true;
-//}
-
-
-////*************************************************************************************************************
-
-//template <typename Func1>
-//bool CommandManager::connectSignal(QString &p_sCommand, const typename QtPrivate::FunctionPointer<Func1>::Object *sender, Func1 signal)
-//{
-//    if(!this->hasCommand(p_sCommand))
-//        return false;
-
-//    QMetaObject::Connection t_qConnection = QObject::connect(sender, signal, &m_qMapCommands[p_sCommand], &Command::send);
-//    m_qMapSignals.insertMulti(p_sCommand, t_qConnection);
-
-//    return true;
-//}
-
-
-////*************************************************************************************************************
-
-//template <typename Func2>
-//bool CommandManager::registerResponseChannel(const typename QtPrivate::FunctionPointer<Func2>::Object *receiver, Func2 slot)
-//{
-//    QObject::disconnect(m_conReplyChannel);
-//    m_conReplyChannel = QObject::connect(this, &CommandManager::response, receiver, slot);
-//    return true;
-//}
-
-
-//*************************************************************************************************************
 
 inline bool CommandManager::hasCommand(const QString &p_sCommand) const
 {
