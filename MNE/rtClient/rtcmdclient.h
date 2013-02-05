@@ -107,6 +107,16 @@ public:
 
     //=========================================================================================================
     /**
+    * Checks if a command is managed;
+    *
+    * @param p_sCommand     COmmand to check.
+    *
+    * @return true if part of command manager, false otherwise
+    */
+    inline bool hasCommand(const QString &p_sCommand) const;
+
+    //=========================================================================================================
+    /**
     * Sends a command to a connected mne_rt_server
     *
     * @param[in] p_sCommand    The command to send
@@ -185,6 +195,16 @@ private:
     CommandManager m_commandManager;
 
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline bool RtCmdClient::hasCommand(const QString &p_sCommand) const
+{
+    return m_commandManager.hasCommand(p_sCommand);
+}
 
 } // NAMESPACE
 
