@@ -202,8 +202,8 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
             }
         }
     }
-    bool do_debug = false;
 
+    bool do_debug = false;
     //
     // Make mult sparse
     //
@@ -327,6 +327,8 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
                     else
                         printf("Data Storage Format not known jet [3]!! Type: %d\n", t_pTag->type);
                 }
+                if(t_pTag)
+                    delete t_pTag;
             }
             //
             //  The picking logic is a bit complicated
