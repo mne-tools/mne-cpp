@@ -45,6 +45,15 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QDateTime>
+#include <QThread>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -59,7 +68,7 @@ using namespace RTCLIENTLIB;
 RtCmdClient::RtCmdClient(QObject *parent)
 : QTcpSocket(parent)
 {
-
+    QObject::connect(&m_commandManager, &CommandManager::triggered, this, &RtCmdClient::sendCommandJSON);
 }
 
 
@@ -73,7 +82,7 @@ void RtCmdClient::connectToHost(QString &p_sRtServerHostName)
 
 //*************************************************************************************************************
 
-QString RtCmdClient::sendCommand(const QString &p_sCommand)
+QString RtCmdClient::sendCLICommand(const QString &p_sCommand)
 {
     QString t_sCommand = QString("%1\n").arg(p_sCommand);
     QString p_sReply;
@@ -97,6 +106,35 @@ QString RtCmdClient::sendCommand(const QString &p_sCommand)
 
 //*************************************************************************************************************
 
+void RtCmdClient::sendCommandJSON(const Command &p_command)
+{
+    QString t_sCommand = QString("{\"commands\":{%1}}\n").arg(p_command.toStringReadySend());
+    QString t_sReply;
+
+    if(this->state() == QAbstractSocket::ConnectedState)
+    {
+        printf("%s",t_sCommand.toLatin1().constData());
+
+        this->write(t_sCommand.toUtf8().constData(),t_sCommand.size());
+        this->waitForBytesWritten();
+
+        //thats not the most elegant way
+        this->waitForReadyRead(1000);
+        QByteArray t_qByteArrayRaw;
+        while (this->bytesAvailable() > 0 && this->canReadLine())
+            t_qByteArrayRaw += this->readAll();
+
+        t_sReply = QString(t_qByteArrayRaw);
+    }
+    m_qMutex.lock();
+    m_sAvailableData.append(t_sReply);
+    m_qMutex.unlock();
+    emit response(t_sReply);
+}
+
+
+//*************************************************************************************************************
+
 void RtCmdClient::requestCommands()
 {
     QString t_sCommand =
@@ -107,7 +145,7 @@ void RtCmdClient::requestCommands()
             "    }"
             "}";
 
-    QByteArray t_sJsonCommands = this->sendCommand(t_sCommand).toLatin1();
+    QByteArray t_sJsonCommands = this->sendCLICommand(t_sCommand).toLatin1();
 
     QJsonDocument t_jsonDocumentOrigin = QJsonDocument::fromJson(t_sJsonCommands);
     m_commandManager.insert(t_jsonDocumentOrigin);
@@ -116,48 +154,67 @@ void RtCmdClient::requestCommands()
 }
 
 
+////*************************************************************************************************************
+
+//void RtCmdClient::requestMeasInfo(qint32 p_id)
+//{
+//    QString t_sCommand = QString("measinfo %1").arg(p_id);
+//    this->sendCommand(t_sCommand);
+//}
+
+
+////*************************************************************************************************************
+
+//void RtCmdClient::requestMeasInfo(const QString &p_Alias)
+//{
+//    QString t_sCommand = QString("measinfo %1").arg(p_Alias);
+//    this->sendCommand(t_sCommand);
+//}
+
+
+////*************************************************************************************************************
+
+//void RtCmdClient::requestMeas(qint32 p_id)
+//{
+//    QString t_sCommand = QString("start %1").arg(p_id);
+//    this->sendCommand(t_sCommand);
+//}
+
+
+////*************************************************************************************************************
+
+//void RtCmdClient::requestMeas(QString p_Alias)
+//{
+//    QString t_sCommand = QString("start %1").arg(p_Alias);
+//    this->sendCommand(t_sCommand);
+//}
+
+
+////*************************************************************************************************************
+
+//void RtCmdClient::stopAll()
+//{
+//    QString t_sCommand = QString("stop-all");
+//    this->sendCommand(t_sCommand);
+//}
+
+
 //*************************************************************************************************************
 
-void RtCmdClient::requestMeasInfo(qint32 p_id)
+bool RtCmdClient::waitForDataAvailable(qint32 msecs) const
 {
-    QString t_sCommand = QString("measinfo %1").arg(p_id);
-    this->sendCommand(t_sCommand);
-}
+    if(m_sAvailableData.size() > 0)
+        return true;
 
+    qint64 t_msecsStart = QDateTime::currentMSecsSinceEpoch();
 
-//*************************************************************************************************************
-
-void RtCmdClient::requestMeasInfo(const QString &p_Alias)
-{
-    QString t_sCommand = QString("measinfo %1").arg(p_Alias);
-    this->sendCommand(t_sCommand);
-}
-
-
-//*************************************************************************************************************
-
-void RtCmdClient::requestMeas(qint32 p_id)
-{
-    QString t_sCommand = QString("start %1").arg(p_id);
-    this->sendCommand(t_sCommand);
-}
-
-
-//*************************************************************************************************************
-
-void RtCmdClient::requestMeas(QString p_Alias)
-{
-    QString t_sCommand = QString("start %1").arg(p_Alias);
-    this->sendCommand(t_sCommand);
-}
-
-
-//*************************************************************************************************************
-
-void RtCmdClient::stopAll()
-{
-    QString t_sCommand = QString("stop-all");
-    this->sendCommand(t_sCommand);
+    while(msecs == -1 || (qint64)msecs < QDateTime::currentMSecsSinceEpoch() - t_msecsStart)
+    {
+        QThread::msleep(5);
+        if(m_sAvailableData.size() > 0)
+            return true;
+    }
+    return false;
 }
 
 

@@ -104,23 +104,29 @@ void RtClient::run()
     t_dataClient.setClientAlias("mne_source_lab"); // used in option 2 later on
 
 //    // example commands
-//    qDebug() << t_cmdClient.sendCommand("help");
-//    qDebug() << t_cmdClient.sendCommand("clist");
-//    qDebug() << t_cmdClient.sendCommand("conlist");
-
+//    t_cmdClient["help"].send();
+//    t_cmdClient.waitForDataAvailable(1000);
+//    qDebug() << t_cmdClient.readAvailableData();
+//    t_cmdClient["clist"].send();
+//    t_cmdClient.waitForDataAvailable(1000);
+//    qDebug() << t_cmdClient.readAvailableData();
+//    t_cmdClient["conlist"].send();
+//    t_cmdClient.waitForDataAvailable(1000);
+//    qDebug() << t_cmdClient.readAvailableData();
     qint32 clientId = t_dataClient.getClientId();
 
     // requestCommands
     t_cmdClient.requestCommands();
 
-
     // read meas info
-    t_cmdClient.requestMeasInfo(clientId);
+    t_cmdClient["measinfo"].pValues()[0].setValue(clientId);
+    t_cmdClient["measinfo"].send();
 
     m_pFiffInfo = new FiffInfo(t_dataClient.readInfo());
 
     // start measurement
-    t_cmdClient.requestMeas(clientId);
+    t_cmdClient["start"].pValues()[0].setValue(clientId);
+    t_cmdClient["start"].send();
 
     MatrixXf t_matRawBuffer;
 

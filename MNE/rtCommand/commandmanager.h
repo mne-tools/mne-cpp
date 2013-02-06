@@ -169,8 +169,13 @@ private:
 signals:
     void commandMapChanged();//(QStringList)
 
-//    void triggered(Command);
-//    void received(Command);
+    //=========================================================================================================
+    /**
+    * Is emitted when a command is ready to send
+    *
+    * @param p_command  Command which should be send
+    */
+    void triggered(Command p_command);
 
     //=========================================================================================================
     /**

@@ -58,6 +58,7 @@
 #include <QSharedPointer>
 #include <QString>
 #include <QTcpSocket>
+#include <QMutex>
 
 
 //*************************************************************************************************************
@@ -117,13 +118,31 @@ public:
 
     //=========================================================================================================
     /**
-    * Sends a command to a connected mne_rt_server
+    * Sends a command line formatted command to a connected mne_rt_server
     *
     * @param[in] p_sCommand    The command to send
     *
     * @return mne_rt_server reply
     */
-    QString sendCommand(const QString &p_sCommand);
+    QString sendCLICommand(const QString &p_sCommand);
+
+    //=========================================================================================================
+    /**
+    * Sends a command to a connected mne_rt_server
+    *
+    * @param[in] p_command    The command to send
+    *
+    * @return mne_rt_server reply
+    */
+    void sendCommandJSON(const Command &p_command);
+
+    //=========================================================================================================
+    /**
+    * Returns the available data.
+    *
+    * @return the available data.
+    */
+    inline QString readAvailableData();
 
     //=========================================================================================================
     /**
@@ -133,41 +152,13 @@ public:
 
     //=========================================================================================================
     /**
-    * Request measurement information to send it to a specified (id) client
+    * Wait for ready read until data are available.
     *
-    * @param[in] p_id   ID of the client to send the measurement information to
-    */
-    void requestMeasInfo(qint32 p_id);
-
-    //=========================================================================================================
-    /**
-    * Request measurement information to send it to a specified (alias) client
+    * @param[in] msecs  time to wait in milliseconds, if -1 function will not time out. Default value is 30000.
     *
-    * @param[in] p_Alias    Alias of the client to send the measurement information to
+    * @return Command object related to command key word.
     */
-    void requestMeasInfo(const QString &p_Alias);
-
-    //=========================================================================================================
-    /**
-    * Request measurement and send raw data to a specified (id) client
-    *
-    * @param[in] p_id   ID of the client to send the measurement to
-    */
-    void requestMeas(qint32 p_id);
-
-    //=========================================================================================================
-    /**
-    * Request measurement and send raw data to a specified (alias) client
-    *
-    * @param[in] p_Alias   Alias of the client to send the measurement to
-    */
-    void requestMeas(QString p_Alias);
-
-    //=========================================================================================================
-    /**
-    * stop data acquistion and sending measurements to all clients
-    */
-    void stopAll();
+    bool waitForDataAvailable(qint32 msecs = 30000) const;
 
     //=========================================================================================================
     /**
@@ -188,18 +179,39 @@ public:
     * @return Command object related to command key word.
     */
     const Command operator[] (const QString &key) const;
-signals:
 
+signals:
+    //=========================================================================================================
+    /**
+    * Emits the received response.
+    *
+    * @param[in] p_sResponse    the received response
+    */
+    void response(QString p_sResponse);
 
 private:
-    CommandManager m_commandManager;
-
+    CommandManager  m_commandManager;   /**< The command manager. */
+    QMutex          m_qMutex;           /**< Access serialization between threads */
+    QString         m_sAvailableData;   /**< The last received response. */
 };
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+inline QString RtCmdClient::readAvailableData()
+{
+    m_qMutex.lock();
+    QString p_sResponse = m_sAvailableData;
+    m_sAvailableData.clear();
+    m_qMutex.unlock();
+
+    return p_sResponse;
+}
+
+
+//*************************************************************************************************************
 
 inline bool RtCmdClient::hasCommand(const QString &p_sCommand) const
 {

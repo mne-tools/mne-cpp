@@ -120,7 +120,7 @@ bool CommandParser::parse(const QString &p_sInput, QStringList &p_qListCommandsP
         for(it = t_jsonObjectCommand.begin(); it != t_jsonObjectCommand.end(); ++it)
         {
             //Print Command
-            printf("%s", it.key().toLatin1().constData());
+            printf("%s\r\n", it.key().toLatin1().constData());
 
             if(exists(it.key()))
             {
@@ -148,7 +148,7 @@ bool CommandParser::parse(const QString &p_sInput, QStringList &p_qListCommandsP
         QStringList t_qCommandList = p_sInput.split(" ");
 
         //Print command
-        printf("%s", t_qCommandList[0].toLatin1().constData());
+        printf("%s\r\n", t_qCommandList[0].toLatin1().constData());
 
         if(!exists(t_qCommandList[0]))
         {
