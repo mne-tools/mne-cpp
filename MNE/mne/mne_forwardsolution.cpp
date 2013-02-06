@@ -408,6 +408,72 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution &p_fwdOut, 
 
 //*************************************************************************************************************
 
+MNEForwardSolution MNEForwardSolution::pick_channels_forward(const QStringList& include, const QStringList& exclude) const
+{
+    MNEForwardSolution fwd(*this);
+
+    if(include.size() == 0 && exclude.size() == 0)
+        return fwd;
+
+    RowVectorXi sel = FiffInfo::pick_channels(fwd.sol->row_names, include, exclude);
+
+    // Do we have something?
+    quint32 nuse = sel.size();
+
+    if (nuse == 0)
+    {
+        printf("Nothing remains after picking. Returning original forward solution.\n");
+        return fwd;
+    }
+    printf("\t%d out of %d channels remain after picking\n", nuse, fwd.nchan);
+
+    //   Pick the correct rows of the forward operator
+
+    MatrixXd newData(nuse, fwd.sol->data.cols());
+    for(qint32 i = 0; i < nuse; ++i)
+        newData.row(i) = fwd.sol->data.row(sel[i]);
+
+    fwd.sol->data = newData;
+    fwd.sol->nrow = nuse;
+
+    qDebug() << "ToDo...";
+
+//ch_names = [fwd['sol']['row_names'][k] for k in sel]
+//fwd['nchan'] = nuse
+//fwd['sol']['row_names'] = ch_names
+
+//fwd['info']['chs'] = [fwd['info']['chs'][k] for k in sel]
+//fwd['info']['nchan'] = nuse
+//fwd['info']['bads'] = [b for b in fwd['info']['bads'] if b in ch_names]
+
+//if fwd['sol_grad'] is not None:
+//    fwd['sol_grad']['data'] = fwd['sol_grad']['data'][sel, :]
+//    fwd['sol_grad']['nrow'] = nuse
+//    fwd['sol_grad']['row_names'] = [fwd['sol_grad']['row_names'][k]
+//                                    for k in sel]
+
+
+
+    return fwd;
+}
+
+//*************************************************************************************************************
+
+MNEForwardSolution MNEForwardSolution::pick_types_forward(const FiffInfo &info, bool meg, bool eeg, const QStringList& include, const QStringList& exclude) const
+{
+    RowVectorXi sel = info.pick_types(meg, eeg, false, include, exclude);
+
+    QStringList include_ch_names;
+    qDebug() << "sel.cols() " << sel.cols();
+    for(qint32 i = 0; i < sel.cols(); ++i)
+        include_ch_names << info.ch_names[sel[i]];
+
+    return this->pick_channels_forward(include_ch_names);
+}
+
+
+//*************************************************************************************************************
+
 bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForwardSolution& fwd, bool force_fixed, bool surf_ori, QStringList& include, QStringList& exclude)
 {
     FiffStream* t_pStream = new FiffStream(&p_IODevice);

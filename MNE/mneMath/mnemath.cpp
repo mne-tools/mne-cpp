@@ -89,6 +89,31 @@ VectorXd* MNEMath::combine_xyz(const VectorXd& vec)
 
 //*************************************************************************************************************
 
+void MNEMath::get_whitener(MatrixXd& A, bool pca, QString& ch_type, VectorXd& eig, MatrixXd& eigvec)
+{
+    // whitening operator
+    qint32 rnk = MNEMath::rank(A);
+    SelfAdjointEigenSolver<MatrixXd> t_eigenSolver(A);
+    qDebug() << "check whether eigvec has to be transposed.";
+    eig = t_eigenSolver.eigenvalues();
+    for(qint32 i = rnk; i < eig.size(); ++i)
+        eig(i) = 0;
+    eigvec = t_eigenSolver.eigenvectors();
+    printf("Setting small %s eigenvalues to zero.\n", ch_type.toLatin1().constData());
+    if (!pca)  // No PCA case.
+        printf("Not doing PCA for %s\n", ch_type.toLatin1().constData());
+    else
+    {
+        printf("Doing PCA for %s.",ch_type.toLatin1().constData());
+        // This line will reduce the actual number of variables in data
+        // and leadfield to the true rank.
+        eigvec.conservativeResize(eigvec.rows(), rnk);
+    }
+}
+
+
+//*************************************************************************************************************
+
 //    static inline MatrixXd extract_block_diag(MatrixXd& A, qint32 n)
 //    {
 
@@ -179,4 +204,19 @@ SparseMatrix<double>* MNEMath::make_block_diag(const MatrixXd* A, qint32 n)
                 bd->insert(r+current_row,c+current_col) = (*A)(r, c+current_col);
     }
     return bd;
+}
+
+
+//*************************************************************************************************************
+
+qint32 MNEMath::rank(MatrixXd& A, double tol)
+{
+    JacobiSVD<MatrixXd> t_svdA(A);//U and V are not computed
+    VectorXd s = t_svdA.singularValues();
+    double t_dMax = s.maxCoeff();
+    t_dMax *= tol;
+    int sum = 0;
+    for(qint32 i = 0; i < s.size(); ++i)
+        sum += s[i] > t_dMax ? 1 : 0;
+    return sum;
 }

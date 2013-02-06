@@ -40,6 +40,9 @@
 
 #include "fiff_cov.h"
 
+#include <iostream>
+#include <MNEMath/mnemath.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -47,6 +50,7 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace MNEMATHLIB;
 
 
 //*************************************************************************************************************
@@ -104,4 +108,136 @@ void FiffCov::clear()
     nfree = -1;
     eig = VectorXd();
     eigvec = MatrixXd();
+}
+
+
+//*************************************************************************************************************
+
+FiffCov FiffCov::prepare_noise_cov(FiffInfo& p_Info, QStringList& p_ChNames)
+{
+    FiffCov p_NoiseCov(*this);
+
+    VectorXi C_ch_idx = VectorXi::Zero(p_NoiseCov.names.size());
+    qint32 count = 0;
+    for(qint32 i = 0; i < p_ChNames.size(); ++i)
+    {
+        qint32 idx = p_NoiseCov.names.indexOf(p_ChNames[i]);
+        if(idx > -1)
+        {
+            C_ch_idx[count] = idx;
+            ++count;
+        }
+    }
+    C_ch_idx.conservativeResize(count);
+
+    MatrixXd C(count, count);
+    for(qint32 i = 0; i < count; ++i)
+        for(qint32 j = 0; j < count; ++j)
+            C(i,j) = p_NoiseCov.data(C_ch_idx(i), C_ch_idx(j));
+
+    MatrixXd proj;
+    qint32 ncomp = p_Info.make_projector_info(proj);
+
+    //Create the projection operator
+    if (ncomp > 0)
+    {
+        printf("Created an SSP operator (subspace dimension = %d)\n", ncomp);
+
+        C = proj * (C * proj.transpose());
+    }
+
+    MatrixXi pick_meg = p_Info.pick_types(true, false, false, defaultQStringList, p_Info.bads);
+    MatrixXi pick_eeg = p_Info.pick_types(false, true, false, defaultQStringList, p_Info.bads);
+
+    QStringList meg_names, eeg_names;
+
+    for(qint32 i = 0; i < pick_meg.size(); ++i)
+        meg_names << p_Info.chs[pick_meg(0,i)].ch_name;
+    VectorXi C_meg_idx = VectorXi::Zero(p_NoiseCov.names.size());
+    count = 0;
+    for(qint32 k = 0; k < C.rows(); ++k)
+    {
+        if(meg_names.indexOf(p_ChNames[k]) > -1)
+        {
+            C_meg_idx(count) = k;
+            ++count;
+        }
+    }
+    if(count > 0)
+        C_meg_idx.conservativeResize(count);
+    else
+        C_meg_idx = VectorXi();
+
+    //
+    for(qint32 i = 0; i < pick_eeg.size(); ++i)
+        eeg_names << p_Info.chs[pick_eeg(0,i)].ch_name;
+    VectorXi C_eeg_idx = VectorXi::Zero(p_NoiseCov.names.size());
+    count = 0;
+    for(qint32 k = 0; k < C.rows(); ++k)
+    {
+        if(eeg_names.indexOf(p_ChNames[k]) > -1)
+        {
+            C_eeg_idx(count) = k;
+            ++count;
+        }
+    }
+
+    if(count > 0)
+        C_eeg_idx.conservativeResize(count);
+    else
+        C_eeg_idx = VectorXi();
+
+    bool has_meg = C_meg_idx.size() > 0;
+    bool has_eeg = C_eeg_idx.size() > 0;
+
+    MatrixXd C_meg, C_eeg;
+    if (has_meg)
+    {
+        count = C_meg_idx.rows();
+        C_meg = MatrixXd(count,count);
+        for(qint32 i = 0; i < count; ++i)
+            for(qint32 j = 0; j < count; ++j)
+                C_meg(i,j) = C(C_meg_idx(i), C_meg_idx(j));
+
+        VectorXd C_meg_eig;
+        MatrixXd C_meg_eigvec;
+        MNEMath::get_whitener(C_meg, false, QString("MEG"), C_meg_eig, C_meg_eigvec);
+    }
+
+    if (has_eeg)
+    {
+        count = C_eeg_idx.rows();
+        C_eeg = MatrixXd(count,count);
+        for(qint32 i = 0; i < count; ++i)
+            for(qint32 j = 0; j < count; ++j)
+                C_eeg(i,j) = C(C_eeg_idx(i), C_eeg_idx(j));
+
+        VectorXd C_eeg_eig;
+        MatrixXd C_eeg_eigvec;
+        MNEMath::get_whitener(C_eeg, false, QString("EEG"), C_eeg_eig, C_eeg_eigvec);
+    }
+
+    qint32 n_chan = p_ChNames.size();
+    p_NoiseCov.eigvec = MatrixXd::Zero(n_chan, n_chan);
+    p_NoiseCov.eig = VectorXd::Zero(n_chan);
+
+//    if(has_meg)
+//    {
+//        p_NoiseCov.eigvec[np.ix_(C_meg_idx, C_meg_idx)] = C_meg_eigvec
+//        p_NoiseCov.eig[C_meg_idx] = C_meg_eig
+//    }
+//    if(has_eeg)
+//    {
+//        p_NoiseCov.eigvec[np.ix_(C_eeg_idx, C_eeg_idx)] = C_eeg_eigvec
+//        p_NoiseCov.eig[C_eeg_idx] = C_eeg_eig
+//    }
+
+    if (C_meg_idx.size() + C_eeg_idx.size() == n_chan)
+        return FiffCov();
+
+    p_NoiseCov.dim = p_ChNames.size();
+    p_NoiseCov.diag = false;
+    p_NoiseCov.names = p_ChNames;
+
+    return p_NoiseCov;
 }

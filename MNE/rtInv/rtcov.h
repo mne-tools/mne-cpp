@@ -50,6 +50,7 @@
 //=============================================================================================================
 
 #include <fiff/fiff_cov.h>
+#include <fiff/fiff_info.h>
 
 
 //*************************************************************************************************************
@@ -116,7 +117,7 @@ public:
     *
     * @param[in] parent     Parent QObject (optional)
     */
-    explicit RtCov(QObject *parent = 0);
+    explicit RtCov(FiffInfo::SPtr p_pFiffInfo, QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -150,6 +151,8 @@ protected:
     virtual void run();
 
 private:
+    FiffInfo::SPtr  m_pFiffInfo;
+
     QMutex      mutex;                  /**< Provides access serialization between threads*/
     bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
     bool        m_bIsRawBufferInit;     /**< If raw buffer is initialized.*/
@@ -165,14 +168,14 @@ signals:
     *
     * @param[out] p_Cov  The covariance matrix -> ToDo replace this by fiffCov Shared Data Pointer.
     */
-    void covCalculated(Eigen::MatrixXf p_Cov);
+    void covCalculated(FIFFLIB::FiffCov p_Cov);
 };
 
 } // NAMESPACE
 
-#ifndef metatype_matrixxf
-#define metatype_matrixxf
-Q_DECLARE_METATYPE(Eigen::MatrixXf);    /**< Provides QT META type declaration of the Eigen::MatrixXf type. For signal/slot usage.*/
+#ifndef metatype_fiffcov
+#define metatype_fiffcov
+Q_DECLARE_METATYPE(FIFFLIB::FiffCov); /**< Provides QT META type declaration of the FIFFLIB::FiffCov type. For signal/slot usage.*/
 #endif
 
 #endif // RTCOV_H
