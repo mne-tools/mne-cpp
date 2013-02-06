@@ -38,9 +38,9 @@ include(../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += generics \
+    mneMath \
     fs \
     fiff \
-    mneMath \
     mne \
     rtCommand \
     rtClient \

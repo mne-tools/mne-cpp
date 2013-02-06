@@ -80,39 +80,38 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     SourceLab t_SourceLab;
-//    QObject::connect(&t_SourceLab, SIGNAL(closeSourceLab()), &app, SLOT(quit()));
+    QObject::connect(&t_SourceLab, SIGNAL(closeSourceLab()), &app, SLOT(quit()));
 
 
+    GeometryView view;
 
-//    GeometryView view;
-
-//    if (view.stereoType() != QGLView::RedCyanAnaglyph)
-//        view.camera()->setEyeSeparation(0.3f);
-//    QStringList args = QCoreApplication::arguments();
-//    int w_pos = args.indexOf("-width");
-//    int h_pos = args.indexOf("-height");
-//    if (w_pos >= 0 && h_pos >= 0)
-//    {
-//        bool ok = true;
-//        int w = args.at(w_pos + 1).toInt(&ok);
-//        if (!ok)
-//        {
-//            qWarning() << "Could not parse width argument:" << args;
-//            return 1;
-//        }
-//        int h = args.at(h_pos + 1).toInt(&ok);
-//        if (!ok)
-//        {
-//            qWarning() << "Could not parse height argument:" << args;
-//            return 1;
-//        }
-//        view.resize(w, h);
-//    }
-//    else
-//    {
-//        view.resize(800, 600);
-//    }
-//    view.show();
+    if (view.stereoType() != QGLView::RedCyanAnaglyph)
+        view.camera()->setEyeSeparation(0.3f);
+    QStringList args = QCoreApplication::arguments();
+    int w_pos = args.indexOf("-width");
+    int h_pos = args.indexOf("-height");
+    if (w_pos >= 0 && h_pos >= 0)
+    {
+        bool ok = true;
+        int w = args.at(w_pos + 1).toInt(&ok);
+        if (!ok)
+        {
+            qWarning() << "Could not parse width argument:" << args;
+            return 1;
+        }
+        int h = args.at(h_pos + 1).toInt(&ok);
+        if (!ok)
+        {
+            qWarning() << "Could not parse height argument:" << args;
+            return 1;
+        }
+        view.resize(w, h);
+    }
+    else
+    {
+        view.resize(800, 600);
+    }
+    view.show();
 
     return app.exec();
 }
