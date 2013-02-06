@@ -48,6 +48,14 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}MneMathd
+}
+else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}MneMath
+}
+
 DESTDIR = $${MNE_LIBRARY_DIR}
 
 #

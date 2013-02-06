@@ -865,7 +865,7 @@ bool FiffStream::read_meas_info(const FiffDirTree& p_Node, FiffInfo& info, FiffD
     //
     info.chs = chs;
     for (qint32 c = 0; c < info.nchan; ++c)
-        info.ch_names << info.chs.at(c).ch_name;
+        info.ch_names << info.chs[c].ch_name;
 
     //
     //  Add the coordinate transformations

@@ -177,6 +177,35 @@ public:
 
     //=========================================================================================================
     /**
+    * mne.fiff.pick_channels_forward
+    *
+    * Pick channels from forward operator
+    *
+    * @param[in] include    List of channels to include. (if None, include all available).
+    * @param[in] exclude    Channels to exclude (if None, do not exclude any).
+    *
+    * @return Forward solution restricted to selected channel types.
+    */
+    MNEForwardSolution pick_channels_forward(const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
+
+    //=========================================================================================================
+    /**
+    * mne.fiff.pick_types_forward
+    *
+    * Pick by channel type and names from a forward operator
+    *
+    * @param[in] info       Fiff measurement info
+    * @param[in] meg        Include MEG channels
+    * @param[in] eeg        Include EEG channels
+    * @param[in] include    Additional channels to include (if empty, do not add any)
+    * @param[in] exclude    Channels to exclude (if empty, do not exclude any)
+    *
+    * @return Forward solution restricted to selected channel types.
+    */
+    MNEForwardSolution pick_types_forward(const FiffInfo &info, bool meg, bool eeg, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
+
+    //=========================================================================================================
+    /**
     *
     */
 //    VectorXi tripletSelection(VectorXi& p_vecIdxSelection)

@@ -53,6 +53,8 @@
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
+#include <Eigen/Eigen>
+//#include <Eigen/SVD>
 
 
 //*************************************************************************************************************
@@ -85,6 +87,7 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
+* ToDo make this a template class
 * Generalized math methods used by mne methods
 *
 * @brief Math methods
@@ -101,6 +104,8 @@ public:
 
     //=========================================================================================================
     /**
+    * ToDo make this a template function
+    *
     * mne_combine_xyz
     *
     * ### MNE toolbox root function ###
@@ -121,6 +126,19 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the whitener of a given matrix.
+    *
+    * @param[in] A      Matrix to compute the whitener from
+    * @param[in] pca    perform a pca
+    *
+    * @return rank of matrix A
+    */
+    static void get_whitener(MatrixXd& A, bool pca, QString& ch_type, VectorXd& eig, MatrixXd& eigvec);
+
+    //=========================================================================================================
+    /**
+    * ToDo make this a template function
+    *
     * ### MNE toolbox root function ###: Implementation of the mne_block_diag function - encoding part
     *
     * Make a sparse block diagonal matrix
@@ -135,6 +153,19 @@ public:
     * @return A sparse block diagonal, diagonalized from the elements in "A".
     */
     static SparseMatrix<double>* make_block_diag(const MatrixXd* A, qint32 n);
+
+    //=========================================================================================================
+    /**
+    * ToDo make this a template function
+    *
+    * Returns the rank of a matrix A.
+    *
+    * @param[in] A      Matrix to get the rank from
+    * @param[in] tol    realtive threshold: biggest singualr value multiplied with tol is smallest singular value considered non-zero
+    *
+    * @return rank of matrix A
+    */
+    static qint32 rank(MatrixXd& A, double tol = 1e-8);
 };
 
 
