@@ -158,7 +158,13 @@ private:
     FiffInfo::SDPtr m_pFiffInfo;        /**< Fiff measurement info.*/
 
 signals:
-    void rawBufferReceived(Eigen::MatrixXf p_rawBuffer);    /**< Emits a received raw buffer - ToDo change the emits to fiff raw data.*/
+    //=========================================================================================================
+    /**
+    * Emits a received raw buffer - ToDo change the emits to fiff raw data.
+    *
+    * @param[in] p_rawBuffer    the received raw buffer
+    */
+    void rawBufferReceived(Eigen::MatrixXf p_rawBuffer);
 };
 
 } // NAMESPACE

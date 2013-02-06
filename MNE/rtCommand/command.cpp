@@ -163,7 +163,9 @@ void Command::reply(const QString &p_sReply)
 
 void Command::send()
 {
-    emit this->triggered(*this);
+    CommandManager* t_commandManager = static_cast<CommandManager*> (this->parent());
+    if(t_commandManager)
+        emit t_commandManager->triggered(*this);
 }
 
 
@@ -208,6 +210,29 @@ QStringList Command::toStringList() const
     p_stringCommandList << m_sDescription;
 
     return p_stringCommandList;
+}
+
+
+//*************************************************************************************************************
+
+QString Command::toStringReadySend() const
+{
+    QString p_stringCommand;
+
+    QString t_sParameters;
+    for(qint32 i = 0; i < m_qListParamNames.size(); ++i)
+    {
+        qDebug() << m_qListParamValues[i];
+
+        t_sParameters.append(QString("\"%1\":\"%2\"").arg(m_qListParamNames[i]).arg(m_qListParamValues[i].toString()));
+
+        if(i < m_qListParamNames.size()-1)
+            t_sParameters.append(",");
+    }
+
+    p_stringCommand.append(QString("\"%1\":{%2}").arg(m_sCommand).arg(t_sParameters));
+
+    return p_stringCommand;
 }
 
 

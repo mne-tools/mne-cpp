@@ -254,6 +254,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Creates a string JSON formatted ready send command.
+    *
+    * @return Command as a JSON formatted string which contains parameter values too.
+    */
+    QString Command::toStringReadySend() const;
+
+    //=========================================================================================================
+    /**
     * Assignment Operator
     *
     * @param[in] rhs     Command which should be assigned.
@@ -298,14 +306,6 @@ signals:
     * @param[in] p_command  the executed command.
     */
     void executed(Command p_command);
-
-    //=========================================================================================================
-    /**
-    * Signal which is emitted when send method is processed.
-    *
-    * @param[in] p_command      Command which should be send.
-    */
-    void triggered(Command p_command);
 
 public:
     bool                m_bIsJson;
