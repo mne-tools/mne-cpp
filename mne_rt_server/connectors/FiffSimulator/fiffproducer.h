@@ -116,7 +116,6 @@ protected:
     virtual void run();
 
 private:
-
     FiffSimulator*  m_pFiffSimulator;   /**< Holds a pointer to corresponding FiffSimulator.*/
     bool            m_bIsRunning;       /**< Holds whether ECGProducer is running.*/
 };
