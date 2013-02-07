@@ -70,20 +70,34 @@ SourceLab::SourceLab(QObject *parent)
 
     qRegisterMetaType<MatrixXf>("MatrixXf");
     qRegisterMetaType<MNEInverseOperator>("MNEInverseOperator");
+    qRegisterMetaType<FiffCov>("FiffCov");
 
     m_pRtClient = new RtClient("127.0.0.1", this);
     connect(m_pRtClient, &RtClient::rawBufferReceived,
             this, &SourceLab::receiveRawBuffer);
     this->start();
 
-    m_pRtCov = new RtCov(this);
-    connect(m_pRtClient, &RtClient::rawBufferReceived,
-            m_pRtCov, &RtCov::receiveDataSegment);
-    m_pRtCov->start();
+    // ToDo --> rtclient emit FiffInfoAvailable signal and call a slot here
+    //DIRTY HACK - following code has to be moved -> it waits until FiffInfo is available
+    bool t_bFiffInfoAvailable = false;
+    while(!t_bFiffInfoAvailable)
+    {
+        mutex.lock();
+        if(m_pRtClient->getFiffInfo().data()->ch_names.size() > 0)
+            t_bFiffInfoAvailable = true;
+        mutex.unlock();
+        sleep(1.0);
+    }
 
     m_pFiffInfo = FiffInfo::SPtr(new FiffInfo(*m_pRtClient->getFiffInfo().data()));
 
     m_pRtInv = new RtInv(m_pFiffInfo, m_pFwd, this);
+
+    m_pRtCov = new RtCov(m_pFiffInfo, this);
+    connect(m_pRtClient, &RtClient::rawBufferReceived,
+            m_pRtCov, &RtCov::receiveDataSegment);
+    m_pRtCov->start();
+
     connect(m_pRtCov, &RtCov::covCalculated,
             m_pRtInv, &RtInv::receiveNoiseCov);
     m_pRtInv->start();
