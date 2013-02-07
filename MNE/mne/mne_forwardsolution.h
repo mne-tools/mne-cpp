@@ -64,6 +64,7 @@
 #include "mne_global.h"
 #include "mne_sourcespace.h"
 
+#include <fiff/fiff_info_forward.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -284,7 +285,26 @@ public:
 //        qint32 nchan = chNames.size();
 //    }
 
+
+    //=========================================================================================================
+    /**
+    * Prepare forward for assembling the inverse operator
+    *
+    * @param[in] info       The measurement info to specify the channels to include. Bad channels in info['bads'] are not used.
+    * @param[in] noise_cov  The noise covariance matrix.
+    * @param[in] pca        Calculate pca or not.
+    * @param[out] p_outChNames  Selected channel names
+    * @param[out] p_outGain     Gain matrix
+    * @param[out] p_outNoiseCov noise covariance matrix
+    * @param[out] p_outWhitener Whitener
+    * @param[out] p_outRank     the rank (non zeros)
+    */
+    void prepare_forward(const FiffInfo &info, const FiffCov &noise_cov, bool pca, QStringList &p_outChNames, MatrixXd &p_outGain, FiffCov &p_outNoiseCov, MatrixXd &p_outWhitener, qint32 &p_outRank);
+
 private:
+
+
+
     //=========================================================================================================
     /**
     * Implementation of the read_one function in mne_read_forward_solution.m
@@ -300,6 +320,7 @@ private:
     static bool read_one(FiffStream* p_pStream, const FiffDirTree& p_Node, MNEForwardSolution& one);
 
 public:
+    FiffInfoForward::SDPtr info;        /**< light weighted measurement info */
     fiff_int_t source_ori;              /**< Source orientation: fixed or free */
     fiff_int_t coord_frame;             /**< Coil coordinate system definition */
     fiff_int_t nsource;                 /**< Number of source dipoles */

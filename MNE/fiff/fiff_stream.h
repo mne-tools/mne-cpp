@@ -103,6 +103,7 @@ class FiffTag;
 class FiffCtfComp;
 class FiffRawData;
 class FiffInfo;
+class FiffInfoForward;
 
 
 static FiffId defaultFiffId;
@@ -266,6 +267,19 @@ public:
     * @return the to measurement corresponding fiff_dir_tree.
     */
     bool read_meas_info(const FiffDirTree& p_Node, FiffInfo& p_Info, FiffDirTree& p_NodeInfo);
+
+    //=========================================================================================================
+    /**
+    * python read_forward_meas_info
+    *
+    * Read light measurement info from forward operator -> ToDo base class of FiffInfo
+    *
+    * @param[in] p_Node         The node of interest
+    * @param[out] p_InfoForward The read light measurement info
+    *
+    * @return the to measurement corresponding fiff_dir_tree.
+    */
+    bool read_meas_info_forward(const FiffDirTree& p_Node, FiffInfoForward& p_InfoForward);
 
     //=========================================================================================================
     /**

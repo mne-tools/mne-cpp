@@ -75,7 +75,8 @@ using namespace FSLIB;
 //=============================================================================================================
 
 MNEForwardSolution::MNEForwardSolution()
-: source_ori(-1)
+: info(new FiffInfoForward)
+, source_ori(-1)
 , coord_frame(-1)
 , nsource(-1)
 , nchan(-1)
@@ -94,7 +95,8 @@ MNEForwardSolution::MNEForwardSolution()
 //*************************************************************************************************************
 
 MNEForwardSolution::MNEForwardSolution(const MNEForwardSolution &p_MNEForwardSolution)
-: source_ori(p_MNEForwardSolution.source_ori)
+: info(p_MNEForwardSolution.info)
+, source_ori(p_MNEForwardSolution.source_ori)
 , coord_frame(p_MNEForwardSolution.coord_frame)
 , nsource(p_MNEForwardSolution.nsource)
 , nchan(p_MNEForwardSolution.nchan)
@@ -122,6 +124,7 @@ MNEForwardSolution::~MNEForwardSolution()
 
 void MNEForwardSolution::clear()
 {
+    info = new FiffInfoForward();
     source_ori = -1;
     coord_frame = -1;
     nsource = -1;
@@ -441,10 +444,17 @@ MNEForwardSolution MNEForwardSolution::pick_channels_forward(const QStringList& 
     fwd.nchan = nuse;
     fwd.sol->row_names = ch_names;
 
-//    qDebug() << "Info is not part of the forward solution jet.";
-//fwd['info']['chs'] = [fwd['info']['chs'][k] for k in sel]
-//fwd['info']['nchan'] = nuse
-//fwd['info']['bads'] = [b for b in fwd['info']['bads'] if b in ch_names]
+    QList<FiffChInfo> chs;
+    for(qint32 i = 0; i < sel.cols(); ++i)
+        chs.append(fwd.info->chs[sel(i)]);
+    fwd.info->chs = chs;
+    fwd.info->nchan = nuse;
+
+    QStringList bads;
+    for(qint32 i = 0; i < fwd.info->bads.size(); ++i)
+        if(ch_names.contains(fwd.info->bads[i]))
+            bads.append(fwd.info->bads[i]);
+    fwd.info->bads = bads;
 
     if(!fwd.sol_grad->isEmpty())
     {
@@ -474,6 +484,16 @@ MNEForwardSolution MNEForwardSolution::pick_types_forward(const FiffInfo &info, 
         include_ch_names << info.ch_names[sel[i]];
 
     return this->pick_channels_forward(include_ch_names);
+}
+
+
+//*************************************************************************************************************
+
+void MNEForwardSolution::prepare_forward(const FiffInfo &info, const FiffCov &noise_cov, bool pca, QStringList &p_outChNames, MatrixXd &p_outGain, FiffCov &p_outNoiseCov, MatrixXd &p_outWhitener, qint32 &p_outRank)
+{
+    QStringList fwd_ch_names;
+//    for(qint32 i = 0; i < this->)
+
 }
 
 
@@ -534,7 +554,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
     //
     //   Bad channel list
     //
-    QStringList bads = Fiff::read_bad_channels(t_pStream,t_Tree);
+    QStringList bads = t_pStream->read_bad_channels(t_Tree);
     printf("\t%d bad channels read\n",bads.size());
     qDebug() << bads;
 
@@ -675,6 +695,13 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
             }
         }
     }
+
+    //
+    // get parent MEG info -> from python package
+    //
+    t_pStream->read_meas_info_forward(t_Tree, *fwd.info.data());
+
+
     t_pStream->device()->close();
 
     //
@@ -701,7 +728,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
     //
     //   Handle the source locations and orientations
     //
-    if (fwd.source_ori == FIFFV_MNE_FIXED_ORI || force_fixed == true)
+    if (fwd.isFixedOrient() || force_fixed == true)
     {
         nuse = 0;
         fwd.source_rr = MatrixXd::Zero(fwd.nsource,3);
@@ -742,90 +769,87 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
             printf("[done]\n");
         }
     }
+    else if (surf_ori)
+    {
+        //
+        //   Rotate the local source coordinate systems
+        //
+        printf("\tConverting to surface-based source orientations...");
+        nuse = 0;
+        qint32 pp = 0;
+        fwd.source_rr = MatrixXd::Zero(fwd.nsource,3);
+        fwd.source_nn = MatrixXd::Zero(fwd.nsource*3,3);
+
+        printf(" (Warning: Rotating the source coordinate system haven't been verified --> Singular Vectors U are different from MATLAB!) ");
+
+        for(qint32 k = 0; k < t_SourceSpace.hemispheres.size();++k)
+        {
+
+            for (qint32 q = 0; q < t_SourceSpace.hemispheres[k].nuse; ++q)
+                fwd.source_rr.block(q+nuse,0,1,3) = t_SourceSpace.hemispheres[k].rr.block(t_SourceSpace.hemispheres[k].vertno(q),0,1,3);
+
+            for (qint32 p = 0; p < t_SourceSpace.hemispheres[k].nuse; ++p)
+            {
+                //
+                //  Project out the surface normal and compute SVD
+                //
+                Vector3d nn = t_SourceSpace.hemispheres[k].nn.block(t_SourceSpace.hemispheres[k].vertno(p),0,1,3).transpose();
+
+                Matrix3d tmp = Matrix3d::Identity() - nn*nn.transpose();
+
+                JacobiSVD<MatrixXd> t_svd(tmp, Eigen::ComputeThinU);
+
+                MatrixXd U(t_svd.matrixU());
+
+                //
+                //  Make sure that ez is in the direction of nn
+                //
+                if ((nn.transpose() * U.block(0,2,3,1))(0,0) < 0)
+                {
+                    U *= -1;
+                }
+
+                fwd.source_nn.block(pp, 0, 3, 3) = U.transpose();
+
+                pp += 3;
+            }
+            nuse += t_SourceSpace.hemispheres[k].nuse;
+        }
+        MatrixXd tmp = fwd.source_nn.transpose();
+        SparseMatrix<double>* surf_rot = MNEMath::make_block_diag(&tmp,3);
+
+        fwd.sol->data *= *surf_rot;
+
+        if (!fwd.sol_grad->isEmpty())
+        {
+            SparseMatrix<double> t_matKron;
+            SparseMatrix<double> t_eye(3,3);
+            for (qint32 i = 0; i < 3; ++i)
+                t_eye.insert(i,i) = 1.0f;
+            kroneckerProduct(*surf_rot,t_eye,t_matKron);//kron(surf_rot,eye(3));
+            fwd.sol_grad->data *= t_matKron;
+        }
+        delete surf_rot;
+        printf("[done]\n");
+    }
     else
     {
-        if (surf_ori)
+        printf("\tCartesian source orientations...");
+        nuse = 0;
+        fwd.source_rr = MatrixXd::Zero(fwd.nsource,3);
+        for(int k = 0; k < t_SourceSpace.hemispheres.size(); ++k)
         {
-            //
-            //   Rotate the local source coordinate systems
-            //
-            printf("\tConverting to surface-based source orientations...");
-            nuse = 0;
-            qint32 pp = 0;
-            fwd.source_rr = MatrixXd::Zero(fwd.nsource,3);
-            fwd.source_nn = MatrixXd::Zero(fwd.nsource*3,3);
+            for (qint32 q = 0; q < t_SourceSpace.hemispheres[k].nuse; ++q)
+                fwd.source_rr.block(q+nuse,0,1,3) = t_SourceSpace.hemispheres[k].rr.block(t_SourceSpace.hemispheres[k].vertno(q),0,1,3);
 
-            printf(" (Warning: Rotating the source coordinate system haven't been verified --> Singular Vectors U are different from MATLAB!) ");
-
-            for(qint32 k = 0; k < t_SourceSpace.hemispheres.size();++k)
-            {
-
-                for (qint32 q = 0; q < t_SourceSpace.hemispheres[k].nuse; ++q)
-                    fwd.source_rr.block(q+nuse,0,1,3) = t_SourceSpace.hemispheres[k].rr.block(t_SourceSpace.hemispheres[k].vertno(q),0,1,3);
-
-                for (qint32 p = 0; p < t_SourceSpace.hemispheres[k].nuse; ++p)
-                {
-                    //
-                    //  Project out the surface normal and compute SVD
-                    //
-                    Vector3d nn = t_SourceSpace.hemispheres[k].nn.block(t_SourceSpace.hemispheres[k].vertno(p),0,1,3).transpose();
-
-                    Matrix3d tmp = Matrix3d::Identity() - nn*nn.transpose();
-
-                    JacobiSVD<MatrixXd> t_svd(tmp, Eigen::ComputeThinU);
-
-                    MatrixXd U(t_svd.matrixU());
-
-                    //
-                    //  Make sure that ez is in the direction of nn
-                    //
-                    if ((nn.transpose() * U.block(0,2,3,1))(0,0) < 0)
-                    {
-                        U *= -1;
-                    }
-
-                    fwd.source_nn.block(pp, 0, 3, 3) = U.transpose();
-
-                    pp += 3;
-                }
-                nuse += t_SourceSpace.hemispheres[k].nuse;
-            }
-            MatrixXd tmp = fwd.source_nn.transpose();
-            SparseMatrix<double>* surf_rot = MNEMath::make_block_diag(&tmp,3);
-
-            fwd.sol->data *= *surf_rot;
-
-            if (!fwd.sol_grad->isEmpty())
-            {
-                SparseMatrix<double> t_matKron;
-                SparseMatrix<double> t_eye(3,3);
-                for (qint32 i = 0; i < 3; ++i)
-                    t_eye.insert(i,i) = 1.0f;
-                kroneckerProduct(*surf_rot,t_eye,t_matKron);//kron(surf_rot,eye(3));
-                fwd.sol_grad->data *= t_matKron;
-            }
-            delete surf_rot;
-            printf("[done]\n");
+            nuse += t_SourceSpace.hemispheres[k].nuse;
         }
-        else
-        {
-            printf("\tCartesian source orientations...");
-            nuse = 0;
-            fwd.source_rr = MatrixXd::Zero(fwd.nsource,3);
-            for(int k = 0; k < t_SourceSpace.hemispheres.size(); ++k)
-            {
-                for (qint32 q = 0; q < t_SourceSpace.hemispheres[k].nuse; ++q)
-                    fwd.source_rr.block(q+nuse,0,1,3) = t_SourceSpace.hemispheres[k].rr.block(t_SourceSpace.hemispheres[k].vertno(q),0,1,3);
 
-                nuse += t_SourceSpace.hemispheres[k].nuse;
-            }
+        MatrixXd t_ones = MatrixXd::Ones(fwd.nsource,1);
+        Matrix3d t_eye = Matrix3d::Identity();
+        kroneckerProduct(t_ones,t_eye,fwd.source_nn);
 
-            MatrixXd t_ones = MatrixXd::Ones(fwd.nsource,1);
-            Matrix3d t_eye = Matrix3d::Identity();
-            kroneckerProduct(t_ones,t_eye,fwd.source_nn);
-
-            printf("[done]\n");
-        }
+        printf("[done]\n");
     }
 
     //
