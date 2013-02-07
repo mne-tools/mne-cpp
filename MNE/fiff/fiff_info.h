@@ -158,10 +158,11 @@ public:
     */
     qint32 get_current_comp();
 
-
     //=========================================================================================================
     /**
     * mne_make_projector
+    *
+    * ToDo move this to fiff_proj; Before: check if info is needed and if make_projector_info should be also moved.
     *
     * ### MNE toolbox root function ### Implementation of the mne_make_projector function
     *
@@ -176,7 +177,6 @@ public:
     * @return nproj - How many items in the projector
     */
     static fiff_int_t make_projector(QList<FiffProj>& projs, QStringList& ch_names, MatrixXd& proj, QStringList& bads = defaultQStringList, MatrixXd& U = defaultMatrixXd);
-
 
     //=========================================================================================================
     /**
@@ -210,7 +210,7 @@ public:
     *
     * @return the selector matrix (row Vector)
     */
-    static MatrixXi pick_channels(QStringList& ch_names, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
+    static RowVectorXi pick_channels(const QStringList& ch_names, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList);
 
     //=========================================================================================================
     /**
@@ -232,6 +232,7 @@ public:
     *
     * ### MNE toolbox root function ###
     *
+    * ToDo meg: differ also between grad & mag
     * Create a selector to pick desired channel types from data
     *
     * @param[in] meg        Include MEG channels
@@ -242,7 +243,7 @@ public:
     *
     * @return the selector matrix (row vector)
     */
-    MatrixXi pick_types(bool meg, bool eeg = false, bool stim = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
+    RowVectorXi pick_types(bool meg, bool eeg = false, bool stim = false, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
 
     //=========================================================================================================
     /**

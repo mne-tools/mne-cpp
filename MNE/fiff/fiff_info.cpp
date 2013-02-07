@@ -400,7 +400,7 @@ fiff_int_t FiffInfo::make_projector(QList<FiffProj>& projs, QStringList& ch_name
             {
                 for (i = 0; i < one.data->col_names.size(); ++i)
                 {
-                    if (QString::compare(ch_names.at(c),one.data->col_names.at(i)) == 0)
+                    if (QString::compare(ch_names.at(c),one.data->col_names[i]) == 0)
                     {
                         isBad = false;
                         for (j = 0; j < bads.size(); ++j)
@@ -489,16 +489,16 @@ fiff_int_t FiffInfo::make_projector(QList<FiffProj>& projs, QStringList& ch_name
 
 //*************************************************************************************************************
 
-MatrixXi FiffInfo::pick_channels(QStringList& ch_names, QStringList& include, QStringList& exclude)
+RowVectorXi FiffInfo::pick_channels(const QStringList& ch_names, const QStringList& include, const QStringList& exclude)
 {
     qint32 nchan = ch_names.size();
-    MatrixXi sel(1, nchan);
+    RowVectorXi sel = RowVectorXi::Zero(nchan);
     qint32 i, k, p, c, count, nzero;
     if (include.size() == 0 && exclude.size() == 0)
     {
         sel.setOnes();
         for(k = 0; k < nchan; ++k)
-            sel(0, k) = k;//+1 using MATLAB notation
+            sel[k] = k;//+1 using MATLAB notation
         return sel;
     }
 
@@ -509,7 +509,7 @@ MatrixXi FiffInfo::pick_channels(QStringList& ch_names, QStringList& include, QS
         //
         sel.setZero();
         for (k = 0; k < nchan; ++k)
-            sel(0, k) = k; //+1 using MATLAB notation
+            sel[k] = k; //+1 using MATLAB notation
 
         qint32 nzero = 0;
         for(k = 0; k < exclude.size(); ++k)
@@ -517,7 +517,7 @@ MatrixXi FiffInfo::pick_channels(QStringList& ch_names, QStringList& include, QS
             count = 0;
             for (i = ch_names.size()-1; i >= 0 ; --i)
             {
-                if (QString::compare(exclude.at(k),ch_names.at(i)) == 0)
+                if (QString::compare(exclude[k],ch_names[i]) == 0)
                 {
                     ++count;
                     c = i;
@@ -526,7 +526,7 @@ MatrixXi FiffInfo::pick_channels(QStringList& ch_names, QStringList& include, QS
             nzero = 0;//does this make sense? - its here because its in the MATLAB file
             if(count > 0)
             {
-                sel(0, c) = -1;//to elimnate channels use -1 instead of 0 - cause its zero based indexed
+                sel[c] = -1;//to elimnate channels use -1 instead of 0 - cause its zero based indexed
                 ++nzero;
             }
         }
@@ -535,14 +535,13 @@ MatrixXi FiffInfo::pick_channels(QStringList& ch_names, QStringList& include, QS
         //
         if(nzero > 0)
         {
-            MatrixXi newsel(1,nchan-nzero);
-            newsel.setZero();
+            RowVectorXi newsel = RowVectorXi::Zero(nchan-nzero);
             p = 0;
             for(k = 0; k < nchan; ++k)
             {
-                if (sel(0, k) >= 0)
+                if (sel[k] >= 0)
                 {
-                    newsel(0, p) = sel(0, k);
+                    newsel[p] = sel[k];
                     ++p;
                 }
             }
@@ -554,7 +553,7 @@ MatrixXi FiffInfo::pick_channels(QStringList& ch_names, QStringList& include, QS
         //
         //   First do the channels to be included
         //
-        sel.resize(1,include.size());
+        sel.resize(include.size());
         sel.setZero();
         nzero = 0;
         for(k = 0; k < include.size(); ++k)
@@ -562,33 +561,32 @@ MatrixXi FiffInfo::pick_channels(QStringList& ch_names, QStringList& include, QS
             count = 0;
             for (i = ch_names.size()-1; i >= 0 ; --i)
             {
-                if (QString::compare(include.at(k),ch_names.at(i)) == 0)
+                if (QString::compare(include[k],ch_names[i]) == 0)
                 {
                     count += 1;
                     c = i;
                 }
             }
             if (count == 0)
-                printf("Missing channel %s\n",include.at(k).toUtf8().constData());
+                printf("Missing channel %s\n",include[k].toUtf8().constData());
             else if (count > 1)
-                printf("Ambiguous channel, taking first occurence: %s",include.at(k).toUtf8().constData());
+                printf("Ambiguous channel, taking first occurence: %s",include[k].toUtf8().constData());
 
             //
             //  Is this channel in the exclusion list?
             //
-            sel(0,k) = c;//+1 using MATLAB notation
+            sel[k] = c;//+1 using MATLAB notation
             if (exclude.size() > 0)
             {
-
                 count = 0;
                 for (i = 0; i < exclude.size(); ++i)
                 {
-                    if (QString::compare(include.at(k),exclude.at(i)) == 0)
+                    if (QString::compare(include[k],exclude[i]) == 0)
                         ++count;
                 }
                 if (count > 0)
                 {
-                    sel(0, k) = -1;//to elimnate channels use -1 instead of 0 - cause its zero based indexed
+                    sel[k] = -1;//to elimnate channels use -1 instead of 0 - cause its zero based indexed
                     ++nzero;
                 }
             }
@@ -598,19 +596,18 @@ MatrixXi FiffInfo::pick_channels(QStringList& ch_names, QStringList& include, QS
         //
         if (nzero > 0)
         {
-            MatrixXi newsel(1,include.size()-nzero);
-            newsel.setZero();
+            RowVectorXi newsel = RowVectorXi::Zero(include.size()-nzero);
 
             p = 0;
             for(k = 0; k < include.size(); ++k)
             {
                 if (sel(0,k) >= 0) // equal also cause of zero based picking
                 {
-                    newsel(0,p) = sel(0,k);
+                    newsel[p] = sel[k];
                     ++p;
                 }
             }
-            sel.resize(newsel.rows(), newsel.cols());
+            sel.resize(newsel.cols());
             sel = newsel;
         }
     }
@@ -645,16 +642,15 @@ FiffInfo FiffInfo::pick_info(const MatrixXi* sel) const
 
 //*************************************************************************************************************
 
-MatrixXi FiffInfo::pick_types(bool meg, bool eeg, bool stim, QStringList& include, QStringList& exclude)
+RowVectorXi FiffInfo::pick_types(bool meg, bool eeg, bool stim, const QStringList& include, const QStringList& exclude) const
 {
-    MatrixXi pick(1, this->nchan);
-    pick.setZero();
+    RowVectorXi pick = RowVectorXi::Zero(this->nchan);
 
     fiff_int_t kind;
     qint32 k;
     for(k = 0; k < this->nchan; ++k)
     {
-        kind = this->chs.at(k).kind;
+        kind = this->chs[k].kind;
         if ((kind == FIFFV_MEG_CH || kind == FIFFV_REF_MEG_CH) && meg)
             pick(0, k) = true;
         else if (kind == FIFFV_EEG_CH && eeg)
@@ -669,7 +665,7 @@ MatrixXi FiffInfo::pick_types(bool meg, bool eeg, bool stim, QStringList& includ
     {
         if (pick(0, k))
         {
-            myinclude << this->ch_names.at(k);
+            myinclude << this->ch_names[k];
             ++p;
         }
     }
@@ -681,7 +677,7 @@ MatrixXi FiffInfo::pick_types(bool meg, bool eeg, bool stim, QStringList& includ
     {
         for (k = 0; k < include.size(); ++k)
         {
-            myinclude << include.at(k);
+            myinclude << include[k];
             ++p;
         }
     }
@@ -689,7 +685,7 @@ MatrixXi FiffInfo::pick_types(bool meg, bool eeg, bool stim, QStringList& includ
 //        qDebug() << "Size: " << myinclude.size();
 //        qDebug() << myinclude;
 
-    MatrixXi sel;
+    RowVectorXi sel;
     if (p != 0)
         sel = FiffInfo::pick_channels(this->ch_names, myinclude, exclude);
 

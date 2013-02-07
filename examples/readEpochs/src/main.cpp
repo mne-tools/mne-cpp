@@ -115,16 +115,16 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    MatrixXi picks;
+    RowVectorXi picks;
     if (pick_all)
     {
         //
         // Pick all
         //
-        picks.resize(1,raw.info->nchan);
+        picks.resize(raw.info->nchan);
 
         for(k = 0; k < raw.info->nchan; ++k)
-            picks(0,k) = k;
+            picks(k) = k;
         //
     }
     else
