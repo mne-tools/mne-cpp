@@ -45,7 +45,8 @@ lessThan(QT_MAJOR_VERSION, 5){
         MNE \
         mne_unit_tests \
         examples \
-        mne_rt_server
+        mne_rt_server \
+        mne_x
 
     contains(Qt3D_available, true) {
         SUBDIRS += \

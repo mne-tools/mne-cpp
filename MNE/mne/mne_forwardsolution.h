@@ -114,9 +114,9 @@ using namespace FSLIB;
 
 //=============================================================================================================
 /**
-* Forward solution
+* Forward operator
 *
-* @brief Forward solution
+* @brief Forward operator
 */
 class MNESHARED_EXPORT MNEForwardSolution
 {
@@ -170,10 +170,15 @@ public:
     *
     * @return true if FIFF measurement file information is empty
     */
-    inline bool isEmpty() const
-    {
-        return this->nchan <= 0;
-    }
+    inline bool isEmpty() const;
+
+    //=========================================================================================================
+    /**
+    * Has forward operator fixed orientation?
+    *
+    * @return true if forward operator has fixed orientation, false otherwise
+    */
+    inline bool isFixedOrient() const;
 
     //=========================================================================================================
     /**
@@ -308,6 +313,24 @@ public:
 
     bool isClustered;   /**< Indicates whether fwd conatins a clustered forward solution. */
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline bool MNEForwardSolution::isEmpty() const
+{
+    return this->nchan <= 0;
+}
+
+
+//*************************************************************************************************************
+
+inline bool MNEForwardSolution::isFixedOrient() const
+{
+    return this->source_ori == FIFFV_MNE_FIXED_ORI;
+}
 
 } // NAMESPACE
 

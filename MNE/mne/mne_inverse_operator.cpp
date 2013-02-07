@@ -115,6 +115,45 @@ MNEInverseOperator::~MNEInverseOperator()
 
 //*************************************************************************************************************
 
+MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNEForwardSolution &forward, FiffCov &noise_cov, float loose, float depth)
+{
+    bool t_bIsFixedOri = forward.isFixedOrient();
+    MNEInverseOperator t_MNEInverseOperator;
+
+    //Check parameters
+    if(t_bIsFixedOri && loose > 0)
+    {
+        printf("Ignoring loose parameter given a forward solution with fixed orientation.\n");
+        loose = 0.0f;
+    }
+
+    if(forward.source_ori == -1 && loose > 0)
+    {
+        printf("Error: Forward solution is not oriented in surface coordinates. loose parameter should be 0 not %f.\n", loose);
+        return t_MNEInverseOperator;
+    }
+
+    if(loose < 0 || loose > 1)
+    {
+        printf("Warning: Loose value should be in interval [0,1] not %f.\n", loose);
+        loose = loose > 1 ? 1 : 0;
+        printf("Setting loose to %f.\n", loose);
+    }
+
+    if(depth < 0 || depth > 1)
+    {
+        printf("Warning: Depth value should be in interval [0,1] not %f.\n", depth);
+        depth = depth > 1 ? 1 : 0;
+        printf("Setting depth to %f.\n", depth);
+    }
+
+
+    return t_MNEInverseOperator;
+}
+
+
+//*************************************************************************************************************
+
 MNEInverseOperator MNEInverseOperator::prepare_inverse_operator(qint32 nave ,float lambda2, bool dSPM, bool sLORETA)
 {
     if(nave <= 0)
