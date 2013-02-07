@@ -114,9 +114,9 @@ using namespace FSLIB;
 
 //=============================================================================================================
 /**
-* Forward solution
+* Forward operator
 *
-* @brief Forward solution
+* @brief Forward operator
 */
 class MNESHARED_EXPORT MNEForwardSolution
 {
@@ -170,10 +170,44 @@ public:
     *
     * @return true if FIFF measurement file information is empty
     */
-    inline bool isEmpty() const
-    {
-        return this->nchan <= 0;
-    }
+    inline bool isEmpty() const;
+
+    //=========================================================================================================
+    /**
+    * Has forward operator fixed orientation?
+    *
+    * @return true if forward operator has fixed orientation, false otherwise
+    */
+    inline bool isFixedOrient() const;
+
+    //=========================================================================================================
+    /**
+    * mne.fiff.pick_channels_forward
+    *
+    * Pick channels from forward operator
+    *
+    * @param[in] include    List of channels to include. (if None, include all available).
+    * @param[in] exclude    Channels to exclude (if None, do not exclude any).
+    *
+    * @return Forward solution restricted to selected channel types.
+    */
+    MNEForwardSolution pick_channels_forward(const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
+
+    //=========================================================================================================
+    /**
+    * mne.fiff.pick_types_forward
+    *
+    * Pick by channel type and names from a forward operator
+    *
+    * @param[in] info       Fiff measurement info
+    * @param[in] meg        Include MEG channels
+    * @param[in] eeg        Include EEG channels
+    * @param[in] include    Additional channels to include (if empty, do not add any)
+    * @param[in] exclude    Channels to exclude (if empty, do not exclude any)
+    *
+    * @return Forward solution restricted to selected channel types.
+    */
+    MNEForwardSolution pick_types_forward(const FiffInfo &info, bool meg, bool eeg, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
 
     //=========================================================================================================
     /**
@@ -279,6 +313,24 @@ public:
 
     bool isClustered;   /**< Indicates whether fwd conatins a clustered forward solution. */
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline bool MNEForwardSolution::isEmpty() const
+{
+    return this->nchan <= 0;
+}
+
+
+//*************************************************************************************************************
+
+inline bool MNEForwardSolution::isFixedOrient() const
+{
+    return this->source_ori == FIFFV_MNE_FIXED_ORI;
+}
 
 } // NAMESPACE
 

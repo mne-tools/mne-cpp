@@ -21,8 +21,8 @@ isEmpty( MNE_LIBRARY_DIR ) {
 
 
 isGui = true #false
-isGui {
-    Qt3D_available = false #true
+contains(isGui, true) {
+    Qt3D_available = true #false #true
 }
 
 

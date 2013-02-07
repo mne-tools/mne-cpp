@@ -80,15 +80,13 @@ RtInv::~RtInv()
 
 
 //*************************************************************************************************************
-
-void RtInv::receiveNoiseCov(MatrixXf p_noiseCov)
+//ToDo use shared pointer for public slot
+void RtInv::receiveNoiseCov(FiffCov p_NoiseCov)
 {
     mutex.lock();
-    qDebug() << "Received Cov";
-    std::cout << "Covariance:\n" << p_noiseCov.block(0,0,10,10) << std::endl;
-
     //Use here a circular buffer
-    m_noiseCov = p_noiseCov;
+    m_vecNoiseCov.push_back(FiffCov::SDPtr(new FiffCov(p_NoiseCov)));
+
     mutex.unlock();
 }
 
@@ -112,7 +110,24 @@ void RtInv::run()
 
     while(m_bIsRunning)
     {
+        if(m_vecNoiseCov.size() > 0)
+        {
 
+            // Restrict forward solution as necessary for MEG
+            MNEForwardSolution forward_meg = m_pFwd->pick_types_forward(*m_pFiffInfo.data(), true, false);
 
+            //Put this inside make_inverse_operator
+
+            qDebug() << "Inverse operator";
+
+//            inverse_operator_meeg = make_inverse_operator(info, forward_meeg, noise_cov,
+//                                                          loose=0.2, depth=0.8)
+
+            FiffCov::SDPtr t_NoiseCov(new FiffCov(m_vecNoiseCov[0]->prepare_noise_cov(*m_pFiffInfo.data(), m_pFiffInfo->ch_names)));
+            m_vecNoiseCov.pop_front();
+
+//            prepare_noise_cov;
+
+        }
     }
 }

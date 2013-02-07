@@ -41,7 +41,7 @@ VERSION = $${MNE_CPP_VERSION}
 
 QT       += core
 QT       += network
-QT       -= gui
+QT       += 3d
 
 CONFIG   += console
 CONFIG   -= app_bundle
@@ -60,7 +60,8 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}RtClientd \
             -lMNE$${MNE_LIB_VERSION}RtInvd \
-            -lMNE$${MNE_LIB_VERSION}Genericsd
+            -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lMNE$${MNE_LIB_VERSION}Dispd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}MneMath \
@@ -69,7 +70,8 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}RtClient \
             -lMNE$${MNE_LIB_VERSION}RtInv \
-            -lMNE$${MNE_LIB_VERSION}Generics
+            -lMNE$${MNE_LIB_VERSION}Generics \
+            -lMNE$${MNE_LIB_VERSION}Disp
 }
 
 DESTDIR = $${PWD}/../bin
