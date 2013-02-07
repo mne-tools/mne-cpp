@@ -89,7 +89,7 @@ VectorXd* MNEMath::combine_xyz(const VectorXd& vec)
 
 //*************************************************************************************************************
 
-void MNEMath::get_whitener(MatrixXd& A, bool pca, QString& ch_type, VectorXd& eig, MatrixXd& eigvec)
+void MNEMath::get_whitener(MatrixXd& A, bool pca, QString ch_type, VectorXd& eig, MatrixXd& eigvec)
 {
     // whitening operator
     qint32 rnk = MNEMath::rank(A);
