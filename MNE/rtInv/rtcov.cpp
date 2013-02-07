@@ -156,7 +156,7 @@ void RtCov::run()
                 cov.data.array() -= n_samples * (mu * mu.transpose()).array();
                 cov.data.array() /= (n_samples - 1);
 
-//                std::cout << "Covariance:\n" << cov.block(0,0,10,10) << std::endl;
+                std::cout << "Covariance:\n" << cov.data.block(0,0,10,10) << std::endl;
 
                 cov.kind = FIFFV_MNE_NOISE_COV;
                 cov.diag = false;
