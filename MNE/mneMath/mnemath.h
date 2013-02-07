@@ -133,7 +133,7 @@ public:
     *
     * @return rank of matrix A
     */
-    static void get_whitener(MatrixXd& A, bool pca, QString& ch_type, VectorXd& eig, MatrixXd& eigvec);
+    static void get_whitener(MatrixXd& A, bool pca, QString ch_type, VectorXd& eig, MatrixXd& eigvec);
 
     //=========================================================================================================
     /**

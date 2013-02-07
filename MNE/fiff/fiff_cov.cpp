@@ -41,7 +41,7 @@
 #include "fiff_cov.h"
 
 #include <iostream>
-#include <MNEMath/mnemath.h>
+#include <mneMath/mnemath.h>
 
 
 //*************************************************************************************************************

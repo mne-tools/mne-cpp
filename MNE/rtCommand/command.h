@@ -258,7 +258,7 @@ public:
     *
     * @return Command as a JSON formatted string which contains parameter values too.
     */
-    QString Command::toStringReadySend() const;
+    QString toStringReadySend() const;
 
     //=========================================================================================================
     /**
