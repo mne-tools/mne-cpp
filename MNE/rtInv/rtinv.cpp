@@ -120,6 +120,9 @@ void RtInv::run()
 
             qDebug() << "Inverse operator";
 
+//            inverse_operator_meeg = make_inverse_operator(info, forward_meeg, noise_cov,
+//                                                          loose=0.2, depth=0.8)
+
             FiffCov::SDPtr t_NoiseCov(new FiffCov(m_vecNoiseCov[0]->prepare_noise_cov(*m_pFiffInfo.data(), m_pFiffInfo->ch_names)));
             m_vecNoiseCov.pop_front();
 
