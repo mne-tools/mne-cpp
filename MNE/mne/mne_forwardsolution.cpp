@@ -428,31 +428,36 @@ MNEForwardSolution MNEForwardSolution::pick_channels_forward(const QStringList& 
     printf("\t%d out of %d channels remain after picking\n", nuse, fwd.nchan);
 
     //   Pick the correct rows of the forward operator
-
     MatrixXd newData(nuse, fwd.sol->data.cols());
-    for(qint32 i = 0; i < nuse; ++i)
+    for(quint32 i = 0; i < nuse; ++i)
         newData.row(i) = fwd.sol->data.row(sel[i]);
 
     fwd.sol->data = newData;
     fwd.sol->nrow = nuse;
 
-    qDebug() << "ToDo...";
+    QStringList ch_names;
+    for(qint32 i = 0; i < sel.cols(); ++i)
+        ch_names << fwd.sol->row_names[sel(i)];
+    fwd.nchan = nuse;
+    fwd.sol->row_names = ch_names;
 
-//ch_names = [fwd['sol']['row_names'][k] for k in sel]
-//fwd['nchan'] = nuse
-//fwd['sol']['row_names'] = ch_names
-
+//    qDebug() << "Info is not part of the forward solution jet.";
 //fwd['info']['chs'] = [fwd['info']['chs'][k] for k in sel]
 //fwd['info']['nchan'] = nuse
 //fwd['info']['bads'] = [b for b in fwd['info']['bads'] if b in ch_names]
 
-//if fwd['sol_grad'] is not None:
-//    fwd['sol_grad']['data'] = fwd['sol_grad']['data'][sel, :]
-//    fwd['sol_grad']['nrow'] = nuse
-//    fwd['sol_grad']['row_names'] = [fwd['sol_grad']['row_names'][k]
-//                                    for k in sel]
-
-
+    if(!fwd.sol_grad->isEmpty())
+    {
+        newData.resize(nuse, fwd.sol_grad->data.cols());
+        for(quint32 i = 0; i < nuse; ++i)
+            newData.row(i) = fwd.sol_grad->data.row(sel[i]);
+        fwd.sol_grad->data = newData;
+        fwd.sol_grad->nrow = nuse;
+        QStringList row_names;
+        for(qint32 i = 0; i < sel.cols(); ++i)
+            row_names << fwd.sol_grad->row_names[sel(i)];
+        fwd.sol_grad->row_names = row_names;
+    }
 
     return fwd;
 }

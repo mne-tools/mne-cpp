@@ -221,6 +221,7 @@ FiffCov FiffCov::prepare_noise_cov(FiffInfo& p_Info, QStringList& p_ChNames)
     p_NoiseCov.eigvec = MatrixXd::Zero(n_chan, n_chan);
     p_NoiseCov.eig = VectorXd::Zero(n_chan);
 
+    std::cout << "C_meg_idx: " << C_meg_idx.rows();
 //    if(has_meg)
 //    {
 //        p_NoiseCov.eigvec[np.ix_(C_meg_idx, C_meg_idx)] = C_meg_eigvec

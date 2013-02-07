@@ -65,8 +65,8 @@ SourceLab::SourceLab(QObject *parent)
     QString t_sRHAnnotFileName = "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot";
     Annotation t_RHAnnotation(t_sRHAnnotFileName);
 
-    MNEForwardSolution t_FwdClustered;
-    m_pFwd->cluster_forward_solution(t_FwdClustered, t_LHAnnotation, t_RHAnnotation, 40);
+//    MNEForwardSolution t_FwdClustered;
+//    m_pFwd->cluster_forward_solution(t_FwdClustered, t_LHAnnotation, t_RHAnnotation, 40);
 
     qRegisterMetaType<MatrixXf>("MatrixXf");
     qRegisterMetaType<MNEInverseOperator>("MNEInverseOperator");
