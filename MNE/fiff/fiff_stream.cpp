@@ -44,6 +44,7 @@
 #include "fiff_dir_tree.h"
 #include "fiff_ctf_comp.h"
 #include "fiff_info.h"
+#include "fiff_info_forward.h"
 #include "fiff_raw_data.h"
 
 
@@ -589,6 +590,80 @@ QList<FiffCtfComp> FiffStream::read_ctf_comp(const FiffDirTree& p_Node, const QL
 
 //*************************************************************************************************************
 
+bool FiffStream::read_meas_info_forward(const FiffDirTree& p_Node, FiffInfoForward& p_InfoForward)
+{
+    p_InfoForward.clear();
+
+    //
+    //   Find the desired blocks
+    //
+    QList<FiffDirTree> parent_meg = p_Node.dir_tree_find(FIFFB_MNE_PARENT_MEAS_FILE);
+
+    if (parent_meg.size() == 0)
+    {
+        printf("No parent MEG information found in operator\n");
+        return false;
+    }
+
+    FiffTag* t_pTag = NULL;
+
+    QList<FiffChInfo> chs;
+    FiffCoordTrans cand;
+    fiff_int_t kind = -1;
+    fiff_int_t pos = -1;
+
+    for (qint32 k = 0; k < parent_meg[0].nent; ++k)
+    {
+        kind = parent_meg[0].dir[k].kind;
+        pos  = parent_meg[0].dir[k].pos;
+        if (kind == FIFF_CH_INFO)
+        {
+            FiffTag::read_tag(this, t_pTag, pos);
+            chs.append( t_pTag->toChInfo() );
+        }
+    }
+
+    //
+    //   Add the channel information and make a list of channel names
+    //   for convenience
+    //
+    p_InfoForward.chs = chs;
+    for (qint32 c = 0; c < p_InfoForward.chs.size(); ++c)
+        p_InfoForward.ch_names << p_InfoForward.chs[c].ch_name;
+
+    p_InfoForward.nchan = chs.size();
+
+    //
+    //   Get the MEG device <-> head coordinate transformation
+    //
+    if(parent_meg[0].find_tag(this, FIFF_COORD_TRANS, t_pTag))
+    {
+        cand = t_pTag->toCoordTrans();
+        if(cand.from == FIFFV_COORD_DEVICE && cand.to == FIFFV_COORD_HEAD)
+            p_InfoForward.dev_head_t = cand;
+        else if (cand.from == FIFFV_MNE_COORD_CTF_HEAD && cand.to == FIFFV_COORD_HEAD)
+            p_InfoForward.ctf_head_t = cand;
+        else
+            printf("MEG device/head coordinate transformation not found");
+    }
+    else
+        printf("MEG/head coordinate transformation not found.\n");
+
+    //
+    //   Load the bad channel list
+    //
+    p_InfoForward.bads = this->read_bad_channels(p_Node);
+
+    //Garbage Collection
+    if (t_pTag)
+        delete t_pTag;
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
 bool FiffStream::read_meas_info(const FiffDirTree& p_Node, FiffInfo& info, FiffDirTree& p_NodeInfo)
 {
 //    if (info)
@@ -895,6 +970,10 @@ bool FiffStream::read_meas_info(const FiffDirTree& p_Node, FiffInfo& info, FiffD
     info.acq_stim = acq_stim;
 
     p_NodeInfo = meas[0];
+
+    //Garbage Collecting;
+    if(t_pTag)
+        delete t_pTag;
     return true;
 }
 
@@ -1139,6 +1218,7 @@ QList<FiffProj> FiffStream::read_proj(const FiffDirTree& p_Node)
         }
     }
 
+    //Garbage Collection
     if (t_pTag)
         delete t_pTag;
 

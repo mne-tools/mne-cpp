@@ -148,6 +148,10 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
     }
 
 
+
+
+
+
     return t_MNEInverseOperator;
 }
 
