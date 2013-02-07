@@ -6,23 +6,23 @@ MNE_LIB_VERSION = 1
 # Paths
 EIGEN_INCLUDE_DIR = $$EIGEN_INCLUDE_DIR
 isEmpty(EIGEN_INCLUDE_DIR) {
-	EIGEN_INCLUDE_DIR = $${PWD}/include/3rdParty
+    EIGEN_INCLUDE_DIR = $${PWD}/include/3rdParty
 }
 
 MNE_INCLUDE_DIR = $$MNE_INCLUDE_DIR
 isEmpty( MNE_INCLUDE_DIR ) {
-	MNE_INCLUDE_DIR = $${PWD}/MNE
+    MNE_INCLUDE_DIR = $${PWD}/MNE
 }
 
 MNE_LIBRARY_DIR = $$MNE_LIBRARY_DIR
 isEmpty( MNE_LIBRARY_DIR ) {
-	MNE_LIBRARY_DIR = $${PWD}/lib
+    MNE_LIBRARY_DIR = $${PWD}/lib
 }
 
-
+#QT Packages
 isGui = true #false
 contains(isGui, true) {
-    Qt3D_available = true #false #true
+    Qt3D_available = false #true
 }
 
 
