@@ -79,8 +79,7 @@ FiffInfo::FiffInfo()
 //*************************************************************************************************************
 
 FiffInfo::FiffInfo(const FiffInfo& p_FiffInfo)
-: QSharedData(p_FiffInfo)
-, file_id(FiffId(p_FiffInfo.file_id))
+: file_id(FiffId(p_FiffInfo.file_id))//: QSharedData(p_FiffInfo)
 , meas_id(FiffId(p_FiffInfo.meas_id))
 , nchan(p_FiffInfo.nchan)
 , sfreq(p_FiffInfo.sfreq)

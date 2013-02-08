@@ -198,7 +198,7 @@ void FiffStreamThread::sendRawBuffer(Eigen::MatrixXf m_matRawData)
 
 //*************************************************************************************************************
 
-void FiffStreamThread::sendMeasurementInfo(qint32 ID, FiffInfo::SDPtr p_FiffInfo)
+void FiffStreamThread::sendMeasurementInfo(qint32 ID, FiffInfo p_fiffInfo)
 {
     if(ID == m_iDataClientId)
     {
@@ -222,8 +222,8 @@ void FiffStreamThread::sendMeasurementInfo(qint32 ID, FiffInfo::SDPtr p_FiffInfo
         qint32 k;
         QList<FiffChInfo> chs;
 
-        for(k = 0; k < p_FiffInfo->nchan; ++k)
-            chs << p_FiffInfo->chs.at(k);
+        for(k = 0; k < p_fiffInfo.nchan; ++k)
+            chs << p_fiffInfo.chs.at(k);
 
         fiff_int_t nchan = chs.size();
 
@@ -232,9 +232,9 @@ void FiffStreamThread::sendMeasurementInfo(qint32 ID, FiffInfo::SDPtr p_FiffInfo
         //
         t_FiffStreamOut.start_block(FIFFB_MEAS);//4
         t_FiffStreamOut.write_id(FIFF_BLOCK_ID);//5
-        if(p_FiffInfo->meas_id.version != -1)
+        if(p_fiffInfo.meas_id.version != -1)
         {
-            t_FiffStreamOut.write_id(FIFF_PARENT_BLOCK_ID,p_FiffInfo->meas_id);//6
+            t_FiffStreamOut.write_id(FIFF_PARENT_BLOCK_ID,p_fiffInfo.meas_id);//6
         }
         //
         //    Measurement info
@@ -251,14 +251,14 @@ void FiffStreamThread::sendMeasurementInfo(qint32 ID, FiffInfo::SDPtr p_FiffInfo
         //
         //    megacq parameters
         //
-        if (!p_FiffInfo->acq_pars.isEmpty() || !p_FiffInfo->acq_stim.isEmpty())
+        if (!p_fiffInfo.acq_pars.isEmpty() || !p_fiffInfo.acq_stim.isEmpty())
         {
             t_FiffStreamOut.start_block(FIFFB_DACQ_PARS);
-            if (!p_FiffInfo->acq_pars.isEmpty())
-                t_FiffStreamOut.write_string(FIFF_DACQ_PARS, p_FiffInfo->acq_pars);
+            if (!p_fiffInfo.acq_pars.isEmpty())
+                t_FiffStreamOut.write_string(FIFF_DACQ_PARS, p_fiffInfo.acq_pars);
 
-            if (!p_FiffInfo->acq_stim.isEmpty())
-                t_FiffStreamOut.write_string(FIFF_DACQ_STIM, p_FiffInfo->acq_stim);
+            if (!p_fiffInfo.acq_stim.isEmpty())
+                t_FiffStreamOut.write_string(FIFF_DACQ_STIM, p_fiffInfo.acq_stim);
 
             t_FiffStreamOut.end_block(FIFFB_DACQ_PARS);
         }
@@ -267,50 +267,50 @@ void FiffStreamThread::sendMeasurementInfo(qint32 ID, FiffInfo::SDPtr p_FiffInfo
         //
         if (!have_hpi_result)
         {
-            if (!p_FiffInfo->dev_head_t.isEmpty())
-                t_FiffStreamOut.write_coord_trans(p_FiffInfo->dev_head_t);
+            if (!p_fiffInfo.dev_head_t.isEmpty())
+                t_FiffStreamOut.write_coord_trans(p_fiffInfo.dev_head_t);
 
-            if (!p_FiffInfo->ctf_head_t.isEmpty())
-                t_FiffStreamOut.write_coord_trans(p_FiffInfo->ctf_head_t);
+            if (!p_fiffInfo.ctf_head_t.isEmpty())
+                t_FiffStreamOut.write_coord_trans(p_fiffInfo.ctf_head_t);
         }
         //
         //    Polhemus data
         //
-        if (p_FiffInfo->dig.size() > 0 && !have_isotrak)
+        if (p_fiffInfo.dig.size() > 0 && !have_isotrak)
         {
             t_FiffStreamOut.start_block(FIFFB_ISOTRAK);
-            for (qint32 k = 0; k < p_FiffInfo->dig.size(); ++k)
-                t_FiffStreamOut.write_dig_point(p_FiffInfo->dig[k]);
+            for (qint32 k = 0; k < p_fiffInfo.dig.size(); ++k)
+                t_FiffStreamOut.write_dig_point(p_fiffInfo.dig[k]);
 
             t_FiffStreamOut.end_block(FIFFB_ISOTRAK);
         }
         //
         //    Projectors
         //
-        t_FiffStreamOut.write_proj(p_FiffInfo->projs);
+        t_FiffStreamOut.write_proj(p_fiffInfo.projs);
         //
         //    CTF compensation info
         //
-        t_FiffStreamOut.write_ctf_comp(p_FiffInfo->comps);
+        t_FiffStreamOut.write_ctf_comp(p_fiffInfo.comps);
         //
         //    Bad channels
         //
-        if (p_FiffInfo->bads.size() > 0)
+        if (p_fiffInfo.bads.size() > 0)
         {
             t_FiffStreamOut.start_block(FIFFB_MNE_BAD_CHANNELS);
-            t_FiffStreamOut.write_name_list(FIFF_MNE_CH_NAME_LIST,p_FiffInfo->bads);
+            t_FiffStreamOut.write_name_list(FIFF_MNE_CH_NAME_LIST,p_fiffInfo.bads);
             t_FiffStreamOut.end_block(FIFFB_MNE_BAD_CHANNELS);
         }
         //
         //    General
         //
-        t_FiffStreamOut.write_float(FIFF_SFREQ,&p_FiffInfo->sfreq);
-        t_FiffStreamOut.write_float(FIFF_HIGHPASS,&p_FiffInfo->highpass);
-        t_FiffStreamOut.write_float(FIFF_LOWPASS,&p_FiffInfo->lowpass);
+        t_FiffStreamOut.write_float(FIFF_SFREQ,&p_fiffInfo.sfreq);
+        t_FiffStreamOut.write_float(FIFF_HIGHPASS,&p_fiffInfo.highpass);
+        t_FiffStreamOut.write_float(FIFF_LOWPASS,&p_fiffInfo.lowpass);
         t_FiffStreamOut.write_int(FIFF_NCHAN,&nchan);
         t_FiffStreamOut.write_int(FIFF_DATA_PACK,&data_type);
-        if (p_FiffInfo->meas_date[0] != -1)
-            t_FiffStreamOut.write_int(FIFF_MEAS_DATE,p_FiffInfo->meas_date, 2);
+        if (p_fiffInfo.meas_date[0] != -1)
+            t_FiffStreamOut.write_int(FIFF_MEAS_DATE,p_fiffInfo.meas_date, 2);
         //
         //    Channel info
         //

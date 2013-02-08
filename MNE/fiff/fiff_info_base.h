@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiff_info_forward.h
+* @file     fiff_info_base.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    FiffInfoForward class declaration.
+* @brief    FiffInfoBase class declaration.
 *
 */
 
-#ifndef FIFF_INFO_FORWARD_H
-#define FIFF_INFO_FORWARD_H
+#ifndef FIFF_INFO_BASE_H
+#define FIFF_INFO_BASE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -83,32 +83,32 @@ namespace FIFFLIB
 *
 * @brief light measurement info
 */
-class FIFFSHARED_EXPORT FiffInfoForward : public QSharedData
+class FIFFSHARED_EXPORT FiffInfoBase : public QSharedData
 {
 public:
-    typedef QSharedPointer<FiffInfoForward> SPtr;              /**< Shared pointer type for FiffInfoForward. */
-    typedef QSharedPointer<const FiffInfoForward> ConstSPtr;   /**< Const shared pointer type for FiffInfoForward. */
-    typedef QSharedDataPointer<FiffInfoForward> SDPtr;         /**< Shared data pointer type for FiffNamedMatrix. */
+    typedef QSharedPointer<FiffInfoBase> SPtr;              /**< Shared pointer type for FiffInfoBase. */
+    typedef QSharedPointer<const FiffInfoBase> ConstSPtr;   /**< Const shared pointer type for FiffInfoBase. */
+    typedef QSharedDataPointer<FiffInfoBase> SDPtr;         /**< Shared data pointer type for FiffNamedMatrix. */
 
     //=========================================================================================================
     /**
     * Constructors the light fiff measurement file information.
     */
-    FiffInfoForward();
+    FiffInfoBase();
 
     //=========================================================================================================
     /**
     * Copy constructor.
     *
-    * @param[in] p_FiffInfoForward  light FIFF measurement information which should be copied
+    * @param[in] p_FiffInfoBase  light FIFF measurement information which should be copied
     */
-    FiffInfoForward(const FiffInfoForward& p_FiffInfoForward);
+    FiffInfoBase(const FiffInfoBase& p_FiffInfoBase);
 
     //=========================================================================================================
     /**
     * Destroys the light fiff measurement file information.
     */
-    ~FiffInfoForward();
+    ~FiffInfoBase();
 
     //=========================================================================================================
     /**
@@ -138,4 +138,4 @@ public: //Public because it's a mne struct
 
 } // NAMESPACE
 
-#endif // FIFF_INFO_FORWARD_H
+#endif // FIFF_INFO_BASE_H

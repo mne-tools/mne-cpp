@@ -75,7 +75,7 @@ using namespace FSLIB;
 //=============================================================================================================
 
 MNEForwardSolution::MNEForwardSolution()
-: info(new FiffInfoForward)
+: info(new FiffInfoBase)
 , source_ori(-1)
 , coord_frame(-1)
 , nsource(-1)
@@ -124,7 +124,7 @@ MNEForwardSolution::~MNEForwardSolution()
 
 void MNEForwardSolution::clear()
 {
-    info = new FiffInfoForward();
+    info = new FiffInfoBase();
     source_ori = -1;
     coord_frame = -1;
     nsource = -1;

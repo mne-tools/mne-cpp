@@ -62,7 +62,6 @@ RtClient::RtClient(QString p_sRtServerHostname, QObject *parent)
 : QThread(parent)
 , m_bIsRunning(false)
 , m_sRtServerHostName(p_sRtServerHostname)
-, m_pFiffInfo(new FiffInfo)
 {
 }
 
@@ -122,7 +121,7 @@ void RtClient::run()
     t_cmdClient["measinfo"].pValues()[0].setValue(clientId);
     t_cmdClient["measinfo"].send();
 
-    m_pFiffInfo = new FiffInfo(t_dataClient.readInfo());
+    m_fiffInfo = t_dataClient.readInfo();
 
     // start measurement
     t_cmdClient["start"].pValues()[0].setValue(clientId);
@@ -137,12 +136,12 @@ void RtClient::run()
 
     while(m_bIsRunning)
     {
-        t_dataClient.readRawBuffer(m_pFiffInfo->nchan, t_matRawBuffer, kind);
+        t_dataClient.readRawBuffer(m_fiffInfo.nchan, t_matRawBuffer, kind);
 
         if(kind == FIFF_DATA_BUFFER)
         {
             to += t_matRawBuffer.cols();
-            printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, ((float)from)/m_pFiffInfo->sfreq, ((float)to)/m_pFiffInfo->sfreq);
+            printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, ((float)from)/m_fiffInfo.sfreq, ((float)to)/m_fiffInfo.sfreq);
             from += t_matRawBuffer.cols();
 
             emit rawBufferReceived(t_matRawBuffer);

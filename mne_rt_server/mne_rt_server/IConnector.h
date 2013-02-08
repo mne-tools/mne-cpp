@@ -209,7 +209,7 @@ public:
     virtual void info(qint32 ID) = 0;
 
 signals:
-    void remitMeasInfo(qint32, FIFFLIB::FiffInfo::SDPtr);
+    void remitMeasInfo(qint32, FIFFLIB::FiffInfo);
 
     void remitRawBuffer(Eigen::MatrixXf);
 

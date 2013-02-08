@@ -56,8 +56,7 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 FiffRawData::FiffRawData()
-: info(new FiffInfo())
-, first_samp(-1)
+: first_samp(-1)
 , last_samp(-1)
 {
 
@@ -92,7 +91,7 @@ FiffRawData::~FiffRawData()
 
 void FiffRawData::clear()
 {
-    info = new FiffInfo();
+    info.clear();
     first_samp = -1;
     last_samp = -1;
     cals = MatrixXd();
@@ -128,11 +127,11 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
         printf("No data in this range\n");
         return false;
     }
-    printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, ((float)from)/this->info->sfreq, ((float)to)/this->info->sfreq);
+    printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, ((float)from)/this->info.sfreq, ((float)to)/this->info.sfreq);
     //
     //  Initialize the data and calibration vector
     //
-    qint32 nchan = this->info->nchan;
+    qint32 nchan = this->info.nchan;
     qint32 dest  = 0;//1;
     qint32 i, k, r;
 //    MatrixXd cal(nchan,nchan);
@@ -225,7 +224,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
     {
         if (!this->file->device()->open(QIODevice::ReadOnly))
         {
-            printf("Cannot open file %s",this->info->filename.toUtf8().constData());
+            printf("Cannot open file %s",this->info.filename.toUtf8().constData());
         }
         fid = this->file;
     }
@@ -413,7 +412,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
     times = MatrixXd(1, to-from+1);
 
     for (i = 0; i < times.cols(); ++i)
-        times(0, i) = ((float)(from+i)) / this->info->sfreq;
+        times(0, i) = ((float)(from+i)) / this->info.sfreq;
 
     return true;
 }
@@ -426,8 +425,8 @@ bool FiffRawData::read_raw_segment_times(MatrixXd& data, MatrixXd& times, float 
     //
     //   Convert to samples
     //
-    from = floor(from*this->info->sfreq);
-    to   = ceil(to*this->info->sfreq);
+    from = floor(from*this->info.sfreq);
+    to   = ceil(to*this->info.sfreq);
     //
     //   Read it
     //

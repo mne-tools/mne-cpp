@@ -129,9 +129,9 @@ public:
     /**
     * Request Fiff Info
     */
-    inline FiffInfo::SDPtr getFiffInfo()
+    inline FiffInfo& getFiffInfo()
     {
-        return m_pFiffInfo;
+        return m_fiffInfo;
     }
 
     //=========================================================================================================
@@ -155,7 +155,7 @@ private:
     QMutex      mutex;                  /**< Provides access serialization between threads*/
     bool        m_bIsRunning;           /**< Holds whether RtClient is running.*/
     QString     m_sRtServerHostName;    /**< The IP Adress of mne_rt_server.*/
-    FiffInfo::SDPtr m_pFiffInfo;        /**< Fiff measurement info.*/
+    FiffInfo    m_fiffInfo;        /**< Fiff measurement info.*/
 
 signals:
     //=========================================================================================================

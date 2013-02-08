@@ -65,7 +65,6 @@ using namespace Eigen;
 //=============================================================================================================
 
 FiffEvokedDataSet::FiffEvokedDataSet()
-: info(new FiffInfo)
 {
 
 }
@@ -93,7 +92,7 @@ FiffEvokedDataSet::~FiffEvokedDataSet()
 
 void FiffEvokedDataSet::clear()
 {
-    info = new FiffInfo();
+    info.clear();
     evoked.clear();
 }
 
@@ -105,7 +104,7 @@ FiffEvokedDataSet FiffEvokedDataSet::pick_channels_evoked(QStringList& include, 
     if(include.size() == 0 && exclude.size() == 0)
         return FiffEvokedDataSet(*this);
 
-    MatrixXi sel = FiffInfo::pick_channels(this->info->ch_names, include, exclude);
+    MatrixXi sel = FiffInfo::pick_channels(this->info.ch_names, include, exclude);
     if (sel.cols() == 0)
     {
         printf("Warning : No channels match the selection.\n");
@@ -118,7 +117,7 @@ FiffEvokedDataSet FiffEvokedDataSet::pick_channels_evoked(QStringList& include, 
     //
 //    if (res->info)
 //        delete res->info;
-    res.info = new FiffInfo(res.info->pick_info(&sel));
+    res.info = FiffInfo(res.info.pick_info(&sel));
     //
     //   Create the reduced data set
     //
@@ -170,11 +169,11 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
     //
     //   Read the measurement info
     //
-    FiffInfo::SDPtr info(new FiffInfo);// = NULL;
+    FiffInfo info;// = NULL;
     FiffDirTree meas;
-    if(!t_pStream->read_meas_info(t_Tree, *info.data(), meas))
+    if(!t_pStream->read_meas_info(t_Tree, info, meas))
         return false;
-    info->filename = t_sFileName; //move fname storage to read_meas_info member function
+    info.filename = t_sFileName; //move fname storage to read_meas_info member function
     //
     //   Locate the data of interest
     //
@@ -338,17 +337,17 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
             printf("Number of channels and number of channel definitions are different\n");
             return false;
         }
-        info->chs   = chs;
-        info->nchan = nchan;
+        info.chs   = chs;
+        info.nchan = nchan;
         printf("\tFound channel information in evoked data. nchan = %d\n",nchan);
         if (sfreq > 0.0f)
-            info->sfreq = sfreq;
+            info.sfreq = sfreq;
     }
     qint32 nsamp = last-first+1;
     printf("\tFound the data of interest:\n");
-    printf("\t\tt = %10.2f ... %10.2f ms (%s)\n", 1000*(float)first/info->sfreq, 1000*(float)last/info->sfreq,comment.toUtf8().constData());
-    if (info->comps.size() > 0)
-        printf("\t\t%d CTF compensation matrices available\n", info->comps.size());
+    printf("\t\tt = %10.2f ... %10.2f ms (%s)\n", 1000*(float)first/info.sfreq, 1000*(float)last/info.sfreq,comment.toUtf8().constData());
+    if (info.comps.size() > 0)
+        printf("\t\t%d CTF compensation matrices available\n", info.comps.size());
     //
     // Read the data in the aspect block
     //
@@ -385,11 +384,11 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
     if (nave == -1)
         nave = 1;
     printf("\t\tnave = %d aspect type = %d\n", nave, aspect_kind);
-    if (nepoch != 1 && nepoch != info->nchan)
+    if (nepoch != 1 && nepoch != info.nchan)
     {
         if(t_pStream)
             delete t_pStream;
-        printf("Number of epoch tags is unreasonable (nepoch = %d nchan = %d)\n", nepoch, info->nchan);
+        printf("Number of epoch tags is unreasonable (nepoch = %d nchan = %d)\n", nepoch, info.nchan);
         return false;
     }
     //
@@ -404,7 +403,7 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
         //
         //   May need a transpose if the number of channels is one
         //
-        if (all.cols() == 1 && info->nchan == 1)
+        if (all.cols() == 1 && info.nchan == 1)
             all.transposeInPlace();
     }
     else
@@ -434,9 +433,9 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
     //
     //   Calibrate
     //
-    SparseMatrix<double> cals(info->nchan, info->nchan);
-    for(k = 0; k < info->nchan; ++k)
-        cals.insert(k, k) = info->chs[k].cal;
+    SparseMatrix<double> cals(info.nchan, info.nchan);
+    for(k = 0; k < info.nchan; ++k)
+        cals.insert(k, k) = info.chs[k].cal;
     all = cals * all;
     //
     //   Put it all together
@@ -464,7 +463,7 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
     data.evoked[0]->times = MatrixXd(1, last-first+1);
 
     for (k = 0; k < data.evoked[0]->times.cols(); ++k)
-        data.evoked[0]->times(0, k) = ((float)(first+k)) / info->sfreq;
+        data.evoked[0]->times(0, k) = ((float)(first+k)) / info.sfreq;
 
 //    if(data.evoked[0].epochs)
 //        delete data.evoked[0]->epochs;

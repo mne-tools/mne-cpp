@@ -112,27 +112,27 @@ int main(int argc, char *argv[])
     bool want_eeg   = false;
     bool want_stim  = false;
 
-    RowVectorXi picks = raw.info->pick_types(want_meg, want_eeg, want_stim, include, raw.info->bads);
+    RowVectorXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
 
     //
     //   Set up projection
     //
     qint32 k = 0;
-    if (raw.info->projs.size() == 0)
+    if (raw.info.projs.size() == 0)
         printf("No projector specified for these data\n");
     else
     {
         //
         //   Activate the projection items
         //
-        for (k = 0; k < raw.info->projs.size(); ++k)
-            raw.info->projs[k].active = true;
+        for (k = 0; k < raw.info.projs.size(); ++k)
+            raw.info.projs[k].active = true;
 
-        printf("%d projection items activated\n",raw.info->projs.size());
+        printf("%d projection items activated\n",raw.info.projs.size());
         //
         //   Create the projector
         //
-        fiff_int_t nproj = raw.info->make_projector_info(raw.proj);
+        fiff_int_t nproj = raw.info.make_projector_info(raw.proj);
 
         if (nproj == 0)
             printf("The projection vectors do not apply to these channels\n");
@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
     //
     //   Set up the CTF compensator
     //
-    qint32 current_comp = raw.info->get_current_comp();
+    qint32 current_comp = raw.info.get_current_comp();
     qint32 dest_comp = -1;
 
     if (current_comp > 0)
@@ -155,9 +155,9 @@ int main(int argc, char *argv[])
     if (current_comp != dest_comp)
     {
         qDebug() << "This part needs to be debugged";
-        if(MNE::make_compensator(*raw.info.data(), current_comp, dest_comp, raw.comp))
+        if(MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp))
         {
-            raw.info->set_current_comp(dest_comp);
+            raw.info.set_current_comp(dest_comp);
             printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
         }
         else
