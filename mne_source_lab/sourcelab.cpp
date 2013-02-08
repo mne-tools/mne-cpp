@@ -83,17 +83,17 @@ SourceLab::SourceLab(QObject *parent)
     while(!t_bFiffInfoAvailable)
     {
         mutex.lock();
-        if(m_pRtClient->getFiffInfo().data()->ch_names.size() > 0)
+        if(m_pRtClient->getFiffInfo().ch_names.size() > 0)
             t_bFiffInfoAvailable = true;
         mutex.unlock();
         sleep(1.0);
     }
 
-    m_pFiffInfo = FiffInfo::SPtr(new FiffInfo(*m_pRtClient->getFiffInfo().data()));
+    m_fiffInfo = FiffInfo(m_pRtClient->getFiffInfo());
 
-    m_pRtInv = new RtInv(m_pFiffInfo, m_pFwd, this);
+    m_pRtInv = new RtInv(m_fiffInfo, m_pFwd, this);
 
-    m_pRtCov = new RtCov(m_pFiffInfo, this);
+    m_pRtCov = new RtCov(m_fiffInfo, this);
     connect(m_pRtClient, &RtClient::rawBufferReceived,
             m_pRtCov, &RtCov::receiveDataSegment);
     m_pRtCov->start();
@@ -165,7 +165,7 @@ void SourceLab::run()
 
     while(m_bIsRunning)
     {
-        if(m_bIsRawBufferInit && m_pRtClient->getFiffInfo().data())
+        if(m_bIsRawBufferInit && !m_pRtClient->getFiffInfo().isEmpty())
         {
             MatrixXf rawSegment = m_pRawMatrixBuffer->pop();
 //            qDebug() << "Received Buffer " << count;

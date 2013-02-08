@@ -103,7 +103,7 @@ private:
     RtInv*          m_pRtInv;
 
 
-    FiffInfo::SPtr              m_pFiffInfo;        /**< Holds the fiff raw measurement information. */
+    FiffInfo                    m_fiffInfo;        /**< Holds the fiff raw measurement information. */
     MNEForwardSolution::SPtr    m_pFwd;
 
     RawMatrixBuffer* m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */

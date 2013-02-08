@@ -63,9 +63,9 @@ using namespace RTINVLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtInv::RtInv(FiffInfo::SPtr p_pFiffInfo, MNEForwardSolution::SPtr p_pFwd, QObject *parent)
+RtInv::RtInv(FiffInfo &p_fiffInfo, MNEForwardSolution::SPtr p_pFwd, QObject *parent)
 : QThread(parent)
-, m_pFiffInfo(p_pFiffInfo)
+, m_fiffInfo(p_fiffInfo)
 , m_pFwd(p_pFwd)
 {
 }
@@ -114,7 +114,7 @@ void RtInv::run()
         {
 
             // Restrict forward solution as necessary for MEG
-            MNEForwardSolution forward_meg = m_pFwd->pick_types_forward(*m_pFiffInfo.data(), true, false);
+            MNEForwardSolution forward_meg = m_pFwd->pick_types_forward(m_fiffInfo, true, false);
 
             //Put this inside make_inverse_operator
 
@@ -123,7 +123,7 @@ void RtInv::run()
 //            inverse_operator_meeg = make_inverse_operator(info, forward_meeg, noise_cov,
 //                                                          loose=0.2, depth=0.8)
 
-            FiffCov::SDPtr t_NoiseCov(new FiffCov(m_vecNoiseCov[0]->prepare_noise_cov(*m_pFiffInfo.data(), m_pFiffInfo->ch_names)));
+            FiffCov::SDPtr t_NoiseCov(new FiffCov(m_vecNoiseCov[0]->prepare_noise_cov(m_fiffInfo, m_fiffInfo.ch_names)));
             m_vecNoiseCov.pop_front();
 
 //            prepare_noise_cov;

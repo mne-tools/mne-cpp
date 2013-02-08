@@ -117,7 +117,7 @@ public:
     *
     * @param[in] parent     Parent QObject (optional)
     */
-    explicit RtCov(FiffInfo::SPtr p_pFiffInfo, QObject *parent = 0);
+    explicit RtCov(FiffInfo &p_fiffInfo, QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -151,7 +151,7 @@ protected:
     virtual void run();
 
 private:
-    FiffInfo::SPtr  m_pFiffInfo;
+    FiffInfo    m_fiffInfo;             /**< Holds the fiff measurement information. */
 
     QMutex      mutex;                  /**< Provides access serialization between threads*/
     bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/

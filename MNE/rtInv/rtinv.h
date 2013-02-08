@@ -118,7 +118,7 @@ public:
     * @param[in] p_pFwd         Forward solution
     * @param[in] parent         Parent QObject (optional)
     */
-    explicit RtInv(FiffInfo::SPtr p_pFiffInfo, MNEForwardSolution::SPtr p_pFwd, QObject *parent = 0);
+    explicit RtInv(FiffInfo& p_fiffInfo, MNEForwardSolution::SPtr p_pFwd, QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -157,7 +157,7 @@ private:
 
     QVector<FiffCov::SDPtr> m_vecNoiseCov;/**< Noise covariance matrix. */
 
-    FiffInfo::SPtr      m_pFiffInfo;    /**< Holds the fiff measurement information. */
+    FiffInfo             m_fiffInfo;    /**< Holds the fiff measurement information. */
     MNEForwardSolution::SPtr m_pFwd;    /**< Holds the forward solution. */
 
 signals:
