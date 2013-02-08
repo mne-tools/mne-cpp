@@ -22,7 +22,7 @@ isEmpty( MNE_LIBRARY_DIR ) {
 #QT Packages
 isGui = true #false
 contains(isGui, true) {
-    Qt3D_available = false #true
+    Qt3D_available = true #false #true
 }
 
 
