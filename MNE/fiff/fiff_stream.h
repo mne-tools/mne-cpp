@@ -279,7 +279,7 @@ public:
     *
     * @return the to measurement corresponding fiff_dir_tree.
     */
-    bool read_meas_info_forward(const FiffDirTree& p_Node, FiffInfoBase& p_InfoForward);
+    bool read_meas_info_base(const FiffDirTree& p_Node, FiffInfoBase& p_InfoForward);
 
     //=========================================================================================================
     /**

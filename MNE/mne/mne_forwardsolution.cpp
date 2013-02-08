@@ -75,8 +75,7 @@ using namespace FSLIB;
 //=============================================================================================================
 
 MNEForwardSolution::MNEForwardSolution()
-: info(new FiffInfoBase)
-, source_ori(-1)
+: source_ori(-1)
 , coord_frame(-1)
 , nsource(-1)
 , nchan(-1)
@@ -124,7 +123,7 @@ MNEForwardSolution::~MNEForwardSolution()
 
 void MNEForwardSolution::clear()
 {
-    info = new FiffInfoBase();
+    info.clear();
     source_ori = -1;
     coord_frame = -1;
     nsource = -1;
@@ -446,15 +445,15 @@ MNEForwardSolution MNEForwardSolution::pick_channels_forward(const QStringList& 
 
     QList<FiffChInfo> chs;
     for(qint32 i = 0; i < sel.cols(); ++i)
-        chs.append(fwd.info->chs[sel(i)]);
-    fwd.info->chs = chs;
-    fwd.info->nchan = nuse;
+        chs.append(fwd.info.chs[sel(i)]);
+    fwd.info.chs = chs;
+    fwd.info.nchan = nuse;
 
     QStringList bads;
-    for(qint32 i = 0; i < fwd.info->bads.size(); ++i)
-        if(ch_names.contains(fwd.info->bads[i]))
-            bads.append(fwd.info->bads[i]);
-    fwd.info->bads = bads;
+    for(qint32 i = 0; i < fwd.info.bads.size(); ++i)
+        if(ch_names.contains(fwd.info.bads[i]))
+            bads.append(fwd.info.bads[i]);
+    fwd.info.bads = bads;
 
     if(!fwd.sol_grad->isEmpty())
     {
@@ -699,7 +698,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
     //
     // get parent MEG info -> from python package
     //
-    t_pStream->read_meas_info_forward(t_Tree, *fwd.info.data());
+    t_pStream->read_meas_info_base(t_Tree, fwd.info);
 
 
     t_pStream->device()->close();

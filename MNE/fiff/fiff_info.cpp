@@ -64,7 +64,7 @@ using namespace Eigen;
 //=============================================================================================================
 
 FiffInfo::FiffInfo()
-: nchan(-1)
+: FiffInfoBase()//nchan(-1)
 , sfreq(-1.0)
 , highpass(-1.0)
 , lowpass(-1.0)
@@ -79,18 +79,14 @@ FiffInfo::FiffInfo()
 //*************************************************************************************************************
 
 FiffInfo::FiffInfo(const FiffInfo& p_FiffInfo)
-: file_id(FiffId(p_FiffInfo.file_id))//: QSharedData(p_FiffInfo)
+: FiffInfoBase(p_FiffInfo)
+, file_id(FiffId(p_FiffInfo.file_id))//: QSharedData(p_FiffInfo)
 , meas_id(FiffId(p_FiffInfo.meas_id))
-, nchan(p_FiffInfo.nchan)
 , sfreq(p_FiffInfo.sfreq)
 , highpass(p_FiffInfo.highpass)
 , lowpass(p_FiffInfo.lowpass)
-, dev_head_t(p_FiffInfo.dev_head_t)
-, ctf_head_t(p_FiffInfo.ctf_head_t)
 , dev_ctf_t(p_FiffInfo.dev_ctf_t)
 , dig_trans(p_FiffInfo.dig_trans)
-, ch_names(p_FiffInfo.ch_names)
-, bads(p_FiffInfo.bads)
 , acq_pars(p_FiffInfo.acq_pars)
 , acq_stim(p_FiffInfo.acq_stim)
 , filename(p_FiffInfo.filename)
@@ -125,21 +121,16 @@ FiffInfo::~FiffInfo()
 
 void FiffInfo::clear()
 {
+    FiffInfoBase::clear();
     file_id.clear();
     meas_id.clear();
     meas_date[0] = -1;
-    nchan = -1;
     sfreq = -1.0;
     highpass = -1.0;
     lowpass = -1.0;
-    chs.clear();
-    ch_names.clear();
-    dev_head_t.clear();
-    ctf_head_t.clear();
     dev_ctf_t.clear();
     dig.clear();
     dig_trans.clear();
-    bads.clear();
     projs.clear();
     comps.clear();
     acq_pars = "";
