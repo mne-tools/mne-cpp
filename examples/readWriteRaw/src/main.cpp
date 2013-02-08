@@ -109,14 +109,14 @@ int main(int argc, char *argv[])
     QStringList include;
     include << "STI 014";
 
-//    MatrixXi picks = Fiff::pick_types(raw.info, want_meg, want_eeg, want_stim, include, raw.info->bads);
-    MatrixXi picks = raw.info->pick_types(want_meg, want_eeg, want_stim, include, raw.info->bads); // prefer member function
+//    MatrixXi picks = Fiff::pick_types(raw.info, want_meg, want_eeg, want_stim, include, raw.info.bads);
+    MatrixXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads); // prefer member function
     if(picks.cols() == 0)
     {
         include.clear();
         include << "STI101" << "STI201" << "STI301";
-//        picks = Fiff::pick_types(raw.info, want_meg, want_eeg, want_stim, include, raw.info->bads);
-        picks = raw.info->pick_types(want_meg, want_eeg, want_stim, include, raw.info->bads);// prefer member function
+//        picks = Fiff::pick_types(raw.info, want_meg, want_eeg, want_stim, include, raw.info.bads);
+        picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);// prefer member function
         if(picks.cols() == 0)
         {
             printf("channel list may need modification\n");
@@ -126,14 +126,14 @@ int main(int argc, char *argv[])
     //
     MatrixXd cals;
 
-    FiffStream* outfid = Fiff::start_writing_raw(&t_OutFile,*raw.info.data(), cals, picks);
+    FiffStream* outfid = Fiff::start_writing_raw(&t_OutFile,raw.info, cals, picks);
     //
     //   Set up the reading parameters
     //
     fiff_int_t from = raw.first_samp;
     fiff_int_t to = raw.last_samp;
     float quantum_sec = 10.0f;//read and write in 10 sec junks
-    fiff_int_t quantum = ceil(quantum_sec*raw.info->sfreq);
+    fiff_int_t quantum = ceil(quantum_sec*raw.info.sfreq);
     //
     //   To read the whole file at once set
     //

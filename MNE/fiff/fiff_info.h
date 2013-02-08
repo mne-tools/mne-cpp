@@ -84,12 +84,11 @@ namespace FIFFLIB
 *
 * @brief FIFF measurement file information
 */
-class FIFFSHARED_EXPORT FiffInfo : public QSharedData
+class FIFFSHARED_EXPORT FiffInfo
 {
 public:
     typedef QSharedPointer<FiffInfo> SPtr;              /**< Shared pointer type for FiffInfo. */
     typedef QSharedPointer<const FiffInfo> ConstSPtr;   /**< Const shared pointer type for FiffInfo. */
-    typedef QSharedDataPointer<FiffInfo> SDPtr;         /**< Shared data pointer type for FiffNamedMatrix. */
 
     //=========================================================================================================
     /**

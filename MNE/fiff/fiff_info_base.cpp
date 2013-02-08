@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiff_info_forward.cpp
+* @file     fiff_info_base.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FiffInfoForward Class.
+* @brief    Implementation of the FiffInfoBase Class.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "fiff_info_forward.h"
+#include "fiff_info_base.h"
 
 
 //*************************************************************************************************************
@@ -55,7 +55,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FiffInfoForward::FiffInfoForward()
+FiffInfoBase::FiffInfoBase()
 : nchan(-1)
 {
 }
@@ -63,23 +63,23 @@ FiffInfoForward::FiffInfoForward()
 
 //*************************************************************************************************************
 
-FiffInfoForward::FiffInfoForward(const FiffInfoForward& p_FiffInfoForward)
-: QSharedData(p_FiffInfoForward)
-, nchan(p_FiffInfoForward.nchan)
-, dev_head_t(p_FiffInfoForward.dev_head_t)
-, ctf_head_t(p_FiffInfoForward.ctf_head_t)
-, ch_names(p_FiffInfoForward.ch_names)
-, bads(p_FiffInfoForward.bads)
+FiffInfoBase::FiffInfoBase(const FiffInfoBase& p_FiffInfoBase)
+: QSharedData(p_FiffInfoBase)
+, nchan(p_FiffInfoBase.nchan)
+, dev_head_t(p_FiffInfoBase.dev_head_t)
+, ctf_head_t(p_FiffInfoBase.ctf_head_t)
+, ch_names(p_FiffInfoBase.ch_names)
+, bads(p_FiffInfoBase.bads)
 {
     qint32 i;
-    for(i = 0; i < p_FiffInfoForward.chs.size(); ++i)
-        chs.append(p_FiffInfoForward.chs[i]);
+    for(i = 0; i < p_FiffInfoBase.chs.size(); ++i)
+        chs.append(p_FiffInfoBase.chs[i]);
 }
 
 
 //*************************************************************************************************************
 
-FiffInfoForward::~FiffInfoForward()
+FiffInfoBase::~FiffInfoBase()
 {
 
 }
@@ -87,7 +87,7 @@ FiffInfoForward::~FiffInfoForward()
 
 //*************************************************************************************************************
 
-void FiffInfoForward::clear()
+void FiffInfoBase::clear()
 {
     nchan = -1;
     chs.clear();

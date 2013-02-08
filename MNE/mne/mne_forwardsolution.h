@@ -64,7 +64,7 @@
 #include "mne_global.h"
 #include "mne_sourcespace.h"
 
-#include <fiff/fiff_info_forward.h>
+#include <fiff/fiff_info_base.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -320,7 +320,7 @@ private:
     static bool read_one(FiffStream* p_pStream, const FiffDirTree& p_Node, MNEForwardSolution& one);
 
 public:
-    FiffInfoForward::SDPtr info;        /**< light weighted measurement info */
+    FiffInfoBase::SDPtr info;        /**< light weighted measurement info */
     fiff_int_t source_ori;              /**< Source orientation: fixed or free */
     fiff_int_t coord_frame;             /**< Coil coordinate system definition */
     fiff_int_t nsource;                 /**< Number of source dipoles */

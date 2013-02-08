@@ -131,7 +131,7 @@ public:
     */
     inline bool isEmpty() const
     {
-        return first_samp == -1 && info->isEmpty();
+        return first_samp == -1 && info.isEmpty();
     }
 
     //=========================================================================================================
@@ -168,7 +168,7 @@ public:
 
 public:
     FiffStream::SPtr file;      /**< replaces fid */
-    FiffInfo::SDPtr info;       /**< Fiff measurement information */
+    FiffInfo info;              /**< Fiff measurement information */
     fiff_int_t first_samp;      /**< Do we have a skip ToDo... */
     fiff_int_t last_samp;       /**< Do we have a skip ToDo... */
     MatrixXd cals;              /**< Calibration matrix */

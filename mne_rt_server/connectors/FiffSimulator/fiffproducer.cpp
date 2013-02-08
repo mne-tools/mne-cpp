@@ -99,7 +99,7 @@ void FiffProducer::run()
     m_bIsRunning = true;
 
     // reopen file in this thread
-    QFile t_File(m_pFiffSimulator->m_RawInfo.info->filename);
+    QFile t_File(m_pFiffSimulator->m_RawInfo.info.filename);
     FiffStream::SPtr p_pStream = FiffStream::SPtr(new FiffStream(&t_File));
     m_pFiffSimulator->m_RawInfo.file = p_pStream;
 
@@ -109,7 +109,7 @@ void FiffProducer::run()
     fiff_int_t from = m_pFiffSimulator->m_RawInfo.first_samp;
     fiff_int_t to = m_pFiffSimulator->m_RawInfo.last_samp;
 //    float quantum_sec = (float)uiSamplePeriod/1000000.0f; //read and write in 10 sec junks
-    fiff_int_t quantum = m_pFiffSimulator->m_uiBufferSampleSize;//ceil(quantum_sec*m_pFiffSimulator->m_pRawInfo->info->sfreq);
+    fiff_int_t quantum = m_pFiffSimulator->m_uiBufferSampleSize;//ceil(quantum_sec*m_pFiffSimulator->m_pRawInfo->info.sfreq);
 
     qDebug() << "quantum " << quantum;
 
@@ -128,14 +128,14 @@ void FiffProducer::run()
 
     first = from;
 
-    qint32 nchan = m_pFiffSimulator->m_RawInfo.info->nchan;
+    qint32 nchan = m_pFiffSimulator->m_RawInfo.info.nchan;
 
     MatrixXd cals(1,nchan);
 
 //    SparseMatrix<double> inv_calsMat(nchan, nchan);
 
 //    for(qint32 i = 0; i < nchan; ++i)
-//        inv_calsMat.insert(i, i) = 1.0f/m_pFiffSimulator->m_RawInfo.info->chs[i].cal;
+//        inv_calsMat.insert(i, i) = 1.0f/m_pFiffSimulator->m_RawInfo.info.chs[i].cal;
 
     //Not good cause production time is not accurate
     //loading and thread sleep is longer than thread sleep time - better to have a extra loading thread
