@@ -42,6 +42,9 @@
 //=============================================================================================================
 
 #include "fiff_global.h"
+
+#include "fiff_info_base.h"
+
 #include "fiff_types.h"
 #include "fiff_id.h"
 #include "fiff_ch_info.h"
@@ -84,7 +87,7 @@ namespace FIFFLIB
 *
 * @brief FIFF measurement file information
 */
-class FIFFSHARED_EXPORT FiffInfo
+class FIFFSHARED_EXPORT FiffInfo : public FiffInfoBase
 {
 public:
     typedef QSharedPointer<FiffInfo> SPtr;              /**< Shared pointer type for FiffInfo. */
@@ -294,18 +297,12 @@ public: //Public because it's a mne struct
     FiffId      file_id;        /**< File ID. */
     FiffId      meas_id;        /**< Measurement ID. */
     fiff_int_t  meas_date[2];   /**< Measurement date. */
-    fiff_int_t  nchan;          /**< Number of channels. */
     float sfreq;                /**< Sample frequency. */
     float highpass;             /**< Highpass frequency. */
     float lowpass;              /**< Lowpass frequency. */
-    QList<FiffChInfo> chs;      /**< List of all channel info descriptors. */
-    QStringList ch_names;       /**< List of all channel names. */
-    FiffCoordTrans dev_head_t;  /**< Coordinate transformation ToDo... */
-    FiffCoordTrans ctf_head_t;  /**< Coordinate transformation ToDo... */
     FiffCoordTrans dev_ctf_t;   /**< Coordinate transformation ToDo... */
     QList<FiffDigPoint> dig;    /**< List of all digitization point descriptors. */
     FiffCoordTrans dig_trans;   /**< Coordinate transformation ToDo... */
-    QStringList bads;           /**< List of bad channels. */
     QList<FiffProj> projs;      /**< List of available SSP projectors. */
     QList<FiffCtfComp> comps;   /**< List of available CTF software compensators. */
     QString acq_pars;           /**< Acquisition information ToDo... */

@@ -64,8 +64,7 @@ FiffInfoBase::FiffInfoBase()
 //*************************************************************************************************************
 
 FiffInfoBase::FiffInfoBase(const FiffInfoBase& p_FiffInfoBase)
-: QSharedData(p_FiffInfoBase)
-, nchan(p_FiffInfoBase.nchan)
+: nchan(p_FiffInfoBase.nchan)
 , dev_head_t(p_FiffInfoBase.dev_head_t)
 , ctf_head_t(p_FiffInfoBase.ctf_head_t)
 , ch_names(p_FiffInfoBase.ch_names)

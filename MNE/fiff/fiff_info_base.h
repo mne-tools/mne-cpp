@@ -83,12 +83,11 @@ namespace FIFFLIB
 *
 * @brief light measurement info
 */
-class FIFFSHARED_EXPORT FiffInfoBase : public QSharedData
+class FIFFSHARED_EXPORT FiffInfoBase
 {
 public:
     typedef QSharedPointer<FiffInfoBase> SPtr;              /**< Shared pointer type for FiffInfoBase. */
     typedef QSharedPointer<const FiffInfoBase> ConstSPtr;   /**< Const shared pointer type for FiffInfoBase. */
-    typedef QSharedDataPointer<FiffInfoBase> SDPtr;         /**< Shared data pointer type for FiffNamedMatrix. */
 
     //=========================================================================================================
     /**

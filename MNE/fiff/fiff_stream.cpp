@@ -590,7 +590,7 @@ QList<FiffCtfComp> FiffStream::read_ctf_comp(const FiffDirTree& p_Node, const QL
 
 //*************************************************************************************************************
 
-bool FiffStream::read_meas_info_forward(const FiffDirTree& p_Node, FiffInfoBase& p_InfoForward)
+bool FiffStream::read_meas_info_base(const FiffDirTree& p_Node, FiffInfoBase& p_InfoForward)
 {
     p_InfoForward.clear();
 
