@@ -19,11 +19,9 @@ isEmpty( MNE_LIBRARY_DIR ) {
     MNE_LIBRARY_DIR = $${PWD}/lib
 }
 
-#QT Packages
-isGui = true #false
-contains(isGui, true) {
-    Qt3D_available = true #false #true
-}
+#QT Packages use new qtHaveModule(<package>):
+#MNE cpp config
+MNECPP_CONFIG += isGui
 
 
 QMAKE_TARGET_PRODUCT = mne-cpp

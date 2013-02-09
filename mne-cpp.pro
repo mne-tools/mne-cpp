@@ -39,23 +39,24 @@ TEMPLATE = subdirs
 
 #At least major version 5
 lessThan(QT_MAJOR_VERSION, 5){
-    message(mne-cpp requires at least Qt version 5!)
-} else {
-    SUBDIRS += \
-        MNE \
-        mne_unit_tests \
-        examples \
-        mne_rt_server
+    error(mne-cpp requires at least Qt version 5!)
+}
 
-    contains(Qt3D_available, true) {
+SUBDIRS += \
+    MNE \
+    mne_unit_tests \
+    examples \
+    mne_rt_server
+
+contains(MNECPP_CONFIG, isGui) {
+    SUBDIRS += \
+        mne_browse_rawq \
+        mne_x
+
+    qtHaveModule(3d) {
+        message(Qt3D available: mne_source_lab configured!)
         SUBDIRS += \
             mne_source_lab
-    }
-
-    contains(isGui, true) {
-        SUBDIRS += \
-            mne_browse_rawq \
-            mne_x
     }
 }
 
