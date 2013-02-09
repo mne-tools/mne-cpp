@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the display library.
+# @brief    This project file builds the display 3D library.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -85,6 +85,6 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 # Install headers to include directory
 header_files.files = ./*.h
-header_files.path = $${MNE_INCLUDE_DIR}/disp
+header_files.path = $${MNE_INCLUDE_DIR}/disp3D
 
 INSTALLS += header_files

@@ -55,8 +55,7 @@ contains(MNECPP_CONFIG, isGui) {
 
     qtHaveModule(3d) {
         message(Qt3D available: mne_source_lab configured!)
-        SUBDIRS += \
-            mne_source_lab
+        SUBDIRS += mne_source_lab
     }
 }
 
