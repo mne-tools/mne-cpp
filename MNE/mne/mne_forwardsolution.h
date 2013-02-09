@@ -200,7 +200,6 @@ public:
     *
     * Pick by channel type and names from a forward operator
     *
-    * @param[in] info       Fiff measurement info
     * @param[in] meg        Include MEG channels
     * @param[in] eeg        Include EEG channels
     * @param[in] include    Additional channels to include (if empty, do not add any)
@@ -208,7 +207,7 @@ public:
     *
     * @return Forward solution restricted to selected channel types.
     */
-    MNEForwardSolution pick_types_forward(const FiffInfo &info, bool meg, bool eeg, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
+    MNEForwardSolution pick_types_forward(bool meg, bool eeg, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
 
     //=========================================================================================================
     /**
@@ -285,26 +284,22 @@ public:
 //        qint32 nchan = chNames.size();
 //    }
 
-
     //=========================================================================================================
     /**
     * Prepare forward for assembling the inverse operator
     *
-    * @param[in] info       The measurement info to specify the channels to include. Bad channels in info['bads'] are not used.
-    * @param[in] noise_cov  The noise covariance matrix.
-    * @param[in] pca        Calculate pca or not.
-    * @param[out] p_outChNames  Selected channel names
-    * @param[out] p_outGain     Gain matrix
-    * @param[out] p_outNoiseCov noise covariance matrix
-    * @param[out] p_outWhitener Whitener
-    * @param[out] p_outRank     the rank (non zeros)
+    * @param[in] p_info             The measurement info to specify the channels to include. Bad channels in info['bads'] are not used.
+    * @param[in] p_noise_cov        The noise covariance matrix.
+    * @param[in] p_pca              Calculate pca or not.
+    * @param[out] p_outChNames      Selected channel names
+    * @param[out] p_outGain         Gain matrix
+    * @param[out] p_outNoiseCov     noise covariance matrix
+    * @param[out] p_outWhitener     Whitener
+    * @param[out] p_outNumNonZero   the rank (non zeros)
     */
-    void prepare_forward(const FiffInfo &info, const FiffCov &noise_cov, bool pca, QStringList &p_outChNames, MatrixXd &p_outGain, FiffCov &p_outNoiseCov, MatrixXd &p_outWhitener, qint32 &p_outRank);
+    void prepare_forward(const FiffInfo &p_info, const FiffCov &p_noise_cov, bool p_pca, QStringList &p_outChNames, MatrixXd &p_outGain, FiffCov &p_outNoiseCov, MatrixXd &p_outWhitener, qint32 &p_outNumNonZero);
 
 private:
-
-
-
     //=========================================================================================================
     /**
     * Implementation of the read_one function in mne_read_forward_solution.m

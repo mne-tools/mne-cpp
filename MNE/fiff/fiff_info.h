@@ -121,17 +121,6 @@ public:
 
     //=========================================================================================================
     /**
-    * True if FIFF measurement file information is empty.
-    *
-    * @return true if FIFF measurement file information is empty
-    */
-    inline bool isEmpty() const
-    {
-        return this->nchan <= 0;
-    }
-
-    //=========================================================================================================
-    /**
     * mne_make_compensator
     *
     * ### MNE toolbox root function ### Implementation of the mne_make_compensator function
@@ -178,7 +167,7 @@ public:
     *
     * @return nproj - How many items in the projector
     */
-    static fiff_int_t make_projector(QList<FiffProj>& projs, QStringList& ch_names, MatrixXd& proj, QStringList& bads = defaultQStringList, MatrixXd& U = defaultMatrixXd);
+    static fiff_int_t make_projector(const QList<FiffProj>& projs, const QStringList& ch_names, MatrixXd& proj, const QStringList& bads = defaultQStringList, MatrixXd& U = defaultMatrixXd);
 
     //=========================================================================================================
     /**
@@ -192,27 +181,10 @@ public:
     *
     * @return nproj - How many items in the projector
     */
-    inline qint32 make_projector_info(MatrixXd& proj)
+    inline qint32 make_projector_info(MatrixXd& proj) const
     {
         return make_projector(this->projs,this->ch_names, proj, this->bads);
     }
-
-
-    //=========================================================================================================
-    /**
-    * fiff_pick_channels
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Make a selector to pick desired channels from data
-    *
-    * @param[in] ch_names  - The channel name list to consult
-    * @param[in] include   - Channels to include (if empty, include all available)
-    * @param[in] exclude   - Channels to exclude (if empty, do not exclude any)
-    *
-    * @return the selector matrix (row Vector)
-    */
-    static RowVectorXi pick_channels(const QStringList& ch_names, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList);
 
     //=========================================================================================================
     /**
@@ -230,25 +202,6 @@ public:
 
     //=========================================================================================================
     /**
-    * fiff_pick_types
-    *
-    * ### MNE toolbox root function ###
-    *
-    * ToDo meg: differ also between grad & mag
-    * Create a selector to pick desired channel types from data
-    *
-    * @param[in] meg        Include MEG channels
-    * @param[in] eeg        Include EEG channels
-    * @param[in] stim       Include stimulus channels
-    * @param[in] include    Additional channels to include (if empty, do not add any)
-    * @param[in] exclude    Channels to exclude (if empty, do not exclude any)
-    *
-    * @return the selector matrix (row vector)
-    */
-    RowVectorXi pick_types(bool meg, bool eeg = false, bool stim = false, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
-
-    //=========================================================================================================
-    /**
     * Set the current compensation value in the channel info structures
     *
     * @param[in] value  compensation value
@@ -257,7 +210,6 @@ public:
     {
         this->chs = set_current_comp(this->chs, value);
     }
-
 
     //=========================================================================================================
     /**

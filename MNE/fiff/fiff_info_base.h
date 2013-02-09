@@ -121,10 +121,56 @@ public:
     *
     * @return true if FIFF measurement file information is empty
     */
-    inline bool isEmpty() const
-    {
-        return this->nchan <= 0;
-    }
+    inline bool isEmpty() const;
+
+    //=========================================================================================================
+    /**
+    * fiff_pick_channels
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Make a selector to pick desired channels from data
+    *
+    * @param[in] ch_names  - The channel name list to consult
+    * @param[in] include   - Channels to include (if empty, include all available)
+    * @param[in] exclude   - Channels to exclude (if empty, do not exclude any)
+    *
+    * @return the selector matrix (row Vector)
+    */
+    static RowVectorXi pick_channels(const QStringList& ch_names, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList);
+
+    //=========================================================================================================
+    /**
+    * fiff_pick_info
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Pick desired channels from measurement info
+    *
+    * @param[in] sel    List of channels to select
+    *
+    * @return Info modified according to sel
+    */
+    FiffInfoBase pick_info(const MatrixXi* sel = NULL) const;
+
+    //=========================================================================================================
+    /**
+    * fiff_pick_types
+    *
+    * ### MNE toolbox root function ###
+    *
+    * ToDo meg: differ also between grad & mag
+    * Create a selector to pick desired channel types from data
+    *
+    * @param[in] meg        Include MEG channels
+    * @param[in] eeg        Include EEG channels
+    * @param[in] stim       Include stimulus channels
+    * @param[in] include    Additional channels to include (if empty, do not add any)
+    * @param[in] exclude    Channels to exclude (if empty, do not exclude any)
+    *
+    * @return the selector matrix (row vector)
+    */
+    RowVectorXi pick_types(bool meg, bool eeg = false, bool stim = false, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
 
 public: //Public because it's a mne struct
     fiff_int_t  nchan;          /**< Number of channels. */
@@ -134,6 +180,16 @@ public: //Public because it's a mne struct
     FiffCoordTrans ctf_head_t;  /**< Coordinate transformation ToDo... */
     QStringList bads;           /**< List of bad channels. */
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline bool FiffInfoBase::isEmpty() const
+{
+    return this->nchan <= 0;
+}
 
 } // NAMESPACE
 

@@ -473,12 +473,11 @@ MNEForwardSolution MNEForwardSolution::pick_channels_forward(const QStringList& 
 
 //*************************************************************************************************************
 
-MNEForwardSolution MNEForwardSolution::pick_types_forward(const FiffInfo &info, bool meg, bool eeg, const QStringList& include, const QStringList& exclude) const
+MNEForwardSolution MNEForwardSolution::pick_types_forward(bool meg, bool eeg, const QStringList& include, const QStringList& exclude) const
 {
     RowVectorXi sel = info.pick_types(meg, eeg, false, include, exclude);
 
     QStringList include_ch_names;
-    qDebug() << "sel.cols() " << sel.cols();
     for(qint32 i = 0; i < sel.cols(); ++i)
         include_ch_names << info.ch_names[sel[i]];
 
@@ -488,11 +487,63 @@ MNEForwardSolution MNEForwardSolution::pick_types_forward(const FiffInfo &info, 
 
 //*************************************************************************************************************
 
-void MNEForwardSolution::prepare_forward(const FiffInfo &info, const FiffCov &noise_cov, bool pca, QStringList &p_outChNames, MatrixXd &p_outGain, FiffCov &p_outNoiseCov, MatrixXd &p_outWhitener, qint32 &p_outRank)
+void MNEForwardSolution::prepare_forward(const FiffInfo &p_info, const FiffCov &p_noise_cov, bool p_pca, QStringList &p_outChNames, MatrixXd &p_outGain, FiffCov &p_outNoiseCov, MatrixXd &p_outWhitener, qint32 &p_outNumNonZero)
 {
     QStringList fwd_ch_names;
-//    for(qint32 i = 0; i < this->)
+    for(qint32 i = 0; i < p_info.chs.size(); ++i)
+        fwd_ch_names << p_info.chs[i].ch_name;
+    p_outChNames.clear();
+    for(qint32 i = 0; i < fwd_ch_names.size(); ++i)
+        if(!p_info.bads.contains(fwd_ch_names[i]))
+            p_outChNames << fwd_ch_names[i];
 
+    qint32 n_chan = p_outChNames.size();
+    printf("Computing inverse operator with %d channels.\n", n_chan);
+
+    //
+    //   Handle noise cov
+    //
+    p_outNoiseCov = p_noise_cov.prepare_noise_cov(p_info, p_outChNames);
+
+    //   Omit the zeroes due to projection
+//    std::cout << "\nEig:\n" << p_outNoiseCov.eig << std::endl;
+
+    p_outNumNonZero = 0;
+    VectorXi t_vecNonZero = VectorXi::Zero(n_chan);
+    for(qint32 i = 0; i < p_outNoiseCov.eig.rows(); ++i)
+    {
+        if(p_outNoiseCov.eig[i] > 0)
+        {
+            t_vecNonZero[p_outNumNonZero] = i;
+            ++p_outNumNonZero;
+        }
+    }
+    t_vecNonZero.conservativeResize(p_outNumNonZero);
+
+    if (p_pca)
+    {
+        p_outWhitener = MatrixXd::Zero(p_outNumNonZero, n_chan);
+        qDebug() << "ToDo PCA Implementation";
+//        whitener = np.zeros((n_nzero, n_chan), dtype=np.float)
+//        whitener = 1.0 / np.sqrt(eig[nzero])
+//        // Rows of eigvec are the eigenvectors
+//        whitener = noise_cov['eigvec'][nzero] / np.sqrt(eig[nzero])[:, None]
+//        logger.info('Reducing data rank to %d' % n_nzero)
+    }
+    else
+    {
+        printf("Creating non pca whitener.\n");
+        p_outWhitener = MatrixXd::Zero(n_chan, n_chan);
+        for(qint32 i = 0; i < p_outNumNonZero; ++i)
+            p_outWhitener(t_vecNonZero(i),t_vecNonZero(i)) = 1.0 / sqrt(p_outNoiseCov.eig(t_vecNonZero(i)));
+//        whitener[nzero, nzero] = 1.0 / np.sqrt(eig[nzero])
+        // Rows of eigvec are the eigenvectors
+        p_outWhitener *= p_outNoiseCov.eigvec;
+//        whitener = np.dot(whitener, noise_cov['eigvec'])
+    }
+
+
+    qDebug() << "HERE To continue here";
 }
 
 
