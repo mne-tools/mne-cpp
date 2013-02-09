@@ -48,6 +48,6 @@ SUBDIRS += \
 contains(MNECPP_CONFIG, isGui) {
     qtHaveModule(3d) {
         message(Qt3D available: readFwdDisp3D configured!)
-        SUBDIRS += readFwdDisp3D \ #Qt3D is missing - figure out if 3D module is available
+        SUBDIRS += readFwdDisp3D
     }
 }
