@@ -53,6 +53,7 @@ LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
             -lMNE$${MNE_LIB_VERSION}MneMathd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}RtCommandd
@@ -60,6 +61,7 @@ CONFIG(debug, debug|release) {
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}MneMath \
+            -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}RtCommand

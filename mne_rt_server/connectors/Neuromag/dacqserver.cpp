@@ -99,12 +99,12 @@ DacqServer::~DacqServer()
 
 //*************************************************************************************************************
 
-bool DacqServer::getMeasInfo(FiffInfo::SDPtr& p_pFiffInfo)
+bool DacqServer::getMeasInfo(FiffInfo& p_fiffInfo)
 {
 
 //    if (p_pFiffInfo)
 //        delete p_pFiffInfo;
-    p_pFiffInfo->clear();
+    p_fiffInfo.clear();
 
 #ifdef DACQ_AUTOSTART
     m_pCollectorSock->server_stop();
@@ -175,7 +175,7 @@ bool DacqServer::getMeasInfo(FiffInfo::SDPtr& p_pFiffInfo)
             
             FiffProj one(kind, active, desc, t_fiffNamedMatrix);
             
-            p_pFiffInfo->projs.append(one);
+            p_fiffInfo.projs.append(one);
             
             printf("[done]\r\n");   
         }
@@ -189,34 +189,34 @@ bool DacqServer::getMeasInfo(FiffInfo::SDPtr& p_pFiffInfo)
                 break;
             case FIFFB_PROCESSED_DATA:
                 printf("Measurement ID... ");
-                p_pFiffInfo->meas_id = t_pTag->toFiffID();
+                p_fiffInfo.meas_id = t_pTag->toFiffID();
                 printf("[done]\r\n");  
                 break;
             case FIFF_MEAS_DATE:
                 printf("\tMeasurement date... ");
-                p_pFiffInfo->meas_date[0] = t_pTag->toInt()[0];
-                p_pFiffInfo->meas_date[1] = t_pTag->toInt()[1];
+                p_fiffInfo.meas_date[0] = t_pTag->toInt()[0];
+                p_fiffInfo.meas_date[1] = t_pTag->toInt()[1];
                 printf("[done]\r\n"); 
                 break;
             case FIFF_NCHAN:
                 printf("\tNumber of channels... ");
-                p_pFiffInfo->nchan = *(t_pTag->toInt());
-                printf("%d... [done]\r\n", p_pFiffInfo->nchan);
+                p_fiffInfo.nchan = *(t_pTag->toInt());
+                printf("%d... [done]\r\n", p_fiffInfo.nchan);
                 break;
             case FIFF_SFREQ:
                 printf("\tSampling frequency... ");
-                p_pFiffInfo->sfreq = *(t_pTag->toFloat());
-                printf("%f... [done]\r\n", p_pFiffInfo->sfreq);
+                p_fiffInfo.sfreq = *(t_pTag->toFloat());
+                printf("%f... [done]\r\n", p_fiffInfo.sfreq);
                 break;
             case FIFF_LOWPASS:
                 printf("\tLowpass frequency... ");
-                p_pFiffInfo->lowpass = *(t_pTag->toFloat());
-                printf("%f Hz... [done]\r\n", p_pFiffInfo->lowpass);
+                p_fiffInfo.lowpass = *(t_pTag->toFloat());
+                printf("%f Hz... [done]\r\n", p_fiffInfo.lowpass);
                 break;
             case FIFF_HIGHPASS:
                 printf("\tHighpass frequency... ");
-                p_pFiffInfo->highpass = *(t_pTag->toFloat());
-                printf("%f Hz... [done]\r\n", p_pFiffInfo->highpass);
+                p_fiffInfo.highpass = *(t_pTag->toFloat());
+                printf("%f Hz... [done]\r\n", p_fiffInfo.highpass);
                 break;
 //            case FIFF_LINE_FREQ:
 //                qDebug() << "FIFF_LINE_FREQ " << *(t_pTag->toFloat());
@@ -226,7 +226,7 @@ bool DacqServer::getMeasInfo(FiffInfo::SDPtr& p_pFiffInfo)
 //                break;
             case FIFF_CH_INFO:
 //                qDebug() << "Processed FIFF_CH_INFO";
-                p_pFiffInfo->chs.append( t_pTag->toChInfo() );
+                p_fiffInfo.chs.append( t_pTag->toChInfo() );
                 break;
             case FIFF_BLOCK_END:
                 switch(*(t_pTag->toInt()))
@@ -250,10 +250,10 @@ bool DacqServer::getMeasInfo(FiffInfo::SDPtr& p_pFiffInfo)
     delete t_pTag;
 
     printf("\tProcessing channels... ");
-    for(qint32 i = 0; i < p_pFiffInfo->chs.size(); ++i)
-        p_pFiffInfo->ch_names.append(p_pFiffInfo->chs[i].ch_name);
+    for(qint32 i = 0; i < p_fiffInfo.chs.size(); ++i)
+        p_fiffInfo.ch_names.append(p_fiffInfo.chs[i].ch_name);
 
-    printf("[done]\r\n", p_pFiffInfo->chs.size());
+    printf("[done]\r\n", p_fiffInfo.chs.size());
     
     printf("measurement info read.\r\n");   
 
@@ -359,10 +359,10 @@ void DacqServer::run()
     //
     // Requesting new header info: read it every time a measurement starts or a measurement info is requested
     //
-    if(m_pNeuromag->m_pInfo->isEmpty() || m_bMeasInfoRequest)
+    if(m_pNeuromag->m_info.isEmpty() || m_bMeasInfoRequest)
     {
         m_pNeuromag->mutex.lock();
-        if(getMeasInfo(m_pNeuromag->m_pInfo))
+        if(getMeasInfo(m_pNeuromag->m_info))
         {
             if(m_bMeasInfoRequest)
             {
@@ -375,8 +375,8 @@ void DacqServer::run()
                 delete m_pNeuromag->m_pRawMatrixBuffer;
             m_pNeuromag->m_pRawMatrixBuffer = NULL;
 
-            if(!m_pNeuromag->m_pInfo->isEmpty())
-                m_pNeuromag->m_pRawMatrixBuffer = new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_pNeuromag->m_pInfo->nchan, m_pNeuromag->m_uiBufferSampleSize);
+            if(!m_pNeuromag->m_info.isEmpty())
+                m_pNeuromag->m_pRawMatrixBuffer = new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_pNeuromag->m_info.nchan, m_pNeuromag->m_uiBufferSampleSize);
         }
         else
             m_bIsRunning = false;
@@ -405,10 +405,10 @@ void DacqServer::run()
             break;
         }
 
-        if (nchan < 0 && !m_pNeuromag->m_pInfo->isEmpty())
+        if (nchan < 0 && !m_pNeuromag->m_info.isEmpty())
         {
-            nchan = m_pNeuromag->m_pInfo->nchan;
-            sfreq = m_pNeuromag->m_pInfo->sfreq;
+            nchan = m_pNeuromag->m_info.nchan;
+            sfreq = m_pNeuromag->m_info.sfreq;
         }
 
 
