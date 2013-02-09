@@ -45,7 +45,9 @@ SUBDIRS += \
     computeInverse \
     realtimeInverse \
 
-contains(Qt3D_available, true) {
-    message(Qt3D available: readFwdDisp configured!)
-    SUBDIRS += readFwdDisp3D \ #Qt3D is missing - figure out if 3D module is available
+contains(MNECPP_CONFIG, isGui) {
+    qtHaveModule(3d) {
+        message(Qt3D available: readFwdDisp3D configured!)
+        SUBDIRS += readFwdDisp3D \ #Qt3D is missing - figure out if 3D module is available
+    }
 }

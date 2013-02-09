@@ -46,11 +46,11 @@ SUBDIRS += generics \
     rtClient \
     rtInv \
 
-
-#qtHaveModule(3d): SUBDIRS += disp
-contains(Qt3D_available, true) {
-    message(Qt3D available: disp library configured!)
-    SUBDIRS += disp3D \ #Qt3D is missing - figure out if module is available
+contains(MNECPP_CONFIG, isGui) {
+    qtHaveModule(3d) {
+        message(Qt3D available: disp3D library configured!)
+        SUBDIRS += disp3D \ #Qt3D is missing - figure out if module is available
+    }
 }
 
 CONFIG += ordered
