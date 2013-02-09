@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     disp.pro
+# @file     readFwdDisp3D.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -18,7 +18,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
@@ -29,61 +29,50 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the display library.
+# @brief    Example to display the forward solution source space using 3D stereoscopic view.
 #
 #--------------------------------------------------------------------------------------------------------------
 
 include(../../mne-cpp.pri)
 
-TEMPLATE = lib
+TEMPLATE = app
+
+VERSION = $${MNE_CPP_VERSION}
 
 QT       += 3d
 
-DEFINES += DISP_LIBRARY
+CONFIG   += console
+CONFIG   -= app_bundle
 
-TARGET = Disp
-TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
+TARGET = readFwdDisp3D
+
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Fiffd \
+    LIBS += -lMNE$${MNE_LIB_VERSION}MneMathd \
             -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${MNE_LIB_VERSION}Fsd
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Disp3Dd
 }
 else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Fiff \
+    LIBS += -lMNE$${MNE_LIB_VERSION}MneMath \
             -lMNE$${MNE_LIB_VERSION}Mne \
-            -lMNE$${MNE_LIB_VERSION}Fs
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Disp3D
 }
 
-DESTDIR = $${MNE_LIBRARY_DIR}
+DESTDIR = $${PWD}/../../bin
 
-#
-# win32: copy dll's to bin dir
-# unix: add lib folder to LD_LIBRARY_PATH
-#
-win32 {
-    FILE = $${DESTDIR}/$${TARGET}.dll
-    BINDIR = $${DESTDIR}/../bin
-    FILE ~= s,/,\\,g
-    BINDIR ~= s,/,\\,g
-    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
-}
+TEMPLATE = app
+
 
 SOURCES += \
-    geometryview.cpp
+    src/main.cpp \
 
-HEADERS += disp_global.h \
-    geometryview.h
+HEADERS += \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
-
-# Install headers to include directory
-header_files.files = ./*.h
-header_files.path = $${MNE_INCLUDE_DIR}/disp
-
-INSTALLS += header_files

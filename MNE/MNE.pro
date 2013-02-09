@@ -50,7 +50,7 @@ SUBDIRS += generics \
 #qtHaveModule(3d): SUBDIRS += disp
 contains(Qt3D_available, true) {
     message(Qt3D available: disp library configured!)
-    SUBDIRS += disp \ #Qt3D is missing - figure out if module is available
+    SUBDIRS += disp3D \ #Qt3D is missing - figure out if module is available
 }
 
 CONFIG += ordered
