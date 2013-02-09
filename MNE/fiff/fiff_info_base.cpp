@@ -95,3 +95,209 @@ void FiffInfoBase::clear()
     ctf_head_t.clear();
     bads.clear();
 }
+
+
+//*************************************************************************************************************
+
+RowVectorXi FiffInfoBase::pick_types(bool meg, bool eeg, bool stim, const QStringList& include, const QStringList& exclude) const
+{
+    RowVectorXi pick = RowVectorXi::Zero(this->nchan);
+
+    fiff_int_t kind;
+    qint32 k;
+    for(k = 0; k < this->nchan; ++k)
+    {
+        kind = this->chs[k].kind;
+        if ((kind == FIFFV_MEG_CH || kind == FIFFV_REF_MEG_CH) && meg)
+            pick(0, k) = true;
+        else if (kind == FIFFV_EEG_CH && eeg)
+            pick(0, k) = true;
+        else if ((kind == FIFFV_STIM_CH) && stim)
+            pick(0, k) = true;
+    }
+
+    qint32 p = 0;
+    QStringList myinclude;
+    for(k = 0; k < this->nchan; ++k)
+    {
+        if (pick(0, k))
+        {
+            myinclude << this->ch_names[k];
+            ++p;
+        }
+    }
+
+//        qDebug() << "Size: " << myinclude.size();
+//        qDebug() << myinclude;
+
+    if (include.size() > 0)
+    {
+        for (k = 0; k < include.size(); ++k)
+        {
+            myinclude << include[k];
+            ++p;
+        }
+    }
+
+//        qDebug() << "Size: " << myinclude.size();
+//        qDebug() << myinclude;
+
+    RowVectorXi sel;
+    if (p != 0)
+        sel = FiffInfoBase::pick_channels(this->ch_names, myinclude, exclude);
+
+    return sel;
+}
+
+
+//*************************************************************************************************************
+
+RowVectorXi FiffInfoBase::pick_channels(const QStringList& ch_names, const QStringList& include, const QStringList& exclude)
+{
+    qint32 nchan = ch_names.size();
+    RowVectorXi sel = RowVectorXi::Zero(nchan);
+    qint32 i, k, p, c, count, nzero;
+    if (include.size() == 0 && exclude.size() == 0)
+    {
+        sel.setOnes();
+        for(k = 0; k < nchan; ++k)
+            sel[k] = k;//+1 using MATLAB notation
+        return sel;
+    }
+
+    if (include.size() == 0)
+    {
+        //
+        //   Include all initially
+        //
+        sel.setZero();
+        for (k = 0; k < nchan; ++k)
+            sel[k] = k; //+1 using MATLAB notation
+
+        qint32 nzero = 0;
+        for(k = 0; k < exclude.size(); ++k)
+        {
+            count = 0;
+            for (i = ch_names.size()-1; i >= 0 ; --i)
+            {
+                if (QString::compare(exclude[k],ch_names[i]) == 0)
+                {
+                    ++count;
+                    c = i;
+                }
+            }
+            nzero = 0;//does this make sense? - its here because its in the MATLAB file
+            if(count > 0)
+            {
+                sel[c] = -1;//to elimnate channels use -1 instead of 0 - cause its zero based indexed
+                ++nzero;
+            }
+        }
+        //
+        //  Check for exclusions
+        //
+        if(nzero > 0)
+        {
+            RowVectorXi newsel = RowVectorXi::Zero(nchan-nzero);
+            p = 0;
+            for(k = 0; k < nchan; ++k)
+            {
+                if (sel[k] >= 0)
+                {
+                    newsel[p] = sel[k];
+                    ++p;
+                }
+            }
+            sel = newsel;
+        }
+    }
+    else
+    {
+        //
+        //   First do the channels to be included
+        //
+        sel.resize(include.size());
+        sel.setZero();
+        nzero = 0;
+        for(k = 0; k < include.size(); ++k)
+        {
+            count = 0;
+            for (i = ch_names.size()-1; i >= 0 ; --i)
+            {
+                if (QString::compare(include[k],ch_names[i]) == 0)
+                {
+                    count += 1;
+                    c = i;
+                }
+            }
+            if (count == 0)
+                printf("Missing channel %s\n",include[k].toUtf8().constData());
+            else if (count > 1)
+                printf("Ambiguous channel, taking first occurence: %s",include[k].toUtf8().constData());
+
+            //
+            //  Is this channel in the exclusion list?
+            //
+            sel[k] = c;//+1 using MATLAB notation
+            if (exclude.size() > 0)
+            {
+                count = 0;
+                for (i = 0; i < exclude.size(); ++i)
+                {
+                    if (QString::compare(include[k],exclude[i]) == 0)
+                        ++count;
+                }
+                if (count > 0)
+                {
+                    sel[k] = -1;//to elimnate channels use -1 instead of 0 - cause its zero based indexed
+                    ++nzero;
+                }
+            }
+        }
+        //
+        //    Check whether some channels were excluded
+        //
+        if (nzero > 0)
+        {
+            RowVectorXi newsel = RowVectorXi::Zero(include.size()-nzero);
+
+            p = 0;
+            for(k = 0; k < include.size(); ++k)
+            {
+                if (sel(0,k) >= 0) // equal also cause of zero based picking
+                {
+                    newsel[p] = sel[k];
+                    ++p;
+                }
+            }
+            sel.resize(newsel.cols());
+            sel = newsel;
+        }
+    }
+    return sel;
+}
+
+
+//*************************************************************************************************************
+
+FiffInfoBase FiffInfoBase::pick_info(const MatrixXi* sel) const
+{
+    FiffInfoBase res = *this;//new FiffInfo(this);
+    if (sel == NULL)
+        return res;
+
+    //ToDo when pointer List do delation
+    res.chs.clear();
+    res.ch_names.clear();
+
+    qint32 idx;
+    for(qint32 i = 0; i < sel->cols(); ++i)
+    {
+        idx = (*sel)(0,i);
+        res.chs.append(this->chs[idx]);
+        res.ch_names.append(this->ch_names[idx]);
+    }
+    res.nchan  = sel->cols();
+
+    return res;
+}

@@ -131,7 +131,15 @@ public:
     *
     * @return the prepared noise covariance matrix
     */
-    FiffCov prepare_noise_cov(FiffInfo& p_Info, QStringList& p_ChNames);
+    FiffCov prepare_noise_cov(const FiffInfo& p_Info, const QStringList& p_ChNames) const;
+
+    //=========================================================================================================
+    /**
+    * Assignment Operator
+    *
+    * @param[in] rhs     FiffCov which should be assigned.
+    */
+    FiffCov& operator= (const FiffCov &rhs);
 
 public:
     fiff_int_t  kind;       /**< Covariance kind -> fiff_constants.h */

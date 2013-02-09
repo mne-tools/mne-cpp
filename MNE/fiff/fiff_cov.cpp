@@ -113,7 +113,7 @@ void FiffCov::clear()
 
 //*************************************************************************************************************
 
-FiffCov FiffCov::prepare_noise_cov(FiffInfo& p_Info, QStringList& p_ChNames)
+FiffCov FiffCov::prepare_noise_cov(const FiffInfo &p_Info, const QStringList &p_ChNames) const
 {
     FiffCov p_NoiseCov(*this);
 
@@ -191,6 +191,8 @@ FiffCov FiffCov::prepare_noise_cov(FiffInfo& p_Info, QStringList& p_ChNames)
     bool has_eeg = C_eeg_idx.size() > 0;
 
     MatrixXd C_meg, C_eeg;
+    VectorXd C_meg_eig, C_eeg_eig;
+    MatrixXd C_meg_eigvec, C_eeg_eigvec;
     if (has_meg)
     {
         count = C_meg_idx.rows();
@@ -198,9 +200,6 @@ FiffCov FiffCov::prepare_noise_cov(FiffInfo& p_Info, QStringList& p_ChNames)
         for(qint32 i = 0; i < count; ++i)
             for(qint32 j = 0; j < count; ++j)
                 C_meg(i,j) = C(C_meg_idx(i), C_meg_idx(j));
-
-        VectorXd C_meg_eig;
-        MatrixXd C_meg_eigvec;
         MNEMath::get_whitener(C_meg, false, QString("MEG"), C_meg_eig, C_meg_eigvec);
     }
 
@@ -211,9 +210,6 @@ FiffCov FiffCov::prepare_noise_cov(FiffInfo& p_Info, QStringList& p_ChNames)
         for(qint32 i = 0; i < count; ++i)
             for(qint32 j = 0; j < count; ++j)
                 C_eeg(i,j) = C(C_eeg_idx(i), C_eeg_idx(j));
-
-        VectorXd C_eeg_eig;
-        MatrixXd C_eeg_eigvec;
         MNEMath::get_whitener(C_eeg, false, QString("EEG"), C_eeg_eig, C_eeg_eigvec);
     }
 
@@ -221,17 +217,22 @@ FiffCov FiffCov::prepare_noise_cov(FiffInfo& p_Info, QStringList& p_ChNames)
     p_NoiseCov.eigvec = MatrixXd::Zero(n_chan, n_chan);
     p_NoiseCov.eig = VectorXd::Zero(n_chan);
 
-    std::cout << "C_meg_idx: " << C_meg_idx.rows();
-//    if(has_meg)
-//    {
-//        p_NoiseCov.eigvec[np.ix_(C_meg_idx, C_meg_idx)] = C_meg_eigvec
-//        p_NoiseCov.eig[C_meg_idx] = C_meg_eig
-//    }
-//    if(has_eeg)
-//    {
-//        p_NoiseCov.eigvec[np.ix_(C_eeg_idx, C_eeg_idx)] = C_eeg_eigvec
-//        p_NoiseCov.eig[C_eeg_idx] = C_eeg_eig
-//    }
+    if(has_meg)
+    {
+        for(qint32 i = 0; i < C_meg_idx.rows(); ++i)
+            for(qint32 j = 0; j < C_meg_idx.rows(); ++j)
+                p_NoiseCov.eigvec(C_meg_idx(i), C_meg_idx(j)) = C_meg_eigvec(i, j);
+        for(qint32 i = 0; i < C_meg_idx.rows(); ++i)
+            p_NoiseCov.eig(C_meg_idx(i)) = C_meg_eig(i);
+    }
+    if(has_eeg)
+    {
+        for(qint32 i = 0; i < C_eeg_idx.rows(); ++i)
+            for(qint32 j = 0; j < C_eeg_idx.rows(); ++j)
+                p_NoiseCov.eigvec(C_eeg_idx(i), C_eeg_idx(j)) = C_eeg_eigvec(i, j);
+        for(qint32 i = 0; i < C_eeg_idx.rows(); ++i)
+            p_NoiseCov.eig(C_eeg_idx(i)) = C_eeg_eig(i);
+    }
 
     if (C_meg_idx.size() + C_eeg_idx.size() == n_chan)
         return FiffCov();
@@ -241,4 +242,26 @@ FiffCov FiffCov::prepare_noise_cov(FiffInfo& p_Info, QStringList& p_ChNames)
     p_NoiseCov.names = p_ChNames;
 
     return p_NoiseCov;
+}
+
+
+//*************************************************************************************************************
+
+FiffCov& FiffCov::operator= (const FiffCov &rhs)
+{
+    if (this != &rhs) // protect against invalid self-assignment
+    {
+        kind = rhs.kind;
+        diag = rhs.diag;
+        dim = rhs.dim;
+        names = rhs.names;
+        data = rhs.data;
+        projs = rhs.projs;
+        bads = rhs.bads;
+        nfree = rhs.nfree;
+        eig = rhs.eig;
+        eigvec = rhs.eigvec;
+    }
+    // to support chained assignment operators (a=b=c), always return *this
+    return *this;
 }

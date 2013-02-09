@@ -339,9 +339,9 @@ public:
     *
     * @return Info modified according to sel
     */
-    inline static FiffInfo pick_info(const FiffInfo* info, const MatrixXi* sel = NULL)
+    inline static FiffInfo pick_info(const FiffInfo& info, const MatrixXi* sel = NULL)
     {
-        return info->pick_info(sel);
+        return info.pick_info(sel);
     }
 
     //=========================================================================================================
