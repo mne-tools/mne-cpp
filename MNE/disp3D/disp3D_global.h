@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     disp_global.h
+* @file     disp3D_global.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    disp library export/import macros.
+* @brief    disp3D library export/import macros.
 *
 */
 
-#ifndef DISP_GLOBAL_H
-#define DISP_GLOBAL_H
+#ifndef DISP3D_GLOBAL_H
+#define DISP3D_GLOBAL_H
 
 
 //*************************************************************************************************************
@@ -50,10 +50,10 @@
 // DEFINES
 //=============================================================================================================
 
-#if defined(DISP_LIBRARY)
-#  define DISPSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#if defined(DISP3D_LIBRARY)
+#  define DISP3DSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define DISPSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define DISP3DSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-#endif // DISP_GLOBAL_H
+#endif // DISP3D_GLOBAL_H

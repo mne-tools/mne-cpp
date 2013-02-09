@@ -47,5 +47,5 @@ SUBDIRS += \
 
 contains(Qt3D_available, true) {
     message(Qt3D available: readFwdDisp configured!)
-    SUBDIRS += readFwdDisp \ #Qt3D is missing - figure out if 3D module is available
+    SUBDIRS += readFwdDisp3D \ #Qt3D is missing - figure out if 3D module is available
 }

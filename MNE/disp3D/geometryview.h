@@ -42,7 +42,7 @@
 // DISP INCLUDES
 //=============================================================================================================
 
-#include "disp_global.h"
+#include "disp3D_global.h"
 
 #include <fs/annotation.h>
 
@@ -69,7 +69,7 @@
 // DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-namespace DISPLIB
+namespace DISP3DLIB
 {
 
 //*************************************************************************************************************
@@ -91,7 +91,7 @@ using namespace FSLIB;
 *
 * @brief Geometry View
 */
-class DISPSHARED_EXPORT GeometryView : public QGLView
+class DISP3DSHARED_EXPORT GeometryView : public QGLView
 {
     Q_OBJECT
 public:

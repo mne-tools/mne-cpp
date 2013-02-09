@@ -61,7 +61,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}RtClientd \
             -lMNE$${MNE_LIB_VERSION}RtInvd \
             -lMNE$${MNE_LIB_VERSION}Genericsd \
-            -lMNE$${MNE_LIB_VERSION}Dispd
+            -lMNE$${MNE_LIB_VERSION}Disp3Dd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}MneMath \
@@ -71,7 +71,7 @@ else {
             -lMNE$${MNE_LIB_VERSION}RtClient \
             -lMNE$${MNE_LIB_VERSION}RtInv \
             -lMNE$${MNE_LIB_VERSION}Generics \
-            -lMNE$${MNE_LIB_VERSION}Disp
+            -lMNE$${MNE_LIB_VERSION}Disp3D
 }
 
 DESTDIR = $${PWD}/../bin
