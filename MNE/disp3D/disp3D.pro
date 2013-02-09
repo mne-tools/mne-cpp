@@ -49,14 +49,14 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${MNE_LIB_VERSION}Fsd
+    LIBS += -lMNE$${MNE_LIB_VERSION}Fsd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned
 }
 else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Mne \
-            -lMNE$${MNE_LIB_VERSION}Fs
+    LIBS += -lMNE$${MNE_LIB_VERSION}Fs \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Mne
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}
@@ -76,7 +76,8 @@ win32 {
 SOURCES += \
     geometryview.cpp
 
-HEADERS += disp3D_global.h \
+HEADERS += \
+    disp3D_global.h \
     geometryview.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

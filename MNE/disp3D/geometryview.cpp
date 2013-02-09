@@ -82,8 +82,10 @@ GeometryView::GeometryView(QWindow *parent)
     if(!MNE::read_forward_solution(t_File, t_ForwardSolution))
         t_ForwardSolution.clear();
 
-    m_vecAnnotation.append(Annotation::SPtr(new Annotation(QString("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot"))));
-    m_vecAnnotation.append(Annotation::SPtr(new Annotation(QString("./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot"))));
+    QString t_sLeftHemisphere("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot");
+    QString t_sRightHemisphere("./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
+    m_vecAnnotation.append(Annotation::SPtr(new Annotation(t_sLeftHemisphere)));
+    m_vecAnnotation.append(Annotation::SPtr(new Annotation(t_sRightHemisphere)));
 
     m_pCameraFrontal = new QGLCamera(this);
     m_pCameraFrontal->setAdjustForAspectRatio(false);
