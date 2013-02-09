@@ -164,7 +164,7 @@ private:
 
     DacqServer*     m_pDacqServer;
 
-    FiffInfo::SDPtr m_pInfo;
+    FiffInfo        m_info;
 
     int             m_iID;
 
