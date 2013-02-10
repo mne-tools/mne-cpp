@@ -43,7 +43,7 @@ SUBDIRS += \
     readFwd \
     readEpochs \
     computeInverse \
-    realTmeInverse \
+    realTimeInverse \
     makeInverseOperator
 
 contains(MNECPP_CONFIG, isGui) {
