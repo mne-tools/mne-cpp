@@ -93,7 +93,7 @@ MNEForwardSolution::MNEForwardSolution()
 
 //*************************************************************************************************************
 
-MNEForwardSolution::MNEForwardSolution(QIODevice &p_IODevice)
+MNEForwardSolution::MNEForwardSolution(QIODevice &p_IODevice, bool force_fixed, bool surf_ori, QStringList& include, QStringList& exclude)
 : source_ori(-1)
 , coord_frame(-1)
 , nsource(-1)
@@ -106,7 +106,7 @@ MNEForwardSolution::MNEForwardSolution(QIODevice &p_IODevice)
 , source_nn(MatrixX3d::Zero(0,3))
 , isClustered(false)
 {
-    if(!read_forward_solution(p_IODevice, *this))
+    if(!read_forward_solution(p_IODevice, *this, force_fixed, surf_ori, include, exclude))
     {
         printf("\tForward solution not found.\n");//ToDo Throw here
         return;
@@ -853,7 +853,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
         fwd.source_rr = MatrixXd::Zero(fwd.nsource,3);
         fwd.source_nn = MatrixXd::Zero(fwd.nsource*3,3);
 
-        printf(" (Warning: Rotating the source coordinate system haven't been verified --> Singular Vectors U are different from MATLAB!) ");
+        printf(" (Warning source_ori: Rotating the source coordinate system haven't been verified --> Singular Vectors U are different from MATLAB!) ");
 
         for(qint32 k = 0; k < t_SourceSpace.hemispheres.size();++k)
         {
