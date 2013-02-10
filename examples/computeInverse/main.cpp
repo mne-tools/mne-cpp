@@ -115,8 +115,8 @@ int main(int argc, char *argv[])
     //
     //   Then the inverse operator
     //
-    MNEInverseOperator inv_raw;
-    MNEInverseOperator::read_inverse_operator(t_fileInv, inv_raw);
+    MNEInverseOperator inv_raw(t_fileInv);
+
     //
     //   Set up the inverse according to the parameters
     //

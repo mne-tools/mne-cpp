@@ -76,6 +76,14 @@ MNEInverseOperator::MNEInverseOperator()
 
 //*************************************************************************************************************
 
+MNEInverseOperator::MNEInverseOperator(QIODevice& p_IODevice)
+{
+    MNEInverseOperator::read_inverse_operator(p_IODevice, *this);
+}
+
+
+//*************************************************************************************************************
+
 MNEInverseOperator::MNEInverseOperator(const MNEInverseOperator &p_MNEInverseOperator)
 : methods(p_MNEInverseOperator.methods)
 , source_ori(p_MNEInverseOperator.source_ori)
