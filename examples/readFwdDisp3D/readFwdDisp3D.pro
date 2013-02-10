@@ -66,13 +66,13 @@ else {
             -lMNE$${MNE_LIB_VERSION}Disp3D
 }
 
-DESTDIR = $${PWD}/../../bin
+DESTDIR =  $${MNE_BINARY_DIR}
 
 TEMPLATE = app
 
 
 SOURCES += \
-    src/main.cpp \
+        main.cpp \
 
 HEADERS += \
 

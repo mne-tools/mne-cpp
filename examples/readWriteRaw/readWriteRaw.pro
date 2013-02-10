@@ -65,10 +65,10 @@ else {
             -lMNE$${MNE_LIB_VERSION}Mne
 }
 
-DESTDIR = $${PWD}/../../bin
+DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
-    src/main.cpp \
+        main.cpp \
 
 HEADERS += \
 

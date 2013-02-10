@@ -44,7 +44,7 @@ QT -= gui
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = realtimeInverse
+TARGET = realTimeInverse
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -64,10 +64,10 @@ else {
             -lMNE$${MNE_LIB_VERSION}Mne
 }
 
-DESTDIR = $${PWD}/../../bin
+DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
-    src/main.cpp \
+        main.cpp \
 
 HEADERS += \
 
