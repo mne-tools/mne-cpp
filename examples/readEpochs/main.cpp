@@ -89,8 +89,7 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    QString t_sFileName = "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
-    QFile t_File(t_sFileName);
+    QFile t_File("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
 
     qint32 event = 1;
     QString t_sEventName = "../../mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif";
@@ -108,7 +107,7 @@ int main(int argc, char *argv[])
     //
     FiffRawData raw;
 
-    if(!FiffStream::setup_read_raw(&t_File, raw))
+    if(!FiffStream::setup_read_raw(t_File, raw))
     {
         printf("Error during fiff setup raw read\n");
         return 0;
@@ -205,10 +204,10 @@ int main(int argc, char *argv[])
     MatrixXi events;
     if (t_sEventName.size() == 0)
     {
-        p = t_sFileName.indexOf(".fif");
+        p = t_File.fileName().indexOf(".fif");
         if (p > 0)
         {
-            t_sEventName = t_sFileName.replace(p, 4, "-eve.fif");
+            t_sEventName = t_File.fileName().replace(p, 4, "-eve.fif");
         }
         else
         {
@@ -226,7 +225,7 @@ int main(int argc, char *argv[])
         //
         //   Binary file
         //
-        p = t_sFileName.indexOf(".fif");
+        p = t_File.fileName().indexOf(".fif");
         if (p > 0)
         {
             t_EventFile.setFileName(t_sEventName);

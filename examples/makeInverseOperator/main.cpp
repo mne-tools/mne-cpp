@@ -35,10 +35,37 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// INCLUDES
+// MNE INCLUDES
 //=============================================================================================================
 
-#include <QCoreApplication>
+#include <fiff/fiff_cov.h>
+#include <mne/mne.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <math.h>
+#include <iostream>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QtCore/QCoreApplication>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace FIFFLIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -58,6 +85,28 @@
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    
+
+    QFile t_fileFwdMeeg("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QFile t_fileFwdEeg("./MNE-sample-data/MEG/sample/sample_audvis-eeg-oct-6-fwd.fif");
+    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+
+    double snr = 3.0;
+    double lambda2 = 1.0 / pow(snr, 2);
+
+    // Load data
+    fiff_int_t setno = 0;
+    FiffEvokedDataSet evoked(t_fileEvoked, setno);
+    MNEForwardSolution t_forwardMeeg;
+    if(!MNEForwardSolution::read_forward_solution(t_fileFwdMeeg, t_forwardMeeg))
+    {
+        printf("Forward solution not found: %s\n", t_fileFwdMeeg.fileName().toLatin1().constData());
+        return 0;
+    }
+    FiffCov noise_cov(t_fileCov);
+
+    qDebug() << "Dimensions: " << noise_cov.data.rows() << " x " << noise_cov.data.cols();
+
+
     return a.exec();
 }

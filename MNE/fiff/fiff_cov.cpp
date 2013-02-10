@@ -39,9 +39,12 @@
 //=============================================================================================================
 
 #include "fiff_cov.h"
+#include "fiff_stream.h"
+
+#include <mneMath/mnemath.h>
+
 
 #include <iostream>
-#include <mneMath/mnemath.h>
 
 
 //*************************************************************************************************************
@@ -65,6 +68,28 @@ FiffCov::FiffCov()
 , nfree(-1)
 {
 
+}
+
+
+//*************************************************************************************************************
+
+FiffCov::FiffCov(QIODevice &p_IODevice)
+{
+    FiffStream* t_pStream = new FiffStream(&p_IODevice);
+    FiffDirTree t_Tree;
+    QList<FiffDirEntry> t_Dir;
+
+    if(!t_pStream->open(t_Tree, t_Dir))
+    {
+        if(t_pStream)
+            delete t_pStream;
+        return;
+    }
+
+    t_pStream->read_cov(t_Tree, FIFFV_MNE_NOISE_COV, *this);
+
+    if(t_pStream)
+        delete t_pStream;
 }
 
 

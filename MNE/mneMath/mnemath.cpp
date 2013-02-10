@@ -176,6 +176,28 @@ void MNEMath::get_whitener(MatrixXd& A, bool pca, QString ch_type, VectorXd& eig
 
 //*************************************************************************************************************
 
+bool MNEMath::issparse(VectorXd &v)
+{
+    qDebug() << "ToDo: Figure out quickly whether it's a sparse or non sparse matrix.";
+
+    qint32 c = 0;
+    qint32 n = v.rows();
+    qint32 t = n/2;
+
+    for(qint32 i = 0; i < n; ++i)
+    {
+        if(v(i) == 0)
+            ++c;
+        if(c > t)
+            return true;
+    }
+
+    return false;
+}
+
+
+//*************************************************************************************************************
+
 SparseMatrix<double>* MNEMath::make_block_diag(const MatrixXd* A, qint32 n)
 {
 

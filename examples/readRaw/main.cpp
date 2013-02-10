@@ -83,8 +83,7 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    QString t_sFileName = "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
-    QFile t_File(t_sFileName);
+    QFile t_File("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
 
     float from = 42.956f;
     float to = 320.670f;
@@ -97,7 +96,7 @@ int main(int argc, char *argv[])
     //   Setup for reading the raw data
     //
     FiffRawData raw;
-    if(!FiffStream::setup_read_raw(&t_File, raw))
+    if(!FiffStream::setup_read_raw(t_File, raw))
     {
         printf("Error during fiff setup raw read");
         return 0;

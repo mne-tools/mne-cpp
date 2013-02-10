@@ -36,7 +36,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// INCLUDES
+// MNE INCLUDES
 //=============================================================================================================
 
 #include "fiff_stream.h"
@@ -47,10 +47,12 @@
 #include "fiff_info_base.h"
 #include "fiff_raw_data.h"
 
+#include <mneMath/mnemath.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
 #include <QFile>
@@ -62,6 +64,7 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace MNEMATHLIB;
 
 
 //*************************************************************************************************************
@@ -267,7 +270,7 @@ bool FiffStream::read_cov(const FiffDirTree& p_Node, fiff_int_t cov_kind, FiffCo
     VectorXd eig;
     MatrixXd eigvec;
     VectorXd cov_diag;
-    VectorXd cov;
+    MatrixXd cov;
     VectorXd cov_sparse;
     QStringList bads;
     for(p = 0; p < covs.size(); ++p)
@@ -330,15 +333,15 @@ bool FiffStream::read_cov(const FiffDirTree& p_Node, fiff_int_t cov_kind, FiffCo
             }
             else
             {
-                diagmat = false;
+                VectorXd vals;
                 nn = dim*(dim+1)/2;
                 if (tag->type == FIFFT_DOUBLE)
                 {
-                    cov =  Map<VectorXd>(tag->toDouble(),nn);
+                    vals =  Map<VectorXd>(tag->toDouble(),nn);
                 }
                 else if (tag->type == FIFFT_FLOAT)
                 {
-                    cov = Map<VectorXf>(tag->toFloat(),nn).cast<double>();
+                    vals = Map<VectorXf>(tag->toFloat(),nn).cast<double>();
                 }
                 else
                 {
@@ -347,6 +350,39 @@ bool FiffStream::read_cov(const FiffDirTree& p_Node, fiff_int_t cov_kind, FiffCo
                 }
 
 
+                if(!MNEMath::issparse(vals))
+                {
+                    //
+                    //   Lower diagonal is stored
+                    //
+                    cov = MatrixXd::Zero(dim,dim);
+
+                    // XXX : should remove for loops
+                    qint32 q = 0;
+                    for(qint32 j = 0; j < dim; ++j)
+                    {
+                        for(qint32 k = 0; k < j; ++k)
+                        {
+                            cov(j,k) = vals(q);
+                            ++q;
+                        }
+                    }
+                    for(qint32 j = 0; j < dim; ++j)
+                        for(qint32 k = j+1; k < dim; ++k)
+                            cov(j,k) = cov(k,j);
+
+                    diagmat = false;
+                    printf("\t%d x %d full covariance (kind = %d) found.\n", dim, dim, cov_kind);
+
+                }
+                else
+                {
+                    diagmat = false;
+                    qDebug() << "ToDo: FiffStream::read_cov - this needs to be debugged.\n";
+                    cov = vals;
+                    printf("\t%d x %d sparse covariance (kind = %d) found.\n", dim, dim, cov_kind);
+                }
+//MATLAB
 //                    if ~issparse(tag.data)
 //                        //
 //                        //   Lower diagonal is stored
@@ -374,6 +410,7 @@ bool FiffStream::read_cov(const FiffDirTree& p_Node, fiff_int_t cov_kind, FiffCo
 //                        data = tag.data;
 //                        fprintf('\t%d x %d sparse covariance (kind = %d) found.\n',dim,dim,cov_kind);
 //                    end
+//MATLAB END
             }
             //
             //   Read the possibly precomputed decomposition
@@ -1228,12 +1265,12 @@ QList<FiffProj> FiffStream::read_proj(const FiffDirTree& p_Node)
 
 //*************************************************************************************************************
 
-bool FiffStream::setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool allow_maxshield)
+bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool allow_maxshield)
 {
     //
     //   Open the file
     //
-    FiffStream::SPtr p_pStream = FiffStream::SPtr(new FiffStream(p_pIODevice));
+    FiffStream::SPtr p_pStream = FiffStream::SPtr(new FiffStream(&p_IODevice));
     QString t_sFileName = p_pStream->streamName();
 
     printf("Opening raw data %s...\n",t_sFileName.toUtf8().constData());

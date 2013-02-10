@@ -72,6 +72,15 @@ FiffEvokedDataSet::FiffEvokedDataSet()
 
 //*************************************************************************************************************
 
+FiffEvokedDataSet::FiffEvokedDataSet(QIODevice& p_IODevice, fiff_int_t setno)
+{
+    if(FiffEvokedDataSet::read_evoked(p_IODevice, *this, setno))
+        return;
+}
+
+
+//*************************************************************************************************************
+
 FiffEvokedDataSet::FiffEvokedDataSet(const FiffEvokedDataSet& p_FiffEvokedDataSet)
 : info(p_FiffEvokedDataSet.info)
 , evoked(p_FiffEvokedDataSet.evoked)

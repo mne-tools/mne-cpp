@@ -104,6 +104,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Constructs a covariance data matrix, by reading from a IO device.
+    *
+    * @param[in] p_IODevice     IO device to readf the evoked data set.
+    */
+    FiffCov(QIODevice &p_IODevice);
+
+    //=========================================================================================================
+    /**
     * Copy constructor.
     *
     * @param[in] p_FiffCov   Covariance data matrix which should be copied
