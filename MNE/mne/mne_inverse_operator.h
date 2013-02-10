@@ -114,6 +114,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Constructs an inverse operator, by reading from a IO device.
+    *
+    * @param[in] p_IODevice     IO device to read from the evoked data set.
+    */
+    MNEInverseOperator(QIODevice& p_IODevice);
+
+    //=========================================================================================================
+    /**
     * Copy constructor.
     *
     * @param[in] p_MNEInverseOperator   MNE forward solution
