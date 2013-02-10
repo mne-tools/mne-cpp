@@ -74,6 +74,10 @@ FiffCov::FiffCov()
 //*************************************************************************************************************
 
 FiffCov::FiffCov(QIODevice &p_IODevice)
+: kind(-1)
+, diag(false)
+, dim(-1)
+, nfree(-1)
 {
     FiffStream* t_pStream = new FiffStream(&p_IODevice);
     FiffDirTree t_Tree;
@@ -83,10 +87,12 @@ FiffCov::FiffCov(QIODevice &p_IODevice)
     {
         if(t_pStream)
             delete t_pStream;
+        printf("\tNot able to open IODevice.\n");//ToDo Throw here
         return;
     }
 
-    t_pStream->read_cov(t_Tree, FIFFV_MNE_NOISE_COV, *this);
+    if(!t_pStream->read_cov(t_Tree, FIFFV_MNE_NOISE_COV, *this))
+        printf("\tFiff covariance not found.\n");//ToDo Throw here
 
     if(t_pStream)
         delete t_pStream;

@@ -49,21 +49,15 @@ SourceLab::SourceLab(QObject *parent)
 , m_bIsRawBufferInit(false)
 , m_pRawMatrixBuffer(NULL)
 {
-    QString t_sFileName = "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
+    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
 
-    QFile t_File(t_sFileName);
-
-    if(!MNEForwardSolution::read_forward_solution(t_File, *m_pFwd))
+    if(!MNEForwardSolution::read_forward_solution(t_fileFwd, *m_pFwd))
         return;
 
     //Cluster the forward solution
 
-    QString t_sLHAnnotFileName = "./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot";
-    Annotation t_LHAnnotation(t_sLHAnnotFileName);
-
-
-    QString t_sRHAnnotFileName = "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot";
-    Annotation t_RHAnnotation(t_sRHAnnotFileName);
+    Annotation t_LHAnnotation("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot");
+    Annotation t_RHAnnotation("./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
 
 //    MNEForwardSolution t_FwdClustered;
 //    m_pFwd->cluster_forward_solution(t_FwdClustered, t_LHAnnotation, t_RHAnnotation, 40);
