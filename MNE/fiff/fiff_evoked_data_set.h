@@ -106,6 +106,15 @@ public:
 
     //=========================================================================================================
     /**
+    * Constructs a fiff evoked data set, by reading from a IO device.
+    *
+    * @param[in] p_IODevice     IO device to readf the evoked data set.
+    * @param[in] setno          The set to pick.
+    */
+    FiffEvokedDataSet(QIODevice& p_IODevice, fiff_int_t setno);
+
+    //=========================================================================================================
+    /**
     * Copy constructor.
     *
     * @param[in] p_FiffEvokedDataSet    Fiff evoked data set which should be copied

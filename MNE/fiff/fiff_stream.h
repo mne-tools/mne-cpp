@@ -321,13 +321,13 @@ public:
     *
     * Read information about raw data file
     *
-    * @param[in] p_pIODevice        An fiff IO device like a fiff QFile or QTCPSocket
+    * @param[in] p_IODevice        An fiff IO device like a fiff QFile or QTCPSocket
     * @param[out] data              The raw data information - contains the opened fiff file
     * @param[in] allow_maxshield    Accept unprocessed MaxShield data
     *
     * @return true if succeeded, false otherwise
     */
-    static bool setup_read_raw(QIODevice* p_pIODevice, FiffRawData& data, bool allow_maxshield = false);
+    static bool setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool allow_maxshield = false);
 
     //=========================================================================================================
     /**

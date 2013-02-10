@@ -80,15 +80,12 @@ GeometryView::GeometryView(QWindow *parent)
 , m_pSceneNodeBrain(0)
 , m_pSceneNode(0)
 {
-    QString t_sFile = "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
-    QFile t_File(t_sFile);
+    QFile t_File("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     if(!MNE::read_forward_solution(t_File, t_ForwardSolution))
         t_ForwardSolution.clear();
 
-    QString t_sLeftHemisphere("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot");
-    QString t_sRightHemisphere("./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
-    m_vecAnnotation.append(Annotation::SPtr(new Annotation(t_sLeftHemisphere)));
-    m_vecAnnotation.append(Annotation::SPtr(new Annotation(t_sRightHemisphere)));
+    m_vecAnnotation.append(Annotation::SPtr(new Annotation("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot")));
+    m_vecAnnotation.append(Annotation::SPtr(new Annotation("./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot")));
 
     m_pCameraFrontal = new QGLCamera(this);
     m_pCameraFrontal->setAdjustForAspectRatio(false);

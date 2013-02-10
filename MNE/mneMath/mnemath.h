@@ -137,6 +137,17 @@ public:
 
     //=========================================================================================================
     /**
+    * Determines if a given data (stored as vector v) are representing a sparse matrix.
+    * ToDo: status is experimental -> needs to be increased in speed.
+    *
+    * @param[in] v      data to be tested
+    *
+    * @return true if sparse false otherwise;
+    */
+    static bool issparse(VectorXd &v);
+
+    //=========================================================================================================
+    /**
     * ToDo make this a template function
     *
     * ### MNE toolbox root function ###: Implementation of the mne_block_diag function - encoding part

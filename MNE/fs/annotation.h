@@ -104,7 +104,7 @@ public:
     *
     * @param[in] p_sFileName    Annotation file
     */
-    explicit Annotation(QString& p_sFileName);
+    explicit Annotation(const QString& p_sFileName);
 
     //=========================================================================================================
     /**

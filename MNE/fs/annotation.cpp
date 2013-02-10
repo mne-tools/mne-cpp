@@ -67,7 +67,7 @@ using namespace FSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Annotation::Annotation(QString& p_sFileName)
+Annotation::Annotation(const QString& p_sFileName)
 : m_sFileName(p_sFileName)
 {
     read_annotation(m_sFileName);

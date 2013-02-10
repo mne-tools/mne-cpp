@@ -76,8 +76,7 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    QString t_sFileName = "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
-    QFile t_File(t_sFileName);
+    QFile t_File("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
 
     MNEForwardSolution t_ForwardSolution;
     if(MNEForwardSolution::read_forward_solution(t_File, t_ForwardSolution))
