@@ -97,11 +97,18 @@ int main(int argc, char *argv[])
     // Load data
     fiff_int_t setno = 0;
     FiffEvokedDataSet evoked(t_fileEvoked, setno);
-    MNEForwardSolution t_forwardMeeg(t_fileFwdMeeg);
+    MNEForwardSolution t_forwardMeeg(t_fileFwdMeeg, false, true);
 
     FiffCov noise_cov(t_fileCov);
 
-    qDebug() << "Dimensions: " << noise_cov.data.rows() << " x " << noise_cov.data.cols();
+//    // regularize noise covariance
+//    noise_cov = mne.cov.regularize(noise_cov, evoked.info,
+//                                   mag=0.05, grad=0.05, eeg=0.1, proj=True)
+
+//    // Restrict forward solution as necessary for MEG
+//    forward_meg = mne.fiff.pick_types_forward(forward_meeg, meg=True, eeg=False)
+    // Alternatively, you can just load a forward solution that is restricted
+    MNEForwardSolution t_forwardEeg(t_fileFwdEeg, false, true);
 
 
     return a.exec();
