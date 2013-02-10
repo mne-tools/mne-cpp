@@ -60,6 +60,7 @@ using namespace DISP3DLIB;
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
+
     GeometryView view;
 
     if (view.stereoType() != QGLView::RedCyanAnaglyph)

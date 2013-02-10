@@ -97,12 +97,8 @@ int main(int argc, char *argv[])
     // Load data
     fiff_int_t setno = 0;
     FiffEvokedDataSet evoked(t_fileEvoked, setno);
-    MNEForwardSolution t_forwardMeeg;
-    if(!MNEForwardSolution::read_forward_solution(t_fileFwdMeeg, t_forwardMeeg))
-    {
-        printf("Forward solution not found: %s\n", t_fileFwdMeeg.fileName().toLatin1().constData());
-        return 0;
-    }
+    MNEForwardSolution t_forwardMeeg(t_fileFwdMeeg);
+
     FiffCov noise_cov(t_fileCov);
 
     qDebug() << "Dimensions: " << noise_cov.data.rows() << " x " << noise_cov.data.cols();

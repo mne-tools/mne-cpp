@@ -40,6 +40,7 @@
 
 #include "fiff_raw_data.h"
 #include "fiff_tag.h"
+#include "fiff_stream.h"
 
 
 //*************************************************************************************************************
@@ -60,6 +61,20 @@ FiffRawData::FiffRawData()
 , last_samp(-1)
 {
 
+}
+
+
+//*************************************************************************************************************
+
+FiffRawData::FiffRawData(QIODevice &p_IODevice)
+: first_samp(-1)
+, last_samp(-1)
+{
+    if(!FiffStream::setup_read_raw(p_IODevice, *this))
+    {
+        printf("\tError during fiff setup raw read.\n");//ToDo Throw here
+        return;
+    }
 }
 
 

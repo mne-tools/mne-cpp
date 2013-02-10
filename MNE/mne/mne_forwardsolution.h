@@ -133,6 +133,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Constructs a forward operator, by reading from a IO device.
+    *
+    * @param[in] p_IODevice     IO device to read from the forward operator.
+    */
+    MNEForwardSolution(QIODevice &p_IODevice);
+
+    //=========================================================================================================
+    /**
     * Copy constructor.
     *
     * @param[in] p_MNEForwardSolution   MNE forward solution

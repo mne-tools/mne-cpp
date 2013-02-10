@@ -81,8 +81,8 @@ GeometryView::GeometryView(QWindow *parent)
 , m_pSceneNode(0)
 {
     QFile t_File("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    if(!MNE::read_forward_solution(t_File, t_ForwardSolution))
-        t_ForwardSolution.clear();
+    if(!MNE::read_forward_solution(t_File, m_forwardSolution))
+        m_forwardSolution.clear();
 
     m_vecAnnotation.append(Annotation::SPtr(new Annotation("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot")));
     m_vecAnnotation.append(Annotation::SPtr(new Annotation("./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot")));
@@ -103,7 +103,7 @@ GeometryView::~GeometryView()
 
 void GeometryView::initializeGL(QGLPainter *painter)
 {
-    if(!t_ForwardSolution.isEmpty())
+    if(!m_forwardSolution.isEmpty())
     {
         // in the constructor construct a builder on the stack
         QGLBuilder builder;
@@ -127,11 +127,10 @@ void GeometryView::initializeGL(QGLPainter *painter)
             builder.newNode();//create new hemisphere node
             {
 
-                MatrixX3i tris = t_ForwardSolution.src.hemispheres[h].tris;
-                MatrixX3d rr = t_ForwardSolution.src.hemispheres[h].rr;
+                MatrixX3i tris = m_forwardSolution.src.hemispheres[h].tris;
+                MatrixX3d rr = m_forwardSolution.src.hemispheres[h].rr;
 
                 builder.pushNode();
-
                 //
                 // Create each ROI in its own node
                 //

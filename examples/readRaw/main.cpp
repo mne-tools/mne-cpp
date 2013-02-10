@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    QFile t_File("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
 
     float from = 42.956f;
     float to = 320.670f;
@@ -95,12 +95,8 @@ int main(int argc, char *argv[])
     //
     //   Setup for reading the raw data
     //
-    FiffRawData raw;
-    if(!FiffStream::setup_read_raw(t_File, raw))
-    {
-        printf("Error during fiff setup raw read");
-        return 0;
-    }
+    FiffRawData raw(t_fileRaw);
+
     //
     //   Set up pick list: MEG + STI 014 - bad channels
     //

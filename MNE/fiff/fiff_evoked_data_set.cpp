@@ -74,8 +74,11 @@ FiffEvokedDataSet::FiffEvokedDataSet()
 
 FiffEvokedDataSet::FiffEvokedDataSet(QIODevice& p_IODevice, fiff_int_t setno)
 {
-    if(FiffEvokedDataSet::read_evoked(p_IODevice, *this, setno))
+    if(!FiffEvokedDataSet::read_evoked(p_IODevice, *this, setno))
+    {
+        printf("\tFiff evoked data set not found.\n");//ToDo Throw here
         return;
+    }
 }
 
 

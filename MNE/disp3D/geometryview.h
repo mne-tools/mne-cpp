@@ -127,7 +127,7 @@ protected:
     void paintGL(QGLPainter *painter);
 
 private:
-    MNEForwardSolution t_ForwardSolution;   /**< Holds the forward soultion -> ToDo change this to shraed data pointer */
+    MNEForwardSolution m_forwardSolution;   /**< Holds the forward soultion -> ToDo change this to shraed data pointer */
 
     bool m_bStereo;
 

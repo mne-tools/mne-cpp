@@ -76,10 +76,10 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    QFile t_File("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QFile t_fileForwardSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    MNEForwardSolution t_ForwardSolution(t_fileForwardSolution);
 
-    MNEForwardSolution t_ForwardSolution;
-    if(MNEForwardSolution::read_forward_solution(t_File, t_ForwardSolution))
+    if(t_ForwardSolution.source_ori != -1)
     {
         std::cout << std::endl << "first 10 rows and columns of the Gain Matrix:" << std::endl << t_ForwardSolution.sol->data.block(0,0,10,10) << std::endl;
         std::cout << std::endl << "first 10 dipole coordinates:" << std::endl << t_ForwardSolution.source_rr.block(0,0,10,3) << std::endl ;

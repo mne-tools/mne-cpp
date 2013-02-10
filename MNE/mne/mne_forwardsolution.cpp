@@ -93,6 +93,29 @@ MNEForwardSolution::MNEForwardSolution()
 
 //*************************************************************************************************************
 
+MNEForwardSolution::MNEForwardSolution(QIODevice &p_IODevice)
+: source_ori(-1)
+, coord_frame(-1)
+, nsource(-1)
+, nchan(-1)
+, sol(new FiffNamedMatrix)
+, sol_grad(new FiffNamedMatrix)
+//, mri_head_t(NULL)
+//, src(NULL)
+, source_rr(MatrixX3d::Zero(0,3))
+, source_nn(MatrixX3d::Zero(0,3))
+, isClustered(false)
+{
+    if(!read_forward_solution(p_IODevice, *this))
+    {
+        printf("\tForward solution not found.\n");//ToDo Throw here
+        return;
+    }
+}
+
+
+//*************************************************************************************************************
+
 MNEForwardSolution::MNEForwardSolution(const MNEForwardSolution &p_MNEForwardSolution)
 : info(p_MNEForwardSolution.info)
 , source_ori(p_MNEForwardSolution.source_ori)
