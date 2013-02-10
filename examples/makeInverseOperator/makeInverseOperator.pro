@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     examples.pro
+# @file     makeInverseOperator.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -18,7 +18,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
@@ -29,26 +29,47 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds all examples of the mne-cpp project.
+# @brief    Builds an example for making an inverse operator
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../mne-cpp.pri)
+include(../../mne-cpp.pri)
 
-TEMPLATE = subdirs
+TEMPLATE = app
 
-SUBDIRS += \
-    readRaw \
-    readWriteRaw \
-    readFwd \
-    readEpochs \
-    computeInverse \
-    realTimeInverse \
-    makeInverseOperator
+VERSION = $${MNE_CPP_VERSION}
 
-contains(MNECPP_CONFIG, isGui) {
-    qtHaveModule(3d) {
-        message(Qt3D available: readFwdDisp3D configured!)
-        SUBDIRS += readFwdDisp3D
-    }
+QT       += core
+QT       -= gui
+
+CONFIG   += console
+CONFIG   -= app_bundle
+
+TARGET = makeInverseOperator
+
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
 }
+
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}MneMathd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned
+}
+else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}MneMath \
+            -lMNE$${MNE_LIB_VERSION}Fs \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Mne
+}
+
+DESTDIR =  $${MNE_BINARY_DIR}
+
+SOURCES += main.cpp
+
+HEADERS += \
+
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}

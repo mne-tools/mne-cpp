@@ -4,19 +4,25 @@ MNE_CPP_VERSION = 0.1.0.252
 MNE_LIB_VERSION = 1
 
 # Paths
+# Eigen
 EIGEN_INCLUDE_DIR = $$EIGEN_INCLUDE_DIR
 isEmpty(EIGEN_INCLUDE_DIR) {
     EIGEN_INCLUDE_DIR = $${PWD}/include/3rdParty
 }
-
+# include
 MNE_INCLUDE_DIR = $$MNE_INCLUDE_DIR
 isEmpty( MNE_INCLUDE_DIR ) {
     MNE_INCLUDE_DIR = $${PWD}/MNE
 }
-
+# lib
 MNE_LIBRARY_DIR = $$MNE_LIBRARY_DIR
 isEmpty( MNE_LIBRARY_DIR ) {
     MNE_LIBRARY_DIR = $${PWD}/lib
+}
+# bin
+MNE_BINARY_DIR = $$MNE_BINARY_DIR
+isEmpty( MNE_BINARY_DIR ) {
+    MNE_BINARY_DIR = $${PWD}/bin
 }
 
 #QT Packages use new qtHaveModule(<package>):
