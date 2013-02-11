@@ -59,6 +59,7 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <Eigen/SparseCore>
 
 
 //*************************************************************************************************************
@@ -179,7 +180,7 @@ public:
     VectorXd nearest_dist;      /**< Distance to the nearest vertices (using option -cps during mne_setup_source_space). */
     QList<VectorXi> pinfo;      /**< Patch information (using option -cps during mne_setup_source_space) */
     float dist_limit;           /**< ToDo... (using option -cps during mne_setup_source_space) */
-    MatrixXd dist;              /**< ToDo... (using option -cps during mne_setup_source_space) */
+    SparseMatrix<double> dist;  /**< ToDo... (using option -cps during mne_setup_source_space) */
     MatrixX3d tri_cent;         /**< Triangle centers */
     MatrixX3d tri_nn;           /**< Triangle normals */
     VectorXd tri_area;          /**< Triangle areas */

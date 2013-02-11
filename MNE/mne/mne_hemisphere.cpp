@@ -71,7 +71,7 @@ MNEHemisphere::MNEHemisphere()
 , nearest(VectorXi::Zero(0))
 , nearest_dist(VectorXd::Zero(0))
 , dist_limit(-1)
-, dist(MatrixXd())
+, dist(SparseMatrix<double>())
 , tri_cent(MatrixX3d::Zero(0,3))
 , tri_nn(MatrixX3d::Zero(0,3))
 , tri_area(VectorXd::Zero(0))
@@ -146,7 +146,7 @@ void MNEHemisphere::clear()
     nearest_dist = VectorXd::Zero(0);
     pinfo.clear();
     dist_limit = -1;
-    dist = MatrixXd();
+    dist = SparseMatrix<double>();
     tri_cent = MatrixX3d::Zero(0,3);
     tri_nn = MatrixX3d::Zero(0,3);
     tri_area = VectorXd::Zero(0);
