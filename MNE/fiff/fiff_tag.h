@@ -96,6 +96,7 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <Eigen/SparseCore>
 
 
 //*************************************************************************************************************
@@ -483,6 +484,16 @@ public:
     * @return a double matrix wich is newly created from the parsed float
     */
     inline MatrixXd toFloatMatrix() const;
+
+    //=========================================================================================================
+    /**
+    * to sparse fiff FIFFT FLOAT MATRIX
+    *
+    * parses a sparse fiff float matrix and returns a double sparse matrix to make sure only double is used
+    *
+    * @return a sparse double matrix wich is newly created from the parsed float
+    */
+    inline SparseMatrix<double> toSparseFloatMatrix() const;
 
     //
     //from fiff_combat.c
@@ -1036,12 +1047,15 @@ inline MatrixXd FiffTag::toFloatMatrix() const
     if(!this->isMatrix() || this->getType() != FIFFT_FLOAT || this->data() == NULL)
         return MatrixXd();//NULL;
 
+    if (fiff_type_matrix_coding(this->type) != FIFFTS_MC_DENSE)
+    {
+        printf("Error in FiffTag::toFloatMatrix(): Matrix is not dense!\n");
+        return MatrixXd();//NULL;
+    }
 
     qint32 ndim;
     QVector<qint32> dims;
     this->getMatrixDimensions(ndim, dims);
-
-//        qDebug() << "toFloatMatrix" << ndim << pDims[0] << pDims[1];
 
     if (ndim != 2)
     {
@@ -1049,11 +1063,97 @@ inline MatrixXd FiffTag::toFloatMatrix() const
         return MatrixXd();//NULL;
     }
 
-    //MatrixXd p_Matrix = Map<MatrixXd>( (float*)this->data,pDims[0], pDims[1]);
     // --> Use copy constructor instead --> slower performance but higher memory management reliability
-//    MatrixXd* p_pMatrix = new MatrixXd((Map<MatrixXf>( (float*)this->data(),pDims[0], pDims[1])).cast<double>());
-
     MatrixXd p_Matrix((Map<MatrixXf>( (float*)this->data(),dims[0], dims[1])).cast<double>());
+
+    return p_Matrix;
+}
+
+
+//*************************************************************************************************************
+
+inline SparseMatrix<double> FiffTag::toSparseFloatMatrix() const
+{
+    if(!this->isMatrix() || this->getType() != FIFFT_FLOAT || this->data() == NULL)
+        return SparseMatrix<double>();//NULL;
+
+    if (fiff_type_matrix_coding(this->type) != FIFFTS_MC_CCS && fiff_type_matrix_coding(this->type) != FIFFTS_MC_RCS)
+    {
+        printf("Error in FiffTag::toSparseFloatMatrix(): Matrix is not sparse!\n");
+        return SparseMatrix<double>();//NULL;
+    }
+
+    qint32 ndim;
+    QVector<qint32> dims;
+    this->getMatrixDimensions(ndim, dims);
+
+    if (ndim != 2)
+    {
+        printf("Only two-dimensional matrices are supported at this time");
+        return SparseMatrix<double>();//NULL;
+    }
+
+    qint32 nnz = dims[0];
+    qint32 nrow = dims[1];
+    qint32 ncol = dims[2];
+
+    MatrixXf sparse_data = MatrixXf::Zero(nnz, 3);
+
+    for(qint32 i = 0; i < nnz; ++i)
+        sparse_data(i,2) = ((float*)this->data())[i];
+
+    if (fiff_type_matrix_coding(this->type) == FIFFTS_MC_CCS)
+    {
+        //
+        //    CCS
+        //
+        qDebug() << "Warning in FiffTag::toSparseFloatMatrix(): CCS has to be debugged - never done before.";
+        for(qint32 i = 0; i < nnz; ++i)
+            sparse_data(i,0) = (float)(((int*)this->data())[nnz+i]);
+
+        VectorXi ptrs = VectorXi::Zero(ncol+1);
+        for(qint32 i = 0; i < ncol+1; ++i)
+            ptrs(i) = ((int*)this->data())[2*nnz+i];
+
+        qint32 p = 0;
+        for(qint32 j = 0; j < ncol; ++j)
+        {
+            while( p < ptrs(j+1))
+            {
+                sparse_data(p,2) = j;
+                ++p;
+            }
+        }
+    }
+    else
+    {
+        //
+        //    RCS
+        //
+        for(qint32 i = 0; i < nnz; ++i)
+            sparse_data(i,1) = (float)(((int*)this->data())[nnz+i]);
+
+        VectorXi ptrs = VectorXi::Zero(ncol+1);
+        for(qint32 i = 0; i < ncol+1; ++i)
+            ptrs(i) = ((int*)this->data())[2*nnz+i];
+
+        qint32 p = 0;
+        for(qint32 j = 0; j < nrow; ++j)
+        {
+            while (p < ptrs(j+1))
+            {
+                sparse_data(p,0) = j;
+                ++p;
+            }
+        }
+    }
+
+    SparseMatrix<double> p_Matrix(nrow, ncol);
+
+    for(qint32 i = 0; i < sparse_data.rows(); ++i)
+        p_Matrix.insert((int)sparse_data(i,0),(int)sparse_data(i,1)) = (double)sparse_data(i,2);
+
+    p_Matrix.insert(nrow-1, ncol-1) = 0.0;
 
     return p_Matrix;
 }

@@ -285,12 +285,18 @@ bool FiffTag::getMatrixDimensions(qint32& p_ndim, QVector<qint32>& p_Dims) const
 
     p_ndim = t_pInt32[(this->size()-4)/4];
 
-    int j = 0;
-    for(int i = p_ndim+1; i > 1; --i)
+    if (fiff_type_matrix_coding(this->type) == FIFFTS_MC_DENSE)
+        for(int i = p_ndim+1; i > 1; --i)
+            p_Dims.append(t_pInt32[(this->size()-(i*4))/4]);
+    else if(fiff_type_matrix_coding(this->type) == FIFFTS_MC_CCS || fiff_type_matrix_coding(this->type) == FIFFTS_MC_RCS)
+        for(int i = p_ndim+2; i > 1; --i)
+            p_Dims.append(t_pInt32[(this->size()-(i*4))/4]);
+    else
     {
-        p_Dims.append(t_pInt32[(this->size()-(i*4))/4]);
-        ++j;
+        printf("Error: Cannot handle other than dense or sparse matrices yet.\n");//ToDo Throw
+        return false;
     }
+
     return true;
 }
 
@@ -647,7 +653,7 @@ void FiffTag::convert_matrix_from_file_data(FiffTag* tag)
     else {
         if (tsize < (ndim+2)*sizeof(fiff_int_t))
             return;
-        if (ndim > 2)		/* Not quite sure what to do */
+        if (ndim > 2)       /* Not quite sure what to do */
             return;
         dimp = dimp - ndim - 1;
         for (k = 0; k < ndim+1; k++)

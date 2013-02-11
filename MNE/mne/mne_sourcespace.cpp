@@ -402,18 +402,17 @@ bool MNESourceSpace::read_source_space(FiffStream* p_pStream, const FiffDirTree&
 //        delete p_Hemisphere.dist;
     if(!p_Tree.find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_DIST, t_pTag1) || !p_Tree.find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_DIST_LIMIT, t_pTag2))
     {
-       p_Hemisphere.dist = MatrixXd();//NULL;
+       p_Hemisphere.dist = SparseMatrix<double>();//NULL;
        p_Hemisphere.dist_limit = 0;
     }
     else
     {
-        qDebug() << "Attention this haven't been debugged! <- Errors are likely";
-        p_Hemisphere.dist       = t_pTag1->toFloatMatrix();
-        p_Hemisphere.dist_limit = *t_pTag1->toFloat();
+        p_Hemisphere.dist       = t_pTag1->toSparseFloatMatrix();
+        p_Hemisphere.dist_limit = *t_pTag2->toFloat();
         //
         //  Add the upper triangle
         //
-        p_Hemisphere.dist += p_Hemisphere.dist.transpose();
+//        p_Hemisphere.dist += p_Hemisphere.dist.transpose();
     }
 
     delete t_pTag2;
