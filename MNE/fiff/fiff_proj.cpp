@@ -94,3 +94,16 @@ FiffProj::~FiffProj()
 {
 
 }
+
+
+//*************************************************************************************************************
+
+void FiffProj::activate_projs(QList<FiffProj> &p_qListFiffProj)
+{
+    // Activate the projection items
+    QList<FiffProj>::Iterator it;
+    for(it = p_qListFiffProj.begin(); it != p_qListFiffProj.end(); ++it)
+        it->active = true;
+
+    printf("\t%d projection items activated.\n", p_qListFiffProj.size());
+}

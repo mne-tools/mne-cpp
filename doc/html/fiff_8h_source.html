@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">mne-cpp (MNE1)
-   &#160;<span id="projectnumber">beta</span>
+   &#160;<span id="projectnumber">beta 0.1</span>
    </div>
   </td>
  </tr>
@@ -225,7 +225,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
 <div class="line"><a name="l00301"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff.html#abaa02f5dc8bae8c7be0a82546b835341">  301</a></span>&#160;<span class="comment"></span>    <span class="keyword">inline</span> <span class="keyword">static</span> MatrixXi pick_channels(QStringList&amp; ch_names, QStringList&amp; include = defaultQStringList, QStringList&amp; exclude = defaultQStringList)</div>
 <div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;    {</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a9f602fae2e5293487bbaab3624d8f547">FiffInfo::pick_channels</a>(ch_names, include, exclude);</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#a50360642b60e476370360e8c684ba67f">FiffInfo::pick_channels</a>(ch_names, include, exclude);</div>
 <div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;    }</div>
 <div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;</div>
 <div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
@@ -235,15 +235,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;    }</div>
 <div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;</div>
 <div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00342"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a4ff2c6690219c1612a3c6b0f3f265cc1">  342</a></span>&#160;<span class="comment"></span>    <span class="keyword">inline</span> <span class="keyword">static</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a> pick_info(<span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a>* info, <span class="keyword">const</span> MatrixXi* sel = NULL)</div>
+<div class="line"><a name="l00342"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff.html#ad3721e640e7a35ac9088e85f793315a7">  342</a></span>&#160;<span class="comment"></span>    <span class="keyword">inline</span> <span class="keyword">static</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a> pick_info(<span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a>&amp; info, <span class="keyword">const</span> MatrixXi* sel = NULL)</div>
 <div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;    {</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;        <span class="keywordflow">return</span> info-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#aaacafc377a1902eb1b96235318b0f0cc">pick_info</a>(sel);</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;        <span class="keywordflow">return</span> info.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#aaacafc377a1902eb1b96235318b0f0cc">pick_info</a>(sel);</div>
 <div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;    }</div>
 <div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;</div>
 <div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00366"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a8d477e72b315f950d37cd41456b0d584">  366</a></span>&#160;<span class="comment"></span>    <span class="keyword">inline</span> <span class="keyword">static</span> MatrixXi pick_types(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a>* info, <span class="keywordtype">bool</span> meg, <span class="keywordtype">bool</span> eeg = <span class="keyword">false</span>, <span class="keywordtype">bool</span> stim = <span class="keyword">false</span>, QStringList&amp; include = defaultQStringList, QStringList&amp; exclude = defaultQStringList)</div>
+<div class="line"><a name="l00366"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a31703943f2595c88a12a4655113c363c">  366</a></span>&#160;<span class="comment"></span>    <span class="keyword">inline</span> <span class="keyword">static</span> RowVectorXi pick_types(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a> &amp;info, <span class="keywordtype">bool</span> meg, <span class="keywordtype">bool</span> eeg = <span class="keyword">false</span>, <span class="keywordtype">bool</span> stim = <span class="keyword">false</span>, QStringList&amp; include = defaultQStringList, QStringList&amp; exclude = defaultQStringList)</div>
 <div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;    {</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;        <span class="keywordflow">return</span> info-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a5bf04d8c3ad253fdb0a21dbf97f4fdac">pick_types</a>(meg, eeg, stim, include, exclude);</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;        <span class="keywordflow">return</span> info.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#a463445a32be6b4d3be6f9c9bd11959dd">pick_types</a>(meg, eeg, stim, include, exclude);</div>
 <div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;    }</div>
 <div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;</div>
 <div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
@@ -301,9 +301,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;    }</div>
 <div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;</div>
 <div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00581"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a1ffb928b0e467e1ae24998dd2d35881f">  581</a></span>&#160;<span class="comment"></span>    <span class="keyword">inline</span> <span class="keyword">static</span> <span class="keywordtype">bool</span> setup_read_raw(QIODevice* p_pIODevice, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html" title="FIFF raw measurement data.">FiffRawData</a>&amp; data, <span class="keywordtype">bool</span> allow_maxshield = <span class="keyword">false</span>)</div>
+<div class="line"><a name="l00581"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff.html#ae24c513ca2b4e1e77920c8c723994fc6">  581</a></span>&#160;<span class="comment"></span>    <span class="keyword">inline</span> <span class="keyword">static</span> <span class="keywordtype">bool</span> setup_read_raw(QIODevice &amp;p_IODevice, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html" title="FIFF raw measurement data.">FiffRawData</a>&amp; data, <span class="keywordtype">bool</span> allow_maxshield = <span class="keyword">false</span>)</div>
 <div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;    {</div>
-<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#af6ca3c97ea1f8ff0dac73cde04d4957a">FiffStream::setup_read_raw</a>(p_pIODevice, data, allow_maxshield);</div>
+<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a650740d72668d3d85b27de3d44c20a96">FiffStream::setup_read_raw</a>(p_IODevice, data, allow_maxshield);</div>
 <div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;    }</div>
 <div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;</div>
 <div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
@@ -422,7 +422,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 31 2013 17:09:07 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 12 2013 15:29:52 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

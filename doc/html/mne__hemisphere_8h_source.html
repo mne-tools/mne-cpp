@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">mne-cpp (MNE1)
-   &#160;<span id="projectnumber">beta</span>
+   &#160;<span id="projectnumber">beta 0.1</span>
    </div>
   </td>
  </tr>
@@ -116,105 +116,106 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">#include &lt;Eigen/Core&gt;</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">#include &lt;Eigen/SparseCore&gt;</span></div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="comment">// QT INCLUDES</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="preprocessor">#include &lt;QList&gt;</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="comment">// QT INCLUDES</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">#include &lt;QList&gt;</span></div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="comment">// DEFINE NAMESPACE MNELIB</span></div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="keyword">namespace </span>MNELIB</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;{</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="comment">// USED NAMESPACES</span></div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="keyword">using namespace </span>Eigen;</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="keyword">using namespace </span>FIFFLIB;</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="comment">// DEFINE NAMESPACE MNELIB</span></div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="keyword">namespace </span>MNELIB</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;{</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="comment">// USED NAMESPACES</span></div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="keyword">using namespace </span>Eigen;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="keyword">using namespace </span>FIFFLIB;</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="comment">// FORWARD DECLARATIONS</span></div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="comment">// FORWARD DECLARATIONS</span></div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00101"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">  101</a></span>&#160;<span class="comment"></span><span class="keyword">class </span><a class="code" href="mne__global_8h.html#ae182e5976a87d895a5eecf737aafefc3">MNESHARED_EXPORT</a> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="Hemisphere provides geometry information.">MNEHemisphere</a></div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;{</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00104"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a02485b7553439c94d7b9347e15e70592">  104</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;MNEHemisphere&gt; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a02485b7553439c94d7b9347e15e70592">SPtr</a>;             </div>
-<div class="line"><a name="l00105"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a4350b9178df33c72619ae1331644b9e1">  105</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;const MNEHemisphere&gt; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a4350b9178df33c72619ae1331644b9e1">ConstSPtr</a>;  </div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="comment"></span>    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="Hemisphere provides geometry information.">MNEHemisphere</a>();</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="comment"></span>    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="Hemisphere provides geometry information.">MNEHemisphere</a>(<span class="keyword">const</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="Hemisphere provides geometry information.">MNEHemisphere</a>&amp; p_MNEHemisphere);</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="Hemisphere provides geometry information.">MNEHemisphere</a>();</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> clear();</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;<span class="comment"></span>    <span class="keywordtype">bool</span> transform_hemisphere_to(fiff_int_t dest, <span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="Coordinate transformation description.">FiffCoordTrans</a> &amp;p_Trans);</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;<span class="comment"></span>    MatrixXf&amp; getTriCoords(<span class="keywordtype">float</span> p_fScaling = 1.0f);</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;<span class="comment"></span>    <span class="comment">//QGeometryData* getGeometryData(float p_fScaling = 1.0f);</span></div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00166"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a8a3b109a01a3750900d1d80369dacaa1">  166</a></span>&#160;    fiff_int_t <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a8a3b109a01a3750900d1d80369dacaa1">id</a>;              </div>
-<div class="line"><a name="l00167"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aed488c023af9e17d490f3abdea867eeb">  167</a></span>&#160;    fiff_int_t <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aed488c023af9e17d490f3abdea867eeb">np</a>;              </div>
-<div class="line"><a name="l00168"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a6a322c8dadb0d6e9f19b0065d859e297">  168</a></span>&#160;    fiff_int_t <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a6a322c8dadb0d6e9f19b0065d859e297">ntri</a>;            </div>
-<div class="line"><a name="l00169"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a5890e89b80dd7631f4405ef68572e7d4">  169</a></span>&#160;    fiff_int_t <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a5890e89b80dd7631f4405ef68572e7d4">coord_frame</a>;     </div>
-<div class="line"><a name="l00170"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a9efbc4bbd8c2d4efb8645fb4d1d68ae4">  170</a></span>&#160;    MatrixX3d <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a9efbc4bbd8c2d4efb8645fb4d1d68ae4">rr</a>;               </div>
-<div class="line"><a name="l00171"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a79f826f72f12b0b98c2ce44281201e28">  171</a></span>&#160;    MatrixX3d <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a79f826f72f12b0b98c2ce44281201e28">nn</a>;               </div>
-<div class="line"><a name="l00172"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab2084cf6ed3de33ef78ef11c0e6f83b6">  172</a></span>&#160;    MatrixX3i <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab2084cf6ed3de33ef78ef11c0e6f83b6">tris</a>;             </div>
-<div class="line"><a name="l00173"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a433b5da63208d426f26317f7c0c236c8">  173</a></span>&#160;    fiff_int_t <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a433b5da63208d426f26317f7c0c236c8">nuse</a>;            </div>
-<div class="line"><a name="l00174"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a1a7ba6a83b5b474df998aaf25eb6ade1">  174</a></span>&#160;    VectorXi <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a1a7ba6a83b5b474df998aaf25eb6ade1">inuse</a>;             </div>
-<div class="line"><a name="l00175"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a5283fc385c823e4c447ddc4926489ac3">  175</a></span>&#160;    VectorXi <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a5283fc385c823e4c447ddc4926489ac3">vertno</a>;            </div>
-<div class="line"><a name="l00176"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a3cd7edb277a5b79e169dec04e2ea38ba">  176</a></span>&#160;    qint32 <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a3cd7edb277a5b79e169dec04e2ea38ba">nuse_tri</a>;            </div>
-<div class="line"><a name="l00177"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab9eb4c710479364bdd279dd7167257cb">  177</a></span>&#160;    MatrixX3i <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab9eb4c710479364bdd279dd7167257cb">use_tris</a>;         </div>
-<div class="line"><a name="l00178"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ac5480868a444c31d040a123f926d537f">  178</a></span>&#160;    VectorXi <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ac5480868a444c31d040a123f926d537f">nearest</a>;           </div>
-<div class="line"><a name="l00179"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aaf1380e5dffa62b3b3e4cdb44f0be303">  179</a></span>&#160;    VectorXd <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aaf1380e5dffa62b3b3e4cdb44f0be303">nearest_dist</a>;      </div>
-<div class="line"><a name="l00180"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a4abab64cbb6ff88af3b693a0b98d410d">  180</a></span>&#160;    QList&lt;VectorXi&gt; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a4abab64cbb6ff88af3b693a0b98d410d">pinfo</a>;      </div>
-<div class="line"><a name="l00181"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ae7ab61927a9552e4f8f4004cb75218db">  181</a></span>&#160;    <span class="keywordtype">float</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ae7ab61927a9552e4f8f4004cb75218db">dist_limit</a>;           </div>
-<div class="line"><a name="l00182"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#abdb66f07a304610e91f639fca39e4dbc">  182</a></span>&#160;    MatrixXd <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#abdb66f07a304610e91f639fca39e4dbc">dist</a>;              </div>
-<div class="line"><a name="l00183"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a5630622faec837c17580af9509cc716f">  183</a></span>&#160;    MatrixX3d <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a5630622faec837c17580af9509cc716f">tri_cent</a>;         </div>
-<div class="line"><a name="l00184"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a636e9d74c490eadb60e7fd3a828a74e9">  184</a></span>&#160;    MatrixX3d <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a636e9d74c490eadb60e7fd3a828a74e9">tri_nn</a>;           </div>
-<div class="line"><a name="l00185"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a139bc83d26deda30a6ac4663b9bac838">  185</a></span>&#160;    VectorXd <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a139bc83d26deda30a6ac4663b9bac838">tri_area</a>;          </div>
-<div class="line"><a name="l00186"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#abcdf7fdbdf1b74ca244853ad1eddd2c7">  186</a></span>&#160;    MatrixX3d <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#abcdf7fdbdf1b74ca244853ad1eddd2c7">use_tri_cent</a>;     </div>
-<div class="line"><a name="l00187"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a553c07a84f09d208127e3208c02df639">  187</a></span>&#160;    MatrixX3d <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a553c07a84f09d208127e3208c02df639">use_tri_nn</a>;       </div>
-<div class="line"><a name="l00188"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a20af1d147844772705c759ee287f4160">  188</a></span>&#160;    VectorXd <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a20af1d147844772705c759ee287f4160">use_tri_area</a>;      </div>
-<div class="line"><a name="l00190"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a9dc1c1e65425853fc558ac92cbe33306">  190</a></span>&#160;    QList&lt;VectorXi&gt; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a9dc1c1e65425853fc558ac92cbe33306">cluster_vertnos</a>;    </div>
-<div class="line"><a name="l00191"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a2fc83d1ab0a0ac1c4be90c5ebef97f23">  191</a></span>&#160;    QList&lt;VectorXd&gt; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a2fc83d1ab0a0ac1c4be90c5ebef97f23">cluster_distances</a>;  </div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    <span class="comment">// Newly added</span></div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    MatrixXf m_TriCoords; </div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;};</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00102"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">  102</a></span>&#160;<span class="comment"></span><span class="keyword">class </span><a class="code" href="mne__global_8h.html#ae182e5976a87d895a5eecf737aafefc3">MNESHARED_EXPORT</a> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="Hemisphere provides geometry information.">MNEHemisphere</a></div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;{</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00105"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a02485b7553439c94d7b9347e15e70592">  105</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;MNEHemisphere&gt; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a02485b7553439c94d7b9347e15e70592">SPtr</a>;             </div>
+<div class="line"><a name="l00106"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a4350b9178df33c72619ae1331644b9e1">  106</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;const MNEHemisphere&gt; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a4350b9178df33c72619ae1331644b9e1">ConstSPtr</a>;  </div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="comment"></span>    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="Hemisphere provides geometry information.">MNEHemisphere</a>();</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;<span class="comment"></span>    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="Hemisphere provides geometry information.">MNEHemisphere</a>(<span class="keyword">const</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="Hemisphere provides geometry information.">MNEHemisphere</a>&amp; p_MNEHemisphere);</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="Hemisphere provides geometry information.">MNEHemisphere</a>();</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> clear();</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;<span class="comment"></span>    <span class="keywordtype">bool</span> transform_hemisphere_to(fiff_int_t dest, <span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="Coordinate transformation description.">FiffCoordTrans</a> &amp;p_Trans);</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;<span class="comment"></span>    MatrixXf&amp; getTriCoords(<span class="keywordtype">float</span> p_fScaling = 1.0f);</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;<span class="comment"></span>    <span class="comment">//QGeometryData* getGeometryData(float p_fScaling = 1.0f);</span></div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00167"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a8a3b109a01a3750900d1d80369dacaa1">  167</a></span>&#160;    fiff_int_t <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a8a3b109a01a3750900d1d80369dacaa1">id</a>;              </div>
+<div class="line"><a name="l00168"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aed488c023af9e17d490f3abdea867eeb">  168</a></span>&#160;    fiff_int_t <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aed488c023af9e17d490f3abdea867eeb">np</a>;              </div>
+<div class="line"><a name="l00169"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a6a322c8dadb0d6e9f19b0065d859e297">  169</a></span>&#160;    fiff_int_t <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a6a322c8dadb0d6e9f19b0065d859e297">ntri</a>;            </div>
+<div class="line"><a name="l00170"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a5890e89b80dd7631f4405ef68572e7d4">  170</a></span>&#160;    fiff_int_t <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a5890e89b80dd7631f4405ef68572e7d4">coord_frame</a>;     </div>
+<div class="line"><a name="l00171"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a9efbc4bbd8c2d4efb8645fb4d1d68ae4">  171</a></span>&#160;    MatrixX3d <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a9efbc4bbd8c2d4efb8645fb4d1d68ae4">rr</a>;               </div>
+<div class="line"><a name="l00172"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a79f826f72f12b0b98c2ce44281201e28">  172</a></span>&#160;    MatrixX3d <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a79f826f72f12b0b98c2ce44281201e28">nn</a>;               </div>
+<div class="line"><a name="l00173"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab2084cf6ed3de33ef78ef11c0e6f83b6">  173</a></span>&#160;    MatrixX3i <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab2084cf6ed3de33ef78ef11c0e6f83b6">tris</a>;             </div>
+<div class="line"><a name="l00174"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a433b5da63208d426f26317f7c0c236c8">  174</a></span>&#160;    fiff_int_t <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a433b5da63208d426f26317f7c0c236c8">nuse</a>;            </div>
+<div class="line"><a name="l00175"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a1a7ba6a83b5b474df998aaf25eb6ade1">  175</a></span>&#160;    VectorXi <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a1a7ba6a83b5b474df998aaf25eb6ade1">inuse</a>;             </div>
+<div class="line"><a name="l00176"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a5283fc385c823e4c447ddc4926489ac3">  176</a></span>&#160;    VectorXi <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a5283fc385c823e4c447ddc4926489ac3">vertno</a>;            </div>
+<div class="line"><a name="l00177"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a3cd7edb277a5b79e169dec04e2ea38ba">  177</a></span>&#160;    qint32 <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a3cd7edb277a5b79e169dec04e2ea38ba">nuse_tri</a>;            </div>
+<div class="line"><a name="l00178"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab9eb4c710479364bdd279dd7167257cb">  178</a></span>&#160;    MatrixX3i <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab9eb4c710479364bdd279dd7167257cb">use_tris</a>;         </div>
+<div class="line"><a name="l00179"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ac5480868a444c31d040a123f926d537f">  179</a></span>&#160;    VectorXi <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ac5480868a444c31d040a123f926d537f">nearest</a>;           </div>
+<div class="line"><a name="l00180"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aaf1380e5dffa62b3b3e4cdb44f0be303">  180</a></span>&#160;    VectorXd <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aaf1380e5dffa62b3b3e4cdb44f0be303">nearest_dist</a>;      </div>
+<div class="line"><a name="l00181"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a4abab64cbb6ff88af3b693a0b98d410d">  181</a></span>&#160;    QList&lt;VectorXi&gt; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a4abab64cbb6ff88af3b693a0b98d410d">pinfo</a>;      </div>
+<div class="line"><a name="l00182"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ae7ab61927a9552e4f8f4004cb75218db">  182</a></span>&#160;    <span class="keywordtype">float</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ae7ab61927a9552e4f8f4004cb75218db">dist_limit</a>;           </div>
+<div class="line"><a name="l00183"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a1fac01b2c5a0d1f43607b773fd6fe421">  183</a></span>&#160;    SparseMatrix&lt;double&gt; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a1fac01b2c5a0d1f43607b773fd6fe421">dist</a>;  </div>
+<div class="line"><a name="l00184"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a5630622faec837c17580af9509cc716f">  184</a></span>&#160;    MatrixX3d <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a5630622faec837c17580af9509cc716f">tri_cent</a>;         </div>
+<div class="line"><a name="l00185"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a636e9d74c490eadb60e7fd3a828a74e9">  185</a></span>&#160;    MatrixX3d <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a636e9d74c490eadb60e7fd3a828a74e9">tri_nn</a>;           </div>
+<div class="line"><a name="l00186"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a139bc83d26deda30a6ac4663b9bac838">  186</a></span>&#160;    VectorXd <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a139bc83d26deda30a6ac4663b9bac838">tri_area</a>;          </div>
+<div class="line"><a name="l00187"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#abcdf7fdbdf1b74ca244853ad1eddd2c7">  187</a></span>&#160;    MatrixX3d <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#abcdf7fdbdf1b74ca244853ad1eddd2c7">use_tri_cent</a>;     </div>
+<div class="line"><a name="l00188"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a553c07a84f09d208127e3208c02df639">  188</a></span>&#160;    MatrixX3d <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a553c07a84f09d208127e3208c02df639">use_tri_nn</a>;       </div>
+<div class="line"><a name="l00189"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a20af1d147844772705c759ee287f4160">  189</a></span>&#160;    VectorXd <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a20af1d147844772705c759ee287f4160">use_tri_area</a>;      </div>
+<div class="line"><a name="l00191"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a9dc1c1e65425853fc558ac92cbe33306">  191</a></span>&#160;    QList&lt;VectorXi&gt; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a9dc1c1e65425853fc558ac92cbe33306">cluster_vertnos</a>;    </div>
+<div class="line"><a name="l00192"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a2fc83d1ab0a0ac1c4be90c5ebef97f23">  192</a></span>&#160;    QList&lt;VectorXd&gt; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a2fc83d1ab0a0ac1c4be90c5ebef97f23">cluster_distances</a>;  </div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="comment">// Newly added</span></div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    MatrixXf m_TriCoords; </div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;};</div>
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;} <span class="comment">// NAMESPACE</span></div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;<span class="preprocessor">#endif // MNE_HEMISPHERE_H</span></div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;} <span class="comment">// NAMESPACE</span></div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;<span class="preprocessor">#endif // MNE_HEMISPHERE_H</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 31 2013 17:09:07 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 12 2013 15:29:53 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

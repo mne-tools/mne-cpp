@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">mne-cpp (MNE1)
-   &#160;<span id="projectnumber">beta</span>
+   &#160;<span id="projectnumber">beta 0.1</span>
    </div>
   </td>
  </tr>
@@ -162,13 +162,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00110"></a><span class="lineno"><a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_inv.html#a6f1a2ccda5ab3e1c1408981dd1277224">  110</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;RtInv&gt; <a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_inv.html#a6f1a2ccda5ab3e1c1408981dd1277224">SPtr</a>;             </div>
 <div class="line"><a name="l00111"></a><span class="lineno"><a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_inv.html#a69b39c31643381ccc3dcc23e1cce0d75">  111</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;const RtInv&gt; <a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_inv.html#a69b39c31643381ccc3dcc23e1cce0d75">ConstSPtr</a>;  </div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="comment"></span>    <span class="keyword">explicit</span> <a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_inv.html" title="Real-time inverse operator estimation.">RtInv</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#abfce6128814de61b3fdd324a97918338">FiffInfo::SPtr</a> p_pFiffInfo, <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a7e95a8381a0f621201981cd6a39ea25c">MNEForwardSolution::SPtr</a> p_pFwd, QObject *parent = 0);</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="comment"></span>    <span class="keyword">explicit</span> <a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_inv.html" title="Real-time inverse operator estimation.">RtInv</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a>&amp; p_fiffInfo, <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a7e95a8381a0f621201981cd6a39ea25c">MNEForwardSolution::SPtr</a> p_pFwd, QObject *parent = 0);</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;</div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_inv.html" title="Real-time inverse operator estimation.">RtInv</a>();</div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;</div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> receiveNoiseCov(MatrixXf p_noiseCov);</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> receiveNoiseCov(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html" title="covariance data">FiffCov</a> p_noiseCov);</div>
 <div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;</div>
 <div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
 <div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;<span class="comment"></span>    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> stop();</div>
@@ -180,8 +180,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;<span class="keyword">private</span>:</div>
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    QMutex      mutex;                  </div>
 <div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    <span class="keywordtype">bool</span>        m_bIsRunning;           </div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    MatrixXf    m_noiseCov;             </div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#abfce6128814de61b3fdd324a97918338">FiffInfo::SPtr</a>      m_pFiffInfo;    </div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    QVector&lt;FiffCov::SDPtr&gt; m_vecNoiseCov;</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a>             m_fiffInfo;    </div>
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a7e95a8381a0f621201981cd6a39ea25c">MNEForwardSolution::SPtr</a> m_pFwd;    </div>
 <div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;signals:</div>
 <div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
@@ -199,7 +199,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 31 2013 17:09:08 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 12 2013 15:29:53 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

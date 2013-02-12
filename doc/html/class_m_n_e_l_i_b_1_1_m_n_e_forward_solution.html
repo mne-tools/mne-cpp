@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">mne-cpp (MNE1)
-   &#160;<span id="projectnumber">beta</span>
+   &#160;<span id="projectnumber">beta 0.1</span>
    </div>
   </td>
  </tr>
@@ -98,7 +98,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>Forward solution.  
+<p>Forward operator.  
  <a href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>&gt;</code></p>
@@ -116,6 +116,8 @@ Public Types</h2></td></tr>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a2de172fb859cda6d067d0e931c696fe2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a2de172fb859cda6d067d0e931c696fe2">MNEForwardSolution</a> ()</td></tr>
 <tr class="separator:a2de172fb859cda6d067d0e931c696fe2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a67a5f028a15c503c0f3de662e7066153"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a67a5f028a15c503c0f3de662e7066153">MNEForwardSolution</a> (QIODevice &amp;p_IODevice, bool force_fixed=false, bool surf_ori=false, QStringList &amp;include=defaultQStringList, QStringList &amp;exclude=defaultQStringList)</td></tr>
+<tr class="separator:a67a5f028a15c503c0f3de662e7066153"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af55e3cd8f01c6c7bd4ea934f00559a10"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#af55e3cd8f01c6c7bd4ea934f00559a10">MNEForwardSolution</a> (const <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">MNEForwardSolution</a> &amp;p_MNEForwardSolution)</td></tr>
 <tr class="separator:af55e3cd8f01c6c7bd4ea934f00559a10"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af7807f7d45b2a21d782ab73aaf117411"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#af7807f7d45b2a21d782ab73aaf117411">~MNEForwardSolution</a> ()</td></tr>
@@ -126,6 +128,14 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a82b3a26bd1c400b55b0076caefc6361e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c81b86cc30d53927ba032543507cdd8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1c81b86cc30d53927ba032543507cdd8">isEmpty</a> () const </td></tr>
 <tr class="separator:a1c81b86cc30d53927ba032543507cdd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab99e06dc8c84618aef405ffe3d54fe78"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ab99e06dc8c84618aef405ffe3d54fe78">isFixedOrient</a> () const </td></tr>
+<tr class="separator:ab99e06dc8c84618aef405ffe3d54fe78"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0dee181d378da88faae21a5e95861586"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">MNEForwardSolution</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a0dee181d378da88faae21a5e95861586">pick_channels_forward</a> (const QStringList &amp;include=defaultQStringList, const QStringList &amp;exclude=defaultQStringList) const </td></tr>
+<tr class="separator:a0dee181d378da88faae21a5e95861586"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a910b70632113e1873100c3415464b584"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">MNEForwardSolution</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a910b70632113e1873100c3415464b584">pick_types_forward</a> (bool meg, bool eeg, const QStringList &amp;include=defaultQStringList, const QStringList &amp;exclude=defaultQStringList) const </td></tr>
+<tr class="separator:a910b70632113e1873100c3415464b584"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0db4da52ee445b78a70abbad4149fb8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ad0db4da52ee445b78a70abbad4149fb8">prepare_forward</a> (const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> &amp;p_info, const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html">FiffCov</a> &amp;p_noise_cov, bool p_pca, QStringList &amp;p_outChNames, MatrixXd &amp;p_outGain, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html">FiffCov</a> &amp;p_outNoiseCov, MatrixXd &amp;p_outWhitener, qint32 &amp;p_outNumNonZero)</td></tr>
+<tr class="separator:ad0db4da52ee445b78a70abbad4149fb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -134,6 +144,8 @@ Static Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
+<tr class="memitem:adeda03feac0c09dc76711921c1e576dd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html">FiffInfoBase</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#adeda03feac0c09dc76711921c1e576dd">info</a></td></tr>
+<tr class="separator:adeda03feac0c09dc76711921c1e576dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1988a88297362b6b34b0318577ad162d"><td class="memItemLeft" align="right" valign="top">fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1988a88297362b6b34b0318577ad162d">source_ori</a></td></tr>
 <tr class="separator:a1988a88297362b6b34b0318577ad162d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8776126f2f4ec08939fb83a61a429348"><td class="memItemLeft" align="right" valign="top">fiff_int_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a8776126f2f4ec08939fb83a61a429348">coord_frame</a></td></tr>
@@ -158,10 +170,10 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a598a41eed229feb0ccd030ed17d77d7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Forward solution. </p>
-<p>Forward solution </p>
+<div class="textblock"><p>Forward operator. </p>
+<p>Forward operator </p>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00121">121</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00122">122</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a class="anchor" id="ac205e3b5d9a3fe1a455d3c45e30d7636"></a>
 <div class="memitem">
@@ -172,9 +184,9 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Const shared pointer type for <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward solution.">MNEForwardSolution</a>. </p>
+<p>Const shared pointer type for <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a>. </p>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00125">125</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00126">126</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
 
 </div>
 </div>
@@ -187,9 +199,9 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Shared pointer type for <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward solution.">MNEForwardSolution</a>. </p>
+<p>Shared pointer type for <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a>. </p>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00124">124</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00125">125</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
 
 </div>
 </div>
@@ -209,6 +221,63 @@ Public Attributes</h2></td></tr>
 <p>Default constructor. </p>
 
 <p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00077">77</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a67a5f028a15c503c0f3de662e7066153"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">MNEForwardSolution::MNEForwardSolution </td>
+          <td>(</td>
+          <td class="paramtype">QIODevice &amp;&#160;</td>
+          <td class="paramname"><em>p_IODevice</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>force_fixed</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>surf_ori</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QStringList &amp;&#160;</td>
+          <td class="paramname"><em>include</em> = <code>defaultQStringList</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QStringList &amp;&#160;</td>
+          <td class="paramname"><em>exclude</em> = <code>defaultQStringList</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Constructs a forward operator, by reading from a IO device.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_IODevice</td><td>IO device to read from the forward operator. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">force_fixed</td><td>Force fixed source orientation mode? (optional) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">surf_ori</td><td>Use surface based source coordinate system? (optional) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">include</td><td>Include these channels (optional) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">exclude</td><td>Exclude these channels (optional) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00096">96</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
 
 </div>
 </div>
@@ -233,7 +302,7 @@ Public Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00096">96</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00119">119</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
 
 </div>
 </div>
@@ -249,9 +318,9 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Destroys the <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward solution.">MNEForwardSolution</a>. </p>
+<p>Destroys the <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a>. </p>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00115">115</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00139">139</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
 
 </div>
 </div>
@@ -270,7 +339,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Initializes the <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e.html" title="The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.">MNE</a> forward solution. </p>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00123">123</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00147">147</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
 
 </div>
 </div>
@@ -321,7 +390,7 @@ Public Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00141">141</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00166">166</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
 
 </div>
 </div>
@@ -348,7 +417,203 @@ Public Attributes</h2></td></tr>
 <p>True if FIFF measurement file information is empty.</p>
 <dl class="section return"><dt>Returns</dt><dd>true if FIFF measurement file information is empty </dd></dl>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00173">173</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00350">350</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ab99e06dc8c84618aef405ffe3d54fe78"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool MNELIB::MNEForwardSolution::isFixedOrient </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Has forward operator fixed orientation?</p>
+<dl class="section return"><dt>Returns</dt><dd>true if forward operator has fixed orientation, false otherwise </dd></dl>
+
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00358">358</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a0dee181d378da88faae21a5e95861586"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">MNEForwardSolution</a> MNEForwardSolution::pick_channels_forward </td>
+          <td>(</td>
+          <td class="paramtype">const QStringList &amp;&#160;</td>
+          <td class="paramname"><em>include</em> = <code>defaultQStringList</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const QStringList &amp;&#160;</td>
+          <td class="paramname"><em>exclude</em> = <code>defaultQStringList</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>mne.fiff.pick_channels_forward</p>
+<p>Pick channels from forward operator</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">include</td><td>List of channels to include. (if None, include all available). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">exclude</td><td>Channels to exclude (if None, do not exclude any).</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Forward solution restricted to selected channel types. </dd></dl>
+
+<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00436">436</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a910b70632113e1873100c3415464b584"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">MNEForwardSolution</a> MNEForwardSolution::pick_types_forward </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>meg</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>eeg</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const QStringList &amp;&#160;</td>
+          <td class="paramname"><em>include</em> = <code>defaultQStringList</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const QStringList &amp;&#160;</td>
+          <td class="paramname"><em>exclude</em> = <code>defaultQStringList</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>mne.fiff.pick_types_forward</p>
+<p>Pick by channel type and names from a forward operator</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">meg</td><td>Include MEG channels </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">eeg</td><td>Include EEG channels </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">include</td><td>Additional channels to include (if empty, do not add any) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">exclude</td><td>Channels to exclude (if empty, do not exclude any)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Forward solution restricted to selected channel types. </dd></dl>
+
+<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00499">499</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ad0db4da52ee445b78a70abbad4149fb8"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MNEForwardSolution::prepare_forward </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> &amp;&#160;</td>
+          <td class="paramname"><em>p_info</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html">FiffCov</a> &amp;&#160;</td>
+          <td class="paramname"><em>p_noise_cov</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>p_pca</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QStringList &amp;&#160;</td>
+          <td class="paramname"><em>p_outChNames</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">MatrixXd &amp;&#160;</td>
+          <td class="paramname"><em>p_outGain</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html">FiffCov</a> &amp;&#160;</td>
+          <td class="paramname"><em>p_outNoiseCov</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">MatrixXd &amp;&#160;</td>
+          <td class="paramname"><em>p_outWhitener</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">qint32 &amp;&#160;</td>
+          <td class="paramname"><em>p_outNumNonZero</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Prepares a forward solution, Bad channels, after clustering etc ToDo...</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_FiffInfo</td><td>Fif measurement info Prepare forward for assembling the inverse operator</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_info</td><td>The measurement info to specify the channels to include. Bad channels in info['bads'] are not used. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_noise_cov</td><td>The noise covariance matrix. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pca</td><td>Calculate pca or not. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">p_outChNames</td><td>Selected channel names </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">p_outGain</td><td>Gain matrix </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">p_outNoiseCov</td><td>noise covariance matrix </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">p_outWhitener</td><td>Whitener </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">p_outNumNonZero</td><td>the rank (non zeros) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00513">513</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
 
 </div>
 </div>
@@ -422,7 +687,7 @@ Public Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00411">411</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00575">575</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
 
 </div>
 </div>
@@ -438,7 +703,22 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Coil coordinate system definition </p>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00270">270</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00332">332</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="adeda03feac0c09dc76711921c1e576dd"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html">FiffInfoBase</a> MNELIB::MNEForwardSolution::info</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>light weighted measurement info </p>
+
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00330">330</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
 
 </div>
 </div>
@@ -453,7 +733,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Indicates whether fwd conatins a clustered forward solution. </p>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00280">280</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00342">342</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
 
 </div>
 </div>
@@ -468,7 +748,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>MRI head coordinate transformation </p>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00275">275</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00337">337</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
 
 </div>
 </div>
@@ -483,7 +763,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Number of channels </p>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00272">272</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00334">334</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
 
 </div>
 </div>
@@ -498,7 +778,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Number of source dipoles </p>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00271">271</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00333">333</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
 
 </div>
 </div>
@@ -513,7 +793,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Forward solution </p>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00273">273</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00335">335</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
 
 </div>
 </div>
@@ -528,7 +808,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>ToDo... </p>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00274">274</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00336">336</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
 
 </div>
 </div>
@@ -543,7 +823,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Source normals (number depends on fixed or free orientation) </p>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00278">278</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00340">340</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
 
 </div>
 </div>
@@ -558,7 +838,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Source orientation: fixed or free </p>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00269">269</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00331">331</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
 
 </div>
 </div>
@@ -573,7 +853,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Source locations </p>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00277">277</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00339">339</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
 
 </div>
 </div>
@@ -588,7 +868,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Geomertic description of the source spaces (hemispheres) </p>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00276">276</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8h_source.html#l00338">338</a> of file <a class="el" href="mne__forwardsolution_8h_source.html">mne_forwardsolution.h</a>.</p>
 
 </div>
 </div>
@@ -599,7 +879,7 @@ Public Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 31 2013 17:09:10 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 12 2013 15:29:56 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

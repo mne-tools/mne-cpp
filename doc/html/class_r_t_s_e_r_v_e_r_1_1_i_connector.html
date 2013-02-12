@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">mne-cpp (MNE1)
-   &#160;<span id="projectnumber">beta</span>
+   &#160;<span id="projectnumber">beta 0.1</span>
    </div>
   </td>
  </tr>
@@ -116,9 +116,9 @@ Inheritance diagram for RTSERVER::IConnector:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="signals"></a>
 Signals</h2></td></tr>
-<tr class="memitem:a10ad64375b0159ec3a4c46ec0df3349f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a10ad64375b0159ec3a4c46ec0df3349f"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>remitMeasInfo</b> (qint32, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a5dad8ba41eaf7f4ad67aeb39fa05f266">FIFFLIB::FiffInfo::SDPtr</a>)</td></tr>
-<tr class="separator:a10ad64375b0159ec3a4c46ec0df3349f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a852e710c6f0836c0c1de5da09efd0d5e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a852e710c6f0836c0c1de5da09efd0d5e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>remitMeasInfo</b> (qint32, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FIFFLIB::FiffInfo</a>)</td></tr>
+<tr class="separator:a852e710c6f0836c0c1de5da09efd0d5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a705c9af85add7d90938b93e843d8d124"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a705c9af85add7d90938b93e843d8d124"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>remitRawBuffer</b> (Eigen::MatrixXf)</td></tr>
 <tr class="separator:a705c9af85add7d90938b93e843d8d124"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -135,33 +135,18 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:addd4fe9089e3fc07db879f1f38c20f63"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a48025cef38638e500c7c01c86e467107"><td class="memItemLeft" align="right" valign="top">virtual const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_s_e_r_v_e_r_1_1_i_connector.html#a48025cef38638e500c7c01c86e467107">getName</a> () const =0</td></tr>
 <tr class="separator:a48025cef38638e500c7c01c86e467107"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2231eefe5ef45fb16a0a951eafa7b983"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2231eefe5ef45fb16a0a951eafa7b983"></a>
-quint32&#160;</td><td class="memItemRight" valign="bottom"><b>getBufferSampleSize</b> ()</td></tr>
-<tr class="separator:a2231eefe5ef45fb16a0a951eafa7b983"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a173b3673ba30e4dfc978cc5d56ebbc2b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_s_e_r_v_e_r_1_1_i_connector.html#a173b3673ba30e4dfc978cc5d56ebbc2b">isActive</a> () const </td></tr>
 <tr class="separator:a173b3673ba30e4dfc978cc5d56ebbc2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af9418cdb50084a96725d9961f40bc1df"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_s_e_r_v_e_r_1_1_i_connector.html#af9418cdb50084a96725d9961f40bc1df">start</a> ()=0</td></tr>
 <tr class="separator:af9418cdb50084a96725d9961f40bc1df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aebdcf7e7086cc7147b2ff60828a37ec1"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_s_e_r_v_e_r_1_1_i_connector.html#aebdcf7e7086cc7147b2ff60828a37ec1">stop</a> ()=0</td></tr>
 <tr class="separator:aebdcf7e7086cc7147b2ff60828a37ec1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae8c8243216bd2f8bda6faca165aff0cd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae8c8243216bd2f8bda6faca165aff0cd"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setBufferSampleSize</b> (quint32 p_uiBuffSize)</td></tr>
-<tr class="separator:ae8c8243216bd2f8bda6faca165aff0cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a512847b425820509472fe03cf912a223"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_s_e_r_v_e_r_1_1_i_connector.html#a512847b425820509472fe03cf912a223">setMetaData</a> (QJsonObject &amp;p_MetaData)</td></tr>
 <tr class="separator:a512847b425820509472fe03cf912a223"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a046c81d49fae93851db8304754af8708"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_s_e_r_v_e_r_1_1_i_connector.html#a046c81d49fae93851db8304754af8708">setStatus</a> (bool status)</td></tr>
 <tr class="separator:a046c81d49fae93851db8304754af8708"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae5e21b306e783ec689e1a76f5900fd6a"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_s_e_r_v_e_r_1_1_i_connector.html#ae5e21b306e783ec689e1a76f5900fd6a">requestMeasInfo</a> (qint32 ID)=0</td></tr>
-<tr class="separator:ae5e21b306e783ec689e1a76f5900fd6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae704b21f0d177bae7d3d2c1987aa1952"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae704b21f0d177bae7d3d2c1987aa1952"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>requestMeas</b> ()=0</td></tr>
-<tr class="separator:ae704b21f0d177bae7d3d2c1987aa1952"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a72481aa6071da5f914934641c045327b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a72481aa6071da5f914934641c045327b"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>requestMeasStop</b> ()=0</td></tr>
-<tr class="separator:a72481aa6071da5f914934641c045327b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a77f6560762c58b82cf5571c776d72fbc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a77f6560762c58b82cf5571c776d72fbc"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>requestSetBufferSize</b> (quint32 p_uiBuffSize)=0</td></tr>
-<tr class="separator:a77f6560762c58b82cf5571c776d72fbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaac579f920c78f7759c82d486a9a515e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_s_e_r_v_e_r_1_1_i_connector.html#aaac579f920c78f7759c82d486a9a515e">info</a> (qint32 ID)=0</td></tr>
+<tr class="separator:aaac579f920c78f7759c82d486a9a515e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -170,8 +155,6 @@ Protected Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:ad0c57cf6ea138551fe169d6bee10fe42"><td class="memItemLeft" align="right" valign="top">RawMatrixBuffer *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_s_e_r_v_e_r_1_1_i_connector.html#ad0c57cf6ea138551fe169d6bee10fe42">m_pRawMatrixBuffer</a></td></tr>
-<tr class="separator:ad0c57cf6ea138551fe169d6bee10fe42"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7ce90dde9155f8310b7c88e130abcf90"><td class="memItemLeft" align="right" valign="top">QJsonObject&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_s_e_r_v_e_r_1_1_i_connector.html#a7ce90dde9155f8310b7c88e130abcf90">m_qJsonObjectMetaData</a></td></tr>
 <tr class="separator:a7ce90dde9155f8310b7c88e130abcf90"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a62a0e1c8e7c9b54522f8ac091900c270"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_manager.html">CommandManager</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_s_e_r_v_e_r_1_1_i_connector.html#a62a0e1c8e7c9b54522f8ac091900c270">m_commandManager</a></td></tr>
@@ -181,7 +164,7 @@ Protected Attributes</h2></td></tr>
 <div class="textblock"><p>The <a class="el" href="class_r_t_s_e_r_v_e_r_1_1_i_connector.html" title="The IConnector class is the interface class of all modules.">IConnector</a> class is the interface class of all modules. </p>
 <p>The <a class="el" href="class_r_t_s_e_r_v_e_r_1_1_i_connector.html" title="The IConnector class is the interface class of all modules.">IConnector</a> class is the interface class for all connectors. </p>
 
-<p>Definition at line <a class="el" href="_i_connector_8h_source.html#l00122">122</a> of file <a class="el" href="_i_connector_8h_source.html">IConnector.h</a>.</p>
+<p>Definition at line <a class="el" href="_i_connector_8h_source.html#l00119">119</a> of file <a class="el" href="_i_connector_8h_source.html">IConnector.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a03e435d83b5f45937d83a6b0a4ff348a"></a>
 <div class="memitem">
@@ -205,7 +188,7 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Destroys the <a class="el" href="class_r_t_s_e_r_v_e_r_1_1_i_connector.html" title="The IConnector class is the interface class of all modules.">IConnector</a>. </p>
 
-<p>Definition at line <a class="el" href="_i_connector_8h_source.html#l00132">132</a> of file <a class="el" href="_i_connector_8h_source.html">IConnector.h</a>.</p>
+<p>Definition at line <a class="el" href="_i_connector_8h_source.html#l00127">127</a> of file <a class="el" href="_i_connector_8h_source.html">IConnector.h</a>.</p>
 
 </div>
 </div>
@@ -232,7 +215,7 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Connects the command manager to the available slots. </p>
 
-<p>Implemented in <a class="el" href="class_fiff_simulator_plugin_1_1_fiff_simulator.html#ac7f862967b858dcde2688d76e7aea8dc">FiffSimulatorPlugin::FiffSimulator</a>.</p>
+<p>Implemented in <a class="el" href="class_neuromag_plugin_1_1_neuromag.html#a61ee0ec4ebd02d9d2f502cb41de1875a">NeuromagPlugin::Neuromag</a>, and <a class="el" href="class_fiff_simulator_plugin_1_1_fiff_simulator.html#ac7f862967b858dcde2688d76e7aea8dc">FiffSimulatorPlugin::FiffSimulator</a>.</p>
 
 </div>
 </div>
@@ -259,7 +242,7 @@ Protected Attributes</h2></td></tr>
 <p>Returns the CommandManager</p>
 <dl class="section return"><dt>Returns</dt><dd>the CommandManager. </dd></dl>
 
-<p>Definition at line <a class="el" href="_i_connector_8h_source.html#l00267">267</a> of file <a class="el" href="_i_connector_8h_source.html">IConnector.h</a>.</p>
+<p>Definition at line <a class="el" href="_i_connector_8h_source.html#l00239">239</a> of file <a class="el" href="_i_connector_8h_source.html">IConnector.h</a>.</p>
 
 </div>
 </div>
@@ -286,7 +269,7 @@ Protected Attributes</h2></td></tr>
 <p>Returns the unique connector id Pure virtual method.</p>
 <dl class="section return"><dt>Returns</dt><dd>the connector ID. </dd></dl>
 
-<p>Implemented in <a class="el" href="class_baby_m_e_g_plugin_1_1_baby_m_e_g.html#a320ac39c8c408ce74e01a193f70f4c72">BabyMEGPlugin::BabyMEG</a>, <a class="el" href="class_neuromag_plugin_1_1_neuromag.html#a221e2c203c6a99acef40d3cfcdc83405">NeuromagPlugin::Neuromag</a>, and <a class="el" href="class_fiff_simulator_plugin_1_1_fiff_simulator.html#af124c82e2400f58b440ab4d81799dc04">FiffSimulatorPlugin::FiffSimulator</a>.</p>
+<p>Implemented in <a class="el" href="class_neuromag_plugin_1_1_neuromag.html#a221e2c203c6a99acef40d3cfcdc83405">NeuromagPlugin::Neuromag</a>, <a class="el" href="class_fiff_simulator_plugin_1_1_fiff_simulator.html#af124c82e2400f58b440ab4d81799dc04">FiffSimulatorPlugin::FiffSimulator</a>, and <a class="el" href="class_baby_m_e_g_plugin_1_1_baby_m_e_g.html#a320ac39c8c408ce74e01a193f70f4c72">BabyMEGPlugin::BabyMEG</a>.</p>
 
 </div>
 </div>
@@ -313,7 +296,40 @@ Protected Attributes</h2></td></tr>
 <p>Returns the module name. Pure virtual method.</p>
 <dl class="section return"><dt>Returns</dt><dd>the name of module. </dd></dl>
 
-<p>Implemented in <a class="el" href="class_baby_m_e_g_plugin_1_1_baby_m_e_g.html#abd7c97d72f80989e438be8c7f089121c">BabyMEGPlugin::BabyMEG</a>, <a class="el" href="class_neuromag_plugin_1_1_neuromag.html#ac9f412844272849ab37b6adc423f5a13">NeuromagPlugin::Neuromag</a>, and <a class="el" href="class_fiff_simulator_plugin_1_1_fiff_simulator.html#aa04459de016b055a2b90fd4ff62f5a9f">FiffSimulatorPlugin::FiffSimulator</a>.</p>
+<p>Implemented in <a class="el" href="class_neuromag_plugin_1_1_neuromag.html#ac9f412844272849ab37b6adc423f5a13">NeuromagPlugin::Neuromag</a>, <a class="el" href="class_fiff_simulator_plugin_1_1_fiff_simulator.html#aa04459de016b055a2b90fd4ff62f5a9f">FiffSimulatorPlugin::FiffSimulator</a>, and <a class="el" href="class_baby_m_e_g_plugin_1_1_baby_m_e_g.html#abd7c97d72f80989e438be8c7f089121c">BabyMEGPlugin::BabyMEG</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aaac579f920c78f7759c82d486a9a515e"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void RTSERVER::IConnector::info </td>
+          <td>(</td>
+          <td class="paramtype">qint32&#160;</td>
+          <td class="paramname"><em>ID</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Request FiffInfo to be released.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">ID</td><td>ID of the data client to send to. ToDo Remove this - do this processing somewhere else </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implemented in <a class="el" href="class_neuromag_plugin_1_1_neuromag.html#a8e000385a961d7b60041f765726977b1">NeuromagPlugin::Neuromag</a>, and <a class="el" href="class_fiff_simulator_plugin_1_1_fiff_simulator.html#afa8355133066a3a1c938aacf3d9a7ab5">FiffSimulatorPlugin::FiffSimulator</a>.</p>
 
 </div>
 </div>
@@ -340,35 +356,7 @@ Protected Attributes</h2></td></tr>
 <p>Returns the activation status of the module.</p>
 <dl class="section return"><dt>Returns</dt><dd>true if module is activated. </dd></dl>
 
-<p>Definition at line <a class="el" href="_i_connector_8h_source.html#l00275">275</a> of file <a class="el" href="_i_connector_8h_source.html">IConnector.h</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ae5e21b306e783ec689e1a76f5900fd6a"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void RTSERVER::IConnector::requestMeasInfo </td>
-          <td>(</td>
-          <td class="paramtype">qint32&#160;</td>
-          <td class="paramname"><em>ID</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Returns the FiffInfo.</p>
-<dl class="section return"><dt>Returns</dt><dd>ToDo </dd></dl>
-
-<p>Implemented in <a class="el" href="class_baby_m_e_g_plugin_1_1_baby_m_e_g.html#aab75e0e121f067c2831105e29249e22b">BabyMEGPlugin::BabyMEG</a>, <a class="el" href="class_neuromag_plugin_1_1_neuromag.html#a98d4c913feaa98e2da9966cdb36f4383">NeuromagPlugin::Neuromag</a>, and <a class="el" href="class_fiff_simulator_plugin_1_1_fiff_simulator.html#a38c22cb744c10f50498baddf2308c4b1">FiffSimulatorPlugin::FiffSimulator</a>.</p>
+<p>Definition at line <a class="el" href="_i_connector_8h_source.html#l00247">247</a> of file <a class="el" href="_i_connector_8h_source.html">IConnector.h</a>.</p>
 
 </div>
 </div>
@@ -427,7 +415,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_i_connector_8h_source.html#l00292">292</a> of file <a class="el" href="_i_connector_8h_source.html">IConnector.h</a>.</p>
+<p>Definition at line <a class="el" href="_i_connector_8h_source.html#l00255">255</a> of file <a class="el" href="_i_connector_8h_source.html">IConnector.h</a>.</p>
 
 </div>
 </div>
@@ -460,7 +448,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_i_connector_8h_source.html#l00300">300</a> of file <a class="el" href="_i_connector_8h_source.html">IConnector.h</a>.</p>
+<p>Definition at line <a class="el" href="_i_connector_8h_source.html#l00263">263</a> of file <a class="el" href="_i_connector_8h_source.html">IConnector.h</a>.</p>
 
 </div>
 </div>
@@ -487,7 +475,7 @@ Protected Attributes</h2></td></tr>
 <p>Starts the <a class="el" href="class_r_t_s_e_r_v_e_r_1_1_i_connector.html" title="The IConnector class is the interface class of all modules.">IConnector</a>. Pure virtual method.</p>
 <dl class="section return"><dt>Returns</dt><dd>true if successful, false otherwise </dd></dl>
 
-<p>Implemented in <a class="el" href="class_baby_m_e_g_plugin_1_1_baby_m_e_g.html#a1b7862e223df5e0aec874b03ab12902d">BabyMEGPlugin::BabyMEG</a>, <a class="el" href="class_neuromag_plugin_1_1_neuromag.html#a631f3f774dfb24a86f2845168bdce82a">NeuromagPlugin::Neuromag</a>, and <a class="el" href="class_fiff_simulator_plugin_1_1_fiff_simulator.html#a9e7ef070b71e39a1036fe66021fd2322">FiffSimulatorPlugin::FiffSimulator</a>.</p>
+<p>Implemented in <a class="el" href="class_neuromag_plugin_1_1_neuromag.html#a631f3f774dfb24a86f2845168bdce82a">NeuromagPlugin::Neuromag</a>, <a class="el" href="class_fiff_simulator_plugin_1_1_fiff_simulator.html#a9e7ef070b71e39a1036fe66021fd2322">FiffSimulatorPlugin::FiffSimulator</a>, and <a class="el" href="class_baby_m_e_g_plugin_1_1_baby_m_e_g.html#a1b7862e223df5e0aec874b03ab12902d">BabyMEGPlugin::BabyMEG</a>.</p>
 
 </div>
 </div>
@@ -514,7 +502,7 @@ Protected Attributes</h2></td></tr>
 <p>Stops the IModule. Pure virtual method.</p>
 <dl class="section return"><dt>Returns</dt><dd>true if success, false otherwise </dd></dl>
 
-<p>Implemented in <a class="el" href="class_baby_m_e_g_plugin_1_1_baby_m_e_g.html#ad16e6b4a19f6b089ab3d95cf0c20eb48">BabyMEGPlugin::BabyMEG</a>, <a class="el" href="class_neuromag_plugin_1_1_neuromag.html#a9da6195e0d4b8ed545819f76bb759542">NeuromagPlugin::Neuromag</a>, and <a class="el" href="class_fiff_simulator_plugin_1_1_fiff_simulator.html#ad39340aeabdb354dff5b2eb263287ce8">FiffSimulatorPlugin::FiffSimulator</a>.</p>
+<p>Implemented in <a class="el" href="class_neuromag_plugin_1_1_neuromag.html#a9da6195e0d4b8ed545819f76bb759542">NeuromagPlugin::Neuromag</a>, <a class="el" href="class_fiff_simulator_plugin_1_1_fiff_simulator.html#ad39340aeabdb354dff5b2eb263287ce8">FiffSimulatorPlugin::FiffSimulator</a>, and <a class="el" href="class_baby_m_e_g_plugin_1_1_baby_m_e_g.html#ad16e6b4a19f6b089ab3d95cf0c20eb48">BabyMEGPlugin::BabyMEG</a>.</p>
 
 </div>
 </div>
@@ -538,30 +526,7 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>The CommandManager of the connector. </p>
 
-<p>Definition at line <a class="el" href="_i_connector_8h_source.html#l00247">247</a> of file <a class="el" href="_i_connector_8h_source.html">IConnector.h</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ad0c57cf6ea138551fe169d6bee10fe42"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">RawMatrixBuffer* RTSERVER::IConnector::m_pRawMatrixBuffer</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>The Circular Raw Matrix Buffer. </p>
-
-<p>Definition at line <a class="el" href="_i_connector_8h_source.html#l00243">243</a> of file <a class="el" href="_i_connector_8h_source.html">IConnector.h</a>.</p>
+<p>Definition at line <a class="el" href="_i_connector_8h_source.html#l00228">228</a> of file <a class="el" href="_i_connector_8h_source.html">IConnector.h</a>.</p>
 
 </div>
 </div>
@@ -584,7 +549,7 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>The meta data of the plugin defined in Q_PLUGIN_METADATA and the corresponding json file. </p>
 
-<p>Definition at line <a class="el" href="_i_connector_8h_source.html#l00245">245</a> of file <a class="el" href="_i_connector_8h_source.html">IConnector.h</a>.</p>
+<p>Definition at line <a class="el" href="_i_connector_8h_source.html#l00226">226</a> of file <a class="el" href="_i_connector_8h_source.html">IConnector.h</a>.</p>
 
 </div>
 </div>
@@ -594,7 +559,7 @@ Protected Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 31 2013 17:09:10 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 12 2013 15:29:57 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">mne-cpp (MNE1)
-   &#160;<span id="projectnumber">beta</span>
+   &#160;<span id="projectnumber">beta 0.1</span>
    </div>
   </td>
  </tr>
@@ -119,9 +119,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="comment">// DEFINE MEMBER METHODS</span></div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;</div>
-<div class="line"><a name="l00066"></a><span class="lineno"><a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_inv.html#a3464cddc1263e4b481699b4407cf2a6b">   66</a></span>&#160;<a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_inv.html#a3464cddc1263e4b481699b4407cf2a6b">RtInv::RtInv</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#abfce6128814de61b3fdd324a97918338">FiffInfo::SPtr</a> p_pFiffInfo, <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a7e95a8381a0f621201981cd6a39ea25c">MNEForwardSolution::SPtr</a> p_pFwd, QObject *parent)</div>
+<div class="line"><a name="l00066"></a><span class="lineno"><a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_inv.html#ac355efe86787ad5d3ccc3dc3950b83ac">   66</a></span>&#160;<a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_inv.html#ac355efe86787ad5d3ccc3dc3950b83ac">RtInv::RtInv</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a> &amp;p_fiffInfo, <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a7e95a8381a0f621201981cd6a39ea25c">MNEForwardSolution::SPtr</a> p_pFwd, QObject *parent)</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;: QThread(parent)</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;, m_pFiffInfo(p_pFiffInfo)</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;, m_fiffInfo(p_fiffInfo)</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;, m_pFwd(p_pFwd)</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;{</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;}</div>
@@ -136,46 +136,62 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div>
-<div class="line"><a name="l00084"></a><span class="lineno"><a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_inv.html#aeb69b12f862a2026120f477359f87d59">   84</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_inv.html#aeb69b12f862a2026120f477359f87d59">RtInv::receiveNoiseCov</a>(MatrixXf p_noiseCov)</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="comment">//ToDo use shared pointer for public slot</span></div>
+<div class="line"><a name="l00084"></a><span class="lineno"><a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_inv.html#a1050ab52d04ec0760edfb1d781446f86">   84</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_inv.html#a1050ab52d04ec0760edfb1d781446f86">RtInv::receiveNoiseCov</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html" title="covariance data">FiffCov</a> p_NoiseCov)</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;{</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    mutex.lock();</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    qDebug() &lt;&lt; <span class="stringliteral">&quot;Received Cov&quot;</span>;</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;Covariance:\n&quot;</span> &lt;&lt; p_noiseCov.block(0,0,10,10) &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="comment">//Use here a circular buffer</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    m_vecNoiseCov.push_back(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html#a2e26b3289771ae79975a7a6621e0e09e">FiffCov::SDPtr</a>(<span class="keyword">new</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html" title="covariance data">FiffCov</a>(p_NoiseCov)));</div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <span class="comment">//Use here a circular buffer</span></div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    m_noiseCov = p_noiseCov;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    mutex.unlock();</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;}</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    mutex.unlock();</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;}</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;</div>
-<div class="line"><a name="l00098"></a><span class="lineno"><a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_inv.html#aba9afc1fa648b6bfbbdfb2bf2af71787">   98</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_inv.html#aba9afc1fa648b6bfbbdfb2bf2af71787">RtInv::stop</a>()</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;{</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    m_bIsRunning = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    QThread::wait();</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;}</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;</div>
+<div class="line"><a name="l00096"></a><span class="lineno"><a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_inv.html#aba9afc1fa648b6bfbbdfb2bf2af71787">   96</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_inv.html#aba9afc1fa648b6bfbbdfb2bf2af71787">RtInv::stop</a>()</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;{</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    m_bIsRunning = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    QThread::wait();</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;}</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;</div>
-<div class="line"><a name="l00109"></a><span class="lineno"><a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_inv.html#aba7d6260c16a40c80d5df8f54a6f7ed3">  109</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_inv.html#aba7d6260c16a40c80d5df8f54a6f7ed3">RtInv::run</a>()</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;{</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    m_bIsRunning = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <span class="keywordflow">while</span>(m_bIsRunning)</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    {</div>
+<div class="line"><a name="l00107"></a><span class="lineno"><a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_inv.html#aba7d6260c16a40c80d5df8f54a6f7ed3">  107</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_inv.html#aba7d6260c16a40c80d5df8f54a6f7ed3">RtInv::run</a>()</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;{</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    m_bIsRunning = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <span class="keywordflow">while</span>(m_bIsRunning)</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    {</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;        <span class="keywordflow">if</span>(m_vecNoiseCov.size() &gt; 0)</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;        {</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    }</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;}</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;            <span class="comment">// Restrict forward solution as necessary for MEG</span></div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;            <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a> forward_meg = m_pFwd-&gt;pick_types_forward(<span class="keyword">true</span>, <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;            <span class="comment">//Put this inside make_inverse_operator</span></div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;            qDebug() &lt;&lt; <span class="stringliteral">&quot;Inverse operator&quot;</span>;</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;<span class="comment">//            inverse_operator_meeg = make_inverse_operator(info, forward_meeg, noise_cov,</span></div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;<span class="comment">//                                                          loose=0.2, depth=0.8)</span></div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;            <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ae05c93857ada8081c6f8775dee40c634">MNEInverseOperator::make_inverse_operator</a>(m_fiffInfo, forward_meg, *m_vecNoiseCov[0].data(), 0.2f, 0.8f);</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;            <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html#a2e26b3289771ae79975a7a6621e0e09e">FiffCov::SDPtr</a> t_NoiseCov(<span class="keyword">new</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html" title="covariance data">FiffCov</a>(m_vecNoiseCov[0]-&gt;prepare_noise_cov(m_fiffInfo, m_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#af15ed691efe28790897198f06306ab29">ch_names</a>)));</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;            m_vecNoiseCov.pop_front();</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;<span class="comment">//            prepare_noise_cov;</span></div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        }</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    }</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 31 2013 17:09:08 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 12 2013 15:29:53 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

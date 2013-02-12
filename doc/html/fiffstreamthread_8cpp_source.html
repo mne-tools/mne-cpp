@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">mne-cpp (MNE1)
-   &#160;<span id="projectnumber">beta</span>
+   &#160;<span id="projectnumber">beta 0.1</span>
    </div>
   </td>
  </tr>
@@ -96,7 +96,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="fiffstreamthread_8h.html" title="implementation of the FiffStreamThread Class.">fiffstreamthread.h</a>&quot;</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor">#include &quot;fiffstreamserver.h&quot;</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="fiffstreamserver_8h.html" title="implementation of the FiffStreamServer Class.">fiffstreamserver.h</a>&quot;</span></div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="mne__rt__commands_8h.html" title="Contains mne rt constants.">mne_rt_commands.h</a>&quot;</span></div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
@@ -147,9 +147,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;FiffStreamThread::~FiffStreamThread()</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;{</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="comment">//Remove from client list</span></div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <a class="code" href="class_r_t_s_e_r_v_e_r_1_1_fiff_strea_r_t_s_e_r_v_e_r.html" title="The FiffStreaRTSERVER class provides.">FiffStreaRTSERVER</a>* t_pFiffStreaRTSERVER = qobject_cast&lt;<a class="code" href="class_r_t_s_e_r_v_e_r_1_1_fiff_strea_r_t_s_e_r_v_e_r.html" title="The FiffStreaRTSERVER class provides.">FiffStreaRTSERVER</a>*&gt;(this-&gt;parent());</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <span class="keywordflow">if</span>(t_pFiffStreaRTSERVER)</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        t_pFiffStreaRTSERVER-&gt;m_qClientList.remove(m_iDataClientId);</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <a class="code" href="class_r_t_s_e_r_v_e_r_1_1_fiff_stream_server.html" title="The FiffStreamServer class provides.">FiffStreamServer</a>* t_pFiffStreamServer = qobject_cast&lt;<a class="code" href="class_r_t_s_e_r_v_e_r_1_1_fiff_stream_server.html" title="The FiffStreamServer class provides.">FiffStreamServer</a>*&gt;(this-&gt;parent());</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <span class="keywordflow">if</span>(t_pFiffStreamServer)</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        t_pFiffStreamServer-&gt;m_qClientList.remove(m_iDataClientId);</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    m_bIsRunning = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    QThread::wait();</div>
@@ -255,7 +255,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;</div>
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;<span class="keywordtype">void</span> FiffStreamThread::sendMeasurementInfo(qint32 ID, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a5dad8ba41eaf7f4ad67aeb39fa05f266">FiffInfo::SDPtr</a> p_FiffInfo)</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;<span class="keywordtype">void</span> FiffStreamThread::sendMeasurementInfo(qint32 ID, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a> p_fiffInfo)</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;{</div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    <span class="keywordflow">if</span>(ID == m_iDataClientId)</div>
 <div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    {</div>
@@ -279,8 +279,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;        qint32 k;</div>
 <div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;        QList&lt;FiffChInfo&gt; chs;</div>
 <div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;        <span class="keywordflow">for</span>(k = 0; k &lt; p_FiffInfo-&gt;nchan; ++k)</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;            chs &lt;&lt; p_FiffInfo-&gt;chs.at(k);</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;        <span class="keywordflow">for</span>(k = 0; k &lt; p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>; ++k)</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;            chs &lt;&lt; p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#aa07b3b770d7fe65ac065e01461688e04">chs</a>.at(k);</div>
 <div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;</div>
 <div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;        fiff_int_t nchan = chs.size();</div>
 <div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;</div>
@@ -289,9 +289,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;        <span class="comment">//</span></div>
 <div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;        t_FiffStreamOut.start_block(FIFFB_MEAS);<span class="comment">//4</span></div>
 <div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;        t_FiffStreamOut.write_id(FIFF_BLOCK_ID);<span class="comment">//5</span></div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;        <span class="keywordflow">if</span>(p_FiffInfo-&gt;meas_id.version != -1)</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;        <span class="keywordflow">if</span>(p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a9c8f8d46ca2721658d3ab20f1dffb939">meas_id</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#ace3ce06929c786230382642f8ef596d3">version</a> != -1)</div>
 <div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;        {</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;            t_FiffStreamOut.write_id(FIFF_PARENT_BLOCK_ID,p_FiffInfo-&gt;meas_id);<span class="comment">//6</span></div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;            t_FiffStreamOut.write_id(FIFF_PARENT_BLOCK_ID,p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a9c8f8d46ca2721658d3ab20f1dffb939">meas_id</a>);<span class="comment">//6</span></div>
 <div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;        }</div>
 <div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;        <span class="comment">//</span></div>
 <div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;        <span class="comment">//    Measurement info</span></div>
@@ -308,14 +308,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        <span class="comment">//</span></div>
 <div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;        <span class="comment">//    megacq parameters</span></div>
 <div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;        <span class="comment">//</span></div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;        <span class="keywordflow">if</span> (!p_FiffInfo-&gt;acq_pars.isEmpty() || !p_FiffInfo-&gt;acq_stim.isEmpty())</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;        <span class="keywordflow">if</span> (!p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ac5441674648831c0e691f4022360755e">acq_pars</a>.isEmpty() || !p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a40a96f92d6d21fbd0678c1f6d0abcee0">acq_stim</a>.isEmpty())</div>
 <div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;        {</div>
 <div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;            t_FiffStreamOut.start_block(FIFFB_DACQ_PARS);</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;            <span class="keywordflow">if</span> (!p_FiffInfo-&gt;acq_pars.isEmpty())</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;                t_FiffStreamOut.write_string(FIFF_DACQ_PARS, p_FiffInfo-&gt;acq_pars);</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;            <span class="keywordflow">if</span> (!p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ac5441674648831c0e691f4022360755e">acq_pars</a>.isEmpty())</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;                t_FiffStreamOut.write_string(FIFF_DACQ_PARS, p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ac5441674648831c0e691f4022360755e">acq_pars</a>);</div>
 <div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;            <span class="keywordflow">if</span> (!p_FiffInfo-&gt;acq_stim.isEmpty())</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;                t_FiffStreamOut.write_string(FIFF_DACQ_STIM, p_FiffInfo-&gt;acq_stim);</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;            <span class="keywordflow">if</span> (!p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a40a96f92d6d21fbd0678c1f6d0abcee0">acq_stim</a>.isEmpty())</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;                t_FiffStreamOut.write_string(FIFF_DACQ_STIM, p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a40a96f92d6d21fbd0678c1f6d0abcee0">acq_stim</a>);</div>
 <div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;</div>
 <div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;            t_FiffStreamOut.end_block(FIFFB_DACQ_PARS);</div>
 <div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;        }</div>
@@ -324,50 +324,50 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;        <span class="comment">//</span></div>
 <div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;        <span class="keywordflow">if</span> (!have_hpi_result)</div>
 <div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;        {</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;            <span class="keywordflow">if</span> (!p_FiffInfo-&gt;dev_head_t.isEmpty())</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;                t_FiffStreamOut.write_coord_trans(p_FiffInfo-&gt;dev_head_t);</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;            <span class="keywordflow">if</span> (!p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#af928d3bcb3e2a26e386647587b48579e">dev_head_t</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ac23a4cd08fe45a1ebee372749068fe3d">isEmpty</a>())</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;                t_FiffStreamOut.write_coord_trans(p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#af928d3bcb3e2a26e386647587b48579e">dev_head_t</a>);</div>
 <div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;            <span class="keywordflow">if</span> (!p_FiffInfo-&gt;ctf_head_t.isEmpty())</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;                t_FiffStreamOut.write_coord_trans(p_FiffInfo-&gt;ctf_head_t);</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;            <span class="keywordflow">if</span> (!p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#aa4ff7b1f98b00a295617c1aaa80e1146">ctf_head_t</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ac23a4cd08fe45a1ebee372749068fe3d">isEmpty</a>())</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;                t_FiffStreamOut.write_coord_trans(p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#aa4ff7b1f98b00a295617c1aaa80e1146">ctf_head_t</a>);</div>
 <div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;        }</div>
 <div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;        <span class="comment">//</span></div>
 <div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;        <span class="comment">//    Polhemus data</span></div>
 <div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;        <span class="comment">//</span></div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;        <span class="keywordflow">if</span> (p_FiffInfo-&gt;dig.size() &gt; 0 &amp;&amp; !have_isotrak)</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;        <span class="keywordflow">if</span> (p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#add2630e0a5269622bfbe15acae9ee5ac">dig</a>.size() &gt; 0 &amp;&amp; !have_isotrak)</div>
 <div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;        {</div>
 <div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;            t_FiffStreamOut.start_block(FIFFB_ISOTRAK);</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;            <span class="keywordflow">for</span> (qint32 k = 0; k &lt; p_FiffInfo-&gt;dig.size(); ++k)</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;                t_FiffStreamOut.write_dig_point(p_FiffInfo-&gt;dig[k]);</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;            <span class="keywordflow">for</span> (qint32 k = 0; k &lt; p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#add2630e0a5269622bfbe15acae9ee5ac">dig</a>.size(); ++k)</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;                t_FiffStreamOut.write_dig_point(p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#add2630e0a5269622bfbe15acae9ee5ac">dig</a>[k]);</div>
 <div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;</div>
 <div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;            t_FiffStreamOut.end_block(FIFFB_ISOTRAK);</div>
 <div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;        }</div>
 <div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;        <span class="comment">//</span></div>
 <div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;        <span class="comment">//    Projectors</span></div>
 <div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;        <span class="comment">//</span></div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;        t_FiffStreamOut.write_proj(p_FiffInfo-&gt;projs);</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;        t_FiffStreamOut.write_proj(p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ae71b753c51dfd23ddd3a8a18e0f19ebe">projs</a>);</div>
 <div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;        <span class="comment">//</span></div>
 <div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;        <span class="comment">//    CTF compensation info</span></div>
 <div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;        <span class="comment">//</span></div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;        t_FiffStreamOut.write_ctf_comp(p_FiffInfo-&gt;comps);</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;        t_FiffStreamOut.write_ctf_comp(p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#abe1b8e3c8986cba9e001f96480f905e9">comps</a>);</div>
 <div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;        <span class="comment">//</span></div>
 <div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;        <span class="comment">//    Bad channels</span></div>
 <div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;        <span class="comment">//</span></div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;        <span class="keywordflow">if</span> (p_FiffInfo-&gt;bads.size() &gt; 0)</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;        <span class="keywordflow">if</span> (p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#abb2b7b298afe7439c1012962c2a8c43c">bads</a>.size() &gt; 0)</div>
 <div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;        {</div>
 <div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;            t_FiffStreamOut.start_block(FIFFB_MNE_BAD_CHANNELS);</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;            t_FiffStreamOut.write_name_list(FIFF_MNE_CH_NAME_LIST,p_FiffInfo-&gt;bads);</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;            t_FiffStreamOut.write_name_list(FIFF_MNE_CH_NAME_LIST,p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#abb2b7b298afe7439c1012962c2a8c43c">bads</a>);</div>
 <div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;            t_FiffStreamOut.end_block(FIFFB_MNE_BAD_CHANNELS);</div>
 <div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;        }</div>
 <div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;        <span class="comment">//</span></div>
 <div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;        <span class="comment">//    General</span></div>
 <div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;        <span class="comment">//</span></div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;        t_FiffStreamOut.write_float(FIFF_SFREQ,&amp;p_FiffInfo-&gt;sfreq);</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;        t_FiffStreamOut.write_float(FIFF_HIGHPASS,&amp;p_FiffInfo-&gt;highpass);</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;        t_FiffStreamOut.write_float(FIFF_LOWPASS,&amp;p_FiffInfo-&gt;lowpass);</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;        t_FiffStreamOut.write_float(FIFF_SFREQ,&amp;p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a963c80bf73b01ed07eb1a31540cf308c">sfreq</a>);</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;        t_FiffStreamOut.write_float(FIFF_HIGHPASS,&amp;p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a19c7faa33c199e6606b7c3f48a613d32">highpass</a>);</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;        t_FiffStreamOut.write_float(FIFF_LOWPASS,&amp;p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ad6d3937c2aca7f34012e6d5f25444b45">lowpass</a>);</div>
 <div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;        t_FiffStreamOut.write_int(FIFF_NCHAN,&amp;nchan);</div>
 <div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;        t_FiffStreamOut.write_int(FIFF_DATA_PACK,&amp;data_type);</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;        <span class="keywordflow">if</span> (p_FiffInfo-&gt;meas_date[0] != -1)</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;            t_FiffStreamOut.write_int(FIFF_MEAS_DATE,p_FiffInfo-&gt;meas_date, 2);</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;        <span class="keywordflow">if</span> (p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#acc617eb0077fa0dda35ade4318abc209">meas_date</a>[0] != -1)</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;            t_FiffStreamOut.write_int(FIFF_MEAS_DATE,p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#acc617eb0077fa0dda35ade4318abc209">meas_date</a>, 2);</div>
 <div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;        <span class="comment">//</span></div>
 <div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;        <span class="comment">//    Channel info</span></div>
 <div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;        <span class="comment">//</span></div>
@@ -412,15 +412,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;{</div>
 <div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;    m_bIsRunning = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;</div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;    <a class="code" href="class_r_t_s_e_r_v_e_r_1_1_fiff_strea_r_t_s_e_r_v_e_r.html" title="The FiffStreaRTSERVER class provides.">FiffStreaRTSERVER</a>* t_pParentServer = qobject_cast&lt;<a class="code" href="class_r_t_s_e_r_v_e_r_1_1_fiff_strea_r_t_s_e_r_v_e_r.html" title="The FiffStreaRTSERVER class provides.">FiffStreaRTSERVER</a>*&gt;(this-&gt;parent());</div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;    <a class="code" href="class_r_t_s_e_r_v_e_r_1_1_fiff_stream_server.html" title="The FiffStreamServer class provides.">FiffStreamServer</a>* t_pParentServer = qobject_cast&lt;<a class="code" href="class_r_t_s_e_r_v_e_r_1_1_fiff_stream_server.html" title="The FiffStreamServer class provides.">FiffStreamServer</a>*&gt;(this-&gt;parent());</div>
 <div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;    connect(t_pParentServer, &amp;FiffStreaRTSERVER::remitMeasInfo,</div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;    connect(t_pParentServer, &amp;FiffStreamServer::remitMeasInfo,</div>
 <div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;            <span class="keyword">this</span>, &amp;FiffStreamThread::sendMeasurementInfo);</div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;    connect(t_pParentServer, &amp;FiffStreaRTSERVER::remitRawBuffer,</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;    connect(t_pParentServer, &amp;FiffStreamServer::remitRawBuffer,</div>
 <div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;            <span class="keyword">this</span>, &amp;FiffStreamThread::sendRawBuffer);</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;    connect(t_pParentServer, &amp;FiffStreaRTSERVER::startMeasFiffStreamClient,</div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;    connect(t_pParentServer, &amp;FiffStreamServer::startMeasFiffStreamClient,</div>
 <div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;            <span class="keyword">this</span>, &amp;FiffStreamThread::startMeas);</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;    connect(t_pParentServer, &amp;FiffStreaRTSERVER::stopMeasFiffStreamClient,</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;    connect(t_pParentServer, &amp;FiffStreamServer::stopMeasFiffStreamClient,</div>
 <div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;            <span class="keyword">this</span>, &amp;FiffStreamThread::stopMeas);</div>
 <div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;</div>
 <div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;    QTcpSocket t_qTcpSocket;</div>
@@ -501,7 +501,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 31 2013 17:09:08 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 12 2013 15:29:54 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

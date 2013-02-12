@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">mne-cpp (MNE1)
-   &#160;<span id="projectnumber">beta</span>
+   &#160;<span id="projectnumber">beta 0.1</span>
    </div>
   </td>
  </tr>
@@ -100,72 +100,115 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="rtclient__global_8h.html" title="rtclient library export/import macros.">rtclient_global.h</a>&quot;</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="comment">// QT INCLUDES</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">#include &lt;rtCommand/commandmanager.h&gt;</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="command_8h.html" title="Declaration of the Command Class.">rtCommand/command.h</a>&gt;</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="preprocessor">#include &lt;QDataStream&gt;</span></div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">#include &lt;QSharedPointer&gt;</span></div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">#include &lt;QString&gt;</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">#include &lt;QTcpSocket&gt;</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="comment">// DEFINE NAMESPACE RTCLIENTLIB</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="keyword">namespace </span>RTCLIENTLIB</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;{</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="comment">// QT INCLUDES</span></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">#include &lt;QDataStream&gt;</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">#include &lt;QSharedPointer&gt;</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">#include &lt;QString&gt;</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">#include &lt;QTcpSocket&gt;</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">#include &lt;QMutex&gt;</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="comment">// DEFINE NAMESPACE RTCLIENTLIB</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno"><a class="code" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html">   76</a></span>&#160;<span class="comment"></span><span class="keyword">class </span><a class="code" href="rtclient__global_8h.html#aa3dc74e409c3089c940da4c6362f75f9">RTCLIENTSHARED_EXPORT</a> <a class="code" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html" title="Real-time command client.">RtCmdClient</a> : <span class="keyword">public</span> QTcpSocket</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;{</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    Q_OBJECT</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00080"></a><span class="lineno"><a class="code" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#ab70f5e7be0b13eea8d6a9060df73246d">   80</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;RtCmdClient&gt; <a class="code" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#ab70f5e7be0b13eea8d6a9060df73246d">SPtr</a>;            </div>
-<div class="line"><a name="l00081"></a><span class="lineno"><a class="code" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#ab203cf7c8181b2a1a6c99c9f7874e8ab">   81</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;const RtCmdClient&gt; <a class="code" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#ab203cf7c8181b2a1a6c99c9f7874e8ab">ConstSPtr</a>; </div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="comment"></span>    <span class="keyword">explicit</span> <a class="code" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html" title="Real-time command client.">RtCmdClient</a>(QObject *parent = 0);</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> connectToHost(QString &amp;p_sRtServerHostName);</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="comment"></span>    QString sendCommand(<span class="keyword">const</span> QString &amp;p_sCommand);</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="keyword">namespace </span>RTCLIENTLIB</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;{</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="comment">// USED NAMESPACES</span></div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="keyword">using namespace </span>RTCOMMANDLIB;</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00086"></a><span class="lineno"><a class="code" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html">   86</a></span>&#160;<span class="comment"></span><span class="keyword">class </span><a class="code" href="rtclient__global_8h.html#aa3dc74e409c3089c940da4c6362f75f9">RTCLIENTSHARED_EXPORT</a> <a class="code" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html" title="Real-time command client.">RtCmdClient</a> : <span class="keyword">public</span> QTcpSocket</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;{</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    Q_OBJECT</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00090"></a><span class="lineno"><a class="code" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#ab70f5e7be0b13eea8d6a9060df73246d">   90</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;RtCmdClient&gt; <a class="code" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#ab70f5e7be0b13eea8d6a9060df73246d">SPtr</a>;            </div>
+<div class="line"><a name="l00091"></a><span class="lineno"><a class="code" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#ab203cf7c8181b2a1a6c99c9f7874e8ab">   91</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;const RtCmdClient&gt; <a class="code" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#ab203cf7c8181b2a1a6c99c9f7874e8ab">ConstSPtr</a>; </div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="comment"></span>    <span class="keyword">explicit</span> <a class="code" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html" title="Real-time command client.">RtCmdClient</a>(QObject *parent = 0);</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> connectToHost(QString &amp;p_sRtServerHostName);</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> requestMeasInfo(qint32 p_id);</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> requestMeasInfo(<span class="keyword">const</span> QString &amp;p_Alias);</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> requestMeas(qint32 p_id);</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> requestMeas(QString p_Alias);</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> stopAll();</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;<span class="comment"></span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> hasCommand(<span class="keyword">const</span> QString &amp;p_sCommand) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="comment"></span>    QString sendCLICommand(<span class="keyword">const</span> QString &amp;p_sCommand);</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> sendCommandJSON(<span class="keyword">const</span> <a class="code" href="class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html" title="Command.">Command</a> &amp;p_command);</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;<span class="comment"></span>    <span class="keyword">inline</span> QString readAvailableData();</div>
 <div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;signals:</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    </div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;<span class="keyword">public</span> slots:</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    </div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;};</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> requestCommands();</div>
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;} <span class="comment">// NAMESPACE</span></div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;<span class="preprocessor">#endif // RTCMDCLIENT_H</span></div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;<span class="comment"></span>    <span class="keywordtype">bool</span> waitForDataAvailable(qint32 msecs = 30000) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;<span class="comment"></span>    <a class="code" href="class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html" title="Command.">Command</a>&amp; operator[] (<span class="keyword">const</span> QString &amp;key);</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;<span class="comment"></span>    <span class="keyword">const</span> <a class="code" href="class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html" title="Command.">Command</a> operator[] (<span class="keyword">const</span> QString &amp;key) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;signals:</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> response(QString p_sResponse);</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    <a class="code" href="class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_manager.html">CommandManager</a>  m_commandManager;   </div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    QMutex          m_qMutex;           </div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    QString         m_sAvailableData;   </div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;};</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;<span class="comment">// INLINE DEFINITIONS</span></div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;</div>
+<div class="line"><a name="l00203"></a><span class="lineno"><a class="code" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#a14d62e8aedd9d853d3011647b9a2477d">  203</a></span>&#160;<span class="keyword">inline</span> QString <a class="code" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#a14d62e8aedd9d853d3011647b9a2477d">RtCmdClient::readAvailableData</a>()</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;{</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    m_qMutex.lock();</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    QString p_sResponse = m_sAvailableData;</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    m_sAvailableData.clear();</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    m_qMutex.unlock();</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    <span class="keywordflow">return</span> p_sResponse;</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;}</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;</div>
+<div class="line"><a name="l00216"></a><span class="lineno"><a class="code" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#a774043b4b8188d7eb26b3752ba6174f4">  216</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#a774043b4b8188d7eb26b3752ba6174f4">RtCmdClient::hasCommand</a>(<span class="keyword">const</span> QString &amp;p_sCommand)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    <span class="keywordflow">return</span> m_commandManager.hasCommand(p_sCommand);</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;}</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;} <span class="comment">// NAMESPACE</span></div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;<span class="preprocessor">#endif // RTCMDCLIENT_H</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 31 2013 17:09:08 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 12 2013 15:29:53 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

@@ -7,5 +7,6 @@ var searchData=
   ['dacqshmblock',['dacqShmBlock',['../struct_neuromag_plugin_1_1dacq_shm_block.html',1,'NeuromagPlugin']]],
   ['dacqshmblock',['dacqShmBlock',['../struct_baby_m_e_g_plugin_1_1dacq_shm_block.html',1,'BabyMEGPlugin']]],
   ['dacqshmclient',['dacqShmClient',['../struct_baby_m_e_g_plugin_1_1dacq_shm_client.html',1,'BabyMEGPlugin']]],
-  ['dacqshmclient',['dacqShmClient',['../struct_neuromag_plugin_1_1dacq_shm_client.html',1,'NeuromagPlugin']]]
+  ['dacqshmclient',['dacqShmClient',['../struct_neuromag_plugin_1_1dacq_shm_client.html',1,'NeuromagPlugin']]],
+  ['disp',['Disp',['../class_d_i_s_p_l_i_b_1_1_disp.html',1,'DISPLIB']]]
 ];

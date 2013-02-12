@@ -3,9 +3,9 @@ var searchData=
   ['cal',['cal',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a280ad3b0f38b3f8ecee6669aa652885d',1,'FIFFLIB::FiffChInfo']]],
   ['cals',['cals',['../class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#aca60160d7aaa770cfe6346ad9264627c',1,'FIFFLIB::FiffRawData']]],
   ['ch_5fname',['ch_name',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#ab3cf2e116d285cdab2313b9adb9ee3bd',1,'FIFFLIB::FiffChInfo']]],
-  ['ch_5fnames',['ch_names',['../class_f_i_f_f_l_i_b_1_1_fiff_info.html#a1397170741832d3f9df9935798ef4cc7',1,'FIFFLIB::FiffInfo']]],
+  ['ch_5fnames',['ch_names',['../class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#af15ed691efe28790897198f06306ab29',1,'FIFFLIB::FiffInfoBase']]],
   ['children',['children',['../class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a5ff78be4cfb6ead6a251f094c581dc66',1,'FIFFLIB::FiffDirTree']]],
-  ['chs',['chs',['../class_f_i_f_f_l_i_b_1_1_fiff_info.html#a012cf0ef62839b8a8fa9f7cfc3901983',1,'FIFFLIB::FiffInfo']]],
+  ['chs',['chs',['../class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#aa07b3b770d7fe65ac065e01461688e04',1,'FIFFLIB::FiffInfoBase']]],
   ['cluster_5fdistances',['cluster_distances',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a2fc83d1ab0a0ac1c4be90c5ebef97f23',1,'MNELIB::MNEHemisphere']]],
   ['cluster_5fvertnos',['cluster_vertnos',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a9dc1c1e65425853fc558ac92cbe33306',1,'MNELIB::MNEHemisphere']]],
   ['coil_5ftrans',['coil_trans',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a50091ebf8d8d2ffbf119444b0ddb3dde',1,'FIFFLIB::FiffChInfo']]],
@@ -17,6 +17,6 @@ var searchData=
   ['comps',['comps',['../class_f_i_f_f_l_i_b_1_1_fiff_info.html#abe1b8e3c8986cba9e001f96480f905e9',1,'FIFFLIB::FiffInfo']]],
   ['connectordir',['connectorDir',['../mne__rt__server_8cpp.html#a8cb247957906e47d5eefe168f3d1390d',1,'mne_rt_server.cpp']]],
   ['coord_5fframe',['coord_frame',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#adc4ceed70642eaf96e92eed073737b74',1,'FIFFLIB::FiffChInfo::coord_frame()'],['../class_f_i_f_f_l_i_b_1_1_fiff_dig_point.html#a96eeede21a4454fae095d0b3aca8cb0a',1,'FIFFLIB::FiffDigPoint::coord_frame()'],['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a8776126f2f4ec08939fb83a61a429348',1,'MNELIB::MNEForwardSolution::coord_frame()'],['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a5890e89b80dd7631f4405ef68572e7d4',1,'MNELIB::MNEHemisphere::coord_frame()'],['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a2e42af80e3698692e08313cf591bce52',1,'MNELIB::MNEInverseOperator::coord_frame()']]],
-  ['ctf_5fhead_5ft',['ctf_head_t',['../class_f_i_f_f_l_i_b_1_1_fiff_info.html#aea65ff187f4b616cfec4bf0882d10b31',1,'FIFFLIB::FiffInfo']]],
+  ['ctf_5fhead_5ft',['ctf_head_t',['../class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#aa4ff7b1f98b00a295617c1aaa80e1146',1,'FIFFLIB::FiffInfoBase']]],
   ['ctfkind',['ctfkind',['../class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a657fc151479eee767b672b7dbc0dcfa8',1,'FIFFLIB::FiffCtfComp']]]
 ];

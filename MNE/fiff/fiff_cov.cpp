@@ -345,6 +345,28 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, float p_fMag, float p_fGrad,
     // This actually removes bad channels from the cov, which is not backward
     // compatible, so let's leave all channels in
     FiffCov cov_good = cov.pick_channels(info_ch_names, p_exclude);
+    QStringList ch_names = cov_good.names;
+
+    std::vector<qint32> idx_eeg, idx_mag, idx_grad;
+    for(qint32 i = 0; i < ch_names.size(); ++i)
+    {
+        if(ch_names_eeg.contains(ch_names[i]))
+            idx_eeg.push_back(i);
+        else if(ch_names_mag.contains(ch_names[i]))
+            idx_mag.push_back(i);
+        else if(ch_names_grad.contains(ch_names[i]))
+            idx_grad.push_back(i);
+    }
+
+    if(cov_good.data.rows() != idx_eeg.size() + idx_mag.size() + idx_grad.size())
+        printf("Error in FiffCov::regularize: Channel dimensions do not fit.\n");//ToDo Throw
+
+    QList<FiffProj> t_listProjs;
+    if(p_bProj)
+    {
+        t_listProjs = p_info.projs + cov_good.projs;
+        FiffProj::activate_projs(t_listProjs);
+    }
 
     qDebug() << "ToDo Regularize...";
 

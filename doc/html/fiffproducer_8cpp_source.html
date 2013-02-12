@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">mne-cpp (MNE1)
-   &#160;<span id="projectnumber">beta</span>
+   &#160;<span id="projectnumber">beta 0.1</span>
    </div>
   </td>
  </tr>
@@ -156,7 +156,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    m_bIsRunning = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="comment">// reopen file in this thread</span></div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    QFile t_File(m_pFiffSimulator-&gt;m_RawInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#aae42b413ebc3499af43fe149a7132fe6">info</a>-&gt;filename);</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    QFile t_File(m_pFiffSimulator-&gt;m_RawInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a30074ee25c17578db14b98a473092061">info</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a11b6df193ce2b6bda590ba7c717f9c94">filename</a>);</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#afc5bb6ae857cf5e93e4e0271bf0bee05">FiffStream::SPtr</a> p_pStream = <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#afc5bb6ae857cf5e93e4e0271bf0bee05">FiffStream::SPtr</a>(<span class="keyword">new</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a>(&amp;t_File));</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    m_pFiffSimulator-&gt;m_RawInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a4d7d8906a821657c22e4e3aaa9a964a9">file</a> = p_pStream;</div>
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;</div>
@@ -166,7 +166,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    fiff_int_t from = m_pFiffSimulator-&gt;m_RawInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#aa7f34c5b4601b59bf79945f4cd8f9e4a">first_samp</a>;</div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    fiff_int_t to = m_pFiffSimulator-&gt;m_RawInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a7be676d089d03325fd7c08cc58d17c2f">last_samp</a>;</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="comment">//    float quantum_sec = (float)uiSamplePeriod/1000000.0f; //read and write in 10 sec junks</span></div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    fiff_int_t quantum = m_pFiffSimulator-&gt;getBufferSampleSize();<span class="comment">//ceil(quantum_sec*m_pFiffSimulator-&gt;m_pRawInfo-&gt;info-&gt;sfreq);</span></div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    fiff_int_t quantum = m_pFiffSimulator-&gt;m_uiBufferSampleSize;<span class="comment">//ceil(quantum_sec*m_pFiffSimulator-&gt;m_pRawInfo-&gt;info.sfreq);</span></div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    qDebug() &lt;&lt; <span class="stringliteral">&quot;quantum &quot;</span> &lt;&lt; quantum;</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;</div>
@@ -185,14 +185,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;</div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    first = from;</div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    qint32 nchan = m_pFiffSimulator-&gt;m_RawInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#aae42b413ebc3499af43fe149a7132fe6">info</a>-&gt;nchan;</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    qint32 nchan = m_pFiffSimulator-&gt;m_RawInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a30074ee25c17578db14b98a473092061">info</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>;</div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;</div>
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    MatrixXd cals(1,nchan);</div>
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;</div>
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;<span class="comment">//    SparseMatrix&lt;double&gt; inv_calsMat(nchan, nchan);</span></div>
 <div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;</div>
 <div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;<span class="comment">//    for(qint32 i = 0; i &lt; nchan; ++i)</span></div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;<span class="comment">//        inv_calsMat.insert(i, i) = 1.0f/m_pFiffSimulator-&gt;m_RawInfo.info-&gt;chs[i].cal;</span></div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;<span class="comment">//        inv_calsMat.insert(i, i) = 1.0f/m_pFiffSimulator-&gt;m_RawInfo.info.chs[i].cal;</span></div>
 <div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;</div>
 <div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    <span class="comment">//Not good cause production time is not accurate</span></div>
 <div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    <span class="comment">//loading and thread sleep is longer than thread sleep time - better to have a extra loading thread</span></div>
@@ -250,7 +250,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;            first += quantum;</div>
 <div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;        }</div>
 <div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;        m_pFiffSimulator-&gt;<a class="code" href="class_r_t_s_e_r_v_e_r_1_1_i_connector.html#ad0c57cf6ea138551fe169d6bee10fe42">m_pRawMatrixBuffer</a>-&gt;push(&amp;tmp);</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;        m_pFiffSimulator-&gt;m_pRawMatrixBuffer-&gt;push(&amp;tmp);</div>
 <div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    }</div>
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;</div>
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    <span class="comment">// close datastream in this thread</span></div>
@@ -260,7 +260,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 31 2013 17:09:08 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 12 2013 15:29:54 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

@@ -121,6 +121,14 @@ public:
     */
     ~FiffProj();
 
+    //=========================================================================================================
+    /**
+    * Set all projections to active
+    *
+    * @param[in, out] p_qListFiffProj  activates projectors in place
+    */
+    static void activate_projs(QList<FiffProj> &p_qListFiffProj);
+
 public:
     fiff_int_t kind;                /**< Fiff kind */
     bool active;                    /**< If fiff projector active */

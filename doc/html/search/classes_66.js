@@ -13,6 +13,7 @@ var searchData=
   ['fiffevokeddataset',['FiffEvokedDataSet',['../class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html',1,'FIFFLIB']]],
   ['fiffid',['FiffId',['../class_f_i_f_f_l_i_b_1_1_fiff_id.html',1,'FIFFLIB']]],
   ['fiffinfo',['FiffInfo',['../class_f_i_f_f_l_i_b_1_1_fiff_info.html',1,'FIFFLIB']]],
+  ['fiffinfobase',['FiffInfoBase',['../class_f_i_f_f_l_i_b_1_1_fiff_info_base.html',1,'FIFFLIB']]],
   ['fiffnamedmatrix',['FiffNamedMatrix',['../class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html',1,'FIFFLIB']]],
   ['fiffproducer',['FiffProducer',['../class_fiff_simulator_plugin_1_1_fiff_producer.html',1,'FiffSimulatorPlugin']]],
   ['fiffproj',['FiffProj',['../class_f_i_f_f_l_i_b_1_1_fiff_proj.html',1,'FIFFLIB']]],
@@ -20,7 +21,7 @@ var searchData=
   ['fiffrawdir',['FiffRawDir',['../class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html',1,'FIFFLIB']]],
   ['fiffsimulator',['FiffSimulator',['../class_fiff_simulator_plugin_1_1_fiff_simulator.html',1,'FiffSimulatorPlugin']]],
   ['fiffstream',['FiffStream',['../class_f_i_f_f_l_i_b_1_1_fiff_stream.html',1,'FIFFLIB']]],
+  ['fiffstreamserver',['FiffStreamServer',['../class_r_t_s_e_r_v_e_r_1_1_fiff_stream_server.html',1,'RTSERVER']]],
   ['fiffstreamthread',['FiffStreamThread',['../class_r_t_s_e_r_v_e_r_1_1_fiff_stream_thread.html',1,'RTSERVER']]],
-  ['fiffstreartserver',['FiffStreaRTSERVER',['../class_r_t_s_e_r_v_e_r_1_1_fiff_strea_r_t_s_e_r_v_e_r.html',1,'RTSERVER']]],
   ['fifftag',['FiffTag',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html',1,'FIFFLIB']]]
 ];

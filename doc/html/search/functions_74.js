@@ -16,12 +16,14 @@ var searchData=
   ['tointmatrix',['toIntMatrix',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#ae6e352d3ff566884190c7ce52896f94d',1,'FIFFLIB::FiffTag']]],
   ['tojsonobject',['toJsonObject',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html#a5ec7afa7dd94358a01ee72329a190486',1,'RTCOMMANDLIB::Command']]],
   ['toshort',['toShort',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#ae482976adfb06db70a06cc0071c8628d',1,'FIFFLIB::FiffTag']]],
+  ['tosparsefloatmatrix',['toSparseFloatMatrix',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a57ba4dde0f35b88ce8d6f0fa5ad1b71c',1,'FIFFLIB::FiffTag']]],
   ['tostring',['toString',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a2c6b9b9cf0ece41a5b2a7189db336748',1,'FIFFLIB::FiffTag']]],
   ['tostringlist',['toStringList',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html#a8ee44ab89ed72a1006ab1fc434d5f124',1,'RTCOMMANDLIB::Command']]],
+  ['tostringreadysend',['toStringReadySend',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html#a77dc32db0fc855d2b610d312cfeccced',1,'RTCOMMANDLIB::Command']]],
   ['tounsignedint',['toUnsignedInt',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a483d8147f585de567ee8a64f5a84ee9b',1,'FIFFLIB::FiffTag']]],
   ['tounsignedshort',['toUnsignedShort',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a34644147b22eb4bcb32c3a803fbaf089',1,'FIFFLIB::FiffTag']]],
   ['transform_5fhemisphere_5fto',['transform_hemisphere_to',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a65d5329ce3b7bfefd30e2a7bf43fa654',1,'MNELIB::MNEHemisphere']]],
   ['transform_5fsource_5fspace_5fto',['transform_source_space_to',['../class_m_n_e_l_i_b_1_1_m_n_e.html#a24942df6f7a4d0869e3fd254e11e67e5',1,'MNELIB::MNE::transform_source_space_to()'],['../class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a38654bb9875091c2cb5a04e2531653d7',1,'MNELIB::MNESourceSpace::transform_source_space_to()']]],
   ['transpose_5fnamed_5fmatrix',['transpose_named_matrix',['../class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#acfc42a46812792ab7b36a5de046c37b6',1,'FIFFLIB::FiffNamedMatrix::transpose_named_matrix()'],['../class_m_n_e_l_i_b_1_1_m_n_e.html#a1bce4f10a8fec00dc70d460da1b96955',1,'MNELIB::MNE::transpose_named_matrix()']]],
-  ['triggered',['triggered',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html#a0b4384401d4fe72b8bdad44f33a59e29',1,'RTCOMMANDLIB::Command']]]
+  ['triggered',['triggered',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_manager.html#aacc0233908903bf8d02356fb7a971f21',1,'RTCOMMANDLIB::CommandManager']]]
 ];

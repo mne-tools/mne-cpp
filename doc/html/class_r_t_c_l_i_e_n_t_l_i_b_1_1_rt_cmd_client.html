@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">mne-cpp (MNE1)
-   &#160;<span id="projectnumber">beta</span>
+   &#160;<span id="projectnumber">beta 0.1</span>
    </div>
   </td>
  </tr>
@@ -89,6 +89,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
+<a href="#signals">Signals</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -118,30 +119,39 @@ Public Types</h2></td></tr>
 <a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html">RtCmdClient</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#ab203cf7c8181b2a1a6c99c9f7874e8ab">ConstSPtr</a></td></tr>
 <tr class="separator:ab203cf7c8181b2a1a6c99c9f7874e8ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="signals"></a>
+Signals</h2></td></tr>
+<tr class="memitem:ae3b01c250a3263511f6ffa9784283d73"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#ae3b01c250a3263511f6ffa9784283d73">response</a> (QString p_sResponse)</td></tr>
+<tr class="separator:ae3b01c250a3263511f6ffa9784283d73"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:abd4d049e3ef89f8301e054df83eb4b14"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#abd4d049e3ef89f8301e054df83eb4b14">RtCmdClient</a> (QObject *parent=0)</td></tr>
 <tr class="separator:abd4d049e3ef89f8301e054df83eb4b14"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c8d242f64593da6a1a2b65cd9f10ca3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#a0c8d242f64593da6a1a2b65cd9f10ca3">connectToHost</a> (QString &amp;p_sRtServerHostName)</td></tr>
 <tr class="separator:a0c8d242f64593da6a1a2b65cd9f10ca3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a320499c8e8df65a84ccebf9c635eeb9f"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#a320499c8e8df65a84ccebf9c635eeb9f">sendCommand</a> (const QString &amp;p_sCommand)</td></tr>
-<tr class="separator:a320499c8e8df65a84ccebf9c635eeb9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a58a48d4c37b968d41209c962aa64b5ad"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#a58a48d4c37b968d41209c962aa64b5ad">requestMeasInfo</a> (qint32 p_id)</td></tr>
-<tr class="separator:a58a48d4c37b968d41209c962aa64b5ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8faab99a450704a6640ffde00e9190ef"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#a8faab99a450704a6640ffde00e9190ef">requestMeasInfo</a> (const QString &amp;p_Alias)</td></tr>
-<tr class="separator:a8faab99a450704a6640ffde00e9190ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1c082b94d630dd87b0217fba63512b33"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#a1c082b94d630dd87b0217fba63512b33">requestMeas</a> (qint32 p_id)</td></tr>
-<tr class="separator:a1c082b94d630dd87b0217fba63512b33"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7957f6f7a1a7cf0ae342dbb11494a51c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#a7957f6f7a1a7cf0ae342dbb11494a51c">requestMeas</a> (QString p_Alias)</td></tr>
-<tr class="separator:a7957f6f7a1a7cf0ae342dbb11494a51c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a08421d94600de9fab2e7f1d9a61875"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#a7a08421d94600de9fab2e7f1d9a61875">stopAll</a> ()</td></tr>
-<tr class="separator:a7a08421d94600de9fab2e7f1d9a61875"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a774043b4b8188d7eb26b3752ba6174f4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#a774043b4b8188d7eb26b3752ba6174f4">hasCommand</a> (const QString &amp;p_sCommand) const </td></tr>
+<tr class="separator:a774043b4b8188d7eb26b3752ba6174f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96d5f4a9a935b7564a986c8fdef7bacb"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#a96d5f4a9a935b7564a986c8fdef7bacb">sendCLICommand</a> (const QString &amp;p_sCommand)</td></tr>
+<tr class="separator:a96d5f4a9a935b7564a986c8fdef7bacb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d642f0f9366cdf0dc61e6721647d8fb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#a3d642f0f9366cdf0dc61e6721647d8fb">sendCommandJSON</a> (const <a class="el" href="class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html">Command</a> &amp;p_command)</td></tr>
+<tr class="separator:a3d642f0f9366cdf0dc61e6721647d8fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a14d62e8aedd9d853d3011647b9a2477d"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#a14d62e8aedd9d853d3011647b9a2477d">readAvailableData</a> ()</td></tr>
+<tr class="separator:a14d62e8aedd9d853d3011647b9a2477d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a247cc00d246e38c07fd08e35c199b9f7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#a247cc00d246e38c07fd08e35c199b9f7">requestCommands</a> ()</td></tr>
+<tr class="separator:a247cc00d246e38c07fd08e35c199b9f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a24e3f119d3fb0eb65898e8cf4f53ff43"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#a24e3f119d3fb0eb65898e8cf4f53ff43">waitForDataAvailable</a> (qint32 msecs=30000) const </td></tr>
+<tr class="separator:a24e3f119d3fb0eb65898e8cf4f53ff43"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3182da9b535fc20c9579a146d2cb6de5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html">Command</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#a3182da9b535fc20c9579a146d2cb6de5">operator[]</a> (const QString &amp;key)</td></tr>
+<tr class="separator:a3182da9b535fc20c9579a146d2cb6de5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a879f56df09a916b9fd2af06699587562"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html">Command</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#a879f56df09a916b9fd2af06699587562">operator[]</a> (const QString &amp;key) const </td></tr>
+<tr class="separator:a879f56df09a916b9fd2af06699587562"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Real-time command client. </p>
 <p>The real-time command client class provides an interface to communicate with the command port 4217 of a running mne_rt_server. </p>
 
-<p>Definition at line <a class="el" href="rtcmdclient_8h_source.html#l00076">76</a> of file <a class="el" href="rtcmdclient_8h_source.html">rtcmdclient.h</a>.</p>
+<p>Definition at line <a class="el" href="rtcmdclient_8h_source.html#l00086">86</a> of file <a class="el" href="rtcmdclient_8h_source.html">rtcmdclient.h</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a class="anchor" id="ab203cf7c8181b2a1a6c99c9f7874e8ab"></a>
 <div class="memitem">
@@ -154,7 +164,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Const shared pointer type for <a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html" title="Real-time command client.">RtCmdClient</a>. </p>
 
-<p>Definition at line <a class="el" href="rtcmdclient_8h_source.html#l00081">81</a> of file <a class="el" href="rtcmdclient_8h_source.html">rtcmdclient.h</a>.</p>
+<p>Definition at line <a class="el" href="rtcmdclient_8h_source.html#l00091">91</a> of file <a class="el" href="rtcmdclient_8h_source.html">rtcmdclient.h</a>.</p>
 
 </div>
 </div>
@@ -169,7 +179,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Shared pointer type for <a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html" title="Real-time command client.">RtCmdClient</a>. </p>
 
-<p>Definition at line <a class="el" href="rtcmdclient_8h_source.html#l00080">80</a> of file <a class="el" href="rtcmdclient_8h_source.html">rtcmdclient.h</a>.</p>
+<p>Definition at line <a class="el" href="rtcmdclient_8h_source.html#l00090">90</a> of file <a class="el" href="rtcmdclient_8h_source.html">rtcmdclient.h</a>.</p>
 
 </div>
 </div>
@@ -203,7 +213,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="rtcmdclient_8cpp_source.html#l00059">59</a> of file <a class="el" href="rtcmdclient_8cpp_source.html">rtcmdclient.cpp</a>.</p>
+<p>Definition at line <a class="el" href="rtcmdclient_8cpp_source.html#l00068">68</a> of file <a class="el" href="rtcmdclient_8cpp_source.html">rtcmdclient.cpp</a>.</p>
 
 </div>
 </div>
@@ -229,116 +239,178 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="rtcmdclient_8cpp_source.html#l00068">68</a> of file <a class="el" href="rtcmdclient_8cpp_source.html">rtcmdclient.cpp</a>.</p>
+<p>Definition at line <a class="el" href="rtcmdclient_8cpp_source.html#l00077">77</a> of file <a class="el" href="rtcmdclient_8cpp_source.html">rtcmdclient.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a1c082b94d630dd87b0217fba63512b33"></a>
+<a class="anchor" id="a774043b4b8188d7eb26b3752ba6174f4"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void RtCmdClient::requestMeas </td>
-          <td>(</td>
-          <td class="paramtype">qint32&#160;</td>
-          <td class="paramname"><em>p_id</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Request measurement and send raw data to a specified (id) client</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_id</td><td>ID of the client to send the measurement to </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="rtcmdclient_8cpp_source.html#l00118">118</a> of file <a class="el" href="rtcmdclient_8cpp_source.html">rtcmdclient.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a7957f6f7a1a7cf0ae342dbb11494a51c"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void RtCmdClient::requestMeas </td>
-          <td>(</td>
-          <td class="paramtype">QString&#160;</td>
-          <td class="paramname"><em>p_Alias</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Request measurement and send raw data to a specified (alias) client</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_Alias</td><td>Alias of the client to send the measurement to </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="rtcmdclient_8cpp_source.html#l00127">127</a> of file <a class="el" href="rtcmdclient_8cpp_source.html">rtcmdclient.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a58a48d4c37b968d41209c962aa64b5ad"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void RtCmdClient::requestMeasInfo </td>
-          <td>(</td>
-          <td class="paramtype">qint32&#160;</td>
-          <td class="paramname"><em>p_id</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Request measurement information to send it to a specified (id) client</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_id</td><td>ID of the client to send the measurement information to </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="rtcmdclient_8cpp_source.html#l00100">100</a> of file <a class="el" href="rtcmdclient_8cpp_source.html">rtcmdclient.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a8faab99a450704a6640ffde00e9190ef"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void RtCmdClient::requestMeasInfo </td>
+          <td class="memname">bool RTCLIENTLIB::RtCmdClient::hasCommand </td>
           <td>(</td>
           <td class="paramtype">const QString &amp;&#160;</td>
-          <td class="paramname"><em>p_Alias</em></td><td>)</td>
-          <td></td>
+          <td class="paramname"><em>p_sCommand</em></td><td>)</td>
+          <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
-<p>Request measurement information to send it to a specified (alias) client</p>
+<p>Checks if a command is managed;</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_Alias</td><td>Alias of the client to send the measurement information to </td></tr>
+    <tr><td class="paramname">p_sCommand</td><td>COmmand to check.</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>true if part of command manager, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="rtcmdclient_8cpp_source.html#l00109">109</a> of file <a class="el" href="rtcmdclient_8cpp_source.html">rtcmdclient.cpp</a>.</p>
+<p>Definition at line <a class="el" href="rtcmdclient_8h_source.html#l00216">216</a> of file <a class="el" href="rtcmdclient_8h_source.html">rtcmdclient.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a320499c8e8df65a84ccebf9c635eeb9f"></a>
+<a class="anchor" id="a3182da9b535fc20c9579a146d2cb6de5"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">QString RtCmdClient::sendCommand </td>
+          <td class="memname"><a class="el" href="class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html">Command</a> &amp; RtCmdClient::operator[] </td>
+          <td>(</td>
+          <td class="paramtype">const QString &amp;&#160;</td>
+          <td class="paramname"><em>key</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Subscript operator [] to access commands by command name</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">key</td><td>the command key word.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Command object related to command key word. </dd></dl>
+
+<p>Definition at line <a class="el" href="rtcmdclient_8cpp_source.html#l00223">223</a> of file <a class="el" href="rtcmdclient_8cpp_source.html">rtcmdclient.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a879f56df09a916b9fd2af06699587562"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html">Command</a> RtCmdClient::operator[] </td>
+          <td>(</td>
+          <td class="paramtype">const QString &amp;&#160;</td>
+          <td class="paramname"><em>key</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Subscript operator [] to access commands by command name</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>the command key word.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Command object related to command key word. </dd></dl>
+
+<p>Definition at line <a class="el" href="rtcmdclient_8cpp_source.html#l00231">231</a> of file <a class="el" href="rtcmdclient_8cpp_source.html">rtcmdclient.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a14d62e8aedd9d853d3011647b9a2477d"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QString RTCLIENTLIB::RtCmdClient::readAvailableData </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Returns the available data.</p>
+<dl class="section return"><dt>Returns</dt><dd>the available data. </dd></dl>
+
+<p>Definition at line <a class="el" href="rtcmdclient_8h_source.html#l00203">203</a> of file <a class="el" href="rtcmdclient_8h_source.html">rtcmdclient.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a247cc00d246e38c07fd08e35c199b9f7"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void RtCmdClient::requestCommands </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Request available commands from mne_rt_server </p>
+
+<p>Definition at line <a class="el" href="rtcmdclient_8cpp_source.html#l00138">138</a> of file <a class="el" href="rtcmdclient_8cpp_source.html">rtcmdclient.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ae3b01c250a3263511f6ffa9784283d73"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void RTCLIENTLIB::RtCmdClient::response </td>
+          <td>(</td>
+          <td class="paramtype">QString&#160;</td>
+          <td class="paramname"><em>p_sResponse</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">signal</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Emits the received response.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_sResponse</td><td>the received response </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a96d5f4a9a935b7564a986c8fdef7bacb"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QString RtCmdClient::sendCLICommand </td>
           <td>(</td>
           <td class="paramtype">const QString &amp;&#160;</td>
           <td class="paramname"><em>p_sCommand</em></td><td>)</td>
@@ -346,7 +418,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Sends a command to a connected mne_rt_server</p>
+<p>Sends a command line formatted command to a connected mne_rt_server</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">p_sCommand</td><td>The command to send</td></tr>
@@ -355,25 +427,59 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>mne_rt_server reply </dd></dl>
 
-<p>Definition at line <a class="el" href="rtcmdclient_8cpp_source.html#l00076">76</a> of file <a class="el" href="rtcmdclient_8cpp_source.html">rtcmdclient.cpp</a>.</p>
+<p>Definition at line <a class="el" href="rtcmdclient_8cpp_source.html#l00085">85</a> of file <a class="el" href="rtcmdclient_8cpp_source.html">rtcmdclient.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a7a08421d94600de9fab2e7f1d9a61875"></a>
+<a class="anchor" id="a3d642f0f9366cdf0dc61e6721647d8fb"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void RtCmdClient::stopAll </td>
+          <td class="memname">void RtCmdClient::sendCommandJSON </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html">Command</a> &amp;&#160;</td>
+          <td class="paramname"><em>p_command</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>stop data acquistion and sending measurements to all clients </p>
+<p>Sends a command to a connected mne_rt_server</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_command</td><td>The command to send</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>mne_rt_server reply </dd></dl>
 
-<p>Definition at line <a class="el" href="rtcmdclient_8cpp_source.html#l00136">136</a> of file <a class="el" href="rtcmdclient_8cpp_source.html">rtcmdclient.cpp</a>.</p>
+<p>Definition at line <a class="el" href="rtcmdclient_8cpp_source.html#l00109">109</a> of file <a class="el" href="rtcmdclient_8cpp_source.html">rtcmdclient.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a24e3f119d3fb0eb65898e8cf4f53ff43"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool RtCmdClient::waitForDataAvailable </td>
+          <td>(</td>
+          <td class="paramtype">qint32&#160;</td>
+          <td class="paramname"><em>msecs</em> = <code>30000</code></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Wait for ready read until data are available.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">msecs</td><td>time to wait in milliseconds, if -1 function will not time out. Default value is 30000.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Command object related to command key word. </dd></dl>
+
+<p>Definition at line <a class="el" href="rtcmdclient_8cpp_source.html#l00204">204</a> of file <a class="el" href="rtcmdclient_8cpp_source.html">rtcmdclient.cpp</a>.</p>
 
 </div>
 </div>
@@ -384,7 +490,7 @@ Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 31 2013 17:09:10 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 12 2013 15:29:56 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

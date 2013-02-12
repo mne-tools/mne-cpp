@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">mne-cpp (MNE1)
-   &#160;<span id="projectnumber">beta</span>
+   &#160;<span id="projectnumber">beta 0.1</span>
    </div>
   </td>
  </tr>
@@ -110,14 +110,20 @@ Public Member Functions</h2></td></tr>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a2b01df2e1093da85ab5edb2ba9354a14"><td class="memItemLeft" align="right" valign="top">static VectorXd *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#a2b01df2e1093da85ab5edb2ba9354a14">combine_xyz</a> (const VectorXd &amp;vec)</td></tr>
 <tr class="separator:a2b01df2e1093da85ab5edb2ba9354a14"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4826938d921564a8fa5779c6e4f45cb3"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#a4826938d921564a8fa5779c6e4f45cb3">get_whitener</a> (MatrixXd &amp;A, bool pca, QString ch_type, VectorXd &amp;eig, MatrixXd &amp;eigvec)</td></tr>
+<tr class="separator:a4826938d921564a8fa5779c6e4f45cb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9543225700faee9fea4a21f1dedaa96"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#af9543225700faee9fea4a21f1dedaa96">issparse</a> (VectorXd &amp;v)</td></tr>
+<tr class="separator:af9543225700faee9fea4a21f1dedaa96"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab47b1124fd5f078f070bfd84257791dc"><td class="memItemLeft" align="right" valign="top">static SparseMatrix&lt; double &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#ab47b1124fd5f078f070bfd84257791dc">make_block_diag</a> (const MatrixXd *A, qint32 n)</td></tr>
 <tr class="separator:ab47b1124fd5f078f070bfd84257791dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a1ca374e7959a7baae65c9d47480165"><td class="memItemLeft" align="right" valign="top">static qint32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#a6a1ca374e7959a7baae65c9d47480165">rank</a> (MatrixXd &amp;A, double tol=1e-8)</td></tr>
+<tr class="separator:a6a1ca374e7959a7baae65c9d47480165"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Math methods. </p>
-<p>Generalized math methods used by mne methods </p>
+<p>ToDo make this a template class Generalized math methods used by mne methods </p>
 
-<p>Definition at line <a class="el" href="mnemath_8h_source.html#l00092">92</a> of file <a class="el" href="mnemath_8h_source.html">mnemath.h</a>.</p>
+<p>Definition at line <a class="el" href="mnemath_8h_source.html#l00095">95</a> of file <a class="el" href="mnemath_8h_source.html">mnemath.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="ac5118943876966b509ae7eacaae0df60"></a>
 <div class="memitem">
@@ -141,7 +147,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Destroys the <a class="el" href="class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html" title="Math methods.">MNEMath</a> object </p>
 
-<p>Definition at line <a class="el" href="mnemath_8h_source.html#l00099">99</a> of file <a class="el" href="mnemath_8h_source.html">mnemath.h</a>.</p>
+<p>Definition at line <a class="el" href="mnemath_8h_source.html#l00102">102</a> of file <a class="el" href="mnemath_8h_source.html">mnemath.h</a>.</p>
 
 </div>
 </div>
@@ -167,6 +173,7 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>ToDo make this a template function</p>
 <p>mne_combine_xyz</p>
 <h3>MNE toolbox root function</h3>
 <p>Compute the three Cartesian components of a vector together</p>
@@ -179,6 +186,104 @@ Static Public Member Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>Output vector [x1^2+y1^2+z1^2 ... x_n^2+y_n^2+z_n^2 ] </dd></dl>
 
 <p>Definition at line <a class="el" href="mnemath_8cpp_source.html#l00068">68</a> of file <a class="el" href="mnemath_8cpp_source.html">mnemath.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a4826938d921564a8fa5779c6e4f45cb3"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MNEMath::get_whitener </td>
+          <td>(</td>
+          <td class="paramtype">MatrixXd &amp;&#160;</td>
+          <td class="paramname"><em>A</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>pca</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QString&#160;</td>
+          <td class="paramname"><em>ch_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">VectorXd &amp;&#160;</td>
+          <td class="paramname"><em>eig</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">MatrixXd &amp;&#160;</td>
+          <td class="paramname"><em>eigvec</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<h3>MNE toolbox root function ###: Implementation of the mne_block_diag function - decoding part</h3>
+<p>Returns the whitener of a given matrix.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">A</td><td>Matrix to compute the whitener from </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">pca</td><td>perform a pca</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>rank of matrix A </dd></dl>
+
+<p>Definition at line <a class="el" href="mnemath_8cpp_source.html#l00092">92</a> of file <a class="el" href="mnemath_8cpp_source.html">mnemath.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="af9543225700faee9fea4a21f1dedaa96"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool MNEMath::issparse </td>
+          <td>(</td>
+          <td class="paramtype">VectorXd &amp;&#160;</td>
+          <td class="paramname"><em>v</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Determines if a given data (stored as vector v) are representing a sparse matrix. ToDo: status is experimental -&gt; needs to be increased in speed.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">v</td><td>data to be tested</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if sparse false otherwise; </dd></dl>
+
+<p>Definition at line <a class="el" href="mnemath_8cpp_source.html#l00179">179</a> of file <a class="el" href="mnemath_8cpp_source.html">mnemath.cpp</a>.</p>
 
 </div>
 </div>
@@ -213,7 +318,7 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<h3>MNE toolbox root function ###: Implementation of the mne_block_diag function - decoding part</h3>
+<p>ToDo make this a template function</p>
 <h3>MNE toolbox root function ###: Implementation of the mne_block_diag function - encoding part</h3>
 <p>Make a sparse block diagonal matrix</p>
 <p>Returns a sparse block diagonal, diagonalized from the elements in "A". "A" is ma x na, comprising bdn=(na/"n") blocks of submatrices. Each submatrix is ma x "n", and these submatrices are placed down the diagonal of the matrix.</p>
@@ -226,7 +331,53 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A sparse block diagonal, diagonalized from the elements in "A". </dd></dl>
 
-<p>Definition at line <a class="el" href="mnemath_8cpp_source.html#l00154">154</a> of file <a class="el" href="mnemath_8cpp_source.html">mnemath.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mnemath_8cpp_source.html#l00201">201</a> of file <a class="el" href="mnemath_8cpp_source.html">mnemath.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a6a1ca374e7959a7baae65c9d47480165"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">qint32 MNEMath::rank </td>
+          <td>(</td>
+          <td class="paramtype">MatrixXd &amp;&#160;</td>
+          <td class="paramname"><em>A</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>tol</em> = <code>1e-8</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>ToDo make this a template function</p>
+<p>Returns the rank of a matrix A.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">A</td><td>Matrix to get the rank from </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">tol</td><td>realtive threshold: biggest singualr value multiplied with tol is smallest singular value considered non-zero</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>rank of matrix A </dd></dl>
+
+<p>Definition at line <a class="el" href="mnemath_8cpp_source.html#l00234">234</a> of file <a class="el" href="mnemath_8cpp_source.html">mnemath.cpp</a>.</p>
 
 </div>
 </div>
@@ -237,7 +388,7 @@ Static Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 31 2013 17:09:10 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 12 2013 15:29:56 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

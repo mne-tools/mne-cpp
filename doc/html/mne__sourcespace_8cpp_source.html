@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">mne-cpp (MNE1)
-   &#160;<span id="projectnumber">beta</span>
+   &#160;<span id="projectnumber">beta 0.1</span>
    </div>
   </td>
  </tr>
@@ -459,18 +459,18 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;<span class="comment">//        delete p_Hemisphere.dist;</span></div>
 <div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;    <span class="keywordflow">if</span>(!p_Tree.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a887f9cb482001d8d41f6504ff2f6308d">find_tag</a>(p_pStream, <a class="code" href="fiff__constants_8h.html#a6342fc7fea3bc397eea7eb2182e48460">FIFF_MNE_SOURCE_SPACE_DIST</a>, t_pTag1) || !p_Tree.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a887f9cb482001d8d41f6504ff2f6308d">find_tag</a>(p_pStream, <a class="code" href="fiff__constants_8h.html#a255826ac1a9a74b9b11f1d9687e76ae4">FIFF_MNE_SOURCE_SPACE_DIST_LIMIT</a>, t_pTag2))</div>
 <div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;    {</div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;       p_Hemisphere.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#abdb66f07a304610e91f639fca39e4dbc">dist</a> = MatrixXd();<span class="comment">//NULL;</span></div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;       p_Hemisphere.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a1fac01b2c5a0d1f43607b773fd6fe421">dist</a> = SparseMatrix&lt;double&gt;();<span class="comment">//NULL;</span></div>
 <div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;       p_Hemisphere.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ae7ab61927a9552e4f8f4004cb75218db">dist_limit</a> = 0;</div>
 <div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;    }</div>
 <div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;    <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;    {</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;        qDebug() &lt;&lt; <span class="stringliteral">&quot;Attention this haven&#39;t been debugged! &lt;- Errors are likely&quot;</span>;</div>
-<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;        p_Hemisphere.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#abdb66f07a304610e91f639fca39e4dbc">dist</a>       = t_pTag1-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a62e3199db07eb1892c6aaf182e171efd">toFloatMatrix</a>();</div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;        p_Hemisphere.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ae7ab61927a9552e4f8f4004cb75218db">dist_limit</a> = *t_pTag1-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#aa36b1845c6f83d65fb73f60205c02849">toFloat</a>();</div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;        <span class="comment">//</span></div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;        <span class="comment">//  Add the upper triangle</span></div>
-<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;        <span class="comment">//</span></div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;        p_Hemisphere.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#abdb66f07a304610e91f639fca39e4dbc">dist</a> += p_Hemisphere.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#abdb66f07a304610e91f639fca39e4dbc">dist</a>.transpose();</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;        p_Hemisphere.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a1fac01b2c5a0d1f43607b773fd6fe421">dist</a>       = t_pTag1-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a57ba4dde0f35b88ce8d6f0fa5ad1b71c">toSparseFloatMatrix</a>();</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;        p_Hemisphere.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ae7ab61927a9552e4f8f4004cb75218db">dist_limit</a> = *t_pTag2-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#aa36b1845c6f83d65fb73f60205c02849">toFloat</a>();</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;        <span class="comment">//</span></div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;        <span class="comment">//  Add the upper triangle</span></div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;        <span class="comment">//</span></div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;        SparseMatrix&lt;double&gt; distT = p_Hemisphere.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a1fac01b2c5a0d1f43607b773fd6fe421">dist</a>.transpose();</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;        p_Hemisphere.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a1fac01b2c5a0d1f43607b773fd6fe421">dist</a> += distT;</div>
 <div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;    }</div>
 <div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;</div>
 <div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;    <span class="keyword">delete</span> t_pTag2;</div>
@@ -656,7 +656,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 31 2013 17:09:07 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 12 2013 15:29:53 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

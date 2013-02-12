@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">mne-cpp (MNE1)
-   &#160;<span id="projectnumber">beta</span>
+   &#160;<span id="projectnumber">beta 0.1</span>
    </div>
   </td>
  </tr>
@@ -153,32 +153,35 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html" title="evoked data">FiffEvokedDataSet</a>();</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html" title="evoked data">FiffEvokedDataSet</a>(<span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html" title="evoked data">FiffEvokedDataSet</a>&amp; p_FiffEvokedDataSet);</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html" title="evoked data">FiffEvokedDataSet</a>();</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> clear();</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html" title="evoked data">FiffEvokedDataSet</a> pick_channels_evoked(QStringList&amp; include = defaultQStringList, QStringList&amp; exclude = defaultQStringList);</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> read_evoked(QIODevice&amp; p_IODevice, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html" title="evoked data">FiffEvokedDataSet</a>&amp; data, fiff_int_t setno = 0);</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00161"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html#a96c1bda04068951fcd921fbc0462e7ae">  161</a></span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a5dad8ba41eaf7f4ad67aeb39fa05f266">FiffInfo::SDPtr</a>                 <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html#a96c1bda04068951fcd921fbc0462e7ae">info</a>;   </div>
-<div class="line"><a name="l00162"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html#a6ac64563aa392544329cd94d4dc4fcd8">  162</a></span>&#160;    QList&lt;FiffEvokedData::SDPtr&gt;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html#a6ac64563aa392544329cd94d4dc4fcd8">evoked</a>; </div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;};</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;} <span class="comment">// NAMESPACE</span></div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;<span class="preprocessor">#endif // FIFF_EVOKED_DATA_SET_H</span></div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html" title="evoked data">FiffEvokedDataSet</a>(QIODevice&amp; p_IODevice, fiff_int_t setno);</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html" title="evoked data">FiffEvokedDataSet</a>(<span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html" title="evoked data">FiffEvokedDataSet</a>&amp; p_FiffEvokedDataSet);</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html" title="evoked data">FiffEvokedDataSet</a>();</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> clear();</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html" title="evoked data">FiffEvokedDataSet</a> pick_channels_evoked(QStringList&amp; include = defaultQStringList, QStringList&amp; exclude = defaultQStringList);</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> read_evoked(QIODevice&amp; p_IODevice, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html" title="evoked data">FiffEvokedDataSet</a>&amp; data, fiff_int_t setno = 0);</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00170"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html#aa30cebdd73c0ef37930e66f5f3ff5f7f">  170</a></span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a>                        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html#aa30cebdd73c0ef37930e66f5f3ff5f7f">info</a>;   </div>
+<div class="line"><a name="l00171"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html#a6ac64563aa392544329cd94d4dc4fcd8">  171</a></span>&#160;    QList&lt;FiffEvokedData::SDPtr&gt;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html#a6ac64563aa392544329cd94d4dc4fcd8">evoked</a>; </div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;};</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;} <span class="comment">// NAMESPACE</span></div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;<span class="preprocessor">#endif // FIFF_EVOKED_DATA_SET_H</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 31 2013 17:09:07 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 12 2013 15:29:53 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

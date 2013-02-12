@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">mne-cpp (MNE1)
-   &#160;<span id="projectnumber">beta</span>
+   &#160;<span id="projectnumber">beta 0.1</span>
    </div>
   </td>
  </tr>
@@ -133,9 +133,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;MNERTServer::MNERTServer()</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;: m_fiffStreaRTSERVER(this)</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;: m_fiffStreamServer(this)</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;, m_commandServer(this)</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;, m_connectorManager(&amp;m_fiffStreaRTSERVER, this)</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;, m_connectorManager(&amp;m_fiffStreamServer, this)</div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;{</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    qRegisterMetaType&lt;MatrixXf&gt;(<span class="stringliteral">&quot;MatrixXf&quot;</span>);</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;</div>
@@ -148,7 +148,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    m_connectorManager.connectCommands();</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <span class="comment">// fiff stream server</span></div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    m_fiffStreaRTSERVER.connectCommands();</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    m_fiffStreamServer.connectCommands();</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="comment">// command manager</span></div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    m_commandServer.registerCommandManager(this-&gt;getCommandManager());</div>
@@ -164,14 +164,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <span class="comment">// Meas Info</span></div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="comment">//    QObject::connect(   this-&gt;m_pFiffStreaRTSERVER, &amp;FiffStreaRTSERVER::requestMeasInfo,</span></div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="comment">//    QObject::connect(   this-&gt;m_pFiffStreamServer, &amp;FiffStreamServer::requestMeasInfo,</span></div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="comment">//                        this-&gt;m_pConnectorManager, &amp;ConnectorManager::forwardMeasInfoRequest);</span></div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    m_connectorManager.connectActiveConnector();</div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;</div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="comment">//Register Fiff Sream Server for command parsing</span></div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="comment">//    m_pCommandServer-&gt;registerCommandParser((ICommandParser*)m_pFiffStreaRTSERVER);//OLD</span></div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="comment">//    m_commandServer.registerCommandManager(m_fiffStreaRTSERVER.getCommandManager());//NEW</span></div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="comment">//    m_pCommandServer-&gt;registerCommandParser((ICommandParser*)m_pFiffStreamServer);//OLD</span></div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="comment">//    m_commandServer.registerCommandManager(m_fiffStreamServer.getCommandManager());//NEW</span></div>
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;</div>
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="comment">//Register Command Managers of loaded connectors</span></div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="keywordflow">for</span>(qint32 i = 0; i &lt; m_connectorManager.getConnectors().size(); ++i)</div>
@@ -188,8 +188,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="comment">// Run data server</span></div>
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="keywordflow">if</span> (!m_fiffStreaRTSERVER.listen(QHostAddress::Any, 4218)) {</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;        printf(<span class="stringliteral">&quot;Unable to start the fiff stream server: %s\n&quot;</span>, m_fiffStreaRTSERVER.errorString().toUtf8().constData());</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="keywordflow">if</span> (!m_fiffStreamServer.listen(QHostAddress::Any, 4218)) {</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;        printf(<span class="stringliteral">&quot;Unable to start the fiff stream server: %s\n&quot;</span>, m_fiffStreamServer.errorString().toUtf8().constData());</div>
 <div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;        <span class="keywordflow">return</span>;</div>
 <div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    }</div>
 <div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;</div>
@@ -207,7 +207,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <span class="keywordflow">if</span> (ipAddress.isEmpty())</div>
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        ipAddress = QHostAddress(QHostAddress::LocalHost).toString();</div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    printf(<span class="stringliteral">&quot;mne_rt_server is running on\n\tIP:\t\t%s\n\tcommand port:\t%d\n\tfiff data port:\t%d\n\n&quot;</span>,ipAddress.toUtf8().constData(), m_commandServer.serverPort(), m_fiffStreaRTSERVER.serverPort());</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    printf(<span class="stringliteral">&quot;mne_rt_server is running on\n\tIP:\t\t%s\n\tcommand port:\t%d\n\tfiff data port:\t%d\n\n&quot;</span>,ipAddress.toUtf8().constData(), m_commandServer.serverPort(), m_fiffStreamServer.serverPort());</div>
 <div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;}</div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;</div>
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;</div>
@@ -434,15 +434,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;    m_commandManager.<a class="code" href="class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_manager.html#af782ff4c95a70b36de448a66f3049bfe">insert</a>(t_jsonDocumentOrigin);</div>
 <div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;</div>
 <div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;    <span class="comment">//connect slots</span></div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;    m_commandManager.<a class="code" href="class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_manager.html#a8f2c6eabdcbd42f77e14a1809f4dd5b6">connectSlot</a>(QString(<span class="stringliteral">&quot;help&quot;</span>), <span class="keyword">this</span>, &amp;MNERTServer::comHelp);</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;    m_commandManager.<a class="code" href="class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_manager.html#a8f2c6eabdcbd42f77e14a1809f4dd5b6">connectSlot</a>(QString(<span class="stringliteral">&quot;close&quot;</span>), <span class="keyword">this</span>, &amp;MNERTServer::comClose);</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;    QObject::connect(&amp;m_commandManager[<span class="stringliteral">&quot;help&quot;</span>], &amp;<a class="code" href="class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html#af9c96c8a2e15807cc650d08a4ee468c1">Command::executed</a>, <span class="keyword">this</span>, &amp;MNERTServer::comHelp);</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;    QObject::connect(&amp;m_commandManager[<span class="stringliteral">&quot;close&quot;</span>], &amp;<a class="code" href="class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html#af9c96c8a2e15807cc650d08a4ee468c1">Command::executed</a>, <span class="keyword">this</span>, &amp;MNERTServer::comClose);</div>
 <div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;}</div>
 <div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;</div>
 <div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;</div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 31 2013 17:09:08 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 12 2013 15:29:54 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

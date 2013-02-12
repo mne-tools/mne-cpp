@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['waitfordataavailable',['waitForDataAvailable',['../class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#a24e3f119d3fb0eb65898e8cf4f53ff43',1,'RTCLIENTLIB::RtCmdClient']]],
   ['whitener',['whitener',['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#abf082cb145b566cd250b32305d5bacd1',1,'MNELIB::MNEInverseOperator']]],
   ['write_5fch_5finfo',['write_ch_info',['../class_f_i_f_f_l_i_b_1_1_fiff.html#a7dfe787844197531fdf3d9ee02f429d9',1,'FIFFLIB::Fiff::write_ch_info()'],['../class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a4dfad2ac6bc2afb42d2c180a972cf635',1,'FIFFLIB::FiffStream::write_ch_info()']]],
   ['write_5fcoord_5ftrans',['write_coord_trans',['../class_f_i_f_f_l_i_b_1_1_fiff.html#abad6a754240320a2c47af07fd6554de3',1,'FIFFLIB::Fiff::write_coord_trans()'],['../class_f_i_f_f_l_i_b_1_1_fiff_stream.html#ad96d325ae45544d1cc276181421d5f7c',1,'FIFFLIB::FiffStream::write_coord_trans()']]],
