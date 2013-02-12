@@ -40,6 +40,7 @@
 
 #include "fiff_cov.h"
 #include "fiff_stream.h"
+#include "fiff_info_base.h"
 
 #include <mneMath/mnemath.h>
 
@@ -139,6 +140,44 @@ void FiffCov::clear()
     nfree = -1;
     eig = VectorXd();
     eigvec = MatrixXd();
+}
+
+
+//*************************************************************************************************************
+
+FiffCov FiffCov::pick_channels(const QStringList &p_include, const QStringList &p_exclude)
+{
+    RowVectorXi sel = FiffInfoBase::pick_channels(this->names, p_include, p_exclude);
+    FiffCov res;//No deep copy here - since almost everything else is adapted anyway
+
+    fiff_int_t  kind;       /**< Covariance kind -> fiff_constants.h */
+    bool diag;              /**< If the covariance is stored in a diagonal order. */
+    fiff_int_t dim;         /**< Dimension of the covariance (dim x dim). */
+    QStringList names;      /**< Channel names. */
+    MatrixXd data;          /**< Covariance data */
+    QList<FiffProj> projs;  /**< List of available ssp projectors. */
+    QStringList bads;       /**< List of bad channels. */
+    fiff_int_t nfree;       /**< Number of degrees of freedom. */
+    VectorXd eig;           /**< Vector of eigenvalues. */
+    MatrixXd eigvec;        /**< Matrix of eigenvectors. */
+
+    res.kind = this->kind;
+    res.diag = this->diag;
+    res.dim = sel.size();
+    for(qint32 k = 0; k < sel.size(); ++k)
+        res.names << this->names[sel(k)];
+    res.data.resize(res.dim, res.dim);
+    for(qint32 i = 0; i < res.dim; ++i)
+        for(qint32 j = 0; j < res.dim; ++j)
+            res.data(i, j) = this->data(sel(i), sel(j));
+    res.projs = this->projs;
+
+    for(qint32 k = 0; k < this->bads.size(); ++k)
+        if(res.names.contains(this->bads[k]))
+            res.bads << this->bads[k];
+    res.nfree = this->nfree;
+
+    return res;
 }
 
 
@@ -282,7 +321,6 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, float p_fMag, float p_fGrad,
 {
     FiffCov cov(*this);
 
-
     if(p_exclude.size() == 0)
     {
         p_exclude = p_info.bads;
@@ -295,16 +333,18 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, float p_fMag, float p_fGrad,
     RowVectorXi sel_mag = p_info.pick_types(QString("mag"), false, false, defaultQStringList, p_exclude);
     RowVectorXi sel_grad = p_info.pick_types(QString("grad"), false, false, defaultQStringList, p_exclude);
 
-
     QStringList info_ch_names = p_info.ch_names;
-    QStringList ch_names_eeg;
-//    for(qint32 i = 0; i < sel_eeg.size(); ++i)
+    QStringList ch_names_eeg, ch_names_mag, ch_names_grad;
+    for(qint32 i = 0; i < sel_eeg.size(); ++i)
+        ch_names_eeg << info_ch_names[sel_eeg(i)];
+    for(qint32 i = 0; i < sel_mag.size(); ++i)
+        ch_names_mag << info_ch_names[sel_mag(i)];
+    for(qint32 i = 0; i < sel_grad.size(); ++i)
+        ch_names_grad << info_ch_names[sel_grad(i)];
 
-//    = [info_ch_names[i] for i in sel_eeg]
-//    QStringList ch_names_mag; = [info_ch_names[i] for i in sel_mag]
-//    QStringList ch_names_grad; = [info_ch_names[i] for i in sel_grad]
-
-
+    // This actually removes bad channels from the cov, which is not backward
+    // compatible, so let's leave all channels in
+    FiffCov cov_good = cov.pick_channels(info_ch_names, p_exclude);
 
     qDebug() << "ToDo Regularize...";
 
