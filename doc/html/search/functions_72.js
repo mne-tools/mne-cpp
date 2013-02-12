@@ -29,7 +29,7 @@ var searchData=
   ['receivedatasegment',['receiveDataSegment',['../class_r_t_i_n_v_l_i_b_1_1_rt_cov.html#ab86578fd68ae4319de1f7894fbd45a91',1,'RTINVLIB::RtCov']]],
   ['receivenoisecov',['receiveNoiseCov',['../class_r_t_i_n_v_l_i_b_1_1_rt_inv.html#a1050ab52d04ec0760edfb1d781446f86',1,'RTINVLIB::RtInv']]],
   ['registercommandmanager',['registerCommandManager',['../class_r_t_s_e_r_v_e_r_1_1_command_server.html#ac0d471baff9dc5c4c4ec0915f1be82c0',1,'RTSERVER::CommandServer']]],
-  ['regularize',['regularize',['../class_f_i_f_f_l_i_b_1_1_fiff_cov.html#aec567250b29585701a28818a618db48c',1,'FIFFLIB::FiffCov']]],
+  ['regularize',['regularize',['../class_f_i_f_f_l_i_b_1_1_fiff_cov.html#a5ff76d6794184f99da238a6a5796a8d2',1,'FIFFLIB::FiffCov']]],
   ['reply',['reply',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html#a1841bcb71e74ec3aea8af9e9ff9dfc2d',1,'RTCOMMANDLIB::Command']]],
   ['replycommand',['replyCommand',['../class_r_t_s_e_r_v_e_r_1_1_command_server.html#ad85dbbec3e3cb2b48c3c56e614db50d6',1,'RTSERVER::CommandServer']]],
   ['requestcommands',['requestCommands',['../class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#a247cc00d246e38c07fd08e35c199b9f7',1,'RTCLIENTLIB::RtCmdClient']]],
