@@ -248,7 +248,7 @@ public:
     */
     inline static fiff_int_t make_projector(const QList<FiffProj>& projs, const QStringList& ch_names, MatrixXd& proj, const QStringList& bads = defaultQStringList, MatrixXd& U = defaultMatrixXd)
     {
-        return FiffInfo::make_projector(projs, ch_names, proj, bads, U);
+        return FiffProj::make_projector(projs, ch_names, proj, bads, U);
     }
 
     //=========================================================================================================

@@ -169,7 +169,7 @@ public:
     * @param[in] p_exclude  List of channels to mark as bad. If None, bads channels are extracted from both info['bads'] and cov['bads'].
     *
     */
-    FiffCov regularize(const FiffInfo& p_info, float p_fMag = 0.1, float p_fGrad = 0.1, float p_fEeg = 0.1, bool p_bProj = true, QStringList p_exclude = defaultQStringList) const;
+    FiffCov regularize(const FiffInfo& p_info, double p_fMag = 0.1, double p_fGrad = 0.1, double p_fEeg = 0.1, bool p_bProj = true, QStringList p_exclude = defaultQStringList) const;
 
     //=========================================================================================================
     /**
