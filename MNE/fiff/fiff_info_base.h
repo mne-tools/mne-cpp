@@ -155,12 +155,30 @@ public:
 
     //=========================================================================================================
     /**
+    * fiff_pick_types (highy diversity in meg picking)
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Create a selector to pick desired channel types from data
+    *
+    * @param[in] meg        It can be "all", to select all or it can be "mag" or "grad" to select only gradiometers or magnetometers.
+    * @param[in] eeg        Include EEG channels
+    * @param[in] stim       Include stimulus channels
+    * @param[in] include    Additional channels to include (if empty, do not add any)
+    * @param[in] exclude    Channels to exclude (if empty, do not exclude any)
+    *
+    * @return the selector matrix (row vector)
+    */
+    RowVectorXi pick_types(const QString meg, bool eeg = false, bool stim = false, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
+
+    //=========================================================================================================
+    /**
     * fiff_pick_types
     *
     * ### MNE toolbox root function ###
     *
-    * ToDo meg: differ also between grad & mag
     * Create a selector to pick desired channel types from data
+    * Use overloaded pick_types method to specify meg (grad, mag, ref_meg)type
     *
     * @param[in] meg        Include MEG channels
     * @param[in] eeg        Include EEG channels

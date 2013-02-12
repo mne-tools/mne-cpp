@@ -101,9 +101,8 @@ int main(int argc, char *argv[])
 
     FiffCov noise_cov(t_fileCov);
 
-//    // regularize noise covariance
-//    noise_cov = mne.cov.regularize(noise_cov, evoked.info,
-//                                   mag=0.05, grad=0.05, eeg=0.1, proj=True)
+    // regularize noise covariance
+    noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
 
 //    // Restrict forward solution as necessary for MEG
 //    forward_meg = mne.fiff.pick_types_forward(forward_meeg, meg=True, eeg=False)

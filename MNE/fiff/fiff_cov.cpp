@@ -278,6 +278,32 @@ FiffCov FiffCov::prepare_noise_cov(const FiffInfo &p_Info, const QStringList &p_
 
 //*************************************************************************************************************
 
+FiffCov FiffCov::regularize(const FiffInfo& p_info, float p_fMag, float p_fGrad, float p_fEeg, bool p_bProj, QStringList p_exclude) const
+{
+    FiffCov cov(*this);
+
+
+    if(p_exclude.size() == 0)
+    {
+        p_exclude = p_info.bads;
+        for(qint32 i = 0; i < cov.bads.size(); ++i)
+            if(!p_exclude.contains(cov.bads[i]))
+                p_exclude << cov.bads[i];
+    }
+
+    RowVectorXi sel_eeg = p_info.pick_types(false, true, false, defaultQStringList, p_exclude);
+    RowVectorXi sel_mag = p_info.pick_types(QString("mag"), false, false, defaultQStringList, p_exclude);
+    RowVectorXi sel_grad = p_info.pick_types(QString("grad"), false, false, defaultQStringList, p_exclude);
+
+    qDebug() << "ToDo Regularize...";
+
+
+    return cov;
+}
+
+
+//*************************************************************************************************************
+
 FiffCov& FiffCov::operator= (const FiffCov &rhs)
 {
     if (this != &rhs) // protect against invalid self-assignment
