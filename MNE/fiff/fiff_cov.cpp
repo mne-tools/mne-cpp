@@ -44,8 +44,23 @@
 
 #include <mneMath/mnemath.h>
 
-
 #include <iostream>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QPair>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/SVD>
 
 
 //*************************************************************************************************************
@@ -55,6 +70,7 @@
 
 using namespace FIFFLIB;
 using namespace MNEMATHLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -149,17 +165,6 @@ FiffCov FiffCov::pick_channels(const QStringList &p_include, const QStringList &
 {
     RowVectorXi sel = FiffInfoBase::pick_channels(this->names, p_include, p_exclude);
     FiffCov res;//No deep copy here - since almost everything else is adapted anyway
-
-    fiff_int_t  kind;       /**< Covariance kind -> fiff_constants.h */
-    bool diag;              /**< If the covariance is stored in a diagonal order. */
-    fiff_int_t dim;         /**< Dimension of the covariance (dim x dim). */
-    QStringList names;      /**< Channel names. */
-    MatrixXd data;          /**< Covariance data */
-    QList<FiffProj> projs;  /**< List of available ssp projectors. */
-    QStringList bads;       /**< List of bad channels. */
-    fiff_int_t nfree;       /**< Number of degrees of freedom. */
-    VectorXd eig;           /**< Vector of eigenvalues. */
-    MatrixXd eigvec;        /**< Matrix of eigenvectors. */
 
     res.kind = this->kind;
     res.diag = this->diag;
@@ -317,7 +322,7 @@ FiffCov FiffCov::prepare_noise_cov(const FiffInfo &p_Info, const QStringList &p_
 
 //*************************************************************************************************************
 
-FiffCov FiffCov::regularize(const FiffInfo& p_info, float p_fMag, float p_fGrad, float p_fEeg, bool p_bProj, QStringList p_exclude) const
+FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_fRegGrad, double p_fRegEeg, bool p_bProj, QStringList p_exclude) const
 {
     FiffCov cov(*this);
 
@@ -358,7 +363,9 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, float p_fMag, float p_fGrad,
             idx_grad.push_back(i);
     }
 
-    if(cov_good.data.rows() != idx_eeg.size() + idx_mag.size() + idx_grad.size())
+    MatrixXd C(cov_good.data);
+
+    if(C.rows() != idx_eeg.size() + idx_mag.size() + idx_grad.size())
         printf("Error in FiffCov::regularize: Channel dimensions do not fit.\n");//ToDo Throw
 
     QList<FiffProj> t_listProjs;
@@ -368,8 +375,71 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, float p_fMag, float p_fGrad,
         FiffProj::activate_projs(t_listProjs);
     }
 
-    qDebug() << "ToDo Regularize...";
+    //Build regularization MAP
+    QMap<QString, QPair<double, std::vector<qint32> > > regData;
+    regData.insert("MAG", QPair<double, std::vector<qint32> >(p_fRegMag, idx_mag));
+    regData.insert("GRAD", QPair<double, std::vector<qint32> >(p_fRegGrad, idx_grad));
+    regData.insert("EEG", QPair<double, std::vector<qint32> >(p_fRegEeg, idx_eeg));
 
+    //
+    //Regularize
+    //
+    QMap<QString, QPair<double, std::vector<qint32> > >::Iterator it;
+    for(it = regData.begin(); it != regData.end(); ++it)
+    {
+        QString desc(it.key());
+        double reg = it.value().first;
+        std::vector<qint32> idx = it.value().second;
+
+        if(idx.size() == 0 || reg == 0.0)
+            printf("\tNothing to regularize within %s data.\n", desc.toLatin1().constData());
+        else
+        {
+            printf("\tRegularize %s: %f\n", desc.toLatin1().constData(), reg);
+            MatrixXd this_C(idx.size(), idx.size());
+            for(quint32 i = 0; i < idx.size(); ++i)
+                for(quint32 j = 0; j < idx.size(); ++j)
+                    this_C(i,j) = cov_good.data(idx[i], idx[j]);
+
+            MatrixXd U;
+            qint32 ncomp;
+            if(p_bProj)
+            {
+                QStringList this_ch_names;
+                for(quint32 k = 0; k < idx.size(); ++k)
+                    this_ch_names << ch_names[idx[k]];
+
+                MatrixXd P;
+                ncomp = FiffProj::make_projector(t_listProjs, this_ch_names, P);
+
+                JacobiSVD<MatrixXd> svd(P, ComputeFullU);
+                U = svd.matrixU().block(0,0, svd.matrixU().rows(), svd.matrixU().cols()-ncomp);
+
+//                printf("\tComponents %d\n", ncomp);
+
+                if (ncomp > 0)
+                {
+                    printf("\tCreated an SSP operator for %s (dimension = %d).\n", desc.toLatin1().constData(), ncomp);
+                    this_C = U.transpose() * (this_C * U);
+                }
+            }
+
+            double sigma = this_C.diagonal().mean();
+            this_C.diagonal() = this_C.diagonal().array() + reg * sigma;  // modify diag inplace
+            if(p_bProj && ncomp > 0)
+                this_C = U * (this_C * U.transpose());
+
+            for(qint32 i = 0; i < this_C.rows(); ++i)
+                for(qint32 j = 0; j < this_C.cols(); ++j)
+                    C(idx[i],idx[j]) = this_C(i,j);
+        }
+    }
+
+    // Put data back in correct locations
+    RowVectorXi idx = FiffInfo::pick_channels(cov.names, info_ch_names, p_exclude);
+    for(qint32 i = 0; i < idx.size(); ++i)
+        for(qint32 j = 0; j < idx.size(); ++j)
+            cov.data(idx[i], idx[j]) = C(i, j);
 
     return cov;
 }

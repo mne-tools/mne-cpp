@@ -201,7 +201,7 @@ MNEInverseOperator MNEInverseOperator::prepare_inverse_operator(qint32 nave ,flo
     //   Create the projection operator
     //
 
-    qint32 ncomp = FiffInfo::make_projector(inv.projs, inv.noise_cov->names, inv.proj);
+    qint32 ncomp = FiffProj::make_projector(inv.projs, inv.noise_cov->names, inv.proj);
     if (ncomp > 0)
         printf("\tCreated an SSP operator (subspace dimension = %d)\n",ncomp);
 

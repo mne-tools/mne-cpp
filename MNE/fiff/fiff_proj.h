@@ -129,6 +129,26 @@ public:
     */
     static void activate_projs(QList<FiffProj> &p_qListFiffProj);
 
+    //=========================================================================================================
+    /**
+    * mne_make_projector
+    *
+    * ToDo move this to fiff_proj; Before: check if info is needed and if make_projector_info should be also moved.
+    *
+    * ### MNE toolbox root function ### Implementation of the mne_make_projector function
+    *
+    * Make an SSP operator
+    *
+    * @param[in] projs      A set of projection vectors
+    * @param[in] ch_names   A cell array of channel names
+    * @param[out] proj      The projection operator to apply to the data
+    * @param[in] bads       Bad channels to exclude
+    * @param[out] U         The orthogonal basis of the projection vectors (optional)
+    *
+    * @return nproj - How many items in the projector
+    */
+    static fiff_int_t make_projector(const QList<FiffProj>& projs, const QStringList& ch_names, MatrixXd& proj, const QStringList& bads = defaultQStringList, MatrixXd& U = defaultMatrixXd);
+
 public:
     fiff_int_t kind;                /**< Fiff kind */
     bool active;                    /**< If fiff projector active */
