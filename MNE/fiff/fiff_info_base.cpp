@@ -99,7 +99,7 @@ void FiffInfoBase::clear()
 
 //*************************************************************************************************************
 
-RowVectorXi FiffInfoBase::pick_types(bool meg, bool eeg, bool stim, const QStringList& include, const QStringList& exclude) const
+RowVectorXi FiffInfoBase::pick_types(const QString meg, bool eeg, bool stim, const QStringList& include, const QStringList& exclude) const
 {
     RowVectorXi pick = RowVectorXi::Zero(this->nchan);
 
@@ -108,14 +108,23 @@ RowVectorXi FiffInfoBase::pick_types(bool meg, bool eeg, bool stim, const QStrin
     for(k = 0; k < this->nchan; ++k)
     {
         kind = this->chs[k].kind;
-        if ((kind == FIFFV_MEG_CH || kind == FIFFV_REF_MEG_CH) && meg)
-            pick(0, k) = true;
+
+        if ((kind == FIFFV_MEG_CH || kind == FIFFV_REF_MEG_CH))
+        {
+            if(meg.compare("all") == 0)
+                pick(k) = 1;
+            else if(meg.compare("grad") == 0 && this->chs[k].unit == FIFF_UNIT_T_M)
+                pick(k) = 1;
+            else if(meg.compare("mag") == 0 && this->chs[k].unit == FIFF_UNIT_T)
+                pick(k) = 1;
+        }
         else if (kind == FIFFV_EEG_CH && eeg)
-            pick(0, k) = true;
-        else if ((kind == FIFFV_STIM_CH) && stim)
-            pick(0, k) = true;
+            pick(k) = 1;
+        else if (kind == FIFFV_STIM_CH && stim)
+            pick(k) = 1;
     }
 
+    // restrict channels to selection if provided
     qint32 p = 0;
     QStringList myinclude;
     for(k = 0; k < this->nchan; ++k)
@@ -127,9 +136,6 @@ RowVectorXi FiffInfoBase::pick_types(bool meg, bool eeg, bool stim, const QStrin
         }
     }
 
-//        qDebug() << "Size: " << myinclude.size();
-//        qDebug() << myinclude;
-
     if (include.size() > 0)
     {
         for (k = 0; k < include.size(); ++k)
@@ -139,14 +145,21 @@ RowVectorXi FiffInfoBase::pick_types(bool meg, bool eeg, bool stim, const QStrin
         }
     }
 
-//        qDebug() << "Size: " << myinclude.size();
-//        qDebug() << myinclude;
-
     RowVectorXi sel;
     if (p != 0)
         sel = FiffInfoBase::pick_channels(this->ch_names, myinclude, exclude);
 
     return sel;
+}
+
+//*************************************************************************************************************
+
+RowVectorXi FiffInfoBase::pick_types(bool meg, bool eeg, bool stim, const QStringList& include, const QStringList& exclude) const
+{
+    if(meg)
+        return this->pick_types(QString("all"), eeg, stim, include, exclude);
+    else
+        return this->pick_types(QString(""), eeg, stim, include, exclude);
 }
 
 

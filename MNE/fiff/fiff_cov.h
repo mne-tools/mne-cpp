@@ -134,12 +134,29 @@ public:
     /**
     * Prepare noise covariance matrix. Before creating inverse operator.
     *
-    * @param[in] p_Info     measurement info
-    * @param[in] p_ChNames  Channels which should be taken into account
+    * @param[in] p_info     measurement info
+    * @param[in] p_chNames  Channels which should be taken into account
     *
     * @return the prepared noise covariance matrix
     */
-    FiffCov prepare_noise_cov(const FiffInfo& p_Info, const QStringList& p_ChNames) const;
+    FiffCov prepare_noise_cov(const FiffInfo& p_info, const QStringList& p_chNames) const;
+
+    //=========================================================================================================
+    /**
+    * Regularize noise covariance matrix
+    *
+    * This method works by adding a constant to the diagonal for each channel type separatly.
+    * Special care is taken to keep the rank of the data constant.
+    *
+    * @param[in] p_info     The measurement info (used to get channel types and bad channels).
+    * @param[in] p_fMag      Regularization factor for MEG magnetometers.
+    * @param[in] p_fGrad     Regularization factor for MEG gradiometers.
+    * @param[in] p_fEeg      Regularization factor for EEG.
+    * @param[in] p_bProj     Apply or not projections to keep rank of data.
+    * @param[in] p_exclude  List of channels to mark as bad. If None, bads channels are extracted from both info['bads'] and cov['bads'].
+    *
+    */
+    FiffCov regularize(const FiffInfo& p_info, float p_fMag = 0.1, float p_fGrad = 0.1, float p_fEeg = 0.1, bool p_bProj = true, QStringList p_exclude = defaultQStringList) const;
 
     //=========================================================================================================
     /**

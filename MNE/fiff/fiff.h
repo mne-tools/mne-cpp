@@ -363,9 +363,9 @@ public:
     *
     * @return the selector matrix (row vector)
     */
-    inline static MatrixXi pick_types(FiffInfo* info, bool meg, bool eeg = false, bool stim = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList)
+    inline static RowVectorXi pick_types(FiffInfo &info, bool meg, bool eeg = false, bool stim = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList)
     {
-        return info->pick_types(meg, eeg, stim, include, exclude);
+        return info.pick_types(meg, eeg, stim, include, exclude);
     }
 
     //=========================================================================================================
