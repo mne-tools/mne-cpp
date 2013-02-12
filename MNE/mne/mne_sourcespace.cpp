@@ -412,7 +412,8 @@ bool MNESourceSpace::read_source_space(FiffStream* p_pStream, const FiffDirTree&
         //
         //  Add the upper triangle
         //
-//        p_Hemisphere.dist += p_Hemisphere.dist.transpose();
+        SparseMatrix<double> distT = p_Hemisphere.dist.transpose();
+        p_Hemisphere.dist += distT;
     }
 
     delete t_pTag2;

@@ -1097,30 +1097,29 @@ inline SparseMatrix<double> FiffTag::toSparseFloatMatrix() const
     qint32 nrow = dims[1];
     qint32 ncol = dims[2];
 
-    MatrixXf sparse_data = MatrixXf::Zero(nnz, 3);
+    typedef Eigen::Triplet<double> T;
+    std::vector<T> tripletList;
+    tripletList.reserve(nnz);
 
-    for(qint32 i = 0; i < nnz; ++i)
-        sparse_data(i,2) = ((float*)this->data())[i];
-
+    float *t_pFloat = (float*)this->data();
+    int *t_pInt = (int*)this->data();
+    qint32 offset1 = nnz;
+    qint32 offset2 = 2*nnz;
     if (fiff_type_matrix_coding(this->type) == FIFFTS_MC_CCS)
     {
         //
         //    CCS
         //
         qDebug() << "Warning in FiffTag::toSparseFloatMatrix(): CCS has to be debugged - never done before.";
-        for(qint32 i = 0; i < nnz; ++i)
-            sparse_data(i,0) = (float)(((int*)this->data())[nnz+i]);
-
-        VectorXi ptrs = VectorXi::Zero(ncol+1);
-        for(qint32 i = 0; i < ncol+1; ++i)
-            ptrs(i) = ((int*)this->data())[2*nnz+i];
-
+//        for(qint32 i = 0; i < nnz; ++i)
+//            tripletList.push_back(T(t_pInt[offset1+i], 0, (double)(t_pFloat[i])));
         qint32 p = 0;
         for(qint32 j = 0; j < ncol; ++j)
         {
-            while( p < ptrs(j+1))
+            while( p < t_pInt[offset2+j+1])
             {
-                sparse_data(p,2) = j;
+//                tripletList[p] = T(tripletList[p].row(), j, tripletList[p].value());
+                tripletList.push_back(T(t_pInt[offset1+p], j, (double)(t_pFloat[p])));
                 ++p;
             }
         }
@@ -1130,28 +1129,28 @@ inline SparseMatrix<double> FiffTag::toSparseFloatMatrix() const
         //
         //    RCS
         //
-        for(qint32 i = 0; i < nnz; ++i)
-            sparse_data(i,1) = (float)(((int*)this->data())[nnz+i]);
-
-        VectorXi ptrs = VectorXi::Zero(ncol+1);
-        for(qint32 i = 0; i < ncol+1; ++i)
-            ptrs(i) = ((int*)this->data())[2*nnz+i];
-
+//        for(qint32 i = 0; i < nnz; ++i)
+//            tripletList.push_back(T(0, t_pInt[offset1+i], (double)(t_pFloat[i])));
         qint32 p = 0;
         for(qint32 j = 0; j < nrow; ++j)
         {
-            while (p < ptrs(j+1))
+            while( p < t_pInt[offset2+j+1])
             {
-                sparse_data(p,0) = j;
+//                tripletList[p] = T(j, tripletList[p].col(), tripletList[p].value());
+                tripletList.push_back(T(j, t_pInt[offset1+p], (double)(t_pFloat[p])));
                 ++p;
             }
         }
     }
 
-    SparseMatrix<double> p_Matrix(nrow, ncol);
+//    std::cout << "Size: " << tripletList.size() << std::endl;
+//    qint32 offsetTest = tripletList.size() - 10;
+//    for(qint32 i = 0; i < 10; ++i)
+//        std::cout << std::endl << tripletList[offsetTest + i].row() << " " << tripletList[offsetTest + i].col() << " " << tripletList[offsetTest + i].value();
 
-    for(qint32 i = 0; i < sparse_data.rows(); ++i)
-        p_Matrix.insert((int)sparse_data(i,0),(int)sparse_data(i,1)) = (double)sparse_data(i,2);
+
+    SparseMatrix<double> p_Matrix(nrow, ncol);
+    p_Matrix.setFromTriplets(tripletList.begin(), tripletList.end());
 
     p_Matrix.insert(nrow-1, ncol-1) = 0.0;
 
