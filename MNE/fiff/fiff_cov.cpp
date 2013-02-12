@@ -295,6 +295,17 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, float p_fMag, float p_fGrad,
     RowVectorXi sel_mag = p_info.pick_types(QString("mag"), false, false, defaultQStringList, p_exclude);
     RowVectorXi sel_grad = p_info.pick_types(QString("grad"), false, false, defaultQStringList, p_exclude);
 
+
+    QStringList info_ch_names = p_info.ch_names;
+    QStringList ch_names_eeg;
+//    for(qint32 i = 0; i < sel_eeg.size(); ++i)
+
+//    = [info_ch_names[i] for i in sel_eeg]
+//    QStringList ch_names_mag; = [info_ch_names[i] for i in sel_mag]
+//    QStringList ch_names_grad; = [info_ch_names[i] for i in sel_grad]
+
+
+
     qDebug() << "ToDo Regularize...";
 
 
