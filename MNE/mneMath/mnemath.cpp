@@ -178,7 +178,7 @@ void MNEMath::get_whitener(MatrixXd& A, bool pca, QString ch_type, VectorXd& eig
 
 bool MNEMath::issparse(VectorXd &v)
 {
-    qDebug() << "ToDo: Figure out quickly whether it's a sparse or non sparse matrix.";
+    qDebug() << "ToDo: Figure out how to accelerate MNEMath::issparse(VectorXd &v).";
 
     qint32 c = 0;
     qint32 n = v.rows();

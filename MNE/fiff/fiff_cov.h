@@ -132,6 +132,19 @@ public:
 
     //=========================================================================================================
     /**
+    * python pick_channels_cov
+    *
+    * Pick channels from covariance matrix
+    *
+    * @param[in] p_include  List of channels to include (if empty, include all available). (optional)
+    * @param[in] p_exclude  Channels to exclude (if empty, do not exclude any). (optional)
+    *
+    * @return Covariance solution restricted to selected channels.
+    */
+    FiffCov pick_channels(const QStringList &p_include = defaultQStringList, const QStringList &p_exclude = defaultQStringList);
+
+    //=========================================================================================================
+    /**
     * Prepare noise covariance matrix. Before creating inverse operator.
     *
     * @param[in] p_info     measurement info
