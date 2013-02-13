@@ -136,7 +136,6 @@ public:
     */
     bool make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf_comp, bool exclude_comp_chs = false) const;
 
-
     //=========================================================================================================
     /**
     * mne_get_current_comp
@@ -161,10 +160,22 @@ public:
     *
     * @return nproj - How many items in the projector
     */
-    inline qint32 make_projector_info(MatrixXd& proj) const
-    {
-        return FiffProj::make_projector(this->projs,this->ch_names, proj, this->bads);
-    }
+    inline qint32 make_projector(MatrixXd& proj) const;
+
+    //=========================================================================================================
+    /**
+    * mne_make_projector_info
+    *
+    * ### MNE toolbox root function ###  Implementation of the mne_make_projector_info function
+    *
+    * Make a SSP operator using the meas info
+    *
+    * @param[out] proj      The projection operator to apply to the data
+    * @param[in] p_chNames   List of channels to include in the projection matrix
+    *
+    * @return nproj - How many items in the projector
+    */
+    inline qint32 make_projector(MatrixXd& proj, const QStringList& p_chNames) const;
 
     //=========================================================================================================
     /**
@@ -186,10 +197,7 @@ public:
     *
     * @param[in] value  compensation value
     */
-    inline void set_current_comp(fiff_int_t value)
-    {
-        this->chs = set_current_comp(this->chs, value);
-    }
+    inline void set_current_comp(fiff_int_t value);
 
     //=========================================================================================================
     /**
@@ -241,6 +249,33 @@ public: //Public because it's a mne struct
     QString acq_stim;           /**< Acquisition information ToDo... */
     QString filename;           /**< Filename when the info is read of a fiff file. */
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline qint32 FiffInfo::make_projector(MatrixXd& proj) const
+{
+    return FiffProj::make_projector(this->projs,this->ch_names, proj, this->bads);
+}
+
+
+//*************************************************************************************************************
+
+inline qint32 FiffInfo::make_projector(MatrixXd& proj, const QStringList& p_chNames) const
+{
+    return FiffProj::make_projector(this->projs, p_chNames, proj, this->bads);
+}
+
+
+//*************************************************************************************************************
+
+inline void FiffInfo::set_current_comp(fiff_int_t value)
+{
+    this->chs = set_current_comp(this->chs, value);
+}
+
 
 } // NAMESPACE
 

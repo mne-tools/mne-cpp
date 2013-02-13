@@ -206,35 +206,43 @@ FiffCov FiffCov::prepare_noise_cov(const FiffInfo &p_Info, const QStringList &p_
     C_ch_idx.conservativeResize(count);
 
     MatrixXd C(count, count);
-    for(qint32 i = 0; i < count; ++i)
-        for(qint32 j = 0; j < count; ++j)
-            C(i,j) = p_NoiseCov.data(C_ch_idx(i), C_ch_idx(j));
+
+    if(!p_NoiseCov.diag)
+        for(qint32 i = 0; i < count; ++i)
+            for(qint32 j = 0; j < count; ++j)
+                C(i,j) = p_NoiseCov.data(C_ch_idx(i), C_ch_idx(j));
+    else
+    {
+        qDebug() << "Warning in FiffCov::prepare_noise_cov: This has to be debugged - not done before!";
+        C = MatrixXd::Zero(count, count);
+        for(qint32 i = 0; i < count; ++i)
+            C.diagonal()[i] = p_NoiseCov.data(C_ch_idx(i),0);
+    }
 
     MatrixXd proj;
-    qint32 ncomp = p_Info.make_projector_info(proj);
+    qint32 ncomp = p_Info.make_projector(proj, p_ChNames);
 
     //Create the projection operator
     if (ncomp > 0)
     {
         printf("Created an SSP operator (subspace dimension = %d)\n", ncomp);
-
         C = proj * (C * proj.transpose());
     }
 
-    MatrixXi pick_meg = p_Info.pick_types(true, false, false, defaultQStringList, p_Info.bads);
-    MatrixXi pick_eeg = p_Info.pick_types(false, true, false, defaultQStringList, p_Info.bads);
+    RowVectorXi pick_meg = p_Info.pick_types(true, false, false, defaultQStringList, p_Info.bads);
+    RowVectorXi pick_eeg = p_Info.pick_types(false, true, false, defaultQStringList, p_Info.bads);
 
     QStringList meg_names, eeg_names;
 
     for(qint32 i = 0; i < pick_meg.size(); ++i)
-        meg_names << p_Info.chs[pick_meg(0,i)].ch_name;
+        meg_names << p_Info.chs[pick_meg[i]].ch_name;
     VectorXi C_meg_idx = VectorXi::Zero(p_NoiseCov.names.size());
     count = 0;
     for(qint32 k = 0; k < C.rows(); ++k)
     {
         if(meg_names.indexOf(p_ChNames[k]) > -1)
         {
-            C_meg_idx(count) = k;
+            C_meg_idx[count] = k;
             ++count;
         }
     }
@@ -252,7 +260,7 @@ FiffCov FiffCov::prepare_noise_cov(const FiffInfo &p_Info, const QStringList &p_
     {
         if(eeg_names.indexOf(p_ChNames[k]) > -1)
         {
-            C_eeg_idx(count) = k;
+            C_eeg_idx[count] = k;
             ++count;
         }
     }
@@ -349,6 +357,7 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
 
     // This actually removes bad channels from the cov, which is not backward
     // compatible, so let's leave all channels in
+
     FiffCov cov_good = cov.pick_channels(info_ch_names, p_exclude);
     QStringList ch_names = cov_good.names;
 
@@ -414,8 +423,6 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
 
                 JacobiSVD<MatrixXd> svd(P, ComputeFullU);
                 U = svd.matrixU().block(0,0, svd.matrixU().rows(), svd.matrixU().cols()-ncomp);
-
-//                printf("\tComponents %d\n", ncomp);
 
                 if (ncomp > 0)
                 {

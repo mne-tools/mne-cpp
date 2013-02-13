@@ -104,10 +104,16 @@ int main(int argc, char *argv[])
     // regularize noise covariance
     noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
 
-//    // Restrict forward solution as necessary for MEG
-//    forward_meg = mne.fiff.pick_types_forward(forward_meeg, meg=True, eeg=False)
+    // Restrict forward solution as necessary for MEG
+    MNEForwardSolution t_forwardMeg = t_forwardMeeg.pick_types(true, false);
     // Alternatively, you can just load a forward solution that is restricted
     MNEForwardSolution t_forwardEeg(t_fileFwdEeg, false, true);
+
+    // make an M/EEG, MEG-only, and EEG-only inverse operators
+    FiffInfo info = evoked.info;
+    MNEInverseOperator inverse_operator_meeg = MNEInverseOperator::make_inverse_operator(info, t_forwardMeeg, noise_cov, 0.2, 0.8);
+//    MNEInverseOperator inverse_operator_meg = MNEInverseOperator::make_inverse_operator(info, t_forwardMeg, noise_cov, 0.2, 0.8);
+//    MNEInverseOperator inverse_operator_eeg = MNEInverseOperator::make_inverse_operator(info, t_forwardEeg, noise_cov, 0.2, 0.8);
 
 
     return a.exec();

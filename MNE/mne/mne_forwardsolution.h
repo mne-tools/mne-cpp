@@ -204,7 +204,7 @@ public:
     *
     * @return Forward solution restricted to selected channel types.
     */
-    MNEForwardSolution pick_channels_forward(const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
+    MNEForwardSolution pick_channels(const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
 
     //=========================================================================================================
     /**
@@ -219,7 +219,7 @@ public:
     *
     * @return Forward solution restricted to selected channel types.
     */
-    MNEForwardSolution pick_types_forward(bool meg, bool eeg, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
+    MNEForwardSolution pick_types(bool meg, bool eeg, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
 
     //=========================================================================================================
     /**
@@ -303,13 +303,13 @@ public:
     * @param[in] p_info             The measurement info to specify the channels to include. Bad channels in info['bads'] are not used.
     * @param[in] p_noise_cov        The noise covariance matrix.
     * @param[in] p_pca              Calculate pca or not.
-    * @param[out] p_outChNames      Selected channel names
-    * @param[out] p_outGain         Gain matrix
+    * @param[out] ch_names          Selected channel names
+    * @param[out] gain              Gain matrix
     * @param[out] p_outNoiseCov     noise covariance matrix
     * @param[out] p_outWhitener     Whitener
     * @param[out] p_outNumNonZero   the rank (non zeros)
     */
-    void prepare_forward(const FiffInfo &p_info, const FiffCov &p_noise_cov, bool p_pca, QStringList &p_outChNames, MatrixXd &p_outGain, FiffCov &p_outNoiseCov, MatrixXd &p_outWhitener, qint32 &p_outNumNonZero);
+    void prepare_forward(const FiffInfo &p_info, const FiffCov &p_noise_cov, bool p_pca, QStringList &ch_names, MatrixXd &gain, FiffCov &p_outNoiseCov, MatrixXd &p_outWhitener, qint32 &p_outNumNonZero);
 
 private:
     //=========================================================================================================

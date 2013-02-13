@@ -266,9 +266,9 @@ public:
     *
     * @return nproj - How many items in the projector
     */
-    static inline qint32 make_projector_info(FiffInfo& info, MatrixXd& proj)
+    static inline qint32 make_projector(FiffInfo& info, MatrixXd& proj)
     {
-        return info.make_projector_info(proj);
+        return info.make_projector(proj);
     }
 
     //=========================================================================================================
