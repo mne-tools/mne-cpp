@@ -349,7 +349,6 @@ bool FiffStream::read_cov(const FiffDirTree& p_Node, fiff_int_t cov_kind, FiffCo
                     return false;
                 }
 
-
                 if(!MNEMath::issparse(vals))
                 {
                     //
@@ -361,7 +360,7 @@ bool FiffStream::read_cov(const FiffDirTree& p_Node, fiff_int_t cov_kind, FiffCo
                     qint32 q = 0;
                     for(qint32 j = 0; j < dim; ++j)
                     {
-                        for(qint32 k = 0; k < j; ++k)
+                        for(qint32 k = 0; k <= j; ++k)
                         {
                             cov(j,k) = vals(q);
                             ++q;

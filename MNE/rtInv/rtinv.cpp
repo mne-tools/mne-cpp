@@ -114,7 +114,7 @@ void RtInv::run()
         {
 
             // Restrict forward solution as necessary for MEG
-            MNEForwardSolution forward_meg = m_pFwd->pick_types_forward(true, false);
+            MNEForwardSolution forward_meg = m_pFwd->pick_types(true, false);
 
             //Put this inside make_inverse_operator
 

@@ -433,7 +433,7 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution &p_fwdOut, 
 
 //*************************************************************************************************************
 
-MNEForwardSolution MNEForwardSolution::pick_channels_forward(const QStringList& include, const QStringList& exclude) const
+MNEForwardSolution MNEForwardSolution::pick_channels(const QStringList& include, const QStringList& exclude) const
 {
     MNEForwardSolution fwd(*this);
 
@@ -494,9 +494,10 @@ MNEForwardSolution MNEForwardSolution::pick_channels_forward(const QStringList& 
     return fwd;
 }
 
+
 //*************************************************************************************************************
 
-MNEForwardSolution MNEForwardSolution::pick_types_forward(bool meg, bool eeg, const QStringList& include, const QStringList& exclude) const
+MNEForwardSolution MNEForwardSolution::pick_types(bool meg, bool eeg, const QStringList& include, const QStringList& exclude) const
 {
     RowVectorXi sel = info.pick_types(meg, eeg, false, include, exclude);
 
@@ -504,32 +505,40 @@ MNEForwardSolution MNEForwardSolution::pick_types_forward(bool meg, bool eeg, co
     for(qint32 i = 0; i < sel.cols(); ++i)
         include_ch_names << info.ch_names[sel[i]];
 
-    return this->pick_channels_forward(include_ch_names);
+    return this->pick_channels(include_ch_names);
 }
 
 
 //*************************************************************************************************************
 
-void MNEForwardSolution::prepare_forward(const FiffInfo &p_info, const FiffCov &p_noise_cov, bool p_pca, QStringList &p_outChNames, MatrixXd &p_outGain, FiffCov &p_outNoiseCov, MatrixXd &p_outWhitener, qint32 &p_outNumNonZero)
+void MNEForwardSolution::prepare_forward(const FiffInfo &p_info, const FiffCov &p_noise_cov, bool p_pca, QStringList &ch_names, MatrixXd &gain, FiffCov &p_outNoiseCov, MatrixXd &p_outWhitener, qint32 &p_outNumNonZero)
 {
-    QStringList fwd_ch_names;
-    for(qint32 i = 0; i < p_info.chs.size(); ++i)
-        fwd_ch_names << p_info.chs[i].ch_name;
-    p_outChNames.clear();
-    for(qint32 i = 0; i < fwd_ch_names.size(); ++i)
-        if(!p_info.bads.contains(fwd_ch_names[i]))
-            p_outChNames << fwd_ch_names[i];
+    qDebug() << "A";
 
-    qint32 n_chan = p_outChNames.size();
+    QStringList fwd_ch_names;
+    for(qint32 i = 0; i < this->info.chs.size(); ++i)
+        fwd_ch_names << this->info.chs[i].ch_name;
+    ch_names.clear();
+    for(qint32 i = 0; i < p_info.chs.size(); ++i)
+        if(     !p_info.bads.contains(p_info.chs[i].ch_name)
+            &&  !p_noise_cov.bads.contains(p_info.chs[i].ch_name)
+            &&  fwd_ch_names.contains(p_info.chs[i].ch_name))
+            ch_names << p_info.chs[i].ch_name;
+
+    qint32 n_chan = ch_names.size();
     printf("Computing inverse operator with %d channels.\n", n_chan);
+
+    qDebug() << "B";
 
     //
     //   Handle noise cov
     //
-    p_outNoiseCov = p_noise_cov.prepare_noise_cov(p_info, p_outChNames);
+    p_outNoiseCov = p_noise_cov.prepare_noise_cov(p_info, ch_names);
 
     //   Omit the zeroes due to projection
 //    std::cout << "\nEig:\n" << p_outNoiseCov.eig << std::endl;
+
+    qDebug() << "B.1";
 
     p_outNumNonZero = 0;
     VectorXi t_vecNonZero = VectorXi::Zero(n_chan);
@@ -543,6 +552,10 @@ void MNEForwardSolution::prepare_forward(const FiffInfo &p_info, const FiffCov &
     }
     t_vecNonZero.conservativeResize(p_outNumNonZero);
 
+
+    qDebug() << "C";
+
+/*
     if (p_pca)
     {
         p_outWhitener = MatrixXd::Zero(p_outNumNonZero, n_chan);
@@ -564,9 +577,10 @@ void MNEForwardSolution::prepare_forward(const FiffInfo &p_info, const FiffCov &
         p_outWhitener *= p_outNoiseCov.eigvec;
 //        whitener = np.dot(whitener, noise_cov['eigvec'])
     }
+    */
 
 
-    qDebug() << "HERE To continue here";
+    qDebug() << "To continue here";
 }
 
 

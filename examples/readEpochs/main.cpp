@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
         //   Create the projector
         //
 //        fiff_int_t nproj = MNE::make_projector_info(raw.info, raw.proj); Using the member function instead
-        fiff_int_t nproj = raw.info.make_projector_info(raw.proj);
+        fiff_int_t nproj = raw.info.make_projector(raw.proj);
 
         if (nproj == 0)
         {
