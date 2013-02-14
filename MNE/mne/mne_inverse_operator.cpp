@@ -155,11 +155,11 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
         printf("Setting depth to %f.\n", depth);
     }
 
-    QStringList ch_names;
+    FiffInfo gain_info;
     MatrixXd gain;
     MatrixXd whitener;
     qint32 n_nzero;
-    forward.prepare_forward(info, noise_cov, false, ch_names, gain, noise_cov, whitener, n_nzero);
+    forward.prepare_forward(info, noise_cov, false, gain_info, gain, noise_cov, whitener, n_nzero);
 
     return t_MNEInverseOperator;
 }

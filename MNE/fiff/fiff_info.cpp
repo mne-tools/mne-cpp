@@ -301,10 +301,10 @@ bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXd& this_comp) const//pri
 
 //*************************************************************************************************************
 
-FiffInfo FiffInfo::pick_info(const MatrixXi* sel) const
+FiffInfo FiffInfo::pick_info(const RowVectorXi &sel) const
 {
     FiffInfo res = *this;//new FiffInfo(this);
-    if (sel == NULL)
+    if (sel.size() == 0)
         return res;
 
     //ToDo when pointer List do delation
@@ -312,13 +312,13 @@ FiffInfo FiffInfo::pick_info(const MatrixXi* sel) const
     res.ch_names.clear();
 
     qint32 idx;
-    for(qint32 i = 0; i < sel->cols(); ++i)
+    for(qint32 i = 0; i < sel.size(); ++i)
     {
-        idx = (*sel)(0,i);
+        idx = sel[i];
         res.chs.append(this->chs[idx]);
         res.ch_names.append(this->ch_names[idx]);
     }
-    res.nchan  = sel->cols();
+    res.nchan  = sel.size();
 
     return res;
 }

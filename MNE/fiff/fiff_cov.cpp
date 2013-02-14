@@ -317,8 +317,11 @@ FiffCov FiffCov::prepare_noise_cov(const FiffInfo &p_Info, const QStringList &p_
             p_NoiseCov.eig(C_eeg_idx(i)) = C_eeg_eig(i);
     }
 
-    if (C_meg_idx.size() + C_eeg_idx.size() == n_chan)
+    if (C_meg_idx.size() + C_eeg_idx.size() != n_chan)
+    {
+        printf("Error in FiffCov::prepare_noise_cov: channel sizes do no match!\n");//ToDo Throw here
         return FiffCov();
+    }
 
     p_NoiseCov.dim = p_ChNames.size();
     p_NoiseCov.diag = false;

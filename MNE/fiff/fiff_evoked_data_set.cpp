@@ -111,12 +111,12 @@ void FiffEvokedDataSet::clear()
 
 //*************************************************************************************************************
 
-FiffEvokedDataSet FiffEvokedDataSet::pick_channels_evoked(QStringList& include, QStringList& exclude)
+FiffEvokedDataSet FiffEvokedDataSet::pick_channels(const QStringList& include, const QStringList& exclude)
 {
     if(include.size() == 0 && exclude.size() == 0)
         return FiffEvokedDataSet(*this);
 
-    MatrixXi sel = FiffInfo::pick_channels(this->info.ch_names, include, exclude);
+    RowVectorXi sel = FiffInfo::pick_channels(this->info.ch_names, include, exclude);
     if (sel.cols() == 0)
     {
         printf("Warning : No channels match the selection.\n");
@@ -129,7 +129,7 @@ FiffEvokedDataSet FiffEvokedDataSet::pick_channels_evoked(QStringList& include, 
     //
 //    if (res->info)
 //        delete res->info;
-    res.info = FiffInfo(res.info.pick_info(&sel));
+    res.info = FiffInfo(res.info.pick_info(sel));
     //
     //   Create the reduced data set
     //

@@ -93,7 +93,7 @@ MNEForwardSolution::MNEForwardSolution()
 
 //*************************************************************************************************************
 
-MNEForwardSolution::MNEForwardSolution(QIODevice &p_IODevice, bool force_fixed, bool surf_ori, QStringList& include, QStringList& exclude)
+MNEForwardSolution::MNEForwardSolution(QIODevice &p_IODevice, bool force_fixed, bool surf_ori, const QStringList& include, const QStringList& exclude, bool bExcludeBads)
 : source_ori(-1)
 , coord_frame(-1)
 , nsource(-1)
@@ -106,7 +106,7 @@ MNEForwardSolution::MNEForwardSolution(QIODevice &p_IODevice, bool force_fixed, 
 , source_nn(MatrixX3d::Zero(0,3))
 , isClustered(false)
 {
-    if(!read_forward_solution(p_IODevice, *this, force_fixed, surf_ori, include, exclude))
+    if(!read_forward_solution(p_IODevice, *this, force_fixed, surf_ori, include, exclude, bExcludeBads))
     {
         printf("\tForward solution not found.\n");//ToDo Throw here
         return;
@@ -511,13 +511,12 @@ MNEForwardSolution MNEForwardSolution::pick_types(bool meg, bool eeg, const QStr
 
 //*************************************************************************************************************
 
-void MNEForwardSolution::prepare_forward(const FiffInfo &p_info, const FiffCov &p_noise_cov, bool p_pca, QStringList &ch_names, MatrixXd &gain, FiffCov &p_outNoiseCov, MatrixXd &p_outWhitener, qint32 &p_outNumNonZero)
+void MNEForwardSolution::prepare_forward(const FiffInfo &p_info, const FiffCov &p_noise_cov, bool p_pca, FiffInfo &p_outFwdInfo, MatrixXd &gain, FiffCov &p_outNoiseCov, MatrixXd &p_outWhitener, qint32 &p_outNumNonZero)
 {
-    qDebug() << "A";
-
-    QStringList fwd_ch_names;
+    QStringList fwd_ch_names, ch_names;
     for(qint32 i = 0; i < this->info.chs.size(); ++i)
         fwd_ch_names << this->info.chs[i].ch_name;
+
     ch_names.clear();
     for(qint32 i = 0; i < p_info.chs.size(); ++i)
         if(     !p_info.bads.contains(p_info.chs[i].ch_name)
@@ -528,18 +527,12 @@ void MNEForwardSolution::prepare_forward(const FiffInfo &p_info, const FiffCov &
     qint32 n_chan = ch_names.size();
     printf("Computing inverse operator with %d channels.\n", n_chan);
 
-    qDebug() << "B";
-
     //
     //   Handle noise cov
     //
     p_outNoiseCov = p_noise_cov.prepare_noise_cov(p_info, ch_names);
 
     //   Omit the zeroes due to projection
-//    std::cout << "\nEig:\n" << p_outNoiseCov.eig << std::endl;
-
-    qDebug() << "B.1";
-
     p_outNumNonZero = 0;
     VectorXi t_vecNonZero = VectorXi::Zero(n_chan);
     for(qint32 i = 0; i < p_outNoiseCov.eig.rows(); ++i)
@@ -550,43 +543,86 @@ void MNEForwardSolution::prepare_forward(const FiffInfo &p_info, const FiffCov &
             ++p_outNumNonZero;
         }
     }
-    t_vecNonZero.conservativeResize(p_outNumNonZero);
+    if(p_outNumNonZero > 0)
+        t_vecNonZero.conservativeResize(p_outNumNonZero);
+
+    if(p_outNumNonZero > 0)
+        if (p_pca)
+        {
+            qDebug() << "Warning in MNEForwardSolution::prepare_forward: if (p_pca) havent been debugged.";
+            p_outWhitener = MatrixXd::Zero(p_outNumNonZero, n_chan);
+            // Rows of eigvec are the eigenvectors
+//            whitener = noise_cov['eigvec'][nzero] / np.sqrt(eig[nzero])[:, None]
+            printf("\tReducing data rank to %d.\n", p_outNumNonZero);
+        }
+        else
+        {
+            printf("Creating non pca whitener.\n");
+            p_outWhitener = MatrixXd::Zero(n_chan, n_chan);
+            for(qint32 i = 0; i < p_outNumNonZero; ++i)
+                p_outWhitener(t_vecNonZero[i],t_vecNonZero[i]) = 1.0 / sqrt(p_outNoiseCov.eig(t_vecNonZero[i]));
+
+            std::cout << "p_outWhitener:\n" << p_outWhitener.block(0,0,20,20) << std::endl;
+            std::cout << "p_outNoiseCov.eig:\n" << p_outNoiseCov.eig << std::endl;
+            std::cout << "p_outNoiseCov.eigvec:\n" << p_outNoiseCov.eigvec.block(0,0,5,5) << std::endl;
+
+            // Rows of eigvec are the eigenvectors
+            p_outWhitener *= p_outNoiseCov.eigvec;
+        }
 
 
-    qDebug() << "C";
 
-/*
-    if (p_pca)
+//    (const FiffInfo &p_info, const FiffCov &p_noise_cov, bool p_pca, FiffInf &p_outFwdInfo, MatrixXd &gain, FiffCov &p_outNoiseCov, MatrixXd &p_outWhitener, qint32 &p_outNumNonZero)
+
+    VectorXi fwd_idx = VectorXi::Zero(ch_names.size());
+    VectorXi info_idx = VectorXi::Zero(ch_names.size());
+    qint32 idx;
+    qint32 count_fwd_idx = 0;
+    qint32 count_info_idx = 0;
+    for(qint32 i = 0; i < ch_names.size(); ++i)
     {
-        p_outWhitener = MatrixXd::Zero(p_outNumNonZero, n_chan);
-        qDebug() << "ToDo PCA Implementation";
-//        whitener = np.zeros((n_nzero, n_chan), dtype=np.float)
-//        whitener = 1.0 / np.sqrt(eig[nzero])
-//        // Rows of eigvec are the eigenvectors
-//        whitener = noise_cov['eigvec'][nzero] / np.sqrt(eig[nzero])[:, None]
-//        logger.info('Reducing data rank to %d' % n_nzero)
+        idx = fwd_ch_names.indexOf(ch_names[i]);
+        if(idx > -1)
+        {
+            fwd_idx[count_fwd_idx] = idx;
+            ++count_fwd_idx;
+        }
+        idx = p_info.ch_names.indexOf(ch_names[i]);
+        if(idx > -1)
+        {
+            info_idx[count_info_idx] = idx;
+            ++count_info_idx;
+        }
     }
-    else
+    fwd_idx.conservativeResize(count_fwd_idx);
+    info_idx.conservativeResize(count_info_idx);
+
+    qDebug() << "Rows: " << this->sol->data.rows();
+    std::cout << "fwd_idx\n" << fwd_idx << std::endl;
+    std::cout << "fwd_idx size\n" << fwd_idx.size() << std::endl;
+
+    gain.resize(count_fwd_idx, this->sol->data.cols());
+    for(qint32 i = 0; i < count_fwd_idx; ++i)
     {
-        printf("Creating non pca whitener.\n");
-        p_outWhitener = MatrixXd::Zero(n_chan, n_chan);
-        for(qint32 i = 0; i < p_outNumNonZero; ++i)
-            p_outWhitener(t_vecNonZero(i),t_vecNonZero(i)) = 1.0 / sqrt(p_outNoiseCov.eig(t_vecNonZero(i)));
-//        whitener[nzero, nzero] = 1.0 / np.sqrt(eig[nzero])
-        // Rows of eigvec are the eigenvectors
-        p_outWhitener *= p_outNoiseCov.eigvec;
-//        whitener = np.dot(whitener, noise_cov['eigvec'])
+        qDebug() << i << fwd_idx(i);
+        gain.row(i) = this->sol->data.row(fwd_idx(i));
     }
-    */
 
+    p_outFwdInfo = p_info.pick_info(info_idx);
 
-    qDebug() << "To continue here";
+//    std::cout << "p_outWhitener:\n" << p_outWhitener.block(0,0,5,5) << std::endl;
+
+    qDebug() << "p_outWhitener" << p_outWhitener.rows() << "x" << p_outWhitener.cols();
+
+    qDebug() << "gain" << gain.rows() << "x" << gain.cols();
+
+    std::cout << "whitened gain:\n" << (p_outWhitener * gain).block(0,0,5,5) << std::endl;
 }
 
 
 //*************************************************************************************************************
 
-bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForwardSolution& fwd, bool force_fixed, bool surf_ori, QStringList& include, QStringList& exclude)
+bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForwardSolution& fwd, bool force_fixed, bool surf_ori, const QStringList& include, const QStringList& exclude, bool bExcludeBads)
 {
     FiffStream* t_pStream = new FiffStream(&p_IODevice);
     FiffDirTree t_Tree;
@@ -635,15 +671,24 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
         return false;
     }
 
-    for(int k = 0; k < t_SourceSpace.hemispheres.size(); ++k)
+    for(qint32 k = 0; k < t_SourceSpace.hemispheres.size(); ++k)
         t_SourceSpace.hemispheres[k].id = MNESourceSpace::find_source_space_hemi(t_SourceSpace.hemispheres[k]);
 
     //
     //   Bad channel list
     //
-    QStringList bads = t_pStream->read_bad_channels(t_Tree);
-    printf("\t%d bad channels read\n",bads.size());
-    qDebug() << bads;
+    QStringList bads;
+    if(bExcludeBads)
+    {
+        bads = t_pStream->read_bad_channels(t_Tree);
+        if(bads.size() > 0)
+        {
+            printf("\t%d bad channels ( ",bads.size());
+            for(qint32 i = 0; i < bads.size(); ++i)
+                printf("%s ", bads[i].toLatin1().constData());
+            printf(") read\n");
+        }
+    }
 
     //
     //   Locate and read the forward solutions
@@ -651,7 +696,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
     FIFFLIB::FiffTag* t_pTag = NULL;
     FiffDirTree megnode;
     FiffDirTree eegnode;
-    for(int k = 0; k < fwds.size(); ++k)
+    for(qint32 k = 0; k < fwds.size(); ++k)
     {
         if(!fwds[k].find_tag(t_pStream, FIFF_MNE_INCLUDED_METHODS, t_pTag))
         {
@@ -804,7 +849,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
     //
     qint32 nuse = 0;
     t_SourceSpace.transform_source_space_to(fwd.coord_frame,fwd.mri_head_t);
-    for(int k = 0; k < t_SourceSpace.hemispheres.size(); ++k)
+    for(qint32 k = 0; k < t_SourceSpace.hemispheres.size(); ++k)
         nuse += t_SourceSpace.hemispheres[k].nuse;
 
     if (nuse != fwd.nsource)
@@ -924,7 +969,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
         printf("\tCartesian source orientations...");
         nuse = 0;
         fwd.source_rr = MatrixXd::Zero(fwd.nsource,3);
-        for(int k = 0; k < t_SourceSpace.hemispheres.size(); ++k)
+        for(qint32 k = 0; k < t_SourceSpace.hemispheres.size(); ++k)
         {
             for (qint32 q = 0; q < t_SourceSpace.hemispheres[k].nuse; ++q)
                 fwd.source_rr.block(q+nuse,0,1,3) = t_SourceSpace.hemispheres[k].rr.block(t_SourceSpace.hemispheres[k].vertno(q),0,1,3);
@@ -942,116 +987,136 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
     //
     //   Do the channel selection
     //
-    if (include.size() > 0 || exclude.size() > 0 || bads.size() > 0)
+    QStringList exclude_bads = exclude;
+    if (bads.size() > 0)
     {
-        //
-        //   First do the channels to be included
-        //
-        RowVectorXi pick;
-        if (include.size() == 0)
-            pick = RowVectorXi::Ones(fwd.nchan);
-        else
-        {
-            pick = RowVectorXi::Zero(fwd.nchan);
-            for(qint32 k = 0; k < include.size(); ++k)
-            {
-                QList<int> c;
-                for(qint32 l = 0; l < fwd.sol->row_names.size(); ++l)
-                    if(fwd.sol->row_names.at(l).contains(include.at(k),Qt::CaseInsensitive))
-                        pick(l) = 1;
-
-//                    c = strmatch(include{k},fwd.sol->row_names,'exact');
-//                    for p = 1:length(c)
-//                        pick(c(p)) = 1;
-//                    end
-            }
-        }
-        //
-        //   Then exclude what needs to be excluded
-        //
-        if (exclude.size() > 0)
-        {
-            for(qint32 k = 0; k < exclude.size(); ++k)
-            {
-                QList<int> c;
-                for(qint32 l = 0; l < fwd.sol->row_names.size(); ++l)
-                    if(fwd.sol->row_names.at(l).contains(exclude.at(k),Qt::CaseInsensitive))
-                        pick(l) = 0;
-
-//                    c = strmatch(exclude{k},fwd.sol->row_names,'exact');
-//                    for p = 1:length(c)
-//                        pick(c(p)) = 0;
-//                    end
-            }
-        }
-        if (bads.size() > 0)
-        {
-            for(qint32 k = 0; k < bads.size(); ++k)
-            {
-                QList<int> c;
-                for(qint32 l = 0; l < fwd.sol->row_names.size(); ++l)
-                    if(fwd.sol->row_names.at(l).contains(bads.at(k),Qt::CaseInsensitive))
-                        pick(l) = 0;
-
-//                    c = strmatch(bads{k},fwd.sol->row_names,'exact');
-//                    for p = 1:length(c)
-//                        pick(c(p)) = 0;
-//                    end
-            }
-        }
-        //
-        //   Do we have something?
-        //
-        nuse = pick.sum();
-        if (nuse == 0)
-            throw("Nothing remains after picking");
-        //
-        //   Create the selector
-        //
-        qint32 p = 0;
-        MatrixXd t_solData(nuse,fwd.sol->data.cols());
-        QStringList t_solRowNames;
-
-        MatrixXd t_solGradData;// = NULL;
-        QStringList t_solGradRowNames;
-
-        if (!fwd.sol_grad->isEmpty())
-            t_solGradData.resize(nuse, fwd.sol_grad->data.cols());
-
-        for(qint32 k = 0; k < fwd.nchan; ++k)
-        {
-            if(pick(k) > 0)
-            {
-                t_solData.block(p, 0, 1, fwd.sol->data.cols()) = fwd.sol->data.block(k, 0, 1, fwd.sol->data.cols());
-                t_solRowNames.append(fwd.sol->row_names.at(k));
-
-                if (!fwd.sol_grad->isEmpty())
-                {
-                    t_solGradData.block(p, 0, 1, fwd.sol_grad->data.cols()) = fwd.sol_grad->data.block(k, 0, 1, fwd.sol_grad->data.cols());
-                    t_solGradRowNames.append(fwd.sol_grad->row_names.at(k));
-                }
-
-                ++p;
-            }
-        }
-        printf("\t%d out of %d channels remain after picking\n",nuse,fwd.nchan);
-        //
-        //   Pick the correct rows of the forward operator
-        //
-        fwd.nchan          = nuse;
-//        if(fwd.sol->data)
-//            delete fwd.sol->data;
-        fwd.sol->data      = t_solData;
-        fwd.sol->nrow      = nuse;
-        fwd.sol->row_names = t_solRowNames;
-
-        if (!fwd.sol_grad->isEmpty())
-        {
-            fwd.sol_grad->data      = t_solGradData;
-            fwd.sol_grad->nrow      = nuse;
-            fwd.sol_grad->row_names = t_solGradRowNames;
-        }
+        for(qint32 k = 0; k < bads.size(); ++k)
+            if(!exclude_bads.contains(bads[k],Qt::CaseInsensitive))
+                exclude_bads << bads[k];
     }
+
+    fwd = fwd.pick_channels(include, exclude_bads);
+
+//    //
+//    //   Do the channel selection - OLD VERSION
+//    //
+//    if (include.size() > 0 || exclude.size() > 0 || bads.size() > 0)
+//    {
+//        //
+//        //   First do the channels to be included
+//        //
+//        RowVectorXi pick;
+//        if (include.size() == 0)
+//            pick = RowVectorXi::Ones(fwd.nchan);
+//        else
+//        {
+//            pick = RowVectorXi::Zero(fwd.nchan);
+//            for(qint32 k = 0; k < include.size(); ++k)
+//            {
+//                QList<int> c;
+//                for(qint32 l = 0; l < fwd.sol->row_names.size(); ++l)
+//                    if(fwd.sol->row_names.at(l).contains(include.at(k),Qt::CaseInsensitive))
+//                        pick(l) = 1;
+
+////                    c = strmatch(include{k},fwd.sol->row_names,'exact');
+////                    for p = 1:length(c)
+////                        pick(c(p)) = 1;
+////                    end
+//            }
+//        }
+//        //
+//        //   Then exclude what needs to be excluded
+//        //
+//        if (exclude.size() > 0)
+//        {
+//            for(qint32 k = 0; k < exclude.size(); ++k)
+//            {
+//                QList<int> c;
+//                for(qint32 l = 0; l < fwd.sol->row_names.size(); ++l)
+//                    if(fwd.sol->row_names.at(l).contains(exclude.at(k),Qt::CaseInsensitive))
+//                        pick(l) = 0;
+
+////                    c = strmatch(exclude{k},fwd.sol->row_names,'exact');
+////                    for p = 1:length(c)
+////                        pick(c(p)) = 0;
+////                    end
+//            }
+//        }
+//        if (bads.size() > 0)
+//        {
+//            for(qint32 k = 0; k < bads.size(); ++k)
+//            {
+//                QList<int> c;
+//                for(qint32 l = 0; l < fwd.sol->row_names.size(); ++l)
+//                    if(fwd.sol->row_names.at(l).contains(bads.at(k),Qt::CaseInsensitive))
+//                        pick(l) = 0;
+
+////                    c = strmatch(bads{k},fwd.sol->row_names,'exact');
+////                    for p = 1:length(c)
+////                        pick(c(p)) = 0;
+////                    end
+//            }
+//        }
+//        //
+//        //   Do we have something?
+//        //
+//        nuse = pick.sum();
+//        if (nuse == 0)
+//            throw("Nothing remains after picking");
+//        //
+//        //   Create the selector
+//        //
+//        qint32 p = 0;
+//        MatrixXd t_solData(nuse,fwd.sol->data.cols());
+//        QStringList t_solRowNames;
+
+//        MatrixXd t_solGradData;// = NULL;
+//        QStringList t_solGradRowNames;
+
+//        QList<FiffChInfo> chs;
+
+
+//        if (!fwd.sol_grad->isEmpty())
+//            t_solGradData.resize(nuse, fwd.sol_grad->data.cols());
+
+//        for(qint32 k = 0; k < fwd.nchan; ++k)
+//        {
+//            if(pick(k) > 0)
+//            {
+//                t_solData.block(p, 0, 1, fwd.sol->data.cols()) = fwd.sol->data.block(k, 0, 1, fwd.sol->data.cols());
+//                t_solRowNames.append(fwd.sol->row_names[k]);
+
+//                if (!fwd.sol_grad->isEmpty())
+//                {
+//                    t_solGradData.block(p, 0, 1, fwd.sol_grad->data.cols()) = fwd.sol_grad->data.block(k, 0, 1, fwd.sol_grad->data.cols());
+//                    t_solGradRowNames.append(fwd.sol_grad->row_names[k]);
+//                }
+
+//                chs.append(fwd.info.chs[k]);
+
+//                ++p;
+//            }
+//        }
+//        printf("\t%d out of %d channels remain after picking\n",nuse,fwd.nchan);
+//        //
+//        //   Pick the correct rows of the forward operator
+//        //
+//        fwd.nchan          = nuse;
+////        if(fwd.sol->data)
+////            delete fwd.sol->data;
+//        fwd.sol->data      = t_solData;
+//        fwd.sol->nrow      = nuse;
+//        fwd.sol->row_names = t_solRowNames;
+
+//        if (!fwd.sol_grad->isEmpty())
+//        {
+//            fwd.sol_grad->data      = t_solGradData;
+//            fwd.sol_grad->nrow      = nuse;
+//            fwd.sol_grad->row_names = t_solGradRowNames;
+//        }
+
+//        fwd.info.chs = chs;
+//    }
 
     //garbage collecting
     t_pStream->device()->close();

@@ -298,7 +298,7 @@ public:
     * @param[in] exclude   - Channels to exclude (if empty, do not exclude any)
     * @return the selector matrix (row Vector)
     */
-    inline static MatrixXi pick_channels(QStringList& ch_names, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList)
+    inline static RowVectorXi pick_channels(QStringList& ch_names, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList)
     {
         return FiffInfo::pick_channels(ch_names, include, exclude);
     }
@@ -319,9 +319,9 @@ public:
     *
     * @return the desired fiff evoked data set
     */
-    inline static FiffEvokedDataSet pick_channels_evoked(FiffEvokedDataSet& orig, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList)
+    inline static FiffEvokedDataSet pick_channels(FiffEvokedDataSet& orig, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList)
     {
-        return orig.pick_channels_evoked(include, exclude);
+        return orig.pick_channels(include, exclude);
     }
 
     //=========================================================================================================
@@ -339,7 +339,7 @@ public:
     *
     * @return Info modified according to sel
     */
-    inline static FiffInfo pick_info(const FiffInfo& info, const MatrixXi* sel = NULL)
+    inline static FiffInfo pick_info(const FiffInfo& info, const RowVectorXi &sel = defaultVectorXi)
     {
         return info.pick_info(sel);
     }
@@ -363,7 +363,7 @@ public:
     *
     * @return the selector matrix (row vector)
     */
-    inline static RowVectorXi pick_types(FiffInfo &info, bool meg, bool eeg = false, bool stim = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList)
+    inline static RowVectorXi pick_types(FiffInfo &info, bool meg, bool eeg = false, bool stim = false, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList)
     {
         return info.pick_types(meg, eeg, stim, include, exclude);
     }
