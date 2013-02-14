@@ -678,7 +678,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
         {
             printf("\t%d bad channels ( ",bads.size());
             for(qint32 i = 0; i < bads.size(); ++i)
-                printf("%s ", bads[i].toLatin1().constData());
+                printf("\"%s\" ", bads[i].toLatin1().constData());
             printf(") read\n");
         }
     }

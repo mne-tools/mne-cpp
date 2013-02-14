@@ -169,8 +169,10 @@ FiffCov FiffCov::pick_channels(const QStringList &p_include, const QStringList &
     res.kind = this->kind;
     res.diag = this->diag;
     res.dim = sel.size();
+
     for(qint32 k = 0; k < sel.size(); ++k)
         res.names << this->names[sel(k)];
+
     res.data.resize(res.dim, res.dim);
     for(qint32 i = 0; i < res.dim; ++i)
         for(qint32 j = 0; j < res.dim; ++j)
@@ -360,7 +362,6 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
 
     // This actually removes bad channels from the cov, which is not backward
     // compatible, so let's leave all channels in
-
     FiffCov cov_good = cov.pick_channels(info_ch_names, p_exclude);
     QStringList ch_names = cov_good.names;
 
@@ -424,11 +425,17 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
                 MatrixXd P;
                 ncomp = FiffProj::make_projector(t_listProjs, this_ch_names, P);
 
+                std::cout << "P\n" << P << std::endl;
+
                 JacobiSVD<MatrixXd> svd(P, ComputeFullU);
                 //Sort singular values and singular vectors
                 VectorXd t_s = svd.singularValues();
                 MatrixXd t_U = svd.matrixU();
                 MNEMath::sort(t_s, t_U);
+
+                std::cout << "t_s\n" << t_s << std::endl;
+                std::cout << "t_U\n" << t_U << std::endl;
+
 
                 U = t_U.block(0,0, t_U.rows(), t_U.cols()-ncomp);
 
