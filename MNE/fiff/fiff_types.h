@@ -74,7 +74,7 @@ namespace FIFFLIB
 const static QStringList defaultQStringList = QStringList();
 static Eigen::MatrixXd defaultMatrixXd = Eigen::MatrixXd::Constant(1,1,-1);
 const static Eigen::MatrixXi defaultMatrixXi(0,0);
-const static Eigen::VectorXi defaultVectorXi(0);
+const static Eigen::VectorXi defaultVectorXi;
 
 typedef Eigen::Matrix<qint16, Eigen::Dynamic, Eigen::Dynamic> MatrixDau16;
 
