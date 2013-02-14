@@ -547,6 +547,7 @@ void MNEForwardSolution::prepare_forward(const FiffInfo &p_info, const FiffCov &
         t_vecNonZero.conservativeResize(p_outNumNonZero);
 
     if(p_outNumNonZero > 0)
+    {
         if (p_pca)
         {
             qDebug() << "Warning in MNEForwardSolution::prepare_forward: if (p_pca) havent been debugged.";
@@ -566,13 +567,12 @@ void MNEForwardSolution::prepare_forward(const FiffInfo &p_info, const FiffCov &
             std::cout << "p_outNoiseCov.eig:\n" << p_outNoiseCov.eig << std::endl;
             std::cout << "p_outNoiseCov.eigvec:\n" << p_outNoiseCov.eigvec.block(0,0,5,5) << std::endl;
 
-            // Rows of eigvec are the eigenvectors
-            p_outWhitener *= p_outNoiseCov.eigvec;
+            // Cols of eigvec are the eigenvectors
+            p_outWhitener *= p_outNoiseCov.eigvec.transpose();
+
+            std::cout << "p_outWhitener:\n" << p_outWhitener.block(0,0,20,20) << std::endl;
         }
-
-
-
-//    (const FiffInfo &p_info, const FiffCov &p_noise_cov, bool p_pca, FiffInf &p_outFwdInfo, MatrixXd &gain, FiffCov &p_outNoiseCov, MatrixXd &p_outWhitener, qint32 &p_outNumNonZero)
+    }
 
     VectorXi fwd_idx = VectorXi::Zero(ch_names.size());
     VectorXi info_idx = VectorXi::Zero(ch_names.size());
@@ -597,20 +597,13 @@ void MNEForwardSolution::prepare_forward(const FiffInfo &p_info, const FiffCov &
     fwd_idx.conservativeResize(count_fwd_idx);
     info_idx.conservativeResize(count_info_idx);
 
-    qDebug() << "Rows: " << this->sol->data.rows();
-    std::cout << "fwd_idx\n" << fwd_idx << std::endl;
-    std::cout << "fwd_idx size\n" << fwd_idx.size() << std::endl;
-
     gain.resize(count_fwd_idx, this->sol->data.cols());
     for(qint32 i = 0; i < count_fwd_idx; ++i)
-    {
-        qDebug() << i << fwd_idx(i);
         gain.row(i) = this->sol->data.row(fwd_idx(i));
-    }
 
     p_outFwdInfo = p_info.pick_info(info_idx);
 
-//    std::cout << "p_outWhitener:\n" << p_outWhitener.block(0,0,5,5) << std::endl;
+    std::cout << "p_outWhitener:\n" << p_outWhitener.block(0,0,5,5) << std::endl;
 
     qDebug() << "p_outWhitener" << p_outWhitener.rows() << "x" << p_outWhitener.cols();
 
@@ -930,8 +923,10 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
                 Matrix3d tmp = Matrix3d::Identity() - nn*nn.transpose();
 
                 JacobiSVD<MatrixXd> t_svd(tmp, Eigen::ComputeThinU);
-
-                MatrixXd U(t_svd.matrixU());
+                //Sort singular values and singular vectors
+                VectorXd t_s = t_svd.singularValues();
+                MatrixXd U = t_svd.matrixU();
+                MNEMath::sort(t_s, U);
 
                 //
                 //  Make sure that ez is in the direction of nn

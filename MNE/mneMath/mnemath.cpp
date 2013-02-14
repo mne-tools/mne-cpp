@@ -40,7 +40,15 @@
 
 #include "mnemath.h"
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
 #include <iostream>
+#include <algorithm>    // std::sort
+#include <vector>       // std::vector
 
 
 //*************************************************************************************************************
@@ -94,7 +102,7 @@ void MNEMath::get_whitener(MatrixXd& A, bool pca, QString ch_type, VectorXd& eig
     // whitening operator
     qint32 rnk = MNEMath::rank(A);
     SelfAdjointEigenSolver<MatrixXd> t_eigenSolver(A);
-    qDebug() << "check whether eigvec has to be transposed.";
+//    qDebug() << "check whether eigvec has to be transposed.";
     eig = t_eigenSolver.eigenvalues();
     for(qint32 i = rnk; i < eig.size(); ++i)
         eig(i) = 0;
@@ -241,4 +249,51 @@ qint32 MNEMath::rank(MatrixXd& A, double tol)
     for(qint32 i = 0; i < s.size(); ++i)
         sum += s[i] > t_dMax ? 1 : 0;
     return sum;
+}
+
+
+//*************************************************************************************************************
+
+VectorXi MNEMath::sort(VectorXd& v)
+{
+    std::vector<IdxDoubleValue> t_vecIdxDoubleValue;
+    VectorXi idx(v.size());
+
+    if(v.size() > 0)
+    {
+        //fill temporal vector
+        for(qint32 i = 0; i < v.size(); ++i)
+            t_vecIdxDoubleValue.push_back(IdxDoubleValue(i, v[i]));
+
+        //sort temporal vector
+        std::sort(t_vecIdxDoubleValue.begin(), t_vecIdxDoubleValue.end(), MNEMath::compareIdxValuePair);
+
+        //store results
+        for(qint32 i = 0; i < v.size(); ++i)
+        {
+            idx[i] = t_vecIdxDoubleValue[i].first;
+            v[i] = t_vecIdxDoubleValue[i].second;
+        }
+    }
+
+    return idx;
+}
+
+
+//*************************************************************************************************************
+
+VectorXi MNEMath::sort(VectorXd &v_prime, MatrixXd &mat)
+{
+    VectorXi idx = MNEMath::sort(v_prime);
+
+    if(v_prime.size() > 0)
+    {
+        //sort Matrix
+        MatrixXd newMat(mat.rows(), mat.cols());
+        for(qint32 i = 0; i < idx.size(); ++i)
+            newMat.col(i) = mat.col(idx[i]);
+        mat = newMat;
+    }
+
+    return idx;
 }

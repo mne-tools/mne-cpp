@@ -39,6 +39,8 @@
 //=============================================================================================================
 
 #include "fiff_proj.h"
+#include <mneMath/mnemath.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -53,6 +55,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace MNEMATHLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
 
@@ -254,8 +257,11 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
     //   Reorthogonalize the vectors
     //
 //    qDebug() << "Attention Jacobi SVD is used, not the MATLAB lapack version. Since the SVD is not unique the results might be a bit different!";
-    JacobiSVD<MatrixXd> svd(vecs.block(0,0,vecs.rows(),nvec), ComputeThinU);
+    JacobiSVD<MatrixXd> svd(vecs.block(0,0,vecs.rows(),nvec), ComputeFullU);
+    //Sort singular values and singular vectors
     VectorXd S = svd.singularValues();
+    MatrixXd t_U = svd.matrixU();
+    MNEMath::sort(S, t_U);
 
     //
     //   Throw away the linearly dependent guys
@@ -269,7 +275,7 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
         }
     }
 
-    U = svd.matrixU().block(0, 0, vecs.rows(), nvec);
+    U = t_U.block(0, 0, vecs.rows(), nvec);
 
     //
     //   Here is the celebrated result
