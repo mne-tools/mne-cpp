@@ -169,125 +169,25 @@ RowVectorXi FiffInfoBase::pick_types(bool meg, bool eeg, bool stim, const QStrin
 
 RowVectorXi FiffInfoBase::pick_channels(const QStringList& ch_names, const QStringList& include, const QStringList& exclude)
 {
-    qint32 nchan = ch_names.size();
-    RowVectorXi sel = RowVectorXi::Zero(nchan);
-    qint32 i, k, p, c, count, nzero;
-    if (include.size() == 0 && exclude.size() == 0)
-    {
-        sel.setOnes();
-        for(k = 0; k < nchan; ++k)
-            sel[k] = k;//+1 using MATLAB notation
-        return sel;
-    }
+    RowVectorXi sel = RowVectorXi::Zero(ch_names.size());
 
-    if (include.size() == 0)
-    {
-        //
-        //   Include all initially
-        //
-        sel.setZero();
-        for (k = 0; k < nchan; ++k)
-            sel[k] = k; //+1 using MATLAB notation
+    QStringList t_includedSelection;
 
-        nzero = 0;
-        for(k = 0; k < exclude.size(); ++k)
+    qint32 count = 0;
+    for(qint32 k = 0; k < ch_names.size(); ++k)
+    {
+        if( (include.size() == 0 || include.contains(ch_names[k])) && !exclude.contains(ch_names[k]))
         {
-            count = 0;
-            for (i = ch_names.size()-1; i >= 0 ; --i)
+            //make sure channel is unique
+            if(!t_includedSelection.contains(ch_names[k]))
             {
-                if (QString::compare(exclude[k],ch_names[i]) == 0)
-                {
-                    ++count;
-                    c = i;
-                }
+                sel[count] = k;
+                ++count;
+                t_includedSelection << ch_names[k];
             }
-            if(count > 0)
-            {
-                sel[c] = -1;//to elimnate channels use -1 instead of 0 - cause its zero based indexed
-                ++nzero;
-            }
-        }
-        //
-        //  Check for exclusions
-        //
-        if(nzero > 0)
-        {
-            RowVectorXi newsel = RowVectorXi::Zero(nchan-nzero);
-            p = 0;
-            for(k = 0; k < nchan; ++k)
-            {
-                if (sel[k] >= 0)
-                {
-                    newsel[p] = sel[k];
-                    ++p;
-                }
-            }
-            sel = newsel;
         }
     }
-    else
-    {
-        //
-        //   First do the channels to be included
-        //
-        sel.resize(include.size());
-        sel.setZero();
-        nzero = 0;
-        for(k = 0; k < include.size(); ++k)
-        {
-            count = 0;
-            for (i = ch_names.size()-1; i >= 0 ; --i)
-            {
-                if (QString::compare(include[k],ch_names[i]) == 0)
-                {
-                    count += 1;
-                    c = i;
-                }
-            }
-            if (count == 0)
-                printf("Missing channel %s\n",include[k].toUtf8().constData());
-            else if (count > 1)
-                printf("Ambiguous channel, taking first occurence: %s",include[k].toUtf8().constData());
-
-            //
-            //  Is this channel in the exclusion list?
-            //
-            sel[k] = c;//+1 using MATLAB notation
-            if (exclude.size() > 0)
-            {
-                count = 0;
-                for (i = 0; i < exclude.size(); ++i)
-                {
-                    if (QString::compare(include[k],exclude[i]) == 0)
-                        ++count;
-                }
-                if (count > 0)
-                {
-                    sel[k] = -1;//to elimnate channels use -1 instead of 0 - cause its zero based indexed
-                    ++nzero;
-                }
-            }
-        }
-        //
-        //    Check whether some channels were excluded
-        //
-        if (nzero > 0)
-        {
-            RowVectorXi newsel = RowVectorXi::Zero(include.size()-nzero);
-
-            p = 0;
-            for(k = 0; k < include.size(); ++k)
-            {
-                if (sel(0,k) >= 0) // equal also cause of zero based picking
-                {
-                    newsel[p] = sel[k];
-                    ++p;
-                }
-            }
-            sel.resize(newsel.cols());
-            sel = newsel;
-        }
-    }
+    sel.conservativeResize(count);
     return sel;
 }
 

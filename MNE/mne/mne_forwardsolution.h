@@ -143,7 +143,7 @@ public:
     * @param[in] bExcludeBads  If true bads are also read; default = false (optional)
     *
     */
-    MNEForwardSolution(QIODevice &p_IODevice, bool force_fixed = false, bool surf_ori = false, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList, bool bExcludeBads = true);
+    MNEForwardSolution(QIODevice &p_IODevice, bool force_fixed = false, bool surf_ori = false, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList, bool bExcludeBads = false);
 
     //=========================================================================================================
     /**
