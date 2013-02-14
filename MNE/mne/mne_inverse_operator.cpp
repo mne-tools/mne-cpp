@@ -123,16 +123,22 @@ MNEInverseOperator::~MNEInverseOperator()
 
 //*************************************************************************************************************
 
-MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNEForwardSolution &forward, FiffCov &noise_cov, float loose, float depth)
+MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNEForwardSolution &forward, FiffCov &noise_cov, float loose, float depth, bool fixed, bool limit_depth_chs)
 {
     bool t_bIsFixedOri = forward.isFixedOrient();
     MNEInverseOperator t_MNEInverseOperator;
 
     //Check parameters
-    if(t_bIsFixedOri && loose > 0)
+    if(fixed && loose > 0)
     {
-        printf("Ignoring loose parameter given a forward solution with fixed orientation.\n");
+        printf("Warning: When invoking make_inverse_operator with fixed = true, the loose parameter is ignored.\n");
         loose = 0.0f;
+    }
+
+    if(t_bIsFixedOri && !fixed)
+    {
+        printf("Warning: Setting fixed parameter = true. Because the given forward operator has fixed orientation and can only be used to make a fixed-orientation inverse operator.\n");
+        fixed = true;
     }
 
     if(forward.source_ori == -1 && loose > 0)
@@ -155,6 +161,12 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
         printf("Setting depth to %f.\n", depth);
     }
 
+    //
+    // 1. Read the bad channels
+    // 2. Read the necessary data from the forward solution matrix file
+    // 3. Load the projection data
+    // 4. Load the sensor noise covariance matrix and attach it to the forward
+    //
     FiffInfo gain_info;
     MatrixXd gain;
     MatrixXd whitener;

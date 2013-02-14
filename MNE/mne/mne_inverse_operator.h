@@ -138,15 +138,17 @@ public:
     /**
     * Assembles the inverse operator.
     *
-    * @param [in] info          The measurement info to specify the channels to include. Bad channels in info['bads'] are not used.
-    * @param [in] forward       Forward operator.
-    * @param [in] noise_cov     The noise covariance matrix.
-    * @param [in] loose         float in [0, 1]. Value that weights the source variances of the dipole components defining the tangent space of the cortical surfaces.
-    * @param [in] depth         float in [0, 1]. Depth weighting coefficients. If None, no depth weighting is performed.
+    * @param[in] info               The measurement info to specify the channels to include. Bad channels in info['bads'] are not used.
+    * @param[in] forward            Forward operator.
+    * @param[in] noise_cov          The noise covariance matrix.
+    * @param[in] loose              float in [0, 1]. Value that weights the source variances of the dipole components defining the tangent space of the cortical surfaces.
+    * @param[in] depth              float in [0, 1]. Depth weighting coefficients. If None, no depth weighting is performed.
+    * @param[in] fixed              Use fixed source orientations normal to the cortical mantle. If True, the loose parameter is ignored.
+    * @param[in] limit_depth_chs    If True, use only grad channels in depth weighting (equivalent to MNE C code). If grad chanels aren't present, only mag channels will be used (if no mag, then eeg). If False, use all channels.
     *
     * @return the assembled inverse operator
     */
-    static MNEInverseOperator make_inverse_operator(FiffInfo &info, MNEForwardSolution &forward, FiffCov& noise_cov, float loose = 0.2f, float depth = 0.8f);
+    static MNEInverseOperator make_inverse_operator(FiffInfo &info, MNEForwardSolution &forward, FiffCov& noise_cov, float loose = 0.2f, float depth = 0.8f, bool fixed = false, bool limit_depth_chs = true);
 
     //=========================================================================================================
     /**
@@ -156,10 +158,10 @@ public:
     *
     * Prepare for actually computing the inverse
     *
-    * @param [in] nave      Number of averages (scales the noise covariance)
-    * @param [in] lambda2   The regularization factor
-    * @param [in] dSPM      Compute the noise-normalization factors for dSPM?
-    * @param [in] sLORETA   Compute the noise-normalization factors for sLORETA?
+    * @param[in] nave      Number of averages (scales the noise covariance)
+    * @param[in] lambda2   The regularization factor
+    * @param[in] dSPM      Compute the noise-normalization factors for dSPM?
+    * @param[in] sLORETA   Compute the noise-normalization factors for sLORETA?
     *
     * @return the prepared inverse operator
     */

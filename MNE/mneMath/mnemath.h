@@ -95,6 +95,8 @@ using namespace Eigen;
 class MNEMATHSHARED_EXPORT MNEMath
 {
 public:
+    typedef std::pair<int,double> IdxDoubleValue;
+
     //=========================================================================================================
     /**
     * Destroys the MNEMath object
@@ -177,7 +179,50 @@ public:
     * @return rank of matrix A
     */
     static qint32 rank(MatrixXd& A, double tol = 1e-8);
+
+    //=========================================================================================================
+    /**
+    * Sorts a vector (ascending order) in place and returns the track of the original indeces
+    *
+    * @param[in, out] v      vector to sort; it#s sorted in place
+    *
+    * @return Vector of the original indeces in the new order
+    */
+    static VectorXi sort(VectorXd &v);
+
+    //=========================================================================================================
+    /**
+    * Sorts a vector (ascending order) and a corresponding matrix in place and returns the track of the original indeces
+    * The matrix is sorted along the columns using the vector values for comparison.
+    *
+    * @param[in, out] v_prime      vector to sort (sorted in place)
+    * @param[in, out] mat          matrix to sort (sorted in place)
+    *
+    * @return Vector of the original indeces in the new order
+    */
+    static VectorXi sort(VectorXd &v_prime, MatrixXd &mat);
+
+    //=========================================================================================================
+    /**
+    * Compares two index-value-pairs.
+    *
+    * @param[in] lhs    left hand side of the comparison
+    * @param[in] rhs    right hand side of the comparison
+    *
+    * @return true if value of lhs is bigger than value of rhs
+    */
+    static inline bool compareIdxValuePair( const IdxDoubleValue& lhs, const IdxDoubleValue& rhs);
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline bool MNEMath::compareIdxValuePair( const IdxDoubleValue& lhs, const IdxDoubleValue& rhs)
+{
+    return lhs.second > rhs.second;
+}
 
 
 } // NAMESPACE

@@ -425,7 +425,12 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
                 ncomp = FiffProj::make_projector(t_listProjs, this_ch_names, P);
 
                 JacobiSVD<MatrixXd> svd(P, ComputeFullU);
-                U = svd.matrixU().block(0,0, svd.matrixU().rows(), svd.matrixU().cols()-ncomp);
+                //Sort singular values and singular vectors
+                VectorXd t_s = svd.singularValues();
+                MatrixXd t_U = svd.matrixU();
+                MNEMath::sort(t_s, t_U);
+
+                U = t_U.block(0,0, t_U.rows(), t_U.cols()-ncomp);
 
                 if (ncomp > 0)
                 {
