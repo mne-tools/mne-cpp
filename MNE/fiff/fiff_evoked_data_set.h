@@ -146,7 +146,7 @@ public:
     *
     * @return the desired fiff evoked data set
     */
-    FiffEvokedDataSet pick_channels_evoked(QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
+    FiffEvokedDataSet pick_channels(const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList);
 
     //=========================================================================================================
     /**

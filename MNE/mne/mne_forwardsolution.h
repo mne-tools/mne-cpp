@@ -140,8 +140,10 @@ public:
     * @param[in] surf_ori      Use surface based source coordinate system? (optional)
     * @param[in] include       Include these channels (optional)
     * @param[in] exclude       Exclude these channels (optional)
+    * @param[in] bExcludeBads  If true bads are also read; default = false (optional)
+    *
     */
-    MNEForwardSolution(QIODevice &p_IODevice, bool force_fixed = false, bool surf_ori = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
+    MNEForwardSolution(QIODevice &p_IODevice, bool force_fixed = false, bool surf_ori = false, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList, bool bExcludeBads = true);
 
     //=========================================================================================================
     /**
@@ -243,17 +245,17 @@ public:
     *
     * Reads a forward solution from a fif file
     *
-    * @param [in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
-    * @param [out] fwd          A forward solution from a fif file
-    * @param [in] force_fixed   Force fixed source orientation mode? (optional)
-    * @param [in] surf_ori      Use surface based source coordinate system? (optional)
-    * @param [in] include       Include these channels (optional)
-    * @param [in] exclude       Exclude these channels (optional)
+    * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
+    * @param[out] fwd          A forward solution from a fif file
+    * @param[in] force_fixed   Force fixed source orientation mode? (optional)
+    * @param[in] surf_ori      Use surface based source coordinate system? (optional)
+    * @param[in] include       Include these channels (optional)
+    * @param[in] exclude       Exclude these channels (optional)
+    * @param[in] bExcludeBads  If true bads are also read; default = false (optional)
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_forward_solution(QIODevice& p_IODevice, MNEForwardSolution& fwd, bool force_fixed = false, bool surf_ori = false, QStringList& include = defaultQStringList, QStringList& exclude = defaultQStringList);
-
+    static bool read_forward_solution(QIODevice& p_IODevice, MNEForwardSolution& fwd, bool force_fixed = false, bool surf_ori = false, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList, bool bExcludeBads = true);
 
 //    //=========================================================================================================
 //    /**
@@ -309,7 +311,7 @@ public:
     * @param[out] p_outWhitener     Whitener
     * @param[out] p_outNumNonZero   the rank (non zeros)
     */
-    void prepare_forward(const FiffInfo &p_info, const FiffCov &p_noise_cov, bool p_pca, QStringList &ch_names, MatrixXd &gain, FiffCov &p_outNoiseCov, MatrixXd &p_outWhitener, qint32 &p_outNumNonZero);
+    void prepare_forward(const FiffInfo &p_info, const FiffCov &p_noise_cov, bool p_pca, FiffInfo &p_outFwdInfo, MatrixXd &gain, FiffCov &p_outNoiseCov, MatrixXd &p_outWhitener, qint32 &p_outNumNonZero);
 
 private:
     //=========================================================================================================

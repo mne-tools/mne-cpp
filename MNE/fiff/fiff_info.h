@@ -189,7 +189,7 @@ public:
     *
     * @return Info modified according to sel
     */
-    FiffInfo pick_info(const MatrixXi* sel = NULL) const;
+    FiffInfo pick_info(const RowVectorXi &sel = defaultVectorXi) const;
 
     //=========================================================================================================
     /**

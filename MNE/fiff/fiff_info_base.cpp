@@ -40,6 +40,8 @@
 
 #include "fiff_info_base.h"
 
+#include <iostream>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -187,7 +189,7 @@ RowVectorXi FiffInfoBase::pick_channels(const QStringList& ch_names, const QStri
         for (k = 0; k < nchan; ++k)
             sel[k] = k; //+1 using MATLAB notation
 
-        qint32 nzero = 0;
+        nzero = 0;
         for(k = 0; k < exclude.size(); ++k)
         {
             count = 0;
@@ -199,7 +201,6 @@ RowVectorXi FiffInfoBase::pick_channels(const QStringList& ch_names, const QStri
                     c = i;
                 }
             }
-            nzero = 0;//does this make sense? - its here because its in the MATLAB file
             if(count > 0)
             {
                 sel[c] = -1;//to elimnate channels use -1 instead of 0 - cause its zero based indexed
