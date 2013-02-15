@@ -433,6 +433,103 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution &p_fwdOut, 
 
 //*************************************************************************************************************
 
+MatrixXd MNEForwardSolution::compute_depth_prior(const MatrixXd &Gain, const FiffInfo &gain_info, bool is_fixed_ori, double exp, double limit, MatrixXd &patch_areas, bool limit_depth_chs)
+{
+    printf("\tCreating the depth weighting matrix...\n");
+
+    MatrixXd G(Gain);
+    // If possible, pick best depth-weighting channels
+    if(limit_depth_chs)
+        MNEForwardSolution::restrict_gain_matrix(G, gain_info);
+
+    VectorXd d;
+    // Compute the gain matrix
+    if(is_fixed_ori)
+    {
+        d = (G*G).rowwise().sum(); //is this correct - is G squared?
+//            d = np.sum(G ** 2, axis=0)
+    }
+    else
+    {
+        qint32 n_pos = G.cols() / 3;
+        d = VectorXd::Zero(n_pos);
+        MatrixXd Gk;
+        for (qint32 k = 0; k < n_pos; ++k)
+        {
+            Gk = G.block(0,3*k, G.rows(), 3);
+
+            JacobiSVD<MatrixXd> svd(Gk.transpose()*Gk);
+            d[k] = svd.singularValues().maxCoeff();
+        }
+    }
+
+    // ToDo Currently the fwd solns never have "patch_areas" defined
+//        if patch_areas is not None:
+//            d /= patch_areas ** 2
+//            logger.info('    Patch areas taken into account in the depth '
+//                        'weighting')
+
+    qint32 n_limit;
+    VectorXd w = d.cwiseInverse();
+    VectorXd ws = w;
+    VectorXd wpp;
+    MNEMath::sort(ws);
+    double weight_limit = pow(limit, 2);
+    if (!limit_depth_chs)
+    {
+        // match old mne-python behavor
+        qint32 ind;
+        ws.minCoeff(&ind);
+        n_limit = ind;
+        limit = ws[ind] * weight_limit;
+    }
+    else
+    {
+        // match C code behavior
+        limit = ws[ws.size()-1];
+        qint32 ind;
+        n_limit = d.size();
+        if (ws[ws.size()-1] > weight_limit * ws[0])
+        {
+            double th = weight_limit * ws[0];
+            for(qint32 i = 0; i < ws.size(); ++i)
+            {
+                if(ws[i] > th)
+                {
+                    ind = i;
+                    break;
+                }
+            }
+            limit = ws[ind];
+            n_limit = ind;
+        }
+    }
+
+    printf("\tlimit = %d/%d = %f", n_limit + 1, d.size(), sqrt(limit / ws[0]));
+    double scale = 1.0 / limit;
+    printf("\tscale = %g exp = %g", scale, exp);
+
+    VectorXd t_w = w.array() / limit;
+    for(qint32 i = 0; i < t_w.size(); ++i)
+        t_w[i] = t_w[i] > 1 ? 1 : t_w[i];
+    wpp = t_w.array().pow(exp);
+
+    MatrixXd depth_prior;
+    if(is_fixed_ori)
+        depth_prior = wpp;
+    else
+    {
+        depth_prior.resize(wpp.rows(), 3);
+        for(qint32 i = 0; i < 3; ++i)
+            depth_prior.col(i) = wpp;
+    }
+
+    return depth_prior;
+}
+
+
+//*************************************************************************************************************
+
 MNEForwardSolution MNEForwardSolution::pick_channels(const QStringList& include, const QStringList& exclude) const
 {
     MNEForwardSolution fwd(*this);
@@ -551,8 +648,10 @@ void MNEForwardSolution::prepare_forward(const FiffInfo &p_info, const FiffCov &
         if (p_pca)
         {
             qDebug() << "Warning in MNEForwardSolution::prepare_forward: if (p_pca) havent been debugged.";
-            p_outWhitener = MatrixXd::Zero(p_outNumNonZero, n_chan);
+            p_outWhitener = MatrixXd::Zero(n_chan, p_outNumNonZero);
             // Rows of eigvec are the eigenvectors
+            for(qint32 i = 0; i < p_outNumNonZero; ++i)
+                p_outWhitener.col(t_vecNonZero[i]) = p_outNoiseCov.eigvec.col(t_vecNonZero[i]).array() / sqrt(p_outNoiseCov.eig(t_vecNonZero[i]));
 //            whitener = noise_cov['eigvec'][nzero] / np.sqrt(eig[nzero])[:, None]
             printf("\tReducing data rank to %d.\n", p_outNumNonZero);
         }
@@ -563,9 +662,10 @@ void MNEForwardSolution::prepare_forward(const FiffInfo &p_info, const FiffCov &
             for(qint32 i = 0; i < p_outNumNonZero; ++i)
                 p_outWhitener(t_vecNonZero[i],t_vecNonZero[i]) = 1.0 / sqrt(p_outNoiseCov.eig(t_vecNonZero[i]));
 
-            std::cout << "p_outWhitener:\n" << p_outWhitener.block(0,0,20,20) << std::endl;
-            std::cout << "p_outNoiseCov.eig:\n" << p_outNoiseCov.eig << std::endl;
-            std::cout << "p_outNoiseCov.eigvec:\n" << p_outNoiseCov.eigvec.block(0,0,5,5) << std::endl;
+            qDebug() << "MNEForwardSolution::prepare_forward: A";
+//            std::cout << "p_outWhitener:\n" << p_outWhitener.block(0,0,20,20) << std::endl;
+//            std::cout << "p_outNoiseCov.eig:\n" << p_outNoiseCov.eig << std::endl;
+//            std::cout << "p_outNoiseCov.eigvec:\n" << p_outNoiseCov.eigvec.block(0,0,5,5) << std::endl;
 
             // Cols of eigvec are the eigenvectors
             p_outWhitener *= p_outNoiseCov.eigvec.transpose();
@@ -603,13 +703,13 @@ void MNEForwardSolution::prepare_forward(const FiffInfo &p_info, const FiffCov &
 
     p_outFwdInfo = p_info.pick_info(info_idx);
 
-    std::cout << "p_outWhitener:\n" << p_outWhitener.block(0,0,5,5) << std::endl;
+    printf("\tTotal rank is %d\n", p_outNumNonZero);
 
-    qDebug() << "p_outWhitener" << p_outWhitener.rows() << "x" << p_outWhitener.cols();
-
-    qDebug() << "gain" << gain.rows() << "x" << gain.cols();
-
-    std::cout << "whitened gain:\n" << (p_outWhitener * gain).block(0,0,5,5) << std::endl;
+    //DEBUG
+//    std::cout << "p_outWhitener:\n" << p_outWhitener.block(0,0,5,5) << std::endl;
+//    qDebug() << "p_outWhitener" << p_outWhitener.rows() << "x" << p_outWhitener.cols();
+//    qDebug() << "gain" << gain.rows() << "x" << gain.cols();
+//    std::cout << "whitened gain:\n" << (p_outWhitener * gain).block(0,0,5,5) << std::endl;
 }
 
 
@@ -1210,4 +1310,50 @@ bool MNEForwardSolution::read_one(FiffStream* p_pStream, const FiffDirTree& p_No
     if (t_pTag)
         delete t_pTag;
     return true;
+}
+
+
+//*************************************************************************************************************
+
+void MNEForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
+{
+    // Figure out which ones have been used
+    if(info.chs.size() != G.rows())
+    {
+        printf("Error G.rows() and length of info.chs do not match: %d != %d", G.rows(), info.chs.size()); //ToDo throw
+        return;
+    }
+
+    RowVectorXi sel = info.pick_types(QString("grad"));
+    if(sel.size() > 0)
+    {
+        for(qint32 i = 0; i < sel.size(); ++i)
+            G.row(i) = G.row(sel[i]);
+        G.conservativeResize(sel.size(), G.cols());
+        printf("\t%d planar channels", sel.size());
+    }
+    else
+    {
+        sel = info.pick_types(QString("mag"));
+        if (sel.size() > 0)
+        {
+            for(qint32 i = 0; i < sel.size(); ++i)
+                G.row(i) = G.row(sel[i]);
+            G.conservativeResize(sel.size(), G.cols());
+            printf("\t%d magnetometer or axial gradiometer channels", sel.size());
+        }
+        else
+        {
+            sel = info.pick_types(false, true);
+            if(sel.size() > 0)
+            {
+                for(qint32 i = 0; i < sel.size(); ++i)
+                    G.row(i) = G.row(sel[i]);
+                G.conservativeResize(sel.size(), G.cols());
+                printf("\t%d EEG channels\n", sel.size());
+            }
+            else
+                printf("Could not find MEG or EEG channels\n");
+        }
+    }
 }

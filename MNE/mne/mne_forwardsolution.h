@@ -65,6 +65,8 @@
 #include "mne_sourcespace.h"
 
 #include <fiff/fiff_info_base.h>
+#include <mneMath/mnemath.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -109,6 +111,7 @@ namespace MNELIB
 //=============================================================================================================
 
 using namespace Eigen;
+using namespace MNEMATHLIB;
 using namespace FIFFLIB;
 using namespace FSLIB;
 
@@ -178,6 +181,22 @@ public:
     * @return true if succeeded, false otherwise
     */
     bool cluster_forward_solution(MNEForwardSolution &p_fwdOut, const Annotation &p_LHAnnotation, const Annotation &p_RHAnnotation, qint32 p_iClusterSize);
+
+    //=========================================================================================================
+    /**
+    * Compute weighting for depth prior
+    *
+    * @param[in] Gain               gain matrix
+    * @param[in] gain_info          The measurement info to specify the channels to include.
+    * @param[in] is_fixed_ori       Fixed orientation?
+    * @param[in] exp                float in [0, 1]. Depth weighting coefficients. If None, no depth weighting is performed. (optional; default = 0.8)
+    * @param[in] limit              (optional; default = 10.0)
+    * @param[in] patch_areas        (optional)
+    * @param[in] limit_depth_chs    If True, use only grad channels in depth weighting (equivalent to MNE C code). If grad chanels aren't present, only mag channels will be used (if no mag, then eeg). If False, use all channels. (optional)
+    *
+    * @return the depth prior
+    */
+    static MatrixXd compute_depth_prior(const MatrixXd &Gain, const FiffInfo &gain_info, bool is_fixed_ori, double exp = 0.8, double limit = 10.0, MatrixXd &patch_areas = defaultMatrixXd, bool limit_depth_chs = false);
 
     //=========================================================================================================
     /**
@@ -312,6 +331,15 @@ public:
     * @param[out] p_outNumNonZero   the rank (non zeros)
     */
     void prepare_forward(const FiffInfo &p_info, const FiffCov &p_noise_cov, bool p_pca, FiffInfo &p_outFwdInfo, MatrixXd &gain, FiffCov &p_outNoiseCov, MatrixXd &p_outWhitener, qint32 &p_outNumNonZero);
+
+    //=========================================================================================================
+    /**
+    * Restrict gain matrix entries for optimal depth weighting
+    *
+    * @param[in, out] G     Gain matrix to be restricted; result is stored in place.
+    * @param[in] info       Fiff information
+    */
+    static void restrict_gain_matrix(MatrixXd &G, const FiffInfo &info);
 
 private:
     //=========================================================================================================

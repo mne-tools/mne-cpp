@@ -122,12 +122,12 @@ void FiffProj::activate_projs(QList<FiffProj> &p_qListFiffProj)
 
 //*************************************************************************************************************
 
-fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringList& ch_names, MatrixXd& proj, const QStringList& bads, MatrixXd& U)
+fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringList& ch_names, MatrixXd& proj, const QStringList& bads, MatrixXd& U, bool include_active)
 {
     fiff_int_t nchan = ch_names.size();
     if (nchan == 0)
     {
-        printf("No channel names specified\n");
+        printf("No channel names specified\n");//ToDo throw here
         return 0;
     }
 
@@ -135,6 +135,7 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
 //        delete proj;
     proj = MatrixXd::Identity(nchan,nchan);
     fiff_int_t nproj = 0;
+    U = MatrixXd();
 
     //
     //   Check trivial cases first
@@ -142,19 +143,18 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
     if (projs.size() == 0)
         return 0;
 
-    fiff_int_t nactive = 0;
     fiff_int_t nvec    = 0;
     fiff_int_t k, l;
     for (k = 0; k < projs.size(); ++k)
     {
-        if (projs[k].active)
+        if (!projs[k].active || include_active)
         {
-            ++nactive;
+            ++nproj;
             nvec += projs[k].data->nrow;
         }
     }
 
-    if (nactive == 0)
+    if (nproj == 0)
         return 0;
 
     //
@@ -166,17 +166,13 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
     qint32 p, c, i, j, v;
     double onesize;
     bool isBad = false;
-    MatrixXi sel(1, nchan);
-    MatrixXi vecSel(1, nchan);
+    RowVectorXi sel(nchan);
+    RowVectorXi vecSel(nchan);
     sel.setConstant(-1);
     vecSel.setConstant(-1);
     for (k = 0; k < projs.size(); ++k)
     {
-        sel.resize(1, nchan);
-        vecSel.resize(1, nchan);
-        sel.setConstant(-1);
-        vecSel.setConstant(-1);
-        if (projs[k].active)
+        if (!projs[k].active || include_active)
         {
             FiffProj one = projs[k];
 
@@ -194,6 +190,10 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
             // Get the two selection vectors to pick correct elements from
             // the projection vectors omitting bad channels
             //
+            sel.resize(nchan);
+            vecSel.resize(nchan);
+            sel.setConstant(-1);
+            vecSel.setConstant(-1);
             p = 0;
             for (c = 0; c < nchan; ++c)
             {
@@ -210,18 +210,18 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
                             }
                         }
 
-                        if (!isBad && sel(0,p) != c)
+                        if (!isBad && sel[p] != c)
                         {
-                            sel(0,p) = c;
-                            vecSel(0, p) = i;
+                            sel[p] = c;
+                            vecSel[p] = i;
                             ++p;
                         }
 
                     }
                 }
             }
-            sel.conservativeResize(1, p);
-            vecSel.conservativeResize(1, p);
+            sel.conservativeResize(p);
+            vecSel.conservativeResize(p);
             //
             // If there is something to pick, pickit
             //
@@ -229,7 +229,7 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
             {
                 for (v = 0; v < one.data->nrow; ++v)
                     for (i = 0; i < p; ++i)
-                        vecs(sel(0,i),nvec+v) = one.data->data(v,vecSel(i));
+                        vecs(sel[i],nvec+v) = one.data->data(v,vecSel[i]);
                 //
                 //   Rescale for more straightforward detection of small singular values
                 //
