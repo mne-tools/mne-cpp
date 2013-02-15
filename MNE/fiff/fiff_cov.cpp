@@ -423,19 +423,13 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
                     this_ch_names << ch_names[idx[k]];
 
                 MatrixXd P;
-                ncomp = FiffProj::make_projector(t_listProjs, this_ch_names, P);
-
-                std::cout << "P\n" << P << std::endl;
+                ncomp = FiffProj::make_projector(t_listProjs, this_ch_names, P); //ToDo: Synchronize with mne-python and debug
 
                 JacobiSVD<MatrixXd> svd(P, ComputeFullU);
                 //Sort singular values and singular vectors
                 VectorXd t_s = svd.singularValues();
                 MatrixXd t_U = svd.matrixU();
                 MNEMath::sort(t_s, t_U);
-
-                std::cout << "t_s\n" << t_s << std::endl;
-                std::cout << "t_U\n" << t_U << std::endl;
-
 
                 U = t_U.block(0,0, t_U.rows(), t_U.cols()-ncomp);
 

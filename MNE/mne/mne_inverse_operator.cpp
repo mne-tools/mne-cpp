@@ -173,6 +173,30 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
     qint32 n_nzero;
     forward.prepare_forward(info, noise_cov, false, gain_info, gain, noise_cov, whitener, n_nzero);
 
+    //
+    // 5. Compose the depth weight matrix
+    //
+    MatrixXd t_depth_prior;
+    MatrixXd patch_areas;
+    if(depth > 0)
+    {
+        qDebug() << "ToDo: patch_areas";
+//        patch_areas = forward.get('patch_areas', None)
+        t_depth_prior = MNEForwardSolution::compute_depth_prior(gain, gain_info, t_bIsFixedOri, depth, 10.0, patch_areas, limit_depth_chs);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
     return t_MNEInverseOperator;
 }
 
