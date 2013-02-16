@@ -149,6 +149,17 @@ public:
     */
     static fiff_int_t make_projector(const QList<FiffProj>& projs, const QStringList& ch_names, MatrixXd& proj, const QStringList& bads = defaultQStringList, MatrixXd& U = defaultMatrixXd, bool include_active = true);
 
+    //=========================================================================================================
+    /**
+    * overloading the stream out operator<<
+    *
+    * @param[in] out           The stream to which the fiff projector should be assigned to.
+    * @param[in] p_FiffProj    Fiff projector which should be assigned to the stream.
+    *
+    * @return the stream with the attached fiff projector
+    */
+    friend std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffProj &p_FiffProj);
+
 public:
     fiff_int_t kind;                /**< Fiff kind */
     bool active;                    /**< If fiff projector active */
@@ -156,6 +167,22 @@ public:
 
     FiffNamedMatrix::SDPtr data;    /**< Projector data */
 };
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffProj &p_FiffProj)
+{
+    out << "#### Fiff Projector ####\n";
+    out << "\tKind: " << p_FiffProj.kind << std::endl;
+    out << "\tactive: " << p_FiffProj.active << std::endl;
+    out << "\tdesc: " << p_FiffProj.desc.toLatin1().constData() << std::endl;
+    out << "\tdata:\n" << *p_FiffProj.data.data() << std::endl;
+    return out;
+}
 
 } // NAMESPACE
 

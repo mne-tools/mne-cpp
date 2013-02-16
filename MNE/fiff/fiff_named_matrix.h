@@ -168,6 +168,17 @@ public:
 //    */
 //    inline FiffNamedMatrix& operator=(const FiffNamedMatrix& rhs);
 
+    //=========================================================================================================
+    /**
+    * overloading the stream out operator<<
+    *
+    * @param[in] out                The stream to which the fiff projector should be assigned to.
+    * @param[in] p_FiffNamedMatrix  Fiff named matrix which should be assigned to the stream.
+    *
+    * @return the stream with the attached fiff named matrix
+    */
+    friend std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffNamedMatrix &p_FiffNamedMatrix);
+
 public:
     fiff_int_t nrow;        /**< Number of rows */
     fiff_int_t  ncol;       /**< Number of columns */
@@ -179,7 +190,7 @@ public:
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE INLINE MEMBER METHODS
+// INLINE DEFINITIONS
 //=============================================================================================================
 
 //inline FiffNamedMatrix& FiffNamedMatrix::operator=(const FiffNamedMatrix& rhs)
@@ -196,6 +207,16 @@ public:
 
 //    return *this;
 //}
+
+
+inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffNamedMatrix &p_FiffNamedMatrix)
+{
+    out << "#### Fiff Named Matrix ####\n";
+    out << "\tnrow: " << p_FiffNamedMatrix.nrow << std::endl;
+    out << "\tncol: " << p_FiffNamedMatrix.ncol << std::endl;
+
+    return out;
+}
 
 } // NAMESPACE
 
