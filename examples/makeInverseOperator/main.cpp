@@ -101,6 +101,8 @@ int main(int argc, char *argv[])
 
     FiffCov noise_cov(t_fileCov);
 
+    std::cout << noise_cov;
+
     // regularize noise covariance
     noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
 
