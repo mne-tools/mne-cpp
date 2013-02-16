@@ -221,7 +221,7 @@ inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffCov &p_Fif
     out << "\tKind: " << p_FiffCov.kind << std::endl;
     out << "\tdiag: " << p_FiffCov.diag << std::endl;
     out << "\tdim: " << p_FiffCov.dim << std::endl;
-    out << "\tnames " << p_FiffCov.names.size() << ": ";
+    out << "\tnames " << p_FiffCov.names.size() << ":\n\t";
 
     if(t_bIsShort)
     {
@@ -234,6 +234,31 @@ inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffCov &p_Fif
         out << std::endl;
     }
 
+    out << "\tdata " << p_FiffCov.data.rows() << " x " << p_FiffCov.data.cols() << ":\n\t";
+    if(t_bIsShort)
+    {
+        qint32 nrows = p_FiffCov.data.rows() > 6 ? 6 : p_FiffCov.data.rows();
+        qint32 ncols = p_FiffCov.data.cols() > 6 ? 6 : p_FiffCov.data.cols();
+        for(qint32 i = 0; i < nrows/2; ++i)
+        {
+            for(qint32 j = 0; j < ncols/2; ++j)
+                out << p_FiffCov.data(i,j) << " ";
+            out << "... ";
+            for(qint32 j = ncols/2; j < ncols; ++j)
+                out << p_FiffCov.data(i,j) << " ";
+            out << "\n\t";
+        }
+        out << "...\n\t";
+        for(qint32 i = nrows/2; i < nrows; ++i)
+        {
+            for(qint32 j = 0; j < ncols/2; ++j)
+                out << p_FiffCov.data(i,j) << " ";
+            out << "... ";
+            for(qint32 j = ncols/2; j < ncols; ++j)
+                out << p_FiffCov.data(i,j) << " ";
+            out << "\n\t";
+        }
+    }
 
     return out;
 }
