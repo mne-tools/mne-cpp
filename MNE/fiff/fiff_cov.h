@@ -66,6 +66,8 @@
 
 #include <Eigen/Core>
 
+#include <iostream>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -168,6 +170,7 @@ public:
     * @param[in] p_bProj     Apply or not projections to keep rank of data.
     * @param[in] p_exclude  List of channels to mark as bad. If None, bads channels are extracted from both info['bads'] and cov['bads'].
     *
+    * @return the regularized covariance matrix
     */
     FiffCov regularize(const FiffInfo& p_info, double p_fMag = 0.1, double p_fGrad = 0.1, double p_fEeg = 0.1, bool p_bProj = true, QStringList p_exclude = defaultQStringList) const;
 
@@ -176,8 +179,21 @@ public:
     * Assignment Operator
     *
     * @param[in] rhs     FiffCov which should be assigned.
+    *
+    * @return the copied covariance matrix
     */
     FiffCov& operator= (const FiffCov &rhs);
+
+    //=========================================================================================================
+    /**
+    * overloading the stream out operator<<
+    *
+    * @param[in] out           The stream to which the fiff covariance should be assigned to.
+    * @param[in] p_FiffCov     FiffCov which should be assigned to the stream.
+    *
+    * @return the stream with the attached fiff covariance matrix
+    */
+    friend std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffCov &p_FiffCov);
 
 public:
     fiff_int_t  kind;       /**< Covariance kind -> fiff_constants.h */
@@ -191,6 +207,36 @@ public:
     VectorXd eig;           /**< Vector of eigenvalues. */
     MatrixXd eigvec;        /**< Matrix of eigenvectors (each column represents an eigenvector - Attention different to mne-python, there are rows). */
 };
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffCov &p_FiffCov)
+{
+    bool t_bIsShort = true;
+    out << "#### Fiff Covariance ####\n";
+    out << "\tKind: " << p_FiffCov.kind << std::endl;
+    out << "\tdiag: " << p_FiffCov.diag << std::endl;
+    out << "\tdim: " << p_FiffCov.dim << std::endl;
+    out << "\tnames " << p_FiffCov.names.size() << ": ";
+
+    if(t_bIsShort)
+    {
+        qint32 nchan = p_FiffCov.names.size() > 6 ? 6 : p_FiffCov.names.size();
+        for(qint32 i = 0; i < nchan/2; ++i)
+            out << p_FiffCov.names[i].toLatin1().constData() << " ";
+        out << "... ";
+        for(qint32 i = nchan/2; i < nchan; ++i)
+            out << p_FiffCov.names[i].toLatin1().constData() << " ";
+        out << std::endl;
+    }
+
+
+    return out;
+}
 
 } // NAMESPACE
 
