@@ -180,7 +180,7 @@ inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffProj &p_Fi
     out << "\tKind: " << p_FiffProj.kind << std::endl;
     out << "\tactive: " << p_FiffProj.active << std::endl;
     out << "\tdesc: " << p_FiffProj.desc.toLatin1().constData() << std::endl;
-    out << "\tdata:\n" << *p_FiffProj.data.data() << std::endl;
+    out << "\tdata:\n\t" << *p_FiffProj.data.data() << std::endl;
     return out;
 }
 
