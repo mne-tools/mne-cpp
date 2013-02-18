@@ -229,7 +229,7 @@ inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffCov &p_Fif
         for(qint32 i = 0; i < nchan/2; ++i)
             out << p_FiffCov.names[i].toLatin1().constData() << " ";
         out << "... ";
-        for(qint32 i = nchan/2; i < nchan; ++i)
+        for(qint32 i = p_FiffCov.names.size() - nchan/2; i < p_FiffCov.names.size(); ++i)
             out << p_FiffCov.names[i].toLatin1().constData() << " ";
         out << std::endl;
     }
@@ -244,22 +244,72 @@ inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffCov &p_Fif
             for(qint32 j = 0; j < ncols/2; ++j)
                 out << p_FiffCov.data(i,j) << " ";
             out << "... ";
-            for(qint32 j = ncols/2; j < ncols; ++j)
+            for(qint32 j = p_FiffCov.data.cols() - ncols/2; j < p_FiffCov.data.cols(); ++j)
                 out << p_FiffCov.data(i,j) << " ";
             out << "\n\t";
         }
         out << "...\n\t";
-        for(qint32 i = nrows/2; i < nrows; ++i)
+        for(qint32 i = p_FiffCov.data.rows()-nrows/2; i < p_FiffCov.data.rows(); ++i)
         {
             for(qint32 j = 0; j < ncols/2; ++j)
                 out << p_FiffCov.data(i,j) << " ";
             out << "... ";
-            for(qint32 j = ncols/2; j < ncols; ++j)
+            for(qint32 j = p_FiffCov.data.cols() - ncols/2; j < p_FiffCov.data.cols(); ++j)
                 out << p_FiffCov.data(i,j) << " ";
             out << "\n\t";
         }
+        out << "\n";
+    }
+    //Projectors
+    out << "\tprojectors " << p_FiffCov.projs.size() << ":\n";
+    for(qint32 i = 0; i < p_FiffCov.projs.size(); ++i)
+        out << "\t" << p_FiffCov.projs[i];
+
+    //Bads
+    out << "\tbads " << p_FiffCov.bads.size() << ":\n\t";
+    for(qint32 i = 0; i < p_FiffCov.bads.size(); ++i)
+        out << p_FiffCov.bads[i].toLatin1().constData() << " ";
+
+    out << "\n\tfree: " << p_FiffCov.nfree << std::endl;
+
+    out << "\teig " << p_FiffCov.eig.size() << ":\n\t";
+    if(t_bIsShort)
+    {
+        qint32 nrows = p_FiffCov.eig.size() > 6 ? 6 : p_FiffCov.eig.size();
+        for(qint32 i = 0; i < nrows/2; ++i)
+            out << p_FiffCov.eig[i] << " ";
+        out << "... ";
+        for(qint32 i = p_FiffCov.eig.size() - nrows/2; i < p_FiffCov.eig.size(); ++i)
+            out << p_FiffCov.eig[i] << " ";
+        out << "\n\t";
     }
 
+    out << "\n\teigvec " << p_FiffCov.eigvec.rows() << " x " << p_FiffCov.eigvec.cols() << ":\n\t";
+    if(t_bIsShort)
+    {
+        qint32 nrows = p_FiffCov.eigvec.rows() > 6 ? 6 : p_FiffCov.eigvec.rows();
+        qint32 ncols = p_FiffCov.eigvec.cols() > 6 ? 6 : p_FiffCov.eigvec.cols();
+        for(qint32 i = 0; i < nrows/2; ++i)
+        {
+            for(qint32 j = 0; j < ncols/2; ++j)
+                out << p_FiffCov.eigvec(i,j) << " ";
+            out << "... ";
+            for(qint32 j = p_FiffCov.eigvec.cols() - ncols/2; j < p_FiffCov.eigvec.cols(); ++j)
+                out << p_FiffCov.eigvec(i,j) << " ";
+            out << "\n\t";
+        }
+        out << "...\n\t";
+        for(qint32 i = p_FiffCov.eigvec.rows() - nrows/2; i < p_FiffCov.eigvec.rows(); ++i)
+        {
+            for(qint32 j = 0; j < ncols/2; ++j)
+                out << p_FiffCov.eigvec(i,j) << " ";
+            out << "... ";
+            for(qint32 j = p_FiffCov.eigvec.cols() - ncols/2; j < p_FiffCov.eigvec.cols(); ++j)
+                out << p_FiffCov.eigvec(i,j) << " ";
+            out << "\n\t";
+        }
+        out << "\n";
+    }
     return out;
 }
 
