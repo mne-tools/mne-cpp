@@ -165,7 +165,7 @@ public:
     *
     * @return A sparse block diagonal, diagonalized from the elements in "A".
     */
-    static SparseMatrix<double>* make_block_diag(const MatrixXd* A, qint32 n);
+    static SparseMatrix<double>* make_block_diag(const MatrixXd &A, qint32 n);
 
     //=========================================================================================================
     /**
@@ -184,23 +184,25 @@ public:
     /**
     * Sorts a vector (ascending order) in place and returns the track of the original indeces
     *
-    * @param[in, out] v      vector to sort; it#s sorted in place
+    * @param[in, out] v     vector to sort; it's sorted in place
+    * @param[in] desc       if true its sorted in a descending order, otherwise ascending (optional, default = true)
     *
     * @return Vector of the original indeces in the new order
     */
-    static VectorXi sort(VectorXd &v);
+    static VectorXi sort(VectorXd &v, bool desc = true);
 
     //=========================================================================================================
     /**
     * Sorts a vector (ascending order) and a corresponding matrix in place and returns the track of the original indeces
     * The matrix is sorted along the columns using the vector values for comparison.
     *
-    * @param[in, out] v_prime      vector to sort (sorted in place)
-    * @param[in, out] mat          matrix to sort (sorted in place)
+    * @param[in, out] v_prime   vector to sort (sorted in place)
+    * @param[in, out] mat       matrix to sort (sorted in place)
+    * @param[in] desc           if true its sorted in a descending order, otherwise ascending (optional, default = true)
     *
     * @return Vector of the original indeces in the new order
     */
-    static VectorXi sort(VectorXd &v_prime, MatrixXd &mat);
+    static VectorXi sort(VectorXd &v_prime, MatrixXd &mat, bool desc = true);
 
     //=========================================================================================================
     /**
@@ -211,7 +213,20 @@ public:
     *
     * @return true if value of lhs is bigger than value of rhs
     */
-    static inline bool compareIdxValuePair( const IdxDoubleValue& lhs, const IdxDoubleValue& rhs);
+    static inline bool compareIdxValuePairBiggerThan( const IdxDoubleValue& lhs, const IdxDoubleValue& rhs);
+
+    //=========================================================================================================
+    /**
+    * Compares two index-value-pairs.
+    *
+    * @param[in] lhs    left hand side of the comparison
+    * @param[in] rhs    right hand side of the comparison
+    *
+    * @return true if value of lhs is smaller than value of rhs
+    */
+    static inline bool compareIdxValuePairSmallerThan( const IdxDoubleValue& lhs, const IdxDoubleValue& rhs);
+
+
 };
 
 //*************************************************************************************************************
@@ -219,11 +234,18 @@ public:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool MNEMath::compareIdxValuePair( const IdxDoubleValue& lhs, const IdxDoubleValue& rhs)
+inline bool MNEMath::compareIdxValuePairBiggerThan( const IdxDoubleValue& lhs, const IdxDoubleValue& rhs)
 {
     return lhs.second > rhs.second;
 }
 
+
+//*************************************************************************************************************
+
+inline bool MNEMath::compareIdxValuePairSmallerThan( const IdxDoubleValue& lhs, const IdxDoubleValue& rhs)
+{
+    return lhs.second < rhs.second;
+}
 
 } // NAMESPACE
 

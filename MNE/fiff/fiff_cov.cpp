@@ -306,17 +306,17 @@ FiffCov FiffCov::prepare_noise_cov(const FiffInfo &p_Info, const QStringList &p_
     {
         for(qint32 i = 0; i < C_meg_idx.rows(); ++i)
             for(qint32 j = 0; j < C_meg_idx.rows(); ++j)
-                p_NoiseCov.eigvec(C_meg_idx(i), C_meg_idx(j)) = C_meg_eigvec(i, j);
+                p_NoiseCov.eigvec(C_meg_idx[i], C_meg_idx[j]) = C_meg_eigvec(i, j);
         for(qint32 i = 0; i < C_meg_idx.rows(); ++i)
-            p_NoiseCov.eig(C_meg_idx(i)) = C_meg_eig(i);
+            p_NoiseCov.eig(C_meg_idx[i]) = C_meg_eig[i];
     }
     if(has_eeg)
     {
         for(qint32 i = 0; i < C_eeg_idx.rows(); ++i)
             for(qint32 j = 0; j < C_eeg_idx.rows(); ++j)
-                p_NoiseCov.eigvec(C_eeg_idx(i), C_eeg_idx(j)) = C_eeg_eigvec(i, j);
+                p_NoiseCov.eigvec(C_eeg_idx[i], C_eeg_idx[j]) = C_eeg_eigvec(i, j);
         for(qint32 i = 0; i < C_eeg_idx.rows(); ++i)
-            p_NoiseCov.eig(C_eeg_idx(i)) = C_eeg_eig(i);
+            p_NoiseCov.eig(C_eeg_idx[i]) = C_eeg_eig[i];
     }
 
     if (C_meg_idx.size() + C_eeg_idx.size() != n_chan)
@@ -325,6 +325,7 @@ FiffCov FiffCov::prepare_noise_cov(const FiffInfo &p_Info, const QStringList &p_
         return FiffCov();
     }
 
+    p_NoiseCov.data = C;
     p_NoiseCov.dim = p_ChNames.size();
     p_NoiseCov.diag = false;
     p_NoiseCov.names = p_ChNames;

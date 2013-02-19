@@ -128,6 +128,8 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
     bool t_bIsFixedOri = forward.isFixedOrient();
     MNEInverseOperator t_MNEInverseOperator;
 
+    qDebug() << "ToDo MNEInverseOperator::make_inverse_operator: do surf_ori check";
+
     //Check parameters
     if(fixed && loose > 0)
     {

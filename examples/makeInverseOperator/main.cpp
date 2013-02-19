@@ -97,24 +97,22 @@ int main(int argc, char *argv[])
     // Load data
     fiff_int_t setno = 0;
     FiffEvokedDataSet evoked(t_fileEvoked, setno);
-    MNEForwardSolution t_forwardMeeg(t_fileFwdMeeg, false, true);
+    MNEForwardSolution t_forwardMeeg(t_fileFwdMeeg, false, false); //OK - inconsistend with mne-python when reading with surf_ori = true
 
-    FiffCov noise_cov(t_fileCov);
-
-    std::cout << noise_cov;
+    FiffCov noise_cov(t_fileCov); //OK
 
     // regularize noise covariance
-    noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
+    noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true); //OK
 
     // Restrict forward solution as necessary for MEG
     MNEForwardSolution t_forwardMeg = t_forwardMeeg.pick_types(true, false);
     // Alternatively, you can just load a forward solution that is restricted
-    MNEForwardSolution t_forwardEeg(t_fileFwdEeg, false, true);
+    MNEForwardSolution t_forwardEeg(t_fileFwdEeg, false, false);
 
     // make an M/EEG, MEG-only, and EEG-only inverse operators
     FiffInfo info = evoked.info;
 
-    MNEInverseOperator inverse_operator_meeg = MNEInverseOperator::make_inverse_operator(info, t_forwardMeeg, noise_cov, 0.2, 0.8);
+    MNEInverseOperator inverse_operator_meeg = MNEInverseOperator::make_inverse_operator(info, t_forwardMeeg, noise_cov, 0.2, 0);
 //    MNEInverseOperator inverse_operator_meg = MNEInverseOperator::make_inverse_operator(info, t_forwardMeg, noise_cov, 0.2, 0.8);
 //    MNEInverseOperator inverse_operator_eeg = MNEInverseOperator::make_inverse_operator(info, t_forwardEeg, noise_cov, 0.2, 0.8);
 

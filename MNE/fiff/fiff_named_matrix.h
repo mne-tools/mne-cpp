@@ -247,6 +247,20 @@ inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffNamedMatri
     {
         qint32 nrows = p_FiffNamedMatrix.data.rows() > 6 ? 6 : p_FiffNamedMatrix.data.rows();
         qint32 ncols = p_FiffNamedMatrix.data.cols() > 6 ? 6 : p_FiffNamedMatrix.data.cols();
+        if(nrows == 1)
+        {
+            for(qint32 i = 0; i < nrows; ++i)
+            {
+                for(qint32 j = 0; j < ncols/2; ++j)
+                    out << p_FiffNamedMatrix.data(i,j) << " ";
+                out << "... ";
+                for(qint32 j = p_FiffNamedMatrix.data.cols() - ncols/2; j < p_FiffNamedMatrix.data.cols(); ++j)
+                    out << p_FiffNamedMatrix.data(i,j) << " ";
+                out << "\n\t";
+            }
+        }
+        else
+        {
         for(qint32 i = 0; i < nrows/2; ++i)
         {
             for(qint32 j = 0; j < ncols/2; ++j)
@@ -266,10 +280,9 @@ inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffNamedMatri
                 out << p_FiffNamedMatrix.data(i,j) << " ";
             out << "\n\t";
         }
+        }
         out << "\n";
     }
-
-
 
     return out;
 }
