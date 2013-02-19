@@ -139,7 +139,7 @@ public:
     * Assembles the inverse operator.
     *
     * @param[in] info               The measurement info to specify the channels to include. Bad channels in info['bads'] are not used.
-    * @param[in] forward            Forward operator.
+    * @param[in,out] forward        Forward operator.
     * @param[in] noise_cov          The noise covariance matrix.
     * @param[in] loose              float in [0, 1]. Value that weights the source variances of the dipole components defining the tangent space of the cortical surfaces.
     * @param[in] depth              float in [0, 1]. Depth weighting coefficients. If None, no depth weighting is performed.

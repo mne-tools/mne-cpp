@@ -184,7 +184,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Compute weighting for depth prior
+    * Compute weighting for depth prior. ToDo move this to FiffCov
     *
     * @param[in] Gain               gain matrix
     * @param[in] gain_info          The measurement info to specify the channels to include.
@@ -196,7 +196,7 @@ public:
     *
     * @return the depth prior
     */
-    static MatrixXd compute_depth_prior(const MatrixXd &Gain, const FiffInfo &gain_info, bool is_fixed_ori, double exp = 0.8, double limit = 10.0, MatrixXd &patch_areas = defaultMatrixXd, bool limit_depth_chs = false);
+    static FiffCov compute_depth_prior(const MatrixXd &Gain, const FiffInfo &gain_info, bool is_fixed_ori, double exp = 0.8, double limit = 10.0, MatrixXd &patch_areas = defaultMatrixXd, bool limit_depth_chs = false);
 
     //=========================================================================================================
     /**
@@ -244,37 +244,18 @@ public:
 
     //=========================================================================================================
     /**
+    * Prepare forward for assembling the inverse operator
     *
+    * @param[in] p_info             The measurement info to specify the channels to include. Bad channels in info['bads'] are not used.
+    * @param[in] p_noise_cov        The noise covariance matrix.
+    * @param[in] p_pca              Calculate pca or not.
+    * @param[out] ch_names          Selected channel names
+    * @param[out] gain              Gain matrix
+    * @param[out] p_outNoiseCov     noise covariance matrix
+    * @param[out] p_outWhitener     Whitener
+    * @param[out] p_outNumNonZero   the rank (non zeros)
     */
-//    VectorXi tripletSelection(VectorXi& p_vecIdxSelection)
-//    {
-//        MatrixXi triSelect = p_vecIdxSelection.transpose().replicate(3,1).array() * 3;//repmat((p_vecIdxSelection - 1) * 3 + 1, 3, 1);
-//        triSelect.row(1).array() += 1;
-//        triSelect.row(2).array() += 2;
-//        VectorXi retTriSelect(triSelect.cols()*3);
-//        for(int i = 0; i < triSelect.cols(); ++i)
-//            retTriSelect.block(i*3,0,3,1) = triSelect.col(i);
-//        return retTriSelect;
-//    } // tripletSelection
-
-
-    //=========================================================================================================
-    /**
-    * ### MNE toolbox root function ###: Implementation of the mne_read_forward_solution function
-    *
-    * Reads a forward solution from a fif file
-    *
-    * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
-    * @param[out] fwd          A forward solution from a fif file
-    * @param[in] force_fixed   Force fixed source orientation mode? (optional)
-    * @param[in] surf_ori      Use surface based source coordinate system? (optional)
-    * @param[in] include       Include these channels (optional)
-    * @param[in] exclude       Exclude these channels (optional)
-    * @param[in] bExcludeBads  If true bads are also read; default = false (optional)
-    *
-    * @return true if succeeded, false otherwise
-    */
-    static bool read_forward_solution(QIODevice& p_IODevice, MNEForwardSolution& fwd, bool force_fixed = false, bool surf_ori = false, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList, bool bExcludeBads = true);
+    void prepare_forward(const FiffInfo &p_info, const FiffCov &p_noise_cov, bool p_pca, FiffInfo &p_outFwdInfo, MatrixXd &gain, FiffCov &p_outNoiseCov, MatrixXd &p_outWhitener, qint32 &p_outNumNonZero) const;
 
 //    //=========================================================================================================
 //    /**
@@ -319,18 +300,37 @@ public:
 
     //=========================================================================================================
     /**
-    * Prepare forward for assembling the inverse operator
     *
-    * @param[in] p_info             The measurement info to specify the channels to include. Bad channels in info['bads'] are not used.
-    * @param[in] p_noise_cov        The noise covariance matrix.
-    * @param[in] p_pca              Calculate pca or not.
-    * @param[out] ch_names          Selected channel names
-    * @param[out] gain              Gain matrix
-    * @param[out] p_outNoiseCov     noise covariance matrix
-    * @param[out] p_outWhitener     Whitener
-    * @param[out] p_outNumNonZero   the rank (non zeros)
     */
-    void prepare_forward(const FiffInfo &p_info, const FiffCov &p_noise_cov, bool p_pca, FiffInfo &p_outFwdInfo, MatrixXd &gain, FiffCov &p_outNoiseCov, MatrixXd &p_outWhitener, qint32 &p_outNumNonZero);
+//    VectorXi tripletSelection(VectorXi& p_vecIdxSelection)
+//    {
+//        MatrixXi triSelect = p_vecIdxSelection.transpose().replicate(3,1).array() * 3;//repmat((p_vecIdxSelection - 1) * 3 + 1, 3, 1);
+//        triSelect.row(1).array() += 1;
+//        triSelect.row(2).array() += 2;
+//        VectorXi retTriSelect(triSelect.cols()*3);
+//        for(int i = 0; i < triSelect.cols(); ++i)
+//            retTriSelect.block(i*3,0,3,1) = triSelect.col(i);
+//        return retTriSelect;
+//    } // tripletSelection
+
+
+    //=========================================================================================================
+    /**
+    * ### MNE toolbox root function ###: Implementation of the mne_read_forward_solution function
+    *
+    * Reads a forward solution from a fif file
+    *
+    * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
+    * @param[out] fwd          A forward solution from a fif file
+    * @param[in] force_fixed   Force fixed source orientation mode? (optional)
+    * @param[in] surf_ori      Use surface based source coordinate system? (optional)
+    * @param[in] include       Include these channels (optional)
+    * @param[in] exclude       Exclude these channels (optional)
+    * @param[in] bExcludeBads  If true bads are also read; default = false (optional)
+    *
+    * @return true if succeeded, false otherwise
+    */
+    static bool read_forward_solution(QIODevice& p_IODevice, MNEForwardSolution& fwd, bool force_fixed = false, bool surf_ori = false, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList, bool bExcludeBads = true);
 
     //=========================================================================================================
     /**
@@ -340,6 +340,12 @@ public:
     * @param[in] info       Fiff information
     */
     static void restrict_gain_matrix(MatrixXd &G, const FiffInfo &info);
+
+    //=========================================================================================================
+    /**
+    * Helper to convert the forward solution to fixed ori from free
+    */
+    void to_fixed_ori();
 
     //=========================================================================================================
     /**
@@ -370,6 +376,7 @@ private:
 public:
     FiffInfoBase info;                  /**< light weighted measurement info */
     fiff_int_t source_ori;              /**< Source orientation: fixed or free */
+    bool surf_ori;                      /**< If surface oriented */
     fiff_int_t coord_frame;             /**< Coil coordinate system definition */
     fiff_int_t nsource;                 /**< Number of source dipoles */
     fiff_int_t nchan;                   /**< Number of channels */

@@ -125,7 +125,7 @@ MNEInverseOperator::~MNEInverseOperator()
 
 MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNEForwardSolution &forward, FiffCov &noise_cov, float loose, float depth, bool fixed, bool limit_depth_chs)
 {
-    bool t_bIsFixedOri = forward.isFixedOrient();
+    bool is_fixed_ori = forward.isFixedOrient();
     MNEInverseOperator t_MNEInverseOperator;
 
     qDebug() << "ToDo MNEInverseOperator::make_inverse_operator: do surf_ori check";
@@ -137,7 +137,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
         loose = 0.0f;
     }
 
-    if(t_bIsFixedOri && !fixed)
+    if(is_fixed_ori && !fixed)
     {
         printf("Warning: Setting fixed parameter = true. Because the given forward operator has fixed orientation and can only be used to make a fixed-orientation inverse operator.\n");
         fixed = true;
@@ -178,24 +178,70 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
     //
     // 5. Compose the depth weight matrix
     //
-    MatrixXd t_depth_prior;
+    FiffCov::SDPtr p_depth_prior;
     MatrixXd patch_areas;
     if(depth > 0)
     {
         qDebug() << "ToDo: patch_areas";
 //        patch_areas = forward.get('patch_areas', None)
-        t_depth_prior = MNEForwardSolution::compute_depth_prior(gain, gain_info, t_bIsFixedOri, depth, 10.0, patch_areas, limit_depth_chs);
+        p_depth_prior = FiffCov::SDPtr(new FiffCov(MNEForwardSolution::compute_depth_prior(gain, gain_info, is_fixed_ori, depth, 10.0, patch_areas, limit_depth_chs)));
+    }
+    else
+    {
+        p_depth_prior->data = MatrixXd::Ones(gain.cols(), gain.cols());
+        p_depth_prior->kind = FIFFV_MNE_DEPTH_PRIOR_COV;
+        p_depth_prior->diag = true;
+        p_depth_prior->dim = gain.cols();
+        p_depth_prior->nfree = 1;
     }
 
+    // Deal with fixed orientation forward / inverse
+    if(fixed)
+    {
+        if(depth < 0 || depth > 1)
+        {
+            // Convert the depth prior into a fixed-orientation one
+            printf("\tToDo: Picked elements from a free-orientation depth-weighting prior into the fixed-orientation one.\n");
+        }
+        if(!is_fixed_ori)
+        {
+            // Convert to the fixed orientation forward solution now
+            qint32 count = 0;
+            for(qint32 i = 2; i < p_depth_prior->data.rows(); i+=3)
+            {
+                p_depth_prior->data.row(count) = p_depth_prior->data.row(i);
+                ++count;
+            }
+            p_depth_prior->data.conservativeResize(count, p_depth_prior->data.cols());
 
+//            forward = deepcopy(forward)
+            forward.to_fixed_ori();
+            is_fixed_ori = forward.isFixedOrient();
+            forward.prepare_forward(info, noise_cov, false, gain_info, gain, noise_cov, whitener, n_nzero);
+        }
+    }
+    printf("\tComputing inverse operator with %d channels.\n", gain_info.ch_names.size());
 
+    //
+    // 6. Compose the source covariance matrix
+    //
+    printf("\tCreating the source covariance matrix\n");
+    FiffCov::SDPtr p_source_cov = p_depth_prior;
 
+    // apply loose orientations
+//    FiffCov::SDPtr p_orient_prior;
+//    if(is_fixed_ori)
+//    {
+//        p_orient_prior = compute_orient_prior(forward, loose=loose)
+//        source_cov->data *= p_orient_prior->data;
+//        orient_prior = dict(data=orient_prior,
+//                            kind=FIFF.FIFFV_MNE_ORIENT_PRIOR_COV,
+//                            bads=[], diag=True, names=[], eig=None,
+//                            eigvec=None, dim=orient_prior.size, nfree=1,
+//                            projs=[])
+//    }
 
-
-
-
-
-
+    // 7. Apply fMRI weighting (not done)
 
 
 
