@@ -50,7 +50,6 @@ SUBDIRS += \
 
 contains(MNECPP_CONFIG, isGui) {
     SUBDIRS += \
-        mne_browse_rawq \
         mne_x
 
     qtHaveModule(3d) {

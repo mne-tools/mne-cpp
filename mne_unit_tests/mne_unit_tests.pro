@@ -33,10 +33,15 @@
 #
 #--------------------------------------------------------------------------------------------------------------
 
+include(../mne-cpp.pri)
+
 TEMPLATE = subdirs
 
 SUBDIRS += \
     mne_lib_tests \
     mne_rt_tests
 
-CONFIG += ordered
+contains(MNECPP_CONFIG, isGui) {
+    SUBDIRS += \
+        mne_disp_test
+}

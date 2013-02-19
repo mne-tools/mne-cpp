@@ -1,5 +1,5 @@
-#ifndef MNEBROWSERAWQ_H
-#define MNEBROWSERAWQ_H
+#ifndef MNEDISPTEST_H
+#define MNEDISPTEST_H
 
 #include <QMainWindow>
 
@@ -9,16 +9,16 @@
 
 
 namespace Ui {
-class MneBrowseRawQ;
+class MneDispTest;
 }
 
-class MneBrowseRawQ : public QMainWindow
+class MneDispTest : public QMainWindow
 {
     Q_OBJECT
     
 public:
-    explicit MneBrowseRawQ(QWidget *parent = 0);
-    ~MneBrowseRawQ();
+    explicit MneDispTest(QWidget *parent = 0);
+    ~MneDispTest();
 
     void setupRealtimeDataDemo(QCustomPlot *customPlot);
 
@@ -29,10 +29,10 @@ public:
     void bracketDataSlot();
 
 private:
-    Ui::MneBrowseRawQ *ui;
+    Ui::MneDispTest *ui;
 
     QTimer dataTimer;
     QCPItemTracer *itemDemoPhaseTracer;
 };
 
-#endif // MNEBROWSERAWQ_H
+#endif // MNEDISPTEST_H

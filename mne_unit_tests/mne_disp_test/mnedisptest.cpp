@@ -1,5 +1,5 @@
-#include "mnebrowserawq.h"
-#include "ui_mnebrowserawq.h"
+#include "mnedisptest.h"
+#include "ui_mnedisptest.h"
 
 #include <cmath>
 #include <cstdlib>
@@ -10,9 +10,9 @@
 
 
 
-MneBrowseRawQ::MneBrowseRawQ(QWidget *parent)
+MneDispTest::MneDispTest(QWidget *parent)
 : QMainWindow(parent)
-, ui(new Ui::MneBrowseRawQ)
+, ui(new Ui::MneDispTest)
 {
     ui->setupUi(this);
 
@@ -24,13 +24,13 @@ MneBrowseRawQ::MneBrowseRawQ(QWidget *parent)
     ui->customPlot->replot();
 }
 
-MneBrowseRawQ::~MneBrowseRawQ()
+MneDispTest::~MneDispTest()
 {
     delete ui;
 }
 
 
-void MneBrowseRawQ::setupRealtimeDataDemo(QCustomPlot *customPlot)
+void MneDispTest::setupRealtimeDataDemo(QCustomPlot *customPlot)
 {
   // include this section to fully disable antialiasing for higher performance:
   /*
@@ -68,13 +68,13 @@ void MneBrowseRawQ::setupRealtimeDataDemo(QCustomPlot *customPlot)
   connect(customPlot->xAxis, SIGNAL(rangeChanged(QCPRange)), customPlot->xAxis2, SLOT(setRange(QCPRange)));
   connect(customPlot->yAxis, SIGNAL(rangeChanged(QCPRange)), customPlot->yAxis2, SLOT(setRange(QCPRange)));
 
-  // setup a timer that repeatedly calls MneBrowseRawQ::realtimeDataSlot:
+  // setup a timer that repeatedly calls MneDispTest::realtimeDataSlot:
   connect(&dataTimer, SIGNAL(timeout()), this, SLOT(realtimeDataSlot()));
   dataTimer.start(0); // Interval 0 means to refresh as fast as possible
 }
 
 
-void MneBrowseRawQ::realtimeDataSlot()
+void MneDispTest::realtimeDataSlot()
 {
   // calculate two new data points:
 #if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
@@ -123,7 +123,7 @@ void MneBrowseRawQ::realtimeDataSlot()
   }
 }
 
-void MneBrowseRawQ::bracketDataSlot()
+void MneDispTest::bracketDataSlot()
 {
 #if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
   double secs = 0;
@@ -164,7 +164,7 @@ void MneBrowseRawQ::bracketDataSlot()
   }
 }
 
-void MneBrowseRawQ::setupPlayground(QCustomPlot *customPlot)
+void MneDispTest::setupPlayground(QCustomPlot *customPlot)
 {
   Q_UNUSED(customPlot)
 }

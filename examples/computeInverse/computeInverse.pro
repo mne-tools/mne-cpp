@@ -64,7 +64,7 @@ else {
             -lMNE$${MNE_LIB_VERSION}Mne
 }
 
-DESTDIR =  $${MNE_BINARY_DIR}
+DESTDIR = $${MNE_BINARY_DIR}
 
 SOURCES += \
         main.cpp \
