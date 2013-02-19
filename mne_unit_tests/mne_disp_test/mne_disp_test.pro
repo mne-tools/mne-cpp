@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     SourceConnector.pro
+# @file     mne_disp_test.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,14 +29,52 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile to build the mne_browse_rawq app and its plugins.
+# @brief    This project file generates the makefile to build the mne_disp_test app.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-TEMPLATE = subdirs
+include(../../mne-cpp.pri)
 
-SUBDIRS += \
-    mne_browse_rawq \
-#    plugins
+TEMPLATE = app
 
-CONFIG += ordered
+QT += core gui
+QT += widgets
+QT += printsupport
+
+TARGET = mne_disp_test
+
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
+}
+
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lMNE$${MNE_LIB_VERSION}MneMathd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned
+
+}
+else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lMNE$${MNE_LIB_VERSION}MneMath \
+            -lMNE$${MNE_LIB_VERSION}Fs \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Mne
+}
+
+DESTDIR = $${MNE_BINARY_DIR}
+
+SOURCES += main.cpp \
+        3rdParty/QCustomPlot/qcustomplot.cpp \
+        mnedisptest.cpp
+
+HEADERS  += \
+        3rdParty/QCustomPlot/qcustomplot.h \
+        mnedisptest.h
+
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
+
+FORMS    += \
+    mnedisptest.ui

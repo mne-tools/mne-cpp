@@ -1,10 +1,10 @@
-#include "mnebrowserawq.h"
+#include "MneDispTest.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    MneBrowseRawQ w;
+    MneDispTest w;
     w.show();
     
     return a.exec();
