@@ -40,23 +40,17 @@
 
 #include "mne_forwardsolution.h"
 
-#include <mneMath/mnemath.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FS INCLUDES
-//=============================================================================================================
-
 #include <fs/colortable.h>
+#include <mneMath/mnemath.h>
+#include <mneMath/kmeans.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MNE_MATH INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <mneMath/kmeans.h>
+#include <iostream>
 
 
 //*************************************************************************************************************
@@ -76,6 +70,7 @@ using namespace FSLIB;
 
 MNEForwardSolution::MNEForwardSolution()
 : source_ori(-1)
+, surf_ori(false)
 , coord_frame(-1)
 , nsource(-1)
 , nchan(-1)
@@ -95,6 +90,7 @@ MNEForwardSolution::MNEForwardSolution()
 
 MNEForwardSolution::MNEForwardSolution(QIODevice &p_IODevice, bool force_fixed, bool surf_ori, const QStringList& include, const QStringList& exclude, bool bExcludeBads)
 : source_ori(-1)
+, surf_ori(surf_ori)
 , coord_frame(-1)
 , nsource(-1)
 , nchan(-1)
@@ -119,6 +115,7 @@ MNEForwardSolution::MNEForwardSolution(QIODevice &p_IODevice, bool force_fixed, 
 MNEForwardSolution::MNEForwardSolution(const MNEForwardSolution &p_MNEForwardSolution)
 : info(p_MNEForwardSolution.info)
 , source_ori(p_MNEForwardSolution.source_ori)
+, surf_ori(p_MNEForwardSolution.surf_ori)
 , coord_frame(p_MNEForwardSolution.coord_frame)
 , nsource(p_MNEForwardSolution.nsource)
 , nchan(p_MNEForwardSolution.nchan)
@@ -148,6 +145,7 @@ void MNEForwardSolution::clear()
 {
     info.clear();
     source_ori = -1;
+    surf_ori = false;
     coord_frame = -1;
     nsource = -1;
     nchan = -1;
@@ -433,7 +431,7 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution &p_fwdOut, 
 
 //*************************************************************************************************************
 
-MatrixXd MNEForwardSolution::compute_depth_prior(const MatrixXd &Gain, const FiffInfo &gain_info, bool is_fixed_ori, double exp, double limit, MatrixXd &patch_areas, bool limit_depth_chs)
+FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd &Gain, const FiffInfo &gain_info, bool is_fixed_ori, double exp, double limit, MatrixXd &patch_areas, bool limit_depth_chs)
 {
     printf("\tCreating the depth weighting matrix...\n");
 
@@ -446,7 +444,7 @@ MatrixXd MNEForwardSolution::compute_depth_prior(const MatrixXd &Gain, const Fif
     // Compute the gain matrix
     if(is_fixed_ori)
     {
-        d = (G*G).rowwise().sum(); //is this correct - is G squared?
+        d = (G*G).rowwise().sum(); //ToDo: is this correct - is G squared?
 //            d = np.sum(G ** 2, axis=0)
     }
     else
@@ -514,15 +512,21 @@ MatrixXd MNEForwardSolution::compute_depth_prior(const MatrixXd &Gain, const Fif
         t_w[i] = t_w[i] > 1 ? 1 : t_w[i];
     wpp = t_w.array().pow(exp);
 
-    MatrixXd depth_prior;
+    FiffCov depth_prior;
+
     if(is_fixed_ori)
-        depth_prior = wpp;
+        depth_prior.data = wpp;
     else
     {
-        depth_prior.resize(wpp.rows(), 3);
+        depth_prior.data.resize(wpp.rows(), 3);
         for(qint32 i = 0; i < 3; ++i)
-            depth_prior.col(i) = wpp;
+            depth_prior.data.col(i) = wpp;
     }
+
+    depth_prior.kind = FIFFV_MNE_DEPTH_PRIOR_COV;
+    depth_prior.diag = true;
+    depth_prior.dim = depth_prior.data.rows();
+    depth_prior.nfree = 1;
 
     return depth_prior;
 }
@@ -608,7 +612,7 @@ MNEForwardSolution MNEForwardSolution::pick_types(bool meg, bool eeg, const QStr
 
 //*************************************************************************************************************
 
-void MNEForwardSolution::prepare_forward(const FiffInfo &p_info, const FiffCov &p_noise_cov, bool p_pca, FiffInfo &p_outFwdInfo, MatrixXd &gain, FiffCov &p_outNoiseCov, MatrixXd &p_outWhitener, qint32 &p_outNumNonZero)
+void MNEForwardSolution::prepare_forward(const FiffInfo &p_info, const FiffCov &p_noise_cov, bool p_pca, FiffInfo &p_outFwdInfo, MatrixXd &gain, FiffCov &p_outNoiseCov, MatrixXd &p_outWhitener, qint32 &p_outNumNonZero) const
 {
     QStringList fwd_ch_names, ch_names;
     for(qint32 i = 0; i < this->info.chs.size(); ++i)
@@ -879,15 +883,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
     }
     else
     {
-//        if(fwd.mri_head_t)
-//            delete fwd.mri_head_t;
         fwd.mri_head_t = t_pTag->toCoordTrans();
-//            std::cout << "Transformation\n" << fwd.mri_head_t.trans << std::endl;
-//            std::cout << "from " << fwd.mri_head_t.from << " to " << fwd.mri_head_t.to << std::endl;
-
-//            std::cout << "inverse Transformation\n" << fwd.mri_head_t.invtrans << std::endl;
-//            std::cout << "size " << sizeof(FiffCoordTrans) << std::endl;
-//            std::cout << "size " << sizeof(fiffCoordTransRec) << std::endl;
 
         if (fwd.mri_head_t.from != FIFFV_COORD_MRI || fwd.mri_head_t.to != FIFFV_COORD_HEAD)
         {
@@ -1075,6 +1071,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
                 exclude_bads << bads[k];
     }
 
+    fwd.surf_ori = surf_ori;
     fwd = fwd.pick_channels(include, exclude_bads);
 
 //    //
@@ -1341,4 +1338,23 @@ void MNEForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
                 printf("Could not find MEG or EEG channels\n");
         }
     }
+}
+
+
+//*************************************************************************************************************
+
+void MNEForwardSolution::to_fixed_ori()
+{
+    if(!this->surf_ori || this->isFixedOrient())
+    {
+        printf("Warning: Only surface-oriented, free-orientation forward solutions can be converted to fixed orientaton.\n");//ToDo: Throw here
+        return;
+    }
+    qint32 count = 0;
+    for(qint32 i = 2; i < this->sol->data.cols(); i += 3)
+        this->sol->data.col(count) = this->sol->data.col(i);//ToDo: is this right? - just take z?
+    this->sol->data.conservativeResize(this->sol->data.rows(), count);
+    this->sol->ncol = this->sol->ncol / 3;
+    this->source_ori = FIFFV_MNE_FIXED_ORI;
+    printf("\tConverted the forward solution into the fixed-orientation mode.\n");
 }
