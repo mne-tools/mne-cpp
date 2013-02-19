@@ -205,7 +205,7 @@ public:
     QStringList bads;       /**< List of bad channels. */
     fiff_int_t nfree;       /**< Number of degrees of freedom. */
     VectorXd eig;           /**< Vector of eigenvalues. */
-    MatrixXd eigvec;        /**< Matrix of eigenvectors (each column represents an eigenvector - Attention different to mne-python, there are rows). */
+    MatrixXd eigvec;        /**< Matrix of eigenvectors (each row represents an eigenvector). */
 };
 
 

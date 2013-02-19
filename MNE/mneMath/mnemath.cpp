@@ -82,7 +82,7 @@ VectorXd* MNEMath::combine_xyz(const VectorXd& vec)
     }
 
     MatrixXd tmp = MatrixXd(vec.transpose());
-    SparseMatrix<double>* s = make_block_diag(&tmp,3);
+    SparseMatrix<double>* s = make_block_diag(tmp,3);
 
     SparseMatrix<double> sC = *s*s->transpose();
     VectorXd* comb = new VectorXd(sC.rows());
@@ -97,16 +97,21 @@ VectorXd* MNEMath::combine_xyz(const VectorXd& vec)
 
 //*************************************************************************************************************
 
-void MNEMath::get_whitener(MatrixXd& A, bool pca, QString ch_type, VectorXd& eig, MatrixXd& eigvec)
+void MNEMath::get_whitener(MatrixXd &A, bool pca, QString ch_type, VectorXd &eig, MatrixXd &eigvec)
 {
     // whitening operator
     qint32 rnk = MNEMath::rank(A);
-    SelfAdjointEigenSolver<MatrixXd> t_eigenSolver(A);
-//    qDebug() << "check whether eigvec has to be transposed.";
+    SelfAdjointEigenSolver<MatrixXd> t_eigenSolver(A);//Can be used because, covariance matrices are self-adjoint matrices.
+    //EigenSolver<MatrixXd> t_eigenSolver(A);
+
     eig = t_eigenSolver.eigenvalues();
-    for(qint32 i = rnk; i < eig.size(); ++i)
+    eigvec = t_eigenSolver.eigenvectors().transpose();
+
+    MNEMath::sort(eig, eigvec, false);
+
+    for(qint32 i = 0; i < eig.size()-rnk; ++i)
         eig(i) = 0;
-    eigvec = t_eigenSolver.eigenvectors();
+
     printf("Setting small %s eigenvalues to zero.\n", ch_type.toLatin1().constData());
     if (!pca)  // No PCA case.
         printf("Not doing PCA for %s\n", ch_type.toLatin1().constData());
@@ -115,7 +120,7 @@ void MNEMath::get_whitener(MatrixXd& A, bool pca, QString ch_type, VectorXd& eig
         printf("Doing PCA for %s.",ch_type.toLatin1().constData());
         // This line will reduce the actual number of variables in data
         // and leadfield to the true rank.
-        eigvec.conservativeResize(eigvec.rows(), rnk);
+        eigvec = eigvec.block(eigvec.rows()-rnk, 0, rnk, eigvec.cols());
     }
 }
 
@@ -206,11 +211,11 @@ bool MNEMath::issparse(VectorXd &v)
 
 //*************************************************************************************************************
 
-SparseMatrix<double>* MNEMath::make_block_diag(const MatrixXd* A, qint32 n)
+SparseMatrix<double>* MNEMath::make_block_diag(const MatrixXd &A, qint32 n)
 {
 
-    qint32 ma = A->rows();
-    qint32 na = A->cols();
+    qint32 ma = A.rows();
+    qint32 na = A.cols();
     float bdn = ((float)na)/n;      // number of submatrices
 
 //    std::cout << std::endl << "ma " << ma << " na " << na << " bdn " << bdn << std::endl;
@@ -221,7 +226,9 @@ SparseMatrix<double>* MNEMath::make_block_diag(const MatrixXd* A, qint32 n)
         return NULL;
     }
 
-    SparseMatrix<double>* bd = new SparseMatrix<double>((int)floor((float)ma*bdn+0.5),na);
+    typedef Eigen::Triplet<double> T;
+    std::vector<T> tripletList;
+    tripletList.reserve(bdn*ma*n);
 
     qint32 current_col, current_row, i, r, c;
     for(i = 0; i < bdn; ++i)
@@ -231,8 +238,13 @@ SparseMatrix<double>* MNEMath::make_block_diag(const MatrixXd* A, qint32 n)
 
         for(r = 0; r < ma; ++r)
             for(c = 0; c < n; ++c)
-                bd->insert(r+current_row,c+current_col) = (*A)(r, c+current_col);
+                tripletList.push_back(T(r+current_row, c+current_col, A(r, c+current_col)));
     }
+
+    SparseMatrix<double>* bd = new SparseMatrix<double>((int)floor((float)ma*bdn+0.5),na);
+//    SparseMatrix<double> p_Matrix(nrow, ncol);
+    bd->setFromTriplets(tripletList.begin(), tripletList.end());
+
     return bd;
 }
 
@@ -254,7 +266,7 @@ qint32 MNEMath::rank(MatrixXd& A, double tol)
 
 //*************************************************************************************************************
 
-VectorXi MNEMath::sort(VectorXd& v)
+VectorXi MNEMath::sort(VectorXd& v, bool desc)
 {
     std::vector<IdxDoubleValue> t_vecIdxDoubleValue;
     VectorXi idx(v.size());
@@ -266,7 +278,10 @@ VectorXi MNEMath::sort(VectorXd& v)
             t_vecIdxDoubleValue.push_back(IdxDoubleValue(i, v[i]));
 
         //sort temporal vector
-        std::sort(t_vecIdxDoubleValue.begin(), t_vecIdxDoubleValue.end(), MNEMath::compareIdxValuePair);
+        if(desc)
+            std::sort(t_vecIdxDoubleValue.begin(), t_vecIdxDoubleValue.end(), MNEMath::compareIdxValuePairBiggerThan);
+        else
+            std::sort(t_vecIdxDoubleValue.begin(), t_vecIdxDoubleValue.end(), MNEMath::compareIdxValuePairSmallerThan);
 
         //store results
         for(qint32 i = 0; i < v.size(); ++i)
@@ -282,9 +297,9 @@ VectorXi MNEMath::sort(VectorXd& v)
 
 //*************************************************************************************************************
 
-VectorXi MNEMath::sort(VectorXd &v_prime, MatrixXd &mat)
+VectorXi MNEMath::sort(VectorXd &v_prime, MatrixXd &mat, bool desc)
 {
-    VectorXi idx = MNEMath::sort(v_prime);
+    VectorXi idx = MNEMath::sort(v_prime, desc);
 
     if(v_prime.size() > 0)
     {

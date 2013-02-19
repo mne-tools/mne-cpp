@@ -341,6 +341,17 @@ public:
     */
     static void restrict_gain_matrix(MatrixXd &G, const FiffInfo &info);
 
+    //=========================================================================================================
+    /**
+    * overloading the stream out operator<<
+    *
+    * @param[in] out                    The stream to which the MNE forward solution should be assigned to.
+    * @param[in] p_MNEForwardSolution   MNE forward solution which should be assigned to the stream.
+    *
+    * @return the stream with the attached fiff projector
+    */
+    friend std::ostream& operator<<(std::ostream& out, const MNELIB::MNEForwardSolution &p_MNEForwardSolution);
+
 private:
     //=========================================================================================================
     /**
@@ -388,6 +399,23 @@ inline bool MNEForwardSolution::isEmpty() const
 inline bool MNEForwardSolution::isFixedOrient() const
 {
     return this->source_ori == FIFFV_MNE_FIXED_ORI;
+}
+
+
+//*************************************************************************************************************
+
+inline std::ostream& operator<<(std::ostream& out, const MNELIB::MNEForwardSolution &p_MNEForwardSolution)
+{
+    out << "#### MNE Forward Solution ####\n";
+
+    out << "\n source_ori: " << p_MNEForwardSolution.source_ori << std::endl;
+    out << "\n coord_frame: " << p_MNEForwardSolution.coord_frame << std::endl;
+    out << "\n nsource: " << p_MNEForwardSolution.nsource << std::endl;
+    out << "\n nchan: " << p_MNEForwardSolution.nchan << std::endl;
+    out << "\n sol:\n\t" << *p_MNEForwardSolution.sol.data() << std::endl;
+    out << "\n sol_grad:\n\t" << *p_MNEForwardSolution.sol_grad.data() << std::endl;
+
+    return out;
 }
 
 } // NAMESPACE

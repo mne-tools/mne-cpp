@@ -198,7 +198,7 @@ public:
     *
     * @return A sparse block diagonal, diagonalized from the elements in "A".
     */
-    static inline SparseMatrix<double>* make_block_diag(const MatrixXd* A, qint32 n)
+    static inline SparseMatrix<double>* make_block_diag(const MatrixXd &A, qint32 n)
     {
         return MNEMath::make_block_diag(A, n);
     }

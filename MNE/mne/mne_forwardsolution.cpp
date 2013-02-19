@@ -652,7 +652,6 @@ void MNEForwardSolution::prepare_forward(const FiffInfo &p_info, const FiffCov &
             // Rows of eigvec are the eigenvectors
             for(qint32 i = 0; i < p_outNumNonZero; ++i)
                 p_outWhitener.col(t_vecNonZero[i]) = p_outNoiseCov.eigvec.col(t_vecNonZero[i]).array() / sqrt(p_outNoiseCov.eig(t_vecNonZero[i]));
-//            whitener = noise_cov['eigvec'][nzero] / np.sqrt(eig[nzero])[:, None]
             printf("\tReducing data rank to %d.\n", p_outNumNonZero);
         }
         else
@@ -661,16 +660,8 @@ void MNEForwardSolution::prepare_forward(const FiffInfo &p_info, const FiffCov &
             p_outWhitener = MatrixXd::Zero(n_chan, n_chan);
             for(qint32 i = 0; i < p_outNumNonZero; ++i)
                 p_outWhitener(t_vecNonZero[i],t_vecNonZero[i]) = 1.0 / sqrt(p_outNoiseCov.eig(t_vecNonZero[i]));
-
-            qDebug() << "MNEForwardSolution::prepare_forward: A";
-//            std::cout << "p_outWhitener:\n" << p_outWhitener.block(0,0,20,20) << std::endl;
-//            std::cout << "p_outNoiseCov.eig:\n" << p_outNoiseCov.eig << std::endl;
-//            std::cout << "p_outNoiseCov.eigvec:\n" << p_outNoiseCov.eigvec.block(0,0,5,5) << std::endl;
-
             // Cols of eigvec are the eigenvectors
-            p_outWhitener *= p_outNoiseCov.eigvec.transpose();
-
-            std::cout << "p_outWhitener:\n" << p_outWhitener.block(0,0,20,20) << std::endl;
+            p_outWhitener *= p_outNoiseCov.eigvec;
         }
     }
 
@@ -704,12 +695,6 @@ void MNEForwardSolution::prepare_forward(const FiffInfo &p_info, const FiffCov &
     p_outFwdInfo = p_info.pick_info(info_idx);
 
     printf("\tTotal rank is %d\n", p_outNumNonZero);
-
-    //DEBUG
-//    std::cout << "p_outWhitener:\n" << p_outWhitener.block(0,0,5,5) << std::endl;
-//    qDebug() << "p_outWhitener" << p_outWhitener.rows() << "x" << p_outWhitener.cols();
-//    qDebug() << "gain" << gain.rows() << "x" << gain.cols();
-//    std::cout << "whitened gain:\n" << (p_outWhitener * gain).block(0,0,5,5) << std::endl;
 }
 
 
@@ -975,7 +960,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
             printf("\tChanging to fixed-orientation forward solution...");
 
             MatrixXd tmp = fwd.source_nn.transpose();
-            SparseMatrix<double>* fix_rot = MNEMath::make_block_diag(&tmp,1);
+            SparseMatrix<double>* fix_rot = MNEMath::make_block_diag(tmp,1);
             fwd.sol->data *= (*fix_rot);
             fwd.sol->ncol  = fwd.nsource;
             fwd.source_ori = FIFFV_MNE_FIXED_ORI;
@@ -1043,7 +1028,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
             nuse += t_SourceSpace.hemispheres[k].nuse;
         }
         MatrixXd tmp = fwd.source_nn.transpose();
-        SparseMatrix<double>* surf_rot = MNEMath::make_block_diag(&tmp,3);
+        SparseMatrix<double>* surf_rot = MNEMath::make_block_diag(tmp,3);
 
         fwd.sol->data *= *surf_rot;
 
