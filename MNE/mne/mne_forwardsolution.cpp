@@ -507,10 +507,14 @@ FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd &Gain, const Fiff
     double scale = 1.0 / limit;
     printf("\tscale = %g exp = %g", scale, exp);
 
+    std::cout << "w\n" << w << std::endl;
+
     VectorXd t_w = w.array() / limit;
     for(qint32 i = 0; i < t_w.size(); ++i)
         t_w[i] = t_w[i] > 1 ? 1 : t_w[i];
     wpp = t_w.array().pow(exp);
+
+    std::cout << "wpp\n" << wpp << std::endl;
 
     FiffCov depth_prior;
 
@@ -518,9 +522,17 @@ FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd &Gain, const Fiff
         depth_prior.data = wpp;
     else
     {
-        depth_prior.data.resize(wpp.rows(), 3);
-        for(qint32 i = 0; i < 3; ++i)
-            depth_prior.data.col(i) = wpp;
+        depth_prior.data.resize(wpp.rows()*3, 1);
+        qint32 idx = 0;
+        double v;
+        for(qint32 i = 0; i < wpp.rows(); ++i)
+        {
+            idx = i*3;
+            v = wpp[i];
+            depth_prior.data(idx, 0) = v;
+            depth_prior.data(idx+1, 0) = v;
+            depth_prior.data(idx+2, 0) = v;
+        }
     }
 
     depth_prior.kind = FIFFV_MNE_DEPTH_PRIOR_COV;
@@ -529,6 +541,55 @@ FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd &Gain, const Fiff
     depth_prior.nfree = 1;
 
     return depth_prior;
+}
+
+
+//*************************************************************************************************************
+
+FiffCov MNEForwardSolution::compute_orient_prior(float loose)
+{
+    bool is_fixed_ori = this->isFixedOrient();
+    qint32 n_sources = this->sol->data.cols();
+
+    if (0 <= loose && loose <= 1)
+    {
+        if(loose < 1 && !this->surf_ori)
+        {
+            printf("\tForward operator is not oriented in surface coordinates. loose parameter should be None not %f.", loose);//ToDo Throw here
+            loose = 1;
+            printf("\tSetting loose to %f.\n", loose);
+        }
+
+        if(is_fixed_ori)
+        {
+            printf("\tIgnoring loose parameter with forward operator with fixed orientation.\n");
+            loose = 0.0;
+        }
+    }
+    else
+    {
+        if(loose < 0 || loose > 1)
+        {
+            printf("Warning: Loose value should be in interval [0,1] not %f.\n", loose);
+            loose = loose > 1 ? 1 : 0;
+            printf("Setting loose to %f.\n", loose);
+        }
+    }
+
+    FiffCov orient_prior;
+    orient_prior.data = VectorXd::Ones(n_sources);
+    if(!is_fixed_ori && (0 <= loose && loose <= 1))
+    {
+        printf("\tApplying loose dipole orientations. Loose value of %d.\n", loose);
+        for(qint32 i = 0; i < n_sources; i+=3)
+            orient_prior.data.block(i,0,2,1).array() *= loose;
+
+        orient_prior.kind = FIFFV_MNE_ORIENT_PRIOR_COV;
+        orient_prior.diag = true;
+        orient_prior.dim = orient_prior.data.size();
+        orient_prior.nfree = 1;
+    }
+    return orient_prior;
 }
 
 
