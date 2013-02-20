@@ -555,7 +555,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool write_raw_buffer(const MatrixXd& buf, const MatrixXd& cals);
+    bool write_raw_buffer(const MatrixXd& buf, const RowVectorXd& cals);
 
     //=========================================================================================================
     /**

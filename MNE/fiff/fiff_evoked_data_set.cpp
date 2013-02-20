@@ -445,9 +445,15 @@ bool FiffEvokedDataSet::read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& da
     //
     //   Calibrate
     //
-    SparseMatrix<double> cals(info.nchan, info.nchan);
+    typedef Eigen::Triplet<double> T;
+    std::vector<T> tripletList;
+    tripletList.reserve(info.nchan);
     for(k = 0; k < info.nchan; ++k)
-        cals.insert(k, k) = info.chs[k].cal;
+        tripletList.push_back(T(k, k, info.chs[k].cal));
+
+    SparseMatrix<double> cals(info.nchan, info.nchan);
+    cals.setFromTriplets(tripletList.begin(), tripletList.end());
+
     all = cals * all;
     //
     //   Put it all together

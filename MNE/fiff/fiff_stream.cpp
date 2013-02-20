@@ -2031,7 +2031,7 @@ void FiffStream::write_proj(const QList<FiffProj>& projs)
 
 //*************************************************************************************************************
 
-bool FiffStream::write_raw_buffer(const MatrixXd& buf, const MatrixXd& cals)
+bool FiffStream::write_raw_buffer(const MatrixXd& buf, const RowVectorXd& cals)
 {
     if (buf.rows() != cals.cols())
     {
@@ -2039,10 +2039,14 @@ bool FiffStream::write_raw_buffer(const MatrixXd& buf, const MatrixXd& cals)
         return false;
     }
 
-    SparseMatrix<double> inv_calsMat(cals.cols(), cals.cols());
-
+    typedef Eigen::Triplet<double> T;
+    std::vector<T> tripletList;
+    tripletList.reserve(cals.cols());
     for(qint32 i = 0; i < cals.cols(); ++i)
-        inv_calsMat.insert(i, i) = 1.0/cals(0,i);
+        tripletList.push_back(T(i, i, 1.0/cals[i]));
+
+    SparseMatrix<double> inv_calsMat(cals.cols(), cals.cols());
+    inv_calsMat.setFromTriplets(tripletList.begin(), tripletList.end());
 
     MatrixXf tmp = (inv_calsMat*buf).cast<float>();
     this->write_float(FIFF_DATA_BUFFER,tmp.data(),tmp.rows()*tmp.cols());
