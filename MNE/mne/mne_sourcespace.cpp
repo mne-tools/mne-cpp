@@ -40,6 +40,8 @@
 
 #include "mne_sourcespace.h"
 
+#include <mneMath/mnemath.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -47,6 +49,7 @@
 //=============================================================================================================
 
 using namespace MNELIB;
+using namespace MNEMATHLIB;
 
 
 //*************************************************************************************************************
@@ -389,11 +392,9 @@ bool MNESourceSpace::read_source_space(FiffStream* p_pStream, const FiffDirTree&
        p_Hemisphere.nearest_dist = VectorXd((Map<VectorXf>(t_pTag2->toFloat(), t_pTag1->size()/4, 1)).cast<double>());//use copy constructor, for the sake of easy memory management
     }
 
-    patch_info(p_Hemisphere.nearest, p_Hemisphere.pinfo);
-    if (p_Hemisphere.pinfo.length() > 0)
-    {
+//    patch_info(p_Hemisphere.nearest, p_Hemisphere.pinfo);
+    if (patch_info(p_Hemisphere))
        printf("\tPatch information added...");
-    }
 
     //
     // Distances
@@ -426,22 +427,27 @@ bool MNESourceSpace::read_source_space(FiffStream* p_pStream, const FiffDirTree&
 
 //*************************************************************************************************************
 
-bool MNESourceSpace::patch_info(VectorXi& nearest, QList<VectorXi>& pinfo)
+bool MNESourceSpace::patch_info(MNEHemisphere &p_Hemisphere)//VectorXi& nearest, QList<VectorXi>& pinfo)
 {
-    if (nearest.rows() == 0)
+    if (p_Hemisphere.nearest.rows() == 0)
     {
-       pinfo.clear();
+       p_Hemisphere.pinfo.clear();
+       p_Hemisphere.patch_inds = VectorXi();
        return false;
     }
 
-    std::vector<intpair> t_vIndn;
+    printf("\tComputing patch statistics...");
 
-    for(qint32 i = 0; i < nearest.rows(); ++i)
+    std::vector<MNEMath::IdxIntValue> t_vIndn;
+
+    for(qint32 i = 0; i < p_Hemisphere.nearest.rows(); ++i)
     {
-        intpair t_pair(nearest(i),i);
+        MNEMath::IdxIntValue t_pair(i, p_Hemisphere.nearest(i));
         t_vIndn.push_back(t_pair);
     }
-    std::sort(t_vIndn.begin(),t_vIndn.end(), MNESourceSpace::intPairComparator );
+    std::sort(t_vIndn.begin(),t_vIndn.end(), MNEMath::compareIndexIntPairSmallerThan );
+
+    VectorXi nearest_sorted(t_vIndn.size());
 
     qint32 current = 0;
     std::vector<qint32> t_vfirsti;
@@ -450,7 +456,8 @@ bool MNESourceSpace::patch_info(VectorXi& nearest, QList<VectorXi>& pinfo)
 
     for(quint32 i = 0; i < t_vIndn.size(); ++i)
     {
-        if (t_vIndn[current].first != t_vIndn[i].first)
+        nearest_sorted[i] = t_vIndn[i].second;
+        if (t_vIndn[current].second != t_vIndn[i].second)
         {
             current = i;
             t_vlasti.push_back(i-1);
@@ -459,31 +466,36 @@ bool MNESourceSpace::patch_info(VectorXi& nearest, QList<VectorXi>& pinfo)
     }
     t_vlasti.push_back(t_vIndn.size()-1);
 
-
     for(quint32 k = 0; k < t_vfirsti.size(); ++k)
     {
-        std::vector<int> t_v;
+        std::vector<int> t_vIndex;
 
         for(int l = t_vfirsti[k]; l <= t_vlasti[k]; ++l)
-            t_v.push_back(t_vIndn[l].second);
+            t_vIndex.push_back(t_vIndn[l].first);
 
-        std::sort(t_v.begin(),t_v.end());
+        std::sort(t_vIndex.begin(),t_vIndex.end());
 
-        int* t_pV = &t_v[0];
-        Eigen::Map<Eigen::VectorXi> t_vEigen(t_pV, t_v.size());
+        int* t_pV = &t_vIndex[0];
+        Eigen::Map<Eigen::VectorXi> t_vPInfo(t_pV, t_vIndex.size());
 
-        pinfo.append(t_vEigen);
+        p_Hemisphere.pinfo.append(t_vPInfo);
+    }
+
+    // compute patch indices of the in-use source space vertices
+    std::vector<qint32> patch_verts;
+    patch_verts.reserve(t_vlasti.size());
+    for(quint32 i = 0; i < t_vlasti.size(); ++i)
+        patch_verts.push_back(nearest_sorted[t_vlasti[i]]);
+
+    p_Hemisphere.patch_inds.resize(p_Hemisphere.vertno.size());
+    std::vector<qint32>::iterator it;
+    for(qint32 i = 0; i < p_Hemisphere.vertno.size(); ++i)
+    {
+        it = std::find(patch_verts.begin(), patch_verts.end(), p_Hemisphere.vertno[i]);
+        p_Hemisphere.patch_inds[i] = it-patch_verts.begin();
     }
 
     return true;
-}
-
-
-//*************************************************************************************************************
-
-bool MNESourceSpace::intPairComparator ( const intpair& l, const intpair& r)
-{
-    return l.first < r.first;
 }
 
 

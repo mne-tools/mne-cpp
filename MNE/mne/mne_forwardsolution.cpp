@@ -1042,6 +1042,14 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
         //   Rotate the local source coordinate systems
         //
         printf("\tConverting to surface-based source orientations...");
+
+        bool use_ave_nn = false;
+        if(t_SourceSpace.hemispheres[0].patch_inds.size() > 0)
+        {
+            use_ave_nn = true;
+            printf("\tAverage patch normals will be employed in the rotation to the local surface coordinates...\n");
+        }
+
         nuse = 0;
         qint32 pp = 0;
         fwd.source_rr = MatrixXd::Zero(fwd.nsource,3);
@@ -1060,7 +1068,18 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
                 //
                 //  Project out the surface normal and compute SVD
                 //
-                Vector3d nn = t_SourceSpace.hemispheres[k].nn.block(t_SourceSpace.hemispheres[k].vertno(p),0,1,3).transpose();
+                Vector3d nn;
+                if(use_ave_nn)
+                {
+                    VectorXi t_vIdx = t_SourceSpace.hemispheres[k].pinfo[t_SourceSpace.hemispheres[k].patch_inds[p]];
+                    Matrix3Xd t_nn(3, t_vIdx.size());
+                    for(qint32 i = 0; i < t_vIdx.size(); ++i)
+                        t_nn.col(i) = t_SourceSpace.hemispheres[k].nn.block(t_vIdx[i],0,1,3).transpose();
+                    nn = t_nn.rowwise().sum();
+                    nn.array() /= nn.norm();
+                }
+                else
+                    nn = t_SourceSpace.hemispheres[k].nn.block(t_SourceSpace.hemispheres[k].vertno(p),0,1,3).transpose();
 
                 Matrix3d tmp = Matrix3d::Identity() - nn*nn.transpose();
 
@@ -1074,12 +1093,8 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
                 //  Make sure that ez is in the direction of nn
                 //
                 if ((nn.transpose() * U.block(0,2,3,1))(0,0) < 0)
-                {
                     U *= -1;
-                }
-
                 fwd.source_nn.block(pp, 0, 3, 3) = U.transpose();
-
                 pp += 3;
             }
             nuse += t_SourceSpace.hemispheres[k].nuse;

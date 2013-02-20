@@ -279,14 +279,13 @@ public:
     *
     * Wrapper for the MNESourceSpace::patch_info static function
     *
-    * @param [in] nearest   The nearest vector of the source space.
-    * @param [out] pinfo    The requested patch information.
+    * @param [in,out] p_Hemisphere  The source space.
     *
     * @return true if succeeded, false otherwise
     */
-    static bool patch_info(VectorXi& nearest, QList<VectorXi>& pinfo)
+    static bool patch_info(MNEHemisphere &p_Hemisphere)
     {
-        return MNESourceSpace::patch_info(nearest, pinfo);
+        return MNESourceSpace::patch_info(p_Hemisphere);
     }
 
     //=========================================================================================================

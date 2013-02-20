@@ -96,6 +96,7 @@ class MNEMATHSHARED_EXPORT MNEMath
 {
 public:
     typedef std::pair<int,double> IdxDoubleValue;
+    typedef std::pair<int,int> IdxIntValue;         /**< Typedef of a pair of ints. */
 
     //=========================================================================================================
     /**
@@ -213,7 +214,7 @@ public:
     *
     * @return true if value of lhs is bigger than value of rhs
     */
-    static inline bool compareIdxValuePairBiggerThan( const IdxDoubleValue& lhs, const IdxDoubleValue& rhs);
+    static inline bool compareIdxDoublePairBiggerThan( const IdxDoubleValue& lhs, const IdxDoubleValue& rhs);
 
     //=========================================================================================================
     /**
@@ -224,8 +225,18 @@ public:
     *
     * @return true if value of lhs is smaller than value of rhs
     */
-    static inline bool compareIdxValuePairSmallerThan( const IdxDoubleValue& lhs, const IdxDoubleValue& rhs);
+    static inline bool compareIdxDoublePairSmallerThan( const IdxDoubleValue& lhs, const IdxDoubleValue& rhs);
 
+    //=========================================================================================================
+    /**
+    * Compeartor of two int pairs
+    *
+    * @param[in] lhs    pair one
+    * @param[in] rhs    pair two
+    *
+    * @return true if pair one is bigger, false otherwise
+    */
+    static inline bool compareIndexIntPairSmallerThan( const IdxIntValue& lhs, const IdxIntValue& rhs);
 
 };
 
@@ -234,7 +245,7 @@ public:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool MNEMath::compareIdxValuePairBiggerThan( const IdxDoubleValue& lhs, const IdxDoubleValue& rhs)
+inline bool MNEMath::compareIdxDoublePairBiggerThan( const IdxDoubleValue& lhs, const IdxDoubleValue& rhs)
 {
     return lhs.second > rhs.second;
 }
@@ -242,7 +253,14 @@ inline bool MNEMath::compareIdxValuePairBiggerThan( const IdxDoubleValue& lhs, c
 
 //*************************************************************************************************************
 
-inline bool MNEMath::compareIdxValuePairSmallerThan( const IdxDoubleValue& lhs, const IdxDoubleValue& rhs)
+inline bool MNEMath::compareIdxDoublePairSmallerThan( const IdxDoubleValue& lhs, const IdxDoubleValue& rhs)
+{
+    return lhs.second < rhs.second;
+}
+
+//*************************************************************************************************************
+
+inline bool MNEMath::compareIndexIntPairSmallerThan( const IdxIntValue& lhs, const IdxIntValue& rhs)
 {
     return lhs.second < rhs.second;
 }
