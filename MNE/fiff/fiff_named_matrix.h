@@ -116,9 +116,9 @@ public:
     */
     explicit FiffNamedMatrix(   fiff_int_t p_nrow,
                                 fiff_int_t p_ncol,
-                                QStringList& p_row_names,
-                                QStringList& p_col_names,
-                                MatrixXd& p_data);
+                                const QStringList& p_row_names,
+                                const QStringList& p_col_names,
+                                const MatrixXd& p_data);
 
     //=========================================================================================================
     /**

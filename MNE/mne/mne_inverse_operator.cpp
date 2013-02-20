@@ -229,19 +229,131 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
     FiffCov::SDPtr p_source_cov = p_depth_prior;
 
     // apply loose orientations
-//    FiffCov::SDPtr p_orient_prior;
-//    if(is_fixed_ori)
-//    {
-//        p_orient_prior = compute_orient_prior(forward, loose=loose)
-//        source_cov->data *= p_orient_prior->data;
-//        orient_prior = dict(data=orient_prior,
-//                            kind=FIFF.FIFFV_MNE_ORIENT_PRIOR_COV,
-//                            bads=[], diag=True, names=[], eig=None,
-//                            eigvec=None, dim=orient_prior.size, nfree=1,
-//                            projs=[])
-//    }
+    FiffCov::SDPtr p_orient_prior;
+    if(is_fixed_ori)
+    {
+        p_orient_prior = FiffCov::SDPtr(new FiffCov(forward.compute_orient_prior(loose)));
+        p_source_cov->data *= p_orient_prior->data;
+    }
 
     // 7. Apply fMRI weighting (not done)
+
+    //
+    // 8. Apply the linear projection to the forward solution
+    // 9. Apply whitening to the forward computation matrix
+    //
+    printf("\tWhitening the forward solution.\n");
+    gain = whitener*gain;
+
+    // 10. Exclude the source space points within the labels (not done)
+
+    //
+    // 11. Do appropriate source weighting to the forward computation matrix
+    //
+
+    // Adjusting Source Covariance matrix to make trace of G*R*G' equal
+    // to number of sensors.
+    printf("\tAdjusting source covariance matrix.\n");
+    MatrixXd source_std;
+
+    if(p_source_cov->data.cols() > 1)
+        p_source_cov->data.transposeInPlace();
+
+
+    std::cout << p_source_cov->data << std::endl;
+
+    source_std = p_source_cov->data.array().sqrt();
+
+    std::cout << source_std << std::endl;
+
+    gain *= source_std;
+
+    double trace_GRGT = pow(gain.norm(), 2);
+    double scaling_source_cov = (double)n_nzero / trace_GRGT;
+
+    p_source_cov->data.array() *= scaling_source_cov;
+
+    gain.array() *= sqrt(scaling_source_cov);
+
+    // now np.trace(np.dot(gain, gain.T)) == n_nzero
+    // logger.info(np.trace(np.dot(gain, gain.T)), n_nzero)
+
+    //
+    // 12. Decompose the combined matrix
+    //
+
+    printf("Computing SVD of whitened and weighted lead field matrix.\n");
+    JacobiSVD<MatrixXd> svd(gain, ComputeThinU | ComputeThinV);
+    FiffNamedMatrix::SDPtr p_eigen_fields = FiffNamedMatrix::SDPtr(new FiffNamedMatrix( svd.matrixU().cols(),
+                                                                                        svd.matrixU().rows(),
+                                                                                        defaultQStringList,
+                                                                                        gain_info.ch_names,
+                                                                                        svd.matrixU().transpose()));
+
+    VectorXd p_sing = svd.singularValues();
+    FiffNamedMatrix::SDPtr p_eigen_leads = FiffNamedMatrix::SDPtr(new FiffNamedMatrix( svd.matrixV().cols(),
+                                                                                       svd.matrixV().rows(),
+                                                                                       defaultQStringList,
+                                                                                       defaultQStringList,
+                                                                                       svd.matrixV().transpose()));
+    printf("\tlargest singular value = %f\n", p_sing.maxCoeff());
+    printf("\tscaling factor to adjust the trace = %f\n", trace_GRGT);
+
+    qint32 p_nave = 1.0;
+
+    // Handle methods
+    bool has_meg = false;
+    bool has_eeg = false;
+
+    RowVectorXd ch_idx(info.chs.size());
+    qint32 count = 0;
+    for(qint32 i = 0; i < info.chs.size(); ++i)
+    {
+        if(gain_info.ch_names.contains(info.chs[i].ch_name))
+        {
+            ch_idx[count] = i;
+            ++count;
+        }
+    }
+    ch_idx.conservativeResize(count);
+
+    for(qint32 i = 0; i < ch_idx.size(); ++i)
+    {
+        QString ch_type = info.channel_type(ch_idx[i]);
+        if (ch_type == "eeg")
+            has_eeg = true;
+        if ((ch_type == "mag") || (ch_type == "grad"))
+            has_meg = true;
+    }
+
+    qint32 p_iMethods;
+
+    if(has_eeg && has_meg)
+        p_iMethods = FIFFV_MNE_MEG_EEG;
+    else if(has_meg)
+        p_iMethods = FIFFV_MNE_MEG;
+    else
+        p_iMethods = FIFFV_MNE_EEG;
+
+    // We set this for consistency with mne C code written inverses
+    if(depth == 0)
+        p_depth_prior = FiffCov::SDPtr();
+//    inv_op = dict(eigen_fields=eigen_fields, eigen_leads=eigen_leads,
+//                  sing=sing, nave=nave, depth_prior=depth_prior,
+//                  source_cov=source_cov, noise_cov=noise_cov,
+//                  orient_prior=orient_prior, projs=deepcopy(info['projs']),
+//                  eigen_leads_weighted=False, source_ori=forward['source_ori'],
+//                  mri_head_t=deepcopy(forward['mri_head_t']),
+//                  methods=methods, nsource=forward['nsource'],
+//                  coord_frame=forward['coord_frame'],
+//                  source_nn=forward['source_nn'].copy(),
+//                  src=deepcopy(forward['src']), fmri_prior=None)
+//    inv_info = deepcopy(forward['info'])
+//    inv_info['bads'] = deepcopy(info['bads'])
+//    inv_op['info'] = inv_info
+
+
+
 
 
 

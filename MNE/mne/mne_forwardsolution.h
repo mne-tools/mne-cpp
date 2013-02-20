@@ -184,6 +184,16 @@ public:
 
     //=========================================================================================================
     /**
+    * Compute orientation prior
+    *
+    * @param[in] loose      The loose orientation parameter.
+    *
+    * @return Orientation priors.
+    */
+    FiffCov compute_orient_prior(float loose = 0.2);
+
+    //=========================================================================================================
+    /**
     * Compute weighting for depth prior. ToDo move this to FiffCov
     *
     * @param[in] Gain               gain matrix
