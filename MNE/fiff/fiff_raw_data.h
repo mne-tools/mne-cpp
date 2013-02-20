@@ -179,7 +179,7 @@ public:
     FiffInfo info;              /**< Fiff measurement information */
     fiff_int_t first_samp;      /**< Do we have a skip ToDo... */
     fiff_int_t last_samp;       /**< Do we have a skip ToDo... */
-    MatrixXd cals;              /**< Calibration matrix */
+    RowVectorXd cals;              /**< Calibration matrix: ToDo Check if RowVectorXd is enough */
     QList<FiffRawDir> rawdir;   /**< Special fiff diretory entry for raw data. */
     MatrixXd proj;              /**< SSP operator to apply to the data. */
     FiffCtfComp comp;           /**< Comepnsator. */

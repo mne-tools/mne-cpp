@@ -149,13 +149,16 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
     qint32 nchan = this->info.nchan;
     qint32 dest  = 0;//1;
     qint32 i, k, r;
-//    MatrixXd cal(nchan,nchan);
-    SparseMatrix<double> cal(nchan,nchan);
-//    cal.setZero();
-    cal.reserve(nchan);
+
+    typedef Eigen::Triplet<double> T;
+    std::vector<T> tripletList;
+    tripletList.reserve(nchan);
     for(i = 0; i < nchan; ++i)
-        cal.insert(i,i) = this->cals(0,i);
-    cal.makeCompressed();
+        tripletList.push_back(T(i, i, this->cals[i]));
+
+    SparseMatrix<double> cal(nchan, nchan);
+    cal.setFromTriplets(tripletList.begin(), tripletList.end());
+//    cal.makeCompressed();
 
     MatrixXd mult_full;
     //
@@ -221,16 +224,16 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
     //
     // Make mult sparse
     //
-    SparseMatrix<double> mult(mult_full.rows(),mult_full.cols());
+    tripletList.clear();
+    tripletList.reserve(mult_full.rows()*mult_full.cols());
     for(i = 0; i < mult_full.rows(); ++i)
-    {
         for(k = 0; k < mult_full.cols(); ++k)
-        {
             if(mult_full(i,k) != 0)
-                mult.insert(i,k) = mult_full(i,k);
-        }
-    }
-    mult.makeCompressed();
+                tripletList.push_back(T(i, k, mult_full(i,k)));
+
+    SparseMatrix<double> mult(mult_full.rows(),mult_full.cols());
+    mult.setFromTriplets(tripletList.begin(), tripletList.end());
+//    mult.makeCompressed();
 
     //
 

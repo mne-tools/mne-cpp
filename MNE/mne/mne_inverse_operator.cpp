@@ -504,10 +504,15 @@ MNEInverseOperator MNEInverseOperator::prepare_inverse_operator(qint32 nave ,flo
         VectorXd tmp = vOnes.cwiseQuotient(noise_norm_new.cwiseAbs());
 //        if(inv.noisenorm)
 //            delete inv.noisenorm;
-        inv.noisenorm = SparseMatrix<double>(noise_norm_new.size(),noise_norm_new.size());
 
+        typedef Eigen::Triplet<double> T;
+        std::vector<T> tripletList;
+        tripletList.reserve(noise_norm_new.size());
         for(qint32 i = 0; i < noise_norm_new.size(); ++i)
-            inv.noisenorm.insert(i,i) = tmp[i];
+            tripletList.push_back(T(i, i, tmp[i]));
+
+        inv.noisenorm = SparseMatrix<double>(noise_norm_new.size(),noise_norm_new.size());
+        inv.noisenorm.setFromTriplets(tripletList.begin(), tripletList.end());
 
         delete noise_weight;
         delete noise_norm;
