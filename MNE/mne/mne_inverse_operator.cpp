@@ -85,7 +85,8 @@ MNEInverseOperator::MNEInverseOperator(QIODevice& p_IODevice)
 //*************************************************************************************************************
 
 MNEInverseOperator::MNEInverseOperator(const MNEInverseOperator &p_MNEInverseOperator)
-: methods(p_MNEInverseOperator.methods)
+: info(p_MNEInverseOperator.info)
+, methods(p_MNEInverseOperator.methods)
 , source_ori(p_MNEInverseOperator.source_ori)
 , nsource(p_MNEInverseOperator.nsource)
 , nchan(p_MNEInverseOperator.nchan)
@@ -123,10 +124,10 @@ MNEInverseOperator::~MNEInverseOperator()
 
 //*************************************************************************************************************
 
-MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNEForwardSolution &forward, FiffCov &noise_cov, float loose, float depth, bool fixed, bool limit_depth_chs)
+MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNEForwardSolution &forward, FiffCov &p_noise_cov, float loose, float depth, bool fixed, bool limit_depth_chs)
 {
     bool is_fixed_ori = forward.isFixedOrient();
-    MNEInverseOperator t_MNEInverseOperator;
+    MNEInverseOperator p_MNEInverseOperator;
 
     qDebug() << "ToDo MNEInverseOperator::make_inverse_operator: do surf_ori check";
 
@@ -146,7 +147,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
     if(forward.source_ori == -1 && loose > 0)
     {
         printf("Error: Forward solution is not oriented in surface coordinates. loose parameter should be 0 not %f.\n", loose);
-        return t_MNEInverseOperator;
+        return p_MNEInverseOperator;
     }
 
     if(loose < 0 || loose > 1)
@@ -173,7 +174,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
     MatrixXd gain;
     MatrixXd whitener;
     qint32 n_nzero;
-    forward.prepare_forward(info, noise_cov, false, gain_info, gain, noise_cov, whitener, n_nzero);
+    forward.prepare_forward(info, p_noise_cov, false, gain_info, gain, p_noise_cov, whitener, n_nzero);
 
     //
     // 5. Compose the depth weight matrix
@@ -217,7 +218,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
 //            forward = deepcopy(forward)
             forward.to_fixed_ori();
             is_fixed_ori = forward.isFixedOrient();
-            forward.prepare_forward(info, noise_cov, false, gain_info, gain, noise_cov, whitener, n_nzero);
+            forward.prepare_forward(info, p_noise_cov, false, gain_info, gain, p_noise_cov, whitener, n_nzero);
         }
     }
     printf("\tComputing inverse operator with %d channels.\n", gain_info.ch_names.size());
@@ -260,11 +261,11 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
         p_source_cov->data.transposeInPlace();
 
 
-    std::cout << p_source_cov->data << std::endl;
+//    std::cout << p_source_cov->data << std::endl;
 
     source_std = p_source_cov->data.array().sqrt();
 
-    std::cout << source_std << std::endl;
+//    std::cout << source_std << std::endl;
 
     gain *= source_std;
 
@@ -338,26 +339,28 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
     // We set this for consistency with mne C code written inverses
     if(depth == 0)
         p_depth_prior = FiffCov::SDPtr();
-//    inv_op = dict(eigen_fields=eigen_fields, eigen_leads=eigen_leads,
-//                  sing=sing, nave=nave, depth_prior=depth_prior,
-//                  source_cov=source_cov, noise_cov=noise_cov,
-//                  orient_prior=orient_prior, projs=deepcopy(info['projs']),
-//                  eigen_leads_weighted=False, source_ori=forward['source_ori'],
-//                  mri_head_t=deepcopy(forward['mri_head_t']),
-//                  methods=methods, nsource=forward['nsource'],
-//                  coord_frame=forward['coord_frame'],
-//                  source_nn=forward['source_nn'].copy(),
-//                  src=deepcopy(forward['src']), fmri_prior=None)
-//    inv_info = deepcopy(forward['info'])
-//    inv_info['bads'] = deepcopy(info['bads'])
-//    inv_op['info'] = inv_info
 
+    p_MNEInverseOperator.eigen_fields = p_eigen_fields;
+    p_MNEInverseOperator.eigen_leads = p_eigen_leads;
+    p_MNEInverseOperator.sing = p_sing;
+    p_MNEInverseOperator.nave = p_nave;
+    p_MNEInverseOperator.depth_prior = p_depth_prior;
+    p_MNEInverseOperator.source_cov = p_source_cov;
+    p_MNEInverseOperator.noise_cov = FiffCov::SDPtr(new FiffCov(p_noise_cov));
+    p_MNEInverseOperator.orient_prior = p_orient_prior;
+    p_MNEInverseOperator.projs = info.projs;
+    p_MNEInverseOperator.eigen_leads_weighted = false;
+    p_MNEInverseOperator.source_ori = forward.source_ori;
+    p_MNEInverseOperator.mri_head_t = forward.mri_head_t;
+    p_MNEInverseOperator.methods = p_iMethods;
+    p_MNEInverseOperator.nsource = forward.nsource;
+    p_MNEInverseOperator.coord_frame = forward.coord_frame;
+    p_MNEInverseOperator.source_nn = forward.source_nn;
+    p_MNEInverseOperator.src = forward.src;
+    p_MNEInverseOperator.info = forward.info;
+    p_MNEInverseOperator.info.bads = info.bads;
 
-
-
-
-
-    return t_MNEInverseOperator;
+    return p_MNEInverseOperator;
 }
 
 
@@ -797,6 +800,12 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
         }
     }
     inv.mri_head_t  = mri_head_t;
+
+    //
+    // get parent MEG info
+    //
+    t_pStream->read_meas_info_base(t_Tree, inv.info);
+
     //
     //   Transform the source spaces to the correct coordinate frame
     //   if necessary
