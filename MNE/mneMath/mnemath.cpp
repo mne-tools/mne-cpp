@@ -279,9 +279,9 @@ VectorXi MNEMath::sort(VectorXd& v, bool desc)
 
         //sort temporal vector
         if(desc)
-            std::sort(t_vecIdxDoubleValue.begin(), t_vecIdxDoubleValue.end(), MNEMath::compareIdxValuePairBiggerThan);
+            std::sort(t_vecIdxDoubleValue.begin(), t_vecIdxDoubleValue.end(), MNEMath::compareIdxDoublePairBiggerThan);
         else
-            std::sort(t_vecIdxDoubleValue.begin(), t_vecIdxDoubleValue.end(), MNEMath::compareIdxValuePairSmallerThan);
+            std::sort(t_vecIdxDoubleValue.begin(), t_vecIdxDoubleValue.end(), MNEMath::compareIdxDoublePairSmallerThan);
 
         //store results
         for(qint32 i = 0; i < v.size(); ++i)

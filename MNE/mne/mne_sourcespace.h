@@ -91,14 +91,6 @@ using namespace FIFFLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// TYPEDEFS
-//=============================================================================================================
-
-typedef std::pair<int,int> intpair;     /**< Typedef of a pair of ints. */
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -156,14 +148,14 @@ public:
     /**
     * ### MNE toolbox root function ###: Implementation of the mne_patch_info function
     *
-    * Generate the patch information from the 'nearest' vector in a source space
+    * Generate the patch information from the 'nearest' vector in a source space. For vertex in the source
+    * space it provides the list of neighboring vertices in the high resolution triangulation.
     *
-    * @param [in] nearest   The nearest vector of the source space.
-    * @param [out] pinfo    The requested patch information.
+    * @param [in,out] p_Hemisphere  The source space.
     *
     * @return true if succeeded, false otherwise
     */
-    static bool patch_info(VectorXi& nearest, QList<VectorXi>& pinfo);
+    static bool patch_info(MNEHemisphere &p_Hemisphere);//VectorXi& nearest, QList<VectorXi>& pinfo);@param [in] nearest   The nearest vector of the source space.@param [out] pinfo    The requested patch information.
 
     //=========================================================================================================
     /**
@@ -211,17 +203,6 @@ private:
     * @return true if succeeded, false otherwise
     */
     static bool read_source_space(FiffStream* p_pStream, const FiffDirTree& p_Tree, MNEHemisphere& p_Hemisphere);
-
-    //=========================================================================================================
-    /**
-    * Compeartor of two int pairs
-    *
-    * @param [in]   l   pair one
-    * @param [in]   r   pair two
-    *
-    * @return true if pair one is bigger, false otherwise
-    */
-    static bool intPairComparator ( const intpair& l, const intpair& r);
 
     //=========================================================================================================
     /**

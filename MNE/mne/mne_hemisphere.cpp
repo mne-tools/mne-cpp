@@ -70,6 +70,7 @@ MNEHemisphere::MNEHemisphere()
 , use_tris(MatrixX3i::Zero(0,3))
 , nearest(VectorXi::Zero(0))
 , nearest_dist(VectorXd::Zero(0))
+, patch_inds(VectorXi::Zero(0))
 , dist_limit(-1)
 , dist(SparseMatrix<double>())
 , tri_cent(MatrixX3d::Zero(0,3))
@@ -102,6 +103,7 @@ MNEHemisphere::MNEHemisphere(const MNEHemisphere& p_MNEHemisphere)
 , nearest(p_MNEHemisphere.nearest)
 , nearest_dist(p_MNEHemisphere.nearest_dist)
 , pinfo(p_MNEHemisphere.pinfo)
+, patch_inds(p_MNEHemisphere.patch_inds)
 , dist_limit(p_MNEHemisphere.dist_limit)
 , dist(p_MNEHemisphere.dist)
 , tri_cent(p_MNEHemisphere.tri_cent)
@@ -145,6 +147,7 @@ void MNEHemisphere::clear()
     nearest = VectorXi::Zero(0);
     nearest_dist = VectorXd::Zero(0);
     pinfo.clear();
+    patch_inds = VectorXi::Zero(0);
     dist_limit = -1;
     dist = SparseMatrix<double>();
     tri_cent = MatrixX3d::Zero(0,3);

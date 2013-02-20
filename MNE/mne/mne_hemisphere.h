@@ -179,6 +179,7 @@ public:
     VectorXi nearest;           /**< All indeces mapped to the indeces of the used vertices (using option -cps during mne_setup_source_space) */
     VectorXd nearest_dist;      /**< Distance to the nearest vertices (using option -cps during mne_setup_source_space). */
     QList<VectorXi> pinfo;      /**< Patch information (using option -cps during mne_setup_source_space) */
+    VectorXi patch_inds;        /**< List of neighboring vertices in the high resolution triangulation. */
     float dist_limit;           /**< ToDo... (using option -cps during mne_setup_source_space) */
     SparseMatrix<double> dist;  /**< ToDo... (using option -cps during mne_setup_source_space) */
     MatrixX3d tri_cent;         /**< Triangle centers */
