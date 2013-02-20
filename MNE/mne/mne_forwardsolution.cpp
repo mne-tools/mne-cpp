@@ -455,7 +455,6 @@ FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd &Gain, const Fiff
         for (qint32 k = 0; k < n_pos; ++k)
         {
             Gk = G.block(0,3*k, G.rows(), 3);
-
             JacobiSVD<MatrixXd> svd(Gk.transpose()*Gk);
             d[k] = svd.singularValues().maxCoeff();
         }
@@ -471,7 +470,7 @@ FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd &Gain, const Fiff
     VectorXd w = d.cwiseInverse();
     VectorXd ws = w;
     VectorXd wpp;
-    MNEMath::sort(ws);
+    MNEMath::sort(ws, false);
     double weight_limit = pow(limit, 2);
     if (!limit_depth_chs)
     {
@@ -507,17 +506,12 @@ FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd &Gain, const Fiff
     double scale = 1.0 / limit;
     printf("\tscale = %g exp = %g", scale, exp);
 
-//    std::cout << "w\n" << w << std::endl;
-
     VectorXd t_w = w.array() / limit;
     for(qint32 i = 0; i < t_w.size(); ++i)
         t_w[i] = t_w[i] > 1 ? 1 : t_w[i];
     wpp = t_w.array().pow(exp);
 
-//    std::cout << "wpp\n" << wpp << std::endl;
-
     FiffCov depth_prior;
-
     if(is_fixed_ori)
         depth_prior.data = wpp;
     else
