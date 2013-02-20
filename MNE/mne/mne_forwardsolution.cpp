@@ -507,14 +507,14 @@ FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd &Gain, const Fiff
     double scale = 1.0 / limit;
     printf("\tscale = %g exp = %g", scale, exp);
 
-    std::cout << "w\n" << w << std::endl;
+//    std::cout << "w\n" << w << std::endl;
 
     VectorXd t_w = w.array() / limit;
     for(qint32 i = 0; i < t_w.size(); ++i)
         t_w[i] = t_w[i] > 1 ? 1 : t_w[i];
     wpp = t_w.array().pow(exp);
 
-    std::cout << "wpp\n" << wpp << std::endl;
+//    std::cout << "wpp\n" << wpp << std::endl;
 
     FiffCov depth_prior;
 
