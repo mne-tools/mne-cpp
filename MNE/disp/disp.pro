@@ -37,6 +37,8 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
+QT += widgets
+
 DEFINES += DISP_LIBRARY
 
 TARGET = Disp
@@ -47,10 +49,10 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd
 }
 else {
-    LIBS += \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}
@@ -68,11 +70,26 @@ win32 {
 }
 
 SOURCES += \
-        disp.cpp
+        disp.cpp \
+#    measurementwidget.cpp \
+#    displaymanager.cpp \
+#    displaymanager.cpp \
+#    realtimesamplearraywidget.cpp \
+#    realtimemultisamplearraywidget.cpp \
+#    measurementwidget.cpp \
+#    displaymanager.cpp
 
 HEADERS += \
         disp.h \
-        disp_global.h
+        disp_global.h \
+#    measurementwidget.h \
+#    realtimesamplearraywidget.h \
+#    displaymanager.h \
+#    displaymanager.h \
+#    realtimesamplearraywidget.h \
+#    realtimemultisamplearraywidget.h \
+#    measurementwidget.h \
+#    displaymanager.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -82,3 +99,10 @@ header_files.files = ./*.h
 header_files.path = $${MNE_INCLUDE_DIR}/disp
 
 INSTALLS += header_files
+
+FORMS += \
+    realtimesamplearraywidget.ui \
+    realtimemultisamplearraywidget.ui \
+    realtimesamplearraywidget.ui \
+    realtimesamplearraywidget.ui \
+    realtimemultisamplearraywidget.ui

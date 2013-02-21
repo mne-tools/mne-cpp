@@ -123,8 +123,6 @@ int main(int argc, char *argv[])
     //ToDo create something similiar to mne-pythons "apply_inverse" -> instead create algorithm interface which is consistend between inverse algorithms -> MNE, RAP MUSIC, ...
 
 
-
-
     //
     //   Set up the inverse according to the parameters
     //
