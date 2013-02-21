@@ -213,7 +213,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
                 p_depth_prior->data.row(count) = p_depth_prior->data.row(i);
                 ++count;
             }
-            p_depth_prior->data.conservativeResize(count, p_depth_prior->data.cols());
+            p_depth_prior->data.conservativeResize(count, 1);
 
 //            forward = deepcopy(forward)
             forward.to_fixed_ori();
@@ -275,18 +275,18 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
     //
     printf("Computing SVD of whitened and weighted lead field matrix.\n");
     JacobiSVD<MatrixXd> svd(gain, ComputeThinU | ComputeThinV);
-    FiffNamedMatrix::SDPtr p_eigen_fields = FiffNamedMatrix::SDPtr(new FiffNamedMatrix( svd.matrixU().cols(),
-                                                                                        svd.matrixU().rows(),
+    FiffNamedMatrix::SDPtr p_eigen_fields = FiffNamedMatrix::SDPtr(new FiffNamedMatrix( svd.matrixU().rows(),
+                                                                                        svd.matrixU().cols(),
                                                                                         defaultQStringList,
                                                                                         gain_info.ch_names,
-                                                                                        svd.matrixU().transpose()));
+                                                                                        svd.matrixU()));
 
     VectorXd p_sing = svd.singularValues();
-    FiffNamedMatrix::SDPtr p_eigen_leads = FiffNamedMatrix::SDPtr(new FiffNamedMatrix( svd.matrixV().cols(),
-                                                                                       svd.matrixV().rows(),
+    FiffNamedMatrix::SDPtr p_eigen_leads = FiffNamedMatrix::SDPtr(new FiffNamedMatrix( svd.matrixV().rows(),
+                                                                                       svd.matrixV().cols(),
                                                                                        defaultQStringList,
                                                                                        defaultQStringList,
-                                                                                       svd.matrixV().transpose()));
+                                                                                       svd.matrixV()));
     printf("\tlargest singular value = %f\n", p_sing.maxCoeff());
     printf("\tscaling factor to adjust the trace = %f\n", trace_GRGT);
 
@@ -438,38 +438,47 @@ MNEInverseOperator MNEInverseOperator::prepare_inverse_operator(qint32 nave ,flo
     //
     if (dSPM || sLORETA)
     {
-        VectorXd* noise_norm = new VectorXd(VectorXd::Zero(inv.eigen_leads->nrow));
-        VectorXd* noise_weight = NULL;
+        VectorXd noise_norm = VectorXd::Zero(inv.eigen_leads->nrow);
+        VectorXd noise_weight;
         if (dSPM)
         {
            printf("\tComputing noise-normalization factors (dSPM)...");
-           noise_weight = new VectorXd(inv.reginv);
+           noise_weight = VectorXd(inv.reginv);
         }
         else
         {
            printf("\tComputing noise-normalization factors (sLORETA)...");
            VectorXd tmp = (VectorXd::Constant(inv.sing.size(), 1) + inv.sing.cwiseProduct(inv.sing)/lambda2);
-           noise_weight = new VectorXd(inv.reginv.cwiseProduct(tmp.cwiseSqrt()));
+           noise_weight = inv.reginv.cwiseProduct(tmp.cwiseSqrt());
         }
         VectorXd one;
         if (inv.eigen_leads_weighted)
         {
            for (k = 0; k < inv.eigen_leads->nrow; ++k)
            {
-              one = inv.eigen_leads->data.block(k,0,1,inv.eigen_leads->data.cols()).cwiseProduct(*noise_weight);
-              (*noise_norm)[k] = sqrt(one.dot(one));
+              one = inv.eigen_leads->data.block(k,0,1,inv.eigen_leads->data.cols()).cwiseProduct(noise_weight);
+              noise_norm[k] = sqrt(one.dot(one));
            }
         }
         else
         {
-            float c;
+//            qDebug() << 32;
+            double c;
             for (k = 0; k < inv.eigen_leads->nrow; ++k)
             {
+//                qDebug() << 321;
                 c = sqrt(inv.source_cov->data(k,0));
-                one = c*(inv.eigen_leads->data.block(k,0,1,inv.eigen_leads->data.cols()).transpose()).cwiseProduct(*noise_weight);//ToDo eigenleads data -> pointer
-                (*noise_norm)[k] = sqrt(one.dot(one));
+//                qDebug() << 322;
+//                qDebug() << "inv.eigen_leads->data" << inv.eigen_leads->data.rows() << "x" << inv.eigen_leads->data.cols();
+//                qDebug() << "noise_weight" << noise_weight.rows() << "x" << noise_weight.cols();
+                one = c*(inv.eigen_leads->data.row(k).transpose()).cwiseProduct(noise_weight);//ToDo eigenleads data -> pointer
+                noise_norm[k] = sqrt(one.dot(one));
+//                qDebug() << 324;
             }
         }
+
+//        qDebug() << 4;
+
         //
         //   Compute the final result
         //
@@ -484,7 +493,7 @@ MNEInverseOperator MNEInverseOperator::prepare_inverse_operator(qint32 nave ,flo
             //   Even in this case return only one noise-normalization factor
             //   per source location
             //
-            VectorXd* t = MNEMath::combine_xyz(noise_norm->transpose());
+            VectorXd* t = MNEMath::combine_xyz(noise_norm.transpose());
             noise_norm_new = t->cwiseSqrt();//double otherwise values are getting too small
             delete t;
             //
@@ -507,8 +516,6 @@ MNEInverseOperator MNEInverseOperator::prepare_inverse_operator(qint32 nave ,flo
         inv.noisenorm = SparseMatrix<double>(noise_norm_new.size(),noise_norm_new.size());
         inv.noisenorm.setFromTriplets(tripletList.begin(), tripletList.end());
 
-        delete noise_weight;
-        delete noise_norm;
         printf("[done]\n");
     }
     else

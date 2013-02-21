@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
     //
     //   Read the data first
     //
-    FiffEvokedDataSet data(t_fileEvoked, setno);
+    FiffEvokedDataSet evokedSet(t_fileEvoked, setno);
 
     //
     //   Then the inverse operator
@@ -121,17 +121,17 @@ int main(int argc, char *argv[])
     //   Set up the inverse according to the parameters
     //
     if (nave < 0)
-        nave = data.evoked[0]->nave;
+        nave = evokedSet.evoked[0]->nave;
 
     MNEInverseOperator inv = inv_raw.prepare_inverse_operator(nave,lambda2,dSPM,sLORETA);
     //
     //   Pick the correct channels from the data
     //
-    FiffEvokedDataSet newData = data.pick_channels(inv.noise_cov->names);
+    FiffEvokedDataSet newEvokedSet = evokedSet.pick_channels(inv.noise_cov->names);
 
-    data = newData;
+    evokedSet = newEvokedSet;
 
-    printf("Picked %d channels from the data\n",data.info.nchan);
+    printf("Picked %d channels from the data\n",evokedSet.info.nchan);
     printf("Computing inverse...");
     //
     //   Simple matrix multiplication followed by combination of the
@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
     qint32 i;
     for(i = 0; i < inv.reginv.rows(); ++i)
         reginv.insert(i,i) = inv.reginv(i,0);
-    MatrixXd trans = reginv*inv.eigen_fields->data*inv.whitener*inv.proj*data.evoked[0]->epochs;
+    MatrixXd trans = reginv*inv.eigen_fields->data*inv.whitener*inv.proj*evokedSet.evoked[0]->epochs;
     //
     //   Transformation into current distributions by weighting the eigenleads
     //   with the weights computed above
@@ -203,8 +203,8 @@ int main(int argc, char *argv[])
     //Results
 //    inv;
 //    sol2;
-    float tmin = ((float)data.evoked[0]->first) / data.info.sfreq;
-    float tstep = 1/data.info.sfreq;
+    float tmin = ((float)evokedSet.evoked[0]->first) / evokedSet.info.sfreq;
+    float tstep = 1/evokedSet.info.sfreq;
 
     std::cout << std::endl << "part ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << sol.block(0,0,10,10) << std::endl;
     printf("tmin = %f s\n", tmin);
