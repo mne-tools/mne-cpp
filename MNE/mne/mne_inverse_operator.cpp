@@ -231,10 +231,10 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
 
     // apply loose orientations
     FiffCov::SDPtr p_orient_prior;
-    if(is_fixed_ori)
+    if(!is_fixed_ori)
     {
         p_orient_prior = FiffCov::SDPtr(new FiffCov(forward.compute_orient_prior(loose)));
-        p_source_cov->data *= p_orient_prior->data;
+        p_source_cov->data.array() *= p_orient_prior->data.array();
     }
 
     // 7. Apply fMRI weighting (not done)
@@ -255,21 +255,12 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
     // Adjusting Source Covariance matrix to make trace of G*R*G' equal
     // to number of sensors.
     printf("\tAdjusting source covariance matrix.\n");
-    MatrixXd source_std;
+    RowVectorXd source_std = p_source_cov->data.array().sqrt().transpose();
 
-    if(p_source_cov->data.cols() > 1)
-        p_source_cov->data.transposeInPlace();
+    for(qint32 i = 0; i < gain.rows(); ++i)
+        gain.row(i) = gain.row(i).array() * source_std.array();
 
-
-//    std::cout << p_source_cov->data << std::endl;
-
-    source_std = p_source_cov->data.array().sqrt();
-
-//    std::cout << source_std << std::endl;
-
-    gain *= source_std;
-
-    double trace_GRGT = pow(gain.norm(), 2);
+    double trace_GRGT = (gain * gain.transpose()).trace();//pow(gain.norm(), 2);
     double scaling_source_cov = (double)n_nzero / trace_GRGT;
 
     p_source_cov->data.array() *= scaling_source_cov;
@@ -282,7 +273,6 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
     //
     // 12. Decompose the combined matrix
     //
-
     printf("Computing SVD of whitened and weighted lead field matrix.\n");
     JacobiSVD<MatrixXd> svd(gain, ComputeThinU | ComputeThinV);
     FiffNamedMatrix::SDPtr p_eigen_fields = FiffNamedMatrix::SDPtr(new FiffNamedMatrix( svd.matrixU().cols(),
