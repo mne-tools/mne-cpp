@@ -119,7 +119,7 @@ FiffEvokedDataSet FiffEvokedDataSet::pick_channels(const QStringList& include, c
     RowVectorXi sel = FiffInfo::pick_channels(this->info.ch_names, include, exclude);
     if (sel.cols() == 0)
     {
-        printf("Warning : No channels match the selection.\n");
+        qWarning("Warning : No channels match the selection.\n");
         return FiffEvokedDataSet(*this);
     }
 

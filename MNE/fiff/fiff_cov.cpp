@@ -215,7 +215,7 @@ FiffCov FiffCov::prepare_noise_cov(const FiffInfo &p_Info, const QStringList &p_
                 C(i,j) = p_NoiseCov.data(C_ch_idx(i), C_ch_idx(j));
     else
     {
-        qDebug() << "Warning in FiffCov::prepare_noise_cov: This has to be debugged - not done before!";
+        qWarning("Warning in FiffCov::prepare_noise_cov: This has to be debugged - not done before!");
         C = MatrixXd::Zero(count, count);
         for(qint32 i = 0; i < count; ++i)
             C.diagonal()[i] = p_NoiseCov.data(C_ch_idx(i),0);

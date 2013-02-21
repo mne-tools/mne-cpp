@@ -1110,7 +1110,7 @@ inline SparseMatrix<double> FiffTag::toSparseFloatMatrix() const
         //
         //    CCS
         //
-        qDebug() << "Warning in FiffTag::toSparseFloatMatrix(): CCS has to be debugged - never done before.";
+        qWarning("Warning in FiffTag::toSparseFloatMatrix(): CCS has to be debugged - never done before.");
 //        for(qint32 i = 0; i < nnz; ++i)
 //            tripletList.push_back(T(t_pInt[offset1+i], 0, (double)(t_pFloat[i])));
         qint32 p = 0;
