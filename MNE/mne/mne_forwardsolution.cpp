@@ -444,7 +444,7 @@ FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd &Gain, const Fiff
     // Compute the gain matrix
     if(is_fixed_ori)
     {
-        d = (G*G).rowwise().sum(); //ToDo: is this correct - is G squared?
+        d = (G.array().square()).rowwise().sum(); //ToDo: is this correct - is G squared?
 //            d = np.sum(G ** 2, axis=0)
     }
     else
