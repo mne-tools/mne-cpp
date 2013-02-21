@@ -99,22 +99,32 @@ VectorXd* MNEMath::combine_xyz(const VectorXd& vec)
 
 void MNEMath::get_whitener(MatrixXd &A, bool pca, QString ch_type, VectorXd &eig, MatrixXd &eigvec)
 {
+//    std::cout << "A\n" << A.block(0,0,20,20) << std::endl;
+
     // whitening operator
     SelfAdjointEigenSolver<MatrixXd> t_eigenSolver(A);//Can be used because, covariance matrices are self-adjoint matrices.
 
     eig = t_eigenSolver.eigenvalues();
     eigvec = t_eigenSolver.eigenvectors().transpose();
 
+//    std::cout << "eig\n" << eig << std::endl;
+
+//    std::cout << "eigvec\n" << eigvec.block(0,0,20,20) << std::endl;
+
     MNEMath::sort(eig, eigvec, false);
 
-//    qint32 rnk = MNEMath::rank(A);
-    //Dirty HACK: rank using eigenvalues -> ToDo: this is a dirty hack cause JacobiSVD and SelfAdjointEigenSolver deliver different ranks
-    double t_dMax = eig.maxCoeff();
-    t_dMax *= 1e-16;
-    qint32 rnk = 0;
-    for(qint32 i = 0; i < eig.size(); ++i)
-        rnk += eig[i] > t_dMax ? 1 : 0;
-    //Dirty HACK END: rank
+//    std::cout << "eig\n" << eig << std::endl;
+
+//    std::cout << "eigvec\n" << eigvec.block(0,0,20,20) << std::endl;
+
+    qint32 rnk = MNEMath::rank(A);
+//    //Dirty HACK: rank using eigenvalues -> ToDo: this is a dirty hack cause JacobiSVD and SelfAdjointEigenSolver deliver different ranks
+//    double t_dMax = eig.maxCoeff();
+//    t_dMax *= 1e-16;
+//    qint32 rnk = 0;
+//    for(qint32 i = 0; i < eig.size(); ++i)
+//        rnk += eig[i] > t_dMax ? 1 : 0;
+//    //Dirty HACK END: rank
 
     for(qint32 i = 0; i < eig.size()-rnk; ++i)
         eig(i) = 0;

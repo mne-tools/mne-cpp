@@ -223,6 +223,9 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
     }
     printf("\tComputing inverse operator with %d channels.\n", gain_info.ch_names.size());
 
+//    std::cout << "whitener:\n" << whitener.block(0,0,20,20) << std::endl;
+
+
     //
     // 6. Compose the source covariance matrix
     //
