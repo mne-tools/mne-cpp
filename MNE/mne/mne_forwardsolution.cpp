@@ -574,7 +574,7 @@ FiffCov MNEForwardSolution::compute_orient_prior(float loose)
     orient_prior.data = VectorXd::Ones(n_sources);
     if(!is_fixed_ori && (0 <= loose && loose <= 1))
     {
-        printf("\tApplying loose dipole orientations. Loose value of %d.\n", loose);
+        printf("\tApplying loose dipole orientations. Loose value of %f.\n", loose);
         for(qint32 i = 0; i < n_sources; i+=3)
             orient_prior.data.block(i,0,2,1).array() *= loose;
 

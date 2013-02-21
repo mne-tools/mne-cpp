@@ -100,14 +100,21 @@ VectorXd* MNEMath::combine_xyz(const VectorXd& vec)
 void MNEMath::get_whitener(MatrixXd &A, bool pca, QString ch_type, VectorXd &eig, MatrixXd &eigvec)
 {
     // whitening operator
-    qint32 rnk = MNEMath::rank(A);
     SelfAdjointEigenSolver<MatrixXd> t_eigenSolver(A);//Can be used because, covariance matrices are self-adjoint matrices.
-    //EigenSolver<MatrixXd> t_eigenSolver(A);
 
     eig = t_eigenSolver.eigenvalues();
     eigvec = t_eigenSolver.eigenvectors().transpose();
 
     MNEMath::sort(eig, eigvec, false);
+
+//    qint32 rnk = MNEMath::rank(A);
+    //Dirty HACK: rank using eigenvalues -> ToDo: this is a dirty hack cause JacobiSVD and SelfAdjointEigenSolver deliver different ranks
+    double t_dMax = eig.maxCoeff();
+    t_dMax *= 1e-16;
+    qint32 rnk = 0;
+    for(qint32 i = 0; i < eig.size(); ++i)
+        rnk += eig[i] > t_dMax ? 1 : 0;
+    //Dirty HACK END: rank
 
     for(qint32 i = 0; i < eig.size()-rnk; ++i)
         eig(i) = 0;
@@ -251,13 +258,13 @@ SparseMatrix<double>* MNEMath::make_block_diag(const MatrixXd &A, qint32 n)
 
 //*************************************************************************************************************
 
-qint32 MNEMath::rank(MatrixXd& A, double tol)
+qint32 MNEMath::rank(const MatrixXd& A, double tol)
 {
     JacobiSVD<MatrixXd> t_svdA(A);//U and V are not computed
     VectorXd s = t_svdA.singularValues();
     double t_dMax = s.maxCoeff();
     t_dMax *= tol;
-    int sum = 0;
+    qint32 sum = 0;
     for(qint32 i = 0; i < s.size(); ++i)
         sum += s[i] > t_dMax ? 1 : 0;
     return sum;

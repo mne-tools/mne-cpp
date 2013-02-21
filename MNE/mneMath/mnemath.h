@@ -179,7 +179,7 @@ public:
     *
     * @return rank of matrix A
     */
-    static qint32 rank(MatrixXd& A, double tol = 1e-8);
+    static qint32 rank(const MatrixXd& A, double tol = 1e-8);
 
     //=========================================================================================================
     /**
