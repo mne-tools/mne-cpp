@@ -134,32 +134,32 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
     //Check parameters
     if(fixed && loose > 0)
     {
-        printf("Warning: When invoking make_inverse_operator with fixed = true, the loose parameter is ignored.\n");
+        qWarning("Warning: When invoking make_inverse_operator with fixed = true, the loose parameter is ignored.\n");
         loose = 0.0f;
     }
 
     if(is_fixed_ori && !fixed)
     {
-        printf("Warning: Setting fixed parameter = true. Because the given forward operator has fixed orientation and can only be used to make a fixed-orientation inverse operator.\n");
+        qWarning("Warning: Setting fixed parameter = true. Because the given forward operator has fixed orientation and can only be used to make a fixed-orientation inverse operator.\n");
         fixed = true;
     }
 
     if(forward.source_ori == -1 && loose > 0)
     {
-        printf("Error: Forward solution is not oriented in surface coordinates. loose parameter should be 0 not %f.\n", loose);
+        qCritical("Error: Forward solution is not oriented in surface coordinates. loose parameter should be 0 not %f.\n", loose);
         return p_MNEInverseOperator;
     }
 
     if(loose < 0 || loose > 1)
     {
-        printf("Warning: Loose value should be in interval [0,1] not %f.\n", loose);
+        qWarning("Warning: Loose value should be in interval [0,1] not %f.\n", loose);
         loose = loose > 1 ? 1 : 0;
         printf("Setting loose to %f.\n", loose);
     }
 
     if(depth < 0 || depth > 1)
     {
-        printf("Warning: Depth value should be in interval [0,1] not %f.\n", depth);
+        qWarning("Warning: Depth value should be in interval [0,1] not %f.\n", depth);
         depth = depth > 1 ? 1 : 0;
         printf("Setting depth to %f.\n", depth);
     }

@@ -564,7 +564,7 @@ FiffCov MNEForwardSolution::compute_orient_prior(float loose)
     {
         if(loose < 0 || loose > 1)
         {
-            printf("Warning: Loose value should be in interval [0,1] not %f.\n", loose);
+            qWarning("Warning: Loose value should be in interval [0,1] not %f.\n", loose);
             loose = loose > 1 ? 1 : 0;
             printf("Setting loose to %f.\n", loose);
         }
@@ -706,7 +706,7 @@ void MNEForwardSolution::prepare_forward(const FiffInfo &p_info, const FiffCov &
     {
         if (p_pca)
         {
-            qDebug() << "Warning in MNEForwardSolution::prepare_forward: if (p_pca) havent been debugged.";
+            qWarning("Warning in MNEForwardSolution::prepare_forward: if (p_pca) havent been debugged.");
             p_outWhitener = MatrixXd::Zero(n_chan, p_outNumNonZero);
             // Rows of eigvec are the eigenvectors
             for(qint32 i = 0; i < p_outNumNonZero; ++i)
@@ -1049,7 +1049,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
         fwd.source_rr = MatrixXd::Zero(fwd.nsource,3);
         fwd.source_nn = MatrixXd::Zero(fwd.nsource*3,3);
 
-        printf(" (Warning source_ori: Rotating the source coordinate system haven't been verified --> Singular Vectors U are different from MATLAB!) ");
+        qWarning("Warning source_ori: Rotating the source coordinate system haven't been verified --> Singular Vectors U are different from MATLAB!");
 
         for(qint32 k = 0; k < t_SourceSpace.hemispheres.size();++k)
         {
@@ -1417,7 +1417,7 @@ void MNEForwardSolution::to_fixed_ori()
 {
     if(!this->surf_ori || this->isFixedOrient())
     {
-        printf("Warning: Only surface-oriented, free-orientation forward solutions can be converted to fixed orientaton.\n");//ToDo: Throw here
+        qWarning("Warning: Only surface-oriented, free-orientation forward solutions can be converted to fixed orientaton.\n");//ToDo: Throw here//qCritical//qFatal
         return;
     }
     qint32 count = 0;
