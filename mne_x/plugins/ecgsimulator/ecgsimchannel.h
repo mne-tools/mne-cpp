@@ -1,0 +1,296 @@
+//=============================================================================================================
+/**
+* @file		ecgsimchannel.h
+* @author	Christoph Dinh <christoph.dinh@live.de>;
+* @version	1.0
+* @date		October, 2010
+*
+* @section	LICENSE
+*
+* Copyright (C) 2010 Christoph Dinh. All rights reserved.
+*
+* No part of this program may be photocopied, reproduced,
+* or translated to another program language without the
+* prior written consent of the author.
+*
+*
+* @brief	Contains the declaration of the ECGChannel class.
+*
+*/
+
+#ifndef ECGSIMCHANNEL_H
+#define ECGSIMCHANNEL_H
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT STL INCLUDES
+//=============================================================================================================
+
+#include <QVector>
+#include <QString>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE ECGSimulatorModule
+//=============================================================================================================
+
+namespace ECGSimulatorModule {
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+//=============================================================================================================
+/**
+* DECLARE CLASS ECGChannel
+*
+* @brief The ECGChannel class provides a ECG channel.
+*/
+class ECGSimChannel {
+public:
+
+    //=========================================================================================================
+    /**
+    * Constructs a ECGSimChannel.
+    *
+    * @param [in] ResourceDataPath a string which holds the resource directory where the files are stored which could be used to simulate a channel.
+    * @param [in] ChannelFile a string to a specific file which should be used initially.
+    * @param [in] enabled whether the channel should be initial enabled.
+    * @param [in] visible whether the channel should be initial visible.
+    */
+    ECGSimChannel(QString ResourceDataPath, QString ChannelFile, bool enabled = true, bool visible = true);
+
+    //=========================================================================================================
+    /**
+    * Destroys the ECGSimChannel.
+    */
+    virtual ~ECGSimChannel();
+
+
+    //=========================================================================================================
+    /**
+    * Sets the resource directory where the simulation files are stored.
+    *
+    * @param [in] path a string which holds the path to the folder where the files are stored which could be used to simulate a channel.
+    */
+    inline void setResourceDataPath(QString& path);
+
+    //=========================================================================================================
+    /**
+    * Returns the resource directory where the simulation files are stored.
+    *
+    * @return a string which holds the path to the folder where the files are stored which could be used to simulate a channel.
+    */
+    inline const QString& getResourceDataPath();
+
+    //=========================================================================================================
+    /**
+    * Sets the file which should be used to simulate the channel.
+    *
+    * @param [in] file a string which specifies the file which should be used to simulate the channel.
+    */
+    inline void setChannelFile(QString file);
+
+    //=========================================================================================================
+    /**
+    * Returns the file which should be used to simulate the channel.
+    *
+    * @return a string which specifies the file which should be used to simulate the channel.
+    */
+    inline const QString& getChannelFile();
+
+    //=========================================================================================================
+    /**
+    * Returns the samples for simulation.
+    *
+    * @return a vector which holds all samples of out of the simulation file.
+    */
+    inline const QVector<double>& getSamples();
+
+    //=========================================================================================================
+    /**
+    * Sets whether channel is enabled.
+    *
+    * @param [in] enabled the parameter which enables the channel.
+    */
+    inline void setEnabled(bool enabled);
+
+    //=========================================================================================================
+    /**
+    * Returns whether channel is enabled.
+    *
+    * @return true when the channel is enabled, false otherwise.
+    */
+    inline const bool isEnabled();
+
+    //=========================================================================================================
+    /**
+    * Sets whether channel is visible.
+    *
+    * @param [in] visible the parameter which declares the channel visible.
+    */
+    inline void setVisible(bool visible);
+
+    //=========================================================================================================
+    /**
+    * Returns whether channel is visible.
+    *
+    * @return true when the channel is visible, false otherwise.
+    */
+    inline const bool isVisible();
+
+    //=========================================================================================================
+    /**
+    * Returns the minimum of all simulation sample values.
+    *
+    * @return the minimal value of all sample values.
+    */
+    inline const double getMinimum();
+
+    //=========================================================================================================
+    /**
+    * Returns the maximum of all simulation sample values.
+    *
+    * @return the maximal value of all sample values.
+    */
+    inline const double getMaximum();
+
+    //=========================================================================================================
+    /**
+    * Initializes the simulation channel.
+    */
+    void initChannel();
+
+    //=========================================================================================================
+    /**
+    * Clears the simulation channel.
+    */
+    void clear();
+
+private:
+
+    QString m_qStringResourceDataPath;	/**< Holds the path to the resource directory.*/
+
+    QString m_qStringChannelFile;	/**< Holds the channel file.*/
+
+    bool m_bIsEnabled;	/**< Holds whether the channel is enabled.*/
+    bool m_bIsVisible;	/**< Holds whether the channel is visible.*/
+
+    QVector<double> m_vecBuffer;	/**< A vector which holds all simualtion sample values.*/
+
+    double m_dMin;	/**< Holds minimal sample value.*/
+    double m_dMax;	/**< Holds maximal sample value.*/
+};
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+inline void ECGSimChannel::setResourceDataPath(QString& path)
+{
+    m_qStringResourceDataPath = path;
+};
+
+
+//*************************************************************************************************************
+
+inline const QString& ECGSimChannel::getResourceDataPath()
+{
+    return m_qStringResourceDataPath;
+};
+
+
+//*************************************************************************************************************
+
+inline void ECGSimChannel::setChannelFile(QString file)
+{
+    m_qStringChannelFile = file;
+};
+
+
+//*************************************************************************************************************
+
+inline const QString& ECGSimChannel::getChannelFile()
+{
+    return m_qStringChannelFile;
+};
+
+
+//*************************************************************************************************************
+
+inline const QVector<double>& ECGSimChannel::getSamples()
+{
+    return m_vecBuffer;
+};
+
+
+//*************************************************************************************************************
+
+inline void ECGSimChannel::setEnabled(bool enabled)
+{
+    m_bIsEnabled = enabled;
+};
+
+
+//*************************************************************************************************************
+
+inline const bool ECGSimChannel::isEnabled()
+{
+    return m_bIsEnabled;
+};
+
+
+//*************************************************************************************************************
+
+inline void ECGSimChannel::setVisible(bool visible)
+{
+    m_bIsVisible = visible;
+};
+
+
+//*************************************************************************************************************
+
+inline const bool ECGSimChannel::isVisible()
+{
+    return m_bIsVisible;
+};
+
+
+//*************************************************************************************************************
+
+inline const double ECGSimChannel::getMinimum()
+{
+    return m_dMin;
+};
+
+
+//*************************************************************************************************************
+
+inline const double ECGSimChannel::getMaximum()
+{
+    return m_dMax;
+};
+
+}// NAMESPACE
+
+#endif // ECGCHANNEL_H
