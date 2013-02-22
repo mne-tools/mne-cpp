@@ -47,8 +47,13 @@ SUBDIRS += \
     rtClient \
     rtInv
 
+
 contains(MNECPP_CONFIG, isGui) {
-    SUBDIRS += disp
+    SUBDIRS += \
+        rtMeas \
+        disp \
+        rtDtMng
+
     qtHaveModule(3d) {
         message(Qt3D available: disp3D library configured!)
         SUBDIRS += disp3D
