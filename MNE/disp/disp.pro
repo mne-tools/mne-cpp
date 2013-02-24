@@ -73,11 +73,8 @@ SOURCES += \
         disp.cpp \
         measurementwidget.cpp \
         displaymanager.cpp \
-        displaymanager.cpp \
         realtimesamplearraywidget.cpp \
         realtimemultisamplearraywidget.cpp \
-        measurementwidget.cpp \
-        displaymanager.cpp \
         textwidget.cpp \
         progressbarwidget.cpp \
         numericwidget.cpp
@@ -88,11 +85,8 @@ HEADERS += \
         measurementwidget.h \
         realtimesamplearraywidget.h \
         displaymanager.h \
-        displaymanager.h \
         realtimesamplearraywidget.h \
         realtimemultisamplearraywidget.h \
-        measurementwidget.h \
-        displaymanager.h \
         textwidget.h \
         progressbarwidget.h \
         numericwidget.h
