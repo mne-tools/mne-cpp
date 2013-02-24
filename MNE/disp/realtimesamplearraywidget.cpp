@@ -43,7 +43,7 @@
 #include "realtimesamplearraywidget.h"
 //#include "annotationwindow.h"
 #include "displaymanager.h"
-//#include "../rtmeas/Measurement/realtimesamplearray.h"
+#include <rtMeas/Measurement/realtimesamplearray.h>
 
 
 //*************************************************************************************************************
@@ -73,6 +73,7 @@
 //=============================================================================================================
 
 using namespace DISPLIB;
+using namespace RTMEASLIB;
 
 
 //*************************************************************************************************************

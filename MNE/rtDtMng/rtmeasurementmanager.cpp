@@ -24,20 +24,20 @@
 //=============================================================================================================
 
 #include "rtmeasurementmanager.h"
-#include "../rtmeas/Measurement/IMeasurementprovider.h"
-#include "../rtmeas/Measurement/IMeasurementacceptor.h"
+#include <rtMeas/Measurement/IMeasurementprovider.h>
+#include <rtMeas/Measurement/IMeasurementacceptor.h>
 
-#include "../rtmeas/Measurement/realtimesamplearray.h"
-#include "../rtmeas/Measurement/realtimemultisamplearray.h"
-#include "../rtmeas/Measurement/numeric.h"
+#include <rtMeas/Measurement/realtimesamplearray.h>
+#include <rtMeas/Measurement/realtimemultisamplearray.h>
+#include <rtMeas/Measurement/numeric.h>
 //#include "Measurement/progressbar.h"
 ////#include "Measurement/alert.h"
 //#include "Measurement/text.h"
 
-#include "../rtdisp/realtimesamplearraywidget.h"
-#include "../rtdisp/realtimemultisamplearraywidget.h"
-#include "../rtdisp/numericwidget.h"
-#include "../rtdisp/displaymanager.h"
+#include <disp/realtimesamplearraywidget.h>
+#include <disp/realtimemultisamplearraywidget.h>
+#include <disp/numericwidget.h>
+#include <disp/displaymanager.h>
 
 
 #include <QDebug>
@@ -48,7 +48,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CSART;
+using namespace RTMEASLIB;
+using namespace RTDTMNGLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -74,9 +76,9 @@ RTMeasurementManager::~RTMeasurementManager()
 
 void RTMeasurementManager::addMeasurementProvider(IMeasurementProvider* pMSRPrv)
 {
-	qDebug() << "Number of Measurement Providers before: "<< s_hashMeasurementProvider.size() << "keys" << s_hashMeasurementProvider.keys();
+    qDebug() << "Number of Measurement Providers before: "<< s_hashMeasurementProvider.size() << "keys" << s_hashMeasurementProvider.keys();
     qDebug() << "Adding Measurement Provider: "<< pMSRPrv->getModule_ID();
-	//check first if MeasurementProvider with id exists jet - and return existing first otherwise do the following stuff
+    //check first if MeasurementProvider with id exists jet - and return existing first otherwise do the following stuff
     if(!s_hashMeasurementProvider.contains(pMSRPrv->getModule_ID()))
         s_hashMeasurementProvider.insert(pMSRPrv->getModule_ID(), pMSRPrv);
 

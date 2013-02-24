@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file	   	connector.h
+* @file		textwidget.h
 * @author	Christoph Dinh <christoph.dinh@live.de>;
 * @version	1.0
 * @date		October, 2010
@@ -14,27 +14,22 @@
 * prior written consent of the author.
 *
 *
-* @brief	Contains the declaration of the Connector class.
+* @brief	Contains the declaration of the TextWidget class.
 *
 */
 
-#ifndef CONNECTOR_H
-#define CONNECTOR_H
+#ifndef TEXTWIDGET_H
+#define TEXTWIDGET_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../../comp/rtmeas/Nomenclature/nomenclature.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QList>
+#include "disp_global.h"
+#include "measurementwidget.h"
+#include "ui_textwidget.h"
 
 
 //*************************************************************************************************************
@@ -42,89 +37,76 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class QTime;
+namespace RTMEASLIB
+{
+class Text;
+}
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEX
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-namespace MNEX
+namespace DISPLIB
 {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// USED NAMESPACES
 //=============================================================================================================
 
-class DisplayManager;
+using namespace RTMEASLIB;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS Connector
+* DECLARE CLASS TextWidget
 *
-* @brief The Connector class is providing static functions which care about the module runtime connection.
+* @brief The TextWidget class provides a digital text widget.
 */
-class Connector
+class DISPSHARED_EXPORT TextWidget : public MeasurementWidget
 {
-//    Q_OBJECT
-//
-//    friend class MainCSART;
+    Q_OBJECT
 
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a Connector.
-    */
-    Connector();
-
-    //=========================================================================================================
-    /**
-    * Destroys the Connector.
-    */
-    virtual ~Connector();
-
-    //=========================================================================================================
-    /**
-    * Initialize a Connector.
-    */
-    static void init();
-
-    //=========================================================================================================
-    /**
-    * Connects all measurements to measurement acceptors, depending on corresponding id's.
-    */
-    static void connectMeasurements();
-
-    //=========================================================================================================
-    /**
-    * Disconnects all measurements to measurement acceptors, depending on corresponding id's.
-    */
-    static void disconnectMeasurements();
-
-    //=========================================================================================================
-    /**
-    * Connects all measurement widgets which are provided by modules of the module id list.
+    * Constructs a TextWidget which is a child of parent.
     *
-    * @param [in] idList list of module id's of which the provided measurements should be connected for displayed.
-    * @param [in] t time needed to initialise real time sample array widgets.
+    * @param [in] pText pointer to Text measurement.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new TextWidget becomes a window. If parent is another widget, TextWidget becomes a child window inside parent. TextWidget is deleted when its parent is deleted.
     */
-    static void connectMeasurementWidgets(QList<MDL_ID::Module_ID>& idList, QTime* t);
+    TextWidget(Text* pText, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Disconnects all measurement widgets which are provided by modules of the module id list.
-    *
-    * @param [in] idList list of module id's of which the provided measurements should be disconnected from display.
+    * Destroys the TextWidget.
     */
-    static void disconnectMeasurementWidgets(QList<MDL_ID::Module_ID>& idList);
+    ~TextWidget();
 
+    //=========================================================================================================
+    /**
+    * Is called when new data are available.
+    * Inherited by IObserver.
+    *
+    * @param [in] pSubject pointer to Subject -> not used because its direct attached to the measurement.
+    */
+    virtual void update(Subject* pSubject);
+
+    //=========================================================================================================
+    /**
+    * Initialise the TextWidget.
+    */
+    virtual void init();
+
+private:
+    Ui::TextWidgetClass ui;			/**< Holds the user interface of the numeric widget. */
+    Text*               m_pText;	/**< Holds the pointer to the Text measurement. */
 };
 
 } // NAMESPACE
 
-#endif // CONNECTOR_H
+#endif // TEXTWIDGET_H

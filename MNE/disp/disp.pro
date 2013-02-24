@@ -71,25 +71,43 @@ win32 {
 
 SOURCES += \
         disp.cpp \
-#    measurementwidget.cpp \
-#    displaymanager.cpp \
-#    displaymanager.cpp \
-#    realtimesamplearraywidget.cpp \
-#    realtimemultisamplearraywidget.cpp \
-#    measurementwidget.cpp \
-#    displaymanager.cpp
+        measurementwidget.cpp \
+        displaymanager.cpp \
+        displaymanager.cpp \
+        realtimesamplearraywidget.cpp \
+        realtimemultisamplearraywidget.cpp \
+        measurementwidget.cpp \
+        displaymanager.cpp \
+        textwidget.cpp \
+        progressbarwidget.cpp \
+        numericwidget.cpp
 
 HEADERS += \
         disp.h \
         disp_global.h \
-#    measurementwidget.h \
-#    realtimesamplearraywidget.h \
-#    displaymanager.h \
-#    displaymanager.h \
-#    realtimesamplearraywidget.h \
-#    realtimemultisamplearraywidget.h \
-#    measurementwidget.h \
-#    displaymanager.h
+        measurementwidget.h \
+        realtimesamplearraywidget.h \
+        displaymanager.h \
+        displaymanager.h \
+        realtimesamplearraywidget.h \
+        realtimemultisamplearraywidget.h \
+        measurementwidget.h \
+        displaymanager.h \
+        textwidget.h \
+        progressbarwidget.h \
+        numericwidget.h
+
+FORMS += \
+    realtimesamplearraywidget.ui \
+    realtimemultisamplearraywidget.ui \
+    realtimesamplearraywidget.ui \
+    realtimesamplearraywidget.ui \
+    realtimemultisamplearraywidget.ui \
+    textwidget.ui \
+    progressbarwidget.ui \
+    numericwidget.ui
+
+UI_DIR = $${PWD}
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -100,9 +118,3 @@ header_files.path = $${MNE_INCLUDE_DIR}/disp
 
 INSTALLS += header_files
 
-FORMS += \
-    realtimesamplearraywidget.ui \
-    realtimemultisamplearraywidget.ui \
-    realtimesamplearraywidget.ui \
-    realtimesamplearraywidget.ui \
-    realtimemultisamplearraywidget.ui

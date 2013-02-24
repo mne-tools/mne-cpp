@@ -50,7 +50,7 @@ SUBDIRS += \
 
 contains(MNECPP_CONFIG, isGui) {
     SUBDIRS += \
-        mne_x
+        #mne_x
 
     qtHaveModule(3d) {
         message(Qt3D available: mne_source_lab configured!)

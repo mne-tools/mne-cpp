@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file		progressbar.cpp
-* @author	Christoph Dinh <christoph.dinh@live.de>;
-* @version	1.0
-* @date		October, 2010
+* @file     numericwidget.cpp
+* @author   Christoph Dinh <christoph.dinh@live.de>;
+* @version  1.0
+* @date     October, 2010
 *
-* @section	LICENSE
+* @section  LICENSE
 *
 * Copyright (C) 2010 Christoph Dinh. All rights reserved.
 *
@@ -14,7 +14,7 @@
 * prior written consent of the author.
 *
 *
-* @brief	Contains the implementation of the ProgressBar class.
+* @brief    Contains the implementation of the NumericWidget class.
 *
 */
 
@@ -23,7 +23,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "progressbar.h"
+#include "numericwidget.h"
+#include <rtMeas/Measurement/numeric.h>
 
 
 //*************************************************************************************************************
@@ -31,6 +32,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace DISPLIB;
 using namespace RTMEASLIB;
 
 
@@ -39,12 +41,18 @@ using namespace RTMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ProgressBar::ProgressBar()
-: Measurement()
-, m_iMin(-1)
-, m_iMax(-1)
-, m_iValue(0)
+NumericWidget::NumericWidget(Numeric* pNumeric, QWidget* parent)
+: MeasurementWidget(parent)
+, m_pNumeric(pNumeric)
 
+{
+    ui.setupUi(this);
+}
+
+
+//*************************************************************************************************************
+
+NumericWidget::~NumericWidget()
 {
 
 }
@@ -52,18 +60,16 @@ ProgressBar::ProgressBar()
 
 //*************************************************************************************************************
 
-ProgressBar::~ProgressBar()
+void NumericWidget::update(Subject*)
 {
-
+    ui.m_qLcdNumber_Value->display(m_pNumeric->getValue());
 }
 
 
 //*************************************************************************************************************
 
-void ProgressBar::setValue(double v)
+void NumericWidget::init()
 {
-    if(v < m_iMin) v = m_iMin;
-    else if(v > m_iMax) v = m_iMax;
-    m_iValue = (int)v;
-    notify();
+    ui.m_qLabel_Caption->setText(m_pNumeric->getName());
+    ui.m_qLabel_Unit->setText(m_pNumeric->getUnit());
 }

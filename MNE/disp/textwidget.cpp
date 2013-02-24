@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file		progressbar.cpp
+* @file		textwidget.cpp
 * @author	Christoph Dinh <christoph.dinh@live.de>;
 * @version	1.0
 * @date		October, 2010
@@ -14,7 +14,7 @@
 * prior written consent of the author.
 *
 *
-* @brief	Contains the implementation of the ProgressBar class.
+* @brief	Contains the implementation of the RealTimeSampleArrayWidget class.
 *
 */
 
@@ -23,7 +23,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "progressbar.h"
+#include "textwidget.h"
+#include <rtMeas/Measurement/text.h>
 
 
 //*************************************************************************************************************
@@ -31,6 +32,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace DISPLIB;
 using namespace RTMEASLIB;
 
 
@@ -39,12 +41,18 @@ using namespace RTMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ProgressBar::ProgressBar()
-: Measurement()
-, m_iMin(-1)
-, m_iMax(-1)
-, m_iValue(0)
+TextWidget::TextWidget(Text* pText, QWidget *parent)
+: MeasurementWidget(parent)
+, m_pText(pText)
 
+{
+    ui.setupUi(this);
+}
+
+
+//*************************************************************************************************************
+
+TextWidget::~TextWidget()
 {
 
 }
@@ -52,18 +60,15 @@ ProgressBar::ProgressBar()
 
 //*************************************************************************************************************
 
-ProgressBar::~ProgressBar()
+void TextWidget::update(Subject*)
 {
-
+    ui.m_qLabel_Text->setText(m_pText->getText());
 }
 
 
 //*************************************************************************************************************
 
-void ProgressBar::setValue(double v)
+void TextWidget::init()
 {
-    if(v < m_iMin) v = m_iMin;
-    else if(v > m_iMax) v = m_iMax;
-    m_iValue = (int)v;
-    notify();
+    ui.m_qLabel_Caption->setText(m_pText->getName());
 }

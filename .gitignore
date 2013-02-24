@@ -64,6 +64,10 @@
 /*.5pre1
 Makefile
 
+# Generated files
+ui_*.h
+
+
 # IDE settings
 .cproject
 .project
