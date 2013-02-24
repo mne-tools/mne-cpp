@@ -151,13 +151,13 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
     qint32 i, k, r;
 
     typedef Eigen::Triplet<double> T;
-    std::vector<T> tripletListCal;
-    tripletListCal.reserve(nchan);
+    std::vector<T> tripletList;
+    tripletList.reserve(nchan);
     for(i = 0; i < nchan; ++i)
-        tripletListCal.push_back(T(i, i, this->cals[i]));
+        tripletList.push_back(T(i, i, this->cals[i]));
 
     SparseMatrix<double> cal(nchan, nchan);
-    cal.setFromTriplets(tripletListCal.begin(), tripletListCal.end());
+    cal.setFromTriplets(tripletList.begin(), tripletList.end());
 //    cal.makeCompressed();
 
     MatrixXd mult_full;
@@ -187,12 +187,12 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
 
         if (!projAvailable && this->comp.kind == -1)
         {
-            std::vector<T> tripletListCalTmp;
-            tripletListCalTmp.reserve(sel.size());
+            tripletList.clear();
+            tripletList.reserve(sel.size());
             for(i = 0; i < sel.size(); ++i)
-                tripletListCalTmp.push_back(T(i, i, this->cals[sel[i]]));
+                tripletList.push_back(T(i, i, this->cals[sel[i]]));
             cal = SparseMatrix<double>(sel.size(), sel.size());
-            cal.setFromTriplets(tripletListCalTmp.begin(), tripletListCalTmp.end());
+            cal.setFromTriplets(tripletList.begin(), tripletList.end());
         }
         else
         {
@@ -225,16 +225,16 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
     //
     // Make mult sparse
     //
-    std::vector<T> tripletListMult;
-    tripletListMult.reserve(mult_full.rows()*mult_full.cols());
+    tripletList.clear();
+    tripletList.reserve(mult_full.rows()*mult_full.cols());
     for(i = 0; i < mult_full.rows(); ++i)
         for(k = 0; k < mult_full.cols(); ++k)
             if(mult_full(i,k) != 0)
-                tripletListMult.push_back(T(i, k, mult_full(i,k)));
+                tripletList.push_back(T(i, k, mult_full(i,k)));
 
     SparseMatrix<double> mult(mult_full.rows(),mult_full.cols());
-    if(tripletListMult.size() > 0)
-        mult.setFromTriplets(tripletListMult.begin(), tripletListMult.end());
+    if(tripletList.size() > 0)
+        mult.setFromTriplets(tripletList.begin(), tripletList.end());
 //    mult.makeCompressed();
 
     //

@@ -18,49 +18,48 @@ DEFINES += ECGSIMULATOR_LIBRARY
 
 QT += core widgets
 
-
 TARGET = ecgsimulator
-
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
-
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
-            -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${MNE_LIB_VERSION}RtCommandd
+            -lMNE$${MNE_LIB_VERSION}Dispd \
+            -lMNE$${MNE_LIB_VERSION}RtMeasd \
+            -lMNE$${MNE_LIB_VERSION}RtDtMngd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
-            -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Mne \
-            -lMNE$${MNE_LIB_VERSION}RtCommand
+            -lMNE$${MNE_LIB_VERSION}Disp \
+            -lMNE$${MNE_LIB_VERSION}RtMeas \
+            -lMNE$${MNE_LIB_VERSION}RtDtMng
 }
 
 DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
-SOURCES += ecgsimulator.cpp \
-    ecgsimchannel.cpp \
-    ecgproducer.cpp \
-    FormFiles/ecgsetupwidget.cpp \
-    FormFiles/ecgrunwidget.cpp \
-    FormFiles/ecgaboutwidget.cpp
+SOURCES += \
+        ecgsimulator.cpp \
+        ecgsimchannel.cpp \
+        ecgproducer.cpp \
+        FormFiles/ecgsetupwidget.cpp \
+        FormFiles/ecgrunwidget.cpp \
+        FormFiles/ecgaboutwidget.cpp
 
-HEADERS += ecgsimulator.h\
+HEADERS += \
+        ecgsimulator.h\
         ecgsimulator_global.h \
-    ecgsimchannel.h \
-    ecgproducer.h \
-    FormFiles/ecgsetupwidget.h \
-    FormFiles/ecgrunwidget.h \
-    FormFiles/ecgaboutwidget.h
+        ecgsimchannel.h \
+        ecgproducer.h \
+        FormFiles/ecgsetupwidget.h \
+        FormFiles/ecgrunwidget.h \
+        FormFiles/ecgaboutwidget.h
 
 FORMS += \
-    FormFiles/ecgsetup.ui \
-    FormFiles/ecgrun.ui \
-    FormFiles/ecgabout.ui
+        FormFiles/ecgsetup.ui \
+        FormFiles/ecgrun.ui \
+        FormFiles/ecgabout.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 DEPENDPATH += $${MNE_INCLUDE_DIR}
