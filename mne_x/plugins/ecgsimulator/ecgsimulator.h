@@ -31,9 +31,9 @@
 
 #include "ecgsimchannel.h"
 
-#include "../../mainApp/src/interfaces/ISensor.h"
-#include "../../comp/rtmeas/IOBuffer/circularbuffer.h"
-#include "../../comp/rtmeas/Measurement/realtimesamplearray.h"
+#include "../../mne_x/mne_x/src/interfaces/ISensor.h"
+#include <rtMeas/IOBuffer/circularbuffer.h>
+#include <rtMeas/Measurement/realtimesamplearray.h>
 
 
 //*************************************************************************************************************
@@ -41,7 +41,7 @@
 // QT STL INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
+#include <QtWidgets>
 #include <QVector>
 
 
@@ -59,7 +59,7 @@ namespace ECGSimulatorModule
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CSART;
+using namespace MNEX;
 using namespace IOBuffer;
 
 
@@ -81,9 +81,9 @@ class ECGProducer;
 class ECGSIMULATORSHARED_EXPORT ECGSimulator : public ISensor
 {
     Q_OBJECT
-
+    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "ecgsimulator.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(CSART::ISensor)
+    Q_INTERFACES(MNEX::ISensor)
 
     friend class ECGProducer;
     friend class ECGSetupWidget;

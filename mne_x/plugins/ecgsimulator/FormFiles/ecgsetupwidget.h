@@ -33,7 +33,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtGui/QWidget>
+#include <QtWidgets>
 #include "../ui_ecgsetup.h"
 
 
