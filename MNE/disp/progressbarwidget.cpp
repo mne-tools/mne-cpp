@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file		runwidget.cpp
+* @file		progressbarwidget.cpp
 * @author	Christoph Dinh <christoph.dinh@live.de>;
 * @version	1.0
 * @date		October, 2010
@@ -14,7 +14,7 @@
 * prior written consent of the author.
 *
 *
-* @brief	Contains implementation of RunWidget class.
+* @brief	Contains the implementation of the ProgressBarWidget class.
 *
 */
 
@@ -23,7 +23,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "runwidget.h"
+#include "progressbarwidget.h"
+#include <rtMeas/Measurement/progressbar.h>
 
 
 //*************************************************************************************************************
@@ -31,8 +32,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtGui>
-#include <QScrollArea>
+#include <QPaintEvent>
+#include <QPainter>
+#include <QTimer>
 
 
 //*************************************************************************************************************
@@ -40,94 +42,75 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEX;
+using namespace DISPLIB;
+using namespace RTMEASLIB;
 
-RunWidget::RunWidget(QWidget *dispWidget, QWidget *parent)
-    : QWidget(parent)
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+ProgressBarWidget::ProgressBarWidget(ProgressBar* pProgressBar, QWidget *parent)
+: MeasurementWidget(parent)
+, m_pProgressBar(pProgressBar)
+, m_dSegmentSize(0.0)
+
 {
+    ui.setupUi(this);
+    m_usXPos = ui.m_qFrame->geometry().x();
 
-    m_pScrollArea = new QScrollArea;
-    //    m_pScrollArea->setBackgroundRole(QPalette::Base);
-    m_pScrollArea->setWidget(dispWidget);
+    QTimer* timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
+    timer->start(1000);
 
-    m_pScrollArea->setWidgetResizable(true);
-
-    m_pTabWidgetMain = new QTabWidget;
-
-    m_pTabWidgetMain->addTab(m_pScrollArea, tr("Dis&play"));
-
-    QVBoxLayout *pVBoxLayout = new QVBoxLayout;
-    pVBoxLayout->addWidget(m_pTabWidgetMain);
-
-    setLayout(pVBoxLayout);
-
-    //setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    m_Brush.setStyle(Qt::SolidPattern);
+    m_Font.setBold(true);
+    m_Font.setPointSizeF(28);
 }
 
 
 //*************************************************************************************************************
 
-RunWidget::~RunWidget()
+ProgressBarWidget::~ProgressBarWidget()
 {
-    qDebug() << "RunCSART destroyed automatically.";
+
 }
 
 
 //*************************************************************************************************************
 
-int RunWidget::addTab(QWidget* page, const QString& label)
+void ProgressBarWidget::update(Subject*)
 {
-    return m_pTabWidgetMain->addTab(page, label);
-}
+    m_usXPos = (unsigned short)(ui.m_qFrame->geometry().x()+m_dSegmentSize*m_pProgressBar->getValue());
+    m_Text = QString::number(m_pProgressBar->getValue()/10.0f);
 
+    if((m_pProgressBar->getValue() >= 0) && (m_pProgressBar->getValue() <= 40))
+        m_Brush.setColor(Qt::green);
 
-//*************************************************************************************************************
+    else if((m_pProgressBar->getValue() > 40) && (m_pProgressBar->getValue() <= 80))
+        m_Brush.setColor(Qt::yellow);
 
-void RunWidget::setStandardZoom()
-{
-    m_pScrollArea->setWidgetResizable(true);
-}
-
-
-//*************************************************************************************************************
-
-void RunWidget::zoomVert(float factor)
-{
-    m_pScrollArea->setWidgetResizable(false);
-
-    QSize size = m_pScrollArea->widget()->size();
-
-    if(m_pScrollArea->size().height()>size.height()*factor)
-        size.setWidth(m_pScrollArea->size().width()-2);
     else
-        size.setWidth(m_pScrollArea->size().width()-20);
-
-    m_pScrollArea->widget()->resize((int)(size.width()),(int)(size.height()*factor));
-
+        m_Brush.setColor(Qt::red);
 }
 
 
 //*************************************************************************************************************
 
-void RunWidget::resizeEvent(QResizeEvent* )
+void ProgressBarWidget::init()
 {
-    if(!m_pScrollArea->widgetResizable())
-    {
-        QSize size = m_pScrollArea->widget()->size();
-
-        if(m_pScrollArea->size().height()>size.height())
-            size.setWidth(m_pScrollArea->size().width()-2);
-        else
-            size.setWidth(m_pScrollArea->size().width()-20);
-
-        m_pScrollArea->widget()->resize(size.width(),size.height());
-    }
+    ui.m_qLabel_Caption->setText(m_pProgressBar->getName());
+    m_dSegmentSize = static_cast<double>(ui.m_qFrame->width())/(m_pProgressBar->getMaxScale()-m_pProgressBar->getMinScale());
 }
 
 
 //*************************************************************************************************************
 
-void RunWidget::closeEvent(QCloseEvent* )
+void ProgressBarWidget::paintEvent(QPaintEvent*)
 {
-    emit displayClosed();
+    QPainter painter(this);
+    painter.fillRect(ui.m_qFrame->geometry().x(), ui.m_qFrame->geometry().y(), m_usXPos, ui.m_qFrame->geometry().height(), m_Brush);
+    painter.setFont(m_Font);
+    painter.drawText(ui.m_qFrame->geometry(), Qt::AlignCenter, m_Text);
 }

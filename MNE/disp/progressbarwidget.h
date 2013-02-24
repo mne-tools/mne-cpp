@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file	   	connector.h
+* @file		progressbarwidget.h
 * @author	Christoph Dinh <christoph.dinh@live.de>;
 * @version	1.0
 * @date		October, 2010
@@ -14,19 +14,22 @@
 * prior written consent of the author.
 *
 *
-* @brief	Contains the declaration of the Connector class.
+* @brief	Contains the declaration of the ProgressBarWidget class.
 *
 */
 
-#ifndef CONNECTOR_H
-#define CONNECTOR_H
+#ifndef PROGRESSBARWIDGET_H
+#define PROGRESSBARWIDGET_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../../comp/rtmeas/Nomenclature/nomenclature.h"
+#include "disp_global.h"
+#include "measurementwidget.h"
+#include "ui_progressbarwidget.h"
 
 
 //*************************************************************************************************************
@@ -34,7 +37,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QList>
+#include <QBrush>
+#include <QFont>
 
 
 //*************************************************************************************************************
@@ -42,89 +46,95 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class QTime;
+namespace RTMEASLIB
+{
+class ProgressBar;
+}
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEX
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-namespace MNEX
+namespace DISPLIB
 {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// USED NAMESPACES
 //=============================================================================================================
 
-class DisplayManager;
+using namespace RTMEASLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS Connector
+* DECLARE CLASS ProgressBarWidget
 *
-* @brief The Connector class is providing static functions which care about the module runtime connection.
+* @brief The ProgressBarWidget class provides a progress bar display.
 */
-class Connector
+class DISPSHARED_EXPORT ProgressBarWidget : public MeasurementWidget
 {
-//    Q_OBJECT
-//
-//    friend class MainCSART;
+    Q_OBJECT
 
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a Connector.
-    */
-    Connector();
-
-    //=========================================================================================================
-    /**
-    * Destroys the Connector.
-    */
-    virtual ~Connector();
-
-    //=========================================================================================================
-    /**
-    * Initialize a Connector.
-    */
-    static void init();
-
-    //=========================================================================================================
-    /**
-    * Connects all measurements to measurement acceptors, depending on corresponding id's.
-    */
-    static void connectMeasurements();
-
-    //=========================================================================================================
-    /**
-    * Disconnects all measurements to measurement acceptors, depending on corresponding id's.
-    */
-    static void disconnectMeasurements();
-
-    //=========================================================================================================
-    /**
-    * Connects all measurement widgets which are provided by modules of the module id list.
+    * Constructs a ProgressBarWidget which is a child of parent.
     *
-    * @param [in] idList list of module id's of which the provided measurements should be connected for displayed.
-    * @param [in] t time needed to initialise real time sample array widgets.
+    * @param [in] pProgressBar pointer to ProgressBar measurement.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new ProgressBarWidget becomes a window. If parent is another widget, ProgressBarWidget becomes a child window inside parent. ProgressBarWidget is deleted when its parent is deleted.
     */
-    static void connectMeasurementWidgets(QList<MDL_ID::Module_ID>& idList, QTime* t);
+    ProgressBarWidget(ProgressBar* pProgressBar, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Disconnects all measurement widgets which are provided by modules of the module id list.
-    *
-    * @param [in] idList list of module id's of which the provided measurements should be disconnected from display.
+    * Destroys the ProgressBarWidget.
     */
-    static void disconnectMeasurementWidgets(QList<MDL_ID::Module_ID>& idList);
+    ~ProgressBarWidget();
 
+    //=========================================================================================================
+    /**
+    * Is called when new data are available.
+    * Inherited by IObserver.
+    *
+    * @param [in] pSubject pointer to Subject -> not used because its direct attached to the measurement.
+    */
+    virtual void update(Subject* pSubject);
+
+    //=========================================================================================================
+    /**
+    * Initialise the ProgressBarWidget.
+    */
+    virtual void init();
+
+    //=========================================================================================================
+    /**
+    * Is called to paint the progress bar of the ProgressBarWidget.
+    *
+    * @param [in] event pointer to PaintEvent -> not used.
+    */
+    virtual void paintEvent(QPaintEvent* event);
+
+private:
+    Ui::ProgressBarWidgetClass  ui;					/**< Holds the user interface of the ProgressBar widget. */
+    ProgressBar*                m_pProgressBar;		/**< Holds ProgressBar measurement. */
+    double                      m_dSegmentSize;		/**< Holds the segment size. */
+    unsigned short              m_usXPos;			/**< Holds the horizontal start position. */
+    QBrush                      m_Brush;			/**< Holds the progress bar brush. */
+    QFont                       m_Font;				/**< Holds the progress bar text font. */
+    QString                     m_Text;				/**< Holds the progress bar progress text. */
 };
 
 } // NAMESPACE
 
-#endif // CONNECTOR_H
+#endif // PROGRESSBARWIDGET_H

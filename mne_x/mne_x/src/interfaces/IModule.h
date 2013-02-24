@@ -33,16 +33,16 @@
 
 
 
-#include "../../../MNE/rtMeas/Nomenclature/nomenclature.h" //ToDo this has not to be relative; //Interfaces needs to be moved to a separate lib
+#include <rtMeas/Nomenclature/nomenclature.h> //ToDo this has not to be relative; //Interfaces needs to be moved to a separate lib
 
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE CSART
+// DEFINE NAMESPACE MNEX
 //=============================================================================================================
 
-namespace CSART
+namespace MNEX
 {
 
 
@@ -63,6 +63,8 @@ enum Type
     _IAlert,				/**< Type for a alert module. */
     _IRTVisualization		/**< Type for a real-time visualization module. */
 };
+
+using namespace RTMEASLIB;
 
 
 //=========================================================================================================
@@ -207,6 +209,6 @@ inline bool IModule::isActive() const
 
 } //Namespace
 
-Q_DECLARE_INTERFACE(CSART::IModule, "csa_rt/1.0")
+Q_DECLARE_INTERFACE(MNEX::IModule, "csa_rt/1.0")
 
 #endif //IMODULE_H

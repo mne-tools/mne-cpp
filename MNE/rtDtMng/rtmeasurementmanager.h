@@ -27,13 +27,13 @@
 //=============================================================================================================
 
 #include "rtdtmng_global.h"
-#include "../rtmeas/Nomenclature/nomenclature.h"
+#include <rtMeas/Nomenclature/nomenclature.h>
 
-#include "../rtmeas/DesignPatterns/observerpattern.h"
+#include <rtMeas/DesignPatterns/observerpattern.h>
 
 
 
-#include "../../mainApp/src/interfaces/IModule.h"
+#include "../../mne_x/mne_x/src/interfaces/IModule.h"
 
 
 //*************************************************************************************************************
@@ -53,14 +53,33 @@
 
 class QTime;
 
+namespace RTMEASLIB
+{
+class IMeasurementProvider;
+class IMeasurementAcceptor;
+}
+
+namespace DISPLIB
+{
+class NumericWidget;
+class RealTimeSampleArrayWidget;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE CSART
+// DEFINE NAMESPACE RTDTMNGLIB
 //=============================================================================================================
 
-namespace CSART
+namespace RTDTMNGLIB
 {
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace MNEX;
 
 
 //*************************************************************************************************************
@@ -68,11 +87,6 @@ namespace CSART
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class IMeasurementProvider;
-class IMeasurementAcceptor;
-
-class NumericWidget;
-class RealTimeSampleArrayWidget;
 
 //=============================================================================================================
 /**

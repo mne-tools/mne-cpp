@@ -8,64 +8,58 @@
 #
 #--------------------------------------------------------
 
+include(../../mne-cpp.pri)
+
 TEMPLATE = lib
-unix:CONFIG += static
+
+QT += core gui widgets
 
 DEFINES += RTDTMNG_LIBRARY
 
-QT += core gui
-
+TARGET = RtDtMng
+TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
 CONFIG(debug, debug|release) {
-    TARGET = rtdtmngd
-    unix:DESTDIR = $$PWD/../../lib/unix/debug
-    win32:DESTDIR = $$PWD/../../lib/win32/debug
-    unix: LIBS += -L$$PWD/../../lib/unix/debug/ -lrtdispd
-    win32:LIBS += -L$$PWD/../../lib/win32/debug/ -lrtdispd
-    unix: LIBS += -L$$PWD/../../lib/unix/debug/ -lrtmeasd
-    win32:LIBS += -L$$PWD/../../lib/win32/debug/ -lrtmeasd
-    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\..\\csa_rt\\lib\\win32\\debug\\rtdtmngd.dll" "..\\..\\..\\csa_rt\\bin\\win32\\debug\\"
+    TARGET = $$join(TARGET,,,d)
+}
+
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lMNE$${MNE_LIB_VERSION}RtMeasd \
+            -lMNE$${MNE_LIB_VERSION}Dispd
 }
 else {
-    TARGET = rtdtmng
-    unix:DESTDIR = $$PWD/../../lib/unix/release
-    win32:DESTDIR = $$PWD/../../lib/win32/release
-    unix: LIBS += -L$$PWD/../../lib/unix/release/ -lrtdisp
-    win32:LIBS += -L$$PWD/../../lib/win32/release/ -lrtdisp
-    unix: LIBS += -L$$PWD/../../lib/unix/release/ -lrtmeas
-    win32:LIBS += -L$$PWD/../../lib/win32/release/ -lrtmeas
-    win32:QMAKE_POST_LINK += xcopy /y "..\\..\\..\\csa_rt\\lib\\win32\\release\\rtdtmng.dll" "..\\..\\..\\csa_rt\\bin\\win32\\release\\"
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lMNE$${MNE_LIB_VERSION}RtMeas \
+            -lMNE$${MNE_LIB_VERSION}Disp
 }
 
-SOURCES += rtmeasurementmanager.cpp
+DESTDIR = $${MNE_LIBRARY_DIR}
 
-HEADERS += rtmeasurementmanager.h\
+#
+# win32: copy dll's to bin dir
+# unix: add lib folder to LD_LIBRARY_PATH
+#
+win32 {
+    FILE = $${DESTDIR}/$${TARGET}.dll
+    BINDIR = $${DESTDIR}/../bin
+    FILE ~= s,/,\\,g
+    BINDIR ~= s,/,\\,g
+    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
+}
+
+SOURCES += \
+        rtmeasurementmanager.cpp
+
+HEADERS += \
+        rtmeasurementmanager.h\
         rtdtmng_global.h
 
-symbian {
-    MMP_RULES += EXPORTUNFROZEN
-    TARGET.UID3 = 0xE62A4B50
-    TARGET.CAPABILITY = 
-    TARGET.EPOCALLOWDLLDATA = 1
-    addFiles.sources = rtdtmng.dll
-    addFiles.path = !:/sys/bin
-    DEPLOYMENT += addFiles
-}
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
-unix:!symbian {
-    maemo5 {
-        target.path = /opt/usr/lib
-    } else {
-        target.path = /usr/lib
-    }
-    INSTALLS += target
-}
+# Install headers to include directory
+header_files.files = ./*.h
+header_files.path = $${MNE_INCLUDE_DIR}/disp
 
-symbian: LIBS += -lrtdisp
-
-INCLUDEPATH += $$PWD/../rtdisp
-DEPENDPATH += $$PWD/../rtdisp
-
-symbian: LIBS += -lrtmeas
-
-INCLUDEPATH += $$PWD/../rtmeas
-DEPENDPATH += $$PWD/../rtmeas
+INSTALLS += header_files

@@ -45,15 +45,7 @@
 #include "disp_global.h"
 
 #include <generics/circularbuffer.h>
-//#include "../rtmeas/Nomenclature/nomenclature.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
-
-#include <QHash>
+#include <rtMeas/Nomenclature/nomenclature.h>
 
 
 //*************************************************************************************************************
@@ -61,8 +53,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QHash>
 #include <QWidget>
-
 #include <QLabel>
 #include <QString>
 
@@ -74,6 +66,15 @@
 
 class QVBoxLayout;
 class QHBoxLayout;
+
+namespace RTMEASLIB
+{
+class Numeric;
+class RealTimeSampleArray;
+class RealTimeMultiSampleArray;
+class ProgressBar;
+class Text;
+}
 
 
 //*************************************************************************************************************
@@ -91,6 +92,7 @@ namespace DISPLIB
 //=============================================================================================================
 
 using namespace IOBuffer;
+using namespace RTMEASLIB;
 
 
 //*************************************************************************************************************
@@ -98,15 +100,10 @@ using namespace IOBuffer;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class Numeric;
 class NumericWidget;
-class RealTimeSampleArray;
 class RealTimeSampleArrayWidget;
-class RealTimeMultiSampleArray;
 class RealTimeMultiSampleArrayWidget;
-class ProgressBar;
 class ProgressBarWidget;
-class Text;
 class TextWidget;
 class MeasurementWidget;
 
@@ -143,7 +140,7 @@ public:
     * @param [in] id of the numeric measurement provider.
     * @return pointer to the new numeric widget.
     */
-//    static NumericWidget* addNumericWidget(Numeric* pNum, QWidget* parent, MSR_ID::Measurement_ID id);
+    static NumericWidget* addNumericWidget(Numeric* pNum, QWidget* parent, MSR_ID::Measurement_ID id);
 
     //=========================================================================================================
     /**
@@ -155,7 +152,7 @@ public:
     * @param [in] t pointer to application time.
     * @return pointer to the new real-time sample array widget.
     */
-//    static RealTimeSampleArrayWidget* addRealTimeSampleArrayWidget(RealTimeSampleArray* pRTSA, QWidget* parent, MSR_ID::Measurement_ID id, QTime* t);
+    static RealTimeSampleArrayWidget* addRealTimeSampleArrayWidget(RealTimeSampleArray* pRTSA, QWidget* parent, MSR_ID::Measurement_ID id, QTime* t);
 
     //=========================================================================================================
     /**
@@ -167,7 +164,7 @@ public:
     * @param [in] t pointer to application time.
     * @return pointer to the new real-time multi sample array widget.
     */
-//    static RealTimeMultiSampleArrayWidget* addRealTimeMultiSampleArrayWidget(RealTimeMultiSampleArray* pRTSM, QWidget* parent, MSR_ID::Measurement_ID id, QTime* t);
+    static RealTimeMultiSampleArrayWidget* addRealTimeMultiSampleArrayWidget(RealTimeMultiSampleArray* pRTSM, QWidget* parent, MSR_ID::Measurement_ID id, QTime* t);
 
     //=========================================================================================================
     /**
@@ -178,7 +175,7 @@ public:
     * @param [in] id of the progress bar measurement provider.
     * @return pointer to the new progress bar widget.
     */
-//    static ProgressBarWidget* addProgressBarWidget(ProgressBar* pProgress, QWidget* parent, MSR_ID::Measurement_ID id);
+    static ProgressBarWidget* addProgressBarWidget(ProgressBar* pProgress, QWidget* parent, MSR_ID::Measurement_ID id);
 
     //=========================================================================================================
     /**
@@ -189,7 +186,7 @@ public:
     * @param [in] id of the text measurement provider.
     * @return pointer to the new text widget.
     */
-//    static TextWidget* addTextWidget(Text* pText, QWidget* parent, MSR_ID::Measurement_ID id);
+    static TextWidget* addTextWidget(Text* pText, QWidget* parent, MSR_ID::Measurement_ID id);
 
 //get
     //=========================================================================================================
@@ -198,7 +195,7 @@ public:
     *
     * @return a reference to a hash containing the measurement widgets and their corresponding measurement provider id's .
     */
-//    static QHash<MSR_ID::Measurement_ID, MeasurementWidget*>& getMeasurementWidgets() {return s_hashMeasurementWidgets;};
+    static QHash<MSR_ID::Measurement_ID, MeasurementWidget*>& getMeasurementWidgets() {return s_hashMeasurementWidgets;};
 
     //=========================================================================================================
     /**
@@ -206,7 +203,7 @@ public:
     *
     * @return a reference to a hash containing the numeric widgets and their corresponding numeric provider id's.
     */
-//    static QHash<MSR_ID::Measurement_ID, NumericWidget*>& getNumericWidgets() {return s_hashNumericWidgets;};
+    static QHash<MSR_ID::Measurement_ID, NumericWidget*>& getNumericWidgets() {return s_hashNumericWidgets;};
 
     //=========================================================================================================
     /**
@@ -214,7 +211,7 @@ public:
     *
     * @return a reference to a hash containing the real-time sample array widgets and their corresponding real-time sample array provider id's .
     */
-//    static QHash<MSR_ID::Measurement_ID, RealTimeSampleArrayWidget*>& getRTSAWidgets() {return s_hashRealTimeSampleArrayWidgets;};
+    static QHash<MSR_ID::Measurement_ID, RealTimeSampleArrayWidget*>& getRTSAWidgets() {return s_hashRealTimeSampleArrayWidgets;};
 
     //=========================================================================================================
     /**
@@ -222,7 +219,7 @@ public:
     *
     * @return a reference to a hash containing the real-time sample array widgets and their corresponding real-time sample array provider id's .
     */
-//    static QHash<MSR_ID::Measurement_ID, RealTimeMultiSampleArrayWidget*>& getRTMSAWidgets() {return s_hashRealTimeMultiSampleArrayWidgets;};
+    static QHash<MSR_ID::Measurement_ID, RealTimeMultiSampleArrayWidget*>& getRTMSAWidgets() {return s_hashRealTimeMultiSampleArrayWidgets;};
 
     //=========================================================================================================
     /**
@@ -230,7 +227,7 @@ public:
     *
     * @return a reference to a hash containing the progress bar widgets and their corresponding progress bar provider id's.
     */
-//    static QHash<MSR_ID::Measurement_ID, ProgressBarWidget*>& getProgressBarWidgets() {return s_hashProgressBarWidgets;};
+    static QHash<MSR_ID::Measurement_ID, ProgressBarWidget*>& getProgressBarWidgets() {return s_hashProgressBarWidgets;};
 
     //=========================================================================================================
     /**
@@ -238,7 +235,7 @@ public:
     *
     * @return a reference to a hash containing the text widgets and their corresponding text provider id's.
     */
-//    static QHash<MSR_ID::Measurement_ID, TextWidget*>& getTextWidgets() {return s_hashTextWidgets;};
+    static QHash<MSR_ID::Measurement_ID, TextWidget*>& getTextWidgets() {return s_hashTextWidgets;};
 
     //=========================================================================================================
     /**
@@ -261,12 +258,12 @@ public:
     static void clean();
 
 private:
-//    static QHash<MSR_ID::Measurement_ID, MeasurementWidget*>              s_hashMeasurementWidgets;			/**< Holds all measurement widgets and corresponding measurement id's.*/
-//    static QHash<MSR_ID::Measurement_ID, NumericWidget*>                  s_hashNumericWidgets;				/**< Holds all numeric widgets and corresponding numeric measurement id's.*/
-//    static QHash<MSR_ID::Measurement_ID, RealTimeSampleArrayWidget*>      s_hashRealTimeSampleArrayWidgets;	/**< Holds all real-time sample array widgets and corresponding real-time sample array id's.*/
-//    static QHash<MSR_ID::Measurement_ID, RealTimeMultiSampleArrayWidget*> s_hashRealTimeMultiSampleArrayWidgets;	/**< Holds all real-time multi sample array widgets and corresponding real-time multi sample array id's.*/
-//    static QHash<MSR_ID::Measurement_ID, ProgressBarWidget*>              s_hashProgressBarWidgets;			/**< Holds all progress bar widgets and corresponding progress bar id's.*/
-//    static QHash<MSR_ID::Measurement_ID, TextWidget*>                     s_hashTextWidgets;					/**< Holds all text widgets and text measurement id's.*/
+    static QHash<MSR_ID::Measurement_ID, MeasurementWidget*>              s_hashMeasurementWidgets;			/**< Holds all measurement widgets and corresponding measurement id's.*/
+    static QHash<MSR_ID::Measurement_ID, NumericWidget*>                  s_hashNumericWidgets;				/**< Holds all numeric widgets and corresponding numeric measurement id's.*/
+    static QHash<MSR_ID::Measurement_ID, RealTimeSampleArrayWidget*>      s_hashRealTimeSampleArrayWidgets;	/**< Holds all real-time sample array widgets and corresponding real-time sample array id's.*/
+    static QHash<MSR_ID::Measurement_ID, RealTimeMultiSampleArrayWidget*> s_hashRealTimeMultiSampleArrayWidgets;	/**< Holds all real-time multi sample array widgets and corresponding real-time multi sample array id's.*/
+    static QHash<MSR_ID::Measurement_ID, ProgressBarWidget*>              s_hashProgressBarWidgets;			/**< Holds all progress bar widgets and corresponding progress bar id's.*/
+    static QHash<MSR_ID::Measurement_ID, TextWidget*>                     s_hashTextWidgets;					/**< Holds all text widgets and text measurement id's.*/
 
 };
 

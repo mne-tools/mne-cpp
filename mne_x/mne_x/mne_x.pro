@@ -55,12 +55,52 @@ else {
 
 DESTDIR = $${PWD}/../../bin
 
-SOURCES += main.cpp\
-        mainwindow.cpp
+SOURCES += \
+    src/main.cpp \
+    src/FormFiles/startupwidget.cpp \
+    src/FormFiles/runwidget.cpp \
+    src/FormFiles/moduledockwidget.cpp \
+    src/FormFiles/mainwindow.cpp \
+    src/FormFiles/mainsplashscreen.cpp \
+    src/management/modulemanager.cpp \
+    src/management/connector.cpp
 
-HEADERS  += mainwindow.h
+HEADERS += \
+    src/FormFiles/startupwidget.h \
+    src/FormFiles/runwidget.h \
+    src/FormFiles/moduledockwidget.h \
+    src/FormFiles/mainwindow.h \
+    src/FormFiles/mainsplashscreen.h \
+    src/interfaces/ISensor.h \
+    src/interfaces/IRTVisualization.h \
+    src/interfaces/IRTRecord.h \
+    src/interfaces/IRTAlgorithm.h \
+    src/interfaces/IModule.h \
+    src/interfaces/IAlert.h \
+    src/management/modulemanager.h \
+    src/management/connector.h \
+    src/preferences/info.h
 
-FORMS    += mainwindow.ui
+FORMS   +=
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
+
+RESOURCES += \
+    res/mainApp.qrc
+
+OTHER_FILES += \
+    res/QtStyleSheets/plastique.qss \
+    res/images/splashscreen/splashscreen_csa_rt.png \
+    res/images/icons/zoomStd.png \
+    res/images/icons/zoomOut.png \
+    res/images/icons/zoomIn.png \
+    res/images/icons/visualisation.png \
+    res/images/icons/stop.png \
+    res/images/icons/sensor.png \
+    res/images/icons/save.png \
+    res/images/icons/run.png \
+    res/images/icons/new.png \
+    res/images/icons/displayMax.png \
+    res/images/icons/csa_rt.png \
+    res/images/icons/algorithm.png

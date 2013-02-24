@@ -40,11 +40,17 @@
 
 #include "displaymanager.h"
 #include "measurementwidget.h"
-//#include "numericwidget.h"
+#include "numericwidget.h"
 #include "realtimesamplearraywidget.h"
 #include "realtimemultisamplearraywidget.h"
-//#include "progressbarwidget.h"
-//#include "textwidget.h"
+#include "progressbarwidget.h"
+#include "textwidget.h"
+
+#include <rtMeas/Measurement/text.h>
+#include <rtMeas/Measurement/realtimemultisamplearray.h>
+#include <rtMeas/Measurement/realtimesamplearray.h>
+#include <rtMeas/Measurement/progressbar.h>
+#include <rtMeas/Measurement/numeric.h>
 
 
 //*************************************************************************************************************
@@ -63,6 +69,7 @@
 //=============================================================================================================
 
 using namespace DISPLIB;
+using namespace RTMEASLIB;
 using namespace IOBuffer;
 
 
@@ -87,62 +94,62 @@ DisplayManager::~DisplayManager()
 
 //*************************************************************************************************************
 
-//NumericWidget* DisplayManager::addNumericWidget(Numeric* pNum, QWidget* parent, MSR_ID::Measurement_ID id)
-//{
-//    NumericWidget* numWidget = new NumericWidget(pNum, parent);
-//    numWidget->hide();
-//    s_hashMeasurementWidgets.insert(id, numWidget);
-//    s_hashNumericWidgets.insert(id, numWidget);
-//    return numWidget;
-//}
+NumericWidget* DisplayManager::addNumericWidget(Numeric* pNum, QWidget* parent, MSR_ID::Measurement_ID id)
+{
+    NumericWidget* numWidget = new NumericWidget(pNum, parent);
+    numWidget->hide();
+    s_hashMeasurementWidgets.insert(id, numWidget);
+    s_hashNumericWidgets.insert(id, numWidget);
+    return numWidget;
+}
 
 
 //*************************************************************************************************************
 
-//RealTimeSampleArrayWidget* DisplayManager::addRealTimeSampleArrayWidget(RealTimeSampleArray* pRTSA, QWidget* parent, MSR_ID::Measurement_ID id, QTime* t)
-//{
-//    RealTimeSampleArrayWidget* rtsaWidget = new RealTimeSampleArrayWidget(pRTSA, t, parent);
-//    rtsaWidget->hide();
-//    s_hashMeasurementWidgets.insert(id, rtsaWidget);
-//    s_hashRealTimeSampleArrayWidgets.insert(id, rtsaWidget);
-//    return rtsaWidget;
-//}
+RealTimeSampleArrayWidget* DisplayManager::addRealTimeSampleArrayWidget(RealTimeSampleArray* pRTSA, QWidget* parent, MSR_ID::Measurement_ID id, QTime* t)
+{
+    RealTimeSampleArrayWidget* rtsaWidget = new RealTimeSampleArrayWidget(pRTSA, t, parent);
+    rtsaWidget->hide();
+    s_hashMeasurementWidgets.insert(id, rtsaWidget);
+    s_hashRealTimeSampleArrayWidgets.insert(id, rtsaWidget);
+    return rtsaWidget;
+}
 
 
 //*************************************************************************************************************
 
-//RealTimeMultiSampleArrayWidget* DisplayManager::addRealTimeMultiSampleArrayWidget(RealTimeMultiSampleArray* pRTSM, QWidget* parent, MSR_ID::Measurement_ID id, QTime* t)
-//{
-//    RealTimeMultiSampleArrayWidget* rtsmWidget = new RealTimeMultiSampleArrayWidget(pRTSM, t, parent);
-//    rtsmWidget->hide();
-//    s_hashMeasurementWidgets.insert(id, rtsmWidget);
-//    s_hashRealTimeMultiSampleArrayWidgets.insert(id, rtsmWidget);
-//    return rtsmWidget;
-//}
+RealTimeMultiSampleArrayWidget* DisplayManager::addRealTimeMultiSampleArrayWidget(RealTimeMultiSampleArray* pRTSM, QWidget* parent, MSR_ID::Measurement_ID id, QTime* t)
+{
+    RealTimeMultiSampleArrayWidget* rtsmWidget = new RealTimeMultiSampleArrayWidget(pRTSM, t, parent);
+    rtsmWidget->hide();
+    s_hashMeasurementWidgets.insert(id, rtsmWidget);
+    s_hashRealTimeMultiSampleArrayWidgets.insert(id, rtsmWidget);
+    return rtsmWidget;
+}
 
 
 //*************************************************************************************************************
 
-//ProgressBarWidget* DisplayManager::addProgressBarWidget(ProgressBar* pProgress, QWidget* parent, MSR_ID::Measurement_ID id)
-//{
-//    ProgressBarWidget* progressWidget = new ProgressBarWidget(pProgress, parent);
-//    progressWidget->hide();
-//    s_hashMeasurementWidgets.insert(id, progressWidget);
-//    s_hashProgressBarWidgets.insert(id, progressWidget);
-//    return progressWidget;
-//}
+ProgressBarWidget* DisplayManager::addProgressBarWidget(ProgressBar* pProgress, QWidget* parent, MSR_ID::Measurement_ID id)
+{
+    ProgressBarWidget* progressWidget = new ProgressBarWidget(pProgress, parent);
+    progressWidget->hide();
+    s_hashMeasurementWidgets.insert(id, progressWidget);
+    s_hashProgressBarWidgets.insert(id, progressWidget);
+    return progressWidget;
+}
 
 
 //*************************************************************************************************************
 
-//TextWidget* DisplayManager::addTextWidget(Text* pText, QWidget* parent, MSR_ID::Measurement_ID id)
-//{
-//    TextWidget* textWidget = new TextWidget(pText, parent);
-//    textWidget->hide();
-//    s_hashMeasurementWidgets.insert(id, textWidget);
-//    s_hashTextWidgets.insert(id, textWidget);
-//    return textWidget;
-//}
+TextWidget* DisplayManager::addTextWidget(Text* pText, QWidget* parent, MSR_ID::Measurement_ID id)
+{
+    TextWidget* textWidget = new TextWidget(pText, parent);
+    textWidget->hide();
+    s_hashMeasurementWidgets.insert(id, textWidget);
+    s_hashTextWidgets.insert(id, textWidget);
+    return textWidget;
+}
 
 
 //*************************************************************************************************************
@@ -204,11 +211,11 @@ void DisplayManager::clean()
         delete pMSRW;
 
     s_hashMeasurementWidgets.clear();
-//    s_hashNumericWidgets.clear();
+    s_hashNumericWidgets.clear();
     s_hashRealTimeSampleArrayWidgets.clear();
     s_hashRealTimeMultiSampleArrayWidgets.clear();
-//    s_hashProgressBarWidgets.clear();
-//    s_hashTextWidgets.clear();
+    s_hashProgressBarWidgets.clear();
+    s_hashTextWidgets.clear();
 
     qDebug() << "DisplayManager::clean() end size:" << s_hashMeasurementWidgets.size();
 }
@@ -219,9 +226,9 @@ void DisplayManager::clean()
 // STATIC DEFINITIONS
 //=============================================================================================================
 
-//QHash<MSR_ID::Measurement_ID, MeasurementWidget*>         DisplayManager::s_hashMeasurementWidgets;
-//QHash<MSR_ID::Measurement_ID, NumericWidget*>             DisplayManager::s_hashNumericWidgets;
-//QHash<MSR_ID::Measurement_ID, RealTimeSampleArrayWidget*> DisplayManager::s_hashRealTimeSampleArrayWidgets;
-//QHash<MSR_ID::Measurement_ID, RealTimeMultiSampleArrayWidget*> DisplayManager::s_hashRealTimeMultiSampleArrayWidgets;
-//QHash<MSR_ID::Measurement_ID, ProgressBarWidget*>         DisplayManager::s_hashProgressBarWidgets;
-//QHash<MSR_ID::Measurement_ID, TextWidget*>                DisplayManager::s_hashTextWidgets;
+QHash<MSR_ID::Measurement_ID, MeasurementWidget*>         DisplayManager::s_hashMeasurementWidgets;
+QHash<MSR_ID::Measurement_ID, NumericWidget*>             DisplayManager::s_hashNumericWidgets;
+QHash<MSR_ID::Measurement_ID, RealTimeSampleArrayWidget*> DisplayManager::s_hashRealTimeSampleArrayWidgets;
+QHash<MSR_ID::Measurement_ID, RealTimeMultiSampleArrayWidget*> DisplayManager::s_hashRealTimeMultiSampleArrayWidgets;
+QHash<MSR_ID::Measurement_ID, ProgressBarWidget*>         DisplayManager::s_hashProgressBarWidgets;
+QHash<MSR_ID::Measurement_ID, TextWidget*>                DisplayManager::s_hashTextWidgets;
