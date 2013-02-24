@@ -82,14 +82,6 @@ SOURCES += \
     Measurement/measurement.cpp \
     Measurement/IMeasurementprovider.cpp \
     Measurement/IMeasurementacceptor.cpp \
-    Measurement/text.cpp \
-    Measurement/realtimesamplearray.cpp \
-    Measurement/realtimemultisamplearray.cpp \
-    Measurement/progressbar.cpp \
-    Measurement/numeric.cpp \
-    Measurement/measurement.cpp \
-    Measurement/IMeasurementprovider.cpp \
-    Measurement/IMeasurementacceptor.cpp \
     Nomenclature/nomenclature.cpp
 
 

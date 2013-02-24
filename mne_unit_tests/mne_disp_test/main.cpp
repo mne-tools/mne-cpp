@@ -1,4 +1,4 @@
-#include "MneDispTest.h"
+#include "mnedisptest.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
