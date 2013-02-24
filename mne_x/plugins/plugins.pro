@@ -11,13 +11,14 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    ecgsimulator \
+#    ecgsimulator \
+
 #    brainmonitor \
-    dummytoolbox \
-    filtertoolbox \
+#    dummytoolbox \
+#    filtertoolbox \
 #    gaborparticletoolbox \
-    megchannelsimulator \
-    megrtproc \
-    roitoolbox \
-    localizationtoolbox \
-    prelocalizationtoolbox
+#    megchannelsimulator \
+#    megrtproc \
+#    roitoolbox \
+#    localizationtoolbox \
+#    prelocalizationtoolbox
