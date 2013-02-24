@@ -38,4 +38,4 @@ include(../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += \
-#    mne_x
+    mne_x
