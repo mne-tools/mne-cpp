@@ -27,9 +27,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <rtMeas/Measurement/IMeasurementprovider.h>
+#include "../../MNE/rtMeas/Measurement/IMeasurementprovider.h"
 
-#include <rtMeas/Nomenclature/nomenclature.h>
+#include "../../MNE/rtMeas/Nomenclature/nomenclature.h"
 
 
 //*************************************************************************************************************

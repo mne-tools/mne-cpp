@@ -33,7 +33,7 @@
 
 
 
-#include <rtMeas/Nomenclature/nomenclature.h> //ToDo this has not to be relative; //Interfaces needs to be moved to a separate lib
+#include "../../MNE/rtMeas/Nomenclature/nomenclature.h" //ToDo this has not to be relative; //Interfaces needs to be moved to a separate lib
 
 
 
