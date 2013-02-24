@@ -67,34 +67,22 @@ else {
             -lMNE$${MNE_LIB_VERSION}RtCommand
 }
 
+DESTDIR = $${MNE_BINARY_DIR}/mne_rt_server_plugins
 
-unix:DESTDIR = $${PWD}/../../../bin/mne_rt_server_plugins
+SOURCES += \
+        neuromag.cpp \
+        dacqserver.cpp \
+        collectorsocket.cpp \
+        shmemsocket.cpp
 
-win32:DESTDIR = $${PWD}/../../../lib
-
-win32 {
-    FILE = $${DESTDIR}/$${TARGET}.dll
-    PLUGINDIR = $${DESTDIR}/../bin/mne_rt_server_plugins
-    FILE ~= s,/,\\,g
-    PLUGINDIR ~= s,/,\\,g
-    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${PLUGINDIR}) $$escape_expand(\\n\\t)
-}
-
-
-
-
-SOURCES += neuromag.cpp \
-    dacqserver.cpp \
-    collectorsocket.cpp \
-    shmemsocket.cpp
-
-HEADERS += neuromag.h\
-    neuromag_global.h \
-    ../../mne_rt_server/IConnector.h \  #IConnector is a Q_OBJECT and the resulting moc file needs to be known -> that's why inclution is important!
-    types_definitions.h \
-    dacqserver.h \
-    collectorsocket.h \
-    shmemsocket.h
+HEADERS += \
+        neuromag.h\
+        neuromag_global.h \
+        ../../mne_rt_server/IConnector.h \  #IConnector is a Q_OBJECT and the resulting moc file needs to be known -> that's why inclution is important!
+        types_definitions.h \
+        dacqserver.h \
+        collectorsocket.h \
+        shmemsocket.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

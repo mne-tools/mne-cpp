@@ -8,32 +8,39 @@
 #
 #--------------------------------------------------------
 
+include(../../../mne-cpp.pri)
+
 TEMPLATE = lib
 
 CONFIG += plugin
 
 DEFINES += ECGSIMULATOR_LIBRARY
 
-QT += core gui
+QT += core widgets
+
+
+TARGET = ecgsimulator
 
 CONFIG(debug, debug|release) {
-    TARGET = ecgsimulatord
-    unix:DESTDIR = $$PWD/../../bin/unix/debug/modules
-    win32:DESTDIR = $$PWD/../../bin/win32/debug/modules
-    unix: LIBS += -L$$PWD/../../lib/unix/debug/ -lrtmeasd
-    #unix: PRE_TARGETDEPS += $$OUT_PWD/../../comp/rtmeas/librtmeasd.a
-    win32:LIBS += -L$$PWD/../../lib/win32/debug/ -lrtmeasd
-    win32:PRE_TARGETDEPS += $$PWD/../../lib/win32/debug/rtmeasd.lib
+    TARGET = $$join(TARGET,,,d)
+}
+
+LIBS += -L$${MNE_LIBRARY_DIR}
+
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}RtCommandd
 }
 else {
-    TARGET = ecgsimulator
-    unix:DESTDIR = $$PWD/../../bin/unix/release/modules
-    win32:DESTDIR = $$PWD/../../bin/win32/release/modules
-    unix: LIBS += -L$$PWD/../../lib/unix/release/ -lrtmeas
-    #unix: PRE_TARGETDEPS += $$OUT_PWD/../../comp/rtmeas/librtmeas.a
-    win32:LIBS += -L$$PWD/../../lib/win32/release/ -lrtmeas
-    win32:PRE_TARGETDEPS += $$PWD/../../lib/win32/release/rtmeas.lib
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}RtCommand
 }
+
+DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
 SOURCES += ecgsimulator.cpp \
     ecgsimchannel.cpp \
@@ -50,34 +57,16 @@ HEADERS += ecgsimulator.h\
     FormFiles/ecgrunwidget.h \
     FormFiles/ecgaboutwidget.h
 
-symbian {
-    MMP_RULES += EXPORTUNFROZEN
-    TARGET.UID3 = 0xE28783FA
-    TARGET.CAPABILITY = 
-    TARGET.EPOCALLOWDLLDATA = 1
-    addFiles.sources = ecgsimulator.dll
-    addFiles.path = !:/sys/bin
-    DEPLOYMENT += addFiles
-}
-
-unix:!symbian {
-    maemo5 {
-        target.path = /opt/usr/lib
-    } else {
-        target.path = /usr/lib
-    }
-    INSTALLS += target
-}
-
 FORMS += \
     FormFiles/ecgsetup.ui \
     FormFiles/ecgrun.ui \
     FormFiles/ecgabout.ui
 
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+DEPENDPATH += $${MNE_INCLUDE_DIR}
+
+OTHER_FILES += ecgsimulator.json
+
 # Put generated form headers into the origin --> cause other src is pointing at them
-UI_DIR = $$PWD
+UI_DIR = $${PWD}
 
-symbian: LIBS += -lrtmeas
-
-INCLUDEPATH += $$PWD/../../comp/rtmeas
-DEPENDPATH += $$PWD/../../comp/rtmeas

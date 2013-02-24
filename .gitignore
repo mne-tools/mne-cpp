@@ -73,3 +73,14 @@ ui_*.h
 .project
 .settings
 /bin/MNE-sample-data/*.txt
+/bin/mne_rt_server_plugins/*.manifest
+/bin/mne_rt_server_plugins/*.exp
+/bin/mne_rt_server_plugins/*.lib
+
+/bin/mne_rt_server_plugins/*.rc
+
+/bin/mne_rt_server_plugins/*.res
+
+/bin/mne_rt_server_plugins/*.ilk
+
+/bin/mne_rt_server_plugins/*.pdb

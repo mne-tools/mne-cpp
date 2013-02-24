@@ -60,12 +60,10 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QMessageBox>
 #include <QMultiHash>
-#include <QMenuBar>
-#include <QToolBar>
-#include <QStatusBar>
-#include <QTextBrowser>
+
+#include <QtWidgets>
+
 #include <QDebug>
 
 #include <QTimer>
@@ -86,7 +84,7 @@ using namespace DISPLIB;
 // CONST
 //=============================================================================================================
 
-const char* moduleDir = "/modules";        /**< holds path to modules.*/
+const char* moduleDir = "/mne_x_plugins";        /**< holds path to plugins.*/
 
 
 //*************************************************************************************************************
