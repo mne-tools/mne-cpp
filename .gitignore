@@ -84,3 +84,11 @@ ui_*.h
 /bin/mne_rt_server_plugins/*.ilk
 
 /bin/mne_rt_server_plugins/*.pdb
+
+/bin/mne_x_plugins/*.dll
+
+/bin/mne_x_plugins/*.manifest
+
+/bin/mne_x_plugins/*.lib
+
+/bin/mne_x_plugins/*.exp

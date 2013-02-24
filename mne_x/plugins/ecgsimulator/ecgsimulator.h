@@ -32,8 +32,8 @@
 #include "ecgsimchannel.h"
 
 #include "../../mne_x/mne_x/src/interfaces/ISensor.h"
-#include <rtMeas/IOBuffer/circularbuffer.h>
-#include <rtMeas/Measurement/realtimesamplearray.h>
+#include "../../MNE/rtMeas/IOBuffer/circularbuffer.h"
+#include "../../MNE/rtMeas/Measurement/realtimesamplearray.h"
 
 
 //*************************************************************************************************************

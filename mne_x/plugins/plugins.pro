@@ -11,7 +11,7 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-#    ecgsimulator \
+    ecgsimulator
 
 #    brainmonitor \
 #    dummytoolbox \
