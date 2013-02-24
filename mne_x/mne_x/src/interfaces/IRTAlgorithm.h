@@ -27,10 +27,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../../../comp/rtmeas/Nomenclature/nomenclature.h"
+#include <rtMeas/Nomenclature/nomenclature.h>
 
-#include "../../../comp/rtmeas/Measurement/IMeasurementprovider.h"
-#include "../../../comp/rtmeas/Measurement/IMeasurementacceptor.h"
+#include <rtMeas/Measurement/IMeasurementprovider.h>
+#include <rtMeas/Measurement/IMeasurementacceptor.h>
 
 
 
@@ -137,6 +137,6 @@ protected:
 
 } // NAMESPACE
 
-Q_DECLARE_INTERFACE(CSART::IRTAlgorithm, "csa_rt/1.0")
+Q_DECLARE_INTERFACE(MNEX::IRTAlgorithm, "csa_rt/1.0")
 
 #endif // IALGORITHM_H

@@ -37,7 +37,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += network core gui widgets
+QT += network core widgets
 
 TARGET = mne_x
 
@@ -48,12 +48,18 @@ CONFIG(debug, debug|release) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lMNE$${MNE_LIB_VERSION}Dispd \
+            -lMNE$${MNE_LIB_VERSION}RtMeasd \
+            -lMNE$${MNE_LIB_VERSION}RtDtMngd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lMNE$${MNE_LIB_VERSION}Disp \
+            -lMNE$${MNE_LIB_VERSION}RtMeas \
+            -lMNE$${MNE_LIB_VERSION}RtDtMng
 }
 
-DESTDIR = $${PWD}/../../bin
+DESTDIR = $${MNE_BINARY_DIR}
 
 SOURCES += \
     src/main.cpp \

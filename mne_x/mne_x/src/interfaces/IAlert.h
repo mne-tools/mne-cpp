@@ -28,7 +28,7 @@
 //=============================================================================================================
 
 #include "IModule.h"
-#include "../../../comp/rtmeas/Measurement/IMeasurementacceptor.h"
+#include <rtMeas/Measurement/IMeasurementacceptor.h>
 
 
 //*************************************************************************************************************
@@ -133,6 +133,6 @@ protected:
 
 } // NAMESPACE
 
-Q_DECLARE_INTERFACE(CSART::IAlert, "csa_rt/1.0")
+Q_DECLARE_INTERFACE(MNEX::IAlert, "csa_rt/1.0")
 
 #endif // IALERT_H

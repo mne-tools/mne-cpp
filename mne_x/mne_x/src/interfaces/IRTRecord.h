@@ -28,10 +28,10 @@
 //=============================================================================================================
 
 #include "IModule.h"
-#include "../../../comp/rtmeas/Nomenclature/nomenclature.h"
-#include "../../../comp/rtmeas/IOBuffer/circularbuffer.h"
+#include <rtMeas/Nomenclature/nomenclature.h>
+#include <rtMeas/IOBuffer/circularbuffer.h>
 
-#include "../../../comp/rtmeas/Measurement/IMeasurementacceptor.h"
+#include <rtMeas/Measurement/IMeasurementacceptor.h>
 
 
 //*************************************************************************************************************
@@ -175,6 +175,6 @@ inline void IRTRecord::setRTRecordDirName(const QString& dirName)
 
 } // NAMESPACE
 
-Q_DECLARE_INTERFACE(CSART::IRTRecord, "cs_art/1.0")
+Q_DECLARE_INTERFACE(MNEX::IRTRecord, "cs_art/1.0")
 
 #endif // IRTRecord_H

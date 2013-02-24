@@ -31,7 +31,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtGui>
+#include <QLabel>
+#include <QVBoxLayout>
 
 #include <QDebug>
 

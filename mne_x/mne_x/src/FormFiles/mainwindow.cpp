@@ -25,21 +25,21 @@
 
 #include "../management/modulemanager.h"
 #include "../management/connector.h"
-#include "../../../comp/rtdtmng/rtmeasurementmanager.h"
+#include <rtDtMng/rtmeasurementmanager.h>
 
-#include "../../../comp/rtmeas/Measurement/realtimesamplearray.h"
-#include "../../../comp/rtmeas/Measurement/numeric.h"
-#include "../../../comp/rtmeas/Measurement/progressbar.h"
+#include <rtMeas/Measurement/realtimesamplearray.h>
+#include <rtMeas/Measurement/numeric.h>
+#include <rtMeas/Measurement/progressbar.h>
 //#include "../../../comp/rtmeas/Measurement/alert.h" //-> text.h
-#include "../../../comp/rtmeas/Measurement/text.h"
+#include <rtMeas/Measurement/text.h>
 
-#include "../../../comp/rtmeas/DesignPatterns/observerpattern.h"
+#include <rtMeas/DesignPatterns/observerpattern.h>
 
-#include "../../../comp/rtdisp/displaymanager.h"
-#include "../../../comp/rtdisp/realtimesamplearraywidget.h"
-#include "../../../comp/rtdisp/numericwidget.h"
-#include "../../../comp/rtdisp/progressbarwidget.h"
-#include "../../../comp/rtdisp/textwidget.h"
+#include <disp/displaymanager.h>
+#include <disp/realtimesamplearraywidget.h>
+#include <disp/numericwidget.h>
+#include <disp/progressbarwidget.h>
+#include <disp/textwidget.h>
 
 #include "../interfaces/IModule.h"
 #include "../interfaces/ISensor.h"
@@ -47,7 +47,6 @@
 #include "../interfaces/IRTVisualization.h"
 #include "../interfaces/IRTRecord.h"
 #include "../interfaces/IAlert.h"
-
 
 //GUI
 #include "mainwindow.h"
@@ -61,8 +60,13 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtGui>
+#include <QMessageBox>
 #include <QMultiHash>
+#include <QMenuBar>
+#include <QToolBar>
+#include <QStatusBar>
+#include <QTextBrowser>
+#include <QDebug>
 
 #include <QTimer>
 #include <QTime>
@@ -74,6 +78,7 @@
 //=============================================================================================================
 
 using namespace MNEX;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
