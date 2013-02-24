@@ -156,7 +156,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t from = -1, fiff_int_t to = -1, const MatrixXi& sel = defaultMatrixXi);
+    bool read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t from = -1, fiff_int_t to = -1, const RowVectorXi& sel = defaultRowVectorXi);
 
     //=========================================================================================================
     /**
@@ -172,7 +172,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool read_raw_segment_times(MatrixXd& data, MatrixXd& times, float from, float to, const MatrixXi& sel = defaultMatrixXi);
+    bool read_raw_segment_times(MatrixXd& data, MatrixXd& times, float from, float to, const RowVectorXi& sel = defaultRowVectorXi);
 
 public:
     FiffStream::SPtr file;      /**< replaces fid */

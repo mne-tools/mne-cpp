@@ -118,7 +118,7 @@ void FiffRawData::clear()
 
 //*************************************************************************************************************
 
-bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t from, fiff_int_t to, const MatrixXi& sel)
+bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t from, fiff_int_t to, const RowVectorXi& sel)
 {
     bool projAvailable = true;
 
@@ -151,18 +151,18 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
     qint32 i, k, r;
 
     typedef Eigen::Triplet<double> T;
-    std::vector<T> tripletList;
-    tripletList.reserve(nchan);
+    std::vector<T> tripletListCal;
+    tripletListCal.reserve(nchan);
     for(i = 0; i < nchan; ++i)
-        tripletList.push_back(T(i, i, this->cals[i]));
+        tripletListCal.push_back(T(i, i, this->cals[i]));
 
     SparseMatrix<double> cal(nchan, nchan);
-    cal.setFromTriplets(tripletList.begin(), tripletList.end());
+    cal.setFromTriplets(tripletListCal.begin(), tripletListCal.end());
 //    cal.makeCompressed();
 
     MatrixXd mult_full;
     //
-    if (sel.cols() == 0)
+    if (sel.size() == 0)
     {
         data = MatrixXd(nchan, to-from+1);
 //            data->setZero();
@@ -178,42 +178,43 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
     }
     else
     {
-        data = MatrixXd(sel.cols(),to-from+1);
+        data = MatrixXd(sel.size(),to-from+1);
 //            data->setZero();
 
-        MatrixXd selVect(sel.cols(), nchan);
+        MatrixXd selVect(sel.size(), nchan);
 
         selVect.setZero();
 
         if (!projAvailable && this->comp.kind == -1)
         {
-            cal.resize(sel.cols(),sel.cols());
-//            cal.setZero();
-            for( i = 0; i  < sel.cols(); ++i)
-                cal.insert(i,i) = this->cals(0,sel(0,i));
-            cal.makeCompressed();
+            std::vector<T> tripletListCalTmp;
+            tripletListCalTmp.reserve(sel.size());
+            for(i = 0; i < sel.size(); ++i)
+                tripletListCalTmp.push_back(T(i, i, this->cals[sel[i]]));
+            cal = SparseMatrix<double>(sel.size(), sel.size());
+            cal.setFromTriplets(tripletListCalTmp.begin(), tripletListCalTmp.end());
         }
         else
         {
             if (!projAvailable)
             {
                 qDebug() << "This has to be debugged! #1";
-                for( i = 0; i  < sel.cols(); ++i)
-                    selVect.row(i) = this->comp.data->data.block(sel(0,i),0,1,nchan);
+                for( i = 0; i  < sel.size(); ++i)
+                    selVect.row(i) = this->comp.data->data.block(sel[i],0,1,nchan);
                 mult_full = selVect*cal;
             }
             else if (this->comp.kind == -1)
             {
-                for( i = 0; i  < sel.cols(); ++i)
-                    selVect.row(i) = this->proj.block(sel(0,i),0,1,nchan);
+                for( i = 0; i  < sel.size(); ++i)
+                    selVect.row(i) = this->proj.block(sel[i],0,1,nchan);
 
                 mult_full = selVect*cal;
             }
             else
             {
                 qDebug() << "This has to be debugged! #3";
-                for( i = 0; i  < sel.cols(); ++i)
-                    selVect.row(i) = this->proj.block(sel(0,i),0,1,nchan);
+                for( i = 0; i  < sel.size(); ++i)
+                    selVect.row(i) = this->proj.block(sel[i],0,1,nchan);
 
                 mult_full = selVect*this->comp.data->data*cal;
             }
@@ -224,15 +225,16 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
     //
     // Make mult sparse
     //
-    tripletList.clear();
-    tripletList.reserve(mult_full.rows()*mult_full.cols());
+    std::vector<T> tripletListMult;
+    tripletListMult.reserve(mult_full.rows()*mult_full.cols());
     for(i = 0; i < mult_full.rows(); ++i)
         for(k = 0; k < mult_full.cols(); ++k)
             if(mult_full(i,k) != 0)
-                tripletList.push_back(T(i, k, mult_full(i,k)));
+                tripletListMult.push_back(T(i, k, mult_full(i,k)));
 
     SparseMatrix<double> mult(mult_full.rows(),mult_full.cols());
-    mult.setFromTriplets(tripletList.begin(), tripletList.end());
+    if(tripletListMult.size() > 0)
+        mult.setFromTriplets(tripletListMult.begin(), tripletListMult.end());
 //    mult.makeCompressed();
 
     //
@@ -308,22 +310,22 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
                         {
                             MatrixXd tmp_data = (Map< MatrixDau16 > ( t_pTag->toDauPack16(),nchan, thisRawDir.nsamp)).cast<double>();
 
-                            for(r = 0; r < sel.cols(); ++r)
-                                newData.block(r,0,1,thisRawDir.nsamp) = tmp_data.block(sel(0,r),0,1,thisRawDir.nsamp);
+                            for(r = 0; r < sel.size(); ++r)
+                                newData.block(r,0,1,thisRawDir.nsamp) = tmp_data.block(sel[r],0,1,thisRawDir.nsamp);
                         }
                         else if(t_pTag->type == FIFFT_INT)
                         {
                             MatrixXd tmp_data = (Map< MatrixXi >( t_pTag->toInt(),nchan, thisRawDir.nsamp)).cast<double>();
 
-                            for(r = 0; r < sel.cols(); ++r)
-                                newData.block(r,0,1,thisRawDir.nsamp) = tmp_data.block(sel(0,r),0,1,thisRawDir.nsamp);
+                            for(r = 0; r < sel.size(); ++r)
+                                newData.block(r,0,1,thisRawDir.nsamp) = tmp_data.block(sel[r],0,1,thisRawDir.nsamp);
                         }
                         else if(t_pTag->type == FIFFT_FLOAT)
                         {
                             MatrixXd tmp_data = (Map< MatrixXf > ( t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
 
-                            for(r = 0; r < sel.cols(); ++r)
-                                newData.block(r,0,1,thisRawDir.nsamp) = tmp_data.block(sel(0,r),0,1,thisRawDir.nsamp);
+                            for(r = 0; r < sel.size(); ++r)
+                                newData.block(r,0,1,thisRawDir.nsamp) = tmp_data.block(sel[r],0,1,thisRawDir.nsamp);
                         }
                         else
                         {
@@ -438,7 +440,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
 
 //*************************************************************************************************************
 
-bool FiffRawData::read_raw_segment_times(MatrixXd& data, MatrixXd& times, float from, float to, const MatrixXi& sel)
+bool FiffRawData::read_raw_segment_times(MatrixXd& data, MatrixXd& times, float from, float to, const RowVectorXi& sel)
 {
     //
     //   Convert to samples
