@@ -47,6 +47,7 @@
 #include "../Nomenclature/nomenclature.h"
 
 #include "../IOBuffer/circularbuffer.h"
+#include "../IOBuffer/buffer.h"
 
 #include "../DesignPatterns/observerpattern.h"
 
@@ -75,7 +76,6 @@ namespace RTMEASLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-//using namespace CSART;
 using namespace IOBuffer;
 
 

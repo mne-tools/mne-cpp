@@ -27,9 +27,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../../../comp/rtmeas/Measurement/IMeasurementprovider.h"
+#include <rtMeas/Measurement/IMeasurementprovider.h>
 
-#include "../../../comp/rtmeas/Nomenclature/nomenclature.h"
+#include <rtMeas/Nomenclature/nomenclature.h>
 
 
 //*************************************************************************************************************
@@ -126,6 +126,6 @@ protected:
 
 } //NAMESPACE
 
-Q_DECLARE_INTERFACE(CSART::ISensor, "csa_rt/1.0")
+Q_DECLARE_INTERFACE(MNEX::ISensor, "csa_rt/1.0")
 
 #endif // ISENSOR_H

@@ -28,10 +28,10 @@
 
 #include "../management/modulemanager.h"
 
-#include "../../../comp/rtdtmng/rtmeasurementmanager.h"
-#include "../../../comp/rtdisp/displaymanager.h"
+#include <rtDtMng/rtmeasurementmanager.h>
+#include <disp/displaymanager.h>
 
-#include "../../../comp/rtmeas/DesignPatterns/observerpattern.h"
+#include <rtMeas/DesignPatterns/observerpattern.h>
 
 #include "../interfaces/IModule.h"
 #include "../interfaces/ISensor.h"
@@ -62,7 +62,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CSART;
+using namespace MNEX;
+using namespace RTDTMNGLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************

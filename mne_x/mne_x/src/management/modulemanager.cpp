@@ -25,7 +25,7 @@
 
 #include "modulemanager.h"
 
-#include "../../../comp/rtdtmng/rtmeasurementmanager.h"
+#include <rtDtMng/rtmeasurementmanager.h>
 
 #include "../interfaces/IModule.h"
 #include "../interfaces/ISensor.h"
@@ -56,7 +56,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CSART;
+using namespace MNEX;
+using namespace RTDTMNGLIB;
 
 
 //*************************************************************************************************************
