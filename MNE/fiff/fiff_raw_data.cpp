@@ -109,7 +109,7 @@ void FiffRawData::clear()
     info.clear();
     first_samp = -1;
     last_samp = -1;
-    cals = MatrixXd();
+    cals = RowVectorXd();
     rawdir.clear();
     proj = MatrixXd();
     comp.clear();
