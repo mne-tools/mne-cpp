@@ -57,7 +57,7 @@ using namespace RTMEASLIB;
 //=============================================================================================================
 
 IMeasurementAcceptor::IMeasurementAcceptor()
-: m_pHashBuffers(new QHash<MSR_ID::Measurement_ID, Buffer*>)
+: m_pHashBuffers(new QHash<MSR_ID::Measurement_ID, Buffer_old*>)
 {
 
 }
@@ -88,7 +88,7 @@ void IMeasurementAcceptor::addModule(MDL_ID::Module_ID id)
 
 //*************************************************************************************************************
 
-void IMeasurementAcceptor::addAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id, Buffer* buffer)
+void IMeasurementAcceptor::addAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id, Buffer_old* buffer)
 {
 //ToDo test at the same time if measurement is accepted
     qDebug() << "inside adding Measurement";
@@ -99,7 +99,7 @@ void IMeasurementAcceptor::addAcceptorMeasurementBuffer(MSR_ID::Measurement_ID i
 
 //*************************************************************************************************************
 
-Buffer* IMeasurementAcceptor::getAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id)
+Buffer_old* IMeasurementAcceptor::getAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id)
 {
     if(m_pHashBuffers->contains(id))
         return m_pHashBuffers->value(id);

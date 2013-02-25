@@ -64,13 +64,18 @@ win32 {
 SOURCES += \ 
     circularbuffer.cpp \
     circularmatrixbuffer.cpp \
-    observerpattern.cpp
+    observerpattern.cpp \
+    buffer_old.cpp
 
 HEADERS += generics_global.h \
     circularmatrixbuffer.h \
     circularbuffer.h \
     observerpattern.h \
-    commandpattern.h
+    commandpattern.h \
+    typename_old.h \
+    buffer_old.h \
+    circularmultichannelbuffer_old.h \
+    circularbuffer_old.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

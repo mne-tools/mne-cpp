@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     circularmultichannelbuffer.h
+* @file     circularmultichannelbuffer_old.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef CIRCULARMULTICHANNELBUFFER_H
-#define CIRCULARMULTICHANNELBUFFER_H
+#ifndef CIRCULARMULTICHANNELBUFFEROLD_H
+#define CIRCULARMULTICHANNELBUFFEROLD_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "circularbuffer.h"
+#include "circularbuffer_old.h"
 
 
 //*************************************************************************************************************
@@ -311,4 +311,4 @@ typedef RTMEASSHARED_EXPORT CircularMultiChannelBuffer< QPair<double, double> > 
 
 } // NAMESPACE
 
-#endif // CIRCULARMULTICHANNELBUFFER_H
+#endif // CIRCULARMULTICHANNELBUFFEROLD_H

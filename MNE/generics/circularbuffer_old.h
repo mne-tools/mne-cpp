@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     circularbuffer.h
+* @file     circularbuffer_old.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the Circular Buffer class.
+* @brief    Contains the declaration of the CircularBuffer_old class.
 *
 */
 
-#ifndef CIRCULARBUFFER_H
-#define CIRCULARBUFFER_H
+#ifndef CIRCULARBUFFEROLD_H
+#define CIRCULARBUFFEROLD_H
 
 
 //*************************************************************************************************************
@@ -42,8 +42,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../rtmeas_global.h"
-#include "buffer.h"
+#include "generics_global.h"
+#include "buffer_old.h"
 
 #include <typeinfo>
 
@@ -89,9 +89,7 @@ namespace IOBuffer
 * @brief The TEMPLATE CIRCULAR BUFFER provides a template for thread safe circular buffers.
 */
 template<typename _Tp>
-class CircularBuffer : public Buffer
-//template<typename _Tp>
-//class RTMEAS_EXPORT CircularBuffer : public Buffer
+class CircularBuffer_old : public Buffer_old
 {
 public:
     //=========================================================================================================
@@ -100,13 +98,13 @@ public:
     *
     * @param [in] uiMaxNumElements length of buffer.
     */
-    CircularBuffer(unsigned int uiMaxNumElements);
+    CircularBuffer_old(unsigned int uiMaxNumElements);
 
     //=========================================================================================================
     /**
     * Destroys the CircularBuffer.
     */
-    ~CircularBuffer();
+    ~CircularBuffer_old();
 
     //=========================================================================================================
     /**
@@ -160,8 +158,8 @@ private:
 //=============================================================================================================
 
 template<typename _Tp>
-CircularBuffer<_Tp>::CircularBuffer(unsigned int uiMaxNumElements)
-: Buffer(typeid(_Tp).name())
+CircularBuffer_old<_Tp>::CircularBuffer_old(unsigned int uiMaxNumElements)
+: Buffer_old(typeid(_Tp).name())
 , m_uiMaxNumElements(uiMaxNumElements)
 , m_pBuffer(new _Tp[m_uiMaxNumElements])
 , m_iCurrentReadIndex(-1)
@@ -176,7 +174,7 @@ CircularBuffer<_Tp>::CircularBuffer(unsigned int uiMaxNumElements)
 //*************************************************************************************************************
 
 template<typename _Tp>
-CircularBuffer<_Tp>::~CircularBuffer()
+CircularBuffer_old<_Tp>::~CircularBuffer_old()
 {
     delete m_pFreeElements;
     delete m_pUsedElements;
@@ -187,7 +185,7 @@ CircularBuffer<_Tp>::~CircularBuffer()
 //*************************************************************************************************************
 
 template<typename _Tp>
-inline void CircularBuffer<_Tp>::push(const _Tp* pArray, unsigned int size)
+inline void CircularBuffer_old<_Tp>::push(const _Tp* pArray, unsigned int size)
 {
     m_pFreeElements->acquire(size);
     for(unsigned int i = 0; i < size; ++i)
@@ -199,7 +197,7 @@ inline void CircularBuffer<_Tp>::push(const _Tp* pArray, unsigned int size)
 //*************************************************************************************************************
 
 template<typename _Tp>
-inline void CircularBuffer<_Tp>::push(const _Tp& newElement)
+inline void CircularBuffer_old<_Tp>::push(const _Tp& newElement)
 {
     m_pFreeElements->acquire();
     m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = newElement;
@@ -210,7 +208,7 @@ inline void CircularBuffer<_Tp>::push(const _Tp& newElement)
 //*************************************************************************************************************
 
 template<typename _Tp>
-inline _Tp CircularBuffer<_Tp>::pop()
+inline _Tp CircularBuffer_old<_Tp>::pop()
 {
     m_pUsedElements->acquire();
     _Tp element = m_pBuffer[mapIndex(m_iCurrentReadIndex)];
@@ -223,7 +221,7 @@ inline _Tp CircularBuffer<_Tp>::pop()
 //*************************************************************************************************************
 
 template<typename _Tp>
-inline unsigned int CircularBuffer<_Tp>::mapIndex(int& index)
+inline unsigned int CircularBuffer_old<_Tp>::mapIndex(int& index)
 {
     return index = ++index % m_uiMaxNumElements;
 }
@@ -232,7 +230,7 @@ inline unsigned int CircularBuffer<_Tp>::mapIndex(int& index)
 //*************************************************************************************************************
 
 template<typename _Tp>
-void CircularBuffer<_Tp>::clear()
+void CircularBuffer_old<_Tp>::clear()
 {
     delete m_pFreeElements;
     m_pFreeElements = new QSemaphore(m_uiMaxNumElements);
@@ -251,25 +249,25 @@ void CircularBuffer<_Tp>::clear()
 
 //ToDo Typedef -> warning visibility ignored -> dllexport/dllimport problem
 
-typedef RTMEASSHARED_EXPORT CircularBuffer<int>                      _int_CircularBuffer;				/**< Defines CircularBuffer of integer type.*/
-typedef RTMEASSHARED_EXPORT CircularBuffer<short>                    _short_CircularBuffer;				/**< Defines CircularBuffer of short type.*/
-typedef RTMEASSHARED_EXPORT CircularBuffer<short*>                    _pShort_CircularBuffer;			/**< Defines CircularBuffer of short* type.*/
-typedef RTMEASSHARED_EXPORT CircularBuffer<char>                     _char_CircularBuffer;				/**< Defines CircularBuffer of char type.*/
-typedef RTMEASSHARED_EXPORT CircularBuffer<double>                   _double_CircularBuffer;			/**< Defines CircularBuffer of double type.*/
-typedef RTMEASSHARED_EXPORT CircularBuffer< QPair<int, int> >        _int_int_pair_CircularBuffer;		/**< Defines CircularBuffer of integer Pair type.*/
-typedef RTMEASSHARED_EXPORT CircularBuffer< QPair<double, double> >  _double_double_pair_CircularBuffer;	/**< Defines CircularBuffer of double Pair type.*/
+typedef GENERICSSHARED_EXPORT CircularBuffer_old<int>                      _int_CircularBuffer_old;				/**< Defines CircularBuffer of integer type.*/
+typedef GENERICSSHARED_EXPORT CircularBuffer_old<short>                    _short_CircularBuffer_old;				/**< Defines CircularBuffer of short type.*/
+typedef GENERICSSHARED_EXPORT CircularBuffer_old<short*>                    _pShort_CircularBuffer_old;			/**< Defines CircularBuffer of short* type.*/
+typedef GENERICSSHARED_EXPORT CircularBuffer_old<char>                     _char_CircularBuffer_old;				/**< Defines CircularBuffer of char type.*/
+typedef GENERICSSHARED_EXPORT CircularBuffer_old<double>                   _double_CircularBuffer_old;			/**< Defines CircularBuffer of double type.*/
+typedef GENERICSSHARED_EXPORT CircularBuffer_old< QPair<int, int> >        _int_int_pair_CircularBuffer_old;		/**< Defines CircularBuffer of integer Pair type.*/
+typedef GENERICSSHARED_EXPORT CircularBuffer_old< QPair<double, double> >  _double_double_pair_CircularBuffer_old;	/**< Defines CircularBuffer of double Pair type.*/
 
-typedef RTMEASSHARED_EXPORT _double_CircularBuffer                   dBuffer;				/**< Short for _double_CircularBuffer.*/
-typedef RTMEASSHARED_EXPORT _int_CircularBuffer                      iBuffer;				/**< Short for _int_CircularBuffer.*/
-typedef RTMEASSHARED_EXPORT _char_CircularBuffer                     cBuffer;				/**< Short for _char_CircularBuffer.*/
-typedef RTMEASSHARED_EXPORT _pShort_CircularBuffer                   pShortBuffer;		/**< Short for _pShort_CircularBuffer.*/
-typedef RTMEASSHARED_EXPORT _double_CircularBuffer                   MEGBuffer;			/**< Defines MEGBuffer of type _double_CircularBuffer.*/
-typedef RTMEASSHARED_EXPORT _double_CircularBuffer                   ECGBuffer;			/**< Defines ECGBuffer of type _double_CircularBuffer.*/
-typedef RTMEASSHARED_EXPORT _double_CircularBuffer                   DummyBuffer;			/**< Defines DummyBuffer of type _double_CircularBuffer.*/
-typedef RTMEASSHARED_EXPORT _double_CircularBuffer                   WaveletBuffer;		/**< Defines WaveletBuffer of type _double_CircularBuffer.*/
-typedef RTMEASSHARED_EXPORT _double_CircularBuffer                   FilterBuffer;		/**< Defines FilterBuffer of type _double_CircularBuffer.*/
-typedef RTMEASSHARED_EXPORT _double_CircularBuffer                   GaborParticleBuffer;	/**< Defines GaborParticleBuffer of type _double_CircularBuffer.*/
+typedef GENERICSSHARED_EXPORT _double_CircularBuffer_old                   dBuffer_old;				/**< Short for _double_CircularBuffer.*/
+typedef GENERICSSHARED_EXPORT _int_CircularBuffer_old                      iBuffer_old;				/**< Short for _int_CircularBuffer.*/
+typedef GENERICSSHARED_EXPORT _char_CircularBuffer_old                     cBuffer_old;				/**< Short for _char_CircularBuffer.*/
+typedef GENERICSSHARED_EXPORT _pShort_CircularBuffer_old                   pShortBuffer_old;		/**< Short for _pShort_CircularBuffer.*/
+typedef GENERICSSHARED_EXPORT _double_CircularBuffer_old                   MEGBuffer_old;			/**< Defines MEGBuffer of type _double_CircularBuffer.*/
+typedef GENERICSSHARED_EXPORT _double_CircularBuffer_old                   ECGBuffer_old;			/**< Defines ECGBuffer of type _double_CircularBuffer.*/
+typedef GENERICSSHARED_EXPORT _double_CircularBuffer_old                   DummyBuffer_old;			/**< Defines DummyBuffer of type _double_CircularBuffer.*/
+typedef GENERICSSHARED_EXPORT _double_CircularBuffer_old                   WaveletBuffer_old;		/**< Defines WaveletBuffer of type _double_CircularBuffer.*/
+typedef GENERICSSHARED_EXPORT _double_CircularBuffer_old                   FilterBuffer_old;		/**< Defines FilterBuffer of type _double_CircularBuffer.*/
+typedef GENERICSSHARED_EXPORT _double_CircularBuffer_old                   GaborParticleBuffer_old;	/**< Defines GaborParticleBuffer of type _double_CircularBuffer.*/
 
 } // NAMESPACE
 
-#endif // CIRCULARBUFFER_H
+#endif // CIRCULARBUFFEROLD_H

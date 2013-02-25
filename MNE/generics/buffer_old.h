@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     buffer.h
+* @file     buffer_old.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef BUFFER_H
-#define BUFFER_H
+#ifndef BUFFEROLD_H
+#define BUFFEROLD_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../rtmeas_global.h"
+#include "generics_global.h"
 
 
 //*************************************************************************************************************
@@ -59,7 +59,7 @@ namespace IOBuffer
 *
 * @brief The Buffer class provides a base class for buffers.
 */
-class RTMEASSHARED_EXPORT Buffer
+class GENERICSSHARED_EXPORT Buffer_old
 {
 public:
 
@@ -69,7 +69,7 @@ public:
     *
     * @param [in] type_id pointer to RTTI type_id of the variables of the buffer.
     */
-    Buffer(const char* type_id) : m_cTypeId(type_id) {};
+    Buffer_old(const char* type_id) : m_cTypeId(type_id) {};
     //=========================================================================================================
     /**
     * Returns the type_id of the current Buffer.
@@ -89,7 +89,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline const char*  Buffer::getTypeId()
+inline const char*  Buffer_old::getTypeId()
 {
 	return m_cTypeId;
 }
@@ -98,4 +98,4 @@ inline const char*  Buffer::getTypeId()
 }//NAMESPACE
 
 
-#endif // BUFFER_H
+#endif // BUFFEROLD_H
