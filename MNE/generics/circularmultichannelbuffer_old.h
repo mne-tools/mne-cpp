@@ -87,25 +87,25 @@ namespace IOBuffer
 * @brief The TEMPLATE CIRCULAR BUFFER provides a template for thread safe circular buffers.
 */
 template<typename _Tp>
-class CircularMultiChannelBuffer : public Buffer
+class CircularMultiChannelBuffer_old : public Buffer_old
 //template<typename _Tp>
-//class RTMEAS_EXPORT CircularMultiChannelBuffer : public Buffer
+//class RTMEAS_EXPORT CircularMultiChannelBuffer_old : public Buffer
 {
 public:
     //=========================================================================================================
     /**
-    * Constructs a CircularMultiChannelBuffer.
+    * Constructs a CircularMultiChannelBuffer_old.
     *
     * @param [in] uiChannel selected channel.
     * @param [in] uiMaxNumElements length of buffer.
     */
-    CircularMultiChannelBuffer(unsigned int uiNumChannels, unsigned int uiMaxNumElements);
+    CircularMultiChannelBuffer_old(unsigned int uiNumChannels, unsigned int uiMaxNumElements);
 
     //=========================================================================================================
     /**
-    * Destroys the CircularMultiChannelBuffer.
+    * Destroys the CircularMultiChannelBuffer_old.
     */
-    ~CircularMultiChannelBuffer();
+    ~CircularMultiChannelBuffer_old();
 
     //=========================================================================================================
     /**
@@ -171,7 +171,7 @@ public:
     void clear();
 
 private:
-    QVector< CircularBuffer<_Tp>* >* m_qVecBuffers;
+    QVector< CircularBuffer_old<_Tp>* >* m_qVecBuffers;
 
     unsigned int    m_uiMaxNumElements;		/**< Holds the maximal number of buffer elements.*/
 
@@ -185,9 +185,9 @@ private:
 //=============================================================================================================
 
 template<typename _Tp>
-CircularMultiChannelBuffer<_Tp>::CircularMultiChannelBuffer(unsigned int uiNumChannels, unsigned int uiMaxNumElements)
-: Buffer(typeid(_Tp).name())
-, m_qVecBuffers(new QVector< CircularBuffer<_Tp>* >(uiNumChannels))
+CircularMultiChannelBuffer_old<_Tp>::CircularMultiChannelBuffer_old(unsigned int uiNumChannels, unsigned int uiMaxNumElements)
+: Buffer_old(typeid(_Tp).name())
+, m_qVecBuffers(new QVector< CircularBuffer_old<_Tp>* >(uiNumChannels))
 , m_uiMaxNumElements(uiMaxNumElements)
 {
     init();
@@ -197,7 +197,7 @@ CircularMultiChannelBuffer<_Tp>::CircularMultiChannelBuffer(unsigned int uiNumCh
 //*************************************************************************************************************
 
 template<typename _Tp>
-CircularMultiChannelBuffer<_Tp>::~CircularMultiChannelBuffer()
+CircularMultiChannelBuffer_old<_Tp>::~CircularMultiChannelBuffer_old()
 {
     clear();
     delete m_qVecBuffers;
@@ -207,15 +207,15 @@ CircularMultiChannelBuffer<_Tp>::~CircularMultiChannelBuffer()
 //*************************************************************************************************************
 
 template<typename _Tp>
-void CircularMultiChannelBuffer<_Tp>::init()
+void CircularMultiChannelBuffer_old<_Tp>::init()
 {
 //     clear();
 //     for (int i = 0; i < uiNumChannels; i++)
 //         m_qVecBuffers.push_back( new  CircularBuffer<_Tp>(m_uiMaxNumElements) );
 
 
-    for (typename  QVector< CircularBuffer<_Tp>* >::iterator i = m_qVecBuffers->begin(); i != m_qVecBuffers->end(); ++i) {
-        *i = new  CircularBuffer<_Tp>(m_uiMaxNumElements);
+    for (typename  QVector< CircularBuffer_old<_Tp>* >::iterator i = m_qVecBuffers->begin(); i != m_qVecBuffers->end(); ++i) {
+        *i = new  CircularBuffer_old<_Tp>(m_uiMaxNumElements);
     }
 
 }
@@ -224,7 +224,7 @@ void CircularMultiChannelBuffer<_Tp>::init()
 //*************************************************************************************************************
 
 template<typename _Tp>
-inline int CircularMultiChannelBuffer<_Tp>::numChannels()
+inline int CircularMultiChannelBuffer_old<_Tp>::numChannels()
 {
     return m_qVecBuffers->size();
 }
@@ -233,7 +233,7 @@ inline int CircularMultiChannelBuffer<_Tp>::numChannels()
 //*************************************************************************************************************
 
 template<typename _Tp>
-inline void CircularMultiChannelBuffer<_Tp>::push(unsigned int uiChannel, const _Tp* pArray, unsigned int size)
+inline void CircularMultiChannelBuffer_old<_Tp>::push(unsigned int uiChannel, const _Tp* pArray, unsigned int size)
 {
     m_qVecBuffers[uiChannel]->push(pArray, size);
 }
@@ -242,7 +242,7 @@ inline void CircularMultiChannelBuffer<_Tp>::push(unsigned int uiChannel, const 
 //*************************************************************************************************************
 
 template<typename _Tp>
-inline void CircularMultiChannelBuffer<_Tp>::push(unsigned int uiChannel, const _Tp& newElement)
+inline void CircularMultiChannelBuffer_old<_Tp>::push(unsigned int uiChannel, const _Tp& newElement)
 {
     (*m_qVecBuffers)[uiChannel]->push(newElement);
 }
@@ -251,7 +251,7 @@ inline void CircularMultiChannelBuffer<_Tp>::push(unsigned int uiChannel, const 
 //*************************************************************************************************************
 
 template<typename _Tp>
-inline void CircularMultiChannelBuffer<_Tp>::push(const QVector<_Tp>& newElements)
+inline void CircularMultiChannelBuffer_old<_Tp>::push(const QVector<_Tp>& newElements)
 {
     for(int i = 0; i < newElements.size(); ++i)
         (*m_qVecBuffers)[i]->push(newElements[i]);
@@ -261,11 +261,11 @@ inline void CircularMultiChannelBuffer<_Tp>::push(const QVector<_Tp>& newElement
 //*************************************************************************************************************
 
 template<typename _Tp>
-inline QVector<_Tp> CircularMultiChannelBuffer<_Tp>::pop()
+inline QVector<_Tp> CircularMultiChannelBuffer_old<_Tp>::pop()
 {
     QVector<_Tp> elements;
 
-    for (typename QVector< CircularBuffer<_Tp>* >::iterator i = m_qVecBuffers->begin(); i != m_qVecBuffers->end(); ++i) {
+    for (typename QVector< CircularBuffer_old<_Tp>* >::iterator i = m_qVecBuffers->begin(); i != m_qVecBuffers->end(); ++i) {
         elements.push_back((*i)->pop());
     }
 
@@ -276,7 +276,7 @@ inline QVector<_Tp> CircularMultiChannelBuffer<_Tp>::pop()
 //*************************************************************************************************************
 
 template<typename _Tp>
-inline _Tp CircularMultiChannelBuffer<_Tp>::pop(unsigned int uiNumChannels)
+inline _Tp CircularMultiChannelBuffer_old<_Tp>::pop(unsigned int uiNumChannels)
 {
         return (*m_qVecBuffers)[uiNumChannels]->pop();
 }
@@ -285,7 +285,7 @@ inline _Tp CircularMultiChannelBuffer<_Tp>::pop(unsigned int uiNumChannels)
 //*************************************************************************************************************
 
 template<typename _Tp>
-void CircularMultiChannelBuffer<_Tp>::clear()
+void CircularMultiChannelBuffer_old<_Tp>::clear()
 {
     for (typename  QVector< CircularBuffer<_Tp>* >::iterator i = m_qVecBuffers->begin(); i != m_qVecBuffers->end(); ++i) {
         delete i;
@@ -301,13 +301,13 @@ void CircularMultiChannelBuffer<_Tp>::clear()
 
 //ToDo Typedef -> warning visibility ignored -> dllexport/dllimport problem
 
-typedef RTMEASSHARED_EXPORT CircularMultiChannelBuffer<int>                      _int_CircularMultiChannelBuffer;				/**< Defines CircularBuffer of integer type.*/
-typedef RTMEASSHARED_EXPORT CircularMultiChannelBuffer<short>                    _short_CircularMultiChannelBuffer;				/**< Defines CircularBuffer of short type.*/
-typedef RTMEASSHARED_EXPORT CircularMultiChannelBuffer<short*>                    _pShort_CircularMultiChannelBuffer;			/**< Defines CircularBuffer of short* type.*/
-typedef RTMEASSHARED_EXPORT CircularMultiChannelBuffer<char>                     _char_CircularMultiChannelBuffer;				/**< Defines CircularBuffer of char type.*/
-typedef RTMEASSHARED_EXPORT CircularMultiChannelBuffer<double>                   _double_CircularMultiChannelBuffer;			/**< Defines CircularBuffer of double type.*/
-typedef RTMEASSHARED_EXPORT CircularMultiChannelBuffer< QPair<int, int> >        _int_int_pair_CircularMultiChannelBuffer;		/**< Defines CircularBuffer of integer Pair type.*/
-typedef RTMEASSHARED_EXPORT CircularMultiChannelBuffer< QPair<double, double> >  _double_double_pair_CircularMultiChannelBuffer;	/**< Defines CircularBuffer of double Pair type.*/
+typedef GENERICSSHARED_EXPORT CircularMultiChannelBuffer_old<int>                      _int_CircularMultiChannelBuffer_old;				/**< Defines CircularBuffer of integer type.*/
+typedef GENERICSSHARED_EXPORT CircularMultiChannelBuffer_old<short>                    _short_CircularMultiChannelBuffer_old;				/**< Defines CircularBuffer of short type.*/
+typedef GENERICSSHARED_EXPORT CircularMultiChannelBuffer_old<short*>                    _pShort_CircularMultiChannelBuffer_old;			/**< Defines CircularBuffer of short* type.*/
+typedef GENERICSSHARED_EXPORT CircularMultiChannelBuffer_old<char>                     _char_CircularMultiChannelBuffer_old;				/**< Defines CircularBuffer of char type.*/
+typedef GENERICSSHARED_EXPORT CircularMultiChannelBuffer_old<double>                   _double_CircularMultiChannelBuffer_old;			/**< Defines CircularBuffer of double type.*/
+typedef GENERICSSHARED_EXPORT CircularMultiChannelBuffer_old< QPair<int, int> >        _int_int_pair_CircularMultiChannelBuffer_old;		/**< Defines CircularBuffer of integer Pair type.*/
+typedef GENERICSSHARED_EXPORT CircularMultiChannelBuffer_old< QPair<double, double> >  _double_double_pair_CircularMultiChannelBuffer_old;	/**< Defines CircularBuffer of double Pair type.*/
 
 } // NAMESPACE
 
