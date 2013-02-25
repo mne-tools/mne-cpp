@@ -62,7 +62,7 @@ FORMS += \
         FormFiles/ecgabout.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
-DEPENDPATH += $${MNE_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 OTHER_FILES += ecgsimulator.json
 

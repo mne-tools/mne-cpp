@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     buffer.cpp
+* @file     typename_old.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,21 +29,32 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the Buffer base class.
+* @brief    ToDo Experimental - to get type
 *
 */
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "buffer.h"
+#ifndef TYPENAMEOLD_H
+#define TYPENAMEOLD_H
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
+#define DECLARE_TYPE_NAME(x) template<> const char *typename<x>::name = #x;	/**< Macro to declare types.*/
+#define GET_TYPE_NAME(x) (CTypeName<typeof(x)>::name)						/**< Macro returns the name of the type.*/
 
-using namespace IOBuffer;
+DECLARE_TYPE_NAME(int);
+DECLARE_TYPE_NAME(short);
+DECLARE_TYPE_NAME(char);
+DECLARE_TYPE_NAME(double);
+
+//=============================================================================================================
+/**
+* DECLARE CLASS CTypeName
+*
+* @brief The CTypeName template class provides a static const to get the type of the template by name.
+*/
+template <typename T> class CTypeName {
+public:
+    static const char *name;	/**< Holds the variable type by name.*/
+};
+
+
+#endif // TYPENAMEOLD_H

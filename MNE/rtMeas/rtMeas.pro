@@ -72,7 +72,6 @@ win32 {
 SOURCES += \
     DesignPatterns/observerpattern.cpp \
     fiff/fiffparser.cpp \
-    IOBuffer/buffer.cpp \
     fiff/fiff_channel.cpp \
     Measurement/text.cpp \
     Measurement/realtimesamplearray.cpp \
@@ -84,7 +83,6 @@ SOURCES += \
     Measurement/IMeasurementacceptor.cpp \
     Nomenclature/nomenclature.cpp
 
-
 HEADERS += \
     rtmeas_global.h \
     DesignPatterns/observerpattern.h \
@@ -94,10 +92,6 @@ HEADERS += \
     fiff/fiff_file.h \
     fiff/dot.h \
     fiff/allocs.h \
-    IOBuffer/typename.h \
-    IOBuffer/circularbuffer.h \
-    IOBuffer/circularmultichannelbuffer.h \
-    IOBuffer/buffer.h \
     Measurement/text.h \
     Measurement/realtimesamplearray.h \
     Measurement/realtimemultisamplearray.h \

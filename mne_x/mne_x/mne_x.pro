@@ -94,19 +94,3 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 RESOURCES += \
     res/mainApp.qrc
-
-OTHER_FILES += \
-    res/QtStyleSheets/plastique.qss \
-    res/images/splashscreen/splashscreen_csa_rt.png \
-    res/images/icons/zoomStd.png \
-    res/images/icons/zoomOut.png \
-    res/images/icons/zoomIn.png \
-    res/images/icons/visualisation.png \
-    res/images/icons/stop.png \
-    res/images/icons/sensor.png \
-    res/images/icons/save.png \
-    res/images/icons/run.png \
-    res/images/icons/new.png \
-    res/images/icons/displayMax.png \
-    res/images/icons/csa_rt.png \
-    res/images/icons/algorithm.png

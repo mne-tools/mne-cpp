@@ -46,8 +46,8 @@
 #include "../rtmeas_global.h"
 #include "../Nomenclature/nomenclature.h"
 
-#include "../IOBuffer/circularbuffer.h"
-#include "../IOBuffer/buffer.h"
+#include <generics/circularbuffer_old.h>
+#include <generics/buffer_old.h>
 
 #include "../DesignPatterns/observerpattern.h"
 
@@ -142,7 +142,7 @@ public:
     * @param [in] id of measurement which should be added.
     * @param [in] buffer pointer to the corresponding buffer of the accepted measurement.
     */
-    void addAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id, Buffer* buffer);
+    void addAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id, Buffer_old* buffer);
     //=========================================================================================================
     /**
     * Returns accepted measurements.
@@ -157,7 +157,7 @@ public:
     * @param [in] id of measurement of which the buffer should be returned.
     * @return the buffer of the requested measurement.
     */
-    Buffer* getAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id);
+    Buffer_old* getAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id);
 
     //=========================================================================================================
     /**
@@ -168,7 +168,7 @@ public:
 protected:
     QList<MDL_ID::Module_ID>          m_qList_MDL_ID;	/**< Modules of which are measurements accepted of current module.*/
 
-    QHash<MSR_ID::Measurement_ID, Buffer*>*         m_pHashBuffers;	/**< accepted measurements */
+    QHash<MSR_ID::Measurement_ID, Buffer_old*>*         m_pHashBuffers;	/**< accepted measurements */
 };
 
 
