@@ -1,6 +1,13 @@
 var searchData=
 [
-  ['main_2ecpp',['main.cpp',['../main_8cpp.html',1,'']]],
+  ['mainsplashscreen_2ecpp',['mainsplashscreen.cpp',['../mainsplashscreen_8cpp.html',1,'']]],
+  ['mainsplashscreen_2eh',['mainsplashscreen.h',['../mainsplashscreen_8h.html',1,'']]],
+  ['mainwindow_2ecpp',['mainwindow.cpp',['../mainwindow_8cpp.html',1,'']]],
+  ['mainwindow_2eh',['mainwindow.h',['../mainwindow_8h.html',1,'']]],
+  ['measurement_2ecpp',['measurement.cpp',['../measurement_8cpp.html',1,'']]],
+  ['measurement_2eh',['measurement.h',['../measurement_8h.html',1,'']]],
+  ['measurementwidget_2ecpp',['measurementwidget.cpp',['../measurementwidget_8cpp.html',1,'']]],
+  ['measurementwidget_2eh',['measurementwidget.h',['../measurementwidget_8h.html',1,'']]],
   ['mne_2ecpp',['mne.cpp',['../mne_8cpp.html',1,'']]],
   ['mne_2eh',['mne.h',['../mne_8h.html',1,'']]],
   ['mne_5fepoch_5fdata_2ecpp',['mne_epoch_data.cpp',['../mne__epoch__data_8cpp.html',1,'']]],
@@ -21,5 +28,9 @@ var searchData=
   ['mne_5fsourcespace_2eh',['mne_sourcespace.h',['../mne__sourcespace_8h.html',1,'']]],
   ['mnemath_2ecpp',['mnemath.cpp',['../mnemath_8cpp.html',1,'']]],
   ['mnemath_2eh',['mnemath.h',['../mnemath_8h.html',1,'']]],
-  ['mnemath_5fglobal_2eh',['mnemath_global.h',['../mnemath__global_8h.html',1,'']]]
+  ['mnemath_5fglobal_2eh',['mnemath_global.h',['../mnemath__global_8h.html',1,'']]],
+  ['moduledockwidget_2ecpp',['moduledockwidget.cpp',['../moduledockwidget_8cpp.html',1,'']]],
+  ['moduledockwidget_2eh',['moduledockwidget.h',['../moduledockwidget_8h.html',1,'']]],
+  ['modulemanager_2ecpp',['modulemanager.cpp',['../modulemanager_8cpp.html',1,'']]],
+  ['modulemanager_2eh',['modulemanager.h',['../modulemanager_8h.html',1,'']]]
 ];

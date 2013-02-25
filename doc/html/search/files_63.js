@@ -2,8 +2,10 @@ var searchData=
 [
   ['circularbuffer_2ecpp',['circularbuffer.cpp',['../circularbuffer_8cpp.html',1,'']]],
   ['circularbuffer_2eh',['circularbuffer.h',['../circularbuffer_8h.html',1,'']]],
+  ['circularbuffer_5fold_2eh',['circularbuffer_old.h',['../circularbuffer__old_8h.html',1,'']]],
   ['circularmatrixbuffer_2ecpp',['circularmatrixbuffer.cpp',['../circularmatrixbuffer_8cpp.html',1,'']]],
   ['circularmatrixbuffer_2eh',['circularmatrixbuffer.h',['../circularmatrixbuffer_8h.html',1,'']]],
+  ['circularmultichannelbuffer_5fold_2eh',['circularmultichannelbuffer_old.h',['../circularmultichannelbuffer__old_8h.html',1,'']]],
   ['colortable_2ecpp',['colortable.cpp',['../colortable_8cpp.html',1,'']]],
   ['colortable_2eh',['colortable.h',['../colortable_8h.html',1,'']]],
   ['command_2eh',['command.h',['../command_8h.html',1,'']]],
@@ -13,6 +15,8 @@ var searchData=
   ['commandserver_2eh',['commandserver.h',['../commandserver_8h.html',1,'']]],
   ['commandthread_2ecpp',['commandthread.cpp',['../commandthread_8cpp.html',1,'']]],
   ['commandthread_2eh',['commandthread.h',['../commandthread_8h.html',1,'']]],
+  ['connector_2ecpp',['connector.cpp',['../connector_8cpp.html',1,'']]],
+  ['connector_2eh',['connector.h',['../connector_8h.html',1,'']]],
   ['connectormanager_2ecpp',['connectormanager.cpp',['../connectormanager_8cpp.html',1,'']]],
   ['connectormanager_2eh',['connectormanager.h',['../connectormanager_8h.html',1,'']]]
 ];

@@ -39,6 +39,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -72,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -97,14 +98,20 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>The <a class="el" href="class_subject.html" title="The Subject class provides the base class of every subject of the observer design pattern...">Subject</a> class provides the base class of every subject of the observer design pattern.  
  <a href="class_subject.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="observerpattern_8h_source.html">observerpattern.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="generics_2observerpattern_8h_source.html">observerpattern.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for Subject:</div>
 <div class="dyncontent">
  <div class="center">
   <img src="class_subject.png" usemap="#Subject_map" alt=""/>
   <map id="Subject_map" name="Subject_map">
-<area href="class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_parser.html" alt="RTCOMMANDLIB::CommandParser" shape="rect" coords="0,56,212,80"/>
+<area href="class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_parser.html" alt="RTCOMMANDLIB::CommandParser" shape="rect" coords="0,56,239,80"/>
+<area href="class_r_t_m_e_a_s_l_i_b_1_1_measurement.html" title="The Measurement class is the base class of every Measurement." alt="RTMEASLIB::Measurement" shape="rect" coords="498,56,737,80"/>
+<area href="class_r_t_m_e_a_s_l_i_b_1_1_numeric.html" title="The Numeric class is the base class of every Numeric Measurement." alt="RTMEASLIB::Numeric" shape="rect" coords="0,112,239,136"/>
+<area href="class_r_t_m_e_a_s_l_i_b_1_1_progress_bar.html" title="The ProgressBar class is the base class of every ProgressBar Measurement." alt="RTMEASLIB::ProgressBar" shape="rect" coords="249,112,488,136"/>
+<area href="class_r_t_m_e_a_s_l_i_b_1_1_real_time_multi_sample_array.html" title="The RealTimeMultiSampleArray class is the base class of every RealTimeMultiSampleArray Measurement..." alt="RTMEASLIB::RealTimeMultiSampleArray" shape="rect" coords="498,112,737,136"/>
+<area href="class_r_t_m_e_a_s_l_i_b_1_1_real_time_sample_array.html" title="The RealTimeSampleArray class is the base class of every RealTimeSampleArray Measurement." alt="RTMEASLIB::RealTimeSampleArray" shape="rect" coords="747,112,986,136"/>
+<area href="class_r_t_m_e_a_s_l_i_b_1_1_text.html" title="The Text class is the base class of every Text Measurement." alt="RTMEASLIB::Text" shape="rect" coords="996,112,1235,136"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -132,14 +139,26 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a346daed34d1c6c222c1840e3cd0b1465"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0032ae0b4ab41fb8669d109b95a12612"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_subject.html#a0032ae0b4ab41fb8669d109b95a12612">observerNumDebug</a> ()</td></tr>
 <tr class="separator:a0032ae0b4ab41fb8669d109b95a12612"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae5980067d5ec5522db5a0d78100a34be"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_subject.html#ae5980067d5ec5522db5a0d78100a34be">~Subject</a> ()</td></tr>
+<tr class="separator:ae5980067d5ec5522db5a0d78100a34be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3cfa2a26196d2fcd78a578ceda09d993"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_subject.html#a3cfa2a26196d2fcd78a578ceda09d993">attach</a> (<a class="el" href="class_i_observer.html">IObserver</a> *pObserver)</td></tr>
+<tr class="separator:a3cfa2a26196d2fcd78a578ceda09d993"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a966116a64ed9221923ba8aa9b3dd3a0e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_subject.html#a966116a64ed9221923ba8aa9b3dd3a0e">detach</a> (<a class="el" href="class_i_observer.html">IObserver</a> *pObserver)</td></tr>
+<tr class="separator:a966116a64ed9221923ba8aa9b3dd3a0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af104c2baf37c7aa63b2ef6d32c2b3a9c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_subject.html#af104c2baf37c7aa63b2ef6d32c2b3a9c">notify</a> ()</td></tr>
+<tr class="separator:af104c2baf37c7aa63b2ef6d32c2b3a9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0032ae0b4ab41fb8669d109b95a12612"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_subject.html#a0032ae0b4ab41fb8669d109b95a12612">observerNumDebug</a> ()</td></tr>
+<tr class="separator:a0032ae0b4ab41fb8669d109b95a12612"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
-<tr class="memitem:ad42e3984f551ca321a2c8ac67a7a0503"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_subject.html#ad42e3984f551ca321a2c8ac67a7a0503">notifyEnabled</a> = true</td></tr>
-<tr class="separator:ad42e3984f551ca321a2c8ac67a7a0503"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac11dae4f73c6b5d1efaceae80544127b"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_subject.html#ac11dae4f73c6b5d1efaceae80544127b">notifyEnabled</a> = true</td></tr>
+<tr class="separator:ac11dae4f73c6b5d1efaceae80544127b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
+<tr class="memitem:ab468044832c824c6d6c2f46272655207"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_subject.html#ab468044832c824c6d6c2f46272655207">Subject</a> ()</td></tr>
+<tr class="separator:ab468044832c824c6d6c2f46272655207"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab468044832c824c6d6c2f46272655207"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_subject.html#ab468044832c824c6d6c2f46272655207">Subject</a> ()</td></tr>
 <tr class="separator:ab468044832c824c6d6c2f46272655207"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -147,7 +166,7 @@ Protected Member Functions</h2></td></tr>
 <div class="textblock"><p>The <a class="el" href="class_subject.html" title="The Subject class provides the base class of every subject of the observer design pattern...">Subject</a> class provides the base class of every subject of the observer design pattern. </p>
 <p>DECLARE BASE CLASS SUBJECT </p>
 
-<p>Definition at line <a class="el" href="observerpattern_8h_source.html#l00099">99</a> of file <a class="el" href="observerpattern_8h_source.html">observerpattern.h</a>.</p>
+<p>Definition at line <a class="el" href="generics_2observerpattern_8h_source.html#l00099">99</a> of file <a class="el" href="generics_2observerpattern_8h_source.html">observerpattern.h</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a class="anchor" id="a507e8d45ce448710c3585ca753ce2e89"></a>
 <div class="memitem">
@@ -160,7 +179,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Const shared pointer type for <a class="el" href="class_subject.html" title="The Subject class provides the base class of every subject of the observer design pattern...">Subject</a>. </p>
 
-<p>Definition at line <a class="el" href="observerpattern_8h_source.html#l00103">103</a> of file <a class="el" href="observerpattern_8h_source.html">observerpattern.h</a>.</p>
+<p>Definition at line <a class="el" href="generics_2observerpattern_8h_source.html#l00103">103</a> of file <a class="el" href="generics_2observerpattern_8h_source.html">observerpattern.h</a>.</p>
 
 </div>
 </div>
@@ -175,7 +194,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Shared pointer type for <a class="el" href="class_subject.html" title="The Subject class provides the base class of every subject of the observer design pattern...">Subject</a>. </p>
 
-<p>Definition at line <a class="el" href="observerpattern_8h_source.html#l00102">102</a> of file <a class="el" href="observerpattern_8h_source.html">observerpattern.h</a>.</p>
+<p>Definition at line <a class="el" href="generics_2observerpattern_8h_source.html#l00102">102</a> of file <a class="el" href="generics_2observerpattern_8h_source.html">observerpattern.h</a>.</p>
 
 </div>
 </div>
@@ -190,7 +209,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Defines a new <a class="el" href="class_i_observer.html" title="The IObserver interface provides the base class of every observer of the observer design pattern...">IObserver</a> set type. </p>
 
-<p>Definition at line <a class="el" href="observerpattern_8h_source.html#l00105">105</a> of file <a class="el" href="observerpattern_8h_source.html">observerpattern.h</a>.</p>
+<p>Definition at line <a class="el" href="generics_2observerpattern_8h_source.html#l00105">105</a> of file <a class="el" href="generics_2observerpattern_8h_source.html">observerpattern.h</a>.</p>
 
 </div>
 </div>
@@ -217,7 +236,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Destroys the <a class="el" href="class_subject.html" title="The Subject class provides the base class of every subject of the observer design pattern...">Subject</a>. </p>
 
-<p>Definition at line <a class="el" href="observerpattern_8cpp_source.html#l00049">49</a> of file <a class="el" href="observerpattern_8cpp_source.html">observerpattern.cpp</a>.</p>
+<p>Definition at line <a class="el" href="generics_2observerpattern_8cpp_source.html#l00049">49</a> of file <a class="el" href="generics_2observerpattern_8cpp_source.html">observerpattern.cpp</a>.</p>
 
 </div>
 </div>
@@ -243,7 +262,57 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Constructs a <a class="el" href="class_subject.html" title="The Subject class provides the base class of every subject of the observer design pattern...">Subject</a>. </p>
 
-<p>Definition at line <a class="el" href="observerpattern_8h_source.html#l00165">165</a> of file <a class="el" href="observerpattern_8h_source.html">observerpattern.h</a>.</p>
+<p>Definition at line <a class="el" href="generics_2observerpattern_8h_source.html#l00165">165</a> of file <a class="el" href="generics_2observerpattern_8h_source.html">observerpattern.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ae5980067d5ec5522db5a0d78100a34be"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual Subject::~Subject </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Destroys the <a class="el" href="class_subject.html" title="The Subject class provides the base class of every subject of the observer design pattern...">Subject</a>. </p>
+
+</div>
+</div>
+<a class="anchor" id="ab468044832c824c6d6c2f46272655207"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Subject::Subject </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Constructs a <a class="el" href="class_subject.html" title="The Subject class provides the base class of every subject of the observer design pattern...">Subject</a>. </p>
+
+<p>Definition at line <a class="el" href="rt_meas_2_design_patterns_2observerpattern_8h_source.html#l00150">150</a> of file <a class="el" href="rt_meas_2_design_patterns_2observerpattern_8h_source.html">observerpattern.h</a>.</p>
 
 </div>
 </div>
@@ -269,7 +338,30 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="observerpattern_8cpp_source.html#l00057">57</a> of file <a class="el" href="observerpattern_8cpp_source.html">observerpattern.cpp</a>.</p>
+</div>
+</div>
+<a class="anchor" id="a3cfa2a26196d2fcd78a578ceda09d993"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Subject::attach </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_i_observer.html">IObserver</a> *&#160;</td>
+          <td class="paramname"><em>pObserver</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Attaches an observer to the subject.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">pObserver</td><td>pointer to the observer which should be attached to the subject. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="generics_2observerpattern_8cpp_source.html#l00057">57</a> of file <a class="el" href="generics_2observerpattern_8cpp_source.html">observerpattern.cpp</a>.</p>
 
 </div>
 </div>
@@ -294,7 +386,30 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="observerpattern_8cpp_source.html#l00065">65</a> of file <a class="el" href="observerpattern_8cpp_source.html">observerpattern.cpp</a>.</p>
+</div>
+</div>
+<a class="anchor" id="a966116a64ed9221923ba8aa9b3dd3a0e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Subject::detach </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_i_observer.html">IObserver</a> *&#160;</td>
+          <td class="paramname"><em>pObserver</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Detaches an observer of the subject.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">pObserver</td><td>pointer to the observer which should be detached of the subject. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="generics_2observerpattern_8cpp_source.html#l00065">65</a> of file <a class="el" href="generics_2observerpattern_8cpp_source.html">observerpattern.cpp</a>.</p>
 
 </div>
 </div>
@@ -312,7 +427,23 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Notifies all attached servers by calling there update method. Is used when subject has updates to provide. This method is enabled when nothifiedEnabled is true. </p>
 
-<p>Definition at line <a class="el" href="observerpattern_8cpp_source.html#l00074">74</a> of file <a class="el" href="observerpattern_8cpp_source.html">observerpattern.cpp</a>.</p>
+</div>
+</div>
+<a class="anchor" id="af104c2baf37c7aa63b2ef6d32c2b3a9c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Subject::notify </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Notifies all attached servers by calling there update method. Is used when subject has updates to provide. This method is enabled when nothifiedEnabled is true. </p>
+
+<p>Definition at line <a class="el" href="generics_2observerpattern_8cpp_source.html#l00074">74</a> of file <a class="el" href="generics_2observerpattern_8cpp_source.html">observerpattern.cpp</a>.</p>
 
 </div>
 </div>
@@ -339,7 +470,34 @@ Protected Member Functions</h2></td></tr>
 <p>Returns number of attached observers. ToDo only for debug purpose -&gt; could be removed</p>
 <dl class="section return"><dt>Returns</dt><dd>the number of attached observers. </dd></dl>
 
-<p>Definition at line <a class="el" href="observerpattern_8h_source.html#l00158">158</a> of file <a class="el" href="observerpattern_8h_source.html">observerpattern.h</a>.</p>
+<p>Definition at line <a class="el" href="rt_meas_2_design_patterns_2observerpattern_8h_source.html#l00142">142</a> of file <a class="el" href="rt_meas_2_design_patterns_2observerpattern_8h_source.html">observerpattern.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a0032ae0b4ab41fb8669d109b95a12612"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int Subject::observerNumDebug </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Returns number of attached observers. ToDo only for debug purpose -&gt; could be removed</p>
+<dl class="section return"><dt>Returns</dt><dd>the number of attached observers. </dd></dl>
+
+<p>Definition at line <a class="el" href="generics_2observerpattern_8h_source.html#l00158">158</a> of file <a class="el" href="generics_2observerpattern_8h_source.html">observerpattern.h</a>.</p>
 
 </div>
 </div>
@@ -366,12 +524,12 @@ Protected Member Functions</h2></td></tr>
 <p>Returns attached observers.</p>
 <dl class="section return"><dt>Returns</dt><dd>attached observers. </dd></dl>
 
-<p>Definition at line <a class="el" href="observerpattern_8h_source.html#l00177">177</a> of file <a class="el" href="observerpattern_8h_source.html">observerpattern.h</a>.</p>
+<p>Definition at line <a class="el" href="generics_2observerpattern_8h_source.html#l00177">177</a> of file <a class="el" href="generics_2observerpattern_8h_source.html">observerpattern.h</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="ad42e3984f551ca321a2c8ac67a7a0503"></a>
+<a class="anchor" id="ac11dae4f73c6b5d1efaceae80544127b"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -379,7 +537,7 @@ Protected Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool Subject::notifyEnabled = true</td>
+          <td class="memname">static bool Subject::notifyEnabled = true</td>
         </tr>
       </table>
   </td>
@@ -390,18 +548,20 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Holds the status whether notification is enabled. This is used to block <a class="el" href="class_subject.html#af104c2baf37c7aa63b2ef6d32c2b3a9c">notify()</a> to make the observer pattern thread safe. It's working like a mutex. The different is that data aren't stored. -&gt; it's okay when values are queued in their own buffer. </p>
 
-<p>Definition at line <a class="el" href="observerpattern_8h_source.html#l00141">141</a> of file <a class="el" href="observerpattern_8h_source.html">observerpattern.h</a>.</p>
+<p>Definition at line <a class="el" href="generics_2observerpattern_8h_source.html#l00141">141</a> of file <a class="el" href="generics_2observerpattern_8h_source.html">observerpattern.h</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>D:/Users/Christoph/Documents/GitHub/mne-cpp/MNE/generics/<a class="el" href="observerpattern_8h_source.html">observerpattern.h</a></li>
-<li>D:/Users/Christoph/Documents/GitHub/mne-cpp/MNE/generics/<a class="el" href="observerpattern_8cpp_source.html">observerpattern.cpp</a></li>
+<li>D:/Users/Christoph/Documents/GitHub/mne-cpp/MNE/generics/<a class="el" href="generics_2observerpattern_8h_source.html">observerpattern.h</a></li>
+<li>D:/Users/Christoph/Documents/GitHub/mne-cpp/MNE/rtMeas/DesignPatterns/<a class="el" href="rt_meas_2_design_patterns_2observerpattern_8h_source.html">observerpattern.h</a></li>
+<li>D:/Users/Christoph/Documents/GitHub/mne-cpp/MNE/generics/<a class="el" href="generics_2observerpattern_8cpp_source.html">observerpattern.cpp</a></li>
+<li>D:/Users/Christoph/Documents/GitHub/mne-cpp/MNE/rtMeas/DesignPatterns/<a class="el" href="rt_meas_2_design_patterns_2observerpattern_8cpp_source.html">observerpattern.cpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Feb 12 2013 18:48:06 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Feb 24 2013 23:14:44 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

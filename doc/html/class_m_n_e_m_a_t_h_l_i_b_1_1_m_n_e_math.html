@@ -39,6 +39,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -72,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -88,6 +89,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math-members.html">List of all members</a>  </div>
@@ -101,6 +103,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <p><code>#include &lt;<a class="el" href="mnemath_8h_source.html">mnemath.h</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:ab978b204d9b4c9d28d5b5c875064cfd9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab978b204d9b4c9d28d5b5c875064cfd9"></a>
+typedef std::pair&lt; int, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>IdxDoubleValue</b></td></tr>
+<tr class="separator:ab978b204d9b4c9d28d5b5c875064cfd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49750501591efdbdc99c95ab60608653"><td class="memItemLeft" align="right" valign="top">typedef std::pair&lt; int, int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#a49750501591efdbdc99c95ab60608653">IdxIntValue</a></td></tr>
+<tr class="separator:a49750501591efdbdc99c95ab60608653"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ac5118943876966b509ae7eacaae0df60"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#ac5118943876966b509ae7eacaae0df60">~MNEMath</a> ()</td></tr>
@@ -114,17 +124,43 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:a4826938d921564a8fa5779c6e4f45cb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af9543225700faee9fea4a21f1dedaa96"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#af9543225700faee9fea4a21f1dedaa96">issparse</a> (VectorXd &amp;v)</td></tr>
 <tr class="separator:af9543225700faee9fea4a21f1dedaa96"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab47b1124fd5f078f070bfd84257791dc"><td class="memItemLeft" align="right" valign="top">static SparseMatrix&lt; double &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#ab47b1124fd5f078f070bfd84257791dc">make_block_diag</a> (const MatrixXd *A, qint32 n)</td></tr>
-<tr class="separator:ab47b1124fd5f078f070bfd84257791dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6a1ca374e7959a7baae65c9d47480165"><td class="memItemLeft" align="right" valign="top">static qint32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#a6a1ca374e7959a7baae65c9d47480165">rank</a> (MatrixXd &amp;A, double tol=1e-8)</td></tr>
-<tr class="separator:a6a1ca374e7959a7baae65c9d47480165"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0db0d2c5128dfa345c8a04acdb9ec70d"><td class="memItemLeft" align="right" valign="top">static SparseMatrix&lt; double &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#a0db0d2c5128dfa345c8a04acdb9ec70d">make_block_diag</a> (const MatrixXd &amp;A, qint32 n)</td></tr>
+<tr class="separator:a0db0d2c5128dfa345c8a04acdb9ec70d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e871e7bcca6042ca4d8837cd90bbd28"><td class="memItemLeft" align="right" valign="top">static qint32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#a5e871e7bcca6042ca4d8837cd90bbd28">rank</a> (const MatrixXd &amp;A, double tol=1e-8)</td></tr>
+<tr class="separator:a5e871e7bcca6042ca4d8837cd90bbd28"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a09e5e39b4110548afe5a881e41185a5e"><td class="memItemLeft" align="right" valign="top">static VectorXi&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#a09e5e39b4110548afe5a881e41185a5e">sort</a> (VectorXd &amp;v, bool desc=true)</td></tr>
+<tr class="separator:a09e5e39b4110548afe5a881e41185a5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a294e213d25574b53c9f7433376d34a81"><td class="memItemLeft" align="right" valign="top">static VectorXi&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#a294e213d25574b53c9f7433376d34a81">sort</a> (VectorXd &amp;v_prime, MatrixXd &amp;mat, bool desc=true)</td></tr>
+<tr class="separator:a294e213d25574b53c9f7433376d34a81"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8828b5063916f7d0144e0ec8359774a3"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#a8828b5063916f7d0144e0ec8359774a3">compareIdxDoublePairBiggerThan</a> (const IdxDoubleValue &amp;lhs, const IdxDoubleValue &amp;rhs)</td></tr>
+<tr class="separator:a8828b5063916f7d0144e0ec8359774a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae33776e47b908cb00fba4e8d9b1482be"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#ae33776e47b908cb00fba4e8d9b1482be">compareIdxDoublePairSmallerThan</a> (const IdxDoubleValue &amp;lhs, const IdxDoubleValue &amp;rhs)</td></tr>
+<tr class="separator:ae33776e47b908cb00fba4e8d9b1482be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a35815927a7d167107454fd2d156a5c38"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#a35815927a7d167107454fd2d156a5c38">compareIndexIntPairSmallerThan</a> (const <a class="el" href="class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#a49750501591efdbdc99c95ab60608653">IdxIntValue</a> &amp;lhs, const <a class="el" href="class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#a49750501591efdbdc99c95ab60608653">IdxIntValue</a> &amp;rhs)</td></tr>
+<tr class="separator:a35815927a7d167107454fd2d156a5c38"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Math methods. </p>
 <p>ToDo make this a template class Generalized math methods used by mne methods </p>
 
 <p>Definition at line <a class="el" href="mnemath_8h_source.html#l00095">95</a> of file <a class="el" href="mnemath_8h_source.html">mnemath.h</a>.</p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a class="anchor" id="a49750501591efdbdc99c95ab60608653"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef std::pair&lt;int,int&gt; <a class="el" href="class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#a49750501591efdbdc99c95ab60608653">MNEMATHLIB::MNEMath::IdxIntValue</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Typedef of a pair of ints. </p>
+
+<p>Definition at line <a class="el" href="mnemath_8h_source.html#l00099">99</a> of file <a class="el" href="mnemath_8h_source.html">mnemath.h</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="ac5118943876966b509ae7eacaae0df60"></a>
 <div class="memitem">
 <div class="memproto">
@@ -147,7 +183,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Destroys the <a class="el" href="class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html" title="Math methods.">MNEMath</a> object </p>
 
-<p>Definition at line <a class="el" href="mnemath_8h_source.html#l00102">102</a> of file <a class="el" href="mnemath_8h_source.html">mnemath.h</a>.</p>
+<p>Definition at line <a class="el" href="mnemath_8h_source.html#l00105">105</a> of file <a class="el" href="mnemath_8h_source.html">mnemath.h</a>.</p>
 
 </div>
 </div>
@@ -185,7 +221,142 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Output vector [x1^2+y1^2+z1^2 ... x_n^2+y_n^2+z_n^2 ] </dd></dl>
 
-<p>Definition at line <a class="el" href="mnemath_8cpp_source.html#l00068">68</a> of file <a class="el" href="mnemath_8cpp_source.html">mnemath.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mnemath_8cpp_source.html#l00076">76</a> of file <a class="el" href="mnemath_8cpp_source.html">mnemath.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a8828b5063916f7d0144e0ec8359774a3"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool MNEMATHLIB::MNEMath::compareIdxDoublePairBiggerThan </td>
+          <td>(</td>
+          <td class="paramtype">const IdxDoubleValue &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const IdxDoubleValue &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Compares two index-value-pairs.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">lhs</td><td>left hand side of the comparison </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">rhs</td><td>right hand side of the comparison</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if value of lhs is bigger than value of rhs </dd></dl>
+
+<p>Definition at line <a class="el" href="mnemath_8h_source.html#l00248">248</a> of file <a class="el" href="mnemath_8h_source.html">mnemath.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ae33776e47b908cb00fba4e8d9b1482be"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool MNEMATHLIB::MNEMath::compareIdxDoublePairSmallerThan </td>
+          <td>(</td>
+          <td class="paramtype">const IdxDoubleValue &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const IdxDoubleValue &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Compares two index-value-pairs.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">lhs</td><td>left hand side of the comparison </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">rhs</td><td>right hand side of the comparison</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if value of lhs is smaller than value of rhs </dd></dl>
+
+<p>Definition at line <a class="el" href="mnemath_8h_source.html#l00256">256</a> of file <a class="el" href="mnemath_8h_source.html">mnemath.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a35815927a7d167107454fd2d156a5c38"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool MNEMATHLIB::MNEMath::compareIndexIntPairSmallerThan </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#a49750501591efdbdc99c95ab60608653">IdxIntValue</a> &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#a49750501591efdbdc99c95ab60608653">IdxIntValue</a> &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Compeartor of two int pairs</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">lhs</td><td>pair one </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">rhs</td><td>pair two</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if pair one is bigger, false otherwise </dd></dl>
+
+<p>Definition at line <a class="el" href="mnemath_8h_source.html#l00263">263</a> of file <a class="el" href="mnemath_8h_source.html">mnemath.h</a>.</p>
 
 </div>
 </div>
@@ -249,7 +420,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>rank of matrix A </dd></dl>
 
-<p>Definition at line <a class="el" href="mnemath_8cpp_source.html#l00092">92</a> of file <a class="el" href="mnemath_8cpp_source.html">mnemath.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mnemath_8cpp_source.html#l00100">100</a> of file <a class="el" href="mnemath_8cpp_source.html">mnemath.cpp</a>.</p>
 
 </div>
 </div>
@@ -283,11 +454,11 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if sparse false otherwise; </dd></dl>
 
-<p>Definition at line <a class="el" href="mnemath_8cpp_source.html#l00179">179</a> of file <a class="el" href="mnemath_8cpp_source.html">mnemath.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mnemath_8cpp_source.html#l00205">205</a> of file <a class="el" href="mnemath_8cpp_source.html">mnemath.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ab47b1124fd5f078f070bfd84257791dc"></a>
+<a class="anchor" id="a0db0d2c5128dfa345c8a04acdb9ec70d"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -297,7 +468,7 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">SparseMatrix&lt; double &gt; * MNEMath::make_block_diag </td>
           <td>(</td>
-          <td class="paramtype">const MatrixXd *&#160;</td>
+          <td class="paramtype">const MatrixXd &amp;&#160;</td>
           <td class="paramname"><em>A</em>, </td>
         </tr>
         <tr>
@@ -331,11 +502,11 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A sparse block diagonal, diagonalized from the elements in "A". </dd></dl>
 
-<p>Definition at line <a class="el" href="mnemath_8cpp_source.html#l00201">201</a> of file <a class="el" href="mnemath_8cpp_source.html">mnemath.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mnemath_8cpp_source.html#l00227">227</a> of file <a class="el" href="mnemath_8cpp_source.html">mnemath.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a6a1ca374e7959a7baae65c9d47480165"></a>
+<a class="anchor" id="a5e871e7bcca6042ca4d8837cd90bbd28"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -345,7 +516,7 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">qint32 MNEMath::rank </td>
           <td>(</td>
-          <td class="paramtype">MatrixXd &amp;&#160;</td>
+          <td class="paramtype">const MatrixXd &amp;&#160;</td>
           <td class="paramname"><em>A</em>, </td>
         </tr>
         <tr>
@@ -377,7 +548,104 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>rank of matrix A </dd></dl>
 
-<p>Definition at line <a class="el" href="mnemath_8cpp_source.html#l00234">234</a> of file <a class="el" href="mnemath_8cpp_source.html">mnemath.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mnemath_8cpp_source.html#l00267">267</a> of file <a class="el" href="mnemath_8cpp_source.html">mnemath.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a09e5e39b4110548afe5a881e41185a5e"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">VectorXi MNEMath::sort </td>
+          <td>(</td>
+          <td class="paramtype">VectorXd &amp;&#160;</td>
+          <td class="paramname"><em>v</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>desc</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Sorts a vector (ascending order) in place and returns the track of the original indeces</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">v</td><td>vector to sort; it's sorted in place </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">desc</td><td>if true its sorted in a descending order, otherwise ascending (optional, default = true)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Vector of the original indeces in the new order </dd></dl>
+
+<p>Definition at line <a class="el" href="mnemath_8cpp_source.html#l00282">282</a> of file <a class="el" href="mnemath_8cpp_source.html">mnemath.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a294e213d25574b53c9f7433376d34a81"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">VectorXi MNEMath::sort </td>
+          <td>(</td>
+          <td class="paramtype">VectorXd &amp;&#160;</td>
+          <td class="paramname"><em>v_prime</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">MatrixXd &amp;&#160;</td>
+          <td class="paramname"><em>mat</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>desc</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Sorts a vector (ascending order) and a corresponding matrix in place and returns the track of the original indeces The matrix is sorted along the columns using the vector values for comparison.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">v_prime</td><td>vector to sort (sorted in place) </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">mat</td><td>matrix to sort (sorted in place) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">desc</td><td>if true its sorted in a descending order, otherwise ascending (optional, default = true)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Vector of the original indeces in the new order </dd></dl>
+
+<p>Definition at line <a class="el" href="mnemath_8cpp_source.html#l00313">313</a> of file <a class="el" href="mnemath_8cpp_source.html">mnemath.cpp</a>.</p>
 
 </div>
 </div>
@@ -388,7 +656,7 @@ Static Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Feb 12 2013 18:48:07 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Feb 24 2013 23:14:45 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

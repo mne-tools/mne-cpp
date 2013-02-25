@@ -39,6 +39,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -72,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -158,6 +159,8 @@ Public Attributes</h2></td></tr>
 <tr class="separator:aaf1380e5dffa62b3b3e4cdb44f0be303"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4abab64cbb6ff88af3b693a0b98d410d"><td class="memItemLeft" align="right" valign="top">QList&lt; VectorXi &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a4abab64cbb6ff88af3b693a0b98d410d">pinfo</a></td></tr>
 <tr class="separator:a4abab64cbb6ff88af3b693a0b98d410d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6ebd8487fd11dbdcef92960c27b1465a"><td class="memItemLeft" align="right" valign="top">VectorXi&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a6ebd8487fd11dbdcef92960c27b1465a">patch_inds</a></td></tr>
+<tr class="separator:a6ebd8487fd11dbdcef92960c27b1465a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae7ab61927a9552e4f8f4004cb75218db"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ae7ab61927a9552e4f8f4004cb75218db">dist_limit</a></td></tr>
 <tr class="separator:ae7ab61927a9552e4f8f4004cb75218db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1fac01b2c5a0d1f43607b773fd6fe421"><td class="memItemLeft" align="right" valign="top">SparseMatrix&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a1fac01b2c5a0d1f43607b773fd6fe421">dist</a></td></tr>
@@ -255,7 +258,7 @@ Public Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8cpp_source.html#l00089">89</a> of file <a class="el" href="mne__hemisphere_8cpp_source.html">mne_hemisphere.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8cpp_source.html#l00090">90</a> of file <a class="el" href="mne__hemisphere_8cpp_source.html">mne_hemisphere.cpp</a>.</p>
 
 </div>
 </div>
@@ -273,7 +276,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Destroys the hemisphere source space. </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8cpp_source.html#l00123">123</a> of file <a class="el" href="mne__hemisphere_8cpp_source.html">mne_hemisphere.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8cpp_source.html#l00125">125</a> of file <a class="el" href="mne__hemisphere_8cpp_source.html">mne_hemisphere.cpp</a>.</p>
 
 </div>
 </div>
@@ -292,7 +295,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Initializes the hemisphere source space. </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8cpp_source.html#l00131">131</a> of file <a class="el" href="mne__hemisphere_8cpp_source.html">mne_hemisphere.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8cpp_source.html#l00133">133</a> of file <a class="el" href="mne__hemisphere_8cpp_source.html">mne_hemisphere.cpp</a>.</p>
 
 </div>
 </div>
@@ -318,7 +321,7 @@ Public Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the geometry model </dd></dl>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8cpp_source.html#l00203">203</a> of file <a class="el" href="mne__hemisphere_8cpp_source.html">mne_hemisphere.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8cpp_source.html#l00206">206</a> of file <a class="el" href="mne__hemisphere_8cpp_source.html">mne_hemisphere.cpp</a>.</p>
 
 </div>
 </div>
@@ -357,7 +360,7 @@ Public Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8cpp_source.html#l00168">168</a> of file <a class="el" href="mne__hemisphere_8cpp_source.html">mne_hemisphere.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8cpp_source.html#l00171">171</a> of file <a class="el" href="mne__hemisphere_8cpp_source.html">mne_hemisphere.cpp</a>.</p>
 
 </div>
 </div>
@@ -373,7 +376,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Distances to clusters centroid. </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00192">192</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00193">193</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -388,7 +391,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Only used within clustered forward solutions </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00191">191</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00192">192</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -418,7 +421,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>ToDo... (using option -cps during mne_setup_source_space) </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00183">183</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00184">184</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -433,7 +436,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>ToDo... (using option -cps during mne_setup_source_space) </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00182">182</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00183">183</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -572,6 +575,21 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a6ebd8487fd11dbdcef92960c27b1465a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">VectorXi MNELIB::MNEHemisphere::patch_inds</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>List of neighboring vertices in the high resolution triangulation. </p>
+
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00182">182</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a4abab64cbb6ff88af3b693a0b98d410d"></a>
 <div class="memitem">
 <div class="memproto">
@@ -613,7 +631,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Triangle areas </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00186">186</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00187">187</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -628,7 +646,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Triangle centers </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00184">184</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00185">185</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -643,7 +661,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Triangle normals </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00185">185</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00186">186</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -673,7 +691,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Triangle areas of used triangles </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00189">189</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00190">190</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -688,7 +706,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Triangle centers of used triangles </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00187">187</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00188">188</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -703,7 +721,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Triangle normals of used triangles </p>
 
-<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00188">188</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__hemisphere_8h_source.html#l00189">189</a> of file <a class="el" href="mne__hemisphere_8h_source.html">mne_hemisphere.h</a>.</p>
 
 </div>
 </div>
@@ -744,7 +762,7 @@ Public Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Feb 12 2013 18:48:07 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Feb 24 2013 23:14:45 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

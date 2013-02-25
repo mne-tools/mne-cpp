@@ -39,6 +39,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -70,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -81,7 +82,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_d9f91708cdb6d7bc2d9cf00ef2519886.html">MNE</a></li><li class="navelem"><a class="el" href="dir_03820bcac740aa4f9e7fd37e64f99512.html">mne</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_fba7b6d30909f9ec66000534e18b073e.html">MNE</a></li><li class="navelem"><a class="el" href="dir_2818de1e5b67557da8c9b7d659dc1661.html">mne</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -101,7 +102,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fiff__constants_8h.html" title="Fiff constants.">fiff/fiff_constants.h</a>&gt;</span></div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fiff__coord__trans_8h.html" title="FiffCoordTrans class declaration.">fiff/fiff_coord_trans.h</a>&gt;</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fiff__types_8h.html" title="Old fiff_type declarations - replace them.">fiff/fiff_types.h</a>&gt;</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">#include &lt;fiff/fiff_types.h&gt;</span></div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
@@ -121,195 +122,230 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="mne__sourcespace_8h.html" title="MNESourceSpace class declaration.">mne_sourcespace.h</a>&quot;</span></div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fiff__info__base_8h.html" title="FiffInfoBase class declaration.">fiff/fiff_info_base.h</a>&gt;</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment">// Eigen INCLUDES</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="mnemath_8h.html" title="MNEMath class declaration.">mneMath/mnemath.h</a>&gt;</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="preprocessor">#include &lt;Eigen/Core&gt;</span></div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="preprocessor">#include &lt;Eigen/SVD&gt;</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="preprocessor">#include &lt;Eigen/Sparse&gt;</span></div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="preprocessor">#include &lt;Eigen/unsupported/KroneckerProduct&gt;</span></div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="comment">// STL INCLUDES</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment">// Eigen INCLUDES</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="preprocessor">#include &lt;Eigen/Core&gt;</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="preprocessor">#include &lt;Eigen/SVD&gt;</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="preprocessor">#include &lt;Eigen/Sparse&gt;</span></div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="preprocessor">#include &lt;Eigen/unsupported/KroneckerProduct&gt;</span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="preprocessor">#include &lt;math.h&gt;</span></div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="comment">// STL INCLUDES</span></div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="comment">// QT INCLUDES</span></div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="preprocessor">#include &lt;math.h&gt;</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="preprocessor">#include &lt;QFile&gt;</span></div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="preprocessor">#include &lt;QDataStream&gt;</span></div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="comment">// DEFINE NAMESPACE MNELIB</span></div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="comment">// QT INCLUDES</span></div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="preprocessor">#include &lt;QFile&gt;</span></div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="preprocessor">#include &lt;QDataStream&gt;</span></div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="keyword">namespace </span>MNELIB</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;{</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="comment">// USED NAMESPACES</span></div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="comment">// DEFINE NAMESPACE MNELIB</span></div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="keyword">namespace </span>MNELIB</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;{</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="keyword">using namespace </span>Eigen;</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="keyword">using namespace </span>FIFFLIB;</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="keyword">using namespace </span>FSLIB;</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00122"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">  122</a></span>&#160;<span class="comment"></span><span class="keyword">class </span><a class="code" href="mne__global_8h.html#ae182e5976a87d895a5eecf737aafefc3">MNESHARED_EXPORT</a> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a></div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;{</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00125"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a7e95a8381a0f621201981cd6a39ea25c">  125</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;MNEForwardSolution&gt; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a7e95a8381a0f621201981cd6a39ea25c">SPtr</a>;            </div>
-<div class="line"><a name="l00126"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ac205e3b5d9a3fe1a455d3c45e30d7636">  126</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;const MNEForwardSolution&gt; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ac205e3b5d9a3fe1a455d3c45e30d7636">ConstSPtr</a>; </div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;<span class="comment"></span>    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a>();</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;<span class="comment"></span>    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a>(QIODevice &amp;p_IODevice, <span class="keywordtype">bool</span> force_fixed = <span class="keyword">false</span>, <span class="keywordtype">bool</span> surf_ori = <span class="keyword">false</span>, QStringList&amp; include = defaultQStringList, QStringList&amp; exclude = defaultQStringList);</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;<span class="comment"></span>    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a>(<span class="keyword">const</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a> &amp;p_MNEForwardSolution);</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a>();</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> clear();</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;<span class="comment"></span>    <span class="keywordtype">bool</span> cluster_forward_solution(<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a> &amp;p_fwdOut, <span class="keyword">const</span> <a class="code" href="class_f_s_l_i_b_1_1_annotation.html" title="Free surfer annotation.">Annotation</a> &amp;p_LHAnnotation, <span class="keyword">const</span> <a class="code" href="class_f_s_l_i_b_1_1_annotation.html" title="Free surfer annotation.">Annotation</a> &amp;p_RHAnnotation, qint32 p_iClusterSize);</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;<span class="comment"></span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> isEmpty() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;<span class="comment"></span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> isFixedOrient() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;<span class="comment"></span>    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a> pick_channels_forward(<span class="keyword">const</span> QStringList&amp; include = defaultQStringList, <span class="keyword">const</span> QStringList&amp; exclude = defaultQStringList) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;<span class="comment"></span>    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a> pick_types_forward(<span class="keywordtype">bool</span> meg, <span class="keywordtype">bool</span> eeg, <span class="keyword">const</span> QStringList&amp; include = defaultQStringList, <span class="keyword">const</span> QStringList&amp; exclude = defaultQStringList) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;<span class="comment"></span><span class="comment">//    VectorXi tripletSelection(VectorXi&amp; p_vecIdxSelection)</span></div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;<span class="comment">//    {</span></div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;<span class="comment">//        MatrixXi triSelect = p_vecIdxSelection.transpose().replicate(3,1).array() * 3;//repmat((p_vecIdxSelection - 1) * 3 + 1, 3, 1);</span></div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;<span class="comment">//        triSelect.row(1).array() += 1;</span></div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;<span class="comment">//        triSelect.row(2).array() += 2;</span></div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;<span class="comment">//        VectorXi retTriSelect(triSelect.cols()*3);</span></div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;<span class="comment">//        for(int i = 0; i &lt; triSelect.cols(); ++i)</span></div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;<span class="comment">//            retTriSelect.block(i*3,0,3,1) = triSelect.col(i);</span></div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;<span class="comment">//        return retTriSelect;</span></div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;<span class="comment">//    } // tripletSelection</span></div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="comment">// USED NAMESPACES</span></div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="keyword">using namespace </span>Eigen;</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="keyword">using namespace </span>MNEMATHLIB;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="keyword">using namespace </span>FIFFLIB;</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="keyword">using namespace </span>FSLIB;</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00125"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">  125</a></span>&#160;<span class="comment"></span><span class="keyword">class </span><a class="code" href="mne__global_8h.html#ae182e5976a87d895a5eecf737aafefc3">MNESHARED_EXPORT</a> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a></div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;{</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00128"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a7e95a8381a0f621201981cd6a39ea25c">  128</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;MNEForwardSolution&gt; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a7e95a8381a0f621201981cd6a39ea25c">SPtr</a>;            </div>
+<div class="line"><a name="l00129"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ac205e3b5d9a3fe1a455d3c45e30d7636">  129</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;const MNEForwardSolution&gt; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ac205e3b5d9a3fe1a455d3c45e30d7636">ConstSPtr</a>; </div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;<span class="comment"></span>    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a>();</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;<span class="comment"></span>    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a>(QIODevice &amp;p_IODevice, <span class="keywordtype">bool</span> force_fixed = <span class="keyword">false</span>, <span class="keywordtype">bool</span> surf_ori = <span class="keyword">false</span>, <span class="keyword">const</span> QStringList&amp; include = defaultQStringList, <span class="keyword">const</span> QStringList&amp; exclude = defaultQStringList, <span class="keywordtype">bool</span> bExcludeBads = <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;<span class="comment"></span>    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a>(<span class="keyword">const</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a> &amp;p_MNEForwardSolution);</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a>();</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> clear();</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;<span class="comment"></span>    <span class="keywordtype">bool</span> cluster_forward_solution(<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a> &amp;p_fwdOut, <span class="keyword">const</span> <a class="code" href="class_f_s_l_i_b_1_1_annotation.html" title="Free surfer annotation.">Annotation</a> &amp;p_LHAnnotation, <span class="keyword">const</span> <a class="code" href="class_f_s_l_i_b_1_1_annotation.html" title="Free surfer annotation.">Annotation</a> &amp;p_RHAnnotation, qint32 p_iClusterSize);</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html" title="covariance data">FiffCov</a> compute_orient_prior(<span class="keywordtype">float</span> loose = 0.2);</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html" title="covariance data">FiffCov</a> compute_depth_prior(<span class="keyword">const</span> MatrixXd &amp;Gain, <span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a> &amp;gain_info, <span class="keywordtype">bool</span> is_fixed_ori, <span class="keywordtype">double</span> exp = 0.8, <span class="keywordtype">double</span> limit = 10.0, MatrixXd &amp;patch_areas = defaultMatrixXd, <span class="keywordtype">bool</span> limit_depth_chs = <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;<span class="comment"></span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> isEmpty() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;<span class="comment"></span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> isFixedOrient() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;<span class="comment"></span>    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a> pick_channels(<span class="keyword">const</span> QStringList&amp; include = defaultQStringList, <span class="keyword">const</span> QStringList&amp; exclude = defaultQStringList) <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;</div>
 <div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> read_forward_solution(QIODevice&amp; p_IODevice, <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a>&amp; fwd, <span class="keywordtype">bool</span> force_fixed = <span class="keyword">false</span>, <span class="keywordtype">bool</span> surf_ori = <span class="keyword">false</span>, QStringList&amp; include = defaultQStringList, QStringList&amp; exclude = defaultQStringList);</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;<span class="comment">//    //=========================================================================================================</span></div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;<span class="comment">//    /**</span></div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;<span class="comment">//    * Prepares a forward solution, Bad channels, after clustering etc ToDo...</span></div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;<span class="comment">//    *</span></div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;<span class="comment">//    * @param [in] p_FiffInfo   Fif measurement info</span></div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;<span class="comment">//    *</span></div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;<span class="comment">//    */</span></div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;<span class="comment">//    void prepare_forward(const FiffInfo&amp; p_FiffInfo)</span></div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;<span class="comment">//    {</span></div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;<span class="comment">//        QStringList fwdChNames = this-&gt;sol-&gt;row_names;</span></div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;<span class="comment">//        QStringList chNames;</span></div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;<span class="comment">//        for(qint32 i = 0; i &lt; p_FiffInfo.ch_names.size(); ++i)</span></div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;<span class="comment">//        {</span></div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;<span class="comment">//            bool inBads = false;</span></div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;<span class="comment">//            bool inFwd = false;</span></div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;<span class="comment">//            for(qint32 j = 0; j &lt; p_FiffInfo.bads.size(); ++j)</span></div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;<span class="comment">//            {</span></div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;<span class="comment">//                if(QString::compare(p_FiffInfo.bads[j], p_FiffInfo.ch_names[i]) == 0)</span></div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;<span class="comment">//                {</span></div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;<span class="comment">//                    inBads = true;</span></div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;<span class="comment">//                    break;</span></div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;<span class="comment">//                }</span></div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;<span class="comment">//            }</span></div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;<span class="comment">//            for(qint32 j = 0; j &lt; fwdChNames.size(); ++j)</span></div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;<span class="comment">//            {</span></div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;<span class="comment">//                if(QString::compare(fwdChNames[j], p_FiffInfo.ch_names[i]) == 0)</span></div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;<span class="comment">//                {</span></div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;<span class="comment">//                    inFwd = true;</span></div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;<span class="comment">//                    break;</span></div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;<span class="comment">//                }</span></div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;<span class="comment">//            }</span></div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;<span class="comment">//            if(!inBads &amp;&amp; inFwd)</span></div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;<span class="comment">//                chNames.append(p_FiffInfo.ch_names[i]);</span></div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;<span class="comment">//        }</span></div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;<span class="comment">//        qint32 nchan = chNames.size();</span></div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;<span class="comment">//    }</span></div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> prepare_forward(<span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a> &amp;p_info, <span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html" title="covariance data">FiffCov</a> &amp;p_noise_cov, <span class="keywordtype">bool</span> p_pca, QStringList &amp;p_outChNames, MatrixXd &amp;p_outGain, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html" title="covariance data">FiffCov</a> &amp;p_outNoiseCov, MatrixXd &amp;p_outWhitener, qint32 &amp;p_outNumNonZero);</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> read_one(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a>* p_pStream, <span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a>&amp; p_Node, <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a>&amp; one);</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00330"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#adeda03feac0c09dc76711921c1e576dd">  330</a></span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html" title="light measurement info">FiffInfoBase</a> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#adeda03feac0c09dc76711921c1e576dd">info</a>;                  </div>
-<div class="line"><a name="l00331"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1988a88297362b6b34b0318577ad162d">  331</a></span>&#160;    fiff_int_t <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1988a88297362b6b34b0318577ad162d">source_ori</a>;              </div>
-<div class="line"><a name="l00332"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a8776126f2f4ec08939fb83a61a429348">  332</a></span>&#160;    fiff_int_t <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a8776126f2f4ec08939fb83a61a429348">coord_frame</a>;             </div>
-<div class="line"><a name="l00333"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a4bc383d90d8550cda0ad96cf0dfeb988">  333</a></span>&#160;    fiff_int_t <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a4bc383d90d8550cda0ad96cf0dfeb988">nsource</a>;                 </div>
-<div class="line"><a name="l00334"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#adedb753633d161cdfa28a450ba64ca42">  334</a></span>&#160;    fiff_int_t <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#adedb753633d161cdfa28a450ba64ca42">nchan</a>;                   </div>
-<div class="line"><a name="l00335"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a247a4b2f503b6b246a4b8ea5f5b69c1c">  335</a></span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#a013471cfe5f75de645b42e1bc71f0651">FiffNamedMatrix::SDPtr</a> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a247a4b2f503b6b246a4b8ea5f5b69c1c">sol</a>;         </div>
-<div class="line"><a name="l00336"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a191e83f3719bf1cf34e5a4fd923b3ca1">  336</a></span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#a013471cfe5f75de645b42e1bc71f0651">FiffNamedMatrix::SDPtr</a> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a191e83f3719bf1cf34e5a4fd923b3ca1">sol_grad</a>;    </div>
-<div class="line"><a name="l00337"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a17bd236b46fd5cb7096a30df6d4f475d">  337</a></span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="Coordinate transformation description.">FiffCoordTrans</a> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a17bd236b46fd5cb7096a30df6d4f475d">mri_head_t</a>;          </div>
-<div class="line"><a name="l00338"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a3d61876581eba25731926eb070d5a1fd">  338</a></span>&#160;    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html" title="Source Space descritpion.">MNESourceSpace</a> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a3d61876581eba25731926eb070d5a1fd">src</a>;                 </div>
-<div class="line"><a name="l00339"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aca622bbe1b6ff6d69834fbafd2ae69b5">  339</a></span>&#160;    MatrixX3d <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aca622bbe1b6ff6d69834fbafd2ae69b5">source_rr</a>;                </div>
-<div class="line"><a name="l00340"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a0070dd5bda4063846fc7bbc9a7b132c2">  340</a></span>&#160;    MatrixX3d <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a0070dd5bda4063846fc7bbc9a7b132c2">source_nn</a>;                </div>
-<div class="line"><a name="l00342"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a598a41eed229feb0ccd030ed17d77d7d">  342</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a598a41eed229feb0ccd030ed17d77d7d">isClustered</a>;   </div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;};</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;<span class="comment"></span>    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a> pick_types(<span class="keywordtype">bool</span> meg, <span class="keywordtype">bool</span> eeg, <span class="keyword">const</span> QStringList&amp; include = defaultQStringList, <span class="keyword">const</span> QStringList&amp; exclude = defaultQStringList) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> prepare_forward(<span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a> &amp;p_info, <span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html" title="covariance data">FiffCov</a> &amp;p_noise_cov, <span class="keywordtype">bool</span> p_pca, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a> &amp;p_outFwdInfo, MatrixXd &amp;gain, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html" title="covariance data">FiffCov</a> &amp;p_outNoiseCov, MatrixXd &amp;p_outWhitener, qint32 &amp;p_outNumNonZero) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;<span class="comment">//    //=========================================================================================================</span></div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;<span class="comment">//    /**</span></div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;<span class="comment">//    * Prepares a forward solution, Bad channels, after clustering etc ToDo...</span></div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;<span class="comment">//    *</span></div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;<span class="comment">//    * @param [in] p_FiffInfo   Fif measurement info</span></div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;<span class="comment">//    *</span></div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;<span class="comment">//    */</span></div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;<span class="comment">//    void prepare_forward(const FiffInfo&amp; p_FiffInfo)</span></div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;<span class="comment">//    {</span></div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;<span class="comment">//        QStringList fwdChNames = this-&gt;sol-&gt;row_names;</span></div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;<span class="comment">//        QStringList chNames;</span></div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;<span class="comment">//        for(qint32 i = 0; i &lt; p_FiffInfo.ch_names.size(); ++i)</span></div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;<span class="comment">//        {</span></div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;<span class="comment">//            bool inBads = false;</span></div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;<span class="comment">//            bool inFwd = false;</span></div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;<span class="comment">//            for(qint32 j = 0; j &lt; p_FiffInfo.bads.size(); ++j)</span></div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;<span class="comment">//            {</span></div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;<span class="comment">//                if(QString::compare(p_FiffInfo.bads[j], p_FiffInfo.ch_names[i]) == 0)</span></div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;<span class="comment">//                {</span></div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;<span class="comment">//                    inBads = true;</span></div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;<span class="comment">//                    break;</span></div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;<span class="comment">//                }</span></div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;<span class="comment">//            }</span></div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;<span class="comment">//            for(qint32 j = 0; j &lt; fwdChNames.size(); ++j)</span></div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;<span class="comment">//            {</span></div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;<span class="comment">//                if(QString::compare(fwdChNames[j], p_FiffInfo.ch_names[i]) == 0)</span></div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;<span class="comment">//                {</span></div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;<span class="comment">//                    inFwd = true;</span></div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;<span class="comment">//                    break;</span></div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;<span class="comment">//                }</span></div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;<span class="comment">//            }</span></div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;<span class="comment">//            if(!inBads &amp;&amp; inFwd)</span></div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;<span class="comment">//                chNames.append(p_FiffInfo.ch_names[i]);</span></div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;<span class="comment">//        }</span></div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;<span class="comment">//        qint32 nchan = chNames.size();</span></div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;<span class="comment">//    }</span></div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;<span class="comment"></span><span class="comment">//    VectorXi tripletSelection(VectorXi&amp; p_vecIdxSelection)</span></div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;<span class="comment">//    {</span></div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;<span class="comment">//        MatrixXi triSelect = p_vecIdxSelection.transpose().replicate(3,1).array() * 3;//repmat((p_vecIdxSelection - 1) * 3 + 1, 3, 1);</span></div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;<span class="comment">//        triSelect.row(1).array() += 1;</span></div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;<span class="comment">//        triSelect.row(2).array() += 2;</span></div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;<span class="comment">//        VectorXi retTriSelect(triSelect.cols()*3);</span></div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;<span class="comment">//        for(int i = 0; i &lt; triSelect.cols(); ++i)</span></div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;<span class="comment">//            retTriSelect.block(i*3,0,3,1) = triSelect.col(i);</span></div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;<span class="comment">//        return retTriSelect;</span></div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;<span class="comment">//    } // tripletSelection</span></div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> read_forward_solution(QIODevice&amp; p_IODevice, <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a>&amp; fwd, <span class="keywordtype">bool</span> force_fixed = <span class="keyword">false</span>, <span class="keywordtype">bool</span> surf_ori = <span class="keyword">false</span>, <span class="keyword">const</span> QStringList&amp; include = defaultQStringList, <span class="keyword">const</span> QStringList&amp; exclude = defaultQStringList, <span class="keywordtype">bool</span> bExcludeBads = <span class="keyword">true</span>);</div>
 <div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;<span class="comment">// INLINE DEFINITIONS</span></div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;</div>
-<div class="line"><a name="l00350"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1c81b86cc30d53927ba032543507cdd8">  350</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1c81b86cc30d53927ba032543507cdd8">MNEForwardSolution::isEmpty</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;    <span class="keywordflow">return</span> this-&gt;nchan &lt;= 0;</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;}</div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;</div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;</div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;</div>
-<div class="line"><a name="l00358"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ab99e06dc8c84618aef405ffe3d54fe78">  358</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ab99e06dc8c84618aef405ffe3d54fe78">MNEForwardSolution::isFixedOrient</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;    <span class="keywordflow">return</span> this-&gt;source_ori == FIFFV_MNE_FIXED_ORI;</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;}</div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;} <span class="comment">// NAMESPACE</span></div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;<span class="preprocessor">#endif // MNE_FORWARDSOLUTION_H</span></div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">void</span> restrict_gain_matrix(MatrixXd &amp;G, <span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a> &amp;info);</div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;</div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> to_fixed_ori();</div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;</div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;<span class="comment"></span>    <span class="keyword">friend</span> std::ostream&amp; operator&lt;&lt;(std::ostream&amp; out, <span class="keyword">const</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNELIB::MNEForwardSolution</a> &amp;p_MNEForwardSolution);</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> read_one(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a>* p_pStream, <span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a>&amp; p_Node, <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a>&amp; one);</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00387"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#adeda03feac0c09dc76711921c1e576dd">  387</a></span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html" title="light measurement info">FiffInfoBase</a> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#adeda03feac0c09dc76711921c1e576dd">info</a>;                  </div>
+<div class="line"><a name="l00388"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1988a88297362b6b34b0318577ad162d">  388</a></span>&#160;    fiff_int_t <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1988a88297362b6b34b0318577ad162d">source_ori</a>;              </div>
+<div class="line"><a name="l00389"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aee695468986dd2e920b5cad332a5a6a1">  389</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aee695468986dd2e920b5cad332a5a6a1">surf_ori</a>;                      </div>
+<div class="line"><a name="l00390"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a8776126f2f4ec08939fb83a61a429348">  390</a></span>&#160;    fiff_int_t <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a8776126f2f4ec08939fb83a61a429348">coord_frame</a>;             </div>
+<div class="line"><a name="l00391"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a4bc383d90d8550cda0ad96cf0dfeb988">  391</a></span>&#160;    fiff_int_t <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a4bc383d90d8550cda0ad96cf0dfeb988">nsource</a>;                 </div>
+<div class="line"><a name="l00392"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#adedb753633d161cdfa28a450ba64ca42">  392</a></span>&#160;    fiff_int_t <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#adedb753633d161cdfa28a450ba64ca42">nchan</a>;                   </div>
+<div class="line"><a name="l00393"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a247a4b2f503b6b246a4b8ea5f5b69c1c">  393</a></span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#a013471cfe5f75de645b42e1bc71f0651">FiffNamedMatrix::SDPtr</a> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a247a4b2f503b6b246a4b8ea5f5b69c1c">sol</a>;         </div>
+<div class="line"><a name="l00394"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a191e83f3719bf1cf34e5a4fd923b3ca1">  394</a></span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#a013471cfe5f75de645b42e1bc71f0651">FiffNamedMatrix::SDPtr</a> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a191e83f3719bf1cf34e5a4fd923b3ca1">sol_grad</a>;    </div>
+<div class="line"><a name="l00395"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a17bd236b46fd5cb7096a30df6d4f475d">  395</a></span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="Coordinate transformation description.">FiffCoordTrans</a> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a17bd236b46fd5cb7096a30df6d4f475d">mri_head_t</a>;          </div>
+<div class="line"><a name="l00396"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a3d61876581eba25731926eb070d5a1fd">  396</a></span>&#160;    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html" title="Source Space descritpion.">MNESourceSpace</a> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a3d61876581eba25731926eb070d5a1fd">src</a>;                 </div>
+<div class="line"><a name="l00397"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aca622bbe1b6ff6d69834fbafd2ae69b5">  397</a></span>&#160;    MatrixX3d <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aca622bbe1b6ff6d69834fbafd2ae69b5">source_rr</a>;                </div>
+<div class="line"><a name="l00398"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a0070dd5bda4063846fc7bbc9a7b132c2">  398</a></span>&#160;    MatrixX3d <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a0070dd5bda4063846fc7bbc9a7b132c2">source_nn</a>;                </div>
+<div class="line"><a name="l00400"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a598a41eed229feb0ccd030ed17d77d7d">  400</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a598a41eed229feb0ccd030ed17d77d7d">isClustered</a>;   </div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;};</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;<span class="comment">// INLINE DEFINITIONS</span></div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;</div>
+<div class="line"><a name="l00408"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1c81b86cc30d53927ba032543507cdd8">  408</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1c81b86cc30d53927ba032543507cdd8">MNEForwardSolution::isEmpty</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;    <span class="keywordflow">return</span> this-&gt;nchan &lt;= 0;</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;}</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;</div>
+<div class="line"><a name="l00416"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ab99e06dc8c84618aef405ffe3d54fe78">  416</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ab99e06dc8c84618aef405ffe3d54fe78">MNEForwardSolution::isFixedOrient</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;    <span class="keywordflow">return</span> this-&gt;source_ori == FIFFV_MNE_FIXED_ORI;</div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;}</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;</div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;</div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;</div>
+<div class="line"><a name="l00424"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aeed5feefa2bdefa17bcd612fc8abdbd5">  424</a></span>&#160;<span class="keyword">inline</span> std::ostream&amp; operator&lt;&lt;(std::ostream&amp; out, <span class="keyword">const</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNELIB::MNEForwardSolution</a> &amp;p_MNEForwardSolution)</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;{</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;#### MNE Forward Solution ####\n&quot;</span>;</div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;</div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;\n source_ori: &quot;</span> &lt;&lt; p_MNEForwardSolution.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1988a88297362b6b34b0318577ad162d">source_ori</a> &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;\n coord_frame: &quot;</span> &lt;&lt; p_MNEForwardSolution.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a8776126f2f4ec08939fb83a61a429348">coord_frame</a> &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;\n nsource: &quot;</span> &lt;&lt; p_MNEForwardSolution.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a4bc383d90d8550cda0ad96cf0dfeb988">nsource</a> &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;\n nchan: &quot;</span> &lt;&lt; p_MNEForwardSolution.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#adedb753633d161cdfa28a450ba64ca42">nchan</a> &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;\n sol:\n\t&quot;</span> &lt;&lt; *p_MNEForwardSolution.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a247a4b2f503b6b246a4b8ea5f5b69c1c">sol</a>.data() &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;\n sol_grad:\n\t&quot;</span> &lt;&lt; *p_MNEForwardSolution.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a191e83f3719bf1cf34e5a4fd923b3ca1">sol_grad</a>.data() &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;    <span class="keywordflow">return</span> out;</div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;}</div>
+<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;</div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;} <span class="comment">// NAMESPACE</span></div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;</div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;<span class="preprocessor">#endif // MNE_FORWARDSOLUTION_H</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Feb 12 2013 18:48:04 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Feb 24 2013 23:14:41 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

@@ -39,6 +39,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -72,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -131,6 +132,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a40097f4856494f666a7d06c27739880f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4232a707da9f18c2ddb1b79832cdf0b2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#a4232a707da9f18c2ddb1b79832cdf0b2">clear</a> ()</td></tr>
 <tr class="separator:a4232a707da9f18c2ddb1b79832cdf0b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a19b7fc7996ba41d8cc1db11c721b8ff0"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#a19b7fc7996ba41d8cc1db11c721b8ff0">channel_type</a> (qint32 idx)</td></tr>
+<tr class="separator:a19b7fc7996ba41d8cc1db11c721b8ff0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a996350a23b293b434c44f5e16866011b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#a996350a23b293b434c44f5e16866011b">isEmpty</a> () const </td></tr>
 <tr class="separator:a996350a23b293b434c44f5e16866011b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a64d78c8e3ceb40ac79dd514da8d09bc0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html">FiffInfoBase</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#a64d78c8e3ceb40ac79dd514da8d09bc0">pick_info</a> (const MatrixXi *sel=NULL) const </td></tr>
@@ -211,7 +214,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Constructors the light fiff measurement file information. </p>
 
-<p>Definition at line <a class="el" href="fiff__info__base_8cpp_source.html#l00058">58</a> of file <a class="el" href="fiff__info__base_8cpp_source.html">fiff_info_base.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info__base_8cpp_source.html#l00060">60</a> of file <a class="el" href="fiff__info__base_8cpp_source.html">fiff_info_base.cpp</a>.</p>
 
 </div>
 </div>
@@ -236,7 +239,7 @@ Public Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff__info__base_8cpp_source.html#l00066">66</a> of file <a class="el" href="fiff__info__base_8cpp_source.html">fiff_info_base.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info__base_8cpp_source.html#l00068">68</a> of file <a class="el" href="fiff__info__base_8cpp_source.html">fiff_info_base.cpp</a>.</p>
 
 </div>
 </div>
@@ -254,11 +257,45 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Destroys the light fiff measurement file information. </p>
 
-<p>Definition at line <a class="el" href="fiff__info__base_8cpp_source.html#l00081">81</a> of file <a class="el" href="fiff__info__base_8cpp_source.html">fiff_info_base.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info__base_8cpp_source.html#l00083">83</a> of file <a class="el" href="fiff__info__base_8cpp_source.html">fiff_info_base.cpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a19b7fc7996ba41d8cc1db11c721b8ff0"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QString FIFFLIB::FiffInfoBase::channel_type </td>
+          <td>(</td>
+          <td class="paramtype">qint32&#160;</td>
+          <td class="paramname"><em>idx</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Get channel type.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">idx</td><td>Index of channel</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Type of channel ('grad', 'mag', 'eeg', 'stim', 'eog', 'emg', 'ecg') </dd></dl>
+
+<p>Definition at line <a class="el" href="fiff__info__base_8h_source.html#l00126">126</a> of file <a class="el" href="fiff__info__base_8h_source.html">fiff_info_base.h</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a4232a707da9f18c2ddb1b79832cdf0b2"></a>
 <div class="memitem">
 <div class="memproto">
@@ -273,7 +310,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Initializes light FIFF measurement information. </p>
 
-<p>Definition at line <a class="el" href="fiff__info__base_8cpp_source.html#l00089">89</a> of file <a class="el" href="fiff__info__base_8cpp_source.html">fiff_info_base.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info__base_8cpp_source.html#l00091">91</a> of file <a class="el" href="fiff__info__base_8cpp_source.html">fiff_info_base.cpp</a>.</p>
 
 </div>
 </div>
@@ -300,7 +337,7 @@ Public Attributes</h2></td></tr>
 <p>True if FIFF measurement file information is empty.</p>
 <dl class="section return"><dt>Returns</dt><dd>true if FIFF measurement file information is empty </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__info__base_8h_source.html#l00207">207</a> of file <a class="el" href="fiff__info__base_8h_source.html">fiff_info_base.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info__base_8h_source.html#l00248">248</a> of file <a class="el" href="fiff__info__base_8h_source.html">fiff_info_base.h</a>.</p>
 
 </div>
 </div>
@@ -354,7 +391,7 @@ Public Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the selector matrix (row Vector) </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__info__base_8cpp_source.html#l00168">168</a> of file <a class="el" href="fiff__info__base_8cpp_source.html">fiff_info_base.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info__base_8cpp_source.html#l00170">170</a> of file <a class="el" href="fiff__info__base_8cpp_source.html">fiff_info_base.cpp</a>.</p>
 
 </div>
 </div>
@@ -382,7 +419,7 @@ Public Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Info modified according to sel </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__info__base_8cpp_source.html#l00296">296</a> of file <a class="el" href="fiff__info__base_8cpp_source.html">fiff_info_base.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info__base_8cpp_source.html#l00197">197</a> of file <a class="el" href="fiff__info__base_8cpp_source.html">fiff_info_base.cpp</a>.</p>
 
 </div>
 </div>
@@ -442,7 +479,7 @@ Public Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the selector matrix (row vector) </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__info__base_8cpp_source.html#l00102">102</a> of file <a class="el" href="fiff__info__base_8cpp_source.html">fiff_info_base.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info__base_8cpp_source.html#l00104">104</a> of file <a class="el" href="fiff__info__base_8cpp_source.html">fiff_info_base.cpp</a>.</p>
 
 </div>
 </div>
@@ -502,7 +539,7 @@ Public Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the selector matrix (row vector) </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__info__base_8cpp_source.html#l00157">157</a> of file <a class="el" href="fiff__info__base_8cpp_source.html">fiff_info_base.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info__base_8cpp_source.html#l00159">159</a> of file <a class="el" href="fiff__info__base_8cpp_source.html">fiff_info_base.cpp</a>.</p>
 
 </div>
 </div>
@@ -518,7 +555,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>List of bad channels. </p>
 
-<p>Definition at line <a class="el" href="fiff__info__base_8h_source.html#l00199">199</a> of file <a class="el" href="fiff__info__base_8h_source.html">fiff_info_base.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info__base_8h_source.html#l00240">240</a> of file <a class="el" href="fiff__info__base_8h_source.html">fiff_info_base.h</a>.</p>
 
 </div>
 </div>
@@ -533,7 +570,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>List of all channel names. </p>
 
-<p>Definition at line <a class="el" href="fiff__info__base_8h_source.html#l00196">196</a> of file <a class="el" href="fiff__info__base_8h_source.html">fiff_info_base.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info__base_8h_source.html#l00237">237</a> of file <a class="el" href="fiff__info__base_8h_source.html">fiff_info_base.h</a>.</p>
 
 </div>
 </div>
@@ -548,7 +585,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>List of all channel info descriptors. </p>
 
-<p>Definition at line <a class="el" href="fiff__info__base_8h_source.html#l00195">195</a> of file <a class="el" href="fiff__info__base_8h_source.html">fiff_info_base.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info__base_8h_source.html#l00236">236</a> of file <a class="el" href="fiff__info__base_8h_source.html">fiff_info_base.h</a>.</p>
 
 </div>
 </div>
@@ -563,7 +600,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Coordinate transformation ToDo... </p>
 
-<p>Definition at line <a class="el" href="fiff__info__base_8h_source.html#l00198">198</a> of file <a class="el" href="fiff__info__base_8h_source.html">fiff_info_base.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info__base_8h_source.html#l00239">239</a> of file <a class="el" href="fiff__info__base_8h_source.html">fiff_info_base.h</a>.</p>
 
 </div>
 </div>
@@ -578,7 +615,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Coordinate transformation ToDo... </p>
 
-<p>Definition at line <a class="el" href="fiff__info__base_8h_source.html#l00197">197</a> of file <a class="el" href="fiff__info__base_8h_source.html">fiff_info_base.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info__base_8h_source.html#l00238">238</a> of file <a class="el" href="fiff__info__base_8h_source.html">fiff_info_base.h</a>.</p>
 
 </div>
 </div>
@@ -593,7 +630,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Number of channels. </p>
 
-<p>Definition at line <a class="el" href="fiff__info__base_8h_source.html#l00194">194</a> of file <a class="el" href="fiff__info__base_8h_source.html">fiff_info_base.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__info__base_8h_source.html#l00235">235</a> of file <a class="el" href="fiff__info__base_8h_source.html">fiff_info_base.h</a>.</p>
 
 </div>
 </div>
@@ -604,7 +641,7 @@ Public Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Feb 12 2013 18:48:06 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Feb 24 2013 23:14:44 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

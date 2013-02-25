@@ -1,11 +1,12 @@
 var searchData=
 [
   ['save_5fcalibrated',['save_calibrated',['../class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a2c42e307469c490de4fcb0b878fdf32c',1,'FIFFLIB::FiffCtfComp']]],
-  ['scanno',['scanno',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#ad70dfc43719627c0bc2aa10bf3a422ac',1,'FIFFLIB::FiffChInfo']]],
-  ['secs',['secs',['../struct_f_i_f_f_l_i_b_1_1__fiff_time_rec.html#aad08009ec30781943ec62c2ae883eb83',1,'FIFFLIB::_fiffTimeRec']]],
+  ['scanno',['scanNo',['../struct_f_i_f_f_1_1__fiff_ch_info_rec.html#a033ef63a84bc45114591f372e084abe5',1,'FIFF::_fiffChInfoRec::scanNo()'],['../class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#ad70dfc43719627c0bc2aa10bf3a422ac',1,'FIFFLIB::FiffChInfo::scanno()']]],
+  ['secs',['secs',['../struct_f_i_f_f_l_i_b_1_1__fiff_time_rec.html#aad08009ec30781943ec62c2ae883eb83',1,'FIFFLIB::_fiffTimeRec::secs()'],['../struct_f_i_f_f_1_1__fiff_time_rec.html#a80096e35bd9973ff57445810e4a0cd98',1,'FIFF::_fiffTimeRec::secs()']]],
   ['sfreq',['sfreq',['../class_f_i_f_f_l_i_b_1_1_fiff_info.html#a963c80bf73b01ed07eb1a31540cf308c',1,'FIFFLIB::FiffInfo']]],
+  ['signal_5fchannel',['signal_channel',['../struct_f_i_f_f_1_1__fiff__hpi__coil.html#a382e31cd897fdccd2004d3b6428da86f',1,'FIFF::_fiff_hpi_coil']]],
   ['sing',['sing',['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#aeed4a8ce7ef123affc36f686c517ccb2',1,'MNELIB::MNEInverseOperator']]],
-  ['size',['size',['../class_f_i_f_f_l_i_b_1_1_fiff_dir_entry.html#a1282e02113b2ab4f3fde07227bb42d37',1,'FIFFLIB::FiffDirEntry::size()'],['../struct_f_i_f_f_l_i_b_1_1__fiff__data__ref.html#a43f960bb9fd41baacf11df97869190bd',1,'FIFFLIB::_fiff_data_ref::size()']]],
+  ['size',['size',['../class_f_i_f_f_l_i_b_1_1_fiff_dir_entry.html#a1282e02113b2ab4f3fde07227bb42d37',1,'FIFFLIB::FiffDirEntry::size()'],['../struct_f_i_f_f_l_i_b_1_1__fiff__data__ref.html#a43f960bb9fd41baacf11df97869190bd',1,'FIFFLIB::_fiff_data_ref::size()'],['../class_f_i_f_f_1_1fiff_tag.html#a56c3a256870cd10a857737212161ace9',1,'FIFF::fiffTag::size()'],['../struct_f_i_f_f_1_1__fiff_dir_entry_rec.html#ae0d7494c3475765a08bcb486e666c7a3',1,'FIFF::_fiffDirEntryRec::size()'],['../struct_f_i_f_f_1_1__fiff__data__ref.html#ae65ac91c04c5f7eabbeeb9916ffe295e',1,'FIFF::_fiff_data_ref::size()']]],
   ['sol',['sol',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a247a4b2f503b6b246a4b8ea5f5b69c1c',1,'MNELIB::MNEForwardSolution']]],
   ['sol_5fgrad',['sol_grad',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a191e83f3719bf1cf34e5a4fd923b3ca1',1,'MNELIB::MNEForwardSolution']]],
   ['source_5fcov',['source_cov',['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a87a4f07a98479a04650f09d82ca48c51',1,'MNELIB::MNEInverseOperator']]],
@@ -13,5 +14,6 @@ var searchData=
   ['source_5fori',['source_ori',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1988a88297362b6b34b0318577ad162d',1,'MNELIB::MNEForwardSolution::source_ori()'],['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ad9be3e35de623862f76a69aa5f3bfbf2',1,'MNELIB::MNEInverseOperator::source_ori()']]],
   ['source_5frr',['source_rr',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aca622bbe1b6ff6d69834fbafd2ae69b5',1,'MNELIB::MNEForwardSolution']]],
   ['src',['src',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a3d61876581eba25731926eb070d5a1fd',1,'MNELIB::MNEForwardSolution::src()'],['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a8074f2dd4963041afbe819487d0e3bd2',1,'MNELIB::MNEInverseOperator::src()']]],
-  ['struct_5fnames',['struct_names',['../class_f_s_l_i_b_1_1_colortable.html#ab7804162918de82c37e9bac3943ff98e',1,'FSLIB::Colortable']]]
+  ['struct_5fnames',['struct_names',['../class_f_s_l_i_b_1_1_colortable.html#ab7804162918de82c37e9bac3943ff98e',1,'FSLIB::Colortable']]],
+  ['surf_5fori',['surf_ori',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aee695468986dd2e920b5cad332a5a6a1',1,'MNELIB::MNEForwardSolution']]]
 ];

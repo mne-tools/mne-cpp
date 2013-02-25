@@ -1,11 +1,22 @@
 var searchData=
 [
-  ['unit',['unit',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a5e79cf6d8e0efa7e5f17b146d4895465',1,'FIFFLIB::FiffChInfo']]],
-  ['unit_5fmul',['unit_mul',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a9d718bd3658c1519a1b22214049b7f9f',1,'FIFFLIB::FiffChInfo']]],
-  ['update',['update',['../class_i_observer.html#a8499f376f794502fdd9ef197edd77b53',1,'IObserver::update()'],['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_manager.html#a088af5dc92fdb0946c3302994fd43cf4',1,'RTCOMMANDLIB::CommandManager::update()']]],
+  ['u16',['U16',['../nomenclature_8h.html#adf928e51a60dba0df29d615401cc55a8',1,'nomenclature.h']]],
+  ['u32',['U32',['../nomenclature_8h.html#ac3df7cf3c8cb172a588adec881447d68',1,'nomenclature.h']]],
+  ['u8',['U8',['../nomenclature_8h.html#a3cb25ca6f51f003950f9625ff05536fc',1,'nomenclature.h']]],
+  ['ui_5fecgaboutwidgetclass',['Ui_ECGAboutWidgetClass',['../class_ui___e_c_g_about_widget_class.html',1,'']]],
+  ['ui_5fecgrunclass',['Ui_ECGRunClass',['../class_ui___e_c_g_run_class.html',1,'']]],
+  ['ui_5fecgsetupclass',['Ui_ECGSetupClass',['../class_ui___e_c_g_setup_class.html',1,'']]],
+  ['ui_5fnumericwidgetclass',['Ui_NumericWidgetClass',['../class_ui___numeric_widget_class.html',1,'']]],
+  ['ui_5fprogressbarwidgetclass',['Ui_ProgressBarWidgetClass',['../class_ui___progress_bar_widget_class.html',1,'']]],
+  ['ui_5frealtimemultisamplearrayclass',['Ui_RealTimeMultiSampleArrayClass',['../class_ui___real_time_multi_sample_array_class.html',1,'']]],
+  ['ui_5frealtimesamplearrayclass',['Ui_RealTimeSampleArrayClass',['../class_ui___real_time_sample_array_class.html',1,'']]],
+  ['ui_5ftextwidgetclass',['Ui_TextWidgetClass',['../class_ui___text_widget_class.html',1,'']]],
+  ['unit',['unit',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a5e79cf6d8e0efa7e5f17b146d4895465',1,'FIFFLIB::FiffChInfo::unit()'],['../struct_f_i_f_f_1_1__fiff_ch_info_rec.html#abbf32b28dcae59f17d9499f5bf14e1d0',1,'FIFF::_fiffChInfoRec::unit()']]],
+  ['unit_5fmul',['unit_mul',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a9d718bd3658c1519a1b22214049b7f9f',1,'FIFFLIB::FiffChInfo::unit_mul()'],['../struct_f_i_f_f_1_1__fiff_ch_info_rec.html#a72bfcfeb9e2c93f0089d22f1c6e47172',1,'FIFF::_fiffChInfoRec::unit_mul()']]],
+  ['update',['update',['../class_d_i_s_p_l_i_b_1_1_measurement_widget.html#ad8ae40cbe2f17cd73a53713fce9c707e',1,'DISPLIB::MeasurementWidget::update()'],['../class_d_i_s_p_l_i_b_1_1_numeric_widget.html#acbcbcde821ca57cc2a085a843c04da00',1,'DISPLIB::NumericWidget::update()'],['../class_d_i_s_p_l_i_b_1_1_progress_bar_widget.html#a2dd6dc1e6cc028879fa8b512147a665b',1,'DISPLIB::ProgressBarWidget::update()'],['../class_d_i_s_p_l_i_b_1_1_real_time_sample_array_widget.html#af7fa3d341fb1977bcbb8896cbc0565cd',1,'DISPLIB::RealTimeSampleArrayWidget::update()'],['../class_d_i_s_p_l_i_b_1_1_text_widget.html#abbc4d3c603c5ffa8cdd30a7f464860c1',1,'DISPLIB::TextWidget::update()'],['../class_i_observer.html#a8499f376f794502fdd9ef197edd77b53',1,'IObserver::update()'],['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_manager.html#a088af5dc92fdb0946c3302994fd43cf4',1,'RTCOMMANDLIB::CommandManager::update()'],['../class_i_observer.html#a8499f376f794502fdd9ef197edd77b53',1,'IObserver::update()'],['../class_r_t_m_e_a_s_l_i_b_1_1_i_measurement_acceptor.html#a01e791ed37af0ade0929bf24d909d57f',1,'RTMEASLIB::IMeasurementAcceptor::update()'],['../class_m_n_e_x_1_1_i_alert.html#ad05d2e7b66c271a47116c785c2dcc6da',1,'MNEX::IAlert::update()'],['../class_m_n_e_x_1_1_i_r_t_algorithm.html#add9c8c62c8e6e1d4caef457a5e63ac37',1,'MNEX::IRTAlgorithm::update()'],['../class_m_n_e_x_1_1_i_r_t_record.html#aba313d4c625ae08286d069bbe8f0ae0f',1,'MNEX::IRTRecord::update()'],['../class_m_n_e_x_1_1_i_r_t_visualization.html#a46331ee058249758d1a66e127425d7a0',1,'MNEX::IRTVisualization::update()']]],
   ['use_5ftri_5farea',['use_tri_area',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a20af1d147844772705c759ee287f4160',1,'MNELIB::MNEHemisphere']]],
   ['use_5ftri_5fcent',['use_tri_cent',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#abcdf7fdbdf1b74ca244853ad1eddd2c7',1,'MNELIB::MNEHemisphere']]],
   ['use_5ftri_5fnn',['use_tri_nn',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a553c07a84f09d208127e3208c02df639',1,'MNELIB::MNEHemisphere']]],
   ['use_5ftris',['use_tris',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab9eb4c710479364bdd279dd7167257cb',1,'MNELIB::MNEHemisphere']]],
-  ['usecs',['usecs',['../struct_f_i_f_f_l_i_b_1_1__fiff_time_rec.html#adee69ba15f10f8337f8070a776211610',1,'FIFFLIB::_fiffTimeRec']]]
+  ['usecs',['usecs',['../struct_f_i_f_f_l_i_b_1_1__fiff_time_rec.html#adee69ba15f10f8337f8070a776211610',1,'FIFFLIB::_fiffTimeRec::usecs()'],['../struct_f_i_f_f_1_1__fiff_time_rec.html#a979af7bc0c089e5b30d749c45bffd84b',1,'FIFF::_fiffTimeRec::usecs()']]]
 ];

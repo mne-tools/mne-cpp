@@ -1,5 +1,10 @@
 var searchData=
 [
+  ['mainsplashscreen',['MainSplashScreen',['../class_m_n_e_x_1_1_main_splash_screen.html',1,'MNEX']]],
+  ['mainwindow',['MainWindow',['../class_m_n_e_x_1_1_main_window.html',1,'MNEX']]],
+  ['mdl_5fid',['MDL_ID',['../class_r_t_m_e_a_s_l_i_b_1_1_m_d_l___i_d.html',1,'RTMEASLIB']]],
+  ['measurement',['Measurement',['../class_r_t_m_e_a_s_l_i_b_1_1_measurement.html',1,'RTMEASLIB']]],
+  ['measurementwidget',['MeasurementWidget',['../class_d_i_s_p_l_i_b_1_1_measurement_widget.html',1,'DISPLIB']]],
   ['mne',['MNE',['../class_m_n_e_l_i_b_1_1_m_n_e.html',1,'MNELIB']]],
   ['mneepochdata',['MNEEpochData',['../class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html',1,'MNELIB']]],
   ['mneepochdatalist',['MNEEpochDataList',['../class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html',1,'MNELIB']]],
@@ -8,5 +13,8 @@ var searchData=
   ['mneinverseoperator',['MNEInverseOperator',['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html',1,'MNELIB']]],
   ['mnemath',['MNEMath',['../class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html',1,'MNEMATHLIB']]],
   ['mnertserver',['MNERTServer',['../class_r_t_s_e_r_v_e_r_1_1_m_n_e_r_t_server.html',1,'RTSERVER']]],
-  ['mnesourcespace',['MNESourceSpace',['../class_m_n_e_l_i_b_1_1_m_n_e_source_space.html',1,'MNELIB']]]
+  ['mnesourcespace',['MNESourceSpace',['../class_m_n_e_l_i_b_1_1_m_n_e_source_space.html',1,'MNELIB']]],
+  ['moduledockwidget',['ModuleDockWidget',['../class_m_n_e_x_1_1_module_dock_widget.html',1,'MNEX']]],
+  ['modulemanager',['ModuleManager',['../class_m_n_e_x_1_1_module_manager.html',1,'MNEX']]],
+  ['msr_5fid',['MSR_ID',['../class_r_t_m_e_a_s_l_i_b_1_1_m_s_r___i_d.html',1,'RTMEASLIB']]]
 ];

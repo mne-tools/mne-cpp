@@ -39,6 +39,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -72,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -175,8 +176,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a622451104ef8a11df98c83338379ab7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afa13482b528ba5a7fcd15e8cf707663f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#afa13482b528ba5a7fcd15e8cf707663f">write_proj</a> (const QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_proj.html">FiffProj</a> &gt; &amp;projs)</td></tr>
 <tr class="separator:afa13482b528ba5a7fcd15e8cf707663f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a85edffb7debabac7c37b5e4bb72dfa04"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a85edffb7debabac7c37b5e4bb72dfa04">write_raw_buffer</a> (const MatrixXd &amp;buf, const MatrixXd &amp;cals)</td></tr>
-<tr class="separator:a85edffb7debabac7c37b5e4bb72dfa04"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc42111aae4fa4038071ee2f4caf2310"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#afc42111aae4fa4038071ee2f4caf2310">write_raw_buffer</a> (const MatrixXd &amp;buf, const RowVectorXd &amp;cals)</td></tr>
+<tr class="separator:afc42111aae4fa4038071ee2f4caf2310"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5af2bc22118117e438770e9dcefa91bb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a5af2bc22118117e438770e9dcefa91bb">write_string</a> (fiff_int_t kind, const QString &amp;data)</td></tr>
 <tr class="separator:a5af2bc22118117e438770e9dcefa91bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7ad0fa9e01aab96b4768b0e540bdf1b5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a7ad0fa9e01aab96b4768b0e540bdf1b5">write_rt_command</a> (fiff_int_t command, const QString &amp;data)</td></tr>
@@ -539,7 +540,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the CTF software compensation data </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l00471">471</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l00470">470</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
 
 </div>
 </div>
@@ -585,7 +586,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the to measurement corresponding fiff_dir_tree. </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l00704">704</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l00703">703</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
 
 </div>
 </div>
@@ -623,7 +624,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the to measurement corresponding fiff_dir_tree. </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l00630">630</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l00629">629</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
 
 </div>
 </div>
@@ -669,7 +670,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01020">1020</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01019">1019</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
 
 </div>
 </div>
@@ -698,7 +699,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a list of SSP projectors </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01113">1113</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01112">1112</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
 
 </div>
 </div>
@@ -752,7 +753,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01268">1268</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01267">1267</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
 
 </div>
 </div>
@@ -788,7 +789,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the splitted string list </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01466">1466</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01465">1465</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
 
 </div>
 </div>
@@ -816,7 +817,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01473">1473</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01472">1472</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
 
 </div>
 </div>
@@ -852,7 +853,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The opened file. </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01481">1481</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01480">1480</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
 
 </div>
 </div>
@@ -913,7 +914,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the started fiff file </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01509">1509</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01508">1508</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
 
 </div>
 </div>
@@ -932,7 +933,7 @@ Static Public Member Functions</h2></td></tr>
 <p>Get the stream name</p>
 <dl class="section return"><dt>Returns</dt><dd>the name of the current stream </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01668">1668</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01667">1667</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
 
 </div>
 </div>
@@ -959,7 +960,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01683">1683</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01682">1682</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
 
 </div>
 </div>
@@ -986,7 +987,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01761">1761</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01760">1760</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
 
 </div>
 </div>
@@ -1013,7 +1014,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01807">1807</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01806">1806</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
 
 </div>
 </div>
@@ -1040,7 +1041,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01840">1840</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01839">1839</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
 
 </div>
 </div>
@@ -1085,7 +1086,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01868">1868</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01867">1867</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
 
 </div>
 </div>
@@ -1123,7 +1124,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01886">1886</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01885">1885</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
 
 </div>
 </div>
@@ -1162,7 +1163,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01916">1916</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01915">1915</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
 
 </div>
 </div>
@@ -1207,7 +1208,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01962">1962</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01961">1961</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
 
 </div>
 </div>
@@ -1245,7 +1246,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01978">1978</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01977">1977</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
 
 </div>
 </div>
@@ -1283,7 +1284,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01987">1987</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l01986">1986</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
 
 </div>
 </div>
@@ -1310,11 +1311,11 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l02003">2003</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l02002">2002</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a85edffb7debabac7c37b5e4bb72dfa04"></a>
+<a class="anchor" id="afc42111aae4fa4038071ee2f4caf2310"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1327,7 +1328,7 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const MatrixXd &amp;&#160;</td>
+          <td class="paramtype">const RowVectorXd &amp;&#160;</td>
           <td class="paramname"><em>cals</em>&#160;</td>
         </tr>
         <tr>
@@ -1349,7 +1350,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l02035">2035</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l02034">2034</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
 
 </div>
 </div>
@@ -1385,7 +1386,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l02070">2070</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l02073">2073</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
 
 </div>
 </div>
@@ -1423,7 +1424,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l02056">2056</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fiff__stream_8cpp_source.html#l02059">2059</a> of file <a class="el" href="fiff__stream_8cpp_source.html">fiff_stream.cpp</a>.</p>
 
 </div>
 </div>
@@ -1434,7 +1435,7 @@ Static Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Feb 12 2013 18:48:06 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Feb 24 2013 23:14:44 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

@@ -39,6 +39,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -72,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -124,14 +125,14 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:aab064fce03e142d745915132549d5682"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9da2257a592dd14e7a5b30ad3cf57f3e"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a9da2257a592dd14e7a5b30ad3cf57f3e">open</a> (QIODevice *p_pIODevice, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *&amp;p_pStream, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> &amp;p_Tree, QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_entry.html">FiffDirEntry</a> &gt; &amp;p_Dir)</td></tr>
 <tr class="separator:a9da2257a592dd14e7a5b30ad3cf57f3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abaa02f5dc8bae8c7be0a82546b835341"><td class="memItemLeft" align="right" valign="top">static MatrixXi&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#abaa02f5dc8bae8c7be0a82546b835341">pick_channels</a> (QStringList &amp;ch_names, QStringList &amp;include=defaultQStringList, QStringList &amp;exclude=defaultQStringList)</td></tr>
-<tr class="separator:abaa02f5dc8bae8c7be0a82546b835341"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aab41f6d954296f811f692ef25544c1d1"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html">FiffEvokedDataSet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#aab41f6d954296f811f692ef25544c1d1">pick_channels_evoked</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html">FiffEvokedDataSet</a> &amp;orig, QStringList &amp;include=defaultQStringList, QStringList &amp;exclude=defaultQStringList)</td></tr>
-<tr class="separator:aab41f6d954296f811f692ef25544c1d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad3721e640e7a35ac9088e85f793315a7"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#ad3721e640e7a35ac9088e85f793315a7">pick_info</a> (const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> &amp;info, const MatrixXi *sel=NULL)</td></tr>
-<tr class="separator:ad3721e640e7a35ac9088e85f793315a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a31703943f2595c88a12a4655113c363c"><td class="memItemLeft" align="right" valign="top">static RowVectorXi&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a31703943f2595c88a12a4655113c363c">pick_types</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> &amp;info, bool meg, bool eeg=false, bool stim=false, QStringList &amp;include=defaultQStringList, QStringList &amp;exclude=defaultQStringList)</td></tr>
-<tr class="separator:a31703943f2595c88a12a4655113c363c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a71e2c1f24381bb8368c238fc102309c7"><td class="memItemLeft" align="right" valign="top">static RowVectorXi&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a71e2c1f24381bb8368c238fc102309c7">pick_channels</a> (QStringList &amp;ch_names, const QStringList &amp;include=defaultQStringList, const QStringList &amp;exclude=defaultQStringList)</td></tr>
+<tr class="separator:a71e2c1f24381bb8368c238fc102309c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa2ac5bcd673d9b7d55245ba05f8af5d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html">FiffEvokedDataSet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#afa2ac5bcd673d9b7d55245ba05f8af5d">pick_channels</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html">FiffEvokedDataSet</a> &amp;orig, const QStringList &amp;include=defaultQStringList, const QStringList &amp;exclude=defaultQStringList)</td></tr>
+<tr class="separator:afa2ac5bcd673d9b7d55245ba05f8af5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b4f961942bd1966570c1d2c1c9716dc"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a5b4f961942bd1966570c1d2c1c9716dc">pick_info</a> (const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> &amp;info, const RowVectorXi &amp;sel=defaultVectorXi)</td></tr>
+<tr class="separator:a5b4f961942bd1966570c1d2c1c9716dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a19c3c6706517775ae94478c41e7b0040"><td class="memItemLeft" align="right" valign="top">static RowVectorXi&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a19c3c6706517775ae94478c41e7b0040">pick_types</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> &amp;info, bool meg, bool eeg=false, bool stim=false, const QStringList &amp;include=defaultQStringList, const QStringList &amp;exclude=defaultQStringList)</td></tr>
+<tr class="separator:a19c3c6706517775ae94478c41e7b0040"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac852f6b4dbd3d810630640edbebe9c5c"><td class="memItemLeft" align="right" valign="top">static QStringList&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#ac852f6b4dbd3d810630640edbebe9c5c">read_bad_channels</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> &amp;p_Node)</td></tr>
 <tr class="separator:ac852f6b4dbd3d810630640edbebe9c5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad2090de5c120c96da8567ee8f36a4c51"><td class="memItemLeft" align="right" valign="top">static QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html">FiffCtfComp</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#ad2090de5c120c96da8567ee8f36a4c51">read_ctf_comp</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> &amp;p_Node, const QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html">FiffChInfo</a> &gt; &amp;p_Chs)</td></tr>
@@ -609,7 +610,7 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="abaa02f5dc8bae8c7be0a82546b835341"></a>
+<a class="anchor" id="a71e2c1f24381bb8368c238fc102309c7"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -617,7 +618,7 @@ Static Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static MatrixXi FIFFLIB::Fiff::pick_channels </td>
+          <td class="memname">static RowVectorXi FIFFLIB::Fiff::pick_channels </td>
           <td>(</td>
           <td class="paramtype">QStringList &amp;&#160;</td>
           <td class="paramname"><em>ch_names</em>, </td>
@@ -625,13 +626,13 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">QStringList &amp;&#160;</td>
+          <td class="paramtype">const QStringList &amp;&#160;</td>
           <td class="paramname"><em>include</em> = <code>defaultQStringList</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">QStringList &amp;&#160;</td>
+          <td class="paramtype">const QStringList &amp;&#160;</td>
           <td class="paramname"><em>exclude</em> = <code>defaultQStringList</code>&#160;</td>
         </tr>
         <tr>
@@ -664,7 +665,7 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="aab41f6d954296f811f692ef25544c1d1"></a>
+<a class="anchor" id="afa2ac5bcd673d9b7d55245ba05f8af5d"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -672,7 +673,7 @@ Static Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html">FiffEvokedDataSet</a> FIFFLIB::Fiff::pick_channels_evoked </td>
+          <td class="memname">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html">FiffEvokedDataSet</a> FIFFLIB::Fiff::pick_channels </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html">FiffEvokedDataSet</a> &amp;&#160;</td>
           <td class="paramname"><em>orig</em>, </td>
@@ -680,13 +681,13 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">QStringList &amp;&#160;</td>
+          <td class="paramtype">const QStringList &amp;&#160;</td>
           <td class="paramname"><em>include</em> = <code>defaultQStringList</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">QStringList &amp;&#160;</td>
+          <td class="paramtype">const QStringList &amp;&#160;</td>
           <td class="paramname"><em>exclude</em> = <code>defaultQStringList</code>&#160;</td>
         </tr>
         <tr>
@@ -719,7 +720,7 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ad3721e640e7a35ac9088e85f793315a7"></a>
+<a class="anchor" id="a5b4f961942bd1966570c1d2c1c9716dc"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -735,8 +736,8 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const MatrixXi *&#160;</td>
-          <td class="paramname"><em>sel</em> = <code>NULL</code>&#160;</td>
+          <td class="paramtype">const RowVectorXi &amp;&#160;</td>
+          <td class="paramname"><em>sel</em> = <code>defaultVectorXi</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -767,7 +768,7 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a31703943f2595c88a12a4655113c363c"></a>
+<a class="anchor" id="a19c3c6706517775ae94478c41e7b0040"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -801,13 +802,13 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">QStringList &amp;&#160;</td>
+          <td class="paramtype">const QStringList &amp;&#160;</td>
           <td class="paramname"><em>include</em> = <code>defaultQStringList</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">QStringList &amp;&#160;</td>
+          <td class="paramtype">const QStringList &amp;&#160;</td>
           <td class="paramname"><em>exclude</em> = <code>defaultQStringList</code>&#160;</td>
         </tr>
         <tr>
@@ -2278,7 +2279,7 @@ Static Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Feb 12 2013 18:48:06 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Feb 24 2013 23:14:44 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>
