@@ -8,13 +8,15 @@
 #
 #--------------------------------------------------------
 
+include(../../mne-cpp.pri)
+
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    ecgsimulator
+    ecgsimulator \
+    dummytoolbox
 
 #    brainmonitor \
-#    dummytoolbox \
 #    filtertoolbox \
 #    gaborparticletoolbox \
 #    megchannelsimulator \

@@ -1,0 +1,268 @@
+//=============================================================================================================
+/**
+* @file     dummytoolbox.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @version  1.0
+* @date     February, 2013
+*
+* @section  LICENSE
+*
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    Contains the implementation of the DummyToolbox class.
+*
+*/
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "dummytoolbox.h"
+
+#include <rtMeas/Measurement/measurement.h>
+
+#include <rtMeas/Measurement/realtimesamplearray.h>
+
+#include "FormFiles/dummysetupwidget.h"
+#include "FormFiles/dummyrunwidget.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QtCore/QtPlugin>
+#include <QDebug>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace DummyToolboxModule;
+using namespace MNEX;
+using namespace RTMEASLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+DummyToolbox::DummyToolbox()
+: m_pDummy_Output(0)
+, m_pDummyBuffer(new DummyBuffer_old(1024))
+, m_pDummyMultiChannelBuffer(new _double_CircularMultiChannelBuffer_old(2, 1024))
+{
+    m_MDL_ID = MDL_ID::DUMMYTOOL;
+}
+
+
+//*************************************************************************************************************
+
+DummyToolbox::~DummyToolbox()
+{
+    stop();
+
+    delete m_pDummyBuffer;
+}
+
+
+//*************************************************************************************************************
+
+bool DummyToolbox::start()
+{
+    // Initialize displaying widgets
+    init();
+
+    QThread::start();
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool DummyToolbox::stop()
+{
+    // Stop threads
+    QThread::terminate();
+    QThread::wait();
+
+    m_pDummyBuffer->clear();
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+Type DummyToolbox::getType() const
+{
+    return _IRTAlgorithm;
+}
+
+
+//*************************************************************************************************************
+
+const char* DummyToolbox::getName() const
+{
+    return "Dummy Toolbox";
+}
+
+
+//*************************************************************************************************************
+
+QWidget* DummyToolbox::setupWidget()
+{
+    DummySetupWidget* setupWidget = new DummySetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    return setupWidget;
+}
+
+
+//*************************************************************************************************************
+
+QWidget* DummyToolbox::runWidget()
+{
+    DummyRunWidget* runWidget = new DummyRunWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    return runWidget;
+}
+
+
+//*************************************************************************************************************
+
+void DummyToolbox::update(Subject* pSubject)
+{
+	//donwsampled by arraysize of m_pRTSA -> then pick only the value
+	bool downsampled = false;
+
+	if(downsampled)
+	{
+		Measurement* pMeasurement = static_cast<Measurement*>(pSubject);
+
+		//Using fast Hash Lookup instead of if then else clause
+		if(getAcceptorMeasurementBuffer(pMeasurement->getID()))
+		{
+	        	//ToDo: Cast to specific Buffer
+            static_cast<DummyBuffer_old*>(getAcceptorMeasurementBuffer(pMeasurement->getID()))->push(pMeasurement->getValue());//if only every (arraysize)th value is necessary
+		}
+	}
+	else
+	{
+		RealTimeSampleArray* pRTSA = static_cast<RealTimeSampleArray*>(pSubject);
+
+		//Using fast Hash Lookup instead of if then else clause
+		if(getAcceptorMeasurementBuffer(pRTSA->getID()))
+		{
+            if(pRTSA->getID() == MSR_ID::ECGSIM_I)
+            {
+                    //ToDo: Cast to specific Buffer
+                for(unsigned char i = 0; i < pRTSA->getArraySize(); ++i)
+                {
+                    static_cast<DummyBuffer_old*>(getAcceptorMeasurementBuffer(pRTSA->getID()))
+                            ->push(pRTSA->getSampleArray()[i]);
+                    //m_pDummyMultiChannelBuffer->push(0,pRTSA->getSampleArray()[i]);
+                }
+            }
+
+            if(pRTSA->getID() == MSR_ID::ECGSIM_II)
+            {
+                    //ToDo: Cast to specific Buffer
+                for(unsigned char i = 0; i < pRTSA->getArraySize(); ++i)
+                {
+                    //static_cast<_vector_double_CircularBuffer*>(m_pDummyMultiChannelBuffer/*getAcceptorMeasurementBuffer(pRTSA->getID())*/) //this is too complicated --> getAcceptorMeasurementBuffer was created to handle a bunch of channels... now with RTSM possible
+//                    QVector<double> myVector;
+//                    myVector.push_back(pRTSA->getSampleArray()[i]);
+
+//                    qDebug() << myVector.at(0);
+
+                    //m_pDummyMultiChannelBuffer->push(myVector);
+                    m_pDummyMultiChannelBuffer->push(0,pRTSA->getSampleArray()[i]);
+                    m_pDummyMultiChannelBuffer->push(1,pRTSA->getSampleArray()[i]);
+                }
+            }
+		}
+	}
+
+}
+
+
+
+//*************************************************************************************************************
+
+void DummyToolbox::run()
+{
+    while (true)
+    {
+//        double v_one = m_pDummyMultiChannelBuffer->pop(0);
+
+//        double v_two = m_pDummyMultiChannelBuffer->pop(1);
+
+        QVector<double> vec = m_pDummyMultiChannelBuffer->pop();
+
+        m_pDummy_MSA_Output->setVector(vec);
+
+        /* Dispatch the inputs */
+
+        double v = m_pDummyBuffer->pop();
+
+        //ToDo: Implement here the algorithm
+
+        m_pDummy_Output->setValue(v);
+    }
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Creating required display instances and set configurations
+//=============================================================================================================
+
+void DummyToolbox::init()
+{
+	qDebug() << "#### DummyToolbox Init; MSR_ECG_I: " << MSR_ID::ECGSIM_I;
+
+
+    this->addModule(MDL_ID::ECGSIM); //ToDo This should be obsolete -  measurement ID should be sufficient -> solve this by adding measurement IDs to subject?? attach observers to subjects with corresponding ID
+	this->addAcceptorMeasurementBuffer(MSR_ID::ECGSIM_I, m_pDummyBuffer);
+
+    m_pDummy_Output = addProviderRealTimeSampleArray(MSR_ID::DUMMYTOOL_OUTPUT);
+	m_pDummy_Output->setName("Dummy Output");
+	m_pDummy_Output->setUnit("mV");
+	m_pDummy_Output->setMinValue(-200);
+	m_pDummy_Output->setMaxValue(360);
+	m_pDummy_Output->setSamplingRate(256.0/1.0);
+
+
+    this->addAcceptorMeasurementBuffer(MSR_ID::ECGSIM_II, m_pDummyMultiChannelBuffer);
+
+    m_pDummy_MSA_Output = addProviderRealTimeMultiSampleArray(MSR_ID::DUMMYTOOL_OUTPUT_II, 2);
+    m_pDummy_MSA_Output->setName("Dummy Output II");
+    m_pDummy_MSA_Output->setUnit("mV");
+    m_pDummy_MSA_Output->setMinValue(-200);
+    m_pDummy_MSA_Output->setMaxValue(360);
+    m_pDummy_MSA_Output->setSamplingRate(256.0/1.0);
+
+}

@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     ecgsimulator.pro
+# @file     dummytoolbox.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the ecgsimulator plug-in.
+# @brief    This project file generates the makefile for the dummytoolbox plug-in.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -39,11 +39,11 @@ TEMPLATE = lib
 
 CONFIG += plugin
 
-DEFINES += ECGSIMULATOR_LIBRARY
+DEFINES += DUMMYTOOLBOX_LIBRARY
 
 QT += core widgets
 
-TARGET = ecgsimulator
+TARGET = dummytoolbox
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -65,31 +65,27 @@ else {
 DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
 SOURCES += \
-        ecgsimulator.cpp \
-        ecgsimchannel.cpp \
-        ecgproducer.cpp \
-        FormFiles/ecgsetupwidget.cpp \
-        FormFiles/ecgrunwidget.cpp \
-        FormFiles/ecgaboutwidget.cpp
+        dummytoolbox.cpp \
+        FormFiles/dummysetupwidget.cpp \
+        FormFiles/dummyrunwidget.cpp \
+        FormFiles/dummyaboutwidget.cpp
 
 HEADERS += \
-        ecgsimulator.h\
-        ecgsimulator_global.h \
-        ecgsimchannel.h \
-        ecgproducer.h \
-        FormFiles/ecgsetupwidget.h \
-        FormFiles/ecgrunwidget.h \
-        FormFiles/ecgaboutwidget.h
+        dummytoolbox.h\
+        dummytoolbox_global.h \
+        FormFiles/dummysetupwidget.h \
+        FormFiles/dummyrunwidget.h \
+        FormFiles/dummyaboutwidget.h
 
 FORMS += \
-        FormFiles/ecgsetup.ui \
-        FormFiles/ecgrun.ui \
-        FormFiles/ecgabout.ui
+        FormFiles/dummysetup.ui \
+        FormFiles/dummyrun.ui \
+        FormFiles/dummyabout.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
-OTHER_FILES += ecgsimulator.json
+OTHER_FILES += dummytoolbox.json
 
 # Put generated form headers into the origin --> cause other src is pointing at them
-UI_DIR = $${PWD}
+UI_DIR = $$PWD
