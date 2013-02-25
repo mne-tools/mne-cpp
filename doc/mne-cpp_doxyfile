@@ -679,7 +679,8 @@ WARN_LOGFILE           =
 
 INPUT                  = ../MNE \
                          pages/mainpage.txt \
-                         ../mne_rt_server
+                         ../mne_rt_server \
+                         ../mne_x
 
 # This tag can be used to specify the character encoding of the source files 
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is 
