@@ -102,7 +102,7 @@ public:
     */
 	const static QString AppNameShort()
 	{
-		return QObject::tr("CSA Real-Time");
+        return QObject::tr("MNE-X");
 	}
 
     //=========================================================================================================
@@ -113,7 +113,7 @@ public:
     */
     const static QString AppName()
     {
-        return QObject::tr("Clinical Sensing and Analysis in Real-Time");
+        return QObject::tr("Real-Time Acquisition & Processing");
     }
 
     //=========================================================================================================
