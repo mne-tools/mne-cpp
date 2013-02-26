@@ -72,7 +72,7 @@ StartUpWidget::StartUpWidget(QWidget *parent)
     QWidget *topFiller = new QWidget;
     topFiller->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    m_pLabel_Info = new QLabel(tr("CSA Real-Time - Clinical Sensing and Analysis"));
+    m_pLabel_Info = new QLabel(tr("MNE-X - Real-Time Acquisition & Processing"));
     m_pLabel_Info->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
     m_pLabel_Info->setAlignment(Qt::AlignCenter);
 
