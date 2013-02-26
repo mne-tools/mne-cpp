@@ -44,7 +44,7 @@
 
 #include "../rtmeas_global.h"
 #include "../Nomenclature/nomenclature.h"
-#include "../DesignPatterns/observerpattern.h"
+#include <generics/observerpattern.h>
 
 
 //*************************************************************************************************************

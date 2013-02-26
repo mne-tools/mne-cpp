@@ -46,7 +46,7 @@
 #include <rtDtMng/rtmeasurementmanager.h>
 #include <disp/displaymanager.h>
 
-#include <rtMeas/DesignPatterns/observerpattern.h>
+#include <generics/observerpattern.h>
 
 #include "../interfaces/IModule.h"
 #include "../interfaces/ISensor.h"

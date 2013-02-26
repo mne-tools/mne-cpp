@@ -70,9 +70,6 @@ win32 {
 }
 
 SOURCES += \
-    DesignPatterns/observerpattern.cpp \
-    fiff/fiffparser.cpp \
-    fiff/fiff_channel.cpp \
     Measurement/text.cpp \
     Measurement/realtimesamplearray.cpp \
     Measurement/realtimemultisamplearray.cpp \
@@ -85,13 +82,6 @@ SOURCES += \
 
 HEADERS += \
     rtmeas_global.h \
-    DesignPatterns/observerpattern.h \
-    fiff/fiff_channel.h \
-    fiff/fiff_types.h \
-    fiff/fiffparser.h \
-    fiff/fiff_file.h \
-    fiff/dot.h \
-    fiff/allocs.h \
     Measurement/text.h \
     Measurement/realtimesamplearray.h \
     Measurement/realtimemultisamplearray.h \
