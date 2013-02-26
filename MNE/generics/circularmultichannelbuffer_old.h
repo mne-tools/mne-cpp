@@ -287,7 +287,7 @@ inline _Tp CircularMultiChannelBuffer_old<_Tp>::pop(unsigned int uiNumChannels)
 template<typename _Tp>
 void CircularMultiChannelBuffer_old<_Tp>::clear()
 {
-    for (typename  QVector< CircularBuffer<_Tp>* >::iterator i = m_qVecBuffers->begin(); i != m_qVecBuffers->end(); ++i) {
+    for (typename  QVector< CircularBuffer_old<_Tp>* >::iterator i = m_qVecBuffers->begin(); i != m_qVecBuffers->end(); ++i) {
         delete i;
         *i = NULL;
     }
