@@ -44,7 +44,7 @@
 #include "rtdtmng_global.h"
 #include <rtMeas/Nomenclature/nomenclature.h>
 
-#include <rtMeas/DesignPatterns/observerpattern.h>
+#include <generics/observerpattern.h>
 
 
 

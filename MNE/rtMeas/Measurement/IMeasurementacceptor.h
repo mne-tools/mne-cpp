@@ -49,7 +49,7 @@
 #include <generics/circularbuffer_old.h>
 #include <generics/buffer_old.h>
 
-#include "../DesignPatterns/observerpattern.h"
+#include <generics/observerpattern.h>
 
 
 //*************************************************************************************************************

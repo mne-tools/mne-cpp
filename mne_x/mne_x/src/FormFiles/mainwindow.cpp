@@ -48,7 +48,7 @@
 //#include "../../../comp/rtmeas/Measurement/alert.h" //-> text.h
 #include <rtMeas/Measurement/text.h>
 
-#include <rtMeas/DesignPatterns/observerpattern.h>
+#include <generics/observerpattern.h>
 
 #include <disp/displaymanager.h>
 #include <disp/realtimesamplearraywidget.h>
