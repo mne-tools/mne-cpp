@@ -196,7 +196,7 @@ void MainWindow::about()
 {
     emit newLogMsg(tr("Invoked <b>Help|About</b>"), _LogKndMessage, _LogLvMin);
     QMessageBox::about(this, CInfo::AppNameShort()+ ", "+tr("Version ")+CInfo::AppVersion(),
-         tr("Copyright (C) 2013 Christoph Dinh, Martin Luessi, Matti Hamalainen, Jens Haueisen. All rights reserved.\n\n"
+         tr("Copyright (C) 2013 Christoph Dinh, Martin Luessi, Jens Haueisen, Matti Hamalainen. All rights reserved.\n\n"
             "Redistribution and use in source and binary forms, with or without modification, are permitted provided that"
             " the following conditions are met:\n"
             "\t* Redistributions of source code must retain the above copyright notice, this list of conditions and the"
