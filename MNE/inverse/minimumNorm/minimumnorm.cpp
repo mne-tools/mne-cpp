@@ -62,10 +62,9 @@ MinimumNorm::MinimumNorm()
 
 //*************************************************************************************************************
 
-SourceEstimate MinimumNorm::calculate() const
+SourceEstimate MinimumNorm::calculateInverse() const
 {
     SourceEstimate p_SourceEstimate;
-
 
     return p_SourceEstimate;
 }

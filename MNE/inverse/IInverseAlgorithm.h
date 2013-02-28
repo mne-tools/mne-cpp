@@ -75,7 +75,7 @@ public:
     *
     * @return the calculated source estimation
     */
-    virtual SourceEstimate calculate() const = 0;
+    virtual SourceEstimate calculateInverse() const = 0;
 
 };
 

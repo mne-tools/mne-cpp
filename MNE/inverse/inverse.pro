@@ -74,13 +74,15 @@ win32 {
 
 SOURCES += \
     sourceestimate.cpp \
-    minimumNorm/minimumnorm.cpp
+    minimumNorm/minimumnorm.cpp \
+    rapMusic/rapmusic.cpp
 
 HEADERS +=\
     inverse_global.h \
     IInverseAlgorithm.h \
     sourceestimate.h \
-    minimumNorm/minimumnorm.h
+    minimumNorm/minimumnorm.h \
+    rapMusic/rapmusic.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
