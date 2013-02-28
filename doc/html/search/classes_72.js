@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['rapmusic',['RapMusic',['../class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html',1,'INVERSELIB']]],
   ['rawcommand',['RawCommand',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_raw_command.html',1,'RTCOMMANDLIB']]],
   ['realtimemultisamplearray',['RealTimeMultiSampleArray',['../class_r_t_m_e_a_s_l_i_b_1_1_real_time_multi_sample_array.html',1,'RTMEASLIB']]],
   ['realtimemultisamplearrayclass',['RealTimeMultiSampleArrayClass',['../class_ui_1_1_real_time_multi_sample_array_class.html',1,'Ui']]],

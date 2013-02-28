@@ -1,5 +1,7 @@
 var searchData=
 [
+  ['rapmusic_2ecpp',['rapmusic.cpp',['../rapmusic_8cpp.html',1,'']]],
+  ['rapmusic_2eh',['rapmusic.h',['../rapmusic_8h.html',1,'']]],
   ['rawcommand_2ecpp',['rawcommand.cpp',['../rawcommand_8cpp.html',1,'']]],
   ['rawcommand_2eh',['rawcommand.h',['../rawcommand_8h.html',1,'']]],
   ['realtimemultisamplearray_2ecpp',['realtimemultisamplearray.cpp',['../realtimemultisamplearray_8cpp.html',1,'']]],

@@ -93,14 +93,44 @@ using namespace Eigen;
 class INVERSESHARED_EXPORT SourceEstimate
 {
 public:
+
+    //=========================================================================================================
+    /**
+    * Default constructor
+    */
     SourceEstimate();
+
+    //=========================================================================================================
+    /**
+    * Constructs a source estimation from given data
+    *
+    * @param[in] p_sol
+    * @param[in] p_vertices
+    * @param[in] p_tmin
+    * @param[in] p_tstep
+    */
+    SourceEstimate(const MatrixXd &p_sol, const QList<VectorXi> &p_vertices, float p_tmin, float p_tstep);
+
+    //=========================================================================================================
+    /**
+    * Initializes source estimate.
+    */
+    void clear();
 
 public:
     MatrixXd data;          /**< Matrix of shape [n_dipoles x n_times] which contains the data in source space. */
-    VectorXd times;         /**< The time vector with n_times steps. */
-    double tmin;            /**< Time starting point. */
-    double tstep;           /**< Time steps within the times vector. */
-    QList<VectorXd> vertno; /**< The indices of the dipoles in the different source spaces. */ //ToDo define is_clustered_result; change vertno to ROI idcs
+    QList<VectorXi> vertno; /**< The indices of the dipoles in the different source spaces. */ //ToDo define is_clustered_result; change vertno to ROI idcs
+    VectorXf times;         /**< The time vector with n_times steps. */
+    float tmin;             /**< Time starting point. */
+    float tstep;            /**< Time steps within the times vector. */
+
+private:
+
+    //=========================================================================================================
+    /**
+    * Update the times attribute after changing tmin, tmax, or tstep
+    */
+    void update_times();
 };
 
 } //NAMESPACE

@@ -1,9 +1,10 @@
 var searchData=
 [
-  ['observernumdebug',['observerNumDebug',['../class_subject.html#a0032ae0b4ab41fb8669d109b95a12612',1,'Subject::observerNumDebug()'],['../class_subject.html#a0032ae0b4ab41fb8669d109b95a12612',1,'Subject::observerNumDebug()']]],
+  ['observernumdebug',['observerNumDebug',['../class_subject.html#a0032ae0b4ab41fb8669d109b95a12612',1,'Subject']]],
+  ['observerpattern_2ecpp',['observerpattern.cpp',['../observerpattern_8cpp.html',1,'']]],
+  ['observerpattern_2eh',['observerpattern.h',['../observerpattern_8h.html',1,'']]],
   ['observers',['observers',['../class_subject.html#a346daed34d1c6c222c1840e3cd0b1465',1,'Subject']]],
-  ['offset',['offset',['../struct_f_i_f_f_l_i_b_1_1__fiff__data__ref.html#a0b93700eee6326f096c1b8b3c71605ba',1,'FIFFLIB::_fiff_data_ref::offset()'],['../struct_f_i_f_f_1_1__fiff__data__ref.html#a820abc155adb0ea5b8cecfdd61e8ca7d',1,'FIFF::_fiff_data_ref::offset()']]],
-  ['oldchinforec',['oldChInfoRec',['../struct_f_i_f_f_1_1old_ch_info_rec.html',1,'FIFF']]],
+  ['offset',['offset',['../struct_f_i_f_f_l_i_b_1_1__fiff__data__ref.html#a0b93700eee6326f096c1b8b3c71605ba',1,'FIFFLIB::_fiff_data_ref']]],
   ['open',['open',['../class_f_i_f_f_l_i_b_1_1_fiff.html#a9da2257a592dd14e7a5b30ad3cf57f3e',1,'FIFFLIB::Fiff::open()'],['../class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aa6a81dd8a8a58e5c9c5034b3062106ed',1,'FIFFLIB::FiffStream::open()'],['../class_baby_m_e_g_plugin_1_1_collector_socket.html#ad599983b0701394df9b7f8425df6eb3f',1,'BabyMEGPlugin::CollectorSocket::open()'],['../class_neuromag_plugin_1_1_collector_socket.html#ad599983b0701394df9b7f8425df6eb3f',1,'NeuromagPlugin::CollectorSocket::open()']]],
   ['operator_21_3d',['operator!=',['../class_r_t_m_e_a_s_l_i_b_1_1_m_d_l___i_d.html#a0cbaafe40b67758e41bb5e1cca3ce7c7',1,'RTMEASLIB::MDL_ID::operator!=()'],['../class_r_t_m_e_a_s_l_i_b_1_1_m_s_r___i_d.html#a2110264e1840701da2365c3049f814d4',1,'RTMEASLIB::MSR_ID::operator!=()']]],
   ['operator_2b',['operator+',['../class_r_t_m_e_a_s_l_i_b_1_1_m_d_l___i_d.html#a11a9ccfe82d1271e3ec72e51d14a926f',1,'RTMEASLIB::MDL_ID::operator+()'],['../class_r_t_m_e_a_s_l_i_b_1_1_m_s_r___i_d.html#a346c35ef18aff5331e62806ef2e5c85a',1,'RTMEASLIB::MSR_ID::operator+()']]],

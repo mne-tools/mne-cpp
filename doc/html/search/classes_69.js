@@ -3,6 +3,7 @@ var searchData=
   ['ialert',['IAlert',['../class_m_n_e_x_1_1_i_alert.html',1,'MNEX']]],
   ['icommand',['ICommand',['../class_i_command.html',1,'']]],
   ['iconnector',['IConnector',['../class_r_t_s_e_r_v_e_r_1_1_i_connector.html',1,'RTSERVER']]],
+  ['iinversealgorithm',['IInverseAlgorithm',['../class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html',1,'INVERSELIB']]],
   ['imeasurementacceptor',['IMeasurementAcceptor',['../class_r_t_m_e_a_s_l_i_b_1_1_i_measurement_acceptor.html',1,'RTMEASLIB']]],
   ['imeasurementprovider',['IMeasurementProvider',['../class_r_t_m_e_a_s_l_i_b_1_1_i_measurement_provider.html',1,'RTMEASLIB']]],
   ['imodule',['IModule',['../class_m_n_e_x_1_1_i_module.html',1,'MNEX']]],

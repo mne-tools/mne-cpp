@@ -8,6 +8,7 @@ var searchData=
   ['imeasurementprovider_2eh',['IMeasurementprovider.h',['../_i_measurementprovider_8h.html',1,'']]],
   ['imodule_2eh',['IModule.h',['../_i_module_8h.html',1,'']]],
   ['info_2eh',['info.h',['../info_8h.html',1,'']]],
+  ['inverse_5fglobal_2eh',['inverse_global.h',['../inverse__global_8h.html',1,'']]],
   ['irtalgorithm_2eh',['IRTAlgorithm.h',['../_i_r_t_algorithm_8h.html',1,'']]],
   ['irtrecord_2eh',['IRTRecord.h',['../_i_r_t_record_8h.html',1,'']]],
   ['irtvisualization_2eh',['IRTVisualization.h',['../_i_r_t_visualization_8h.html',1,'']]],

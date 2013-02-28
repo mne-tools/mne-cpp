@@ -5,6 +5,7 @@ var searchData=
   ['mdl_5fid',['MDL_ID',['../class_r_t_m_e_a_s_l_i_b_1_1_m_d_l___i_d.html',1,'RTMEASLIB']]],
   ['measurement',['Measurement',['../class_r_t_m_e_a_s_l_i_b_1_1_measurement.html',1,'RTMEASLIB']]],
   ['measurementwidget',['MeasurementWidget',['../class_d_i_s_p_l_i_b_1_1_measurement_widget.html',1,'DISPLIB']]],
+  ['minimumnorm',['MinimumNorm',['../class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html',1,'INVERSELIB']]],
   ['mne',['MNE',['../class_m_n_e_l_i_b_1_1_m_n_e.html',1,'MNELIB']]],
   ['mneepochdata',['MNEEpochData',['../class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html',1,'MNELIB']]],
   ['mneepochdatalist',['MNEEpochDataList',['../class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html',1,'MNELIB']]],

@@ -294,7 +294,7 @@ var searchData=
   ['eigvec',['eigvec',['../class_f_i_f_f_l_i_b_1_1_fiff_cov.html#ab3292fd27b3ab9f10c64dc0b8fd3e12e',1,'FIFFLIB::FiffCov']]],
   ['end_5fblock',['end_block',['../class_f_i_f_f_l_i_b_1_1_fiff.html#aaf5fdbeca3cbb7e2bd7be5d62d175e37',1,'FIFFLIB::Fiff::end_block()'],['../class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a904df8f48da1564a8d5a975a22aa6b54',1,'FIFFLIB::FiffStream::end_block()']]],
   ['end_5ffile',['end_file',['../class_f_i_f_f_l_i_b_1_1_fiff.html#a694dadabbf0b775d91b5a0477ddc3f98',1,'FIFFLIB::Fiff::end_file()'],['../class_f_i_f_f_l_i_b_1_1_fiff_stream.html#ae1aa8744d83c7aee9dc57c2f9c9919a8',1,'FIFFLIB::FiffStream::end_file()']]],
-  ['endian',['endian',['../struct_f_i_f_f_l_i_b_1_1__fiff__data__ref.html#adf1ace9f1a93518db18b26e97b11929a',1,'FIFFLIB::_fiff_data_ref::endian()'],['../struct_f_i_f_f_1_1__fiff__data__ref.html#aceb2ed09ce41841de5972180bc55f265',1,'FIFF::_fiff_data_ref::endian()']]],
+  ['endian',['endian',['../struct_f_i_f_f_l_i_b_1_1__fiff__data__ref.html#adf1ace9f1a93518db18b26e97b11929a',1,'FIFFLIB::_fiff_data_ref']]],
   ['ent',['ent',['../class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a4eb9431e5cc5f8a5d8ae452a51661f5e',1,'FIFFLIB::FiffRawDir']]],
   ['eog_5f0',['EOG_0',['../class_r_t_m_e_a_s_l_i_b_1_1_m_s_r___i_d.html#a4d10651b0425e64723309453a071a149a1fd4e48a63cbcad427cd23fae59cfdbd',1,'RTMEASLIB::MSR_ID']]],
   ['eog_5f1',['EOG_1',['../class_r_t_m_e_a_s_l_i_b_1_1_m_s_r___i_d.html#a4d10651b0425e64723309453a071a149a099a4bda27bdac8ccfc66f096d32d8c2',1,'RTMEASLIB::MSR_ID']]],
@@ -319,15 +319,11 @@ var searchData=
   ['epoch',['epoch',['../class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html#ae4a5960195809fd713fc6ecef9b53731',1,'MNELIB::MNEEpochData']]],
   ['epochs',['epochs',['../class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a3299c9d7a7c3fc8d874eec57aa141343',1,'FIFFLIB::FiffEvokedData']]],
   ['event',['event',['../class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html#a17777212048bda9f08419a4056a96fa6',1,'MNELIB::MNEEpochData']]],
-  ['event_5fbits',['event_bits',['../struct_f_i_f_f_1_1__fiff__hpi__coil.html#abbad60e04a5845211c6f96db74bbbf61',1,'FIFF::_fiff_hpi_coil']]],
-  ['event_5fchannel',['event_channel',['../struct_f_i_f_f_1_1__fiff__hpi__coil.html#aa052c60673f60dbcc016648c5600dbb6',1,'FIFF::_fiff_hpi_coil']]],
   ['evoked',['evoked',['../class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html#a6ac64563aa392544329cd94d4dc4fcd8',1,'FIFFLIB::FiffEvokedDataSet']]],
-  ['ex',['ex',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#a3384bdc6bec84189fc61ad275127dc2f',1,'FIFFLIB::FiffChPos::ex()'],['../struct_f_i_f_f_1_1__fiff_ch_pos_rec.html#afdb6023fe55f421ae8c77540b7409b91',1,'FIFF::_fiffChPosRec::ex()']]],
+  ['ex',['ex',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#a3384bdc6bec84189fc61ad275127dc2f',1,'FIFFLIB::FiffChPos']]],
   ['execute',['execute',['../class_i_command.html#ace81beb0beea968f876f292446bf1120',1,'ICommand::execute()'],['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html#abc8574913684044b0f1a9f810b4e969b',1,'RTCOMMANDLIB::Command::execute()'],['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_raw_command.html#aabe8fbd9d2838022d473abc000ab7884',1,'RTCOMMANDLIB::RawCommand::execute()']]],
   ['executed',['executed',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html#af9c96c8a2e15807cc650d08a4ee468c1',1,'RTCOMMANDLIB::Command::executed()'],['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_raw_command.html#a5921d91b0760ffa648b373e9e478bb63',1,'RTCOMMANDLIB::RawCommand::executed()']]],
   ['exists',['exists',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_parser.html#a3396b3761d2da79ab982b3159f100c23',1,'RTCOMMANDLIB::CommandParser']]],
-  ['ext_5ffd',['ext_fd',['../struct_f_i_f_f_1_1__fiff_file_rec.html#a25aa36f70cd5657d79e961dc8c535ec7',1,'FIFF::_fiffFileRec']]],
-  ['ext_5ffile_5fname',['ext_file_name',['../struct_f_i_f_f_1_1__fiff_file_rec.html#a8c872b8a6c9de94382b44895cb7edbf6',1,'FIFF::_fiffFileRec']]],
-  ['ey',['ey',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#aa637edd56f2bf5a062c5c8e3b0200ebc',1,'FIFFLIB::FiffChPos::ey()'],['../struct_f_i_f_f_1_1__fiff_ch_pos_rec.html#a722db10edb7a71ec4cc5d5bc1334f15d',1,'FIFF::_fiffChPosRec::ey()']]],
-  ['ez',['ez',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#aee3694181745e0a287bee5d4535ea774',1,'FIFFLIB::FiffChPos::ez()'],['../struct_f_i_f_f_1_1__fiff_ch_pos_rec.html#ad5c2bf2a8ea62c9a2d778107563b7311',1,'FIFF::_fiffChPosRec::ez()']]]
+  ['ey',['ey',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#aa637edd56f2bf5a062c5c8e3b0200ebc',1,'FIFFLIB::FiffChPos']]],
+  ['ez',['ez',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#aee3694181745e0a287bee5d4535ea774',1,'FIFFLIB::FiffChPos']]]
 ];

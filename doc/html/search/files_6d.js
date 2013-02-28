@@ -8,6 +8,8 @@ var searchData=
   ['measurement_2eh',['measurement.h',['../measurement_8h.html',1,'']]],
   ['measurementwidget_2ecpp',['measurementwidget.cpp',['../measurementwidget_8cpp.html',1,'']]],
   ['measurementwidget_2eh',['measurementwidget.h',['../measurementwidget_8h.html',1,'']]],
+  ['minimumnorm_2ecpp',['minimumnorm.cpp',['../minimumnorm_8cpp.html',1,'']]],
+  ['minimumnorm_2eh',['minimumnorm.h',['../minimumnorm_8h.html',1,'']]],
   ['mne_2ecpp',['mne.cpp',['../mne_8cpp.html',1,'']]],
   ['mne_2eh',['mne.h',['../mne_8h.html',1,'']]],
   ['mne_5fepoch_5fdata_2ecpp',['mne_epoch_data.cpp',['../mne__epoch__data_8cpp.html',1,'']]],

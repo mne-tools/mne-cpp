@@ -4,7 +4,7 @@ var searchData=
   ['circularbuffer',['CircularBuffer',['../class_i_o_buffer_1_1_circular_buffer.html',1,'IOBuffer']]],
   ['circularbuffer_5fold',['CircularBuffer_old',['../class_i_o_buffer_1_1_circular_buffer__old.html',1,'IOBuffer']]],
   ['circularmatrixbuffer',['CircularMatrixBuffer',['../class_i_o_buffer_1_1_circular_matrix_buffer.html',1,'IOBuffer']]],
-  ['circularmultichannelbuffer',['CircularMultiChannelBuffer',['../class_i_o_buffer_1_1_circular_multi_channel_buffer.html',1,'IOBuffer']]],
+  ['circularmultichannelbuffer_5fold',['CircularMultiChannelBuffer_old',['../class_i_o_buffer_1_1_circular_multi_channel_buffer__old.html',1,'IOBuffer']]],
   ['collectorsocket',['CollectorSocket',['../class_baby_m_e_g_plugin_1_1_collector_socket.html',1,'BabyMEGPlugin']]],
   ['collectorsocket',['CollectorSocket',['../class_neuromag_plugin_1_1_collector_socket.html',1,'NeuromagPlugin']]],
   ['colortable',['Colortable',['../class_f_s_l_i_b_1_1_colortable.html',1,'FSLIB']]],
