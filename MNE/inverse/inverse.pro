@@ -73,12 +73,14 @@ win32 {
 
 
 SOURCES += \
-    sourceestimate.cpp
+    sourceestimate.cpp \
+    minimumNorm/minimumnorm.cpp
 
 HEADERS +=\
     inverse_global.h \
     IInverseAlgorithm.h \
-    sourceestimate.h
+    sourceestimate.h \
+    minimumNorm/minimumnorm.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
