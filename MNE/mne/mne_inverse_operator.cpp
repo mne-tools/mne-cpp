@@ -176,6 +176,8 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
     qint32 n_nzero;
     forward.prepare_forward(info, p_noise_cov, false, gain_info, gain, p_noise_cov, whitener, n_nzero);
 
+    std::cout << "gain:\n" << gain.block(0,0,20,20) << std::endl;
+
     //
     // 5. Compose the depth weight matrix
     //
@@ -223,6 +225,8 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
     }
     printf("\tComputing inverse operator with %d channels.\n", gain_info.ch_names.size());
 
+//    std::cout << "gain:\n" << gain.block(0,0,20,20) << std::endl;
+
 //    std::cout << "whitener:\n" << whitener.block(0,0,20,20) << std::endl;
 
 
@@ -248,6 +252,8 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
     //
     printf("\tWhitening the forward solution.\n");
     gain = whitener*gain;
+
+//    std::cout << "gain_whithened\n" << gain.block(0,0,20,20) << std::endl;
 
     // 10. Exclude the source space points within the labels (not done)
 
@@ -276,20 +282,28 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
     //
     // 12. Decompose the combined matrix
     //
+    std::cout << "gain:\n" << gain.block(0,0,20,20) << std::endl;
+
     printf("Computing SVD of whitened and weighted lead field matrix.\n");
     JacobiSVD<MatrixXd> svd(gain, ComputeThinU | ComputeThinV);
-    FiffNamedMatrix::SDPtr p_eigen_fields = FiffNamedMatrix::SDPtr(new FiffNamedMatrix( svd.matrixU().rows(),
-                                                                                        svd.matrixU().cols(),
+    qDebug("ToDo Sorting Necessary?");
+    VectorXd p_sing = svd.singularValues();
+    MatrixXd t_U = svd.matrixU();
+    MNEMath::sort(p_sing, t_U);
+    FiffNamedMatrix::SDPtr p_eigen_fields = FiffNamedMatrix::SDPtr(new FiffNamedMatrix( svd.matrixU().cols(),
+                                                                                        svd.matrixU().rows(),
                                                                                         defaultQStringList,
                                                                                         gain_info.ch_names,
-                                                                                        svd.matrixU()));
+                                                                                        t_U.transpose() ));
 
-    VectorXd p_sing = svd.singularValues();
+    p_sing = svd.singularValues();
+    MatrixXd t_V = svd.matrixV();
+    MNEMath::sort(p_sing, t_V);
     FiffNamedMatrix::SDPtr p_eigen_leads = FiffNamedMatrix::SDPtr(new FiffNamedMatrix( svd.matrixV().rows(),
                                                                                        svd.matrixV().cols(),
                                                                                        defaultQStringList,
                                                                                        defaultQStringList,
-                                                                                       svd.matrixV()));
+                                                                                       t_V ));
     printf("\tlargest singular value = %f\n", p_sing.maxCoeff());
     printf("\tscaling factor to adjust the trace = %f\n", trace_GRGT);
 

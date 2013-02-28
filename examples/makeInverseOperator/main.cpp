@@ -100,31 +100,36 @@ int main(int argc, char *argv[])
     bool dSPM = false;
     bool sLORETA = true;
 
-
     // Load data
     fiff_int_t setno = 0;
     FiffEvokedDataSet evokedSet(t_fileEvoked, setno);
     MNEForwardSolution t_forwardMeeg(t_fileFwdMeeg, false, true); //OK - inconsistend with mne-python when reading with surf_ori = true
 
-    FiffCov noise_cov(t_fileCov); //OK
+//    //QDEBUG
+//    QFile file("D:/Users/Christoph/Desktop/sol_data.txt");
+//    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+//        return 1;
 
-//    //DEBUG
-//    std::ofstream file("D:/Users/Christoph/Desktop/mnecpp_A_before_regularization.txt", std::ios::out | std::ios::trunc);
-//    file.precision(18);
-//    if (file.is_open())
-//      file << noise_cov.data << "\n";
+//    double v = 0;
+//    qint32 row = 0;
+//    while (!file.atEnd()) {
+//        QString line = file.readLine();
+//        QStringList t_qListEntries = line.split(" ");
+
+//        for(qint32 j = 0; j < t_qListEntries.size(); ++j)
+//        {
+//            v = t_qListEntries[j].toDouble();
+//            t_forwardMeeg.sol->data(row,j) = v;
+//        }
+//        ++row;
+//    }
 //    file.close();
+//    //QDEBUG
+
+    FiffCov noise_cov(t_fileCov); //OK
 
     // regularize noise covariance
     noise_cov = noise_cov.regularize(evokedSet.info, 0.05, 0.05, 0.1, true); //OK
-
-//    //DEBUG
-//    std::ofstream fileAfter("D:/Users/Christoph/Desktop/mnecpp_A_after_regularization.txt", std::ios::out | std::ios::trunc);
-//    fileAfter.precision(18);
-//    if (fileAfter.is_open())
-//      fileAfter << noise_cov.data << "\n";
-//    fileAfter.close();
-//    //DEBUG
 
     // Restrict forward solution as necessary for MEG
     MNEForwardSolution t_forwardMeg = t_forwardMeeg.pick_types(true, false);
@@ -135,12 +140,17 @@ int main(int argc, char *argv[])
     FiffInfo info = evokedSet.info;
 
     MNEInverseOperator inverse_operator_meeg = MNEInverseOperator::make_inverse_operator(info, t_forwardMeeg, noise_cov, 0.2, 0.8);
+
+    std::cout << "inverse_operator_meeg.eigen_fields:\n" << inverse_operator_meeg.eigen_fields->data.block(0,0,20,20) << std::endl;
+    std::cout << "inverse_operator_meeg.eigen_leads:\n" << inverse_operator_meeg.eigen_leads->data.block(0,0,20,20) << std::endl;
+
+
 //    MNEInverseOperator inverse_operator_meg = MNEInverseOperator::make_inverse_operator(info, t_forwardMeg, noise_cov, 0.2, 0.8);
 //    MNEInverseOperator inverse_operator_eeg = MNEInverseOperator::make_inverse_operator(info, t_forwardEeg, noise_cov, 0.2, 0.8);
 
     //ToDo create something similiar to mne-pythons "apply_inverse" -> instead create algorithm interface which is consistend between inverse algorithms -> MNE, RAP MUSIC, ...
 
-
+/*
     //
     //   Set up the inverse according to the parameters
     //

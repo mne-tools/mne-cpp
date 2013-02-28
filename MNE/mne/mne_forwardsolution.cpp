@@ -749,7 +749,7 @@ void MNEForwardSolution::prepare_forward(const FiffInfo &p_info, const FiffCov &
 
     gain.resize(count_fwd_idx, this->sol->data.cols());
     for(qint32 i = 0; i < count_fwd_idx; ++i)
-        gain.row(i) = this->sol->data.row(fwd_idx(i));
+        gain.row(i) = this->sol->data.row(fwd_idx[i]);
 
     p_outFwdInfo = p_info.pick_info(info_idx);
 
