@@ -44,8 +44,6 @@
 
 #include <mneMath/mnemath.h>
 
-#include <iostream>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -391,9 +389,9 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
 
     //Build regularization MAP
     QMap<QString, QPair<double, std::vector<qint32> > > regData;
+    regData.insert("EEG", QPair<double, std::vector<qint32> >(p_fRegEeg, idx_eeg));
     regData.insert("MAG", QPair<double, std::vector<qint32> >(p_fRegMag, idx_mag));
     regData.insert("GRAD", QPair<double, std::vector<qint32> >(p_fRegGrad, idx_grad));
-    regData.insert("EEG", QPair<double, std::vector<qint32> >(p_fRegEeg, idx_eeg));
 
     //
     //Regularize

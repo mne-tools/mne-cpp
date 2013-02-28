@@ -50,6 +50,9 @@
 #include <math.h>
 #include <iostream>
 
+//DEBUG fstream
+#include <fstream>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -105,8 +108,23 @@ int main(int argc, char *argv[])
 
     FiffCov noise_cov(t_fileCov); //OK
 
+//    //DEBUG
+//    std::ofstream file("D:/Users/Christoph/Desktop/mnecpp_A_before_regularization.txt", std::ios::out | std::ios::trunc);
+//    file.precision(18);
+//    if (file.is_open())
+//      file << noise_cov.data << "\n";
+//    file.close();
+
     // regularize noise covariance
     noise_cov = noise_cov.regularize(evokedSet.info, 0.05, 0.05, 0.1, true); //OK
+
+//    //DEBUG
+//    std::ofstream fileAfter("D:/Users/Christoph/Desktop/mnecpp_A_after_regularization.txt", std::ios::out | std::ios::trunc);
+//    fileAfter.precision(18);
+//    if (fileAfter.is_open())
+//      fileAfter << noise_cov.data << "\n";
+//    fileAfter.close();
+//    //DEBUG
 
     // Restrict forward solution as necessary for MEG
     MNEForwardSolution t_forwardMeg = t_forwardMeeg.pick_types(true, false);
@@ -215,6 +233,8 @@ int main(int argc, char *argv[])
     std::cout << std::endl << "part ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << sol.block(0,0,10,10) << std::endl;
     printf("tmin = %f s\n", tmin);
     printf("tstep = %f s\n", tstep);
+
+//*/
 
     return a.exec();
 }

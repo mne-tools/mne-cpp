@@ -226,25 +226,23 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
             // If there is something to pick, pickit
             //
             if (sel.cols() > 0)
-            {
                 for (v = 0; v < one.data->nrow; ++v)
                     for (i = 0; i < p; ++i)
                         vecs(sel[i],nvec+v) = one.data->data(v,vecSel[i]);
-                //
-                //   Rescale for more straightforward detection of small singular values
-                //
 
-                for (v = 0; v < one.data->nrow; ++v)
+            //
+            //   Rescale for more straightforward detection of small singular values
+            //
+            for (v = 0; v < one.data->nrow; ++v)
+            {
+                onesize = sqrt((vecs.col(nvec+v).transpose()*vecs.col(nvec+v))(0,0));
+                if (onesize > 0.0)
                 {
-                    onesize = sqrt((vecs.col(nvec+v).transpose()*vecs.col(nvec+v))(0,0));
-                    if (onesize > 0.0)
-                    {
-                        vecs.col(nvec+v) = vecs.col(nvec+v)/onesize;
-                        ++nonzero;
-                    }
+                    vecs.col(nvec+v) = vecs.col(nvec+v)/onesize;
+                    ++nonzero;
                 }
-                nvec += one.data->nrow;
             }
+            nvec += one.data->nrow;
         }
     }
     //
@@ -256,7 +254,6 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
     //
     //   Reorthogonalize the vectors
     //
-//    qDebug() << "Attention Jacobi SVD is used, not the MATLAB lapack version. Since the SVD is not unique the results might be a bit different!";
     JacobiSVD<MatrixXd> svd(vecs.block(0,0,vecs.rows(),nvec), ComputeFullU);
     //Sort singular values and singular vectors
     VectorXd S = svd.singularValues();
@@ -266,22 +263,17 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
     //
     //   Throw away the linearly dependent guys
     //
-    for(k = 0; k < nvec; ++k)
-    {
-        if (S(k)/S(0) < 1e-2)
-        {
-            nvec = k+1;
-            break;
-        }
-    }
+    nproj = 0;
+    for(k = 0; k < S.size(); ++k)
+        if (S[k]/S[0] > 1e-2)
+            ++nproj;
 
-    U = t_U.block(0, 0, vecs.rows(), nvec);
+    U = t_U.block(0, 0, t_U.rows(), nproj);
 
     //
     //   Here is the celebrated result
     //
     proj -= U*U.transpose();
-    nproj = nvec;
 
     return nproj;
 }

@@ -50,6 +50,9 @@
 #include <algorithm>    // std::sort
 #include <vector>       // std::vector
 
+//DEBUG fstream
+//#include <fstream>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -100,6 +103,12 @@ VectorXd* MNEMath::combine_xyz(const VectorXd& vec)
 void MNEMath::get_whitener(MatrixXd &A, bool pca, QString ch_type, VectorXd &eig, MatrixXd &eigvec)
 {
 //    std::cout << "A\n" << A.block(0,0,20,20) << std::endl;
+
+//    //DEBUG
+//    std::ofstream file("D:/Users/Christoph/Desktop/mnecpp_A_in_get_whitener_regularization.txt", std::ios::out | std::ios::trunc);
+//    if (file.is_open())
+//      file << A << "\n";
+//    file.close();
 
     // whitening operator
     SelfAdjointEigenSolver<MatrixXd> t_eigenSolver(A);//Can be used because, covariance matrices are self-adjoint matrices.
