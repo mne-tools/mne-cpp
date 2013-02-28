@@ -151,6 +151,6 @@ protected:
 
 } // NAMESPACE
 
-Q_DECLARE_INTERFACE(MNEX::IRTVisualization, "csa_rt/1.0")
+Q_DECLARE_INTERFACE(MNEX::IRTVisualization, "mne_x/1.0")
 
 #endif // IRTVISUALIZATION_H

@@ -224,6 +224,6 @@ inline bool IModule::isActive() const
 
 } //Namespace
 
-Q_DECLARE_INTERFACE(MNEX::IModule, "csa_rt/1.0")
+Q_DECLARE_INTERFACE(MNEX::IModule, "mne_x/1.0")
 
 #endif //IMODULE_H

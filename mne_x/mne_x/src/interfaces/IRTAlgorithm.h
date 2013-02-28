@@ -152,6 +152,6 @@ protected:
 
 } // NAMESPACE
 
-Q_DECLARE_INTERFACE(MNEX::IRTAlgorithm, "csa_rt/1.0")
+Q_DECLARE_INTERFACE(MNEX::IRTAlgorithm, "mne_x/1.0")
 
 #endif // IALGORITHM_H
