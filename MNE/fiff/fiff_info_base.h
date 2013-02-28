@@ -123,38 +123,7 @@ public:
     *
     * @return Type of channel ('grad', 'mag', 'eeg', 'stim', 'eog', 'emg', 'ecg')
     */
-    QString channel_type(qint32 idx)
-    {
-        qint32 kind = this->chs[idx].kind;
-        if(kind == FIFFV_MEG_CH)
-        {
-            if(this->chs[idx].unit == FIFF_UNIT_T_M)
-                return "grad";
-            else if(this->chs[idx].unit == FIFF_UNIT_T)
-                return "mag";
-        }
-        else if(kind == FIFFV_REF_MEG_CH)
-            return "ref_meg";
-        else if(kind == FIFFV_EEG_CH)
-            return "eeg";
-        else if(kind == FIFFV_STIM_CH)
-            return "stim";
-        else if(kind == FIFFV_EOG_CH)
-            return "eog";
-        else if(kind == FIFFV_EMG_CH)
-            return "emg";
-        else if(kind == FIFFV_ECG_CH)
-            return "ecg";
-        else if(kind == FIFFV_MISC_CH)
-            return "misc";
-        else if (kind == FIFFV_QUAT_0 || kind == FIFFV_QUAT_1 || kind == FIFFV_QUAT_2
-                 || kind == FIFFV_QUAT_3 || kind == FIFFV_QUAT_4 || kind == FIFFV_QUAT_5
-                 || kind == FIFFV_QUAT_6 || kind == FIFFV_HPI_G || kind == FIFFV_HPI_ERR || kind == FIFFV_HPI_MOV)
-            return "chpi";  // channels relative to head position monitoring
-        printf("Unknown channel type\n"); //ToDo Throw
-        return "";
-    }
-
+    QString channel_type(qint32 idx) const;
 
     //=========================================================================================================
     /**
