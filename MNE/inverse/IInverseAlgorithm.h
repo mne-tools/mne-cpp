@@ -29,118 +29,56 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains declaration of ISensor interface class.
+* @brief    Contains declaration of IIinverseAlgorithm interface class.
 *
 */
 
-#ifndef ISENSOR_H
-#define ISENSOR_H
+#ifndef IINVERSEALGORITHM_H
+#define IINVERSEALGORITHM_H
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// INCLUDES
+// DEFINE NAMESPACE INVERSE
 //=============================================================================================================
 
-#include "../../MNE/rtMeas/Measurement/IMeasurementprovider.h"
-
-#include "../../MNE/rtMeas/Nomenclature/nomenclature.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MNEX
-//=============================================================================================================
-
-namespace MNEX
+namespace INVERSELIB
 {
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class SourceEstimate;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS IRTAlgorithm
+* Inverse algorithm interface for inverse routines of MNE-CPP
 *
-* @brief The ISensor class provides an interface for a sensor module.
+* @brief Inverse algorithm interface
 */
-class ISensor : public IMeasurementProvider
+class IInverseAlgorithm
 {
-//ToDo virtual methods of IMeasurementProvider
 public:
-
     //=========================================================================================================
     /**
-    * Destroys the ISensor.
+    * Destroys the IInverseAlgorithm.
     */
-    virtual ~ISensor() {};
+    virtual ~IInverseAlgorithm() {};
 
     //=========================================================================================================
     /**
-    * Starts the ISensor.
-    * Pure virtual method inherited by IModule.
+    * Applies the inverse algorithm to input data and returns a source estimate.
     *
-    * @return true if success, false otherwise
+    * @return the calculated source estimation
     */
-    virtual bool start() = 0;
-
-    //=========================================================================================================
-    /**
-    * Stops the ISensor.
-    * Pure virtual method inherited by IModule.
-    *
-    * @return true if success, false otherwise
-    */
-    virtual bool stop() = 0;
-
-    //=========================================================================================================
-    /**
-    * Returns the module type.
-    * Pure virtual method inherited by IModule.
-    *
-    * @return type of the ISensor
-    */
-    virtual Type getType() const = 0;
-
-    //=========================================================================================================
-    /**
-    * Returns the module name.
-    * Pure virtual method inherited by IModule.
-    *
-    * @return the name of the ISensor.
-    */
-    virtual const char* getName() const = 0;
-
-    //=========================================================================================================
-    /**
-    * Returns the set up widget for configuration of ISensor.
-    * Pure virtual method inherited by IModule.
-    *
-    * @return the setup widget.
-    */
-    virtual QWidget* setupWidget() = 0;
-
-    //=========================================================================================================
-    /**
-    * Returns the widget which is shown under configuration tab while running mode.
-    * Pure virtual method inherited by IModule.
-    *
-    * @return the run widget.
-    */
-    virtual QWidget* runWidget() = 0;
-
-protected:
-
-    //=========================================================================================================
-    /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
-    virtual void run() = 0;
+    virtual SourceEstimate calculate() const = 0;
 
 };
 
 } //NAMESPACE
 
-Q_DECLARE_INTERFACE(MNEX::ISensor, "mne_x/1.0")
-
-#endif // ISENSOR_H
+#endif // IINVERSEALGORITHM_H

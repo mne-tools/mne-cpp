@@ -148,6 +148,6 @@ protected:
 
 } // NAMESPACE
 
-Q_DECLARE_INTERFACE(MNEX::IAlert, "csa_rt/1.0")
+Q_DECLARE_INTERFACE(MNEX::IAlert, "mne_x/1.0")
 
 #endif // IALERT_H

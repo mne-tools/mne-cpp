@@ -190,6 +190,6 @@ inline void IRTRecord::setRTRecordDirName(const QString& dirName)
 
 } // NAMESPACE
 
-Q_DECLARE_INTERFACE(MNEX::IRTRecord, "cs_art/1.0")
+Q_DECLARE_INTERFACE(MNEX::IRTRecord, "mne_x/1.0")
 
 #endif // IRTRecord_H
