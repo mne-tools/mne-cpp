@@ -92,3 +92,10 @@ ui_*.h
 /bin/mne_x_plugins/*.lib
 
 /bin/mne_x_plugins/*.exp
+
+/bin/mne_x_plugins/*.rc
+
+/bin/mne_x_plugins/*.res
+
+/bin/mne_x_plugins/*.ilk
+/bin/mne_x_plugins/*.pdb

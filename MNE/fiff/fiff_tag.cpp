@@ -847,7 +847,6 @@ void FiffTag::convert_tag_data(FiffTag* tag, int from_endian, int to_endian)
             swap_doublep(dthis);
         break;
 
-
     case FIFFT_OLD_PACK :
         fthis = (float *)tag->data();
     /*
