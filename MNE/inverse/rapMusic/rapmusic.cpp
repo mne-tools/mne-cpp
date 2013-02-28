@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     minimumnorm.h
+* @file     rapmusic.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2012
+* @date     February, 2013
 *
 * @section  LICENSE
 *
@@ -29,46 +29,42 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Minimum norm class declaration.
+* @brief    Implementation of the RapMusic Algorithm Class.
 *
 */
-
-#ifndef MINIMUMNORM_H
-#define MINIMUMNORM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../inverse_global.h"
-#include "../IInverseAlgorithm.h"
+#include "rapmusic.h"
+#include "../sourceestimate.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE INVERSELIB
+// USED NAMESPACES
 //=============================================================================================================
 
-namespace INVERSELIB
-{
+using namespace INVERSELIB;
 
+
+//*************************************************************************************************************
 //=============================================================================================================
-/**
-* Minimum norm estimation algorithm ToDo: Paper references.
-*
-* @brief Minimum norm estimation
-*/
-class INVERSESHARED_EXPORT MinimumNorm : public IInverseAlgorithm
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+RapMusic::RapMusic()
 {
-public:
-    MinimumNorm();
+}
 
-    virtual ~MinimumNorm(){}
 
-    virtual SourceEstimate calculateInverse() const;
-};
+//*************************************************************************************************************
 
-} //NAMESPACE
+SourceEstimate RapMusic::calculateInverse() const
+{
+    SourceEstimate p_SourceEstimate;
 
-#endif // MINIMUMNORM_H
+    return p_SourceEstimate;
+}

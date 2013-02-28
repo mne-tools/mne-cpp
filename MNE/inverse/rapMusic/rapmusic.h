@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     minimumnorm.h
+* @file     rapmusic.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Minimum norm class declaration.
+* @brief    RapMusic algorithm class declaration.
 *
 */
 
-#ifndef MINIMUMNORM_H
-#define MINIMUMNORM_H
+#ifndef RAPMUSIC_H
+#define RAPMUSIC_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -55,20 +55,20 @@ namespace INVERSELIB
 
 //=============================================================================================================
 /**
-* Minimum norm estimation algorithm ToDo: Paper references.
+* RAP MUSIC algorithm ToDo: Paper references.
 *
-* @brief Minimum norm estimation
+* @brief RAP MUSIC
 */
-class INVERSESHARED_EXPORT MinimumNorm : public IInverseAlgorithm
+class INVERSESHARED_EXPORT RapMusic : public IInverseAlgorithm
 {
 public:
-    MinimumNorm();
+    RapMusic();
 
-    virtual ~MinimumNorm(){}
+    virtual ~RapMusic(){}
 
     virtual SourceEstimate calculateInverse() const;
 };
 
 } //NAMESPACE
 
-#endif // MINIMUMNORM_H
+#endif // RAPMUSIC_H
