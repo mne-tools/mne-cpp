@@ -176,8 +176,6 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
     qint32 n_nzero;
     forward.prepare_forward(info, p_noise_cov, false, gain_info, gain, p_noise_cov, whitener, n_nzero);
 
-    std::cout << "gain:\n" << gain.block(0,0,20,20) << std::endl;
-
     //
     // 5. Compose the depth weight matrix
     //
@@ -225,11 +223,6 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
     }
     printf("\tComputing inverse operator with %d channels.\n", gain_info.ch_names.size());
 
-//    std::cout << "gain:\n" << gain.block(0,0,20,20) << std::endl;
-
-//    std::cout << "whitener:\n" << whitener.block(0,0,20,20) << std::endl;
-
-
     //
     // 6. Compose the source covariance matrix
     //
@@ -252,8 +245,6 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
     //
     printf("\tWhitening the forward solution.\n");
     gain = whitener*gain;
-
-//    std::cout << "gain_whithened\n" << gain.block(0,0,20,20) << std::endl;
 
     // 10. Exclude the source space points within the labels (not done)
 
@@ -282,8 +273,6 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
     //
     // 12. Decompose the combined matrix
     //
-    std::cout << "gain:\n" << gain.block(0,0,20,20) << std::endl;
-
     printf("Computing SVD of whitened and weighted lead field matrix.\n");
     JacobiSVD<MatrixXd> svd(gain, ComputeThinU | ComputeThinV);
     qDebug("ToDo Sorting Necessary?");
