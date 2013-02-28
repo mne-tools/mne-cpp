@@ -105,27 +105,6 @@ int main(int argc, char *argv[])
     FiffEvokedDataSet evokedSet(t_fileEvoked, setno);
     MNEForwardSolution t_forwardMeeg(t_fileFwdMeeg, false, true); //OK - inconsistend with mne-python when reading with surf_ori = true
 
-//    //QDEBUG
-//    QFile file("D:/Users/Christoph/Desktop/sol_data.txt");
-//    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-//        return 1;
-
-//    double v = 0;
-//    qint32 row = 0;
-//    while (!file.atEnd()) {
-//        QString line = file.readLine();
-//        QStringList t_qListEntries = line.split(" ");
-
-//        for(qint32 j = 0; j < t_qListEntries.size(); ++j)
-//        {
-//            v = t_qListEntries[j].toDouble();
-//            t_forwardMeeg.sol->data(row,j) = v;
-//        }
-//        ++row;
-//    }
-//    file.close();
-//    //QDEBUG
-
     FiffCov noise_cov(t_fileCov); //OK
 
     // regularize noise covariance
@@ -141,9 +120,8 @@ int main(int argc, char *argv[])
 
     MNEInverseOperator inverse_operator_meeg = MNEInverseOperator::make_inverse_operator(info, t_forwardMeeg, noise_cov, 0.2, 0.8);
 
-    std::cout << "inverse_operator_meeg.eigen_fields:\n" << inverse_operator_meeg.eigen_fields->data.block(0,0,20,20) << std::endl;
-    std::cout << "inverse_operator_meeg.eigen_leads:\n" << inverse_operator_meeg.eigen_leads->data.block(0,0,20,20) << std::endl;
-
+//    std::cout << "inverse_operator_meeg.eigen_fields:\n" << inverse_operator_meeg.eigen_fields->data.block(0,0,20,20) << std::endl;
+//    std::cout << "inverse_operator_meeg.eigen_leads:\n" << inverse_operator_meeg.eigen_leads->data.block(0,0,20,20) << std::endl;
 
 //    MNEInverseOperator inverse_operator_meg = MNEInverseOperator::make_inverse_operator(info, t_forwardMeg, noise_cov, 0.2, 0.8);
 //    MNEInverseOperator inverse_operator_eeg = MNEInverseOperator::make_inverse_operator(info, t_forwardEeg, noise_cov, 0.2, 0.8);
