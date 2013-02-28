@@ -111,7 +111,7 @@ void FiffEvokedDataSet::clear()
 
 //*************************************************************************************************************
 
-FiffEvokedDataSet FiffEvokedDataSet::pick_channels(const QStringList& include, const QStringList& exclude)
+FiffEvokedDataSet FiffEvokedDataSet::pick_channels(const QStringList& include, const QStringList& exclude) const
 {
     if(include.size() == 0 && exclude.size() == 0)
         return FiffEvokedDataSet(*this);

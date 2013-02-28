@@ -44,6 +44,8 @@
 #include "../inverse_global.h"
 #include "../IInverseAlgorithm.h"
 
+#include <mne/mne_inverse_operator.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -52,6 +54,20 @@
 
 namespace INVERSELIB
 {
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace MNELIB;
+
 
 //=============================================================================================================
 /**
@@ -62,11 +78,66 @@ namespace INVERSELIB
 class INVERSESHARED_EXPORT MinimumNorm : public IInverseAlgorithm
 {
 public:
-    MinimumNorm();
+
+    //=========================================================================================================
+    /**
+    * Constructs minimum norm inverse algorithm
+    *
+    * @param[in] p_inverseOperator  The inverse operator
+    * @param[in] lambda             The regularization factor
+    * @param[in] method             Use mininum norm, dSPM or sLORETA. ("MNE" | "dSPM" | "sLORETA")
+    *
+    * @return the prepared inverse operator
+    */
+    explicit MinimumNorm(const MNEInverseOperator &p_inverseOperator, float lambda, const QString method);
+
+    //=========================================================================================================
+    /**
+    * Constructs minimum norm inverse algorithm
+    *
+    * @param[in] p_inverseOperator  The inverse operator
+    * @param[in] lambda             The regularization factor
+    * @param[in] dSPM               Compute the noise-normalization factors for dSPM?
+    * @param[in] sLORETA            Compute the noise-normalization factors for sLORETA?
+    *
+    * @return the prepared inverse operator
+    */
+    explicit MinimumNorm(const MNEInverseOperator &p_inverseOperator, float lambda, bool dSPM, bool sLORETA);
 
     virtual ~MinimumNorm(){}
 
-    virtual SourceEstimate calculateInverse() const;
+    virtual SourceEstimate calculateInverse(const FiffEvokedDataSet &p_evokedDataSet) const;
+
+    //=========================================================================================================
+    /**
+    * Set minimum norm algorithm method ("MNE" | "dSPM" | "sLORETA")
+    *
+    * @param[in] method   Use mininum norm, dSPM or sLORETA.
+    */
+    void setMethod(QString method);
+
+    //=========================================================================================================
+    /**
+    * Set minimum norm algorithm method ("MNE" | "dSPM" | "sLORETA")
+    *
+    * @param[in] dSPM      Compute the noise-normalization factors for dSPM?
+    * @param[in] sLORETA   Compute the noise-normalization factors for sLORETA?
+    */
+    void setMethod(bool dSPM, bool sLORETA);
+
+    //=========================================================================================================
+    /**
+    * Set regularization factor
+    *
+    * @param[in] lambda   The regularization factor
+    */
+    void setRegularization(float lambda);
+
+private:
+    MNEInverseOperator m_inverseOperator;   /**< The inverse operator */
+    float m_fLambda;                        /**< Regularization parameter */
+    bool m_bsLORETA;                        /**< Do sLORETA method */
+    bool m_bdSPM;                           /**< Do dSPM method */
 };
 
 } //NAMESPACE

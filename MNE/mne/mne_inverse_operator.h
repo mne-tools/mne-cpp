@@ -164,7 +164,7 @@ public:
     *
     * @return the prepared inverse operator
     */
-    MNEInverseOperator prepare_inverse_operator(qint32 nave ,float lambda2, bool dSPM, bool sLORETA = false);
+    MNEInverseOperator prepare_inverse_operator(qint32 nave ,float lambda2, bool dSPM, bool sLORETA = false) const;
 
     //=========================================================================================================
     /**

@@ -129,7 +129,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Initializes FIFF measurement informationfiff evoked data set.
+    * Initializes fiff evoked data set.
     */
     void clear();
 
@@ -146,7 +146,7 @@ public:
     *
     * @return the desired fiff evoked data set
     */
-    FiffEvokedDataSet pick_channels(const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList);
+    FiffEvokedDataSet pick_channels(const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
 
     //=========================================================================================================
     /**

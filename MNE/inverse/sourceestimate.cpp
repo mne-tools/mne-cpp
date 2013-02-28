@@ -55,5 +55,47 @@ using namespace INVERSELIB;
 //=============================================================================================================
 
 SourceEstimate::SourceEstimate()
+: tmin(0)
+, tstep(0)
 {
+}
+
+
+//*************************************************************************************************************
+
+SourceEstimate::SourceEstimate(const MatrixXd &p_sol, const QList<VectorXi> &p_vertices, float p_tmin, float p_tstep)
+: data(p_sol)
+, vertno(p_vertices)
+, tmin(p_tmin)
+, tstep(p_tstep)
+{
+    this->update_times();
+}
+
+
+//*************************************************************************************************************
+
+void SourceEstimate::clear()
+{
+    data = MatrixXd();
+    vertno.clear();
+    times = VectorXf();
+    tmin = 0;
+    tstep = 0;
+}
+
+
+//*************************************************************************************************************
+
+void SourceEstimate::update_times()
+{
+    if(data.cols() > 0)
+    {
+        this->times = VectorXf(data.cols());
+        this->times[0] = this->tmin;
+        for(float i = 1; i < this->times.size(); ++i)
+            this->times[i] = this->times[i-1] + this->tstep;
+    }
+    else
+        this->times = VectorXf();
 }
