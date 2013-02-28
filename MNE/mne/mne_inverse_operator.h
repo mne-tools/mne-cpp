@@ -138,7 +138,7 @@ public:
     * Assembles the inverse operator.
     *
     * @param[in] info               The measurement info to specify the channels to include. Bad channels in info['bads'] are not used.
-    * @param[in,out] forward        Forward operator.
+    * @param[in] forward            Forward operator.
     * @param[in] p_noise_cov        The noise covariance matrix.
     * @param[in] loose              float in [0, 1]. Value that weights the source variances of the dipole components defining the tangent space of the cortical surfaces.
     * @param[in] depth              float in [0, 1]. Depth weighting coefficients. If None, no depth weighting is performed.
@@ -147,7 +147,7 @@ public:
     *
     * @return the assembled inverse operator
     */
-    static MNEInverseOperator make_inverse_operator(FiffInfo &info, MNEForwardSolution &forward, FiffCov& p_noise_cov, float loose = 0.2f, float depth = 0.8f, bool fixed = false, bool limit_depth_chs = true);
+    static MNEInverseOperator make_inverse_operator(const FiffInfo &info, MNEForwardSolution forward, const FiffCov& p_noise_cov, float loose = 0.2f, float depth = 0.8f, bool fixed = false, bool limit_depth_chs = true);
 
     //=========================================================================================================
     /**

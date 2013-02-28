@@ -97,12 +97,9 @@ int main(int argc, char *argv[])
     QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
 
-    qint32 nave = -1;
     double snr = 3.0;
     double lambda2 = 1.0 / pow(snr, 2);
     QString method("MNE"); //"MNE" | "dSPM" | "sLORETA"
-    bool dSPM = true;
-    bool sLORETA = false;
 
     // Load data
     fiff_int_t setno = 0;
@@ -123,19 +120,20 @@ int main(int argc, char *argv[])
     FiffInfo info = evokedSet.info;
 
     MNEInverseOperator inverse_operator_meeg = MNEInverseOperator::make_inverse_operator(info, t_forwardMeeg, noise_cov, 0.2, 0.8);
+    MNEInverseOperator inverse_operator_meg = MNEInverseOperator::make_inverse_operator(info, t_forwardMeg, noise_cov, 0.2, 0.8);
+    MNEInverseOperator inverse_operator_eeg = MNEInverseOperator::make_inverse_operator(info, t_forwardEeg, noise_cov, 0.2, 0.8);
 
-//    MNEInverseOperator inverse_operator_meg = MNEInverseOperator::make_inverse_operator(info, t_forwardMeg, noise_cov, 0.2, 0.8);
-//    qDebug() << 2;
-
-    //ToDo to debug
-//    MNEInverseOperator inverse_operator_eeg = MNEInverseOperator::make_inverse_operator(info, t_forwardEeg, noise_cov, 0.2, 0.8);
-//    qDebug() << 3;
-    //ToDo create something similiar to mne-pythons "apply_inverse" -> instead create algorithm interface which is consistend between inverse algorithms -> MNE, RAP MUSIC, ...
-
-
+    // Compute inverse solution
     MinimumNorm minimumNorm_meeg(inverse_operator_meeg, lambda2, method);
     SourceEstimate sourceEstimate_meeg = minimumNorm_meeg.calculateInverse(evokedSet);
 
+    MinimumNorm minimumNorm_meg(inverse_operator_meg, lambda2, method);
+    SourceEstimate sourceEstimate_meg = minimumNorm_meg.calculateInverse(evokedSet);
+
+    MinimumNorm minimumNorm_eeg(inverse_operator_meeg, lambda2, method);
+    SourceEstimate sourceEstimate_eeg = minimumNorm_eeg.calculateInverse(evokedSet);
+
+    // View activation time-series
     std::cout << "\npart ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << sourceEstimate_meeg.data.block(0,0,10,10) << std::endl;
     printf("tmin = %f s\n", sourceEstimate_meeg.tmin);
     printf("tstep = %f s\n", sourceEstimate_meeg.tstep);

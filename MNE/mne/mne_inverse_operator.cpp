@@ -124,7 +124,7 @@ MNEInverseOperator::~MNEInverseOperator()
 
 //*************************************************************************************************************
 
-MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNEForwardSolution &forward, FiffCov &p_noise_cov, float loose, float depth, bool fixed, bool limit_depth_chs)
+MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo &info, MNEForwardSolution forward, const FiffCov &p_noise_cov, float loose, float depth, bool fixed, bool limit_depth_chs)
 {
     bool is_fixed_ori = forward.isFixedOrient();
     MNEInverseOperator p_MNEInverseOperator;
@@ -174,7 +174,8 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
     MatrixXd gain;
     MatrixXd whitener;
     qint32 n_nzero;
-    forward.prepare_forward(info, p_noise_cov, false, gain_info, gain, p_noise_cov, whitener, n_nzero);
+    FiffCov p_outNoiseCov;
+    forward.prepare_forward(info, p_noise_cov, false, gain_info, gain, p_outNoiseCov, whitener, n_nzero);
 
     //
     // 5. Compose the depth weight matrix
@@ -218,7 +219,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
 //            forward = deepcopy(forward)
             forward.to_fixed_ori();
             is_fixed_ori = forward.isFixedOrient();
-            forward.prepare_forward(info, p_noise_cov, false, gain_info, gain, p_noise_cov, whitener, n_nzero);
+            forward.prepare_forward(info, p_outNoiseCov, false, gain_info, gain, p_outNoiseCov, whitener, n_nzero);
         }
     }
     printf("\tComputing inverse operator with %d channels.\n", gain_info.ch_names.size());
@@ -342,7 +343,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(FiffInfo &info, MNE
     p_MNEInverseOperator.nave = p_nave;
     p_MNEInverseOperator.depth_prior = p_depth_prior;
     p_MNEInverseOperator.source_cov = p_source_cov;
-    p_MNEInverseOperator.noise_cov = FiffCov::SDPtr(new FiffCov(p_noise_cov));
+    p_MNEInverseOperator.noise_cov = FiffCov::SDPtr(new FiffCov(p_outNoiseCov));
     p_MNEInverseOperator.orient_prior = p_orient_prior;
     p_MNEInverseOperator.projs = info.projs;
     p_MNEInverseOperator.eigen_leads_weighted = false;
