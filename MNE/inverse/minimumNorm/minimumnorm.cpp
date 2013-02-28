@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     sourceestimate.h
+* @file     minimumnorm.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2012
+* @date     February, 2013
 *
 * @section  LICENSE
 *
@@ -29,44 +29,17 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     SourceEstimate class declaration.
+* @brief    Implementation of the MinimumNorm Class.
 *
 */
-
-#ifndef SOURCEESTIMATE_H
-#define SOURCEESTIMATE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "inverse_global.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QList>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE INVERSELIB
-//=============================================================================================================
-
-namespace INVERSELIB
-{
+#include "minimumnorm.h"
+#include "../sourceestimate.h"
 
 
 //*************************************************************************************************************
@@ -74,35 +47,25 @@ namespace INVERSELIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
+using namespace INVERSELIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
-
-//=============================================================================================================
-/**
-* Source estimation which holds results of MNE-CPP inverse routines
-*
-* @brief Source estimation
-*/
-class INVERSESHARED_EXPORT SourceEstimate
+MinimumNorm::MinimumNorm()
 {
-public:
-    SourceEstimate();
+}
 
-public:
-    MatrixXd data;          /**< Matrix of shape [n_dipoles x n_times] which contains the data in source space. */
-    VectorXd times;         /**< The time vector with n_times steps. */
-    double tmin;            /**< Time starting point. */
-    double tstep;           /**< Time steps within the times vector. */
-    QList<VectorXd> vertno; /**< The indices of the dipoles in the different source spaces. */ //ToDo define is_clustered_result; change vertno to ROI idcs
-};
 
-} //NAMESPACE
+//*************************************************************************************************************
 
-#endif // SOURCEESTIMATE_H
+SourceEstimate MinimumNorm::calculate() const
+{
+    SourceEstimate p_SourceEstimate;
+
+
+    return p_SourceEstimate;
+}

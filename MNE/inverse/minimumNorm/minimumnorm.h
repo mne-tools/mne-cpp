@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     sourceestimate.h
+* @file     mne_inverse_operator.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,35 +29,21 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     SourceEstimate class declaration.
+* @brief     MNEInverseOperator class declaration.
 *
 */
 
-#ifndef SOURCEESTIMATE_H
-#define SOURCEESTIMATE_H
+#ifndef MINIMUMNORM_H
+#define MINIMUMNORM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "inverse_global.h"
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QList>
+#include "../inverse_global.h"
+#include "../IInverseAlgorithm.h"
 
 
 //*************************************************************************************************************
@@ -69,40 +55,23 @@ namespace INVERSELIB
 {
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-
 
 //=============================================================================================================
 /**
-* Source estimation which holds results of MNE-CPP inverse routines
+* Minimum norm estimation algorithm ToDo: Paper references.
 *
-* @brief Source estimation
+* @brief Minimum norm estimation
 */
-class INVERSESHARED_EXPORT SourceEstimate
+class INVERSESHARED_EXPORT MinimumNorm : public IInverseAlgorithm
 {
 public:
-    SourceEstimate();
+    MinimumNorm();
 
-public:
-    MatrixXd data;          /**< Matrix of shape [n_dipoles x n_times] which contains the data in source space. */
-    VectorXd times;         /**< The time vector with n_times steps. */
-    double tmin;            /**< Time starting point. */
-    double tstep;           /**< Time steps within the times vector. */
-    QList<VectorXd> vertno; /**< The indices of the dipoles in the different source spaces. */ //ToDo define is_clustered_result; change vertno to ROI idcs
+    virtual ~MinimumNorm(){}
+
+    virtual SourceEstimate calculate() const;
 };
 
 } //NAMESPACE
 
-#endif // SOURCEESTIMATE_H
+#endif // MINIMUMNORM_H
