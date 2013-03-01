@@ -89,6 +89,17 @@ void MNESourceSpace::clear()
 
 //*************************************************************************************************************
 
+QList<VectorXi> MNESourceSpace::get_vertno() const
+{
+    QList<VectorXi> p_vertices;
+    for(qint32 i = 0; i < hemispheres.size(); ++i)
+        p_vertices.push_back(hemispheres[i].vertno);
+    return p_vertices;
+}
+
+
+//*************************************************************************************************************
+
 bool MNESourceSpace::read_source_spaces(FiffStream*& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNESourceSpace& p_SourceSpace)
 {
 //    if (p_pSourceSpace != NULL)

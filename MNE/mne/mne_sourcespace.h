@@ -146,6 +146,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the Zero based (different to MATLAB) indices of the used vertices of both hemispheres
+    *
+    * @return the hemisphere vertices
+    */
+    QList<VectorXi> get_vertno() const;
+
+    //=========================================================================================================
+    /**
     * ### MNE toolbox root function ###: Implementation of the mne_patch_info function
     *
     * Generate the patch information from the 'nearest' vector in a source space. For vertex in the source

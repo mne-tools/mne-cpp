@@ -84,14 +84,24 @@ MinimumNorm::MinimumNorm(const MNEInverseOperator &p_inverseOperator, float lamb
 
 //*************************************************************************************************************
 
-SourceEstimate MinimumNorm::calculateInverse(const FiffEvokedDataSet &p_evokedSet) const
+bool MinimumNorm::calculateInverse(const FiffEvokedDataSet &p_evokedSet, SourceEstimate &p_SourceEstimate) const
 {
+    //ToDo put this in parameters
+    VectorXi label;
+    bool pick_normal = false;
+
     //
     //   Set up the inverse according to the parameters
     //
     qint32 nave = p_evokedSet.evoked[0]->nave;
 
-    MNEInverseOperator inv = m_inverseOperator.prepare_inverse_operator(nave,m_fLambda,m_bdSPM,m_bsLORETA);
+    if(!m_inverseOperator.check_ch_names(p_evokedSet.info))
+    {
+        qWarning("Channel name check failed.");
+        return false;
+    }
+
+    MNEInverseOperator inv = m_inverseOperator.prepare_inverse_operator(nave, m_fLambda, m_bdSPM, m_bsLORETA);
     //
     //   Pick the correct channels from the data
     //
@@ -99,53 +109,19 @@ SourceEstimate MinimumNorm::calculateInverse(const FiffEvokedDataSet &p_evokedSe
 
     printf("Picked %d channels from the data\n",t_evokedSet.info.nchan);
     printf("Computing inverse...");
-    //
-    //   Simple matrix multiplication followed by combination of the
-    //   three current components
-    //
-    //   This does all the data transformations to compute the weights for the
-    //   eigenleads
-    //
-    SparseMatrix<double> reginv(inv.reginv.rows(),inv.reginv.rows());
 
-    // put this in the MNE algorithm class derived from inverse algorithm
-    //ToDo put this into a function of inv data
-    qint32 i;
-    for(i = 0; i < inv.reginv.rows(); ++i)
-        reginv.insert(i,i) = inv.reginv(i,0);
-    MatrixXd trans = reginv*inv.eigen_fields->data*inv.whitener*inv.proj*t_evokedSet.evoked[0]->epochs;
-    //
-    //   Transformation into current distributions by weighting the eigenleads
-    //   with the weights computed above
-    //
-    MatrixXd sol;
-    if (inv.eigen_leads_weighted)
-    {
-        //
-        //     R^0.5 has been already factored in
-        //
-        printf("(eigenleads already weighted)...");
-        sol = inv.eigen_leads->data*trans;
-    }
-    else
-    {
-        //
-        //     R^0.5 has to factored in
-        //
-       printf("(eigenleads need to be weighted)...");
+    MatrixXd K;
+    SparseMatrix<double> noise_norm;
+    QList<VectorXi> vertno;
 
-       SparseMatrix<double> sourceCov(inv.source_cov->data.rows(),inv.source_cov->data.rows());
-       for(i = 0; i < inv.source_cov->data.rows(); ++i)
-           sourceCov.insert(i,i) = sqrt(inv.source_cov->data(i,0));
-
-       sol   = sourceCov*inv.eigen_leads->data*trans;
-    }
+    inv.assemble_kernel(label, m_sMethod, pick_normal, K, noise_norm, vertno);
+    MatrixXd sol = K * t_evokedSet.evoked[0]->epochs; //apply imaging kernel
 
     if (inv.source_ori == FIFFV_MNE_FREE_ORI)
     {
         printf("combining the current components...");
         MatrixXd sol1(sol.rows()/3,sol.cols());
-        for(i = 0; i < sol.cols(); ++i)
+        for(qint32 i = 0; i < sol.cols(); ++i)
         {
             VectorXd* tmp = MNEMath::combine_xyz(sol.block(0,i,sol.rows(),1));
             sol1.block(0,i,sol.rows()/3,1) = tmp->cwiseSqrt();
@@ -174,9 +150,9 @@ SourceEstimate MinimumNorm::calculateInverse(const FiffEvokedDataSet &p_evokedSe
     for(qint32 h = 0; h < inv.src.hemispheres.size(); ++h)
         t_qListVertices.push_back(inv.src.hemispheres[h].vertno);
 
-    SourceEstimate p_SourceEstimate(sol, t_qListVertices, tmin, tstep);
+    p_SourceEstimate = SourceEstimate(sol, t_qListVertices, tmin, tstep);
 
-    return p_SourceEstimate;
+    return true;
 }
 
 
@@ -215,6 +191,13 @@ void MinimumNorm::setMethod(bool dSPM, bool sLORETA)
     {
         m_bdSPM = dSPM;
         m_bsLORETA = sLORETA;
+        if(dSPM)
+            m_sMethod = QString("dSPM");
+        else if(sLORETA)
+            m_sMethod = QString("sLORETA");
+        else
+            m_sMethod = QString("MNE");
+
     }
 }
 

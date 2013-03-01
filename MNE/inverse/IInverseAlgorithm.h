@@ -91,10 +91,11 @@ public:
     * Applies the inverse algorithm to input data and returns a source estimate.
     *
     * @param[in] p_evokedDataSet    Evoked data.
+    * @param[out] p_SourceEstimate  The calculated source estimation
     *
-    * @return the calculated source estimation
+    * @return true if successful, false otherwise
     */
-    virtual SourceEstimate calculateInverse(const FiffEvokedDataSet &p_evokedDataSet) const = 0;
+    virtual bool calculateInverse(const FiffEvokedDataSet &p_evokedDataSet, SourceEstimate &p_SourceEstimate) const = 0;
 };
 
 } //NAMESPACE

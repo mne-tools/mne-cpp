@@ -106,7 +106,17 @@ public:
 
     virtual ~MinimumNorm(){}
 
-    virtual SourceEstimate calculateInverse(const FiffEvokedDataSet &p_evokedDataSet) const;
+    //=========================================================================================================
+    /**
+    * Computes a L2-norm inverse solution Actual code using these principles might be different because the
+    * inverse operator is often reused across data sets.
+    *
+    * @param[in] p_evokedDataSet    Evoked data.
+    * @param[out] p_SourceEstimate  The calculated source estimation
+    *
+    * @return true if successful, false otherwise
+    */
+    virtual bool calculateInverse(const FiffEvokedDataSet &p_evokedDataSet, SourceEstimate &p_SourceEstimate) const;
 
     //=========================================================================================================
     /**
@@ -136,6 +146,7 @@ public:
 private:
     MNEInverseOperator m_inverseOperator;   /**< The inverse operator */
     float m_fLambda;                        /**< Regularization parameter */
+    QString m_sMethod;                      /**< Selected method */
     bool m_bsLORETA;                        /**< Do sLORETA method */
     bool m_bdSPM;                           /**< Do dSPM method */
 };
