@@ -135,6 +135,35 @@ public:
 
     //=========================================================================================================
     /**
+    * Simple matrix multiplication followed by combination of the
+    * current components
+    *
+    * This does all the data transformations to compute the weights for the
+    * eigenleads
+    *
+    * @param[in] label          labels.
+    * @param[in] method         The applied normals. ("MNE" | "dSPM" | "sLORETA")
+    * @param[in] pick_normal    Pick normals.
+    * @param[out] K             Kernel.
+    * @param[out] noise_norm    Noise normals.
+    * @param[out] vertno        Vertices of the hemispheres.
+    *
+    * @return the assembled kernel
+    */
+    bool assemble_kernel(const VectorXi &label, QString method, bool pick_normal, MatrixXd &K, SparseMatrix<double> &noise_norm, QList<VectorXi> &vertno) const;
+
+    //=========================================================================================================
+    /**
+    * Check that channels in inverse operator are measurements.
+    *
+    * @param[in] info   The measurement info
+    *
+    * @return true when successful, false otherwise
+    */
+    bool check_ch_names(const FiffInfo &info) const;
+
+    //=========================================================================================================
+    /**
     * Assembles the inverse operator.
     *
     * @param[in] info               The measurement info to specify the channels to include. Bad channels in info['bads'] are not used.

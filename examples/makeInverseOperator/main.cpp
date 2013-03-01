@@ -104,8 +104,11 @@ int main(int argc, char *argv[])
     // Load data
     fiff_int_t setno = 0;
     FiffEvokedDataSet evokedSet(t_fileEvoked, setno);
-    MNEForwardSolution t_forwardMeeg(t_fileFwdMeeg, false, true); //OK - inconsistend with mne-python when reading with surf_ori = true
 
+    // ToDo
+//    std::cout << "evokedSet:\n" << evokedSet.evoked[0]->epochs.block(0,0,10,10);
+
+    MNEForwardSolution t_forwardMeeg(t_fileFwdMeeg, false, true); //OK - inconsistend with mne-python when reading with surf_ori = true
 
 
 //    QFile file("D:/Users/Christoph/Desktop/sol_data.txt");
@@ -127,8 +130,6 @@ int main(int argc, char *argv[])
 //    }
 //    file.close();
 
-
-
     FiffCov noise_cov(t_fileCov); //OK
 
     // regularize noise covariance
@@ -147,21 +148,20 @@ int main(int argc, char *argv[])
     MNEInverseOperator inverse_operator_eeg = MNEInverseOperator::make_inverse_operator(info, t_forwardEeg, noise_cov, 0.2, 0.8);
 
     // Compute inverse solution
-
-//    std::cout << "\neigen_leads\n" << inverse_operator_meeg.eigen_leads->data.block(0,0,10,10) << std::endl;
-//    std::cout << "\nnoisenorm\n" << inverse_operator_meeg.noisenorm.block(0,0,10,10);
-//    qDebug() << inverse_operator_meeg.whitener.rows() << inverse_operator_meeg.whitener.cols();
-//    std::cout << "\nwhitener\n" << inverse_operator_meeg.whitener.block(0,0,10,10);
-
-
     MinimumNorm minimumNorm_meeg(inverse_operator_meeg, lambda2, method);
-    SourceEstimate sourceEstimate_meeg = minimumNorm_meeg.calculateInverse(evokedSet);
+    SourceEstimate sourceEstimate_meeg;
+    if(!minimumNorm_meeg.calculateInverse(evokedSet, sourceEstimate_meeg))
+        return 1;
 
     MinimumNorm minimumNorm_meg(inverse_operator_meg, lambda2, method);
-    SourceEstimate sourceEstimate_meg = minimumNorm_meg.calculateInverse(evokedSet);
+    SourceEstimate sourceEstimate_meg;
+    if(!minimumNorm_meg.calculateInverse(evokedSet, sourceEstimate_meg))
+        return 1;
 
     MinimumNorm minimumNorm_eeg(inverse_operator_eeg, lambda2, method);
-    SourceEstimate sourceEstimate_eeg = minimumNorm_eeg.calculateInverse(evokedSet);
+    SourceEstimate sourceEstimate_eeg;
+    if(!minimumNorm_eeg.calculateInverse(evokedSet, sourceEstimate_eeg))
+        return 1;
 
     // View activation time-series
     std::cout << "\nsourceEstimate_meeg:\n" << sourceEstimate_meeg.data.block(0,0,10,10) << std::endl;

@@ -124,6 +124,116 @@ MNEInverseOperator::~MNEInverseOperator()
 
 //*************************************************************************************************************
 
+bool MNEInverseOperator::assemble_kernel(const VectorXi &label, QString method, bool pick_normal, MatrixXd &K, SparseMatrix<double> &noise_norm, QList<VectorXi> &vertno) const
+{
+    if(method.compare("MNE") != 0)
+        noise_norm = this->noisenorm;
+
+    vertno = this->src.get_vertno();
+
+    if(label.size() > 0)
+    {
+        qDebug() << "ToDo";
+    }
+
+    if(pick_normal)
+    {
+        qDebug() << "ToDo";
+    }
+
+    typedef Eigen::Triplet<double> T;
+    std::vector<T> tripletList;
+    tripletList.reserve(reginv.rows());
+    for(qint32 i = 0; i < reginv.rows(); ++i)
+        tripletList.push_back(T(i, i, reginv(i,0)));
+    SparseMatrix<double> t_reginv(reginv.rows(),reginv.rows());
+    t_reginv.setFromTriplets(tripletList.begin(), tripletList.end());
+
+    MatrixXd trans = t_reginv*eigen_fields->data*whitener*proj;
+    //
+    //   Transformation into current distributions by weighting the eigenleads
+    //   with the weights computed above
+    //
+    if (eigen_leads_weighted)
+    {
+        //
+        //     R^0.5 has been already factored in
+        //
+        printf("(eigenleads already weighted)...");
+        K = eigen_leads->data*trans;
+    }
+    else
+    {
+        //
+        //     R^0.5 has to factored in
+        //
+       printf("(eigenleads need to be weighted)...");
+
+       std::vector<T> tripletList2;
+       tripletList2.reserve(source_cov->data.rows());
+       for(qint32 i = 0; i < source_cov->data.rows(); ++i)
+           tripletList2.push_back(T(i, i, sqrt(source_cov->data(i,0))));
+       SparseMatrix<double> t_sourceCov(source_cov->data.rows(),source_cov->data.rows());
+       t_sourceCov.setFromTriplets(tripletList2.begin(), tripletList2.end());
+
+       K = t_sourceCov*eigen_leads->data*trans;
+    }
+
+    if(method.compare("MNE") == 0)
+        noise_norm = SparseMatrix<double>();
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool MNEInverseOperator::check_ch_names(const FiffInfo &info) const
+{
+    QStringList inv_ch_names = this->eigen_fields->col_names;
+
+    bool t_bContains = true;
+    if(this->eigen_fields->col_names.size() != this->noise_cov->names.size())
+        t_bContains = false;
+    else
+    {
+        for(qint32 i = 0; i < this->noise_cov->names.size(); ++i)
+        {
+            if(inv_ch_names[i] != this->noise_cov->names[i])
+            {
+                t_bContains = false;
+                break;
+            }
+        }
+    }
+
+    if(!t_bContains)
+    {
+        qCritical("Channels in inverse operator eigen fields do not match noise covariance channels.");
+        return false;
+    }
+
+    QStringList data_ch_names = info.ch_names;
+
+    QStringList missing_ch_names;
+    for(qint32 i = 0; i < inv_ch_names.size(); ++i)
+        if(!data_ch_names.contains(inv_ch_names[i]))
+            missing_ch_names.append(inv_ch_names[i]);
+
+    qint32 n_missing = missing_ch_names.size();
+
+    if(n_missing > 0)
+    {
+        qCritical() << n_missing << "channels in inverse operator are not present in the data (" << missing_ch_names << ")";
+        return false;
+    }
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
 MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo &info, MNEForwardSolution forward, const FiffCov &p_noise_cov, float loose, float depth, bool fixed, bool limit_depth_chs)
 {
     bool is_fixed_ori = forward.isFixedOrient();
