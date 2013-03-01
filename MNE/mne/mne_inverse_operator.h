@@ -181,6 +181,17 @@ public:
     */
     static bool read_inverse_operator(QIODevice& p_pIODevice, MNEInverseOperator& inv);
 
+    //=========================================================================================================
+    /**
+    * overloading the stream out operator<<
+    *
+    * @param[in] out                    The stream to which the fiff covariance should be assigned to.
+    * @param[in] p_MNEInverseOperator   MNEInverseOperator which should be assigned to the stream.
+    *
+    * @return the stream with the attached fiff covariance matrix
+    */
+    friend std::ostream& operator<<(std::ostream& out, const MNELIB::MNEInverseOperator &p_MNEInverseOperator);
+
 public:
     FiffInfoBase info;                      /**< light weighted measurement info */
     fiff_int_t methods;                     /**< MEG, EEG or both */
@@ -207,6 +218,27 @@ public:
     VectorXd reginv;                        /**< The diagonal matrix implementing. regularization and the inverse */
     SparseMatrix<double> noisenorm;         /**< These are the noise-normalization factors */
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline std::ostream& operator<<(std::ostream& out, const MNELIB::MNEInverseOperator &p_MNEInverseOperator)
+{
+    out << "#### MNE Inverse Operator ####\n";
+
+    out << "\n methods: " << p_MNEInverseOperator.methods << std::endl;
+    out << "\n source_ori: " << p_MNEInverseOperator.source_ori << std::endl;
+    out << "\n nsource: " << p_MNEInverseOperator.nsource << std::endl;
+    out << "\n nchan: " << p_MNEInverseOperator.nchan << std::endl;
+    out << "\n coord_frame:\n\t" << p_MNEInverseOperator.coord_frame << std::endl;
+
+    out << "\n eigen_leads: " << p_MNEInverseOperator.eigen_leads << std::endl;
+    out << "\n eigen_fields:\n\t" << p_MNEInverseOperator.eigen_fields << std::endl;
+
+    return out;
+}
 
 } // NAMESPACE
 
