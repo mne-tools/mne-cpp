@@ -162,7 +162,7 @@ public:
     * @param[out] data          The read evoked data
     * @param[in] setno          the set to pick
     *
-    * @return the CTF software compensation data
+    * @return true when successful, false otherwise
     */
     static bool read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& data, fiff_int_t setno = 0);
 

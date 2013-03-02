@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     minimumnorm.h
+* @file     fiff_evoked_data.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,128 +29,150 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Minimum norm class declaration.
+* @brief    FiffEvokedData class declaration.
 *
 */
 
-#ifndef MINIMUMNORM_H
-#define MINIMUMNORM_H
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "../inverse_global.h"
-#include "../IInverseAlgorithm.h"
-
-#include <mne/mne_inverse_operator.h>
+#ifndef FIFF_EVOKED_H
+#define FIFF_EVOKED_H
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE INVERSELIB
+// FIFF INCLUDES
 //=============================================================================================================
 
-namespace INVERSELIB
+#include "fiff_global.h"
+#include "fiff_info.h"
+#include "fiff_types.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QString>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNELIB
+//=============================================================================================================
+
+namespace FIFFLIB
 {
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace FIFFLIB;
+using namespace Eigen;
 
 
 //=============================================================================================================
 /**
-* Minimum norm estimation algorithm ToDo: Paper references.
+* NEW PYTHON LIKE Fiff evoked
 *
-* @brief Minimum norm estimation
+* @brief evoked data
 */
-class INVERSESHARED_EXPORT MinimumNorm : public IInverseAlgorithm
+class FIFFSHARED_EXPORT FiffEvoked
 {
 public:
 
     //=========================================================================================================
     /**
-    * Constructs minimum norm inverse algorithm
-    *
-    * @param[in] p_inverseOperator  The inverse operator
-    * @param[in] lambda             The regularization factor
-    * @param[in] method             Use mininum norm, dSPM or sLORETA. ("MNE" | "dSPM" | "sLORETA")
-    *
-    * @return the prepared inverse operator
+    * Constructs a fiff evoked data.
     */
-    explicit MinimumNorm(const MNEInverseOperator &p_inverseOperator, float lambda, const QString method);
+    FiffEvoked();
 
     //=========================================================================================================
     /**
-    * Constructs minimum norm inverse algorithm
+    * Constructs fiff evoked data, by reading from a IO device.
     *
-    * @param[in] p_inverseOperator  The inverse operator
-    * @param[in] lambda             The regularization factor
-    * @param[in] dSPM               Compute the noise-normalization factors for dSPM?
-    * @param[in] sLORETA            Compute the noise-normalization factors for sLORETA?
-    *
-    * @return the prepared inverse operator
+    * @param[in] p_IODevice     IO device to read from the evoked data set.
+    * @param[in] setno          The set to pick.
     */
-    explicit MinimumNorm(const MNEInverseOperator &p_inverseOperator, float lambda, bool dSPM, bool sLORETA);
-
-    virtual ~MinimumNorm(){}
+    FiffEvoked(QIODevice& p_IODevice, fiff_int_t setno);
 
     //=========================================================================================================
     /**
-    * Computes a L2-norm inverse solution Actual code using these principles might be different because the
-    * inverse operator is often reused across data sets.
+    * Copy constructor.
     *
-    * @param[in] p_fiffEvoked       Evoked data.
-    * @param[out] p_SourceEstimate  The calculated source estimation
-    *
-    * @return true if successful, false otherwise
+    * @param[in] p_FiffEvoked    Fiff evoked data which should be copied
     */
-    virtual bool calculateInverse(const FiffEvoked &p_fiffEvoked, SourceEstimate &p_SourceEstimate) const;
+    FiffEvoked(const FiffEvoked& p_FiffEvoked);
 
     //=========================================================================================================
     /**
-    * Set minimum norm algorithm method ("MNE" | "dSPM" | "sLORETA")
-    *
-    * @param[in] method   Use mininum norm, dSPM or sLORETA.
+    * Destroys the FiffEvoked.
     */
-    void setMethod(QString method);
+    ~FiffEvoked();
 
     //=========================================================================================================
     /**
-    * Set minimum norm algorithm method ("MNE" | "dSPM" | "sLORETA")
-    *
-    * @param[in] dSPM      Compute the noise-normalization factors for dSPM?
-    * @param[in] sLORETA   Compute the noise-normalization factors for sLORETA?
+    * Initializes fiff evoked data.
     */
-    void setMethod(bool dSPM, bool sLORETA);
+    void clear();
 
     //=========================================================================================================
     /**
-    * Set regularization factor
+    * fiff_pick_channels_evoked
     *
-    * @param[in] lambda   The regularization factor
+    * ### MNE toolbox root function ###
+    *
+    * Pick desired channels from evoked-response data
+    *
+    * @param[in] include   - Channels to include (if empty, include all available)
+    * @param[in] exclude   - Channels to exclude (if empty, do not exclude any)
+    *
+    * @return the desired fiff evoked data
     */
-    void setRegularization(float lambda);
+    FiffEvoked pick_channels(const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
 
-private:
-    MNEInverseOperator m_inverseOperator;   /**< The inverse operator */
-    float m_fLambda;                        /**< Regularization parameter */
-    QString m_sMethod;                      /**< Selected method */
-    bool m_bsLORETA;                        /**< Do sLORETA method */
-    bool m_bdSPM;                           /**< Do dSPM method */
+    //=========================================================================================================
+    /**
+    * fiff_read_evoked
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffEvokedDataSet::read_evoked static function
+    *
+    * Read one evoked data set
+    *
+    * @param[in] p_IODevice     An fiff IO device like a fiff QFile or QTCPSocket
+    * @param[out] p_FiffEvoked  The read evoked data
+    * @param[in] setno          the set to pick (optional, default = 0)
+    * @param[in] proj           Apply SSP projection vectors (optional, default = true)
+    *
+    * @return the CTF software compensation data
+    */
+    static bool read_evoked(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, fiff_int_t setno = 0, bool proj = true);
+
+public:
+    FiffInfo    info;           /**< Measurement info. */
+    QStringList ch_names;       /**< List of channels' names. */
+    fiff_int_t  nave;           /**< Number of averaged epochs. */
+    fiff_int_t  aspect_kind;    /**< Aspect identifier */
+    QString     kind_stat;      /**< Type of data, either average or standard_error. */
+    fiff_int_t  first;          /**< First time sample. */
+    fiff_int_t  last;           /**< Last time sample. */
+    QString     comment;        /**< Comment on dataset. Can be the condition. */
+    RowVectorXf times;          /**< Vector of time instants in seconds. */
+    MatrixXd    data;           /**< 2D array of shape [n_channels x n_times]; Evoked response. */
+    MatrixXd    proj;           /**< SSP projection */
 };
 
-} //NAMESPACE
+} // NAMESPACE
 
-#endif // MINIMUMNORM_H
+#endif // FIFF_EVOKED_H

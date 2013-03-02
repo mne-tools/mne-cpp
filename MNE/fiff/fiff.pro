@@ -90,7 +90,8 @@ SOURCES += fiff.cpp \
     fiff_cov.cpp \
     fiff_stream.cpp \
     fiff_dir_entry.cpp \
-    fiff_info_base.cpp
+    fiff_info_base.cpp \
+    fiff_evoked.cpp
 
 HEADERS += fiff.h \
     fiff_global.h \
@@ -116,7 +117,8 @@ HEADERS += fiff.h \
     fiff_evoked_data.h \
     fiff_cov.h \
     fiff_stream.h \
-    fiff_info_base.h
+    fiff_info_base.h \
+    fiff_evoked.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

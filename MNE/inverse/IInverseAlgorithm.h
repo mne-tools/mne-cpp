@@ -43,7 +43,7 @@
 //=============================================================================================================
 namespace FIFFLIB
 {
-class FiffEvokedDataSet;
+class FiffEvoked;
 }
 
 
@@ -90,12 +90,12 @@ public:
     /**
     * Applies the inverse algorithm to input data and returns a source estimate.
     *
-    * @param[in] p_evokedDataSet    Evoked data.
+    * @param[in] p_fiffEvoked       Evoked data.
     * @param[out] p_SourceEstimate  The calculated source estimation
     *
     * @return true if successful, false otherwise
     */
-    virtual bool calculateInverse(const FiffEvokedDataSet &p_evokedDataSet, SourceEstimate &p_SourceEstimate) const = 0;
+    virtual bool calculateInverse(const FiffEvoked &p_fiffEvoked, SourceEstimate &p_SourceEstimate) const = 0;
 };
 
 } //NAMESPACE

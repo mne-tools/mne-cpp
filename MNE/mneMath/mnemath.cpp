@@ -268,6 +268,88 @@ qint32 MNEMath::rank(const MatrixXd& A, double tol)
 
 //*************************************************************************************************************
 
+MatrixXd MNEMath::rescale(const MatrixXd &data, const RowVectorXf &times, QPair<QVariant,QVariant> baseline, QString mode)
+{
+    MatrixXd data_out = data;
+    QStringList valid_modes;
+    valid_modes << "logratio" << "ratio" << "zscore" << "mean" << "percent";
+    if(!valid_modes.contains(mode))
+    {
+        qWarning() << "\tWarning: mode should be any of : " << valid_modes;
+        return data_out;
+    }
+    printf("\tApplying baseline correction ... (mode: %s)\n", mode.toLatin1().constData());
+
+    qint32 imin, imax;
+    float bmin, bmax;
+
+    if(!baseline.first.isValid())
+        imin = 0;
+    else
+    {
+        bmin = baseline.first.toFloat();
+        for(qint32 i = 0; i < times.size(); ++i)
+        {
+            if(times[i] >= bmin)
+            {
+                imin = i;
+                break;
+            }
+        }
+    }
+    if (!baseline.second.isValid())
+        imax = times.size();
+    else
+    {
+        bmax = baseline.second.toFloat();
+        for(qint32 i = times.size()-1; i >= 0; --i)
+        {
+            if(times[i] <= bmax)
+            {
+                imax = i+1;
+                break;
+            }
+        }
+    }
+
+    VectorXd mean = data_out.block(0, imin,data_out.rows(),imax-imin).rowwise().mean();
+    if(mode.compare("mean") == 0)
+    {
+        data_out -= mean.rowwise().replicate(data.cols());
+    }
+    else if(mode.compare("logratio") == 0)
+    {
+        for(qint32 i = 0; i < data_out.rows(); ++i)
+            for(qint32 j = 0; j < data_out.cols(); ++j)
+                data_out(i,j) = log10(data_out(i,j)/mean[i]); // a value of 1 means 10 times bigger
+    }
+    else if(mode.compare("ratio") == 0)
+    {
+        data_out = data_out.cwiseQuotient(mean.rowwise().replicate(data_out.cols()));
+    }
+    else if(mode.compare("zscore") == 0)
+    {
+        MatrixXd std_mat = data.block(0, imin, data.rows(), imax-imin) - mean.rowwise().replicate(imax-imin);
+        std_mat = std_mat.cwiseProduct(std_mat);
+        VectorXd std_v = std_mat.rowwise().mean();
+        for(qint32 i = 0; i < std_v.size(); ++i)
+            std_v[i] = sqrt(std_v[i] / (float)(imax-imin));
+
+        data_out -= mean.rowwise().replicate(data_out.cols());
+        data_out = data_out.cwiseQuotient(std_v.rowwise().replicate(data_out.cols()));
+    }
+    else if(mode.compare("percent") == 0)
+    {
+        data_out -= mean.rowwise().replicate(data_out.cols());
+        data_out = data_out.cwiseQuotient(mean.rowwise().replicate(data_out.cols()));
+    }
+
+    return data_out;
+}
+
+
+//*************************************************************************************************************
+
 VectorXi MNEMath::sort(VectorXd& v, bool desc)
 {
     std::vector<IdxDoubleValue> t_vecIdxDoubleValue;
