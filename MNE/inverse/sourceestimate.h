@@ -113,14 +113,30 @@ public:
 
     //=========================================================================================================
     /**
+    * Copy constructor.
+    *
+    * @param[in] p_SourceEstimate    Source estimate data which should be copied
+    */
+    SourceEstimate(const SourceEstimate& p_SourceEstimate);
+
+    //=========================================================================================================
+    /**
     * Initializes source estimate.
     */
     void clear();
 
+    //=========================================================================================================
+    /**
+    * Returns whether SourceEstimate is empty.
+    *
+    * @return true if is empty, false otherwise
+    */
+    inline bool isEmpty();
+
 public:
     MatrixXd data;          /**< Matrix of shape [n_dipoles x n_times] which contains the data in source space. */
     QList<VectorXi> vertno; /**< The indices of the dipoles in the different source spaces. */ //ToDo define is_clustered_result; change vertno to ROI idcs
-    VectorXf times;         /**< The time vector with n_times steps. */
+    RowVectorXf times;      /**< The time vector with n_times steps. */
     float tmin;             /**< Time starting point. */
     float tstep;            /**< Time steps within the times vector. */
 
@@ -132,6 +148,17 @@ private:
     */
     void update_times();
 };
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline bool SourceEstimate::isEmpty()
+{
+    return tstep == -1;
+}
 
 } //NAMESPACE
 

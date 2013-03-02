@@ -90,12 +90,13 @@ public:
     /**
     * Applies the inverse algorithm to input data and returns a source estimate.
     *
-    * @param[in] p_fiffEvoked       Evoked data.
-    * @param[out] p_SourceEstimate  The calculated source estimation
+    * @param[in] p_fiffEvoked   Evoked data.
+    * @param[in] pick_normal    If True, rather than pooling the orientations by taking the norm, only the
+    *                           radial component is kept. This is only applied when working with loose orientations.
     *
-    * @return true if successful, false otherwise
+    * @return the calculated source estimation
     */
-    virtual bool calculateInverse(const FiffEvoked &p_fiffEvoked, SourceEstimate &p_SourceEstimate) const = 0;
+    virtual SourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false) const = 0;
 };
 
 } //NAMESPACE

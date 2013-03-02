@@ -93,6 +93,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="#friends">Friends</a> &#124;
 <a href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">MNELIB::MNEInverseOperator Class Reference</div>  </div>
@@ -123,13 +124,17 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a05ec4c0906714d9d431d495c1cd19e1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad67ea2b10e4a96c86ac1887af2430fcf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ad67ea2b10e4a96c86ac1887af2430fcf">~MNEInverseOperator</a> ()</td></tr>
 <tr class="separator:ad67ea2b10e4a96c86ac1887af2430fcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a660f0b847809611513006c4ef005d343"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a660f0b847809611513006c4ef005d343">assemble_kernel</a> (const VectorXi &amp;label, QString method, bool pick_normal, MatrixXd &amp;K, SparseMatrix&lt; double &gt; &amp;noise_norm, QList&lt; VectorXi &gt; &amp;vertno) const </td></tr>
+<tr class="separator:a660f0b847809611513006c4ef005d343"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7dbcd0907ea09be18db037fbf413022"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#aa7dbcd0907ea09be18db037fbf413022">check_ch_names</a> (const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> &amp;<a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ab3a60435927ae1a66709158e609e6fee">info</a>) const </td></tr>
+<tr class="separator:aa7dbcd0907ea09be18db037fbf413022"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4175981ee21be2d7d43e2cd52a31311d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html">MNEInverseOperator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a4175981ee21be2d7d43e2cd52a31311d">prepare_inverse_operator</a> (qint32 <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ac0d085ad6c61c13cca4253fbe13d9a21">nave</a>, float lambda2, bool dSPM, bool sLORETA=false) const </td></tr>
 <tr class="separator:a4175981ee21be2d7d43e2cd52a31311d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a5ff795cb1658904c5b4f7a2778aa0763"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html">MNEInverseOperator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a5ff795cb1658904c5b4f7a2778aa0763">make_inverse_operator</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> &amp;<a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ab3a60435927ae1a66709158e609e6fee">info</a>, <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">MNEForwardSolution</a> &amp;forward, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html">FiffCov</a> &amp;p_noise_cov, float loose=0.2f, float depth=0.8f, bool fixed=false, bool limit_depth_chs=true)</td></tr>
-<tr class="separator:a5ff795cb1658904c5b4f7a2778aa0763"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7014603c49e468c7d4eceff8d4485a8d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html">MNEInverseOperator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a7014603c49e468c7d4eceff8d4485a8d">make_inverse_operator</a> (const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> &amp;<a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ab3a60435927ae1a66709158e609e6fee">info</a>, <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">MNEForwardSolution</a> forward, const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html">FiffCov</a> &amp;p_noise_cov, float loose=0.2f, float depth=0.8f, bool fixed=false, bool limit_depth_chs=true)</td></tr>
+<tr class="separator:a7014603c49e468c7d4eceff8d4485a8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3a6110cd1543410cc91e013f5113cef9"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a3a6110cd1543410cc91e013f5113cef9">read_inverse_operator</a> (QIODevice &amp;p_pIODevice, <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html">MNEInverseOperator</a> &amp;inv)</td></tr>
 <tr class="separator:a3a6110cd1543410cc91e013f5113cef9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -183,6 +188,11 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a1377129c9684f572208c9f2851925271"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a40f80ae63531d67ceb8a40ddd48f80d2"><td class="memItemLeft" align="right" valign="top">SparseMatrix&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a40f80ae63531d67ceb8a40ddd48f80d2">noisenorm</a></td></tr>
 <tr class="separator:a40f80ae63531d67ceb8a40ddd48f80d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
+Friends</h2></td></tr>
+<tr class="memitem:a5ee9fd4b01a95c7944f54ae309570aeb"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a5ee9fd4b01a95c7944f54ae309570aeb">operator&lt;&lt;</a> (std::ostream &amp;out, const <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html">MNELIB::MNEInverseOperator</a> &amp;p_MNEInverseOperator)</td></tr>
+<tr class="separator:a5ee9fd4b01a95c7944f54ae309570aeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Inverse operator. </p>
@@ -308,7 +318,99 @@ Public Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a5ff795cb1658904c5b4f7a2778aa0763"></a>
+<a class="anchor" id="a660f0b847809611513006c4ef005d343"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool MNEInverseOperator::assemble_kernel </td>
+          <td>(</td>
+          <td class="paramtype">const VectorXi &amp;&#160;</td>
+          <td class="paramname"><em>label</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QString&#160;</td>
+          <td class="paramname"><em>method</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>pick_normal</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">MatrixXd &amp;&#160;</td>
+          <td class="paramname"><em>K</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SparseMatrix&lt; double &gt; &amp;&#160;</td>
+          <td class="paramname"><em>noise_norm</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QList&lt; VectorXi &gt; &amp;&#160;</td>
+          <td class="paramname"><em>vertno</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Simple matrix multiplication followed by combination of the current components</p>
+<p>This does all the data transformations to compute the weights for the eigenleads</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">label</td><td>labels. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">method</td><td>The applied normals. ("MNE" | "dSPM" | "sLORETA") </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">pick_normal</td><td>Pick normals. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">K</td><td>Kernel. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">noise_norm</td><td>Noise normals. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">vertno</td><td>Vertices of the hemispheres.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the assembled kernel </dd></dl>
+
+<p>Definition at line <a class="el" href="mne__inverse__operator_8cpp_source.html#l00127">127</a> of file <a class="el" href="mne__inverse__operator_8cpp_source.html">mne_inverse_operator.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa7dbcd0907ea09be18db037fbf413022"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool MNEInverseOperator::check_ch_names </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> &amp;&#160;</td>
+          <td class="paramname"><em>info</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Check that channels in inverse operator are measurements.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">info</td><td>The measurement info</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true when successful, false otherwise </dd></dl>
+
+<p>Definition at line <a class="el" href="mne__inverse__operator_8cpp_source.html#l00233">233</a> of file <a class="el" href="mne__inverse__operator_8cpp_source.html">mne_inverse_operator.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a7014603c49e468c7d4eceff8d4485a8d"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -318,19 +420,19 @@ Public Attributes</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html">MNEInverseOperator</a> MNEInverseOperator::make_inverse_operator </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> &amp;&#160;</td>
           <td class="paramname"><em>info</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">MNEForwardSolution</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">MNEForwardSolution</a>&#160;</td>
           <td class="paramname"><em>forward</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html">FiffCov</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html">FiffCov</a> &amp;&#160;</td>
           <td class="paramname"><em>p_noise_cov</em>, </td>
         </tr>
         <tr>
@@ -373,7 +475,7 @@ Public Attributes</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">info</td><td>The measurement info to specify the channels to include. Bad channels in info['bads'] are not used. </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">forward</td><td>Forward operator. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">forward</td><td>Forward operator. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">p_noise_cov</td><td>The noise covariance matrix. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">loose</td><td>float in [0, 1]. Value that weights the source variances of the dipole components defining the tangent space of the cortical surfaces. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">depth</td><td>float in [0, 1]. Depth weighting coefficients. If None, no depth weighting is performed. </td></tr>
@@ -384,7 +486,7 @@ Public Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the assembled inverse operator </dd></dl>
 
-<p>Definition at line <a class="el" href="mne__inverse__operator_8cpp_source.html#l00127">127</a> of file <a class="el" href="mne__inverse__operator_8cpp_source.html">mne_inverse_operator.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__inverse__operator_8cpp_source.html#l00279">279</a> of file <a class="el" href="mne__inverse__operator_8cpp_source.html">mne_inverse_operator.cpp</a>.</p>
 
 </div>
 </div>
@@ -437,7 +539,7 @@ Public Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the prepared inverse operator </dd></dl>
 
-<p>Definition at line <a class="el" href="mne__inverse__operator_8cpp_source.html#l00365">365</a> of file <a class="el" href="mne__inverse__operator_8cpp_source.html">mne_inverse_operator.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__inverse__operator_8cpp_source.html#l00518">518</a> of file <a class="el" href="mne__inverse__operator_8cpp_source.html">mne_inverse_operator.cpp</a>.</p>
 
 </div>
 </div>
@@ -484,7 +586,53 @@ Public Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="mne__inverse__operator_8cpp_source.html#l00540">540</a> of file <a class="el" href="mne__inverse__operator_8cpp_source.html">mne_inverse_operator.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__inverse__operator_8cpp_source.html#l00693">693</a> of file <a class="el" href="mne__inverse__operator_8cpp_source.html">mne_inverse_operator.cpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Friends And Related Function Documentation</h2>
+<a class="anchor" id="a5ee9fd4b01a95c7944f54ae309570aeb"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream&amp; operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>out</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html">MNELIB::MNEInverseOperator</a> &amp;&#160;</td>
+          <td class="paramname"><em>p_MNEInverseOperator</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>overloading the stream out operator&lt;&lt;</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">out</td><td>The stream to which the fiff covariance should be assigned to. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_MNEInverseOperator</td><td><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html" title="Inverse operator.">MNEInverseOperator</a> which should be assigned to the stream.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the stream with the attached fiff covariance matrix </dd></dl>
+
+<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00256">256</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
 
 </div>
 </div>
@@ -500,7 +648,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Coordinate system definition </p>
 
-<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00190">190</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00230">230</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
 
 </div>
 </div>
@@ -515,7 +663,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Depth priors </p>
 
-<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00199">199</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00239">239</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
 
 </div>
 </div>
@@ -530,7 +678,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Eigen fields </p>
 
-<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00195">195</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00235">235</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
 
 </div>
 </div>
@@ -545,7 +693,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Eigen leads </p>
 
-<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00194">194</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00234">234</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
 
 </div>
 </div>
@@ -560,7 +708,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>If eigen lead are weighted. </p>
 
-<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00193">193</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00233">233</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
 
 </div>
 </div>
@@ -575,7 +723,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>fMRI priors </p>
 
-<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00200">200</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00240">240</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
 
 </div>
 </div>
@@ -590,7 +738,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>light weighted measurement info </p>
 
-<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00185">185</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00225">225</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
 
 </div>
 </div>
@@ -605,7 +753,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>MEG, EEG or both </p>
 
-<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00186">186</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00226">226</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
 
 </div>
 </div>
@@ -620,7 +768,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>MRI head coordinate transformation </p>
 
-<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00202">202</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00242">242</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
 
 </div>
 </div>
@@ -635,7 +783,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Number of averages used to regularize the solution. Set to 1 on single Epoch by default. </p>
 
-<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00203">203</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00243">243</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
 
 </div>
 </div>
@@ -650,7 +798,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Number of channels. </p>
 
-<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00189">189</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00229">229</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
 
 </div>
 </div>
@@ -665,7 +813,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Noise covariance matrix. </p>
 
-<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00196">196</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00236">236</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
 
 </div>
 </div>
@@ -680,7 +828,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>These are the noise-normalization factors </p>
 
-<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00208">208</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00248">248</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
 
 </div>
 </div>
@@ -695,7 +843,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Number of source points. </p>
 
-<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00188">188</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00228">228</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
 
 </div>
 </div>
@@ -710,7 +858,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Orientation priors </p>
 
-<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00198">198</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00238">238</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
 
 </div>
 </div>
@@ -725,7 +873,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>The projector to apply to the data. </p>
 
-<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00205">205</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00245">245</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
 
 </div>
 </div>
@@ -740,7 +888,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>SSP operator </p>
 
-<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00204">204</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00244">244</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
 
 </div>
 </div>
@@ -755,7 +903,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>The diagonal matrix implementing. regularization and the inverse </p>
 
-<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00207">207</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00247">247</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
 
 </div>
 </div>
@@ -770,7 +918,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Singular values </p>
 
-<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00192">192</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00232">232</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
 
 </div>
 </div>
@@ -785,7 +933,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Source covariance matrix. </p>
 
-<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00197">197</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00237">237</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
 
 </div>
 </div>
@@ -800,7 +948,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Source normals. </p>
 
-<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00191">191</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00231">231</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
 
 </div>
 </div>
@@ -815,7 +963,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Source orientation: f </p>
 
-<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00187">187</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00227">227</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
 
 </div>
 </div>
@@ -830,7 +978,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Source Space </p>
 
-<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00201">201</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00241">241</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
 
 </div>
 </div>
@@ -845,7 +993,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Whitens the data </p>
 
-<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00206">206</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
+<p>Definition at line <a class="el" href="mne__inverse__operator_8h_source.html#l00246">246</a> of file <a class="el" href="mne__inverse__operator_8h_source.html">mne_inverse_operator.h</a>.</p>
 
 </div>
 </div>
@@ -856,7 +1004,7 @@ Public Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Feb 28 2013 18:24:41 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Mar 2 2013 02:51:46 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

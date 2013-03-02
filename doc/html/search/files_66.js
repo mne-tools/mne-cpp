@@ -19,6 +19,7 @@ var searchData=
   ['fiff_5fdir_5fentry_2eh',['fiff_dir_entry.h',['../fiff__dir__entry_8h.html',1,'']]],
   ['fiff_5fdir_5ftree_2ecpp',['fiff_dir_tree.cpp',['../fiff__dir__tree_8cpp.html',1,'']]],
   ['fiff_5fdir_5ftree_2eh',['fiff_dir_tree.h',['../fiff__dir__tree_8h.html',1,'']]],
+  ['fiff_5fevoked_2ecpp',['fiff_evoked.cpp',['../fiff__evoked_8cpp.html',1,'']]],
   ['fiff_5fevoked_5fdata_2ecpp',['fiff_evoked_data.cpp',['../fiff__evoked__data_8cpp.html',1,'']]],
   ['fiff_5fevoked_5fdata_2eh',['fiff_evoked_data.h',['../fiff__evoked__data_8h.html',1,'']]],
   ['fiff_5fevoked_5fdata_5fset_2ecpp',['fiff_evoked_data_set.cpp',['../fiff__evoked__data__set_8cpp.html',1,'']]],

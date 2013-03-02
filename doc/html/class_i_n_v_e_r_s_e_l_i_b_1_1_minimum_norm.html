@@ -116,8 +116,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a0439015d4d2b367523aea36f9e39398b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a602de1995a285f2506b70aabd0190e09"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#a602de1995a285f2506b70aabd0190e09">MinimumNorm</a> (const <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html">MNEInverseOperator</a> &amp;p_inverseOperator, float lambda, bool dSPM, bool sLORETA)</td></tr>
 <tr class="separator:a602de1995a285f2506b70aabd0190e09"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a800ff56889c1a8dfb3dc07d137cf8a95"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html">SourceEstimate</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#a800ff56889c1a8dfb3dc07d137cf8a95">calculateInverse</a> (const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html">FiffEvokedDataSet</a> &amp;p_evokedDataSet) const </td></tr>
-<tr class="separator:a800ff56889c1a8dfb3dc07d137cf8a95"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aede3e8398bfac4ad9a1366b3cba89af6"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html">SourceEstimate</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#aede3e8398bfac4ad9a1366b3cba89af6">calculateInverse</a> (const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html">FiffEvoked</a> &amp;p_fiffEvoked, bool pick_normal=false) const </td></tr>
+<tr class="separator:aede3e8398bfac4ad9a1366b3cba89af6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad4b70afa3ff6d7de780ffe248b5fd120"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#ad4b70afa3ff6d7de780ffe248b5fd120">setMethod</a> (QString method)</td></tr>
 <tr class="separator:ad4b70afa3ff6d7de780ffe248b5fd120"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a46c8154877896582b9d510afe3d28820"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#a46c8154877896582b9d510afe3d28820">setMethod</a> (bool dSPM, bool sLORETA)</td></tr>
@@ -182,7 +182,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the prepared inverse operator </dd></dl>
 
-<p>Definition at line <a class="el" href="minimumnorm_8cpp_source.html#l00068">68</a> of file <a class="el" href="minimumnorm_8cpp_source.html">minimumnorm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="minimumnorm_8cpp_source.html#l00070">70</a> of file <a class="el" href="minimumnorm_8cpp_source.html">minimumnorm.cpp</a>.</p>
 
 </div>
 </div>
@@ -241,12 +241,12 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the prepared inverse operator </dd></dl>
 
-<p>Definition at line <a class="el" href="minimumnorm_8cpp_source.html#l00077">77</a> of file <a class="el" href="minimumnorm_8cpp_source.html">minimumnorm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="minimumnorm_8cpp_source.html#l00079">79</a> of file <a class="el" href="minimumnorm_8cpp_source.html">minimumnorm.cpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a800ff56889c1a8dfb3dc07d137cf8a95"></a>
+<a class="anchor" id="aede3e8398bfac4ad9a1366b3cba89af6"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -256,9 +256,19 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html">SourceEstimate</a> MinimumNorm::calculateInverse </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html">FiffEvokedDataSet</a> &amp;&#160;</td>
-          <td class="paramname"><em>p_evokedDataSet</em></td><td>)</td>
-          <td> const</td>
+          <td class="paramtype">const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html">FiffEvoked</a> &amp;&#160;</td>
+          <td class="paramname"><em>p_fiffEvoked</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>pick_normal</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
         </tr>
       </table>
   </td>
@@ -267,18 +277,19 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Applies the inverse algorithm to input data and returns a source estimate.</p>
+<p>Computes a L2-norm inverse solution Actual code using these principles might be different because the inverse operator is often reused across data sets.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_evokedDataSet</td><td>Evoked data.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_fiffEvoked</td><td>Evoked data. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">pick_normal</td><td>If True, rather than pooling the orientations by taking the norm, only the radial component is kept. This is only applied when working with loose orientations.</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the calculated source estimation </dd></dl>
 
-<p>Implements <a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html#a8ac7c2c4ce7e1a7ccbfbaf1284800c23">INVERSELIB::IInverseAlgorithm</a>.</p>
+<p>Implements <a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html#aeb4557c3d15974fbc6c5e74b01b26262">INVERSELIB::IInverseAlgorithm</a>.</p>
 
-<p>Definition at line <a class="el" href="minimumnorm_8cpp_source.html#l00087">87</a> of file <a class="el" href="minimumnorm_8cpp_source.html">minimumnorm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="minimumnorm_8cpp_source.html#l00089">89</a> of file <a class="el" href="minimumnorm_8cpp_source.html">minimumnorm.cpp</a>.</p>
 
 </div>
 </div>
@@ -303,7 +314,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="minimumnorm_8cpp_source.html#l00185">185</a> of file <a class="el" href="minimumnorm_8cpp_source.html">minimumnorm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="minimumnorm_8cpp_source.html#l00159">159</a> of file <a class="el" href="minimumnorm_8cpp_source.html">minimumnorm.cpp</a>.</p>
 
 </div>
 </div>
@@ -339,7 +350,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="minimumnorm_8cpp_source.html#l00206">206</a> of file <a class="el" href="minimumnorm_8cpp_source.html">minimumnorm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="minimumnorm_8cpp_source.html#l00180">180</a> of file <a class="el" href="minimumnorm_8cpp_source.html">minimumnorm.cpp</a>.</p>
 
 </div>
 </div>
@@ -364,7 +375,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="minimumnorm_8cpp_source.html#l00224">224</a> of file <a class="el" href="minimumnorm_8cpp_source.html">minimumnorm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="minimumnorm_8cpp_source.html#l00205">205</a> of file <a class="el" href="minimumnorm_8cpp_source.html">minimumnorm.cpp</a>.</p>
 
 </div>
 </div>
@@ -375,7 +386,7 @@ Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Feb 28 2013 18:24:41 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Mar 2 2013 02:51:46 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

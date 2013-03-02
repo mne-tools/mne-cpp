@@ -56,7 +56,7 @@ using namespace INVERSELIB;
 
 SourceEstimate::SourceEstimate()
 : tmin(0)
-, tstep(0)
+, tstep(-1)
 {
 }
 
@@ -75,11 +75,24 @@ SourceEstimate::SourceEstimate(const MatrixXd &p_sol, const QList<VectorXi> &p_v
 
 //*************************************************************************************************************
 
+SourceEstimate::SourceEstimate(const SourceEstimate& p_SourceEstimate)
+: data(p_SourceEstimate.data)
+, vertno(p_SourceEstimate.vertno)
+, times(p_SourceEstimate.times)
+, tmin(p_SourceEstimate.tmin)
+, tstep(p_SourceEstimate.tstep)
+{
+
+}
+
+
+//*************************************************************************************************************
+
 void SourceEstimate::clear()
 {
     data = MatrixXd();
     vertno.clear();
-    times = VectorXf();
+    times = RowVectorXf();
     tmin = 0;
     tstep = 0;
 }
@@ -91,11 +104,11 @@ void SourceEstimate::update_times()
 {
     if(data.cols() > 0)
     {
-        this->times = VectorXf(data.cols());
+        this->times = RowVectorXf(data.cols());
         this->times[0] = this->tmin;
         for(float i = 1; i < this->times.size(); ++i)
             this->times[i] = this->times[i-1] + this->tstep;
     }
     else
-        this->times = VectorXf();
+        this->times = RowVectorXf();
 }

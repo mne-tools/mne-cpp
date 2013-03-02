@@ -114,7 +114,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;</div>
 <div class="line"><a name="l00057"></a><span class="lineno"><a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a7de0394b3e1c7f5dd278e917b44d42a3">   57</a></span>&#160;<a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a7de0394b3e1c7f5dd278e917b44d42a3">SourceEstimate::SourceEstimate</a>()</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;: tmin(0)</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;, tstep(0)</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;, tstep(-1)</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;{</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;}</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;</div>
@@ -133,34 +133,47 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;</div>
-<div class="line"><a name="l00078"></a><span class="lineno"><a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#ab6c31cf75e753d3e3733f76e2ddd5a64">   78</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#ab6c31cf75e753d3e3733f76e2ddd5a64">SourceEstimate::clear</a>()</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;{</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a7ae98d0ab882aa80a82215cf9a0b881f">data</a> = MatrixXd();</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a25ee3b098597003c172aa00dd4e33c05">vertno</a>.clear();</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#aabeb8b3e262550f9560d2a62988d6162">times</a> = VectorXf();</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#ad295c3ee271fa3345f21045d1da6157e">tmin</a> = 0;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#ac34303f7634fe3cc5741ea7b7b308b9e">tstep</a> = 0;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;}</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;</div>
+<div class="line"><a name="l00078"></a><span class="lineno"><a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a548611f1063e5e4ae923abd6c4c907e8">   78</a></span>&#160;<a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a7de0394b3e1c7f5dd278e917b44d42a3">SourceEstimate::SourceEstimate</a>(<span class="keyword">const</span> <a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html" title="Source estimation.">SourceEstimate</a>&amp; p_SourceEstimate)</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;: data(p_SourceEstimate.data)</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;, vertno(p_SourceEstimate.vertno)</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;, times(p_SourceEstimate.times)</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;, tmin(p_SourceEstimate.tmin)</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;, tstep(p_SourceEstimate.tstep)</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;{</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;}</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="keywordtype">void</span> SourceEstimate::update_times()</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;{</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a7ae98d0ab882aa80a82215cf9a0b881f">data</a>.cols() &gt; 0)</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    {</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;        this-&gt;<a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#aabeb8b3e262550f9560d2a62988d6162">times</a> = VectorXf(<a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a7ae98d0ab882aa80a82215cf9a0b881f">data</a>.cols());</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        this-&gt;<a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#aabeb8b3e262550f9560d2a62988d6162">times</a>[0] = this-&gt;<a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#ad295c3ee271fa3345f21045d1da6157e">tmin</a>;</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        <span class="keywordflow">for</span>(<span class="keywordtype">float</span> i = 1; i &lt; this-&gt;times.size(); ++i)</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;            this-&gt;times[i] = this-&gt;times[i-1] + this-&gt;<a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#ac34303f7634fe3cc5741ea7b7b308b9e">tstep</a>;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    }</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        this-&gt;times = VectorXf();</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;}</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;</div>
+<div class="line"><a name="l00091"></a><span class="lineno"><a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#ab6c31cf75e753d3e3733f76e2ddd5a64">   91</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#ab6c31cf75e753d3e3733f76e2ddd5a64">SourceEstimate::clear</a>()</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;{</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a7ae98d0ab882aa80a82215cf9a0b881f">data</a> = MatrixXd();</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a25ee3b098597003c172aa00dd4e33c05">vertno</a>.clear();</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a6b3861a0fdf6f14f3be0d3ddcf708354">times</a> = RowVectorXf();</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#ad295c3ee271fa3345f21045d1da6157e">tmin</a> = 0;</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#ac34303f7634fe3cc5741ea7b7b308b9e">tstep</a> = 0;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;}</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="keywordtype">void</span> SourceEstimate::update_times()</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;{</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a7ae98d0ab882aa80a82215cf9a0b881f">data</a>.cols() &gt; 0)</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    {</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;        this-&gt;<a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a6b3861a0fdf6f14f3be0d3ddcf708354">times</a> = RowVectorXf(<a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a7ae98d0ab882aa80a82215cf9a0b881f">data</a>.cols());</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        this-&gt;<a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a6b3861a0fdf6f14f3be0d3ddcf708354">times</a>[0] = this-&gt;<a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#ad295c3ee271fa3345f21045d1da6157e">tmin</a>;</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;        <span class="keywordflow">for</span>(<span class="keywordtype">float</span> i = 1; i &lt; this-&gt;times.size(); ++i)</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;            this-&gt;times[i] = this-&gt;times[i-1] + this-&gt;<a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#ac34303f7634fe3cc5741ea7b7b308b9e">tstep</a>;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    }</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;        this-&gt;times = RowVectorXf();</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Feb 28 2013 18:24:37 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Mar 2 2013 02:51:42 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

@@ -154,6 +154,18 @@ public:
 
     //=========================================================================================================
     /**
+    * Find vertex numbers and indices from label
+    *
+    * @param[in] label      Source space label
+    * @param[out] src_sel   array of int (idx.size() = vertno[0].size() + vertno[1].size())
+    *                       Indices of the selected vertices in sourse space
+    *
+    * @return vertno list of length 2 Vertex numbers for lh and rh
+    */
+    QList<VectorXi> label_src_vertno_sel(const VectorXi &label, VectorXi &src_sel);
+
+    //=========================================================================================================
+    /**
     * ### MNE toolbox root function ###: Implementation of the mne_patch_info function
     *
     * Generate the patch information from the 'nearest' vector in a source space. For vertex in the source

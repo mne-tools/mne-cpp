@@ -126,6 +126,8 @@ MNEInverseOperator::~MNEInverseOperator()
 
 bool MNEInverseOperator::assemble_kernel(const VectorXi &label, QString method, bool pick_normal, MatrixXd &K, SparseMatrix<double> &noise_norm, QList<VectorXi> &vertno) const
 {
+    MatrixXd t_eigen_leads = this->eigen_leads->data;
+    MatrixXd t_source_cov = this->source_cov->data;
     if(method.compare("MNE") != 0)
         noise_norm = this->noisenorm;
 
@@ -134,11 +136,51 @@ bool MNEInverseOperator::assemble_kernel(const VectorXi &label, QString method, 
     if(label.size() > 0)
     {
         qDebug() << "ToDo";
+//        vertno, src_sel = label_src_vertno_sel(label, inv['src'])
+
+//        if method != "MNE":
+//            noise_norm = noise_norm[src_sel]
+
+//        if inv['source_ori'] == FIFF.FIFFV_MNE_FREE_ORI:
+//            src_sel = 3 * src_sel
+//            src_sel = np.c_[src_sel, src_sel + 1, src_sel + 2]
+//            src_sel = src_sel.ravel()
+
+//        eigen_leads = eigen_leads[src_sel]
+//        source_cov = source_cov[src_sel]
     }
 
     if(pick_normal)
     {
-        qDebug() << "ToDo";
+        if(this->source_ori != FIFFV_MNE_FREE_ORI)
+        {
+            qWarning("Warning: Pick normal can only be used with a free orientation inverse operator.\n");
+            return false;
+        }
+
+        bool is_loose = ((0 < this->orient_prior->data(0,0)) && (this->orient_prior->data(0,0) < 1)) ? true : false;
+        if(!is_loose)
+        {
+            qWarning("The pick_normal parameter is only valid when working with loose orientations.\n");
+            return false;
+        }
+
+        // keep only the normal components
+        qint32 count = 0;
+        for(qint32 i = 2; i < t_eigen_leads.rows(); i+=3)
+        {
+            t_eigen_leads.row(count) = t_eigen_leads.row(i);
+            ++count;
+        }
+        t_eigen_leads.conservativeResize(count, t_eigen_leads.cols());
+
+        count = 0;
+        for(qint32 i = 2; i < t_source_cov.rows(); i+=3)
+        {
+            t_source_cov.row(count) = t_source_cov.row(i);
+            ++count;
+        }
+        t_source_cov.conservativeResize(count, t_source_cov.cols());
     }
 
     typedef Eigen::Triplet<double> T;
@@ -160,7 +202,7 @@ bool MNEInverseOperator::assemble_kernel(const VectorXi &label, QString method, 
         //     R^0.5 has been already factored in
         //
         printf("(eigenleads already weighted)...");
-        K = eigen_leads->data*trans;
+        K = t_eigen_leads*trans;
     }
     else
     {
@@ -170,13 +212,13 @@ bool MNEInverseOperator::assemble_kernel(const VectorXi &label, QString method, 
        printf("(eigenleads need to be weighted)...");
 
        std::vector<T> tripletList2;
-       tripletList2.reserve(source_cov->data.rows());
-       for(qint32 i = 0; i < source_cov->data.rows(); ++i)
-           tripletList2.push_back(T(i, i, sqrt(source_cov->data(i,0))));
-       SparseMatrix<double> t_sourceCov(source_cov->data.rows(),source_cov->data.rows());
+       tripletList2.reserve(t_source_cov.rows());
+       for(qint32 i = 0; i < t_source_cov.rows(); ++i)
+           tripletList2.push_back(T(i, i, sqrt(t_source_cov(i,0))));
+       SparseMatrix<double> t_sourceCov(t_source_cov.rows(),t_source_cov.rows());
        t_sourceCov.setFromTriplets(tripletList2.begin(), tripletList2.end());
 
-       K = t_sourceCov*eigen_leads->data*trans;
+       K = t_sourceCov*t_eigen_leads*trans;
     }
 
     if(method.compare("MNE") == 0)

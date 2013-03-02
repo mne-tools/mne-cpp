@@ -2,7 +2,7 @@ var searchData=
 [
   ['table',['table',['../class_f_s_l_i_b_1_1_colortable.html#a4987ee030edf7db8b5ed9e1974dd8456',1,'FSLIB::Colortable']]],
   ['time',['time',['../class_f_i_f_f_l_i_b_1_1_fiff_id.html#a93dc35d7aa0034b38b9443906303fe6c',1,'FIFFLIB::FiffId']]],
-  ['times',['times',['../class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#aa0eb73f0d5e1ab2dd9f9efbe3506e661',1,'FIFFLIB::FiffEvokedData::times()'],['../class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#aabeb8b3e262550f9560d2a62988d6162',1,'INVERSELIB::SourceEstimate::times()']]],
+  ['times',['times',['../class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#a44df92f479c19bb5a3806d00844bfa21',1,'FIFFLIB::FiffEvoked::times()'],['../class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#aa0eb73f0d5e1ab2dd9f9efbe3506e661',1,'FIFFLIB::FiffEvokedData::times()'],['../class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a6b3861a0fdf6f14f3be0d3ddcf708354',1,'INVERSELIB::SourceEstimate::times()']]],
   ['tmax',['tmax',['../class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html#af14c458e96940b814fc3a54a145fc4e3',1,'MNELIB::MNEEpochData']]],
   ['tmin',['tmin',['../class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#ad295c3ee271fa3345f21045d1da6157e',1,'INVERSELIB::SourceEstimate::tmin()'],['../class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html#ae886dc35e258419e7592afac6537e07c',1,'MNELIB::MNEEpochData::tmin()']]],
   ['to',['to',['../class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a0d4f29ae5b9affe90e2cfadf922e36f7',1,'FIFFLIB::FiffCoordTrans']]],

@@ -100,6 +100,46 @@ QList<VectorXi> MNESourceSpace::get_vertno() const
 
 //*************************************************************************************************************
 
+QList<VectorXi> MNESourceSpace::label_src_vertno_sel(const VectorXi &label, VectorXi &src_sel)
+{
+    QList<VectorXi> vertno;
+    src_sel = VectorXi();
+
+    qDebug() << "ToDo";
+
+//    if (hemispheres[0].type.compare("surf") != 0)
+//    {
+//        qWarning("Label are only supported with surface source spaces\n");
+//        return vertno;
+//    }
+
+    vertno << hemispheres[0].vertno << hemispheres[1].vertno;
+
+//    if label.hemi == 'lh':
+//        vertno_sel = np.intersect1d(vertno[0], label.vertices)
+//        src_sel = np.searchsorted(vertno[0], vertno_sel)
+//        vertno[0] = vertno_sel
+//        vertno[1] = np.array([])
+//    elif label.hemi == 'rh':
+//        vertno_sel = np.intersect1d(vertno[1], label.vertices)
+//        src_sel = np.searchsorted(vertno[1], vertno_sel) + len(vertno[0])
+//        vertno[0] = np.array([])
+//        vertno[1] = vertno_sel
+//    elif label.hemi == 'both':
+//        vertno_sel_lh = np.intersect1d(vertno[0], label.lh.vertices)
+//        src_sel_lh = np.searchsorted(vertno[0], vertno_sel_lh)
+//        vertno_sel_rh = np.intersect1d(vertno[1], label.rh.vertices)
+//        src_sel_rh = np.searchsorted(vertno[1], vertno_sel_rh) + len(vertno[0])
+//        src_sel = np.hstack((src_sel_lh, src_sel_rh))
+//        vertno = [vertno_sel_lh, vertno_sel_rh]
+//    else:
+//        raise Exception("Unknown hemisphere type")
+
+    return vertno;
+}
+
+//*************************************************************************************************************
+
 bool MNESourceSpace::read_source_spaces(FiffStream*& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNESourceSpace& p_SourceSpace)
 {
 //    if (p_pSourceSpace != NULL)

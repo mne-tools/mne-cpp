@@ -108,8 +108,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a7de0394b3e1c7f5dd278e917b44d42a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1a117bda78a9aa73a2b47a3f69f818a1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a1a117bda78a9aa73a2b47a3f69f818a1">SourceEstimate</a> (const MatrixXd &amp;p_sol, const QList&lt; VectorXi &gt; &amp;p_vertices, float p_tmin, float p_tstep)</td></tr>
 <tr class="separator:a1a117bda78a9aa73a2b47a3f69f818a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a548611f1063e5e4ae923abd6c4c907e8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a548611f1063e5e4ae923abd6c4c907e8">SourceEstimate</a> (const <a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html">SourceEstimate</a> &amp;p_SourceEstimate)</td></tr>
+<tr class="separator:a548611f1063e5e4ae923abd6c4c907e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab6c31cf75e753d3e3733f76e2ddd5a64"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#ab6c31cf75e753d3e3733f76e2ddd5a64">clear</a> ()</td></tr>
 <tr class="separator:ab6c31cf75e753d3e3733f76e2ddd5a64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4b95695a45977ccb5ccc73bd957960cf"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a4b95695a45977ccb5ccc73bd957960cf">isEmpty</a> ()</td></tr>
+<tr class="separator:a4b95695a45977ccb5ccc73bd957960cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -117,8 +121,8 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a7ae98d0ab882aa80a82215cf9a0b881f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a25ee3b098597003c172aa00dd4e33c05"><td class="memItemLeft" align="right" valign="top">QList&lt; VectorXi &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a25ee3b098597003c172aa00dd4e33c05">vertno</a></td></tr>
 <tr class="separator:a25ee3b098597003c172aa00dd4e33c05"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aabeb8b3e262550f9560d2a62988d6162"><td class="memItemLeft" align="right" valign="top">VectorXf&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#aabeb8b3e262550f9560d2a62988d6162">times</a></td></tr>
-<tr class="separator:aabeb8b3e262550f9560d2a62988d6162"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6b3861a0fdf6f14f3be0d3ddcf708354"><td class="memItemLeft" align="right" valign="top">RowVectorXf&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a6b3861a0fdf6f14f3be0d3ddcf708354">times</a></td></tr>
+<tr class="separator:a6b3861a0fdf6f14f3be0d3ddcf708354"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad295c3ee271fa3345f21045d1da6157e"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#ad295c3ee271fa3345f21045d1da6157e">tmin</a></td></tr>
 <tr class="separator:ad295c3ee271fa3345f21045d1da6157e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac34303f7634fe3cc5741ea7b7b308b9e"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#ac34303f7634fe3cc5741ea7b7b308b9e">tstep</a></td></tr>
@@ -198,6 +202,31 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a548611f1063e5e4ae923abd6c4c907e8"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SourceEstimate::SourceEstimate </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html">SourceEstimate</a> &amp;&#160;</td>
+          <td class="paramname"><em>p_SourceEstimate</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Copy constructor.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_SourceEstimate</td><td>Source estimate data which should be copied </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="sourceestimate_8cpp_source.html#l00078">78</a> of file <a class="el" href="sourceestimate_8cpp_source.html">sourceestimate.cpp</a>.</p>
+
+</div>
+</div>
 <h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="ab6c31cf75e753d3e3733f76e2ddd5a64"></a>
 <div class="memitem">
@@ -213,7 +242,34 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Initializes source estimate. </p>
 
-<p>Definition at line <a class="el" href="sourceestimate_8cpp_source.html#l00078">78</a> of file <a class="el" href="sourceestimate_8cpp_source.html">sourceestimate.cpp</a>.</p>
+<p>Definition at line <a class="el" href="sourceestimate_8cpp_source.html#l00091">91</a> of file <a class="el" href="sourceestimate_8cpp_source.html">sourceestimate.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a4b95695a45977ccb5ccc73bd957960cf"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool INVERSELIB::SourceEstimate::isEmpty </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Returns whether <a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html" title="Source estimation.">SourceEstimate</a> is empty.</p>
+<dl class="section return"><dt>Returns</dt><dd>true if is empty, false otherwise </dd></dl>
+
+<p>Definition at line <a class="el" href="sourceestimate_8h_source.html#l00158">158</a> of file <a class="el" href="sourceestimate_8h_source.html">sourceestimate.h</a>.</p>
 
 </div>
 </div>
@@ -229,22 +285,22 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Matrix of shape [n_dipoles x n_times] which contains the data in source space. </p>
 
-<p>Definition at line <a class="el" href="sourceestimate_8h_source.html#l00121">121</a> of file <a class="el" href="sourceestimate_8h_source.html">sourceestimate.h</a>.</p>
+<p>Definition at line <a class="el" href="sourceestimate_8h_source.html#l00137">137</a> of file <a class="el" href="sourceestimate_8h_source.html">sourceestimate.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="aabeb8b3e262550f9560d2a62988d6162"></a>
+<a class="anchor" id="a6b3861a0fdf6f14f3be0d3ddcf708354"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">VectorXf INVERSELIB::SourceEstimate::times</td>
+          <td class="memname">RowVectorXf INVERSELIB::SourceEstimate::times</td>
         </tr>
       </table>
 </div><div class="memdoc">
 <p>The time vector with n_times steps. </p>
 
-<p>Definition at line <a class="el" href="sourceestimate_8h_source.html#l00123">123</a> of file <a class="el" href="sourceestimate_8h_source.html">sourceestimate.h</a>.</p>
+<p>Definition at line <a class="el" href="sourceestimate_8h_source.html#l00139">139</a> of file <a class="el" href="sourceestimate_8h_source.html">sourceestimate.h</a>.</p>
 
 </div>
 </div>
@@ -259,7 +315,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Time starting point. </p>
 
-<p>Definition at line <a class="el" href="sourceestimate_8h_source.html#l00124">124</a> of file <a class="el" href="sourceestimate_8h_source.html">sourceestimate.h</a>.</p>
+<p>Definition at line <a class="el" href="sourceestimate_8h_source.html#l00140">140</a> of file <a class="el" href="sourceestimate_8h_source.html">sourceestimate.h</a>.</p>
 
 </div>
 </div>
@@ -274,7 +330,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Time steps within the times vector. </p>
 
-<p>Definition at line <a class="el" href="sourceestimate_8h_source.html#l00125">125</a> of file <a class="el" href="sourceestimate_8h_source.html">sourceestimate.h</a>.</p>
+<p>Definition at line <a class="el" href="sourceestimate_8h_source.html#l00141">141</a> of file <a class="el" href="sourceestimate_8h_source.html">sourceestimate.h</a>.</p>
 
 </div>
 </div>
@@ -289,7 +345,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>The indices of the dipoles in the different source spaces. </p>
 
-<p>Definition at line <a class="el" href="sourceestimate_8h_source.html#l00122">122</a> of file <a class="el" href="sourceestimate_8h_source.html">sourceestimate.h</a>.</p>
+<p>Definition at line <a class="el" href="sourceestimate_8h_source.html#l00138">138</a> of file <a class="el" href="sourceestimate_8h_source.html">sourceestimate.h</a>.</p>
 
 </div>
 </div>
@@ -300,7 +356,7 @@ Public Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Feb 28 2013 18:24:41 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Mar 2 2013 02:51:46 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>
