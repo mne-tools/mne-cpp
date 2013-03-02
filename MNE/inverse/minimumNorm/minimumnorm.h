@@ -111,12 +111,13 @@ public:
     * Computes a L2-norm inverse solution Actual code using these principles might be different because the
     * inverse operator is often reused across data sets.
     *
-    * @param[in] p_fiffEvoked       Evoked data.
-    * @param[out] p_SourceEstimate  The calculated source estimation
+    * @param[in] p_fiffEvoked   Evoked data.
+    * @param[in] pick_normal    If True, rather than pooling the orientations by taking the norm, only the
+    *                           radial component is kept. This is only applied when working with loose orientations.
     *
-    * @return true if successful, false otherwise
+    * @return the calculated source estimation
     */
-    virtual bool calculateInverse(const FiffEvoked &p_fiffEvoked, SourceEstimate &p_SourceEstimate) const;
+    virtual SourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false) const;
 
     //=========================================================================================================
     /**

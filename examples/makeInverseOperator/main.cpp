@@ -104,7 +104,8 @@ int main(int argc, char *argv[])
 
     // Load data
     fiff_int_t setno = 0;
-    FiffEvoked evoked(t_fileEvoked, setno);
+    QPair<QVariant, QVariant> baseline(QVariant(), 0);
+    FiffEvoked evoked(t_fileEvoked, setno, baseline);
     if(evoked.isEmpty())
         return 1;
 
@@ -129,32 +130,26 @@ int main(int argc, char *argv[])
 
     // Compute inverse solution
     MinimumNorm minimumNorm_meeg(inverse_operator_meeg, lambda2, method);
-    SourceEstimate sourceEstimate_meeg;
-    if(!minimumNorm_meeg.calculateInverse(evoked, sourceEstimate_meeg))
-        return 1;
+    SourceEstimate sourceEstimate_meeg = minimumNorm_meeg.calculateInverse(evoked);
 
     MinimumNorm minimumNorm_meg(inverse_operator_meg, lambda2, method);
-    SourceEstimate sourceEstimate_meg;
-    if(!minimumNorm_meg.calculateInverse(evoked, sourceEstimate_meg))
-        return 1;
+    SourceEstimate sourceEstimate_meg = minimumNorm_meg.calculateInverse(evoked);
 
     MinimumNorm minimumNorm_eeg(inverse_operator_eeg, lambda2, method);
-    SourceEstimate sourceEstimate_eeg;
-    if(!minimumNorm_eeg.calculateInverse(evoked, sourceEstimate_eeg))
+    SourceEstimate sourceEstimate_eeg = minimumNorm_eeg.calculateInverse(evoked);
+
+    if(sourceEstimate_meeg.isEmpty() || sourceEstimate_meg.isEmpty() || sourceEstimate_eeg.isEmpty())
         return 1;
 
     // View activation time-series
     std::cout << "\nsourceEstimate_meeg:\n" << sourceEstimate_meeg.data.block(0,0,10,10) << std::endl;
-    printf("tmin = %f s\n", sourceEstimate_meeg.tmin);
-    printf("tstep = %f s\n", sourceEstimate_meeg.tstep);
+    std::cout << "time\n" << sourceEstimate_meeg.times.block(0,0,1,10) << std::endl;
 
     std::cout << "\nsourceEstimate_meg:\n" << sourceEstimate_meg.data.block(0,0,10,10) << std::endl;
-    printf("tmin = %f s\n", sourceEstimate_meg.tmin);
-    printf("tstep = %f s\n", sourceEstimate_meg.tstep);
+    std::cout << "time\n" << sourceEstimate_meg.times.block(0,0,1,10) << std::endl;
 
     std::cout << "\nsourceEstimate_eeg:\n" << sourceEstimate_eeg.data.block(0,0,10,10) << std::endl;
-    printf("tmin = %f s\n", sourceEstimate_eeg.tmin);
-    printf("tstep = %f s\n", sourceEstimate_eeg.tstep);
+    std::cout << "time\n" << sourceEstimate_eeg.times.block(0,0,1,10) << std::endl;
 
     return a.exec();
 }

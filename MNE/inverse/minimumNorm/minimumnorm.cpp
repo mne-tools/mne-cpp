@@ -86,12 +86,8 @@ MinimumNorm::MinimumNorm(const MNEInverseOperator &p_inverseOperator, float lamb
 
 //*************************************************************************************************************
 
-bool MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, SourceEstimate &p_SourceEstimate) const
+SourceEstimate MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal) const
 {
-    //ToDo put this in parameters
-    VectorXi label;
-    bool pick_normal = false;
-
     //
     //   Set up the inverse according to the parameters
     //
@@ -100,7 +96,7 @@ bool MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, SourceEstimat
     if(!m_inverseOperator.check_ch_names(p_fiffEvoked.info))
     {
         qWarning("Channel name check failed.");
-        return false;
+        return SourceEstimate();
     }
 
     MNEInverseOperator inv = m_inverseOperator.prepare_inverse_operator(nave, m_fLambda, m_bdSPM, m_bsLORETA);
@@ -115,6 +111,7 @@ bool MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, SourceEstimat
     MatrixXd K;
     SparseMatrix<double> noise_norm;
     QList<VectorXi> vertno;
+    VectorXi label;
 
     inv.assemble_kernel(label, m_sMethod, pick_normal, K, noise_norm, vertno);
     MatrixXd sol = K * t_fiffEvoked.data; //apply imaging kernel
@@ -153,9 +150,7 @@ bool MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, SourceEstimat
     for(qint32 h = 0; h < inv.src.hemispheres.size(); ++h)
         t_qListVertices.push_back(inv.src.hemispheres[h].vertno);
 
-    p_SourceEstimate = SourceEstimate(sol, t_qListVertices, tmin, tstep);
-
-    return true;
+    return SourceEstimate(sol, t_qListVertices, tmin, tstep);
 }
 
 
