@@ -45,6 +45,8 @@
 
 #include "mnemath_global.h"
 
+#include <iostream>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -61,6 +63,10 @@
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
+
+#include <QStringList>
+#include <QVariant>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -180,6 +186,26 @@ public:
     * @return rank of matrix A
     */
     static qint32 rank(const MatrixXd& A, double tol = 1e-8);
+
+    //=========================================================================================================
+    /**
+    * ToDo: Maybe new processing class
+    *
+    * Rescale aka baseline correct data
+    *
+    * @param[in] data           Data Matrix (m x n_time)
+    * @param[in] times          Time instants is seconds.
+    * @param[in] baseline       If baseline is (a, b) the interval is between "a (s)" and "b (s)".
+    *                           If a is invalid the beginning of the data is used and if b is invalid then b is set to the end of the interval.
+    *                           If baseline is equal to (invalid, invalid) all the time interval is used.
+    * @param[in] baseline_usage See description of parameter baseline.
+    * @param[in] mode           Do baseline correction with ratio (power is divided by mean power during baseline) or zscore (power is divided by standard
+    *                           deviatio of power during baseline after substracting the mean, power = [power - mean(power_baseline)] / std(power_baseline)).
+    *                           ("logratio" | "ratio" | "zscore" | "mean" | "percent")
+    *
+    * @return   rescaled data matrix rescaling.
+    */
+    static MatrixXd rescale(const MatrixXd &data, const RowVectorXf &times, QPair<QVariant,QVariant> baseline, QString mode);
 
     //=========================================================================================================
     /**

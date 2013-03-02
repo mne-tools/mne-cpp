@@ -41,6 +41,8 @@
 #include "minimumnorm.h"
 #include "../sourceestimate.h"
 
+#include <fiff/fiff_evoked.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -84,7 +86,7 @@ MinimumNorm::MinimumNorm(const MNEInverseOperator &p_inverseOperator, float lamb
 
 //*************************************************************************************************************
 
-bool MinimumNorm::calculateInverse(const FiffEvokedDataSet &p_evokedSet, SourceEstimate &p_SourceEstimate) const
+bool MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, SourceEstimate &p_SourceEstimate) const
 {
     //ToDo put this in parameters
     VectorXi label;
@@ -93,9 +95,9 @@ bool MinimumNorm::calculateInverse(const FiffEvokedDataSet &p_evokedSet, SourceE
     //
     //   Set up the inverse according to the parameters
     //
-    qint32 nave = p_evokedSet.evoked[0]->nave;
+    qint32 nave = p_fiffEvoked.nave;
 
-    if(!m_inverseOperator.check_ch_names(p_evokedSet.info))
+    if(!m_inverseOperator.check_ch_names(p_fiffEvoked.info))
     {
         qWarning("Channel name check failed.");
         return false;
@@ -105,9 +107,9 @@ bool MinimumNorm::calculateInverse(const FiffEvokedDataSet &p_evokedSet, SourceE
     //
     //   Pick the correct channels from the data
     //
-    FiffEvokedDataSet t_evokedSet = p_evokedSet.pick_channels(inv.noise_cov->names);
+    FiffEvoked t_fiffEvoked = p_fiffEvoked.pick_channels(inv.noise_cov->names);
 
-    printf("Picked %d channels from the data\n",t_evokedSet.info.nchan);
+    printf("Picked %d channels from the data\n",t_fiffEvoked.info.nchan);
     printf("Computing inverse...");
 
     MatrixXd K;
@@ -115,7 +117,7 @@ bool MinimumNorm::calculateInverse(const FiffEvokedDataSet &p_evokedSet, SourceE
     QList<VectorXi> vertno;
 
     inv.assemble_kernel(label, m_sMethod, pick_normal, K, noise_norm, vertno);
-    MatrixXd sol = K * t_evokedSet.evoked[0]->epochs; //apply imaging kernel
+    MatrixXd sol = K * t_fiffEvoked.data; //apply imaging kernel
 
     if (inv.source_ori == FIFFV_MNE_FREE_ORI)
     {
@@ -130,6 +132,7 @@ bool MinimumNorm::calculateInverse(const FiffEvokedDataSet &p_evokedSet, SourceE
         sol.resize(sol1.rows(),sol1.cols());
         sol = sol1;
     }
+
     if (m_bdSPM)
     {
         printf("(dSPM)...");
@@ -143,8 +146,8 @@ bool MinimumNorm::calculateInverse(const FiffEvokedDataSet &p_evokedSet, SourceE
     printf("[done]\n");
 
     //Results
-    float tmin = ((float)t_evokedSet.evoked[0]->first) / t_evokedSet.info.sfreq;
-    float tstep = 1/t_evokedSet.info.sfreq;
+    float tmin = ((float)t_fiffEvoked.first) / t_fiffEvoked.info.sfreq;
+    float tstep = 1/t_fiffEvoked.info.sfreq;
 
     QList<VectorXi> t_qListVertices;
     for(qint32 h = 0; h < inv.src.hemispheres.size(); ++h)

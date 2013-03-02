@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include <fiff/fiff_cov.h>
+#include <fiff/fiff_evoked.h>
 #include <mne/mne.h>
 #include <inverse/sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
@@ -103,37 +104,14 @@ int main(int argc, char *argv[])
 
     // Load data
     fiff_int_t setno = 0;
-    FiffEvokedDataSet evokedSet(t_fileEvoked, setno);
+    FiffEvoked evoked(t_fileEvoked, setno);
 
-    // ToDo
-//    std::cout << "evokedSet:\n" << evokedSet.evoked[0]->epochs.block(0,0,10,10);
+    MNEForwardSolution t_forwardMeeg(t_fileFwdMeeg, false, true);
 
-    MNEForwardSolution t_forwardMeeg(t_fileFwdMeeg, false, true); //OK - inconsistend with mne-python when reading with surf_ori = true
-
-
-//    QFile file("D:/Users/Christoph/Desktop/sol_data.txt");
-//    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-//        return 1;
-
-//    double v = 0;
-//    qint32 row = 0;
-//    while (!file.atEnd()) {
-//        QString line = file.readLine();
-//        QStringList t_qListEntries = line.split(" ");
-
-//        for(qint32 j = 0; j < t_qListEntries.size(); ++j)
-//        {
-//            v = t_qListEntries[j].toDouble();
-//            t_forwardMeeg.sol->data(row,j) = v;
-//        }
-//        ++row;
-//    }
-//    file.close();
-
-    FiffCov noise_cov(t_fileCov); //OK
+    FiffCov noise_cov(t_fileCov);
 
     // regularize noise covariance
-    noise_cov = noise_cov.regularize(evokedSet.info, 0.05, 0.05, 0.1, true); //OK
+    noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
 
     // Restrict forward solution as necessary for MEG
     MNEForwardSolution t_forwardMeg = t_forwardMeeg.pick_types(true, false);
@@ -141,7 +119,7 @@ int main(int argc, char *argv[])
     MNEForwardSolution t_forwardEeg(t_fileFwdEeg, false, true);
 
     // make an M/EEG, MEG-only, and EEG-only inverse operators
-    FiffInfo info = evokedSet.info;
+    FiffInfo info = evoked.info;
 
     MNEInverseOperator inverse_operator_meeg = MNEInverseOperator::make_inverse_operator(info, t_forwardMeeg, noise_cov, 0.2, 0.8);
     MNEInverseOperator inverse_operator_meg = MNEInverseOperator::make_inverse_operator(info, t_forwardMeg, noise_cov, 0.2, 0.8);
@@ -150,17 +128,17 @@ int main(int argc, char *argv[])
     // Compute inverse solution
     MinimumNorm minimumNorm_meeg(inverse_operator_meeg, lambda2, method);
     SourceEstimate sourceEstimate_meeg;
-    if(!minimumNorm_meeg.calculateInverse(evokedSet, sourceEstimate_meeg))
+    if(!minimumNorm_meeg.calculateInverse(evoked, sourceEstimate_meeg))
         return 1;
 
     MinimumNorm minimumNorm_meg(inverse_operator_meg, lambda2, method);
     SourceEstimate sourceEstimate_meg;
-    if(!minimumNorm_meg.calculateInverse(evokedSet, sourceEstimate_meg))
+    if(!minimumNorm_meg.calculateInverse(evoked, sourceEstimate_meg))
         return 1;
 
     MinimumNorm minimumNorm_eeg(inverse_operator_eeg, lambda2, method);
     SourceEstimate sourceEstimate_eeg;
-    if(!minimumNorm_eeg.calculateInverse(evokedSet, sourceEstimate_eeg))
+    if(!minimumNorm_eeg.calculateInverse(evoked, sourceEstimate_eeg))
         return 1;
 
     // View activation time-series
