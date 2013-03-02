@@ -183,6 +183,19 @@ public:
 
     //=========================================================================================================
     /**
+    * Helper to get all evoked entries
+    *
+    * @param[in] evoked_node    evoked tree nodes
+    * @param[out] comments      found comments
+    * @param[out] aspect_kinds  found aspect_kinds
+    * @param[out] t             text formatted found information
+    *
+    * @return true if information is available, fasle otherwise
+    */
+    bool get_evoked_entries(const QList<FiffDirTree> &evoked_node, QStringList &comments, QList<fiff_int_t> &aspect_kinds, QString &t);
+
+    //=========================================================================================================
+    /**
     * QFile::open
     *
     * unmask base class open function

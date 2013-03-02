@@ -105,6 +105,8 @@ int main(int argc, char *argv[])
     // Load data
     fiff_int_t setno = 0;
     FiffEvoked evoked(t_fileEvoked, setno);
+    if(evoked.isEmpty())
+        return 1;
 
     MNEForwardSolution t_forwardMeeg(t_fileFwdMeeg, false, true);
 
@@ -121,9 +123,9 @@ int main(int argc, char *argv[])
     // make an M/EEG, MEG-only, and EEG-only inverse operators
     FiffInfo info = evoked.info;
 
-    MNEInverseOperator inverse_operator_meeg = MNEInverseOperator::make_inverse_operator(info, t_forwardMeeg, noise_cov, 0.2, 0.8);
-    MNEInverseOperator inverse_operator_meg = MNEInverseOperator::make_inverse_operator(info, t_forwardMeg, noise_cov, 0.2, 0.8);
-    MNEInverseOperator inverse_operator_eeg = MNEInverseOperator::make_inverse_operator(info, t_forwardEeg, noise_cov, 0.2, 0.8);
+    MNEInverseOperator inverse_operator_meeg = MNEInverseOperator::make_inverse_operator(info, t_forwardMeeg, noise_cov, 0.2f, 0.8f);
+    MNEInverseOperator inverse_operator_meg = MNEInverseOperator::make_inverse_operator(info, t_forwardMeg, noise_cov, 0.2f, 0.8f);
+    MNEInverseOperator inverse_operator_eeg = MNEInverseOperator::make_inverse_operator(info, t_forwardEeg, noise_cov, 0.2f, 0.8f);
 
     // Compute inverse solution
     MinimumNorm minimumNorm_meeg(inverse_operator_meeg, lambda2, method);

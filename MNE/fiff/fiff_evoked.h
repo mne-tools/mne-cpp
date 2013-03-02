@@ -101,9 +101,9 @@ public:
     * Constructs fiff evoked data, by reading from a IO device.
     *
     * @param[in] p_IODevice     IO device to read from the evoked data set.
-    * @param[in] setno          The set to pick.
+    * @param[in] setno          The set to pick. Dataset ID number (int) or comment/name (str). Optional if there isonly one data set in file.
     */
-    FiffEvoked(QIODevice& p_IODevice, fiff_int_t setno);
+    FiffEvoked(QIODevice& p_IODevice, QVariant setno);
 
     //=========================================================================================================
     /**
@@ -124,6 +124,23 @@ public:
     * Initializes fiff evoked data.
     */
     void clear();
+
+    //=========================================================================================================
+    /**
+    * Provides the python Evoked string formatted aspect_kind, which is stored in kind:
+    * "average" <-> FIFFV_ASPECT_AVERAGE, "standard_error" <-> FIFFV_ASPECT_STD_ERR or "unknown"
+    *
+    * @return string formatted aspect_kind
+    */
+    inline QString aspectKindToString();
+
+    //=========================================================================================================
+    /**
+    * Returns whether FiffEvoked is empty.
+    *
+    * @return true if is empty, false otherwise
+    */
+    inline bool isEmpty();
 
     //=========================================================================================================
     /**
@@ -152,19 +169,19 @@ public:
     *
     * @param[in] p_IODevice     An fiff IO device like a fiff QFile or QTCPSocket
     * @param[out] p_FiffEvoked  The read evoked data
-    * @param[in] setno          the set to pick (optional, default = 0)
+    * @param[in] setno          the set to pick. Dataset ID number (int) or comment/name (str). Optional if there isonly one data set in file.
     * @param[in] proj           Apply SSP projection vectors (optional, default = true)
+    * @param[in] p_aspect_kind  Either "FIFFV_ASPECT_AVERAGE" or "FIFFV_ASPECT_STD_ERR". The type of data to read. Only used if "setno" is a str.
     *
     * @return the CTF software compensation data
     */
-    static bool read_evoked(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, fiff_int_t setno = 0, bool proj = true);
+    static bool read_evoked(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant setno = 0, bool proj = true, fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE);
 
 public:
     FiffInfo    info;           /**< Measurement info. */
     QStringList ch_names;       /**< List of channels' names. */
     fiff_int_t  nave;           /**< Number of averaged epochs. */
-    fiff_int_t  aspect_kind;    /**< Aspect identifier */
-    QString     kind_stat;      /**< Type of data, either average or standard_error. */
+    fiff_int_t  aspect_kind;    /**< Aspect identifier, either FIFFV_ASPECT_AVERAGE or FIFFV_ASPECT_STD_ERR.  */
     fiff_int_t  first;          /**< First time sample. */
     fiff_int_t  last;           /**< Last time sample. */
     QString     comment;        /**< Comment on dataset. Can be the condition. */
@@ -172,6 +189,30 @@ public:
     MatrixXd    data;           /**< 2D array of shape [n_channels x n_times]; Evoked response. */
     MatrixXd    proj;           /**< SSP projection */
 };
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline QString FiffEvoked::aspectKindToString()
+{
+    if(aspect_kind == FIFFV_ASPECT_AVERAGE)
+        return QString("average");
+    else if(aspect_kind == FIFFV_ASPECT_STD_ERR)
+        return QString("standard_error");
+    else
+        return QString("unknown");
+}
+
+
+//*************************************************************************************************************
+
+inline bool FiffEvoked::isEmpty()
+{
+    return nave == -1;
+}
 
 } // NAMESPACE
 
