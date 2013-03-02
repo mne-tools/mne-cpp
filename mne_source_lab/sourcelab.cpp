@@ -60,7 +60,7 @@ SourceLab::SourceLab(QObject *parent)
     Annotation t_RHAnnotation("./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
 
 //    MNEForwardSolution t_FwdClustered;
-//    m_pFwd->cluster_forward_solution(t_FwdClustered, t_LHAnnotation, t_RHAnnotation, 40);
+//    t_FwdClustered = m_pFwd->cluster_forward_solution(t_LHAnnotation, t_RHAnnotation, 40);
 
     qRegisterMetaType<MatrixXf>("MatrixXf");
     qRegisterMetaType<MNEInverseOperator>("MNEInverseOperator");

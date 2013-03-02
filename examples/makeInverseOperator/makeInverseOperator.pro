@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    Builds an example for making an inverse operator
+# @brief    Builds example for making an inverse operator
 #
 #--------------------------------------------------------------------------------------------------------------
 

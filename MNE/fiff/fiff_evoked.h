@@ -78,7 +78,6 @@ namespace FIFFLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
 using namespace Eigen;
 
 
