@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    ToDo Documentation...
+# @brief    Builds example for computing an inverse source estimation
 #
 #--------------------------------------------------------------------------------------------------------------
 

@@ -173,14 +173,13 @@ public:
     * Cluster the forward solution and stores the result to p_fwdOut.
     * The clustering is done by using the provided annotations
     *
-    * @param[out] p_fwdOut          clustered MNE forward solution
     * @param[in] p_LHAnnotation     Annotation of the left hemisphere
     * @param[in] p_RHAnnotation     Annotation of the right hemisphere
     * @param[in] p_iClusterSize     Maximal cluster size per roi
     *
-    * @return true if succeeded, false otherwise
+    * @return clustered MNE forward solution
     */
-    bool cluster_forward_solution(MNEForwardSolution &p_fwdOut, const Annotation &p_LHAnnotation, const Annotation &p_RHAnnotation, qint32 p_iClusterSize);
+    MNEForwardSolution cluster_forward_solution(const Annotation &p_LHAnnotation, const Annotation &p_RHAnnotation, qint32 p_iClusterSize);
 
     //=========================================================================================================
     /**

@@ -39,11 +39,14 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <fs/annotation.h>
+#include <fiff/fiff_evoked.h>
+#include <mne/mne.h>
+#include <inverse/sourceestimate.h>
+#include <inverse/minimumNorm/minimumnorm.h>
+
 #include <iostream>
 #include <vector>
-
-#include <mne/mne.h>
-#include <fs/annotation.h>
 
 
 //*************************************************************************************************************
@@ -64,6 +67,8 @@
 
 using namespace MNELIB;
 using namespace FSLIB;
+using namespace FIFFLIB;
+using namespace INVERSELIB;
 
 
 //*************************************************************************************************************
@@ -85,13 +90,56 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
 
     QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+
+    double snr = 3.0;
+    double lambda2 = 1.0 / pow(snr, 2);
+    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
+
+    // Load data
+    fiff_int_t setno = 0;
+    QPair<QVariant, QVariant> baseline(QVariant(), 0);
+    FiffEvoked evoked(t_fileEvoked, setno, baseline);
+    if(evoked.isEmpty())
+        return 1;
 
     MNEForwardSolution t_Fwd(t_fileFwd);
+    if(t_Fwd.isEmpty())
+        return 1;
 
-    if(t_Fwd.source_ori == -1)
-        return -1;
+    Annotation t_LHAnnotation("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot");
+    Annotation t_RHAnnotation("./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
 
-    qDebug() << "ToDo....\n";
+    FiffCov noise_cov(t_fileCov);
+
+    // regularize noise covariance
+    noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
+
+    //
+    // Cluster forward solution;
+    //
+    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_LHAnnotation, t_RHAnnotation, 40);
+
+    //
+    // make an inverse operators
+    //
+    FiffInfo info = evoked.info;
+
+    MNEInverseOperator inverse_operator = MNEInverseOperator::make_inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
+
+    //
+    // Compute inverse solution
+    //
+    MinimumNorm minimumNorm(inverse_operator, lambda2, method);
+    SourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
+
+    if(sourceEstimate.isEmpty())
+        return 1;
+
+    // View activation time-series
+    std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
+    std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
 
     return a.exec();
 }

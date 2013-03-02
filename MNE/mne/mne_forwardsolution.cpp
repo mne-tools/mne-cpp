@@ -161,9 +161,9 @@ void MNEForwardSolution::clear()
 
 //*************************************************************************************************************
 
-bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution &p_fwdOut, const Annotation &p_LHAnnotation, const Annotation &p_RHAnnotation, qint32 p_iClusterSize)
+MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const Annotation &p_LHAnnotation, const Annotation &p_RHAnnotation, qint32 p_iClusterSize)
 {
-    p_fwdOut = MNEForwardSolution(*this);
+    MNEForwardSolution p_fwdOut = MNEForwardSolution(*this);
 
     QList<Annotation> t_listAnnotation;
     t_listAnnotation.append(p_LHAnnotation);
@@ -425,7 +425,7 @@ bool MNEForwardSolution::cluster_forward_solution(MNEForwardSolution &p_fwdOut, 
 
     p_fwdOut.isClustered = true;
 
-    return true;
+    return p_fwdOut;
 }
 
 
