@@ -140,6 +140,68 @@ void FiffStream::finish_writing_raw()
 
 //*************************************************************************************************************
 
+bool FiffStream::get_evoked_entries(const QList<FiffDirTree> &evoked_node, QStringList &comments, QList<fiff_int_t> &aspect_kinds, QString &t)
+{
+    comments.clear();
+    aspect_kinds.clear();
+    QList<FiffDirTree>::ConstIterator ev;
+
+    FiffTag* t_pTag = NULL;
+    qint32 kind, pos, k;
+
+    for(ev = evoked_node.begin(); ev != evoked_node.end(); ++ev)
+    {
+        for(k = 0; k < ev->nent; ++k)
+        {
+            kind = ev->dir[k].kind;
+            pos = ev->dir[k].pos;
+            if (kind == FIFF_COMMENT)
+            {
+                FiffTag::read_tag(this,t_pTag,pos);
+                comments.append(t_pTag->toString());
+            }
+        }
+        FiffDirTree my_aspect = ev->dir_tree_find(FIFFB_ASPECT)[0];
+        for(k = 0; k < my_aspect.nent; ++k)
+        {
+            kind = my_aspect.dir[k].kind;
+            pos = my_aspect.dir[k].pos;
+            if (kind == FIFF_ASPECT_KIND)
+            {
+                FiffTag::read_tag(this,t_pTag,pos);
+                aspect_kinds.append(*t_pTag->toInt());
+            }
+        }
+    }
+
+    //garbage collection
+    if(t_pTag)
+        delete t_pTag;
+
+    if(comments.size() != aspect_kinds.size() || comments.size() == 0)
+    {
+        qWarning("Dataset names in FIF file could not be found.");
+        return false;
+    }
+
+    t = QString();
+    for(k = 0; k < aspect_kinds.size(); ++k)
+    {
+        t += QString("%1 - \"%2\" (").arg(k).arg(comments[k]);
+        if(aspect_kinds[k] == FIFFV_ASPECT_AVERAGE)
+            t += QString("FIFFV_ASPECT_AVERAGE)\n");
+        else if(aspect_kinds[k] == FIFFV_ASPECT_STD_ERR)
+            t += QString("FIFFV_ASPECT_STD_ERR)\n");
+        else
+            t += QString("unknown)\n");
+    }
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
 bool FiffStream::open(FiffDirTree& p_Tree, QList<FiffDirEntry>& p_Dir)
 {
     QString t_sFileName = this->streamName();

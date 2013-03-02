@@ -71,7 +71,7 @@ FiffEvoked::FiffEvoked()
 
 //*************************************************************************************************************
 
-FiffEvoked::FiffEvoked(QIODevice& p_IODevice, fiff_int_t setno)
+FiffEvoked::FiffEvoked(QIODevice& p_IODevice, QVariant setno)
 {
     if(!FiffEvoked::read_evoked(p_IODevice, *this, setno))
     {
@@ -88,7 +88,6 @@ FiffEvoked::FiffEvoked(const FiffEvoked& p_FiffEvoked)
 , ch_names(p_FiffEvoked.ch_names)
 , nave(p_FiffEvoked.nave)
 , aspect_kind(p_FiffEvoked.aspect_kind)
-, kind_stat(p_FiffEvoked.kind_stat)
 , first(p_FiffEvoked.first)
 , last(p_FiffEvoked.last)
 , comment(p_FiffEvoked.comment)
@@ -116,7 +115,6 @@ void FiffEvoked::clear()
     ch_names.clear();
     nave = -1;
     aspect_kind = -1;
-    kind_stat = QString("");
     first = -1;
     last = -1;
     comment = QString("");
@@ -165,15 +163,10 @@ FiffEvoked FiffEvoked::pick_channels(const QStringList& include, const QStringLi
 
 //*************************************************************************************************************
 
-bool FiffEvoked::read_evoked(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, fiff_int_t setno, bool proj)
+bool FiffEvoked::read_evoked(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant setno, bool proj, fiff_int_t p_aspect_kind)
 {
     p_FiffEvoked.clear();
 
-    if (setno < 0)
-    {
-        qWarning("Data set selector must be positive\n");
-        return false;
-    }
     //
     //   Open the file
     //
@@ -220,50 +213,64 @@ bool FiffEvoked::read_evoked(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, fi
     }
 
     // convert setno to an integer
-    // -> Done at the beginning
-//    //
-//    //   Identify the aspects
-//    //
-//    fiff_int_t naspect = 0;
-//    fiff_int_t nsaspects = 0;
-//    qint32 oldsize = 0;
-//    MatrixXi is_smsh(1,0);
-//    QList< QList<FiffDirTree> > sets_aspects;
-//    QList< qint32 > sets_naspect;
-//    QList<FiffDirTree> saspects;
-//    qint32 k;
-//    for (k = 0; k < evoked.size(); ++k)
-//    {
-////            sets(k).aspects = fiff_dir_tree_find(evoked(k),FIFF.FIFFB_ASPECT);
-////            sets(k).naspect = length(sets(k).aspects);
+    if(!setno.isValid())
+    {
+        if (evoked_node.size() > 1)
+        {
+            QStringList comments;
+            QList<fiff_int_t> aspect_kinds;
+            QString t;
+            if(!t_pStream->get_evoked_entries(evoked_node, comments, aspect_kinds, t))
+                t = QString("None found, must use integer");
+            if(t_pStream)
+                delete t_pStream;
+            qWarning("%d datasets present, setno parameter must be set. Candidate setno names:\n%s", evoked_node.size(), t.toLatin1().constData());
+            return false;
+        }
+        else
+            setno = 0;
+    }
+    else
+    {
+        // find string-based entry
+        bool t_bIsInteger = true;
+        setno.toInt(&t_bIsInteger);
+        if(!t_bIsInteger)
+        {
+            if(p_aspect_kind != FIFFV_ASPECT_AVERAGE && p_aspect_kind != FIFFV_ASPECT_STD_ERR)
+            {
+                if(t_pStream)
+                    delete t_pStream;
+                qWarning("kindStat must be \"FIFFV_ASPECT_AVERAGE\" or \"FIFFV_ASPECT_STD_ERR\"");
+                return false;
+            }
 
-//        sets_aspects.append(evoked[k].dir_tree_find(FIFFB_ASPECT));
-//        sets_naspect.append(sets_aspects[k].size());
+            QStringList comments;
+            QList<fiff_int_t> aspect_kinds;
+            QString t;
+            t_pStream->get_evoked_entries(evoked_node, comments, aspect_kinds, t);
 
-//        if (sets_naspect[k] > 0)
-//        {
-//            oldsize = is_smsh.cols();
-//            is_smsh.conservativeResize(1, oldsize + sets_naspect[k]);
-//            is_smsh.block(0, oldsize, 1, sets_naspect[k]) = MatrixXi::Zero(1, sets_naspect[k]);
-//            naspect += sets_naspect[k];
-//        }
-//        saspects  = evoked[k].dir_tree_find(FIFFB_SMSH_ASPECT);
-//        nsaspects = saspects.size();
-//        if (nsaspects > 0)
-//        {
-//            sets_naspect[k] += nsaspects;
-//            sets_aspects[k].append(saspects);
+            bool found = false;
+            for(qint32 i = 0; i < comments.size(); ++i)
+            {
+                if(comments[i].compare(setno.toString()) == 0 && p_aspect_kind == aspect_kinds[i])
+                {
+                    setno = i;
+                    found = true;
+                    break;
+                }
+            }
+            if(!found)
+            {
+                if(t_pStream)
+                    delete t_pStream;
+                qWarning() << "setno " << setno << " (" << p_aspect_kind << ") not found, out of found datasets:\n " << t;
+                return false;
+            }
+        }
+    }
 
-//            oldsize = is_smsh.cols();
-//            is_smsh.conservativeResize(1, oldsize + sets_naspect[k]);
-//            is_smsh.block(0, oldsize, 1, sets_naspect[k]) = MatrixXi::Ones(1, sets_naspect[k]);
-//            naspect += nsaspects;
-//        }
-//    }
-//    printf("\t%d evoked data sets containing a total of %d data aspects in %s\n",evoked.size(),naspect,t_sFileName.toUtf8().constData());
-
-
-    if (setno >= evoked_node.size() || setno < 0)
+    if (setno.toInt() >= evoked_node.size() || setno.toInt() < 0)
     {
         if(t_pStream)
             delete t_pStream;
@@ -271,7 +278,7 @@ bool FiffEvoked::read_evoked(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, fi
         return false;
     }
 
-    FiffDirTree my_evoked = evoked_node[setno];
+    FiffDirTree my_evoked = evoked_node[setno.toInt()];
 
     //
     //   Identify the aspects
@@ -493,12 +500,6 @@ bool FiffEvoked::read_evoked(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, fi
     p_FiffEvoked.info = info;
     p_FiffEvoked.nave = nave;
     p_FiffEvoked.aspect_kind = aspect_kind;
-    if(aspect_kind == FIFFV_ASPECT_AVERAGE)
-        p_FiffEvoked.kind_stat = QString("Average");
-    else if(aspect_kind == FIFFV_ASPECT_STD_ERR)
-        p_FiffEvoked.kind_stat = QString("standard_error");
-    else
-        p_FiffEvoked.kind_stat = QString("Unknown");
     p_FiffEvoked.first = first;
     p_FiffEvoked.last = last;
     p_FiffEvoked.comment = comment;
@@ -506,6 +507,8 @@ bool FiffEvoked::read_evoked(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, fi
     p_FiffEvoked.data = all_data;
 
     //Garbage collecting
+    if(t_pTag)
+        delete t_pTag;
     if(t_pStream)
         delete t_pStream;
 
