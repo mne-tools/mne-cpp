@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include "mne_global.h"
+#include "mne_cluster_info.h"
 
 
 //*************************************************************************************************************
@@ -133,6 +134,14 @@ public:
 
     //=========================================================================================================
     /**
+    * is hemisphere clustered?
+    *
+    * @return true if hemisphere is clustered, false otherwise.
+    */
+    inline bool isClustered() const;
+
+    //=========================================================================================================
+    /**
     * mne_transform_source_space_to
     *
     * ### MNE toolbox root function ###
@@ -189,15 +198,22 @@ public:
     MatrixX3d use_tri_nn;       /**< Triangle normals of used triangles */
     VectorXd use_tri_area;      /**< Triangle areas of used triangles */
 
-    QList<VectorXi> cluster_vertnos;    /**< Only used within clustered forward solutions */
-    QList<VectorXd> cluster_distances;  /**< Distances to clusters centroid. */
-
+    MNEClusterInfo cluster_info; /**< Holds the cluster information. */
 private:
     // Newly added
     MatrixXf m_TriCoords; /**< Holds the rr tri Matrix transformed to geometry data. */
 
 };
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline bool MNEHemisphere::isClustered() const
+{
+    return !cluster_info.isEmpty();
+}
 
 } // NAMESPACE
 
