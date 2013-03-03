@@ -40,6 +40,12 @@
 
 #include "mne_forwardsolution.h"
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FIFF INCLUDES
+//=============================================================================================================
+
 #include <fs/colortable.h>
 #include <mneMath/mnemath.h>
 #include <mneMath/kmeans.h>
@@ -80,7 +86,6 @@ MNEForwardSolution::MNEForwardSolution()
 //, src(NULL)
 , source_rr(MatrixX3d::Zero(0,3))
 , source_nn(MatrixX3d::Zero(0,3))
-, isClustered(false)
 {
 
 }
@@ -100,7 +105,6 @@ MNEForwardSolution::MNEForwardSolution(QIODevice &p_IODevice, bool force_fixed, 
 //, src(NULL)
 , source_rr(MatrixX3d::Zero(0,3))
 , source_nn(MatrixX3d::Zero(0,3))
-, isClustered(false)
 {
     if(!read_forward_solution(p_IODevice, *this, force_fixed, surf_ori, include, exclude, bExcludeBads))
     {
@@ -125,7 +129,6 @@ MNEForwardSolution::MNEForwardSolution(const MNEForwardSolution &p_MNEForwardSol
 , src(p_MNEForwardSolution.src)
 , source_rr(p_MNEForwardSolution.source_rr)
 , source_nn(p_MNEForwardSolution.source_nn)
-, isClustered(p_MNEForwardSolution.isClustered)
 {
 
 }
@@ -155,7 +158,6 @@ void MNEForwardSolution::clear()
     src.clear();
     source_rr = MatrixX3d();
     source_nn = MatrixX3d();
-    isClustered = false;
 }
 
 
@@ -343,8 +345,8 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const Annotation
                             }
                         }
                         clusterIdcs.conservativeResize(nClusterIdcs);
-                        p_fwdOut.src.hemispheres[h].cluster_vertnos.append(clusterIdcs);
-                        p_fwdOut.src.hemispheres[h].cluster_distances.append(clusterDistance);
+                        p_fwdOut.src.hemispheres[h].cluster_info.cluster_vertnos.append(clusterIdcs);
+                        p_fwdOut.src.hemispheres[h].cluster_info.cluster_distances.append(clusterDistance);
                     }
 
                     //
@@ -391,9 +393,15 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const Annotation
             }
         }
 
+        //
+        // Assemble new hemisphere information
+        //
+
         p_fwdOut.src.hemispheres[h].rr.conservativeResize(count, 3);
         p_fwdOut.src.hemispheres[h].nn.conservativeResize(count, 3);
         p_fwdOut.src.hemispheres[h].vertno.conservativeResize(count);
+
+        p_fwdOut.src.hemispheres[h].cluster_info.orig_vertno = this->src.hemispheres[h].vertno;
 
         p_fwdOut.src.hemispheres[h].nuse_tri = 0;
         p_fwdOut.src.hemispheres[h].use_tris = MatrixX3i(0,3);
@@ -417,13 +425,14 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const Annotation
         printf("[done]\n");
     }
 
-    // set new fwd solution;
+    //
+    // Put it all together
+    //
     p_fwdOut.sol->data = t_LF_new;
     p_fwdOut.sol->ncol = t_LF_new.cols();
 
     p_fwdOut.nsource = p_fwdOut.sol->ncol/3;
 
-    p_fwdOut.isClustered = true;
 
     return p_fwdOut;
 }

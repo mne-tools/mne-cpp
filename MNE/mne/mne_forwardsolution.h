@@ -37,35 +37,28 @@
 #ifndef MNE_FORWARDSOLUTION_H
 #define MNE_FORWARDSOLUTION_H
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "mne_global.h"
+#include "mne_sourcespace.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FIFF INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_coord_trans.h>
-#include <fiff/fiff_types.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FS INCLUDES
-//=============================================================================================================
+#include <mneMath/mnemath.h>
 
 #include <fs/annotation.h>
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MNE INCLUDES
-//=============================================================================================================
-
-#include "mne_global.h"
-#include "mne_sourcespace.h"
-
+#include <fiff/fiff_constants.h>
+#include <fiff/fiff_coord_trans.h>
+#include <fiff/fiff_types.h>
 #include <fiff/fiff_info_base.h>
-#include <mneMath/mnemath.h>
 
 
 //*************************************************************************************************************
@@ -93,6 +86,7 @@
 //=============================================================================================================
 
 #include <QFile>
+#include <QSharedPointer>
 #include <QDataStream>
 
 
@@ -206,6 +200,14 @@ public:
     * @return the depth prior
     */
     static FiffCov compute_depth_prior(const MatrixXd &Gain, const FiffInfo &gain_info, bool is_fixed_ori, double exp = 0.8, double limit = 10.0, MatrixXd &patch_areas = defaultMatrixXd, bool limit_depth_chs = false);
+
+    //=========================================================================================================
+    /**
+    * Indicates whether fwd conatins a clustered forward solution.
+    *
+    * @return true if forward solution is clustered, false otherwise.
+    */
+    inline bool isClustered() const;
 
     //=========================================================================================================
     /**
@@ -395,14 +397,20 @@ public:
     MNESourceSpace src;                 /**< Geomertic description of the source spaces (hemispheres) */
     MatrixX3d source_rr;                /**< Source locations */
     MatrixX3d source_nn;                /**< Source normals (number depends on fixed or free orientation) */
-
-    bool isClustered;   /**< Indicates whether fwd conatins a clustered forward solution. */
 };
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+inline bool MNEForwardSolution::isClustered() const
+{
+    return src.hemispheres[0].isClustered();
+}
+
+
+//*************************************************************************************************************
 
 inline bool MNEForwardSolution::isEmpty() const
 {

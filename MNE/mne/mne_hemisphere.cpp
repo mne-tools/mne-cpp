@@ -113,8 +113,7 @@ MNEHemisphere::MNEHemisphere(const MNEHemisphere& p_MNEHemisphere)
 , use_tri_nn(p_MNEHemisphere.use_tri_nn)
 , use_tri_area(p_MNEHemisphere.use_tri_area)
 , m_TriCoords(p_MNEHemisphere.m_TriCoords)
-, cluster_vertnos(p_MNEHemisphere.cluster_vertnos)
-, cluster_distances(p_MNEHemisphere.cluster_distances)
+, cluster_info(p_MNEHemisphere.cluster_info)
 {
     //*m_pGeometryData = *p_MNEHemisphere.m_pGeometryData;
 }
@@ -157,13 +156,10 @@ void MNEHemisphere::clear()
     use_tri_nn = MatrixX3d::Zero(0,3);
     use_tri_area = VectorXd::Zero(0);
 
-    cluster_vertnos.clear();
-    cluster_distances.clear();
+    cluster_info.clear();
 
     m_TriCoords = MatrixXf();
 }
-
-
 
 
 //*************************************************************************************************************
