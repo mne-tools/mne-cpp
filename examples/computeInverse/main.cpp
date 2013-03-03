@@ -49,8 +49,7 @@
 // MNE INCLUDES
 //=============================================================================================================
 
-//#include <fiff/fiff.h>
-#include <fiff/fiff_evoked_data_set.h>
+#include <fiff/fiff_evoked_set.h>
 #include <mne/mne.h>
 
 
@@ -99,7 +98,6 @@ int main(int argc, char *argv[])
 //  dSPM        - do dSPM?
 //  sLORETA     - do sLORETA?
     QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    qint32 setno = 0;
     QFile t_fileInv("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif");
     qint32 nave = 40;
     float snr = 3.0f;
@@ -110,7 +108,7 @@ int main(int argc, char *argv[])
     //
     //   Read the data first
     //
-    FiffEvokedDataSet evokedSet(t_fileEvoked, setno);
+    FiffEvokedSet evokedSet(t_fileEvoked);
 
     //
     //   Then the inverse operator
@@ -118,102 +116,102 @@ int main(int argc, char *argv[])
     MNEInverseOperator inv_raw(t_fileInv);
 
     //
-    //   Set up the inverse according to the parameters
+    //   Iterate over found data sets
     //
-    if (nave < 0)
-        nave = evokedSet.evoked[0]->nave;
-
-    MNEInverseOperator inv = inv_raw.prepare_inverse_operator(nave,lambda2,dSPM,sLORETA);
-    //
-    //   Pick the correct channels from the data
-    //
-    FiffEvokedDataSet newEvokedSet = evokedSet.pick_channels(inv.noise_cov->names);
-
-    evokedSet = newEvokedSet;
-
-    printf("Picked %d channels from the data\n",evokedSet.info.nchan);
-    printf("Computing inverse...");
-    //
-    //   Simple matrix multiplication followed by combination of the
-    //   three current components
-    //
-    //   This does all the data transformations to compute the weights for the
-    //   eigenleads
-    //
-    SparseMatrix<double> reginv(inv.reginv.rows(),inv.reginv.rows());
-
-    // put this in the MNE algorithm class derived from inverse algorithm
-    //ToDo put this into a function of inv data
-    qint32 i;
-    for(i = 0; i < inv.reginv.rows(); ++i)
-        reginv.insert(i,i) = inv.reginv(i,0);
-    MatrixXd trans = reginv*inv.eigen_fields->data*inv.whitener*inv.proj*evokedSet.evoked[0]->epochs;
-    //
-    //   Transformation into current distributions by weighting the eigenleads
-    //   with the weights computed above
-    //
-    MatrixXd sol;
-    if (inv.eigen_leads_weighted)
+    for(qint32 setno = 0; setno < evokedSet.evoked.size(); ++setno)
     {
+        printf(">> Computing inverse for %s data set <<\n", evokedSet.evoked[setno].comment.toLatin1().constData());
         //
-        //     R^0.5 has been already factored in
+        //   Set up the inverse according to the parameters
         //
-        printf("(eigenleads already weighted)...");
-        sol = inv.eigen_leads->data*trans;
-    }
-    else
-    {
-        //
-        //     R^0.5 has to factored in
-        //
-       printf("(eigenleads need to be weighted)...");
+        if (nave < 0)
+            nave = evokedSet.evoked[setno].nave;
 
-       SparseMatrix<double> sourceCov(inv.source_cov->data.rows(),inv.source_cov->data.rows());
-       for(i = 0; i < inv.source_cov->data.rows(); ++i)
-           sourceCov.insert(i,i) = sqrt(inv.source_cov->data(i,0));
+        MNEInverseOperator inv = inv_raw.prepare_inverse_operator(nave,lambda2,dSPM,sLORETA);
+        //
+        //   Pick the correct channels from the data
+        //
+        FiffEvokedSet newEvokedSet = evokedSet.pick_channels(inv.noise_cov->names);
 
-       sol   = sourceCov*inv.eigen_leads->data*trans;
-    }
+        evokedSet = newEvokedSet;
 
-    if (inv.source_ori == FIFFV_MNE_FREE_ORI)
-    {
-        printf("combining the current components...");
-        MatrixXd sol1(sol.rows()/3,sol.cols());
-        for(i = 0; i < sol.cols(); ++i)
+        printf("Picked %d channels from the data\n",evokedSet.info.nchan);
+        printf("Computing inverse...");
+        //
+        //   Simple matrix multiplication followed by combination of the
+        //   three current components
+        //
+        //   This does all the data transformations to compute the weights for the
+        //   eigenleads
+        //
+        SparseMatrix<double> reginv(inv.reginv.rows(),inv.reginv.rows());
+        // put this in the MNE algorithm class derived from inverse algorithm
+        //ToDo put this into a function of inv data
+        qint32 i;
+        for(i = 0; i < inv.reginv.rows(); ++i)
+            reginv.insert(i,i) = inv.reginv(i,0);
+
+        MatrixXd trans = reginv*inv.eigen_fields->data*inv.whitener*inv.proj*evokedSet.evoked[setno].data;
+        //
+        //   Transformation into current distributions by weighting the eigenleads
+        //   with the weights computed above
+        //
+        MatrixXd sol;
+        if (inv.eigen_leads_weighted)
         {
-            VectorXd* tmp = MNE::combine_xyz(sol.block(0,i,sol.rows(),1));
-            sol1.block(0,i,sol.rows()/3,1) = tmp->cwiseSqrt();
-            delete tmp;
+            //
+            //     R^0.5 has been already factored in
+            //
+            printf("(eigenleads already weighted)...");
+            sol = inv.eigen_leads->data*trans;
         }
-        sol.resize(sol1.rows(),sol1.cols());
-        sol = sol1;
-    }
-    if (dSPM)
-    {
-        printf("(dSPM)...");
-        sol = inv.noisenorm*sol;
-    }
-    else if (sLORETA)
-    {
-        printf("(sLORETA)...");
-        sol = inv.noisenorm*sol;
-    }
-    printf("[done]\n");
+        else
+        {
+            //
+            //     R^0.5 has to factored in
+            //
+           printf("(eigenleads need to be weighted)...");
 
-    //Results
-//    inv;
-//    sol2;
-    float tmin = ((float)evokedSet.evoked[0]->first) / evokedSet.info.sfreq;
-    float tstep = 1/evokedSet.info.sfreq;
+           SparseMatrix<double> sourceCov(inv.source_cov->data.rows(),inv.source_cov->data.rows());
+           for(i = 0; i < inv.source_cov->data.rows(); ++i)
+               sourceCov.insert(i,i) = sqrt(inv.source_cov->data(i,0));
 
-    std::cout << std::endl << "part ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << sol.block(0,0,10,10) << std::endl;
-    printf("tmin = %f s\n", tmin);
-    printf("tstep = %f s\n", tstep);
+           sol   = sourceCov*inv.eigen_leads->data*trans;
+        }
+
+        if (inv.source_ori == FIFFV_MNE_FREE_ORI)
+        {
+            printf("combining the current components...");
+            MatrixXd sol1(sol.rows()/3,sol.cols());
+            for(i = 0; i < sol.cols(); ++i)
+            {
+                VectorXd* tmp = MNE::combine_xyz(sol.block(0,i,sol.rows(),1));
+                sol1.block(0,i,sol.rows()/3,1) = tmp->cwiseSqrt();
+                delete tmp;
+            }
+            sol.resize(sol1.rows(),sol1.cols());
+            sol = sol1;
+        }
+        if (dSPM)
+        {
+            printf("(dSPM)...");
+            sol = inv.noisenorm*sol;
+        }
+        else if (sLORETA)
+        {
+            printf("(sLORETA)...");
+            sol = inv.noisenorm*sol;
+        }
+        printf("[done]\n");
+
+        //Results
+        float tmin = ((float)evokedSet.evoked[setno].first) / evokedSet.info.sfreq;
+        float tstep = 1/evokedSet.info.sfreq;
+
+        std::cout << "\npart ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << sol.block(0,0,10,10) << std::endl;
+        printf("tmin = %f s\n", tmin);
+        printf("tstep = %f s\n", tstep);
+    }
 
     return a.exec();
 }
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STATIC DEFINITIONS
-//=============================================================================================================

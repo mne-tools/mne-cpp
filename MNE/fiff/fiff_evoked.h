@@ -63,6 +63,7 @@
 #include <QString>
 #include <QVariant>
 #include <QPair>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -90,6 +91,8 @@ using namespace Eigen;
 class FIFFSHARED_EXPORT FiffEvoked
 {
 public:
+    typedef QSharedPointer<FiffEvoked> SPtr;            /**< Shared pointer type for FiffEvoked. */
+    typedef QSharedPointer<const FiffEvoked> ConstSPtr; /**< Const shared pointer type for FiffEvoked. */
 
     //=========================================================================================================
     /**
@@ -186,7 +189,7 @@ public:
     *
     * @return true if successful, false otherwise
     */
-    static bool read_evoked(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant setno = 0, QPair<QVariant,QVariant> baseline = QPair<QVariant,QVariant>(), bool proj = true, fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE);
+    static bool read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant setno = 0, QPair<QVariant,QVariant> baseline = QPair<QVariant,QVariant>(), bool proj = true, fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE);
 
 public:
     FiffInfo    info;           /**< Measurement info. */

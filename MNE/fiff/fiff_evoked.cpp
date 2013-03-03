@@ -73,7 +73,7 @@ FiffEvoked::FiffEvoked()
 
 FiffEvoked::FiffEvoked(QIODevice& p_IODevice, QVariant setno, QPair<QVariant,QVariant> baseline, bool proj, fiff_int_t p_aspect_kind)
 {
-    if(!FiffEvoked::read_evoked(p_IODevice, *this, setno, baseline, proj, p_aspect_kind))
+    if(!FiffEvoked::read(p_IODevice, *this, setno, baseline, proj, p_aspect_kind))
     {
         printf("\tFiff evoked data not found.\n");//ToDo Throw here
         return;
@@ -163,7 +163,7 @@ FiffEvoked FiffEvoked::pick_channels(const QStringList& include, const QStringLi
 
 //*************************************************************************************************************
 
-bool FiffEvoked::read_evoked(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant setno, QPair<QVariant,QVariant> baseline, bool proj, fiff_int_t p_aspect_kind)
+bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant setno, QPair<QVariant,QVariant> baseline, bool proj, fiff_int_t p_aspect_kind)
 {
     p_FiffEvoked.clear();
 

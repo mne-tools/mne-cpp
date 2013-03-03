@@ -85,13 +85,13 @@ SOURCES += fiff.cpp \
     fiff_raw_dir.cpp \
     fiff_dig_point.cpp \
     fiff_ch_pos.cpp \
-    fiff_evoked_data_set.cpp \
     fiff_evoked_data.cpp \
     fiff_cov.cpp \
     fiff_stream.cpp \
     fiff_dir_entry.cpp \
     fiff_info_base.cpp \
-    fiff_evoked.cpp
+    fiff_evoked.cpp \
+    fiff_evoked_set.cpp
 
 HEADERS += fiff.h \
     fiff_global.h \
@@ -113,12 +113,12 @@ HEADERS += fiff.h \
     fiff_ch_pos.h \
     fiff_evoked_data.h \
     fiff_evoked_data.h \
-    fiff_evoked_data_set.h \
     fiff_evoked_data.h \
     fiff_cov.h \
     fiff_stream.h \
     fiff_info_base.h \
-    fiff_evoked.h
+    fiff_evoked.h \
+    fiff_evoked_set.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
