@@ -6,8 +6,9 @@ Except the authors of mne-cpp we want to acknowledge:
 People
 ------
 
-  * Prof. Dr.-Ing. habil. Jens Haueisen (Ilmenau University of Technology)
-  * Dr.-Ing. Daniel Güllmar (Jena University Hospital)
+  * Jens Haueisen (Ilmenau University of Technology, Ilmenau, GER)
+  * Yoshio Okada (Childrens Hospital, Boston, USA)
+  * Daniel Güllmar (Jena University Hospital, Jena, GER)
   * ...
 
 Institutions

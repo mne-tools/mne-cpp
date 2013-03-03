@@ -58,7 +58,7 @@
 #include "fiff_raw_data.h"
 #include "fiff_raw_dir.h"
 #include "fiff_stream.h"
-#include "fiff_evoked_data_set.h"
+#include "fiff_evoked_set.h"
 
 
 //*************************************************************************************************************
@@ -319,7 +319,7 @@ public:
     *
     * @return the desired fiff evoked data set
     */
-    inline static FiffEvokedDataSet pick_channels(FiffEvokedDataSet& orig, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList)
+    inline static FiffEvokedSet pick_channels(FiffEvokedSet& orig, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList)
     {
         return orig.pick_channels(include, exclude);
     }
@@ -415,19 +415,39 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Wrapper for the FiffEvokedDataSet::read_evoked static function
+    * Wrapper for the FiffEvoked::read static function
     *
     * Read one evoked data set
     *
     * @param[in] p_IODevice     A fiff IO device like a fiff QFile or QTCPSocket
     * @param[out] data          The read evoked data
     * @param[in] setno          the set to pick
+    * @param[in] baseline       The time interval to apply rescaling / baseline correction. If None do not apply it. If baseline is (a, b)
+    *                           the interval is between "a (s)" and "b (s)". If a is None the beginning of the data is used and if b is
+    *                           None then b is set to the end of the interval. If baseline is equal ot (None, None) all the time interval is used.
+    *                           If None, no correction is applied.
+    * @param[in] proj           Apply SSP projection vectors (optional, default = true)
+    * @param[in] p_aspect_kind  Either "FIFFV_ASPECT_AVERAGE" or "FIFFV_ASPECT_STD_ERR". The type of data to read. Only used if "setno" is a str.
     *
-    * @return the CTF software compensation data
+    * @return true if successful, false otherwise
     */
-    static inline bool read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& data, fiff_int_t setno = 0)
+    static inline bool read_evoked(QIODevice& p_IODevice, FiffEvoked& data, QVariant setno = 0, QPair<QVariant,QVariant> baseline = QPair<QVariant,QVariant>(), bool proj = true, fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE)
     {
-        return FiffEvokedDataSet::read_evoked(p_IODevice, data, setno);
+        return FiffEvoked::read(p_IODevice, data, setno, baseline, proj, p_aspect_kind);
+    }
+
+    //=========================================================================================================
+    /**
+    * Read all evoked data from one file
+    *
+    * @param[in] p_IODevice     A fiff IO device like a fiff QFile or QTCPSocket
+    * @param[out] data          The read evoked data
+    *
+    * @return true if successful, false otherwise
+    */
+    static inline bool read_evoked_set(QIODevice& p_IODevice, FiffEvokedSet& data)
+    {
+        return FiffEvokedSet::read(p_IODevice, data);
     }
 
     //=========================================================================================================

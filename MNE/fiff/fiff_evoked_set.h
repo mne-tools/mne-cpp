@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiff_evoked_data_set.h
+* @file     fiff_evoked_set.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    FiffEvokedDataSet class declaration.
+* @brief    FiffEvokedSet class declaration.
 *
 */
 
-#ifndef FIFF_EVOKED_DATA_SET_H
-#define FIFF_EVOKED_DATA_SET_H
+#ifndef FIFF_EVOKED_SET_H
+#define FIFF_EVOKED_SET_H
 
 
 //*************************************************************************************************************
@@ -42,11 +42,8 @@
 // FIFF INCLUDES
 //=============================================================================================================
 
-#include "fiff_types.h"
 #include "fiff_info.h"
-#include "fiff_evoked_data.h"
-#include "fiff_stream.h"
-#include "fiff_dir_tree.h"
+#include "fiff_evoked.h"
 #include "fiff_global.h"
 
 
@@ -87,45 +84,44 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* Fiff evoked data
+* Fiff evoked data set
 *
-* @brief evoked data
+* @brief evoked data set
 */
-class FIFFSHARED_EXPORT FiffEvokedDataSet
+class FIFFSHARED_EXPORT FiffEvokedSet
 {
 
 public:
-    typedef QSharedPointer<FiffEvokedDataSet> SPtr;             /**< Shared pointer type for FiffEvokedDataSet. */
-    typedef QSharedPointer<const FiffEvokedDataSet> ConstSPtr;  /**< Const shared pointer type for FiffEvokedDataSet. */
+    typedef QSharedPointer<FiffEvokedSet> SPtr;             /**< Shared pointer type for FiffEvokedSet. */
+    typedef QSharedPointer<const FiffEvokedSet> ConstSPtr;  /**< Const shared pointer type for FiffEvokedSet. */
 
     //=========================================================================================================
     /**
     * Constructs a fiff evoked data set.
     */
-    FiffEvokedDataSet();
+    FiffEvokedSet();
 
     //=========================================================================================================
     /**
     * Constructs a fiff evoked data set, by reading from a IO device.
     *
     * @param[in] p_IODevice     IO device to read from the evoked data set.
-    * @param[in] setno          The set to pick.
     */
-    FiffEvokedDataSet(QIODevice& p_IODevice, fiff_int_t setno);
+    FiffEvokedSet(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**
     * Copy constructor.
     *
-    * @param[in] p_FiffEvokedDataSet    Fiff evoked data set which should be copied
+    * @param[in] p_FiffEvokedSet    Fiff evoked data set which should be copied
     */
-    FiffEvokedDataSet(const FiffEvokedDataSet& p_FiffEvokedDataSet);
+    FiffEvokedSet(const FiffEvokedSet& p_FiffEvokedSet);
 
     //=========================================================================================================
     /**
     * Destroys the fiff evoked data set.
     */
-    ~FiffEvokedDataSet();
+    ~FiffEvokedSet();
 
     //=========================================================================================================
     /**
@@ -146,7 +142,7 @@ public:
     *
     * @return the desired fiff evoked data set
     */
-    FiffEvokedDataSet pick_channels(const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
+    FiffEvokedSet pick_channels(const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
 
     //=========================================================================================================
     /**
@@ -158,19 +154,23 @@ public:
     *
     * Read one evoked data set
     *
-    * @param[in] p_IODevice     An fiff IO device like a fiff QFile or QTCPSocket
-    * @param[out] data          The read evoked data
-    * @param[in] setno          the set to pick
+    * @param[in] p_IODevice         An fiff IO device like a fiff QFile or QTCPSocket
+    * @param[out] p_FiffEvokedSet   The read evoked data set
+    * @param[in] baseline           The time interval to apply rescaling / baseline correction. If None do not apply it. If baseline is (a, b)
+    *                               the interval is between "a (s)" and "b (s)". If a is None the beginning of the data is used and if b is
+    *                               None then b is set to the end of the interval. If baseline is equal ot (None, None) all the time interval is used.
+    *                               If None, no correction is applied.
+    * @param[in] proj           Apply SSP projection vectors (optional, default = true)
     *
     * @return true when successful, false otherwise
     */
-    static bool read_evoked(QIODevice& p_IODevice, FiffEvokedDataSet& data, fiff_int_t setno = 0);
+    static bool read(QIODevice& p_IODevice, FiffEvokedSet& p_FiffEvokedSet, QPair<QVariant,QVariant> baseline = QPair<QVariant,QVariant>(), bool proj = true);
 
 public:
-    FiffInfo                        info;   /**< FIFF measurement information */
-    QList<FiffEvokedData::SDPtr>    evoked; /**< List of Fiff Evoked Data */
+    FiffInfo             info;   /**< FIFF measurement information */
+    QList<FiffEvoked>    evoked; /**< List of Fiff Evoked Data */
 };
 
 } // NAMESPACE
 
-#endif // FIFF_EVOKED_DATA_SET_H
+#endif // FIFF_EVOKED_SET_H
