@@ -68,3 +68,11 @@ SourceEstimate RapMusic::calculateInverse() const
 
     return p_SourceEstimate;
 }
+
+
+//*************************************************************************************************************
+
+const char* RapMusic::getName() const
+{
+    return "RAP MUSIC";
+}

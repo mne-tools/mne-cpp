@@ -156,6 +156,14 @@ SourceEstimate MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, boo
 
 //*************************************************************************************************************
 
+const char* MinimumNorm::getName() const
+{
+    return "Minimum Norm Estimate";
+}
+
+
+//*************************************************************************************************************
+
 void MinimumNorm::setMethod(QString method)
 {
     if(method.compare("MNE") == 0)

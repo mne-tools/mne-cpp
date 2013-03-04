@@ -119,6 +119,8 @@ public:
     */
     virtual SourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false) const;
 
+    virtual const char* getName() const;
+
     //=========================================================================================================
     /**
     * Set minimum norm algorithm method ("MNE" | "dSPM" | "sLORETA")
