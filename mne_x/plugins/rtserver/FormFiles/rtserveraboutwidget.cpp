@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dummytoolbox_global.h
+* @file     rtserveraboutwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,16 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the DummyToolbox library export/import macros.
+* @brief    Contains the implementation of the RTServerAboutWidget class.
 *
 */
 
-#ifndef DUMMYTOOLBOX_GLOBAL_H
-#define DUMMYTOOLBOX_GLOBAL_H
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "rtserveraboutwidget.h"
 
 
 //*************************************************************************************************************
@@ -42,18 +46,31 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/qglobal.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// PREPROCESSOR DEFINES
+// USED NAMESPACES
 //=============================================================================================================
 
-#if defined(DUMMYTOOLBOX_LIBRARY)
-#  define DUMMYTOOLBOXSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-#else
-#  define DUMMYTOOLBOXSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-#endif
+using namespace RTServerPlugin;
 
-#endif // DUMMYTOOLBOX_GLOBAL_H
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+RTServerAboutWidget::RTServerAboutWidget(QWidget *parent)
+: QDialog(parent)
+{
+    ui.setupUi(this);
+}
+
+
+//*************************************************************************************************************
+
+RTServerAboutWidget::~RTServerAboutWidget()
+{
+
+}

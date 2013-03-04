@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dummytoolbox_global.h
+* @file     rtserver_global.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the DummyToolbox library export/import macros.
+* @brief    Contains the RTServer library export/import macros.
 *
 */
 
-#ifndef DUMMYTOOLBOX_GLOBAL_H
-#define DUMMYTOOLBOX_GLOBAL_H
+#ifndef RTSERVER_GLOBAL_H
+#define RTSERVER_GLOBAL_H
 
 
 //*************************************************************************************************************
@@ -50,10 +50,10 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(DUMMYTOOLBOX_LIBRARY)
-#  define DUMMYTOOLBOXSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#if defined(RTSERVER_LIBRARY)
+#  define RTSERVERSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define DUMMYTOOLBOXSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define RTSERVERSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-#endif // DUMMYTOOLBOX_GLOBAL_H
+#endif // RTSERVER_GLOBAL_H
