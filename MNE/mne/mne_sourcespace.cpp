@@ -659,3 +659,33 @@ bool MNESourceSpace::complete_source_space_info(MNEHemisphere& p_Hemisphere)
 
     return true;
 }
+
+
+//*************************************************************************************************************
+
+MNEHemisphere& MNESourceSpace::operator[] (qint32 idx)
+{
+    if(hemispheres.size() > idx)
+        return hemispheres[idx];
+    else
+    {
+        qWarning("Warning: Index out of bound! Returning last element.");
+        return hemispheres[hemispheres.size()-1];
+    }
+}
+
+
+//*************************************************************************************************************
+
+MNEHemisphere& MNESourceSpace::operator[] (QString idt)
+{
+    if(idt.compare("lh") == 0)
+        return hemispheres[0];
+    else if(idt.compare("rh") == 0)
+        return hemispheres[1];
+    else
+    {
+        qWarning("Warning: Identifier is not 'lh' or 'rh'! Returning 'lh'.");
+        return hemispheres[0];
+    }
+}

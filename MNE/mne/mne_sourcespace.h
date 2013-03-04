@@ -236,6 +236,26 @@ private:
     */
     static bool complete_source_space_info(MNEHemisphere& p_Hemisphere);
 
+    //=========================================================================================================
+    /**
+    * Subscript operator [] to access parameter values by index
+    *
+    * @param[in] idx    the hemisphere index (0 or 1).
+    *
+    * @return Hemisphere related to the parameter index.
+    */
+    MNEHemisphere& operator[] (qint32 idx);
+
+    //=========================================================================================================
+    /**
+    * Subscript operator [] to access parameter values by index
+    *
+    * @param[in] idt    the hemisphere identifier ("lh" or "rh").
+    *
+    * @return Hemisphere related to the parameter identifier.
+    */
+    MNEHemisphere& operator[] (QString idt);
+
 public:
     QList<MNEHemisphere> hemispheres;   /**< List of the hemispheres containing the source space information. */
 };

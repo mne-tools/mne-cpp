@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiff_evoked_data.cpp
+* @file     annotation_set.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    OLD Implementation of the FIFFEvokedData Class.
+* @brief     AnnotationSet class implementation
 *
 */
 
@@ -38,7 +38,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "fiff_evoked_data.h"
+#include "annotation_set.h"
+
+#include <QFile>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -46,7 +49,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace FSLIB;
 
 
 //*************************************************************************************************************
@@ -54,13 +57,7 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FiffEvokedData::FiffEvokedData()
-: aspect_kind(-1)
-, is_smsh(-1)
-, nave(-1)
-, first(-1)
-, last(-1)
-, comment("")
+AnnotationSet::AnnotationSet()
 {
 
 }
@@ -68,24 +65,83 @@ FiffEvokedData::FiffEvokedData()
 
 //*************************************************************************************************************
 
-FiffEvokedData::FiffEvokedData(const FiffEvokedData &p_FiffEvokedData)
-: QSharedData(p_FiffEvokedData)
-, aspect_kind(p_FiffEvokedData.aspect_kind)
-, is_smsh(p_FiffEvokedData.is_smsh)
-, nave(p_FiffEvokedData.nave)
-, first(p_FiffEvokedData.first)
-, last(p_FiffEvokedData.last)
-, comment(p_FiffEvokedData.comment)
-, times(p_FiffEvokedData.times)
-, epochs(p_FiffEvokedData.epochs)
+AnnotationSet::AnnotationSet(const Annotation& p_sLHAnnotation, const Annotation& p_sRHAnnotation)
 {
-
+    src_annotations.insert(0, p_sLHAnnotation);
+    src_annotations.insert(1, p_sRHAnnotation);
 }
 
 
 //*************************************************************************************************************
 
-FiffEvokedData::~FiffEvokedData()
+AnnotationSet::AnnotationSet(const QString& p_sLHFileName, const QString& p_sRHFileName)
 {
+    QStringList t_qListFileName;
+    t_qListFileName << p_sLHFileName << p_sRHFileName;
 
+    AnnotationSet t_AnnotationSet;
+    if(AnnotationSet::read(t_qListFileName, t_AnnotationSet))
+        *this = t_AnnotationSet;
+}
+
+
+//*************************************************************************************************************
+
+void AnnotationSet::clear()
+{
+    src_annotations.clear();
+}
+
+
+//*************************************************************************************************************
+
+bool AnnotationSet::read(const QStringList &p_qListFileNames, AnnotationSet &p_AnnotationSet)
+{
+    p_AnnotationSet.clear();
+
+    for(qint32 i = 0; i < p_qListFileNames.size(); ++i)
+    {
+        Annotation t_Annotation;
+        if(Annotation::read(p_qListFileNames[i], t_Annotation))
+        {
+            if(p_qListFileNames[i].contains("lh."))
+                p_AnnotationSet.src_annotations.insert(0, t_Annotation);
+            else if(p_qListFileNames[i].contains("rh."))
+                p_AnnotationSet.src_annotations.insert(1, t_Annotation);
+            else
+                return false;
+        }
+    }
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+Annotation& AnnotationSet::operator[] (qint32 idx)
+{
+    if(src_annotations.size() > idx)
+        return src_annotations[idx];
+    else
+    {
+        qWarning("Warning: Index out of bound! Returning last element.");
+        return src_annotations[src_annotations.size()-1];
+    }
+}
+
+
+//*************************************************************************************************************
+
+Annotation& AnnotationSet::operator[] (QString idt)
+{
+    if(idt.compare("lh") == 0)
+        return src_annotations[0];
+    else if(idt.compare("rh") == 0)
+        return src_annotations[1];
+    else
+    {
+        qWarning("Warning: Identifier is not 'lh' or 'rh'! Returning 'lh'.");
+        return src_annotations[0];
+    }
 }

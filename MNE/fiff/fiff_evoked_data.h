@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    FiffEvokedData class declaration.
+* @brief    OLD FiffEvokedData class declaration.
 *
 */
 
