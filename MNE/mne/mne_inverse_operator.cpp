@@ -84,6 +84,14 @@ MNEInverseOperator::MNEInverseOperator(QIODevice& p_IODevice)
 
 //*************************************************************************************************************
 
+MNEInverseOperator::MNEInverseOperator(const FiffInfo &info, MNEForwardSolution forward, const FiffCov& p_noise_cov, float loose, float depth, bool fixed, bool limit_depth_chs)
+{
+    *this = MNEInverseOperator::make_inverse_operator(info, forward, p_noise_cov, loose, depth, fixed, limit_depth_chs);
+}
+
+
+//*************************************************************************************************************
+
 MNEInverseOperator::MNEInverseOperator(const MNEInverseOperator &p_MNEInverseOperator)
 : info(p_MNEInverseOperator.info)
 , methods(p_MNEInverseOperator.methods)
