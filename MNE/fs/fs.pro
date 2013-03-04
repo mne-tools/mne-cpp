@@ -64,12 +64,14 @@ win32 {
 
 SOURCES += annotation.cpp \
     colortable.cpp \
-    annotation_set.cpp
+    annotation_set.cpp \
+    label.cpp
 
 HEADERS += annotation.h\
         fs_global.h \
     colortable.h \
-    annotation_set.h
+    annotation_set.h \
+    label.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
