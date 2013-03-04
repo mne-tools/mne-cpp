@@ -40,7 +40,6 @@
 
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_evoked.h>
-#include <mne/mne.h>
 #include <inverse/sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
 
@@ -50,11 +49,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
-#include <math.h>
 #include <iostream>
-
-//DEBUG fstream
-#include <fstream>
 
 
 //*************************************************************************************************************
