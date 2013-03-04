@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dummytoolbox_global.h
+* @file     rtserverchannel.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,17 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the DummyToolbox library export/import macros.
+* @brief    Contains the implementation of the RTServerChannel class.
 *
 */
 
-#ifndef DUMMYTOOLBOX_GLOBAL_H
-#define DUMMYTOOLBOX_GLOBAL_H
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "rtserverchannel.h"
 
 
 //*************************************************************************************************************
@@ -42,18 +47,79 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/qglobal.h>
+#include <QtCore/QTextStream>
+#include <QtCore/QFile>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// PREPROCESSOR DEFINES
+// USED NAMESPACES
 //=============================================================================================================
 
-#if defined(DUMMYTOOLBOX_LIBRARY)
-#  define DUMMYTOOLBOXSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-#else
-#  define DUMMYTOOLBOXSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-#endif
+using namespace RTServerPlugin;
 
-#endif // DUMMYTOOLBOX_GLOBAL_H
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+RTServerChannel::RTServerChannel(QString ResourceDataPath, QString ChannelFile, bool enabled, bool visible)
+: m_qStringResourceDataPath(ResourceDataPath)
+, m_qStringChannelFile(ChannelFile)
+, m_bIsEnabled(enabled)
+, m_bIsVisible(visible)
+{
+
+}
+
+
+//*************************************************************************************************************
+
+RTServerChannel::~RTServerChannel()
+{
+}
+
+
+//*************************************************************************************************************
+
+void RTServerChannel::initChannel()
+{
+    QFile file;
+    file.setFileName(m_qStringResourceDataPath+m_qStringChannelFile);
+    if(file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        QTextStream in(&file);
+        double value;
+
+        while(!in.atEnd())
+        {
+            in >> value;
+
+            //init min and max with first value
+            if(m_vecBuffer.size() == 0)
+            {
+                m_dMin = value;
+                m_dMax = value;
+            }
+
+            if(value < m_dMin)
+                m_dMin = value;
+
+            if(value > m_dMax)
+                m_dMax = value;
+
+            m_vecBuffer.push_back(value);
+
+        }
+        file.close();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void RTServerChannel::clear()
+{
+    m_vecBuffer.clear();
+}
