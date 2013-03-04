@@ -40,6 +40,8 @@
 //=============================================================================================================
 
 #include <fs/annotation.h>
+#include <fs/annotation_set.h>
+
 #include <fiff/fiff_evoked.h>
 #include <mne/mne.h>
 #include <inverse/sourceestimate.h>
@@ -108,8 +110,7 @@ int main(int argc, char *argv[])
     if(t_Fwd.isEmpty())
         return 1;
 
-    Annotation t_LHAnnotation("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot");
-    Annotation t_RHAnnotation("./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
+    AnnotationSet t_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
 
     FiffCov noise_cov(t_fileCov);
 
@@ -119,7 +120,7 @@ int main(int argc, char *argv[])
     //
     // Cluster forward solution;
     //
-    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_LHAnnotation, t_RHAnnotation, 40);
+    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 40);
 
     //
     // make an inverse operators

@@ -266,7 +266,7 @@ QVariant& Command::operator[] (const QString &key)
 
 //*************************************************************************************************************
 
-QVariant& Command::operator[] (const qint32 &idx)
+QVariant& Command::operator[] (qint32 idx)
 {
     if(m_qListParamValues.size() > idx)
         return m_qListParamValues[idx];

@@ -1,9 +1,8 @@
 //=============================================================================================================
 /**
-* @file     annotation.h
+* @file     annotation_set.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Bruce Fischl
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2012
 *
@@ -30,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Annotation class declaration
+* @brief    AnnotationSet class declaration
 *
 */
 
-#ifndef ANNOTATION_H
-#define ANNOTATION_H
+#ifndef ANNOTATION_SET_H
+#define ANNOTATION_SET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -43,7 +42,7 @@
 //=============================================================================================================
 
 #include "fs_global.h"
-#include "colortable.h"
+#include "annotation.h"
 
 
 //*************************************************************************************************************
@@ -53,6 +52,7 @@
 
 #include <QString>
 #include <QSharedPointer>
+#include <QMap>
 
 
 //*************************************************************************************************************
@@ -87,96 +87,88 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* Free surfer annotation contains vertix label relations and a color/name lookup table
+* Annotation set
 *
-* @brief Free surfer annotation
+* @brief Annotation set
 */
-class FSSHARED_EXPORT Annotation
+class FSSHARED_EXPORT AnnotationSet
 {
-
 public:
-    typedef QSharedPointer<Annotation> SPtr;            /**< Shared pointer type for Annotation. */
-    typedef QSharedPointer<const Annotation> ConstSPtr; /**< Const shared pointer type for Annotation. */
+    typedef QSharedPointer<AnnotationSet> SPtr;            /**< Shared pointer type for AnnotationSet. */
+    typedef QSharedPointer<const AnnotationSet> ConstSPtr; /**< Const shared pointer type for AnnotationSet. */
 
     //=========================================================================================================
     /**
     * Default constructor
     */
-    Annotation();
+    AnnotationSet();
 
     //=========================================================================================================
     /**
-    * Construts the annotation by reading it of the given file.
+    * Constructs an annotation set by assembling given annotations
     *
-    * @param[in] p_sFileName    Annotation file
+    * @param[in] p_sLHAnnotation    Left hemisphere annotation
+    * @param[in] p_sRHAnnotation    Right hemisphere annotation
     */
-    explicit Annotation(const QString& p_sFileName);
+    explicit AnnotationSet(const Annotation& p_sLHAnnotation, const Annotation& p_sRHAnnotation);
 
     //=========================================================================================================
     /**
-    * Destroys the annotation.
+    * Constructs an annotation set by reading from annotation files
+    *
+    * @param[in] p_sLHFileName  Left hemisphere annotation file
+    * @param[in] p_sRHFileName  Right hemisphere annotation file
     */
-    ~Annotation();
+    explicit AnnotationSet(const QString& p_sLHFileName, const QString& p_sRHFileName);
 
     //=========================================================================================================
     /**
-    * Initializes the Annotation.
+    * Destroys the annotation set.
+    */
+    ~AnnotationSet(){};
+
+    //=========================================================================================================
+    /**
+    * Initializes the AnnotationSet.
     */
     void clear();
 
     //=========================================================================================================
     /**
-    * Returns the vertix indeces
+    * Reads different annotation files and assembles them to a SourceSpaceAnnotation
     *
-    * @return vertix indeces
+    * @param[in] p_listFileNames    List annotation files to read (lh and rh)
+    * @param[out] p_AnnotationSet   The read annotation set
+    *
+    * @return true if succesfull, false otherwise
     */
-    inline VectorXi& getVertices()
-    {
-        return m_Vertices;
-    }
+    static bool read(const QStringList &p_qListFileNames, AnnotationSet &p_AnnotationSet);
 
     //=========================================================================================================
     /**
-    * Returns the vertix labels
+    * Subscript operator [] to access parameter values by index
     *
-    * @return vertix labels
+    * @param[in] idx    the hemisphere index (0 or 1).
+    *
+    * @return Annotation related to the parameter index.
     */
-    inline VectorXi& getLabel()
-    {
-        return m_Label;
-    }
+    Annotation& operator[] (qint32 idx);
 
     //=========================================================================================================
     /**
-    * Returns the coloratable containing the label based nomenclature
+    * Subscript operator [] to access parameter values by index
     *
-    * @return colortable
+    * @param[in] idt    the hemisphere identifier ("lh" or "rh").
+    *
+    * @return Annotation related to the parameter identifier.
     */
-    inline Colortable& getColortable()
-    {
-        return m_Colortable;
-    }
+    Annotation& operator[] (QString idt);
 
-    //=========================================================================================================
-    /**
-    * Reads an annotation of a file
-    *
-    * @param[in] p_sFileName    Annotation file
-    * @param[out] p_Annotation  the read annotation
-    *
-    * @return true if successful, false otherwise
-    */
-    static bool read(const QString &p_sFileName, Annotation &p_Annotation);
+public:
+    QMap<qint32, Annotation> src_annotations;       /**< Annotation spaces. */
 
-private:
-    QString m_sFileName;        /**< Annotation file */
-
-    VectorXi m_Vertices;        /**< Vertice indeces */
-    VectorXi m_Label;           /**< Vertice labels */
-
-    Colortable m_Colortable;    /**< Lookup table label colors & names */
 };
 
 } // NAMESPACE
 
-#endif // ANNOTATION_H
+#endif // ANNOTATION_SET_H

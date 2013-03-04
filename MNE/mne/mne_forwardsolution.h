@@ -53,7 +53,7 @@
 
 #include <mneMath/mnemath.h>
 
-#include <fs/annotation.h>
+#include <fs/annotation_set.h>
 
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_coord_trans.h>
@@ -167,13 +167,12 @@ public:
     * Cluster the forward solution and stores the result to p_fwdOut.
     * The clustering is done by using the provided annotations
     *
-    * @param[in] p_LHAnnotation     Annotation of the left hemisphere
-    * @param[in] p_RHAnnotation     Annotation of the right hemisphere
+    * @param[in] p_AnnotationSet    Annotation set containing the annotation of left & right hemisphere
     * @param[in] p_iClusterSize     Maximal cluster size per roi
     *
     * @return clustered MNE forward solution
     */
-    MNEForwardSolution cluster_forward_solution(const Annotation &p_LHAnnotation, const Annotation &p_RHAnnotation, qint32 p_iClusterSize);
+    MNEForwardSolution cluster_forward_solution(AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize);
 
     //=========================================================================================================
     /**

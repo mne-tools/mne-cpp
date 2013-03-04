@@ -286,7 +286,7 @@ public:
     *
     * @return Parameter value related to the parameter index.
     */
-    QVariant& operator[] (const qint32 &idx);
+    QVariant& operator[] (qint32 idx);
 
     //=========================================================================================================
     /**

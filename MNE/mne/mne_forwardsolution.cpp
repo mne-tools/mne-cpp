@@ -163,13 +163,9 @@ void MNEForwardSolution::clear()
 
 //*************************************************************************************************************
 
-MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const Annotation &p_LHAnnotation, const Annotation &p_RHAnnotation, qint32 p_iClusterSize)
+MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize)
 {
     MNEForwardSolution p_fwdOut = MNEForwardSolution(*this);
-
-    QList<Annotation> t_listAnnotation;
-    t_listAnnotation.append(p_LHAnnotation);
-    t_listAnnotation.append(p_RHAnnotation);
 
     //
     // Check consisty
@@ -249,14 +245,14 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const Annotation
         else
             printf("Cluster Right Hemisphere\n");
 
-        Colortable t_CurrentColorTable = t_listAnnotation[h].getColortable();
+        Colortable t_CurrentColorTable = p_AnnotationSet[h].getColortable();
         VectorXi label = t_CurrentColorTable.getAvailableROIs();
 
         // Get label for every vertice
         VectorXi vertno_labeled = VectorXi::Zero(this->src.hemispheres[h].vertno.rows());
 
         for(qint32 i = 0; i < vertno_labeled.rows(); ++i)
-            vertno_labeled[i] = t_listAnnotation[h].getLabel()[this->src.hemispheres[h].vertno[i]];
+            vertno_labeled[i] = p_AnnotationSet[h].getLabel()[this->src.hemispheres[h].vertno[i]];
 
         MatrixXd t_LF_partial;
         for (qint32 i = 0; i < label.rows(); ++i)
