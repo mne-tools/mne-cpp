@@ -67,6 +67,8 @@ public:
     virtual ~RapMusic(){}
 
     virtual SourceEstimate calculateInverse() const;
+
+    virtual const char* getName() const;
 };
 
 } //NAMESPACE
