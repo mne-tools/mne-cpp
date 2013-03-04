@@ -121,6 +121,20 @@ public:
 
     //=========================================================================================================
     /**
+    * Constructs an inverse operator by making one.
+    *
+    * @param[in] info               The measurement info to specify the channels to include. Bad channels in info['bads'] are not used.
+    * @param[in] forward            Forward operator.
+    * @param[in] p_noise_cov        The noise covariance matrix.
+    * @param[in] loose              float in [0, 1]. Value that weights the source variances of the dipole components defining the tangent space of the cortical surfaces.
+    * @param[in] depth              float in [0, 1]. Depth weighting coefficients. If None, no depth weighting is performed.
+    * @param[in] fixed              Use fixed source orientations normal to the cortical mantle. If True, the loose parameter is ignored.
+    * @param[in] limit_depth_chs    If True, use only grad channels in depth weighting (equivalent to MNE C code). If grad chanels aren't present, only mag channels will be used (if no mag, then eeg). If False, use all channels.
+    */
+    MNEInverseOperator(const FiffInfo &info, MNEForwardSolution forward, const FiffCov& p_noise_cov, float loose = 0.2f, float depth = 0.8f, bool fixed = false, bool limit_depth_chs = true);
+
+    //=========================================================================================================
+    /**
     * Copy constructor.
     *
     * @param[in] p_MNEInverseOperator   MNE forward solution

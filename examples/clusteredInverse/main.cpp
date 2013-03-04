@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
     //
     FiffInfo info = evoked.info;
 
-    MNEInverseOperator inverse_operator = MNEInverseOperator::make_inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
+    MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
 
     //
     // Compute inverse solution
