@@ -98,6 +98,15 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 # Install headers to include directory
 header_files.files = ./*.h
-header_files.path = $${MNE_INCLUDE_DIR}/rtMEas
+header_files.path = $${MNE_INCLUDE_DIR}/rtMeas
+
+header_files_measurement.files = ./Measurement/*.h
+header_files_measurement.path = $${MNE_INCLUDE_DIR}/rtMeas/Measurement
+
+header_files_nomenclature.files = ./Nomenclature/*.h
+header_files_nomenclature.path = $${MNE_INCLUDE_DIR}/rtMeas/Nomenclature
 
 INSTALLS += header_files
+INSTALLS += header_files_measurement
+INSTALLS += header_files_nomenclature
+
