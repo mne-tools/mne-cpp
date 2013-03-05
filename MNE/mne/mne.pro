@@ -83,8 +83,7 @@ SOURCES += \
     mne_inverse_operator.cpp \
     mne_epoch_data.cpp \
     mne_epoch_data_list.cpp \
-    mne_cluster_info.cpp \
-    mne.cpp
+    mne_cluster_info.cpp
 
 HEADERS += \
     mne.h \
@@ -95,8 +94,7 @@ HEADERS += \
     mne_inverse_operator.h \
     mne_epoch_data.h \
     mne_epoch_data_list.h \
-    mne_cluster_info.h \
-    mne.h
+    mne_cluster_info.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
