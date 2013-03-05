@@ -303,18 +303,6 @@ qint32 MNEMath::rank(const MatrixXd& A, double tol)
 
 //*************************************************************************************************************
 
-qint32 MNEMath::fread3(QDataStream &p_qStream)
-{
-    char* bytes = new char[3];
-    p_qStream.readRawData(bytes, 3);
-    qint32 int3 = (((unsigned char) bytes[0]) << 16) + (((unsigned char) bytes[1]) << 8) + ((unsigned char) bytes[2]);
-    delete[] bytes;
-    return int3;
-}
-
-
-//*************************************************************************************************************
-
 MatrixXd MNEMath::rescale(const MatrixXd &data, const RowVectorXf &times, QPair<QVariant,QVariant> baseline, QString mode)
 {
     MatrixXd data_out = data;
