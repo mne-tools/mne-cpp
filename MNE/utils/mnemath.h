@@ -201,18 +201,6 @@ public:
 
     //=========================================================================================================
     /**
-    * mne_fread3(fid) -> ToDO put this into a sparate mneHelpers class
-    *
-    * Reads a 3-byte integer out of a stream
-    *
-    * @param[in] p_qStream  Stream to read from
-    *
-    * @return the read 3-byte integer
-    */
-    static qint32 fread3(QDataStream &p_qStream);
-
-    //=========================================================================================================
-    /**
     * ToDo: Maybe new processing class
     *
     * Rescale aka baseline correct data

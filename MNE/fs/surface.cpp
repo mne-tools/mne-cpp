@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "surface.h"
-#include <utils/mnemath.h>
+#include <utils/ioutils.h>
 
 
 //*************************************************************************************************************
@@ -116,12 +116,12 @@ bool Surface::read(const QString &p_sFileName, Surface &p_Surface)
     qint32 TRIANGLE_FILE_MAGIC_NUMBER =  16777214;
     qint32 QUAD_FILE_MAGIC_NUMBER     =  16777215;
 
-    qint32 magic = MNEMath::fread3(t_DataStream);
+    qint32 magic = IOUtils::fread3(t_DataStream);
 
     if(magic == QUAD_FILE_MAGIC_NUMBER || magic == NEW_QUAD_FILE_MAGIC_NUMBER)
     {
-        qint32 nvert = MNEMath::fread3(t_DataStream);
-        qint32 nquad = MNEMath::fread3(t_DataStream);
+        qint32 nvert = IOUtils::fread3(t_DataStream);
+        qint32 nquad = IOUtils::fread3(t_DataStream);
 //        if magic == QUAD_FILE_MAGIC_NUMBER
 //            fprintf(1,'\t%s is a quad file (nvert = %d nquad = %d)\n', ...
 //                fname,nvert,nquad);
