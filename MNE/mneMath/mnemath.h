@@ -146,6 +146,18 @@ public:
 
     //=========================================================================================================
     /**
+    * Find the intersection of two arrays
+    *
+    * @param[in] v1         Input vector 1
+    * @param[in] v2         Input vector 2
+    * @param[out] idx_sel   Index of intersection based on v1
+    *
+    * @return the sorted, unique values that are in both of the input arrays.
+    */
+    static VectorXi intersect(const VectorXi &v1, const VectorXi &v2, VectorXi &idx_sel);
+
+    //=========================================================================================================
+    /**
     * Determines if a given data (stored as vector v) are representing a sparse matrix.
     * ToDo: status is experimental -> needs to be increased in speed.
     *
@@ -262,7 +274,7 @@ public:
     *
     * @return true if pair one is bigger, false otherwise
     */
-    static inline bool compareIndexIntPairSmallerThan( const IdxIntValue& lhs, const IdxIntValue& rhs);
+    static inline bool compareIdxIntPairSmallerThan( const IdxIntValue& lhs, const IdxIntValue& rhs);
 
 };
 
@@ -286,7 +298,7 @@ inline bool MNEMath::compareIdxDoublePairSmallerThan( const IdxDoubleValue& lhs,
 
 //*************************************************************************************************************
 
-inline bool MNEMath::compareIndexIntPairSmallerThan( const IdxIntValue& lhs, const IdxIntValue& rhs)
+inline bool MNEMath::compareIdxIntPairSmallerThan( const IdxIntValue& lhs, const IdxIntValue& rhs)
 {
     return lhs.second < rhs.second;
 }

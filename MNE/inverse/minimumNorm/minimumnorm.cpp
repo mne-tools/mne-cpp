@@ -42,6 +42,7 @@
 #include "../sourceestimate.h"
 
 #include <fiff/fiff_evoked.h>
+#include <fs/label.h>
 
 
 //*************************************************************************************************************
@@ -58,6 +59,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
+using namespace FSLIB;
 using namespace MNELIB;
 using namespace INVERSELIB;
 
@@ -111,8 +113,7 @@ SourceEstimate MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, boo
     MatrixXd K;
     SparseMatrix<double> noise_norm;
     QList<VectorXi> vertno;
-    VectorXi label;
-
+    Label label;
     inv.assemble_kernel(label, m_sMethod, pick_normal, K, noise_norm, vertno);
     MatrixXd sol = K * t_fiffEvoked.data; //apply imaging kernel
 

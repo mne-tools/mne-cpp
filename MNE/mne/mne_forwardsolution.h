@@ -105,9 +105,9 @@ namespace MNELIB
 //=============================================================================================================
 
 using namespace Eigen;
+using namespace FSLIB;
 using namespace MNEMATHLIB;
 using namespace FIFFLIB;
-using namespace FSLIB;
 
 
 //=============================================================================================================

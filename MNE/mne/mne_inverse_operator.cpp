@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include "mne_inverse_operator.h"
+#include <fs/label.h>
 
 
 //*************************************************************************************************************
@@ -132,7 +133,7 @@ MNEInverseOperator::~MNEInverseOperator()
 
 //*************************************************************************************************************
 
-bool MNEInverseOperator::assemble_kernel(const VectorXi &label, QString method, bool pick_normal, MatrixXd &K, SparseMatrix<double> &noise_norm, QList<VectorXi> &vertno) const
+bool MNEInverseOperator::assemble_kernel(const Label &label, QString method, bool pick_normal, MatrixXd &K, SparseMatrix<double> &noise_norm, QList<VectorXi> &vertno) const
 {
     MatrixXd t_eigen_leads = this->eigen_leads->data;
     MatrixXd t_source_cov = this->source_cov->data;
@@ -141,21 +142,59 @@ bool MNEInverseOperator::assemble_kernel(const VectorXi &label, QString method, 
 
     vertno = this->src.get_vertno();
 
-    if(label.size() > 0)
+    typedef Eigen::Triplet<double> T;
+    std::vector<T> tripletList;
+
+    if(!label.isEmpty())
     {
-        qDebug() << "ToDo";
-//        vertno, src_sel = label_src_vertno_sel(label, inv['src'])
+        qDebug() << "ToDo: Label selection needs to be debugged - not done jet!";
+        VectorXi src_sel;
+        vertno = this->src.label_src_vertno_sel(label, src_sel);
 
-//        if method != "MNE":
-//            noise_norm = noise_norm[src_sel]
+        if(method.compare("MNE") != 0)
+        {
+            tripletList.clear();
+            tripletList.reserve(noise_norm.nonZeros());
 
-//        if inv['source_ori'] == FIFF.FIFFV_MNE_FREE_ORI:
-//            src_sel = 3 * src_sel
-//            src_sel = np.c_[src_sel, src_sel + 1, src_sel + 2]
-//            src_sel = src_sel.ravel()
+            for (qint32 k = 0; k < noise_norm.outerSize(); ++k)
+            {
+                for (SparseMatrix<double>::InnerIterator it(noise_norm,k); it; ++it)
+                {
+                    //ToDo bad search - increase speed by using stl search
+                    qint32 row = -1;
+                    for(qint32 i = 0; i < src_sel.size(); ++i)
+                        if(src_sel[i] == it.row())
+                            row = i;
+                    if(row != -1)
+                        tripletList.push_back(T(it.row(), it.col(), it.value()));
+                }
+            }
 
-//        eigen_leads = eigen_leads[src_sel]
-//        source_cov = source_cov[src_sel]
+            noise_norm = SparseMatrix<double>(src_sel.size(),noise_norm.cols());
+            noise_norm.setFromTriplets(tripletList.begin(), tripletList.end());
+        }
+
+        if(this->source_ori == FIFFV_MNE_FREE_ORI)
+        {
+            VectorXi src_sel_new(src_sel.size()*3);
+
+            for(qint32 i = 0; i < src_sel.size(); ++i)
+            {
+                src_sel_new[i*3] = src_sel[i]*3;
+                src_sel_new[i*3+1] = src_sel[i]*3+1;
+                src_sel_new[i*3+2] = src_sel[i]*3+2;
+            }
+            src_sel = src_sel_new;
+        }
+
+
+        for(qint32 i = 0; i < src_sel.size(); ++i)
+        {
+            t_eigen_leads.row(i) = t_eigen_leads.row(src_sel[i]);
+            t_source_cov = t_source_cov.row(src_sel[i]);
+        }
+        t_eigen_leads.conservativeResize(src_sel.size(), t_eigen_leads.cols());
+        t_source_cov.conservativeResize(src_sel.size(), t_source_cov.cols());
     }
 
     if(pick_normal)
@@ -191,8 +230,7 @@ bool MNEInverseOperator::assemble_kernel(const VectorXi &label, QString method, 
         t_source_cov.conservativeResize(count, t_source_cov.cols());
     }
 
-    typedef Eigen::Triplet<double> T;
-    std::vector<T> tripletList;
+    tripletList.clear();
     tripletList.reserve(reginv.rows());
     for(qint32 i = 0; i < reginv.rows(); ++i)
         tripletList.push_back(T(i, i, reginv(i,0)));

@@ -87,18 +87,6 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-
-
-    Label testLabel;
-
-    QString t_sFileName("./MNE-sample-data/subjects/sample/label/lh.BA1.label");
-    Label::read(t_sFileName, testLabel);
-
-
-    qint32 n;
-    std::cin >> n;
-
-
     QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
