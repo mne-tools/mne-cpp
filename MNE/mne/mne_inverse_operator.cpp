@@ -47,7 +47,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEMATHLIB;
+using namespace UTILSLIB;
 using namespace MNELIB;
 
 

@@ -47,8 +47,8 @@
 //=============================================================================================================
 
 #include <fs/colortable.h>
-#include <mneMath/mnemath.h>
-#include <mneMath/kmeans.h>
+#include <utils/mnemath.h>
+#include <utils/kmeans.h>
 
 
 //*************************************************************************************************************
@@ -65,7 +65,7 @@
 //=============================================================================================================
 
 using namespace MNELIB;
-using namespace MNEMATHLIB;
+using namespace UTILSLIB;
 using namespace FSLIB;
 
 

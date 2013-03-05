@@ -40,7 +40,7 @@
 
 #include "mne_sourcespace.h"
 
-#include <mneMath/mnemath.h>
+#include <utils/mnemath.h>
 #include <fs/label.h>
 
 
@@ -49,7 +49,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEMATHLIB;
+using namespace UTILSLIB;
 using namespace FSLIB;
 using namespace MNELIB;
 

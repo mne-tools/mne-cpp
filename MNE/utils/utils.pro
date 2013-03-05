@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mneMath.pro
+# @file     utils.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the MneMath library.
+# @brief    This project file builds the Utils library.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -39,9 +39,9 @@ TEMPLATE = lib
 
 QT       -= gui
 
-DEFINES += MNEMATH_LIBRARY
+DEFINES += UTILS_LIBRARY
 
-TARGET = MneMath
+TARGET = Utils
 TARGET = $$join(TARGET,,MNE$$MNE_LIB_VERSION,)
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -65,7 +65,7 @@ SOURCES += kmeans.cpp \
     mnemath.cpp
 
 HEADERS +=  kmeans.h\
-            mnemath_global.h \
+            utils_global.h \
     mnemath.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
@@ -73,6 +73,6 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 # Install headers to include directory
 header_files.files = ./*.h
-header_files.path = $${MNE_INCLUDE_DIR}/mneMath
+header_files.path = $${MNE_INCLUDE_DIR}/utils
 
 INSTALLS += header_files

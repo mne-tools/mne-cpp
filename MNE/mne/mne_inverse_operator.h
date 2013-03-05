@@ -57,7 +57,7 @@
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_info.h>
 
-#include <mneMath/mnemath.h>
+#include <utils/mnemath.h>
 
 
 //*************************************************************************************************************

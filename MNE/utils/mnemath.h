@@ -43,7 +43,7 @@
 // MNE INCLUDES
 //=============================================================================================================
 
-#include "mnemath_global.h"
+#include "utils_global.h"
 
 #include <iostream>
 
@@ -71,10 +71,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEMATHLIB
+// DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
 
-namespace MNEMATHLIB
+namespace UTILSLIB
 {
 
 //*************************************************************************************************************
@@ -98,7 +98,7 @@ using namespace Eigen;
 *
 * @brief Math methods
 */
-class MNEMATHSHARED_EXPORT MNEMath
+class UTILSSHARED_EXPORT MNEMath
 {
 public:
     typedef std::pair<int,double> IdxDoubleValue;
@@ -198,6 +198,18 @@ public:
     * @return rank of matrix A
     */
     static qint32 rank(const MatrixXd& A, double tol = 1e-8);
+
+    //=========================================================================================================
+    /**
+    * mne_fread3(fid) -> ToDO put this into a sparate mneHelpers class
+    *
+    * Reads a 3-byte integer out of a stream
+    *
+    * @param[in] p_qStream  Stream to read from
+    *
+    * @return the read 3-byte integer
+    */
+    static qint32 fread3(QDataStream &p_qStream);
 
     //=========================================================================================================
     /**

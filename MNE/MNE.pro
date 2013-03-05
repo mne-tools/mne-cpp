@@ -39,7 +39,7 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     generics \
-    mneMath \
+    utils \
     fs \
     fiff \
     mne \

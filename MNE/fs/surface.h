@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     annotation.h
+* @file     surface.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Bruce Fischl
 * @version  1.0
-* @date     July, 2012
+* @date     March, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Annotation class declaration
+* @brief    Surface class declaration
 *
 */
 
-#ifndef ANNOTATION_H
-#define ANNOTATION_H
+#ifndef SURFACE_H
+#define SURFACE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -43,7 +42,6 @@
 //=============================================================================================================
 
 #include "fs_global.h"
-#include "colortable.h"
 
 
 //*************************************************************************************************************
@@ -51,7 +49,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QString>
 #include <QSharedPointer>
 
 
@@ -84,112 +81,60 @@ using namespace Eigen;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class Label;
-
 
 //=============================================================================================================
 /**
-* Free surfer annotation contains vertix label relations and a color/name lookup table
+* A FreeSurfer surface mesh in triangular format
 *
-* @brief Free surfer annotation
+* @brief FreeSurfer surface mesh
 */
-class FSSHARED_EXPORT Annotation
+class FSSHARED_EXPORT Surface
 {
-
 public:
-    typedef QSharedPointer<Annotation> SPtr;            /**< Shared pointer type for Annotation. */
-    typedef QSharedPointer<const Annotation> ConstSPtr; /**< Const shared pointer type for Annotation. */
-
+    typedef QSharedPointer<Surface> SPtr;            /**< Shared pointer type for Surface class. */
+    typedef QSharedPointer<const Surface> ConstSPtr; /**< Const shared pointer type for Surface class. */
+    
     //=========================================================================================================
     /**
     * Default constructor
     */
-    Annotation();
-
+    Surface();
+    
     //=========================================================================================================
     /**
-    * Construts the annotation by reading it of the given file.
-    *
-    * @param[in] p_sFileName    Annotation file
+    * Destroys the Surface class.
     */
-    explicit Annotation(const QString& p_sFileName);
-
+    ~Surface();
+    
     //=========================================================================================================
     /**
-    * Destroys the annotation.
-    */
-    ~Annotation();
-
-    //=========================================================================================================
-    /**
-    * Initializes the Annotation.
+    * Initializes the Surface.
     */
     void clear();
 
     //=========================================================================================================
     /**
-    * Returns the vertix indeces
+    * mne_read_surface
     *
-    * @return vertix indeces
+    * Reads a FreeSurfer surface file
+    *
+    * @param[in] p_sFileName    The file to read
+    * @param[out] p_Surface     The read surface
+    *
     */
-    inline VectorXi& getVertices()
-    {
-        return m_Vertices;
-    }
-
-    //=========================================================================================================
-    /**
-    * Returns the vertix labels
-    *
-    * @return vertix labels
-    */
-    inline VectorXi& getLabel()
-    {
-        return m_Label;
-    }
-
-    //=========================================================================================================
-    /**
-    * Returns the coloratable containing the label based nomenclature
-    *
-    * @return colortable
-    */
-    inline Colortable& getColortable()
-    {
-        return m_Colortable;
-    }
-
-    //=========================================================================================================
-    /**
-    * Reads an annotation of a file
-    *
-    * @param[in] p_sFileName    Annotation file
-    * @param[out] p_Annotation  the read annotation
-    *
-    * @return true if successful, false otherwise
-    */
-    static bool read(const QString &p_sFileName, Annotation &p_Annotation);
-
-    //=========================================================================================================
-    /**
-    * Converts annotation to a label list and colortable
-    *
-    * @param[out] p_qListLabels the converted labels
-    * @param[out] p_Colortable  the converted colortable
-    *
-    * @return true if successful, false otherwise
-    */
-    bool toLabels(QList<Label> &p_qListLabels, Colortable &p_Colortable) const;
+    static bool read(const QString &p_sFileName, Surface &p_Surface);
 
 private:
-    QString m_sFileName;        /**< Annotation file */
-
-    VectorXi m_Vertices;        /**< Vertice indeces */
-    VectorXi m_Label;           /**< Vertice labels */
-
-    Colortable m_Colortable;    /**< Lookup table label colors & names */
+    Matrix3Xf verts;    /**< Vertex coordinates in meters */
+    Matrix3Xf faces;    /**< The triangle descriptions */
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
 
 } // NAMESPACE
 
-#endif // ANNOTATION_H
+#endif // SURFACE_H

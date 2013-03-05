@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mnemath_global.h
+* @file     utils_global.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,13 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     mnemath library export/import macros.
+* @brief    utils library export/import macros.
 *
 */
 
-#ifndef MNEMATH_GLOBAL_H
-#define MNEMATH_GLOBAL_H
-
+#ifndef UTILS_GLOBAL_H
+#define UTILS_GLOBAL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -50,10 +49,10 @@
 // DEFINES
 //=============================================================================================================
 
-#if defined(MNEMATH_LIBRARY)
-#  define MNEMATHSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#if defined(UTILS_LIBRARY)
+#  define UTILSSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define MNEMATHSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define UTILSSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-#endif // MNEMATH_GLOBAL_H
+#endif // MNEUTILS_GLOBAL_H

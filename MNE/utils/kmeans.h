@@ -41,7 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mnemath_global.h"
+#include "utils_global.h"
 
 
 //*************************************************************************************************************
@@ -66,7 +66,7 @@
 // DEFINE NAMESPACE MNELIB
 //=============================================================================================================
 
-namespace MNEMATHLIB
+namespace UTILSLIB
 {
 
 
@@ -83,7 +83,7 @@ using namespace Eigen;
 *
 * @brief K-Means Clustering
 */
-class MNEMATHSHARED_EXPORT KMeans
+class UTILSSHARED_EXPORT KMeans
 {
 public:
     typedef QSharedPointer<KMeans> SPtr;            /**< Shared pointer type for KMeans. */

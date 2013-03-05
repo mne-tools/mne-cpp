@@ -59,7 +59,7 @@
 #include <fiff/fiff_cov.h>
 
 
-#include <mneMath/mnemath.h>
+#include <utils/mnemath.h>
 
 
 //*************************************************************************************************************
@@ -83,7 +83,7 @@ namespace MNELIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEMATHLIB;
+using namespace UTILSLIB;
 using namespace FIFFLIB;
 
 

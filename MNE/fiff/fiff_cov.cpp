@@ -42,7 +42,7 @@
 #include "fiff_stream.h"
 #include "fiff_info_base.h"
 
-#include <mneMath/mnemath.h>
+#include <utils/mnemath.h>
 
 
 //*************************************************************************************************************
@@ -67,7 +67,7 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
-using namespace MNEMATHLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 
