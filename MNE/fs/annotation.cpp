@@ -103,15 +103,14 @@ void Annotation::clear()
 }
 
 
-
 //*************************************************************************************************************
 
-bool Annotation::read(const QString& t_sFileName, Annotation &p_Annotation)
+bool Annotation::read(const QString& p_sFileName, Annotation &p_Annotation)
 {
     p_Annotation.clear();
 
     printf("Reading annotation...\n");
-    QFile t_File(t_sFileName);
+    QFile t_File(p_sFileName);
 
     if (!t_File.open(QIODevice::ReadOnly))
     {
