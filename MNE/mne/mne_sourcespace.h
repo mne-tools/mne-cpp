@@ -75,6 +75,17 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace FSLIB
+{
+class Label;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // DEFINE NAMESPACE MNE
 //=============================================================================================================
 
@@ -86,6 +97,7 @@ namespace MNELIB
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace FSLIB;
 using namespace FIFFLIB;
 
 
@@ -162,7 +174,7 @@ public:
     *
     * @return vertno list of length 2 Vertex numbers for lh and rh
     */
-    QList<VectorXi> label_src_vertno_sel(const VectorXi &label, VectorXi &src_sel);
+    QList<VectorXi> label_src_vertno_sel(const Label &p_label, VectorXi &src_sel) const;
 
     //=========================================================================================================
     /**
@@ -210,19 +222,6 @@ public:
     bool transform_source_space_to(fiff_int_t dest, FiffCoordTrans& trans);
 
 private:
-    //=========================================================================================================
-    /**
-    * Implementation of the read_source_space function in e.g. mne_read_source_spaces.m, mne_read_bem_surfaces.m
-    *
-    * Reads a single source space (hemisphere)
-    *
-    * @param [in] p_pStream         The opened fif file
-    * @param [in] p_Tree            Search for the source space here
-    * @param [out] p_pHemisphere    The read source space (hemisphere)
-    *
-    * @return true if succeeded, false otherwise
-    */
-    static bool read_source_space(FiffStream* p_pStream, const FiffDirTree& p_Tree, MNEHemisphere& p_Hemisphere);
 
     //=========================================================================================================
     /**
@@ -255,6 +254,20 @@ private:
     * @return Hemisphere related to the parameter identifier.
     */
     MNEHemisphere& operator[] (QString idt);
+
+    //=========================================================================================================
+    /**
+    * Implementation of the read_source_space function in e.g. mne_read_source_spaces.m, mne_read_bem_surfaces.m
+    *
+    * Reads a single source space (hemisphere)
+    *
+    * @param [in] p_pStream         The opened fif file
+    * @param [in] p_Tree            Search for the source space here
+    * @param [out] p_pHemisphere    The read source space (hemisphere)
+    *
+    * @return true if succeeded, false otherwise
+    */
+    static bool read_source_space(FiffStream* p_pStream, const FiffDirTree& p_Tree, MNEHemisphere& p_Hemisphere);
 
 public:
     QList<MNEHemisphere> hemispheres;   /**< List of the hemispheres containing the source space information. */

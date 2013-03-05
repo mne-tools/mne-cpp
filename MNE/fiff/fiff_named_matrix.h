@@ -146,10 +146,7 @@ public:
     *
     * @return true if named matrix is empty.
     */
-    inline bool isEmpty()
-    {
-        return !(this->data.size() > 0);
-    }
+    inline bool isEmpty() const;
 
     //ToDo return the transposed matrix instead of applying it to its members
     //=========================================================================================================
@@ -208,6 +205,14 @@ public:
 //    return *this;
 //}
 
+
+inline bool FiffNamedMatrix::isEmpty() const
+{
+    return !(this->data.size() > 0);
+}
+
+
+//*************************************************************************************************************
 
 inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffNamedMatrix &p_FiffNamedMatrix)
 {

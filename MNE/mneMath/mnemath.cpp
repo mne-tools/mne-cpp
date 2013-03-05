@@ -129,6 +129,41 @@ void MNEMath::get_whitener(MatrixXd &A, bool pca, QString ch_type, VectorXd &eig
 
 //*************************************************************************************************************
 
+VectorXi MNEMath::intersect(const VectorXi &v1, const VectorXi &v2, VectorXi &idx_sel)
+{
+    std::vector<int> tmp;
+
+    std::vector<IdxIntValue> t_vecIdxIntValue;
+
+    //ToDo:Slow; map VectorXi to stl container
+    for(qint32 i = 0; i < v1.size(); ++i)
+        tmp.push_back(v1[i]);
+
+    std::vector<int>::iterator it;
+    for(qint32 i = 0; i < v2.size(); ++i)
+    {
+        it = std::search(tmp.begin(), tmp.end(), &v2[i], &v2[i]+1);
+        if(it != tmp.end())
+            t_vecIdxIntValue.push_back(IdxIntValue(v2[i], it-tmp.begin()));
+    }
+
+    std::sort(t_vecIdxIntValue.begin(), t_vecIdxIntValue.end(), MNEMath::compareIdxIntPairSmallerThan);
+
+    VectorXi p_res(t_vecIdxIntValue.size());
+    idx_sel = VectorXi(t_vecIdxIntValue.size());
+
+    for(quint32 i = 0; i < t_vecIdxIntValue.size(); ++i)
+    {
+        p_res[i] = t_vecIdxIntValue[i].first;
+        idx_sel[i] = t_vecIdxIntValue[i].second;
+    }
+
+    return p_res;
+}
+
+
+//*************************************************************************************************************
+
 //    static inline MatrixXd extract_block_diag(MatrixXd& A, qint32 n)
 //    {
 

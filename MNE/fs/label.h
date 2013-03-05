@@ -50,6 +50,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QMap>
 
 
 //*************************************************************************************************************
@@ -111,6 +112,14 @@ public:
     * Initializes the Label.
     */
     void clear();
+
+    //=========================================================================================================
+    /**
+    * True if Label is empty.
+    *
+    * @return true if Label is empty, fasle otherwise.
+    */
+    inline bool isEmpty() const;
     
     //=========================================================================================================
     /**
@@ -128,18 +137,23 @@ public:
     static bool read(const QString& p_sFileName, Label &p_Label);
 
 public:
-    QString comment;    /**< Comment from the first line of the label file. */
-    qint32 hemi;        /**< Hemisphere (lh = 0; rh = 1) */
-    QString name;       /**< Name of the label */
-    VectorXi vertices;  /**< Vertex indices (0 based) */
-    MatrixX3f pos;      /**< Locations in meters */
-    VectorXd values;    /**< Values at the vertices */
+    QString comment;                    /**< Comment from the first line of the label file. */
+    qint32 hemi;                        /**< Hemisphere (lh = 0; rh = 1; both = 2) */
+    QString name;                       /**< Name of the label */
+    QMap<qint32, VectorXi> vertices;    /**< Vertex indices (0 based) */
+    QMap<qint32, MatrixX3f> pos;        /**< Locations in meters */
+    QMap<qint32, VectorXd> values;      /**< Values at the vertices */
 };
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+inline bool Label::isEmpty() const
+{
+    return this->hemi == -1;
+}
 
 
 } // NAMESPACE
