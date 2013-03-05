@@ -244,3 +244,13 @@ bool Annotation::read(const QString& p_sFileName, Annotation &p_Annotation)
     return true;
 }
 
+
+//*************************************************************************************************************
+
+bool Annotation::toLabels(QList<Label> &p_qListLabels, Colortable &p_Colortable) const
+{
+
+    std::cout << p_Colortable.table;
+
+    return true;
+}

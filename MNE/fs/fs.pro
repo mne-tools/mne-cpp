@@ -47,6 +47,14 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd
+}
+else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utils
+}
+
 DESTDIR = $${MNE_LIBRARY_DIR}
 
 #
@@ -62,16 +70,20 @@ win32 {
 }
 
 
-SOURCES += annotation.cpp \
+SOURCES += \
+    annotation.cpp \
     colortable.cpp \
     annotation_set.cpp \
-    label.cpp
+    label.cpp \
+    surface.cpp
 
-HEADERS += annotation.h\
-        fs_global.h \
+HEADERS += \
+    annotation.h\
+    fs_global.h \
     colortable.h \
     annotation_set.h \
-    label.h
+    label.h \
+    surface.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

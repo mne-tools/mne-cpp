@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 #include <fs/label.h>
+#include <fs/surface.h>
 
 #include <fs/annotation_set.h>
 
@@ -86,6 +87,19 @@ using namespace INVERSELIB;
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
+
+
+    Surface t_surf;
+    QString t_fName("./MNE-sample-data/subjects/sample/surf/lh.white");
+
+    Surface::read(t_fName, t_surf);
+
+    qint32 n;
+    std::cin >> n;
+
+
+
+
 
     QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");

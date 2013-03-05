@@ -51,7 +51,7 @@
 // FIFF INCLUDES
 //=============================================================================================================
 
-#include <mneMath/mnemath.h>
+#include <utils/mnemath.h>
 
 #include <fs/annotation_set.h>
 
@@ -106,7 +106,7 @@ namespace MNELIB
 
 using namespace Eigen;
 using namespace FSLIB;
-using namespace MNEMATHLIB;
+using namespace UTILSLIB;
 using namespace FIFFLIB;
 
 
