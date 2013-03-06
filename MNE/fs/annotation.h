@@ -85,6 +85,7 @@ using namespace Eigen;
 //=============================================================================================================
 
 class Label;
+class Surface;
 
 
 //=============================================================================================================
@@ -143,9 +144,9 @@ public:
     *
     * @return vertix labels
     */
-    inline VectorXi& getLabel()
+    inline VectorXi& getLabelIds()
     {
-        return m_Label;
+        return m_LabelIds;
     }
 
     //=========================================================================================================
@@ -172,22 +173,26 @@ public:
 
     //=========================================================================================================
     /**
+    * python labels_from_parc
+    *
     * Converts annotation to a label list and colortable
     *
-    * @param[out] p_qListLabels the converted labels
-    * @param[out] p_Colortable  the converted colortable
+    * @param[in] p_surf                 the surface to read the vertex positions from
+    * @param[out] p_qListLabels         the converted labels
+    * @param[out] p_qListLabelRGBAs     the converted label RGBAs
     *
     * @return true if successful, false otherwise
     */
-    bool toLabels(QList<Label> &p_qListLabels, Colortable &p_Colortable) const;
+    bool toLabels(const Surface &p_surf, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListLabelRGBAs) const;
 
 private:
     QString m_sFileName;        /**< Annotation file */
 
+    qint32 hemi;                /**< Hemisphere (lh = 0; rh = 1) */
     VectorXi m_Vertices;        /**< Vertice indeces */
-    VectorXi m_Label;           /**< Vertice labels */
+    VectorXi m_LabelIds;        /**< Vertice label ids */
 
-    Colortable m_Colortable;    /**< Lookup table label colors & names */
+    Colortable m_Colortable;    /**< Lookup table label colors & ids */
 };
 
 } // NAMESPACE

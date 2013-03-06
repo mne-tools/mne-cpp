@@ -75,6 +75,19 @@ Label::Label()
 
 //*************************************************************************************************************
 
+Label::Label(const VectorXi &p_vertices, const MatrixX3f &p_pos, const VectorXd &p_values, qint32 p_hemi, const QString &p_name)
+: vertices(p_vertices)
+, pos(p_pos)
+, values(p_values)
+, hemi(p_hemi)
+, name(p_name)
+{
+
+}
+
+
+//*************************************************************************************************************
+
 Label::~Label()
 {
 }
@@ -87,9 +100,12 @@ void Label::clear()
     comment = QString("");
     hemi = -1;
     name = QString("");
-    vertices.clear();
-    pos.clear();
-    values.clear();
+    vertices = VectorXi();
+    pos = MatrixX3f();
+    values = VectorXd();
+//    vertices.clear();
+//    pos.clear();
+//    values.clear();
 }
 
 
@@ -147,9 +163,13 @@ bool Label::read(const QString& p_sFileName, Label &p_Label)
     else
         p_Label.hemi = 1;
 
-    p_Label.vertices.insert(p_Label.hemi, data.cast<int>().block(0,0,data.rows(),1));
-    p_Label.pos.insert(p_Label.hemi, data.cast<float>().block(0,1,data.rows(),3).array() * 1e-3);
-    p_Label.values.insert(p_Label.hemi, data.block(0,4,data.rows(),1));
+    //This structure is not need since we don't mix both hemis
+//    p_Label.vertices.insert(p_Label.hemi, data.cast<int>().block(0,0,data.rows(),1));
+//    p_Label.pos.insert(p_Label.hemi, data.cast<float>().block(0,1,data.rows(),3).array() * 1e-3);
+//    p_Label.values.insert(p_Label.hemi, data.block(0,4,data.rows(),1));
+    p_Label.vertices = data.cast<int>().block(0,0,data.rows(),1);
+    p_Label.pos = data.cast<float>().block(0,1,data.rows(),3).array() * 1e-3;
+    p_Label.values = data.block(0,4,data.rows(),1);
 
     if(t_File.fileName().contains("lh.label"))
     {

@@ -100,6 +100,18 @@ public:
     * Default constructor
     */
     Label();
+
+    //=========================================================================================================
+    /**
+    * Constructs a label
+    *
+    * @param[in] p_vertices     label file name
+    * @param[in] p_pos          read label
+    * @param[in] p_values       label file name
+    * @param[in] p_hemi         read label
+    * @param[in] p_name         label file name
+    */
+    Label(const VectorXi &p_vertices, const MatrixX3f &p_pos, const VectorXd &p_values, qint32 p_hemi, const QString &p_name);
     
     //=========================================================================================================
     /**
@@ -137,12 +149,17 @@ public:
     static bool read(const QString& p_sFileName, Label &p_Label);
 
 public:
-    QString comment;                    /**< Comment from the first line of the label file. */
-    qint32 hemi;                        /**< Hemisphere (lh = 0; rh = 1; both = 2) */
-    QString name;                       /**< Name of the label */
-    QMap<qint32, VectorXi> vertices;    /**< Vertex indices (0 based) */
-    QMap<qint32, MatrixX3f> pos;        /**< Locations in meters */
-    QMap<qint32, VectorXd> values;      /**< Values at the vertices */
+    QString comment;    /**< Comment from the first line of the label file. */
+    qint32 hemi;        /**< Hemisphere (lh = 0; rh = 1) */
+//    qint32 hemi;                        /**< Hemisphere (lh = 0; rh = 1; both = 2) */ Don't mix both hemis - KISS principle
+    QString name;       /**< Name of the label */
+    VectorXi vertices;  /**< Vertex indices (0 based) */
+    MatrixX3f pos;      /**< Locations in meters */
+    VectorXd values;    /**< Values at the vertices */
+
+//    QMap<qint32, VectorXi> vertices;    /**< Vertex indices (0 based) */
+//    QMap<qint32, MatrixX3f> pos;        /**< Locations in meters */
+//    QMap<qint32, VectorXd> values;      /**< Values at the vertices */
 };
 
 //*************************************************************************************************************

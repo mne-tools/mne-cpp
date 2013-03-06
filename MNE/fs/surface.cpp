@@ -71,6 +71,7 @@ using namespace FSLIB;
 
 Surface::Surface()
 : m_fileName("")
+, hemi(-1)
 {
 }
 
@@ -79,6 +80,7 @@ Surface::Surface()
 
 Surface::Surface(const QString& p_sFileName)
 : m_fileName(p_sFileName)
+, hemi(-1)
 {
     Surface::read(p_sFileName, *this);
 }
@@ -95,6 +97,8 @@ Surface::~Surface()
 
 void Surface::clear()
 {
+    m_fileName = QString("");
+    hemi = -1;
     verts = MatrixX3f();
     faces = MatrixX3i();
 }
@@ -256,6 +260,12 @@ bool Surface::read(const QString &p_sFileName, Surface &p_Surface)
 
     p_Surface.verts = verts.block(0,0,verts.rows(),3);
     p_Surface.faces = faces.block(0,0,faces.rows(),3);
+
+    // hemi info
+    if(t_File.fileName().contains("lh."))
+        p_Surface.hemi = 0;
+    else
+        p_Surface.hemi = 1;
 
     t_File.close();
     printf("\tRead a surface with %d vertices from %s\n",nvert,p_sFileName.toLatin1().constData());

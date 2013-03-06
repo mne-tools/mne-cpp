@@ -134,6 +134,7 @@ public:
 
 public:
     QString m_fileName; /**< Surface file name. */
+    qint32 hemi;        /**< Hemisphere (lh = 0; rh = 1) */
     MatrixX3f verts;    /**< Vertex coordinates in meters */
     MatrixX3i faces;    /**< The triangle descriptions */
 };

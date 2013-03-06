@@ -144,11 +144,11 @@ void GeometryView::initializeGL(QGLPainter *painter)
 
                     MatrixXf t_TriCoords(3,3*tris.rows());
                     qint32 t_size = 0;
-                    qint32 t_label = m_vecAnnotation[h]->getColortable().table(k,4);
+                    qint32 t_label_ids = m_vecAnnotation[h]->getColortable().table(k,4);
 
                     for(qint32 i = 0; i < tris.rows(); ++i)
                     {
-                        if(m_vecAnnotation[h]->getLabel()(tris(i,0)) == t_label || m_vecAnnotation[h]->getLabel()(tris(i,1)) == t_label || m_vecAnnotation[h]->getLabel()(tris(i,2)) == t_label)
+                        if(m_vecAnnotation[h]->getLabelIds()(tris(i,0)) == t_label_ids || m_vecAnnotation[h]->getLabelIds()(tris(i,1)) == t_label_ids || m_vecAnnotation[h]->getLabelIds()(tris(i,2)) == t_label_ids)
                         {
                             t_TriCoords.col(t_size*3) = rr.row( tris(i,0) ).transpose().cast<float>();
                             t_TriCoords.col(t_size*3+1) = rr.row( tris(i,1) ).transpose().cast<float>();

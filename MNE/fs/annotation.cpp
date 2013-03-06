@@ -40,6 +40,8 @@
 //=============================================================================================================
 
 #include "annotation.h"
+#include "label.h"
+#include "surface.h"
 
 
 //*************************************************************************************************************
@@ -98,7 +100,7 @@ void Annotation::clear()
 {
     m_sFileName = QString("");
     m_Vertices = VectorXi::Zero(0);
-    m_Label = VectorXi::Zero(0);
+    m_LabelIds = VectorXi::Zero(0);
     m_Colortable.clear();
 }
 
@@ -125,16 +127,13 @@ bool Annotation::read(const QString& p_sFileName, Annotation &p_Annotation)
     t_Stream >> numEl;
 
     p_Annotation.m_Vertices = VectorXi(numEl);
-    p_Annotation.m_Label = VectorXi(numEl);
+    p_Annotation.m_LabelIds = VectorXi(numEl);
 
     for(qint32 i = 0; i < numEl; ++i)
     {
         t_Stream >> p_Annotation.m_Vertices[i];
-        t_Stream >> p_Annotation.m_Label[i];
+        t_Stream >> p_Annotation.m_LabelIds[i];
     }
-
-//    std::cout << "Vertices" << std::endl << m_pVertices->block(0,0,10,1) << std::endl;
-//    std::cout << "Label" << std::endl << m_pLabel->block(0,0,10,1) << std::endl;
 
     qint32 hasColortable;
     t_Stream >> hasColortable;
@@ -237,6 +236,12 @@ bool Annotation::read(const QString& p_sFileName, Annotation &p_Annotation)
         printf("\tError! No colortable stored\n");
     }
 
+    // hemi info
+    if(t_File.fileName().contains("lh."))
+        p_Annotation.hemi = 0;
+    else
+        p_Annotation.hemi = 1;
+
     printf("[done]\n");
 
     t_File.close();
@@ -247,10 +252,114 @@ bool Annotation::read(const QString& p_sFileName, Annotation &p_Annotation)
 
 //*************************************************************************************************************
 
-bool Annotation::toLabels(QList<Label> &p_qListLabels, Colortable &p_Colortable) const
+bool Annotation::toLabels(const Surface &p_surf, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListLabelRGBAs) const
 {
+    if(this->hemi != p_surf.hemi)
+    {
+        qWarning("Annotation and surface hemisphere (annot = %d; surf = %d) do not match!\n", this->hemi, p_surf.hemi);
+        return false;
+    }
 
-    std::cout << p_Colortable.table;
+    if(m_LabelIds.size() == 0)
+    {
+        qWarning("Annotation doesn't' contain data!\n");
+        return false;
+    }
+
+    printf("Converting labels from annotation...");
+
+//n_read = 0
+//labels = list()
+//label_colors = list()
+
+    VectorXi label_ids = m_Colortable.getLabelIds();
+    QStringList label_names = m_Colortable.getNames();
+    MatrixX4i label_rgbas = m_Colortable.getRGBAs();
+
+    // load the vertex positions from surface
+    MatrixX3f vert_pos = p_surf.verts;
+
+//    qDebug() << label_rgbas.rows() << label_ids.size() << label_names.size();
+
+//    std::cout << label_ids;
+
+    qint32 label_id, count;
+    RowVector4i label_rgba;
+    VectorXi vertices;
+    VectorXd values;
+    MatrixX3f pos;
+    QString name;
+    for(qint32 i = 0; i < label_rgbas.rows(); ++i)
+    {
+        label_id = label_ids[i];
+        label_rgba = label_rgbas.row(i);
+        count = 0;
+        vertices.resize(m_LabelIds.size());
+        //Where
+        for(qint32 j = 0; j < m_LabelIds.size(); ++j)
+        {
+            if(m_LabelIds[j] == label_id)
+            {
+                vertices[count] = j;
+                ++count;
+            }
+        }
+        // check if label is part of cortical surface
+        if(count == 0)
+            continue;
+        vertices.conservativeResize(count);
+
+        pos.resize(count, 3);
+        for(qint32 j = 0; j < count; ++j)
+            pos.row(j) = vert_pos.row(vertices[j]);
+
+        values = VectorXd::Zero(count);
+        name = QString("%1-%2").arg(label_names[i]).arg(this->hemi == 0 ? "lh" : "rh");
+
+        p_qListLabels.append(Label(vertices, pos, values, this->hemi, name));
+
+        // store the color
+        p_qListLabelRGBAs.append(label_rgba);
+
+    }
+
+
+
+
+//    for label_id, label_name, label_rgba in\
+//            zip(label_ids, label_names, label_rgbas):
+//        vertices = np.where(annot == label_id)[0]
+//        if len(vertices) == 0:
+//            # label is not part of cortical surface
+//            continue
+//        pos = vert_pos[vertices, :]
+//        values = np.zeros(len(vertices))
+//        name = label_name + '-' + hemi
+//        label = Label(vertices, pos, values, hemi, name=name)
+//        labels.append(label)
+
+//        # store the color
+//        label_rgba = tuple(label_rgba / 255.)
+//        label_colors.append(label_rgba)
+
+//    n_read = len(labels) - n_read
+//    logger.info('   read %d labels from %s' % (n_read, fname))
+
+//# sort the labels and colors by label name
+//names = [label.name for label in labels]
+//labels, label_colors = zip(*((label, color) for (name, label, color)
+//                           in sorted(zip(names, labels, label_colors))))
+//# convert tuples to lists
+//labels = list(labels)
+//label_colors = list(label_colors)
+
+//logger.info('[done]')
+
+
+
+
+
+
 
     return true;
 }
