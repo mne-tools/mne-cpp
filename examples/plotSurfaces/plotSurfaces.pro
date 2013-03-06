@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     examples.pro
+# @file     plotSurfaces.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,28 +29,51 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds all examples of the mne-cpp project.
+# @brief    Builds example for making an clustered inverse operator
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../mne-cpp.pri)
+include(../../mne-cpp.pri)
 
-TEMPLATE = subdirs
+TEMPLATE = app
 
-SUBDIRS += \
-    readRaw \
-    readWriteRaw \
-    readFwd \
-    readEpochs \
-    computeInverse \
-    clusteredInverse \
-    makeInverseOperator
+VERSION = $${MNE_CPP_VERSION}
 
-contains(MNECPP_CONFIG, isGui) {
-    qtHaveModule(3d) {
-        message(Qt3D available: readFwdDisp3D configured!)
-        SUBDIRS += \
-            readFwdDisp3D \
-            plotSurfaces
-    }
+QT -= gui
+
+CONFIG   += console
+CONFIG   -= app_bundle
+
+TARGET = plotSurfaces
+
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
 }
+
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Inversed \
+            -lMNE$${MNE_LIB_VERSION}Disp3Dd
+}
+else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
+            -lMNE$${MNE_LIB_VERSION}Fs \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Inverse \
+            -lMNE$${MNE_LIB_VERSION}Disp3D
+}
+
+DESTDIR =  $${MNE_BINARY_DIR}
+
+SOURCES += \
+        main.cpp \
+
+HEADERS += \
+
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}

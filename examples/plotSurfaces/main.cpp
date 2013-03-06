@@ -88,6 +88,21 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
+    Annotation t_annot("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot");
+    Surface t_surf("./MNE-sample-data/subjects/sample/surf/lh.white");
+
+    QList<Label> t_qListLabels;
+    QList<RowVector4i> t_qListRGBAs;
+
+    t_annot.toLabels(t_surf, t_qListLabels, t_qListRGBAs);
+
+    qint32 n;
+    std::cin >> n;
+
+
+
+
+
     QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
