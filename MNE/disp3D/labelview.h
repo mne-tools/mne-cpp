@@ -43,13 +43,21 @@
 
 #include "disp3D_global.h"
 
+#include <fs/label.h>
+#include <fs/annotation.h>
+#include <mne/mne.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include "qglview.h"
+#include <QGeometryData>
+#include <QGLColorMaterial>
 #include <QSharedPointer>
+#include <QList>
 
 
 //*************************************************************************************************************
@@ -65,6 +73,9 @@ namespace DISP3DLIB
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace MNELIB;
+using namespace FSLIB;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -78,8 +89,9 @@ namespace DISP3DLIB
 *
 * @brief 3D stereoscopic labels
 */
-class DISP3DSHARED_EXPORT LabelView
+class DISP3DSHARED_EXPORT LabelView : public QGLView
 {
+    Q_OBJECT
 public:
     typedef QSharedPointer<LabelView> SPtr;            /**< Shared pointer type for LabelView class. */
     typedef QSharedPointer<const LabelView> ConstSPtr; /**< Const shared pointer type for LabelView class. */
@@ -87,17 +99,65 @@ public:
     //=========================================================================================================
     /**
     * Default constructor
+    *
+    * @param[in] parent     Parent QObject (optional)
     */
-    LabelView();
+    LabelView(QWindow *parent = 0);
     
     //=========================================================================================================
     /**
     * Destroys the LabelView class.
     */
     ~LabelView();
-    
+
+protected:
+    //=========================================================================================================
+    /**
+    * Initializes the current GL context represented by painter.
+    *
+    * @param[in] painter    GL painter which should be initialized
+    */
+    void initializeGL(QGLPainter *painter);
+
+    //=========================================================================================================
+    /**
+    * Paints the scene onto painter. The color and depth buffers will have already been cleared, and the camera() position set.
+    *
+    * @param[in] painter    GL painter which is updated
+    */
+    void paintGL(QGLPainter *painter);
+
 private:
-    
+    MNEForwardSolution m_forwardSolution;   /**< Holds the forward soultion -> ToDo change this to shraed data pointer */
+    qint32 testCount;
+    QVector<Annotation::SPtr> m_vecAnnotation;
+
+
+    //Data Stuff
+    QList<Label> m_qListLabels;                     /**< The labels. */
+    QList<RowVector4i> m_qListRGBAs;                /**< The label colors encoded in RGBA. */
+
+    //GL Stuff
+    bool m_bStereo;
+
+    QGLLightModel *m_pLightModel;                   /**< The selected light model. */
+    QGLLightParameters *m_pLightParametersScene;    /**< The selected light parameters. */
+
+    QGLColorMaterial material;
+
+    QGLSceneNode *m_pSceneNodeBrain;               /**< Scene node of the hemisphere models. */
+    QGLSceneNode *m_pSceneNode;                    /**< Node of the scene. */
+
+    QGLCamera *m_pCameraFrontal;     /**< frontal camera. */
+
+    //=========================================================================================================
+    /**
+    * Creates the scene
+    *
+    * @return the root scene noode
+    */
+//    QGLSceneNode *createScene();
+
 };
 
 //*************************************************************************************************************
