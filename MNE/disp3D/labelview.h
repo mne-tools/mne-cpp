@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     labelview.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     July, 2012
+* @date     March, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,21 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the main() application function.
+* @brief    LabelView class declaration
 *
 */
 
+#ifndef LABELVIEW_H
+#define LABELVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <fs/label.h>
-#include <fs/surface.h>
-#include <fs/annotation_set.h>
-
-#include <iostream>
+#include "disp3D_global.h"
 
 
 //*************************************************************************************************************
@@ -51,42 +49,64 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/QCoreApplication>
+#include <QSharedPointer>
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE FSLIB
+//=============================================================================================================
+
+namespace DISP3DLIB
+{
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FSLIB;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MAIN
+// FORWARD DECLARATIONS
 //=============================================================================================================
+
 
 //=============================================================================================================
 /**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
+* Visualize labels using a stereoscopic view. Coloring is done per label.
 *
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+* @brief 3D stereoscopic labels
 */
-int main(int argc, char *argv[])
+class DISP3DSHARED_EXPORT LabelView
 {
-    QCoreApplication a(argc, argv);
+public:
+    typedef QSharedPointer<LabelView> SPtr;            /**< Shared pointer type for LabelView class. */
+    typedef QSharedPointer<const LabelView> ConstSPtr; /**< Const shared pointer type for LabelView class. */
+    
+    //=========================================================================================================
+    /**
+    * Default constructor
+    */
+    LabelView();
+    
+    //=========================================================================================================
+    /**
+    * Destroys the LabelView class.
+    */
+    ~LabelView();
+    
+private:
+    
+};
 
-    Annotation t_annot("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot");
-    Surface t_surf("./MNE-sample-data/subjects/sample/surf/lh.white");
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
 
-    QList<Label> t_qListLabels;
-    QList<RowVector4i> t_qListRGBAs;
 
-    t_annot.toLabels(t_surf, t_qListLabels, t_qListRGBAs);
+} // NAMESPACE
 
-    return a.exec();
-}
+#endif // LABELVIEW_H
+

@@ -74,11 +74,13 @@ win32 {
 }
 
 SOURCES += \
-    geometryview.cpp
+    geometryview.cpp \
+    labelview.cpp
 
 HEADERS += \
     disp3D_global.h \
-    geometryview.h
+    geometryview.h \
+    labelview.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

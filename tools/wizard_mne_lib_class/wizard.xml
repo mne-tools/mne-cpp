@@ -57,7 +57,7 @@ MNE class wizard configuration file. -->
             <fielddescription xml:lang="de">Namespace:</fielddescription>
         </field>
         <field name="LibGlobal">
-            <fieldcontrol class="QLineEdit" validator="^[a-z_.]+$" defaulttext="lib_global.h" />
+            <fieldcontrol class="QLineEdit" validator="^[a-zA-Z0-9_.]+$" defaulttext="lib_global.h" />
             <fielddescription>Lib export header:</fielddescription>
             <fielddescription xml:lang="de">Lib export header:</fielddescription>
         </field>
