@@ -85,6 +85,7 @@ var searchData=
   ['_7eprogressbar',['~ProgressBar',['../class_r_t_m_e_a_s_l_i_b_1_1_progress_bar.html#aa0ced60c0ade467a4602c35443e7bc78',1,'RTMEASLIB::ProgressBar']]],
   ['_7eprogressbarwidget',['~ProgressBarWidget',['../class_d_i_s_p_l_i_b_1_1_progress_bar_widget.html#ad538c291e1c9b546b52743feb7dae563',1,'DISPLIB::ProgressBarWidget']]],
   ['_7erealtimemultisamplearray',['~RealTimeMultiSampleArray',['../class_r_t_m_e_a_s_l_i_b_1_1_real_time_multi_sample_array.html#a4140ddf255fe8c2eb119c13499987dfd',1,'RTMEASLIB::RealTimeMultiSampleArray']]],
+  ['_7erealtimemultisamplearraywidget',['~RealTimeMultiSampleArrayWidget',['../class_d_i_s_p_l_i_b_1_1_real_time_multi_sample_array_widget.html#a92956983a09987c68bab137c8b9cf96e',1,'DISPLIB::RealTimeMultiSampleArrayWidget']]],
   ['_7erealtimesamplearray',['~RealTimeSampleArray',['../class_r_t_m_e_a_s_l_i_b_1_1_real_time_sample_array.html#a5074ae8b81d607cead6dac192dcb7999',1,'RTMEASLIB::RealTimeSampleArray']]],
   ['_7erealtimesamplearraywidget',['~RealTimeSampleArrayWidget',['../class_d_i_s_p_l_i_b_1_1_real_time_sample_array_widget.html#ad9fd61431701952152bd1952bbf3d98e',1,'DISPLIB::RealTimeSampleArrayWidget']]],
   ['_7ertclient',['~RtClient',['../class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_client.html#a33bb04ea1663bdd1aa126611976a5678',1,'RTCLIENTLIB::RtClient']]],

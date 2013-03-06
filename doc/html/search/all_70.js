@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['paintevent',['paintEvent',['../class_d_i_s_p_l_i_b_1_1_progress_bar_widget.html#a74447c042f792bb4625bdcc13aee07da',1,'DISPLIB::ProgressBarWidget::paintEvent()'],['../class_d_i_s_p_l_i_b_1_1_real_time_sample_array_widget.html#a4739d6bf71376270eb9ef32f24280ca1',1,'DISPLIB::RealTimeSampleArrayWidget::paintEvent()']]],
+  ['paintevent',['paintEvent',['../class_d_i_s_p_l_i_b_1_1_progress_bar_widget.html#a74447c042f792bb4625bdcc13aee07da',1,'DISPLIB::ProgressBarWidget::paintEvent()'],['../class_d_i_s_p_l_i_b_1_1_real_time_multi_sample_array_widget.html#ae0ab9c58037bccacf56b40f8a24982dc',1,'DISPLIB::RealTimeMultiSampleArrayWidget::paintEvent()'],['../class_d_i_s_p_l_i_b_1_1_real_time_sample_array_widget.html#a4739d6bf71376270eb9ef32f24280ca1',1,'DISPLIB::RealTimeSampleArrayWidget::paintEvent()']]],
   ['paintgl',['paintGL',['../class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a394ff6a0626e1cc306d40df437a34718',1,'DISP3DLIB::GeometryView']]],
   ['parent_5fid',['parent_id',['../class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a8611ccc7bd0762298f403a34a8ca9330',1,'FIFFLIB::FiffDirTree']]],
   ['parse',['parse',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_parser.html#ae476638d6f9dbfe09e0302103ef1fa3a',1,'RTCOMMANDLIB::CommandParser']]],

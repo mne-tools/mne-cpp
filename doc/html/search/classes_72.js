@@ -4,6 +4,7 @@ var searchData=
   ['rawcommand',['RawCommand',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_raw_command.html',1,'RTCOMMANDLIB']]],
   ['realtimemultisamplearray',['RealTimeMultiSampleArray',['../class_r_t_m_e_a_s_l_i_b_1_1_real_time_multi_sample_array.html',1,'RTMEASLIB']]],
   ['realtimemultisamplearrayclass',['RealTimeMultiSampleArrayClass',['../class_ui_1_1_real_time_multi_sample_array_class.html',1,'Ui']]],
+  ['realtimemultisamplearraywidget',['RealTimeMultiSampleArrayWidget',['../class_d_i_s_p_l_i_b_1_1_real_time_multi_sample_array_widget.html',1,'DISPLIB']]],
   ['realtimesamplearray',['RealTimeSampleArray',['../class_r_t_m_e_a_s_l_i_b_1_1_real_time_sample_array.html',1,'RTMEASLIB']]],
   ['realtimesamplearrayclass',['RealTimeSampleArrayClass',['../class_ui_1_1_real_time_sample_array_class.html',1,'Ui']]],
   ['realtimesamplearraywidget',['RealTimeSampleArrayWidget',['../class_d_i_s_p_l_i_b_1_1_real_time_sample_array_widget.html',1,'DISPLIB']]],

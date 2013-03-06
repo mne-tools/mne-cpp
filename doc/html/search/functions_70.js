@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['paintevent',['paintEvent',['../class_d_i_s_p_l_i_b_1_1_progress_bar_widget.html#a74447c042f792bb4625bdcc13aee07da',1,'DISPLIB::ProgressBarWidget::paintEvent()'],['../class_d_i_s_p_l_i_b_1_1_real_time_sample_array_widget.html#a4739d6bf71376270eb9ef32f24280ca1',1,'DISPLIB::RealTimeSampleArrayWidget::paintEvent()']]],
+  ['paintevent',['paintEvent',['../class_d_i_s_p_l_i_b_1_1_progress_bar_widget.html#a74447c042f792bb4625bdcc13aee07da',1,'DISPLIB::ProgressBarWidget::paintEvent()'],['../class_d_i_s_p_l_i_b_1_1_real_time_multi_sample_array_widget.html#ae0ab9c58037bccacf56b40f8a24982dc',1,'DISPLIB::RealTimeMultiSampleArrayWidget::paintEvent()'],['../class_d_i_s_p_l_i_b_1_1_real_time_sample_array_widget.html#a4739d6bf71376270eb9ef32f24280ca1',1,'DISPLIB::RealTimeSampleArrayWidget::paintEvent()']]],
   ['paintgl',['paintGL',['../class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a394ff6a0626e1cc306d40df437a34718',1,'DISP3DLIB::GeometryView']]],
   ['parse',['parse',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_parser.html#ae476638d6f9dbfe09e0302103ef1fa3a',1,'RTCOMMANDLIB::CommandParser']]],
   ['patch_5finfo',['patch_info',['../class_m_n_e_l_i_b_1_1_m_n_e.html#a6ef7ba56a38a48a198e214b983281985',1,'MNELIB::MNE::patch_info()'],['../class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a0092de75b4374893bebd6ab3dbae6ca0',1,'MNELIB::MNESourceSpace::patch_info()']]],
