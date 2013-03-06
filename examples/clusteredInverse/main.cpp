@@ -88,11 +88,13 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    QString t_fName("./MNE-sample-data/subjects/sample/surf/lh.white");
+    Annotation t_annot("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot");
+    Surface t_surf("./MNE-sample-data/subjects/sample/surf/lh.white");
 
-    Surface t_surf(t_fName);
+    QList<Label> t_qListLabels;
+    QList<RowVector4i> t_qListRGBAs;
 
-    std::cout << std::endl << t_surf.verts.block(t_surf.verts.rows()-20,0,20,3) << std::endl;
+    t_annot.toLabels(t_surf, t_qListLabels, t_qListRGBAs);
 
 
     qint32 n;

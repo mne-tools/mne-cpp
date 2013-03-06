@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['name',['name',['../class_c_type_name.html#ae1c92fafa161460cdc8555d45581c84c',1,'CTypeName']]],
+  ['name',['name',['../class_f_s_l_i_b_1_1_label.html#aafe7016a7b71c8850e1c70db77065917',1,'FSLIB::Label::name()'],['../class_c_type_name.html#ae1c92fafa161460cdc8555d45581c84c',1,'CTypeName::name()']]],
   ['names',['names',['../class_f_i_f_f_l_i_b_1_1_fiff_cov.html#ac4727db648bc2652e98162e917611605',1,'FIFFLIB::FiffCov']]],
   ['nave',['nave',['../class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#ab678c64a099131848c27ad92b8c76c37',1,'FIFFLIB::FiffEvoked::nave()'],['../class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#abaff5b4b0089398fbf06a9f1f7424277',1,'FIFFLIB::FiffEvokedData::nave()'],['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ac0d085ad6c61c13cca4253fbe13d9a21',1,'MNELIB::MNEInverseOperator::nave()']]],
   ['nchan',['nchan',['../class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893',1,'FIFFLIB::FiffInfoBase::nchan()'],['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#adedb753633d161cdfa28a450ba64ca42',1,'MNELIB::MNEForwardSolution::nchan()'],['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a5ab16a16ee9efc33692ffdf90d126b1d',1,'MNELIB::MNEInverseOperator::nchan()']]],

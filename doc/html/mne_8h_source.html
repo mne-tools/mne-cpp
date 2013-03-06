@@ -116,7 +116,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fiff__cov_8h.html" title="FiffCov class declaration.">fiff/fiff_cov.h</a>&gt;</span></div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="mnemath_8h.html" title="MNEMath class declaration.">mneMath/mnemath.h</a>&gt;</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="mnemath_8h.html" title="MNEMath class declaration.">utils/mnemath.h</a>&gt;</span></div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
@@ -140,7 +140,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="comment">// USED NAMESPACES</span></div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="keyword">using namespace </span>MNEMATHLIB;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="keyword">using namespace </span>UTILSLIB;</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="keyword">using namespace </span>FIFFLIB;</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
@@ -163,7 +163,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
 <div class="line"><a name="l00128"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e.html#a730256c44026e9d64551d85fc649488d">  128</a></span>&#160;<span class="comment"></span>    <span class="keyword">inline</span> <span class="keyword">static</span> VectorXd* combine_xyz(<span class="keyword">const</span> VectorXd&amp; vec)</div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    {</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#a2b01df2e1093da85ab5edb2ba9354a14">MNEMath::combine_xyz</a>(vec);</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a2b01df2e1093da85ab5edb2ba9354a14">MNEMath::combine_xyz</a>(vec);</div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    }</div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;</div>
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
@@ -185,7 +185,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
 <div class="line"><a name="l00201"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e.html#a8ffa287af3a5537fb4ae5af8f21275ae">  201</a></span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keyword">inline</span> SparseMatrix&lt;double&gt;* make_block_diag(<span class="keyword">const</span> MatrixXd &amp;A, qint32 n)</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    {</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="class_m_n_e_m_a_t_h_l_i_b_1_1_m_n_e_math.html#a0db0d2c5128dfa345c8a04acdb9ec70d">MNEMath::make_block_diag</a>(A, n);</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a0db0d2c5128dfa345c8a04acdb9ec70d">MNEMath::make_block_diag</a>(A, n);</div>
 <div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    }</div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
@@ -273,7 +273,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Mar 2 2013 02:51:42 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 6 2013 01:58:23 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.3"/>
-<title>mne-cpp (MNE1): D:/Users/Christoph/Documents/GitHub/mne-cpp/MNE/mneMath/kmeans.h Source File</title>
+<title>mne-cpp (MNE1): D:/Users/Christoph/Documents/GitHub/mne-cpp/MNE/utils/kmeans.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -82,7 +82,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_d9f91708cdb6d7bc2d9cf00ef2519886.html">MNE</a></li><li class="navelem"><a class="el" href="dir_a84649bfd0bc3018fd41369fea63483d.html">mneMath</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_d9f91708cdb6d7bc2d9cf00ef2519886.html">MNE</a></li><li class="navelem"><a class="el" href="dir_54f14aee4d723d2cd9407d028f6ab6d4.html">utils</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -99,7 +99,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="comment">// INCLUDES</span></div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="mnemath__global_8h.html" title="mnemath library export/import macros.">mnemath_global.h</a>&quot;</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="utils__global_8h.html" title="utils library export/import macros.">utils_global.h</a>&quot;</span></div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
@@ -124,7 +124,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="comment">// DEFINE NAMESPACE MNELIB</span></div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="keyword">namespace </span>MNEMATHLIB</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="keyword">namespace </span>UTILSLIB</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;{</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;</div>
@@ -136,17 +136,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="keyword">using namespace </span>Eigen;</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00086"></a><span class="lineno"><a class="code" href="class_m_n_e_m_a_t_h_l_i_b_1_1_k_means.html">   86</a></span>&#160;<span class="comment"></span><span class="keyword">class </span><a class="code" href="mnemath__global_8h.html#a78b25cc423e2fd9f75044c03f149090b">MNEMATHSHARED_EXPORT</a> <a class="code" href="class_m_n_e_m_a_t_h_l_i_b_1_1_k_means.html" title="K-Means Clustering.">KMeans</a></div>
+<div class="line"><a name="l00086"></a><span class="lineno"><a class="code" href="class_u_t_i_l_s_l_i_b_1_1_k_means.html">   86</a></span>&#160;<span class="comment"></span><span class="keyword">class </span><a class="code" href="utils__global_8h.html#a66e92968c1d28ba0dcd8b83fd51f6c95">UTILSSHARED_EXPORT</a> <a class="code" href="class_u_t_i_l_s_l_i_b_1_1_k_means.html" title="K-Means Clustering.">KMeans</a></div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;{</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00089"></a><span class="lineno"><a class="code" href="class_m_n_e_m_a_t_h_l_i_b_1_1_k_means.html#a6af4fcdf1da64ce8519beb318ba76fb1">   89</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;KMeans&gt; <a class="code" href="class_m_n_e_m_a_t_h_l_i_b_1_1_k_means.html#a6af4fcdf1da64ce8519beb318ba76fb1">SPtr</a>;            </div>
-<div class="line"><a name="l00090"></a><span class="lineno"><a class="code" href="class_m_n_e_m_a_t_h_l_i_b_1_1_k_means.html#a1524c0cd8ff8c4160d3a8cddd3d0a878">   90</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;const KMeans&gt; <a class="code" href="class_m_n_e_m_a_t_h_l_i_b_1_1_k_means.html#a1524c0cd8ff8c4160d3a8cddd3d0a878">ConstSPtr</a>; </div>
+<div class="line"><a name="l00089"></a><span class="lineno"><a class="code" href="class_u_t_i_l_s_l_i_b_1_1_k_means.html#aaaed53d888d290125300402d3acfe0e8">   89</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;KMeans&gt; <a class="code" href="class_u_t_i_l_s_l_i_b_1_1_k_means.html#aaaed53d888d290125300402d3acfe0e8">SPtr</a>;            </div>
+<div class="line"><a name="l00090"></a><span class="lineno"><a class="code" href="class_u_t_i_l_s_l_i_b_1_1_k_means.html#a41cd75832f896b0627ebb118f52f4349">   90</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;const KMeans&gt; <a class="code" href="class_u_t_i_l_s_l_i_b_1_1_k_means.html#a41cd75832f896b0627ebb118f52f4349">ConstSPtr</a>; </div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="comment">//distance {&#39;sqeuclidean&#39;,&#39;cityblock&#39;,&#39;cosine&#39;,&#39;correlation&#39;,&#39;hamming&#39;};</span></div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="comment">//startNames = {&#39;uniform&#39;,&#39;sample&#39;,&#39;cluster&#39;};</span></div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <span class="comment">//emptyactNames = {&#39;error&#39;,&#39;drop&#39;,&#39;singleton&#39;};</span></div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="comment"></span>    <span class="keyword">explicit</span> <a class="code" href="class_m_n_e_m_a_t_h_l_i_b_1_1_k_means.html" title="K-Means Clustering.">KMeans</a>(QString distance = QString(<span class="stringliteral">&quot;sqeuclidean&quot;</span>) , QString start = QString(<span class="stringliteral">&quot;sample&quot;</span>), qint32 replicates = 1, QString emptyact = QString(<span class="stringliteral">&quot;error&quot;</span>), <span class="keywordtype">bool</span> online = <span class="keyword">true</span>, qint32 maxit = 100);</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="comment"></span>    <span class="keyword">explicit</span> <a class="code" href="class_u_t_i_l_s_l_i_b_1_1_k_means.html" title="K-Means Clustering.">KMeans</a>(QString distance = QString(<span class="stringliteral">&quot;sqeuclidean&quot;</span>) , QString start = QString(<span class="stringliteral">&quot;sample&quot;</span>), qint32 replicates = 1, QString emptyact = QString(<span class="stringliteral">&quot;error&quot;</span>), <span class="keywordtype">bool</span> online = <span class="keyword">true</span>, qint32 maxit = 100);</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;<span class="comment"></span>    <span class="keywordtype">bool</span> calculate( MatrixXd X, qint32 kClusters, VectorXi&amp; idx, MatrixXd&amp; C, VectorXd&amp; sumD, MatrixXd&amp; D);</div>
@@ -196,7 +196,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Mar 2 2013 02:51:43 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 6 2013 01:58:24 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

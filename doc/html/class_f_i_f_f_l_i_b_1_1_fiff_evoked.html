@@ -89,6 +89,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
@@ -103,6 +104,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <p><code>#include &lt;<a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a427a54548db07d9a54447bf6ba9243ae"><td class="memItemLeft" align="right" valign="top">typedef QSharedPointer<br class="typebreak"/>
+&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html">FiffEvoked</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#a427a54548db07d9a54447bf6ba9243ae">SPtr</a></td></tr>
+<tr class="separator:a427a54548db07d9a54447bf6ba9243ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad36ab3ceb106f2e856a4a6346b241e21"><td class="memItemLeft" align="right" valign="top">typedef QSharedPointer&lt; const <br class="typebreak"/>
+<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html">FiffEvoked</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#ad36ab3ceb106f2e856a4a6346b241e21">ConstSPtr</a></td></tr>
+<tr class="separator:ad36ab3ceb106f2e856a4a6346b241e21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a6ab0fcdd35c0582eb651afb9914163a1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#a6ab0fcdd35c0582eb651afb9914163a1">FiffEvoked</a> ()</td></tr>
@@ -124,8 +134,8 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:ababc0ef5329a871b2987eea4409865a5"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#ababc0ef5329a871b2987eea4409865a5">read_evoked</a> (QIODevice &amp;p_IODevice, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html">FiffEvoked</a> &amp;p_FiffEvoked, QVariant setno=0, QPair&lt; QVariant, QVariant &gt; baseline=QPair&lt; QVariant, QVariant &gt;(), bool <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#aea2f6eaf6b0a67918b203a502f8d041b">proj</a>=true, fiff_int_t p_aspect_kind=<a class="el" href="fiff__constants_8h.html#a5dab727c9be8983aee7be8d73fabe64e">FIFFV_ASPECT_AVERAGE</a>)</td></tr>
-<tr class="separator:ababc0ef5329a871b2987eea4409865a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a3d8c7063606010659b16327ca38fbc"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#a2a3d8c7063606010659b16327ca38fbc">read</a> (QIODevice &amp;p_IODevice, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html">FiffEvoked</a> &amp;p_FiffEvoked, QVariant setno=0, QPair&lt; QVariant, QVariant &gt; baseline=QPair&lt; QVariant, QVariant &gt;(), bool <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#aea2f6eaf6b0a67918b203a502f8d041b">proj</a>=true, fiff_int_t p_aspect_kind=<a class="el" href="fiff__constants_8h.html#a5dab727c9be8983aee7be8d73fabe64e">FIFFV_ASPECT_AVERAGE</a>)</td></tr>
+<tr class="separator:a2a3d8c7063606010659b16327ca38fbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -155,7 +165,38 @@ Public Attributes</h2></td></tr>
 <p>NEW PYTHON LIKE <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html" title="The Fiff class provides static wrapper functions to stay consistent with mne matlab toolbox Note: avo...">Fiff</a> evoked </p>
 
 <p>Definition at line <a class="el" href="fiff__evoked_8h_source.html#l00091">91</a> of file <a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>.</p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a class="anchor" id="ad36ab3ceb106f2e856a4a6346b241e21"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef QSharedPointer&lt;const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html">FiffEvoked</a>&gt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#ad36ab3ceb106f2e856a4a6346b241e21">FIFFLIB::FiffEvoked::ConstSPtr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Const shared pointer type for <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html" title="evoked data">FiffEvoked</a>. </p>
+
+<p>Definition at line <a class="el" href="fiff__evoked_8h_source.html#l00095">95</a> of file <a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a427a54548db07d9a54447bf6ba9243ae"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef QSharedPointer&lt;<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html">FiffEvoked</a>&gt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#a427a54548db07d9a54447bf6ba9243ae">FIFFLIB::FiffEvoked::SPtr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Shared pointer type for <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html" title="evoked data">FiffEvoked</a>. </p>
+
+<p>Definition at line <a class="el" href="fiff__evoked_8h_source.html#l00094">94</a> of file <a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a6ab0fcdd35c0582eb651afb9914163a1"></a>
 <div class="memitem">
 <div class="memproto">
@@ -298,7 +339,7 @@ Public Attributes</h2></td></tr>
 <p>Provides the python Evoked string formatted aspect_kind, which is stored in kind: "average" &lt;-&gt; FIFFV_ASPECT_AVERAGE, "standard_error" &lt;-&gt; FIFFV_ASPECT_STD_ERR or "unknown"</p>
 <dl class="section return"><dt>Returns</dt><dd>string formatted aspect_kind </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__evoked_8h_source.html#l00211">211</a> of file <a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__evoked_8h_source.html#l00213">213</a> of file <a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>.</p>
 
 </div>
 </div>
@@ -343,7 +384,7 @@ Public Attributes</h2></td></tr>
 <p>Returns whether <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html" title="evoked data">FiffEvoked</a> is empty.</p>
 <dl class="section return"><dt>Returns</dt><dd>true if is empty, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__evoked_8h_source.html#l00224">224</a> of file <a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__evoked_8h_source.html#l00226">226</a> of file <a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>.</p>
 
 </div>
 </div>
@@ -386,7 +427,7 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ababc0ef5329a871b2987eea4409865a5"></a>
+<a class="anchor" id="a2a3d8c7063606010659b16327ca38fbc"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -394,7 +435,7 @@ Public Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool FiffEvoked::read_evoked </td>
+          <td class="memname">bool FiffEvoked::read </td>
           <td>(</td>
           <td class="paramtype">QIODevice &amp;&#160;</td>
           <td class="paramname"><em>p_IODevice</em>, </td>
@@ -443,7 +484,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_read_evoked</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html#a5b15f35b63c1771e315f3e55488a92bc">FiffEvokedDataSet::read_evoked</a> static function</p>
+<p>Wrapper for the FiffEvokedDataSet::read_evoked static function</p>
 <p>Read one evoked data set</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -474,7 +515,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Aspect identifier, either FIFFV_ASPECT_AVERAGE or FIFFV_ASPECT_STD_ERR. </p>
 
-<p>Definition at line <a class="el" href="fiff__evoked_8h_source.html#l00196">196</a> of file <a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__evoked_8h_source.html#l00198">198</a> of file <a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>.</p>
 
 </div>
 </div>
@@ -489,7 +530,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>List of channels' names. </p>
 
-<p>Definition at line <a class="el" href="fiff__evoked_8h_source.html#l00194">194</a> of file <a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__evoked_8h_source.html#l00196">196</a> of file <a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>.</p>
 
 </div>
 </div>
@@ -504,7 +545,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Comment on dataset. Can be the condition. </p>
 
-<p>Definition at line <a class="el" href="fiff__evoked_8h_source.html#l00199">199</a> of file <a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__evoked_8h_source.html#l00201">201</a> of file <a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>.</p>
 
 </div>
 </div>
@@ -519,7 +560,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>2D array of shape [n_channels x n_times]; Evoked response. </p>
 
-<p>Definition at line <a class="el" href="fiff__evoked_8h_source.html#l00201">201</a> of file <a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__evoked_8h_source.html#l00203">203</a> of file <a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>.</p>
 
 </div>
 </div>
@@ -534,7 +575,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>First time sample. </p>
 
-<p>Definition at line <a class="el" href="fiff__evoked_8h_source.html#l00197">197</a> of file <a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__evoked_8h_source.html#l00199">199</a> of file <a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>.</p>
 
 </div>
 </div>
@@ -549,7 +590,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Measurement info. </p>
 
-<p>Definition at line <a class="el" href="fiff__evoked_8h_source.html#l00193">193</a> of file <a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__evoked_8h_source.html#l00195">195</a> of file <a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>.</p>
 
 </div>
 </div>
@@ -564,7 +605,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Last time sample. </p>
 
-<p>Definition at line <a class="el" href="fiff__evoked_8h_source.html#l00198">198</a> of file <a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__evoked_8h_source.html#l00200">200</a> of file <a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>.</p>
 
 </div>
 </div>
@@ -579,7 +620,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Number of averaged epochs. </p>
 
-<p>Definition at line <a class="el" href="fiff__evoked_8h_source.html#l00195">195</a> of file <a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__evoked_8h_source.html#l00197">197</a> of file <a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>.</p>
 
 </div>
 </div>
@@ -594,7 +635,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>SSP projection </p>
 
-<p>Definition at line <a class="el" href="fiff__evoked_8h_source.html#l00202">202</a> of file <a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__evoked_8h_source.html#l00204">204</a> of file <a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>.</p>
 
 </div>
 </div>
@@ -609,7 +650,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Vector of time instants in seconds. </p>
 
-<p>Definition at line <a class="el" href="fiff__evoked_8h_source.html#l00200">200</a> of file <a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__evoked_8h_source.html#l00202">202</a> of file <a class="el" href="fiff__evoked_8h_source.html">fiff_evoked.h</a>.</p>
 
 </div>
 </div>
@@ -620,7 +661,7 @@ Public Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Mar 2 2013 02:51:45 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 6 2013 01:58:27 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

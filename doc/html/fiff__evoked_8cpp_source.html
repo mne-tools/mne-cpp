@@ -100,7 +100,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="fiff__stream_8h.html" title="FiffStream class declaration.">fiff_stream.h</a>&quot;</span></div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="fiff__tag_8h.html" title="FiffTag class declaration, which provides fiff tag I/O and processing methods.">fiff_tag.h</a>&quot;</span></div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="mnemath_8h.html" title="MNEMath class declaration.">mneMath/mnemath.h</a>&gt;</span></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="mnemath_8h.html" title="MNEMath class declaration.">utils/mnemath.h</a>&gt;</span></div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
@@ -109,7 +109,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="keyword">using namespace </span>FIFFLIB;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="keyword">using namespace </span>MNEMATHLIB;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="keyword">using namespace </span>UTILSLIB;</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
@@ -131,7 +131,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div>
 <div class="line"><a name="l00074"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#a78231d4f78af90432d726afe38614c53">   74</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#a6ab0fcdd35c0582eb651afb9914163a1">FiffEvoked::FiffEvoked</a>(QIODevice&amp; p_IODevice, QVariant setno, QPair&lt;QVariant,QVariant&gt; baseline, <span class="keywordtype">bool</span> proj, fiff_int_t p_aspect_kind)</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;{</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#ababc0ef5329a871b2987eea4409865a5">FiffEvoked::read_evoked</a>(p_IODevice, *<span class="keyword">this</span>, setno, baseline, proj, p_aspect_kind))</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#a2a3d8c7063606010659b16327ca38fbc">FiffEvoked::read</a>(p_IODevice, *<span class="keyword">this</span>, setno, baseline, proj, p_aspect_kind))</div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    {</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        printf(<span class="stringliteral">&quot;\tFiff evoked data not found.\n&quot;</span>);<span class="comment">//ToDo Throw here</span></div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        <span class="keywordflow">return</span>;</div>
@@ -221,7 +221,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;</div>
 <div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;</div>
-<div class="line"><a name="l00166"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#ababc0ef5329a871b2987eea4409865a5">  166</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#ababc0ef5329a871b2987eea4409865a5">FiffEvoked::read_evoked</a>(QIODevice&amp; p_IODevice, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html" title="evoked data">FiffEvoked</a>&amp; p_FiffEvoked, QVariant setno, QPair&lt;QVariant,QVariant&gt; baseline, <span class="keywordtype">bool</span> proj, fiff_int_t p_aspect_kind)</div>
+<div class="line"><a name="l00166"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#a2a3d8c7063606010659b16327ca38fbc">  166</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#a2a3d8c7063606010659b16327ca38fbc">FiffEvoked::read</a>(QIODevice&amp; p_IODevice, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html" title="evoked data">FiffEvoked</a>&amp; p_FiffEvoked, QVariant setno, QPair&lt;QVariant,QVariant&gt; baseline, <span class="keywordtype">bool</span> proj, fiff_int_t p_aspect_kind)</div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;{</div>
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    p_FiffEvoked.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#a196068971089679a53a01e877a2b3de6">clear</a>();</div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;</div>
@@ -574,7 +574,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Mar 2 2013 02:51:42 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 6 2013 01:58:23 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

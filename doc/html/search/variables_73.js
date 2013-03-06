@@ -13,6 +13,7 @@ var searchData=
   ['source_5fori',['source_ori',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1988a88297362b6b34b0318577ad162d',1,'MNELIB::MNEForwardSolution::source_ori()'],['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ad9be3e35de623862f76a69aa5f3bfbf2',1,'MNELIB::MNEInverseOperator::source_ori()']]],
   ['source_5frr',['source_rr',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aca622bbe1b6ff6d69834fbafd2ae69b5',1,'MNELIB::MNEForwardSolution']]],
   ['src',['src',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a3d61876581eba25731926eb070d5a1fd',1,'MNELIB::MNEForwardSolution::src()'],['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a8074f2dd4963041afbe819487d0e3bd2',1,'MNELIB::MNEInverseOperator::src()']]],
+  ['src_5fannotations',['src_annotations',['../class_f_s_l_i_b_1_1_annotation_set.html#a4c5dcd043ca2be984754a0ef837d8854',1,'FSLIB::AnnotationSet']]],
   ['struct_5fnames',['struct_names',['../class_f_s_l_i_b_1_1_colortable.html#ab7804162918de82c37e9bac3943ff98e',1,'FSLIB::Colortable']]],
   ['surf_5fori',['surf_ori',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aee695468986dd2e920b5cad332a5a6a1',1,'MNELIB::MNEForwardSolution']]]
 ];

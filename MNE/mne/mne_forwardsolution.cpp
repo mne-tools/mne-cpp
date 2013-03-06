@@ -246,22 +246,22 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
             printf("Cluster Right Hemisphere\n");
 
         Colortable t_CurrentColorTable = p_AnnotationSet[h].getColortable();
-        VectorXi label = t_CurrentColorTable.getAvailableROIs();
+        VectorXi label_ids = t_CurrentColorTable.getLabelIds();
 
-        // Get label for every vertice
+        // Get label ids for every vertice
         VectorXi vertno_labeled = VectorXi::Zero(this->src.hemispheres[h].vertno.rows());
 
         for(qint32 i = 0; i < vertno_labeled.rows(); ++i)
-            vertno_labeled[i] = p_AnnotationSet[h].getLabel()[this->src.hemispheres[h].vertno[i]];
+            vertno_labeled[i] = p_AnnotationSet[h].getLabelIds()[this->src.hemispheres[h].vertno[i]];
 
         MatrixXd t_LF_partial;
-        for (qint32 i = 0; i < label.rows(); ++i)
+        for (qint32 i = 0; i < label_ids.rows(); ++i)
         {
 
-            if (label[i] != 0)
+            if (label_ids[i] != 0)
             {
                 QString curr_name = t_CurrentColorTable.struct_names[i];//obj.label2AtlasName(label(i));
-                printf("\tCluster %d / %d %s...", i+1, label.rows(), curr_name.toUtf8().constData());
+                printf("\tCluster %d / %d %s...", i+1, label_ids.rows(), curr_name.toUtf8().constData());
 
                 //
                 // Get source space indeces
@@ -272,7 +272,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
                 //Select ROIs
                 for(qint32 j = 0; j < vertno_labeled.rows(); ++j)
                 {
-                    if(vertno_labeled[j] == label[i])
+                    if(vertno_labeled[j] == label_ids[i])
                     {
                         idcs[c] = j;
                         ++c;
@@ -428,7 +428,6 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
     p_fwdOut.sol->ncol = t_LF_new.cols();
 
     p_fwdOut.nsource = p_fwdOut.sol->ncol/3;
-
 
     return p_fwdOut;
 }

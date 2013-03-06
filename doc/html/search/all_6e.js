@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['name',['name',['../class_c_type_name.html#ae1c92fafa161460cdc8555d45581c84c',1,'CTypeName']]],
+  ['name',['name',['../class_f_s_l_i_b_1_1_label.html#aafe7016a7b71c8850e1c70db77065917',1,'FSLIB::Label::name()'],['../class_c_type_name.html#ae1c92fafa161460cdc8555d45581c84c',1,'CTypeName::name()']]],
   ['names',['names',['../class_f_i_f_f_l_i_b_1_1_fiff_cov.html#ac4727db648bc2652e98162e917611605',1,'FIFFLIB::FiffCov']]],
   ['nave',['nave',['../class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#ab678c64a099131848c27ad92b8c76c37',1,'FIFFLIB::FiffEvoked::nave()'],['../class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#abaff5b4b0089398fbf06a9f1f7424277',1,'FIFFLIB::FiffEvokedData::nave()'],['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ac0d085ad6c61c13cca4253fbe13d9a21',1,'MNELIB::MNEInverseOperator::nave()']]],
   ['nchan',['nchan',['../class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893',1,'FIFFLIB::FiffInfoBase::nchan()'],['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#adedb753633d161cdfa28a450ba64ca42',1,'MNELIB::MNEForwardSolution::nchan()'],['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a5ab16a16ee9efc33692ffdf90d126b1d',1,'MNELIB::MNEInverseOperator::nchan()']]],
@@ -32,6 +32,7 @@ var searchData=
   ['nsource',['nsource',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a4bc383d90d8550cda0ad96cf0dfeb988',1,'MNELIB::MNEForwardSolution::nsource()'],['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a46e0b1b46763a8b6f90158af33f2b119',1,'MNELIB::MNEInverseOperator::nsource()']]],
   ['ntri',['ntri',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a6a322c8dadb0d6e9f19b0065d859e297',1,'MNELIB::MNEHemisphere']]],
   ['numchannels',['numChannels',['../class_i_o_buffer_1_1_circular_multi_channel_buffer__old.html#abcab3a44ecb55ab604b43694bc3a32b5',1,'IOBuffer::CircularMultiChannelBuffer_old']]],
+  ['numclust',['numClust',['../class_m_n_e_l_i_b_1_1_m_n_e_cluster_info.html#ae25e1cdfa7b96e4b7a835f96c31236f7',1,'MNELIB::MNEClusterInfo']]],
   ['numentries',['numEntries',['../class_f_s_l_i_b_1_1_colortable.html#acec8d20347807b29cf3f6b5a9047ebdd',1,'FSLIB::Colortable']]],
   ['numeric',['Numeric',['../class_r_t_m_e_a_s_l_i_b_1_1_numeric.html#a7e001a674c1d430db61532cc25350be6',1,'RTMEASLIB::Numeric']]],
   ['numeric',['Numeric',['../class_r_t_m_e_a_s_l_i_b_1_1_numeric.html',1,'RTMEASLIB']]],

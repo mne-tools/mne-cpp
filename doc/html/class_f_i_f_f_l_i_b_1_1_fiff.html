@@ -127,8 +127,8 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:a9da2257a592dd14e7a5b30ad3cf57f3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a71e2c1f24381bb8368c238fc102309c7"><td class="memItemLeft" align="right" valign="top">static RowVectorXi&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a71e2c1f24381bb8368c238fc102309c7">pick_channels</a> (QStringList &amp;ch_names, const QStringList &amp;include=defaultQStringList, const QStringList &amp;exclude=defaultQStringList)</td></tr>
 <tr class="separator:a71e2c1f24381bb8368c238fc102309c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afa2ac5bcd673d9b7d55245ba05f8af5d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html">FiffEvokedDataSet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#afa2ac5bcd673d9b7d55245ba05f8af5d">pick_channels</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html">FiffEvokedDataSet</a> &amp;orig, const QStringList &amp;include=defaultQStringList, const QStringList &amp;exclude=defaultQStringList)</td></tr>
-<tr class="separator:afa2ac5bcd673d9b7d55245ba05f8af5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef7f55fae4deec70ddd40523bb0e4e24"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html">FiffEvokedSet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#aef7f55fae4deec70ddd40523bb0e4e24">pick_channels</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html">FiffEvokedSet</a> &amp;orig, const QStringList &amp;include=defaultQStringList, const QStringList &amp;exclude=defaultQStringList)</td></tr>
+<tr class="separator:aef7f55fae4deec70ddd40523bb0e4e24"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5b4f961942bd1966570c1d2c1c9716dc"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a5b4f961942bd1966570c1d2c1c9716dc">pick_info</a> (const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> &amp;info, const RowVectorXi &amp;sel=defaultVectorXi)</td></tr>
 <tr class="separator:a5b4f961942bd1966570c1d2c1c9716dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a19c3c6706517775ae94478c41e7b0040"><td class="memItemLeft" align="right" valign="top">static RowVectorXi&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a19c3c6706517775ae94478c41e7b0040">pick_types</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> &amp;info, bool meg, bool eeg=false, bool stim=false, const QStringList &amp;include=defaultQStringList, const QStringList &amp;exclude=defaultQStringList)</td></tr>
@@ -137,8 +137,10 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:ac852f6b4dbd3d810630640edbebe9c5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad2090de5c120c96da8567ee8f36a4c51"><td class="memItemLeft" align="right" valign="top">static QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html">FiffCtfComp</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#ad2090de5c120c96da8567ee8f36a4c51">read_ctf_comp</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> &amp;p_Node, const QList&lt; <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html">FiffChInfo</a> &gt; &amp;p_Chs)</td></tr>
 <tr class="separator:ad2090de5c120c96da8567ee8f36a4c51"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aed1466db166fee1d54e9e077f474a615"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#aed1466db166fee1d54e9e077f474a615">read_evoked</a> (QIODevice &amp;p_IODevice, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html">FiffEvokedDataSet</a> &amp;data, fiff_int_t setno=0)</td></tr>
-<tr class="separator:aed1466db166fee1d54e9e077f474a615"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06714bf39c1180ac6f4121f6e3925149"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a06714bf39c1180ac6f4121f6e3925149">read_evoked</a> (QIODevice &amp;p_IODevice, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html">FiffEvoked</a> &amp;data, QVariant setno=0, QPair&lt; QVariant, QVariant &gt; baseline=QPair&lt; QVariant, QVariant &gt;(), bool proj=true, fiff_int_t p_aspect_kind=<a class="el" href="fiff__constants_8h.html#a5dab727c9be8983aee7be8d73fabe64e">FIFFV_ASPECT_AVERAGE</a>)</td></tr>
+<tr class="separator:a06714bf39c1180ac6f4121f6e3925149"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6151b2f6fa6421ecd78fc67173d17664"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a6151b2f6fa6421ecd78fc67173d17664">read_evoked_set</a> (QIODevice &amp;p_IODevice, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html">FiffEvokedSet</a> &amp;data)</td></tr>
+<tr class="separator:a6151b2f6fa6421ecd78fc67173d17664"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a34a22adff944b2e31f3ae8dd156e942e"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#a34a22adff944b2e31f3ae8dd156e942e">read_meas_info</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> &amp;p_Node, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> &amp;p_Info, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> &amp;p_NodeInfo)</td></tr>
 <tr class="separator:a34a22adff944b2e31f3ae8dd156e942e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acf2ac5f58740a306ff182e285829a421"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff.html#acf2ac5f58740a306ff182e285829a421">read_named_matrix</a> (<a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a> *p_pStream, const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FiffDirTree</a> &amp;p_Node, fiff_int_t matkind, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html">FiffNamedMatrix</a> &amp;mat)</td></tr>
@@ -665,7 +667,7 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="afa2ac5bcd673d9b7d55245ba05f8af5d"></a>
+<a class="anchor" id="aef7f55fae4deec70ddd40523bb0e4e24"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -673,9 +675,9 @@ Static Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html">FiffEvokedDataSet</a> FIFFLIB::Fiff::pick_channels </td>
+          <td class="memname">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html">FiffEvokedSet</a> FIFFLIB::Fiff::pick_channels </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html">FiffEvokedDataSet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html">FiffEvokedSet</a> &amp;&#160;</td>
           <td class="paramname"><em>orig</em>, </td>
         </tr>
         <tr>
@@ -704,7 +706,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_pick_channels_evoked</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html" title="evoked data">FiffEvokedDataSet</a> pick_channels_evoked member function</p>
+<p>Wrapper for the FiffEvokedDataSet pick_channels_evoked member function</p>
 <p>Pick desired channels from evoked-response data</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -947,7 +949,7 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="aed1466db166fee1d54e9e077f474a615"></a>
+<a class="anchor" id="a06714bf39c1180ac6f4121f6e3925149"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -963,14 +965,32 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html">FiffEvokedDataSet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html">FiffEvoked</a> &amp;&#160;</td>
           <td class="paramname"><em>data</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">QVariant&#160;</td>
+          <td class="paramname"><em>setno</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QPair&lt; QVariant, QVariant &gt;&#160;</td>
+          <td class="paramname"><em>baseline</em> = <code>QPair&lt;QVariant,QVariant&gt;()</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>proj</em> = <code>true</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">fiff_int_t&#160;</td>
-          <td class="paramname"><em>setno</em> = <code>0</code>&#160;</td>
+          <td class="paramname"><em>p_aspect_kind</em> = <code><a class="el" href="fiff__constants_8h.html#a5dab727c9be8983aee7be8d73fabe64e">FIFFV_ASPECT_AVERAGE</a></code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -986,19 +1006,67 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>fiff_read_evoked</p>
 <h3>MNE toolbox root function</h3>
-<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_data_set.html#a5b15f35b63c1771e315f3e55488a92bc">FiffEvokedDataSet::read_evoked</a> static function</p>
+<p>Wrapper for the <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#a2a3d8c7063606010659b16327ca38fbc">FiffEvoked::read</a> static function</p>
 <p>Read one evoked data set</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">p_IODevice</td><td>A fiff IO device like a fiff QFile or QTCPSocket </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">data</td><td>The read evoked data </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">setno</td><td>the set to pick</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">setno</td><td>the set to pick </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">baseline</td><td>The time interval to apply rescaling / baseline correction. If None do not apply it. If baseline is (a, b) the interval is between "a (s)" and "b (s)". If a is None the beginning of the data is used and if b is None then b is set to the end of the interval. If baseline is equal ot (None, None) all the time interval is used. If None, no correction is applied. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">proj</td><td>Apply SSP projection vectors (optional, default = true) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_aspect_kind</td><td>Either "FIFFV_ASPECT_AVERAGE" or "FIFFV_ASPECT_STD_ERR". The type of data to read. Only used if "setno" is a str.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the CTF software compensation data </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if successful, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00428">428</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00434">434</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a6151b2f6fa6421ecd78fc67173d17664"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool FIFFLIB::Fiff::read_evoked_set </td>
+          <td>(</td>
+          <td class="paramtype">QIODevice &amp;&#160;</td>
+          <td class="paramname"><em>p_IODevice</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html">FiffEvokedSet</a> &amp;&#160;</td>
+          <td class="paramname"><em>data</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Read all evoked data from one file</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_IODevice</td><td>A fiff IO device like a fiff QFile or QTCPSocket </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">data</td><td>The read evoked data</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if successful, false otherwise </dd></dl>
+
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00448">448</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -1060,7 +1128,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00451">451</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00471">471</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -1122,7 +1190,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00473">473</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00493">493</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -1170,7 +1238,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a list of SSP projectors </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00493">493</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00513">513</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -1246,7 +1314,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00517">517</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00537">537</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -1301,7 +1369,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00539">539</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00559">559</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -1349,7 +1417,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00560">560</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00580">580</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -1404,7 +1472,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00581">581</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00601">601</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -1441,7 +1509,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the splitted string list </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00600">600</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00620">620</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -1488,7 +1556,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00618">618</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00638">638</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -1525,7 +1593,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The opened file. </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00637">637</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00657">657</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -1587,7 +1655,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the started fiff file </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00659">659</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00679">679</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -1634,7 +1702,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00679">679</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00699">699</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -1681,7 +1749,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00697">697</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00717">717</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -1728,7 +1796,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00715">715</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00735">735</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -1775,7 +1843,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00733">733</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00753">753</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -1836,7 +1904,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00793">793</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00813">813</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -1890,7 +1958,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00812">812</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00832">832</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -1944,7 +2012,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00753">753</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00773">773</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -2005,7 +2073,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00773">773</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00793">793</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -2059,7 +2127,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00831">831</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00851">851</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -2113,7 +2181,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00850">850</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00870">870</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -2160,7 +2228,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00868">868</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00888">888</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -2215,7 +2283,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00889">889</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00909">909</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -2269,7 +2337,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fiff_8h_source.html#l00908">908</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff_8h_source.html#l00928">928</a> of file <a class="el" href="fiff_8h_source.html">fiff.h</a>.</p>
 
 </div>
 </div>
@@ -2279,7 +2347,7 @@ Static Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Mar 2 2013 02:51:45 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 6 2013 01:58:27 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

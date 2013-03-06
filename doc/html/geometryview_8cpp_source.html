@@ -202,11 +202,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;</div>
 <div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;                    MatrixXf t_TriCoords(3,3*tris.rows());</div>
 <div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;                    qint32 t_size = 0;</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;                    qint32 t_label = m_vecAnnotation[h]-&gt;getColortable().table(k,4);</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;                    qint32 t_label_ids = m_vecAnnotation[h]-&gt;getColortable().table(k,4);</div>
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;</div>
 <div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;                    <span class="keywordflow">for</span>(qint32 i = 0; i &lt; tris.rows(); ++i)</div>
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;                    {</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;                        <span class="keywordflow">if</span>(m_vecAnnotation[h]-&gt;getLabel()(tris(i,0)) == t_label || m_vecAnnotation[h]-&gt;getLabel()(tris(i,1)) == t_label || m_vecAnnotation[h]-&gt;getLabel()(tris(i,2)) == t_label)</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;                        <span class="keywordflow">if</span>(m_vecAnnotation[h]-&gt;getLabelIds()(tris(i,0)) == t_label_ids || m_vecAnnotation[h]-&gt;getLabelIds()(tris(i,1)) == t_label_ids || m_vecAnnotation[h]-&gt;getLabelIds()(tris(i,2)) == t_label_ids)</div>
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;                        {</div>
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;                            t_TriCoords.col(t_size*3) = rr.row( tris(i,0) ).transpose().cast&lt;<span class="keywordtype">float</span>&gt;();</div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;                            t_TriCoords.col(t_size*3+1) = rr.row( tris(i,1) ).transpose().cast&lt;<span class="keywordtype">float</span>&gt;();</div>
@@ -322,7 +322,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Mar 2 2013 02:51:42 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 6 2013 01:58:23 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

@@ -96,18 +96,27 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns rois encoded in the colortable
+    * Ids encoded in the colortable
     *
-    * @return available rois
+    * @return ids
     */
-    inline VectorXi getAvailableROIs()
-    {
-        VectorXi p_vecRois;
-        if (table.cols() == 5)
-            p_vecRois = table.block(0,4,table.rows(),1);
+    inline VectorXi getLabelIds() const;
 
-        return p_vecRois;
-    }
+    //=========================================================================================================
+    /**
+    * Names encoded in the colortable
+    *
+    * @return ids
+    */
+    inline QStringList getNames() const;
+
+    //=========================================================================================================
+    /**
+    * RGBAs encoded in the colortable
+    *
+    * @return RGBAs
+    */
+    inline MatrixX4i getRGBAs() const;
 
 public:
     QString orig_tab;           /**< Colortable raw data */
@@ -115,6 +124,41 @@ public:
     QStringList struct_names;   /**< Anatomical ROI description */
     MatrixXi table;             /**< labels and corresponing colorcode */
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline VectorXi Colortable::getLabelIds() const
+{
+    VectorXi p_vecIds;
+    if (table.cols() == 5)
+        p_vecIds = table.block(0,4,table.rows(),1);
+
+    return p_vecIds;
+}
+
+
+//*************************************************************************************************************
+
+inline QStringList Colortable::getNames() const
+{
+    return struct_names;
+}
+
+
+//*************************************************************************************************************
+
+inline MatrixX4i Colortable::getRGBAs() const
+{
+    MatrixX4i p_matRGBAs;
+    if (table.cols() == 5)
+        p_matRGBAs = table.block(0,0,table.rows(),4);
+
+    return p_matRGBAs;
+}
+
 
 } // NAMESPACE
 

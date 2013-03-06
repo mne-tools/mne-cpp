@@ -91,6 +91,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="class_f_s_l_i_b_1_1_annotation-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">FSLIB::Annotation Class Reference</div>  </div>
@@ -113,24 +114,33 @@ Public Types</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:ad757e67158494d4d5e7e74b1e9591736"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_annotation.html#ad757e67158494d4d5e7e74b1e9591736">Annotation</a> ()</td></tr>
+<tr class="separator:ad757e67158494d4d5e7e74b1e9591736"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8ed7a2aa3370b7ac0f69917815d2a4d1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_annotation.html#a8ed7a2aa3370b7ac0f69917815d2a4d1">Annotation</a> (const QString &amp;p_sFileName)</td></tr>
 <tr class="separator:a8ed7a2aa3370b7ac0f69917815d2a4d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a95144855eb445040d47951c668dc5764"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_annotation.html#a95144855eb445040d47951c668dc5764">~Annotation</a> ()</td></tr>
 <tr class="separator:a95144855eb445040d47951c668dc5764"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a112db7b7d0aa9fdada3f0355609fa472"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_annotation.html#a112db7b7d0aa9fdada3f0355609fa472">clear</a> ()</td></tr>
+<tr class="separator:a112db7b7d0aa9fdada3f0355609fa472"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa2ea7604be630f4756d9f9a4a8268846"><td class="memItemLeft" align="right" valign="top">VectorXi &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_annotation.html#aa2ea7604be630f4756d9f9a4a8268846">getVertices</a> ()</td></tr>
 <tr class="separator:aa2ea7604be630f4756d9f9a4a8268846"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a19cc61e5205211e4f6f77fae8e5a980a"><td class="memItemLeft" align="right" valign="top">VectorXi &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_annotation.html#a19cc61e5205211e4f6f77fae8e5a980a">getLabel</a> ()</td></tr>
-<tr class="separator:a19cc61e5205211e4f6f77fae8e5a980a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a66279b2873ed2dc63dff201a4f6058fd"><td class="memItemLeft" align="right" valign="top">VectorXi &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_annotation.html#a66279b2873ed2dc63dff201a4f6058fd">getLabelIds</a> ()</td></tr>
+<tr class="separator:a66279b2873ed2dc63dff201a4f6058fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a18a31f199db1e308eb31fc16225d2c52"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_s_l_i_b_1_1_colortable.html">Colortable</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_annotation.html#a18a31f199db1e308eb31fc16225d2c52">getColortable</a> ()</td></tr>
 <tr class="separator:a18a31f199db1e308eb31fc16225d2c52"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a67e59e98afeae35f9a5e4fd962de37cc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_annotation.html#a67e59e98afeae35f9a5e4fd962de37cc">read_annotation</a> (const QString &amp;p_sFileName)</td></tr>
-<tr class="separator:a67e59e98afeae35f9a5e4fd962de37cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a832df6b2077880e27508d16439640bbf"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_annotation.html#a832df6b2077880e27508d16439640bbf">toLabels</a> (const <a class="el" href="class_f_s_l_i_b_1_1_surface.html">Surface</a> &amp;p_surf, QList&lt; <a class="el" href="class_f_s_l_i_b_1_1_label.html">Label</a> &gt; &amp;p_qListLabels, QList&lt; RowVector4i &gt; &amp;p_qListLabelRGBAs) const </td></tr>
+<tr class="separator:a832df6b2077880e27508d16439640bbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:ad5cff41a3c57b0ed0a28d18c4bfb1034"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_annotation.html#ad5cff41a3c57b0ed0a28d18c4bfb1034">read</a> (const QString &amp;p_sFileName, <a class="el" href="class_f_s_l_i_b_1_1_annotation.html">Annotation</a> &amp;p_Annotation)</td></tr>
+<tr class="separator:ad5cff41a3c57b0ed0a28d18c4bfb1034"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Free surfer annotation. </p>
 <p>Free surfer annotation contains vertix label relations and a color/name lookup table </p>
 
-<p>Definition at line <a class="el" href="annotation_8h_source.html#l00094">94</a> of file <a class="el" href="annotation_8h_source.html">annotation.h</a>.</p>
+<p>Definition at line <a class="el" href="annotation_8h_source.html#l00097">97</a> of file <a class="el" href="annotation_8h_source.html">annotation.h</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a class="anchor" id="a568cd6c3b36bc65cd0d830228ded9b54"></a>
 <div class="memitem">
@@ -143,7 +153,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Const shared pointer type for <a class="el" href="class_f_s_l_i_b_1_1_annotation.html" title="Free surfer annotation.">Annotation</a>. </p>
 
-<p>Definition at line <a class="el" href="annotation_8h_source.html#l00099">99</a> of file <a class="el" href="annotation_8h_source.html">annotation.h</a>.</p>
+<p>Definition at line <a class="el" href="annotation_8h_source.html#l00102">102</a> of file <a class="el" href="annotation_8h_source.html">annotation.h</a>.</p>
 
 </div>
 </div>
@@ -158,11 +168,29 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Shared pointer type for <a class="el" href="class_f_s_l_i_b_1_1_annotation.html" title="Free surfer annotation.">Annotation</a>. </p>
 
-<p>Definition at line <a class="el" href="annotation_8h_source.html#l00098">98</a> of file <a class="el" href="annotation_8h_source.html">annotation.h</a>.</p>
+<p>Definition at line <a class="el" href="annotation_8h_source.html#l00101">101</a> of file <a class="el" href="annotation_8h_source.html">annotation.h</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="ad757e67158494d4d5e7e74b1e9591736"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Annotation::Annotation </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Default constructor </p>
+
+<p>Definition at line <a class="el" href="annotation_8cpp_source.html#l00072">72</a> of file <a class="el" href="annotation_8cpp_source.html">annotation.cpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a8ed7a2aa3370b7ac0f69917815d2a4d1"></a>
 <div class="memitem">
 <div class="memproto">
@@ -192,7 +220,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="annotation_8cpp_source.html#l00070">70</a> of file <a class="el" href="annotation_8cpp_source.html">annotation.cpp</a>.</p>
+<p>Definition at line <a class="el" href="annotation_8cpp_source.html#l00080">80</a> of file <a class="el" href="annotation_8cpp_source.html">annotation.cpp</a>.</p>
 
 </div>
 </div>
@@ -210,11 +238,29 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Destroys the annotation. </p>
 
-<p>Definition at line <a class="el" href="annotation_8cpp_source.html#l00079">79</a> of file <a class="el" href="annotation_8cpp_source.html">annotation.cpp</a>.</p>
+<p>Definition at line <a class="el" href="annotation_8cpp_source.html#l00091">91</a> of file <a class="el" href="annotation_8cpp_source.html">annotation.cpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a112db7b7d0aa9fdada3f0355609fa472"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Annotation::clear </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Initializes the <a class="el" href="class_f_s_l_i_b_1_1_annotation.html" title="Free surfer annotation.">Annotation</a>. </p>
+
+<p>Definition at line <a class="el" href="annotation_8cpp_source.html#l00099">99</a> of file <a class="el" href="annotation_8cpp_source.html">annotation.cpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a18a31f199db1e308eb31fc16225d2c52"></a>
 <div class="memitem">
 <div class="memproto">
@@ -238,11 +284,11 @@ Public Member Functions</h2></td></tr>
 <p>Returns the coloratable containing the label based nomenclature</p>
 <dl class="section return"><dt>Returns</dt><dd>colortable </dd></dl>
 
-<p>Definition at line <a class="el" href="annotation_8h_source.html#l00143">143</a> of file <a class="el" href="annotation_8h_source.html">annotation.h</a>.</p>
+<p>Definition at line <a class="el" href="annotation_8h_source.html#l00158">158</a> of file <a class="el" href="annotation_8h_source.html">annotation.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a19cc61e5205211e4f6f77fae8e5a980a"></a>
+<a class="anchor" id="a66279b2873ed2dc63dff201a4f6058fd"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -250,7 +296,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">VectorXi&amp; FSLIB::Annotation::getLabel </td>
+          <td class="memname">VectorXi&amp; FSLIB::Annotation::getLabelIds </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -265,7 +311,7 @@ Public Member Functions</h2></td></tr>
 <p>Returns the vertix labels</p>
 <dl class="section return"><dt>Returns</dt><dd>vertix labels </dd></dl>
 
-<p>Definition at line <a class="el" href="annotation_8h_source.html#l00132">132</a> of file <a class="el" href="annotation_8h_source.html">annotation.h</a>.</p>
+<p>Definition at line <a class="el" href="annotation_8h_source.html#l00147">147</a> of file <a class="el" href="annotation_8h_source.html">annotation.h</a>.</p>
 
 </div>
 </div>
@@ -292,32 +338,97 @@ Public Member Functions</h2></td></tr>
 <p>Returns the vertix indeces</p>
 <dl class="section return"><dt>Returns</dt><dd>vertix indeces </dd></dl>
 
-<p>Definition at line <a class="el" href="annotation_8h_source.html#l00121">121</a> of file <a class="el" href="annotation_8h_source.html">annotation.h</a>.</p>
+<p>Definition at line <a class="el" href="annotation_8h_source.html#l00136">136</a> of file <a class="el" href="annotation_8h_source.html">annotation.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a67e59e98afeae35f9a5e4fd962de37cc"></a>
+<a class="anchor" id="ad5cff41a3c57b0ed0a28d18c4bfb1034"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void Annotation::read_annotation </td>
+          <td class="memname">bool Annotation::read </td>
           <td>(</td>
           <td class="paramtype">const QString &amp;&#160;</td>
-          <td class="paramname"><em>p_sFileName</em></td><td>)</td>
+          <td class="paramname"><em>p_sFileName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="class_f_s_l_i_b_1_1_annotation.html">Annotation</a> &amp;&#160;</td>
+          <td class="paramname"><em>p_Annotation</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Reads an annotation of a file</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">p_sFileName</td><td><a class="el" href="class_f_s_l_i_b_1_1_annotation.html" title="Free surfer annotation.">Annotation</a> file </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">p_Annotation</td><td>the read annotation</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>true if successful, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="annotation_8cpp_source.html#l00087">87</a> of file <a class="el" href="annotation_8cpp_source.html">annotation.cpp</a>.</p>
+<p>Definition at line <a class="el" href="annotation_8cpp_source.html#l00110">110</a> of file <a class="el" href="annotation_8cpp_source.html">annotation.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a832df6b2077880e27508d16439640bbf"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Annotation::toLabels </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_s_l_i_b_1_1_surface.html">Surface</a> &amp;&#160;</td>
+          <td class="paramname"><em>p_surf</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QList&lt; <a class="el" href="class_f_s_l_i_b_1_1_label.html">Label</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>p_qListLabels</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QList&lt; RowVector4i &gt; &amp;&#160;</td>
+          <td class="paramname"><em>p_qListLabelRGBAs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>python labels_from_parc</p>
+<p>Converts annotation to a label list and colortable</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_surf</td><td>the surface to read the vertex positions from </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">p_qListLabels</td><td>the converted labels </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">p_qListLabelRGBAs</td><td>the converted label RGBAs</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if successful, false otherwise </dd></dl>
+
+<p>Definition at line <a class="el" href="annotation_8cpp_source.html#l00255">255</a> of file <a class="el" href="annotation_8cpp_source.html">annotation.cpp</a>.</p>
 
 </div>
 </div>
@@ -328,7 +439,7 @@ Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Mar 2 2013 02:51:46 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 6 2013 01:58:27 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

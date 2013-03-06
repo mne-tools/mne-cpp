@@ -94,114 +94,111 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="comment"></span><span class="preprocessor">#ifndef MNE_FORWARDSOLUTION_H</span></div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define MNE_FORWARDSOLUTION_H</span></div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="comment">// FIFF INCLUDES</span></div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fiff__constants_8h.html" title="Fiff constants.">fiff/fiff_constants.h</a>&gt;</span></div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fiff__coord__trans_8h.html" title="FiffCoordTrans class declaration.">fiff/fiff_coord_trans.h</a>&gt;</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fiff__types_8h.html" title="Old fiff_type declarations - replace them.">fiff/fiff_types.h</a>&gt;</span></div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="comment">// INCLUDES</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="mne__global_8h.html" title="mne library export/import macros.">mne_global.h</a>&quot;</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="mne__sourcespace_8h.html" title="MNESourceSpace class declaration.">mne_sourcespace.h</a>&quot;</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="comment">// FIFF INCLUDES</span></div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="comment">// FS INCLUDES</span></div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="mnemath_8h.html" title="MNEMath class declaration.">utils/mnemath.h</a>&gt;</span></div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="annotation_8h.html" title="Annotation class declaration.">fs/annotation.h</a>&gt;</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="annotation__set_8h.html" title="AnnotationSet class declaration.">fs/annotation_set.h</a>&gt;</span></div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="comment">// MNE INCLUDES</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fiff__constants_8h.html" title="Fiff constants.">fiff/fiff_constants.h</a>&gt;</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fiff__coord__trans_8h.html" title="FiffCoordTrans class declaration.">fiff/fiff_coord_trans.h</a>&gt;</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fiff__types_8h.html" title="Old fiff_type declarations - replace them.">fiff/fiff_types.h</a>&gt;</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fiff__info__base_8h.html" title="FiffInfoBase class declaration.">fiff/fiff_info_base.h</a>&gt;</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="mne__global_8h.html" title="mne library export/import macros.">mne_global.h</a>&quot;</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="mne__sourcespace_8h.html" title="MNESourceSpace class declaration.">mne_sourcespace.h</a>&quot;</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fiff__info__base_8h.html" title="FiffInfoBase class declaration.">fiff/fiff_info_base.h</a>&gt;</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="mnemath_8h.html" title="MNEMath class declaration.">mneMath/mnemath.h</a>&gt;</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment">// Eigen INCLUDES</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="preprocessor">#include &lt;Eigen/Core&gt;</span></div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="preprocessor">#include &lt;Eigen/SVD&gt;</span></div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="preprocessor">#include &lt;Eigen/Sparse&gt;</span></div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="preprocessor">#include &lt;Eigen/unsupported/KroneckerProduct&gt;</span></div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="comment">// Eigen INCLUDES</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="preprocessor">#include &lt;Eigen/Core&gt;</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">#include &lt;Eigen/SVD&gt;</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="preprocessor">#include &lt;Eigen/Sparse&gt;</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="preprocessor">#include &lt;Eigen/unsupported/KroneckerProduct&gt;</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="comment">// STL INCLUDES</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="preprocessor">#include &lt;math.h&gt;</span></div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="comment">// STL INCLUDES</span></div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="preprocessor">#include &lt;math.h&gt;</span></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="comment">// QT INCLUDES</span></div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="preprocessor">#include &lt;QFile&gt;</span></div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="preprocessor">#include &lt;QDataStream&gt;</span></div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="comment">// QT INCLUDES</span></div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="preprocessor">#include &lt;QFile&gt;</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="preprocessor">#include &lt;QSharedPointer&gt;</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="preprocessor">#include &lt;QDataStream&gt;</span></div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="comment">// DEFINE NAMESPACE MNELIB</span></div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="comment">// DEFINE NAMESPACE MNELIB</span></div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="keyword">namespace </span>MNELIB</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;{</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="keyword">namespace </span>MNELIB</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;{</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="comment">// USED NAMESPACES</span></div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="comment">// USED NAMESPACES</span></div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="keyword">using namespace </span>Eigen;</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="keyword">using namespace </span>FSLIB;</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<span class="keyword">using namespace </span>UTILSLIB;</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="keyword">using namespace </span>FIFFLIB;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="keyword">using namespace </span>Eigen;</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="keyword">using namespace </span>MNEMATHLIB;</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="keyword">using namespace </span>FIFFLIB;</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="keyword">using namespace </span>FSLIB;</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00125"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">  125</a></span>&#160;<span class="comment"></span><span class="keyword">class </span><a class="code" href="mne__global_8h.html#ae182e5976a87d895a5eecf737aafefc3">MNESHARED_EXPORT</a> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a></div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;{</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00128"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a7e95a8381a0f621201981cd6a39ea25c">  128</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;MNEForwardSolution&gt; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a7e95a8381a0f621201981cd6a39ea25c">SPtr</a>;            </div>
-<div class="line"><a name="l00129"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ac205e3b5d9a3fe1a455d3c45e30d7636">  129</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;const MNEForwardSolution&gt; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ac205e3b5d9a3fe1a455d3c45e30d7636">ConstSPtr</a>; </div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00119"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">  119</a></span>&#160;<span class="comment"></span><span class="keyword">class </span><a class="code" href="mne__global_8h.html#ae182e5976a87d895a5eecf737aafefc3">MNESHARED_EXPORT</a> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a></div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;{</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00122"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a7e95a8381a0f621201981cd6a39ea25c">  122</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;MNEForwardSolution&gt; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a7e95a8381a0f621201981cd6a39ea25c">SPtr</a>;            </div>
+<div class="line"><a name="l00123"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ac205e3b5d9a3fe1a455d3c45e30d7636">  123</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;const MNEForwardSolution&gt; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ac205e3b5d9a3fe1a455d3c45e30d7636">ConstSPtr</a>; </div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;<span class="comment"></span>    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a>();</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;</div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;<span class="comment"></span>    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a>();</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;<span class="comment"></span>    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a>(QIODevice &amp;p_IODevice, <span class="keywordtype">bool</span> force_fixed = <span class="keyword">false</span>, <span class="keywordtype">bool</span> surf_ori = <span class="keyword">false</span>, <span class="keyword">const</span> QStringList&amp; include = defaultQStringList, <span class="keyword">const</span> QStringList&amp; exclude = defaultQStringList, <span class="keywordtype">bool</span> bExcludeBads = <span class="keyword">false</span>);</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;<span class="comment"></span>    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a>(<span class="keyword">const</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a> &amp;p_MNEForwardSolution);</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;<span class="comment"></span>    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a>(QIODevice &amp;p_IODevice, <span class="keywordtype">bool</span> force_fixed = <span class="keyword">false</span>, <span class="keywordtype">bool</span> surf_ori = <span class="keyword">false</span>, <span class="keyword">const</span> QStringList&amp; include = defaultQStringList, <span class="keyword">const</span> QStringList&amp; exclude = defaultQStringList, <span class="keywordtype">bool</span> bExcludeBads = <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;<span class="comment"></span>    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a>(<span class="keyword">const</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a> &amp;p_MNEForwardSolution);</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a>();</div>
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;</div>
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a>();</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> clear();</div>
 <div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;</div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> clear();</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;<span class="comment"></span>    <span class="keywordtype">bool</span> cluster_forward_solution(<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a> &amp;p_fwdOut, <span class="keyword">const</span> <a class="code" href="class_f_s_l_i_b_1_1_annotation.html" title="Free surfer annotation.">Annotation</a> &amp;p_LHAnnotation, <span class="keyword">const</span> <a class="code" href="class_f_s_l_i_b_1_1_annotation.html" title="Free surfer annotation.">Annotation</a> &amp;p_RHAnnotation, qint32 p_iClusterSize);</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html" title="covariance data">FiffCov</a> compute_orient_prior(<span class="keywordtype">float</span> loose = 0.2);</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html" title="covariance data">FiffCov</a> compute_depth_prior(<span class="keyword">const</span> MatrixXd &amp;Gain, <span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a> &amp;gain_info, <span class="keywordtype">bool</span> is_fixed_ori, <span class="keywordtype">double</span> exp = 0.8, <span class="keywordtype">double</span> limit = 10.0, MatrixXd &amp;patch_areas = defaultMatrixXd, <span class="keywordtype">bool</span> limit_depth_chs = <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;<span class="comment"></span>    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNEForwardSolution</a> cluster_forward_solution(<a class="code" href="class_f_s_l_i_b_1_1_annotation_set.html" title="Annotation set.">AnnotationSet</a> &amp;p_AnnotationSet, qint32 p_iClusterSize);</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html" title="covariance data">FiffCov</a> compute_orient_prior(<span class="keywordtype">float</span> loose = 0.2);</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html" title="covariance data">FiffCov</a> compute_depth_prior(<span class="keyword">const</span> MatrixXd &amp;Gain, <span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a> &amp;gain_info, <span class="keywordtype">bool</span> is_fixed_ori, <span class="keywordtype">double</span> exp = 0.8, <span class="keywordtype">double</span> limit = 10.0, MatrixXd &amp;patch_areas = defaultMatrixXd, <span class="keywordtype">bool</span> limit_depth_chs = <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;<span class="comment"></span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> isClustered() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;</div>
 <div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
 <div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;<span class="comment"></span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> isEmpty() <span class="keyword">const</span>;</div>
@@ -301,51 +298,58 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00396"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a3d61876581eba25731926eb070d5a1fd">  396</a></span>&#160;    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html" title="Source Space descritpion.">MNESourceSpace</a> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a3d61876581eba25731926eb070d5a1fd">src</a>;                 </div>
 <div class="line"><a name="l00397"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aca622bbe1b6ff6d69834fbafd2ae69b5">  397</a></span>&#160;    MatrixX3d <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aca622bbe1b6ff6d69834fbafd2ae69b5">source_rr</a>;                </div>
 <div class="line"><a name="l00398"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a0070dd5bda4063846fc7bbc9a7b132c2">  398</a></span>&#160;    MatrixX3d <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a0070dd5bda4063846fc7bbc9a7b132c2">source_nn</a>;                </div>
-<div class="line"><a name="l00400"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a598a41eed229feb0ccd030ed17d77d7d">  400</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a598a41eed229feb0ccd030ed17d77d7d">isClustered</a>;   </div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;};</div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;</div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;};</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;<span class="comment">// INLINE DEFINITIONS</span></div>
 <div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;<span class="comment">// INLINE DEFINITIONS</span></div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;</div>
-<div class="line"><a name="l00408"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1c81b86cc30d53927ba032543507cdd8">  408</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1c81b86cc30d53927ba032543507cdd8">MNEForwardSolution::isEmpty</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;    <span class="keywordflow">return</span> this-&gt;nchan &lt;= 0;</div>
-<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;}</div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;</div>
+<div class="line"><a name="l00406"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a26f3df0a23f29cddd2359276bd9f3393">  406</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a26f3df0a23f29cddd2359276bd9f3393">MNEForwardSolution::isClustered</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;    <span class="keywordflow">return</span> src.hemispheres[0].isClustered();</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;}</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;</div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;</div>
-<div class="line"><a name="l00416"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ab99e06dc8c84618aef405ffe3d54fe78">  416</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ab99e06dc8c84618aef405ffe3d54fe78">MNEForwardSolution::isFixedOrient</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;    <span class="keywordflow">return</span> this-&gt;source_ori == FIFFV_MNE_FIXED_ORI;</div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;}</div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;</div>
+<div class="line"><a name="l00414"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1c81b86cc30d53927ba032543507cdd8">  414</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1c81b86cc30d53927ba032543507cdd8">MNEForwardSolution::isEmpty</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;    <span class="keywordflow">return</span> this-&gt;nchan &lt;= 0;</div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;}</div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;</div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;</div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;</div>
-<div class="line"><a name="l00424"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aeed5feefa2bdefa17bcd612fc8abdbd5">  424</a></span>&#160;<span class="keyword">inline</span> std::ostream&amp; operator&lt;&lt;(std::ostream&amp; out, <span class="keyword">const</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNELIB::MNEForwardSolution</a> &amp;p_MNEForwardSolution)</div>
-<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;{</div>
-<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;#### MNE Forward Solution ####\n&quot;</span>;</div>
+<div class="line"><a name="l00422"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ab99e06dc8c84618aef405ffe3d54fe78">  422</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ab99e06dc8c84618aef405ffe3d54fe78">MNEForwardSolution::isFixedOrient</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;    <span class="keywordflow">return</span> this-&gt;source_ori == FIFFV_MNE_FIXED_ORI;</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;}</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;</div>
 <div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;</div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;\n source_ori: &quot;</span> &lt;&lt; p_MNEForwardSolution.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1988a88297362b6b34b0318577ad162d">source_ori</a> &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;\n coord_frame: &quot;</span> &lt;&lt; p_MNEForwardSolution.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a8776126f2f4ec08939fb83a61a429348">coord_frame</a> &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;\n nsource: &quot;</span> &lt;&lt; p_MNEForwardSolution.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a4bc383d90d8550cda0ad96cf0dfeb988">nsource</a> &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;\n nchan: &quot;</span> &lt;&lt; p_MNEForwardSolution.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#adedb753633d161cdfa28a450ba64ca42">nchan</a> &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;\n sol:\n\t&quot;</span> &lt;&lt; *p_MNEForwardSolution.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a247a4b2f503b6b246a4b8ea5f5b69c1c">sol</a>.data() &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;\n sol_grad:\n\t&quot;</span> &lt;&lt; *p_MNEForwardSolution.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a191e83f3719bf1cf34e5a4fd923b3ca1">sol_grad</a>.data() &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;</div>
-<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;    <span class="keywordflow">return</span> out;</div>
-<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;}</div>
-<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;</div>
-<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;} <span class="comment">// NAMESPACE</span></div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;</div>
-<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;<span class="preprocessor">#endif // MNE_FORWARDSOLUTION_H</span></div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;</div>
+<div class="line"><a name="l00430"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aeed5feefa2bdefa17bcd612fc8abdbd5">  430</a></span>&#160;<span class="keyword">inline</span> std::ostream&amp; operator&lt;&lt;(std::ostream&amp; out, <span class="keyword">const</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" title="Forward operator.">MNELIB::MNEForwardSolution</a> &amp;p_MNEForwardSolution)</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;{</div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;#### MNE Forward Solution ####\n&quot;</span>;</div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;</div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;\n source_ori: &quot;</span> &lt;&lt; p_MNEForwardSolution.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1988a88297362b6b34b0318577ad162d">source_ori</a> &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;\n coord_frame: &quot;</span> &lt;&lt; p_MNEForwardSolution.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a8776126f2f4ec08939fb83a61a429348">coord_frame</a> &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;\n nsource: &quot;</span> &lt;&lt; p_MNEForwardSolution.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a4bc383d90d8550cda0ad96cf0dfeb988">nsource</a> &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;\n nchan: &quot;</span> &lt;&lt; p_MNEForwardSolution.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#adedb753633d161cdfa28a450ba64ca42">nchan</a> &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;\n sol:\n\t&quot;</span> &lt;&lt; *p_MNEForwardSolution.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a247a4b2f503b6b246a4b8ea5f5b69c1c">sol</a>.data() &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;\n sol_grad:\n\t&quot;</span> &lt;&lt; *p_MNEForwardSolution.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a191e83f3719bf1cf34e5a4fd923b3ca1">sol_grad</a>.data() &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;</div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;    <span class="keywordflow">return</span> out;</div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;}</div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;</div>
+<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;} <span class="comment">// NAMESPACE</span></div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;</div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;<span class="preprocessor">#endif // MNE_FORWARDSOLUTION_H</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Mar 2 2013 02:51:42 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 6 2013 01:58:23 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>

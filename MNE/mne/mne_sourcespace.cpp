@@ -112,28 +112,42 @@ QList<VectorXi> MNESourceSpace::label_src_vertno_sel(const Label &p_label, Vecto
 
     if (p_label.hemi == 0) //lh
     {
-        VectorXi vertno_sel = MNEMath::intersect(vertno[0], p_label.vertices[0], src_sel);
+        VectorXi vertno_sel = MNEMath::intersect(vertno[0], p_label.vertices, src_sel);
         vertno[0] = vertno_sel;
         vertno[1] = VectorXi();
     }
     else if (p_label.hemi == 1) //rh
     {
-        VectorXi vertno_sel = MNEMath::intersect(vertno[1], p_label.vertices[1], src_sel);
-        src_sel.array() += p_label.vertices[0].size();
+        VectorXi vertno_sel = MNEMath::intersect(vertno[1], p_label.vertices, src_sel);
+        src_sel.array() += p_label.vertices.size();
         vertno[0] = VectorXi();
         vertno[1] = vertno_sel;
     }
-    else if (p_label.hemi == 2) //both
-    {
-        VectorXi src_sel_lh, src_sel_rh;
-        VectorXi vertno_sel_lh = MNEMath::intersect(vertno[0], p_label.vertices[0], src_sel_lh);
-        VectorXi vertno_sel_rh = MNEMath::intersect(vertno[1], p_label.vertices[1], src_sel_rh);
-        src_sel.resize(src_sel_lh.size() + src_sel_rh.size());
-        src_sel.block(0,0,src_sel_lh.size(),1) = src_sel_lh;
-        src_sel.block(src_sel_lh.size(),0,src_sel_rh.size(),1) = src_sel_rh;
-        vertno[0] = vertno_sel_lh;
-        vertno[0] = vertno_sel_rh;
-    }
+
+//    if (p_label.hemi == 0) //lh
+//    {
+//        VectorXi vertno_sel = MNEMath::intersect(vertno[0], p_label.vertices[0], src_sel);
+//        vertno[0] = vertno_sel;
+//        vertno[1] = VectorXi();
+//    }
+//    else if (p_label.hemi == 1) //rh
+//    {
+//        VectorXi vertno_sel = MNEMath::intersect(vertno[1], p_label.vertices[1], src_sel);
+//        src_sel.array() += p_label.vertices[0].size();
+//        vertno[0] = VectorXi();
+//        vertno[1] = vertno_sel;
+//    }
+//    else if (p_label.hemi == 2) //both
+//    {
+//        VectorXi src_sel_lh, src_sel_rh;
+//        VectorXi vertno_sel_lh = MNEMath::intersect(vertno[0], p_label.vertices[0], src_sel_lh);
+//        VectorXi vertno_sel_rh = MNEMath::intersect(vertno[1], p_label.vertices[1], src_sel_rh);
+//        src_sel.resize(src_sel_lh.size() + src_sel_rh.size());
+//        src_sel.block(0,0,src_sel_lh.size(),1) = src_sel_lh;
+//        src_sel.block(src_sel_lh.size(),0,src_sel_rh.size(),1) = src_sel_rh;
+//        vertno[0] = vertno_sel_lh;
+//        vertno[0] = vertno_sel_rh;
+//    }
     else
     {
         qWarning("Unknown hemisphere type\n");

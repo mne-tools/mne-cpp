@@ -117,12 +117,14 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a9c2cda48ff32559bfedc02d8479be7f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeb4557c3d15974fbc6c5e74b01b26262"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html">SourceEstimate</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html#aeb4557c3d15974fbc6c5e74b01b26262">calculateInverse</a> (const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html">FiffEvoked</a> &amp;p_fiffEvoked, bool pick_normal=false) const =0</td></tr>
 <tr class="separator:aeb4557c3d15974fbc6c5e74b01b26262"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a89c73b0cc0887941b8e9e8fe3be20943"><td class="memItemLeft" align="right" valign="top">virtual const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html#a89c73b0cc0887941b8e9e8fe3be20943">getName</a> () const =0</td></tr>
+<tr class="separator:a89c73b0cc0887941b8e9e8fe3be20943"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Inverse algorithm interface. </p>
 <p>Inverse algorithm interface for inverse routines of MNE-CPP </p>
 
-<p>Definition at line <a class="el" href="_i_inverse_algorithm_8h_source.html#l00080">80</a> of file <a class="el" href="_i_inverse_algorithm_8h_source.html">IInverseAlgorithm.h</a>.</p>
+<p>Definition at line <a class="el" href="_i_inverse_algorithm_8h_source.html#l00087">87</a> of file <a class="el" href="_i_inverse_algorithm_8h_source.html">IInverseAlgorithm.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a9c2cda48ff32559bfedc02d8479be7f7"></a>
 <div class="memitem">
@@ -146,7 +148,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Destroys the <a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html" title="Inverse algorithm interface.">IInverseAlgorithm</a>. </p>
 
-<p>Definition at line <a class="el" href="_i_inverse_algorithm_8h_source.html#l00087">87</a> of file <a class="el" href="_i_inverse_algorithm_8h_source.html">IInverseAlgorithm.h</a>.</p>
+<p>Definition at line <a class="el" href="_i_inverse_algorithm_8h_source.html#l00094">94</a> of file <a class="el" href="_i_inverse_algorithm_8h_source.html">IInverseAlgorithm.h</a>.</p>
 
 </div>
 </div>
@@ -196,13 +198,40 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a89c73b0cc0887941b8e9e8fe3be20943"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual const char* INVERSELIB::IInverseAlgorithm::getName </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Returns the algorithm name</p>
+<dl class="section return"><dt>Returns</dt><dd>the algorithm name </dd></dl>
+
+<p>Implemented in <a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#a2e328adb859a6e5a3d0443cab5f9f247">INVERSELIB::MinimumNorm</a>, and <a class="el" href="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#aa6b55a784708e1f1ad7dcc8a37be4b78">INVERSELIB::RapMusic</a>.</p>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>D:/Users/Christoph/Documents/GitHub/mne-cpp/MNE/inverse/<a class="el" href="_i_inverse_algorithm_8h_source.html">IInverseAlgorithm.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Mar 2 2013 02:51:46 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 6 2013 01:58:27 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3
 </small></address>
