@@ -99,6 +99,14 @@ public:
     * Default constructor
     */
     Surface();
+
+    //=========================================================================================================
+    /**
+    * Construts the surface by reading it of the given file.
+    *
+    * @param[in] p_sFileName    Surface file
+    */
+    explicit Surface(const QString& p_sFileName);
     
     //=========================================================================================================
     /**
@@ -124,9 +132,10 @@ public:
     */
     static bool read(const QString &p_sFileName, Surface &p_Surface);
 
-private:
-    Matrix3Xf verts;    /**< Vertex coordinates in meters */
-    Matrix3Xf faces;    /**< The triangle descriptions */
+public:
+    QString m_fileName; /**< Surface file name. */
+    MatrixX3f verts;    /**< Vertex coordinates in meters */
+    MatrixX3i faces;    /**< The triangle descriptions */
 };
 
 //*************************************************************************************************************
