@@ -96,7 +96,6 @@ int main(int argc, char *argv[])
 
     t_annot.toLabels(t_surf, t_qListLabels, t_qListRGBAs);
 
-
     qint32 n;
     std::cin >> n;
 
