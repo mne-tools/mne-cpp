@@ -88,11 +88,12 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-
-    Surface t_surf;
     QString t_fName("./MNE-sample-data/subjects/sample/surf/lh.white");
 
-    Surface::read(t_fName, t_surf);
+    Surface t_surf(t_fName);
+
+    std::cout << std::endl << t_surf.verts.block(t_surf.verts.rows()-20,0,20,3) << std::endl;
+
 
     qint32 n;
     std::cin >> n;
