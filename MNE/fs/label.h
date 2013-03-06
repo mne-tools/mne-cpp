@@ -105,11 +105,11 @@ public:
     /**
     * Constructs a label
     *
-    * @param[in] p_vertices     label file name
-    * @param[in] p_pos          read label
-    * @param[in] p_values       label file name
-    * @param[in] p_hemi         read label
-    * @param[in] p_name         label file name
+    * @param[in] p_vertices     Vertices
+    * @param[in] p_pos          Positions
+    * @param[in] p_values       Values
+    * @param[in] p_hemi         Hemisphere (lh = 0; rh = 1)
+    * @param[in] p_name         label names
     */
     Label(const VectorXi &p_vertices, const MatrixX3f &p_pos, const VectorXd &p_values, qint32 p_hemi, const QString &p_name);
     
