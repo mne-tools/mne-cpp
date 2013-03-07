@@ -82,6 +82,8 @@ using namespace Eigen;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class Surface;
+
 
 //=============================================================================================================
 /**
@@ -110,8 +112,9 @@ public:
     * @param[in] p_values       Values
     * @param[in] p_hemi         Hemisphere (lh = 0; rh = 1)
     * @param[in] p_name         label names
+    * @param[in] p_id           label id (optional, default = -1)
     */
-    Label(const VectorXi &p_vertices, const MatrixX3f &p_pos, const VectorXd &p_values, qint32 p_hemi, const QString &p_name);
+    Label(const VectorXi &p_vertices, const MatrixX3f &p_pos, const VectorXd &p_values, qint32 p_hemi, const QString &p_name, qint32 p_id = -1);
     
     //=========================================================================================================
     /**
@@ -129,10 +132,26 @@ public:
     /**
     * True if Label is empty.
     *
-    * @return true if Label is empty, fasle otherwise.
+    * @return true if Label is empty, false otherwise.
     */
     inline bool isEmpty() const;
     
+    //=========================================================================================================
+    /**
+    * True if Label contains tri information
+    *
+    * @return true if Label contains tri information, false otherwise.
+    */
+    inline bool hasTris() const;
+
+    //=========================================================================================================
+    /**
+    * Generates tris for this labbel using a surface file.
+    *
+    * @return true if gerenation was successful false otherwise.
+    */
+    bool generateTris(const Surface & p_Surface);
+
     //=========================================================================================================
     /**
     * mne_read_label_file
@@ -157,6 +176,9 @@ public:
     MatrixX3f pos;      /**< Locations in meters */
     VectorXd values;    /**< Values at the vertices */
 
+    qint32 label_id;    /**< Label id (optional) */
+    MatrixX3i tris;     /**< Tris for plotting (optional) */
+
 //    QMap<qint32, VectorXi> vertices;    /**< Vertex indices (0 based) */
 //    QMap<qint32, MatrixX3f> pos;        /**< Locations in meters */
 //    QMap<qint32, VectorXd> values;      /**< Values at the vertices */
@@ -172,6 +194,13 @@ inline bool Label::isEmpty() const
     return this->hemi == -1;
 }
 
+
+//*************************************************************************************************************
+
+inline bool Label::hasTris() const
+{
+    return tris.rows() > 0;
+}
 
 } // NAMESPACE
 
