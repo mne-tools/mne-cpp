@@ -99,8 +99,8 @@ void Surface::clear()
 {
     m_fileName = QString("");
     hemi = -1;
-    verts = MatrixX3f();
-    faces = MatrixX3i();
+    rr = MatrixX3f();
+    tris = MatrixX3i();
 }
 
 
@@ -258,8 +258,8 @@ bool Surface::read(const QString &p_sFileName, Surface &p_Surface)
     verts.transposeInPlace();
     verts.array() *= 0.001f;
 
-    p_Surface.verts = verts.block(0,0,verts.rows(),3);
-    p_Surface.faces = faces.block(0,0,faces.rows(),3);
+    p_Surface.rr = verts.block(0,0,verts.rows(),3);
+    p_Surface.tris = faces.block(0,0,faces.rows(),3);
 
     // hemi info
     if(t_File.fileName().contains("lh."))

@@ -43,9 +43,8 @@
 
 #include "disp3D_global.h"
 
-#include <fs/label.h>
-#include <fs/annotation.h>
 #include <mne/mne.h>
+#include <fs/surface.h>
 
 
 //*************************************************************************************************************
@@ -58,6 +57,17 @@
 #include <QGLColorMaterial>
 #include <QSharedPointer>
 #include <QList>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace FSLIB
+{
+class Label;
+}
 
 
 //*************************************************************************************************************
@@ -102,7 +112,7 @@ public:
     *
     * @param[in] parent     Parent QObject (optional)
     */
-    LabelView(QWindow *parent = 0);
+    LabelView(Surface &p_surf, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, QWindow *parent = 0);
     
     //=========================================================================================================
     /**
@@ -128,12 +138,9 @@ protected:
     void paintGL(QGLPainter *painter);
 
 private:
-    MNEForwardSolution m_forwardSolution;   /**< Holds the forward soultion -> ToDo change this to shraed data pointer */
-    qint32 testCount;
-    QVector<Annotation::SPtr> m_vecAnnotation;
-
 
     //Data Stuff
+    Surface m_surf;                                 /**< The surface which should be displayed. */
     QList<Label> m_qListLabels;                     /**< The labels. */
     QList<RowVector4i> m_qListRGBAs;                /**< The label colors encoded in RGBA. */
 

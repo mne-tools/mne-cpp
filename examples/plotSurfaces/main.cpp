@@ -92,8 +92,7 @@ int main(int argc, char *argv[])
 
     t_annot.toLabels(t_surf, t_qListLabels, t_qListRGBAs);
 
-
-    LabelView view;
+    LabelView view(t_surf, t_qListLabels, t_qListRGBAs);
 
     if (view.stereoType() != QGLView::RedCyanAnaglyph)
         view.camera()->setEyeSeparation(0.3f);

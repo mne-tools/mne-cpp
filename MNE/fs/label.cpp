@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include "label.h"
+#include "surface.h"
 
 
 //*************************************************************************************************************
@@ -52,6 +53,7 @@
 #include <QDebug>
 
 #include <iostream>
+#include <vector>
 
 
 //*************************************************************************************************************
@@ -69,18 +71,20 @@ using namespace FSLIB;
 
 Label::Label()
 : hemi(-1)
+, label_id(-1)
 {
 }
 
 
 //*************************************************************************************************************
 
-Label::Label(const VectorXi &p_vertices, const MatrixX3f &p_pos, const VectorXd &p_values, qint32 p_hemi, const QString &p_name)
+Label::Label(const VectorXi &p_vertices, const MatrixX3f &p_pos, const VectorXd &p_values, qint32 p_hemi, const QString &p_name, qint32 p_id)
 : vertices(p_vertices)
 , pos(p_pos)
 , values(p_values)
 , hemi(p_hemi)
 , name(p_name)
+, label_id(p_id)
 {
 
 }
@@ -103,9 +107,45 @@ void Label::clear()
     vertices = VectorXi();
     pos = MatrixX3f();
     values = VectorXd();
+
+    label_id = -1;
+    tris = MatrixX3i();
 //    vertices.clear();
 //    pos.clear();
 //    values.clear();
+}
+
+
+//*************************************************************************************************************
+
+bool Label::generateTris(const Surface & p_Surface)
+{
+
+    this->tris = MatrixX3i(p_Surface.tris.rows(),3);
+
+    std::vector<int> verts;
+    verts.reserve(this->vertices.size());
+    for(qint32 i = 0; i < this->vertices.size(); ++i)
+        verts.push_back(this->vertices[i]);
+
+    //
+    // Search for all the tris where is at least one corner part of the label
+    //
+    qint32 t_size = 0;
+    for(qint32 i = 0; i < p_Surface.tris.rows(); ++i)
+    {
+        if(find(verts.begin(), verts.end(), p_Surface.tris(i,0)) == verts.end())
+            if(find(verts.begin(), verts.end(), p_Surface.tris(i,1)) == verts.end())
+                if(find(verts.begin(), verts.end(), p_Surface.tris(i,2)) == verts.end())
+                    continue;
+
+        this->tris.row(t_size) = p_Surface.tris.row(i);
+        ++t_size;
+    }
+
+    this->tris.conservativeResize(t_size, 3);
+
+    return true;
 }
 
 
