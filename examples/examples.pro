@@ -43,13 +43,13 @@ SUBDIRS += \
     readFwd \
     readEpochs \
     computeInverse \
-    clusteredInverse \
     makeInverseOperator
 
 contains(MNECPP_CONFIG, isGui) {
     qtHaveModule(3d) {
         message(Qt3D available: readFwdDisp3D configured!)
         SUBDIRS += \
+            clusteredInverse \
             readFwdDisp3D \
             plotSurfaces
     }

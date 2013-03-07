@@ -41,12 +41,13 @@
 
 #include <fs/label.h>
 #include <fs/surface.h>
-
 #include <fs/annotation_set.h>
 
 #include <fiff/fiff_evoked.h>
 #include <inverse/sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
+
+#include <disp3D/labelview.h>
 
 #include <iostream>
 
@@ -56,7 +57,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/QCoreApplication>
+#include <QGuiApplication>
 
 
 //*************************************************************************************************************
@@ -68,6 +69,7 @@ using namespace MNELIB;
 using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace INVERSELIB;
+using namespace DISP3DLIB;
 
 
 //*************************************************************************************************************
@@ -86,7 +88,10 @@ using namespace INVERSELIB;
 */
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
+    QGuiApplication a(argc, argv);
+
+    //########################################################################################
+    // Source Estimate
 
     QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
@@ -138,6 +143,50 @@ int main(int argc, char *argv[])
     // View activation time-series
     std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
     std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
+
+    //Source Estimate end
+    //########################################################################################
+
+    Annotation t_annot("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot");
+    Surface t_surf("./MNE-sample-data/subjects/sample/surf/lh.white");
+
+    QList<Label> t_qListLabels;
+    QList<RowVector4i> t_qListRGBAs;
+
+    t_annot.toLabels(t_surf, t_qListLabels, t_qListRGBAs);
+
+    LabelView view(t_surf, t_qListLabels, t_qListRGBAs);
+
+    if (view.stereoType() != QGLView::RedCyanAnaglyph)
+        view.camera()->setEyeSeparation(0.3f);
+    QStringList args = QCoreApplication::arguments();
+    int w_pos = args.indexOf("-width");
+    int h_pos = args.indexOf("-height");
+    if (w_pos >= 0 && h_pos >= 0)
+    {
+        bool ok = true;
+        int w = args.at(w_pos + 1).toInt(&ok);
+        if (!ok)
+        {
+            qWarning() << "Could not parse width argument:" << args;
+            return 1;
+        }
+        int h = args.at(h_pos + 1).toInt(&ok);
+        if (!ok)
+        {
+            qWarning() << "Could not parse height argument:" << args;
+            return 1;
+        }
+        view.resize(w, h);
+    }
+    else
+    {
+        view.resize(800, 600);
+    }
+    view.show();
+
+    //Push Estimate
+    view.pushSourceEstimate(sourceEstimate);
 
     return a.exec();
 }
