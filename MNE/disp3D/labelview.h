@@ -45,6 +45,7 @@
 
 #include <mne/mne.h>
 #include <fs/surface.h>
+#include <inverse/sourceestimate.h>
 
 
 //*************************************************************************************************************
@@ -63,6 +64,8 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+class QTimer;
 
 namespace FSLIB
 {
@@ -85,6 +88,7 @@ namespace DISP3DLIB
 
 using namespace MNELIB;
 using namespace FSLIB;
+using namespace INVERSELIB;
 
 
 //*************************************************************************************************************
@@ -119,6 +123,10 @@ public:
     * Destroys the LabelView class.
     */
     ~LabelView();
+
+
+    void pushSourceEstimate(SourceEstimate &p_sourceEstimate);
+
 
 protected:
     //=========================================================================================================
@@ -156,6 +164,22 @@ private:
     QGLSceneNode *m_pSceneNode;                    /**< Node of the scene. */
 
     QGLCamera *m_pCameraFrontal;     /**< frontal camera. */
+
+
+
+
+    SourceEstimate m_curSourceEstimate;
+    RowVectorXd m_vecFirstLabelSourceEstimate;
+    double m_dMaxSourceEstimate;
+
+    qint32 simCount;
+    qint32 m_nTSteps;
+    QTimer *m_timer;
+    void updateData();
+
+
+
+
 
     //=========================================================================================================
     /**

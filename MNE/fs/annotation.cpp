@@ -289,6 +289,7 @@ bool Annotation::toLabels(const Surface &p_surf, QList<Label> &p_qListLabels, QL
     VectorXd values;
     MatrixX3f pos;
     QString name;
+    MatrixX3i t_tris;
     for(qint32 i = 0; i < label_rgbas.rows(); ++i)
     {
         label_id = label_ids[i];
@@ -316,11 +317,26 @@ bool Annotation::toLabels(const Surface &p_surf, QList<Label> &p_qListLabels, QL
         values = VectorXd::Zero(count);
         name = QString("%1-%2").arg(label_names[i]).arg(this->hemi == 0 ? "lh" : "rh");
 
-        p_qListLabels.append(Label(vertices, pos, values, this->hemi, name, label_id));
+        // generate tris information
+        t_tris.resize(p_surf.tris.rows(),3);
+        qint32 t_size = 0;
+        for(qint32 i = 0; i < p_surf.tris.rows(); ++i)
+        {
+            if(m_LabelIds(p_surf.tris(i,0)) != label_id)
+                if(m_LabelIds(p_surf.tris(i,1)) != label_id)
+                    if(m_LabelIds(p_surf.tris(i,2)) != label_id)
+                        continue;
+
+            t_tris.row(t_size) = p_surf.tris.row(i);
+            ++t_size;
+        }
+        t_tris.conservativeResize(t_size, 3);
+
+        // put it all together
+        p_qListLabels.append(Label(vertices, pos, values, this->hemi, name, label_id, t_tris));
 
         // store the color
         p_qListLabelRGBAs.append(label_rgba);
-
     }
 
 
@@ -353,13 +369,8 @@ bool Annotation::toLabels(const Surface &p_surf, QList<Label> &p_qListLabels, QL
 //labels = list(labels)
 //label_colors = list(label_colors)
 
-//logger.info('[done]')
 
-
-
-
-
-
+    printf("[done]\n");
 
     return true;
 }

@@ -78,13 +78,14 @@ Label::Label()
 
 //*************************************************************************************************************
 
-Label::Label(const VectorXi &p_vertices, const MatrixX3f &p_pos, const VectorXd &p_values, qint32 p_hemi, const QString &p_name, qint32 p_id)
+Label::Label(const VectorXi &p_vertices, const MatrixX3f &p_pos, const VectorXd &p_values, qint32 p_hemi, const QString &p_name, qint32 p_id, const MatrixX3i &p_tris)
 : vertices(p_vertices)
 , pos(p_pos)
 , values(p_values)
 , hemi(p_hemi)
 , name(p_name)
 , label_id(p_id)
+, tris(p_tris)
 {
 
 }
@@ -120,6 +121,9 @@ void Label::clear()
 
 bool Label::generateTris(const Surface & p_Surface)
 {
+    //check whether there are data to create the tris
+    if(this->vertices.size() == 0)
+        return false;
 
     this->tris = MatrixX3i(p_Surface.tris.rows(),3);
 

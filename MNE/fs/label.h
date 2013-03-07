@@ -69,6 +69,9 @@
 namespace FSLIB
 {
 
+const static Eigen::MatrixX3i defaultTris(0,3);
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -113,8 +116,9 @@ public:
     * @param[in] p_hemi         Hemisphere (lh = 0; rh = 1)
     * @param[in] p_name         label names
     * @param[in] p_id           label id (optional, default = -1)
+    * @param[in] p_tris         triangulation information(optional)
     */
-    Label(const VectorXi &p_vertices, const MatrixX3f &p_pos, const VectorXd &p_values, qint32 p_hemi, const QString &p_name, qint32 p_id = -1);
+    Label(const VectorXi &p_vertices, const MatrixX3f &p_pos, const VectorXd &p_values, qint32 p_hemi, const QString &p_name, qint32 p_id = -1, const MatrixX3i &p_tris = defaultTris);
     
     //=========================================================================================================
     /**
