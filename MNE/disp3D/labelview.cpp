@@ -54,6 +54,7 @@
 
 #include <QtCore/qurl.h>
 #include <QArray>
+#include <QTimer>
 
 
 //*************************************************************************************************************
@@ -85,9 +86,14 @@ LabelView::LabelView(Surface &p_surf, QList<Label> &p_qListLabels, QList<RowVect
 , m_bStereo(true)
 , m_pSceneNodeBrain(0)
 , m_pSceneNode(0)
+, m_nTSteps(0)
 {
     m_pCameraFrontal = new QGLCamera(this);
     m_pCameraFrontal->setAdjustForAspectRatio(false);
+
+
+    m_timer = new QTimer(this);
+    QObject::connect(m_timer, &QTimer::timeout, this, &LabelView::updateData);
 }
 
 
@@ -96,6 +102,26 @@ LabelView::LabelView(Surface &p_surf, QList<Label> &p_qListLabels, QList<RowVect
 LabelView::~LabelView()
 {
     delete m_pSceneNode;
+}
+
+
+//*************************************************************************************************************
+
+void LabelView::pushSourceEstimate(SourceEstimate &p_sourceEstimate)
+{
+    m_timer->stop();
+    m_curSourceEstimate = p_sourceEstimate;
+
+    m_nTSteps = m_curSourceEstimate.times.size();
+
+    qDebug() << "#########" << m_curSourceEstimate.data.rows() << m_curSourceEstimate.data.cols() << m_nTSteps;
+
+    m_vecFirstLabelSourceEstimate = m_curSourceEstimate.data.block(0,0,3,m_curSourceEstimate.data.cols()).colwise().sum();
+
+    m_dMaxSourceEstimate = m_vecFirstLabelSourceEstimate.maxCoeff();
+
+
+    m_timer->start(m_curSourceEstimate.tstep*1000);
 }
 
 
@@ -218,6 +244,10 @@ void LabelView::initializeGL(QGLPainter *painter)
     m_pLightParametersScene->setPosition(QVector3D(0.0f, 0.0f, 3.0f));
     painter->setMainLight(m_pLightParametersScene);
 
+
+
+    simCount = 0;
+
     //
     // Set stereo type
     //
@@ -251,7 +281,13 @@ void LabelView::paintGL(QGLPainter *painter)
 //        material.prepareToDraw(painter, painter->attributes());
 
 
-//    m_pSceneNode->palette()->material(15)->setSpecularColor(QColor((testCount%10)*28,(testCount%10)*28,(testCount%10)*28,1));
+//    qint32 iVal = (simCount%m_nTSteps)*(255.0/m_nTSteps);
+
+    qint32 iVal = (m_vecFirstLabelSourceEstimate[simCount%m_nTSteps]/m_dMaxSourceEstimate) * 255;
+
+
+
+    m_pSceneNode->palette()->material(15)->setSpecularColor(QColor(iVal,iVal,iVal,1));
 
     m_pSceneNode->draw(painter);
 
@@ -271,3 +307,15 @@ void LabelView::paintGL(QGLPainter *painter)
 //    //completed building, so finalise
 //    return builder.finalizedSceneNode();
 //}
+
+
+//*************************************************************************************************************
+
+void LabelView::updateData()
+{
+//    qDebug() << simCount%m_nTSteps;
+
+    ++simCount;
+
+    this->update();
+}

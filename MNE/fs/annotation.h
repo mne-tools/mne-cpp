@@ -133,10 +133,7 @@ public:
     *
     * @return vertix indeces
     */
-    inline VectorXi& getVertices()
-    {
-        return m_Vertices;
-    }
+    inline VectorXi& getVertices();
 
     //=========================================================================================================
     /**
@@ -144,10 +141,7 @@ public:
     *
     * @return vertix labels
     */
-    inline VectorXi& getLabelIds()
-    {
-        return m_LabelIds;
-    }
+    inline VectorXi& getLabelIds();
 
     //=========================================================================================================
     /**
@@ -155,10 +149,7 @@ public:
     *
     * @return colortable
     */
-    inline Colortable& getColortable()
-    {
-        return m_Colortable;
-    }
+    inline Colortable& getColortable();
 
     //=========================================================================================================
     /**
@@ -194,6 +185,33 @@ private:
 
     Colortable m_Colortable;    /**< Lookup table label colors & ids */
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline VectorXi& Annotation::getVertices()
+{
+    return m_Vertices;
+}
+
+
+//*************************************************************************************************************
+
+inline VectorXi& Annotation::getLabelIds()
+{
+    return m_LabelIds;
+}
+
+
+//*************************************************************************************************************
+
+inline Colortable& Annotation::getColortable()
+{
+    return m_Colortable;
+}
+
 
 } // NAMESPACE
 
