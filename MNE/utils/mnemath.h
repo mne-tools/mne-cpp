@@ -315,7 +315,7 @@ VectorXi MNEMath::sort(Matrix<T, Dynamic, 1> &v_prime, Matrix<T, Dynamic, Dynami
     if(v_prime.size() > 0)
     {
         //sort Matrix
-        MatrixXd newMat(mat.rows(), mat.cols());
+        Matrix<T, Dynamic, Dynamic> newMat(mat.rows(), mat.cols());
         for(qint32 i = 0; i < idx.size(); ++i)
             newMat.col(i) = mat.col(idx[i]);
         mat = newMat;

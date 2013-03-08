@@ -394,8 +394,8 @@ public:
     FiffNamedMatrix::SDPtr sol_grad;    /**< ToDo... */
     FiffCoordTrans mri_head_t;          /**< MRI head coordinate transformation */
     MNESourceSpace src;                 /**< Geomertic description of the source spaces (hemispheres) */
-    MatrixX3d source_rr;                /**< Source locations */
-    MatrixX3d source_nn;                /**< Source normals (number depends on fixed or free orientation) */
+    MatrixX3f source_rr;                /**< Source locations */
+    MatrixX3f source_nn;                /**< Source normals (number depends on fixed or free orientation) */
 };
 
 //*************************************************************************************************************

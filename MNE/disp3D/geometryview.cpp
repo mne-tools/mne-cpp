@@ -128,7 +128,7 @@ void GeometryView::initializeGL(QGLPainter *painter)
             {
 
                 MatrixX3i tris = m_forwardSolution.src[h].tris;
-                MatrixX3d rr = m_forwardSolution.src[h].rr;
+                MatrixX3f rr = m_forwardSolution.src[h].rr;
 
                 builder.pushNode();
                 //
@@ -150,9 +150,9 @@ void GeometryView::initializeGL(QGLPainter *painter)
                     {
                         if(m_vecAnnotation[h]->getLabelIds()(tris(i,0)) == t_label_ids || m_vecAnnotation[h]->getLabelIds()(tris(i,1)) == t_label_ids || m_vecAnnotation[h]->getLabelIds()(tris(i,2)) == t_label_ids)
                         {
-                            t_TriCoords.col(t_size*3) = rr.row( tris(i,0) ).transpose().cast<float>();
-                            t_TriCoords.col(t_size*3+1) = rr.row( tris(i,1) ).transpose().cast<float>();
-                            t_TriCoords.col(t_size*3+2) = rr.row( tris(i,2) ).transpose().cast<float>();
+                            t_TriCoords.col(t_size*3) = rr.row( tris(i,0) ).transpose();
+                            t_TriCoords.col(t_size*3+1) = rr.row( tris(i,1) ).transpose();
+                            t_TriCoords.col(t_size*3+2) = rr.row( tris(i,2) ).transpose();
                             ++t_size;
                         }
                     }

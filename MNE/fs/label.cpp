@@ -79,7 +79,7 @@ Label::Label()
 
 //*************************************************************************************************************
 
-Label::Label(const VectorXi &p_vertices, const MatrixX3d &p_pos, const VectorXd &p_values, qint32 p_hemi, const QString &p_name, qint32 p_id)
+Label::Label(const VectorXi &p_vertices, const MatrixX3f &p_pos, const VectorXd &p_values, qint32 p_hemi, const QString &p_name, qint32 p_id)
 : vertices(p_vertices)
 , pos(p_pos)
 , values(p_values)
@@ -106,7 +106,7 @@ void Label::clear()
     hemi = -1;
     name = QString("");
     vertices = VectorXi();
-    pos = MatrixX3d(0,3);
+    pos = MatrixX3f(0,3);
     values = VectorXd();
 
     label_id = -1;
@@ -240,7 +240,7 @@ bool Label::read(const QString& p_sFileName, Label &p_Label)
 //    p_Label.pos.insert(p_Label.hemi, data.cast<float>().block(0,1,data.rows(),3).array() * 1e-3);
 //    p_Label.values.insert(p_Label.hemi, data.block(0,4,data.rows(),1));
     p_Label.vertices = data.cast<int>().block(0,0,data.rows(),1);
-    p_Label.pos = data.block(0,1,data.rows(),3).array() * 1e-3;
+    p_Label.pos = data.cast<float>().block(0,1,data.rows(),3).array() * 1e-3;
     p_Label.values = data.block(0,4,data.rows(),1);
 
     if(t_File.fileName().contains("lh.label"))

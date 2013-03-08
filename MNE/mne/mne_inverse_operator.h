@@ -254,7 +254,7 @@ public:
     fiff_int_t nsource;                     /**< Number of source points. */
     fiff_int_t nchan;                       /**< Number of channels. */
     fiff_int_t coord_frame;                 /**< Coordinate system definition */
-    MatrixXd  source_nn;                    /**< Source normals. */
+    MatrixXf  source_nn;                    /**< Source normals. */
     VectorXd  sing;                         /**< Singular values */
     bool    eigen_leads_weighted;           /**< If eigen lead are weighted. */
     FiffNamedMatrix::SDPtr eigen_leads;     /**< Eigen leads */
