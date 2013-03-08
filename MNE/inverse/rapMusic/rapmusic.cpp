@@ -76,3 +76,11 @@ const char* RapMusic::getName() const
 {
     return "RAP MUSIC";
 }
+
+
+//*************************************************************************************************************
+
+const MNESourceSpace& RapMusic::getSourceSpace() const
+{
+    return m_ForwardSolution.src;
+}

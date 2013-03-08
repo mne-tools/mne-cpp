@@ -844,7 +844,7 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
 
 //    if(inv.source_nn)
 //        delete inv.source_nn;
-    inv.source_nn = t_pTag->toFloatMatrix();
+    inv.source_nn = t_pTag->toFloatMatrix().cast<double>();
     inv.source_nn.transposeInPlace();
 
     printf("[done]\n");

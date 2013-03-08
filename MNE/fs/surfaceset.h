@@ -142,7 +142,17 @@ public:
     *
     * @return Surface related to the parameter index.
     */
-    Surface operator[] (qint32 idx) const;
+    const Surface& operator[] (qint32 idx) const;
+
+    //=========================================================================================================
+    /**
+    * Subscript operator [] to access surface by index
+    *
+    * @param[in] idx    the hemisphere index (0 or 1).
+    *
+    * @return Surface related to the parameter index.
+    */
+    Surface& operator[] (qint32 idx);
 
     //=========================================================================================================
     /**
@@ -152,7 +162,17 @@ public:
     *
     * @return Surface related to the parameter identifier.
     */
-    Surface operator[] (QString idt) const;
+    const Surface& operator[] (QString idt) const;
+
+    //=========================================================================================================
+    /**
+    * Subscript operator [] to access surface by identifier
+    *
+    * @param[in] idt    the hemisphere identifier ("lh" or "rh").
+    *
+    * @return Surface related to the parameter identifier.
+    */
+    Surface& operator[] (QString idt);
 
 private:
     QMap<qint32, Surface> m_qMapSurfs;   /**< Hemisphere surfaces (lh = 0; rh = 1). */

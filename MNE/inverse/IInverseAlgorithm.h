@@ -53,6 +53,10 @@ namespace FIFFLIB
 class FiffEvoked;
 }
 
+namespace MNELIB
+{
+class MNESourceSpace;
+}
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -68,6 +72,7 @@ namespace INVERSELIB
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -91,7 +96,7 @@ public:
     /**
     * Destroys the IInverseAlgorithm.
     */
-    virtual ~IInverseAlgorithm() {};
+    virtual ~IInverseAlgorithm() {}
 
     //=========================================================================================================
     /**
@@ -112,6 +117,15 @@ public:
     * @return the algorithm name
     */
     virtual const char* getName() const = 0;
+
+    //=========================================================================================================
+    /**
+    * Returns the current mne source space on which the inverse algorithm is performing on.
+    * Either from inverse operator (minimum norm estimate), or from forward solution (beamformers)
+    *
+    * @return the mne source space information
+    */
+    virtual const MNESourceSpace& getSourceSpace() const = 0;
 };
 
 } //NAMESPACE

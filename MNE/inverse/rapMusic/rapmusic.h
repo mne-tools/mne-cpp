@@ -44,6 +44,8 @@
 #include "../inverse_global.h"
 #include "../IInverseAlgorithm.h"
 
+#include <mne/mne_forwardsolution.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -52,6 +54,13 @@
 
 namespace INVERSELIB
 {
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace MNELIB;
 
 //=============================================================================================================
 /**
@@ -69,6 +78,11 @@ public:
     virtual SourceEstimate calculateInverse() const;
 
     virtual const char* getName() const;
+
+    virtual const MNESourceSpace& getSourceSpace() const;
+
+private:
+    MNEForwardSolution m_ForwardSolution; /**< The Forward operator which should be scanned through*/
 };
 
 } //NAMESPACE

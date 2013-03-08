@@ -318,7 +318,7 @@ bool MNESourceSpace::read_source_space(FiffStream* p_pStream, const FiffDirTree&
         return false;
     }
 
-    p_Hemisphere.rr = t_pTag->toFloatMatrix().transpose();
+    p_Hemisphere.rr = t_pTag->toFloatMatrix().transpose().cast<double>();
     qint32 rows_rr = p_Hemisphere.rr.rows();
 //        qDebug() << "last element rr: " << p_Hemisphere.rr(rows_rr-1, 0) << p_Hemisphere.rr(rows_rr-1, 1) << p_Hemisphere.rr(rows_rr-1, 2);
 
@@ -339,7 +339,7 @@ bool MNESourceSpace::read_source_space(FiffStream* p_pStream, const FiffDirTree&
         return false;
     }
 
-    p_Hemisphere.nn = t_pTag->toFloatMatrix().transpose();
+    p_Hemisphere.nn = t_pTag->toFloatMatrix().transpose().cast<double>();
     qint32 rows_nn = p_Hemisphere.nn.rows();
 
     if (rows_nn != p_Hemisphere.np)

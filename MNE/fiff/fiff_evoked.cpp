@@ -408,7 +408,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
         //
         //   Only one epoch
         //
-        all_data = epoch[0].toFloatMatrix();
+        all_data = epoch[0].toFloatMatrix().cast<double>();
         all_data.transposeInPlace();
         //
         //   May need a transpose if the number of channels is one
@@ -421,13 +421,13 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
         //
         //   Put the old style epochs together
         //
-        all_data = epoch[0].toFloatMatrix();
+        all_data = epoch[0].toFloatMatrix().cast<double>();
         all_data.transposeInPlace();
         qint32 oldsize;
         for (k = 1; k < nepoch; ++k)
         {
             oldsize = all_data.rows();
-            MatrixXd tmp = epoch[k].toFloatMatrix();
+            MatrixXd tmp = epoch[k].toFloatMatrix().cast<double>();
             tmp.transposeInPlace();
             all_data.conservativeResize(oldsize+tmp.rows(), all_data.cols());
             all_data.block(oldsize, 0, tmp.rows(), tmp.cols()) = tmp;

@@ -63,7 +63,7 @@ MNEClusterInfo::MNEClusterInfo()
 
 void MNEClusterInfo::clear()
 {
-    orig_vertno = VectorXi::Zero(0);
-    cluster_vertnos.clear();
-    cluster_distances.clear();
+    clusterVertnos.clear();
+    clusterDistances.clear();
+    clusterIds.clear();
 }

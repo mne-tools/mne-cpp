@@ -133,31 +133,64 @@ bool SurfaceSet::read(const QString& p_sLHFileName, const QString& p_sRHFileName
 
 //*************************************************************************************************************
 
-Surface SurfaceSet::operator[] (qint32 idx) const
+const Surface& SurfaceSet::operator[] (qint32 idx) const
 {
     if(idx == 0)
-        return m_qMapSurfs[idx];
+        return m_qMapSurfs.find(idx).value();
     else if(idx == 1)
-        return m_qMapSurfs[idx];
+        return m_qMapSurfs.find(idx).value();
     else
     {
         qWarning("Warning: Index is not '0' or '1'! Returning '0'.");
-        return m_qMapSurfs[0];
+        return m_qMapSurfs.find(0).value();
     }
 }
 
 
 //*************************************************************************************************************
 
-Surface SurfaceSet::operator[] (QString idt) const
+Surface& SurfaceSet::operator[] (qint32 idx)
+{
+    if(idx == 0)
+        return m_qMapSurfs.find(idx).value();
+    else if(idx == 1)
+        return m_qMapSurfs.find(idx).value();
+    else
+    {
+        qWarning("Warning: Index is not '0' or '1'! Returning '0'.");
+        return m_qMapSurfs.find(0).value();
+    }
+}
+
+
+//*************************************************************************************************************
+
+const Surface& SurfaceSet::operator[] (QString idt) const
 {
     if(idt.compare("lh") == 0)
-        return m_qMapSurfs[0];
+        return m_qMapSurfs.find(0).value();
     else if(idt.compare("rh") == 0)
-        return m_qMapSurfs[1];
+        return m_qMapSurfs.find(1).value();
     else
     {
         qWarning("Warning: Identifier is not 'lh' or 'rh'! Returning 'lh'.");
-        return m_qMapSurfs[0];
+        return m_qMapSurfs.find(0).value();
     }
 }
+
+
+//*************************************************************************************************************
+
+Surface& SurfaceSet::operator[] (QString idt)
+{
+    if(idt.compare("lh") == 0)
+        return m_qMapSurfs.find(0).value();
+    else if(idt.compare("rh") == 0)
+        return m_qMapSurfs.find(1).value();
+    else
+    {
+        qWarning("Warning: Identifier is not 'lh' or 'rh'! Returning 'lh'.");
+        return m_qMapSurfs.find(0).value();
+    }
+}
+

@@ -214,7 +214,7 @@ FiffInfo RtDataClient::readInfo()
                             p_FiffInfo.projs[countProj].data->col_names = FiffStream::split_name_list(t_pTag->toString());
                             break;
                         case FIFF_PROJ_ITEM_VECTORS:
-                            p_FiffInfo.projs[countProj].data->data = t_pTag->toFloatMatrix();
+                            p_FiffInfo.projs[countProj].data->data = t_pTag->toFloatMatrix().cast<double>();
                             break;
                         }
                     }

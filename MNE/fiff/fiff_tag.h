@@ -479,11 +479,11 @@ public:
     /**
     * to fiff FIFFT FLOAT MATRIX
     *
-    * parses a fiff float matrix and returns a double matrix to make sure only double is used
+    * parses a fiff float matrix
     *
-    * @return a double matrix wich is newly created from the parsed float
+    * @return the parsed float matrix
     */
-    inline MatrixXd toFloatMatrix() const;
+    inline MatrixXf toFloatMatrix() const;
 
     //=========================================================================================================
     /**
@@ -973,15 +973,15 @@ inline MatrixXi FiffTag::toIntMatrix() const
 
 //*************************************************************************************************************
 
-inline MatrixXd FiffTag::toFloatMatrix() const
+inline MatrixXf FiffTag::toFloatMatrix() const
 {
     if(!this->isMatrix() || this->getType() != FIFFT_FLOAT || this->data() == NULL)
-        return MatrixXd();//NULL;
+        return MatrixXf();//NULL;
 
     if (fiff_type_matrix_coding(this->type) != FIFFTS_MC_DENSE)
     {
         printf("Error in FiffTag::toFloatMatrix(): Matrix is not dense!\n");
-        return MatrixXd();//NULL;
+        return MatrixXf();//NULL;
     }
 
     qint32 ndim;
@@ -991,11 +991,11 @@ inline MatrixXd FiffTag::toFloatMatrix() const
     if (ndim != 2)
     {
         printf("Only two-dimensional matrices are supported at this time");
-        return MatrixXd();//NULL;
+        return MatrixXf();//NULL;
     }
 
     // --> Use copy constructor instead --> slower performance but higher memory management reliability
-    MatrixXd p_Matrix((Map<MatrixXf>( (float*)this->data(),dims[0], dims[1])).cast<double>());
+    MatrixXf p_Matrix((Map<MatrixXf>( (float*)this->data(),dims[0], dims[1])));
 
     return p_Matrix;
 }

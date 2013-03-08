@@ -481,7 +481,7 @@ bool FiffStream::read_cov(const FiffDirTree& p_Node, fiff_int_t cov_kind, FiffCo
             if (current->find_tag(this, FIFF_MNE_COV_EIGENVALUES, tag1) && current->find_tag(this, FIFF_MNE_COV_EIGENVECTORS, tag2))
             {
                 eig = VectorXd(Map<VectorXd>(tag1->toDouble(),dim));
-                eigvec = tag2->toFloatMatrix();
+                eigvec = tag2->toFloatMatrix().cast<double>();
                 eigvec.transposeInPlace();
             }
             //
@@ -1128,7 +1128,7 @@ bool FiffStream::read_named_matrix(const FiffDirTree& p_Node, fiff_int_t matkind
     else
     {
         //qDebug() << "Is Matrix" << t_pTag->isMatrix() << "Special Type:" << t_pTag->getType();
-        mat.data = t_pTag->toFloatMatrix();
+        mat.data = t_pTag->toFloatMatrix().cast<double>();
         mat.data.transposeInPlace();
     }
 
@@ -1269,7 +1269,7 @@ QList<FiffProj> FiffStream::read_proj(const FiffDirTree& p_Node)
         MatrixXd data;// = NULL;
         if (t_pTag)
         {
-            data = t_pTag->toFloatMatrix();
+            data = t_pTag->toFloatMatrix().cast<double>();
             data.transposeInPlace();
         }
         else
