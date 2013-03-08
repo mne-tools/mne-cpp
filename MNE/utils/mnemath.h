@@ -308,7 +308,7 @@ VectorXi MNEMath::sort(Matrix<T, Dynamic, 1> &v, bool desc)
 //*************************************************************************************************************
 
 template<typename T>
-static VectorXi MNEMath::sort(Matrix<T, Dynamic, 1> &v_prime, Matrix<T, Dynamic, Dynamic> &mat, bool desc)
+VectorXi MNEMath::sort(Matrix<T, Dynamic, 1> &v_prime, Matrix<T, Dynamic, Dynamic> &mat, bool desc)
 {
     VectorXi idx = MNEMath::sort<T>(v_prime, desc);
 

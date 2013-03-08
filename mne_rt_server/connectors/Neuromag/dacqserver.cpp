@@ -165,7 +165,7 @@ bool DacqServer::getMeasInfo(FiffInfo& p_fiffInfo)
                         active == *(t_pTag->toInt());
                         break;
                     case FIFF_PROJ_ITEM_VECTORS:
-                        data = t_pTag->toFloatMatrix();
+                    data = t_pTag->toFloatMatrix().cast<double>();
                         data.transposeInPlace();
                         break;
                 }
