@@ -165,6 +165,13 @@ const char* MinimumNorm::getName() const
 
 //*************************************************************************************************************
 
+const MNESourceSpace& MinimumNorm::getSourceSpace() const
+{
+    return m_inverseOperator.src;
+}
+
+//*************************************************************************************************************
+
 void MinimumNorm::setMethod(QString method)
 {
     if(method.compare("MNE") == 0)

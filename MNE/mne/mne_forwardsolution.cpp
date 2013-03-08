@@ -234,13 +234,10 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
         count = 0;
         offset = 0;
 
-
-
         // Offset for continuous indexing;
         if(h > 0)
             for(qint32 j = 0; j < h; ++j)
                 offset += this->src[j].nuse;
-
 
         if(h == 0)
             printf("Cluster Left Hemisphere\n");
@@ -250,12 +247,14 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
         Colortable t_CurrentColorTable = p_AnnotationSet[h].getColortable();
         VectorXi label_ids = t_CurrentColorTable.getLabelIds();
 
-        // Get label ids for every vertice
+        // Get label ids for every vertex
         VectorXi vertno_labeled = VectorXi::Zero(this->src[h].vertno.rows());
 
+        //ToDo make this more universal -> using Label instead of annotations - obsolete when using Labels
         for(qint32 i = 0; i < vertno_labeled.rows(); ++i)
             vertno_labeled[i] = p_AnnotationSet[h].getLabelIds()[this->src[h].vertno[i]];
 
+        //iterate over labels
         MatrixXd t_LF_partial;
         for (qint32 i = 0; i < label_ids.rows(); ++i)
         {
@@ -271,7 +270,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
                 VectorXi idcs = VectorXi::Zero(vertno_labeled.rows());
                 qint32 c = 0;
 
-                //Select ROIs
+                //Select ROIs //change this use label info with a hash tabel
                 for(qint32 j = 0; j < vertno_labeled.rows(); ++j)
                 {
                     if(vertno_labeled[j] == label_ids[i])
@@ -343,8 +342,9 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
                             }
                         }
                         clusterIdcs.conservativeResize(nClusterIdcs);
-                        p_fwdOut.src[h].cluster_info.cluster_vertnos.append(clusterIdcs);
-                        p_fwdOut.src[h].cluster_info.cluster_distances.append(clusterDistance);
+                        p_fwdOut.src[h].cluster_info.clusterVertnos.append(clusterIdcs);
+                        p_fwdOut.src[h].cluster_info.clusterDistances.append(clusterDistance);
+                        p_fwdOut.src[h].cluster_info.clusterIds.append(i);
                     }
 
                     //
@@ -375,8 +375,9 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
 
                             // Take the closest coordinates
                             qint32 sel_idx = idcs[j_min];
-                            p_fwdOut.src[h].rr.row(count) = this->src[h].rr.row(sel_idx);
-                            p_fwdOut.src[h].nn.row(count) = MatrixXd::Zero(1,3);
+                            //ToDo store this in cluster info
+//                            p_fwdOut.src[h].rr.row(count) = this->src[h].rr.row(sel_idx);
+//                            p_fwdOut.src[h].nn.row(count) = MatrixXd::Zero(1,3);
 
                             p_fwdOut.src[h].vertno[count] = this->src[h].vertno[sel_idx];
                             ++count;
@@ -394,31 +395,29 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
         //
         // Assemble new hemisphere information
         //
-
-        p_fwdOut.src[h].rr.conservativeResize(count, 3);
-        p_fwdOut.src[h].nn.conservativeResize(count, 3);
+//ToDo store this in cluster info
+//        p_fwdOut.src[h].rr.conservativeResize(count, 3);
+//        p_fwdOut.src[h].nn.conservativeResize(count, 3);
         p_fwdOut.src[h].vertno.conservativeResize(count);
 
-        p_fwdOut.src[h].cluster_info.orig_vertno = this->src[h].vertno;
-
-        p_fwdOut.src[h].nuse_tri = 0;
-        p_fwdOut.src[h].use_tris = MatrixX3i(0,3);
+//        p_fwdOut.src[h].nuse_tri = 0;
+//        p_fwdOut.src[h].use_tris = MatrixX3i(0,3);
 
 
-        if(p_fwdOut.src[h].rr.rows() > 0 && p_fwdOut.src[h].rr.cols() > 0)
-        {
-            if(h == 0)
-            {
-                p_fwdOut.source_rr = MatrixX3d(0,3);
-                p_fwdOut.source_nn = MatrixX3d(0,3);
-            }
+//        if(p_fwdOut.src[h].rr.rows() > 0 && p_fwdOut.src[h].rr.cols() > 0)
+//        {
+//            if(h == 0)
+//            {
+//                p_fwdOut.source_rr = MatrixX3d(0,3);
+//                p_fwdOut.source_nn = MatrixX3d(0,3);
+//            }
 
-            p_fwdOut.source_rr.conservativeResize(p_fwdOut.source_rr.rows() + p_fwdOut.src[h].rr.rows(),3);
-            p_fwdOut.source_rr.block(p_fwdOut.source_rr.rows() -  p_fwdOut.src[h].rr.rows(), 0,  p_fwdOut.src[h].rr.rows(), 3) = p_fwdOut.src[h].rr;
+//            p_fwdOut.source_rr.conservativeResize(p_fwdOut.source_rr.rows() + p_fwdOut.src[h].rr.rows(),3);
+//            p_fwdOut.source_rr.block(p_fwdOut.source_rr.rows() -  p_fwdOut.src[h].rr.rows(), 0,  p_fwdOut.src[h].rr.rows(), 3) = p_fwdOut.src[h].rr;
 
-            p_fwdOut.source_nn.conservativeResize(p_fwdOut.source_nn.rows() + p_fwdOut.src[h].nn.rows(),3);
-            p_fwdOut.source_nn.block(p_fwdOut.source_nn.rows() -  p_fwdOut.src[h].nn.rows(), 0,  p_fwdOut.src[h].nn.rows(), 3) = p_fwdOut.src[h].nn;
-        }
+//            p_fwdOut.source_nn.conservativeResize(p_fwdOut.source_nn.rows() + p_fwdOut.src[h].nn.rows(),3);
+//            p_fwdOut.source_nn.block(p_fwdOut.source_nn.rows() -  p_fwdOut.src[h].nn.rows(), 0,  p_fwdOut.src[h].nn.rows(), 3) = p_fwdOut.src[h].nn;
+//        }
 
         printf("[done]\n");
     }

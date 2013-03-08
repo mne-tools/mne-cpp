@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     labelview.cpp
+* @file     inverseview.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the LabelView class.
+* @brief    Implementation of the InverseView class.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "labelview.h"
+#include "inverseview.h"
 
 #include <fs/label.h>
 
@@ -77,9 +77,9 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-LabelView::LabelView(SurfaceSet &p_surfSet, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, QWindow *parent)
+InverseView::InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, QWindow *parent)
 : QGLView(parent)
-, m_surfSet(p_surfSet)
+, m_sourceSpace(p_sourceSpace)
 , m_qListLabels(p_qListLabels)
 , m_qListRGBAs(p_qListRGBAs)
 , m_bStereo(true)
@@ -92,13 +92,13 @@ LabelView::LabelView(SurfaceSet &p_surfSet, QList<Label> &p_qListLabels, QList<R
 
 
     m_timer = new QTimer(this);
-    QObject::connect(m_timer, &QTimer::timeout, this, &LabelView::updateData);
+    QObject::connect(m_timer, &QTimer::timeout, this, &InverseView::updateData);
 }
 
 
 //*************************************************************************************************************
 
-LabelView::~LabelView()
+InverseView::~InverseView()
 {
     delete m_pSceneNode;
 }
@@ -106,7 +106,7 @@ LabelView::~LabelView()
 
 //*************************************************************************************************************
 
-void LabelView::pushSourceEstimate(SourceEstimate &p_sourceEstimate)
+void InverseView::pushSourceEstimate(SourceEstimate &p_sourceEstimate)
 {
     m_timer->stop();
     m_curSourceEstimate = p_sourceEstimate;
@@ -126,7 +126,7 @@ void LabelView::pushSourceEstimate(SourceEstimate &p_sourceEstimate)
 
 //*************************************************************************************************************
 
-void LabelView::initializeGL(QGLPainter *painter)
+void InverseView::initializeGL(QGLPainter *painter)
 {
     // in the constructor construct a builder on the stack
     QGLBuilder builder;
@@ -150,7 +150,7 @@ void LabelView::initializeGL(QGLPainter *painter)
         builder.newNode();//create new hemisphere node
         {
             MatrixX3i tris;
-            MatrixX3f rr = m_surfSet[h].rr.cast<float>();
+            MatrixX3f rr = m_sourceSpace[h].rr.cast<float>();
 
             builder.pushNode();
             //
@@ -163,7 +163,7 @@ void LabelView::initializeGL(QGLPainter *painter)
                     continue;
 
                 //Ggenerate label tri information
-                tris = m_qListLabels[k].selectTris(m_surfSet[h]);
+                tris = m_qListLabels[k].selectTris(m_sourceSpace[h].tris);
 
                 // add new ROI node when current ROI node is not empty
                 if(builder.currentNode()->count() > 0)
@@ -256,7 +256,7 @@ void LabelView::initializeGL(QGLPainter *painter)
 
 //*************************************************************************************************************
 
-void LabelView::paintGL(QGLPainter *painter)
+void InverseView::paintGL(QGLPainter *painter)
 {
     glEnable(GL_BLEND); // enable transparency
 
@@ -293,7 +293,7 @@ void LabelView::paintGL(QGLPainter *painter)
 
 //*************************************************************************************************************
 
-//QGLSceneNode *LabelView::createScene()
+//QGLSceneNode *InverseView::createScene()
 //{
 //    QGLBuilder builder;
 //    QGLSceneNode *root = builder.sceneNode();
@@ -305,7 +305,7 @@ void LabelView::paintGL(QGLPainter *painter)
 
 //*************************************************************************************************************
 
-void LabelView::updateData()
+void InverseView::updateData()
 {
 //    qDebug() << simCount%m_nTSteps;
 

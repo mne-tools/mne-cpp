@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     mne_cluster_info.h
+* @file     inverseview.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     July, 2012
+* @date     March, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,27 +29,23 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    MNEClusterInfo class declaration, which provides cluster information.
+* @brief    InverseView class declaration
 *
 */
 
-#ifndef MNE_CLUSTER_INFO_H
-#define MNE_CLUSTER_INFO_H
+#ifndef INVERSEVIEW_H
+#define INVERSEVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_global.h"
+#include "disp3D_global.h"
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
+#include <mne/mne_sourcespace.h>
+#include <fs/surfaceset.h>
+#include <inverse/sourceestimate.h>
 
 
 //*************************************************************************************************************
@@ -57,16 +53,32 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include "qglview.h"
+#include <QGeometryData>
+#include <QGLColorMaterial>
 #include <QSharedPointer>
 #include <QList>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace MNELIB
+class QTimer;
+
+namespace FSLIB
+{
+class Label;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE FSLIB
+//=============================================================================================================
+
+namespace DISP3DLIB
 {
 
 //*************************************************************************************************************
@@ -74,53 +86,114 @@ namespace MNELIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
+using namespace MNELIB;
+using namespace FSLIB;
+using namespace INVERSELIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
 
 //=============================================================================================================
 /**
-* Cluster information
+* Visualize labels using a stereoscopic view. Coloring is done per label.
 *
-* @brief cluster information
+* @brief 3D stereoscopic labels
 */
-class MNESHARED_EXPORT MNEClusterInfo
+class DISP3DSHARED_EXPORT InverseView : public QGLView
 {
+    Q_OBJECT
 public:
-    typedef QSharedPointer<MNEClusterInfo> SPtr;            /**< Shared pointer type for MNEClusterInfo. */
-    typedef QSharedPointer<const MNEClusterInfo> ConstSPtr; /**< Const shared pointer type for MNEClusterInfo. */
-
+    typedef QSharedPointer<InverseView> SPtr;            /**< Shared pointer type for InverseView class. */
+    typedef QSharedPointer<const InverseView> ConstSPtr; /**< Const shared pointer type for InverseView class. */
+    
     //=========================================================================================================
     /**
-    * Default constructor.
-    */
-    MNEClusterInfo();
-
-    //=========================================================================================================
-    /**
-    * Initializes the cluster information.
-    */
-    void clear();
-
-    //=========================================================================================================
-    /**
-    * Returns true if MNE cluster information contains no data.
+    * Default constructor
     *
-    * @return true if MNE cluster information is empty.
+    *
+    *
+    *
+    *
+    *
+    * @param[in] parent     Parent QObject (optional)
     */
-    inline bool isEmpty() const;
+    InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, QWindow *parent = 0);
+    
+    //=========================================================================================================
+    /**
+    * Destroys the InverseView class.
+    */
+    ~InverseView();
+
+
+    void pushSourceEstimate(SourceEstimate &p_sourceEstimate);
+
+
+protected:
+    //=========================================================================================================
+    /**
+    * Initializes the current GL context represented by painter.
+    *
+    * @param[in] painter    GL painter which should be initialized
+    */
+    void initializeGL(QGLPainter *painter);
 
     //=========================================================================================================
     /**
-    * Returns the number of clusters
+    * Paints the scene onto painter. The color and depth buffers will have already been cleared, and the camera() position set.
     *
-    * @return true if MNE cluster information is empty.
+    * @param[in] painter    GL painter which is updated
     */
-    inline bool numClust() const;
+    void paintGL(QGLPainter *painter);
 
-public:
-    QList<VectorXi> clusterVertnos;    /**< Vertnos which belong to corresponding cluster. */
-    QList<VectorXd> clusterDistances;  /**< Distances to clusters centroid. */
-    QList<int> clusterIds;              /**< Id (Label/ROI id) of the cluster. Entries can be non unique, since some Label/ROI consist of more than one cluster.*/
+private:
+
+    //Data Stuff
+    MNESourceSpace m_sourceSpace;                   /**< The used source space. */
+    QList<Label> m_qListLabels;                     /**< The labels. */
+    QList<RowVector4i> m_qListRGBAs;                /**< The label colors encoded in RGBA. */
+
+    //GL Stuff
+    bool m_bStereo;
+
+    QGLLightModel *m_pLightModel;                   /**< The selected light model. */
+    QGLLightParameters *m_pLightParametersScene;    /**< The selected light parameters. */
+
+    QGLColorMaterial material;
+
+    QGLSceneNode *m_pSceneNodeBrain;               /**< Scene node of the hemisphere models. */
+    QGLSceneNode *m_pSceneNode;                    /**< Node of the scene. */
+
+    QGLCamera *m_pCameraFrontal;     /**< frontal camera. */
+
+
+
+
+    SourceEstimate m_curSourceEstimate;
+    RowVectorXd m_vecFirstLabelSourceEstimate;
+    double m_dMaxSourceEstimate;
+
+    qint32 simCount;
+    qint32 m_nTSteps;
+    QTimer *m_timer;
+    void updateData();
+
+
+
+
+
+    //=========================================================================================================
+    /**
+    * Creates the scene
+    *
+    * @return the root scene noode
+    */
+//    QGLSceneNode *createScene();
+
 };
 
 //*************************************************************************************************************
@@ -128,19 +201,8 @@ public:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool MNEClusterInfo::isEmpty() const
-{
-    return !(this->clusterVertnos.size() > 0);
-}
-
-
-//*************************************************************************************************************
-
-inline bool MNEClusterInfo::numClust() const
-{
-    return this->clusterVertnos.size();
-}
 
 } // NAMESPACE
 
-#endif // MNE_CLUSTER_INFO_H
+#endif // INVERSEVIEW_H
+

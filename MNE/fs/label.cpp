@@ -79,7 +79,7 @@ Label::Label()
 
 //*************************************************************************************************************
 
-Label::Label(const VectorXi &p_vertices, const MatrixX3f &p_pos, const VectorXd &p_values, qint32 p_hemi, const QString &p_name, qint32 p_id)
+Label::Label(const VectorXi &p_vertices, const MatrixX3d &p_pos, const VectorXd &p_values, qint32 p_hemi, const QString &p_name, qint32 p_id)
 : vertices(p_vertices)
 , pos(p_pos)
 , values(p_values)
@@ -106,7 +106,7 @@ void Label::clear()
     hemi = -1;
     name = QString("");
     vertices = VectorXi();
-    pos = MatrixX3f();
+    pos = MatrixX3d(0,3);
     values = VectorXd();
 
     label_id = -1;
@@ -115,7 +115,7 @@ void Label::clear()
 
 //*************************************************************************************************************
 
-MatrixX3i Label::generateTris(const Surface & p_Surface)
+MatrixX3i Label::selectTris(const Surface & p_Surface)
 {
     //check whether there are data to create the tris
     if(this->vertices.size() == 0)
@@ -137,6 +137,40 @@ MatrixX3i Label::generateTris(const Surface & p_Surface)
         if(verts.contains(p_Surface.tris(i,0)) || verts.contains(p_Surface.tris(i,1)) || verts.contains(p_Surface.tris(i,2)))
         {
             tris.row(t_size) = p_Surface.tris.row(i);
+            ++t_size;
+        }
+    }
+
+    tris.conservativeResize(t_size, 3);
+
+    return tris;
+}
+
+
+//*************************************************************************************************************
+
+MatrixX3i Label::selectTris(const MatrixX3i &p_matTris)
+{
+    //check whether there are data to create the tris
+    if(this->vertices.size() == 0)
+        return MatrixX3i(0,3);
+
+    MatrixX3i tris(p_matTris.rows(),3);
+
+    QSet<int> verts;
+    verts.reserve(this->vertices.size());
+    for(qint32 i = 0; i < this->vertices.size(); ++i)
+        verts.insert(this->vertices[i]);
+
+    //
+    // Search for all the tris where is at least one corner part of the label
+    //
+    qint32 t_size = 0;
+    for(qint32 i = 0; i < p_matTris.rows(); ++i)
+    {
+        if(verts.contains(p_matTris(i,0)) || verts.contains(p_matTris(i,1)) || verts.contains(p_matTris(i,2)))
+        {
+            tris.row(t_size) = p_matTris.row(i);
             ++t_size;
         }
     }
@@ -206,7 +240,7 @@ bool Label::read(const QString& p_sFileName, Label &p_Label)
 //    p_Label.pos.insert(p_Label.hemi, data.cast<float>().block(0,1,data.rows(),3).array() * 1e-3);
 //    p_Label.values.insert(p_Label.hemi, data.block(0,4,data.rows(),1));
     p_Label.vertices = data.cast<int>().block(0,0,data.rows(),1);
-    p_Label.pos = data.cast<float>().block(0,1,data.rows(),3).array() * 1e-3;
+    p_Label.pos = data.block(0,1,data.rows(),3).array() * 1e-3;
     p_Label.values = data.block(0,4,data.rows(),1);
 
     if(t_File.fileName().contains("lh.label"))

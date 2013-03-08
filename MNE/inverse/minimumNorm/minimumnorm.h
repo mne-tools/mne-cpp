@@ -121,6 +121,8 @@ public:
 
     virtual const char* getName() const;
 
+    virtual const MNESourceSpace& getSourceSpace() const;
+
     //=========================================================================================================
     /**
     * Set minimum norm algorithm method ("MNE" | "dSPM" | "sLORETA")

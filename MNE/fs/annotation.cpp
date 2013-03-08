@@ -277,7 +277,7 @@ bool Annotation::toLabels(const Surface &p_surf, QList<Label> &p_qListLabels, QL
     MatrixX4i label_rgbas = m_Colortable.getRGBAs();
 
     // load the vertex positions from surface
-    MatrixX3f vert_pos = p_surf.rr;
+    MatrixX3d vert_pos = p_surf.rr;
 
 //    qDebug() << label_rgbas.rows() << label_ids.size() << label_names.size();
 
@@ -287,7 +287,7 @@ bool Annotation::toLabels(const Surface &p_surf, QList<Label> &p_qListLabels, QL
     RowVector4i label_rgba;
     VectorXi vertices;
     VectorXd values;
-    MatrixX3f pos;
+    MatrixX3d pos;
     QString name;
     for(qint32 i = 0; i < label_rgbas.rows(); ++i)
     {

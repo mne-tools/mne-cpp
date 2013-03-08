@@ -99,8 +99,8 @@ void Surface::clear()
 {
     m_fileName = QString("");
     hemi = -1;
-    rr = MatrixX3f();
-    tris = MatrixX3i();
+    rr = MatrixX3d(0,3);
+    tris = MatrixX3i(0,3);
 }
 
 
@@ -258,7 +258,7 @@ bool Surface::read(const QString &p_sFileName, Surface &p_Surface)
     verts.transposeInPlace();
     verts.array() *= 0.001f;
 
-    p_Surface.rr = verts.block(0,0,verts.rows(),3);
+    p_Surface.rr = verts.block(0,0,verts.rows(),3).cast<double>();
     p_Surface.tris = faces.block(0,0,faces.rows(),3);
 
     // hemi info

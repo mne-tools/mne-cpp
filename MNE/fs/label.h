@@ -117,7 +117,7 @@ public:
     * @param[in] p_name         label names
     * @param[in] p_id           label id (optional, default = -1)
     */
-    Label(const VectorXi &p_vertices, const MatrixX3f &p_pos, const VectorXd &p_values, qint32 p_hemi, const QString &p_name, qint32 p_id = -1);
+    Label(const VectorXi &p_vertices, const MatrixX3d &p_pos, const VectorXd &p_values, qint32 p_hemi, const QString &p_name, qint32 p_id = -1);
     
     //=========================================================================================================
     /**
@@ -141,13 +141,23 @@ public:
 
     //=========================================================================================================
     /**
-    * Generates tris for this label using a given surface file.
+    * Select tris for this label from a given surface file.
     *
     * @param[in] p_Surface      to generate the label tris from
     *
     * @return the generated tris.
     */
-    MatrixX3i generateTris(const Surface & p_Surface);
+    MatrixX3i selectTris(const Surface & p_Surface);
+
+    //=========================================================================================================
+    /**
+    * Select tris for this label from a given tri matrix.
+    *
+    * @param[in] p_matTris      tris from which the selection should be made
+    *
+    * @return the generated tris.
+    */
+    MatrixX3i selectTris(const MatrixX3i &p_matTris);
 
     //=========================================================================================================
     /**
@@ -170,14 +180,14 @@ public:
 //    qint32 hemi;                        /**< Hemisphere (lh = 0; rh = 1; both = 2) */ Don't mix both hemis - KISS principle
     QString name;       /**< Name of the label */
     VectorXi vertices;  /**< Vertex indices (0 based) */
-    MatrixX3f pos;      /**< Locations in meters */
+    MatrixX3d pos;      /**< Locations in meters */
     VectorXd values;    /**< Values at the vertices */
 
     qint32 label_id;    /**< Label id (optional) */
 //    MatrixX3i tris;     /**< Tris for plotting (optional) */
 
 //    QMap<qint32, VectorXi> vertices;    /**< Vertex indices (0 based) */
-//    QMap<qint32, MatrixX3f> pos;        /**< Locations in meters */
+//    QMap<qint32, MatrixX3d> pos;        /**< Locations in meters */
 //    QMap<qint32, VectorXd> values;      /**< Values at the vertices */
 };
 

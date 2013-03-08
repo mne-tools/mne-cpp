@@ -47,7 +47,7 @@
 #include <inverse/sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
 
-#include <disp3D/labelview.h>
+#include <disp3D/inverseview.h>
 
 #include <iostream>
 
@@ -153,9 +153,10 @@ int main(int argc, char *argv[])
     QList<Label> t_qListLabels;
     QList<RowVector4i> t_qListRGBAs;
 
+    //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
     t_annotSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
 
-    LabelView view(t_surfSet, t_qListLabels, t_qListRGBAs);
+    InverseView view(minimumNorm.getSourceSpace(), t_qListLabels, t_qListRGBAs);
 
     if (view.stereoType() != QGLView::RedCyanAnaglyph)
         view.camera()->setEyeSeparation(0.3f);
