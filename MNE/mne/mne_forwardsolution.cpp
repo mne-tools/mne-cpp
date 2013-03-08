@@ -475,7 +475,7 @@ FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd &Gain, const Fiff
     VectorXd w = d.cwiseInverse();
     VectorXd ws = w;
     VectorXd wpp;
-    MNEMath::sort(ws, false);
+    MNEMath::sort<double>(ws, false);
     double weight_limit = pow(limit, 2);
     if (!limit_depth_chs)
     {
@@ -1086,7 +1086,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
                 //Sort singular values and singular vectors
                 VectorXd t_s = t_svd.singularValues();
                 MatrixXd U = t_svd.matrixU();
-                MNEMath::sort(t_s, U);
+                MNEMath::sort<double>(t_s, U);
 
                 //
                 //  Make sure that ez is in the direction of nn
