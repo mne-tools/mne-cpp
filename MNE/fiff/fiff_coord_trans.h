@@ -149,8 +149,8 @@ public:
 public:
     fiff_int_t  from;   /**< Source coordinate system. */
     fiff_int_t  to;     /**< Destination coordinate system. */
-    Matrix<double, 4,4, DontAlign>   trans;      /**< The forward transform */
-    Matrix<double, 4,4, DontAlign>   invtrans;   /**< The inverse transform */
+    Matrix<float, 4,4, DontAlign>   trans;      /**< The forward transform */
+    Matrix<float, 4,4, DontAlign>   invtrans;   /**< The inverse transform */
 
 // ### OLD STRUCT ###
 // Coordinate transformation descriptor

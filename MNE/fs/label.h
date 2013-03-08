@@ -117,7 +117,7 @@ public:
     * @param[in] p_name         label names
     * @param[in] p_id           label id (optional, default = -1)
     */
-    Label(const VectorXi &p_vertices, const MatrixX3d &p_pos, const VectorXd &p_values, qint32 p_hemi, const QString &p_name, qint32 p_id = -1);
+    Label(const VectorXi &p_vertices, const MatrixX3f &p_pos, const VectorXd &p_values, qint32 p_hemi, const QString &p_name, qint32 p_id = -1);
     
     //=========================================================================================================
     /**
@@ -180,7 +180,7 @@ public:
 //    qint32 hemi;                        /**< Hemisphere (lh = 0; rh = 1; both = 2) */ Don't mix both hemis - KISS principle
     QString name;       /**< Name of the label */
     VectorXi vertices;  /**< Vertex indices (0 based) */
-    MatrixX3d pos;      /**< Locations in meters */
+    MatrixX3f pos;      /**< Locations in meters */
     VectorXd values;    /**< Values at the vertices */
 
     qint32 label_id;    /**< Label id (optional) */

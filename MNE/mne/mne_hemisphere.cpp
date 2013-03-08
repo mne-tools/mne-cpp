@@ -60,8 +60,8 @@ MNEHemisphere::MNEHemisphere()
 , np(-1)
 , ntri(-1)
 , coord_frame(-1)
-, rr(MatrixX3d::Zero(0,3))
-, nn(MatrixX3d::Zero(0,3))
+, rr(MatrixX3f::Zero(0,3))
+, nn(MatrixX3f::Zero(0,3))
 , tris(MatrixX3i::Zero(0,3))
 , nuse(-1)
 , inuse(VectorXi::Zero(0))
@@ -135,8 +135,8 @@ void MNEHemisphere::clear()
     np = -1;
     ntri = -1;
     coord_frame = -1;
-    rr = MatrixX3d::Zero(0,3);
-    nn = MatrixX3d::Zero(0,3);
+    rr = MatrixX3f::Zero(0,3);
+    nn = MatrixX3f::Zero(0,3);
     tris = MatrixX3i::Zero(0,3);
     nuse = -1;
     inuse = VectorXi::Zero(0);
@@ -182,12 +182,12 @@ bool MNEHemisphere::transform_hemisphere_to(fiff_int_t dest, const FiffCoordTran
         return false;
     }
 
-    MatrixXd t = trans.trans.block(0,0,3,4);
+    MatrixXf t = trans.trans.block(0,0,3,4);
 //        res             = src;
     this->coord_frame = dest;
-    MatrixXd t_rr = MatrixXd::Ones(this->np, 4);
+    MatrixXf t_rr = MatrixXf::Ones(this->np, 4);
     t_rr.block(0, 0, this->np, 3) = this->rr;
-    MatrixXd t_nn = MatrixXd::Zero(this->np, 4);
+    MatrixXf t_nn = MatrixXf::Zero(this->np, 4);
     t_nn.block(0, 0, this->np, 3) = this->nn;
 
     this->rr    = (t*t_rr.transpose()).transpose();

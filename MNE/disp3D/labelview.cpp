@@ -150,7 +150,7 @@ void LabelView::initializeGL(QGLPainter *painter)
         builder.newNode();//create new hemisphere node
         {
             MatrixX3i tris;
-            MatrixX3f rr = m_surfSet[h].rr.cast<float>();
+            MatrixX3f rr = m_surfSet[h].rr;
 
             builder.pushNode();
             //

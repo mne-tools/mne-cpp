@@ -84,8 +84,8 @@ MNEForwardSolution::MNEForwardSolution()
 , sol_grad(new FiffNamedMatrix)
 //, mri_head_t(NULL)
 //, src(NULL)
-, source_rr(MatrixX3d::Zero(0,3))
-, source_nn(MatrixX3d::Zero(0,3))
+, source_rr(MatrixX3f::Zero(0,3))
+, source_nn(MatrixX3f::Zero(0,3))
 {
 
 }
@@ -103,8 +103,8 @@ MNEForwardSolution::MNEForwardSolution(QIODevice &p_IODevice, bool force_fixed, 
 , sol_grad(new FiffNamedMatrix)
 //, mri_head_t(NULL)
 //, src(NULL)
-, source_rr(MatrixX3d::Zero(0,3))
-, source_nn(MatrixX3d::Zero(0,3))
+, source_rr(MatrixX3f::Zero(0,3))
+, source_nn(MatrixX3f::Zero(0,3))
 {
     if(!read_forward_solution(p_IODevice, *this, force_fixed, surf_ori, include, exclude, bExcludeBads))
     {
@@ -156,8 +156,8 @@ void MNEForwardSolution::clear()
     sol_grad = FiffNamedMatrix::SDPtr(new FiffNamedMatrix());
     mri_head_t.clear();
     src.clear();
-    source_rr = MatrixX3d();
-    source_nn = MatrixX3d();
+    source_rr = MatrixX3f(0,3);
+    source_nn = MatrixX3f(0,3);
 }
 
 
@@ -997,8 +997,8 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
     if (fwd.isFixedOrient() || force_fixed == true)
     {
         nuse = 0;
-        fwd.source_rr = MatrixXd::Zero(fwd.nsource,3);
-        fwd.source_nn = MatrixXd::Zero(fwd.nsource,3);
+        fwd.source_rr = MatrixXf::Zero(fwd.nsource,3);
+        fwd.source_nn = MatrixXf::Zero(fwd.nsource,3);
         for(qint32 k = 0; k < t_SourceSpace.size();++k)
         {
             for(qint32 q = 0; q < t_SourceSpace[k].nuse; ++q)
@@ -1015,7 +1015,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
         {
             printf("\tChanging to fixed-orientation forward solution...");
 
-            MatrixXd tmp = fwd.source_nn.transpose();
+            MatrixXd tmp = fwd.source_nn.transpose().cast<double>();
             SparseMatrix<double>* fix_rot = MNEMath::make_block_diag(tmp,1);
             fwd.sol->data *= (*fix_rot);
             fwd.sol->ncol  = fwd.nsource;
@@ -1051,8 +1051,8 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
 
         nuse = 0;
         qint32 pp = 0;
-        fwd.source_rr = MatrixXd::Zero(fwd.nsource,3);
-        fwd.source_nn = MatrixXd::Zero(fwd.nsource*3,3);
+        fwd.source_rr = MatrixXf::Zero(fwd.nsource,3);
+        fwd.source_nn = MatrixXf::Zero(fwd.nsource*3,3);
 
         qWarning("Warning source_ori: Rotating the source coordinate system haven't been verified --> Singular Vectors U are different from MATLAB!");
 
@@ -1067,11 +1067,11 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
                 //
                 //  Project out the surface normal and compute SVD
                 //
-                Vector3d nn;
+                Vector3f nn;
                 if(use_ave_nn)
                 {
                     VectorXi t_vIdx = t_SourceSpace[k].pinfo[t_SourceSpace[k].patch_inds[p]];
-                    Matrix3Xd t_nn(3, t_vIdx.size());
+                    Matrix3Xf t_nn(3, t_vIdx.size());
                     for(qint32 i = 0; i < t_vIdx.size(); ++i)
                         t_nn.col(i) = t_SourceSpace[k].nn.block(t_vIdx[i],0,1,3).transpose();
                     nn = t_nn.rowwise().sum();
@@ -1080,13 +1080,13 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
                 else
                     nn = t_SourceSpace[k].nn.block(t_SourceSpace[k].vertno(p),0,1,3).transpose();
 
-                Matrix3d tmp = Matrix3d::Identity() - nn*nn.transpose();
+                Matrix3f tmp = Matrix3f::Identity(nn.rows(), nn.rows()) - nn*nn.transpose();
 
-                JacobiSVD<MatrixXd> t_svd(tmp, Eigen::ComputeThinU);
+                JacobiSVD<MatrixXf> t_svd(tmp, Eigen::ComputeThinU);
                 //Sort singular values and singular vectors
-                VectorXd t_s = t_svd.singularValues();
-                MatrixXd U = t_svd.matrixU();
-                MNEMath::sort<double>(t_s, U);
+                VectorXf t_s = t_svd.singularValues();
+                MatrixXf U = t_svd.matrixU();
+                MNEMath::sort<float>(t_s, U);
 
                 //
                 //  Make sure that ez is in the direction of nn
@@ -1098,7 +1098,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
             }
             nuse += t_SourceSpace[k].nuse;
         }
-        MatrixXd tmp = fwd.source_nn.transpose();
+        MatrixXd tmp = fwd.source_nn.transpose().cast<double>();
         SparseMatrix<double>* surf_rot = MNEMath::make_block_diag(tmp,3);
 
         fwd.sol->data *= *surf_rot;
@@ -1119,7 +1119,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
     {
         printf("\tCartesian source orientations...");
         nuse = 0;
-        fwd.source_rr = MatrixXd::Zero(fwd.nsource,3);
+        fwd.source_rr = MatrixXf::Zero(fwd.nsource,3);
         for(qint32 k = 0; k < t_SourceSpace.size(); ++k)
         {
             for (qint32 q = 0; q < t_SourceSpace[k].nuse; ++q)
@@ -1128,8 +1128,8 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
             nuse += t_SourceSpace[k].nuse;
         }
 
-        MatrixXd t_ones = MatrixXd::Ones(fwd.nsource,1);
-        Matrix3d t_eye = Matrix3d::Identity();
+        MatrixXf t_ones = MatrixXf::Ones(fwd.nsource,1);
+        Matrix3f t_eye = Matrix3f::Identity();
         kroneckerProduct(t_ones,t_eye,fwd.source_nn);
 
         printf("[done]\n");

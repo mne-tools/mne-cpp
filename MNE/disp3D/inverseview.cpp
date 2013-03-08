@@ -150,7 +150,7 @@ void InverseView::initializeGL(QGLPainter *painter)
         builder.newNode();//create new hemisphere node
         {
             MatrixX3i tris;
-            MatrixX3f rr = m_sourceSpace[h].rr.cast<float>();
+            MatrixX3f rr = m_sourceSpace[h].rr;
 
             builder.pushNode();
             //

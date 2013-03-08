@@ -143,7 +143,7 @@ public:
 public:
     QString m_fileName; /**< Surface file name. */
     qint32 hemi;        /**< Hemisphere (lh = 0; rh = 1) */
-    MatrixX3d rr;       /**< alias verts. Vertex coordinates in meters */
+    MatrixX3f rr;       /**< alias verts. Vertex coordinates in meters */
     MatrixX3i tris;     /**< alias faces. The triangle descriptions */
 };
 
