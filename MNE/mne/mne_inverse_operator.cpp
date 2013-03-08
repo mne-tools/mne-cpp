@@ -967,8 +967,8 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
             delete t_pStream;
         return false;
     }
-    for (qint32 k = 0; k < inv.src.hemispheres.size(); ++k)
-       inv.src.hemispheres[k].id = MNESourceSpace::find_source_space_hemi(inv.src.hemispheres[k]);
+    for (qint32 k = 0; k < inv.src.size(); ++k)
+       inv.src[k].id = MNESourceSpace::find_source_space_hemi(inv.src[k]);
     //
     //   Get the MRI <-> head coordinate transformation
     //

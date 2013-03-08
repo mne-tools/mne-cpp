@@ -172,7 +172,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
     //
 //    for(qint32 h = 0; h < this->src.hemispheres.size(); ++h )//obj.sizeForwardSolution)
 //    {
-//        if(this->src.hemispheres[h]->vertno.rows() !=  t_listAnnotation[h]->getLabel()->rows())
+//        if(this->src[h]->vertno.rows() !=  t_listAnnotation[h]->getLabel()->rows())
 //        {
 //            printf("Error: Annotation doesn't fit to Forward Solution: Vertice number is different!");
 //            return false;
@@ -229,15 +229,17 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
     qint32 count;
     qint32 offset;
 
-    for(qint32 h = 0; h < this->src.hemispheres.size(); ++h )//obj.sizeForwardSolution)
+    for(qint32 h = 0; h < this->src.size(); ++h )//obj.sizeForwardSolution)
     {
         count = 0;
         offset = 0;
 
+
+
         // Offset for continuous indexing;
         if(h > 0)
             for(qint32 j = 0; j < h; ++j)
-                offset += this->src.hemispheres[j].nuse;
+                offset += this->src[j].nuse;
 
 
         if(h == 0)
@@ -249,10 +251,10 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
         VectorXi label_ids = t_CurrentColorTable.getLabelIds();
 
         // Get label ids for every vertice
-        VectorXi vertno_labeled = VectorXi::Zero(this->src.hemispheres[h].vertno.rows());
+        VectorXi vertno_labeled = VectorXi::Zero(this->src[h].vertno.rows());
 
         for(qint32 i = 0; i < vertno_labeled.rows(); ++i)
-            vertno_labeled[i] = p_AnnotationSet[h].getLabelIds()[this->src.hemispheres[h].vertno[i]];
+            vertno_labeled[i] = p_AnnotationSet[h].getLabelIds()[this->src[h].vertno[i]];
 
         MatrixXd t_LF_partial;
         for (qint32 i = 0; i < label_ids.rows(); ++i)
@@ -341,8 +343,8 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
                             }
                         }
                         clusterIdcs.conservativeResize(nClusterIdcs);
-                        p_fwdOut.src.hemispheres[h].cluster_info.cluster_vertnos.append(clusterIdcs);
-                        p_fwdOut.src.hemispheres[h].cluster_info.cluster_distances.append(clusterDistance);
+                        p_fwdOut.src[h].cluster_info.cluster_vertnos.append(clusterIdcs);
+                        p_fwdOut.src[h].cluster_info.cluster_distances.append(clusterDistance);
                     }
 
                     //
@@ -373,10 +375,10 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
 
                             // Take the closest coordinates
                             qint32 sel_idx = idcs[j_min];
-                            p_fwdOut.src.hemispheres[h].rr.row(count) = this->src.hemispheres[h].rr.row(sel_idx);
-                            p_fwdOut.src.hemispheres[h].nn.row(count) = MatrixXd::Zero(1,3);
+                            p_fwdOut.src[h].rr.row(count) = this->src[h].rr.row(sel_idx);
+                            p_fwdOut.src[h].nn.row(count) = MatrixXd::Zero(1,3);
 
-                            p_fwdOut.src.hemispheres[h].vertno[count] = this->src.hemispheres[h].vertno[sel_idx];
+                            p_fwdOut.src[h].vertno[count] = this->src[h].vertno[sel_idx];
                             ++count;
                         }
                     }
@@ -393,17 +395,17 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
         // Assemble new hemisphere information
         //
 
-        p_fwdOut.src.hemispheres[h].rr.conservativeResize(count, 3);
-        p_fwdOut.src.hemispheres[h].nn.conservativeResize(count, 3);
-        p_fwdOut.src.hemispheres[h].vertno.conservativeResize(count);
+        p_fwdOut.src[h].rr.conservativeResize(count, 3);
+        p_fwdOut.src[h].nn.conservativeResize(count, 3);
+        p_fwdOut.src[h].vertno.conservativeResize(count);
 
-        p_fwdOut.src.hemispheres[h].cluster_info.orig_vertno = this->src.hemispheres[h].vertno;
+        p_fwdOut.src[h].cluster_info.orig_vertno = this->src[h].vertno;
 
-        p_fwdOut.src.hemispheres[h].nuse_tri = 0;
-        p_fwdOut.src.hemispheres[h].use_tris = MatrixX3i(0,3);
+        p_fwdOut.src[h].nuse_tri = 0;
+        p_fwdOut.src[h].use_tris = MatrixX3i(0,3);
 
 
-        if(p_fwdOut.src.hemispheres[h].rr.rows() > 0 && p_fwdOut.src.hemispheres[h].rr.cols() > 0)
+        if(p_fwdOut.src[h].rr.rows() > 0 && p_fwdOut.src[h].rr.cols() > 0)
         {
             if(h == 0)
             {
@@ -411,11 +413,11 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
                 p_fwdOut.source_nn = MatrixX3d(0,3);
             }
 
-            p_fwdOut.source_rr.conservativeResize(p_fwdOut.source_rr.rows() + p_fwdOut.src.hemispheres[h].rr.rows(),3);
-            p_fwdOut.source_rr.block(p_fwdOut.source_rr.rows() -  p_fwdOut.src.hemispheres[h].rr.rows(), 0,  p_fwdOut.src.hemispheres[h].rr.rows(), 3) = p_fwdOut.src.hemispheres[h].rr;
+            p_fwdOut.source_rr.conservativeResize(p_fwdOut.source_rr.rows() + p_fwdOut.src[h].rr.rows(),3);
+            p_fwdOut.source_rr.block(p_fwdOut.source_rr.rows() -  p_fwdOut.src[h].rr.rows(), 0,  p_fwdOut.src[h].rr.rows(), 3) = p_fwdOut.src[h].rr;
 
-            p_fwdOut.source_nn.conservativeResize(p_fwdOut.source_nn.rows() + p_fwdOut.src.hemispheres[h].nn.rows(),3);
-            p_fwdOut.source_nn.block(p_fwdOut.source_nn.rows() -  p_fwdOut.src.hemispheres[h].nn.rows(), 0,  p_fwdOut.src.hemispheres[h].nn.rows(), 3) = p_fwdOut.src.hemispheres[h].nn;
+            p_fwdOut.source_nn.conservativeResize(p_fwdOut.source_nn.rows() + p_fwdOut.src[h].nn.rows(),3);
+            p_fwdOut.source_nn.block(p_fwdOut.source_nn.rows() -  p_fwdOut.src[h].nn.rows(), 0,  p_fwdOut.src[h].nn.rows(), 3) = p_fwdOut.src[h].nn;
         }
 
         printf("[done]\n");
@@ -812,8 +814,8 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
         return false;
     }
 
-    for(qint32 k = 0; k < t_SourceSpace.hemispheres.size(); ++k)
-        t_SourceSpace.hemispheres[k].id = MNESourceSpace::find_source_space_hemi(t_SourceSpace.hemispheres[k]);
+    for(qint32 k = 0; k < t_SourceSpace.size(); ++k)
+        t_SourceSpace[k].id = MNESourceSpace::find_source_space_hemi(t_SourceSpace[k]);
 
     //
     //   Bad channel list
@@ -982,8 +984,8 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
     //
     qint32 nuse = 0;
     t_SourceSpace.transform_source_space_to(fwd.coord_frame,fwd.mri_head_t);
-    for(qint32 k = 0; k < t_SourceSpace.hemispheres.size(); ++k)
-        nuse += t_SourceSpace.hemispheres[k].nuse;
+    for(qint32 k = 0; k < t_SourceSpace.size(); ++k)
+        nuse += t_SourceSpace[k].nuse;
 
     if (nuse != fwd.nsource)
         throw("Source spaces do not match the forward solution.\n");
@@ -998,14 +1000,14 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
         nuse = 0;
         fwd.source_rr = MatrixXd::Zero(fwd.nsource,3);
         fwd.source_nn = MatrixXd::Zero(fwd.nsource,3);
-        for(qint32 k = 0; k < t_SourceSpace.hemispheres.size();++k)
+        for(qint32 k = 0; k < t_SourceSpace.size();++k)
         {
-            for(qint32 q = 0; q < t_SourceSpace.hemispheres[k].nuse; ++q)
+            for(qint32 q = 0; q < t_SourceSpace[k].nuse; ++q)
             {
-                fwd.source_rr.block(q,0,1,3) = t_SourceSpace.hemispheres[k].rr.block(t_SourceSpace.hemispheres[k].vertno(q),0,1,3);
-                fwd.source_nn.block(q,0,1,3) = t_SourceSpace.hemispheres[k].nn.block(t_SourceSpace.hemispheres[k].vertno(q),0,1,3);
+                fwd.source_rr.block(q,0,1,3) = t_SourceSpace[k].rr.block(t_SourceSpace[k].vertno(q),0,1,3);
+                fwd.source_nn.block(q,0,1,3) = t_SourceSpace[k].nn.block(t_SourceSpace[k].vertno(q),0,1,3);
             }
-            nuse += t_SourceSpace.hemispheres[k].nuse;
+            nuse += t_SourceSpace[k].nuse;
         }
         //
         //   Modify the forward solution for fixed source orientations
@@ -1042,7 +1044,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
         printf("\tConverting to surface-based source orientations...");
 
         bool use_ave_nn = false;
-        if(t_SourceSpace.hemispheres[0].patch_inds.size() > 0)
+        if(t_SourceSpace[0].patch_inds.size() > 0)
         {
             use_ave_nn = true;
             printf("\tAverage patch normals will be employed in the rotation to the local surface coordinates...\n");
@@ -1055,13 +1057,13 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
 
         qWarning("Warning source_ori: Rotating the source coordinate system haven't been verified --> Singular Vectors U are different from MATLAB!");
 
-        for(qint32 k = 0; k < t_SourceSpace.hemispheres.size();++k)
+        for(qint32 k = 0; k < t_SourceSpace.size();++k)
         {
 
-            for (qint32 q = 0; q < t_SourceSpace.hemispheres[k].nuse; ++q)
-                fwd.source_rr.block(q+nuse,0,1,3) = t_SourceSpace.hemispheres[k].rr.block(t_SourceSpace.hemispheres[k].vertno(q),0,1,3);
+            for (qint32 q = 0; q < t_SourceSpace[k].nuse; ++q)
+                fwd.source_rr.block(q+nuse,0,1,3) = t_SourceSpace[k].rr.block(t_SourceSpace[k].vertno(q),0,1,3);
 
-            for (qint32 p = 0; p < t_SourceSpace.hemispheres[k].nuse; ++p)
+            for (qint32 p = 0; p < t_SourceSpace[k].nuse; ++p)
             {
                 //
                 //  Project out the surface normal and compute SVD
@@ -1069,15 +1071,15 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
                 Vector3d nn;
                 if(use_ave_nn)
                 {
-                    VectorXi t_vIdx = t_SourceSpace.hemispheres[k].pinfo[t_SourceSpace.hemispheres[k].patch_inds[p]];
+                    VectorXi t_vIdx = t_SourceSpace[k].pinfo[t_SourceSpace[k].patch_inds[p]];
                     Matrix3Xd t_nn(3, t_vIdx.size());
                     for(qint32 i = 0; i < t_vIdx.size(); ++i)
-                        t_nn.col(i) = t_SourceSpace.hemispheres[k].nn.block(t_vIdx[i],0,1,3).transpose();
+                        t_nn.col(i) = t_SourceSpace[k].nn.block(t_vIdx[i],0,1,3).transpose();
                     nn = t_nn.rowwise().sum();
                     nn.array() /= nn.norm();
                 }
                 else
-                    nn = t_SourceSpace.hemispheres[k].nn.block(t_SourceSpace.hemispheres[k].vertno(p),0,1,3).transpose();
+                    nn = t_SourceSpace[k].nn.block(t_SourceSpace[k].vertno(p),0,1,3).transpose();
 
                 Matrix3d tmp = Matrix3d::Identity() - nn*nn.transpose();
 
@@ -1095,7 +1097,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
                 fwd.source_nn.block(pp, 0, 3, 3) = U.transpose();
                 pp += 3;
             }
-            nuse += t_SourceSpace.hemispheres[k].nuse;
+            nuse += t_SourceSpace[k].nuse;
         }
         MatrixXd tmp = fwd.source_nn.transpose();
         SparseMatrix<double>* surf_rot = MNEMath::make_block_diag(tmp,3);
@@ -1119,12 +1121,12 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
         printf("\tCartesian source orientations...");
         nuse = 0;
         fwd.source_rr = MatrixXd::Zero(fwd.nsource,3);
-        for(qint32 k = 0; k < t_SourceSpace.hemispheres.size(); ++k)
+        for(qint32 k = 0; k < t_SourceSpace.size(); ++k)
         {
-            for (qint32 q = 0; q < t_SourceSpace.hemispheres[k].nuse; ++q)
-                fwd.source_rr.block(q+nuse,0,1,3) = t_SourceSpace.hemispheres[k].rr.block(t_SourceSpace.hemispheres[k].vertno(q),0,1,3);
+            for (qint32 q = 0; q < t_SourceSpace[k].nuse; ++q)
+                fwd.source_rr.block(q+nuse,0,1,3) = t_SourceSpace[k].rr.block(t_SourceSpace[k].vertno(q),0,1,3);
 
-            nuse += t_SourceSpace.hemispheres[k].nuse;
+            nuse += t_SourceSpace[k].nuse;
         }
 
         MatrixXd t_ones = MatrixXd::Ones(fwd.nsource,1);

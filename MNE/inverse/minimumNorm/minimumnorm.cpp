@@ -148,8 +148,8 @@ SourceEstimate MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, boo
     float tstep = 1/t_fiffEvoked.info.sfreq;
 
     QList<VectorXi> t_qListVertices;
-    for(qint32 h = 0; h < inv.src.hemispheres.size(); ++h)
-        t_qListVertices.push_back(inv.src.hemispheres[h].vertno);
+    for(qint32 h = 0; h < inv.src.size(); ++h)
+        t_qListVertices.push_back(inv.src[h].vertno);
 
     return SourceEstimate(sol, t_qListVertices, tmin, tstep);
 }
