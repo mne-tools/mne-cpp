@@ -6,6 +6,7 @@ var searchData=
   ['gaborparticletool_5ffrequency_5fstd',['GABORPARTICLETOOL_FREQUENCY_STD',['../class_r_t_m_e_a_s_l_i_b_1_1_m_s_r___i_d.html#a4d10651b0425e64723309453a071a149ac1bd43561eaf233d0330411b69912b2a',1,'RTMEASLIB::MSR_ID']]],
   ['gaborparticletool_5fscale',['GABORPARTICLETOOL_SCALE',['../class_r_t_m_e_a_s_l_i_b_1_1_m_s_r___i_d.html#a4d10651b0425e64723309453a071a149a384821130beadd6ad4112c02b5d3ac75',1,'RTMEASLIB::MSR_ID']]],
   ['gaborparticletool_5fscale_5fstd',['GABORPARTICLETOOL_SCALE_STD',['../class_r_t_m_e_a_s_l_i_b_1_1_m_s_r___i_d.html#a4d10651b0425e64723309453a071a149a49206e94157fc274995f8dc5e12aad06',1,'RTMEASLIB::MSR_ID']]],
+  ['generatetris',['generateTris',['../class_f_s_l_i_b_1_1_label.html#a005b78a2fc685ef35892c0d0c798c36b',1,'FSLIB::Label']]],
   ['generics_5fglobal_2eh',['generics_global.h',['../generics__global_8h.html',1,'']]],
   ['genericsshared_5fexport',['GENERICSSHARED_EXPORT',['../generics__global_8h.html#a130c651d8996a3ba06528cf9bf302479',1,'generics_global.h']]],
   ['geometryview',['GeometryView',['../class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html',1,'DISP3DLIB']]],
@@ -31,7 +32,7 @@ var searchData=
   ['getchannelfile',['getChannelFile',['../class_e_c_g_simulator_module_1_1_e_c_g_sim_channel.html#afd01103dda1861106d6ab78c1c0ce1c0',1,'ECGSimulatorModule::ECGSimChannel::getChannelFile()'],['../class_r_t_server_plugin_1_1_r_t_server_channel.html#ad5d24f16787d936480117392f321314d',1,'RTServerPlugin::RTServerChannel::getChannelFile()']]],
   ['getclient',['getClient',['../class_r_t_s_e_r_v_e_r_1_1_fiff_stream_server.html#a379c94c49a4bf2f533ecaff1912631ba',1,'RTSERVER::FiffStreamServer::getClient()'],['../class_r_t_s_e_r_v_e_r_1_1_i_server.html#a4b7ec0d1dcce3535745a703056794d24',1,'RTSERVER::IServer::getClient()']]],
   ['getclientid',['getClientId',['../class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_data_client.html#a524d49e8936ab5dd4fde52911490165d',1,'RTCLIENTLIB::RtDataClient']]],
-  ['getcolortable',['getColortable',['../class_f_s_l_i_b_1_1_annotation.html#a18a31f199db1e308eb31fc16225d2c52',1,'FSLIB::Annotation']]],
+  ['getcolortable',['getColortable',['../class_f_s_l_i_b_1_1_annotation.html#ab8fe274bc78ed81546f1c7c667205b65',1,'FSLIB::Annotation']]],
   ['getcommandmanager',['getCommandManager',['../class_r_t_s_e_r_v_e_r_1_1_i_connector.html#a87e1488cccfbc45bcd24297a461b6a0c',1,'RTSERVER::IConnector::getCommandManager()'],['../class_r_t_s_e_r_v_e_r_1_1_m_n_e_r_t_server.html#ad0e605ad5e9d8a5c8f308ed3bcac4768',1,'RTSERVER::MNERTServer::getCommandManager()']]],
   ['getcommandparser',['getCommandParser',['../class_r_t_s_e_r_v_e_r_1_1_command_server.html#a164d2b5bb6b61b848992d79af4061f1f',1,'RTSERVER::CommandServer']]],
   ['getconnectorid',['getConnectorID',['../class_baby_m_e_g_plugin_1_1_baby_m_e_g.html#a320ac39c8c408ce74e01a193f70f4c72',1,'BabyMEGPlugin::BabyMEG::getConnectorID()'],['../class_fiff_simulator_plugin_1_1_fiff_simulator.html#af124c82e2400f58b440ab4d81799dc04',1,'FiffSimulatorPlugin::FiffSimulator::getConnectorID()'],['../class_neuromag_plugin_1_1_neuromag.html#a221e2c203c6a99acef40d3cfcdc83405',1,'NeuromagPlugin::Neuromag::getConnectorID()'],['../class_r_t_s_e_r_v_e_r_1_1_i_connector.html#addd4fe9089e3fc07db879f1f38c20f63',1,'RTSERVER::IConnector::getConnectorID()']]],
@@ -40,10 +41,11 @@ var searchData=
   ['getcurrentitem',['getCurrentItem',['../class_m_n_e_x_1_1_module_dock_widget.html#adae669c7c12246be0ca843a371c1060a',1,'MNEX::ModuleDockWidget']]],
   ['getcurrentmoduleidx',['getCurrentModuleIdx',['../class_m_n_e_x_1_1_module_dock_widget.html#a01274b45317701a29e3c2acdbd33080c',1,'MNEX::ModuleDockWidget']]],
   ['getfiffinfo',['getFiffInfo',['../class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_client.html#a9f5b64162eb0bca563e0e00c6a05f779',1,'RTCLIENTLIB::RtClient']]],
+  ['gethemi',['getHemi',['../class_f_s_l_i_b_1_1_annotation.html#a9f292ac51debb9ad15c231576259e55e',1,'FSLIB::Annotation']]],
   ['getid',['getID',['../class_r_t_m_e_a_s_l_i_b_1_1_measurement.html#a95fcb17b51c61a45a0e868c53bdd0544',1,'RTMEASLIB::Measurement']]],
   ['getinfo',['getInfo',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a2ff0d4a2209b5194fa89106b7f9f5796',1,'FIFFLIB::FiffTag']]],
   ['getintid',['getIntID',['../class_r_t_m_e_a_s_l_i_b_1_1_m_d_l___i_d.html#a1e4b7ac08f835eb5439c5548c466093c',1,'RTMEASLIB::MDL_ID::getIntID()'],['../class_r_t_m_e_a_s_l_i_b_1_1_m_s_r___i_d.html#abae3166ca59108d48c4341fd1ad7f7b5',1,'RTMEASLIB::MSR_ID::getIntID()']]],
-  ['getlabelids',['getLabelIds',['../class_f_s_l_i_b_1_1_annotation.html#a66279b2873ed2dc63dff201a4f6058fd',1,'FSLIB::Annotation::getLabelIds()'],['../class_f_s_l_i_b_1_1_colortable.html#a4f4e69f5d4556ffb3bf5f245b3232f53',1,'FSLIB::Colortable::getLabelIds()']]],
+  ['getlabelids',['getLabelIds',['../class_f_s_l_i_b_1_1_annotation.html#a6592b2f7ebdb4a455f4d50c7e5b165d5',1,'FSLIB::Annotation::getLabelIds()'],['../class_f_s_l_i_b_1_1_colortable.html#a4f4e69f5d4556ffb3bf5f245b3232f53',1,'FSLIB::Colortable::getLabelIds()']]],
   ['getmatrixcoding',['getMatrixCoding',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#af84cc827bfad88ba1599784b38ce2706',1,'FIFFLIB::FiffTag']]],
   ['getmatrixdimensions',['getMatrixDimensions',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a101a9edea22d8eb9e9946184b4366702',1,'FIFFLIB::FiffTag']]],
   ['getmaxbuflen',['getMaxBuflen',['../class_baby_m_e_g_plugin_1_1_collector_socket.html#ac72f69b7373008c7c6b7a43ae084eb18',1,'BabyMEGPlugin::CollectorSocket::getMaxBuflen()'],['../class_neuromag_plugin_1_1_collector_socket.html#ac72f69b7373008c7c6b7a43ae084eb18',1,'NeuromagPlugin::CollectorSocket::getMaxBuflen()']]],
@@ -101,5 +103,5 @@ var searchData=
   ['getunit',['getUnit',['../class_r_t_m_e_a_s_l_i_b_1_1_numeric.html#aee33532cf7c0302ec77789e5cf645f48',1,'RTMEASLIB::Numeric::getUnit()'],['../class_r_t_m_e_a_s_l_i_b_1_1_real_time_multi_sample_array.html#a16890adc6593167ff1ae4f1476fd62aa',1,'RTMEASLIB::RealTimeMultiSampleArray::getUnit()'],['../class_r_t_m_e_a_s_l_i_b_1_1_real_time_sample_array.html#a2e1c9f8d6dd20105725a64fb35d2dda7',1,'RTMEASLIB::RealTimeSampleArray::getUnit()']]],
   ['getvalue',['getValue',['../class_r_t_m_e_a_s_l_i_b_1_1_measurement.html#af6c157006b05f02174912759449636e8',1,'RTMEASLIB::Measurement::getValue()'],['../class_r_t_m_e_a_s_l_i_b_1_1_numeric.html#acade3df0b46f56745b051f13878a3a5e',1,'RTMEASLIB::Numeric::getValue()'],['../class_r_t_m_e_a_s_l_i_b_1_1_progress_bar.html#ab79d2ebe5c5b989bbf4205b7fc2e27c9',1,'RTMEASLIB::ProgressBar::getValue()'],['../class_r_t_m_e_a_s_l_i_b_1_1_real_time_multi_sample_array.html#a21153bd1afc87727496ffbf0ac32105c',1,'RTMEASLIB::RealTimeMultiSampleArray::getValue()'],['../class_r_t_m_e_a_s_l_i_b_1_1_real_time_sample_array.html#a91e518ffc4adf9291a8dfe7455a42a66',1,'RTMEASLIB::RealTimeSampleArray::getValue()'],['../class_r_t_m_e_a_s_l_i_b_1_1_text.html#ace6a79cc247bca7e1c9c014e2632e41b',1,'RTMEASLIB::Text::getValue()']]],
   ['getvector',['getVector',['../class_r_t_m_e_a_s_l_i_b_1_1_real_time_multi_sample_array.html#a2f2100f9866e41632a1fc02fe824ba97',1,'RTMEASLIB::RealTimeMultiSampleArray']]],
-  ['getvertices',['getVertices',['../class_f_s_l_i_b_1_1_annotation.html#aa2ea7604be630f4756d9f9a4a8268846',1,'FSLIB::Annotation']]]
+  ['getvertices',['getVertices',['../class_f_s_l_i_b_1_1_annotation.html#a1fe1a658d5c9020add3c8d884f4f1f24',1,'FSLIB::Annotation']]]
 ];

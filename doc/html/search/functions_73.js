@@ -62,6 +62,7 @@ var searchData=
   ['streamname',['streamName',['../class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aaef2f46402149d34b308bbaf6ecb95e8',1,'FIFFLIB::FiffStream']]],
   ['subject',['Subject',['../class_subject.html#ab468044832c824c6d6c2f46272655207',1,'Subject']]],
   ['surface',['Surface',['../class_f_s_l_i_b_1_1_surface.html#a8fc57f2a15292135c00545c9d224ec68',1,'FSLIB::Surface::Surface()'],['../class_f_s_l_i_b_1_1_surface.html#a60731705fa28661cd1bea84132508df3',1,'FSLIB::Surface::Surface(const QString &amp;p_sFileName)']]],
+  ['surfaceset',['SurfaceSet',['../class_f_s_l_i_b_1_1_surface_set.html#a457b199170e70db266c641e62e02fe38',1,'FSLIB::SurfaceSet']]],
   ['swap_5fdoublep',['swap_doublep',['../class_u_t_i_l_s_l_i_b_1_1_i_o_utils.html#a5bf9fb63f5ea71221ae54cea50386115',1,'UTILSLIB::IOUtils']]],
   ['swap_5ffloatp',['swap_floatp',['../class_u_t_i_l_s_l_i_b_1_1_i_o_utils.html#a7c179e23aefa620496eb2390315228fd',1,'UTILSLIB::IOUtils']]],
   ['swap_5fint',['swap_int',['../class_u_t_i_l_s_l_i_b_1_1_i_o_utils.html#a77d2b4842eada7320492d813c42db045',1,'UTILSLIB::IOUtils']]],

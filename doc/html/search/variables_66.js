@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['faces',['faces',['../class_f_s_l_i_b_1_1_surface.html#aa36dd92ca53a5845dfdfa049623797d8',1,'FSLIB::Surface']]],
   ['file',['file',['../class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a4d7d8906a821657c22e4e3aaa9a964a9',1,'FIFFLIB::FiffRawData']]],
   ['file_5fid',['file_id',['../class_f_i_f_f_l_i_b_1_1_fiff_info.html#a74d71ad1c22f639bfd0a04984d3ddf6b',1,'FIFFLIB::FiffInfo']]],
   ['filename',['filename',['../class_f_i_f_f_l_i_b_1_1_fiff_info.html#a11b6df193ce2b6bda590ba7c717f9c94',1,'FIFFLIB::FiffInfo']]],

@@ -127,75 +127,85 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="keyword">namespace </span>FSLIB</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;{</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="comment">// USED NAMESPACES</span></div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="keyword">using namespace </span>Eigen;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="keyword">const</span> <span class="keyword">static</span> Eigen::MatrixX3i defaultTris(0,3);</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="comment">// USED NAMESPACES</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="comment">// FORWARD DECLARATIONS</span></div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="keyword">using namespace </span>Eigen;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="comment">// FORWARD DECLARATIONS</span></div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00092"></a><span class="lineno"><a class="code" href="class_f_s_l_i_b_1_1_label.html">   92</a></span>&#160;<span class="comment"></span><span class="keyword">class </span><a class="code" href="fs__global_8h.html#a8e4f08d490ea850b4b6631d7772df965">FSSHARED_EXPORT</a> <a class="code" href="class_f_s_l_i_b_1_1_label.html" title="Freesurfer/MNE label.">Label</a></div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;{</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00095"></a><span class="lineno"><a class="code" href="class_f_s_l_i_b_1_1_label.html#a3d55d6572c876d18c36ebfc06176f3b9">   95</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;Label&gt; <a class="code" href="class_f_s_l_i_b_1_1_label.html#a3d55d6572c876d18c36ebfc06176f3b9">SPtr</a>;            </div>
-<div class="line"><a name="l00096"></a><span class="lineno"><a class="code" href="class_f_s_l_i_b_1_1_label.html#a33e72e0d96ee49316a69b9abe56e8d85">   96</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;const Label&gt; <a class="code" href="class_f_s_l_i_b_1_1_label.html#a33e72e0d96ee49316a69b9abe56e8d85">ConstSPtr</a>; </div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_s_l_i_b_1_1_label.html" title="Freesurfer/MNE label.">Label</a>();</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_s_l_i_b_1_1_label.html" title="Freesurfer/MNE label.">Label</a>(<span class="keyword">const</span> VectorXi &amp;p_vertices, <span class="keyword">const</span> MatrixX3f &amp;p_pos, <span class="keyword">const</span> VectorXd &amp;p_values, qint32 p_hemi, <span class="keyword">const</span> QString &amp;p_name);</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    </div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_f_s_l_i_b_1_1_label.html" title="Freesurfer/MNE label.">Label</a>();</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="keyword">class </span>Surface;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00097"></a><span class="lineno"><a class="code" href="class_f_s_l_i_b_1_1_label.html">   97</a></span>&#160;<span class="comment"></span><span class="keyword">class </span><a class="code" href="fs__global_8h.html#a8e4f08d490ea850b4b6631d7772df965">FSSHARED_EXPORT</a> <a class="code" href="class_f_s_l_i_b_1_1_label.html" title="Freesurfer/MNE label.">Label</a></div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;{</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00100"></a><span class="lineno"><a class="code" href="class_f_s_l_i_b_1_1_label.html#a3d55d6572c876d18c36ebfc06176f3b9">  100</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;Label&gt; <a class="code" href="class_f_s_l_i_b_1_1_label.html#a3d55d6572c876d18c36ebfc06176f3b9">SPtr</a>;            </div>
+<div class="line"><a name="l00101"></a><span class="lineno"><a class="code" href="class_f_s_l_i_b_1_1_label.html#a33e72e0d96ee49316a69b9abe56e8d85">  101</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;const Label&gt; <a class="code" href="class_f_s_l_i_b_1_1_label.html#a33e72e0d96ee49316a69b9abe56e8d85">ConstSPtr</a>; </div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_s_l_i_b_1_1_label.html" title="Freesurfer/MNE label.">Label</a>();</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;<span class="comment"></span>    <a class="code" href="class_f_s_l_i_b_1_1_label.html" title="Freesurfer/MNE label.">Label</a>(<span class="keyword">const</span> VectorXi &amp;p_vertices, <span class="keyword">const</span> MatrixX3f &amp;p_pos, <span class="keyword">const</span> VectorXd &amp;p_values, qint32 p_hemi, <span class="keyword">const</span> QString &amp;p_name, qint32 p_id = -1);</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    </div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> clear();</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_f_s_l_i_b_1_1_label.html" title="Freesurfer/MNE label.">Label</a>();</div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;</div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;<span class="comment"></span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> isEmpty() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    </div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> read(<span class="keyword">const</span> QString&amp; p_sFileName, <a class="code" href="class_f_s_l_i_b_1_1_label.html" title="Freesurfer/MNE label.">Label</a> &amp;p_Label);</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00152"></a><span class="lineno"><a class="code" href="class_f_s_l_i_b_1_1_label.html#a7ed5373bf3ac45c3c9fe6dc7789dd423">  152</a></span>&#160;    QString <a class="code" href="class_f_s_l_i_b_1_1_label.html#a7ed5373bf3ac45c3c9fe6dc7789dd423">comment</a>;    </div>
-<div class="line"><a name="l00153"></a><span class="lineno"><a class="code" href="class_f_s_l_i_b_1_1_label.html#a846b65c0b3a8ce5a56a944cca3d95378">  153</a></span>&#160;    qint32 <a class="code" href="class_f_s_l_i_b_1_1_label.html#a846b65c0b3a8ce5a56a944cca3d95378">hemi</a>;        </div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;<span class="comment">//    qint32 hemi;                        /**&lt; Hemisphere (lh = 0; rh = 1; both = 2) */ Don&#39;t mix both hemis - KISS principle</span></div>
-<div class="line"><a name="l00155"></a><span class="lineno"><a class="code" href="class_f_s_l_i_b_1_1_label.html#aafe7016a7b71c8850e1c70db77065917">  155</a></span>&#160;    QString <a class="code" href="class_f_s_l_i_b_1_1_label.html#aafe7016a7b71c8850e1c70db77065917">name</a>;       </div>
-<div class="line"><a name="l00156"></a><span class="lineno"><a class="code" href="class_f_s_l_i_b_1_1_label.html#a9fa6d9321697cf073cecc4a2426badf5">  156</a></span>&#160;    VectorXi <a class="code" href="class_f_s_l_i_b_1_1_label.html#a9fa6d9321697cf073cecc4a2426badf5">vertices</a>;  </div>
-<div class="line"><a name="l00157"></a><span class="lineno"><a class="code" href="class_f_s_l_i_b_1_1_label.html#ab8e2ce6ac9114f437093e0b8dc0fb537">  157</a></span>&#160;    MatrixX3f <a class="code" href="class_f_s_l_i_b_1_1_label.html#ab8e2ce6ac9114f437093e0b8dc0fb537">pos</a>;      </div>
-<div class="line"><a name="l00158"></a><span class="lineno"><a class="code" href="class_f_s_l_i_b_1_1_label.html#afeaac89afbc1ec5221a8e068f399bc7e">  158</a></span>&#160;    VectorXd <a class="code" href="class_f_s_l_i_b_1_1_label.html#afeaac89afbc1ec5221a8e068f399bc7e">values</a>;    </div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;<span class="comment">//    QMap&lt;qint32, VectorXi&gt; vertices;    /**&lt; Vertex indices (0 based) */</span></div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;<span class="comment">//    QMap&lt;qint32, MatrixX3f&gt; pos;        /**&lt; Locations in meters */</span></div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;<span class="comment">//    QMap&lt;qint32, VectorXd&gt; values;      /**&lt; Values at the vertices */</span></div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;};</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;<span class="comment">// INLINE DEFINITIONS</span></div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;</div>
-<div class="line"><a name="l00170"></a><span class="lineno"><a class="code" href="class_f_s_l_i_b_1_1_label.html#a16ef1e0a9ecbe79a0aa959fe2120ac4e">  170</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="class_f_s_l_i_b_1_1_label.html#a16ef1e0a9ecbe79a0aa959fe2120ac4e">Label::isEmpty</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <span class="keywordflow">return</span> this-&gt;hemi == -1;</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;}</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;} <span class="comment">// NAMESPACE</span></div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;<span class="preprocessor">#endif // LABEL_H</span></div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> clear();</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;<span class="comment"></span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> isEmpty() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;<span class="comment"></span>    MatrixX3i generateTris(<span class="keyword">const</span> <a class="code" href="class_f_s_l_i_b_1_1_surface.html" title="FreeSurfer surface mesh.">Surface</a> &amp; p_Surface);</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> read(<span class="keyword">const</span> QString&amp; p_sFileName, <a class="code" href="class_f_s_l_i_b_1_1_label.html" title="Freesurfer/MNE label.">Label</a> &amp;p_Label);</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00168"></a><span class="lineno"><a class="code" href="class_f_s_l_i_b_1_1_label.html#a7ed5373bf3ac45c3c9fe6dc7789dd423">  168</a></span>&#160;    QString <a class="code" href="class_f_s_l_i_b_1_1_label.html#a7ed5373bf3ac45c3c9fe6dc7789dd423">comment</a>;    </div>
+<div class="line"><a name="l00169"></a><span class="lineno"><a class="code" href="class_f_s_l_i_b_1_1_label.html#a846b65c0b3a8ce5a56a944cca3d95378">  169</a></span>&#160;    qint32 <a class="code" href="class_f_s_l_i_b_1_1_label.html#a846b65c0b3a8ce5a56a944cca3d95378">hemi</a>;        </div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;<span class="comment">//    qint32 hemi;                        /**&lt; Hemisphere (lh = 0; rh = 1; both = 2) */ Don&#39;t mix both hemis - KISS principle</span></div>
+<div class="line"><a name="l00171"></a><span class="lineno"><a class="code" href="class_f_s_l_i_b_1_1_label.html#aafe7016a7b71c8850e1c70db77065917">  171</a></span>&#160;    QString <a class="code" href="class_f_s_l_i_b_1_1_label.html#aafe7016a7b71c8850e1c70db77065917">name</a>;       </div>
+<div class="line"><a name="l00172"></a><span class="lineno"><a class="code" href="class_f_s_l_i_b_1_1_label.html#a9fa6d9321697cf073cecc4a2426badf5">  172</a></span>&#160;    VectorXi <a class="code" href="class_f_s_l_i_b_1_1_label.html#a9fa6d9321697cf073cecc4a2426badf5">vertices</a>;  </div>
+<div class="line"><a name="l00173"></a><span class="lineno"><a class="code" href="class_f_s_l_i_b_1_1_label.html#ab8e2ce6ac9114f437093e0b8dc0fb537">  173</a></span>&#160;    MatrixX3f <a class="code" href="class_f_s_l_i_b_1_1_label.html#ab8e2ce6ac9114f437093e0b8dc0fb537">pos</a>;      </div>
+<div class="line"><a name="l00174"></a><span class="lineno"><a class="code" href="class_f_s_l_i_b_1_1_label.html#afeaac89afbc1ec5221a8e068f399bc7e">  174</a></span>&#160;    VectorXd <a class="code" href="class_f_s_l_i_b_1_1_label.html#afeaac89afbc1ec5221a8e068f399bc7e">values</a>;    </div>
+<div class="line"><a name="l00176"></a><span class="lineno"><a class="code" href="class_f_s_l_i_b_1_1_label.html#a24103edab5af2b181f49cfa6e870345b">  176</a></span>&#160;    qint32 <a class="code" href="class_f_s_l_i_b_1_1_label.html#a24103edab5af2b181f49cfa6e870345b">label_id</a>;    </div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;<span class="comment">//    MatrixX3i tris;     /**&lt; Tris for plotting (optional) */</span></div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;<span class="comment">//    QMap&lt;qint32, VectorXi&gt; vertices;    /**&lt; Vertex indices (0 based) */</span></div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;<span class="comment">//    QMap&lt;qint32, MatrixX3f&gt; pos;        /**&lt; Locations in meters */</span></div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;<span class="comment">//    QMap&lt;qint32, VectorXd&gt; values;      /**&lt; Values at the vertices */</span></div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;};</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;<span class="comment">// INLINE DEFINITIONS</span></div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;</div>
+<div class="line"><a name="l00189"></a><span class="lineno"><a class="code" href="class_f_s_l_i_b_1_1_label.html#a16ef1e0a9ecbe79a0aa959fe2120ac4e">  189</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="class_f_s_l_i_b_1_1_label.html#a16ef1e0a9ecbe79a0aa959fe2120ac4e">Label::isEmpty</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    <span class="keywordflow">return</span> this-&gt;hemi == -1;</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;}</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;} <span class="comment">// NAMESPACE</span></div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;<span class="preprocessor">#endif // LABEL_H</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 6 2013 12:42:31 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Mar 7 2013 16:51:27 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

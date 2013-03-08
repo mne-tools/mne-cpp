@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <QtHelpProject version="1.0">
-  <namespace>org.martinos.mne-cpp</namespace>
+  <namespace>org.martinos.mne-cpp.01</namespace>
   <virtualFolder>mne-cpp</virtualFolder>
   <filterSection>
     <filterAttribute>doxygen</filterAttribute>
@@ -93,6 +93,15 @@
                 <section title="~GeometryView" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#ab4bb78457615996a1be0c44add508ff9" />
                 <section title="initializeGL" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a816a10949d2879546377239cc72f9cd7" />
                 <section title="paintGL" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a394ff6a0626e1cc306d40df437a34718" />
+              </section>
+              <section title="LabelView" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html">
+                <section title="ConstSPtr" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a075ef2ab9e773e769a589c712e8dd9a3" />
+                <section title="SPtr" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a502f5fc5785f33a38b49486b7e320b75" />
+                <section title="LabelView" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a01f0bba9f19f0cbb7f72a815370bcbb9" />
+                <section title="~LabelView" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a3c7ec5b375db42b8984ec08f76228295" />
+                <section title="initializeGL" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a4777b7f0234499359d1416b104bfe908" />
+                <section title="paintGL" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#ac61e3be860ec6c41640a1b082df8552d" />
+                <section title="pushSourceEstimate" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a751b31c71ed2f03a3ab64d782ef7f7d4" />
               </section>
             </section>
             <section title="DISPLIB">
@@ -650,9 +659,10 @@
                 <section title="Annotation" ref="class_f_s_l_i_b_1_1_annotation.html#a8ed7a2aa3370b7ac0f69917815d2a4d1" />
                 <section title="~Annotation" ref="class_f_s_l_i_b_1_1_annotation.html#a95144855eb445040d47951c668dc5764" />
                 <section title="clear" ref="class_f_s_l_i_b_1_1_annotation.html#a112db7b7d0aa9fdada3f0355609fa472" />
-                <section title="getColortable" ref="class_f_s_l_i_b_1_1_annotation.html#a18a31f199db1e308eb31fc16225d2c52" />
-                <section title="getLabelIds" ref="class_f_s_l_i_b_1_1_annotation.html#a66279b2873ed2dc63dff201a4f6058fd" />
-                <section title="getVertices" ref="class_f_s_l_i_b_1_1_annotation.html#aa2ea7604be630f4756d9f9a4a8268846" />
+                <section title="getColortable" ref="class_f_s_l_i_b_1_1_annotation.html#ab8fe274bc78ed81546f1c7c667205b65" />
+                <section title="getHemi" ref="class_f_s_l_i_b_1_1_annotation.html#a9f292ac51debb9ad15c231576259e55e" />
+                <section title="getLabelIds" ref="class_f_s_l_i_b_1_1_annotation.html#a6592b2f7ebdb4a455f4d50c7e5b165d5" />
+                <section title="getVertices" ref="class_f_s_l_i_b_1_1_annotation.html#a1fe1a658d5c9020add3c8d884f4f1f24" />
                 <section title="toLabels" ref="class_f_s_l_i_b_1_1_annotation.html#a832df6b2077880e27508d16439640bbf" />
               </section>
               <section title="AnnotationSet" ref="class_f_s_l_i_b_1_1_annotation_set.html">
@@ -665,7 +675,6 @@
                 <section title="clear" ref="class_f_s_l_i_b_1_1_annotation_set.html#a50e15835a32be178552134ee08def943" />
                 <section title="operator[]" ref="class_f_s_l_i_b_1_1_annotation_set.html#ac2c85b6c78cb4d6c56c6732584ff8c2e" />
                 <section title="operator[]" ref="class_f_s_l_i_b_1_1_annotation_set.html#a21a44ee7fe417c705aa80a26baeee7a0" />
-                <section title="src_annotations" ref="class_f_s_l_i_b_1_1_annotation_set.html#a4c5dcd043ca2be984754a0ef837d8854" />
               </section>
               <section title="Colortable" ref="class_f_s_l_i_b_1_1_colortable.html">
                 <section title="ConstSPtr" ref="class_f_s_l_i_b_1_1_colortable.html#ab429f601fbc14580b27a8fada7a23a37" />
@@ -684,12 +693,14 @@
                 <section title="ConstSPtr" ref="class_f_s_l_i_b_1_1_label.html#a33e72e0d96ee49316a69b9abe56e8d85" />
                 <section title="SPtr" ref="class_f_s_l_i_b_1_1_label.html#a3d55d6572c876d18c36ebfc06176f3b9" />
                 <section title="Label" ref="class_f_s_l_i_b_1_1_label.html#af8f2bccf9faadcb2ca964bd2347dde24" />
-                <section title="Label" ref="class_f_s_l_i_b_1_1_label.html#ad59a64d3252271662e56689a58c03807" />
+                <section title="Label" ref="class_f_s_l_i_b_1_1_label.html#a694ed6bb525564615834c0b1cdd1f944" />
                 <section title="~Label" ref="class_f_s_l_i_b_1_1_label.html#a39e1167a9b5827afd888780973d88894" />
                 <section title="clear" ref="class_f_s_l_i_b_1_1_label.html#a4d84eb04f4f9ad588ac5df49de7f7a06" />
+                <section title="generateTris" ref="class_f_s_l_i_b_1_1_label.html#a005b78a2fc685ef35892c0d0c798c36b" />
                 <section title="isEmpty" ref="class_f_s_l_i_b_1_1_label.html#a16ef1e0a9ecbe79a0aa959fe2120ac4e" />
                 <section title="comment" ref="class_f_s_l_i_b_1_1_label.html#a7ed5373bf3ac45c3c9fe6dc7789dd423" />
                 <section title="hemi" ref="class_f_s_l_i_b_1_1_label.html#a846b65c0b3a8ce5a56a944cca3d95378" />
+                <section title="label_id" ref="class_f_s_l_i_b_1_1_label.html#a24103edab5af2b181f49cfa6e870345b" />
                 <section title="name" ref="class_f_s_l_i_b_1_1_label.html#aafe7016a7b71c8850e1c70db77065917" />
                 <section title="pos" ref="class_f_s_l_i_b_1_1_label.html#ab8e2ce6ac9114f437093e0b8dc0fb537" />
                 <section title="values" ref="class_f_s_l_i_b_1_1_label.html#afeaac89afbc1ec5221a8e068f399bc7e" />
@@ -702,10 +713,16 @@
                 <section title="Surface" ref="class_f_s_l_i_b_1_1_surface.html#a60731705fa28661cd1bea84132508df3" />
                 <section title="~Surface" ref="class_f_s_l_i_b_1_1_surface.html#a89de75c95cb550d432f3ea4ed1429db0" />
                 <section title="clear" ref="class_f_s_l_i_b_1_1_surface.html#aedc7bb57dc9f9b7198ae4f812491738c" />
-                <section title="faces" ref="class_f_s_l_i_b_1_1_surface.html#aa36dd92ca53a5845dfdfa049623797d8" />
                 <section title="hemi" ref="class_f_s_l_i_b_1_1_surface.html#aac67d537b9fed94b0aca3a52be8212d4" />
                 <section title="m_fileName" ref="class_f_s_l_i_b_1_1_surface.html#a390d601f3b4dd5a379989d86fe4d7c33" />
-                <section title="verts" ref="class_f_s_l_i_b_1_1_surface.html#ab1a8814787355eb0ba5874e7f3da4b36" />
+                <section title="rr" ref="class_f_s_l_i_b_1_1_surface.html#ab1723f2322f50e7111bc8682486b6140" />
+                <section title="tris" ref="class_f_s_l_i_b_1_1_surface.html#acce9e22ae0113996f262217e14c3ea30" />
+              </section>
+              <section title="SurfaceSet" ref="class_f_s_l_i_b_1_1_surface_set.html">
+                <section title="ConstSPtr" ref="class_f_s_l_i_b_1_1_surface_set.html#af8da43a0ba864a9c3302380e068b03c6" />
+                <section title="SPtr" ref="class_f_s_l_i_b_1_1_surface_set.html#a6710e7cb52dc6353b78d956caef34cf0" />
+                <section title="SurfaceSet" ref="class_f_s_l_i_b_1_1_surface_set.html#a457b199170e70db266c641e62e02fe38" />
+                <section title="~SurfaceSet" ref="class_f_s_l_i_b_1_1_surface_set.html#a74176d9d573614df26a73aafba5c2cb3" />
               </section>
             </section>
             <section title="INVERSELIB">
@@ -2593,6 +2610,7 @@
             </section>
             <section title="QGLView">
               <section title="DISP3DLIB::GeometryView" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html" />
+              <section title="DISP3DLIB::LabelView" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html" />
             </section>
             <section title="QList">
               <section title="MNELIB::MNEEpochDataList" ref="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html" />
@@ -2686,6 +2704,7 @@
               </section>
             </section>
             <section title="FSLIB::Surface" ref="class_f_s_l_i_b_1_1_surface.html" />
+            <section title="FSLIB::SurfaceSet" ref="class_f_s_l_i_b_1_1_surface_set.html" />
             <section title="Ui_DummyAboutWidgetClass" ref="class_ui___dummy_about_widget_class.html">
               <section title="Ui::DummyAboutWidgetClass" ref="class_ui_1_1_dummy_about_widget_class.html" />
             </section>
@@ -2927,6 +2946,18 @@
                     <section title="~GeometryView" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#ab4bb78457615996a1be0c44add508ff9" />
                     <section title="initializeGL" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a816a10949d2879546377239cc72f9cd7" />
                     <section title="paintGL" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a394ff6a0626e1cc306d40df437a34718" />
+                  </section>
+                </section>
+                <section title="labelview.cpp" ref="labelview_8cpp.html" />
+                <section title="labelview.h" ref="labelview_8h.html">
+                  <section title="LabelView" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html">
+                    <section title="ConstSPtr" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a075ef2ab9e773e769a589c712e8dd9a3" />
+                    <section title="SPtr" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a502f5fc5785f33a38b49486b7e320b75" />
+                    <section title="LabelView" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a01f0bba9f19f0cbb7f72a815370bcbb9" />
+                    <section title="~LabelView" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a3c7ec5b375db42b8984ec08f76228295" />
+                    <section title="initializeGL" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a4777b7f0234499359d1416b104bfe908" />
+                    <section title="paintGL" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#ac61e3be860ec6c41640a1b082df8552d" />
+                    <section title="pushSourceEstimate" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a751b31c71ed2f03a3ab64d782ef7f7d4" />
                   </section>
                 </section>
               </section>
@@ -3908,14 +3939,15 @@
                     <section title="Annotation" ref="class_f_s_l_i_b_1_1_annotation.html#a8ed7a2aa3370b7ac0f69917815d2a4d1" />
                     <section title="~Annotation" ref="class_f_s_l_i_b_1_1_annotation.html#a95144855eb445040d47951c668dc5764" />
                     <section title="clear" ref="class_f_s_l_i_b_1_1_annotation.html#a112db7b7d0aa9fdada3f0355609fa472" />
-                    <section title="getColortable" ref="class_f_s_l_i_b_1_1_annotation.html#a18a31f199db1e308eb31fc16225d2c52" />
-                    <section title="getLabelIds" ref="class_f_s_l_i_b_1_1_annotation.html#a66279b2873ed2dc63dff201a4f6058fd" />
-                    <section title="getVertices" ref="class_f_s_l_i_b_1_1_annotation.html#aa2ea7604be630f4756d9f9a4a8268846" />
+                    <section title="getColortable" ref="class_f_s_l_i_b_1_1_annotation.html#ab8fe274bc78ed81546f1c7c667205b65" />
+                    <section title="getHemi" ref="class_f_s_l_i_b_1_1_annotation.html#a9f292ac51debb9ad15c231576259e55e" />
+                    <section title="getLabelIds" ref="class_f_s_l_i_b_1_1_annotation.html#a6592b2f7ebdb4a455f4d50c7e5b165d5" />
+                    <section title="getVertices" ref="class_f_s_l_i_b_1_1_annotation.html#a1fe1a658d5c9020add3c8d884f4f1f24" />
                     <section title="toLabels" ref="class_f_s_l_i_b_1_1_annotation.html#a832df6b2077880e27508d16439640bbf" />
                   </section>
                 </section>
-                <section title="annotation_set.cpp" ref="annotation__set_8cpp.html" />
-                <section title="annotation_set.h" ref="annotation__set_8h.html">
+                <section title="annotationset.cpp" ref="annotationset_8cpp.html" />
+                <section title="annotationset.h" ref="annotationset_8h.html">
                   <section title="AnnotationSet" ref="class_f_s_l_i_b_1_1_annotation_set.html">
                     <section title="ConstSPtr" ref="class_f_s_l_i_b_1_1_annotation_set.html#a2a19cbd53984028df0e93b9e320631cf" />
                     <section title="SPtr" ref="class_f_s_l_i_b_1_1_annotation_set.html#a220d7c73355df37b8c68eb1b869342b4" />
@@ -3926,7 +3958,6 @@
                     <section title="clear" ref="class_f_s_l_i_b_1_1_annotation_set.html#a50e15835a32be178552134ee08def943" />
                     <section title="operator[]" ref="class_f_s_l_i_b_1_1_annotation_set.html#ac2c85b6c78cb4d6c56c6732584ff8c2e" />
                     <section title="operator[]" ref="class_f_s_l_i_b_1_1_annotation_set.html#a21a44ee7fe417c705aa80a26baeee7a0" />
-                    <section title="src_annotations" ref="class_f_s_l_i_b_1_1_annotation_set.html#a4c5dcd043ca2be984754a0ef837d8854" />
                   </section>
                 </section>
                 <section title="colortable.cpp" ref="colortable_8cpp.html" />
@@ -3954,12 +3985,14 @@
                     <section title="ConstSPtr" ref="class_f_s_l_i_b_1_1_label.html#a33e72e0d96ee49316a69b9abe56e8d85" />
                     <section title="SPtr" ref="class_f_s_l_i_b_1_1_label.html#a3d55d6572c876d18c36ebfc06176f3b9" />
                     <section title="Label" ref="class_f_s_l_i_b_1_1_label.html#af8f2bccf9faadcb2ca964bd2347dde24" />
-                    <section title="Label" ref="class_f_s_l_i_b_1_1_label.html#ad59a64d3252271662e56689a58c03807" />
+                    <section title="Label" ref="class_f_s_l_i_b_1_1_label.html#a694ed6bb525564615834c0b1cdd1f944" />
                     <section title="~Label" ref="class_f_s_l_i_b_1_1_label.html#a39e1167a9b5827afd888780973d88894" />
                     <section title="clear" ref="class_f_s_l_i_b_1_1_label.html#a4d84eb04f4f9ad588ac5df49de7f7a06" />
+                    <section title="generateTris" ref="class_f_s_l_i_b_1_1_label.html#a005b78a2fc685ef35892c0d0c798c36b" />
                     <section title="isEmpty" ref="class_f_s_l_i_b_1_1_label.html#a16ef1e0a9ecbe79a0aa959fe2120ac4e" />
                     <section title="comment" ref="class_f_s_l_i_b_1_1_label.html#a7ed5373bf3ac45c3c9fe6dc7789dd423" />
                     <section title="hemi" ref="class_f_s_l_i_b_1_1_label.html#a846b65c0b3a8ce5a56a944cca3d95378" />
+                    <section title="label_id" ref="class_f_s_l_i_b_1_1_label.html#a24103edab5af2b181f49cfa6e870345b" />
                     <section title="name" ref="class_f_s_l_i_b_1_1_label.html#aafe7016a7b71c8850e1c70db77065917" />
                     <section title="pos" ref="class_f_s_l_i_b_1_1_label.html#ab8e2ce6ac9114f437093e0b8dc0fb537" />
                     <section title="values" ref="class_f_s_l_i_b_1_1_label.html#afeaac89afbc1ec5221a8e068f399bc7e" />
@@ -3975,10 +4008,19 @@
                     <section title="Surface" ref="class_f_s_l_i_b_1_1_surface.html#a60731705fa28661cd1bea84132508df3" />
                     <section title="~Surface" ref="class_f_s_l_i_b_1_1_surface.html#a89de75c95cb550d432f3ea4ed1429db0" />
                     <section title="clear" ref="class_f_s_l_i_b_1_1_surface.html#aedc7bb57dc9f9b7198ae4f812491738c" />
-                    <section title="faces" ref="class_f_s_l_i_b_1_1_surface.html#aa36dd92ca53a5845dfdfa049623797d8" />
                     <section title="hemi" ref="class_f_s_l_i_b_1_1_surface.html#aac67d537b9fed94b0aca3a52be8212d4" />
                     <section title="m_fileName" ref="class_f_s_l_i_b_1_1_surface.html#a390d601f3b4dd5a379989d86fe4d7c33" />
-                    <section title="verts" ref="class_f_s_l_i_b_1_1_surface.html#ab1a8814787355eb0ba5874e7f3da4b36" />
+                    <section title="rr" ref="class_f_s_l_i_b_1_1_surface.html#ab1723f2322f50e7111bc8682486b6140" />
+                    <section title="tris" ref="class_f_s_l_i_b_1_1_surface.html#acce9e22ae0113996f262217e14c3ea30" />
+                  </section>
+                </section>
+                <section title="surfaceset.cpp" ref="surfaceset_8cpp.html" />
+                <section title="surfaceset.h" ref="surfaceset_8h.html">
+                  <section title="SurfaceSet" ref="class_f_s_l_i_b_1_1_surface_set.html">
+                    <section title="ConstSPtr" ref="class_f_s_l_i_b_1_1_surface_set.html#af8da43a0ba864a9c3302380e068b03c6" />
+                    <section title="SPtr" ref="class_f_s_l_i_b_1_1_surface_set.html#a6710e7cb52dc6353b78d956caef34cf0" />
+                    <section title="SurfaceSet" ref="class_f_s_l_i_b_1_1_surface_set.html#a457b199170e70db266c641e62e02fe38" />
+                    <section title="~SurfaceSet" ref="class_f_s_l_i_b_1_1_surface_set.html#a74176d9d573614df26a73aafba5c2cb3" />
                   </section>
                 </section>
               </section>
@@ -6915,6 +6957,14 @@
       <keyword name="~GeometryView" id="DISP3DLIB::GeometryView::~GeometryView" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#ab4bb78457615996a1be0c44add508ff9" />
       <keyword name="initializeGL" id="DISP3DLIB::GeometryView::initializeGL" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a816a10949d2879546377239cc72f9cd7" />
       <keyword name="paintGL" id="DISP3DLIB::GeometryView::paintGL" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a394ff6a0626e1cc306d40df437a34718" />
+      <keyword name="DISP3DLIB::LabelView" id="DISP3DLIB::LabelView" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html" />
+      <keyword name="SPtr" id="DISP3DLIB::LabelView::SPtr" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a502f5fc5785f33a38b49486b7e320b75" />
+      <keyword name="ConstSPtr" id="DISP3DLIB::LabelView::ConstSPtr" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a075ef2ab9e773e769a589c712e8dd9a3" />
+      <keyword name="LabelView" id="DISP3DLIB::LabelView::LabelView" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a01f0bba9f19f0cbb7f72a815370bcbb9" />
+      <keyword name="~LabelView" id="DISP3DLIB::LabelView::~LabelView" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a3c7ec5b375db42b8984ec08f76228295" />
+      <keyword name="pushSourceEstimate" id="DISP3DLIB::LabelView::pushSourceEstimate" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a751b31c71ed2f03a3ab64d782ef7f7d4" />
+      <keyword name="initializeGL" id="DISP3DLIB::LabelView::initializeGL" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a4777b7f0234499359d1416b104bfe908" />
+      <keyword name="paintGL" id="DISP3DLIB::LabelView::paintGL" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#ac61e3be860ec6c41640a1b082df8552d" />
       <keyword name="DISPLIB::Disp" id="DISPLIB::Disp" ref="class_d_i_s_p_l_i_b_1_1_disp.html" />
       <keyword name="Disp" id="DISPLIB::Disp::Disp" ref="class_d_i_s_p_l_i_b_1_1_disp.html#a9e3457b8cfea7679b70bd7e724134661" />
       <keyword name="DISPLIB::DisplayManager" id="DISPLIB::DisplayManager" ref="class_d_i_s_p_l_i_b_1_1_display_manager.html" />
@@ -7589,9 +7639,10 @@
       <keyword name="Annotation" id="FSLIB::Annotation::Annotation" ref="class_f_s_l_i_b_1_1_annotation.html#a8ed7a2aa3370b7ac0f69917815d2a4d1" />
       <keyword name="~Annotation" id="FSLIB::Annotation::~Annotation" ref="class_f_s_l_i_b_1_1_annotation.html#a95144855eb445040d47951c668dc5764" />
       <keyword name="clear" id="FSLIB::Annotation::clear" ref="class_f_s_l_i_b_1_1_annotation.html#a112db7b7d0aa9fdada3f0355609fa472" />
-      <keyword name="getVertices" id="FSLIB::Annotation::getVertices" ref="class_f_s_l_i_b_1_1_annotation.html#aa2ea7604be630f4756d9f9a4a8268846" />
-      <keyword name="getLabelIds" id="FSLIB::Annotation::getLabelIds" ref="class_f_s_l_i_b_1_1_annotation.html#a66279b2873ed2dc63dff201a4f6058fd" />
-      <keyword name="getColortable" id="FSLIB::Annotation::getColortable" ref="class_f_s_l_i_b_1_1_annotation.html#a18a31f199db1e308eb31fc16225d2c52" />
+      <keyword name="getHemi" id="FSLIB::Annotation::getHemi" ref="class_f_s_l_i_b_1_1_annotation.html#a9f292ac51debb9ad15c231576259e55e" />
+      <keyword name="getVertices" id="FSLIB::Annotation::getVertices" ref="class_f_s_l_i_b_1_1_annotation.html#a1fe1a658d5c9020add3c8d884f4f1f24" />
+      <keyword name="getLabelIds" id="FSLIB::Annotation::getLabelIds" ref="class_f_s_l_i_b_1_1_annotation.html#a6592b2f7ebdb4a455f4d50c7e5b165d5" />
+      <keyword name="getColortable" id="FSLIB::Annotation::getColortable" ref="class_f_s_l_i_b_1_1_annotation.html#ab8fe274bc78ed81546f1c7c667205b65" />
       <keyword name="toLabels" id="FSLIB::Annotation::toLabels" ref="class_f_s_l_i_b_1_1_annotation.html#a832df6b2077880e27508d16439640bbf" />
       <keyword name="read" id="FSLIB::Annotation::read" ref="class_f_s_l_i_b_1_1_annotation.html#ad5cff41a3c57b0ed0a28d18c4bfb1034" />
       <keyword name="FSLIB::AnnotationSet" id="FSLIB::AnnotationSet" ref="class_f_s_l_i_b_1_1_annotation_set.html" />
@@ -7605,7 +7656,6 @@
       <keyword name="operator[]" id="FSLIB::AnnotationSet::operator[]" ref="class_f_s_l_i_b_1_1_annotation_set.html#ac2c85b6c78cb4d6c56c6732584ff8c2e" />
       <keyword name="operator[]" id="FSLIB::AnnotationSet::operator[]" ref="class_f_s_l_i_b_1_1_annotation_set.html#a21a44ee7fe417c705aa80a26baeee7a0" />
       <keyword name="read" id="FSLIB::AnnotationSet::read" ref="class_f_s_l_i_b_1_1_annotation_set.html#ae20af70e4b063ce376eabe523b55f749" />
-      <keyword name="src_annotations" id="FSLIB::AnnotationSet::src_annotations" ref="class_f_s_l_i_b_1_1_annotation_set.html#a4c5dcd043ca2be984754a0ef837d8854" />
       <keyword name="FSLIB::Colortable" id="FSLIB::Colortable" ref="class_f_s_l_i_b_1_1_colortable.html" />
       <keyword name="SPtr" id="FSLIB::Colortable::SPtr" ref="class_f_s_l_i_b_1_1_colortable.html#a7d57c8cbf2408975db0ccbe1d2e71675" />
       <keyword name="ConstSPtr" id="FSLIB::Colortable::ConstSPtr" ref="class_f_s_l_i_b_1_1_colortable.html#ab429f601fbc14580b27a8fada7a23a37" />
@@ -7622,10 +7672,11 @@
       <keyword name="SPtr" id="FSLIB::Label::SPtr" ref="class_f_s_l_i_b_1_1_label.html#a3d55d6572c876d18c36ebfc06176f3b9" />
       <keyword name="ConstSPtr" id="FSLIB::Label::ConstSPtr" ref="class_f_s_l_i_b_1_1_label.html#a33e72e0d96ee49316a69b9abe56e8d85" />
       <keyword name="Label" id="FSLIB::Label::Label" ref="class_f_s_l_i_b_1_1_label.html#af8f2bccf9faadcb2ca964bd2347dde24" />
-      <keyword name="Label" id="FSLIB::Label::Label" ref="class_f_s_l_i_b_1_1_label.html#ad59a64d3252271662e56689a58c03807" />
+      <keyword name="Label" id="FSLIB::Label::Label" ref="class_f_s_l_i_b_1_1_label.html#a694ed6bb525564615834c0b1cdd1f944" />
       <keyword name="~Label" id="FSLIB::Label::~Label" ref="class_f_s_l_i_b_1_1_label.html#a39e1167a9b5827afd888780973d88894" />
       <keyword name="clear" id="FSLIB::Label::clear" ref="class_f_s_l_i_b_1_1_label.html#a4d84eb04f4f9ad588ac5df49de7f7a06" />
       <keyword name="isEmpty" id="FSLIB::Label::isEmpty" ref="class_f_s_l_i_b_1_1_label.html#a16ef1e0a9ecbe79a0aa959fe2120ac4e" />
+      <keyword name="generateTris" id="FSLIB::Label::generateTris" ref="class_f_s_l_i_b_1_1_label.html#a005b78a2fc685ef35892c0d0c798c36b" />
       <keyword name="read" id="FSLIB::Label::read" ref="class_f_s_l_i_b_1_1_label.html#ae947494138be5062444cd014815181fb" />
       <keyword name="comment" id="FSLIB::Label::comment" ref="class_f_s_l_i_b_1_1_label.html#a7ed5373bf3ac45c3c9fe6dc7789dd423" />
       <keyword name="hemi" id="FSLIB::Label::hemi" ref="class_f_s_l_i_b_1_1_label.html#a846b65c0b3a8ce5a56a944cca3d95378" />
@@ -7633,6 +7684,7 @@
       <keyword name="vertices" id="FSLIB::Label::vertices" ref="class_f_s_l_i_b_1_1_label.html#a9fa6d9321697cf073cecc4a2426badf5" />
       <keyword name="pos" id="FSLIB::Label::pos" ref="class_f_s_l_i_b_1_1_label.html#ab8e2ce6ac9114f437093e0b8dc0fb537" />
       <keyword name="values" id="FSLIB::Label::values" ref="class_f_s_l_i_b_1_1_label.html#afeaac89afbc1ec5221a8e068f399bc7e" />
+      <keyword name="label_id" id="FSLIB::Label::label_id" ref="class_f_s_l_i_b_1_1_label.html#a24103edab5af2b181f49cfa6e870345b" />
       <keyword name="FSLIB::Surface" id="FSLIB::Surface" ref="class_f_s_l_i_b_1_1_surface.html" />
       <keyword name="SPtr" id="FSLIB::Surface::SPtr" ref="class_f_s_l_i_b_1_1_surface.html#a98676b16c2fce1dbd457feaeb44e330d" />
       <keyword name="ConstSPtr" id="FSLIB::Surface::ConstSPtr" ref="class_f_s_l_i_b_1_1_surface.html#a048cb1a8bc573e9f03bf6adcba581755" />
@@ -7643,8 +7695,13 @@
       <keyword name="read" id="FSLIB::Surface::read" ref="class_f_s_l_i_b_1_1_surface.html#a1ff84f0339ef45075e66c22da67c155a" />
       <keyword name="m_fileName" id="FSLIB::Surface::m_fileName" ref="class_f_s_l_i_b_1_1_surface.html#a390d601f3b4dd5a379989d86fe4d7c33" />
       <keyword name="hemi" id="FSLIB::Surface::hemi" ref="class_f_s_l_i_b_1_1_surface.html#aac67d537b9fed94b0aca3a52be8212d4" />
-      <keyword name="verts" id="FSLIB::Surface::verts" ref="class_f_s_l_i_b_1_1_surface.html#ab1a8814787355eb0ba5874e7f3da4b36" />
-      <keyword name="faces" id="FSLIB::Surface::faces" ref="class_f_s_l_i_b_1_1_surface.html#aa36dd92ca53a5845dfdfa049623797d8" />
+      <keyword name="rr" id="FSLIB::Surface::rr" ref="class_f_s_l_i_b_1_1_surface.html#ab1723f2322f50e7111bc8682486b6140" />
+      <keyword name="tris" id="FSLIB::Surface::tris" ref="class_f_s_l_i_b_1_1_surface.html#acce9e22ae0113996f262217e14c3ea30" />
+      <keyword name="FSLIB::SurfaceSet" id="FSLIB::SurfaceSet" ref="class_f_s_l_i_b_1_1_surface_set.html" />
+      <keyword name="SPtr" id="FSLIB::SurfaceSet::SPtr" ref="class_f_s_l_i_b_1_1_surface_set.html#a6710e7cb52dc6353b78d956caef34cf0" />
+      <keyword name="ConstSPtr" id="FSLIB::SurfaceSet::ConstSPtr" ref="class_f_s_l_i_b_1_1_surface_set.html#af8da43a0ba864a9c3302380e068b03c6" />
+      <keyword name="SurfaceSet" id="FSLIB::SurfaceSet::SurfaceSet" ref="class_f_s_l_i_b_1_1_surface_set.html#a457b199170e70db266c641e62e02fe38" />
+      <keyword name="~SurfaceSet" id="FSLIB::SurfaceSet::~SurfaceSet" ref="class_f_s_l_i_b_1_1_surface_set.html#a74176d9d573614df26a73aafba5c2cb3" />
       <keyword name="INVERSELIB::IInverseAlgorithm" id="INVERSELIB::IInverseAlgorithm" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html" />
       <keyword name="~IInverseAlgorithm" id="INVERSELIB::IInverseAlgorithm::~IInverseAlgorithm" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html#a9c2cda48ff32559bfedc02d8479be7f7" />
       <keyword name="calculateInverse" id="INVERSELIB::IInverseAlgorithm::calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html#aeb4557c3d15974fbc6c5e74b01b26262" />
@@ -9765,6 +9822,8 @@
       <file>disp3_d__global_8h_source.html</file>
       <file>geometryview_8cpp_source.html</file>
       <file>geometryview_8h_source.html</file>
+      <file>labelview_8cpp_source.html</file>
+      <file>labelview_8h_source.html</file>
       <file>fiff_8cpp_source.html</file>
       <file>fiff_8h_source.html</file>
       <file>fiff__ch__info_8cpp_source.html</file>
@@ -9812,8 +9871,8 @@
       <file>fiff__types_8h_source.html</file>
       <file>annotation_8cpp_source.html</file>
       <file>annotation_8h_source.html</file>
-      <file>annotation__set_8cpp_source.html</file>
-      <file>annotation__set_8h_source.html</file>
+      <file>annotationset_8cpp_source.html</file>
+      <file>annotationset_8h_source.html</file>
       <file>colortable_8cpp_source.html</file>
       <file>colortable_8h_source.html</file>
       <file>fs__global_8h_source.html</file>
@@ -9821,6 +9880,8 @@
       <file>label_8h_source.html</file>
       <file>surface_8cpp_source.html</file>
       <file>surface_8h_source.html</file>
+      <file>surfaceset_8cpp_source.html</file>
+      <file>surfaceset_8h_source.html</file>
       <file>buffer__old_8cpp_source.html</file>
       <file>buffer__old_8h_source.html</file>
       <file>circularbuffer_8cpp_source.html</file>
@@ -10036,6 +10097,8 @@
       <file>disp3_d__global_8h.html</file>
       <file>geometryview_8cpp.html</file>
       <file>geometryview_8h.html</file>
+      <file>labelview_8cpp.html</file>
+      <file>labelview_8h.html</file>
       <file>fiff_8cpp.html</file>
       <file>fiff_8h.html</file>
       <file>fiff__ch__info_8cpp.html</file>
@@ -10082,8 +10145,8 @@
       <file>fiff__types_8h.html</file>
       <file>annotation_8cpp.html</file>
       <file>annotation_8h.html</file>
-      <file>annotation__set_8cpp.html</file>
-      <file>annotation__set_8h.html</file>
+      <file>annotationset_8cpp.html</file>
+      <file>annotationset_8h.html</file>
       <file>colortable_8cpp.html</file>
       <file>colortable_8h.html</file>
       <file>fs__global_8h.html</file>
@@ -10091,6 +10154,8 @@
       <file>label_8h.html</file>
       <file>surface_8cpp.html</file>
       <file>surface_8h.html</file>
+      <file>surfaceset_8cpp.html</file>
+      <file>surfaceset_8h.html</file>
       <file>buffer__old_8cpp.html</file>
       <file>buffer__old_8h.html</file>
       <file>circularbuffer_8cpp.html</file>
@@ -10331,6 +10396,9 @@
       <file>class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html</file>
       <file>class_d_i_s_p3_d_l_i_b_1_1_geometry_view.png</file>
       <file>class_d_i_s_p3_d_l_i_b_1_1_geometry_view-members.html</file>
+      <file>class_d_i_s_p3_d_l_i_b_1_1_label_view.html</file>
+      <file>class_d_i_s_p3_d_l_i_b_1_1_label_view.png</file>
+      <file>class_d_i_s_p3_d_l_i_b_1_1_label_view-members.html</file>
       <file>class_d_i_s_p_l_i_b_1_1_disp.html</file>
       <file>class_d_i_s_p_l_i_b_1_1_disp-members.html</file>
       <file>class_d_i_s_p_l_i_b_1_1_display_manager.html</file>
@@ -10457,6 +10525,8 @@
       <file>class_f_s_l_i_b_1_1_label-members.html</file>
       <file>class_f_s_l_i_b_1_1_surface.html</file>
       <file>class_f_s_l_i_b_1_1_surface-members.html</file>
+      <file>class_f_s_l_i_b_1_1_surface_set.html</file>
+      <file>class_f_s_l_i_b_1_1_surface_set-members.html</file>
       <file>class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html</file>
       <file>class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.png</file>
       <file>class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm-members.html</file>

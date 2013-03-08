@@ -134,10 +134,10 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a390d601f3b4dd5a379989d86fe4d7c33"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aac67d537b9fed94b0aca3a52be8212d4"><td class="memItemLeft" align="right" valign="top">qint32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_surface.html#aac67d537b9fed94b0aca3a52be8212d4">hemi</a></td></tr>
 <tr class="separator:aac67d537b9fed94b0aca3a52be8212d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab1a8814787355eb0ba5874e7f3da4b36"><td class="memItemLeft" align="right" valign="top">MatrixX3f&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_surface.html#ab1a8814787355eb0ba5874e7f3da4b36">verts</a></td></tr>
-<tr class="separator:ab1a8814787355eb0ba5874e7f3da4b36"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa36dd92ca53a5845dfdfa049623797d8"><td class="memItemLeft" align="right" valign="top">MatrixX3i&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_surface.html#aa36dd92ca53a5845dfdfa049623797d8">faces</a></td></tr>
-<tr class="separator:aa36dd92ca53a5845dfdfa049623797d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab1723f2322f50e7111bc8682486b6140"><td class="memItemLeft" align="right" valign="top">MatrixX3f&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_surface.html#ab1723f2322f50e7111bc8682486b6140">rr</a></td></tr>
+<tr class="separator:ab1723f2322f50e7111bc8682486b6140"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acce9e22ae0113996f262217e14c3ea30"><td class="memItemLeft" align="right" valign="top">MatrixX3i&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_surface.html#acce9e22ae0113996f262217e14c3ea30">tris</a></td></tr>
+<tr class="separator:acce9e22ae0113996f262217e14c3ea30"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>FreeSurfer surface mesh. </p>
@@ -310,21 +310,6 @@ Public Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="aa36dd92ca53a5845dfdfa049623797d8"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">MatrixX3i FSLIB::Surface::faces</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>The triangle descriptions </p>
-
-<p>Definition at line <a class="el" href="surface_8h_source.html#l00139">139</a> of file <a class="el" href="surface_8h_source.html">surface.h</a>.</p>
-
-</div>
-</div>
 <a class="anchor" id="aac67d537b9fed94b0aca3a52be8212d4"></a>
 <div class="memitem">
 <div class="memproto">
@@ -355,18 +340,33 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ab1a8814787355eb0ba5874e7f3da4b36"></a>
+<a class="anchor" id="ab1723f2322f50e7111bc8682486b6140"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">MatrixX3f FSLIB::Surface::verts</td>
+          <td class="memname">MatrixX3f FSLIB::Surface::rr</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Vertex coordinates in meters </p>
+<p>alias verts. Vertex coordinates in meters </p>
 
 <p>Definition at line <a class="el" href="surface_8h_source.html#l00138">138</a> of file <a class="el" href="surface_8h_source.html">surface.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="acce9e22ae0113996f262217e14c3ea30"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">MatrixX3i FSLIB::Surface::tris</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>alias faces. The triangle descriptions </p>
+
+<p>Definition at line <a class="el" href="surface_8h_source.html#l00139">139</a> of file <a class="el" href="surface_8h_source.html">surface.h</a>.</p>
 
 </div>
 </div>
@@ -377,7 +377,7 @@ Public Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 6 2013 12:42:35 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Mar 7 2013 16:51:32 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

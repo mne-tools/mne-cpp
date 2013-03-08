@@ -116,9 +116,8 @@ public:
     * @param[in] p_hemi         Hemisphere (lh = 0; rh = 1)
     * @param[in] p_name         label names
     * @param[in] p_id           label id (optional, default = -1)
-    * @param[in] p_tris         triangulation information(optional)
     */
-    Label(const VectorXi &p_vertices, const MatrixX3f &p_pos, const VectorXd &p_values, qint32 p_hemi, const QString &p_name, qint32 p_id = -1, const MatrixX3i &p_tris = defaultTris);
+    Label(const VectorXi &p_vertices, const MatrixX3f &p_pos, const VectorXd &p_values, qint32 p_hemi, const QString &p_name, qint32 p_id = -1);
     
     //=========================================================================================================
     /**
@@ -139,22 +138,16 @@ public:
     * @return true if Label is empty, false otherwise.
     */
     inline bool isEmpty() const;
-    
-    //=========================================================================================================
-    /**
-    * True if Label contains tri information
-    *
-    * @return true if Label contains tri information, false otherwise.
-    */
-    inline bool hasTris() const;
 
     //=========================================================================================================
     /**
-    * Generates tris for this labbel using a surface file.
+    * Generates tris for this label using a given surface file.
     *
-    * @return true if gerenation was successful false otherwise.
+    * @param[in] p_Surface      to generate the label tris from
+    *
+    * @return the generated tris.
     */
-    bool generateTris(const Surface & p_Surface);
+    MatrixX3i generateTris(const Surface & p_Surface);
 
     //=========================================================================================================
     /**
@@ -181,7 +174,7 @@ public:
     VectorXd values;    /**< Values at the vertices */
 
     qint32 label_id;    /**< Label id (optional) */
-    MatrixX3i tris;     /**< Tris for plotting (optional) */
+//    MatrixX3i tris;     /**< Tris for plotting (optional) */
 
 //    QMap<qint32, VectorXi> vertices;    /**< Vertex indices (0 based) */
 //    QMap<qint32, MatrixX3f> pos;        /**< Locations in meters */
@@ -196,14 +189,6 @@ public:
 inline bool Label::isEmpty() const
 {
     return this->hemi == -1;
-}
-
-
-//*************************************************************************************************************
-
-inline bool Label::hasTris() const
-{
-    return tris.rows() > 0;
 }
 
 } // NAMESPACE

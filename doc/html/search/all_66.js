@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['faces',['faces',['../class_f_s_l_i_b_1_1_surface.html#aa36dd92ca53a5845dfdfa049623797d8',1,'FSLIB::Surface']]],
   ['fiff',['Fiff',['../class_f_i_f_f_l_i_b_1_1_fiff.html',1,'FIFFLIB']]],
   ['fiff_2ecpp',['fiff.cpp',['../fiff_8cpp.html',1,'']]],
   ['fiff_2eh',['fiff.h',['../fiff_8h.html',1,'']]],
@@ -111,8 +110,8 @@ var searchData=
   ['fiffchpos',['FiffChPos',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html',1,'FIFFLIB']]],
   ['fiffcoordtrans',['FiffCoordTrans',['../class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html',1,'FIFFLIB']]],
   ['fiffcoordtrans',['FiffCoordTrans',['../class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a76eeba5b0c9c6bf9f8fb7df9eaa8dbb5',1,'FIFFLIB::FiffCoordTrans::FiffCoordTrans()'],['../class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a2e61ae5ce7bbcb1e99a70d2ae82e4529',1,'FIFFLIB::FiffCoordTrans::FiffCoordTrans(const FiffCoordTrans &amp;p_FiffCoordTrans)']]],
-  ['fiffcov',['FiffCov',['../class_f_i_f_f_l_i_b_1_1_fiff_cov.html#a35bb2e4d59e4b17e792b8d48deebe612',1,'FIFFLIB::FiffCov::FiffCov()'],['../class_f_i_f_f_l_i_b_1_1_fiff_cov.html#aee229e7ee6a131e66b4b8f4740d6f9a8',1,'FIFFLIB::FiffCov::FiffCov(QIODevice &amp;p_IODevice)'],['../class_f_i_f_f_l_i_b_1_1_fiff_cov.html#a0a638f0de5c0c22ffbcd99d72bd5f8e4',1,'FIFFLIB::FiffCov::FiffCov(const FiffCov &amp;p_FiffCov)']]],
   ['fiffcov',['FiffCov',['../class_f_i_f_f_l_i_b_1_1_fiff_cov.html',1,'FIFFLIB']]],
+  ['fiffcov',['FiffCov',['../class_f_i_f_f_l_i_b_1_1_fiff_cov.html#a35bb2e4d59e4b17e792b8d48deebe612',1,'FIFFLIB::FiffCov::FiffCov()'],['../class_f_i_f_f_l_i_b_1_1_fiff_cov.html#aee229e7ee6a131e66b4b8f4740d6f9a8',1,'FIFFLIB::FiffCov::FiffCov(QIODevice &amp;p_IODevice)'],['../class_f_i_f_f_l_i_b_1_1_fiff_cov.html#a0a638f0de5c0c22ffbcd99d72bd5f8e4',1,'FIFFLIB::FiffCov::FiffCov(const FiffCov &amp;p_FiffCov)']]],
   ['fiffctfcomp',['FiffCtfComp',['../class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a71ab7f302a963cee050a96c9789a00df',1,'FIFFLIB::FiffCtfComp::FiffCtfComp()'],['../class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#af6c554692ac36e8ff72ddeed26c1d0bf',1,'FIFFLIB::FiffCtfComp::FiffCtfComp(const FiffCtfComp &amp;p_FiffCtfComp)']]],
   ['fiffctfcomp',['FiffCtfComp',['../class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html',1,'FIFFLIB']]],
   ['fiffdigpoint',['FiffDigPoint',['../class_f_i_f_f_l_i_b_1_1_fiff_dig_point.html#ad1076014df93b5d9e42d17c00e60d49a',1,'FIFFLIB::FiffDigPoint::FiffDigPoint()'],['../class_f_i_f_f_l_i_b_1_1_fiff_dig_point.html#a4df5728f3edf61c45851b0e3581c95c1',1,'FIFFLIB::FiffDigPoint::FiffDigPoint(const FiffDigPoint &amp;p_FiffDigPoint)']]],

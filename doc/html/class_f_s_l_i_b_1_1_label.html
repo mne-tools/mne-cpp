@@ -116,14 +116,16 @@ Public Types</h2></td></tr>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:af8f2bccf9faadcb2ca964bd2347dde24"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_label.html#af8f2bccf9faadcb2ca964bd2347dde24">Label</a> ()</td></tr>
 <tr class="separator:af8f2bccf9faadcb2ca964bd2347dde24"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad59a64d3252271662e56689a58c03807"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_label.html#ad59a64d3252271662e56689a58c03807">Label</a> (const VectorXi &amp;p_vertices, const MatrixX3f &amp;p_pos, const VectorXd &amp;p_values, qint32 p_hemi, const QString &amp;p_name)</td></tr>
-<tr class="separator:ad59a64d3252271662e56689a58c03807"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a694ed6bb525564615834c0b1cdd1f944"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_label.html#a694ed6bb525564615834c0b1cdd1f944">Label</a> (const VectorXi &amp;p_vertices, const MatrixX3f &amp;p_pos, const VectorXd &amp;p_values, qint32 p_hemi, const QString &amp;p_name, qint32 p_id=-1)</td></tr>
+<tr class="separator:a694ed6bb525564615834c0b1cdd1f944"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a39e1167a9b5827afd888780973d88894"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_label.html#a39e1167a9b5827afd888780973d88894">~Label</a> ()</td></tr>
 <tr class="separator:a39e1167a9b5827afd888780973d88894"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d84eb04f4f9ad588ac5df49de7f7a06"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_label.html#a4d84eb04f4f9ad588ac5df49de7f7a06">clear</a> ()</td></tr>
 <tr class="separator:a4d84eb04f4f9ad588ac5df49de7f7a06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a16ef1e0a9ecbe79a0aa959fe2120ac4e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_label.html#a16ef1e0a9ecbe79a0aa959fe2120ac4e">isEmpty</a> () const </td></tr>
 <tr class="separator:a16ef1e0a9ecbe79a0aa959fe2120ac4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a005b78a2fc685ef35892c0d0c798c36b"><td class="memItemLeft" align="right" valign="top">MatrixX3i&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_label.html#a005b78a2fc685ef35892c0d0c798c36b">generateTris</a> (const <a class="el" href="class_f_s_l_i_b_1_1_surface.html">Surface</a> &amp;p_Surface)</td></tr>
+<tr class="separator:a005b78a2fc685ef35892c0d0c798c36b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -144,12 +146,14 @@ Public Attributes</h2></td></tr>
 <tr class="separator:ab8e2ce6ac9114f437093e0b8dc0fb537"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afeaac89afbc1ec5221a8e068f399bc7e"><td class="memItemLeft" align="right" valign="top">VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_label.html#afeaac89afbc1ec5221a8e068f399bc7e">values</a></td></tr>
 <tr class="separator:afeaac89afbc1ec5221a8e068f399bc7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a24103edab5af2b181f49cfa6e870345b"><td class="memItemLeft" align="right" valign="top">qint32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_label.html#a24103edab5af2b181f49cfa6e870345b">label_id</a></td></tr>
+<tr class="separator:a24103edab5af2b181f49cfa6e870345b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Freesurfer/MNE label. </p>
 <p>A Freesurfer/MNE label with vertices restricted to one hemisphere </p>
 
-<p>Definition at line <a class="el" href="label_8h_source.html#l00092">92</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
+<p>Definition at line <a class="el" href="label_8h_source.html#l00097">97</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a class="anchor" id="a33e72e0d96ee49316a69b9abe56e8d85"></a>
 <div class="memitem">
@@ -162,7 +166,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Const shared pointer type for <a class="el" href="class_f_s_l_i_b_1_1_label.html" title="Freesurfer/MNE label.">Label</a> class. </p>
 
-<p>Definition at line <a class="el" href="label_8h_source.html#l00096">96</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
+<p>Definition at line <a class="el" href="label_8h_source.html#l00101">101</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
 
 </div>
 </div>
@@ -177,7 +181,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Shared pointer type for <a class="el" href="class_f_s_l_i_b_1_1_label.html" title="Freesurfer/MNE label.">Label</a> class. </p>
 
-<p>Definition at line <a class="el" href="label_8h_source.html#l00095">95</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
+<p>Definition at line <a class="el" href="label_8h_source.html#l00100">100</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
 
 </div>
 </div>
@@ -196,11 +200,11 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Default constructor </p>
 
-<p>Definition at line <a class="el" href="label_8cpp_source.html#l00070">70</a> of file <a class="el" href="label_8cpp_source.html">label.cpp</a>.</p>
+<p>Definition at line <a class="el" href="label_8cpp_source.html#l00073">73</a> of file <a class="el" href="label_8cpp_source.html">label.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ad59a64d3252271662e56689a58c03807"></a>
+<a class="anchor" id="a694ed6bb525564615834c0b1cdd1f944"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -232,7 +236,13 @@ Public Attributes</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const QString &amp;&#160;</td>
-          <td class="paramname"><em>p_name</em>&#160;</td>
+          <td class="paramname"><em>p_name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">qint32&#160;</td>
+          <td class="paramname"><em>p_id</em> = <code>-1</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -244,16 +254,17 @@ Public Attributes</h2></td></tr>
 <p>Constructs a label</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_vertices</td><td>label file name </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_pos</td><td>read label </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_values</td><td>label file name </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_hemi</td><td>read label </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_name</td><td>label file name </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_vertices</td><td>Vertices </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_pos</td><td>Positions </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_values</td><td>Values </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_hemi</td><td>Hemisphere (lh = 0; rh = 1) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_name</td><td>label names </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_id</td><td>label id (optional, default = -1) </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="label_8cpp_source.html#l00078">78</a> of file <a class="el" href="label_8cpp_source.html">label.cpp</a>.</p>
+<p>Definition at line <a class="el" href="label_8cpp_source.html#l00082">82</a> of file <a class="el" href="label_8cpp_source.html">label.cpp</a>.</p>
 
 </div>
 </div>
@@ -271,7 +282,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Destroys the <a class="el" href="class_f_s_l_i_b_1_1_label.html" title="Freesurfer/MNE label.">Label</a> class. </p>
 
-<p>Definition at line <a class="el" href="label_8cpp_source.html#l00091">91</a> of file <a class="el" href="label_8cpp_source.html">label.cpp</a>.</p>
+<p>Definition at line <a class="el" href="label_8cpp_source.html#l00096">96</a> of file <a class="el" href="label_8cpp_source.html">label.cpp</a>.</p>
 
 </div>
 </div>
@@ -290,7 +301,33 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Initializes the <a class="el" href="class_f_s_l_i_b_1_1_label.html" title="Freesurfer/MNE label.">Label</a>. </p>
 
-<p>Definition at line <a class="el" href="label_8cpp_source.html#l00098">98</a> of file <a class="el" href="label_8cpp_source.html">label.cpp</a>.</p>
+<p>Definition at line <a class="el" href="label_8cpp_source.html#l00103">103</a> of file <a class="el" href="label_8cpp_source.html">label.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a005b78a2fc685ef35892c0d0c798c36b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">MatrixX3i Label::generateTris </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_s_l_i_b_1_1_surface.html">Surface</a> &amp;&#160;</td>
+          <td class="paramname"><em>p_Surface</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Generates tris for this label using a given surface file.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_Surface</td><td>to generate the label tris from</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the generated tris. </dd></dl>
+
+<p>Definition at line <a class="el" href="label_8cpp_source.html#l00118">118</a> of file <a class="el" href="label_8cpp_source.html">label.cpp</a>.</p>
 
 </div>
 </div>
@@ -315,9 +352,9 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>True if <a class="el" href="class_f_s_l_i_b_1_1_label.html" title="Freesurfer/MNE label.">Label</a> is empty.</p>
-<dl class="section return"><dt>Returns</dt><dd>true if <a class="el" href="class_f_s_l_i_b_1_1_label.html" title="Freesurfer/MNE label.">Label</a> is empty, fasle otherwise. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if <a class="el" href="class_f_s_l_i_b_1_1_label.html" title="Freesurfer/MNE label.">Label</a> is empty, false otherwise. </dd></dl>
 
-<p>Definition at line <a class="el" href="label_8h_source.html#l00170">170</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
+<p>Definition at line <a class="el" href="label_8h_source.html#l00189">189</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
 
 </div>
 </div>
@@ -363,7 +400,7 @@ Public Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if successful, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="label_8cpp_source.html#l00114">114</a> of file <a class="el" href="label_8cpp_source.html">label.cpp</a>.</p>
+<p>Definition at line <a class="el" href="label_8cpp_source.html#l00152">152</a> of file <a class="el" href="label_8cpp_source.html">label.cpp</a>.</p>
 
 </div>
 </div>
@@ -379,7 +416,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Comment from the first line of the label file. </p>
 
-<p>Definition at line <a class="el" href="label_8h_source.html#l00152">152</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
+<p>Definition at line <a class="el" href="label_8h_source.html#l00168">168</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
 
 </div>
 </div>
@@ -394,7 +431,22 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Hemisphere (lh = 0; rh = 1) </p>
 
-<p>Definition at line <a class="el" href="label_8h_source.html#l00153">153</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
+<p>Definition at line <a class="el" href="label_8h_source.html#l00169">169</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a24103edab5af2b181f49cfa6e870345b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">qint32 FSLIB::Label::label_id</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p><a class="el" href="class_f_s_l_i_b_1_1_label.html" title="Freesurfer/MNE label.">Label</a> id (optional) </p>
+
+<p>Definition at line <a class="el" href="label_8h_source.html#l00176">176</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
 
 </div>
 </div>
@@ -409,7 +461,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Name of the label </p>
 
-<p>Definition at line <a class="el" href="label_8h_source.html#l00155">155</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
+<p>Definition at line <a class="el" href="label_8h_source.html#l00171">171</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
 
 </div>
 </div>
@@ -424,7 +476,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Locations in meters </p>
 
-<p>Definition at line <a class="el" href="label_8h_source.html#l00157">157</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
+<p>Definition at line <a class="el" href="label_8h_source.html#l00173">173</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
 
 </div>
 </div>
@@ -439,7 +491,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Values at the vertices </p>
 
-<p>Definition at line <a class="el" href="label_8h_source.html#l00158">158</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
+<p>Definition at line <a class="el" href="label_8h_source.html#l00174">174</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
 
 </div>
 </div>
@@ -454,7 +506,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Vertex indices (0 based) </p>
 
-<p>Definition at line <a class="el" href="label_8h_source.html#l00156">156</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
+<p>Definition at line <a class="el" href="label_8h_source.html#l00172">172</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
 
 </div>
 </div>
@@ -465,7 +517,7 @@ Public Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 6 2013 12:42:35 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Mar 7 2013 16:51:32 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

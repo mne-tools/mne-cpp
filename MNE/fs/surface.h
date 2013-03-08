@@ -122,6 +122,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the hemisphere id (0 = lh; 1 = rh)
+    *
+    * @return hemisphere id
+    */
+    inline qint32 getHemi() const;
+
+    //=========================================================================================================
+    /**
     * mne_read_surface
     *
     * Reads a FreeSurfer surface file
@@ -144,6 +152,10 @@ public:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
+inline qint32 Surface::getHemi() const
+{
+    return hemi;
+}
 
 } // NAMESPACE
 

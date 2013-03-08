@@ -70,7 +70,7 @@ var searchData=
   ['revisionversion',['RevisionVersion',['../class_m_n_e_x_1_1_c_info.html#ae9118d8453615edc16f1546450b9c047',1,'MNEX::CInfo']]],
   ['row_5fnames',['row_names',['../class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#ae3e205f52a45955739f2d6c711a52150',1,'FIFFLIB::FiffNamedMatrix']]],
   ['rowcals',['rowcals',['../class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a17684e6406f2b16153164cb49b6d570d',1,'FIFFLIB::FiffCtfComp']]],
-  ['rr',['rr',['../struct_f_i_f_f_l_i_b_1_1__fiff_dig_string_rec.html#ab8ab44e9a7b4322867256a14d7c1cc3b',1,'FIFFLIB::_fiffDigStringRec::rr()'],['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a9efbc4bbd8c2d4efb8645fb4d1d68ae4',1,'MNELIB::MNEHemisphere::rr()']]],
+  ['rr',['rr',['../struct_f_i_f_f_l_i_b_1_1__fiff_dig_string_rec.html#ab8ab44e9a7b4322867256a14d7c1cc3b',1,'FIFFLIB::_fiffDigStringRec::rr()'],['../class_f_s_l_i_b_1_1_surface.html#ab1723f2322f50e7111bc8682486b6140',1,'FSLIB::Surface::rr()'],['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a9efbc4bbd8c2d4efb8645fb4d1d68ae4',1,'MNELIB::MNEHemisphere::rr()']]],
   ['rtclient',['RtClient',['../class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_client.html',1,'RTCLIENTLIB']]],
   ['rtclient',['RtClient',['../class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_client.html#ac53a2fac10f4c1177a71333f49e33c0d',1,'RTCLIENTLIB::RtClient']]],
   ['rtclient_2ecpp',['rtclient.cpp',['../rtclient_8cpp.html',1,'']]],

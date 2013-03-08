@@ -62,6 +62,7 @@ var searchData=
   ['_7eisensor',['~ISensor',['../class_m_n_e_x_1_1_i_sensor.html#aad5c0364093df3e6286b388d9de98b5c',1,'MNEX::ISensor']]],
   ['_7eiserver',['~IServer',['../class_r_t_s_e_r_v_e_r_1_1_i_server.html#a938204656599a29ed28b5326f430bbaf',1,'RTSERVER::IServer']]],
   ['_7elabel',['~Label',['../class_f_s_l_i_b_1_1_label.html#a39e1167a9b5827afd888780973d88894',1,'FSLIB::Label']]],
+  ['_7elabelview',['~LabelView',['../class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a3c7ec5b375db42b8984ec08f76228295',1,'DISP3DLIB::LabelView']]],
   ['_7emainsplashscreen',['~MainSplashScreen',['../class_m_n_e_x_1_1_main_splash_screen.html#a0069834f94396c8fb517d12c77223414',1,'MNEX::MainSplashScreen']]],
   ['_7emainwindow',['~MainWindow',['../class_m_n_e_x_1_1_main_window.html#ae98d00a93bc118200eeef9f9bba1dba7',1,'MNEX::MainWindow']]],
   ['_7emdl_5fid',['~MDL_ID',['../class_r_t_m_e_a_s_l_i_b_1_1_m_d_l___i_d.html#a80ebbe481460420ac23f4611ed49db0f',1,'RTMEASLIB::MDL_ID']]],
@@ -102,6 +103,7 @@ var searchData=
   ['_7estartupwidget',['~StartUpWidget',['../class_m_n_e_x_1_1_start_up_widget.html#abfc4a70fc2bc392a687d6a90469db78d',1,'MNEX::StartUpWidget']]],
   ['_7esubject',['~Subject',['../class_subject.html#a7c4f522850f718466e5be7eb55ba1969',1,'Subject']]],
   ['_7esurface',['~Surface',['../class_f_s_l_i_b_1_1_surface.html#a89de75c95cb550d432f3ea4ed1429db0',1,'FSLIB::Surface']]],
+  ['_7esurfaceset',['~SurfaceSet',['../class_f_s_l_i_b_1_1_surface_set.html#a74176d9d573614df26a73aafba5c2cb3',1,'FSLIB::SurfaceSet']]],
   ['_7etext',['~Text',['../class_r_t_m_e_a_s_l_i_b_1_1_text.html#a2d49e5c280e205125b149f7777ae30c7',1,'RTMEASLIB::Text']]],
   ['_7etextwidget',['~TextWidget',['../class_d_i_s_p_l_i_b_1_1_text_widget.html#a5236b5dabb05f7a53ab9a021bc57e413',1,'DISPLIB::TextWidget']]]
 ];

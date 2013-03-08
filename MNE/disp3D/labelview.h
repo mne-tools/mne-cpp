@@ -44,7 +44,7 @@
 #include "disp3D_global.h"
 
 #include <mne/mne.h>
-#include <fs/surface.h>
+#include <fs/surfaceset.h>
 #include <inverse/sourceestimate.h>
 
 
@@ -114,9 +114,14 @@ public:
     /**
     * Default constructor
     *
+    *
+    *
+    *
+    *
+    *
     * @param[in] parent     Parent QObject (optional)
     */
-    LabelView(Surface &p_surf, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, QWindow *parent = 0);
+    LabelView(SurfaceSet &p_surfSet, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, QWindow *parent = 0);
     
     //=========================================================================================================
     /**
@@ -148,7 +153,7 @@ protected:
 private:
 
     //Data Stuff
-    Surface m_surf;                                 /**< The surface which should be displayed. */
+    SurfaceSet m_surfSet;                                 /**< The surface which should be displayed. */
     QList<Label> m_qListLabels;                     /**< The labels. */
     QList<RowVector4i> m_qListRGBAs;                /**< The label colors encoded in RGBA. */
 
