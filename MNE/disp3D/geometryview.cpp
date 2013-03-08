@@ -213,8 +213,6 @@ void GeometryView::initializeGL(QGLPainter *painter)
         m_pLightParametersScene->setPosition(QVector3D(0.0f, 0.0f, 3.0f));
         painter->setMainLight(m_pLightParametersScene);
 
-        testCount = 0;
-
         //
         // Set stereo type
         //
@@ -232,10 +230,6 @@ void GeometryView::initializeGL(QGLPainter *painter)
 
 void GeometryView::paintGL(QGLPainter *painter)
 {
-
-
-    ++testCount;
-
     glEnable(GL_BLEND); // enable transparency
 
     //    painter->modelViewMatrix().rotate(45.0f, 1.0f, 1.0f, 1.0f);
@@ -251,9 +245,6 @@ void GeometryView::paintGL(QGLPainter *painter)
 
 //        material.bind(painter);
 //        material.prepareToDraw(painter, painter->attributes());
-
-
-    m_pSceneNode->palette()->material(15)->setSpecularColor(QColor((testCount%10)*28,(testCount%10)*28,(testCount%10)*28,1));
 
     m_pSceneNode->draw(painter);
 

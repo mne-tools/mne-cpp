@@ -131,8 +131,6 @@ private:
 
     bool m_bStereo;
 
-    qint32 testCount;
-
     QGLLightModel *m_pLightModel;    /**< The selected light model. */
     QGLLightParameters *m_pLightParametersScene;    /**< The selected light parameters. */
 
