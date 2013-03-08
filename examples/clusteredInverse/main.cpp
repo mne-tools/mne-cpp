@@ -41,7 +41,7 @@
 
 #include <fs/label.h>
 #include <fs/surface.h>
-#include <fs/annotation_set.h>
+#include <fs/annotationset.h>
 
 #include <fiff/fiff_evoked.h>
 #include <inverse/sourceestimate.h>
@@ -147,15 +147,15 @@ int main(int argc, char *argv[])
     //Source Estimate end
     //########################################################################################
 
-    Annotation t_annot("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot");
-    Surface t_surf("./MNE-sample-data/subjects/sample/surf/lh.white");
+    AnnotationSet t_annotSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot","./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
+    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
 
     QList<Label> t_qListLabels;
     QList<RowVector4i> t_qListRGBAs;
 
-    t_annot.toLabels(t_surf, t_qListLabels, t_qListRGBAs);
+    t_annotSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
 
-    LabelView view(t_surf, t_qListLabels, t_qListRGBAs);
+    LabelView view(t_surfSet, t_qListLabels, t_qListRGBAs);
 
     if (view.stereoType() != QGLView::RedCyanAnaglyph)
         view.camera()->setEyeSeparation(0.3f);

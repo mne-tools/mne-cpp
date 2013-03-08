@@ -41,7 +41,6 @@
 #include "labelview.h"
 
 #include <fs/label.h>
-#include <fs/annotation.h>
 
 
 //*************************************************************************************************************
@@ -78,9 +77,9 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-LabelView::LabelView(Surface &p_surf, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, QWindow *parent)
+LabelView::LabelView(SurfaceSet &p_surfSet, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, QWindow *parent)
 : QGLView(parent)
-, m_surf(p_surf)
+, m_surfSet(p_surfSet)
 , m_qListLabels(p_qListLabels)
 , m_qListRGBAs(p_qListRGBAs)
 , m_bStereo(true)
@@ -146,12 +145,12 @@ void LabelView::initializeGL(QGLPainter *painter)
     //
     // Build each hemisphere in its separate node
     //
-    for(qint32 h = 0; h < 1; ++h)
+    for(qint32 h = 0; h < 2; ++h)
     {
         builder.newNode();//create new hemisphere node
         {
-            MatrixX3i tris = m_surf.tris;
-            MatrixX3f rr = m_surf.rr;
+            MatrixX3i tris;
+            MatrixX3f rr = m_surfSet[h].rr;
 
             builder.pushNode();
             //
@@ -163,13 +162,8 @@ void LabelView::initializeGL(QGLPainter *painter)
                 if(m_qListLabels[k].hemi != h)
                     continue;
 
-                //check if label contains tri information
-                if(!m_qListLabels[k].hasTris())
-                {
-                    printf("No triangulations found in label \"%s\" - Generating them... ", m_qListLabels[k].name.toLatin1().constData());
-                    m_qListLabels[k].generateTris(m_surf);
-                    printf("[done]\n");
-                }
+                //Ggenerate label tri information
+                tris = m_qListLabels[k].generateTris(m_surfSet[h]);
 
                 // add new ROI node when current ROI node is not empty
                 if(builder.currentNode()->count() > 0)
@@ -179,13 +173,13 @@ void LabelView::initializeGL(QGLPainter *painter)
                 QGeometryData t_GeometryDataTri;
 
 
-                MatrixXf t_TriCoords(3,3*m_qListLabels[k].tris.rows());
+                MatrixXf t_TriCoords(3,3*tris.rows());
 
-                for(qint32 i = 0; i < m_qListLabels[k].tris.rows(); ++i)
+                for(qint32 i = 0; i < tris.rows(); ++i)
                 {
-                    t_TriCoords.col(i*3) = rr.row( m_qListLabels[k].tris(i,0) ).transpose();
-                    t_TriCoords.col(i*3+1) = rr.row( m_qListLabels[k].tris(i,1) ).transpose();
-                    t_TriCoords.col(i*3+2) = rr.row( m_qListLabels[k].tris(i,2) ).transpose();
+                    t_TriCoords.col(i*3) = rr.row( tris(i,0) ).transpose();
+                    t_TriCoords.col(i*3+1) = rr.row( tris(i,1) ).transpose();
+                    t_TriCoords.col(i*3+2) = rr.row( tris(i,2) ).transpose();
                 }
 
                 t_TriCoords *= fac;
@@ -283,11 +277,11 @@ void LabelView::paintGL(QGLPainter *painter)
 
 //    qint32 iVal = (simCount%m_nTSteps)*(255.0/m_nTSteps);
 
-    qint32 iVal = (m_vecFirstLabelSourceEstimate[simCount%m_nTSteps]/m_dMaxSourceEstimate) * 255;
-
-
-
-    m_pSceneNode->palette()->material(15)->setSpecularColor(QColor(iVal,iVal,iVal,1));
+    if(m_nTSteps > 0)
+    {
+        qint32 iVal = (m_vecFirstLabelSourceEstimate[simCount%m_nTSteps]/m_dMaxSourceEstimate) * 255;
+        m_pSceneNode->palette()->material(15)->setSpecularColor(QColor(iVal,iVal,iVal,1));
+    }
 
     m_pSceneNode->draw(painter);
 

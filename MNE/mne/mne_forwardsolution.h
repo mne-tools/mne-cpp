@@ -53,7 +53,7 @@
 
 #include <utils/mnemath.h>
 
-#include <fs/annotation_set.h>
+#include <fs/annotationset.h>
 
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_coord_trans.h>

@@ -73,17 +73,19 @@ win32 {
 SOURCES += \
     annotation.cpp \
     colortable.cpp \
-    annotation_set.cpp \
     label.cpp \
-    surface.cpp
+    surface.cpp \
+    annotationset.cpp \
+    surfaceset.cpp
 
 HEADERS += \
     annotation.h\
     fs_global.h \
     colortable.h \
-    annotation_set.h \
     label.h \
-    surface.h
+    surface.h \
+    annotationset.h \
+    surfaceset.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

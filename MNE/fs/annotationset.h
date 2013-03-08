@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     labelview.h
+* @file     annotationset.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2013
+* @date     July, 2012
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,23 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    LabelView class declaration
+* @brief    AnnotationSet class declaration
 *
 */
 
-#ifndef LABELVIEW_H
-#define LABELVIEW_H
+#ifndef ANNOTATION_SET_H
+#define ANNOTATION_SET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "disp3D_global.h"
-
-#include <mne/mne.h>
-#include <fs/surfaceset.h>
-#include <inverse/sourceestimate.h>
+#include "fs_global.h"
+#include "annotation.h"
 
 
 //*************************************************************************************************************
@@ -53,24 +50,17 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include "qglview.h"
-#include <QGeometryData>
-#include <QGLColorMaterial>
+#include <QString>
 #include <QSharedPointer>
-#include <QList>
+#include <QMap>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// Eigen INCLUDES
 //=============================================================================================================
 
-class QTimer;
-
-namespace FSLIB
-{
-class Label;
-}
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -78,7 +68,7 @@ class Label;
 // DEFINE NAMESPACE FSLIB
 //=============================================================================================================
 
-namespace DISP3DLIB
+namespace FSLIB
 {
 
 //*************************************************************************************************************
@@ -86,9 +76,7 @@ namespace DISP3DLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace FSLIB;
-using namespace INVERSELIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -96,113 +84,108 @@ using namespace INVERSELIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class SurfaceSet;
+
 
 //=============================================================================================================
 /**
-* Visualize labels using a stereoscopic view. Coloring is done per label.
+* Annotation set
 *
-* @brief 3D stereoscopic labels
+* @brief Annotation set
 */
-class DISP3DSHARED_EXPORT LabelView : public QGLView
+class FSSHARED_EXPORT AnnotationSet
 {
-    Q_OBJECT
 public:
-    typedef QSharedPointer<LabelView> SPtr;            /**< Shared pointer type for LabelView class. */
-    typedef QSharedPointer<const LabelView> ConstSPtr; /**< Const shared pointer type for LabelView class. */
-    
+    typedef QSharedPointer<AnnotationSet> SPtr;            /**< Shared pointer type for AnnotationSet. */
+    typedef QSharedPointer<const AnnotationSet> ConstSPtr; /**< Const shared pointer type for AnnotationSet. */
+
     //=========================================================================================================
     /**
     * Default constructor
-    *
-    *
-    *
-    *
-    *
-    *
-    * @param[in] parent     Parent QObject (optional)
     */
-    LabelView(SurfaceSet &p_surfSet, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, QWindow *parent = 0);
-    
-    //=========================================================================================================
-    /**
-    * Destroys the LabelView class.
-    */
-    ~LabelView();
-
-
-    void pushSourceEstimate(SourceEstimate &p_sourceEstimate);
-
-
-protected:
-    //=========================================================================================================
-    /**
-    * Initializes the current GL context represented by painter.
-    *
-    * @param[in] painter    GL painter which should be initialized
-    */
-    void initializeGL(QGLPainter *painter);
+    AnnotationSet();
 
     //=========================================================================================================
     /**
-    * Paints the scene onto painter. The color and depth buffers will have already been cleared, and the camera() position set.
+    * Constructs an annotation set by assembling given annotations
     *
-    * @param[in] painter    GL painter which is updated
+    * @param[in] p_sLHAnnotation    Left hemisphere annotation
+    * @param[in] p_sRHAnnotation    Right hemisphere annotation
     */
-    void paintGL(QGLPainter *painter);
+    explicit AnnotationSet(const Annotation& p_sLHAnnotation, const Annotation& p_sRHAnnotation);
+
+    //=========================================================================================================
+    /**
+    * Constructs an annotation set by reading from annotation files
+    *
+    * @param[in] p_sLHFileName  Left hemisphere annotation file
+    * @param[in] p_sRHFileName  Right hemisphere annotation file
+    */
+    explicit AnnotationSet(const QString& p_sLHFileName, const QString& p_sRHFileName);
+
+    //=========================================================================================================
+    /**
+    * Destroys the annotation set.
+    */
+    ~AnnotationSet(){}
+
+    //=========================================================================================================
+    /**
+    * Initializes the AnnotationSet.
+    */
+    void clear();
+
+    //=========================================================================================================
+    /**
+    * Reads different annotation files and assembles them to a AnnotationSet
+    *
+    * @param[in] p_sLHFileName  Left hemisphere annotation file
+    * @param[in] p_sRHFileName  Right hemisphere annotation file
+    * @param[out] p_AnnotationSet   The read annotation set
+    *
+    * @return true if succesfull, false otherwise
+    */
+    static bool read(const QString& p_sLHFileName, const QString& p_sRHFileName, AnnotationSet &p_AnnotationSet);
+
+    //=========================================================================================================
+    /**
+    * python labels_from_parc
+    *
+    * Converts annotation to a label list and colortable
+    *
+    * @param[in] p_surfSet              the SurfaceSet to read the vertex positions from
+    * @param[out] p_qListLabels         the converted labels are appended to a given list. Stored data are not affected.
+    * @param[out] p_qListLabelRGBAs     the converted label RGBAs are appended to a given list. Stored data are not affected.
+    *
+    * @return true if successful, false otherwise
+    */
+    bool toLabels(const SurfaceSet &p_surfSet, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListLabelRGBAs) const;
+
+    //=========================================================================================================
+    /**
+    * Subscript operator [] to access annotation by index
+    *
+    * @param[in] idx    the hemisphere index (0 or 1).
+    *
+    * @return Annotation related to the parameter index.
+    */
+    Annotation& operator[] (qint32 idx);
+
+    //=========================================================================================================
+    /**
+    * Subscript operator [] to access annotation by identifier
+    *
+    * @param[in] idt    the hemisphere identifier ("lh" or "rh").
+    *
+    * @return Annotation related to the parameter identifier.
+    */
+    Annotation& operator[] (QString idt);
 
 private:
-
-    //Data Stuff
-    SurfaceSet m_surfSet;                                 /**< The surface which should be displayed. */
-    QList<Label> m_qListLabels;                     /**< The labels. */
-    QList<RowVector4i> m_qListRGBAs;                /**< The label colors encoded in RGBA. */
-
-    //GL Stuff
-    bool m_bStereo;
-
-    QGLLightModel *m_pLightModel;                   /**< The selected light model. */
-    QGLLightParameters *m_pLightParametersScene;    /**< The selected light parameters. */
-
-    QGLColorMaterial material;
-
-    QGLSceneNode *m_pSceneNodeBrain;               /**< Scene node of the hemisphere models. */
-    QGLSceneNode *m_pSceneNode;                    /**< Node of the scene. */
-
-    QGLCamera *m_pCameraFrontal;     /**< frontal camera. */
-
-
-
-
-    SourceEstimate m_curSourceEstimate;
-    RowVectorXd m_vecFirstLabelSourceEstimate;
-    double m_dMaxSourceEstimate;
-
-    qint32 simCount;
-    qint32 m_nTSteps;
-    QTimer *m_timer;
-    void updateData();
-
-
-
-
-
-    //=========================================================================================================
-    /**
-    * Creates the scene
-    *
-    * @return the root scene noode
-    */
-//    QGLSceneNode *createScene();
+    QMap<qint32, Annotation> m_qMapAnnots;   /**< Hemisphere annotations (lh = 0; rh = 1). */
 
 };
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-
 } // NAMESPACE
 
-#endif // LABELVIEW_H
-
+#endif // ANNOTATION_SET_H

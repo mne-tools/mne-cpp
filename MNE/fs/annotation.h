@@ -129,6 +129,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the hemisphere id (0 = lh; 1 = rh)
+    *
+    * @return hemisphere id
+    */
+    inline qint32 getHemi() const;
+
+    //=========================================================================================================
+    /**
     * Returns the vertix indeces
     *
     * @return vertix indeces
@@ -169,8 +177,8 @@ public:
     * Converts annotation to a label list and colortable
     *
     * @param[in] p_surf                 the surface to read the vertex positions from
-    * @param[out] p_qListLabels         the converted labels
-    * @param[out] p_qListLabelRGBAs     the converted label RGBAs
+    * @param[out] p_qListLabels         the converted labels are appended to a given list. Stored data are not affected.
+    * @param[out] p_qListLabelRGBAs     the converted label RGBAs are appended to a given list. Stored data are not affected.
     *
     * @return true if successful, false otherwise
     */
@@ -190,6 +198,14 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+inline qint32 Annotation::getHemi() const
+{
+    return hemi;
+}
+
+
+//*************************************************************************************************************
 
 inline VectorXi& Annotation::getVertices()
 {
