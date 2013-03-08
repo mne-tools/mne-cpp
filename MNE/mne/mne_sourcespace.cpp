@@ -67,7 +67,7 @@ MNESourceSpace::MNESourceSpace()
 //*************************************************************************************************************
 
 MNESourceSpace::MNESourceSpace(const MNESourceSpace &p_MNESourceSpace)
-: hemispheres(p_MNESourceSpace.hemispheres)
+: m_qListHemispheres(p_MNESourceSpace.m_qListHemispheres)
 {
 
 }
@@ -85,7 +85,7 @@ MNESourceSpace::~MNESourceSpace()
 
 void MNESourceSpace::clear()
 {
-    hemispheres.clear();
+    m_qListHemispheres.clear();
 }
 
 
@@ -94,8 +94,8 @@ void MNESourceSpace::clear()
 QList<VectorXi> MNESourceSpace::get_vertno() const
 {
     QList<VectorXi> p_vertices;
-    for(qint32 i = 0; i < hemispheres.size(); ++i)
-        p_vertices.push_back(hemispheres[i].vertno);
+    for(qint32 i = 0; i < m_qListHemispheres.size(); ++i)
+        p_vertices.push_back(m_qListHemispheres[i].vertno);
     return p_vertices;
 }
 
@@ -108,7 +108,7 @@ QList<VectorXi> MNESourceSpace::label_src_vertno_sel(const Label &p_label, Vecto
 //        return Exception('Label are only supported with surface source spaces')
 
     QList<VectorXi> vertno;
-    vertno << this->hemispheres[0].vertno << this->hemispheres[1].vertno;
+    vertno << this->m_qListHemispheres[0].vertno << this->m_qListHemispheres[1].vertno;
 
     if (p_label.hemi == 0) //lh
     {
@@ -209,7 +209,7 @@ bool MNESourceSpace::read_source_spaces(FiffStream*& p_pStream, bool add_geom, F
         if (add_geom)
             complete_source_space_info(p_Hemisphere);
 
-        p_SourceSpace.hemispheres.append(p_Hemisphere);
+        p_SourceSpace.m_qListHemispheres.append(p_Hemisphere);
 
 //           src(k) = this;
     }
@@ -243,9 +243,9 @@ qint32 MNESourceSpace::find_source_space_hemi(MNEHemisphere& p_Hemisphere)
 
 bool MNESourceSpace::transform_source_space_to(fiff_int_t dest, FiffCoordTrans& trans)
 {
-    for(int k = 0; k < this->hemispheres.size(); ++k)
+    for(int k = 0; k < this->m_qListHemispheres.size(); ++k)
     {
-        if(!this->hemispheres[k].transform_hemisphere_to(dest,trans))
+        if(!this->m_qListHemispheres[k].transform_hemisphere_to(dest,trans))
         {
             printf("Could not transform source space.\n");
             return false;
@@ -686,12 +686,26 @@ bool MNESourceSpace::complete_source_space_info(MNEHemisphere& p_Hemisphere)
 
 MNEHemisphere& MNESourceSpace::operator[] (qint32 idx)
 {
-    if(hemispheres.size() > idx)
-        return hemispheres[idx];
+    if(m_qListHemispheres.size() > idx)
+        return m_qListHemispheres[idx];
     else
     {
         qWarning("Warning: Index out of bound! Returning last element.");
-        return hemispheres[hemispheres.size()-1];
+        return m_qListHemispheres[m_qListHemispheres.size()-1];
+    }
+}
+
+
+//*************************************************************************************************************
+
+const MNEHemisphere& MNESourceSpace::operator[] (qint32 idx) const
+{
+    if(m_qListHemispheres.size() > idx)
+        return m_qListHemispheres[idx];
+    else
+    {
+        qWarning("Warning: Index out of bound! Returning last element.");
+        return m_qListHemispheres[m_qListHemispheres.size()-1];
     }
 }
 
@@ -701,12 +715,28 @@ MNEHemisphere& MNESourceSpace::operator[] (qint32 idx)
 MNEHemisphere& MNESourceSpace::operator[] (QString idt)
 {
     if(idt.compare("lh") == 0)
-        return hemispheres[0];
+        return m_qListHemispheres[0];
     else if(idt.compare("rh") == 0)
-        return hemispheres[1];
+        return m_qListHemispheres[1];
     else
     {
         qWarning("Warning: Identifier is not 'lh' or 'rh'! Returning 'lh'.");
-        return hemispheres[0];
+        return m_qListHemispheres[0];
+    }
+}
+
+
+//*************************************************************************************************************
+
+const MNEHemisphere& MNESourceSpace::operator[] (QString idt) const
+{
+    if(idt.compare("lh") == 0)
+        return m_qListHemispheres[0];
+    else if(idt.compare("rh") == 0)
+        return m_qListHemispheres[1];
+    else
+    {
+        qWarning("Warning: Identifier is not 'lh' or 'rh'! Returning 'lh'.");
+        return m_qListHemispheres[0];
     }
 }

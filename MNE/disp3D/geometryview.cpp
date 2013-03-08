@@ -127,8 +127,8 @@ void GeometryView::initializeGL(QGLPainter *painter)
             builder.newNode();//create new hemisphere node
             {
 
-                MatrixX3i tris = m_forwardSolution.src.hemispheres[h].tris;
-                MatrixX3d rr = m_forwardSolution.src.hemispheres[h].rr;
+                MatrixX3i tris = m_forwardSolution.src[h].tris;
+                MatrixX3d rr = m_forwardSolution.src[h].rr;
 
                 builder.pushNode();
                 //

@@ -405,7 +405,7 @@ public:
 
 inline bool MNEForwardSolution::isClustered() const
 {
-    return src.hemispheres[0].isClustered();
+    return src[0].isClustered();
 }
 
 

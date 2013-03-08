@@ -118,9 +118,10 @@ public:
     inline bool numClust() const;
 
 public:
-    VectorXi orig_vertno;              /**< Original vertnos. */
+    VectorXi orig_vertno;               /**< Original vertnos. */
     QList<VectorXi> cluster_vertnos;    /**< Vertnos which belong to corresponding cluster. */
     QList<VectorXd> cluster_distances;  /**< Distances to clusters centroid. */
+    QList<int> clusterIds;              /**< Id (Label/ROI id) of the cluster. Entries can be non unique, since some Label/ROI consist of more than one cluster.*/
 };
 
 //*************************************************************************************************************

@@ -206,6 +206,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the number of stored hemispheres 0, 1 or 2
+    *
+    * @return number of stored hemispheres
+    */
+    inline qint32 size() const;
+
+    //=========================================================================================================
+    /**
     * ### MNE toolbox root function ###: Implementation of the mne_transform_source_space_to function
     * Wrapper for the MNESourceSpace transform_source_space_to member function
     *
@@ -220,6 +228,46 @@ public:
     * @return true if succeeded, false otherwise
     */
     bool transform_source_space_to(fiff_int_t dest, FiffCoordTrans& trans);
+
+    //=========================================================================================================
+    /**
+    * Subscript operator [] to access parameter values by index
+    *
+    * @param[in] idx    the hemisphere index (0 or 1).
+    *
+    * @return Hemisphere related to the parameter index.
+    */
+    MNEHemisphere& operator[] (qint32 idx);
+
+    //=========================================================================================================
+    /**
+    * Subscript operator [] to access parameter values by index
+    *
+    * @param[in] idx    the hemisphere index (0 or 1).
+    *
+    * @return Hemisphere related to the parameter index.
+    */
+    const MNEHemisphere& operator[] (qint32 idx) const;
+
+    //=========================================================================================================
+    /**
+    * Subscript operator [] to access parameter values by index
+    *
+    * @param[in] idt    the hemisphere identifier ("lh" or "rh").
+    *
+    * @return Hemisphere related to the parameter identifier.
+    */
+    MNEHemisphere& operator[] (QString idt);
+
+    //=========================================================================================================
+    /**
+    * Subscript operator [] to access parameter values by index
+    *
+    * @param[in] idt    the hemisphere identifier ("lh" or "rh").
+    *
+    * @return Hemisphere related to the parameter identifier.
+    */
+    const MNEHemisphere& operator[] (QString idt) const;
 
 private:
 
@@ -237,26 +285,6 @@ private:
 
     //=========================================================================================================
     /**
-    * Subscript operator [] to access parameter values by index
-    *
-    * @param[in] idx    the hemisphere index (0 or 1).
-    *
-    * @return Hemisphere related to the parameter index.
-    */
-    MNEHemisphere& operator[] (qint32 idx);
-
-    //=========================================================================================================
-    /**
-    * Subscript operator [] to access parameter values by index
-    *
-    * @param[in] idt    the hemisphere identifier ("lh" or "rh").
-    *
-    * @return Hemisphere related to the parameter identifier.
-    */
-    MNEHemisphere& operator[] (QString idt);
-
-    //=========================================================================================================
-    /**
     * Implementation of the read_source_space function in e.g. mne_read_source_spaces.m, mne_read_bem_surfaces.m
     *
     * Reads a single source space (hemisphere)
@@ -269,9 +297,19 @@ private:
     */
     static bool read_source_space(FiffStream* p_pStream, const FiffDirTree& p_Tree, MNEHemisphere& p_Hemisphere);
 
-public:
-    QList<MNEHemisphere> hemispheres;   /**< List of the hemispheres containing the source space information. */
+private:
+    QList<MNEHemisphere> m_qListHemispheres;    /**< List of the hemispheres containing the source space information. */
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline qint32 MNESourceSpace::size() const
+{
+    return m_qListHemispheres.size();
+}
 
 } // NAMESPACE
 
