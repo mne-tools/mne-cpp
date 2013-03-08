@@ -101,7 +101,6 @@ using namespace Eigen;
 class UTILSSHARED_EXPORT MNEMath
 {
 public:
-    typedef std::pair<int,double> IdxDoubleValue;
     typedef std::pair<int,int> IdxIntValue;         /**< Typedef of a pair of ints. */
 
     //=========================================================================================================
@@ -146,7 +145,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Find the intersection of two arrays
+    * Find the intersection of two vectors
     *
     * @param[in] v1         Input vector 1
     * @param[in] v2         Input vector 2
@@ -228,7 +227,8 @@ public:
     *
     * @return Vector of the original indeces in the new order
     */
-    static VectorXi sort(VectorXd &v, bool desc = true);
+    template<typename T>
+    static VectorXi sort(Matrix<T, Dynamic, 1> &v, bool desc = true);
 
     //=========================================================================================================
     /**
@@ -241,7 +241,8 @@ public:
     *
     * @return Vector of the original indeces in the new order
     */
-    static VectorXi sort(VectorXd &v_prime, MatrixXd &mat, bool desc = true);
+    template<typename T>
+    static VectorXi sort(Matrix<T, Dynamic, 1> &v_prime, Matrix<T, Dynamic, Dynamic> &mat, bool desc = true);
 
     //=========================================================================================================
     /**
@@ -252,7 +253,8 @@ public:
     *
     * @return true if value of lhs is bigger than value of rhs
     */
-    static inline bool compareIdxDoublePairBiggerThan( const IdxDoubleValue& lhs, const IdxDoubleValue& rhs);
+    template<typename T>
+    static inline bool compareIdxValuePairBiggerThan( const std::pair<int,T>& lhs, const std::pair<int,T>& rhs);
 
     //=========================================================================================================
     /**
@@ -263,27 +265,70 @@ public:
     *
     * @return true if value of lhs is smaller than value of rhs
     */
-    static inline bool compareIdxDoublePairSmallerThan( const IdxDoubleValue& lhs, const IdxDoubleValue& rhs);
-
-    //=========================================================================================================
-    /**
-    * Compeartor of two int pairs
-    *
-    * @param[in] lhs    pair one
-    * @param[in] rhs    pair two
-    *
-    * @return true if pair one is bigger, false otherwise
-    */
-    static inline bool compareIdxIntPairSmallerThan( const IdxIntValue& lhs, const IdxIntValue& rhs);
+    template<typename T>
+    static inline bool compareIdxValuePairSmallerThan( const std::pair<int,T>& lhs, const std::pair<int,T>& rhs);
 
 };
 
 //*************************************************************************************************************
 //=============================================================================================================
-// INLINE DEFINITIONS
+// INLINE & TEMPLATE DEFINITIONS
 //=============================================================================================================
 
-inline bool MNEMath::compareIdxDoublePairBiggerThan( const IdxDoubleValue& lhs, const IdxDoubleValue& rhs)
+template< typename T>
+VectorXi MNEMath::sort(Matrix<T, Dynamic, 1> &v, bool desc)
+{
+    std::vector< std::pair<int,T> > t_vecIdxValue;
+    VectorXi idx(v.size());
+
+    if(v.size() > 0)
+    {
+        //fill temporal vector
+        for(qint32 i = 0; i < v.size(); ++i)
+            t_vecIdxValue.push_back(std::pair<int,T>(i, v[i]));
+
+        //sort temporal vector
+        if(desc)
+            std::sort(t_vecIdxValue.begin(), t_vecIdxValue.end(), MNEMath::compareIdxValuePairBiggerThan<T>);
+        else
+            std::sort(t_vecIdxValue.begin(), t_vecIdxValue.end(), MNEMath::compareIdxValuePairSmallerThan<T>);
+
+        //store results
+        for(qint32 i = 0; i < v.size(); ++i)
+        {
+            idx[i] = t_vecIdxValue[i].first;
+            v[i] = t_vecIdxValue[i].second;
+        }
+    }
+
+    return idx;
+}
+
+
+//*************************************************************************************************************
+
+template<typename T>
+static VectorXi MNEMath::sort(Matrix<T, Dynamic, 1> &v_prime, Matrix<T, Dynamic, Dynamic> &mat, bool desc)
+{
+    VectorXi idx = MNEMath::sort<T>(v_prime, desc);
+
+    if(v_prime.size() > 0)
+    {
+        //sort Matrix
+        MatrixXd newMat(mat.rows(), mat.cols());
+        for(qint32 i = 0; i < idx.size(); ++i)
+            newMat.col(i) = mat.col(idx[i]);
+        mat = newMat;
+    }
+
+    return idx;
+}
+
+
+//*************************************************************************************************************
+
+template<typename T>
+inline bool MNEMath::compareIdxValuePairBiggerThan( const std::pair<int,T>& lhs, const std::pair<int,T>& rhs)
 {
     return lhs.second > rhs.second;
 }
@@ -291,14 +336,8 @@ inline bool MNEMath::compareIdxDoublePairBiggerThan( const IdxDoubleValue& lhs, 
 
 //*************************************************************************************************************
 
-inline bool MNEMath::compareIdxDoublePairSmallerThan( const IdxDoubleValue& lhs, const IdxDoubleValue& rhs)
-{
-    return lhs.second < rhs.second;
-}
-
-//*************************************************************************************************************
-
-inline bool MNEMath::compareIdxIntPairSmallerThan( const IdxIntValue& lhs, const IdxIntValue& rhs)
+template<typename T>
+inline bool MNEMath::compareIdxValuePairSmallerThan( const std::pair<int,T>& lhs, const std::pair<int,T>& rhs)
 {
     return lhs.second < rhs.second;
 }

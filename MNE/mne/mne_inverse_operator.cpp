@@ -477,7 +477,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo &inf
     qDebug("ToDo Sorting Necessary?");
     VectorXd p_sing = svd.singularValues();
     MatrixXd t_U = svd.matrixU();
-    MNEMath::sort(p_sing, t_U);
+    MNEMath::sort<double>(p_sing, t_U);
     FiffNamedMatrix::SDPtr p_eigen_fields = FiffNamedMatrix::SDPtr(new FiffNamedMatrix( svd.matrixU().cols(),
                                                                                         svd.matrixU().rows(),
                                                                                         defaultQStringList,
@@ -486,7 +486,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo &inf
 
     p_sing = svd.singularValues();
     MatrixXd t_V = svd.matrixV();
-    MNEMath::sort(p_sing, t_V);
+    MNEMath::sort<double>(p_sing, t_V);
     FiffNamedMatrix::SDPtr p_eigen_leads = FiffNamedMatrix::SDPtr(new FiffNamedMatrix( svd.matrixV().rows(),
                                                                                        svd.matrixV().cols(),
                                                                                        defaultQStringList,

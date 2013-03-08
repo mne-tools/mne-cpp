@@ -428,7 +428,7 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
                 //Sort singular values and singular vectors
                 VectorXd t_s = svd.singularValues();
                 MatrixXd t_U = svd.matrixU();
-                MNEMath::sort(t_s, t_U);
+                MNEMath::sort<double>(t_s, t_U);
 
                 U = t_U.block(0,0, t_U.rows(), t_U.cols()-ncomp);
 

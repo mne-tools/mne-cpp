@@ -258,7 +258,7 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
     //Sort singular values and singular vectors
     VectorXd S = svd.singularValues();
     MatrixXd t_U = svd.matrixU();
-    MNEMath::sort(S, t_U);
+    MNEMath::sort<double>(S, t_U);
 
     //
     //   Throw away the linearly dependent guys

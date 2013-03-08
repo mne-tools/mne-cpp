@@ -108,7 +108,7 @@ void MNEMath::get_whitener(MatrixXd &A, bool pca, QString ch_type, VectorXd &eig
     eig = t_eigenSolver.eigenvalues();
     eigvec = t_eigenSolver.eigenvectors().transpose();
 
-    MNEMath::sort(eig, eigvec, false);
+    MNEMath::sort<double>(eig, eigvec, false);
     qint32 rnk = MNEMath::rank(A);
 
     for(qint32 i = 0; i < eig.size()-rnk; ++i)
@@ -133,7 +133,7 @@ VectorXi MNEMath::intersect(const VectorXi &v1, const VectorXi &v2, VectorXi &id
 {
     std::vector<int> tmp;
 
-    std::vector<IdxIntValue> t_vecIdxIntValue;
+    std::vector< std::pair<int,int> > t_vecIntIdxValue;
 
     //ToDo:Slow; map VectorXi to stl container
     for(qint32 i = 0; i < v1.size(); ++i)
@@ -144,18 +144,18 @@ VectorXi MNEMath::intersect(const VectorXi &v1, const VectorXi &v2, VectorXi &id
     {
         it = std::search(tmp.begin(), tmp.end(), &v2[i], &v2[i]+1);
         if(it != tmp.end())
-            t_vecIdxIntValue.push_back(IdxIntValue(v2[i], it-tmp.begin()));
+            t_vecIntIdxValue.push_back(std::pair<int,int>(v2[i], it-tmp.begin()));//Index and int value are swapped // to sort using the idx
     }
 
-    std::sort(t_vecIdxIntValue.begin(), t_vecIdxIntValue.end(), MNEMath::compareIdxIntPairSmallerThan);
+    std::sort(t_vecIntIdxValue.begin(), t_vecIntIdxValue.end(), MNEMath::compareIdxValuePairSmallerThan<int>);
 
-    VectorXi p_res(t_vecIdxIntValue.size());
-    idx_sel = VectorXi(t_vecIdxIntValue.size());
+    VectorXi p_res(t_vecIntIdxValue.size());
+    idx_sel = VectorXi(t_vecIntIdxValue.size());
 
-    for(quint32 i = 0; i < t_vecIdxIntValue.size(); ++i)
+    for(quint32 i = 0; i < t_vecIntIdxValue.size(); ++i)
     {
-        p_res[i] = t_vecIdxIntValue[i].first;
-        idx_sel[i] = t_vecIdxIntValue[i].second;
+        p_res[i] = t_vecIntIdxValue[i].first;
+        idx_sel[i] = t_vecIntIdxValue[i].second;
     }
 
     return p_res;
@@ -380,54 +380,4 @@ MatrixXd MNEMath::rescale(const MatrixXd &data, const RowVectorXf &times, QPair<
     }
 
     return data_out;
-}
-
-
-//*************************************************************************************************************
-
-VectorXi MNEMath::sort(VectorXd& v, bool desc)
-{
-    std::vector<IdxDoubleValue> t_vecIdxDoubleValue;
-    VectorXi idx(v.size());
-
-    if(v.size() > 0)
-    {
-        //fill temporal vector
-        for(qint32 i = 0; i < v.size(); ++i)
-            t_vecIdxDoubleValue.push_back(IdxDoubleValue(i, v[i]));
-
-        //sort temporal vector
-        if(desc)
-            std::sort(t_vecIdxDoubleValue.begin(), t_vecIdxDoubleValue.end(), MNEMath::compareIdxDoublePairBiggerThan);
-        else
-            std::sort(t_vecIdxDoubleValue.begin(), t_vecIdxDoubleValue.end(), MNEMath::compareIdxDoublePairSmallerThan);
-
-        //store results
-        for(qint32 i = 0; i < v.size(); ++i)
-        {
-            idx[i] = t_vecIdxDoubleValue[i].first;
-            v[i] = t_vecIdxDoubleValue[i].second;
-        }
-    }
-
-    return idx;
-}
-
-
-//*************************************************************************************************************
-
-VectorXi MNEMath::sort(VectorXd &v_prime, MatrixXd &mat, bool desc)
-{
-    VectorXi idx = MNEMath::sort(v_prime, desc);
-
-    if(v_prime.size() > 0)
-    {
-        //sort Matrix
-        MatrixXd newMat(mat.rows(), mat.cols());
-        for(qint32 i = 0; i < idx.size(); ++i)
-            newMat.col(i) = mat.col(idx[i]);
-        mat = newMat;
-    }
-
-    return idx;
 }

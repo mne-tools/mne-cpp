@@ -510,14 +510,14 @@ bool MNESourceSpace::patch_info(MNEHemisphere &p_Hemisphere)//VectorXi& nearest,
 
     printf("\tComputing patch statistics...");
 
-    std::vector<MNEMath::IdxIntValue> t_vIndn;
+    std::vector< std::pair<int,int> > t_vIndn;
 
     for(qint32 i = 0; i < p_Hemisphere.nearest.rows(); ++i)
     {
-        MNEMath::IdxIntValue t_pair(i, p_Hemisphere.nearest(i));
+        std::pair<int,int> t_pair(i, p_Hemisphere.nearest(i));
         t_vIndn.push_back(t_pair);
     }
-    std::sort(t_vIndn.begin(),t_vIndn.end(), MNEMath::compareIdxIntPairSmallerThan );
+    std::sort(t_vIndn.begin(),t_vIndn.end(), MNEMath::compareIdxValuePairSmallerThan<int> );
 
     VectorXi nearest_sorted(t_vIndn.size());
 
