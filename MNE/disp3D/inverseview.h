@@ -58,6 +58,7 @@
 #include <QGLColorMaterial>
 #include <QSharedPointer>
 #include <QList>
+#include <QMap>
 
 
 //*************************************************************************************************************
@@ -171,7 +172,7 @@ private:
     QGLCamera *m_pCameraFrontal;     /**< frontal camera. */
 
 
-
+    QList< QMap<qint32, qint32> > m_qListMapLabelIdIndex;
 
     SourceEstimate m_curSourceEstimate;
     RowVectorXd m_dMaxActivation;

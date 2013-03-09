@@ -120,7 +120,7 @@ public:
 public:
     QList<VectorXi> clusterVertnos;    /**< Vertnos which belong to corresponding cluster. */
     QList<VectorXd> clusterDistances;  /**< Distances to clusters centroid. */
-    QList<int> clusterIds;              /**< Id (Label/ROI id) of the cluster. Entries can be non unique, since some Label/ROI consist of more than one cluster.*/
+    QList<int> clusterLabelIds;        /**< Id (Label/ROI id) of the cluster. Entries can be non unique, since some Label/ROI consist of more than one cluster.*/
 };
 
 //*************************************************************************************************************

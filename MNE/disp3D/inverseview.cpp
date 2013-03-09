@@ -90,6 +90,8 @@ InverseView::InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qL
     m_pCameraFrontal = new QGLCamera(this);
     m_pCameraFrontal->setAdjustForAspectRatio(false);
 
+    qDebug() << "p_qListLabels" << p_qListLabels.size();
+
 
     m_timer = new QTimer(this);
     QObject::connect(m_timer, &QTimer::timeout, this, &InverseView::updateData);
@@ -112,6 +114,8 @@ void InverseView::pushSourceEstimate(SourceEstimate &p_sourceEstimate)
     m_curSourceEstimate = p_sourceEstimate;
 
     m_nTimeSteps = m_curSourceEstimate.times.size();
+
+    qDebug() << "source estimates" << m_curSourceEstimate.data.rows();
 
     m_dMaxActivation = m_curSourceEstimate.data.colwise().maxCoeff();
 
@@ -138,6 +142,8 @@ void InverseView::initializeGL(QGLPainter *painter)
     // Collor palette
     qint32 index;
     QSharedPointer<QGLMaterialCollection> palette = builder.sceneNode()->palette(); // register color palette within the root node
+
+    m_qListMapLabelIdIndex << QMap<qint32, qint32>() << QMap<qint32, qint32>();
 
     //
     // Build each hemisphere in its separate node
@@ -206,9 +212,10 @@ void InverseView::initializeGL(QGLPainter *painter)
 //                        t_pMaterialROI->setEmittedLight(QColor(100,100,100,255));
 //                        t_pMaterialROI->setSpecularColor(QColor(10,10,10,20));
 
-
                     index = palette->addMaterial(t_pMaterialROI);
                     builder.currentNode()->setMaterialIndex(index);
+
+                    m_qListMapLabelIdIndex[h].insert(m_qListLabels[k].label_id, index);
                 }
             }
         }
@@ -262,7 +269,6 @@ void InverseView::paintGL(QGLPainter *painter)
     //    painter->modelViewMatrix().rotate(45.0f, 1.0f, 1.0f, 1.0f);
 
 
-
     painter->modelViewMatrix().push();
     painter->projectionMatrix().push();
 
@@ -301,14 +307,17 @@ void InverseView::updateData()
 
     VectorXd t_curLabelActivation = VectorXd::Zero(m_pSceneNode->palette()->size());
 
-    for(qint32 i = 0; i < m_sourceSpace[0].cluster_info.numClust(); ++i)
+    for(qint32 h = 0; h < 2; ++h)
     {
-        qint32 id = m_sourceSpace[0].cluster_info.clusterIds[i];
-        //search for max activation within one label - by checking if there is already an assigned value
-        if(abs(t_curLabelActivation[id]) < abs(m_curSourceEstimate.data(i, currentSample)))
-            t_curLabelActivation[id] = m_curSourceEstimate.data(i, currentSample);
+        for(qint32 i = 0; i < m_sourceSpace[h].cluster_info.numClust(); ++i)
+        {
+            qint32 labelId = m_sourceSpace[h].cluster_info.clusterLabelIds[i];
+            qint32 colorIdx = m_qListMapLabelIdIndex[h][labelId];
+            //search for max activation within one label - by checking if there is already an assigned value
+            if(abs(t_curLabelActivation[colorIdx]) < abs(m_curSourceEstimate.data(i, currentSample)))
+                t_curLabelActivation[colorIdx] = m_curSourceEstimate.data(i, currentSample);
+        }
     }
-
 
     for(qint32 i = 0; i < m_pSceneNode->palette()->size(); ++i)
     {
