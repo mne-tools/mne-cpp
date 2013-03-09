@@ -344,7 +344,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
                         clusterIdcs.conservativeResize(nClusterIdcs);
                         p_fwdOut.src[h].cluster_info.clusterVertnos.append(clusterIdcs);
                         p_fwdOut.src[h].cluster_info.clusterDistances.append(clusterDistance);
-                        p_fwdOut.src[h].cluster_info.clusterIds.append(i);
+                        p_fwdOut.src[h].cluster_info.clusterLabelIds.append(label_ids[i]);
                     }
 
                     //

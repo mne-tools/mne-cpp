@@ -65,5 +65,5 @@ void MNEClusterInfo::clear()
 {
     clusterVertnos.clear();
     clusterDistances.clear();
-    clusterIds.clear();
+    clusterLabelIds.clear();
 }
