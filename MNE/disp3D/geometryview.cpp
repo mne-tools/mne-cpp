@@ -222,6 +222,9 @@ void GeometryView::initializeGL(QGLPainter *painter)
             m_pCameraFrontal->setEyeSeparation(0.1f);
         }
 
+        //set background to white
+        glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+
     }
 
 }
@@ -233,8 +236,6 @@ void GeometryView::paintGL(QGLPainter *painter)
     glEnable(GL_BLEND); // enable transparency
 
     //    painter->modelViewMatrix().rotate(45.0f, 1.0f, 1.0f, 1.0f);
-
-
 
     painter->modelViewMatrix().push();
     painter->projectionMatrix().push();

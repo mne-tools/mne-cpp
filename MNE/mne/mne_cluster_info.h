@@ -113,9 +113,9 @@ public:
     /**
     * Returns the number of clusters
     *
-    * @return true if MNE cluster information is empty.
+    * @return number of clusters.
     */
-    inline bool numClust() const;
+    inline qint32 numClust() const;
 
 public:
     QList<VectorXi> clusterVertnos;    /**< Vertnos which belong to corresponding cluster. */
@@ -136,7 +136,7 @@ inline bool MNEClusterInfo::isEmpty() const
 
 //*************************************************************************************************************
 
-inline bool MNEClusterInfo::numClust() const
+inline qint32 MNEClusterInfo::numClust() const
 {
     return this->clusterVertnos.size();
 }
