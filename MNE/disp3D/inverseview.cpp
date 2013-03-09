@@ -85,7 +85,7 @@ InverseView::InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qL
 , m_bStereo(true)
 , m_pSceneNodeBrain(0)
 , m_pSceneNode(0)
-, m_nTSteps(0)
+, m_nTimeSteps(0)
 {
     m_pCameraFrontal = new QGLCamera(this);
     m_pCameraFrontal->setAdjustForAspectRatio(false);
@@ -111,14 +111,11 @@ void InverseView::pushSourceEstimate(SourceEstimate &p_sourceEstimate)
     m_timer->stop();
     m_curSourceEstimate = p_sourceEstimate;
 
-    m_nTSteps = m_curSourceEstimate.times.size();
+    m_nTimeSteps = m_curSourceEstimate.times.size();
 
-    qDebug() << "#########" << m_curSourceEstimate.data.rows() << m_curSourceEstimate.data.cols() << m_nTSteps;
+    m_dMaxActivation = m_curSourceEstimate.data.colwise().maxCoeff();
 
-    m_vecFirstLabelSourceEstimate = m_curSourceEstimate.data.block(0,0,3,m_curSourceEstimate.data.cols()).colwise().sum();
-
-    m_dMaxSourceEstimate = m_vecFirstLabelSourceEstimate.maxCoeff();
-
+    m_dGlobalMaximum = m_dMaxActivation.maxCoeff();
 
     m_timer->start(m_curSourceEstimate.tstep*1000);
 }
@@ -251,6 +248,8 @@ void InverseView::initializeGL(QGLPainter *painter)
         m_pCameraFrontal->setEyeSeparation(0.1f);
     }
 
+    //set background to light grey-blue
+    glClearColor(0.8f, 0.8f, 1.0f, 0.0f);
 }
 
 
@@ -273,15 +272,6 @@ void InverseView::paintGL(QGLPainter *painter)
 
 //        material.bind(painter);
 //        material.prepareToDraw(painter, painter->attributes());
-
-
-//    qint32 iVal = (simCount%m_nTSteps)*(255.0/m_nTSteps);
-
-    if(m_nTSteps > 0)
-    {
-        qint32 iVal = (m_vecFirstLabelSourceEstimate[simCount%m_nTSteps]/m_dMaxSourceEstimate) * 255;
-        m_pSceneNode->palette()->material(15)->setSpecularColor(QColor(iVal,iVal,iVal,1));
-    }
 
     m_pSceneNode->draw(painter);
 
@@ -307,7 +297,29 @@ void InverseView::paintGL(QGLPainter *painter)
 
 void InverseView::updateData()
 {
-//    qDebug() << simCount%m_nTSteps;
+    qint32 currentSample = simCount%m_nTimeSteps;
+
+    VectorXd t_curLabelActivation = VectorXd::Zero(m_pSceneNode->palette()->size());
+
+    for(qint32 i = 0; i < m_sourceSpace[0].cluster_info.numClust(); ++i)
+    {
+        qint32 id = m_sourceSpace[0].cluster_info.clusterIds[i];
+        //search for max activation within one label - by checking if there is already an assigned value
+        if(abs(t_curLabelActivation[id]) < abs(m_curSourceEstimate.data(i, currentSample)))
+            t_curLabelActivation[id] = m_curSourceEstimate.data(i, currentSample);
+    }
+
+
+    for(qint32 i = 0; i < m_pSceneNode->palette()->size(); ++i)
+    {
+        if(m_dMaxActivation[i] != 0)
+        {
+            qint32 iVal = (t_curLabelActivation[i]/m_dGlobalMaximum/*m_dMaxActivation[currentSample]*/) * 255;
+            iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
+            m_pSceneNode->palette()->material(i)->setSpecularColor(QColor(iVal,iVal,iVal,200));
+        }
+    }
+
 
     ++simCount;
 

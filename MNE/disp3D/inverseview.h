@@ -174,15 +174,13 @@ private:
 
 
     SourceEstimate m_curSourceEstimate;
-    RowVectorXd m_vecFirstLabelSourceEstimate;
-    double m_dMaxSourceEstimate;
+    RowVectorXd m_dMaxActivation;
+    double m_dGlobalMaximum;
 
     qint32 simCount;
-    qint32 m_nTSteps;
+    qint32 m_nTimeSteps;
     QTimer *m_timer;
     void updateData();
-
-
 
 
 

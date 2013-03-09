@@ -58,6 +58,7 @@
 //=============================================================================================================
 
 #include <QGuiApplication>
+#include <QSet>
 
 
 //*************************************************************************************************************
@@ -185,6 +186,17 @@ int main(int argc, char *argv[])
         view.resize(800, 600);
     }
     view.show();
+
+//    QSet<int> clusterVertnoSetLH = minimumNorm.getSourceSpace()[0].cluster_info.clusterIds.toSet();
+//    qDebug() << "LH" << clusterVertnoSetLH.size();
+//    qDebug() << "LH" << minimumNorm.getSourceSpace()[0].cluster_info.clusterVertnos.size();
+//    qDebug() << "LH" << minimumNorm.getSourceSpace()[0].cluster_info.clusterIds.size() << "ids:" << minimumNorm.getSourceSpace()[0].cluster_info.clusterIds;
+
+
+//    QSet<int> clusterVertnoSetRH = minimumNorm.getSourceSpace()[1].cluster_info.clusterIds.toSet();
+//    qDebug() << "RH" << clusterVertnoSetRH.size();
+//    qDebug() << "RH" << minimumNorm.getSourceSpace()[1].cluster_info.clusterVertnos.size();
+//    qDebug() << "RH" << minimumNorm.getSourceSpace()[1].cluster_info.clusterIds.size() << "ids:" << minimumNorm.getSourceSpace()[1].cluster_info.clusterIds;
 
     //Push Estimate
     view.pushSourceEstimate(sourceEstimate);
