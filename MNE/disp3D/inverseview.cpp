@@ -79,6 +79,7 @@ using namespace DISP3DLIB;
 
 InverseView::InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, QWindow *parent)
 : QGLView(parent)
+, m_iColorMode(0)
 , m_sourceSpace(p_sourceSpace)
 , m_qListLabels(p_qListLabels)
 , m_qListRGBAs(p_qListRGBAs)
@@ -204,9 +205,19 @@ void InverseView::initializeGL(QGLPainter *painter)
                     //
                     QGLMaterial *t_pMaterialROI = new QGLMaterial();
                     int r, g, b;
-                    r = m_qListRGBAs[k][0];
-                    g = m_qListRGBAs[k][1];
-                    b = m_qListRGBAs[k][2];
+
+                    if(m_iColorMode == 0)
+                    {
+                        r = 100;
+                        g = 100;
+                        b = 100;
+                    }
+                    else if(m_iColorMode == 1)
+                    {
+                        r = m_qListRGBAs[k][0];
+                        g = m_qListRGBAs[k][1];
+                        b = m_qListRGBAs[k][2];
+                    }
 
                     t_pMaterialROI->setColor(QColor(r,g,b,200));
 //                        t_pMaterialROI->setEmittedLight(QColor(100,100,100,255));
@@ -325,7 +336,22 @@ void InverseView::updateData()
         {
             qint32 iVal = (t_curLabelActivation[i]/m_dGlobalMaximum/*m_dMaxActivation[currentSample]*/) * 255;
             iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
-            m_pSceneNode->palette()->material(i)->setSpecularColor(QColor(iVal,iVal,iVal,200));
+
+            int r, g, b;
+            if(m_iColorMode == 0)
+            {
+                r = iVal;
+                g = iVal;
+                b = iVal;
+            }
+            else if(m_iColorMode == 1)
+            {
+                r = iVal;
+                g = iVal;
+                b = iVal;
+            }
+
+            m_pSceneNode->palette()->material(i)->setSpecularColor(QColor(r,g,b,200));
         }
     }
 

@@ -153,6 +153,7 @@ protected:
 
 private:
 
+    qint32 m_iColorMode;                            /**< used colorization mode. */
     //Data Stuff
     MNESourceSpace m_sourceSpace;                   /**< The used source space. */
     QList<Label> m_qListLabels;                     /**< The labels. */
