@@ -144,6 +144,9 @@ int main(int argc, char *argv[])
     // View activation time-series
     std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
     std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
+    std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
+    std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
+    std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
 
     //Source Estimate end
     //########################################################################################
