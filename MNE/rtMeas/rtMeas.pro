@@ -76,9 +76,9 @@ SOURCES += \
     Measurement/progressbar.cpp \
     Measurement/numeric.cpp \
     Measurement/measurement.cpp \
-    Measurement/IMeasurementprovider.cpp \
-    Measurement/IMeasurementacceptor.cpp \
-    Nomenclature/nomenclature.cpp
+    Nomenclature/nomenclature.cpp \
+    Measurement/ISink.cpp \
+    Measurement/ISource.cpp
 
 HEADERS += \
     rtmeas_global.h \
@@ -88,9 +88,9 @@ HEADERS += \
     Measurement/progressbar.h \
     Measurement/numeric.h \
     Measurement/measurement.h \
-    Measurement/IMeasurementprovider.h \
-    Measurement/IMeasurementacceptor.h \
-    Nomenclature/nomenclature.h
+    Nomenclature/nomenclature.h \
+    Measurement/ISink.h \
+    Measurement/ISource.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

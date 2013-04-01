@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     IMeasurementprovider.cpp
+* @file     ISource.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the IMeasurementProvider interface.
+* @brief    Contains the implementation of the ISource interface.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "IMeasurementprovider.h"
+#include "ISource.h"
 #include "numeric.h"
 #include "realtimesamplearray.h"
 #include "realtimemultisamplearray.h"
@@ -60,7 +60,7 @@ using namespace RTMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-IMeasurementProvider::~IMeasurementProvider()
+ISource::~ISource()
 {
 
 }
@@ -68,7 +68,7 @@ IMeasurementProvider::~IMeasurementProvider()
 
 //*************************************************************************************************************
 
-Numeric* IMeasurementProvider::addProviderNumeric(MSR_ID::Measurement_ID id)
+Numeric* ISource::addProviderNumeric(MSR_ID::Measurement_ID id)
 {
 	//ToDo Check if belongs to group (division with group id)
 	// if id already exists push warning and return the existing channel Todo Todo
@@ -82,7 +82,7 @@ Numeric* IMeasurementProvider::addProviderNumeric(MSR_ID::Measurement_ID id)
 
 //*************************************************************************************************************
 
-RealTimeSampleArray* IMeasurementProvider::addProviderRealTimeSampleArray(MSR_ID::Measurement_ID id)
+RealTimeSampleArray* ISource::addProviderRealTimeSampleArray(MSR_ID::Measurement_ID id)
 {
     RealTimeSampleArray* rtsa = new RealTimeSampleArray;
     rtsa->setID(id);
@@ -103,7 +103,7 @@ RealTimeSampleArray* IMeasurementProvider::addProviderRealTimeSampleArray(MSR_ID
 
 //*************************************************************************************************************
 
-RealTimeMultiSampleArray* IMeasurementProvider::addProviderRealTimeMultiSampleArray(MSR_ID::Measurement_ID id, unsigned int uiNumChannels)
+RealTimeMultiSampleArray* ISource::addProviderRealTimeMultiSampleArray(MSR_ID::Measurement_ID id, unsigned int uiNumChannels)
 {
     RealTimeMultiSampleArray* rtmsa = new RealTimeMultiSampleArray(uiNumChannels);
     rtmsa->setID(id);
@@ -117,7 +117,7 @@ RealTimeMultiSampleArray* IMeasurementProvider::addProviderRealTimeMultiSampleAr
 
 //*************************************************************************************************************
 
-ProgressBar* IMeasurementProvider::addProviderProgressBar(MSR_ID::Measurement_ID id)
+ProgressBar* ISource::addProviderProgressBar(MSR_ID::Measurement_ID id)
 {
     ProgressBar* progress = new ProgressBar;
     progress->setID(id);
@@ -129,7 +129,7 @@ ProgressBar* IMeasurementProvider::addProviderProgressBar(MSR_ID::Measurement_ID
 
 //*************************************************************************************************************
 
-Text* IMeasurementProvider::addProviderText(MSR_ID::Measurement_ID id)
+Text* ISource::addProviderText(MSR_ID::Measurement_ID id)
 {
     Text* text = new Text;
     text->setID(id);
@@ -141,7 +141,7 @@ Text* IMeasurementProvider::addProviderText(MSR_ID::Measurement_ID id)
 
 ////*************************************************************************************************************
 //
-//Alert* IMeasurementProvider::addProviderAlert(MSR_ID::Measurement_ID id)
+//Alert* ISource::addProviderAlert(MSR_ID::Measurement_ID id)
 //{
 //    Alert* alert = new Alert;
 //    alert->setID(id);
@@ -153,7 +153,7 @@ Text* IMeasurementProvider::addProviderText(MSR_ID::Measurement_ID id)
 
 //*************************************************************************************************************
 
-QList<MSR_ID::Measurement_ID> IMeasurementProvider::getProviderMeasurement_IDs() const
+QList<MSR_ID::Measurement_ID> ISource::getProviderMeasurement_IDs() const
 {
 	QList<MSR_ID::Measurement_ID> idList;
 	idList << getProviderNumeric_IDs();
@@ -168,7 +168,7 @@ QList<MSR_ID::Measurement_ID> IMeasurementProvider::getProviderMeasurement_IDs()
 
 //*************************************************************************************************************
 
-QList<MSR_ID::Measurement_ID> IMeasurementProvider::getProviderNumeric_IDs() const
+QList<MSR_ID::Measurement_ID> ISource::getProviderNumeric_IDs() const
 {
 	QList<MSR_ID::Measurement_ID> idList;
 	idList << m_hashNumeric.uniqueKeys();
@@ -179,7 +179,7 @@ QList<MSR_ID::Measurement_ID> IMeasurementProvider::getProviderNumeric_IDs() con
 
 //*************************************************************************************************************
 
-QList<MSR_ID::Measurement_ID> IMeasurementProvider::getProviderRTSA_IDs() const
+QList<MSR_ID::Measurement_ID> ISource::getProviderRTSA_IDs() const
 {
 	QList<MSR_ID::Measurement_ID> idList;
 	idList << m_hashRealTimeSampleArray.uniqueKeys();
@@ -190,7 +190,7 @@ QList<MSR_ID::Measurement_ID> IMeasurementProvider::getProviderRTSA_IDs() const
 
 //*************************************************************************************************************
 
-QList<MSR_ID::Measurement_ID> IMeasurementProvider::getProviderRTMSA_IDs() const
+QList<MSR_ID::Measurement_ID> ISource::getProviderRTMSA_IDs() const
 {
     QList<MSR_ID::Measurement_ID> idList;
     idList << m_hashRealTimeMultiSampleArray.uniqueKeys();
@@ -201,7 +201,7 @@ QList<MSR_ID::Measurement_ID> IMeasurementProvider::getProviderRTMSA_IDs() const
 
 //*************************************************************************************************************
 
-QList<MSR_ID::Measurement_ID> IMeasurementProvider::getProviderProgressbar_IDs() const
+QList<MSR_ID::Measurement_ID> ISource::getProviderProgressbar_IDs() const
 {
 	QList<MSR_ID::Measurement_ID> idList;
 	idList << m_hashProgressBar.uniqueKeys();
@@ -212,7 +212,7 @@ QList<MSR_ID::Measurement_ID> IMeasurementProvider::getProviderProgressbar_IDs()
 
 //*************************************************************************************************************
 
-QList<MSR_ID::Measurement_ID> IMeasurementProvider::getProviderText_IDs() const
+QList<MSR_ID::Measurement_ID> ISource::getProviderText_IDs() const
 {
 	QList<MSR_ID::Measurement_ID> idList;
 	idList << m_hashText.uniqueKeys();
@@ -223,7 +223,7 @@ QList<MSR_ID::Measurement_ID> IMeasurementProvider::getProviderText_IDs() const
 
 ////*************************************************************************************************************
 //
-//QList<MSR_ID::Measurement_ID> IMeasurementProvider::getProviderAlert_IDs() const
+//QList<MSR_ID::Measurement_ID> ISource::getProviderAlert_IDs() const
 //{
 //	QList<MSR_ID::Measurement_ID> idList;
 //	idList << m_hashAlert.uniqueKeys();
@@ -234,7 +234,7 @@ QList<MSR_ID::Measurement_ID> IMeasurementProvider::getProviderText_IDs() const
 
 //*************************************************************************************************************
 
-void IMeasurementProvider::cleanProvider()
+void ISource::cleanProvider()
 {
     foreach (Numeric* value, m_hashNumeric)
     		delete value;

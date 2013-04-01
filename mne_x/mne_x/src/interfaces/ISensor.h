@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../../MNE/rtMeas/Measurement/IMeasurementprovider.h"
+#include "../../MNE/rtMeas/Measurement/ISource.h"
 
 #include "../../MNE/rtMeas/Nomenclature/nomenclature.h"
 
@@ -62,9 +62,9 @@ namespace MNEX
 *
 * @brief The ISensor class provides an interface for a sensor module.
 */
-class ISensor : public IMeasurementProvider
+class ISensor : public ISource
 {
-//ToDo virtual methods of IMeasurementProvider
+//ToDo virtual methods of ISource
 public:
 
     //=========================================================================================================

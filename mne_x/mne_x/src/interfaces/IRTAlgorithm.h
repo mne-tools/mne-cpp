@@ -44,8 +44,8 @@
 
 #include <rtMeas/Nomenclature/nomenclature.h>
 
-#include <rtMeas/Measurement/IMeasurementprovider.h>
-#include <rtMeas/Measurement/IMeasurementacceptor.h>
+#include <rtMeas/Measurement/ISource.h>
+#include <rtMeas/Measurement/ISink.h>
 
 
 
@@ -64,9 +64,9 @@ namespace MNEX
 *
 * @brief The IRTAlgorithm class provides an interface for a real-time algorithm module.
 */
-class IRTAlgorithm : public IMeasurementProvider, public IMeasurementAcceptor
+class IRTAlgorithm : public ISource, public ISink
 {
-//ToDo virtual methods of IMeasurementAcceptor && IMeasurementProvider
+//ToDo virtual methods of ISink && ISource
 public:
 
     //=========================================================================================================

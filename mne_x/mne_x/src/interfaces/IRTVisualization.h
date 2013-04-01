@@ -42,8 +42,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <rtMeas/Measurement/IMeasurementprovider.h>
-#include <rtMeas/Measurement/IMeasurementacceptor.h>
+#include <rtMeas/Measurement/ISource.h>
+#include <rtMeas/Measurement/ISink.h>
 
 #include <rtMeas/Nomenclature/nomenclature.h>
 
@@ -63,9 +63,9 @@ namespace MNEX
 *
 * @brief The IRTVisualization class provides an interface for a real-time algorithm module.
 */
-class IRTVisualization :  public IMeasurementProvider, public IMeasurementAcceptor
+class IRTVisualization :  public ISource, public ISink
 {
-//ToDo virtual methods of IMeasurementAcceptor && IMeasurementProvider
+//ToDo virtual methods of ISink && ISource
 public:
 
     //=========================================================================================================
