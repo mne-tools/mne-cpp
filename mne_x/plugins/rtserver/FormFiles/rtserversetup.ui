@@ -23,7 +23,7 @@
       </font>
      </property>
      <property name="text">
-      <string>ECG Simulator Configuration</string>
+      <string>RT Client Configuration</string>
      </property>
     </widget>
    </item>
