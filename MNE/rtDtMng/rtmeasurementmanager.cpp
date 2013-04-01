@@ -39,8 +39,8 @@
 //=============================================================================================================
 
 #include "rtmeasurementmanager.h"
-#include <rtMeas/Measurement/IMeasurementprovider.h>
-#include <rtMeas/Measurement/IMeasurementacceptor.h>
+#include <rtMeas/Measurement/ISource.h>
+#include <rtMeas/Measurement/ISink.h>
 
 #include <rtMeas/Measurement/realtimesamplearray.h>
 #include <rtMeas/Measurement/realtimemultisamplearray.h>
@@ -89,7 +89,7 @@ RTMeasurementManager::~RTMeasurementManager()
 
 //*************************************************************************************************************
 
-void RTMeasurementManager::addMeasurementProvider(IMeasurementProvider* pMSRPrv)
+void RTMeasurementManager::addMeasurementProvider(ISource* pMSRPrv)
 {
     qDebug() << "Number of Measurement Providers before: "<< s_hashMeasurementProvider.size() << "keys" << s_hashMeasurementProvider.keys();
     qDebug() << "Adding Measurement Provider: "<< pMSRPrv->getModule_ID();
@@ -103,7 +103,7 @@ void RTMeasurementManager::addMeasurementProvider(IMeasurementProvider* pMSRPrv)
 
 //*************************************************************************************************************
 
-void RTMeasurementManager::addMeasurementAcceptor(IModule* pMSRAcc)//IMeasurementAcceptor* pMSRAcc)
+void RTMeasurementManager::addMeasurementAcceptor(IModule* pMSRAcc)//ISink* pMSRAcc)
 {
 	qDebug() << "Number of Measurement Acceptors before: "<< s_hashMeasurementAcceptor.size() << "keys" << s_hashMeasurementAcceptor.keys();
     qDebug() << "Adding Measurement Acceptor: "<< pMSRAcc->getModule_ID();
@@ -136,7 +136,7 @@ void RTMeasurementManager::attachToRTSA(IObserver* pObserver, QList<MDL_ID::Modu
     {
     	if(s_hashMeasurementProvider.contains(mdl_id))
     	{
-            IMeasurementProvider* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            ISource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
 			msr_idList += pMsrPvr->getProviderRTSA().keys();
     	}
     	else
@@ -154,7 +154,7 @@ void RTMeasurementManager::attachToRTSA(IObserver* pObserver, QList<MDL_ID::Modu
     {
     	if(s_hashMeasurementProvider.contains(mdl_id))
     	{
-            IMeasurementProvider* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            ISource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
 		    foreach(MSR_ID::Measurement_ID msr_id, msr_idList)
 		    {
 		    	if(pMsrPvr->getProviderRTSA().contains(msr_id))
@@ -183,7 +183,7 @@ void RTMeasurementManager::attachWidgetsToRTSA(MDL_ID::Module_ID mdl_id, QTime* 
 	qDebug() << "Number of Measurement Providers to attach Widget RTSA to: " << s_hashMeasurementProvider.size();
 	if(s_hashMeasurementProvider.contains(mdl_id))
 	{
-        IMeasurementProvider* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+        ISource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
 		foreach(MSR_ID::Measurement_ID msr_id, pMsrPvr->getProviderRTSA().keys())
 			attachWidgetToRTSA(mdl_id, msr_id, t);
 	}
@@ -198,7 +198,7 @@ void RTMeasurementManager::attachWidgetToRTSA(MDL_ID::Module_ID mdl_id, MSR_ID::
 {
 	if(s_hashMeasurementProvider.contains(mdl_id))
 	{
-        IMeasurementProvider* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+        ISource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
 		if(pMsrPvr->getProviderRTSA().contains(msr_id))
 		{
 			RealTimeSampleArray* pRTSA = pMsrPvr->getProviderRTSA().value(msr_id);
@@ -238,7 +238,7 @@ void RTMeasurementManager::detachFromRTSA(IObserver* pObserver, QList<MDL_ID::Mo
     {
     	if(s_hashMeasurementProvider.contains(mdl_id))
     	{
-            IMeasurementProvider* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            ISource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
 			msr_idList += pMsrPvr->getProviderRTSA().keys();
     	}
     	else
@@ -257,7 +257,7 @@ void RTMeasurementManager::detachFromRTSA(IObserver* pObserver, QList<MDL_ID::Mo
     {
     	if(s_hashMeasurementProvider.contains(mdl_id))
     	{
-            IMeasurementProvider* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            ISource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
 		    foreach(MSR_ID::Measurement_ID msr_id, msr_idList)
 		    {
 		    	if(pMsrPvr->getProviderRTSA().contains(msr_id))
@@ -334,7 +334,7 @@ void RTMeasurementManager::attachToRTMSA(IObserver* pObserver, QList<MDL_ID::Mod
     {
         if(s_hashMeasurementProvider.contains(mdl_id))
         {
-            IMeasurementProvider* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            ISource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
             msr_idList += pMsrPvr->getProviderRTMSA().keys();
         }
         else
@@ -352,7 +352,7 @@ void RTMeasurementManager::attachToRTMSA(IObserver* pObserver, QList<MDL_ID::Mod
     {
         if(s_hashMeasurementProvider.contains(mdl_id))
         {
-            IMeasurementProvider* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            ISource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
             foreach(MSR_ID::Measurement_ID msr_id, msr_idList)
             {
                 if(pMsrPvr->getProviderRTMSA().contains(msr_id))
@@ -381,7 +381,7 @@ void RTMeasurementManager::attachWidgetsToRTMSA(MDL_ID::Module_ID mdl_id, QTime*
     qDebug() << "Number of Measurement Providers to attach Widget RTSA to: " << s_hashMeasurementProvider.size();
     if(s_hashMeasurementProvider.contains(mdl_id))
     {
-        IMeasurementProvider* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+        ISource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
         foreach(MSR_ID::Measurement_ID msr_id, pMsrPvr->getProviderRTMSA().keys())
             attachWidgetToRTMSA(mdl_id, msr_id, t);
     }
@@ -396,7 +396,7 @@ void RTMeasurementManager::attachWidgetToRTMSA(MDL_ID::Module_ID mdl_id, MSR_ID:
 {
     if(s_hashMeasurementProvider.contains(mdl_id))
     {
-        IMeasurementProvider* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+        ISource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
         if(pMsrPvr->getProviderRTMSA().contains(msr_id))
         {
             RealTimeMultiSampleArray* pRTMSA = pMsrPvr->getProviderRTMSA().value(msr_id);
@@ -436,7 +436,7 @@ void RTMeasurementManager::detachFromRTMSA(IObserver* pObserver, QList<MDL_ID::M
     {
         if(s_hashMeasurementProvider.contains(mdl_id))
         {
-            IMeasurementProvider* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            ISource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
             msr_idList += pMsrPvr->getProviderRTMSA().keys();
         }
         else
@@ -455,7 +455,7 @@ void RTMeasurementManager::detachFromRTMSA(IObserver* pObserver, QList<MDL_ID::M
     {
         if(s_hashMeasurementProvider.contains(mdl_id))
         {
-            IMeasurementProvider* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            ISource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
             foreach(MSR_ID::Measurement_ID msr_id, msr_idList)
             {
                 if(pMsrPvr->getProviderRTMSA().contains(msr_id))
@@ -505,7 +505,7 @@ void RTMeasurementManager::detachFromRTMSA(IObserver* pObserver, QList<MDL_ID::M
 
 void RTMeasurementManager::attachToNumeric(IObserver* pObserver) //attaching to all Measurements of all Measurement Providers
 {
-    foreach(IMeasurementProvider* pMsrPvr, s_hashMeasurementProvider.values())
+    foreach(ISource* pMsrPvr, s_hashMeasurementProvider.values())
     {
         foreach(Numeric* pNum, pMsrPvr->getProviderNumeric().values())
         {
@@ -523,7 +523,7 @@ void RTMeasurementManager::attachToNumeric(IObserver* pObserver, QList<MDL_ID::M
     {
         if(s_hashMeasurementProvider.contains(mdl_id))
         {
-            IMeasurementProvider* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            ISource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
             foreach(Numeric* pNum, pMsrPvr->getProviderNumeric().values())
             {
                 pNum->attach(pObserver);
@@ -545,7 +545,7 @@ void RTMeasurementManager::attachToNumeric(IObserver* pObserver, QList<MDL_ID::M
     {
     	if(s_hashMeasurementProvider.contains(mdl_id))
     	{
-    		IMeasurementProvider* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            ISource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
 		    foreach(MSR_ID::Measurement_ID msr_id, msr_idList)
 		    {
 		    	if(pMsrPvr->getProviderNumeric().contains(msr_id))
@@ -573,7 +573,7 @@ void RTMeasurementManager::attachWidgetsToNumeric(MDL_ID::Module_ID mdl_id) //at
 {
 	if(s_hashMeasurementProvider.contains(mdl_id))
 	{
-		IMeasurementProvider* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+        ISource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
 		foreach(MSR_ID::Measurement_ID msr_id, pMsrPvr->getProviderNumeric().keys())
 			attachWidgetToNumeric(mdl_id, msr_id);
 	}
@@ -588,7 +588,7 @@ void RTMeasurementManager::attachWidgetToNumeric(MDL_ID::Module_ID mdl_id, MSR_I
 {
 	if(s_hashMeasurementProvider.contains(mdl_id))
 	{
-		IMeasurementProvider* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+        ISource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
 		if(pMsrPvr->getProviderNumeric().contains(msr_id))
 		{
 			Numeric* pNum = pMsrPvr->getProviderNumeric().value(msr_id);
@@ -633,7 +633,7 @@ void RTMeasurementManager::detachFromNumeric(IObserver* pObserver, QList<MDL_ID:
     {
     	if(s_hashMeasurementProvider.contains(mdl_id))
     	{
-            IMeasurementProvider* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            ISource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
 
 			qDebug() << "RTMeasurementManager::detachFromNumeric: MSR_ID::Measurement_IDS: " << pMsrPvr->getProviderRTSA().keys();
 			foreach(Numeric* pNum, pMsrPvr->getProviderNumeric().values())
@@ -674,7 +674,7 @@ void RTMeasurementManager::detachFromNumeric(IObserver* pObserver, QList<MDL_ID:
     {
     	if(s_hashMeasurementProvider.contains(mdl_id))
     	{
-    		IMeasurementProvider* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            ISource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
 		    foreach(MSR_ID::Measurement_ID msr_id, msr_idList)
 		    {
 		    	if(pMsrPvr->getProviderNumeric().contains(msr_id))
@@ -783,10 +783,10 @@ void RTMeasurementManager::clean()
 {
     qDebug()<<"RTMeasurementManager::clean(): Cleaning up rt measurement manager";
 
-//    foreach (IMeasurementProvider* value, s_hashMeasurementProvider)
+//    foreach (ISource* value, s_hashMeasurementProvider)
 //    		delete value;
 //
-//    foreach (IMeasurementAcceptor* value, s_hashMeasurementAcceptor)
+//    foreach (ISink* value, s_hashMeasurementAcceptor)
 //    		delete value;
 
     s_hashMeasurementProvider.clear();
@@ -799,5 +799,5 @@ void RTMeasurementManager::clean()
 // STATIC DEFINITIONS
 //=============================================================================================================
 
-QHash<MDL_ID::Module_ID, IMeasurementProvider*>    RTMeasurementManager::s_hashMeasurementProvider;
+QHash<MDL_ID::Module_ID, ISource*>    RTMeasurementManager::s_hashMeasurementProvider;
 QHash<MDL_ID::Module_ID, IModule*>    RTMeasurementManager::s_hashMeasurementAcceptor;

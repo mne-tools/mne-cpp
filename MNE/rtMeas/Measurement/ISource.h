@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     IMeasurementprovider.h
+* @file     ISource.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the IMeasurementProvider interface.
+* @brief    Contains the declaration of the ISource interface.
 *
 */
 
@@ -96,19 +96,19 @@ using namespace MNEX;
 //Measuerement manager
 //=========================================================================================================
 /**
-* DECLARE INTERFACE IMeasurementProvider
+* DECLARE INTERFACE ISource
 *
-* @brief The IMeasurementProvider class provides an interface for a measurement provider. Todo check what's virtual and write this to inherits todo add measurement providers, if measurement provider with id exists already return pointer to MeasurementProvider
+* @brief The ISource class provides an interface for a measurement provider. Todo check what's virtual and write this to inherits todo add measurement providers, if measurement provider with id exists already return pointer to MeasurementProvider
 */
-class RTMEASSHARED_EXPORT IMeasurementProvider : public IModule
+class RTMEASSHARED_EXPORT ISource : public IModule
 {
 public:
 
     //=========================================================================================================
     /**
-    * Destroys the IMeasurementProvider.
+    * Destroys the ISource.
     */
-    virtual ~IMeasurementProvider();
+    virtual ~ISource();
 
 
 

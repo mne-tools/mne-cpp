@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     IMeasurementacceptor.cpp
+* @file     ISink.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the IMeasurementAcceptor interface.
+* @brief    Contains the implementation of the ISink interface.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "IMeasurementacceptor.h"
+#include "ISink.h"
 
 
 #include <QDebug>
@@ -56,7 +56,7 @@ using namespace RTMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-IMeasurementAcceptor::IMeasurementAcceptor()
+ISink::ISink()
 : m_pHashBuffers(new QHash<MSR_ID::Measurement_ID, Buffer_old*>)
 {
 
@@ -65,7 +65,7 @@ IMeasurementAcceptor::IMeasurementAcceptor()
 
 //*************************************************************************************************************
 
-IMeasurementAcceptor::~IMeasurementAcceptor()
+ISink::~ISink()
 {
 //	foreach(Buffer* buf, m_pHashBuffers->values())
 
@@ -79,7 +79,7 @@ IMeasurementAcceptor::~IMeasurementAcceptor()
 
 //*************************************************************************************************************
 
-void IMeasurementAcceptor::addModule(MDL_ID::Module_ID id)
+void ISink::addModule(MDL_ID::Module_ID id)
 {
     if(!m_qList_MDL_ID.contains(id))
         m_qList_MDL_ID.append(id);
@@ -88,7 +88,7 @@ void IMeasurementAcceptor::addModule(MDL_ID::Module_ID id)
 
 //*************************************************************************************************************
 
-void IMeasurementAcceptor::addAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id, Buffer_old* buffer)
+void ISink::addAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id, Buffer_old* buffer)
 {
 //ToDo test at the same time if measurement is accepted
     qDebug() << "inside adding Measurement";
@@ -99,7 +99,7 @@ void IMeasurementAcceptor::addAcceptorMeasurementBuffer(MSR_ID::Measurement_ID i
 
 //*************************************************************************************************************
 
-Buffer_old* IMeasurementAcceptor::getAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id)
+Buffer_old* ISink::getAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id)
 {
     if(m_pHashBuffers->contains(id))
         return m_pHashBuffers->value(id);
@@ -110,9 +110,9 @@ Buffer_old* IMeasurementAcceptor::getAcceptorMeasurementBuffer(MSR_ID::Measureme
 
 //*************************************************************************************************************
 
-void IMeasurementAcceptor::cleanAcceptor()
+void ISink::cleanAcceptor()
 {
-    qDebug()<<"IMeasurementAcceptor::clean(): Cleaning up IMeasurementAcceptor";
+    qDebug()<<"ISink::clean(): Cleaning up ISink";
 
     m_pHashBuffers->clear();
 }
