@@ -53,7 +53,15 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT STL INCLUDES
+// MNE INCLUDES
+//=============================================================================================================
+
+#include <rtClient/rtclient.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QtWidgets>
@@ -76,6 +84,7 @@ namespace RTServerPlugin
 
 using namespace MNEX;
 using namespace IOBuffer;
+using namespace RTCLIENTLIB;
 
 
 //*************************************************************************************************************
@@ -162,6 +171,8 @@ private:
     RTServerChannel* m_pRTServerChannel_ECG_I;      /**< Holds the simulation channel for ECG I.*/
     RTServerChannel* m_pRTServerChannel_ECG_II;     /**< Holds the simulation channel for ECG II.*/
     RTServerChannel* m_pRTServerChannel_ECG_III;    /**< Holds the simulation channel for ECG III.*/
+
+    RtClient*       m_pRtClient;
 };
 
 } // NAMESPACE

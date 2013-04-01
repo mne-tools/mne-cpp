@@ -86,6 +86,14 @@ RTServer::RTServer()
 , m_pRTServerChannel_ECG_III(new RTServerChannel(m_qStringResourcePath+"data/", QString("ECG_III_256_s30661.txt")))
 {
     m_MDL_ID = MDL_ID::ECGSIM;
+
+
+
+    m_pRtClient = new RtClient("127.0.0.1", this);
+
+    // Start RtClient - ToDo just perform a rtserver check
+    m_pRtClient->start();
+
 }
 
 
