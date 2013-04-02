@@ -77,8 +77,8 @@ SOURCES += \
     Measurement/numeric.cpp \
     Measurement/measurement.cpp \
     Nomenclature/nomenclature.cpp \
-    Measurement/ISink.cpp \
-    Measurement/ISource.cpp
+    Measurement/IMeasurementSink.cpp \
+    Measurement/IMeasurementSource.cpp
 
 HEADERS += \
     rtmeas_global.h \
@@ -89,8 +89,8 @@ HEADERS += \
     Measurement/numeric.h \
     Measurement/measurement.h \
     Nomenclature/nomenclature.h \
-    Measurement/ISink.h \
-    Measurement/ISource.h
+    Measurement/IMeasurementSink.h \
+    Measurement/IMeasurementSource.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

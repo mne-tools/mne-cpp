@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     ISink.h
+* @file     IMeasurementSink.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ISink interface.
+* @brief    Contains the declaration of the IMeasurementSink interface.
 *
 */
 
-#ifndef ISINK_H
-#define ISINK_H
+#ifndef IMEASUREMENTSINK_H
+#define IMEASUREMENTSINK_H
 
 
 
@@ -92,24 +92,24 @@ using namespace IOBuffer;
 
 //=========================================================================================================
 /**
-* DECLARE INTERFACE ISink
+* DECLARE INTERFACE IMeasurementSink
 *
-* @brief The ISink class provides an interface for a measurement acceptor. Todo check what's virtual and write this to inherits
+* @brief The IMeasurementSink class provides an interface for a measurement acceptor. Todo check what's virtual and write this to inherits
 */
-class RTMEASSHARED_EXPORT ISink : public IObserver
+class RTMEASSHARED_EXPORT IMeasurementSink : public IObserver
 {
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a ISink.
+    * Constructs a IMeasurementSink.
     */
-    ISink();
+    IMeasurementSink();
     //=========================================================================================================
     /**
-    * Destroys the ISink.
+    * Destroys the IMeasurementSink.
     */
-    virtual ~ISink();
+    virtual ~IMeasurementSink();
 
     //=========================================================================================================
     /**
@@ -177,7 +177,7 @@ protected:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline QList<MDL_ID::Module_ID> ISink::getAcceptorModule_IDs() const
+inline QList<MDL_ID::Module_ID> IMeasurementSink::getAcceptorModule_IDs() const
 {
     return m_qList_MDL_ID;
 }
@@ -185,11 +185,11 @@ inline QList<MDL_ID::Module_ID> ISink::getAcceptorModule_IDs() const
 
 //*************************************************************************************************************
 
-inline QList<MSR_ID::Measurement_ID> ISink::getAcceptorMeasurement_IDs() const
+inline QList<MSR_ID::Measurement_ID> IMeasurementSink::getAcceptorMeasurement_IDs() const
 {
     return m_pHashBuffers->keys();
 }
 
 } // NAMESPACE
 
-#endif // ISINK_H
+#endif // IMEASUREMENTSINK_H
