@@ -114,16 +114,16 @@ public:
     * Creates the real-time client.
     *
     * @param[in] p_sRtServerHostname    The IP address of the mne_rt_server
+    * @param[in] p_sClientAlias         The client alias of the data client.
     * @param[in] parent                 Parent QObject (optional)
     */
-    explicit RtClient(QString p_sRtServerHostname,QObject *parent = 0);
+    explicit RtClient(QString p_sRtServerHostname, QString p_sClientAlias = "rtclient", QObject *parent = 0);
     
     //=========================================================================================================
     /**
     * Destroys the real time client.
     */
     ~RtClient();
-
 
     //=========================================================================================================
     /**
@@ -133,6 +133,14 @@ public:
     {
         return m_fiffInfo;
     }
+
+    //=========================================================================================================
+    /**
+    * Rt Server status, returns true when rt server is started.
+    *
+    * @return true if started, false otherwise
+    */
+    bool rtServerStatus();
 
     //=========================================================================================================
     /**
@@ -153,7 +161,10 @@ protected:
 
 private:
     QMutex      mutex;                  /**< Provides access serialization between threads*/
+    bool        m_bIsConnected;         /**< Is Connected. */
+    bool        m_bIsMeasuring;         /**< Is Measuring. */
     bool        m_bIsRunning;           /**< Holds whether RtClient is running.*/
+    QString     m_sClientAlias;         /**< The clien alias of the data client */
     QString     m_sRtServerHostName;    /**< The IP Adress of mne_rt_server.*/
     FiffInfo    m_fiffInfo;        /**< Fiff measurement info.*/
 

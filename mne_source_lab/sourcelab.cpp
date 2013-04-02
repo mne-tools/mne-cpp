@@ -66,7 +66,7 @@ SourceLab::SourceLab(QObject *parent)
     qRegisterMetaType<MNEInverseOperator>("MNEInverseOperator");
     qRegisterMetaType<FiffCov>("FiffCov");
 
-    m_pRtClient = new RtClient("127.0.0.1", this);
+    m_pRtClient = new RtClient("127.0.0.1", "mne_source_lab", this);
     connect(m_pRtClient, &RtClient::rawBufferReceived,
             this, &SourceLab::receiveRawBuffer);
     this->start();

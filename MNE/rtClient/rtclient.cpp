@@ -58,9 +58,12 @@ using namespace RTCLIENTLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtClient::RtClient(QString p_sRtServerHostname, QObject *parent)
+RtClient::RtClient(QString p_sRtServerHostname, QString p_sClientAlias, QObject *parent)
 : QThread(parent)
+, m_bIsConnected(false)
+, m_bIsMeasuring(false)
 , m_bIsRunning(false)
+, m_sClientAlias(p_sClientAlias)
 , m_sRtServerHostName(p_sRtServerHostname)
 {
 }
@@ -71,6 +74,14 @@ RtClient::RtClient(QString p_sRtServerHostname, QObject *parent)
 RtClient::~RtClient()
 {
     stop();
+}
+
+
+//*************************************************************************************************************
+
+bool RtClient::rtServerStatus()
+{
+    return m_bIsConnected;
 }
 
 
@@ -91,16 +102,53 @@ void RtClient::run()
 {
     m_bIsRunning = true;
 
+    //
+    // Connect Clients
+    //
     RtCmdClient t_cmdClient;
     t_cmdClient.connectToHost(m_sRtServerHostName);
-    t_cmdClient.waitForConnected();
+    t_cmdClient.waitForConnected(1000);
+
+    while(t_cmdClient.state() != QTcpSocket::ConnectedState)
+    {
+        msleep(100);
+        t_cmdClient.connectToHost(m_sRtServerHostName);
+        t_cmdClient.waitForConnected(1000);
+    }
 
     RtDataClient t_dataClient;
     t_dataClient.connectToHost(m_sRtServerHostName);
     t_dataClient.waitForConnected();
 
+    mutex.lock();
+    m_bIsConnected = true;
+    mutex.unlock();
+
+    msleep(1000);
+
+    //
+    // get client ID
+    //
+    qint32 clientId = t_dataClient.getClientId();
+
+    //
+    // request available commands
+    //
+    t_cmdClient.requestCommands();
+
+
+    //
+    // Inits
+    //
+    MatrixXf t_matRawBuffer;
+
+    fiff_int_t kind;
+
+    qint32 from = 0;
+    qint32 to = -1;
+
     // set data client alias -> for convinience (optional)
-    t_dataClient.setClientAlias("mne_source_lab"); // used in option 2 later on
+    t_dataClient.setClientAlias(m_sClientAlias); // used in option 2 later on
 
 //    // example commands
 //    t_cmdClient["help"].send();
@@ -112,10 +160,7 @@ void RtClient::run()
 //    t_cmdClient["conlist"].send();
 //    t_cmdClient.waitForDataAvailable(1000);
 //    qDebug() << t_cmdClient.readAvailableData();
-    qint32 clientId = t_dataClient.getClientId();
 
-    // requestCommands
-    t_cmdClient.requestCommands();
 
     // read meas info
     t_cmdClient["measinfo"].pValues()[0].setValue(clientId);
@@ -127,15 +172,12 @@ void RtClient::run()
     t_cmdClient["start"].pValues()[0].setValue(clientId);
     t_cmdClient["start"].send();
 
-    MatrixXf t_matRawBuffer;
-
-    fiff_int_t kind;
-
-    qint32 from = 0;
-    qint32 to = -1;
-
     while(m_bIsRunning)
     {
+
+//        while(m_bIsMeasuring)
+
+
         t_dataClient.readRawBuffer(m_fiffInfo.nchan, t_matRawBuffer, kind);
 
         if(kind == FIFF_DATA_BUFFER)
@@ -151,4 +193,10 @@ void RtClient::run()
 
         printf("[done]\n");
     }
+
+    //
+    // Disconnect Stuff
+    //
+    t_cmdClient.disconnectFromHost();
+    t_dataClient.disconnectFromHost();
 }

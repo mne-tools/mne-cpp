@@ -92,15 +92,16 @@ public:
     */
     enum Module_ID
     {
-        ECGSIM = 0x00010000,				/**< Module id of the ECG simulator. */
-        ECG = 0x00020000,					/**< Module id of the ECG sensor (Not implemented - just a dummy). */
-        MEGSIM = 0x00030000,				/**< Module id of the MEG channel simulator. */
-        MEG = 0x00040000,					/**< Module id of the MEG (rtproc) - Neuromag. */
-        DUMMYTOOL = 0x00050000,				/**< Module id of the dummy toolbox. */
-        FILTERTOOL = 0x00060000,			/**< Module id of the filter toolbox. */
-        GABORPARTICLETOOL = 0x00070000,		/**< Module id of the gabor toolbox. */
-        BRAINMONITOR = 0x00080000,			/**< Module id of the brain monitor visualization. */
-        _default = -1						/**< Default module id. */
+        ECGSIM = 0x00010000,                /**< Plugin id of the ECG simulator. */
+        ECG = 0x00020000,                   /**< Plugin id of the ECG sensor (Not implemented - just a dummy). */
+        MEGSIM = 0x00030000,                /**< Plugin id of the MEG channel simulator. */
+        MEG = 0x00040000,                   /**< Plugin id of the MEG (rtproc) - Neuromag. */
+        DUMMYTOOL = 0x00050000,             /**< Plugin id of the dummy toolbox. */
+        FILTERTOOL = 0x00060000,            /**< Plugin id of the filter toolbox. */
+        GABORPARTICLETOOL = 0x00070000,     /**< Plugin id of the gabor toolbox. */
+        BRAINMONITOR = 0x00080000,          /**< Plugin id of the brain monitor visualization. */
+        RTSERVER = 0x00080000,              /**< Plugin id of the rt server. */
+        _default = -1                       /**< Default module id. */
     };
 
     //=========================================================================================================
