@@ -70,8 +70,8 @@ class QTime;
 
 namespace RTMEASLIB
 {
-class ISource;
-class ISink;
+class IMeasurementSource;
+class IMeasurementSink;
 }
 
 namespace DISPLIB
@@ -128,18 +128,18 @@ public:
 //add
     //=========================================================================================================
     /**
-    * Adds a ISource to measurement manager.
+    * Adds a IMeasurementSource to measurement manager.
     *
-    * @param [in] pMSRPrv pointer to ISource.
+    * @param [in] pMSRPrv pointer to IMeasurementSource.
     */
-    static void addMeasurementProvider(ISource* pMSRPrv);
+    static void addMeasurementProvider(IMeasurementSource* pMSRPrv);
     //=========================================================================================================
     /**
-    * Adds a ISink to measurement manager.
+    * Adds a IMeasurementSink to measurement manager.
     *
-    * @param [in] pMSRAcc pointer to ISink.
+    * @param [in] pMSRAcc pointer to IMeasurementSink.
     */
-    static void addMeasurementAcceptor(IModule* pMSRAcc);//ISink* pMSRAcc);
+    static void addMeasurementAcceptor(IModule* pMSRAcc);//IMeasurementSink* pMSRAcc);
 
 //ToDo with Pattern Visitor
 
@@ -366,7 +366,7 @@ public:
     *
     * @return a hash of all current measurement providers and their corresponding module id's.
     */
-    static QHash<MDL_ID::Module_ID, ISource*>& getMeasurementProvider() {return s_hashMeasurementProvider;};
+    static QHash<MDL_ID::Module_ID, IMeasurementSource*>& getMeasurementProvider() {return s_hashMeasurementProvider;};
     //=========================================================================================================
     /**
     * Returns all current measurement acceptors.
@@ -383,7 +383,7 @@ public:
     static void clean();
 
 private:
-    static QHash<MDL_ID::Module_ID, ISource*>    s_hashMeasurementProvider;	/**< Holds the measurement providers.*/
+    static QHash<MDL_ID::Module_ID, IMeasurementSource*>    s_hashMeasurementProvider;	/**< Holds the measurement providers.*/
     static QHash<MDL_ID::Module_ID, IModule*>    s_hashMeasurementAcceptor;	/**< Holds the measurement acceptors.*/
 };
 

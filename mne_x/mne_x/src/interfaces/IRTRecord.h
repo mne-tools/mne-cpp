@@ -46,7 +46,7 @@
 #include <rtMeas/Nomenclature/nomenclature.h>
 #include <generics/circularbuffer_old.h>
 
-#include <rtMeas/Measurement/ISink.h>
+#include <rtMeas/Measurement/IMeasurementSink.h>
 
 
 //*************************************************************************************************************
@@ -80,9 +80,9 @@ namespace MNEX
 *
 * @brief The IRTRecord class provides an interface for a real-time record module.
 */
-class IRTRecord : public IModule, public ISink
+class IRTRecord : public IModule, public IMeasurementSink
 {
-//ToDo virtual methods of ISink
+//ToDo virtual methods of IMeasurementSink
 public:
 
     //=========================================================================================================

@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "IModule.h"
-#include <rtMeas/Measurement/ISink.h>
+#include <rtMeas/Measurement/IMeasurementSink.h>
 
 
 //*************************************************************************************************************
@@ -60,9 +60,9 @@ namespace MNEX
 *
 * @brief The IAlert class provides an interface for an alert module.
 */
-class IAlert : public IModule, public ISink
+class IAlert : public IModule, public IMeasurementSink
 {
-//ToDo virtual methods of ISink
+//ToDo virtual methods of IMeasurementSink
 public:
 
     //=========================================================================================================
