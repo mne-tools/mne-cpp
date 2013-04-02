@@ -98,9 +98,9 @@ class RTServerProducer;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ECGSimulator
+* DECLARE CLASS RTServer
 *
-* @brief The ECGSimulator class provides a ECG simulator.
+* @brief The RTServer class provides a RT server connection.
 */
 class RTSERVERSHARED_EXPORT RTServer : public ISensor
 {
@@ -109,7 +109,6 @@ class RTSERVERSHARED_EXPORT RTServer : public ISensor
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MNEX::ISensor)
 
-    friend class RTServerProducer;
     friend class RTServerSetupWidget;
     friend class RTServerRunWidget;
 
@@ -134,16 +133,7 @@ public:
     virtual const char* getName() const;
 
     virtual QWidget* setupWidget();
-	virtual QWidget* runWidget();
-
-    //=========================================================================================================
-    /**
-    * Returns the RTServer resource path.
-    *
-    * @return the RTServer resource path.
-    */
-    QString getResourcePath(){return m_qStringResourcePath;};
-
+    virtual QWidget* runWidget();
 
 protected:
     virtual void run();
@@ -155,22 +145,22 @@ private:
     */
     void init();
 
-    RealTimeSampleArray*    m_pRTSA_RTServer_I;     /**< Holds the RealTimeSampleArray to provide the channel ECG I.*/
-    RealTimeSampleArray*    m_pRTSA_RTServer_II;    /**< Holds the RealTimeSampleArray to provide the channel ECG II.*/
-    RealTimeSampleArray*    m_pRTSA_RTServer_III;   /**< Holds the RealTimeSampleArray to provide the channel ECG III.*/
+//    RealTimeSampleArray*    m_pRTSA_RTServer_I;     /**< Holds the RealTimeSampleArray to provide the channel ECG I.*/
+//    RealTimeSampleArray*    m_pRTSA_RTServer_II;    /**< Holds the RealTimeSampleArray to provide the channel ECG II.*/
+//    RealTimeSampleArray*    m_pRTSA_RTServer_III;   /**< Holds the RealTimeSampleArray to provide the channel ECG III.*/
 
-    float           m_fSamplingRate;                /**< Holds the sampling rate.*/
-    int             m_iDownsamplingFactor;          /**< Holds the down sampling factor.*/
-    RTServerBuffer_old*      m_pInBuffer_I;         /**< Holds ECG I data which arrive from ECG producer.*/
-    RTServerBuffer_old*      m_pInBuffer_II;        /**< Holds ECG II data which arrive from ECG producer.*/
-    RTServerBuffer_old*      m_pInBuffer_III;       /**< Holds ECG III data which arrive from ECG producer.*/
-    RTServerProducer*       m_pRTServerProducer;    /**< Holds the ECGProducer.*/
+//    float           m_fSamplingRate;                /**< Holds the sampling rate.*/
+//    int             m_iDownsamplingFactor;          /**< Holds the down sampling factor.*/
+//    RTServerBuffer_old*      m_pInBuffer_I;         /**< Holds ECG I data which arrive from ECG producer.*/
+//    RTServerBuffer_old*      m_pInBuffer_II;        /**< Holds ECG II data which arrive from ECG producer.*/
+//    RTServerBuffer_old*      m_pInBuffer_III;       /**< Holds ECG III data which arrive from ECG producer.*/
+//    RTServerProducer*       m_pRTServerProducer;    /**< Holds the ECGProducer.*/
 
-    QString m_qStringResourcePath;	/**< Holds the path to the ECG resource directory.*/
+//    QString m_qStringResourcePath;	/**< Holds the path to the ECG resource directory.*/
 
-    RTServerChannel* m_pRTServerChannel_ECG_I;      /**< Holds the simulation channel for ECG I.*/
-    RTServerChannel* m_pRTServerChannel_ECG_II;     /**< Holds the simulation channel for ECG II.*/
-    RTServerChannel* m_pRTServerChannel_ECG_III;    /**< Holds the simulation channel for ECG III.*/
+//    RTServerChannel* m_pRTServerChannel_ECG_I;      /**< Holds the simulation channel for ECG I.*/
+//    RTServerChannel* m_pRTServerChannel_ECG_II;     /**< Holds the simulation channel for ECG II.*/
+//    RTServerChannel* m_pRTServerChannel_ECG_III;    /**< Holds the simulation channel for ECG III.*/
 
     RtClient*       m_pRtClient;
 };

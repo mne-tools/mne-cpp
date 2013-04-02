@@ -23,7 +23,7 @@
       </font>
      </property>
      <property name="text">
-      <string>RT Client</string>
+      <string>RT Server</string>
      </property>
     </widget>
    </item>
