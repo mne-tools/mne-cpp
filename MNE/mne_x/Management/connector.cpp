@@ -48,12 +48,12 @@
 
 #include <generics/observerpattern.h>
 
-#include "../interfaces/IModule.h"
-#include "../interfaces/ISensor.h"
-#include "../interfaces/IRTAlgorithm.h"
-#include "../interfaces/IRTVisualization.h"
-#include "../interfaces/IRTRecord.h"
-#include "../interfaces/IAlert.h"
+#include "../Interfaces/IModule.h"
+#include "../Interfaces/ISensor.h"
+#include "../Interfaces/IRTAlgorithm.h"
+#include "../Interfaces/IRTVisualization.h"
+#include "../Interfaces/IRTRecord.h"
+#include "../Interfaces/IAlert.h"
 
 
 //*************************************************************************************************************

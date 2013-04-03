@@ -45,7 +45,7 @@
 #include "../rtmeas_global.h"
 #include "../Nomenclature/nomenclature.h"
 
-#include "../../../mne_x/mne_x/src/interfaces/IModule.h" //ToDo: this is not allowed to be relative
+#include <mne_X/Interfaces/IModule.h>
 
 
 //*************************************************************************************************************

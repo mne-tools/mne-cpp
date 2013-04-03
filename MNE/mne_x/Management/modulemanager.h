@@ -36,13 +36,12 @@
 #ifndef MODULEMANAGER_H
 #define MODULEMANAGER_H
 
-
 //*************************************************************************************************************
 //=============================================================================================================
-// QT STL INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QVector>
+#include "../mne_x_global.h"
 
 
 //*************************************************************************************************************
@@ -50,6 +49,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QVector>
 #include <QPluginLoader>
 
 
@@ -81,7 +81,7 @@ class IAlert;
 *
 * @brief The ModuleManager class provides a dynamic module loader. As well as the handling of the loaded modules.
 */
-class ModuleManager : public QPluginLoader
+class MNE_X_SHARED_EXPORT ModuleManager : public QPluginLoader
 {
     Q_OBJECT
 

@@ -99,3 +99,10 @@ ui_*.h
 
 /bin/mne_x_plugins/*.ilk
 /bin/mne_x_plugins/*.pdb
+/bin/mne_x_plugins/mne_rt_server_plugins/*.dll
+
+/bin/mne_x_plugins/mne_rt_server_plugins/*.manifest
+
+/bin/mne_x_plugins/mne_rt_server_plugins/*.exp
+
+/bin/mne_x_plugins/mne_rt_server_plugins/*.lib

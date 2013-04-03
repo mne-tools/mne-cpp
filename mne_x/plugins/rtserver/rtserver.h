@@ -44,7 +44,7 @@
 
 #include "rtserver_global.h"
 
-#include "../../mne_x/mne_x/src/interfaces/ISensor.h"
+#include <mne_x/Interfaces/ISensor.h>
 #include <generics/circularbuffer_old.h>
 #include <rtMeas/Measurement/realtimesamplearray.h>
 

@@ -48,7 +48,7 @@
 
 
 
-#include "../../mne_x/mne_x/src/interfaces/IModule.h"
+#include <mne_x/Interfaces/IModule.h>
 
 
 //*************************************************************************************************************

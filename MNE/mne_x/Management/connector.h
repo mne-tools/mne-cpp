@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     ISensor.h
+* @file     connector.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,22 +29,41 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains declaration of ISensor interface class.
+* @brief    Contains the declaration of the Connector class.
 *
 */
 
-#ifndef ISENSOR_H
-#define ISENSOR_H
-
+#ifndef CONNECTOR_H
+#define CONNECTOR_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../MNE/rtMeas/Measurement/IMeasurementSource.h"
+#include "../mne_x_global.h"
+#include <rtMeas/Nomenclature/nomenclature.h>
 
-#include "../../MNE/rtMeas/Nomenclature/nomenclature.h"
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QList>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class QTime;
+
+namespace DISPLIB
+{
+class DisplayManager;
+}
 
 
 //*************************************************************************************************************
@@ -56,91 +75,83 @@ namespace MNEX
 {
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace RTMEASLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
 //=============================================================================================================
 /**
-* DECLARE CLASS IRTAlgorithm
+* DECLARE CLASS Connector
 *
-* @brief The ISensor class provides an interface for a sensor module.
+* @brief The Connector class is providing static functions which care about the module runtime connection.
 */
-class ISensor : public IMeasurementSource
+class MNE_X_SHARED_EXPORT Connector
 {
-//ToDo virtual methods of IMeasurementSource
+//    Q_OBJECT
+//
+//    friend class MainCSART;
+
 public:
 
     //=========================================================================================================
     /**
-    * Destroys the ISensor.
+    * Constructs a Connector.
     */
-    virtual ~ISensor() {};
+    Connector();
 
     //=========================================================================================================
     /**
-    * Starts the ISensor.
-    * Pure virtual method inherited by IModule.
+    * Destroys the Connector.
+    */
+    virtual ~Connector();
+
+    //=========================================================================================================
+    /**
+    * Initialize a Connector.
+    */
+    static void init();
+
+    //=========================================================================================================
+    /**
+    * Connects all measurements to measurement acceptors, depending on corresponding id's.
+    */
+    static void connectMeasurements();
+
+    //=========================================================================================================
+    /**
+    * Disconnects all measurements to measurement acceptors, depending on corresponding id's.
+    */
+    static void disconnectMeasurements();
+
+    //=========================================================================================================
+    /**
+    * Connects all measurement widgets which are provided by modules of the module id list.
     *
-    * @return true if success, false otherwise
+    * @param [in] idList list of module id's of which the provided measurements should be connected for displayed.
+    * @param [in] t time needed to initialise real time sample array widgets.
     */
-    virtual bool start() = 0;
+    static void connectMeasurementWidgets(QList<MDL_ID::Module_ID>& idList, QTime* t);
 
     //=========================================================================================================
     /**
-    * Stops the ISensor.
-    * Pure virtual method inherited by IModule.
+    * Disconnects all measurement widgets which are provided by modules of the module id list.
     *
-    * @return true if success, false otherwise
+    * @param [in] idList list of module id's of which the provided measurements should be disconnected from display.
     */
-    virtual bool stop() = 0;
-
-    //=========================================================================================================
-    /**
-    * Returns the module type.
-    * Pure virtual method inherited by IModule.
-    *
-    * @return type of the ISensor
-    */
-    virtual Type getType() const = 0;
-
-    //=========================================================================================================
-    /**
-    * Returns the module name.
-    * Pure virtual method inherited by IModule.
-    *
-    * @return the name of the ISensor.
-    */
-    virtual const char* getName() const = 0;
-
-    //=========================================================================================================
-    /**
-    * Returns the set up widget for configuration of ISensor.
-    * Pure virtual method inherited by IModule.
-    *
-    * @return the setup widget.
-    */
-    virtual QWidget* setupWidget() = 0;
-
-    //=========================================================================================================
-    /**
-    * Returns the widget which is shown under configuration tab while running mode.
-    * Pure virtual method inherited by IModule.
-    *
-    * @return the run widget.
-    */
-    virtual QWidget* runWidget() = 0;
-
-protected:
-
-    //=========================================================================================================
-    /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
-    virtual void run() = 0;
+    static void disconnectMeasurementWidgets(QList<MDL_ID::Module_ID>& idList);
 
 };
 
-} //NAMESPACE
+} // NAMESPACE
 
-Q_DECLARE_INTERFACE(MNEX::ISensor, "mne_x/1.0")
-
-#endif // ISENSOR_H
+#endif // CONNECTOR_H
