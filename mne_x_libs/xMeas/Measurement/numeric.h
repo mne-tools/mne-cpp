@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dummysetupwidget.h
+* @file     numeric.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummySetupWidget class.
+* @brief    Contains the declaration of the Numeric class.
 *
 */
 
-#ifndef DUMMYSETUPWIDGET_H
-#define DUMMYSETUPWIDGET_H
+#ifndef NUMERIC_H
+#define NUMERIC_H
 
 
 //*************************************************************************************************************
@@ -42,88 +42,95 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_dummysetup.h"
-
-#include <xMeas/Nomenclature/nomenclature.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QtWidgets>
+#include "../xmeas_global.h"
+#include "measurement.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE NAMESPACE XMEASLIB
 //=============================================================================================================
 
-using namespace XMEASLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE ECGWheelFilterPlugin
-//=============================================================================================================
-
-namespace DummyToolboxModule
+namespace XMEASLIB
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class DummyToolbox;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS DummySetupWidget
+* DECLARE CLASS Numeric
 *
-* @brief The DummySetupWidget class provides the DummyToolbox configuration window.
+* @brief The Numeric class is the base class of every Numeric Measurement.
 */
-class DummySetupWidget : public QWidget
+class XMEASSHARED_EXPORT Numeric : public Measurement
 {
-    Q_OBJECT
-
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a DummySetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding DummyToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummySetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
+    * Constructs a Numeric.
     */
-    DummySetupWidget(DummyToolbox* toolbox, QWidget *parent = 0);
+    Numeric();
+    //=========================================================================================================
+    /**
+    * Destroys the Numeric.
+    */
+    virtual ~Numeric();
 
     //=========================================================================================================
     /**
-    * Destroys the DummySetupWidget.
-    * All DummySetupWidget's children are deleted first. The application exits if DummySetupWidget is the main widget.
+    * Sets the unit of the numeric data.
+    *
+    * @param [in] unit of the data.
     */
-    ~DummySetupWidget();
-
-
-private slots:
+    inline void setUnit(const QString& unit);
     //=========================================================================================================
     /**
-    * Shows the About Dialog
+    * Returns the unit of the numeric measurement.
     *
+    * @return the unit of the data of measurement.
     */
-    void showAboutDialog();
+    inline const QString& getUnit() const;
+    //=========================================================================================================
+    /**
+    * Sets a value and notify() all attached observers.
+    * This method is inherited by Measurement.
+    *
+    * @param [in] v the value which is set to the Numeric measurement.
+    */
+    virtual void setValue(double v);
+    //=========================================================================================================
+    /**
+    * Returns the current value.
+    * This method is inherited by Measurement.
+    *
+    * @return the current value of the Numeric measurement.
+    */
+    virtual double getValue() const;
 
 private:
-
-    DummyToolbox* m_pDummyToolbox;	/**< Holds a pointer to corresponding DummyToolbox.*/
-
-    Ui::DummySetupWidgetClass ui;	/**< Holds the user interface for the DummySetupWidget.*/
+    QString m_qString_Unit;		/**< Holds unit of the data of the measurement.*/
+    double  m_dValue;			/**< Holds current set value.*/
 };
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline void Numeric::setUnit(const QString& unit)
+{
+    m_qString_Unit = unit;
+}
+
+
+//*************************************************************************************************************
+
+inline const QString& Numeric::getUnit() const
+{
+    return m_qString_Unit;
+}
 
 } // NAMESPACE
 
-#endif // DUMMYSETUPWIDGET_H
+#endif // NUMERIC_H

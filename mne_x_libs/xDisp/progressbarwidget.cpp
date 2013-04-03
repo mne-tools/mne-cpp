@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dummysetupwidget.h
+* @file     progressbarwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,22 +29,17 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummySetupWidget class.
+* @brief    Contains the implementation of the ProgressBarWidget class.
 *
 */
-
-#ifndef DUMMYSETUPWIDGET_H
-#define DUMMYSETUPWIDGET_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_dummysetup.h"
-
-#include <xMeas/Nomenclature/nomenclature.h>
+#include "progressbarwidget.h"
+#include <xMeas/Measurement/progressbar.h>
 
 
 //*************************************************************************************************************
@@ -52,7 +47,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QPaintEvent>
+#include <QPainter>
+#include <QTimer>
 
 
 //*************************************************************************************************************
@@ -60,70 +57,75 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace XDISPLIB;
 using namespace XMEASLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE ECGWheelFilterPlugin
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace DummyToolboxModule
+ProgressBarWidget::ProgressBarWidget(ProgressBar* pProgressBar, QWidget *parent)
+: MeasurementWidget(parent)
+, m_pProgressBar(pProgressBar)
+, m_dSegmentSize(0.0)
+
 {
+    ui.setupUi(this);
+    m_usXPos = ui.m_qFrame->geometry().x();
+
+    QTimer* timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
+    timer->start(1000);
+
+    m_Brush.setStyle(Qt::SolidPattern);
+    m_Font.setBold(true);
+    m_Font.setPointSizeF(28);
+}
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
 
-class DummyToolbox;
-
-
-//=============================================================================================================
-/**
-* DECLARE CLASS DummySetupWidget
-*
-* @brief The DummySetupWidget class provides the DummyToolbox configuration window.
-*/
-class DummySetupWidget : public QWidget
+ProgressBarWidget::~ProgressBarWidget()
 {
-    Q_OBJECT
 
-public:
-
-    //=========================================================================================================
-    /**
-    * Constructs a DummySetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding DummyToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummySetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
-    */
-    DummySetupWidget(DummyToolbox* toolbox, QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the DummySetupWidget.
-    * All DummySetupWidget's children are deleted first. The application exits if DummySetupWidget is the main widget.
-    */
-    ~DummySetupWidget();
+}
 
 
-private slots:
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
+//*************************************************************************************************************
 
-private:
+void ProgressBarWidget::update(Subject*)
+{
+    m_usXPos = (unsigned short)(ui.m_qFrame->geometry().x()+m_dSegmentSize*m_pProgressBar->getValue());
+    m_Text = QString::number(m_pProgressBar->getValue()/10.0f);
 
-    DummyToolbox* m_pDummyToolbox;	/**< Holds a pointer to corresponding DummyToolbox.*/
+    if((m_pProgressBar->getValue() >= 0) && (m_pProgressBar->getValue() <= 40))
+        m_Brush.setColor(Qt::green);
 
-    Ui::DummySetupWidgetClass ui;	/**< Holds the user interface for the DummySetupWidget.*/
-};
+    else if((m_pProgressBar->getValue() > 40) && (m_pProgressBar->getValue() <= 80))
+        m_Brush.setColor(Qt::yellow);
 
-} // NAMESPACE
+    else
+        m_Brush.setColor(Qt::red);
+}
 
-#endif // DUMMYSETUPWIDGET_H
+
+//*************************************************************************************************************
+
+void ProgressBarWidget::init()
+{
+    ui.m_qLabel_Caption->setText(m_pProgressBar->getName());
+    m_dSegmentSize = static_cast<double>(ui.m_qFrame->width())/(m_pProgressBar->getMaxScale()-m_pProgressBar->getMinScale());
+}
+
+
+//*************************************************************************************************************
+
+void ProgressBarWidget::paintEvent(QPaintEvent*)
+{
+    QPainter painter(this);
+    painter.fillRect(ui.m_qFrame->geometry().x(), ui.m_qFrame->geometry().y(), m_usXPos, ui.m_qFrame->geometry().height(), m_Brush);
+    painter.setFont(m_Font);
+    painter.drawText(ui.m_qFrame->geometry(), Qt::AlignCenter, m_Text);
+}

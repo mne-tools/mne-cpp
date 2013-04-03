@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dummysetupwidget.h
+* @file     realtimemultisamplearray.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,22 +29,16 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummySetupWidget class.
+* @brief    Contains the implementation of the RealTimeMultiSampleArray class.
 *
 */
-
-#ifndef DUMMYSETUPWIDGET_H
-#define DUMMYSETUPWIDGET_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_dummysetup.h"
-
-#include <xMeas/Nomenclature/nomenclature.h>
+#include "realtimemultisamplearray.h"
 
 
 //*************************************************************************************************************
@@ -52,7 +46,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -61,69 +55,62 @@
 //=============================================================================================================
 
 using namespace XMEASLIB;
+//using namespace IOBuffer;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE ECGWheelFilterPlugin
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace DummyToolboxModule
+RealTimeMultiSampleArray::RealTimeMultiSampleArray(unsigned int uiNumChannels)
+: Measurement()
+, m_dMinValue(0)
+, m_dMaxValue(65535)
+, m_dSamplingRate(0)
+, m_qString_Unit("")
+, m_uiNumChannels(uiNumChannels)
+, m_ucMultiArraySize(10)
+
 {
+
+}
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
 
-class DummyToolbox;
-
-
-//=============================================================================================================
-/**
-* DECLARE CLASS DummySetupWidget
-*
-* @brief The DummySetupWidget class provides the DummyToolbox configuration window.
-*/
-class DummySetupWidget : public QWidget
+RealTimeMultiSampleArray::~RealTimeMultiSampleArray()
 {
-    Q_OBJECT
 
-public:
-
-    //=========================================================================================================
-    /**
-    * Constructs a DummySetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding DummyToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummySetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
-    */
-    DummySetupWidget(DummyToolbox* toolbox, QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the DummySetupWidget.
-    * All DummySetupWidget's children are deleted first. The application exits if DummySetupWidget is the main widget.
-    */
-    ~DummySetupWidget();
+}
 
 
-private slots:
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
+//*************************************************************************************************************
 
-private:
+QVector<double> RealTimeMultiSampleArray::getVector() const
+{
+    return m_vecValue;
+}
 
-    DummyToolbox* m_pDummyToolbox;	/**< Holds a pointer to corresponding DummyToolbox.*/
 
-    Ui::DummySetupWidgetClass ui;	/**< Holds the user interface for the DummySetupWidget.*/
-};
+//*************************************************************************************************************
 
-} // NAMESPACE
+void RealTimeMultiSampleArray::setVector(QVector<double> v)
+{
+    if(v.size() != m_uiNumChannels)
+        qDebug() << "Error Occured in RealTimeMultiSampleArray::setVector: Vector size does not matche the number of channels! ";
 
-#endif // DUMMYSETUPWIDGET_H
+    for(QVector<double>::iterator it = v.begin(); it != v.end(); ++it)
+    {
+        if(*it < m_dMinValue) *it = m_dMinValue;
+        else if(*it > m_dMaxValue) *it = m_dMaxValue;
+    }
+
+    m_vecValue = v;
+    m_matSamples.push_back(m_vecValue);
+    if(m_matSamples.size() >= m_ucMultiArraySize && notifyEnabled)
+    {
+        notify();
+        m_matSamples.clear();
+    }
+}

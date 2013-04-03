@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dummysetupwidget.h
+* @file     measurementwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,22 +29,27 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummySetupWidget class.
+* @brief    Declaration of the MeasurementWidget Class.
 *
 */
 
-#ifndef DUMMYSETUPWIDGET_H
-#define DUMMYSETUPWIDGET_H
-
+#ifndef MEASUREMENTWIDGET_H
+#define MEASUREMENTWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_dummysetup.h"
+#include "xdisp_global.h"
 
-#include <xMeas/Nomenclature/nomenclature.h>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <generics/observerpattern.h>
 
 
 //*************************************************************************************************************
@@ -52,78 +57,65 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QWidget>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE NAMESPACE XDISPLIB
 //=============================================================================================================
 
-using namespace XMEASLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE ECGWheelFilterPlugin
-//=============================================================================================================
-
-namespace DummyToolboxModule
+namespace XDISPLIB
 {
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class DummyToolbox;
-
 
 //=============================================================================================================
 /**
-* DECLARE CLASS DummySetupWidget
+* DECLARE CLASS MeasurementWidget
 *
-* @brief The DummySetupWidget class provides the DummyToolbox configuration window.
+* @brief The MeasurementWidget class is the base class of all measurement widgets.
 */
-class DummySetupWidget : public QWidget
+class XDISPSHARED_EXPORT MeasurementWidget : public QWidget, public IObserver
 {
     Q_OBJECT
-
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a DummySetupWidget which is a child of parent.
+    * Constructs a MeasurementWidget which is a child of parent.
     *
-    * @param [in] toolbox a pointer to the corresponding DummyToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummySetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new MeasurementWidget becomes a window. If parent is another widget, MeasurementWidget becomes a child window inside parent. MeasurementWidget is deleted when its parent is deleted.
     */
-    DummySetupWidget(DummyToolbox* toolbox, QWidget *parent = 0);
+    MeasurementWidget(QWidget* parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the DummySetupWidget.
-    * All DummySetupWidget's children are deleted first. The application exits if DummySetupWidget is the main widget.
+    * Destroys the MeasurementWidget.
     */
-    ~DummySetupWidget();
+    virtual ~MeasurementWidget();
 
-
-private slots:
     //=========================================================================================================
     /**
-    * Shows the About Dialog
+    * Is called when new data are available.
+    * Pure virtual method inherited by IObserver.
     *
+    * @param [in] pSubject  pointer to Subject -> not used because its direct attached to the measurement.
     */
-    void showAboutDialog();
+    virtual void update(Subject* pSubject) = 0;
 
-private:
-
-    DummyToolbox* m_pDummyToolbox;	/**< Holds a pointer to corresponding DummyToolbox.*/
-
-    Ui::DummySetupWidgetClass ui;	/**< Holds the user interface for the DummySetupWidget.*/
+    //=========================================================================================================
+    /**
+    * Initialise the MeasurementWidget.
+    * Pure virtual method.
+    */
+    virtual void init() = 0;
 };
 
-} // NAMESPACE
+}
 
-#endif // DUMMYSETUPWIDGET_H
+#endif // MEASUREMENTWIDGET_H

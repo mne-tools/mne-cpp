@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dummysetupwidget.h
+* @file     nomenclature.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,30 +29,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummySetupWidget class.
+* @brief    ToDo Brief description of file
 *
 */
-
-#ifndef DUMMYSETUPWIDGET_H
-#define DUMMYSETUPWIDGET_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_dummysetup.h"
-
-#include <xMeas/Nomenclature/nomenclature.h>
+#include "nomenclature.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-#include <QtWidgets>
 
 
 //*************************************************************************************************************
@@ -65,65 +57,59 @@ using namespace XMEASLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE ECGWheelFilterPlugin
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace DummyToolboxModule
+MDL_ID::MDL_ID(int id)
+: m_S32_ID(id)
 {
+
+}
+
+
+//*************************************************************************************************************
+
+MDL_ID::MDL_ID(const MDL_ID &mdl_id)
+: m_S32_ID(mdl_id.m_S32_ID)
+{
+
+}
+
+
+//*************************************************************************************************************
+
+MDL_ID::MDL_ID(Module_ID standard_ID)
+: m_S32_ID(standard_ID)
+{
+
+}
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-class DummyToolbox;
-
-
-//=============================================================================================================
-/**
-* DECLARE CLASS DummySetupWidget
-*
-* @brief The DummySetupWidget class provides the DummyToolbox configuration window.
-*/
-class DummySetupWidget : public QWidget
+MSR_ID::MSR_ID(int id)
+: m_S32_ID(id)
 {
-    Q_OBJECT
 
-public:
-
-    //=========================================================================================================
-    /**
-    * Constructs a DummySetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding DummyToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummySetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
-    */
-    DummySetupWidget(DummyToolbox* toolbox, QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the DummySetupWidget.
-    * All DummySetupWidget's children are deleted first. The application exits if DummySetupWidget is the main widget.
-    */
-    ~DummySetupWidget();
+}
 
 
-private slots:
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
+//*************************************************************************************************************
 
-private:
+MSR_ID::MSR_ID(const MSR_ID &msr_id)
+: m_S32_ID(msr_id.m_S32_ID)
+{
 
-    DummyToolbox* m_pDummyToolbox;	/**< Holds a pointer to corresponding DummyToolbox.*/
+}
 
-    Ui::DummySetupWidgetClass ui;	/**< Holds the user interface for the DummySetupWidget.*/
-};
 
-} // NAMESPACE
+//*************************************************************************************************************
 
-#endif // DUMMYSETUPWIDGET_H
+MSR_ID::MSR_ID(Measurement_ID standard_ID)
+: m_S32_ID(standard_ID)
+{
+
+}

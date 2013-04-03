@@ -40,21 +40,21 @@
 
 #include <mne_x/Management/modulemanager.h>
 #include <mne_x/Management/connector.h>
-#include <rtDtMng/rtmeasurementmanager.h>
+#include <xDtMng/measurementmanager.h>
 
-#include <rtMeas/Measurement/realtimesamplearray.h>
-#include <rtMeas/Measurement/numeric.h>
-#include <rtMeas/Measurement/progressbar.h>
+#include <xMeas/Measurement/realtimesamplearray.h>
+#include <xMeas/Measurement/numeric.h>
+#include <xMeas/Measurement/progressbar.h>
 //#include "../../../comp/rtmeas/Measurement/alert.h" //-> text.h
-#include <rtMeas/Measurement/text.h>
+#include <xMeas/Measurement/text.h>
 
 #include <generics/observerpattern.h>
 
-#include <disp/displaymanager.h>
-#include <disp/realtimesamplearraywidget.h>
-#include <disp/numericwidget.h>
-#include <disp/progressbarwidget.h>
-#include <disp/textwidget.h>
+#include <xDisp/displaymanager.h>
+#include <xDisp/realtimesamplearraywidget.h>
+#include <xDisp/numericwidget.h>
+#include <xDisp/progressbarwidget.h>
+#include <xDisp/textwidget.h>
 
 #include <mne_x/Interfaces/IModule.h>
 #include <mne_x/Interfaces/ISensor.h>
@@ -91,7 +91,7 @@
 //=============================================================================================================
 
 using namespace MNEX;
-using namespace DISPLIB;
+using namespace XDISPLIB;
 
 
 //*************************************************************************************************************

@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     MNELibraries.pro
+# @file     mne_x_libs.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds all MNE libraries.
+# @brief    This project file builds all mne_x libraries.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -37,25 +37,12 @@ include(../mne-cpp.pri)
 
 TEMPLATE = subdirs
 
-SUBDIRS += \
-    generics \
-    utils \
-    fs \
-    fiff \
-    mne \
-    inverse \
-    rtCommand \
-    rtClient \
-    rtInv \
-
-
 contains(MNECPP_CONFIG, isGui) {
-    SUBDIRS +=
-
-    qtHaveModule(3d) {
-        message(Qt3D available: disp3D library configured!)
-        SUBDIRS += disp3D
-    }
+    SUBDIRS += \
+        xMeas \
+        xDisp \
+        xDtMng \
+        mne_x
 }
 
 CONFIG += ordered

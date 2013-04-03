@@ -40,9 +40,9 @@
 
 #include "dummytoolbox.h"
 
-#include <rtMeas/Measurement/measurement.h>
+#include <xMeas/Measurement/measurement.h>
 
-#include <rtMeas/Measurement/realtimesamplearray.h>
+#include <xMeas/Measurement/realtimesamplearray.h>
 
 #include "FormFiles/dummysetupwidget.h"
 #include "FormFiles/dummyrunwidget.h"
@@ -64,7 +64,7 @@
 
 using namespace DummyToolboxModule;
 using namespace MNEX;
-using namespace RTMEASLIB;
+using namespace XMEASLIB;
 
 
 //*************************************************************************************************************
