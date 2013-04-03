@@ -7,8 +7,8 @@
         <file alias="sensor.png">images/icons/sensor.png</file>
         <file alias="visualisation.png">images/icons/visualisation.png</file>
         <file alias="algorithm.png">images/icons/algorithm.png</file>
-        <file alias="csa_rt.png">images/icons/csa_rt.png</file>
-        <file alias="splashscreen.png">images/splashscreen/splashscreen_csa_rt.png</file>
+        <file alias="csa_rt.png">images/icons/mne_x.png</file>
+        <file alias="splashscreen.png">images/splashscreen/splashscreen_mne_x.png</file>
         <file alias="zoomIn.png">images/icons/zoomIn.png</file>
         <file alias="zoomOut.png">images/icons/zoomOut.png</file>
         <file alias="zoomStd.png">images/icons/zoomStd.png</file>
