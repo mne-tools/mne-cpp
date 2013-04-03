@@ -382,5 +382,3 @@ void MNERTServer::init()
     QObject::connect(&m_commandManager["help"], &Command::executed, this, &MNERTServer::comHelp);
     QObject::connect(&m_commandManager["close"], &Command::executed, this, &MNERTServer::comClose);
 }
-
-

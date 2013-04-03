@@ -221,6 +221,13 @@ FiffInfo RtDataClient::readInfo()
                 }
             }
         }
+        // Check consisty
+        for(qint32 i = 0; i < p_FiffInfo.projs.size(); ++i)
+        {
+            if(p_FiffInfo.projs[i].data->data.rows() != p_FiffInfo.projs[i].data->nrow)
+                p_FiffInfo.projs[i].data->data.transposeInPlace();
+        }
+
         //
         //    CTF compensation info
         //
