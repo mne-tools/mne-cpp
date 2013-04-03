@@ -41,7 +41,7 @@
 
 #include "connector.h"
 
-#include "../management/modulemanager.h"
+#include "../Management/modulemanager.h"
 
 #include <xDtMng/measurementmanager.h>
 #include <xDisp/displaymanager.h>
