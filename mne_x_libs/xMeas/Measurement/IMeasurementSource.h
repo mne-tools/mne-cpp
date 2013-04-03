@@ -45,7 +45,7 @@
 #include "../xmeas_global.h"
 #include "../Nomenclature/nomenclature.h"
 
-#include <mne_X/Interfaces/IModule.h>
+#include <mne_x/Interfaces/IModule.h>
 
 
 //*************************************************************************************************************
