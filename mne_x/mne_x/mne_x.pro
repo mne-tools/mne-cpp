@@ -48,15 +48,17 @@ CONFIG(debug, debug|release) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
-            -lMNE$${MNE_LIB_VERSION}Dispd \
             -lMNE$${MNE_LIB_VERSION}RtMeasd \
-            -lMNE$${MNE_LIB_VERSION}RtDtMngd
+            -lMNE$${MNE_LIB_VERSION}Dispd \
+            -lMNE$${MNE_LIB_VERSION}RtDtMngd \
+            -lMNE$${MNE_LIB_VERSION}mne_xd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
-            -lMNE$${MNE_LIB_VERSION}Disp \
             -lMNE$${MNE_LIB_VERSION}RtMeas \
-            -lMNE$${MNE_LIB_VERSION}RtDtMng
+            -lMNE$${MNE_LIB_VERSION}Disp \
+            -lMNE$${MNE_LIB_VERSION}RtDtMng \
+            -lMNE$${MNE_LIB_VERSION}mne_x
 }
 
 DESTDIR = $${MNE_BINARY_DIR}
@@ -67,9 +69,7 @@ SOURCES += \
     src/FormFiles/runwidget.cpp \
     src/FormFiles/moduledockwidget.cpp \
     src/FormFiles/mainwindow.cpp \
-    src/FormFiles/mainsplashscreen.cpp \
-    src/management/modulemanager.cpp \
-    src/management/connector.cpp
+    src/FormFiles/mainsplashscreen.cpp
 
 HEADERS += \
     src/FormFiles/startupwidget.h \
@@ -77,14 +77,6 @@ HEADERS += \
     src/FormFiles/moduledockwidget.h \
     src/FormFiles/mainwindow.h \
     src/FormFiles/mainsplashscreen.h \
-    src/interfaces/ISensor.h \
-    src/interfaces/IRTVisualization.h \
-    src/interfaces/IRTRecord.h \
-    src/interfaces/IRTAlgorithm.h \
-    src/interfaces/IModule.h \
-    src/interfaces/IAlert.h \
-    src/management/modulemanager.h \
-    src/management/connector.h \
     src/preferences/info.h
 
 FORMS   +=

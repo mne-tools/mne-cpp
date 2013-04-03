@@ -1,10 +1,10 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     rtserver.pro
+# @file     mne_x.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     July, 2012
+# @date     March, 2013
 #
 # @section  LICENSE
 #
@@ -29,21 +29,20 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the rtserver plug-in.
+# @brief    This project file builds the mne_x library.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../../../mne-cpp.pri)
+include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-CONFIG += plugin
+QT += widgets
 
-DEFINES += RTSERVER_LIBRARY
+DEFINES += MNE_X_LIBRARY
 
-QT += core widgets
-
-TARGET = rtserver
+TARGET = mne_x
+TARGET = $$join(TARGET,,MNE$$MNE_LIB_VERSION,)
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -51,55 +50,58 @@ CONFIG(debug, debug|release) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
-            -lMNE$${MNE_LIB_VERSION}Utilsd \
-            -lMNE$${MNE_LIB_VERSION}Fsd \
-            -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}RtCommandd \
-            -lMNE$${MNE_LIB_VERSION}RtClientd \
             -lMNE$${MNE_LIB_VERSION}RtMeasd \
-            -lMNE$${MNE_LIB_VERSION}Dispd \
-            -lMNE$${MNE_LIB_VERSION}RtDtMngd \
-            -lMNE$${MNE_LIB_VERSION}mne_xd
+            -lMNE$${MNE_LIB_VERSION}dispd \
+            -lMNE$${MNE_LIB_VERSION}rtDtMngd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
-            -lMNE$${MNE_LIB_VERSION}Utils \
-            -lMNE$${MNE_LIB_VERSION}Fs \
-            -lMNE$${MNE_LIB_VERSION}Mne \
-            -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}RtCommand \
-            -lMNE$${MNE_LIB_VERSION}RtClient \
             -lMNE$${MNE_LIB_VERSION}RtMeas \
-            -lMNE$${MNE_LIB_VERSION}Disp \
-            -lMNE$${MNE_LIB_VERSION}RtDtMng \
-            -lMNE$${MNE_LIB_VERSION}mne_x
+            -lMNE$${MNE_LIB_VERSION}disp \
+            -lMNE$${MNE_LIB_VERSION}rtDtMng
 }
 
-DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
+DESTDIR = $${MNE_LIBRARY_DIR}
+
+#
+# win32: copy dll's to bin dir
+# unix: add lib folder to LD_LIBRARY_PATH
+#
+win32 {
+    FILE = $${DESTDIR}/$${TARGET}.dll
+    BINDIR = $${DESTDIR}/../bin
+    FILE ~= s,/,\\,g
+    BINDIR ~= s,/,\\,g
+    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
+}
 
 SOURCES += \
-        rtserver.cpp \
-        FormFiles/rtserversetupwidget.cpp \
-        FormFiles/rtserverrunwidget.cpp \
-        FormFiles/rtserveraboutwidget.cpp
+    Management/modulemanager.cpp \
+    Management/connector.cpp
+
 
 HEADERS += \
-        rtserver.h\
-        rtserver_global.h \
-        FormFiles/rtserversetupwidget.h \
-        FormFiles/rtserverrunwidget.h \
-        FormFiles/rtserveraboutwidget.h
+    mne_x_global.h \
+    Interfaces/ISensor.h \
+    Interfaces/IRTVisualization.h \
+    Interfaces/IRTRecord.h \
+    Interfaces/IRTAlgorithm.h \
+    Interfaces/IModule.h \
+    Interfaces/IAlert.h \
+    Management/modulemanager.h \
+    Management/connector.h
 
-FORMS += \
-        FormFiles/rtserversetup.ui \
-        FormFiles/rtserverrun.ui \
-        FormFiles/rtserverabout.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
-OTHER_FILES += rtserver.json
+# Install headers to include directory
+header_files.files = ./*.h
+header_files.path = $${MNE_INCLUDE_DIR}/mne_x
 
-# Put generated form headers into the origin --> cause other src is pointing at them
-UI_DIR = $${PWD}
+header_files_interfaces.files = ./Interfaces/*.h
+header_files_interfaces.path = $${MNE_INCLUDE_DIR}/mne_x/Interfaces
+
+INSTALLS += header_files
+INSTALLS += header_files_interfaces
+

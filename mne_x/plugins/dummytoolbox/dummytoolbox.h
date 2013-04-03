@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "dummytoolbox_global.h"
-#include "../../mne_x/mne_x/src/interfaces/IRTAlgorithm.h"
+#include <mne_x/Interfaces/IRTAlgorithm.h>
 #include <generics/circularbuffer_old.h>
 #include <generics/circularmultichannelbuffer_old.h>
 

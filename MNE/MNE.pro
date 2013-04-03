@@ -53,7 +53,8 @@ contains(MNECPP_CONFIG, isGui) {
     SUBDIRS += \
         rtMeas \
         disp \
-        rtDtMng
+        rtDtMng \
+        mne_x
 
     qtHaveModule(3d) {
         message(Qt3D available: disp3D library configured!)

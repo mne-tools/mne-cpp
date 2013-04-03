@@ -57,6 +57,7 @@ else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}RtMeas \
             -lMNE$${MNE_LIB_VERSION}Disp
+
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}

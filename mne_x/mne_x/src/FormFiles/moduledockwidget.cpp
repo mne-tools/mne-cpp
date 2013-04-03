@@ -40,14 +40,14 @@
 
 #include "moduledockwidget.h"
 
-#include "../management/modulemanager.h"
+#include <mne_x/Management/modulemanager.h>
 
-#include "../interfaces/IModule.h"
-#include "../interfaces/ISensor.h"
-#include "../interfaces/IRTAlgorithm.h"
-#include "../interfaces/IRTVisualization.h"
-#include "../interfaces/IRTRecord.h"
-#include "../interfaces/IAlert.h"
+#include <mne_x/Interfaces/IModule.h>
+#include <mne_x/Interfaces/ISensor.h>
+#include <mne_x/Interfaces/IRTAlgorithm.h>
+#include <mne_x/Interfaces/IRTVisualization.h>
+#include <mne_x/Interfaces/IRTRecord.h>
+#include <mne_x/Interfaces/IAlert.h>
 
 #include "../preferences/info.h"
 
