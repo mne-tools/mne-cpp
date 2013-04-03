@@ -78,7 +78,6 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
 SOURCES += \
         rtserver.cpp \
-        rtserverchannel.cpp \
         FormFiles/rtserversetupwidget.cpp \
         FormFiles/rtserverrunwidget.cpp \
         FormFiles/rtserveraboutwidget.cpp
@@ -86,7 +85,6 @@ SOURCES += \
 HEADERS += \
         rtserver.h\
         rtserver_global.h \
-        rtserverchannel.h \
         FormFiles/rtserversetupwidget.h \
         FormFiles/rtserverrunwidget.h \
         FormFiles/rtserveraboutwidget.h
