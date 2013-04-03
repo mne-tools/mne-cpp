@@ -47,8 +47,8 @@
 #include <generics/circularbuffer_old.h>
 #include <generics/circularmultichannelbuffer_old.h>
 
-#include <rtMeas/Measurement/realtimesamplearray.h>
-#include <rtMeas/Measurement/realtimemultisamplearray.h>
+#include <xMeas/Measurement/realtimesamplearray.h>
+#include <xMeas/Measurement/realtimemultisamplearray.h>
 
 
 //*************************************************************************************************************

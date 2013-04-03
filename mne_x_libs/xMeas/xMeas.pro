@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     dummytoolbox.pro
+# @file     xMeas.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,66 +29,83 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the dummytoolbox plug-in.
+# @brief    This project file builds the xMeas library.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../../../mne-cpp.pri)
+include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-CONFIG += plugin
+QT += widgets
 
-DEFINES += DUMMYTOOLBOX_LIBRARY
+DEFINES += XMEAS_LIBRARY
 
-QT += core widgets
-
-TARGET = dummytoolbox
+TARGET = xMeas
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
-            -lxMeasd \
-            -lxDispd \
-            -lxDtMngd \
-            -lmne_xd
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd
 }
 else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
-            -lxMeas \
-            -lxDisp \
-            -lxDtMng \
-            -lmne_x
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics
 }
 
-DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
+DESTDIR = $${MNE_LIBRARY_DIR}
+
+#
+# win32: copy dll's to bin dir
+# unix: add lib folder to LD_LIBRARY_PATH
+#
+win32 {
+    FILE = $${DESTDIR}/$${TARGET}.dll
+    BINDIR = $${DESTDIR}/../bin
+    FILE ~= s,/,\\,g
+    BINDIR ~= s,/,\\,g
+    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
+}
 
 SOURCES += \
-        dummytoolbox.cpp \
-        FormFiles/dummysetupwidget.cpp \
-        FormFiles/dummyrunwidget.cpp \
-        FormFiles/dummyaboutwidget.cpp
+    Measurement/text.cpp \
+    Measurement/realtimesamplearray.cpp \
+    Measurement/realtimemultisamplearray.cpp \
+    Measurement/progressbar.cpp \
+    Measurement/numeric.cpp \
+    Measurement/measurement.cpp \
+    Nomenclature/nomenclature.cpp \
+    Measurement/IMeasurementSink.cpp \
+    Measurement/IMeasurementSource.cpp
 
 HEADERS += \
-        dummytoolbox.h\
-        dummytoolbox_global.h \
-        FormFiles/dummysetupwidget.h \
-        FormFiles/dummyrunwidget.h \
-        FormFiles/dummyaboutwidget.h
+    xmeas_global.h \
+    Measurement/text.h \
+    Measurement/realtimesamplearray.h \
+    Measurement/realtimemultisamplearray.h \
+    Measurement/progressbar.h \
+    Measurement/numeric.h \
+    Measurement/measurement.h \
+    Nomenclature/nomenclature.h \
+    Measurement/IMeasurementSink.h \
+    Measurement/IMeasurementSource.h
 
-FORMS += \
-        FormFiles/dummysetup.ui \
-        FormFiles/dummyrun.ui \
-        FormFiles/dummyabout.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 
-OTHER_FILES += dummytoolbox.json
+# Install headers to include directory
+header_files.files = ./*.h
+header_files.path = $${MNE_X_INCLUDE_DIR}/xMeas
 
-# Put generated form headers into the origin --> cause other src is pointing at them
-UI_DIR = $$PWD
+header_files_measurement.files = ./Measurement/*.h
+header_files_measurement.path = $${MNE_X_INCLUDE_DIR}/xMeas/Measurement
+
+header_files_nomenclature.files = ./Nomenclature/*.h
+header_files_nomenclature.path = $${MNE_X_INCLUDE_DIR}/xMeas/Nomenclature
+
+INSTALLS += header_files
+INSTALLS += header_files_measurement
+INSTALLS += header_files_nomenclature

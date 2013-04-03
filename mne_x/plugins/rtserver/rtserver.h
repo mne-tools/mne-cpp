@@ -46,7 +46,7 @@
 
 #include <mne_x/Interfaces/ISensor.h>
 #include <generics/circularbuffer_old.h>
-#include <rtMeas/Measurement/realtimesamplearray.h>
+#include <xMeas/Measurement/realtimesamplearray.h>
 
 
 //*************************************************************************************************************

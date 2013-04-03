@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dummysetupwidget.h
+* @file     IRTVisualization.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummySetupWidget class.
+* @brief    Contains declaration of IRTVisualization interface class.
 *
 */
 
-#ifndef DUMMYSETUPWIDGET_H
-#define DUMMYSETUPWIDGET_H
+#ifndef IRTVISUALIZATION_H
+#define IRTVISUALIZATION_H
 
 
 //*************************************************************************************************************
@@ -42,88 +42,115 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_dummysetup.h"
+#include <xMeas/Measurement/IMeasurementSource.h>
+#include <xMeas/Measurement/IMeasurementSink.h>
 
 #include <xMeas/Nomenclature/nomenclature.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// DEFINE NAMESPACE MNEX
 //=============================================================================================================
 
-#include <QtWidgets>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace XMEASLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE ECGWheelFilterPlugin
-//=============================================================================================================
-
-namespace DummyToolboxModule
+namespace MNEX
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class DummyToolbox;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS DummySetupWidget
+* DECLARE CLASS IRTVisualization
 *
-* @brief The DummySetupWidget class provides the DummyToolbox configuration window.
+* @brief The IRTVisualization class provides an interface for a real-time algorithm module.
 */
-class DummySetupWidget : public QWidget
+class IRTVisualization :  public IMeasurementSource, public IMeasurementSink
 {
-    Q_OBJECT
-
+//ToDo virtual methods of IMeasurementSink && IMeasurementSource
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a DummySetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding DummyToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummySetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
+    * Destroys the IRTVisualization.
     */
-    DummySetupWidget(DummyToolbox* toolbox, QWidget *parent = 0);
+    virtual ~IRTVisualization() {};
+
 
     //=========================================================================================================
     /**
-    * Destroys the DummySetupWidget.
-    * All DummySetupWidget's children are deleted first. The application exits if DummySetupWidget is the main widget.
+    * Starts the IRTVisualization.
+    * Pure virtual method inherited by IModule.
+    *
+    * @return true if success, false otherwise
     */
-    ~DummySetupWidget();
+    virtual bool start() = 0;
 
-
-private slots:
     //=========================================================================================================
     /**
-    * Shows the About Dialog
+    * Stops the IRTVisualization.
+    * Pure virtual method inherited by IModule.
     *
+    * @return true if success, false otherwise
     */
-    void showAboutDialog();
+    virtual bool stop() = 0;
 
-private:
+    //=========================================================================================================
+    /**
+    * Returns the module type.
+    * Pure virtual method inherited by IModule.
+    *
+    * @return type of the IRTVisualization
+    */
+    virtual Type getType() const = 0;
 
-    DummyToolbox* m_pDummyToolbox;	/**< Holds a pointer to corresponding DummyToolbox.*/
+    //=========================================================================================================
+    /**
+    * Returns the module name.
+    * Pure virtual method inherited by IModule.
+    *
+    * @return the name of the IRTVisualization.
+    */
+    virtual const char* getName() const = 0;
 
-    Ui::DummySetupWidgetClass ui;	/**< Holds the user interface for the DummySetupWidget.*/
+    //=========================================================================================================
+    /**
+    * Returns the set up widget for configuration of IRTVisualization.
+    * Pure virtual method inherited by IModule.
+    *
+    * @return the setup widget.
+    */
+    virtual QWidget* setupWidget() = 0; //setup();
+
+    //=========================================================================================================
+    /**
+    * Returns the widget which is shown under configuration tab while running mode.
+    * Pure virtual method inherited by IModule.
+    *
+    * @return the run widget.
+    */
+    virtual QWidget* runWidget() = 0;
+
+    //=========================================================================================================
+    /**
+    * Is called when new data are available.
+    * Pure virtual method inherited by IObserver.
+    *
+    * @param [in] pSubject pointer to Subject, should be up-cast-able to Measurement and even further.
+    */
+    virtual void update(Subject* pSubject) = 0;
+
+protected:
+
+    //=========================================================================================================
+    /**
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread
+    */
+    virtual void run() = 0;
 };
 
 } // NAMESPACE
 
-#endif // DUMMYSETUPWIDGET_H
+Q_DECLARE_INTERFACE(MNEX::IRTVisualization, "mne_x/1.0")
+
+#endif // IRTVISUALIZATION_H

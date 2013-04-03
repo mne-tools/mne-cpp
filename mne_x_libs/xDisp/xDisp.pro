@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     MNELibraries.pro
+# @file     xDisp.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -18,7 +18,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
@@ -29,33 +29,84 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds all MNE libraries.
+# @brief    This project file builds the xDisp library.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../mne-cpp.pri)
+include(../../mne-cpp.pri)
 
-TEMPLATE = subdirs
+TEMPLATE = lib
 
-SUBDIRS += \
-    generics \
-    utils \
-    fs \
-    fiff \
-    mne \
-    inverse \
-    rtCommand \
-    rtClient \
-    rtInv \
+QT += widgets
 
+DEFINES += XDISP_LIBRARY
 
-contains(MNECPP_CONFIG, isGui) {
-    SUBDIRS +=
-
-    qtHaveModule(3d) {
-        message(Qt3D available: disp3D library configured!)
-        SUBDIRS += disp3D
-    }
+TARGET = xDisp
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
 }
 
-CONFIG += ordered
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lxMeasd
+}
+else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lxMeas
+}
+
+DESTDIR = $${MNE_LIBRARY_DIR}
+
+#
+# win32: copy dll's to bin dir
+# unix: add lib folder to LD_LIBRARY_PATH
+#
+win32 {
+    FILE = $${DESTDIR}/$${TARGET}.dll
+    BINDIR = $${DESTDIR}/../bin
+    FILE ~= s,/,\\,g
+    BINDIR ~= s,/,\\,g
+    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
+}
+
+SOURCES += \
+        measurementwidget.cpp \
+        displaymanager.cpp \
+        realtimesamplearraywidget.cpp \
+        realtimemultisamplearraywidget.cpp \
+        textwidget.cpp \
+        progressbarwidget.cpp \
+        numericwidget.cpp
+
+HEADERS += \
+        xdisp_global.h \
+        measurementwidget.h \
+        realtimesamplearraywidget.h \
+        displaymanager.h \
+        realtimesamplearraywidget.h \
+        realtimemultisamplearraywidget.h \
+        textwidget.h \
+        progressbarwidget.h \
+        numericwidget.h
+
+FORMS += \
+    realtimesamplearraywidget.ui \
+    realtimemultisamplearraywidget.ui \
+    realtimesamplearraywidget.ui \
+    realtimesamplearraywidget.ui \
+    realtimemultisamplearraywidget.ui \
+    textwidget.ui \
+    progressbarwidget.ui \
+    numericwidget.ui
+
+UI_DIR = $${PWD}
+
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
+
+# Install headers to include directory
+header_files.files = ./*.h
+header_files.path = $${MNE_X_INCLUDE_DIR}/xDisp
+
+INSTALLS += header_files

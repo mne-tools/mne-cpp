@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dummysetupwidget.h
+* @file     connector.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,21 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummySetupWidget class.
+* @brief    Contains the declaration of the Connector class.
 *
 */
 
-#ifndef DUMMYSETUPWIDGET_H
-#define DUMMYSETUPWIDGET_H
-
+#ifndef CONNECTOR_H
+#define CONNECTOR_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_dummysetup.h"
-
+#include "../mne_x_global.h"
 #include <xMeas/Nomenclature/nomenclature.h>
 
 
@@ -52,7 +50,29 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QList>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class QTime;
+
+namespace XDISPLIB
+{
+class DisplayManager;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNEX
+//=============================================================================================================
+
+namespace MNEX
+{
 
 
 //*************************************************************************************************************
@@ -65,65 +85,73 @@ using namespace XMEASLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE ECGWheelFilterPlugin
-//=============================================================================================================
-
-namespace DummyToolboxModule
-{
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-class DummyToolbox;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS DummySetupWidget
+* DECLARE CLASS Connector
 *
-* @brief The DummySetupWidget class provides the DummyToolbox configuration window.
+* @brief The Connector class is providing static functions which care about the module runtime connection.
 */
-class DummySetupWidget : public QWidget
+class MNE_X_SHARED_EXPORT Connector
 {
-    Q_OBJECT
+//    Q_OBJECT
+//
+//    friend class MainCSART;
 
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a DummySetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding DummyToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummySetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
+    * Constructs a Connector.
     */
-    DummySetupWidget(DummyToolbox* toolbox, QWidget *parent = 0);
+    Connector();
 
     //=========================================================================================================
     /**
-    * Destroys the DummySetupWidget.
-    * All DummySetupWidget's children are deleted first. The application exits if DummySetupWidget is the main widget.
+    * Destroys the Connector.
     */
-    ~DummySetupWidget();
+    virtual ~Connector();
 
-
-private slots:
     //=========================================================================================================
     /**
-    * Shows the About Dialog
-    *
+    * Initialize a Connector.
     */
-    void showAboutDialog();
+    static void init();
 
-private:
+    //=========================================================================================================
+    /**
+    * Connects all measurements to measurement acceptors, depending on corresponding id's.
+    */
+    static void connectMeasurements();
 
-    DummyToolbox* m_pDummyToolbox;	/**< Holds a pointer to corresponding DummyToolbox.*/
+    //=========================================================================================================
+    /**
+    * Disconnects all measurements to measurement acceptors, depending on corresponding id's.
+    */
+    static void disconnectMeasurements();
 
-    Ui::DummySetupWidgetClass ui;	/**< Holds the user interface for the DummySetupWidget.*/
+    //=========================================================================================================
+    /**
+    * Connects all measurement widgets which are provided by modules of the module id list.
+    *
+    * @param [in] idList list of module id's of which the provided measurements should be connected for displayed.
+    * @param [in] t time needed to initialise real time sample array widgets.
+    */
+    static void connectMeasurementWidgets(QList<MDL_ID::Module_ID>& idList, QTime* t);
+
+    //=========================================================================================================
+    /**
+    * Disconnects all measurement widgets which are provided by modules of the module id list.
+    *
+    * @param [in] idList list of module id's of which the provided measurements should be disconnected from display.
+    */
+    static void disconnectMeasurementWidgets(QList<MDL_ID::Module_ID>& idList);
+
 };
 
 } // NAMESPACE
 
-#endif // DUMMYSETUPWIDGET_H
+#endif // CONNECTOR_H

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dummysetupwidget.h
+* @file     progressbarwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummySetupWidget class.
+* @brief    Contains the declaration of the ProgressBarWidget class.
 *
 */
 
-#ifndef DUMMYSETUPWIDGET_H
-#define DUMMYSETUPWIDGET_H
+#ifndef PROGRESSBARWIDGET_H
+#define PROGRESSBARWIDGET_H
 
 
 //*************************************************************************************************************
@@ -42,9 +42,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_dummysetup.h"
-
-#include <xMeas/Nomenclature/nomenclature.h>
+#include "xdisp_global.h"
+#include "measurementwidget.h"
+#include "ui_progressbarwidget.h"
 
 
 //*************************************************************************************************************
@@ -52,7 +52,28 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QBrush>
+#include <QFont>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace XMEASLIB
+{
+class ProgressBar;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE XDISPLIB
+//=============================================================================================================
+
+namespace XDISPLIB
+{
 
 
 //*************************************************************************************************************
@@ -65,28 +86,17 @@ using namespace XMEASLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE ECGWheelFilterPlugin
-//=============================================================================================================
-
-namespace DummyToolboxModule
-{
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-class DummyToolbox;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS DummySetupWidget
+* DECLARE CLASS ProgressBarWidget
 *
-* @brief The DummySetupWidget class provides the DummyToolbox configuration window.
+* @brief The ProgressBarWidget class provides a progress bar display.
 */
-class DummySetupWidget : public QWidget
+class XDISPSHARED_EXPORT ProgressBarWidget : public MeasurementWidget
 {
     Q_OBJECT
 
@@ -94,36 +104,52 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a DummySetupWidget which is a child of parent.
+    * Constructs a ProgressBarWidget which is a child of parent.
     *
-    * @param [in] toolbox a pointer to the corresponding DummyToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummySetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
+    * @param [in] pProgressBar pointer to ProgressBar measurement.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new ProgressBarWidget becomes a window. If parent is another widget, ProgressBarWidget becomes a child window inside parent. ProgressBarWidget is deleted when its parent is deleted.
     */
-    DummySetupWidget(DummyToolbox* toolbox, QWidget *parent = 0);
+    ProgressBarWidget(ProgressBar* pProgressBar, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the DummySetupWidget.
-    * All DummySetupWidget's children are deleted first. The application exits if DummySetupWidget is the main widget.
+    * Destroys the ProgressBarWidget.
     */
-    ~DummySetupWidget();
+    ~ProgressBarWidget();
 
-
-private slots:
     //=========================================================================================================
     /**
-    * Shows the About Dialog
+    * Is called when new data are available.
+    * Inherited by IObserver.
     *
+    * @param [in] pSubject pointer to Subject -> not used because its direct attached to the measurement.
     */
-    void showAboutDialog();
+    virtual void update(Subject* pSubject);
+
+    //=========================================================================================================
+    /**
+    * Initialise the ProgressBarWidget.
+    */
+    virtual void init();
+
+    //=========================================================================================================
+    /**
+    * Is called to paint the progress bar of the ProgressBarWidget.
+    *
+    * @param [in] event pointer to PaintEvent -> not used.
+    */
+    virtual void paintEvent(QPaintEvent* event);
 
 private:
-
-    DummyToolbox* m_pDummyToolbox;	/**< Holds a pointer to corresponding DummyToolbox.*/
-
-    Ui::DummySetupWidgetClass ui;	/**< Holds the user interface for the DummySetupWidget.*/
+    Ui::ProgressBarWidgetClass  ui;					/**< Holds the user interface of the ProgressBar widget. */
+    ProgressBar*                m_pProgressBar;		/**< Holds ProgressBar measurement. */
+    double                      m_dSegmentSize;		/**< Holds the segment size. */
+    unsigned short              m_usXPos;			/**< Holds the horizontal start position. */
+    QBrush                      m_Brush;			/**< Holds the progress bar brush. */
+    QFont                       m_Font;				/**< Holds the progress bar text font. */
+    QString                     m_Text;				/**< Holds the progress bar progress text. */
 };
 
 } // NAMESPACE
 
-#endif // DUMMYSETUPWIDGET_H
+#endif // PROGRESSBARWIDGET_H

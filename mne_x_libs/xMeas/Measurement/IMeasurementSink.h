@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     ecgsimulator.h
+* @file     IMeasurementSink.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,13 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ECGSimulator class.
+* @brief    Contains the declaration of the IMeasurementSink interface.
 *
 */
 
-#ifndef ECGSIMULATOR_H
-#define ECGSIMULATOR_H
+#ifndef IMEASUREMENTSINK_H
+#define IMEASUREMENTSINK_H
+
 
 
 //*************************************************************************************************************
@@ -42,30 +43,31 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "ecgsimulator_global.h"
+#include "../xmeas_global.h"
+#include "../Nomenclature/nomenclature.h"
 
-#include "ecgsimchannel.h"
-
-#include <mne_x/Interfaces/ISensor.h>
 #include <generics/circularbuffer_old.h>
-#include <xMeas/Measurement/realtimesamplearray.h>
+#include <generics/buffer_old.h>
+
+#include <generics/observerpattern.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT STL INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-#include <QVector>
+//#include <QVector>
+#include <QHash>
+#include <QList>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE ECGSimulatorModule
+// DEFINE NAMESPACE XMEASLIB
 //=============================================================================================================
 
-namespace ECGSimulatorModule
+namespace XMEASLIB
 {
 
 
@@ -74,7 +76,6 @@ namespace ECGSimulatorModule
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEX;
 using namespace IOBuffer;
 
 
@@ -83,86 +84,112 @@ using namespace IOBuffer;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class ECGProducer;
-//class ECGChannel;
+//class Numeric;
+//class RealTimeSampleArray;
+//class ProgressBar;
+//class Text;
+////class Alert;
 
-
-//=============================================================================================================
+//=========================================================================================================
 /**
-* DECLARE CLASS ECGSimulator
+* DECLARE INTERFACE IMeasurementSink
 *
-* @brief The ECGSimulator class provides a ECG simulator.
+* @brief The IMeasurementSink class provides an interface for a measurement acceptor. Todo check what's virtual and write this to inherits
 */
-class ECGSIMULATORSHARED_EXPORT ECGSimulator : public ISensor
+class XMEASSHARED_EXPORT IMeasurementSink : public IObserver
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "ecgsimulator.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::ISensor)
-
-    friend class ECGProducer;
-    friend class ECGSetupWidget;
-    friend class ECGRunWidget;
-
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a ECGSimulator.
+    * Constructs a IMeasurementSink.
     */
-    ECGSimulator();
+    IMeasurementSink();
     //=========================================================================================================
     /**
-    * Destroys the ECGSimulator.
+    * Destroys the IMeasurementSink.
     */
-    virtual ~ECGSimulator();
-
-    virtual bool start();
-    virtual bool stop();
-
-    virtual Type getType() const;
-    virtual const char* getName() const;
-
-    virtual QWidget* setupWidget();
-	virtual QWidget* runWidget();
+    virtual ~IMeasurementSink();
 
     //=========================================================================================================
     /**
-    * Returns the ECGSimulator resource path.
+    * Updates the IObserver.
     *
-    * @return the ECGSimulator resource path.
+    * @param [in] pSubject pointer to the subject where observer is attached to.
     */
-    QString getResourcePath(){return m_qStringResourcePath;};
+    virtual void update(Subject* pSubject) = 0;
 
+    //=========================================================================================================
+    /**
+    * Adds a module which should be accepted by the acceptor
+    *
+    * @param [in] id which should be accepted.
+    */
+    void addModule(MDL_ID::Module_ID id);
+
+    //=========================================================================================================
+    /**
+    * Returns the module types from which are measurements accepted
+    *
+    * @return list of module id's of modules from which measurements are accepted.
+    */
+    inline QList<MDL_ID::Module_ID> getAcceptorModule_IDs() const;
+
+    //=========================================================================================================
+    /**
+    * Adds id's of measurements and pointers to their buffers of measurements which should be accepted.
+    *
+    * @param [in] id of measurement which should be added.
+    * @param [in] buffer pointer to the corresponding buffer of the accepted measurement.
+    */
+    void addAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id, Buffer_old* buffer);
+    //=========================================================================================================
+    /**
+    * Returns accepted measurements.
+    *
+    * @return id's of measurements which are accepted.
+    */
+    inline QList<MSR_ID::Measurement_ID> getAcceptorMeasurement_IDs() const;
+    //=========================================================================================================
+    /**
+    * Returns the buffer of a specific accepted measurement.
+    *
+    * @param [in] id of measurement of which the buffer should be returned.
+    * @return the buffer of the requested measurement.
+    */
+    Buffer_old* getAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id);
+
+    //=========================================================================================================
+    /**
+    * Cleans accepted measurements.
+    */
+    void cleanAcceptor();
 
 protected:
-    virtual void run();
+    QList<MDL_ID::Module_ID>          m_qList_MDL_ID;	/**< Modules of which are measurements accepted of current module.*/
 
-private:
-    //=========================================================================================================
-    /**
-    * Initialise the ECGSimulator.
-    */
-    void init();
-
-    RealTimeSampleArray*    m_pRTSA_ECG_I;		/**< Holds the RealTimeSampleArray to provide the channel ECG I.*/
-    RealTimeSampleArray*    m_pRTSA_ECG_II;		/**< Holds the RealTimeSampleArray to provide the channel ECG II.*/
-    RealTimeSampleArray*    m_pRTSA_ECG_III;	/**< Holds the RealTimeSampleArray to provide the channel ECG III.*/
-
-    float           m_fSamplingRate;			/**< Holds the sampling rate.*/
-    int             m_iDownsamplingFactor;		/**< Holds the down sampling factor.*/
-    ECGBuffer_old*      m_pInBuffer_I;				/**< Holds ECG I data which arrive from ECG producer.*/
-    ECGBuffer_old*      m_pInBuffer_II;				/**< Holds ECG II data which arrive from ECG producer.*/
-    ECGBuffer_old*      m_pInBuffer_III;			/**< Holds ECG III data which arrive from ECG producer.*/
-    ECGProducer*    m_pECGProducer;				/**< Holds the ECGProducer.*/
-
-    QString m_qStringResourcePath;	/**< Holds the path to the ECG resource directory.*/
-
-    ECGSimChannel* m_pECGChannel_ECG_I;		/**< Holds the simulation channel for ECG I.*/
-    ECGSimChannel* m_pECGChannel_ECG_II;	/**< Holds the simulation channel for ECG II.*/
-    ECGSimChannel* m_pECGChannel_ECG_III;	/**< Holds the simulation channel for ECG III.*/
+    QHash<MSR_ID::Measurement_ID, Buffer_old*>*         m_pHashBuffers;	/**< accepted measurements */
 };
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline QList<MDL_ID::Module_ID> IMeasurementSink::getAcceptorModule_IDs() const
+{
+    return m_qList_MDL_ID;
+}
+
+
+//*************************************************************************************************************
+
+inline QList<MSR_ID::Measurement_ID> IMeasurementSink::getAcceptorMeasurement_IDs() const
+{
+    return m_pHashBuffers->keys();
+}
 
 } // NAMESPACE
 
-#endif // ECGSIMULATOR_H
+#endif // IMEASUREMENTSINK_H

@@ -48,16 +48,16 @@ CONFIG(debug, debug|release) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
-            -lrtMeasd \
-            -lMNE$${MNE_LIB_VERSION}Dispd \
-            -lrtDtMngd \
+            -lxMeasd \
+            -lxDispd \
+            -lxDtMngd \
             -lmne_xd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
-            -lrtMeas \
-            -lMNE$${MNE_LIB_VERSION}Disp \
-            -lrtDtMng \
+            -lxMeas \
+            -lxDisp \
+            -lxDtMng \
             -lmne_x
 }
 
@@ -83,6 +83,7 @@ FORMS   +=
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 
 RESOURCES += \
     res/mainApp.qrc

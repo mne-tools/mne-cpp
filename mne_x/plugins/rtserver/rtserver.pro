@@ -41,7 +41,7 @@ CONFIG += plugin
 
 DEFINES += RTSERVER_LIBRARY
 
-QT += core widgets
+QT += widgets
 
 TARGET = rtserver
 CONFIG(debug, debug|release) {
@@ -57,9 +57,9 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}RtCommandd \
             -lMNE$${MNE_LIB_VERSION}RtClientd \
-            -lMNE$${MNE_LIB_VERSION}RtMeasd \
-            -lMNE$${MNE_LIB_VERSION}Dispd \
-            -lMNE$${MNE_LIB_VERSION}RtDtMngd \
+            -lxMeasd \
+            -lxDispd \
+            -lxDtMngd \
             -lmne_xd
 }
 else {
@@ -70,9 +70,9 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}RtCommand \
             -lMNE$${MNE_LIB_VERSION}RtClient \
-            -lMNE$${MNE_LIB_VERSION}RtMeas \
-            -lMNE$${MNE_LIB_VERSION}Disp \
-            -lMNE$${MNE_LIB_VERSION}RtDtMng \
+            -lxMeas \
+            -lxDisp \
+            -lxDtMng \
             -lmne_x
 }
 
@@ -98,6 +98,7 @@ FORMS += \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 
 OTHER_FILES += rtserver.json
 

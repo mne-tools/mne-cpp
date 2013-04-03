@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     ecgsimulator.h
+* @file     IRTRecord.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ECGSimulator class.
+* @brief    Contains declaration of IRTReord interface class.
 *
 */
 
-#ifndef ECGSIMULATOR_H
-#define ECGSIMULATOR_H
+#ifndef IRTRecord_H
+#define IRTRecord_H
 
 
 //*************************************************************************************************************
@@ -42,127 +42,154 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "ecgsimulator_global.h"
-
-#include "ecgsimchannel.h"
-
-#include <mne_x/Interfaces/ISensor.h>
+#include "IModule.h"
+#include <xMeas/Nomenclature/nomenclature.h>
 #include <generics/circularbuffer_old.h>
-#include <xMeas/Measurement/realtimesamplearray.h>
+
+#include <xMeas/Measurement/IMeasurementSink.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT STL INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-#include <QVector>
+#include <QMap>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE ECGSimulatorModule
+// QT INCLUDES
 //=============================================================================================================
 
-namespace ECGSimulatorModule
+#include <QFile>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNEX
+//=============================================================================================================
+
+namespace MNEX
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace MNEX;
-using namespace IOBuffer;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class ECGProducer;
-//class ECGChannel;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ECGSimulator
+* DECLARE CLASS IRTRecord
 *
-* @brief The ECGSimulator class provides a ECG simulator.
+* @brief The IRTRecord class provides an interface for a real-time record module.
 */
-class ECGSIMULATORSHARED_EXPORT ECGSimulator : public ISensor
+class IRTRecord : public IModule, public IMeasurementSink
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "ecgsimulator.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::ISensor)
-
-    friend class ECGProducer;
-    friend class ECGSetupWidget;
-    friend class ECGRunWidget;
-
+//ToDo virtual methods of IMeasurementSink
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a ECGSimulator.
+    * Destroys the IRTRecord.
     */
-    ECGSimulator();
-    //=========================================================================================================
-    /**
-    * Destroys the ECGSimulator.
-    */
-    virtual ~ECGSimulator();
-
-    virtual bool start();
-    virtual bool stop();
-
-    virtual Type getType() const;
-    virtual const char* getName() const;
-
-    virtual QWidget* setupWidget();
-	virtual QWidget* runWidget();
+    virtual ~IRTRecord() {};
 
     //=========================================================================================================
     /**
-    * Returns the ECGSimulator resource path.
+    * Starts the IRTRecord.
+    * Pure virtual method inherited by IModule.
     *
-    * @return the ECGSimulator resource path.
+    * @return true if success, false otherwise
     */
-    QString getResourcePath(){return m_qStringResourcePath;};
+    virtual bool start() = 0;
 
+    //=========================================================================================================
+    /**
+    * Stops the IRTRecord.
+    * Pure virtual method inherited by IModule.
+    *
+    * @return true if success, false otherwise
+    */
+    virtual bool stop() = 0;
+
+    //=========================================================================================================
+    /**
+    * Returns the module type.
+    * Pure virtual method inherited by IModule.
+    *
+    * @return type of the IRTRecord
+    */
+    virtual Type getType() const = 0;
+
+    //=========================================================================================================
+    /**
+    * Returns the module name.
+    * Pure virtual method inherited by IModule.
+    *
+    * @return the name of the IRTRecord.
+    */
+    virtual const char* getName() const = 0;
+
+    //=========================================================================================================
+    /**
+    * Returns the set up widget for configuration of IRTRecord.
+    * Pure virtual method inherited by IModule.
+    *
+    * @return the setup widget.
+    */
+    virtual QWidget* setupWidget() const = 0; //setup();
+
+    //=========================================================================================================
+    /**
+    * Returns the widget which is shown under configuration tab while running mode.
+    * Pure virtual method inherited by IModule.
+    *
+    * @return the run widget.
+    */
+    virtual QWidget* runWidget() const = 0;
+
+    //=========================================================================================================
+    /**
+    * Is called when new data are available.
+    * Pure virtual method inherited by IObserver.
+    *
+    * @param [in] pSubject pointer to Subject, should be up-cast-able to Measurement and even further.
+    */
+    virtual void update(Subject* pSubject) = 0;
+
+    //=========================================================================================================
+    /**
+    * Sets the name of the RTRecord directory.
+    *
+    * @param [in] dirName name of the RTRecord directory
+    */
+    inline void setRTRecordDirName(const QString& dirName);
 
 protected:
-    virtual void run();
 
-private:
     //=========================================================================================================
     /**
-    * Initialise the ECGSimulator.
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread
     */
-    void init();
+    virtual void run() = 0;
 
-    RealTimeSampleArray*    m_pRTSA_ECG_I;		/**< Holds the RealTimeSampleArray to provide the channel ECG I.*/
-    RealTimeSampleArray*    m_pRTSA_ECG_II;		/**< Holds the RealTimeSampleArray to provide the channel ECG II.*/
-    RealTimeSampleArray*    m_pRTSA_ECG_III;	/**< Holds the RealTimeSampleArray to provide the channel ECG III.*/
-
-    float           m_fSamplingRate;			/**< Holds the sampling rate.*/
-    int             m_iDownsamplingFactor;		/**< Holds the down sampling factor.*/
-    ECGBuffer_old*      m_pInBuffer_I;				/**< Holds ECG I data which arrive from ECG producer.*/
-    ECGBuffer_old*      m_pInBuffer_II;				/**< Holds ECG II data which arrive from ECG producer.*/
-    ECGBuffer_old*      m_pInBuffer_III;			/**< Holds ECG III data which arrive from ECG producer.*/
-    ECGProducer*    m_pECGProducer;				/**< Holds the ECGProducer.*/
-
-    QString m_qStringResourcePath;	/**< Holds the path to the ECG resource directory.*/
-
-    ECGSimChannel* m_pECGChannel_ECG_I;		/**< Holds the simulation channel for ECG I.*/
-    ECGSimChannel* m_pECGChannel_ECG_II;	/**< Holds the simulation channel for ECG II.*/
-    ECGSimChannel* m_pECGChannel_ECG_III;	/**< Holds the simulation channel for ECG III.*/
+    QString                         m_RTRecordDirName;		/**< Holds the real-time record sub directory name. */
+    typedef QMap<S16, QFile*>       t_FileMap;				/**< Defines a new file mapping type. */
+    t_FileMap                       m_mapFiles;				/**< Holds the file map. */
 };
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline void IRTRecord::setRTRecordDirName(const QString& dirName)
+{
+    m_RTRecordDirName = dirName;
+}
 
 } // NAMESPACE
 
-#endif // ECGSIMULATOR_H
+Q_DECLARE_INTERFACE(MNEX::IRTRecord, "mne_x/1.0")
+
+#endif // IRTRecord_H

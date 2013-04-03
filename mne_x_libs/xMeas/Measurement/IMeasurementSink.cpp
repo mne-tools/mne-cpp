@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dummysetupwidget.h
+* @file     IMeasurementSink.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,31 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummySetupWidget class.
+* @brief    Contains the implementation of the IMeasurementSink interface.
 *
 */
-
-#ifndef DUMMYSETUPWIDGET_H
-#define DUMMYSETUPWIDGET_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_dummysetup.h"
-
-#include <xMeas/Nomenclature/nomenclature.h>
+#include "IMeasurementSink.h"
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QtWidgets>
-
+#include <QDebug>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -65,65 +53,66 @@ using namespace XMEASLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE ECGWheelFilterPlugin
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace DummyToolboxModule
+IMeasurementSink::IMeasurementSink()
+: m_pHashBuffers(new QHash<MSR_ID::Measurement_ID, Buffer_old*>)
 {
+
+}
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
 
-class DummyToolbox;
-
-
-//=============================================================================================================
-/**
-* DECLARE CLASS DummySetupWidget
-*
-* @brief The DummySetupWidget class provides the DummyToolbox configuration window.
-*/
-class DummySetupWidget : public QWidget
+IMeasurementSink::~IMeasurementSink()
 {
-    Q_OBJECT
+//	foreach(Buffer* buf, m_pHashBuffers->values())
 
-public:
-
-    //=========================================================================================================
-    /**
-    * Constructs a DummySetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding DummyToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummySetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
-    */
-    DummySetupWidget(DummyToolbox* toolbox, QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the DummySetupWidget.
-    * All DummySetupWidget's children are deleted first. The application exits if DummySetupWidget is the main widget.
-    */
-    ~DummySetupWidget();
+//    m_pBuffInp_r->clear();
+//    m_pBuffInp_phi->clear();
+//    m_pBuffInp_theta->clear();
+//ToDo Cleanup STuff inside the buffer
+    delete m_pHashBuffers;
+}
 
 
-private slots:
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
+//*************************************************************************************************************
 
-private:
+void IMeasurementSink::addModule(MDL_ID::Module_ID id)
+{
+    if(!m_qList_MDL_ID.contains(id))
+        m_qList_MDL_ID.append(id);
+}
 
-    DummyToolbox* m_pDummyToolbox;	/**< Holds a pointer to corresponding DummyToolbox.*/
 
-    Ui::DummySetupWidgetClass ui;	/**< Holds the user interface for the DummySetupWidget.*/
-};
+//*************************************************************************************************************
 
-} // NAMESPACE
+void IMeasurementSink::addAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id, Buffer_old* buffer)
+{
+//ToDo test at the same time if measurement is accepted
+    qDebug() << "inside adding Measurement";
+    if(!m_pHashBuffers->contains(id))
+        m_pHashBuffers->insert(id, buffer);
+}
 
-#endif // DUMMYSETUPWIDGET_H
+
+//*************************************************************************************************************
+
+Buffer_old* IMeasurementSink::getAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id)
+{
+    if(m_pHashBuffers->contains(id))
+        return m_pHashBuffers->value(id);
+
+    return NULL;
+}
+
+
+//*************************************************************************************************************
+
+void IMeasurementSink::cleanAcceptor()
+{
+    qDebug()<<"IMeasurementSink::clean(): Cleaning up IMeasurementSink";
+
+    m_pHashBuffers->clear();
+}

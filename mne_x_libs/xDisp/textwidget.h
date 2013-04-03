@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dummysetupwidget.h
+* @file     textwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummySetupWidget class.
+* @brief    Contains the declaration of the TextWidget class.
 *
 */
 
-#ifndef DUMMYSETUPWIDGET_H
-#define DUMMYSETUPWIDGET_H
+#ifndef TEXTWIDGET_H
+#define TEXTWIDGET_H
 
 
 //*************************************************************************************************************
@@ -42,17 +42,29 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_dummysetup.h"
-
-#include <xMeas/Nomenclature/nomenclature.h>
+#include "xdisp_global.h"
+#include "measurementwidget.h"
+#include "ui_textwidget.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-#include <QtWidgets>
+namespace XMEASLIB
+{
+class Text;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE XDISPLIB
+//=============================================================================================================
+
+namespace XDISPLIB
+{
 
 
 //*************************************************************************************************************
@@ -63,30 +75,13 @@
 using namespace XMEASLIB;
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE ECGWheelFilterPlugin
-//=============================================================================================================
-
-namespace DummyToolboxModule
-{
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class DummyToolbox;
-
-
 //=============================================================================================================
 /**
-* DECLARE CLASS DummySetupWidget
+* DECLARE CLASS TextWidget
 *
-* @brief The DummySetupWidget class provides the DummyToolbox configuration window.
+* @brief The TextWidget class provides a digital text widget.
 */
-class DummySetupWidget : public QWidget
+class XDISPSHARED_EXPORT TextWidget : public MeasurementWidget
 {
     Q_OBJECT
 
@@ -94,36 +89,39 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a DummySetupWidget which is a child of parent.
+    * Constructs a TextWidget which is a child of parent.
     *
-    * @param [in] toolbox a pointer to the corresponding DummyToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummySetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
+    * @param [in] pText pointer to Text measurement.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new TextWidget becomes a window. If parent is another widget, TextWidget becomes a child window inside parent. TextWidget is deleted when its parent is deleted.
     */
-    DummySetupWidget(DummyToolbox* toolbox, QWidget *parent = 0);
+    TextWidget(Text* pText, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the DummySetupWidget.
-    * All DummySetupWidget's children are deleted first. The application exits if DummySetupWidget is the main widget.
+    * Destroys the TextWidget.
     */
-    ~DummySetupWidget();
+    ~TextWidget();
 
-
-private slots:
     //=========================================================================================================
     /**
-    * Shows the About Dialog
+    * Is called when new data are available.
+    * Inherited by IObserver.
     *
+    * @param [in] pSubject pointer to Subject -> not used because its direct attached to the measurement.
     */
-    void showAboutDialog();
+    virtual void update(Subject* pSubject);
+
+    //=========================================================================================================
+    /**
+    * Initialise the TextWidget.
+    */
+    virtual void init();
 
 private:
-
-    DummyToolbox* m_pDummyToolbox;	/**< Holds a pointer to corresponding DummyToolbox.*/
-
-    Ui::DummySetupWidgetClass ui;	/**< Holds the user interface for the DummySetupWidget.*/
+    Ui::TextWidgetClass ui;			/**< Holds the user interface of the numeric widget. */
+    Text*               m_pText;	/**< Holds the pointer to the Text measurement. */
 };
 
 } // NAMESPACE
 
-#endif // DUMMYSETUPWIDGET_H
+#endif // TEXTWIDGET_H
