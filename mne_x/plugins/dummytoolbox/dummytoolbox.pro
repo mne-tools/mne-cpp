@@ -51,17 +51,17 @@ CONFIG(debug, debug|release) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
-            -lMNE$${MNE_LIB_VERSION}RtMeasd \
+            -lrtMeasd \
             -lMNE$${MNE_LIB_VERSION}Dispd \
-            -lMNE$${MNE_LIB_VERSION}RtDtMngd \
-            -lMNE$${MNE_LIB_VERSION}mne_xd
+            -lrtDtMngd \
+            -lmne_xd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
-            -lMNE$${MNE_LIB_VERSION}RtMeas \
+            -lrtMeas \
             -lMNE$${MNE_LIB_VERSION}Disp \
-            -lMNE$${MNE_LIB_VERSION}RtDtMng \
-            -lMNE$${MNE_LIB_VERSION}mne_x
+            -lrtDtMng \
+            -lmne_x
 }
 
 DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins

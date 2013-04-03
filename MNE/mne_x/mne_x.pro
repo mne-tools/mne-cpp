@@ -42,7 +42,6 @@ QT += widgets
 DEFINES += MNE_X_LIBRARY
 
 TARGET = mne_x
-TARGET = $$join(TARGET,,MNE$$MNE_LIB_VERSION,)
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -50,15 +49,15 @@ CONFIG(debug, debug|release) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
-            -lMNE$${MNE_LIB_VERSION}RtMeasd \
+            -lrtMeasd \
             -lMNE$${MNE_LIB_VERSION}dispd \
-            -lMNE$${MNE_LIB_VERSION}rtDtMngd
+            -lrtDtMngd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
-            -lMNE$${MNE_LIB_VERSION}RtMeas \
+            -lrtMeas \
             -lMNE$${MNE_LIB_VERSION}disp \
-            -lMNE$${MNE_LIB_VERSION}rtDtMng
+            -lrtDtMng
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}

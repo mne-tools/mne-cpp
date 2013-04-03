@@ -60,7 +60,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}RtMeasd \
             -lMNE$${MNE_LIB_VERSION}Dispd \
             -lMNE$${MNE_LIB_VERSION}RtDtMngd \
-            -lMNE$${MNE_LIB_VERSION}mne_xd
+            -lmne_xd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
@@ -73,7 +73,7 @@ else {
             -lMNE$${MNE_LIB_VERSION}RtMeas \
             -lMNE$${MNE_LIB_VERSION}Disp \
             -lMNE$${MNE_LIB_VERSION}RtDtMng \
-            -lMNE$${MNE_LIB_VERSION}mne_x
+            -lmne_x
 }
 
 DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
