@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dummysetupwidget.cpp
+* @file     brainmonitor_global.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,19 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ECGSetupWidget class.
+* @brief    Contains the BrainMonitor library export/import macros.
 *
 */
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "dummysetupwidget.h"
-#include "dummyaboutwidget.h"
-
-#include "../dummytoolbox.h"
+#ifndef BRAINMONITOR_GLOBAL_H
+#define BRAINMONITOR_GLOBAL_H
 
 
 //*************************************************************************************************************
@@ -49,44 +42,18 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
+#include <QtCore/qglobal.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// PREPROCESSOR DEFINES
 //=============================================================================================================
 
-using namespace DummyToolboxPlugin;
+#if defined(BRAINMONITOR_LIBRARY)
+#  define BRAINMONITORSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#else
+#  define BRAINMONITORSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#endif
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-DummySetupWidget::DummySetupWidget(DummyToolbox* toolbox, QWidget *parent)
-: QWidget(parent)
-, m_pDummyToolbox(toolbox)
-{
-    ui.setupUi(this);
-
-    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
-}
-
-
-//*************************************************************************************************************
-
-DummySetupWidget::~DummySetupWidget()
-{
-
-}
-
-
-//*************************************************************************************************************
-
-void DummySetupWidget::showAboutDialog()
-{
-    DummyAboutWidget aboutDialog(this);
-    aboutDialog.exec();
-}
+#endif // BRAINMONITOR_GLOBAL_H

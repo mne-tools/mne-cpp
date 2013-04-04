@@ -15,9 +15,8 @@ TEMPLATE = subdirs
 SUBDIRS += \
     ecgsimulator \
     dummytoolbox \
-    rtserver
-
-#    brainmonitor \
+    rtserver \
+    brainmonitor \
 #    filtertoolbox \
 #    gaborparticletoolbox \
 #    megchannelsimulator \

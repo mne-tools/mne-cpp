@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dummyrunwidget.h
+* @file     brainmonitorsetupwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummyRunWidget class.
+* @brief    Contains the declaration of the BrainMonitorSetupWidget class.
 *
 */
 
-#ifndef DUMMYRUNWIDGET_H
-#define DUMMYRUNWIDGET_H
+#ifndef BRAINMONITORSETUPWIDGET_H
+#define BRAINMONITORSETUPWIDGET_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_dummyrun.h"
+#include "../ui_brainmonitorsetup.h"
+
+#include <xMeas/Nomenclature/nomenclature.h>
 
 
 //*************************************************************************************************************
@@ -55,10 +57,18 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DummyToolboxPlugin
+// USED NAMESPACES
 //=============================================================================================================
 
-namespace DummyToolboxPlugin
+using namespace XMEASLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE BrainMonitorPlugin
+//=============================================================================================================
+
+namespace BrainMonitorPlugin
 {
 
 
@@ -67,22 +77,16 @@ namespace DummyToolboxPlugin
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class DummyToolbox;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
+class BrainMonitor;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS DummyRunWidget
+* DECLARE CLASS BrainMonitorSetupWidget
 *
-* @brief The DummyRunWidget class provides the DummyToolbox configuration window for the run mode.
+* @brief The BrainMonitorSetupWidget class provides the DummyToolbox configuration window.
 */
-class DummyRunWidget : public QWidget
+class BrainMonitorSetupWidget : public QWidget
 {
     Q_OBJECT
 
@@ -90,19 +94,20 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a DummyRunWidget which is a child of parent.
+    * Constructs a BrainMonitorSetupWidget which is a child of parent.
     *
-    * @param [in] toolbox a pointer to the corresponding DummyToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummyRunWidget becomes a window. If parent is another widget, DummyRunWidget becomes a child window inside parent. DummyRunWidget is deleted when its parent is deleted.
+    * @param [in] p_pBrainMonitor   a pointer to the corresponding DummyToolbox.
+    * @param [in] parent            pointer to parent widget; If parent is 0, the new BrainMonitorSetupWidget becomes a window. If parent is another widget, BrainMonitorSetupWidget becomes a child window inside parent. BrainMonitorSetupWidget is deleted when its parent is deleted.
     */
-    DummyRunWidget(DummyToolbox* toolbox, QWidget *parent = 0);
+    BrainMonitorSetupWidget(BrainMonitor* p_pBrainMonitor, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the DummyRunWidget.
-    * All DummyRunWidget's children are deleted first. The application exits if DummyRunWidget is the main widget.
+    * Destroys the BrainMonitorSetupWidget.
+    * All BrainMonitorSetupWidget's children are deleted first. The application exits if BrainMonitorSetupWidget is the main widget.
     */
-    ~DummyRunWidget();
+    ~BrainMonitorSetupWidget();
+
 
 private slots:
     //=========================================================================================================
@@ -114,11 +119,11 @@ private slots:
 
 private:
 
-    DummyToolbox*    m_pDummyToolbox;	/**< Holds a pointer to corresponding DummyToolbox.*/
+    BrainMonitor* m_pBrainMonitor;	/**< Holds a pointer to corresponding DummyToolbox.*/
 
-    Ui::DummyRunWidgetClass ui;		/**< Holds the user interface for the DummyRunWidget.*/
+    Ui::BrainMonitorSetupWidgetClass ui;	/**< Holds the user interface for the BrainMonitorSetupWidget.*/
 };
 
 } // NAMESPACE
 
-#endif // DUMMYRUNWIDGET_H
+#endif // BrainMonitorSetupWidget_H
