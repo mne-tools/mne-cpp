@@ -73,6 +73,14 @@ RTServerSetupWidget::RTServerSetupWidget(RTServer* simulator, QWidget* parent)
 
     connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
 
+    this->setConnectionStatus(m_pRTServer->m_pRtClient->getConnectionStatus());
+
+//    if(m_pRTServer->m_pRtClient->getConnectionStatus())
+//        ui.m_qTextBrowser_Information->setText(QString("true"));
+//    else
+//        ui.m_qTextBrowser_Information->setText(QString("false"));
+
+    connect(m_pRTServer->m_pRtClient, &RtClient::connectionChanged, this, &RTServerSetupWidget::setConnectionStatus);
 }
 
 
@@ -81,6 +89,29 @@ RTServerSetupWidget::RTServerSetupWidget(RTServer* simulator, QWidget* parent)
 RTServerSetupWidget::~RTServerSetupWidget()
 {
 
+}
+
+
+//*************************************************************************************************************
+
+void RTServerSetupWidget::printToLog(QString logMsg)
+{
+    ui.m_qTextBrowser_ServerMessage->insertPlainText(logMsg+"\n");
+    //scroll down to the newest entry
+    QTextCursor c = ui.m_qTextBrowser_ServerMessage->textCursor();
+    c.movePosition(QTextCursor::End);
+    ui.m_qTextBrowser_ServerMessage->setTextCursor(c);
+}
+
+
+//*************************************************************************************************************
+
+void RTServerSetupWidget::setConnectionStatus(bool p_bConnectionStatus)
+{
+    if(p_bConnectionStatus)
+        this->printToLog(QString("Connected to mne_rt_server"));
+    else
+        this->printToLog(QString("Not connected to mne_rt_server"));
 }
 
 

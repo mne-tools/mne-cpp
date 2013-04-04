@@ -79,7 +79,7 @@ RtClient::~RtClient()
 
 //*************************************************************************************************************
 
-bool RtClient::rtServerStatus()
+bool RtClient::getConnectionStatus()
 {
     return m_bIsConnected;
 }
@@ -123,6 +123,8 @@ void RtClient::run()
     mutex.lock();
     m_bIsConnected = true;
     mutex.unlock();
+
+    emit connectionChanged(m_bIsConnected);
 
     msleep(1000);
 
@@ -199,4 +201,10 @@ void RtClient::run()
     //
     t_cmdClient.disconnectFromHost();
     t_dataClient.disconnectFromHost();
+
+    mutex.lock();
+    m_bIsConnected = false;
+    mutex.unlock();
+
+    emit connectionChanged(m_bIsConnected);
 }

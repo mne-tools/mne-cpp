@@ -140,7 +140,7 @@ public:
     *
     * @return true if started, false otherwise
     */
-    bool rtServerStatus();
+    bool getConnectionStatus();
 
     //=========================================================================================================
     /**
@@ -176,6 +176,14 @@ signals:
     * @param[in] p_rawBuffer    the received raw buffer
     */
     void rawBufferReceived(Eigen::MatrixXf p_rawBuffer);
+
+    //=========================================================================================================
+    /**
+    * Emitted when connection status changed
+    *
+    * @param[in] p_bStatus  connection status
+    */
+    void connectionChanged(bool p_bStatus);
 };
 
 } // NAMESPACE

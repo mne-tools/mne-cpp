@@ -257,29 +257,29 @@ private:
 
 private slots:
 
-    void CentralWidgetShowModule();		/**< Sets a widget to central widget of MainWindow class depending on the current module selected in m_pDockWidgetModules.*/
+    void CentralWidgetShowModule();     /**< Sets a widget to central widget of MainWindow class depending on the current module selected in m_pDockWidgetModules.*/
 
-    void newConfiguration();			/**< Implements new configuration tasks.*/
-    void openConfiguration();			/**< Implements open configuration tasks.*/
-    void saveConfiguration();			/**< Implements save configuration tasks.*/
+    void newConfiguration();            /**< Implements new configuration tasks.*/
+    void openConfiguration();           /**< Implements open configuration tasks.*/
+    void saveConfiguration();           /**< Implements save configuration tasks.*/
 
-    void helpContents();				/**< Implements help contents action.*/
+    void helpContents();                /**< Implements help contents action.*/
 
-    void about();						/**< Implements about action.*/
+    void about();                       /**< Implements about action.*/
 
-    void setMinLogLevel();				/**< Sets minimal log level as current log level.*/
-    void setNormalLogLevel();			/**< Sets normal log level as current log level.*/
-    void setMaxLogLevel();				/**< Sets maximal log level as current log level.*/
+    void setMinLogLevel();              /**< Sets minimal log level as current log level.*/
+    void setNormalLogLevel();           /**< Sets normal log level as current log level.*/
+    void setMaxLogLevel();              /**< Sets maximal log level as current log level.*/
 
-    void startRTMeasurement();			/**< Runs application.*/
-    void stopRTMeasurement();			/**< Stops application.*/
+    void startMeasurement();            /**< Runs application.*/
+    void stopMeasurement();             /**< Stops application.*/
 
-    void zoomStd(); 					/**< Implements standard of runWidget.*/
-    void zoomIn();						/**< Implements zoom in of runWidget.*/
-    void zoomOut();						/**< Implements zoom out of runWidget.*/
-    void toggleDisplayMax();			/**< Implements show full screen mode of runWidget.*/
+    void zoomStd();                     /**< Implements standard of runWidget.*/
+    void zoomIn();                      /**< Implements zoom in of runWidget.*/
+    void zoomOut();                     /**< Implements zoom out of runWidget.*/
+    void toggleDisplayMax();            /**< Implements show full screen mode of runWidget.*/
 
-    void updateTime();		/**< Updates m_pTime and is called through timeout() of m_pTimer.*/
+    void updateTime();                  /**< Updates m_pTime and is called through timeout() of m_pTimer.*/
 
 };
 

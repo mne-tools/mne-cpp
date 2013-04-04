@@ -97,7 +97,17 @@ public:
     */
     ~RTServerSetupWidget();
 
-private slots:
+
+    void printToLog(QString message);   /**< Implements printing messages to rtproc log.*/
+
+private:
+    //=========================================================================================================
+    /**
+    * Set connection status
+    *
+    * @param[in] p_bConnectionStatus    the connection status
+    */
+    void setConnectionStatus(bool p_bConnectionStatus);
 
     //=========================================================================================================
     /**
@@ -106,11 +116,9 @@ private slots:
     */
     void showAboutDialog();
 
-
-private:
     RTServer*   m_pRTServer;    /**< Holds a pointer to corresponding ECGSimulator.*/
 
-    Ui::RTServerSetupClass ui;       /**< Holds the user interface for the RTServerSetupWidget.*/
+    Ui::RTServerSetupWidgetClass ui;       /**< Holds the user interface for the RTServerSetupWidget.*/
 };
 
 } // NAMESPACE
