@@ -118,8 +118,7 @@ public:
     */
     void initChannelStates();
 
-
-private slots:
+private:
 
     //=========================================================================================================
     /**
@@ -206,7 +205,6 @@ private slots:
     void showAboutDialog();
 
 
-private:
     ECGSimulator*           m_pECGSimulator;	/**< Holds a pointer to corresponding ECGSimulator.*/
 
     Ui::ECGSetupClass ui;		/**< Holds the user interface for the ECGSetupWidget.*/

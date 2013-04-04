@@ -317,12 +317,12 @@ void MainWindow::createActions()
     m_pActionRun = new QAction(QIcon(":/images/run.png"), tr("Run (F5)"), this);
     m_pActionRun->setShortcut(tr("F5"));
     m_pActionRun->setStatusTip(tr("Runs (F5) ")+CInfo::AppNameShort());
-    connect(m_pActionRun, SIGNAL(triggered()), this, SLOT(startRTMeasurement()));
+    connect(m_pActionRun, SIGNAL(triggered()), this, SLOT(startMeasurement()));
 
     m_pActionStop = new QAction(QIcon(":/images/stop.png"), tr("Stop (F6)"), this);
     m_pActionStop->setShortcut(tr("F6"));
     m_pActionStop->setStatusTip(tr("Stops (F6) ")+CInfo::AppNameShort());
-    connect(m_pActionStop, SIGNAL(triggered()), this, SLOT(stopRTMeasurement()));
+    connect(m_pActionStop, SIGNAL(triggered()), this, SLOT(stopMeasurement()));
 
     m_pActionZoomStd = new QAction(QIcon(":/images/zoomStd.png"), tr("Standard Zoom (Ctrl+0)"), this);
     m_pActionZoomStd->setShortcut(tr("Ctrl+0"));
@@ -532,13 +532,13 @@ void MainWindow::writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl
 
 //*************************************************************************************************************
 
-void MainWindow::startRTMeasurement()
+void MainWindow::startMeasurement()
 {
     emit newLogMsg(tr("Starting real-time measurement..."), _LogKndMessage, _LogLvMin);
 
-    qDebug() << "MainCSART::startRTMeasurement()";
+    qDebug() << "MainCSART::startMeasurement()";
 
-    //RTMeasurementManager::clean();
+    //MeasurementManager::clean();
     //DisplayManager::clean();
 
     if(!ModuleManager::startModules())
@@ -556,11 +556,11 @@ void MainWindow::startRTMeasurement()
 
 //*************************************************************************************************************
 
-void MainWindow::stopRTMeasurement()
+void MainWindow::stopMeasurement()
 {
     emit newLogMsg(tr("Stopping real-time measurement..."), _LogKndMessage, _LogLvMin);
 
-    qDebug() << "MainWindow::stopRTMeasurement()";
+    qDebug() << "MainWindow::stopMeasurement()";
 
 
     ModuleManager::stopModules();
