@@ -62,7 +62,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DummyToolboxModule;
+using namespace DummyToolboxPlugin;
 using namespace MNEX;
 using namespace XMEASLIB;
 

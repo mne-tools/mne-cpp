@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dummyrunwidget.h
+* @file     brainmonitor.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummyRunWidget class.
+* @brief    Contains the declaration of the BrainMonitor class.
 *
 */
 
-#ifndef DUMMYRUNWIDGET_H
-#define DUMMYRUNWIDGET_H
+#ifndef BRAINMONITOR_H
+#define BRAINMONITOR_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_dummyrun.h"
+#include "brainmonitor_global.h"
+#include <mne_x/Interfaces/IRTVisualization.h>
+#include <generics/circularbuffer_old.h>
+#include <generics/circularmultichannelbuffer_old.h>
+
+#include <xMeas/Measurement/realtimesamplearray.h>
+#include <xMeas/Measurement/realtimemultisamplearray.h>
 
 
 //*************************************************************************************************************
@@ -55,19 +61,11 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DummyToolboxPlugin
+// DEFINE NAMESPACE BrainMonitorPlugin
 //=============================================================================================================
 
-namespace DummyToolboxPlugin
+namespace BrainMonitorPlugin
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class DummyToolbox;
 
 
 //*************************************************************************************************************
@@ -75,50 +73,64 @@ class DummyToolbox;
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace MNEX;
+using namespace IOBuffer;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
 
 //=============================================================================================================
 /**
-* DECLARE CLASS DummyRunWidget
+* DECLARE CLASS BrainMonitor
 *
-* @brief The DummyRunWidget class provides the DummyToolbox configuration window for the run mode.
+* @brief The BrainMonitor class provides a dummy algorithm structure.
 */
-class DummyRunWidget : public QWidget
+class BRAINMONITORSHARED_EXPORT BrainMonitor : public IRTVisualization
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "brainmonitor.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
+    Q_INTERFACES(MNEX::IRTVisualization)
 
 public:
-
     //=========================================================================================================
     /**
-    * Constructs a DummyRunWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding DummyToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummyRunWidget becomes a window. If parent is another widget, DummyRunWidget becomes a child window inside parent. DummyRunWidget is deleted when its parent is deleted.
+    * Constructs a BrainMonitor.
     */
-    DummyRunWidget(DummyToolbox* toolbox, QWidget *parent = 0);
-
+    BrainMonitor();
     //=========================================================================================================
     /**
-    * Destroys the DummyRunWidget.
-    * All DummyRunWidget's children are deleted first. The application exits if DummyRunWidget is the main widget.
+    * Destroys the BrainMonitor.
     */
-    ~DummyRunWidget();
+    ~BrainMonitor();
 
-private slots:
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
+    virtual bool start();
+    virtual bool stop();
+
+    virtual Type getType() const;
+    virtual const char* getName() const;
+
+    virtual QWidget* setupWidget();
+    virtual QWidget* runWidget();
+
+    virtual void update(Subject* pSubject);
+
+protected:
+    virtual void run();
 
 private:
+    //=========================================================================================================
+    /**
+    * Initialise the BrainMonitor.
+    */
+    void init();
 
-    DummyToolbox*    m_pDummyToolbox;	/**< Holds a pointer to corresponding DummyToolbox.*/
-
-    Ui::DummyRunWidgetClass ui;		/**< Holds the user interface for the DummyRunWidget.*/
 };
 
 } // NAMESPACE
 
-#endif // DUMMYRUNWIDGET_H
+#endif // BRAINMONITOR_H

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dummyrunwidget.h
+* @file     brainmonitor.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,20 +29,23 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummyRunWidget class.
+* @brief    Contains the implementation of the BrainMonitor class.
 *
 */
-
-#ifndef DUMMYRUNWIDGET_H
-#define DUMMYRUNWIDGET_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_dummyrun.h"
+#include "brainmonitor.h"
+
+#include <xMeas/Measurement/measurement.h>
+
+#include <xMeas/Measurement/realtimesamplearray.h>
+
+#include "FormFiles/brainmonitorsetupwidget.h"
+#include "FormFiles/brainmonitorrunwidget.h"
 
 
 //*************************************************************************************************************
@@ -50,24 +53,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE DummyToolboxPlugin
-//=============================================================================================================
-
-namespace DummyToolboxPlugin
-{
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class DummyToolbox;
+#include <QtCore/QtPlugin>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -75,50 +62,118 @@ class DummyToolbox;
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace BrainMonitorPlugin;
+using namespace MNEX;
+using namespace XMEASLIB;
 
+
+//*************************************************************************************************************
 //=============================================================================================================
-/**
-* DECLARE CLASS DummyRunWidget
-*
-* @brief The DummyRunWidget class provides the DummyToolbox configuration window for the run mode.
-*/
-class DummyRunWidget : public QWidget
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+BrainMonitor::BrainMonitor()
 {
-    Q_OBJECT
 
-public:
+}
 
-    //=========================================================================================================
-    /**
-    * Constructs a DummyRunWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding DummyToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummyRunWidget becomes a window. If parent is another widget, DummyRunWidget becomes a child window inside parent. DummyRunWidget is deleted when its parent is deleted.
-    */
-    DummyRunWidget(DummyToolbox* toolbox, QWidget *parent = 0);
 
-    //=========================================================================================================
-    /**
-    * Destroys the DummyRunWidget.
-    * All DummyRunWidget's children are deleted first. The application exits if DummyRunWidget is the main widget.
-    */
-    ~DummyRunWidget();
+//*************************************************************************************************************
 
-private slots:
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
+BrainMonitor::~BrainMonitor()
+{
+    stop();
 
-private:
+}
 
-    DummyToolbox*    m_pDummyToolbox;	/**< Holds a pointer to corresponding DummyToolbox.*/
 
-    Ui::DummyRunWidgetClass ui;		/**< Holds the user interface for the DummyRunWidget.*/
-};
+//*************************************************************************************************************
 
-} // NAMESPACE
+bool BrainMonitor::start()
+{
+    // Initialize displaying widgets
+    init();
 
-#endif // DUMMYRUNWIDGET_H
+    QThread::start();
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool BrainMonitor::stop()
+{
+    // Stop threads
+    QThread::terminate();
+    QThread::wait();
+
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+Type BrainMonitor::getType() const
+{
+    return _IRTVisualization;
+}
+
+
+//*************************************************************************************************************
+
+const char* BrainMonitor::getName() const
+{
+    return "Brain Monitor";
+}
+
+
+//*************************************************************************************************************
+
+QWidget* BrainMonitor::setupWidget()
+{
+    BrainMonitorSetupWidget* setupWidget = new BrainMonitorSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    return setupWidget;
+}
+
+
+//*************************************************************************************************************
+
+QWidget* BrainMonitor::runWidget()
+{
+    BrainMonitorRunWidget* runWidget = new BrainMonitorRunWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    return runWidget;
+}
+
+
+//*************************************************************************************************************
+
+void BrainMonitor::update(Subject* pSubject)
+{
+
+}
+
+
+//*************************************************************************************************************
+
+void BrainMonitor::run()
+{
+    while (true)
+    {
+//        double v_one = m_pDummyMultiChannelBuffer->pop(0);
+
+//        double v_two = m_pDummyMultiChannelBuffer->pop(1);
+
+    }
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Creating required display instances and set configurations
+//=============================================================================================================
+
+void BrainMonitor::init()
+{
+
+}

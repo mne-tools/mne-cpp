@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dummyrunwidget.h
+* @file     dummysetupwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,20 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummyRunWidget class.
+* @brief    Contains the implementation of the ECGSetupWidget class.
 *
 */
-
-#ifndef DUMMYRUNWIDGET_H
-#define DUMMYRUNWIDGET_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_dummyrun.h"
+#include "brainmonitorsetupwidget.h"
+#include "brainmonitoraboutwidget.h"
+
+#include "../brainmonitor.h"
 
 
 //*************************************************************************************************************
@@ -50,24 +49,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE DummyToolboxPlugin
-//=============================================================================================================
-
-namespace DummyToolboxPlugin
-{
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class DummyToolbox;
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -75,50 +57,36 @@ class DummyToolbox;
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace BrainMonitorPlugin;
 
+
+//*************************************************************************************************************
 //=============================================================================================================
-/**
-* DECLARE CLASS DummyRunWidget
-*
-* @brief The DummyRunWidget class provides the DummyToolbox configuration window for the run mode.
-*/
-class DummyRunWidget : public QWidget
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+BrainMonitorSetupWidget::BrainMonitorSetupWidget(BrainMonitor* p_pBrainMonitor, QWidget *parent)
+: QWidget(parent)
+, m_pBrainMonitor(p_pBrainMonitor)
 {
-    Q_OBJECT
+    ui.setupUi(this);
 
-public:
+    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
+}
 
-    //=========================================================================================================
-    /**
-    * Constructs a DummyRunWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding DummyToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummyRunWidget becomes a window. If parent is another widget, DummyRunWidget becomes a child window inside parent. DummyRunWidget is deleted when its parent is deleted.
-    */
-    DummyRunWidget(DummyToolbox* toolbox, QWidget *parent = 0);
 
-    //=========================================================================================================
-    /**
-    * Destroys the DummyRunWidget.
-    * All DummyRunWidget's children are deleted first. The application exits if DummyRunWidget is the main widget.
-    */
-    ~DummyRunWidget();
+//*************************************************************************************************************
 
-private slots:
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
+BrainMonitorSetupWidget::~BrainMonitorSetupWidget()
+{
 
-private:
+}
 
-    DummyToolbox*    m_pDummyToolbox;	/**< Holds a pointer to corresponding DummyToolbox.*/
 
-    Ui::DummyRunWidgetClass ui;		/**< Holds the user interface for the DummyRunWidget.*/
-};
+//*************************************************************************************************************
 
-} // NAMESPACE
-
-#endif // DUMMYRUNWIDGET_H
+void BrainMonitorSetupWidget::showAboutDialog()
+{
+    BrainMonitorAboutWidget aboutDialog(this);
+    aboutDialog.exec();
+}
