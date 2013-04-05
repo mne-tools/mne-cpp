@@ -225,7 +225,7 @@ void FiffStreamThread::sendMeasurementInfo(qint32 ID, FiffInfo p_fiffInfo)
         QList<FiffChInfo> chs;
 
         for(k = 0; k < p_fiffInfo.nchan; ++k)
-            chs << p_fiffInfo.chs.at(k);
+            chs << p_fiffInfo.chs[k];
 
         fiff_int_t nchan = chs.size();
 
