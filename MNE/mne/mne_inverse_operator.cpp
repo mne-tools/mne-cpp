@@ -1052,3 +1052,97 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
 
     return true;
 }
+
+
+//*************************************************************************************************************
+
+void MNEInverseOperator::write_inverse_operator(QIODevice &p_IODevice)
+{
+    //
+    //   Open the file, create directory
+    //
+
+    // Create the file and save the essentials
+    FiffStream* t_pStream = FiffStream::start_file(&p_IODevice);
+    printf("Write inverse operator decomposition in %s...", t_pStream->streamName().toUtf8().constData());
+
+    t_pStream->start_block(FIFFB_MNE_INVERSE_SOLUTION);
+
+    printf("\tWriting inverse operator info...\n");
+
+    t_pStream->write_int(FIFF_MNE_INCLUDED_METHODS, &this->methods);
+    t_pStream->write_int(FIFF_MNE_SOURCE_ORIENTATION, &this->source_ori);
+    t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NPOINTS, &this->nsource);
+    t_pStream->write_int(FIFF_MNE_COORD_FRAME, &this->coord_frame);
+    t_pStream->write_float_matrix(FIFF_MNE_INVERSE_SOURCE_ORIENTATIONS, this->source_nn);
+    VectorXf tmp_sing = this->sing.cast<float>();
+    t_pStream->write_float(FIFF_MNE_INVERSE_SING, tmp_sing.data(), this->sing.size());
+
+    //
+    //   The eigenleads and eigenfields
+    //
+    if(this->eigen_leads_weighted)
+    {
+        FiffNamedMatrix tmpMatrix(*this->eigen_leads.data());
+        tmpMatrix.transpose_named_matrix();
+        t_pStream->write_named_matrix(FIFF_MNE_INVERSE_LEADS_WEIGHTED, tmpMatrix);
+    }
+    else
+    {
+        FiffNamedMatrix tmpMatrix(*this->eigen_leads.data());
+        tmpMatrix.transpose_named_matrix();
+        t_pStream->write_named_matrix(FIFF_MNE_INVERSE_LEADS, tmpMatrix);
+    }
+
+    t_pStream->write_named_matrix(FIFF_MNE_INVERSE_FIELDS, *this->eigen_fields.data());
+    printf("\t[done]\n");
+    //
+    //   write the covariance matrices
+    //
+    printf("\tWriting noise covariance matrix.");
+//    write_cov(fid, inv['noise_cov']);
+
+//    logger.info('    Writing source covariance matrix.')
+//    write_cov(fid, inv['source_cov'])
+//    #
+//    #   write the various priors
+//    #
+//    logger.info('    Writing orientation priors.')
+//    if inv['orient_prior'] is not None:
+//        write_cov(fid, inv['orient_prior'])
+//    if inv['depth_prior'] is not None:
+//        write_cov(fid, inv['depth_prior'])
+//    if inv['fmri_prior'] is not None:
+//        write_cov(fid, inv['fmri_prior'])
+
+//    #
+//    #   Parent MRI data
+//    #
+//    start_block(fid, FIFF.FIFFB_MNE_PARENT_MRI_FILE)
+//    #   write the MRI <-> head coordinate transformation
+//    write_coord_trans(fid, inv['mri_head_t'])
+//    end_block(fid, FIFF.FIFFB_MNE_PARENT_MRI_FILE)
+
+//    #
+//    #   Parent MEG measurement info
+//    #
+//    write_forward_meas_info(fid, inv['info'])
+
+//    #
+//    #   Write the source spaces
+//    #
+//    if 'src' in inv:
+//        write_source_spaces_to_fid(fid, inv['src'])
+
+    //
+    //  We also need the SSP operator
+    //
+    t_pStream->write_proj(this->projs);
+    //
+    //   Done!
+    //
+    t_pStream->end_block(FIFFB_MNE_INVERSE_SOLUTION);
+    t_pStream->end_file();
+
+    delete t_pStream;
+}

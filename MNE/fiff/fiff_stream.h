@@ -514,7 +514,7 @@ public:
     * @param[in] kind       The tag kind
     * @param[in] mat        The data matrix
     */
-    void write_float_matrix(fiff_int_t kind, const MatrixXd& mat);
+    void write_float_matrix(fiff_int_t kind, const MatrixXf& mat);
 
 
     //=========================================================================================================

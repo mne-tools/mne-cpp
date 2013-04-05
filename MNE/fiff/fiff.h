@@ -829,7 +829,7 @@ public:
     * @param[in] kind       The tag kind
     * @param[in] mat        The data matrix
     */
-    inline static void write_float_matrix(FiffStream* p_pStream, fiff_int_t kind, MatrixXd& mat)
+    inline static void write_float_matrix(FiffStream* p_pStream, fiff_int_t kind, MatrixXf& mat)
     {
         p_pStream->write_float_matrix(kind, mat);
     }
