@@ -235,7 +235,6 @@ private:
 
 public: //Public because it's a mne struct
     FiffId      file_id;        /**< File ID. */
-    FiffId      meas_id;        /**< Measurement ID. */
     fiff_int_t  meas_date[2];   /**< Measurement date. */
     float sfreq;                /**< Sample frequency. */
     float highpass;             /**< Highpass frequency. */
@@ -247,7 +246,6 @@ public: //Public because it's a mne struct
     QList<FiffCtfComp> comps;   /**< List of available CTF software compensators. */
     QString acq_pars;           /**< Acquisition information ToDo... */
     QString acq_stim;           /**< Acquisition information ToDo... */
-    QString filename;           /**< Filename when the info is read of a fiff file. */
 };
 
 //*************************************************************************************************************

@@ -76,8 +76,6 @@ using namespace FIFFLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-
-
 class FiffStreamThread : public QThread
 {
     Q_OBJECT

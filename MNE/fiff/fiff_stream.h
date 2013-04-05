@@ -104,6 +104,7 @@ class FiffCtfComp;
 class FiffRawData;
 class FiffInfo;
 class FiffInfoBase;
+class FiffCov;
 
 
 static FiffId defaultFiffId;
@@ -433,7 +434,15 @@ public:
     *
     * @param[in] trans  The coordinate transfomation structure
     */
-    void write_coord_trans(const FiffCoordTrans& trans);
+    void write_coord_trans(const FiffCoordTrans &trans);
+
+    //=========================================================================================================
+    /**
+    * Write a noise covariance matrix
+    *
+    * @param[in] p_FiffCov      The noise covariance matrix to write
+    */
+    void write_cov(const FiffCov &p_FiffCov);
 
     //=========================================================================================================
     /**
@@ -461,6 +470,20 @@ public:
 
     //=========================================================================================================
     /**
+    * fiff_write_double
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Writes a double-precision floating point tag to a fif file
+    *
+    * @param[in] kind       Tag kind
+    * @param[in] data       The float data pointer
+    * @param[in] nel        Number of doubles to write (default = 1)
+    */
+    void write_double(fiff_int_t kind, const double* data, fiff_int_t nel = 1);
+
+    //=========================================================================================================
+    /**
     * fiff_write_id
     *
     * ### MNE toolbox root function ###
@@ -474,6 +497,14 @@ public:
     * @param[in] id         The id to write
     */
     void write_id(fiff_int_t kind, const FiffId& id = defaultFiffId);
+
+    //=========================================================================================================
+    /**
+    * Write measurement info stored in forward solution
+    *
+    * @param[in] p_FiffInfoBase     The measurement info.
+    */
+    void write_info_base(const FiffInfoBase & p_FiffInfoBase);
 
     //=========================================================================================================
     /**
@@ -515,7 +546,6 @@ public:
     * @param[in] mat        The data matrix
     */
     void write_float_matrix(fiff_int_t kind, const MatrixXf& mat);
-
 
     //=========================================================================================================
     /**

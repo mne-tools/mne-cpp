@@ -58,7 +58,8 @@ using namespace Eigen;
 //=============================================================================================================
 
 FiffInfoBase::FiffInfoBase()
-: nchan(-1)
+: filename("")
+, nchan(-1)
 {
 }
 
@@ -66,11 +67,14 @@ FiffInfoBase::FiffInfoBase()
 //*************************************************************************************************************
 
 FiffInfoBase::FiffInfoBase(const FiffInfoBase& p_FiffInfoBase)
-: nchan(p_FiffInfoBase.nchan)
+: filename(p_FiffInfoBase.filename)
+, meas_id(FiffId(p_FiffInfoBase.meas_id))
+, nchan(p_FiffInfoBase.nchan)
 , dev_head_t(p_FiffInfoBase.dev_head_t)
 , ctf_head_t(p_FiffInfoBase.ctf_head_t)
 , ch_names(p_FiffInfoBase.ch_names)
 , bads(p_FiffInfoBase.bads)
+
 {
     qint32 i;
     for(i = 0; i < p_FiffInfoBase.chs.size(); ++i)
@@ -125,6 +129,8 @@ QString FiffInfoBase::channel_type(qint32 idx) const
 
 void FiffInfoBase::clear()
 {
+    filename = "";
+    meas_id.clear();
     nchan = -1;
     chs.clear();
     ch_names.clear();

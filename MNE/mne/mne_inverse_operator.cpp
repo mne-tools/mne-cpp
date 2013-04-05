@@ -1076,7 +1076,7 @@ void MNEInverseOperator::write_inverse_operator(QIODevice &p_IODevice)
     t_pStream->write_int(FIFF_MNE_COORD_FRAME, &this->coord_frame);
     t_pStream->write_float_matrix(FIFF_MNE_INVERSE_SOURCE_ORIENTATIONS, this->source_nn);
     VectorXf tmp_sing = this->sing.cast<float>();
-    t_pStream->write_float(FIFF_MNE_INVERSE_SING, tmp_sing.data(), this->sing.size());
+    t_pStream->write_float(FIFF_MNE_INVERSE_SING, tmp_sing.data(), tmp_sing.size());
 
     //
     //   The eigenleads and eigenfields
@@ -1100,37 +1100,37 @@ void MNEInverseOperator::write_inverse_operator(QIODevice &p_IODevice)
     //   write the covariance matrices
     //
     printf("\tWriting noise covariance matrix.");
-//    write_cov(fid, inv['noise_cov']);
+    t_pStream->write_cov(*this->noise_cov.data());
 
-//    logger.info('    Writing source covariance matrix.')
-//    write_cov(fid, inv['source_cov'])
-//    #
-//    #   write the various priors
-//    #
-//    logger.info('    Writing orientation priors.')
-//    if inv['orient_prior'] is not None:
-//        write_cov(fid, inv['orient_prior'])
-//    if inv['depth_prior'] is not None:
-//        write_cov(fid, inv['depth_prior'])
-//    if inv['fmri_prior'] is not None:
-//        write_cov(fid, inv['fmri_prior'])
+    printf("\tWriting source covariance matrix.\n");
+    t_pStream->write_cov(*this->source_cov.data());
+    //
+    //   write the various priors
+    //
+    printf("\tWriting orientation priors.\n");
+    if(!this->orient_prior->isEmpty())
+        t_pStream->write_cov(*this->orient_prior.data());
+    if(!this->depth_prior->isEmpty())
+        t_pStream->write_cov(*this->depth_prior.data());
+    if(!this->fmri_prior->isEmpty())
+        t_pStream->write_cov(*this->fmri_prior.data());
 
-//    #
-//    #   Parent MRI data
-//    #
-//    start_block(fid, FIFF.FIFFB_MNE_PARENT_MRI_FILE)
-//    #   write the MRI <-> head coordinate transformation
-//    write_coord_trans(fid, inv['mri_head_t'])
-//    end_block(fid, FIFF.FIFFB_MNE_PARENT_MRI_FILE)
+    //
+    //   Parent MRI data
+    //
+    t_pStream->start_block(FIFFB_MNE_PARENT_MRI_FILE);
+    //   write the MRI <-> head coordinate transformation
+    t_pStream->write_coord_trans(this->mri_head_t);
+    t_pStream->end_block(FIFFB_MNE_PARENT_MRI_FILE);
 
-//    #
-//    #   Parent MEG measurement info
-//    #
-//    write_forward_meas_info(fid, inv['info'])
+    //
+    //   Parent MEG measurement info
+    //
+    t_pStream->write_info_base(this->info);
 
-//    #
-//    #   Write the source spaces
-//    #
+    //
+    //   Write the source spaces
+    //
 //    if 'src' in inv:
 //        write_source_spaces_to_fid(fid, inv['src'])
 

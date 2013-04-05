@@ -46,6 +46,7 @@
 #include "fiff_info.h"
 #include "fiff_info_base.h"
 #include "fiff_raw_data.h"
+#include "fiff_cov.h"
 
 #include <utils/mnemath.h>
 
@@ -1865,6 +1866,65 @@ void FiffStream::write_coord_trans(const FiffCoordTrans& trans)
 
 //*************************************************************************************************************
 
+void FiffStream::write_cov(const FiffCov &p_FiffCov)
+{
+    this->start_block(FIFFB_MNE_COV);
+
+    //   Dimensions etc.
+    this->write_int(FIFF_MNE_COV_KIND, &p_FiffCov.kind);
+    this->write_int(FIFF_MNE_COV_DIM, &p_FiffCov.dim);
+    if (p_FiffCov.nfree > 0)
+        this->write_int(FIFF_MNE_COV_NFREE, &p_FiffCov.nfree);
+
+    //   Channel names
+    if(p_FiffCov.names.size() > 0)
+        this->write_name_list(FIFF_MNE_ROW_NAMES, p_FiffCov.names);
+
+    //   Data
+    if(p_FiffCov.diag)
+        this->write_double(FIFF_MNE_COV_DIAG, p_FiffCov.data.col(0).data(), p_FiffCov.data.rows());
+    else
+    {
+        // Store only lower part of covariance matrix
+        qint32 dim = p_FiffCov.dim;
+        qint32 n = ((dim*dim) - dim)/2;
+
+//        mask = np.tril(np.ones((dim, dim), dtype=np.bool)) > 0
+//        vals = cov['data'][mask].ravel()
+        VectorXd vals(n);
+        qint32 count = 0;
+        for(qint32 i = 1; i < dim; ++i)
+            for(qint32 j = 0; j < i; ++j)
+                vals(count) = p_FiffCov.data(i,j);
+
+        this->write_double(FIFF_MNE_COV, vals.data(), vals.size());
+    }
+
+    //   Eigenvalues and vectors if present
+    if(p_FiffCov.eig.size() > 0 && p_FiffCov.eigvec.size() > 0)
+    {
+        this->write_float_matrix(FIFF_MNE_COV_EIGENVECTORS, p_FiffCov.eigvec.cast<float>());
+        this->write_double(FIFF_MNE_COV_EIGENVALUES, p_FiffCov.eig.data(), p_FiffCov.eig.size());
+    }
+
+    //   Projection operator
+    this->write_proj(p_FiffCov.projs);
+
+    //   Bad channels
+    if(p_FiffCov.bads.size() > 0)
+    {
+        this->start_block(FIFFB_MNE_BAD_CHANNELS);
+        this->write_name_list(FIFF_MNE_CH_NAME_LIST, p_FiffCov.bads);
+        this->end_block(FIFFB_MNE_BAD_CHANNELS);
+    }
+
+    //   Done!
+    this->end_block(FIFFB_MNE_COV);
+}
+
+
+//*************************************************************************************************************
+
 void FiffStream::write_ctf_comp(const QList<FiffCtfComp>& comps)
 {
     if (comps.size() <= 0)
@@ -1921,6 +1981,24 @@ void FiffStream::write_dig_point(const FiffDigPoint& dig)
     *this << (qint32)dig.ident;
     for(qint32 i = 0; i < 3; ++i)
         *this << dig.r[i];
+}
+
+
+//*************************************************************************************************************
+
+void FiffStream::write_double(fiff_int_t kind, const double* data, fiff_int_t nel)
+{
+    qint32 datasize = nel * 8;
+
+    *this << (qint32)kind;
+    *this << (qint32)FIFFT_DOUBLE;
+    *this << (qint32)datasize;
+    *this << (qint32)FIFFV_NEXT_SEQ;
+
+//    this->setFloatingPointPrecision(QDataStream::SinglePrecision);
+
+    for(qint32 i = 0; i < nel; ++i)
+        *this << data[i];
 }
 
 
@@ -2015,6 +2093,71 @@ void FiffStream::write_id(fiff_int_t kind, const FiffId& id)
 
     for(qint32 i = 0; i < 5; ++i)
         *this << data[i];
+}
+
+
+//*************************************************************************************************************
+
+void FiffStream::write_info_base(const FiffInfoBase & p_FiffInfoBase)
+{
+    //
+    // Information from the MEG file
+    //
+    this->start_block(FIFFB_MNE_PARENT_MEAS_FILE);
+    this->write_string(FIFF_MNE_FILE_NAME, p_FiffInfoBase.filename);
+    if(!p_FiffInfoBase.meas_id.isEmpty())
+        this->write_id(FIFF_PARENT_BLOCK_ID, p_FiffInfoBase.meas_id);
+
+    //
+    //    General
+    //
+    this->write_int(FIFF_NCHAN,&p_FiffInfoBase.nchan);
+
+    //
+    //    Channel info
+    //
+    qint32 k;
+    QList<FiffChInfo> chs;
+    for(k = 0; k < p_FiffInfoBase.nchan; ++k)
+        chs << p_FiffInfoBase.chs[k];
+
+    for(k = 0; k < p_FiffInfoBase.nchan; ++k)
+    {
+        //
+        //    Scan numbers may have been messed up
+        //
+        chs[k].scanno = k+1;//+1 because
+        chs[k].range  = 1.0f;//Why? -> cause its already calibrated through reading
+        this->write_ch_info(&chs[k]);
+    }
+
+    //
+    //    Blocks from the original -> skip this
+    //
+    bool have_hpi_result = false;
+
+    //
+    //    Coordinate transformations if the HPI result block was not there
+    //
+    if (!have_hpi_result)
+    {
+        if (!p_FiffInfoBase.dev_head_t.isEmpty())
+            this->write_coord_trans(p_FiffInfoBase.dev_head_t);
+        if (!p_FiffInfoBase.ctf_head_t.isEmpty())
+            this->write_coord_trans(p_FiffInfoBase.ctf_head_t);
+    }
+
+    //
+    //    Bad channels
+    //
+    if (p_FiffInfoBase.bads.size() > 0)
+    {
+        this->start_block(FIFFB_MNE_BAD_CHANNELS);
+        this->write_name_list(FIFF_MNE_CH_NAME_LIST,p_FiffInfoBase.bads);
+        this->end_block(FIFFB_MNE_BAD_CHANNELS);
+    }
+
+    this->end_block(FIFFB_MNE_PARENT_MEAS_FILE);
 }
 
 
