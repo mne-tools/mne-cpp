@@ -146,6 +146,14 @@ public:
 
     //=========================================================================================================
     /**
+    * True if MNE Source Space is empty.
+    *
+    * @return true if MNE Source Space is empty
+    */
+    inline bool isEmpty() const;
+
+    //=========================================================================================================
+    /**
     * ### MNE toolbox root function ###: Implementation of the mne_find_source_space_hemi function
     *
     * Returns the hemisphere id ( FIFFV_MNE_SURF_LEFT_HEMI or FIFFV_MNE_SURF_RIGHT_HEMI) for a source space.
@@ -229,6 +237,9 @@ public:
     */
     bool transform_source_space_to(fiff_int_t dest, FiffCoordTrans& trans);
 
+
+//    void write_source_spaces_to_fid(FiffStream* t_pStream);
+
     //=========================================================================================================
     /**
     * Subscript operator [] to access parameter values by index
@@ -305,6 +316,14 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+inline bool MNESourceSpace::isEmpty() const
+{
+    return m_qListHemispheres.size() == 0;
+}
+
+
+//*************************************************************************************************************
 
 inline qint32 MNESourceSpace::size() const
 {

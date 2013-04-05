@@ -1131,6 +1131,8 @@ void MNEInverseOperator::write_inverse_operator(QIODevice &p_IODevice)
     //
     //   Write the source spaces
     //
+//    if(!src.isEmpty())
+//        this->src->write_source_spaces_to_fid(t_pStream);
 //    if 'src' in inv:
 //        write_source_spaces_to_fid(fid, inv['src'])
 
