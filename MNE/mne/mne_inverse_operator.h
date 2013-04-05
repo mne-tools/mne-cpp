@@ -229,12 +229,22 @@ public:
     *
     * Reads the inverse operator decomposition from a fif file
     *
-    * @param [in] p_pIODevice   A fiff IO device like a fiff QFile or QTCPSocket
+    * @param [in] p_IODevice   A fiff IO device like a fiff QFile or QTCPSocket
     * @param [out] inv          The read inverse operator
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_inverse_operator(QIODevice& p_pIODevice, MNEInverseOperator& inv);
+    static bool read_inverse_operator(QIODevice &p_IODevice, MNEInverseOperator& inv);
+
+    //=========================================================================================================
+    /**
+    * write_inverse_operator
+    *
+    * Writes an inverse operator to a fif file
+    *
+    * @param [in] p_IODevice   IO device to write the inverse operator to.
+    */
+    void write_inverse_operator(QIODevice &p_IODevice);
 
     //=========================================================================================================
     /**

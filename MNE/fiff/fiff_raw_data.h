@@ -115,7 +115,7 @@ public:
     /**
     * Constructs fiff raw data, by reading from a IO device.
     *
-    * @param[in] p_IODevice     IO device to read from the raw data.
+    * @param[in] p_IODevice     IO device to read the raw data from .
     */
     FiffRawData(QIODevice &p_IODevice);
 

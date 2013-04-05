@@ -1588,10 +1588,10 @@ FiffStream* FiffStream::start_writing_raw(QIODevice* p_pIODevice, const FiffInfo
         chs << info.chs.at(sel(0,k));
 
     fiff_int_t nchan = chs.size();
+
     //
     //  Create the file and save the essentials
     //
-
     FiffStream* t_pStream = start_file(p_pIODevice);//1, 2, 3
     t_pStream->start_block(FIFFB_MEAS);//4
     t_pStream->write_id(FIFF_BLOCK_ID);//5
@@ -1944,7 +1944,7 @@ void FiffStream::write_float(fiff_int_t kind, const float* data, fiff_int_t nel)
 
 //*************************************************************************************************************
 
-void FiffStream::write_float_matrix(fiff_int_t kind, const MatrixXd& mat)
+void FiffStream::write_float_matrix(fiff_int_t kind, const MatrixXf& mat)
 {
     qint32 FIFFT_MATRIX = 1 << 30;
     qint32 FIFFT_MATRIX_FLOAT = FIFFT_FLOAT | FIFFT_MATRIX;
@@ -1960,7 +1960,7 @@ void FiffStream::write_float_matrix(fiff_int_t kind, const MatrixXd& mat)
 
     qint32 i;
     for(i = 0; i < numel; ++i)
-        *this << (float)mat.data()[i];
+        *this << mat.data()[i];
 
     qint32 dims[3];
     dims[0] = mat.cols();
@@ -2054,7 +2054,7 @@ void FiffStream::write_named_matrix(fiff_int_t kind, const FiffNamedMatrix& mat)
        this->write_name_list(FIFF_MNE_ROW_NAMES, mat.row_names);
     if (mat.col_names.size() > 0)
        this->write_name_list(FIFF_MNE_COL_NAMES, mat.col_names);
-    this->write_float_matrix(kind,mat.data);
+    this->write_float_matrix(kind,mat.data.cast<float>());
     this->end_block(FIFFB_MNE_NAMED_MATRIX);
 }
 
@@ -2084,7 +2084,7 @@ void FiffStream::write_proj(const QList<FiffProj>& projs)
         qint32 bValue = (qint32)projs[k].active;
         this->write_int(FIFF_MNE_PROJ_ITEM_ACTIVE, &bValue);
         this->write_name_list(FIFF_PROJ_ITEM_CH_NAME_LIST, projs[k].data->col_names);
-        this->write_float_matrix(FIFF_PROJ_ITEM_VECTORS, projs[k].data->data.transpose());
+        this->write_float_matrix(FIFF_PROJ_ITEM_VECTORS, projs[k].data->data.transpose().cast<float>());
         this->end_block(FIFFB_PROJ_ITEM);
     }
     this->end_block(FIFFB_PROJ);

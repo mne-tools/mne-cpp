@@ -98,6 +98,8 @@ int main(int argc, char *argv[])
     QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
 
+    QFile t_fileClusteredInverse("./clusteredInverse-inv.fif");
+
     double snr = 3.0;
     double lambda2 = 1.0 / pow(snr, 2);
     QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
@@ -131,6 +133,8 @@ int main(int argc, char *argv[])
     FiffInfo info = evoked.info;
 
     MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
+
+    inverse_operator.write_inverse_operator(t_fileClusteredInverse);
 
     //
     // Compute inverse solution
