@@ -134,6 +134,16 @@ public:
 
     //=========================================================================================================
     /**
+    * Qt 3d geometry information. Data are generated within first call.
+    *
+    * @param[in] p_fScaling  Scale factor of the returned geometry tri model.
+    *
+    * @return the geometry model
+    */
+    MatrixXf& getTriCoords(float p_fScaling = 1.0f);
+
+    //=========================================================================================================
+    /**
     * is hemisphere clustered?
     *
     * @return true if hemisphere is clustered, false otherwise.
@@ -158,13 +168,15 @@ public:
 
     //=========================================================================================================
     /**
-    * Qt 3d geometry information. Data are generated within first call.
+    * mne_python _write_one_source_space
     *
-    * @param[in] p_fScaling  Scale factor of the returned geometry tri model.
+    * ### MNE toolbox root function ###
     *
-    * @return the geometry model
+    * Write the hemisphere to a FIF stream
+    *
+    * @param[in] p_pStream  The stream to write to.
     */
-    MatrixXf& getTriCoords(float p_fScaling = 1.0f);
+    void write_to_stream(FiffStream* p_pStream);
 
     //=========================================================================================================
     /**
@@ -173,6 +185,7 @@ public:
     //QGeometryData* getGeometryData(float p_fScaling = 1.0f);
 
 public:
+    fiff_int_t type;            /**< Type of the source space: 1 = "surf" or 2 = "vol". ToDo not used jet. */
     fiff_int_t id;              /**< Id information */
     fiff_int_t np;              /**< Number of source points */
     fiff_int_t ntri;            /**< Number of available triangles */
