@@ -56,7 +56,8 @@ using namespace MNELIB;
 //=============================================================================================================
 
 MNEHemisphere::MNEHemisphere()
-: id(-1)
+: type(1)
+, id(-1)
 , np(-1)
 , ntri(-1)
 , coord_frame(-1)
@@ -88,7 +89,8 @@ MNEHemisphere::MNEHemisphere()
 //*************************************************************************************************************
 
 MNEHemisphere::MNEHemisphere(const MNEHemisphere& p_MNEHemisphere)
-: id(p_MNEHemisphere.id)
+: type(p_MNEHemisphere.type)
+, id(p_MNEHemisphere.id)
 , np(p_MNEHemisphere.np)
 , ntri(p_MNEHemisphere.ntri)
 , coord_frame(p_MNEHemisphere.coord_frame)
@@ -131,6 +133,7 @@ MNEHemisphere::~MNEHemisphere()
 
 void MNEHemisphere::clear()
 {
+    type = 1;
     id = -1;
     np = -1;
     ntri = -1;
@@ -159,6 +162,27 @@ void MNEHemisphere::clear()
     cluster_info.clear();
 
     m_TriCoords = MatrixXf();
+}
+
+
+//*************************************************************************************************************
+
+MatrixXf& MNEHemisphere::getTriCoords(float p_fScaling)
+{
+    if(m_TriCoords.size() == 0)
+    {
+        m_TriCoords = MatrixXf(3,3*tris.rows());
+        for(qint32 i = 0; i < tris.rows(); ++i)
+        {
+            m_TriCoords.col(i*3) = rr.row( tris(i,0) ).transpose().cast<float>();
+            m_TriCoords.col(i*3+1) = rr.row( tris(i,1) ).transpose().cast<float>();
+            m_TriCoords.col(i*3+2) = rr.row( tris(i,2) ).transpose().cast<float>();
+        }
+    }
+
+    m_TriCoords *= p_fScaling;
+
+    return m_TriCoords;
 }
 
 
@@ -199,24 +223,80 @@ bool MNEHemisphere::transform_hemisphere_to(fiff_int_t dest, const FiffCoordTran
 
 //*************************************************************************************************************
 
-MatrixXf& MNEHemisphere::getTriCoords(float p_fScaling)
+void MNEHemisphere::write_to_stream(FiffStream* p_pStream)
 {
-    if(m_TriCoords.size() == 0)
+    if(this->type == 1 || this->type == 2)
+        p_pStream->write_int(FIFF_MNE_SOURCE_SPACE_TYPE, &this->type);
+    else
+        printf("Unknown source space type (%d)\n", this->type);
+    p_pStream->write_int(FIFF_MNE_SOURCE_SPACE_ID, &this->id);
+
+//    data = this.get('subject_his_id', None)
+//    if data:
+//        write_string(fid, FIFF.FIFF_SUBJ_HIS_ID, data)
+    p_pStream->write_int(FIFF_MNE_COORD_FRAME, &this->coord_frame);
+
+//    if(this->type == 2) //2 = Vol
+//    {
+//        p_pStream->write_int(FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS, this->shape)
+//        write_coord_trans(fid, this['src_mri_t'])
+
+//        start_block(fid, FIFF.FIFFB_MNE_PARENT_MRI_FILE)
+//        write_coord_trans(fid, this['vox_mri_t'])
+
+//        write_coord_trans(fid, this['mri_ras_t'])
+
+//        write_float_sparse_rcs(fid, FIFF.FIFF_MNE_SOURCE_SPACE_INTERPOLATOR,
+//                            this['interpolator'])
+
+//        if 'mri_file' in this and this['mri_file'] is not None:
+//            write_string(fid, FIFF.FIFF_MNE_SOURCE_SPACE_MRI_FILE,
+//                         this['mri_file'])
+
+//        write_int(fid, FIFF.FIFF_MRI_WIDTH, this['mri_width'])
+//        write_int(fid, FIFF.FIFF_MRI_HEIGHT, this['mri_height'])
+//        write_int(fid, FIFF.FIFF_MRI_DEPTH, this['mri_depth'])
+
+//        end_block(fid, FIFF.FIFFB_MNE_PARENT_MRI_FILE)
+//    }
+
+    p_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NPOINTS, &this->np);
+    p_pStream->write_float_matrix(FIFF_MNE_SOURCE_SPACE_POINTS, this->rr);
+    p_pStream->write_float_matrix(FIFF_MNE_SOURCE_SPACE_NORMALS, this->nn);
+
+    //   Which vertices are active
+    p_pStream->write_int(FIFF_MNE_SOURCE_SPACE_SELECTION, this->inuse.data(), this->inuse.size());
+    p_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NUSE, &this->nuse);
+
+    p_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NTRI, &this->ntri);
+    if (this->ntri > 0)
+        p_pStream->write_int_matrix(FIFF_MNE_SOURCE_SPACE_TRIANGLES, this->tris.array() + 1);
+
+    if (this->type != 2 && this->use_tris.rows() > 0)
     {
-        m_TriCoords = MatrixXf(3,3*tris.rows());
-        for(qint32 i = 0; i < tris.rows(); ++i)
-        {
-            m_TriCoords.col(i*3) = rr.row( tris(i,0) ).transpose().cast<float>();
-            m_TriCoords.col(i*3+1) = rr.row( tris(i,1) ).transpose().cast<float>();
-            m_TriCoords.col(i*3+2) = rr.row( tris(i,2) ).transpose().cast<float>();
-        }
+        //   Use triangulation
+        p_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NUSE_TRI, &this->nuse_tri);
+        p_pStream->write_int_matrix(FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES, this->use_tris.array() + 1);
     }
 
-    m_TriCoords *= p_fScaling;
+    //   Patch-related information
+    if (this->nearest.size() > 0)
+    {
+        p_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NEAREST, this->nearest.data(), this->nearest.size());
+        p_pStream->write_float_matrix(FIFF_MNE_SOURCE_SPACE_NEAREST_DIST, this->nearest_dist.cast<float>());
+    }
 
-    return m_TriCoords;
+//    //   Distances
+//    if (this->dist.rows() > 0)
+//    {
+//        // Save only lower triangle
+//        dists = this['dist'].copy()
+//        dists = sparse.triu(dists, format=dists.format)
+//        write_float_sparse_rcs(fid, FIFF.FIFF_MNE_SOURCE_SPACE_DIST, dists)
+//        write_float_matrix(fid, FIFF.FIFF_MNE_SOURCE_SPACE_DIST_LIMIT,
+//                           this['dist_limit'])
+//    }
 }
-
 
 
 ////*************************************************************************************************************

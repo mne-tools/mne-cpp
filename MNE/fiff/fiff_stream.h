@@ -440,6 +440,8 @@ public:
     /**
     * Write a noise covariance matrix
     *
+    * ### MNE toolbox root function ###
+    *
     * @param[in] p_FiffCov      The noise covariance matrix to write
     */
     void write_cov(const FiffCov &p_FiffCov);
@@ -519,6 +521,19 @@ public:
     * @param[in] nel        Number of integers to write (default = 1)
     */
     void write_int(fiff_int_t kind, const fiff_int_t* data, fiff_int_t nel = 1);
+
+    //=========================================================================================================
+    /**
+    * fiff_write_int_matrix
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Writes a integer matrix tag
+    *
+    * @param[in] kind       The tag kind
+    * @param[in] mat        The data matrix
+    */
+    void write_int_matrix(fiff_int_t kind, const MatrixXi& mat);
 
     //=========================================================================================================
     /**

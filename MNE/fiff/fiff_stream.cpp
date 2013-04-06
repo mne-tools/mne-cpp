@@ -33,10 +33,9 @@
 *
 */
 
-
 //*************************************************************************************************************
 //=============================================================================================================
-// MNE INCLUDES
+// INCLUDES
 //=============================================================================================================
 
 #include "fiff_stream.h"
@@ -1870,55 +1869,66 @@ void FiffStream::write_cov(const FiffCov &p_FiffCov)
 {
     this->start_block(FIFFB_MNE_COV);
 
+    //
     //   Dimensions etc.
+    //
     this->write_int(FIFF_MNE_COV_KIND, &p_FiffCov.kind);
     this->write_int(FIFF_MNE_COV_DIM, &p_FiffCov.dim);
     if (p_FiffCov.nfree > 0)
         this->write_int(FIFF_MNE_COV_NFREE, &p_FiffCov.nfree);
-
+    //
     //   Channel names
+    //
     if(p_FiffCov.names.size() > 0)
         this->write_name_list(FIFF_MNE_ROW_NAMES, p_FiffCov.names);
-
+    //
     //   Data
+    //
     if(p_FiffCov.diag)
         this->write_double(FIFF_MNE_COV_DIAG, p_FiffCov.data.col(0).data(), p_FiffCov.data.rows());
     else
     {
-        // Store only lower part of covariance matrix
-        qint32 dim = p_FiffCov.dim;
-        qint32 n = ((dim*dim) - dim)/2;
+//        if issparse(cov.data)
+//           fiff_write_float_sparse_rcs(fid,FIFF.FIFF_MNE_COV,cov.data);
+//        else
+//        {
+            // Store only lower part of covariance matrix
+            qint32 dim = p_FiffCov.dim;
+            qint32 n = ((dim*dim) - dim)/2;
 
-//        mask = np.tril(np.ones((dim, dim), dtype=np.bool)) > 0
-//        vals = cov['data'][mask].ravel()
-        VectorXd vals(n);
-        qint32 count = 0;
-        for(qint32 i = 1; i < dim; ++i)
-            for(qint32 j = 0; j < i; ++j)
-                vals(count) = p_FiffCov.data(i,j);
+            VectorXd vals(n);
+            qint32 count = 0;
+            for(qint32 i = 1; i < dim; ++i)
+                for(qint32 j = 0; j < i; ++j)
+                    vals(count) = p_FiffCov.data(i,j);
 
-        this->write_double(FIFF_MNE_COV, vals.data(), vals.size());
+            this->write_double(FIFF_MNE_COV, vals.data(), vals.size());
+//        }
     }
-
+    //
     //   Eigenvalues and vectors if present
+    //
     if(p_FiffCov.eig.size() > 0 && p_FiffCov.eigvec.size() > 0)
     {
         this->write_float_matrix(FIFF_MNE_COV_EIGENVECTORS, p_FiffCov.eigvec.cast<float>());
         this->write_double(FIFF_MNE_COV_EIGENVALUES, p_FiffCov.eig.data(), p_FiffCov.eig.size());
     }
-
+    //
     //   Projection operator
+    //
     this->write_proj(p_FiffCov.projs);
-
+    //
     //   Bad channels
+    //
     if(p_FiffCov.bads.size() > 0)
     {
         this->start_block(FIFFB_MNE_BAD_CHANNELS);
         this->write_name_list(FIFF_MNE_CH_NAME_LIST, p_FiffCov.bads);
         this->end_block(FIFFB_MNE_BAD_CHANNELS);
     }
-
+    //
     //   Done!
+    //
     this->end_block(FIFFB_MNE_COV);
 }
 
@@ -2174,6 +2184,36 @@ void FiffStream::write_int(fiff_int_t kind, const fiff_int_t* data, fiff_int_t n
 
     for(qint32 i = 0; i < nel; ++i)
         *this << data[i];
+}
+
+
+//*************************************************************************************************************
+
+void FiffStream::write_int_matrix(fiff_int_t kind, const MatrixXi& mat)
+{
+    qint32 FIFFT_MATRIX = 1 << 30;
+    qint32 FIFFT_MATRIX_INT = FIFFT_INT | FIFFT_MATRIX;
+
+    qint32 numel = mat.rows() * mat.cols();
+
+    fiff_int_t datasize = 4*numel + 4*3;
+
+    *this << (qint32)kind;
+    *this << (qint32)FIFFT_MATRIX_INT;
+    *this << (qint32)datasize;
+    *this << (qint32)FIFFV_NEXT_SEQ;
+
+    qint32 i;
+    for(i = 0; i < numel; ++i)
+        *this << mat.data()[i];
+
+    qint32 dims[3];
+    dims[0] = mat.cols();
+    dims[1] = mat.rows();
+    dims[2] = 2;
+
+    for(i = 0; i < 3; ++i)
+        *this << dims[i];
 }
 
 

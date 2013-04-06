@@ -237,8 +237,15 @@ public:
     */
     bool transform_source_space_to(fiff_int_t dest, FiffCoordTrans& trans);
 
-
-//    void write_source_spaces_to_fid(FiffStream* t_pStream);
+    //=========================================================================================================
+    /**
+    * ### MNE toolbox root function ###: Implementation of the write_source_spaces_to_fid function
+    *
+    * Write the source spaces to a FIF stream
+    *
+    * @param[in] p_pStream  The stream to write to.
+    */
+    void write_to_stream(FiffStream* p_pStream);
 
     //=========================================================================================================
     /**

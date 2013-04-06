@@ -684,6 +684,22 @@ bool MNESourceSpace::complete_source_space_info(MNEHemisphere& p_Hemisphere)
 
 //*************************************************************************************************************
 
+void MNESourceSpace::write_to_stream(FiffStream* p_pStream)
+{
+    for(qint32 h = 0; h < m_qListHemispheres.size(); ++h)
+    {
+        printf("\tWrite a source space... ");
+        p_pStream->start_block(FIFFB_MNE_SOURCE_SPACE);
+        m_qListHemispheres[h].write_to_stream(p_pStream);
+        p_pStream->end_block(FIFFB_MNE_SOURCE_SPACE);
+        printf("[done]\n");
+    }
+    printf("\t%d source spaces written\n", m_qListHemispheres.size());
+}
+
+
+//*************************************************************************************************************
+
 MNEHemisphere& MNESourceSpace::operator[] (qint32 idx)
 {
     if(m_qListHemispheres.size() > idx)
