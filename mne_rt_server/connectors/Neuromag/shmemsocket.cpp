@@ -46,6 +46,10 @@
 // UNIX INCLUDES
 //=============================================================================================================
 
+#include <stdio.h>      // fopen
+#include <string.h>     // memcpy
+#include <unistd.h>     // unlink, close
+
 #include <sys/stat.h>   //umask
 #include <sys/un.h>     //sockaddr_un
 #include <sys/socket.h> //AF_UNIX
