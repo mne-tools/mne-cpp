@@ -71,6 +71,8 @@ RTServerSetupWidget::RTServerSetupWidget(RTServer* simulator, QWidget* parent)
 {
     ui.setupUi(this);
 
+    this->ui.m_qLineEdit_Ip->setText("127.0.0.1");
+
     connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
 
     this->setConnectionStatus(m_pRTServer->m_pRtClient->getConnectionStatus());
@@ -109,9 +111,17 @@ void RTServerSetupWidget::printToLog(QString logMsg)
 void RTServerSetupWidget::setConnectionStatus(bool p_bConnectionStatus)
 {
     if(p_bConnectionStatus)
-        this->printToLog(QString("Connected to mne_rt_server"));
+    {
+        this->ui.m_qLabel_ConnectionStatus->setText(QString("Connected"));
+        this->ui.m_qLineEdit_Ip->setEnabled(false);
+        this->ui.m_qPushButton_SetIp->setEnabled(false);
+    }
     else
-        this->printToLog(QString("Not connected to mne_rt_server"));
+    {
+        this->ui.m_qLabel_ConnectionStatus->setText(QString("Not connected"));
+        this->ui.m_qLineEdit_Ip->setEnabled(true);
+        this->ui.m_qPushButton_SetIp->setEnabled(true);
+    }
 }
 
 

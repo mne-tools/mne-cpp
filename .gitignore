@@ -106,3 +106,5 @@ ui_*.h
 /bin/mne_x_plugins/mne_rt_server_plugins/*.exp
 
 /bin/mne_x_plugins/mne_rt_server_plugins/*.lib
+
+/bin/*.fif
