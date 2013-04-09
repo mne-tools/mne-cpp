@@ -65,24 +65,23 @@ using namespace RTServerPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RTServerSetupWidget::RTServerSetupWidget(RTServer* simulator, QWidget* parent)
+RTServerSetupWidget::RTServerSetupWidget(RTServer* p_pRtServer, QWidget* parent)
 : QWidget(parent)
-, m_pRTServer(simulator)
+, m_pRTServer(p_pRtServer)
 {
     ui.setupUi(this);
 
-    this->ui.m_qLineEdit_Ip->setText("127.0.0.1");
+    //rt server connection
+    this->ui.m_qLineEdit_Ip->setText(m_pRTServer->m_sRtServerIP);
 
-    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
+    connect(ui.m_qPushButton_Connect, &QPushButton::released, this, &RTServerSetupWidget::pressedConnect);
 
-    this->setConnectionStatus(m_pRTServer->m_pRtClient->getConnectionStatus());
+    this->setCmdConnectionStatus(m_pRTServer->m_bCmdClientIsConnected);
+    connect(m_pRTServer, &RTServer::cmdConnectionChanged, this, &RTServerSetupWidget::setCmdConnectionStatus);
 
-//    if(m_pRTServer->m_pRtClient->getConnectionStatus())
-//        ui.m_qTextBrowser_Information->setText(QString("true"));
-//    else
-//        ui.m_qTextBrowser_Information->setText(QString("false"));
 
-    connect(m_pRTServer->m_pRtClient, &RtClient::connectionChanged, this, &RTServerSetupWidget::setConnectionStatus);
+    //About
+    connect(ui.m_qPushButton_About, &QPushButton::released, this, &RTServerSetupWidget::showAboutDialog);
 }
 
 
@@ -91,6 +90,17 @@ RTServerSetupWidget::RTServerSetupWidget(RTServer* simulator, QWidget* parent)
 RTServerSetupWidget::~RTServerSetupWidget()
 {
 
+}
+
+
+//*************************************************************************************************************
+
+void RTServerSetupWidget::pressedConnect()
+{
+    if(m_pRTServer->m_bCmdClientIsConnected)
+        m_pRTServer->disconnectCmdClient();
+    else
+        m_pRTServer->connectCmdClient(this->ui.m_qLineEdit_Ip->text());
 }
 
 
@@ -108,19 +118,23 @@ void RTServerSetupWidget::printToLog(QString logMsg)
 
 //*************************************************************************************************************
 
-void RTServerSetupWidget::setConnectionStatus(bool p_bConnectionStatus)
+void RTServerSetupWidget::setCmdConnectionStatus(bool p_bConnectionStatus)
 {
     if(p_bConnectionStatus)
     {
         this->ui.m_qLabel_ConnectionStatus->setText(QString("Connected"));
         this->ui.m_qLineEdit_Ip->setEnabled(false);
-        this->ui.m_qPushButton_SetIp->setEnabled(false);
+        this->ui.m_qPushButton_Connect->setText(QString("Disconnect"));
+        this->ui.m_qLineEdit_Send->setEnabled(true);
+        this->ui.m_qPushButton_Send->setEnabled(true);
     }
     else
     {
         this->ui.m_qLabel_ConnectionStatus->setText(QString("Not connected"));
         this->ui.m_qLineEdit_Ip->setEnabled(true);
-        this->ui.m_qPushButton_SetIp->setEnabled(true);
+        this->ui.m_qPushButton_Connect->setText(QString("Connect"));
+        this->ui.m_qLineEdit_Send->setEnabled(false);
+        this->ui.m_qPushButton_Send->setEnabled(false);
     }
 }
 

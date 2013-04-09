@@ -176,12 +176,28 @@
          </item>
          <item row="0" column="0">
           <widget class="QGroupBox" name="m_qGroupBox_Init">
+           <property name="maximumSize">
+            <size>
+             <width>200</width>
+             <height>16777215</height>
+            </size>
+           </property>
            <property name="title">
             <string>Init Manager</string>
            </property>
            <layout class="QGridLayout" name="gridLayout">
-            <item row="10" column="0">
-             <widget class="QPushButton" name="m_qPushButton_Initialize_Helper">
+            <item row="0" column="1">
+             <widget class="QComboBox" name="m_qComboBox_Connector"/>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="m_qLabel_Connector">
+              <property name="text">
+               <string>Connector:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="1">
+             <widget class="QPushButton" name="m_qPushButton_SetSize">
               <property name="minimumSize">
                <size>
                 <width>0</width>
@@ -189,116 +205,30 @@
                </size>
               </property>
               <property name="text">
-               <string>Initialize</string>
+               <string>Set Size</string>
               </property>
              </widget>
             </item>
-            <item row="4" column="0">
-             <widget class="QRadioButton" name="m_qRadioButton_MEG">
-              <property name="text">
-               <string>MEG</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="0">
-             <widget class="QRadioButton" name="m_qRadioButton_SIM">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="text">
-               <string>Simulation</string>
-              </property>
-              <property name="checked">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="9" column="0">
-             <widget class="Line" name="line_2">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="0">
-             <widget class="QCheckBox" name="m_qCheckBox_PackageMode">
-              <property name="text">
-               <string>Package Mode</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
+            <item row="3" column="0" colspan="2">
              <widget class="Line" name="line">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
              </widget>
             </item>
-            <item row="1" column="0">
-             <layout class="QGridLayout" name="gridLayout_8">
-              <item row="1" column="1">
-               <widget class="QPushButton" name="m_qPushButton_Disconnect_Helper">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>27</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Disconnect</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QPushButton" name="m_qPushButton_Connect_Helper">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>27</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Connect</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
+            <item row="4" column="1">
+             <widget class="QLineEdit" name="m_qLineEdit_BufferSize">
+              <property name="text">
+               <string>100</string>
+              </property>
+             </widget>
             </item>
-            <item row="8" column="0">
-             <layout class="QGridLayout" name="gridLayout_9">
-              <item row="0" column="1">
-               <widget class="QPushButton" name="m_qPushButton_ResetMode">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>27</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Reset Mode</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0">
-               <widget class="QPushButton" name="m_qPushButton_SetMode">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>27</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Set Mode</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
+            <item row="4" column="0">
+             <widget class="QLabel" name="m_qLabel_BufferSize">
+              <property name="text">
+               <string>Buffer Size:</string>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -332,13 +262,16 @@
         <layout class="QGridLayout" name="gridLayout_3">
          <item row="2" column="0">
           <widget class="QGroupBox" name="m_qGroupBox_Send">
+           <property name="maximumSize">
+            <size>
+             <width>250</width>
+             <height>16777215</height>
+            </size>
+           </property>
            <property name="title">
             <string>Send Command Line Instruction</string>
            </property>
            <layout class="QGridLayout" name="gridLayout_6">
-            <item row="0" column="1" colspan="2">
-             <widget class="QLineEdit" name="m_qLineEdit_Send"/>
-            </item>
             <item row="0" column="0">
              <widget class="QLabel" name="m_qLabel_Instruction">
               <property name="text">
@@ -346,28 +279,15 @@
               </property>
              </widget>
             </item>
-            <item row="1" column="2">
+            <item row="1" column="1">
              <widget class="QPushButton" name="m_qPushButton_Send">
               <property name="text">
                <string>Send</string>
               </property>
              </widget>
             </item>
-            <item row="1" column="1">
-             <spacer name="horizontalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
+            <item row="0" column="1">
+             <widget class="QLineEdit" name="m_qLineEdit_Send"/>
             </item>
            </layout>
           </widget>
@@ -400,42 +320,22 @@
          </item>
          <item row="1" column="0">
           <widget class="QGroupBox" name="m_qGroupBox_rtServerInfo">
+           <property name="maximumSize">
+            <size>
+             <width>250</width>
+             <height>16777215</height>
+            </size>
+           </property>
            <property name="title">
             <string>Host (mne_rt_server) Information</string>
            </property>
            <layout class="QGridLayout" name="gridLayout_5">
-            <item row="1" column="1" colspan="2">
-             <widget class="QLineEdit" name="m_qLineEdit_Ip"/>
-            </item>
-            <item row="2" column="2">
-             <widget class="QPushButton" name="m_qPushButton_SetIp">
-              <property name="text">
-               <string>set IP</string>
-              </property>
-             </widget>
-            </item>
             <item row="1" column="0">
              <widget class="QLabel" name="m_qLabel_Ip">
               <property name="text">
                <string>IP Address:</string>
               </property>
              </widget>
-            </item>
-            <item row="2" column="1">
-             <spacer name="horizontalSpacer">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
             </item>
             <item row="0" column="0">
              <widget class="QLabel" name="m_qLabel_ConnectionStatusDescr">
@@ -444,7 +344,17 @@
               </property>
              </widget>
             </item>
-            <item row="0" column="1" colspan="2">
+            <item row="2" column="1">
+             <widget class="QPushButton" name="m_qPushButton_Connect">
+              <property name="text">
+               <string>Connect</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLineEdit" name="m_qLineEdit_Ip"/>
+            </item>
+            <item row="0" column="1">
              <widget class="QLabel" name="m_qLabel_ConnectionStatus">
               <property name="frameShape">
                <enum>QFrame::StyledPanel</enum>

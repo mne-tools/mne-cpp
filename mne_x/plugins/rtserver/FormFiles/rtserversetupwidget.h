@@ -97,17 +97,19 @@ public:
     */
     ~RTServerSetupWidget();
 
-
     void printToLog(QString message);   /**< Implements printing messages to rtproc log.*/
+
+//slots
+    void pressedConnect();     /**< Triggers a connection trial to rt_server.*/
 
 private:
     //=========================================================================================================
     /**
-    * Set connection status
+    * Set command connection status
     *
     * @param[in] p_bConnectionStatus    the connection status
     */
-    void setConnectionStatus(bool p_bConnectionStatus);
+    void setCmdConnectionStatus(bool p_bConnectionStatus);
 
     //=========================================================================================================
     /**
