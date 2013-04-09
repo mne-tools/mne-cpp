@@ -70,16 +70,19 @@ using namespace RTServerPlugin;
 //=============================================================================================================
 
 RTServer::RTServer()
+: m_pRtCmdClient(NULL)
+, m_pRtDataClient(NULL)
+, m_sRtServerIP("127.0.0.1")
+, m_bCmdClientIsConnected(false)
+, m_bDataClientIsConnected(false)
 {
     m_MDL_ID = MDL_ID::RTSERVER;
 
-    m_pRtClient = new RtClient("127.0.0.1", "mne_x", this);
-
-
-    qDebug() << "m_pRtClient->start()";
+    //Try to connect the cmd client on start up using localhost connection
+    this->connectCmdClient(m_sRtServerIP);
 
     // Start RtClient - ToDo just perform a rtserver check
-    m_pRtClient->start();
+//    m_pRtClient->start();
 
 }
 
@@ -88,7 +91,53 @@ RTServer::RTServer()
 
 RTServer::~RTServer()
 {
+    if(m_pRtCmdClient)
+        delete m_pRtCmdClient;
+    if(m_pRtDataClient)
+        delete m_pRtDataClient;
+}
 
+
+//*************************************************************************************************************
+
+void RTServer::connectCmdClient(QString p_sRtSeverIP)
+{
+    qDebug() << "Here";
+    if(!m_pRtCmdClient)
+        m_pRtCmdClient = new RtCmdClient();
+    else if(m_bCmdClientIsConnected)
+        this->disconnectCmdClient();
+
+    m_pRtCmdClient->connectToHost(p_sRtSeverIP);
+    m_pRtCmdClient->waitForConnected(1000);
+
+    if(m_pRtCmdClient->state() == QTcpSocket::ConnectedState)
+    {
+        mutex.lock();
+        m_sRtServerIP = p_sRtSeverIP;
+        if(!m_bCmdClientIsConnected)
+        {
+            m_bCmdClientIsConnected = true;
+            emit cmdConnectionChanged(m_bCmdClientIsConnected);
+        }
+        mutex.unlock();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void RTServer::disconnectCmdClient()
+{
+    if(m_bCmdClientIsConnected)
+    {
+        m_pRtCmdClient->disconnectFromHost();
+        m_pRtCmdClient->waitForDisconnected();
+        mutex.lock();
+        m_bCmdClientIsConnected = false;
+        mutex.unlock();
+        emit cmdConnectionChanged(m_bCmdClientIsConnected);
+    }
 }
 
 

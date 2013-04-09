@@ -54,7 +54,8 @@
 // MNE INCLUDES
 //=============================================================================================================
 
-#include <rtClient/rtclient.h>
+#include <rtClient/rtcmdclient.h>
+#include <rtClient/rtdataclient.h>
 
 
 //*************************************************************************************************************
@@ -133,6 +134,30 @@ public:
     virtual QWidget* setupWidget();
     virtual QWidget* runWidget();
 
+//slots:
+    //=========================================================================================================
+    /**
+    * Connects the cmd client.
+    *
+    * @param[in] p_sRtSeverIP   real-time server ip
+    */
+    void connectCmdClient(QString p_sRtSeverIP);
+
+    //=========================================================================================================
+    /**
+    * Disconnects the cmd client.
+    */
+    void disconnectCmdClient();
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emitted when command clients connection status changed
+    *
+    * @param[in] p_bStatus  connection status
+    */
+    void cmdConnectionChanged(bool p_bStatus);
+
 protected:
     virtual void run();
 
@@ -142,6 +167,9 @@ private:
     * Initialise the RTServer.
     */
     void init();
+
+
+    QMutex mutex;
 
 //    RealTimeSampleArray*    m_pRTSA_RTServer_I;     /**< Holds the RealTimeSampleArray to provide the channel ECG I.*/
 //    RealTimeSampleArray*    m_pRTSA_RTServer_II;    /**< Holds the RealTimeSampleArray to provide the channel ECG II.*/
@@ -154,13 +182,19 @@ private:
 //    RTServerBuffer_old*      m_pInBuffer_III;       /**< Holds ECG III data which arrive from ECG producer.*/
 //    RTServerProducer*       m_pRTServerProducer;    /**< Holds the ECGProducer.*/
 
-//    QString m_qStringResourcePath;	/**< Holds the path to the ECG resource directory.*/
+//    QString m_qStringResourcePath;    /**< Holds the path to the ECG resource directory.*/
 
 //    RTServerChannel* m_pRTServerChannel_ECG_I;      /**< Holds the simulation channel for ECG I.*/
 //    RTServerChannel* m_pRTServerChannel_ECG_II;     /**< Holds the simulation channel for ECG II.*/
 //    RTServerChannel* m_pRTServerChannel_ECG_III;    /**< Holds the simulation channel for ECG III.*/
 
-    RtClient*       m_pRtClient;
+    RtCmdClient*       m_pRtCmdClient;      /**< The command client.*/
+    RtDataClient*      m_pRtDataClient;     /**< The data client.*/
+
+    bool m_bCmdClientIsConnected;   /**< If the command client is connected.*/
+    bool m_bDataClientIsConnected;  /**< If the data client is connected.*/
+
+    QString     m_sRtServerIP;      /**< The IP Adress of mne_rt_server.*/
 };
 
 } // NAMESPACE

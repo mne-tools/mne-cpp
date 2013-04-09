@@ -42,6 +42,7 @@ CONFIG += plugin
 DEFINES += RTSERVER_LIBRARY
 
 QT += widgets
+QT += network
 
 TARGET = rtserver
 CONFIG(debug, debug|release) {

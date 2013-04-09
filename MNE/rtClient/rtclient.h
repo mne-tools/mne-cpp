@@ -166,7 +166,7 @@ private:
     bool        m_bIsRunning;           /**< Holds whether RtClient is running.*/
     QString     m_sClientAlias;         /**< The clien alias of the data client */
     QString     m_sRtServerHostName;    /**< The IP Adress of mne_rt_server.*/
-    FiffInfo    m_fiffInfo;        /**< Fiff measurement info.*/
+    FiffInfo    m_fiffInfo;             /**< Fiff measurement info.*/
 
 signals:
     //=========================================================================================================
