@@ -102,7 +102,6 @@ RTServer::~RTServer()
 
 void RTServer::connectCmdClient(QString p_sRtSeverIP)
 {
-    qDebug() << "Here";
     if(!m_pRtCmdClient)
         m_pRtCmdClient = new RtCmdClient();
     else if(m_bCmdClientIsConnected)
