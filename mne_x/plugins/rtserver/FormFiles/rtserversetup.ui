@@ -280,14 +280,14 @@
              </widget>
             </item>
             <item row="1" column="1">
-             <widget class="QPushButton" name="m_qPushButton_Send">
+             <widget class="QPushButton" name="m_qPushButton_SendCLI">
               <property name="text">
                <string>Send</string>
               </property>
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QLineEdit" name="m_qLineEdit_Send"/>
+             <widget class="QLineEdit" name="m_qLineEdit_SendCLI"/>
             </item>
            </layout>
           </widget>

@@ -79,6 +79,8 @@ RTServerSetupWidget::RTServerSetupWidget(RTServer* p_pRtServer, QWidget* parent)
     this->setCmdConnectionStatus(m_pRTServer->m_bCmdClientIsConnected);
     connect(m_pRTServer, &RTServer::cmdConnectionChanged, this, &RTServerSetupWidget::setCmdConnectionStatus);
 
+    //CLI
+    connect(ui.m_qPushButton_SendCLI, &QPushButton::released, this, &RTServerSetupWidget::pressedSendCLI);
 
     //About
     connect(ui.m_qPushButton_About, &QPushButton::released, this, &RTServerSetupWidget::showAboutDialog);
@@ -106,6 +108,19 @@ void RTServerSetupWidget::pressedConnect()
 
 //*************************************************************************************************************
 
+void RTServerSetupWidget::pressedSendCLI()
+{
+    if(m_pRTServer->m_bCmdClientIsConnected)
+    {
+        this->printToLog(this->ui.m_qLineEdit_SendCLI->text());
+        QString t_sReply = m_pRTServer->m_pRtCmdClient->sendCLICommand(this->ui.m_qLineEdit_SendCLI->text());
+        this->printToLog(t_sReply);
+    }
+}
+
+
+//*************************************************************************************************************
+
 void RTServerSetupWidget::printToLog(QString logMsg)
 {
     ui.m_qTextBrowser_ServerMessage->insertPlainText(logMsg+"\n");
@@ -125,16 +140,16 @@ void RTServerSetupWidget::setCmdConnectionStatus(bool p_bConnectionStatus)
         this->ui.m_qLabel_ConnectionStatus->setText(QString("Connected"));
         this->ui.m_qLineEdit_Ip->setEnabled(false);
         this->ui.m_qPushButton_Connect->setText(QString("Disconnect"));
-        this->ui.m_qLineEdit_Send->setEnabled(true);
-        this->ui.m_qPushButton_Send->setEnabled(true);
+        this->ui.m_qLineEdit_SendCLI->setEnabled(true);
+        this->ui.m_qPushButton_SendCLI->setEnabled(true);
     }
     else
     {
         this->ui.m_qLabel_ConnectionStatus->setText(QString("Not connected"));
         this->ui.m_qLineEdit_Ip->setEnabled(true);
         this->ui.m_qPushButton_Connect->setText(QString("Connect"));
-        this->ui.m_qLineEdit_Send->setEnabled(false);
-        this->ui.m_qPushButton_Send->setEnabled(false);
+        this->ui.m_qLineEdit_SendCLI->setEnabled(false);
+        this->ui.m_qPushButton_SendCLI->setEnabled(false);
     }
 }
 
