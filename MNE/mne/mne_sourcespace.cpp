@@ -481,7 +481,7 @@ bool MNESourceSpace::read_source_space(FiffStream* p_pStream, const FiffDirTree&
     else
     {
         p_Hemisphere.dist       = t_pTag1->toSparseFloatMatrix();
-        p_Hemisphere.dist_limit = *t_pTag2->toFloat();
+        p_Hemisphere.dist_limit = *t_pTag2->toFloat(); //ToDo Check if this is realy always a float and not a matrix
         //
         //  Add the upper triangle
         //
