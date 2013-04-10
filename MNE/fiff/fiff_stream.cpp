@@ -2064,73 +2064,56 @@ void FiffStream::write_float_matrix(fiff_int_t kind, const MatrixXf& mat)
 
 void FiffStream::write_float_sparse_ccs(fiff_int_t kind, const SparseMatrix<float>& mat)
 {
-//        if ~issparse(mat)
-//           error(me,'Input should be a sparse matrix');
-//        end
+    qint32 FIFFT_MATRIX = 16400 << 16;  // 4010
+    qint32 FIFFT_MATRIX_FLOAT_CCS = FIFFT_FLOAT | FIFFT_MATRIX;
 
-//        FIFFT_FLOAT  = 4;
-//        FIFFT_MATRIX = bitshift(16400,16);    % 4010
-//        FIFFT_MATRIX_FLOAT_CCS = bitor(FIFFT_FLOAT,FIFFT_MATRIX);
-//        FIFFV_NEXT_SEQ=0;
-//        %
-//        %    nnz values
-//        %    nnz row indices
-//        %    ncol+1 pointers
-//        %    dims
-//        %    nnz
-//        %    ndim
-//        %
-//        nnzm = nnz(mat);
-//        ncol = size(mat,2);
-//        datasize = 4*nnzm + 4*nnzm + 4*(ncol+1) + 4*4;
-//        %
-//        %    Nonzero entries
-//        %
+    //
+    //   nnz values
+    //   nnz row indices
+    //   ncol+1 pointers
+    //   dims
+    //   nnz
+    //   ndim
+    //
+    qint32 nnzm = mat.nonZeros();
+    qint32 ncol = mat.cols();
+    fiff_int_t datasize = 4*nnzm + 4*nnzm + 4*(ncol+1) + 4*4;
+    //
+    //   Nonzero entries
+    //
 //        [ s(:,1), s(:,2), s(:,3) ] = find(mat);
 //        s = sortrows(s,2);
 //        [ cols, starts ] = unique(s(:,2),'first');
 
-//        count = fwrite(fid,int32(kind),'int32');
-//        if count ~= 1
-//           error(me,'write failed');
-//        end
-//        count = fwrite(fid,int32(FIFFT_MATRIX_FLOAT_CCS),'int32');
-//        if count ~= 1
-//           error(me,'write failed');
-//        end
-//        count = fwrite(fid,int32(datasize),'int32');
-//        if count ~= 1
-//           error(me,'write failed');
-//        end
-//        count = fwrite(fid,int32(FIFFV_NEXT_SEQ),'int32');
-//        if count ~= 1
-//           error(me,'write failed');
-//        end
-//        %
-//        %   The data values
-//        %
+    *this << (qint32)kind;
+    *this << (qint32)FIFFT_MATRIX_FLOAT_CCS;
+    *this << (qint32)datasize;
+    *this << (qint32)FIFFV_NEXT_SEQ;
+    //
+    //  The data values
+    //
 //        count = fwrite(fid,single(s(:,3)),'single');
 //        if count ~= nnzm
 //           error(me,'write failed');
 //        end
-//        %
-//        %   Row indices
-//        %
+    //
+    //  Row indices
+    //
 //        count = fwrite(fid,int32(s(:,1)-1),'int32');
 //        if count ~= nnzm
 //           error(me,'write failed');
 //        end
-//        %
-//        %   Pointers
-//        %
+    //
+    //  Pointers
+    //
 //        ptrs = -ones(1,ncol+1);
 //        for k = 1:length(cols)
 //           ptrs(cols(k)) = starts(k) - 1;
 //        end
 //        ptrs(ncol+1) = nnzm;
-//        %
-//        %   Fill in pointers for empty columns
-//        %
+    //
+    //  Fill in pointers for empty columns
+    //
 //        for k = ncol:-1:1
 //           if ptrs(k) < 0
 //              ptrs(k) = ptrs(k+1);
@@ -2141,19 +2124,18 @@ void FiffStream::write_float_sparse_ccs(fiff_int_t kind, const SparseMatrix<floa
 //        if count ~= ncol+1
 //           error(me,'write failed');
 //        end
-//        %
-//        %   Dimensions
-//        %
-//        dims(1) = nnz(mat);
-//        dims(2) = size(mat,1);
-//        dims(3) = size(mat,2);
-//        dims(4) = 2;
-//        count = fwrite(fid,int32(dims),'int32');
-//        if count ~= 4
-//           error(me,'write failed');
-//        end
+    //
+    //   Dimensions
+    //
+    qint32 dims[4];
+    dims[0] = mat.nonZeros();
+    dims[1] = mat.rows();
+    dims[2] = mat.cols();
+    dims[3] = 2;
 
-//        return;
+    qint32 i;
+    for(i = 0; i < 4; ++i)
+        *this << dims[i];
 }
 
 
@@ -2161,97 +2143,78 @@ void FiffStream::write_float_sparse_ccs(fiff_int_t kind, const SparseMatrix<floa
 
 void FiffStream::write_float_sparse_rcs(fiff_int_t kind, const SparseMatrix<float>& mat)
 {
+    qint32 FIFFT_MATRIX = 16416 << 16;  // 4020
+    qint32 FIFFT_MATRIX_FLOAT_RCS = FIFFT_FLOAT | FIFFT_MATRIX;
 
-//        if ~issparse(mat)
-//           error(me,'Input should be a sparse matrix');
-//        end
-
-//        FIFFT_FLOAT  = 4;
-//        FIFFT_MATRIX = bitshift(16416,16);    % 4020
-//        FIFFT_MATRIX_FLOAT_RCS = bitor(FIFFT_FLOAT,FIFFT_MATRIX);
-//        FIFFV_NEXT_SEQ=0;
-//        %
-//        %    nnz values
-//        %    nnz column indices
-//        %    nrow+1 pointers
-//        %    dims
-//        %    nnz
-//        %    ndim
-//        %
-//        nnzm = nnz(mat);
-//        nrow = size(mat,1);
-//        datasize = 4*nnzm + 4*nnzm + 4*(nrow+1) + 4*4;
-//        %
-//        %    Nonzero entries
-//        %
+    //
+    //   nnz values
+    //   nnz column indices
+    //   nrow+1 pointers
+    //   dims
+    //   nnz
+    //   ndim
+    //
+    qint32 nnzm = mat.nonZeros();
+    qint32 nrow = mat.rows();
+    fiff_int_t datasize = 4*nnzm + 4*nnzm + 4*(nrow+1) + 4*4;
+    //
+    //   Nonzero entries
+    //
 //        [ s(:,1), s(:,2), s(:,3) ] = find(mat);
 //        s = sortrows(s,1);
 //        [ rows, starts ] = unique(s(:,1),'first');
 
-//        count = fwrite(fid,int32(kind),'int32');
-//        if count ~= 1
-//           error(me,'write failed');
-//        end
-//        count = fwrite(fid,int32(FIFFT_MATRIX_FLOAT_RCS),'int32');
-//        if count ~= 1
-//           error(me,'write failed');
-//        end
-//        count = fwrite(fid,int32(datasize),'int32');
-//        if count ~= 1
-//           error(me,'write failed');
-//        end
-//        count = fwrite(fid,int32(FIFFV_NEXT_SEQ),'int32');
-//        if count ~= 1
-//           error(me,'write failed');
-//        end
-//        %
-//        %   The data values
-//        %
-//        count = fwrite(fid,single(s(:,3)),'single');
-//        if count ~= nnzm
-//           error(me,'write failed');
-//        end
-//        %
-//        %   Column indices
-//        %
+    *this << (qint32)kind;
+    *this << (qint32)FIFFT_MATRIX_FLOAT_RCS;
+    *this << (qint32)datasize;
+    *this << (qint32)FIFFV_NEXT_SEQ;
+    //
+    //  The data values
+    //
+//    count = fwrite(fid,single(s(:,3)),'single');
+//    if count ~= nnzm
+//       error(me,'write failed');
+//    end
+    //
+    //  Column indices
+    //
 //        count = fwrite(fid,int32(s(:,2)-1),'int32');
 //        if count ~= nnzm
 //           error(me,'write failed');
 //        end
-//        %
-//        %   Pointers
-//        %
+    //
+    //  Pointers
+    //
 //        ptrs = -ones(1,nrow+1);
 //        for k = 1:length(rows)
 //           ptrs(rows(k)) = starts(k) - 1;
 //        end
 //        ptrs(nrow+1) = nnzm;
-//        %
-//        %   Fill in pointers for empty rows
-//        %
+    //
+    //  Fill in pointers for empty rows
+    //
 //        for k = nrow:-1:1
 //           if ptrs(k) < 0
 //              ptrs(k) = ptrs(k+1);
 //           end
 //        end
-//        %
+    //
 //        count = fwrite(fid,int32(ptrs),'int32');
 //        if count ~= nrow+1
 //           error(me,'write failed');
 //        end
-//        %
-//        %   Dimensions
-//        %
-//        dims(1) = nnz(mat);
-//        dims(2) = size(mat,1);
-//        dims(3) = size(mat,2);
-//        dims(4) = 2;
-//        count = fwrite(fid,int32(dims),'int32');
-//        if count ~= 4
-//           error(me,'write failed');
-//        end
+    //
+    //  Dimensions
+    //
+    qint32 dims[4];
+    dims[0] = mat.nonZeros();
+    dims[1] = mat.rows();
+    dims[2] = mat.cols();
+    dims[3] = 2;
 
-//        return;
+    qint32 i;
+    for(i = 0; i < 4; ++i)
+        *this << dims[i];
 }
 
 
