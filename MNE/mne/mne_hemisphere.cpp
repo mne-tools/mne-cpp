@@ -222,7 +222,7 @@ bool MNEHemisphere::transform_hemisphere_to(fiff_int_t dest, const FiffCoordTran
 
 
 //*************************************************************************************************************
-
+//ToDo
 void MNEHemisphere::write_to_stream(FiffStream* p_pStream)
 {
     if(this->type == 1 || this->type == 2)
@@ -286,16 +286,16 @@ void MNEHemisphere::write_to_stream(FiffStream* p_pStream)
         p_pStream->write_float_matrix(FIFF_MNE_SOURCE_SPACE_NEAREST_DIST, this->nearest_dist.cast<float>());
     }
 
-//    //   Distances
-//    if (this->dist.rows() > 0)
-//    {
-//        // Save only lower triangle
+    //   Distances
+    if (this->dist.rows() > 0)
+    {
+        // Save only lower triangle
 //        dists = this['dist'].copy()
 //        dists = sparse.triu(dists, format=dists.format)
 //        write_float_sparse_rcs(fid, FIFF.FIFF_MNE_SOURCE_SPACE_DIST, dists)
 //        write_float_matrix(fid, FIFF.FIFF_MNE_SOURCE_SPACE_DIST_LIMIT,
 //                           this['dist_limit'])
-//    }
+    }
 }
 
 

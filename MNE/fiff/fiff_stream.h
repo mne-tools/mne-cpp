@@ -57,6 +57,7 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <Eigen/SparseCore>
 
 
 //*************************************************************************************************************
@@ -561,6 +562,32 @@ public:
     * @param[in] mat        The data matrix
     */
     void write_float_matrix(fiff_int_t kind, const MatrixXf& mat);
+
+    //=========================================================================================================
+    /**
+    * fiff_write_float_sparse_ccs
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Writes a single-precision sparse (ccs) floating-point matrix tag
+    *
+    * @param[in] kind       The tag kind
+    * @param[in] mat        The data matrix
+    */
+    void write_float_sparse_ccs(fiff_int_t kind, const SparseMatrix<float>& mat);
+
+    //=========================================================================================================
+    /**
+    * fiff_write_float_sparse_rcs
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Writes a single-precision sparse (RCS) floating-point matrix tag
+    *
+    * @param[in] kind       The tag kind
+    * @param[in] mat        The data matrix
+    */
+    void write_float_sparse_rcs(fiff_int_t kind, const SparseMatrix<float>& mat);
 
     //=========================================================================================================
     /**
