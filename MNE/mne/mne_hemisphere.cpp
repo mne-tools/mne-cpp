@@ -289,12 +289,20 @@ void MNEHemisphere::write_to_stream(FiffStream* p_pStream)
     //   Distances
     if (this->dist.rows() > 0)
     {
-        // Save only lower triangle
-//        dists = this['dist'].copy()
-//        dists = sparse.triu(dists, format=dists.format)
-//        write_float_sparse_rcs(fid, FIFF.FIFF_MNE_SOURCE_SPACE_DIST, dists)
-//        write_float_matrix(fid, FIFF.FIFF_MNE_SOURCE_SPACE_DIST_LIMIT,
-//                           this['dist_limit'])
+        // Save only upper triangular portion of the matrix
+        typedef Eigen::Triplet<float> T;
+        std::vector<T> tripletList;
+        tripletList.reserve(this->dist.nonZeros());
+        for (int k=0; k < this->dist.outerSize(); ++k)
+            for (SparseMatrix<double>::InnerIterator it(this->dist,k); it; ++it)
+                if(it.col() >= it.row())//only upper triangle -> todo iteration can be optimized
+                    tripletList.push_back(T(it.row(), it.col(), (float)it.value()));
+        SparseMatrix<float> dists(this->dist.rows(), this->dist.cols());
+        dists.setFromTriplets(tripletList.begin(), tripletList.end());
+
+        p_pStream->write_float_sparse_rcs(FIFF_MNE_SOURCE_SPACE_DIST, dists);
+        //ToDo check if write_float_matrix or write float is okay
+        p_pStream->write_float(FIFF_MNE_SOURCE_SPACE_DIST_LIMIT, &this->dist_limit); //p_pStream->write_float_matrix(FIFF_MNE_SOURCE_SPACE_DIST_LIMIT, this->dist_limit);
     }
 }
 

@@ -246,6 +246,18 @@ public:
 
     //=========================================================================================================
     /**
+    * Sort rows in ascending order
+    *
+    * @param[in] A          triplet vector to sort (sorted in place)
+    * @param[in] column     sorts the triplet vector based on the column specified
+    *
+    * @return Vector of the original indeces in the new order
+    */
+    template<typename T>
+    static std::vector<Triplet<T> > sortrows(const std::vector<Triplet<T> > &A, qint32 column = 0);
+
+    //=========================================================================================================
+    /**
     * Compares two index-value-pairs.
     *
     * @param[in] lhs    left hand side of the comparison
@@ -267,6 +279,18 @@ public:
     */
     template<typename T>
     static inline bool compareIdxValuePairSmallerThan( const std::pair<int,T>& lhs, const std::pair<int,T>& rhs);
+
+    //=========================================================================================================
+    /**
+    * Compares triplet first entry
+    *
+    * @param[in] lhs    left hand side of the comparison
+    * @param[in] rhs    right hand side of the comparison
+    *
+    * @return true if value of lhs is smaller than value of rhs
+    */
+    template<typename T>
+    static inline bool compareTripletFirstEntry( const Triplet<T>& lhs, const Triplet<T> & rhs);
 
 };
 
@@ -328,6 +352,22 @@ VectorXi MNEMath::sort(Matrix<T, Dynamic, 1> &v_prime, Matrix<T, Dynamic, Dynami
 //*************************************************************************************************************
 
 template<typename T>
+std::vector<Triplet<T> > MNEMath::sortrows(const std::vector<Triplet<T> > &A, qint32 column)
+{
+    std::vector<Triplet<T> > p_ASorted;
+
+    for(quint32 i = 0; i < A.size(); ++i)
+        p_ASorted.push_back(A[i]);
+
+    if(column == 0)
+        std::sort(p_ASorted.begin(), p_ASorted.end(), MNEMath::compareTripletFirstEntry<T>);
+
+    return p_ASorted;
+}
+
+//*************************************************************************************************************
+
+template<typename T>
 inline bool MNEMath::compareIdxValuePairBiggerThan( const std::pair<int,T>& lhs, const std::pair<int,T>& rhs)
 {
     return lhs.second > rhs.second;
@@ -340,6 +380,15 @@ template<typename T>
 inline bool MNEMath::compareIdxValuePairSmallerThan( const std::pair<int,T>& lhs, const std::pair<int,T>& rhs)
 {
     return lhs.second < rhs.second;
+}
+
+
+//*************************************************************************************************************
+
+template<typename T>
+inline bool MNEMath::compareTripletFirstEntry( const Triplet<T>& lhs, const Triplet<T> & rhs)
+{
+    return lhs.row() < rhs.row();
 }
 
 } // NAMESPACE
