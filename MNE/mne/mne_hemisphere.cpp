@@ -236,12 +236,13 @@ void MNEHemisphere::write_to_stream(FiffStream* p_pStream)
 //        write_string(fid, FIFF.FIFF_SUBJ_HIS_ID, data)
     p_pStream->write_int(FIFF_MNE_COORD_FRAME, &this->coord_frame);
 
-//    if(this->type == 2) //2 = Vol
-//    {
+    if(this->type == 2) //2 = Vol
+    {
+        qDebug() << "ToDo: Write Volume not implemented jet!!!!!!!!";
 //        p_pStream->write_int(FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS, this->shape)
-//        write_coord_trans(fid, this['src_mri_t'])
+//        p_pStream->write_coord_trans(this->src_mri_t);
 
-//        start_block(fid, FIFF.FIFFB_MNE_PARENT_MRI_FILE)
+        p_pStream->start_block(FIFFB_MNE_PARENT_MRI_FILE);
 //        write_coord_trans(fid, this['vox_mri_t'])
 
 //        write_coord_trans(fid, this['mri_ras_t'])
@@ -257,8 +258,8 @@ void MNEHemisphere::write_to_stream(FiffStream* p_pStream)
 //        write_int(fid, FIFF.FIFF_MRI_HEIGHT, this['mri_height'])
 //        write_int(fid, FIFF.FIFF_MRI_DEPTH, this['mri_depth'])
 
-//        end_block(fid, FIFF.FIFFB_MNE_PARENT_MRI_FILE)
-//    }
+        p_pStream->end_block(FIFFB_MNE_PARENT_MRI_FILE);
+    }
 
     p_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NPOINTS, &this->np);
     p_pStream->write_float_matrix(FIFF_MNE_SOURCE_SPACE_POINTS, this->rr);
