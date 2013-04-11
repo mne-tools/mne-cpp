@@ -2081,49 +2081,64 @@ void FiffStream::write_float_sparse_ccs(fiff_int_t kind, const SparseMatrix<floa
     //
     //   Nonzero entries
     //
-//        [ s(:,1), s(:,2), s(:,3) ] = find(mat);
-//        s = sortrows(s,2);
-//        [ cols, starts ] = unique(s(:,2),'first');
+    typedef Eigen::Triplet<float> T;
+    std::vector<T> s;
+    s.reserve(mat.nonZeros());
+    for (int k=0; k < mat.outerSize(); ++k)
+        for (SparseMatrix<float>::InnerIterator it(mat,k); it; ++it)
+            s.push_back(T(it.row(), it.col(), it.value()));
+
+    s = MNEMath::sortrows<float>(s, 1);
+
+    //[ rows, starts ] = unique(s(:,1),'first');
+    std::vector<qint32> cols, starts;
+    qint32 v_old = -1;
+    quint32 i;
+    for(i = 0; i < s.size(); ++i)
+    {
+        if(s[i].col() != v_old)
+        {
+            v_old = s[i].col();
+            cols.push_back(s[i].col());
+            starts.push_back(i);
+        }
+    }
 
     *this << (qint32)kind;
     *this << (qint32)FIFFT_MATRIX_FLOAT_CCS;
     *this << (qint32)datasize;
     *this << (qint32)FIFFV_NEXT_SEQ;
+
     //
     //  The data values
     //
-//        count = fwrite(fid,single(s(:,3)),'single');
-//        if count ~= nnzm
-//           error(me,'write failed');
-//        end
+    for(i = 0; i < s.size(); ++i)
+        *this << s[i].value();
+
     //
     //  Row indices
     //
-//        count = fwrite(fid,int32(s(:,1)-1),'int32');
-//        if count ~= nnzm
-//           error(me,'write failed');
-//        end
+    for(i = 0; i < s.size(); ++i)
+        *this << s[i].row();
+
     //
     //  Pointers
     //
-//        ptrs = -ones(1,ncol+1);
-//        for k = 1:length(cols)
-//           ptrs(cols(k)) = starts(k) - 1;
-//        end
-//        ptrs(ncol+1) = nnzm;
+    RowVectorXi ptrs = RowVectorXi::Ones(ncol+1);
+    ptrs.array() *= -1;
+    quint32 k;
+    for(k = 0; k < cols.size(); ++k)
+        ptrs[cols[k]] = starts[k];
+    ptrs[ncol] = nnzm;
     //
     //  Fill in pointers for empty columns
     //
-//        for k = ncol:-1:1
-//           if ptrs(k) < 0
-//              ptrs(k) = ptrs(k+1);
-//           end
-//        end
-//        %
-//        count = fwrite(fid,int32(ptrs),'int32');
-//        if count ~= ncol+1
-//           error(me,'write failed');
-//        end
+    for(k = ncol; k >= 1; --k)
+       if(ptrs[k-1] < 0)
+          ptrs[k-1] = ptrs[k];
+    //
+    for(i = 0; i < (quint32)ptrs.size(); ++i)
+        *this << ptrs[i];
     //
     //   Dimensions
     //
@@ -2133,7 +2148,6 @@ void FiffStream::write_float_sparse_ccs(fiff_int_t kind, const SparseMatrix<floa
     dims[2] = mat.cols();
     dims[3] = 2;
 
-    qint32 i;
     for(i = 0; i < 4; ++i)
         *this << dims[i];
 }
