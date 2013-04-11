@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RTServerRunWidget class.
+* @brief    Contains the implementation of the RtServerRunWidget class.
 *
 */
 
@@ -48,7 +48,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace RTServerPlugin;
+using namespace RtServerPlugin;
 
 
 //*************************************************************************************************************
@@ -56,9 +56,9 @@ using namespace RTServerPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RTServerRunWidget::RTServerRunWidget(RTServer *simulator, QWidget *parent)
+RtServerRunWidget::RtServerRunWidget(RtServer *p_pRtServer, QWidget *parent)
 : QWidget(parent)
-, m_pRTServer(simulator)
+, m_pRtServer(p_pRtServer)
 {
     ui.setupUi(this);
 
@@ -70,7 +70,7 @@ RTServerRunWidget::RTServerRunWidget(RTServer *simulator, QWidget *parent)
 
 //*************************************************************************************************************
 
-RTServerRunWidget::~RTServerRunWidget()
+RtServerRunWidget::~RtServerRunWidget()
 {
 
 }
@@ -78,8 +78,8 @@ RTServerRunWidget::~RTServerRunWidget()
 
 //*************************************************************************************************************
 
-void RTServerRunWidget::showAboutDialog()
+void RtServerRunWidget::showAboutDialog()
 {
-    RTServerAboutWidget aboutDialog(this);
+    RtServerAboutWidget aboutDialog(this);
     aboutDialog.exec();
 }

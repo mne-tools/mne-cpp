@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RTServerAboutWidget class.
+* @brief    Contains the implementation of the RtServerAboutWidget class.
 *
 */
 
@@ -53,7 +53,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace RTServerPlugin;
+using namespace RtServerPlugin;
 
 
 //*************************************************************************************************************
@@ -61,7 +61,7 @@ using namespace RTServerPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RTServerAboutWidget::RTServerAboutWidget(QWidget *parent)
+RtServerAboutWidget::RtServerAboutWidget(QWidget *parent)
 : QDialog(parent)
 {
     ui.setupUi(this);
@@ -70,7 +70,7 @@ RTServerAboutWidget::RTServerAboutWidget(QWidget *parent)
 
 //*************************************************************************************************************
 
-RTServerAboutWidget::~RTServerAboutWidget()
+RtServerAboutWidget::~RtServerAboutWidget()
 {
 
 }

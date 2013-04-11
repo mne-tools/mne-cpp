@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     rtserversetupwidget.cpp
+* @file     rtserverproducer.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     April, 2013
 *
 * @section  LICENSE
 *
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RTServerSetupWidget class.
+* @brief    Contains the implementation of the RtServerProducer class.
 *
 */
 
@@ -38,18 +38,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rtserversetupwidget.h"
-#include "rtserveraboutwidget.h"
-#include "../rtserver.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDir>
-#include <QDebug>
+#include "rtserverproducer.h"
+#include "rtserver.h"
 
 
 //*************************************************************************************************************
@@ -62,118 +52,120 @@ using namespace RtServerPlugin;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// QT INCLUDES
 //=============================================================================================================
 
-RtServerSetupWidget::RtServerSetupWidget(RtServer* p_pRtServer, QWidget* parent)
-: QWidget(parent)
-, m_pRtServer(p_pRtServer)
+RtServerProducer::RtServerProducer(RtServer* p_pRtServer)
+: m_pRtServer(p_pRtServer)
+, m_pRtDataClient(NULL)
+, m_bDataClientIsConnected(false)
+, m_iDataClientId(-1)
+, m_bFlagInfoRequest(false)
 {
-    ui.setupUi(this);
-
-    //rt server connection
-    this->ui.m_qLineEdit_Ip->setText(m_pRtServer->m_sRtServerIP);
-
-    connect(ui.m_qPushButton_Connect, &QPushButton::released, this, &RtServerSetupWidget::pressedConnect);
-
-    connect(m_pRtServer, &RtServer::cmdConnectionChanged, this, &RtServerSetupWidget::cmdConnectionChanged);
-
-    //CLI
-    connect(ui.m_qPushButton_SendCLI, &QPushButton::released, this, &RtServerSetupWidget::pressedSendCLI);
-
-    //About
-    connect(ui.m_qPushButton_About, &QPushButton::released, this, &RtServerSetupWidget::showAboutDialog);
-
-    this->init();
 }
 
 
 //*************************************************************************************************************
 
-RtServerSetupWidget::~RtServerSetupWidget()
+RtServerProducer::~RtServerProducer()
 {
-
+    if(m_pRtDataClient)
+        delete m_pRtDataClient;
 }
 
 
 //*************************************************************************************************************
 
-void RtServerSetupWidget::init()
+void RtServerProducer::connectDataClient(QString p_sRtSeverIP)
 {
-    cmdConnectionChanged(m_pRtServer->m_bCmdClientIsConnected);
+    if(!m_pRtDataClient)
+        m_pRtDataClient = new RtDataClient();
+    else if(m_bDataClientIsConnected)
+        this->disconnectDataClient();
 
-}
+    m_pRtDataClient->connectToHost(p_sRtSeverIP);
+    m_pRtDataClient->waitForConnected(1000);
 
-
-//*************************************************************************************************************
-
-void RtServerSetupWidget::pressedConnect()
-{
-    if(m_pRtServer->m_bCmdClientIsConnected)
-        m_pRtServer->disconnectCmdClient();
-    else
-        m_pRtServer->connectCmdClient(this->ui.m_qLineEdit_Ip->text());
-}
-
-
-//*************************************************************************************************************
-
-void RtServerSetupWidget::pressedSendCLI()
-{
-    if(m_pRtServer->m_bCmdClientIsConnected)
+    if(m_pRtDataClient->state() == QTcpSocket::ConnectedState)
     {
-        this->printToLog(this->ui.m_qLineEdit_SendCLI->text());
-        QString t_sReply = m_pRtServer->m_pRtCmdClient->sendCLICommand(this->ui.m_qLineEdit_SendCLI->text());
-        this->printToLog(t_sReply);
+        producerMutex.lock();
+        if(!m_bDataClientIsConnected)
+        {
+            //
+            // get client ID
+            //
+            m_iDataClientId = m_pRtDataClient->getClientId();
+
+            //
+            // set data client alias -> for convinience (optional)
+            //
+            m_pRtDataClient->setClientAlias(m_pRtServer->m_sRtServerClientAlias); // used in option 2 later on
+
+            //
+            // set new state
+            //
+            m_bDataClientIsConnected = true;
+            emit dataConnectionChanged(m_bDataClientIsConnected);
+        }
+        producerMutex.unlock();
     }
 }
 
 
 //*************************************************************************************************************
 
-void RtServerSetupWidget::printToLog(QString logMsg)
+void RtServerProducer::disconnectDataClient()
 {
-    ui.m_qTextBrowser_ServerMessage->insertPlainText(logMsg+"\n");
-    //scroll down to the newest entry
-    QTextCursor c = ui.m_qTextBrowser_ServerMessage->textCursor();
-    c.movePosition(QTextCursor::End);
-    ui.m_qTextBrowser_ServerMessage->setTextCursor(c);
+    if(m_bDataClientIsConnected)
+    {
+        m_pRtDataClient->disconnectFromHost();
+        m_pRtDataClient->waitForDisconnected();
+        producerMutex.lock();
+        m_iDataClientId = -1;
+        m_bDataClientIsConnected = false;
+        producerMutex.unlock();
+        emit dataConnectionChanged(m_bDataClientIsConnected);
+    }
 }
 
 
 //*************************************************************************************************************
 
-void RtServerSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
+void RtServerProducer::stop()
 {
-    if(p_bConnectionStatus)
+    m_bIsRunning = false;
+    QThread::wait();
+}
+
+
+//*************************************************************************************************************
+
+void RtServerProducer::run()
+{
+    //
+    // Connect data client
+    //
+    this->connectDataClient(m_pRtServer->m_sRtServerIP);
+
+    while(m_pRtDataClient->state() != QTcpSocket::ConnectedState)
     {
-        if(!m_pRtServer->m_fiffInfo.isEmpty())
+        msleep(100);
+        this->connectDataClient(m_pRtServer->m_sRtServerIP);
+    }
+
+    msleep(1000);
+
+    m_bIsRunning = true;
+
+    while(m_bIsRunning)
+    {
+        if(m_bFlagInfoRequest)
         {
-            // Read Info
-            m_pRtServer->requestInfo();
+            producerMutex.lock();
+            m_pRtDataClient->readInfo();
+            m_bFlagInfoRequest = false;
+            producerMutex.unlock();
         }
 
-        this->ui.m_qLabel_ConnectionStatus->setText(QString("Connected"));
-        this->ui.m_qLineEdit_Ip->setEnabled(false);
-        this->ui.m_qPushButton_Connect->setText(QString("Disconnect"));
-        this->ui.m_qLineEdit_SendCLI->setEnabled(true);
-        this->ui.m_qPushButton_SendCLI->setEnabled(true);
     }
-    else
-    {
-        this->ui.m_qLabel_ConnectionStatus->setText(QString("Not connected"));
-        this->ui.m_qLineEdit_Ip->setEnabled(true);
-        this->ui.m_qPushButton_Connect->setText(QString("Connect"));
-        this->ui.m_qLineEdit_SendCLI->setEnabled(false);
-        this->ui.m_qPushButton_SendCLI->setEnabled(false);
-    }
-}
-
-
-//*************************************************************************************************************
-
-void RtServerSetupWidget::showAboutDialog()
-{
-    RtServerAboutWidget aboutDialog(this);
-    aboutDialog.exec();
 }

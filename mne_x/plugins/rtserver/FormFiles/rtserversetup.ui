@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>RTServerSetupWidgetClass</class>
- <widget class="QWidget" name="RTServerSetupWidgetClass">
+ <class>RtServerSetupWidgetClass</class>
+ <widget class="QWidget" name="RtServerSetupWidgetClass">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -193,19 +193,6 @@
              <widget class="QLabel" name="m_qLabel_Connector">
               <property name="text">
                <string>Connector:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="1">
-             <widget class="QPushButton" name="m_qPushButton_SetSize">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>27</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Set Size</string>
               </property>
              </widget>
             </item>

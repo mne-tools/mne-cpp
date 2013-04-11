@@ -145,22 +145,22 @@ private:
     */
     void init();
 
-    RealTimeSampleArray*    m_pRTSA_ECG_I;		/**< Holds the RealTimeSampleArray to provide the channel ECG I.*/
-    RealTimeSampleArray*    m_pRTSA_ECG_II;		/**< Holds the RealTimeSampleArray to provide the channel ECG II.*/
-    RealTimeSampleArray*    m_pRTSA_ECG_III;	/**< Holds the RealTimeSampleArray to provide the channel ECG III.*/
+    RealTimeSampleArray*    m_pRTSA_ECG_I;      /**< Holds the RealTimeSampleArray to provide the channel ECG I.*/
+    RealTimeSampleArray*    m_pRTSA_ECG_II;     /**< Holds the RealTimeSampleArray to provide the channel ECG II.*/
+    RealTimeSampleArray*    m_pRTSA_ECG_III;    /**< Holds the RealTimeSampleArray to provide the channel ECG III.*/
 
-    float           m_fSamplingRate;			/**< Holds the sampling rate.*/
-    int             m_iDownsamplingFactor;		/**< Holds the down sampling factor.*/
-    ECGBuffer_old*      m_pInBuffer_I;				/**< Holds ECG I data which arrive from ECG producer.*/
-    ECGBuffer_old*      m_pInBuffer_II;				/**< Holds ECG II data which arrive from ECG producer.*/
-    ECGBuffer_old*      m_pInBuffer_III;			/**< Holds ECG III data which arrive from ECG producer.*/
-    ECGProducer*    m_pECGProducer;				/**< Holds the ECGProducer.*/
+    float           m_fSamplingRate;            /**< Holds the sampling rate.*/
+    int             m_iDownsamplingFactor;      /**< Holds the down sampling factor.*/
+    ECGBuffer_old*      m_pInBuffer_I;          /**< Holds ECG I data which arrive from ECG producer.*/
+    ECGBuffer_old*      m_pInBuffer_II;         /**< Holds ECG II data which arrive from ECG producer.*/
+    ECGBuffer_old*      m_pInBuffer_III;        /**< Holds ECG III data which arrive from ECG producer.*/
+    ECGProducer*    m_pECGProducer;             /**< Holds the ECGProducer.*/
 
-    QString m_qStringResourcePath;	/**< Holds the path to the ECG resource directory.*/
+    QString m_qStringResourcePath;          /**< Holds the path to the ECG resource directory.*/
 
-    ECGSimChannel* m_pECGChannel_ECG_I;		/**< Holds the simulation channel for ECG I.*/
-    ECGSimChannel* m_pECGChannel_ECG_II;	/**< Holds the simulation channel for ECG II.*/
-    ECGSimChannel* m_pECGChannel_ECG_III;	/**< Holds the simulation channel for ECG III.*/
+    ECGSimChannel* m_pECGChannel_ECG_I;     /**< Holds the simulation channel for ECG I.*/
+    ECGSimChannel* m_pECGChannel_ECG_II;    /**< Holds the simulation channel for ECG II.*/
+    ECGSimChannel* m_pECGChannel_ECG_III;   /**< Holds the simulation channel for ECG III.*/
 };
 
 } // NAMESPACE
