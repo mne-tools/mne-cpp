@@ -147,7 +147,7 @@ void RtServer::disconnectCmdClient()
 
 void RtServer::requestInfo()
 {
-    if(m_pRtServerProducer->m_iDataClientId > -1)
+    if(m_pRtServerProducer->m_iDataClientId > -1 && m_bCmdClientIsConnected)
     {
         qDebug() << "in reqeust Info";
         // read meas info

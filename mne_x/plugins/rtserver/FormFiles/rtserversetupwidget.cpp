@@ -147,11 +147,17 @@ void RtServerSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
 {
     if(p_bConnectionStatus)
     {
+        // Read Info
         if(!m_pRtServer->m_fiffInfo.isEmpty())
-        {
-            // Read Info
             m_pRtServer->requestInfo();
+
+        // Read Connectors
+        if(m_pRtServer->m_qMapConnectors.size() == 0)
+        {
+            QString test = m_pRtServer->m_pRtCmdClient->requestConnectors();
+            this->printToLog(test);
         }
+
 
         this->ui.m_qLabel_ConnectionStatus->setText(QString("Connected"));
         this->ui.m_qLineEdit_Ip->setEnabled(false);

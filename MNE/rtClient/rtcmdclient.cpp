@@ -140,11 +140,13 @@ void RtCmdClient::sendCommandJSON(const Command &p_command)
     }
 
     m_qMutex.lock();
-    m_sAvailableData.append(t_sReply);
+//    m_sAvailableData.append(t_sReply); //ToDo check this
+    m_sAvailableData = t_sReply;
     m_qMutex.unlock();
 
     emit response(t_sReply);
 }
+
 
 //*************************************************************************************************************
 
@@ -171,6 +173,34 @@ void RtCmdClient::requestCommands()
         qCritical() << "Unable to parse JSON response: " << error.errorString();
     }
 }
+
+
+//*************************************************************************************************************
+
+//QMap<qint32, QString>
+QString RtCmdClient::requestConnectors()
+{
+    const QString connList("conlist");
+    const QString description("");
+    const Command cmdConnectorList(connList, description);
+    this->sendCommandJSON(cmdConnectorList);
+
+    m_qMutex.lock();
+    QByteArray t_sJsonConnectors = m_sAvailableData.toUtf8();
+    m_qMutex.unlock();
+
+
+    QJsonParseError error;
+    QJsonDocument t_jsonDocumentOrigin = QJsonDocument::fromJson(
+            t_sJsonConnectors, &error);
+
+//    QMap<qint32, QString> p_qMapConnectors;
+
+//    return p_qMapConnectors;
+
+    return t_sJsonConnectors;
+}
+
 
 ////*************************************************************************************************************
 
