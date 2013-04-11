@@ -292,6 +292,17 @@ public:
     template<typename T>
     static inline bool compareTripletFirstEntry( const Triplet<T>& lhs, const Triplet<T> & rhs);
 
+    //=========================================================================================================
+    /**
+    * Compares triplet second entry
+    *
+    * @param[in] lhs    left hand side of the comparison
+    * @param[in] rhs    right hand side of the comparison
+    *
+    * @return true if value of lhs is smaller than value of rhs
+    */
+    template<typename T>
+    static inline bool compareTripletSecondEntry( const Triplet<T>& lhs, const Triplet<T> & rhs);
 };
 
 //*************************************************************************************************************
@@ -361,6 +372,8 @@ std::vector<Triplet<T> > MNEMath::sortrows(const std::vector<Triplet<T> > &A, qi
 
     if(column == 0)
         std::sort(p_ASorted.begin(), p_ASorted.end(), MNEMath::compareTripletFirstEntry<T>);
+    if(column == 1)
+        std::sort(p_ASorted.begin(), p_ASorted.end(), MNEMath::compareTripletSecondEntry<T>);
 
     return p_ASorted;
 }
@@ -389,6 +402,15 @@ template<typename T>
 inline bool MNEMath::compareTripletFirstEntry( const Triplet<T>& lhs, const Triplet<T> & rhs)
 {
     return lhs.row() < rhs.row();
+}
+
+
+//*************************************************************************************************************
+
+template<typename T>
+inline bool MNEMath::compareTripletSecondEntry( const Triplet<T>& lhs, const Triplet<T> & rhs)
+{
+    return lhs.col() < rhs.col();
 }
 
 } // NAMESPACE
