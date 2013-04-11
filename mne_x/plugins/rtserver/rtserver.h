@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RTServer class.
+* @brief    Contains the declaration of the RtServer class.
 *
 */
 
@@ -51,11 +51,19 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// FIFF INCLUDES
+//=============================================================================================================
+
+#include <fiff/fiff_info.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // MNE INCLUDES
 //=============================================================================================================
 
 #include <rtClient/rtcmdclient.h>
-#include <rtClient/rtdataclient.h>
+#include <rtClient/rtcmdclient.h>
 
 
 //*************************************************************************************************************
@@ -69,10 +77,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RTServerPlugin
+// DEFINE NAMESPACE RtServerPlugin
 //=============================================================================================================
 
-namespace RTServerPlugin
+namespace RtServerPlugin
 {
 
 
@@ -84,6 +92,7 @@ namespace RTServerPlugin
 using namespace MNEX;
 using namespace IOBuffer;
 using namespace RTCLIENTLIB;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -91,39 +100,40 @@ using namespace RTCLIENTLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class RTServerProducer;
+class RtServerProducer;
 //class ECGChannel;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RTServer
+* DECLARE CLASS RtServer
 *
-* @brief The RTServer class provides a RT server connection.
+* @brief The RtServer class provides a RT server connection.
 */
-class RTSERVERSHARED_EXPORT RTServer : public ISensor
+class RTSERVERSHARED_EXPORT RtServer : public ISensor
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "rtserver.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MNEX::ISensor)
 
-    friend class RTServerSetupWidget;
-    friend class RTServerRunWidget;
+    friend class RtServerProducer;
+    friend class RtServerSetupWidget;
+    friend class RtServerRunWidget;
 
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a RTServer.
+    * Constructs a RtServer.
     */
-    RTServer();
+    RtServer();
 
     //=========================================================================================================
     /**
-    * Destroys the RTServer.
+    * Destroys the RtServer.
     */
-    virtual ~RTServer();
+    virtual ~RtServer();
 
     virtual bool start();
     virtual bool stop();
@@ -149,6 +159,12 @@ public:
     */
     void disconnectCmdClient();
 
+    //=========================================================================================================
+    /**
+    * Request FiffInfo using cmd client and producer (data client)
+    */
+    void requestInfo();
+
 signals:
     //=========================================================================================================
     /**
@@ -164,37 +180,43 @@ protected:
 private:
     //=========================================================================================================
     /**
-    * Initialise the RTServer.
+    * Initialise the RtServer.
     */
     void init();
 
 
     QMutex mutex;
 
-//    RealTimeSampleArray*    m_pRTSA_RTServer_I;     /**< Holds the RealTimeSampleArray to provide the channel ECG I.*/
-//    RealTimeSampleArray*    m_pRTSA_RTServer_II;    /**< Holds the RealTimeSampleArray to provide the channel ECG II.*/
-//    RealTimeSampleArray*    m_pRTSA_RTServer_III;   /**< Holds the RealTimeSampleArray to provide the channel ECG III.*/
+    QString m_sRtServerClientAlias;     /**< The rt server client alias.*/
+
+
+//    RealTimeSampleArray*    m_pRTSA_RtServer_I;     /**< Holds the RealTimeSampleArray to provide the channel ECG I.*/
+//    RealTimeSampleArray*    m_pRTSA_RtServer_II;    /**< Holds the RealTimeSampleArray to provide the channel ECG II.*/
+//    RealTimeSampleArray*    m_pRTSA_RtServer_III;   /**< Holds the RealTimeSampleArray to provide the channel ECG III.*/
 
 //    float           m_fSamplingRate;                /**< Holds the sampling rate.*/
 //    int             m_iDownsamplingFactor;          /**< Holds the down sampling factor.*/
-//    RTServerBuffer_old*      m_pInBuffer_I;         /**< Holds ECG I data which arrive from ECG producer.*/
-//    RTServerBuffer_old*      m_pInBuffer_II;        /**< Holds ECG II data which arrive from ECG producer.*/
-//    RTServerBuffer_old*      m_pInBuffer_III;       /**< Holds ECG III data which arrive from ECG producer.*/
-//    RTServerProducer*       m_pRTServerProducer;    /**< Holds the ECGProducer.*/
+//    RtServerBuffer_old*      m_pInBuffer_I;         /**< Holds ECG I data which arrive from ECG producer.*/
+//    RtServerBuffer_old*      m_pInBuffer_II;        /**< Holds ECG II data which arrive from ECG producer.*/
+//    RtServerBuffer_old*      m_pInBuffer_III;       /**< Holds ECG III data which arrive from ECG producer.*/
+//    RtServerProducer*       m_pRtServerProducer;    /**< Holds the ECGProducer.*/
 
 //    QString m_qStringResourcePath;    /**< Holds the path to the ECG resource directory.*/
 
-//    RTServerChannel* m_pRTServerChannel_ECG_I;      /**< Holds the simulation channel for ECG I.*/
-//    RTServerChannel* m_pRTServerChannel_ECG_II;     /**< Holds the simulation channel for ECG II.*/
-//    RTServerChannel* m_pRTServerChannel_ECG_III;    /**< Holds the simulation channel for ECG III.*/
+//    RtServerChannel* m_pRtServerChannel_ECG_I;      /**< Holds the simulation channel for ECG I.*/
+//    RtServerChannel* m_pRtServerChannel_ECG_II;     /**< Holds the simulation channel for ECG II.*/
+//    RtServerChannel* m_pRtServerChannel_ECG_III;    /**< Holds the simulation channel for ECG III.*/
 
     RtCmdClient*       m_pRtCmdClient;      /**< The command client.*/
-    RtDataClient*      m_pRtDataClient;     /**< The data client.*/
+    bool m_bCmdClientIsConnected;           /**< If the command client is connected.*/
 
-    bool m_bCmdClientIsConnected;   /**< If the command client is connected.*/
-    bool m_bDataClientIsConnected;  /**< If the data client is connected.*/
+    QString     m_sRtServerIP;              /**< The IP Adress of mne_rt_server.*/
 
-    QString     m_sRtServerIP;      /**< The IP Adress of mne_rt_server.*/
+    RtServerProducer*   m_pRtServerProducer;    /**< Holds the RtServerProducer.*/
+
+
+    FiffInfo    m_fiffInfo;             /**< Fiff measurement info.*/
+
 };
 
 } // NAMESPACE

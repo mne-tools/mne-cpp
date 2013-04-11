@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RTServer class.
+* @brief    Contains the implementation of the RtServer class.
 *
 */
 
@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include "rtserver.h"
+#include "rtserverproducer.h"
 
 #include "FormFiles/rtserversetupwidget.h"
 #include "FormFiles/rtserverrunwidget.h"
@@ -61,7 +62,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace RTServerPlugin;
+using namespace RtServerPlugin;
 
 
 //*************************************************************************************************************
@@ -69,38 +70,35 @@ using namespace RTServerPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RTServer::RTServer()
-: m_pRtCmdClient(NULL)
-, m_pRtDataClient(NULL)
+RtServer::RtServer()
+: m_sRtServerClientAlias("mne-x")
+, m_pRtCmdClient(NULL)
+, m_pRtServerProducer(new RtServerProducer(this))
 , m_sRtServerIP("127.0.0.1")
 , m_bCmdClientIsConnected(false)
-, m_bDataClientIsConnected(false)
 {
     m_MDL_ID = MDL_ID::RTSERVER;
 
     //Try to connect the cmd client on start up using localhost connection
     this->connectCmdClient(m_sRtServerIP);
 
-    // Start RtClient - ToDo just perform a rtserver check
-//    m_pRtClient->start();
-
+    // Start RtServerProducer
+    m_pRtServerProducer->start();
 }
 
 
 //*************************************************************************************************************
 
-RTServer::~RTServer()
+RtServer::~RtServer()
 {
     if(m_pRtCmdClient)
         delete m_pRtCmdClient;
-    if(m_pRtDataClient)
-        delete m_pRtDataClient;
 }
 
 
 //*************************************************************************************************************
 
-void RTServer::connectCmdClient(QString p_sRtSeverIP)
+void RtServer::connectCmdClient(QString p_sRtSeverIP)
 {
     if(!m_pRtCmdClient)
         m_pRtCmdClient = new RtCmdClient();
@@ -116,6 +114,11 @@ void RTServer::connectCmdClient(QString p_sRtSeverIP)
         m_sRtServerIP = p_sRtSeverIP;
         if(!m_bCmdClientIsConnected)
         {
+            //
+            // request available commands
+            //
+            m_pRtCmdClient->requestCommands();
+
             m_bCmdClientIsConnected = true;
             emit cmdConnectionChanged(m_bCmdClientIsConnected);
         }
@@ -126,7 +129,7 @@ void RTServer::connectCmdClient(QString p_sRtSeverIP)
 
 //*************************************************************************************************************
 
-void RTServer::disconnectCmdClient()
+void RtServer::disconnectCmdClient()
 {
     if(m_bCmdClientIsConnected)
     {
@@ -142,7 +145,27 @@ void RTServer::disconnectCmdClient()
 
 //*************************************************************************************************************
 
-bool RTServer::start()
+void RtServer::requestInfo()
+{
+    if(m_pRtServerProducer->m_iDataClientId > -1)
+    {
+        qDebug() << "in reqeust Info";
+        // read meas info
+        (*m_pRtCmdClient)["measinfo"].pValues()[0].setValue(m_pRtServerProducer->m_iDataClientId);
+        (*m_pRtCmdClient)["measinfo"].send();
+
+        m_pRtServerProducer->producerMutex.lock();
+        m_pRtServerProducer->m_bFlagInfoRequest = true;
+        m_pRtServerProducer->producerMutex.unlock();
+    }
+    else
+        qWarning() << "RtServerProducer is not connected!";
+}
+
+
+//*************************************************************************************************************
+
+bool RtServer::start()
 {
     // Initialize real time measurements
     init();
@@ -156,7 +179,7 @@ bool RTServer::start()
 
 //*************************************************************************************************************
 
-bool RTServer::stop()
+bool RtServer::stop()
 {
     // Stop threads
     QThread::terminate();
@@ -170,7 +193,7 @@ bool RTServer::stop()
 
 //*************************************************************************************************************
 
-Type RTServer::getType() const
+Type RtServer::getType() const
 {
     return _ISensor;
 }
@@ -178,7 +201,7 @@ Type RTServer::getType() const
 
 //*************************************************************************************************************
 
-const char* RTServer::getName() const
+const char* RtServer::getName() const
 {
     return "RT Server";
 }
@@ -186,9 +209,9 @@ const char* RTServer::getName() const
 
 //*************************************************************************************************************
 
-QWidget* RTServer::setupWidget()
+QWidget* RtServer::setupWidget()
 {
-    RTServerSetupWidget* widget = new RTServerSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    RtServerSetupWidget* widget = new RtServerSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
 
     //init dialog
 
@@ -198,9 +221,9 @@ QWidget* RTServer::setupWidget()
 
 //*************************************************************************************************************
 
-QWidget* RTServer::runWidget()
+QWidget* RtServer::runWidget()
 {
-    RTServerRunWidget* widget = new RTServerRunWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    RtServerRunWidget* widget = new RtServerRunWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
     return widget;
 }
 
@@ -210,15 +233,15 @@ QWidget* RTServer::runWidget()
 // Create measurement instances and config them
 //=============================================================================================================
 
-void RTServer::init()
+void RtServer::init()
 {
-    qDebug() << "RTServer::init()";
+    qDebug() << "RtServer::init()";
 }
 
 
 //*************************************************************************************************************
 
-void RTServer::run()
+void RtServer::run()
 {
     while(true)
     {

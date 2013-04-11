@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtserversetupwidget.h
+* @file     rtserverproducer.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RtServerSetupWidget class.
+* @brief    Contains the declaration of the RTServerProducer class.
 *
 */
 
-#ifndef RTSERVERSETUPWIDGET_H
-#define RTSERVERSETUPWIDGET_H
+#ifndef RTSERVERPRODUCER_H
+#define RTSERVERPRODUCER_H
 
 
 //*************************************************************************************************************
@@ -42,14 +42,24 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <generics/circularbuffer_old.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// MNE INCLUDES
+//=============================================================================================================
+
+#include <rtClient/rtdataclient.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-#include "../ui_rtserversetup.h"
+#include <QThread>
+#include <QMutex>
 
 
 //*************************************************************************************************************
@@ -63,6 +73,15 @@ namespace RtServerPlugin
 
 //*************************************************************************************************************
 //=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+//using namespace IOBuffer;
+using namespace RTCLIENTLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -71,66 +90,85 @@ class RtServer;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RtServerSetupWidget
+* DECLARE CLASS ECGProducer
 *
-* @brief The RtServerSetupWidget class provides the ECG configuration window.
+* @brief The ECGProducer class provides a ECG data producer for a given sampling rate.
 */
-class RtServerSetupWidget : public QWidget
+class RtServerProducer : public QThread
 {
     Q_OBJECT
 
-public:
+    friend class RtServer;
 
+public:
     //=========================================================================================================
     /**
-    * Constructs a RtServerSetupWidget which is a child of parent.
+    * Constructs a RtServerProducer.
     *
     * @param [in] p_pRtServer   a pointer to the corresponding RtServer.
-    * @param [in] parent        pointer to parent widget; If parent is 0, the new RtServerSetupWidget becomes a window. If parent is another widget, RtServerSetupWidget becomes a child window inside parent. RtServerSetupWidget is deleted when its parent is deleted.
     */
-    RtServerSetupWidget(RtServer* p_pRtServer, QWidget *parent = 0);
+    RtServerProducer(RtServer* p_pRtServer);
 
     //=========================================================================================================
     /**
-    * Destroys the RtServerSetupWidget.
-    * All RtServerSetupWidget's children are deleted first. The application exits if RtServerSetupWidget is the main widget.
+    * Destroys the RtServerProducer.
     */
-    ~RtServerSetupWidget();
+    ~RtServerProducer();
 
     //=========================================================================================================
     /**
-    * Inits the setup widget
+    * Connects the data client.
+    *
+    * @param[in] p_sRtSeverIP   real-time server ip
     */
-    void init();
+    void connectDataClient(QString p_sRtSeverIP);
 
-//slots
-    void printToLog(QString message);   /**< Implements printing messages to rtproc log.*/
+    //=========================================================================================================
+    /**
+    * Disconnects the data client.
+    */
+    void disconnectDataClient();
 
-    void pressedConnect();      /**< Triggers a connection trial to rt_server.*/
+    //=========================================================================================================
+    /**
+    * Stops the RtServerProducer by stopping the producer's thread.
+    */
+    void stop();
 
-    void pressedSendCLI();      /**< Triggers a send request of a cli command.*/
+signals:
+    //=========================================================================================================
+    /**
+    * Emitted when data clients connection status changed
+    *
+    * @param[in] p_bStatus  connection status
+    */
+    void dataConnectionChanged(bool p_bStatus);
+
+protected:
+    //=========================================================================================================
+    /**
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread.
+    */
+    virtual void run();
 
 private:
-    //=========================================================================================================
-    /**
-    * Set command connection status
-    *
-    * @param[in] p_bConnectionStatus    the connection status
-    */
-    void cmdConnectionChanged(bool p_bConnectionStatus);
 
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
+    QMutex producerMutex;
 
-    RtServer*   m_pRtServer;    /**< Holds a pointer to corresponding ECGSimulator.*/
+    RtServer*   m_pRtServer;    /**< Holds a pointer to corresponding RtServer.*/
+    bool        m_bIsRunning;   /**< Whether RtServerProducer is running.*/
 
-    Ui::RtServerSetupWidgetClass ui;       /**< Holds the user interface for the RtServerSetupWidget.*/
+    RtDataClient*      m_pRtDataClient;     /**< The data client.*/
+    bool m_bDataClientIsConnected;          /**< If the data client is connected.*/
+
+    qint32 m_iDataClientId;
+
+    //Acquisition flags
+    bool m_bFlagInfoRequest;    /**< Read Fiff Info flag */
 };
 
 } // NAMESPACE
 
-#endif // RTSERVERSETUPWIDGET_H
+#endif // RTSERVERPRODUCER_H

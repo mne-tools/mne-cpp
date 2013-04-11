@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RTServerRunWidget class.
+* @brief    Contains the declaration of the RtServerRunWidget class.
 *
 */
 
@@ -55,10 +55,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RTServerPlugin
+// DEFINE NAMESPACE RtServerPlugin
 //=============================================================================================================
 
-namespace RTServerPlugin
+namespace RtServerPlugin
 {
 
 
@@ -67,16 +67,16 @@ namespace RTServerPlugin
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class RTServer;
+class RtServer;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RTServerRunWidget
+* DECLARE CLASS RtServerRunWidget
 *
-* @brief The RTServerRunWidget class provides the ECG configuration window for the run mode.
+* @brief The RtServerRunWidget class provides the ECG configuration window for the run mode.
 */
-class RTServerRunWidget : public QWidget
+class RtServerRunWidget : public QWidget
 {
     Q_OBJECT
 
@@ -84,19 +84,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RTServerRunWidget which is a child of parent.
+    * Constructs a RtServerRunWidget which is a child of parent.
     *
     * @param [in] simulator a pointer to the corresponding ECG Simulator.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new RTServerRunWidget becomes a window. If parent is another widget, RTServerRunWidget becomes a child window inside parent. RTServerRunWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new RtServerRunWidget becomes a window. If parent is another widget, RtServerRunWidget becomes a child window inside parent. RtServerRunWidget is deleted when its parent is deleted.
     */
-    RTServerRunWidget(RTServer* simulator, QWidget *parent = 0);
+    RtServerRunWidget(RtServer* simulator, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RTServerRunWidget.
-    * All RTServerRunWidget's children are deleted first. The application exits if RTServerRunWidget is the main widget.
+    * Destroys the RtServerRunWidget.
+    * All RtServerRunWidget's children are deleted first. The application exits if RtServerRunWidget is the main widget.
     */
-    ~RTServerRunWidget();
+    ~RtServerRunWidget();
 
 private slots:
     //=========================================================================================================
@@ -107,9 +107,9 @@ private slots:
     void showAboutDialog();
 
 private:
-    RTServer* m_pRTServer;      /**< Holds a pointer to corresponding ECGSimulator.*/
+    RtServer* m_pRtServer;      /**< Holds a pointer to corresponding ECGSimulator.*/
 
-    Ui::RTServerRunClass ui;    /**< Holds the user interface for the RTServerRunWidget.*/
+    Ui::RtServerRunClass ui;    /**< Holds the user interface for the RtServerRunWidget.*/
 };
 
 } // NAMESPACE

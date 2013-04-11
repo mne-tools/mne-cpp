@@ -83,14 +83,16 @@ SOURCES += \
         rtserver.cpp \
         FormFiles/rtserversetupwidget.cpp \
         FormFiles/rtserverrunwidget.cpp \
-        FormFiles/rtserveraboutwidget.cpp
+        FormFiles/rtserveraboutwidget.cpp \
+    rtserverproducer.cpp
 
 HEADERS += \
         rtserver.h\
         rtserver_global.h \
         FormFiles/rtserversetupwidget.h \
         FormFiles/rtserverrunwidget.h \
-        FormFiles/rtserveraboutwidget.h
+        FormFiles/rtserveraboutwidget.h \
+    rtserverproducer.h
 
 FORMS += \
         FormFiles/rtserversetup.ui \

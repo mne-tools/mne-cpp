@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RTServerAboutWidget class.
+* @brief    Contains the declaration of the RtServerAboutWidget class.
 *
 */
 
@@ -55,10 +55,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RTServerPlugin
+// DEFINE NAMESPACE RtServerPlugin
 //=============================================================================================================
 
-namespace RTServerPlugin
+namespace RtServerPlugin
 {
 
 
@@ -76,11 +76,11 @@ namespace RTServerPlugin
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RTServerAboutWidget
+* DECLARE CLASS RtServerAboutWidget
 *
-* @brief The RTServerAboutWidget class provides the about dialog for the RTServer.
+* @brief The RtServerAboutWidget class provides the about dialog for the RtServer.
 */
-class RTServerAboutWidget : public QDialog
+class RtServerAboutWidget : public QDialog
 {
     Q_OBJECT
 
@@ -88,21 +88,21 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RTServerAboutWidget dialog which is a child of parent.
+    * Constructs a RtServerAboutWidget dialog which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new RTServerAboutWidget becomes a window. If parent is another widget, RTServerAboutWidget becomes a child window inside parent. ECGAboutWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new RtServerAboutWidget becomes a window. If parent is another widget, RtServerAboutWidget becomes a child window inside parent. ECGAboutWidget is deleted when its parent is deleted.
     */
-    RTServerAboutWidget(QWidget *parent = 0);
+    RtServerAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RTServerAboutWidget.
-    * All RTServerAboutWidget's children are deleted first. The application exits if RTServerAboutWidget is the main widget.
+    * Destroys the RtServerAboutWidget.
+    * All RtServerAboutWidget's children are deleted first. The application exits if RtServerAboutWidget is the main widget.
     */
-    ~RTServerAboutWidget();
+    ~RtServerAboutWidget();
 
 private:
-    Ui::RTServerAboutWidgetClass ui;    /**< Holds the user interface for the DummyAboutWidget.*/
+    Ui::RtServerAboutWidgetClass ui;    /**< Holds the user interface for the DummyAboutWidget.*/
 };
 
 } // NAMESPACE
