@@ -215,7 +215,10 @@ private:
     RtServerProducer*   m_pRtServerProducer;    /**< Holds the RtServerProducer.*/
 
 
-    FiffInfo    m_fiffInfo;             /**< Fiff measurement info.*/
+    QMap<qint32, QString> m_qMapConnectors; /**< Connector map.*/
+
+    FiffInfo    m_fiffInfo;                 /**< Fiff measurement info.*/
+
 
 };
 

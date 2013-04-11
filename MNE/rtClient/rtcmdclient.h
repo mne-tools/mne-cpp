@@ -152,6 +152,13 @@ public:
 
     //=========================================================================================================
     /**
+    * Request available connectors from mne_rt_server
+    */
+//    QMap<qint32, QString>
+    QString requestConnectors();
+
+    //=========================================================================================================
+    /**
     * Wait for ready read until data are available.
     *
     * @param[in] msecs  time to wait in milliseconds, if -1 function will not time out. Default value is 30000.
