@@ -120,8 +120,15 @@ void ConnectorManager::clearConnectorActivation()
 
 void ConnectorManager::comConlist(Command p_command)
 {
-    //ToDO JSON
-    qobject_cast<MNERTServer*> (this->parent())->getCommandManager()["conlist"].reply(this->getConnectorList());
+    bool t_bCommandIsJson = p_command.isJson();
+
+    MNERTServer* t_pMNERTServer = qobject_cast<MNERTServer*> (this->parent());
+
+    if(!t_bCommandIsJson)
+        t_pMNERTServer->getCommandManager()["conlist"].reply(this->getConnectorList());
+    else
+        t_pMNERTServer->getCommandManager()["conlist"].reply(this->getConnectorList(true));
+
 }
 
 
@@ -268,24 +275,53 @@ IConnector* ConnectorManager::getActiveConnector()
 
 //*************************************************************************************************************
 
-QByteArray ConnectorManager::getConnectorList() const
+QByteArray ConnectorManager::getConnectorList(bool p_bFlagJSON) const
 {
     QByteArray t_blockConnectorList;
-    if(s_vecConnectors.size() > 0)
+
+    if(p_bFlagJSON)
     {
+        QJsonObject t_qJsonObjectConnectors;
+
         QVector<IConnector*>::const_iterator it = s_vecConnectors.begin();
         for( ; it != s_vecConnectors.end(); ++it)
         {
-            if((*it)->isActive())
-                t_blockConnectorList.append(QString("  *  (%1) %2\r\n").arg((*it)->getConnectorID()).arg((*it)->getName()));
-            else
-                t_blockConnectorList.append(QString("     (%1) %2\r\n").arg((*it)->getConnectorID()).arg((*it)->getName()));
+            QJsonObject t_qJsonObjectConnector;
+
+            //insert id
+            t_qJsonObjectConnector.insert(QString("id"), QJsonValue((*it)->getConnectorID()));
+
+            //insert isActive
+            t_qJsonObjectConnector.insert(QString("active"), QJsonValue((*it)->isActive()));
+
+            //insert Connector JsonObject
+            t_qJsonObjectConnectors.insert((*it)->getName(),t_qJsonObjectConnector);//QJsonObject());//QJsonValue());
+
         }
+
+        QJsonObject t_qJsonObjectRoot;
+        t_qJsonObjectRoot.insert("connectors", t_qJsonObjectConnectors);
+        QJsonDocument p_qJsonDocument(t_qJsonObjectRoot);
+
+        t_blockConnectorList.append(p_qJsonDocument.toJson());
     }
     else
-        t_blockConnectorList.append(" - no connector loaded - \r\n");
-
-    t_blockConnectorList.append("\r\n");
+    {
+        if(s_vecConnectors.size() > 0)
+        {
+            QVector<IConnector*>::const_iterator it = s_vecConnectors.begin();
+            for( ; it != s_vecConnectors.end(); ++it)
+            {
+                if((*it)->isActive())
+                    t_blockConnectorList.append(QString("  *  (%1) %2\r\n").arg((*it)->getConnectorID()).arg((*it)->getName()));
+                else
+                    t_blockConnectorList.append(QString("     (%1) %2\r\n").arg((*it)->getConnectorID()).arg((*it)->getName()));
+            }
+        }
+        else
+            t_blockConnectorList.append(" - no connector loaded - \r\n");
+        t_blockConnectorList.append("\r\n");
+    }
     return t_blockConnectorList;
 }
 

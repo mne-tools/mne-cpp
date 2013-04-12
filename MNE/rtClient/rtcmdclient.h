@@ -153,9 +153,12 @@ public:
     //=========================================================================================================
     /**
     * Request available connectors from mne_rt_server
+    *
+    * @param[in] p_qMapConnectors   list of connectors
+    *
+    * @return the active connector.
     */
-//    QMap<qint32, QString>
-    QString requestConnectors();
+    qint32 requestConnectors(QMap<qint32, QString> &p_qMapConnectors);
 
     //=========================================================================================================
     /**

@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_pref">
       <attribute name="title">
@@ -178,7 +178,7 @@
           <widget class="QGroupBox" name="m_qGroupBox_Init">
            <property name="maximumSize">
             <size>
-             <width>200</width>
+             <width>250</width>
              <height>16777215</height>
             </size>
            </property>
