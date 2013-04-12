@@ -86,6 +86,7 @@ FiffStreamServer::~FiffStreamServer()
 
 void FiffStreamServer::comClist(Command p_command)
 {
+    //ToDo JSON
     QString t_sOutput("");
     t_sOutput.append("\tID\tAlias\r\n");
     QMap<qint32, FiffStreamThread*>::iterator i;

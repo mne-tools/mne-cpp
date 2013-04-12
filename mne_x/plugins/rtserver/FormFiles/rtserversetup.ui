@@ -26,104 +26,6 @@
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <layout class="QGridLayout" name="m_qGridLayout_main">
-         <item row="1" column="0">
-          <widget class="QGroupBox" name="m_qGroupBox_Properties">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>100</height>
-            </size>
-           </property>
-           <property name="title">
-            <string>Properties</string>
-           </property>
-           <property name="flat">
-            <bool>false</bool>
-           </property>
-           <layout class="QGridLayout" name="m_qGridLayout_Properties">
-            <item row="0" column="0">
-             <widget class="QLabel" name="m_qLabel_SamplingRate">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="layoutDirection">
-               <enum>Qt::LeftToRight</enum>
-              </property>
-              <property name="text">
-               <string>Sampling Rate:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLabel" name="m_qLabel_sps">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::Panel</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Sunken</enum>
-              </property>
-              <property name="text">
-               <string>200sps</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="m_qLabel_Downsampling">
-              <property name="text">
-               <string>Downsampling: </string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QSpinBox" name="m_qSpinBox_Downsampling">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="suffix">
-               <string>x</string>
-              </property>
-              <property name="minimum">
-               <number>1</number>
-              </property>
-              <property name="maximum">
-               <number>10</number>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <spacer name="m_qHorizontalSpacer_About">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
          <item row="3" column="1" colspan="2">
           <widget class="QGroupBox" name="m_qGroupBox_Information">
            <property name="minimumSize">
@@ -174,20 +76,81 @@
            </property>
           </spacer>
          </item>
+         <item row="1" column="0">
+          <widget class="QGroupBox" name="m_qGroupBox_PluginProperties">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="title">
+            <string>Plugin Properties</string>
+           </property>
+           <property name="flat">
+            <bool>false</bool>
+           </property>
+           <layout class="QGridLayout" name="m_qGridLayout_Properties">
+            <item row="1" column="1">
+             <widget class="QSpinBox" name="m_qSpinBox_Downsampling">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="suffix">
+               <string>x</string>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>10</number>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="m_qLabel_Downsampling">
+              <property name="text">
+               <string>Downsampling: </string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
          <item row="0" column="0">
-          <widget class="QGroupBox" name="m_qGroupBox_Init">
+          <widget class="QGroupBox" name="m_qGroupBox_RtServerProperties">
            <property name="maximumSize">
             <size>
-             <width>250</width>
+             <width>300</width>
              <height>16777215</height>
             </size>
            </property>
            <property name="title">
-            <string>Init Manager</string>
+            <string>Rt Server Properties</string>
            </property>
            <layout class="QGridLayout" name="gridLayout">
-            <item row="0" column="1">
-             <widget class="QComboBox" name="m_qComboBox_Connector"/>
+            <item row="4" column="0">
+             <widget class="QLabel" name="m_qLabel_BufferSize">
+              <property name="text">
+               <string>Buffer [samples]:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QLineEdit" name="m_qLineEdit_BufferSize">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
             </item>
             <item row="0" column="0">
              <widget class="QLabel" name="m_qLabel_Connector">
@@ -196,6 +159,9 @@
               </property>
              </widget>
             </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="m_qComboBox_Connector"/>
+            </item>
             <item row="3" column="0" colspan="2">
              <widget class="Line" name="line">
               <property name="orientation">
@@ -203,22 +169,47 @@
               </property>
              </widget>
             </item>
-            <item row="4" column="1">
-             <widget class="QLineEdit" name="m_qLineEdit_BufferSize">
+            <item row="5" column="0">
+             <widget class="QLabel" name="m_qLabel_sps_description">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
               <property name="text">
-               <string>100</string>
+               <string>Sampling Rate [sps]:</string>
               </property>
              </widget>
             </item>
-            <item row="4" column="0">
-             <widget class="QLabel" name="m_qLabel_BufferSize">
+            <item row="5" column="1">
+             <widget class="QLabel" name="m_qLabel_sps">
+              <property name="frameShape">
+               <enum>QFrame::StyledPanel</enum>
+              </property>
               <property name="text">
-               <string>Buffer Size:</string>
+               <string/>
               </property>
              </widget>
             </item>
            </layout>
           </widget>
+         </item>
+         <item row="4" column="1">
+          <spacer name="m_qHorizontalSpacer_About">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
          </item>
         </layout>
        </item>

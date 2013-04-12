@@ -76,6 +76,7 @@ RtServer::RtServer()
 , m_pRtServerProducer(new RtServerProducer(this))
 , m_sRtServerIP("127.0.0.1")
 , m_bCmdClientIsConnected(false)
+, m_iBufferSize(-1)
 {
     m_MDL_ID = MDL_ID::RTSERVER;
 
@@ -110,7 +111,7 @@ void RtServer::connectCmdClient(QString p_sRtSeverIP)
 
     if(m_pRtCmdClient->state() == QTcpSocket::ConnectedState)
     {
-        mutex.lock();
+        rtServerMutex.lock();
         m_sRtServerIP = p_sRtSeverIP;
         if(!m_bCmdClientIsConnected)
         {
@@ -122,7 +123,7 @@ void RtServer::connectCmdClient(QString p_sRtSeverIP)
             m_bCmdClientIsConnected = true;
             emit cmdConnectionChanged(m_bCmdClientIsConnected);
         }
-        mutex.unlock();
+        rtServerMutex.unlock();
     }
 }
 
@@ -135,9 +136,9 @@ void RtServer::disconnectCmdClient()
     {
         m_pRtCmdClient->disconnectFromHost();
         m_pRtCmdClient->waitForDisconnected();
-        mutex.lock();
+        rtServerMutex.lock();
         m_bCmdClientIsConnected = false;
-        mutex.unlock();
+        rtServerMutex.unlock();
         emit cmdConnectionChanged(m_bCmdClientIsConnected);
     }
 }
@@ -169,6 +170,10 @@ bool RtServer::start()
 {
     // Initialize real time measurements
     init();
+
+    //Set buffer size
+    (*m_pRtCmdClient)["bufsize"].pValues()[0].setValue(m_iBufferSize);
+    (*m_pRtCmdClient)["bufsize"].send();
 
     // Start threads
     QThread::start();
