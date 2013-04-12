@@ -84,6 +84,9 @@ RtServerSetupWidget::RtServerSetupWidget(RtServer* p_pRtServer, QWidget* parent)
     //About
     connect(ui.m_qPushButton_About, &QPushButton::released, this, &RtServerSetupWidget::showAboutDialog);
 
+    //Convinience CMD Connection Timer
+    connect(&m_cmdConnectionTimer, &QTimer::timeout, this, &RtServerSetupWidget::pressedConnect);
+
     this->init();
 }
 
@@ -101,7 +104,6 @@ RtServerSetupWidget::~RtServerSetupWidget()
 void RtServerSetupWidget::init()
 {
     cmdConnectionChanged(m_pRtServer->m_bCmdClientIsConnected);
-
 }
 
 
@@ -147,6 +149,8 @@ void RtServerSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
 {
     if(p_bConnectionStatus)
     {
+        //Stop convinience timer
+        m_cmdConnectionTimer.stop();
         // Read Info
         if(!m_pRtServer->m_fiffInfo.isEmpty())
             m_pRtServer->requestInfo();
@@ -166,6 +170,7 @@ void RtServerSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
             ++idx;
         }
 
+        //UI enables/disables
         this->ui.m_qLabel_ConnectionStatus->setText(QString("Connected"));
         this->ui.m_qLineEdit_Ip->setEnabled(false);
         this->ui.m_qPushButton_Connect->setText(QString("Disconnect"));
@@ -174,11 +179,19 @@ void RtServerSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
     }
     else
     {
+        //clear connectors --> ToDO create a clear function
+        m_pRtServer->m_qMapConnectors.clear();
+        this->ui.m_qComboBox_Connector->clear();
+
+        //UI enables/disables
         this->ui.m_qLabel_ConnectionStatus->setText(QString("Not connected"));
         this->ui.m_qLineEdit_Ip->setEnabled(true);
         this->ui.m_qPushButton_Connect->setText(QString("Connect"));
         this->ui.m_qLineEdit_SendCLI->setEnabled(false);
         this->ui.m_qPushButton_SendCLI->setEnabled(false);
+
+        //Start convinience timer
+        m_cmdConnectionTimer.start(5000);
     }
 }
 
