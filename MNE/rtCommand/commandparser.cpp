@@ -138,6 +138,7 @@ bool CommandParser::parse(const QString &p_sInput, QStringList &p_qListCommandsP
                     m_rawCommand.pValues().append(itParam.value().toString());
 //                    qDebug() << itParam.key() << " + " << itParam.value().toString();
                 }
+                //Notify attached command manager
                 notify();
             }
             printf("\r\n");

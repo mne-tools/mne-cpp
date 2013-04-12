@@ -153,11 +153,18 @@ void RtServerSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
 
         // Read Connectors
         if(m_pRtServer->m_qMapConnectors.size() == 0)
-        {
-            QString test = m_pRtServer->m_pRtCmdClient->requestConnectors();
-            this->printToLog(test);
-        }
+            QString activeId = QString("%1").arg(m_pRtServer->m_pRtCmdClient->requestConnectors(m_pRtServer->m_qMapConnectors));
 
+        //ToDo store and select active id
+
+        QMap<qint32, QString>::ConstIterator it = m_pRtServer->m_qMapConnectors.begin();
+        qint32 idx = 0;
+
+        for(; it != m_pRtServer->m_qMapConnectors.end(); ++it)
+        {
+            this->ui.m_qComboBox_Connector->insertItem(idx, it.value(), it.key());
+            ++idx;
+        }
 
         this->ui.m_qLabel_ConnectionStatus->setText(QString("Connected"));
         this->ui.m_qLineEdit_Ip->setEnabled(false);

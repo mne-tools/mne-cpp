@@ -178,7 +178,7 @@ void RtCmdClient::requestCommands()
 //*************************************************************************************************************
 
 //QMap<qint32, QString>
-QString RtCmdClient::requestConnectors()
+qint32 RtCmdClient::requestConnectors(QMap<qint32, QString> &p_qMapConnectors)
 {
     const QString connList("conlist");
     const QString description("");
@@ -194,11 +194,35 @@ QString RtCmdClient::requestConnectors()
     QJsonDocument t_jsonDocumentOrigin = QJsonDocument::fromJson(
             t_sJsonConnectors, &error);
 
-//    QMap<qint32, QString> p_qMapConnectors;
+    QJsonObject t_jsonObjectConnectors;
 
-//    return p_qMapConnectors;
+    //Switch to command object
+    if(t_jsonDocumentOrigin.isObject() && t_jsonDocumentOrigin.object().value(QString("connectors")) != QJsonValue::Undefined)
+        t_jsonObjectConnectors = t_jsonDocumentOrigin.object().value(QString("connectors")).toObject();
 
-    return t_sJsonConnectors;
+    //inits
+    qint32 p_iActiveId = -1;
+    p_qMapConnectors.clear();
+
+    //insert connectors
+    QJsonObject::Iterator it;
+    for(it = t_jsonObjectConnectors.begin(); it != t_jsonObjectConnectors.end(); ++it)
+    {
+        QString t_qConnectorName = it.key();
+
+        qint32 id = it.value().toObject().value(QString("id")).toDouble();
+
+        if(!p_qMapConnectors.contains(id))
+            p_qMapConnectors.insert(id, t_qConnectorName);
+        else
+            qWarning("Warning: CommandMap contains command %s already. Insertion skipped.\n", it.key().toLatin1().constData());
+
+        //if connector is active indicate it
+        if(it.value().toObject().value(QString("active")).toBool())
+            p_iActiveId = id;
+    }
+
+    return p_iActiveId;
 }
 
 
