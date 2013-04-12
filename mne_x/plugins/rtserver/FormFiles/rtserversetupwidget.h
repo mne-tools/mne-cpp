@@ -42,6 +42,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "../ui_rtserversetup.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -49,7 +51,7 @@
 //=============================================================================================================
 
 #include <QtWidgets>
-#include "../ui_rtserversetup.h"
+#include <QTimer>
 
 
 //*************************************************************************************************************
@@ -129,6 +131,9 @@ private:
     RtServer*   m_pRtServer;    /**< Holds a pointer to corresponding ECGSimulator.*/
 
     Ui::RtServerSetupWidgetClass ui;       /**< Holds the user interface for the RtServerSetupWidget.*/
+
+    QTimer m_cmdConnectionTimer;    /**< Timer for convinient command client connection. When timer times out a connection is tried to be established. */
+
 };
 
 } // NAMESPACE
