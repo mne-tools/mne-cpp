@@ -11,6 +11,10 @@
                     "type": "uint"
                 }
             }
+        },
+        "getbufsize": {
+            "description": "Returns the current buffer size of the FiffStreamClient raw data buffer.",
+            "parameters": {}
         }
     }
 }

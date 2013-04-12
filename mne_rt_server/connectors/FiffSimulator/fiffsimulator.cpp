@@ -146,6 +146,30 @@ void FiffSimulator::comBufsize(Command p_command)
 
 //*************************************************************************************************************
 
+void FiffSimulator::comGetBufsize(Command p_command)
+{
+    bool t_bCommandIsJson = p_command.isJson();
+    if(t_bCommandIsJson)
+    {
+        //
+        //create JSON help object
+        //
+        QJsonObject t_qJsonObjectRoot;
+        t_qJsonObjectRoot.insert("bufsize", QJsonValue((double)m_uiBufferSampleSize));
+        QJsonDocument p_qJsonDocument(t_qJsonObjectRoot);
+
+        m_commandManager["getbufsize"].reply(p_qJsonDocument.toJson());
+    }
+    else
+    {
+        QString str = QString("\t%1\r\n\n").arg(m_uiBufferSampleSize);
+        m_commandManager["getbufsize"].reply(str);
+    }
+}
+
+
+//*************************************************************************************************************
+
 void FiffSimulator::comSimfile(Command p_command)
 {
     //
@@ -184,6 +208,7 @@ void FiffSimulator::connectCommandManager()
 {
     //Connect slots
     QObject::connect(&m_commandManager["bufsize"], &Command::executed, this, &FiffSimulator::comBufsize);
+    QObject::connect(&m_commandManager["getbufsize"], &Command::executed, this, &FiffSimulator::comGetBufsize);
     QObject::connect(&m_commandManager["simfile"], &Command::executed, this, &FiffSimulator::comSimfile);
 }
 

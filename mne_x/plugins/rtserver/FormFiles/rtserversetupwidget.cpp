@@ -78,6 +78,9 @@ RtServerSetupWidget::RtServerSetupWidget(RtServer* p_pRtServer, QWidget* parent)
 
     connect(m_pRtServer, &RtServer::cmdConnectionChanged, this, &RtServerSetupWidget::cmdConnectionChanged);
 
+    //rt server fiffInfo received
+    connect(m_pRtServer, &RtServer::fiffInfoAvailable, this, &RtServerSetupWidget::fiffInfoReceived);
+
     //CLI
     connect(ui.m_qPushButton_SendCLI, &QPushButton::released, this, &RtServerSetupWidget::pressedSendCLI);
 
@@ -151,15 +154,24 @@ void RtServerSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
     {
         //Stop convinience timer
         m_cmdConnectionTimer.stop();
+
         // Read Info
-        if(!m_pRtServer->m_fiffInfo.isEmpty())
+        if(m_pRtServer->m_fiffInfo.isEmpty())
             m_pRtServer->requestInfo();
+
+        if(!m_pRtServer->m_fiffInfo.isEmpty())
+            this->ui.m_qLabel_sps->setText(QString("%1").arg(m_pRtServer->m_fiffInfo.sfreq));
 
         // Read Connectors
         if(m_pRtServer->m_qMapConnectors.size() == 0)
-            QString activeId = QString("%1").arg(m_pRtServer->m_pRtCmdClient->requestConnectors(m_pRtServer->m_qMapConnectors));
+            m_pRtServer->m_iActiveConnectorId = m_pRtServer->m_pRtCmdClient->requestConnectors(m_pRtServer->m_qMapConnectors);
 
-        //ToDo store and select active id
+        // Read Buffer Size
+        m_pRtServer->m_iBufferSize = m_pRtServer->m_pRtCmdClient->requestBufsize();
+        this->ui.m_qLineEdit_BufferSize->setText(QString("%1").arg(m_pRtServer->m_iBufferSize));
+
+
+
 
         QMap<qint32, QString>::ConstIterator it = m_pRtServer->m_qMapConnectors.begin();
         qint32 idx = 0;
@@ -182,6 +194,7 @@ void RtServerSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
         //clear connectors --> ToDO create a clear function
         m_pRtServer->m_qMapConnectors.clear();
         this->ui.m_qComboBox_Connector->clear();
+        m_pRtServer->m_iBufferSize = -1;
 
         //UI enables/disables
         this->ui.m_qLabel_ConnectionStatus->setText(QString("Not connected"));
@@ -190,9 +203,21 @@ void RtServerSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
         this->ui.m_qLineEdit_SendCLI->setEnabled(false);
         this->ui.m_qPushButton_SendCLI->setEnabled(false);
 
+        this->ui.m_qLineEdit_BufferSize->setText(QString(""));
+
         //Start convinience timer
         m_cmdConnectionTimer.start(5000);
     }
+}
+
+
+//*************************************************************************************************************
+
+void RtServerSetupWidget::fiffInfoReceived()
+{
+    if(!m_pRtServer->m_fiffInfo.isEmpty())
+        this->ui.m_qLabel_sps->setText(QString("%1").arg(m_pRtServer->m_fiffInfo.sfreq));
+
 }
 
 

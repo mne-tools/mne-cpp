@@ -161,8 +161,12 @@ void RtServerProducer::run()
     {
         if(m_bFlagInfoRequest)
         {
+            m_pRtServer->rtServerMutex.lock();
+            m_pRtServer->m_fiffInfo = m_pRtDataClient->readInfo();
+            emit m_pRtServer->fiffInfoAvailable();
+            m_pRtServer->rtServerMutex.unlock();
+
             producerMutex.lock();
-            m_pRtDataClient->readInfo();
             m_bFlagInfoRequest = false;
             producerMutex.unlock();
         }

@@ -150,23 +150,60 @@ void RtCmdClient::sendCommandJSON(const Command &p_command)
 
 //*************************************************************************************************************
 
+qint32 RtCmdClient::requestBufsize()
+{
+    //Send
+    m_commandManager["getbufsize"].send();
+
+    //Receive
+    m_qMutex.lock();
+    QByteArray t_sJsonCommands = m_sAvailableData.toUtf8();
+    m_qMutex.unlock();
+
+    //Parse
+    QJsonParseError error;
+    QJsonDocument t_jsonDocumentOrigin = QJsonDocument::fromJson(t_sJsonCommands, &error);
+
+    if (error.error == QJsonParseError::NoError)
+    {
+        qDebug() << t_jsonDocumentOrigin;//"Received Commands" << m_commandManager.commandMap().keys();
+
+        //Switch to command object
+        if(t_jsonDocumentOrigin.isObject() && t_jsonDocumentOrigin.object().value(QString("bufsize")) != QJsonValue::Undefined)
+        {
+            qint32 size = (qint32)t_jsonDocumentOrigin.object().value(QString("bufsize")).toDouble();
+            return size;
+        }
+    }
+
+    qCritical() << "Unable to parse JSON response: " << error.errorString();
+    return -1;
+}
+
+
+//*************************************************************************************************************
+
 void RtCmdClient::requestCommands()
 {
+    //No commands are present -> thats why help has to be send using a self created command
     const QString help("help");
     const QString description("");
     const Command cmdHelp(help, description);
     this->sendCommandJSON(cmdHelp);
 
+    //Receive
     m_qMutex.lock();
     QByteArray t_sJsonCommands = m_sAvailableData.toUtf8();
     m_qMutex.unlock();
+
+    //Parse
     QJsonParseError error;
     QJsonDocument t_jsonDocumentOrigin = QJsonDocument::fromJson(
             t_sJsonCommands, &error);
     if (error.error == QJsonParseError::NoError)
     {
         m_commandManager.insert(t_jsonDocumentOrigin);
-        qDebug() << "Received Commands" << m_commandManager.commandMap().keys();
+//        qDebug() << "Received Commands" << m_commandManager.commandMap().keys();
     }
     else
     {
@@ -180,16 +217,15 @@ void RtCmdClient::requestCommands()
 //QMap<qint32, QString>
 qint32 RtCmdClient::requestConnectors(QMap<qint32, QString> &p_qMapConnectors)
 {
-    const QString connList("conlist");
-    const QString description("");
-    const Command cmdConnectorList(connList, description);
-    this->sendCommandJSON(cmdConnectorList);
+    //Send
+    m_commandManager["conlist"].send();
 
+    //Receive
     m_qMutex.lock();
     QByteArray t_sJsonConnectors = m_sAvailableData.toUtf8();
     m_qMutex.unlock();
 
-
+    //Parse
     QJsonParseError error;
     QJsonDocument t_jsonDocumentOrigin = QJsonDocument::fromJson(
             t_sJsonConnectors, &error);

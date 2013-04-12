@@ -146,6 +146,12 @@ public:
 
     //=========================================================================================================
     /**
+    * Request buffer size from mne_rt_server
+    */
+    qint32 requestBufsize();
+
+    //=========================================================================================================
+    /**
     * Request available commands from mne_rt_server
     */
     void requestCommands();

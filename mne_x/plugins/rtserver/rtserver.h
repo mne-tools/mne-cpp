@@ -174,6 +174,12 @@ signals:
     */
     void cmdConnectionChanged(bool p_bStatus);
 
+    //=========================================================================================================
+    /**
+    * Emitted when fiffInfo is available
+    */
+    void fiffInfoAvailable();
+
 protected:
     virtual void run();
 
@@ -185,10 +191,9 @@ private:
     void init();
 
 
-    QMutex mutex;
+    QMutex rtServerMutex;
 
     QString m_sRtServerClientAlias;     /**< The rt server client alias.*/
-
 
 //    RealTimeSampleArray*    m_pRTSA_RtServer_I;     /**< Holds the RealTimeSampleArray to provide the channel ECG I.*/
 //    RealTimeSampleArray*    m_pRTSA_RtServer_II;    /**< Holds the RealTimeSampleArray to provide the channel ECG II.*/
@@ -212,12 +217,16 @@ private:
 
     QString     m_sRtServerIP;              /**< The IP Adress of mne_rt_server.*/
 
-    RtServerProducer*   m_pRtServerProducer;    /**< Holds the RtServerProducer.*/
+    RtServerProducer*   m_pRtServerProducer;/**< Holds the RtServerProducer.*/
 
 
     QMap<qint32, QString> m_qMapConnectors; /**< Connector map.*/
 
+    qint32 m_iActiveConnectorId;            /**< The active connector.*/
+
     FiffInfo    m_fiffInfo;                 /**< Fiff measurement info.*/
+
+    qint32 m_iBufferSize;                   /**< The raw data buffer size.*/
 
 
 };

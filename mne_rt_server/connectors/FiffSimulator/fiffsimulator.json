@@ -12,6 +12,10 @@
                 }
             }
         },
+        "getbufsize": {
+            "description": "Returns the current buffer size of the FiffStreamClient raw data buffer.",
+            "parameters": {}
+        },
         "simfile": {
             "description": "The fiff file which should be used as simulation file.",
             "parameters": {
