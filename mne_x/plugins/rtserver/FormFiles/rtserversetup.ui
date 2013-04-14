@@ -26,57 +26,27 @@
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <layout class="QGridLayout" name="m_qGridLayout_main">
-         <item row="3" column="1" colspan="2">
-          <widget class="QGroupBox" name="m_qGroupBox_Information">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="title">
-            <string>Information</string>
-           </property>
-           <layout class="QGridLayout" name="m_qGridLayout_Information">
-            <item row="0" column="0">
-             <widget class="QTextBrowser" name="m_qTextBrowser_Information"/>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item row="4" column="2">
+         <item row="5" column="2">
           <widget class="QPushButton" name="m_qPushButton_About">
            <property name="text">
             <string>About</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1" rowspan="3" colspan="2">
-          <widget class="QGroupBox" name="m_qGroupBox_Channels">
-           <property name="title">
-            <string>Fiff Channel</string>
-           </property>
-           <layout class="QGridLayout" name="m_qGridLayout_Channel">
-            <item row="0" column="0">
-             <widget class="QColumnView" name="m_qColumnView_Channels"/>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item row="2" column="3">
-          <spacer name="verticalSpacer_2">
+         <item row="5" column="1">
+          <spacer name="m_qHorizontalSpacer_About">
            <property name="orientation">
-            <enum>Qt::Vertical</enum>
+            <enum>Qt::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>20</width>
-             <height>40</height>
+             <width>40</width>
+             <height>20</height>
             </size>
            </property>
           </spacer>
          </item>
-         <item row="1" column="0">
+         <item row="4" column="0">
           <widget class="QGroupBox" name="m_qGroupBox_PluginProperties">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
@@ -97,6 +67,13 @@
             <bool>false</bool>
            </property>
            <layout class="QGridLayout" name="m_qGridLayout_Properties">
+            <item row="1" column="0">
+             <widget class="QLabel" name="m_qLabel_Downsampling">
+              <property name="text">
+               <string>Downsampling: </string>
+              </property>
+             </widget>
+            </item>
             <item row="1" column="1">
              <widget class="QSpinBox" name="m_qSpinBox_Downsampling">
               <property name="sizePolicy">
@@ -116,17 +93,10 @@
               </property>
              </widget>
             </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="m_qLabel_Downsampling">
-              <property name="text">
-               <string>Downsampling: </string>
-              </property>
-             </widget>
-            </item>
            </layout>
           </widget>
          </item>
-         <item row="0" column="0">
+         <item row="3" column="0">
           <widget class="QGroupBox" name="m_qGroupBox_RtServerProperties">
            <property name="maximumSize">
             <size>
@@ -198,18 +168,92 @@
            </layout>
           </widget>
          </item>
-         <item row="4" column="1">
-          <spacer name="m_qHorizontalSpacer_About">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+         <item row="0" column="0" rowspan="3">
+          <widget class="QGroupBox" name="m_qGroupBox_Acquisition">
+           <property name="title">
+            <string>Acquisition</string>
            </property>
-           <property name="sizeHint" stdset="0">
+           <layout class="QGridLayout" name="gridLayout">
+            <item row="3" column="1">
+             <widget class="QLineEdit" name="lineEdit"/>
+            </item>
+            <item row="3" column="2">
+             <widget class="QPushButton" name="pushButton">
+              <property name="text">
+               <string>...</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>File:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0" colspan="3">
+             <widget class="Line" name="line_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0" colspan="3">
+             <widget class="QCheckBox" name="checkBox">
+              <property name="text">
+               <string>Record Data</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="m_qLabel_SubjectDescription">
+              <property name="text">
+               <string>Subject:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QComboBox" name="m_qComboBox_SubjectSelection"/>
+            </item>
+            <item row="2" column="2">
+             <widget class="QPushButton" name="m_qPushButton_NewSubject">
+              <property name="text">
+               <string>New Subject</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="0" column="1" rowspan="3" colspan="2">
+          <widget class="QGroupBox" name="m_qGroupBox_Information">
+           <property name="minimumSize">
             <size>
-             <width>40</width>
-             <height>20</height>
+             <width>0</width>
+             <height>0</height>
             </size>
            </property>
-          </spacer>
+           <property name="title">
+            <string>Information</string>
+           </property>
+           <layout class="QGridLayout" name="m_qGridLayout_Information">
+            <item row="0" column="0">
+             <widget class="QTextBrowser" name="m_qTextBrowser_Information"/>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="3" column="1" rowspan="2" colspan="2">
+          <widget class="QGroupBox" name="m_qGroupBox_Channels">
+           <property name="title">
+            <string>Fiff Channel</string>
+           </property>
+           <layout class="QGridLayout" name="m_qGridLayout_Channel">
+            <item row="0" column="0">
+             <widget class="QColumnView" name="m_qColumnView_Channels"/>
+            </item>
+           </layout>
+          </widget>
          </item>
         </layout>
        </item>

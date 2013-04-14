@@ -178,6 +178,10 @@ bool RtServer::start()
     // Start threads
     QThread::start();
 
+    // Start Measurement at rt_Server
+    (*m_pRtCmdClient)["start"].send();
+
+
     return true;
 }
 
@@ -186,6 +190,10 @@ bool RtServer::start()
 
 bool RtServer::stop()
 {
+    // Stop Measurement at rt_Server
+    (*m_pRtCmdClient)["stop-all"].send();
+
+
     // Stop threads
     QThread::terminate();
     QThread::wait();
