@@ -108,6 +108,8 @@ public:
 //slots
     void printToLog(QString message);   /**< Implements printing messages to rtproc log.*/
 
+    void pressedFiffRecordFile(); /**< Triggers file dialog to select record file.*/
+
     void pressedConnect();      /**< Triggers a connection trial to rt_server.*/
 
     void pressedSendCLI();      /**< Triggers a send request of a cli command.*/

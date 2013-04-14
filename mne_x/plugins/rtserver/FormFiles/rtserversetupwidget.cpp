@@ -81,6 +81,9 @@ RtServerSetupWidget::RtServerSetupWidget(RtServer* p_pRtServer, QWidget* parent)
     //rt server fiffInfo received
     connect(m_pRtServer, &RtServer::fiffInfoAvailable, this, &RtServerSetupWidget::fiffInfoReceived);
 
+    //Fiff Record File
+    connect(ui.m_qPushButton_FiffRecordFile, &QPushButton::released, this, &RtServerSetupWidget::pressedFiffRecordFile);
+
     //CLI
     connect(ui.m_qPushButton_SendCLI, &QPushButton::released, this, &RtServerSetupWidget::pressedSendCLI);
 
@@ -107,6 +110,14 @@ RtServerSetupWidget::~RtServerSetupWidget()
 void RtServerSetupWidget::init()
 {
     cmdConnectionChanged(m_pRtServer->m_bCmdClientIsConnected);
+}
+
+
+//*************************************************************************************************************
+
+void RtServerSetupWidget::pressedFiffRecordFile()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Fiff Record File"), "", tr("Fiff Record File (*.fif)"));
 }
 
 
