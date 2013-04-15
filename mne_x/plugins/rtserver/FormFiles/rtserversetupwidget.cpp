@@ -90,9 +90,6 @@ RtServerSetupWidget::RtServerSetupWidget(RtServer* p_pRtServer, QWidget* parent)
     //About
     connect(ui.m_qPushButton_About, &QPushButton::released, this, &RtServerSetupWidget::showAboutDialog);
 
-    //Convinience CMD Connection Timer
-    connect(&m_cmdConnectionTimer, &QTimer::timeout, this, &RtServerSetupWidget::pressedConnect);
-
     this->init();
 }
 
@@ -128,7 +125,10 @@ void RtServerSetupWidget::pressedConnect()
     if(m_pRtServer->m_bCmdClientIsConnected)
         m_pRtServer->disconnectCmdClient();
     else
-        m_pRtServer->connectCmdClient(this->ui.m_qLineEdit_Ip->text());
+    {
+        m_pRtServer->m_sRtServerIP = this->ui.m_qLineEdit_Ip->text();
+        m_pRtServer->connectCmdClient();
+    }
 }
 
 
@@ -163,22 +163,20 @@ void RtServerSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
 {
     if(p_bConnectionStatus)
     {
-        //Stop convinience timer
-        m_cmdConnectionTimer.stop();
-
         //
-        // set frequency
+        // set frequency txt
         //
         if(!m_pRtServer->m_fiffInfo.isEmpty())
             this->ui.m_qLabel_sps->setText(QString("%1").arg(m_pRtServer->m_fiffInfo.sfreq));
 
         //
-        // Read Buffer Size
+        // set buffer size txt
         //
-        if(m_pRtServer->m_iBufferSize > -1)
-            this->ui.m_qLineEdit_BufferSize->setText(QString("%1").arg(m_pRtServer->m_iBufferSize));
+        this->ui.m_qLineEdit_BufferSize->setText(QString("%1").arg(m_pRtServer->m_iBufferSize));
 
-
+        //
+        // set connectors
+        //
         QMap<qint32, QString>::ConstIterator it = m_pRtServer->m_qMapConnectors.begin();
         qint32 idx = 0;
 
@@ -211,8 +209,6 @@ void RtServerSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
 
         this->ui.m_qLineEdit_BufferSize->setText(QString(""));
 
-        //Start convinience timer
-        m_cmdConnectionTimer.start(5000);
     }
 }
 

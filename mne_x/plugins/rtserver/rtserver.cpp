@@ -80,11 +80,18 @@ RtServer::RtServer()
 {
     m_MDL_ID = MDL_ID::RTSERVER;
 
-    //Try to connect the cmd client on start up using localhost connection
-    this->connectCmdClient(m_sRtServerIP);
-
     // Start RtServerProducer
     m_pRtServerProducer->start();
+
+
+    //Convinience CMD connection timer
+    connect(&m_cmdConnectionTimer, &QTimer::timeout, this, &RtServer::connectCmdClient);
+
+    //Start convinience timer
+    m_cmdConnectionTimer.start(5000);
+
+    //Try to connect the cmd client on start up using localhost connection
+    this->connectCmdClient();
 }
 
 
@@ -99,26 +106,34 @@ RtServer::~RtServer()
 
 //*************************************************************************************************************
 
-void RtServer::connectCmdClient(QString p_sRtSeverIP)
+void RtServer::connectCmdClient()
 {
     if(!m_pRtCmdClient)
         m_pRtCmdClient = new RtCmdClient();
     else if(m_bCmdClientIsConnected)
         this->disconnectCmdClient();
 
-    m_pRtCmdClient->connectToHost(p_sRtSeverIP);
+    m_pRtCmdClient->connectToHost(m_sRtServerIP);
     m_pRtCmdClient->waitForConnected(1000);
 
     if(m_pRtCmdClient->state() == QTcpSocket::ConnectedState)
     {
         rtServerMutex.lock();
-        m_sRtServerIP = p_sRtSeverIP;
+
+        //Stop convinience timer
+        m_cmdConnectionTimer.stop();
+
         if(!m_bCmdClientIsConnected)
         {
             //
             // request available commands
             //
             m_pRtCmdClient->requestCommands();
+
+            //
+            // set cmd client is connected
+            //
+            m_bCmdClientIsConnected = true;
 
             //
             // Read Info
@@ -135,11 +150,8 @@ void RtServer::connectCmdClient(QString p_sRtSeverIP)
             //
             // Read Buffer Size
             //
-            if(m_iBufferSize > -1)
-                m_iBufferSize = m_pRtCmdClient->requestBufsize();
+            m_iBufferSize = m_pRtCmdClient->requestBufsize();
 
-
-            m_bCmdClientIsConnected = true;
             emit cmdConnectionChanged(m_bCmdClientIsConnected);
         }
         rtServerMutex.unlock();
@@ -169,7 +181,6 @@ void RtServer::requestInfo()
 {
     if(m_pRtServerProducer->m_iDataClientId > -1 && m_bCmdClientIsConnected)
     {
-        qDebug() << "in reqeust Info";
         // read meas info
         (*m_pRtCmdClient)["measinfo"].pValues()[0].setValue(m_pRtServerProducer->m_iDataClientId);
         (*m_pRtCmdClient)["measinfo"].send();
