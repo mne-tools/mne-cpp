@@ -98,12 +98,6 @@
          </item>
          <item row="3" column="0">
           <widget class="QGroupBox" name="m_qGroupBox_RtServerProperties">
-           <property name="maximumSize">
-            <size>
-             <width>300</width>
-             <height>16777215</height>
-            </size>
-           </property>
            <property name="title">
             <string>Rt Server Properties</string>
            </property>
