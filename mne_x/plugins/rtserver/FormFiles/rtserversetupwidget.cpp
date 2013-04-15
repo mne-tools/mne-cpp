@@ -166,22 +166,17 @@ void RtServerSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
         //Stop convinience timer
         m_cmdConnectionTimer.stop();
 
-        // Read Info
-        if(m_pRtServer->m_fiffInfo.isEmpty())
-            m_pRtServer->requestInfo();
-
+        //
+        // set frequency
+        //
         if(!m_pRtServer->m_fiffInfo.isEmpty())
             this->ui.m_qLabel_sps->setText(QString("%1").arg(m_pRtServer->m_fiffInfo.sfreq));
 
-        // Read Connectors
-        if(m_pRtServer->m_qMapConnectors.size() == 0)
-            m_pRtServer->m_iActiveConnectorId = m_pRtServer->m_pRtCmdClient->requestConnectors(m_pRtServer->m_qMapConnectors);
-
+        //
         // Read Buffer Size
-        m_pRtServer->m_iBufferSize = m_pRtServer->m_pRtCmdClient->requestBufsize();
-        this->ui.m_qLineEdit_BufferSize->setText(QString("%1").arg(m_pRtServer->m_iBufferSize));
-
-
+        //
+        if(m_pRtServer->m_iBufferSize > -1)
+            this->ui.m_qLineEdit_BufferSize->setText(QString("%1").arg(m_pRtServer->m_iBufferSize));
 
 
         QMap<qint32, QString>::ConstIterator it = m_pRtServer->m_qMapConnectors.begin();

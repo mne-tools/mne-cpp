@@ -120,6 +120,25 @@ void RtServer::connectCmdClient(QString p_sRtSeverIP)
             //
             m_pRtCmdClient->requestCommands();
 
+            //
+            // Read Info
+            //
+            if(m_fiffInfo.isEmpty())
+                requestInfo();
+
+            //
+            // Read Connectors
+            //
+            if(m_qMapConnectors.size() == 0)
+                m_iActiveConnectorId = m_pRtCmdClient->requestConnectors(m_qMapConnectors);
+
+            //
+            // Read Buffer Size
+            //
+            if(m_iBufferSize > -1)
+                m_iBufferSize = m_pRtCmdClient->requestBufsize();
+
+
             m_bCmdClientIsConnected = true;
             emit cmdConnectionChanged(m_bCmdClientIsConnected);
         }
