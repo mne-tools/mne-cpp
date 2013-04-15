@@ -73,6 +73,7 @@
 
 #include <QtWidgets>
 #include <QVector>
+#include <QTimer>
 
 
 //*************************************************************************************************************
@@ -148,10 +149,8 @@ public:
     //=========================================================================================================
     /**
     * Connects the cmd client.
-    *
-    * @param[in] p_sRtSeverIP   real-time server ip
     */
-    void connectCmdClient(QString p_sRtSeverIP);
+    void connectCmdClient();
 
     //=========================================================================================================
     /**
@@ -227,6 +226,9 @@ private:
     FiffInfo    m_fiffInfo;                 /**< Fiff measurement info.*/
 
     qint32 m_iBufferSize;                   /**< The raw data buffer size.*/
+
+    QTimer m_cmdConnectionTimer;            /**< Timer for convinient command client connection. When timer times out a connection is tried to be established. */
+
 
 
 };
