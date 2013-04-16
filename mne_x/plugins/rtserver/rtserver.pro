@@ -84,7 +84,8 @@ SOURCES += \
         FormFiles/rtserversetupwidget.cpp \
         FormFiles/rtserverrunwidget.cpp \
         FormFiles/rtserveraboutwidget.cpp \
-    rtserverproducer.cpp
+    rtserverproducer.cpp \
+    directrecord.cpp
 
 HEADERS += \
         rtserver.h\
@@ -92,7 +93,8 @@ HEADERS += \
         FormFiles/rtserversetupwidget.h \
         FormFiles/rtserverrunwidget.h \
         FormFiles/rtserveraboutwidget.h \
-    rtserverproducer.h
+    rtserverproducer.h \
+    directrecord.h
 
 FORMS += \
         FormFiles/rtserversetup.ui \
