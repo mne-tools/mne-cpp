@@ -159,6 +159,10 @@ void RtServerSetupWidget::checkedRecordDataChanged()
 void RtServerSetupWidget::pressedFiffRecordFile()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Fiff Record File"), "", tr("Fiff Record File (*.fif)"));
+
+    ui.m_qLineEdit_FiffRecordFile->setText(fileName);
+
+
 }
 
 
