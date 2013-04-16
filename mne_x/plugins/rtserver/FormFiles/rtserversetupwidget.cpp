@@ -122,6 +122,8 @@ void RtServerSetupWidget::bufferSizeEdited()
 
     if(t_bSuccess && t_iBufferSize > 0)
         m_pRtServer->m_iBufferSize = t_iBufferSize;
+    else
+        ui.m_qLineEdit_BufferSize->setText(QString("%1").arg(m_pRtServer->m_iBufferSize));
 }
 
 
