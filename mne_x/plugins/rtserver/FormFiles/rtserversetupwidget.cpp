@@ -84,6 +84,9 @@ RtServerSetupWidget::RtServerSetupWidget(RtServer* p_pRtServer, QWidget* parent)
     //Fiff Record File
     connect(ui.m_qPushButton_FiffRecordFile, &QPushButton::released, this, &RtServerSetupWidget::pressedFiffRecordFile);
 
+    //Buffer
+    connect(ui.m_qLineEdit_BufferSize, &QLineEdit::editingFinished, this, &RtServerSetupWidget::bufferSizeEdited);
+
     //CLI
     connect(ui.m_qPushButton_SendCLI, &QPushButton::released, this, &RtServerSetupWidget::pressedSendCLI);
 
@@ -107,6 +110,18 @@ RtServerSetupWidget::~RtServerSetupWidget()
 void RtServerSetupWidget::init()
 {
     cmdConnectionChanged(m_pRtServer->m_bCmdClientIsConnected);
+}
+
+
+//*************************************************************************************************************
+
+void RtServerSetupWidget::bufferSizeEdited()
+{
+    bool t_bSuccess = false;
+    qint32 t_iBufferSize = ui.m_qLineEdit_BufferSize->text().toInt(&t_bSuccess);
+
+    if(t_bSuccess && t_iBufferSize > 0)
+        m_pRtServer->m_iBufferSize = t_iBufferSize;
 }
 
 
