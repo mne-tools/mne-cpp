@@ -76,7 +76,7 @@ static Eigen::MatrixXd defaultMatrixXd = Eigen::MatrixXd::Constant(1,1,-1);
 const static Eigen::MatrixXi defaultMatrixXi(0,0);
 const static Eigen::VectorXi defaultVectorXi;
 const static Eigen::RowVectorXi defaultRowVectorXi;
-const static QPair<QVariant,QVariant> defaultVariantPair(QVariant(0),QVariant(0));
+const static QPair<QVariant,QVariant> defaultVariantPair;
 
 typedef Eigen::Matrix<qint16, Eigen::Dynamic, Eigen::Dynamic> MatrixDau16;
 
