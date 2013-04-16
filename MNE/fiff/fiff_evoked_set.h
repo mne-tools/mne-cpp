@@ -164,7 +164,7 @@ public:
     *
     * @return true when successful, false otherwise
     */
-    static bool read(QIODevice& p_IODevice, FiffEvokedSet& p_FiffEvokedSet, QPair<QVariant,QVariant> baseline = QPair<QVariant,QVariant>(), bool proj = true);
+    static bool read(QIODevice& p_IODevice, FiffEvokedSet& p_FiffEvokedSet, QPair<QVariant,QVariant> baseline = defaultVariantPair, bool proj = true);
 
 public:
     FiffInfo             info;   /**< FIFF measurement information */
