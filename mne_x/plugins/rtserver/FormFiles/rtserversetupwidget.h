@@ -105,6 +105,8 @@ public:
     void init();
 
 //slots
+    void bufferSizeEdited();    /**< Buffer size edited and set new buffer size.*/
+
     void printToLog(QString message);   /**< Implements printing messages to rtproc log.*/
 
     void pressedFiffRecordFile(); /**< Triggers file dialog to select record file.*/
