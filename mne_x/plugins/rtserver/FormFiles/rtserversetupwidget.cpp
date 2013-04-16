@@ -71,6 +71,14 @@ RtServerSetupWidget::RtServerSetupWidget(RtServer* p_pRtServer, QWidget* parent)
 {
     ui.setupUi(this);
 
+
+    connect(ui.m_qCheckBox_RecordData, &QCheckBox::stateChanged, this, &RtServerSetupWidget::checkedRecordDataChanged);
+
+    //Fiff Record File
+    connect(ui.m_qPushButton_FiffRecordFile, &QPushButton::released, this, &RtServerSetupWidget::pressedFiffRecordFile);
+
+
+
     //rt server connection
     this->ui.m_qLineEdit_Ip->setText(m_pRtServer->m_sRtServerIP);
 
@@ -80,9 +88,6 @@ RtServerSetupWidget::RtServerSetupWidget(RtServer* p_pRtServer, QWidget* parent)
 
     //rt server fiffInfo received
     connect(m_pRtServer, &RtServer::fiffInfoAvailable, this, &RtServerSetupWidget::fiffInfoReceived);
-
-    //Fiff Record File
-    connect(ui.m_qPushButton_FiffRecordFile, &QPushButton::released, this, &RtServerSetupWidget::pressedFiffRecordFile);
 
     //Buffer
     connect(ui.m_qLineEdit_BufferSize, &QLineEdit::editingFinished, this, &RtServerSetupWidget::bufferSizeEdited);
@@ -109,6 +114,7 @@ RtServerSetupWidget::~RtServerSetupWidget()
 
 void RtServerSetupWidget::init()
 {
+    checkedRecordDataChanged();
     cmdConnectionChanged(m_pRtServer->m_bCmdClientIsConnected);
 }
 
@@ -124,6 +130,27 @@ void RtServerSetupWidget::bufferSizeEdited()
         m_pRtServer->m_iBufferSize = t_iBufferSize;
     else
         ui.m_qLineEdit_BufferSize->setText(QString("%1").arg(m_pRtServer->m_iBufferSize));
+}
+
+
+//*************************************************************************************************************
+
+void RtServerSetupWidget::checkedRecordDataChanged()
+{
+    if(ui.m_qCheckBox_RecordData->checkState() == Qt::Checked)
+    {
+        ui.m_qComboBox_SubjectSelection->setEnabled(true);
+        ui.m_qPushButton_NewSubject->setEnabled(true);
+        ui.m_qLineEdit_FiffRecordFile->setEnabled(true);
+        ui.m_qPushButton_FiffRecordFile->setEnabled(true);
+    }
+    else
+    {
+        ui.m_qComboBox_SubjectSelection->setEnabled(false);
+        ui.m_qPushButton_NewSubject->setEnabled(false);
+        ui.m_qLineEdit_FiffRecordFile->setEnabled(false);
+        ui.m_qPushButton_FiffRecordFile->setEnabled(false);
+    }
 }
 
 

@@ -105,17 +105,19 @@ public:
     void init();
 
 //slots
-    void bufferSizeEdited();    /**< Buffer size edited and set new buffer size.*/
+    void bufferSizeEdited();        /**< Buffer size edited and set new buffer size.*/
+
+    void checkedRecordDataChanged();    /**< Record Data checkbox changed. */
 
     void printToLog(QString message);   /**< Implements printing messages to rtproc log.*/
 
-    void pressedFiffRecordFile(); /**< Triggers file dialog to select record file.*/
+    void pressedFiffRecordFile();   /**< Triggers file dialog to select record file.*/
 
-    void pressedConnect();      /**< Triggers a connection trial to rt_server.*/
+    void pressedConnect();          /**< Triggers a connection trial to rt_server.*/
 
-    void pressedSendCLI();      /**< Triggers a send request of a cli command.*/
+    void pressedSendCLI();          /**< Triggers a send request of a cli command.*/
 
-    void fiffInfoReceived();    /**< Triggered when new fiff info is recieved by producer and stored intor rt_server */
+    void fiffInfoReceived();        /**< Triggered when new fiff info is recieved by producer and stored intor rt_server */
 
 
 private:
