@@ -74,8 +74,6 @@
 namespace FIFFLIB
 {
 
-const static QPair<QVariant,QVariant> defaultPair(NULL,NULL);
-
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -115,7 +113,7 @@ public:
     * @param[in] proj           Apply SSP projection vectors (optional, default = true)
     * @param[in] p_aspect_kind  Either "FIFFV_ASPECT_AVERAGE" or "FIFFV_ASPECT_STD_ERR". The type of data to read. Only used if "setno" is a str.
     */
-    FiffEvoked(QIODevice& p_IODevice, QVariant setno = 0, QPair<QVariant,QVariant> baseline = defaultPair, bool proj = true, fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE);
+    FiffEvoked(QIODevice& p_IODevice, QVariant setno = 0, QPair<QVariant,QVariant> baseline = defaultVariantPair, bool proj = true, fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE);
 
     //=========================================================================================================
     /**
@@ -191,7 +189,7 @@ public:
     *
     * @return true if successful, false otherwise
     */
-    static bool read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant setno = 0, QPair<QVariant,QVariant> baseline = QPair<QVariant,QVariant>(), bool proj = true, fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE);
+    static bool read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant setno = 0, QPair<QVariant,QVariant> baseline = defaultVariantPair, bool proj = true, fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE);
 
 public:
     FiffInfo    info;           /**< Measurement info. */

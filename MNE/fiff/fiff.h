@@ -431,7 +431,7 @@ public:
     *
     * @return true if successful, false otherwise
     */
-    static inline bool read_evoked(QIODevice& p_IODevice, FiffEvoked& data, QVariant setno = 0, QPair<QVariant,QVariant> baseline = QPair<QVariant,QVariant>(), bool proj = true, fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE)
+    static inline bool read_evoked(QIODevice& p_IODevice, FiffEvoked& data, QVariant setno = 0, QPair<QVariant,QVariant> baseline = defaultVariantPair, bool proj = true, fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE)
     {
         return FiffEvoked::read(p_IODevice, data, setno, baseline, proj, p_aspect_kind);
     }
