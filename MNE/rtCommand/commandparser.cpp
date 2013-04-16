@@ -124,7 +124,8 @@ bool CommandParser::parse(const QString &p_sInput, QStringList &p_qListCommandsP
 
             if(exists(it.key()))
             {
-                m_rawCommand = RawCommand(it.key(), true);
+                RawCommand t_rawCommand(it.key(), true);
+                m_rawCommand = t_rawCommand;
                 t_jsonObjectParameters = it.value().toObject();
 
                 // push command to processed commands
@@ -157,7 +158,8 @@ bool CommandParser::parse(const QString &p_sInput, QStringList &p_qListCommandsP
             return false;
         }
 
-        m_rawCommand = RawCommand(t_qCommandList[0], false);
+        RawCommand t_rawCommand(t_qCommandList[0], false);
+        m_rawCommand = t_rawCommand;
 
         // push command to processed commands
         p_qListCommandsParsed.push_back(t_qCommandList[0]);
