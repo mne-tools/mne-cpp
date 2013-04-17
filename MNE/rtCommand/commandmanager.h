@@ -61,14 +61,17 @@ public:
 
     //=========================================================================================================
     /**
+    * Clears the command manager
+    */
+    void clear();
+
+    //=========================================================================================================
+    /**
     * Returns the lookup table of all available commands.
     *
     * @return the command lookup table
     */
-    inline QMap<QString, Command>& commandMap()
-    {
-        return m_qMapCommands;
-    }
+    inline QMap<QString, Command>& commandMap();
 
     //=========================================================================================================
     /**
@@ -191,6 +194,14 @@ signals:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+inline QMap<QString, Command>& CommandManager::commandMap()
+{
+    return m_qMapCommands;
+}
+
+
+//*************************************************************************************************************
 
 inline bool CommandManager::hasCommand(const QString &p_sCommand) const
 {
