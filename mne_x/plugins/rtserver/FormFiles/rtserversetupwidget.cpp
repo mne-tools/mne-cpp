@@ -161,11 +161,8 @@ void RtServerSetupWidget::checkedRecordDataChanged()
 
 void RtServerSetupWidget::connectorIdxChanged(int idx)
 {
-    qDebug() << "New IDX" << idx;
-
-    QMessageBox msgBox;
-    msgBox.setText("The document has been modified.");
-    msgBox.exec();
+    if(ui.m_qComboBox_Connector->itemData(idx).toInt() != m_pRtServer->m_iActiveConnectorId)
+        m_pRtServer->changeConnector(ui.m_qComboBox_Connector->itemData(idx).toInt());
 }
 
 
