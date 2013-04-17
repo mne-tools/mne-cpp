@@ -106,6 +106,24 @@ RtServer::~RtServer()
 
 //*************************************************************************************************************
 
+void RtServer::changeConnector(qint32 p_iNewConnectorId)
+{
+    if(p_iNewConnectorId != m_iActiveConnectorId)
+    {
+        // read meas info
+        (*m_pRtCmdClient)["selcon"].pValues()[0].setValue(p_iNewConnectorId);
+        (*m_pRtCmdClient)["selcon"].send();
+
+        m_iActiveConnectorId = p_iNewConnectorId;
+
+        // clear all and request everything new
+
+    }
+}
+
+
+//*************************************************************************************************************
+
 void RtServer::connectCmdClient()
 {
     if(!m_pRtCmdClient)

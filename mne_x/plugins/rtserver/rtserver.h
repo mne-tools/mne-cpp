@@ -148,6 +148,14 @@ public:
 //slots:
     //=========================================================================================================
     /**
+    * Change connector
+    *
+    * @param[in] p_iNewConnectorId      new connector ID
+    */
+    void changeConnector(qint32 p_iNewConnectorId);
+
+    //=========================================================================================================
+    /**
     * Connects the cmd client.
     */
     void connectCmdClient();
