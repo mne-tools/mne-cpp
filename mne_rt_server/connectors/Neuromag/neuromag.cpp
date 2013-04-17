@@ -141,10 +141,36 @@ void Neuromag::comBufsize(Command p_command)
 
 //*************************************************************************************************************
 
+void Neuromag::comGetBufsize(Command p_command)
+{
+    bool t_bCommandIsJson = p_command.isJson();
+    if(t_bCommandIsJson)
+    {
+        //
+        //create JSON help object
+        //
+        QJsonObject t_qJsonObjectRoot;
+        t_qJsonObjectRoot.insert("bufsize", QJsonValue((double)m_uiBufferSampleSize));
+        QJsonDocument p_qJsonDocument(t_qJsonObjectRoot);
+
+        m_commandManager["getbufsize"].reply(p_qJsonDocument.toJson());
+    }
+    else
+    {
+        QString str = QString("\t%1\r\n\n").arg(m_uiBufferSampleSize);
+        m_commandManager["getbufsize"].reply(str);
+    }
+}
+
+
+//*************************************************************************************************************
+
 void Neuromag::connectCommandManager()
 {
     //Connect slots
     QObject::connect(&m_commandManager["bufsize"], &Command::executed, this, &Neuromag::comBufsize);
+    QObject::connect(&m_commandManager["getbufsize"], &Command::executed, this, &Neuromag::comGetBufsize);
+
 }
 
 
