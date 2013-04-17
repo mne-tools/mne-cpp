@@ -50,6 +50,7 @@
 
 #include <QDir>
 #include <QDebug>
+#include <QComboBox>
 
 
 //*************************************************************************************************************
@@ -77,7 +78,9 @@ RtServerSetupWidget::RtServerSetupWidget(RtServer* p_pRtServer, QWidget* parent)
     //Fiff Record File
     connect(ui.m_qPushButton_FiffRecordFile, &QPushButton::released, this, &RtServerSetupWidget::pressedFiffRecordFile);
 
-
+    //Select Connector
+    connect(ui.m_qComboBox_Connector, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            this, &RtServerSetupWidget::connectorIdxChanged);
 
     //rt server connection
     this->ui.m_qLineEdit_Ip->setText(m_pRtServer->m_sRtServerIP);
@@ -151,6 +154,18 @@ void RtServerSetupWidget::checkedRecordDataChanged()
         ui.m_qLineEdit_FiffRecordFile->setEnabled(false);
         ui.m_qPushButton_FiffRecordFile->setEnabled(false);
     }
+}
+
+
+//*************************************************************************************************************
+
+void RtServerSetupWidget::connectorIdxChanged(int idx)
+{
+    qDebug() << "New IDX" << idx;
+
+    QMessageBox msgBox;
+    msgBox.setText("The document has been modified.");
+    msgBox.exec();
 }
 
 
@@ -233,6 +248,7 @@ void RtServerSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
             this->ui.m_qComboBox_Connector->insertItem(idx, it.value(), it.key());
             ++idx;
         }
+        this->ui.m_qComboBox_Connector->setCurrentIndex(this->ui.m_qComboBox_Connector->findData(m_pRtServer->m_iActiveConnectorId));
 
         //UI enables/disables
         this->ui.m_qLabel_ConnectionStatus->setText(QString("Connected"));

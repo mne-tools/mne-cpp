@@ -109,6 +109,14 @@ public:
 
     void checkedRecordDataChanged();    /**< Record Data checkbox changed. */
 
+    //=========================================================================================================
+    /**
+    * Connector selection index changed
+    *
+    * @param [in] idx   new connector combo box index
+    */
+    void connectorIdxChanged(int idx);
+
     void printToLog(QString message);   /**< Implements printing messages to rtproc log.*/
 
     void pressedFiffRecordFile();   /**< Triggers file dialog to select record file.*/

@@ -74,7 +74,7 @@ RtServer::RtServer()
 : m_sRtServerClientAlias("mne-x")
 , m_pRtCmdClient(NULL)
 , m_pRtServerProducer(new RtServerProducer(this))
-, m_sRtServerIP("127.0.0.1")
+, m_sRtServerIP("172.21.16.88")//("127.0.0.1")
 , m_bCmdClientIsConnected(false)
 , m_iBufferSize(-1)
 {
