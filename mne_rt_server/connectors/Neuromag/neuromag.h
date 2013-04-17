@@ -155,6 +155,14 @@ private:
 
     //=========================================================================================================
     /**
+    * Returns the buffer sample size
+    *
+    * @param[in] p_command  The buffer sample size command.
+    */
+    void comGetBufsize(Command p_command);
+
+    //=========================================================================================================
+    /**
     * Initialise the FiffSimulator.
     */
     void init();
