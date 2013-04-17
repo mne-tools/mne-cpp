@@ -117,8 +117,35 @@ void RtServer::changeConnector(qint32 p_iNewConnectorId)
         m_iActiveConnectorId = p_iNewConnectorId;
 
         // clear all and request everything new
+        clear();
 
+        //
+        // request available commands
+        //
+        m_pRtCmdClient->requestCommands();
+
+        //
+        // Read Info
+        //
+        if(m_fiffInfo.isEmpty())
+            requestInfo();
+
+        //
+        // Read Buffer Size
+        //
+        m_iBufferSize = m_pRtCmdClient->requestBufsize();
+
+        emit cmdConnectionChanged(m_bCmdClientIsConnected);
     }
+}
+
+
+//*************************************************************************************************************
+
+void RtServer::clear()
+{
+    m_fiffInfo.clear ();
+    m_iBufferSize = -1;
 }
 
 

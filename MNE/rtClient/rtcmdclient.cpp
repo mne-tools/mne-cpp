@@ -191,6 +191,9 @@ void RtCmdClient::requestCommands()
     const Command cmdHelp(help, description);
     this->sendCommandJSON(cmdHelp);
 
+    //Clear Commands
+    m_commandManager.clear();
+
     //Receive
     m_qMutex.lock();
     QByteArray t_sJsonCommands = m_sAvailableData.toUtf8();

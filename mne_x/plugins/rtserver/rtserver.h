@@ -136,6 +136,12 @@ public:
     */
     virtual ~RtServer();
 
+    //=========================================================================================================
+    /**
+    * Clears the rt server
+    */
+    void clear();
+
     virtual bool start();
     virtual bool stop();
 
