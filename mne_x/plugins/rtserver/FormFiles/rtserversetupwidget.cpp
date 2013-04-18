@@ -173,8 +173,6 @@ void RtServerSetupWidget::pressedFiffRecordFile()
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Fiff Record File"), "", tr("Fiff Record File (*.fif)"));
 
     ui.m_qLineEdit_FiffRecordFile->setText(fileName);
-
-
 }
 
 
@@ -242,8 +240,13 @@ void RtServerSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
 
         for(; it != m_pRtServer->m_qMapConnectors.end(); ++it)
         {
-            this->ui.m_qComboBox_Connector->insertItem(idx, it.value(), it.key());
-            ++idx;
+            if(this->ui.m_qComboBox_Connector->findData(it.key()) == -1)
+            {
+                this->ui.m_qComboBox_Connector->insertItem(idx, it.value(), it.key());
+                ++idx;
+            }
+            else
+                idx = this->ui.m_qComboBox_Connector->findData(it.key()) + 1;
         }
         this->ui.m_qComboBox_Connector->setCurrentIndex(this->ui.m_qComboBox_Connector->findData(m_pRtServer->m_iActiveConnectorId));
 
@@ -280,7 +283,6 @@ void RtServerSetupWidget::fiffInfoReceived()
 {
     if(!m_pRtServer->m_fiffInfo.isEmpty())
         this->ui.m_qLabel_sps->setText(QString("%1").arg(m_pRtServer->m_fiffInfo.sfreq));
-
 }
 
 
