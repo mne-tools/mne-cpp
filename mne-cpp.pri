@@ -31,11 +31,7 @@ isEmpty( MNE_BINARY_DIR ) {
 
 #QT Packages use new qtHaveModule(<package>):
 #MNE cpp config
-qtHaveModule(widgets) {
-    message(Widgets available: isGui configured!)
-    MNECPP_CONFIG += isGui
-}
-
+MNECPP_CONFIG += isGui
 
 QMAKE_TARGET_PRODUCT = mne-cpp
 QMAKE_TARGET_DESCRIPTION = MNE Qt 5 based C++ library.
