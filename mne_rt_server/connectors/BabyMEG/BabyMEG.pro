@@ -67,18 +67,7 @@ else {
             -lMNE$${MNE_LIB_VERSION}RtCommand
 }
 
-unix:DESTDIR = $${PWD}/../../../bin/mne_rt_server_plugins
-
-win32:DESTDIR = $${PWD}/../../../lib
-
-win32 {
-    FILE = $${DESTDIR}/$${TARGET}.dll
-    PLUGINDIR = $${DESTDIR}/../bin/mne_rt_server_plugins
-    FILE ~= s,/,\\,g
-    PLUGINDIR ~= s,/,\\,g
-    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${PLUGINDIR}) $$escape_expand(\\n\\t)
-}
-
+DESTDIR = $${MNE_BINARY_DIR}/mne_rt_server_plugins
 
 SOURCES += \
     babymegproducer.cpp \
