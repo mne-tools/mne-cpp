@@ -38,13 +38,13 @@ include(../../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    FiffSimulator
+    FiffSimulator \
+    BabyMEG
 
 # Build Neuromag Plugin only for Unix Systems - cause of unix specific shmem commands
 unix{
     SUBDIRS += \
-        Neuromag \
-#        BabyMEG
+        Neuromag
 }
 
 CONFIG += ordered

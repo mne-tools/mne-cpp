@@ -81,19 +81,14 @@ win32 {
 
 
 SOURCES += \
-    dacqserver.cpp \
-    collectorsocket.cpp \
-    shmemsocket.cpp \
+    babymegproducer.cpp \
     babymeg.cpp
 
 HEADERS += \
     ../../mne_rt_server/IConnector.h \  #IConnector is a Q_OBJECT and the resulting moc file needs to be known -> that's why inclution is important!
-    types_definitions.h \
-    dacqserver.h \
-    collectorsocket.h \
-    shmemsocket.h \
-    babymeg.h \
-    babymeg_global.h
+    babymegproducer.h \
+    babymeg_global.h \
+    babymeg.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

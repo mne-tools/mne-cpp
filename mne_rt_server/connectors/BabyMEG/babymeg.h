@@ -1,7 +1,8 @@
 //=============================================================================================================
 /**
-* @file     BabyMEG.h
+* @file     babymeg.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2012
@@ -44,9 +45,14 @@
 #include "babymeg_global.h"
 #include "../../mne_rt_server/IConnector.h"
 
-#include <fiff/fiff_info.h>
 
-//#include "circularbuffer.h"
+//*************************************************************************************************************
+//=============================================================================================================
+// MNE INCLUDES
+//=============================================================================================================
+
+#include <fiff/fiff_raw_data.h>
+#include <generics/circularmatrixbuffer.h>
 
 
 //*************************************************************************************************************
@@ -60,7 +66,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE BabyMEGPlugin
+// DEFINE NAMESPACE BabyeMEGPlugin
 //=============================================================================================================
 
 namespace BabyMEGPlugin
@@ -73,97 +79,100 @@ namespace BabyMEGPlugin
 //=============================================================================================================
 
 using namespace RTSERVER;
-
+using namespace IOBuffer;
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class DacqServer;
+class BabyMEGProducer;
 
 
 //=============================================================================================================
 /**
 * DECLARE CLASS BabyMEG
 *
-* @brief The BabyMEG class provides a BabyMEG connector.
+* @brief The BabyMEG class provides a Fiff data simulator.
 */
 class BABYMEGSHARED_EXPORT BabyMEG : public IConnector
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_rt_server/1.0" FILE "babymeg.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "mne_rt_server/1.0" FILE "babymeg.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(RTSERVER::IConnector)
 
 
-    friend class DacqServer;
+    friend class BabyMEGProducer;
 
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a BabyMEG Connector.
+    * Constructs a BabyMEG.
     */
     BabyMEG();
 
-
     //=========================================================================================================
     /**
-    * Destroys the BabyMEG Connector.
-    *
+    * Destroys the BabyMEG.
     */
     virtual ~BabyMEG();
 
-    virtual QByteArray availableCommands();
+    virtual void connectCommandManager();
 
     virtual ConnectorID getConnectorID() const;
 
     virtual const char* getName() const;
 
-
-    virtual bool parseCommand(QStringList& p_qCommandList, QByteArray& p_blockOutputInfo);
-
+    virtual void info(qint32 ID);
 
     virtual bool start();
 
     virtual bool stop();
 
-
-    void releaseMeasInfo();
-
-//public slots: --> in Qt 5 not anymore declared as slot
-
-    virtual void requestMeasInfo(qint32 ID);
-
-    virtual void requestMeas();
-
-    virtual void requestMeasStop();
-
-    virtual void requestSetBufferSize(quint32 p_uiBuffSize);
-
 protected:
     virtual void run();
 
 private:
+
+    //Slots
     //=========================================================================================================
     /**
-    * Initialise the BabyMEG connector.
+    * Sets the buffer sample size
+    *
+    * @param[in] p_command  The buffer sample size command.
+    */
+    void comBufsize(Command p_command);
+
+    //=========================================================================================================
+    /**
+    * Returns the buffer sample size
+    *
+    * @param[in] p_command  The buffer sample size command.
+    */
+    void comGetBufsize(Command p_command);
+
+    //////////
+
+    //=========================================================================================================
+    /**
+    * Initialise the BabyMEG.
     */
     void init();
 
+    bool readRawInfo();
 
     QMutex mutex;
 
-    DacqServer*     m_pDacqServer;
+    BabyMEGProducer*    m_pBabyMEGProducer;        /**< Holds the DataProducer.*/
+    FiffRawData         m_RawInfo;              /**< Holds the fiff raw measurement information. */
+    QString             m_sResourceDataPath;    /**< Holds the path to the Fiff resource simulation file directory.*/
+    quint32             m_uiBufferSampleSize;   /**< Sample size of the buffer */
 
-    FiffInfo::SDPtr m_pInfo;
+    RawMatrixBuffer*    m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
 
-    int             m_iID;
-
-    bool            m_bIsRunning;
-
-
+    bool                m_bIsRunning;
 };
 
 } // NAMESPACE
