@@ -94,6 +94,18 @@ BabyMEG::BabyMEG()
 , m_uiBufferSampleSize(1000)
 , m_pRawMatrixBuffer(NULL)
 {
+    //BabyMEG Inits
+    pInfo = new BabyMEGInfo();
+    myClient = new BabyMEGClient(6340,this);
+    myClient->SetInfo(pInfo);
+    myClient->start();
+    myClientComm = new BabyMEGClient(6341,this);
+    myClientComm->SetInfo(pInfo);
+    myClientComm->start();
+
+
+
+
     this->init();
 }
 
@@ -199,6 +211,8 @@ const char* BabyMEG::getName() const
 
 void BabyMEG::init()
 {
+
+    ///////////////////////////////////////////////// OLD
     if(m_pRawMatrixBuffer)
         delete m_pRawMatrixBuffer;
     m_pRawMatrixBuffer = NULL;
@@ -215,6 +229,12 @@ bool BabyMEG::start()
     this->init();
 
     // Start threads
+
+    myClient->ConnectToBabyMEG();
+
+
+    ////////////////////////////////// OLD
+
     m_pBabyMEGProducer->start();
 
     QThread::start();
@@ -227,7 +247,15 @@ bool BabyMEG::start()
 
 bool BabyMEG::stop()
 {
+
+    myClient->DisConnectBabyMEG();
+
+
+
+
+    ///////////////////////////////////// OLD
     this->m_pBabyMEGProducer->stop();
+
     m_bIsRunning = false;
     QThread::wait();
 
