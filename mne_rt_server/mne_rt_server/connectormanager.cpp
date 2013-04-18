@@ -153,6 +153,7 @@ void ConnectorManager::comSelcon(Command p_command)
         else
             qobject_cast<MNERTServer*> (this->parent())->getCommandManager()["selcon"].reply(this->getConnectorList(true));
     }
+
 }
 
 
