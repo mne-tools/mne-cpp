@@ -381,8 +381,11 @@ void DacqServer::run()
         else
             m_bIsRunning = false;
         m_pNeuromag->mutex.unlock();
-    }
 
+        //Stop if only meas info is requested
+        if(!m_pNeuromag->m_bIsRunning)
+            this->wait();
+    }
 
     //
     // Control measurement start through Neuromag connector. ToDo: in Case Realtime measurement should be performed during normal acqusition process, change this!!

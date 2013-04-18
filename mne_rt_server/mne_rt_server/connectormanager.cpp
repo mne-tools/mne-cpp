@@ -139,7 +139,19 @@ void ConnectorManager::comSelcon(Command p_command)
     bool t_bIsInt;
     qint32 t_id = p_command.pValues()[0].toInt(&t_bIsInt);
     if(t_bIsInt)
-        qobject_cast<MNERTServer*> (this->parent())->getCommandManager()["selcon"].reply(this->setActiveConnector(t_id));
+    {
+//        qobject_cast<MNERTServer*> (this->parent())->getCommandManager()["selcon"].reply(this->setActiveConnector(t_id));
+        QString t_sActivated = this->setActiveConnector(t_id);
+
+        qDebug() << t_sActivated;
+
+        bool t_bCommandIsJson = p_command.isJson();
+
+        if(!t_bCommandIsJson)
+            qobject_cast<MNERTServer*> (this->parent())->getCommandManager()["selcon"].reply(this->getConnectorList());
+        else
+            qobject_cast<MNERTServer*> (this->parent())->getCommandManager()["selcon"].reply(this->getConnectorList(true));
+    }
 }
 
 
@@ -466,7 +478,7 @@ QByteArray ConnectorManager::setActiveConnector(qint32 ID)
            t_pNewActiveConnector->setStatus(true);
            this->connectActiveConnector();
 
-            str = QString("\t%1 activated. ToDo...\r\n\n").arg(t_pNewActiveConnector->getName());
+            str = QString("\t%1 activated.\r\n\n").arg(t_pNewActiveConnector->getName());
             p_blockClientList.append(str);
         }
         else
