@@ -43,7 +43,12 @@
 //=============================================================================================================
 
 #include "babymeg_global.h"
+
+#include "babymegclient.h"
+
+
 #include "../../mne_rt_server/IConnector.h"
+
 
 
 //*************************************************************************************************************
@@ -164,6 +169,15 @@ private:
     bool readRawInfo();
 
     QMutex mutex;
+
+
+    BabyMEGClient *myClient;
+    BabyMEGClient *myClientComm;
+    BabyMEGInfo   *pInfo;
+    bool DataStartFlag;
+
+
+
 
     BabyMEGProducer*    m_pBabyMEGProducer;        /**< Holds the DataProducer.*/
     FiffRawData         m_RawInfo;              /**< Holds the fiff raw measurement information. */
