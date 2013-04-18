@@ -137,6 +137,7 @@ void ConnectorManager::comConlist(Command p_command)
 void ConnectorManager::comSelcon(Command p_command)
 {
     bool t_bIsInt;
+
     qint32 t_id = p_command.pValues()[0].toInt(&t_bIsInt);
     if(t_bIsInt)
     {
