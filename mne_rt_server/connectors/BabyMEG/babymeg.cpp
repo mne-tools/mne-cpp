@@ -1,7 +1,8 @@
 //=============================================================================================================
 /**
-* @file     BabyMEG.cpp
+* @file     babymeg.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2012
@@ -40,7 +41,7 @@
 //=============================================================================================================
 
 #include "babymeg.h"
-#include "dacqserver.h"
+#include "babymegproducer.h"
 
 
 //*************************************************************************************************************
@@ -48,8 +49,8 @@
 // FIFF INCLUDES
 //=============================================================================================================
 
-#include "../../../MNE/fiff/fiff.h"
-#include "../../../MNE/fiff/fiff_types.h"
+#include <fiff/fiff.h>
+#include <fiff/fiff_types.h>
 
 
 //*************************************************************************************************************
@@ -57,8 +58,8 @@
 // MNE INCLUDES
 //=============================================================================================================
 
-#include "../../../MNE/mne/mne.h"
-#include "../../../MNE/mne/mne_epoch_data_list.h"
+#include <mne/mne.h>
+#include <mne/mne_epoch_data_list.h>
 
 
 //*************************************************************************************************************
@@ -87,15 +88,25 @@ using namespace MNELIB;
 //=============================================================================================================
 
 BabyMEG::BabyMEG()
-: m_pDacqServer(new DacqServer(this))
-, m_pInfo(new FiffInfo())
+: m_pBabyMEGProducer(new BabyMEGProducer(this))
+, m_sResourceDataPath("../../mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
 , m_bIsRunning(false)
-, m_iID(-1)
+, m_uiBufferSampleSize(1000)
+, m_pRawMatrixBuffer(NULL)
 {
-    this->setBufferSampleSize(100);
-    m_pRawMatrixBuffer = NULL;
+    //BabyMEG Inits
+    pInfo = new BabyMEGInfo();
+    myClient = new BabyMEGClient(6340,this);
+    myClient->SetInfo(pInfo);
+    myClient->start();
+    myClientComm = new BabyMEGClient(6341,this);
+    myClientComm->SetInfo(pInfo);
+    myClientComm->start();
+
+
+
+
     this->init();
-//    this->start();
 }
 
 
@@ -105,7 +116,7 @@ BabyMEG::~BabyMEG()
 {
     qDebug() << "Destroy BabyMEG::~BabyMEG()";
 
-    delete m_pDacqServer;
+    delete m_pBabyMEGProducer;
 
     m_bIsRunning = false;
     QThread::wait();
@@ -114,13 +125,69 @@ BabyMEG::~BabyMEG()
 
 //*************************************************************************************************************
 
-QByteArray BabyMEG::availableCommands()
+void BabyMEG::comBufsize(Command p_command)
 {
-    QByteArray t_blockCmdInfoList;
+    //ToDO JSON
 
-//    t_blockCmdInfoList.append(QString("\t### %1 connector###\r\n").arg(this->getName()));
+    quint32 t_uiBuffSize = p_command.pValues()[0].toUInt();
 
-    return t_blockCmdInfoList;
+    if(t_uiBuffSize > 0)
+    {
+//        printf("bufsize %d\n", t_uiBuffSize);
+
+            bool t_bWasRunning = m_bIsRunning;
+
+            if(m_bIsRunning)
+            {
+                m_pBabyMEGProducer->stop();
+                this->stop();
+            }
+
+            m_uiBufferSampleSize = t_uiBuffSize;
+
+            if(t_bWasRunning)
+                this->start();
+
+        QString str = QString("\tSet %1 buffer sample size to %2 samples\r\n\n").arg(getName()).arg(t_uiBuffSize);
+
+        m_commandManager["bufsize"].reply(str);
+    }
+    else
+        m_commandManager["bufsize"].reply("Buffer size not set\r\n");
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEG::comGetBufsize(Command p_command)
+{
+    bool t_bCommandIsJson = p_command.isJson();
+    if(t_bCommandIsJson)
+    {
+        //
+        //create JSON help object
+        //
+        QJsonObject t_qJsonObjectRoot;
+        t_qJsonObjectRoot.insert("bufsize", QJsonValue((double)m_uiBufferSampleSize));
+        QJsonDocument p_qJsonDocument(t_qJsonObjectRoot);
+
+        m_commandManager["getbufsize"].reply(p_qJsonDocument.toJson());
+    }
+    else
+    {
+        QString str = QString("\t%1\r\n\n").arg(m_uiBufferSampleSize);
+        m_commandManager["getbufsize"].reply(str);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEG::connectCommandManager()
+{
+    //Connect slots
+    QObject::connect(&m_commandManager["bufsize"], &Command::executed, this, &BabyMEG::comBufsize);
+    QObject::connect(&m_commandManager["getbufsize"], &Command::executed, this, &BabyMEG::comGetBufsize);
 }
 
 
@@ -136,7 +203,7 @@ ConnectorID BabyMEG::getConnectorID() const
 
 const char* BabyMEG::getName() const
 {
-    return "BabyMEG Connector";
+    return "BabyMEG 2";
 }
 
 
@@ -145,16 +212,13 @@ const char* BabyMEG::getName() const
 void BabyMEG::init()
 {
 
-}
+    ///////////////////////////////////////////////// OLD
+    if(m_pRawMatrixBuffer)
+        delete m_pRawMatrixBuffer;
+    m_pRawMatrixBuffer = NULL;
 
-
-//*************************************************************************************************************
-
-bool BabyMEG::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo)
-{
-    bool success = false;
-
-    return success;
+    if(!m_RawInfo.isEmpty())
+        m_pRawMatrixBuffer = new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_RawInfo.info.nchan, this->m_uiBufferSampleSize);
 }
 
 
@@ -162,8 +226,16 @@ bool BabyMEG::parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutpu
 
 bool BabyMEG::start()
 {
-    // Start thread
-    m_pDacqServer->start();
+    this->init();
+
+    // Start threads
+
+    myClient->ConnectToBabyMEG();
+
+
+    ////////////////////////////////// OLD
+
+    m_pBabyMEGProducer->start();
 
     QThread::start();
 
@@ -175,13 +247,17 @@ bool BabyMEG::start()
 
 bool BabyMEG::stop()
 {
-    m_bIsRunning = false;
-    QThread::wait();//ToDo: This thread will never be terminated when circular buffer is blocking the thread (happens when circularbuffer is empty)
-    
-    m_pDacqServer->m_bIsRunning = false;
-    m_pDacqServer->wait();
 
-    qDebug() << "bool BabyMEG::stop()";
+    myClient->DisConnectBabyMEG();
+
+
+
+
+    ///////////////////////////////////// OLD
+    this->m_pBabyMEGProducer->stop();
+
+    m_bIsRunning = false;
+    QThread::wait();
 
     return true;
 }
@@ -189,75 +265,128 @@ bool BabyMEG::stop()
 
 //*************************************************************************************************************
 
-void BabyMEG::releaseMeasInfo()
+void BabyMEG::info(qint32 ID)
 {
-    if(!m_pInfo->isEmpty())
-        emit remitMeasInfo(m_iID, m_pInfo);
+
+    if(m_RawInfo.isEmpty())
+        readRawInfo();
+
+    if(!m_RawInfo.isEmpty())
+        emit remitMeasInfo(ID, m_RawInfo.info);
 }
 
 
 //*************************************************************************************************************
 
-void BabyMEG::requestMeasInfo(qint32 ID)
+bool BabyMEG::readRawInfo()
 {
-    m_iID = ID;
-
-    if(!m_pInfo->isEmpty())
-        releaseMeasInfo();
-    else
+    if(m_RawInfo.isEmpty())
     {
-        m_pDacqServer->m_bMeasInfoRequest = true;
+        QFile t_File(m_sResourceDataPath);
 
-        //This should never happen
-        if(m_pDacqServer->isRunning())
+        mutex.lock();
+
+        if(!FiffStream::setup_read_raw(t_File, m_RawInfo))
         {
-            m_pDacqServer->m_bIsRunning = false;
-            m_pDacqServer->wait();
-            m_pDacqServer->start();
+            printf("Error: Not able to read raw info!\n");
+            m_RawInfo.clear();
+            return false;
         }
+
+//        bool in_samples = false;
+//
+//        bool keep_comp = true;
+//
+//        //
+//        //   Set up pick list: MEG + STI 014 - bad channels
+//        //
+//        //
+//        QStringList include;
+//        include << "STI 014";
+//        bool want_meg   = true;
+//        bool want_eeg   = true;
+//        bool want_stim  = true;
+
+//    //    MatrixXi picks = Fiff::pick_types(m_RawInfo.info, want_meg, want_eeg, want_stim, include, m_RawInfo.info.bads);
+//        MatrixXi picks = m_RawInfo.info.pick_types(want_meg, want_eeg, want_stim, include, m_RawInfo.info.bads); //Prefer member function
+
+
+//        //
+//        //   Set up projection
+//        //
+//        qint32 k = 0;
+//        if (m_RawInfo.info.projs.size() == 0)
+//            printf("No projector specified for these data\n");
+//        else
+//        {
+//            //
+//            //   Activate the projection items
+//            //
+//            for (k = 0; k < m_RawInfo.info.projs.size(); ++k)
+//                m_RawInfo.info.projs[k].active = true;
+
+//            printf("%d projection items activated\n",m_RawInfo.info.projs.size());
+//            //
+//            //   Create the projector
+//            //
+//    //        fiff_int_t nproj = MNE::make_projector_info(m_RawInfo.info, m_RawInfo.proj); Using the member function instead
+//            fiff_int_t nproj = m_RawInfo.info.make_projector_info(m_RawInfo.proj);
+
+
+//    //        qDebug() << m_RawInfo.proj.data->data.rows();
+//    //        qDebug() << m_RawInfo.proj.data->data.cols();
+//    //        std::cout << "proj: \n" << m_RawInfo.proj.data->data.block(0,0,10,10);
+
+//            if (nproj == 0)
+//            {
+//                printf("The projection vectors do not apply to these channels\n");
+//            }
+//            else
+//            {
+//                printf("Created an SSP operator (subspace dimension = %d)\n",nproj);
+//            }
+//        }
+
+//        //
+//        //   Set up the CTF compensator
+//        //
+//    //    qint32 current_comp = MNE::get_current_comp(m_RawInfo.info);
+//        qint32 current_comp = m_RawInfo.info.get_current_comp();
+//        qint32 dest_comp = -1;
+
+//        if (current_comp > 0)
+//            printf("Current compensation grade : %d\n",current_comp);
+
+//        if (keep_comp)
+//            dest_comp = current_comp;
+
+//        if (current_comp != dest_comp)
+//        {
+//            qDebug() << "This part needs to be debugged";
+//            if(MNE::make_compensator(*m_RawInfo.info.data(), current_comp, dest_comp, m_RawInfo.comp))
+//            {
+//    //            m_RawInfo.info.chs = MNE::set_current_comp(m_RawInfo.info.chs,dest_comp);
+//                m_RawInfo.info.set_current_comp(dest_comp);
+//                printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
+//            }
+//            else
+//            {
+//                printf("Could not make the compensator\n");
+//                return -1;
+//            }
+//        }
+
         //
-        else
-        {
-            m_pDacqServer->start();
-//            m_pDacqServer->wait();// until header reading finished
-        }
+        // Create circular buffer to transfer data form producer to simulator
+        //
+        if(m_pRawMatrixBuffer)
+            delete m_pRawMatrixBuffer;
+        m_pRawMatrixBuffer = new RawMatrixBuffer(10, m_RawInfo.info.nchan, m_uiBufferSampleSize);
+
+        mutex.unlock();
     }
-}
 
-
-//*************************************************************************************************************
-
-void BabyMEG::requestMeas()
-{
-    qDebug() << "void BabyMEG::requestMeas()";
-
-    m_pDacqServer->m_bMeasRequest = true;
-    this->start();
-}
-
-
-//*************************************************************************************************************
-
-void BabyMEG::requestMeasStop()
-{
-    this->stop();
-}
-
-
-//*************************************************************************************************************
-
-void BabyMEG::requestSetBufferSize(quint32 p_uiBuffSize)
-{
-    if(p_uiBuffSize > 0)
-    {
-        qDebug() << "void BabyMEG::setBufferSize: " << p_uiBuffSize;
-
-        this->stop();
-
-        this->setBufferSampleSize(p_uiBuffSize);
-
-        this->start();
-    }
+    return true;
 }
 
 
@@ -267,15 +396,19 @@ void BabyMEG::run()
 {
     m_bIsRunning = true;
 
+    float t_fSamplingFrequency = m_RawInfo.info.sfreq;
+    float t_fBuffSampleSize = (float)m_uiBufferSampleSize;
+
+    quint32 uiSamplePeriod = (unsigned int) ((t_fBuffSampleSize/t_fSamplingFrequency)*1000000.0f);
+    quint32 count = 0;
+
     while(m_bIsRunning)
     {
-        if(m_pRawMatrixBuffer)
-        {
-            // Pop available Buffers
-            MatrixXf tmp = m_pRawMatrixBuffer->pop();
-//            printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
+        MatrixXf tmp = m_pRawMatrixBuffer->pop();
+        ++count;
+//        printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
 
-            emit remitRawBuffer(tmp);
-        }
+        emit remitRawBuffer(tmp);
+        usleep(uiSamplePeriod);
     }
 }

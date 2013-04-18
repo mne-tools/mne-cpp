@@ -1,8 +1,9 @@
 //=============================================================================================================
 /**
-* @file     collectorsocket.h
+* @file     babymegproducer.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2012
 *
@@ -29,19 +30,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the CollectorSocket Class.
+* @brief     declaration of the BabyMEGProducer Class.
 *
 */
 
-#ifndef COLLECTORSOCKET_H
-#define COLLECTORSOCKET_H
+#ifndef BABYMEGPRODUCER_H
+#define BABYMEGPRODUCER_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "types_definitions.h"
+//#include "circularbuffer.h"
 
 
 //*************************************************************************************************************
@@ -49,7 +51,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QTcpSocket>
+#include <QThread>
 
 
 //*************************************************************************************************************
@@ -61,120 +63,64 @@ namespace BabyMEGPlugin
 {
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+//using namespace IOBuffer;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class BabyMEG;
+
+
 //=============================================================================================================
 /**
-* DECLARE CLASS CollectorSocket
+* DECLARE CLASS BabyMEGProducer
 *
-* @brief The CollectorSocket class provides ....
+* @brief The BabyMEGProducer class provides a ECG data producer for a given sampling rate.
 */
-class CollectorSocket : public QTcpSocket
+class BabyMEGProducer : public QThread
 {
-    Q_OBJECT
-
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a acquisition Server.
+    * Constructs a DataProducer.
     */
-    CollectorSocket(QObject *parent = 0);
+    BabyMEGProducer(BabyMEG* p_pBabyMEG);
 
     //=========================================================================================================
     /**
-    * Open the collector control connection
-    *
-    * @return
+    * Destroys the DataProducer.
     */
-    bool open();
+    ~BabyMEGProducer();
 
     //=========================================================================================================
     /**
-    * Close the collector connection
-    *
-    * @return
+    * Stops the DataProducer by stopping the producer's thread.
     */
-//    int close();
+    virtual bool stop();
 
-
-    inline bool isMeasuring()
-    {
-        return m_bIsMeasuring;
-    }
-
+protected:
     //=========================================================================================================
     /**
-    * Query the current buffer length of the Elekta acquisition system
-    *
-    * @return
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread.
     */
-    int getMaxBuflen();
-
-
-    //=========================================================================================================
-    /**
-    * Set the desired maximum buffer length
-    *
-    * @return
-    */
-    int setMaxBuflen(int maxbuflen);
-
-
-    // new client.c to qt functions
-    //=========================================================================================================
-    /**
-    *
-    *
-    * @return
-    */
-    bool server_command(const QString& p_sCommand);
-
-
-    //=========================================================================================================
-    /**
-    *
-    *
-    * @return
-    */
-    bool server_login(const QString& p_sCollectorPass, const QString& p_sMyName);
-
-
-    //=========================================================================================================
-    /**
-    *
-    *
-    * @return
-    */
-    bool server_send(QString& p_sDataSend, QByteArray& p_dataOut, int p_iInputFlag = DACQ_DRAIN_INPUT);
-
-
-    //=========================================================================================================
-    /**
-    *
-    *
-    * @return
-    */
-    bool server_start();
-
-
-    //=========================================================================================================
-    /**
-    *
-    *
-    * @return
-//    */
-    bool server_stop();
-
-
+    virtual void run();
 
 private:
-
-    QString     m_sCollectorHost;
-
-    bool        m_bIsMeasuring;
-
-
+    BabyMEG*  m_pBabyMEG;   /**< Holds a pointer to corresponding FiffSimulator.*/
+    bool            m_bIsRunning;       /**< Holds whether ECGProducer is running.*/
 };
 
 } // NAMESPACE
 
-#endif // COLLECTORSOCKET_H
+#endif // BABYMEGPRODUCER_H
