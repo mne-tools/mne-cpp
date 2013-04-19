@@ -2,7 +2,7 @@
 #define BABYMEGCLIENT_H
 
 #include <QObject>
-#include <QtNetWork/QTcpSocket>
+#include <QtNetwork/QTcpSocket>
 #include <QMutex>
 #include <QThread>
 #include <QDataStream>
