@@ -55,7 +55,7 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 Numeric::Numeric()
-: Measurement()
+: SngChnMeasurement()
 , m_qString_Unit("")
 , m_dValue(-1)
 

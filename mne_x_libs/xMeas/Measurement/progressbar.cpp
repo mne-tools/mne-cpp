@@ -55,7 +55,7 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 ProgressBar::ProgressBar()
-: Measurement()
+: SngChnMeasurement()
 , m_iMin(-1)
 , m_iMax(-1)
 , m_iValue(0)

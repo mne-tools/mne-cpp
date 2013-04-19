@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     measurement.h
+* @file     sngchnmeasurement.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the Measurement base class.
+* @brief    Contains the declaration of the SngChnMeasurement base class.
 *
 */
 
-#ifndef MEASUREMENT_H
-#define MEASUREMENT_H
+#ifndef SNGCHNMEASUREMENT_H
+#define SNGCHNMEASUREMENT_H
 
 
 //*************************************************************************************************************
@@ -66,37 +66,37 @@ namespace XMEASLIB
 
 //=============================================================================================================
 /**
-* DECLARE CLASS Measurement
+* DECLARE CLASS SngChnMeasurement
 *
-* @brief The Measurement class is the base class of every Measurement.
+* @brief The SngChnMeasurement class is the base class of every SngChnMeasurement.
 */
-class XMEASSHARED_EXPORT Measurement : public Subject
+class XMEASSHARED_EXPORT SngChnMeasurement : public Subject
 {
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a Measurement.
+    * Constructs a SngChnMeasurement.
     */
-    Measurement();
+    SngChnMeasurement();
     //=========================================================================================================
     /**
-    * Destroys the Measurement.
+    * Destroys the SngChnMeasurement.
     */
-    virtual ~Measurement();
+    virtual ~SngChnMeasurement();
 
     //=========================================================================================================
     /**
-    * Sets the name of the measurement.
+    * Sets the name of the SngChnMeasurement.
     *
     * @param [in] name which should be set.
     */
     inline void setName(const QString& name);
     //=========================================================================================================
     /**
-    * Returns the name of the measurement.
+    * Returns the name of the SngChnMeasurement.
     *
-    * @return the name of the measurement.
+    * @return the name of the SngChnMeasurement.
     */
     inline const QString& getName() const;
 
@@ -106,31 +106,31 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the id of the measurement.
+    * Sets the id of the SngChnMeasurement.
     *
     * @param [in] id which should be set.
     */
     inline void setID(MSR_ID::Measurement_ID id);
     //=========================================================================================================
     /**
-    * Returns the measurement id.
+    * Returns the SngChnMeasurement id.
     *
-    * @return the measurement id.
+    * @return the SngChnMeasurement id.
     */
     inline MSR_ID::Measurement_ID getID() const;
 
     //=========================================================================================================
     /**
-    * Sets the visibility of the measurement, whether measurement is visible at the display or just data are send invisible.
+    * Sets the visibility of the SngChnMeasurement, whether SngChnMeasurement is visible at the display or just data are send invisible.
     *
-    * @param [in] visibility of the measurement.
+    * @param [in] visibility of the SngChnMeasurement.
     */
     inline void setVisibility(bool visibility);
     //=========================================================================================================
     /**
-    * Returns whether measurement is visible.
+    * Returns whether SngChnMeasurement is visible.
     *
-    * @return true if measurement is visible, otherwise false.
+    * @return true if SngChnMeasurement is visible, otherwise false.
     */
     inline bool isVisible() const;
 
@@ -144,17 +144,17 @@ public:
     virtual void setValue(double value) = 0;
     //=========================================================================================================
     /**
-    * Returns whether measurement is visible.
+    * Returns whether SngChnMeasurement is visible.
     * Pure virtual method.
     *
-    * @return true if measurement is visible, otherwise false.
+    * @return true if SngChnMeasurement is visible, otherwise false.
     */
     virtual double getValue() const = 0;
 
 private:
-    QString         m_qString_Name;		/**< Holds the name of the measurement. */
+    QString         m_qString_Name;		/**< Holds the name of the SngChnMeasurement. */
 //    MDL_ID::Module_ID         m_MDL_ID;		/**< Holds the corresponding module id. */
-    MSR_ID::Measurement_ID    m_MSR_ID;		/**< Holds the measurement id. */
+    MSR_ID::Measurement_ID    m_MSR_ID;		/**< Holds the SngChnMeasurement id. */
     bool        m_bVisibility;		/**< Holds the visibility status. */
 };
 
@@ -164,7 +164,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline void Measurement::setName(const QString& name)
+inline void SngChnMeasurement::setName(const QString& name)
 {
     m_qString_Name = name;
 }
@@ -172,14 +172,14 @@ inline void Measurement::setName(const QString& name)
 
 //*************************************************************************************************************
 
-inline const QString& Measurement::getName() const
+inline const QString& SngChnMeasurement::getName() const
 {
     return m_qString_Name;
 }
 
 //*************************************************************************************************************
 
-//inline void Measurement::setModuleID(MDL_ID::Module_ID id)
+//inline void SngChnMeasurement::setModuleID(MDL_ID::Module_ID id)
 //{
 //	m_MDL_ID = id;
 //}
@@ -187,14 +187,14 @@ inline const QString& Measurement::getName() const
 
 //*************************************************************************************************************
 
-//inline MDL_ID::Module_ID Measurement::getModuleID() const
+//inline MDL_ID::Module_ID SngChnMeasurement::getModuleID() const
 //{
 //    return m_MDL_ID;
 //}
 
 //*************************************************************************************************************
 
-inline void Measurement::setID(MSR_ID::Measurement_ID id)
+inline void SngChnMeasurement::setID(MSR_ID::Measurement_ID id)
 {
 	m_MSR_ID = id;
 }
@@ -202,7 +202,7 @@ inline void Measurement::setID(MSR_ID::Measurement_ID id)
 
 //*************************************************************************************************************
 
-inline MSR_ID::Measurement_ID Measurement::getID() const
+inline MSR_ID::Measurement_ID SngChnMeasurement::getID() const
 {
     return m_MSR_ID;
 }
@@ -210,7 +210,7 @@ inline MSR_ID::Measurement_ID Measurement::getID() const
 
 //*************************************************************************************************************
 
-inline void Measurement::setVisibility(bool visibility)
+inline void SngChnMeasurement::setVisibility(bool visibility)
 {
     m_bVisibility = visibility;
 }
@@ -218,7 +218,7 @@ inline void Measurement::setVisibility(bool visibility)
 
 //*************************************************************************************************************
 
-inline bool Measurement::isVisible() const
+inline bool SngChnMeasurement::isVisible() const
 {
     return m_bVisibility;
 }
@@ -226,4 +226,4 @@ inline bool Measurement::isVisible() const
 
 } // NAMESPACE
 
-#endif // MEASUREMENT_H
+#endif // SNGCHNMEASUREMENT_H

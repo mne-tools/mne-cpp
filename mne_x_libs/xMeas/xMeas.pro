@@ -74,10 +74,10 @@ SOURCES += \
     Measurement/realtimemultisamplearray.cpp \
     Measurement/progressbar.cpp \
     Measurement/numeric.cpp \
-    Measurement/measurement.cpp \
     Nomenclature/nomenclature.cpp \
     Measurement/IMeasurementSink.cpp \
-    Measurement/IMeasurementSource.cpp
+    Measurement/IMeasurementSource.cpp \
+    Measurement/sngchnmeasurement.cpp
 
 HEADERS += \
     xmeas_global.h \
@@ -86,10 +86,10 @@ HEADERS += \
     Measurement/realtimemultisamplearray.h \
     Measurement/progressbar.h \
     Measurement/numeric.h \
-    Measurement/measurement.h \
     Nomenclature/nomenclature.h \
     Measurement/IMeasurementSink.h \
-    Measurement/IMeasurementSource.h
+    Measurement/IMeasurementSource.h \
+    Measurement/sngchnmeasurement.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

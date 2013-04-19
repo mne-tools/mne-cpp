@@ -40,7 +40,7 @@
 
 #include "dummytoolbox.h"
 
-#include <xMeas/Measurement/measurement.h>
+#include <xMeas/Measurement/sngchnmeasurement.h>
 
 #include <xMeas/Measurement/realtimesamplearray.h>
 
@@ -155,27 +155,27 @@ QWidget* DummyToolbox::runWidget()
 
 void DummyToolbox::update(Subject* pSubject)
 {
-	//donwsampled by arraysize of m_pRTSA -> then pick only the value
-	bool downsampled = false;
+    //donwsampled by arraysize of m_pRTSA -> then pick only the value
+    bool downsampled = false;
 
-	if(downsampled)
-	{
-		Measurement* pMeasurement = static_cast<Measurement*>(pSubject);
+    if(downsampled)
+    {
+        SngChnMeasurement* pMeasurement = static_cast<SngChnMeasurement*>(pSubject);
 
-		//Using fast Hash Lookup instead of if then else clause
-		if(getAcceptorMeasurementBuffer(pMeasurement->getID()))
-		{
-	        	//ToDo: Cast to specific Buffer
+        //Using fast Hash Lookup instead of if then else clause
+        if(getAcceptorMeasurementBuffer(pMeasurement->getID()))
+        {
+                //ToDo: Cast to specific Buffer
             static_cast<DummyBuffer_old*>(getAcceptorMeasurementBuffer(pMeasurement->getID()))->push(pMeasurement->getValue());//if only every (arraysize)th value is necessary
-		}
-	}
-	else
-	{
-		RealTimeSampleArray* pRTSA = static_cast<RealTimeSampleArray*>(pSubject);
+        }
+    }
+    else
+    {
+        RealTimeSampleArray* pRTSA = static_cast<RealTimeSampleArray*>(pSubject);
 
-		//Using fast Hash Lookup instead of if then else clause
-		if(getAcceptorMeasurementBuffer(pRTSA->getID()))
-		{
+        //Using fast Hash Lookup instead of if then else clause
+        if(getAcceptorMeasurementBuffer(pRTSA->getID()))
+        {
             if(pRTSA->getID() == MSR_ID::ECGSIM_I)
             {
                     //ToDo: Cast to specific Buffer

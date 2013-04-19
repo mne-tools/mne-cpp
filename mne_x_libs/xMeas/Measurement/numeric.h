@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "../xmeas_global.h"
-#include "measurement.h"
+#include "sngchnmeasurement.h"
 
 
 //*************************************************************************************************************
@@ -61,7 +61,7 @@ namespace XMEASLIB
 *
 * @brief The Numeric class is the base class of every Numeric Measurement.
 */
-class XMEASSHARED_EXPORT Numeric : public Measurement
+class XMEASSHARED_EXPORT Numeric : public SngChnMeasurement
 {
 public:
 

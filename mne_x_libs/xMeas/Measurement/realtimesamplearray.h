@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "../xmeas_global.h"
-#include "measurement.h"
+#include "sngchnmeasurement.h"
 
 
 //*************************************************************************************************************
@@ -77,7 +77,7 @@ namespace XMEASLIB
 *
 * @brief The RealTimeSampleArray class is the base class of every RealTimeSampleArray Measurement.
 */
-class XMEASSHARED_EXPORT RealTimeSampleArray : public Measurement
+class XMEASSHARED_EXPORT RealTimeSampleArray : public SngChnMeasurement
 {
 public:
 
