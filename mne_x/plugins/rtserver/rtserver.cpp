@@ -243,21 +243,24 @@ void RtServer::requestInfo()
 
 bool RtServer::start()
 {
-    // Initialize real time measurements
-    init();
+    if(m_bCmdClientIsConnected)
+    {
+        // Initialize real time measurements
+        init();
 
-    //Set buffer size
-    (*m_pRtCmdClient)["bufsize"].pValues()[0].setValue(m_iBufferSize);
-    (*m_pRtCmdClient)["bufsize"].send();
+        //Set buffer size
+        (*m_pRtCmdClient)["bufsize"].pValues()[0].setValue(m_iBufferSize);
+        (*m_pRtCmdClient)["bufsize"].send();
 
-    // Start threads
-    QThread::start();
+        // Start threads
+        QThread::start();
 
-    // Start Measurement at rt_Server
-    (*m_pRtCmdClient)["start"].send();
+        // Start Measurement at rt_Server
+        (*m_pRtCmdClient)["start"].send();
 
 
-    return true;
+        return true;
+    }
 }
 
 
@@ -265,17 +268,20 @@ bool RtServer::start()
 
 bool RtServer::stop()
 {
-    // Stop Measurement at rt_Server
-    (*m_pRtCmdClient)["stop-all"].send();
+    if(m_bCmdClientIsConnected) //ToDo replace this with is running
+    {
+        // Stop Measurement at rt_Server
+        (*m_pRtCmdClient)["stop-all"].send();
 
 
-    // Stop threads
-    QThread::terminate();
-    QThread::wait();
+        // Stop threads
+        QThread::terminate();
+        QThread::wait();
 
-    //Clear Buffers
+        //Clear Buffers
 
-    return true;
+        return true;
+    }
 }
 
 
