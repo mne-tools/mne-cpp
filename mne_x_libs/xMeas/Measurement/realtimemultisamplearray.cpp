@@ -64,7 +64,7 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 RealTimeMultiSampleArray::RealTimeMultiSampleArray(unsigned int uiNumChannels)
-: Measurement()
+: SngChnMeasurement()
 , m_dMinValue(0)
 , m_dMaxValue(65535)
 , m_dSamplingRate(0)

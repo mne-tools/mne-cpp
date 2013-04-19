@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "measurement.h"
+#include "sngchnmeasurement.h"
 
 
 //*************************************************************************************************************
@@ -61,7 +61,7 @@ namespace XMEASLIB
 * @brief The Text class is the base class of every Text Measurement.
 */
 
-class XMEASSHARED_EXPORT Text : public Measurement
+class XMEASSHARED_EXPORT Text : public SngChnMeasurement
 {
 public:
 

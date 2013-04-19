@@ -62,7 +62,7 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 RealTimeSampleArray::RealTimeSampleArray()
-: Measurement()
+: SngChnMeasurement()
 , m_dMinValue(0)
 , m_dMaxValue(65535)
 , m_dSamplingRate(0)

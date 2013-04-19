@@ -40,7 +40,7 @@
 
 #include "brainmonitor.h"
 
-#include <xMeas/Measurement/measurement.h>
+#include <xMeas/Measurement/sngchnmeasurement.h>
 
 #include <xMeas/Measurement/realtimesamplearray.h>
 

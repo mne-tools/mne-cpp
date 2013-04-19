@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "../xmeas_global.h"
-#include "measurement.h"
+#include "sngchnmeasurement.h"
 
 
 //*************************************************************************************************************
@@ -60,7 +60,7 @@ namespace XMEASLIB
 *
 * @brief The ProgressBar class is the base class of every ProgressBar Measurement.
 */
-class XMEASSHARED_EXPORT ProgressBar : public Measurement
+class XMEASSHARED_EXPORT ProgressBar : public SngChnMeasurement
 {
 public:
 

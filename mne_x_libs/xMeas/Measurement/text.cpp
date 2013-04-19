@@ -55,7 +55,7 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 Text::Text()
-: Measurement()
+: SngChnMeasurement()
 , m_Text("")
 
 {
