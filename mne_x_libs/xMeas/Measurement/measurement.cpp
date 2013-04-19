@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     sngchnmeasurement.cpp
+* @file     measurement.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the SngChnMeasurement base class.
+* @brief    Contains the implementation of the Measurement base class.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "sngchnmeasurement.h"
+#include "measurement.h"
 #include <generics/observerpattern.h>
 
 
@@ -55,8 +55,14 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SngChnMeasurement::SngChnMeasurement()
-: Measurement()
+Measurement::Measurement()
+: Subject()
+, m_qString_Name("")
+//, m_MDL_ID(MDL_ID::_default)
+, m_MSR_ID(MSR_ID::_default)
+, m_bVisibility(true)
+, m_MDL_ID_new(MDL_ID::_default)
+, m_iMSR_idx(-1)
 {
 
 }
@@ -64,7 +70,7 @@ SngChnMeasurement::SngChnMeasurement()
 
 //*************************************************************************************************************
 
-SngChnMeasurement::~SngChnMeasurement()
+Measurement::~Measurement()
 {
 
 }
