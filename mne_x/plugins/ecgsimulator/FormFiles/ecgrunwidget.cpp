@@ -67,20 +67,20 @@ ECGRunWidget::ECGRunWidget(ECGSimulator *simulator, QWidget *parent)
     ui.m_qTextBrowser_Information->insertHtml(QString("Sampling Rate: %1sps").arg(m_pECGSimulator->m_fSamplingRate));
     ui.m_qTextBrowser_Information->insertHtml(QString("<br>Downsampling Factor: %1x").arg(m_pECGSimulator->m_iDownsamplingFactor));
     ui.m_qTextBrowser_Information->insertHtml(QString("<br><u>ECG I</u>"
-    		"<br>Enabled: ") + QString(m_pECGSimulator->m_pECGChannel_ECG_I->isEnabled()?"True":"False") +
-    		QString("<br>Visible: ") + QString(m_pECGSimulator->m_pECGChannel_ECG_I->isVisible()?"True":"False") +
-    		QString("<br>File: ") + m_pECGSimulator->m_pECGChannel_ECG_I->getChannelFile() +
-    		QString("<br>Simulation Signal Length: %1s").arg(m_pECGSimulator->m_pECGChannel_ECG_I->getSamples().size()/m_pECGSimulator->m_fSamplingRate));
+            "<br>Enabled: ") + QString(m_pECGSimulator->m_pECGChannel_ECG_I->isEnabled()?"True":"False") +
+            QString("<br>Visible: ") + QString(m_pECGSimulator->m_pECGChannel_ECG_I->isVisible()?"True":"False") +
+            QString("<br>File: ") + m_pECGSimulator->m_pECGChannel_ECG_I->getChannelFile() +
+            QString("<br>Simulation Signal Length: %1s").arg(m_pECGSimulator->m_pECGChannel_ECG_I->getSamples().size()/m_pECGSimulator->m_fSamplingRate));
     ui.m_qTextBrowser_Information->insertHtml(QString("<br><u>ECG II</u>"
-    		"<br>Enabled: ") + QString(m_pECGSimulator->m_pECGChannel_ECG_II->isEnabled()?"True":"False") +
-    		QString("<br>Visible: ") + QString(m_pECGSimulator->m_pECGChannel_ECG_II->isVisible()?"True":"False") +
-    		QString("<br>File: ") + m_pECGSimulator->m_pECGChannel_ECG_II->getChannelFile() +
-    		QString("<br>Simulation Signal Length: %1s").arg(m_pECGSimulator->m_pECGChannel_ECG_II->getSamples().size()/m_pECGSimulator->m_fSamplingRate));
+            "<br>Enabled: ") + QString(m_pECGSimulator->m_pECGChannel_ECG_II->isEnabled()?"True":"False") +
+            QString("<br>Visible: ") + QString(m_pECGSimulator->m_pECGChannel_ECG_II->isVisible()?"True":"False") +
+            QString("<br>File: ") + m_pECGSimulator->m_pECGChannel_ECG_II->getChannelFile() +
+            QString("<br>Simulation Signal Length: %1s").arg(m_pECGSimulator->m_pECGChannel_ECG_II->getSamples().size()/m_pECGSimulator->m_fSamplingRate));
     ui.m_qTextBrowser_Information->insertHtml(QString("<br><u>ECG III</u>"
-    		"<br>Enabled: ") + QString(m_pECGSimulator->m_pECGChannel_ECG_III->isEnabled()?"True":"False") +
-    		QString("<br>Visible: ") + QString(m_pECGSimulator->m_pECGChannel_ECG_III->isVisible()?"True":"False") +
-    		QString("<br>File: ") + m_pECGSimulator->m_pECGChannel_ECG_III->getChannelFile() +
-    		QString("<br>Simulation Signal Length: %1s").arg(m_pECGSimulator->m_pECGChannel_ECG_III->getSamples().size()/m_pECGSimulator->m_fSamplingRate));
+            "<br>Enabled: ") + QString(m_pECGSimulator->m_pECGChannel_ECG_III->isEnabled()?"True":"False") +
+            QString("<br>Visible: ") + QString(m_pECGSimulator->m_pECGChannel_ECG_III->isVisible()?"True":"False") +
+            QString("<br>File: ") + m_pECGSimulator->m_pECGChannel_ECG_III->getChannelFile() +
+            QString("<br>Simulation Signal Length: %1s").arg(m_pECGSimulator->m_pECGChannel_ECG_III->getSamples().size()/m_pECGSimulator->m_fSamplingRate));
 }
 
 
