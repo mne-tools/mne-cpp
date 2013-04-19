@@ -114,6 +114,7 @@ public:
     * @param [in] maxValue maximal value.
     */
     inline void setMaxValue(double maxValue);
+
     //=========================================================================================================
     /**
     * Returns the maximal value.
@@ -129,6 +130,7 @@ public:
     * @param [in] dSamplingRate the sampling rate of the RealTimeSampleArray.
     */
     inline void setSamplingRate(double dSamplingRate);
+
     //=========================================================================================================
     /**
     * Returns the sampling rate of the RealTimeSampleArray Measurement.
