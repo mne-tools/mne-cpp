@@ -140,6 +140,7 @@ public:
     * @param [in] visibility of the Measurement.
     */
     inline void setVisibility(bool visibility);
+
     //=========================================================================================================
     /**
     * Returns whether Measurement is visible.
@@ -147,6 +148,14 @@ public:
     * @return true if Measurement is visible, otherwise false.
     */
     inline bool isVisible() const;
+
+    //=========================================================================================================
+    /**
+    * true if single channel measurement.
+    *
+    * @return true if Measurement is single channel measurement
+    */
+    inline bool isSingleChannel() const;
 
 private:
     QString         m_qString_Name;         /**< Holds the name of the Measurement. */
@@ -235,6 +244,13 @@ inline bool Measurement::isVisible() const
     return m_bVisibility;
 }
 
+
+//*************************************************************************************************************
+
+inline bool Measurement::isSingleChannel() const
+{
+    return m_bIsSingleChannel;
+}
 
 } // NAMESPACE
 
