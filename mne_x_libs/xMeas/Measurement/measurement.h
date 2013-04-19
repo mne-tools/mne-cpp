@@ -77,8 +77,11 @@ public:
     //=========================================================================================================
     /**
     * Constructs a Measurement.
+    *
+    * @param[in] p_pIsSingleChannel     if measurement is single channel measurement
     */
-    Measurement();
+    Measurement(bool p_pIsSingleChannel);
+
     //=========================================================================================================
     /**
     * Destroys the Measurement.
@@ -89,7 +92,7 @@ public:
     /**
     * Sets the name of the Measurement.
     *
-    * @param [in] name which should be set.
+    * @param[in] name which should be set.
     */
     inline void setName(const QString& name);
 
@@ -152,8 +155,9 @@ private:
     bool        m_bVisibility;              /**< Holds the visibility status. */
 
     /////////////// NEW
-    MDL_ID::Module_ID   m_MDL_ID_new;     /**< Holds the corresponding module id. */
+    MDL_ID::Module_ID   m_MDL_ID_new;       /**< Holds the corresponding module id. */
     qint32              m_iMSR_idx;
+    bool                m_bIsSingleChannel; /**< If is single channel measurement */
 
 };
 

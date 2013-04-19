@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     sngchnmeasurement.cpp
+* @file     mltchnmeasurement.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,42 +29,89 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the SngChnMeasurement base class.
+* @brief    Contains the declaration of the MltChnMeasurement base class.
 *
 */
+
+#ifndef MLTCHNMEASUREMENT_H
+#define MLTCHNMEASUREMENT_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "sngchnmeasurement.h"
-#include <generics/observerpattern.h>
+#include "../xmeas_global.h"
+#include "../Nomenclature/nomenclature.h"
+#include "measurement.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// QT INCLUDES
 //=============================================================================================================
 
-using namespace XMEASLIB;
+#include <QString>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE NAMESPACE XMEASLIB
 //=============================================================================================================
 
-SngChnMeasurement::SngChnMeasurement()
-: Measurement(true)
+namespace XMEASLIB
 {
 
-}
+//=============================================================================================================
+/**
+* DECLARE CLASS SngChnMeasurement
+*
+* @brief The SngChnMeasurement class is the base class of every SngChnMeasurement.
+*/
+class XMEASSHARED_EXPORT MltChnMeasurement : public Measurement
+{
+public:
+    //=========================================================================================================
+    /**
+    * Constructs a SngChnMeasurement.
+    */
+    MltChnMeasurement();
+
+    //=========================================================================================================
+    /**
+    * Destroys the SngChnMeasurement.
+    */
+    virtual ~MltChnMeasurement();
+
+    //=========================================================================================================
+    /**
+    * Sets a value.
+    * Pure virtual method.
+    *
+    * @param [in] value which should be set.
+    */
+    virtual void setValue(double value) = 0;
+
+    //=========================================================================================================
+    /**
+    * Returns whether SngChnMeasurement is visible.
+    * Pure virtual method.
+    *
+    * @return true if SngChnMeasurement is visible, otherwise false.
+    */
+    virtual double getValue() const = 0;
+
+private:
+
+};
 
 
 //*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
 
-SngChnMeasurement::~SngChnMeasurement()
-{
+} // NAMESPACE
 
-}
+#endif // MLTCHNMEASUREMENT_H
