@@ -16,7 +16,7 @@ SUBDIRS += \
     ecgsimulator \
     dummytoolbox \
     rtserver \
-    brainmonitor \
+
 #    filtertoolbox \
 #    gaborparticletoolbox \
 #    megchannelsimulator \
@@ -24,3 +24,9 @@ SUBDIRS += \
 #    roitoolbox \
 #    localizationtoolbox \
 #    prelocalizationtoolbox
+
+
+qtHaveModule(3d) {
+    message(Qt3D available: brainmonitor library configured!)
+    SUBDIRS += brainmonitor \
+}
