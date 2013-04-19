@@ -78,7 +78,8 @@ SOURCES += \
     Measurement/IMeasurementSink.cpp \
     Measurement/IMeasurementSource.cpp \
     Measurement/sngchnmeasurement.cpp \
-    Measurement/measurement.cpp
+    Measurement/measurement.cpp \
+    Measurement/mltchnmeasurement.cpp
 
 HEADERS += \
     xmeas_global.h \
@@ -91,7 +92,8 @@ HEADERS += \
     Measurement/IMeasurementSink.h \
     Measurement/IMeasurementSource.h \
     Measurement/sngchnmeasurement.h \
-    Measurement/measurement.h
+    Measurement/measurement.h \
+    Measurement/mltchnmeasurement.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
