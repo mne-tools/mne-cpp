@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     realtimesamplearray.h
+* @file     realtimemultisamplearray_new.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RealTimeSampleArray class.
+* @brief    Contains the declaration of the RealTimeMultiSampleArrayNew class.
 *
 */
 
-#ifndef REALTIMESAMPLEARRAY_H
-#define REALTIMESAMPLEARRAY_H
+#ifndef REALTIMEMULTISAMPLEARRAY_NEW_H
+#define REALTIMEMULTISAMPLEARRAY_NEW_H
 
 
 //*************************************************************************************************************
@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "../xmeas_global.h"
-#include "sngchnmeasurement.h"
+#include "mltchnmeasurement.h"
 
 
 //*************************************************************************************************************
@@ -73,24 +73,26 @@ namespace XMEASLIB
 
 //=========================================================================================================
 /**
-* DECLARE CLASS RealTimeSampleArray
+* DECLARE CLASS RealTimeMultiSampleArrayNew
 *
-* @brief The RealTimeSampleArray class is the base class of every RealTimeSampleArray Measurement.
+* @brief The RealTimeMultiSampleArrayNew class is the base class of every RealTimeMultiSampleArrayNew Measurement.
 */
-class XMEASSHARED_EXPORT RealTimeSampleArray : public SngChnMeasurement
+class XMEASSHARED_EXPORT RealTimeMultiSampleArrayNew : public MltChnMeasurement
 {
 public:
+    //=========================================================================================================
+    /**
+    * Constructs a RealTimeMultiSampleArrayNew.
+    *
+    * @param [in] uiNumChannels the number of channels.
+    */
+    RealTimeMultiSampleArrayNew(unsigned int uiNumChannels);
 
     //=========================================================================================================
     /**
-    * Constructs a RealTimeSampleArray.
+    * Destroys the RealTimeMultiSampleArrayNew.
     */
-    RealTimeSampleArray();
-    //=========================================================================================================
-    /**
-    * Destroys the RealTimeSampleArray.
-    */
-    virtual ~RealTimeSampleArray();
+    virtual ~RealTimeMultiSampleArrayNew();
 
     //=========================================================================================================
     /**
@@ -99,6 +101,7 @@ public:
     * @param [in] minValue minimal value.
     */
     inline void setMinValue(double minValue);
+
     //=========================================================================================================
     /**
     * Returns the minimal value.
@@ -125,52 +128,70 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the sampling rate of the RealTimeSampleArray Measurement.
+    * Sets the sampling rate of the RealTimeMultiSampleArrayNew Measurement.
     *
-    * @param [in] dSamplingRate the sampling rate of the RealTimeSampleArray.
+    * @param [in] dSamplingRate the sampling rate of the RealTimeMultiSampleArrayNew.
     */
     inline void setSamplingRate(double dSamplingRate);
 
     //=========================================================================================================
     /**
-    * Returns the sampling rate of the RealTimeSampleArray Measurement.
+    * Returns the sampling rate of the RealTimeMultiSampleArrayNew Measurement.
     *
-    * @return the sampling rate of the RealTimeSampleArray.
+    * @return the sampling rate of the RealTimeMultiSampleArrayNew.
     */
     inline double getSamplingRate() const;
 
     //=========================================================================================================
     /**
-    * Sets the number of values which should be gathered before attached observers are notified by calling the Subject notify() method.
+    * Sets the number of channels of .
     *
-    * @param [in] ucArraySize the number of values.
+    * @param [in] uiNumChannels the number of channels.
     */
-    inline void setArraySize(unsigned char ucArraySize);
+    inline void setNumChannels(unsigned int uiNumChannels);
+
+    //=========================================================================================================
+    /**
+    * Returns the number of channels of .
+    *
+    * @return the number of values which are gathered before a notify() is called.
+    */
+    inline unsigned int getNumChannels() const;
+
+    //=========================================================================================================
+    /**
+    * Sets the number of sample vectors which should be gathered before attached observers are notified by calling the Subject notify() method.
+    *
+    * @param [in] ucMultiArraySize the number of values.
+    */
+    inline void setMultiArraySize(unsigned char ucMultiArraySize);
+
     //=========================================================================================================
     /**
     * Returns the number of values which should be gathered before attached observers are notified by calling the Subject notify() method.
     *
     * @return the number of values which are gathered before a notify() is called.
     */
-    inline unsigned char getArraySize() const;
-    //=========================================================================================================
-    /**
-    * Returns the gathered sample array vector.
-    *
-    * @return the current sample array vector.
-    */
-    inline const QVector<double>& getSampleArray();
+    inline unsigned char getMultiArraySize() const;
 
     //=========================================================================================================
     /**
-    * Sets the unit of the RealTimeSampleArray data.
+    * Returns the gathered multi sample array.
+    *
+    * @return the current multi sample array.
+    */
+    inline const QVector< VectorXd >& getMultiSampleArray();
+
+    //=========================================================================================================
+    /**
+    * Sets the unit of the RealTimeMultiSampleArrayNew data.
     *
     * @param [in] unit of the data.
     */
     inline void setUnit(const QString& unit);
     //=========================================================================================================
     /**
-    * Returns the unit of the RealTimeSampleArray measurement.
+    * Returns the unit of the RealTimeMultiSampleArrayNew measurement.
     *
     * @return the unit of the data of measurement.
     */
@@ -183,7 +204,8 @@ public:
     *
     * @param [in] v the value which is attached to the sample array vector.
     */
-    virtual void setValue(double v);
+    virtual void setValue(VectorXd v);
+
     //=========================================================================================================
     /**
     * Returns the current value set.
@@ -191,16 +213,17 @@ public:
     *
     * @return the last attached value.
     */
-    virtual double getValue() const;
+    virtual VectorXd getValue() const;
 
 private:
-    double              m_dMinValue;        /**< Holds the minimal value.*/
-    double              m_dMaxValue;        /**< Holds the maximal value.*/
-    double              m_dSamplingRate;    /**< Holds sampling rate of the RealTimeSampleArray.*/
-    QString             m_qString_Unit;     /**< Holds unit of the data of the measurement.*/
-    double              m_dValue;           /**< Holds the current attached value.*/
-    unsigned char       m_ucArraySize;      /**< Holds vector size of the sample array vector.*/
-    QVector<double>     m_vecSamples;       /**< Holds the sample array vector.*/
+    double              m_dMinValue;                /**< Holds the minimal value.*/
+    double              m_dMaxValue;                /**< Holds the maximal value.*/
+    double              m_dSamplingRate;            /**< Holds sampling rate of the RealTimeSampleArray.*/
+    QString             m_qString_Unit;             /**< Holds unit of the data of the measurement.*/
+    unsigned int        m_uiNumChannels;            /**< Holds the number of channels.*/
+    VectorXd            m_vecValue;                 /**< Holds the current attached sample vector.*/
+    unsigned char       m_ucMultiArraySize;         /**< Holds sample size of the multi sample array.*/
+    QVector< VectorXd >     m_matSamples;           /**< Holds the multi sample array.*/
 };
 
 
@@ -209,7 +232,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline void RealTimeSampleArray::setMinValue(double minValue)
+inline void RealTimeMultiSampleArrayNew::setMinValue(double minValue)
 {
     m_dMinValue = minValue;
 }
@@ -217,7 +240,7 @@ inline void RealTimeSampleArray::setMinValue(double minValue)
 
 //*************************************************************************************************************
 
-inline double RealTimeSampleArray::getMinValue() const
+inline double RealTimeMultiSampleArrayNew::getMinValue() const
 {
     return m_dMinValue;
 }
@@ -225,7 +248,7 @@ inline double RealTimeSampleArray::getMinValue() const
 
 //*************************************************************************************************************
 
-inline void RealTimeSampleArray::setMaxValue(double maxValue)
+inline void RealTimeMultiSampleArrayNew::setMaxValue(double maxValue)
 {
     m_dMaxValue = maxValue;
 }
@@ -233,7 +256,7 @@ inline void RealTimeSampleArray::setMaxValue(double maxValue)
 
 //*************************************************************************************************************
 
-inline double RealTimeSampleArray::getMaxValue() const
+inline double RealTimeMultiSampleArrayNew::getMaxValue() const
 {
     return m_dMaxValue;
 }
@@ -241,7 +264,7 @@ inline double RealTimeSampleArray::getMaxValue() const
 
 //*************************************************************************************************************
 
-inline void RealTimeSampleArray::setSamplingRate(double dSamplingRate)
+inline void RealTimeMultiSampleArrayNew::setSamplingRate(double dSamplingRate)
 {
     m_dSamplingRate = dSamplingRate;
 }
@@ -249,7 +272,7 @@ inline void RealTimeSampleArray::setSamplingRate(double dSamplingRate)
 
 //*************************************************************************************************************
 
-inline double RealTimeSampleArray::getSamplingRate() const
+inline double RealTimeMultiSampleArrayNew::getSamplingRate() const
 {
     return m_dSamplingRate;
 }
@@ -257,35 +280,50 @@ inline double RealTimeSampleArray::getSamplingRate() const
 
 //*************************************************************************************************************
 
-inline void RealTimeSampleArray::setArraySize(unsigned char ucArraySize)
+inline void RealTimeMultiSampleArrayNew::setNumChannels(unsigned int uiNumChannels)
 {
-	//Obsolete unsigned char can't be bigger
+    m_uiNumChannels = uiNumChannels;
+}
+
+
+//*************************************************************************************************************
+
+inline unsigned int RealTimeMultiSampleArrayNew::getNumChannels() const
+{
+    return m_uiNumChannels;
+}
+
+//*************************************************************************************************************
+
+inline void RealTimeMultiSampleArrayNew::setMultiArraySize(unsigned char ucMultiArraySize)
+{
+    //Obsolete unsigned char can't be bigger
 //    if(ucArraySize > 255)
 //        m_ucArraySize = 255;
 //    else
-        m_ucArraySize = ucArraySize;
+        m_ucMultiArraySize = ucMultiArraySize;
 }
 
 
 //*************************************************************************************************************
 
-unsigned char RealTimeSampleArray::getArraySize() const
+unsigned char RealTimeMultiSampleArrayNew::getMultiArraySize() const
 {
-    return m_ucArraySize;
+    return m_ucMultiArraySize;
 }
 
 
 //*************************************************************************************************************
 
-inline const QVector<double>& RealTimeSampleArray::getSampleArray()
+inline const QVector< VectorXd >& RealTimeMultiSampleArrayNew::getMultiSampleArray()
 {
-    return m_vecSamples;
+    return m_matSamples;
 }
 
 
 //*************************************************************************************************************
 
-inline void RealTimeSampleArray::setUnit(const QString& unit)
+inline void RealTimeMultiSampleArrayNew::setUnit(const QString& unit)
 {
     m_qString_Unit = unit;
 }
@@ -293,11 +331,11 @@ inline void RealTimeSampleArray::setUnit(const QString& unit)
 
 //*************************************************************************************************************
 
-inline const QString& RealTimeSampleArray::getUnit() const
+inline const QString& RealTimeMultiSampleArrayNew::getUnit() const
 {
     return m_qString_Unit;
 }
 
 } // NAMESPACE
 
-#endif // REALTIMESAMPLEARRAY_H
+#endif // REALTIMEMULTISAMPLEARRAYNEW_H
