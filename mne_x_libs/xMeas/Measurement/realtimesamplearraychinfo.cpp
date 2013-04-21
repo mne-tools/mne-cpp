@@ -62,7 +62,8 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 RealTimeSampleArrayChInfo::RealTimeSampleArrayChInfo()
-: m_dMinValue(0)
+: m_qStringChName("")
+, m_dMinValue(0)
 , m_dMaxValue(65535)
 , m_qString_Unit("")
 {

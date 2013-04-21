@@ -43,6 +43,7 @@
 
 #include "../xmeas_global.h"
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
@@ -65,19 +66,18 @@ namespace XMEASLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-//using namespace IOBuffer;
+//using namespace FIFFLIB;
 
 
 //=========================================================================================================
 /**
-* DECLARE CLASS RealTimeSampleArray
+* Channel Info for RealTimeSampleArray, used in RealTimeMultiSampleArray
 *
-* @brief The RealTimeSampleArray class is the base class of every RealTimeSampleArray Measurement.
+* @brief Channel Info for RealTimeSampleArray
 */
 class XMEASSHARED_EXPORT RealTimeSampleArrayChInfo
 {
 public:
-
     //=========================================================================================================
     /**
     * Constructs a RealTimeSampleArrayChInfo.
@@ -92,9 +92,25 @@ public:
 
     //=========================================================================================================
     /**
+    * Sets the channel name
+    *
+    * @param[in] p_qStringChName    channel name
+    */
+    inline void setChannelName(QString p_qStringChName);
+
+    //=========================================================================================================
+    /**
+    * Returns the channel name
+    *
+    * @return the channel name.
+    */
+    inline QString getChannelName() const;
+
+    //=========================================================================================================
+    /**
     * Sets the minimal value. If current value to set is smaller, current value is set to minimal value.
     *
-    * @param [in] minValue minimal value.
+    * @param[in] minValue minimal value.
     */
     inline void setMinValue(double minValue);
 
@@ -139,10 +155,10 @@ public:
     inline const QString& getUnit() const;
 
 private:
-    QString             m_qStringChName;            /**< The channel name.*/
-    double              m_dMinValue;                /**< The minimal value.*/
-    double              m_dMaxValue;                /**< The maximal value.*/
-    QString             m_qString_Unit;             /**< Unit of the data of the measurement.*/
+    QString     m_qStringChName;    /**< The channel name.*/
+    double      m_dMinValue;        /**< The minimal value.*/
+    double      m_dMaxValue;        /**< The maximal value.*/
+    QString     m_qString_Unit;     /**< Unit of the data of the measurement.*/
 
 };
 
@@ -151,6 +167,22 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+inline void RealTimeSampleArrayChInfo::setChannelName(QString p_qStringChName)
+{
+    m_qStringChName = p_qStringChName;
+}
+
+
+//*************************************************************************************************************
+
+inline QString RealTimeSampleArrayChInfo::getChannelName() const
+{
+    return m_qStringChName;
+}
+
+
+//*************************************************************************************************************
 
 inline void RealTimeSampleArrayChInfo::setMinValue(double minValue)
 {
