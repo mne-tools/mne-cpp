@@ -261,6 +261,8 @@ bool RtServer::start()
 
         return true;
     }
+    else
+        return false;
 }
 
 
@@ -272,16 +274,15 @@ bool RtServer::stop()
     {
         // Stop Measurement at rt_Server
         (*m_pRtCmdClient)["stop-all"].send();
-
-
-        // Stop threads
-        QThread::terminate();
-        QThread::wait();
-
-        //Clear Buffers
-
-        return true;
     }
+
+    // Stop threads
+    QThread::terminate();
+    QThread::wait();
+
+    //Clear Buffers
+
+    return true;
 }
 
 
