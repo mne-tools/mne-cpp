@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mltchnmeasurement.h
+* @file     realtimemultisamplearray_new.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,30 +29,16 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the MltChnMeasurement base class.
+* @brief    Contains the implementation of the RealTimeMultiSampleArrayNew class.
 *
 */
-
-#ifndef MLTCHNMEASUREMENT_H
-#define MLTCHNMEASUREMENT_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../xmeas_global.h"
-#include "../Nomenclature/nomenclature.h"
-#include "measurement.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
+#include "realtimemultisamplearray_new.h"
 
 
 //*************************************************************************************************************
@@ -60,16 +46,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QString>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE XMEASLIB
-//=============================================================================================================
-
-namespace XMEASLIB
-{
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -77,58 +54,66 @@ namespace XMEASLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
-
-
-//=============================================================================================================
-/**
-* DECLARE CLASS MltChnMeasurement
-*
-* @brief The MltChnMeasurement class is the base class of every MltChnMeasurement.
-*/
-class XMEASSHARED_EXPORT MltChnMeasurement : public Measurement
-{
-public:
-    //=========================================================================================================
-    /**
-    * Constructs a MltChnMeasurement.
-    */
-    MltChnMeasurement();
-
-    //=========================================================================================================
-    /**
-    * Destroys the MltChnMeasurement.
-    */
-    virtual ~MltChnMeasurement();
-
-    //=========================================================================================================
-    /**
-    * Sets a value.
-    * Pure virtual method.
-    *
-    * @param [in] value which should be set.
-    */
-    virtual void setValue(VectorXd value) = 0;
-
-    //=========================================================================================================
-    /**
-    * Returns whether MltChnMeasurement is visible.
-    * Pure virtual method.
-    *
-    * @return true if MltChnMeasurement is visible, otherwise false.
-    */
-    virtual VectorXd getValue() const = 0;
-
-private:
-
-};
+using namespace XMEASLIB;
+//using namespace IOBuffer;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// INLINE DEFINITIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-} // NAMESPACE
+RealTimeMultiSampleArrayNew::RealTimeMultiSampleArrayNew(unsigned int uiNumChannels)
+: MltChnMeasurement()
+, m_dMinValue(0)
+, m_dMaxValue(65535)
+, m_dSamplingRate(0)
+, m_qString_Unit("")
+, m_uiNumChannels(uiNumChannels)
+, m_ucMultiArraySize(10)
 
-#endif // MLTCHNMEASUREMENT_H
+{
+
+}
+
+
+//*************************************************************************************************************
+
+RealTimeMultiSampleArrayNew::~RealTimeMultiSampleArrayNew()
+{
+
+}
+
+
+//*************************************************************************************************************
+
+VectorXd RealTimeMultiSampleArrayNew::getValue() const
+{
+    return m_vecValue;
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayNew::setValue(VectorXd v)
+{
+    //check vector size
+    if(v.size() != m_uiNumChannels)
+        qCritical() << "Error Occured in RealTimeMultiSampleArrayNew::setVector: Vector size does not matche the number of channels! ";
+
+    //Check if maximum exceeded //ToDo speed this up
+    for(qint32 i = 0; i < v.size(); ++i)
+    {
+        if(v[i] < m_dMinValue) v[i] = m_dMinValue;
+        else if(v[i] > m_dMaxValue) v[i] = m_dMaxValue;
+    }
+
+    //Store
+    m_vecValue = v;
+    m_matSamples.push_back(m_vecValue);
+    if(m_matSamples.size() >= m_ucMultiArraySize && notifyEnabled)
+    {
+        notify();
+        m_matSamples.clear();
+    }
+}
