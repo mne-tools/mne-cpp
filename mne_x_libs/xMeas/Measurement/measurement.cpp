@@ -75,3 +75,17 @@ Measurement::~Measurement()
 {
 
 }
+
+
+////*************************************************************************************************************
+
+//bool Measurement::isSingleChannel()
+//{
+//    MltChnMeasurement* pSngChnMeasurement = NULL;
+//    pSngChnMeasurement = dynamic_cast<MltChnMeasurement*>(this);
+
+//    if(pSngChnMeasurement == NULL)
+//        return false;
+//    else
+//        return true;
+//}
