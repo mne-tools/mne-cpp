@@ -130,11 +130,27 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the number of channels of .
+    * Returns the number of channels.
     *
     * @return the number of values which are gathered before a notify() is called.
     */
     inline unsigned int getNumChannels() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the reference to the channel list.
+    *
+    * @return the reference to the channel list.
+    */
+    inline QList<RealTimeSampleArrayChInfo>& chInfo();
+
+    //=========================================================================================================
+    /**
+    * Returns the reference to the orig FiffInfo.
+    *
+    * @return the reference to the orig FiffInfo.
+    */
+    inline FiffInfo& getFiffInfo();
 
     //=========================================================================================================
     /**
@@ -214,6 +230,23 @@ inline unsigned int RealTimeMultiSampleArrayNew::getNumChannels() const
 {
     return m_qListChInfo.size();
 }
+
+
+//*************************************************************************************************************
+
+inline QList<RealTimeSampleArrayChInfo>& RealTimeMultiSampleArrayNew::chInfo()
+{
+    return m_qListChInfo;
+}
+
+
+//*************************************************************************************************************
+
+inline FiffInfo& RealTimeMultiSampleArrayNew::getFiffInfo()
+{
+    return m_FiffInfo_orig;
+}
+
 
 //*************************************************************************************************************
 
