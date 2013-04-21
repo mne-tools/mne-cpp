@@ -96,38 +96,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the minimal value. If current value to set is smaller, current value is set to minimal value.
-    *
-    * @param [in] minValue minimal value.
-    */
-    inline void setMinValue(double minValue);
-
-    //=========================================================================================================
-    /**
-    * Returns the minimal value.
-    *
-    * @return the minimal value.
-    */
-    inline double getMinValue() const;
-
-    //=========================================================================================================
-    /**
-    * Sets the maximal value. If value to set is bigger, current value is set to maximal value.
-    *
-    * @param [in] maxValue maximal value.
-    */
-    inline void setMaxValue(double maxValue);
-
-    //=========================================================================================================
-    /**
-    * Returns the maximal value.
-    *
-    * @return the maximal value.
-    */
-    inline double getMaxValue() const;
-
-    //=========================================================================================================
-    /**
     * Sets the sampling rate of the RealTimeMultiSampleArrayNew Measurement.
     *
     * @param [in] dSamplingRate the sampling rate of the RealTimeMultiSampleArrayNew.
@@ -184,21 +152,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the unit of the RealTimeMultiSampleArrayNew data.
-    *
-    * @param [in] unit of the data.
-    */
-    inline void setUnit(const QString& unit);
-    //=========================================================================================================
-    /**
-    * Returns the unit of the RealTimeMultiSampleArrayNew measurement.
-    *
-    * @return the unit of the data of measurement.
-    */
-    inline const QString& getUnit() const;
-
-    //=========================================================================================================
-    /**
     * Attaches a value to the sample array vector.
     * This method is inherited by Measurement.
     *
@@ -231,38 +184,6 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
-inline void RealTimeMultiSampleArrayNew::setMinValue(double minValue)
-{
-    m_dMinValue = minValue;
-}
-
-
-//*************************************************************************************************************
-
-inline double RealTimeMultiSampleArrayNew::getMinValue() const
-{
-    return m_dMinValue;
-}
-
-
-//*************************************************************************************************************
-
-inline void RealTimeMultiSampleArrayNew::setMaxValue(double maxValue)
-{
-    m_dMaxValue = maxValue;
-}
-
-
-//*************************************************************************************************************
-
-inline double RealTimeMultiSampleArrayNew::getMaxValue() const
-{
-    return m_dMaxValue;
-}
-
-
-//*************************************************************************************************************
 
 inline void RealTimeMultiSampleArrayNew::setSamplingRate(double dSamplingRate)
 {
@@ -318,22 +239,6 @@ unsigned char RealTimeMultiSampleArrayNew::getMultiArraySize() const
 inline const QVector< VectorXd >& RealTimeMultiSampleArrayNew::getMultiSampleArray()
 {
     return m_matSamples;
-}
-
-
-//*************************************************************************************************************
-
-inline void RealTimeMultiSampleArrayNew::setUnit(const QString& unit)
-{
-    m_qString_Unit = unit;
-}
-
-
-//*************************************************************************************************************
-
-inline const QString& RealTimeMultiSampleArrayNew::getUnit() const
-{
-    return m_qString_Unit;
 }
 
 } // NAMESPACE
