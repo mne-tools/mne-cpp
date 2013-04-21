@@ -77,10 +77,8 @@ public:
     //=========================================================================================================
     /**
     * Constructs a Measurement.
-    *
-    * @param[in] p_pIsSingleChannel     if measurement is single channel measurement
     */
-    Measurement(bool p_pIsSingleChannel);
+    Measurement();
 
     //=========================================================================================================
     /**
@@ -149,14 +147,6 @@ public:
     */
     inline bool isVisible() const;
 
-    //=========================================================================================================
-    /**
-    * true if single channel measurement.
-    *
-    * @return true if Measurement is single channel measurement
-    */
-    inline bool isSingleChannel() const;
-
 private:
     QString         m_qString_Name;         /**< Holds the name of the Measurement. */
 //    MDL_ID::Module_ID         m_MDL_ID;     /**< Holds the corresponding module id. */
@@ -166,7 +156,6 @@ private:
     /////////////// NEW
     MDL_ID::Module_ID   m_MDL_ID_new;       /**< Holds the corresponding module id. */
     qint32              m_iMSR_idx;
-    bool                m_bIsSingleChannel; /**< If is single channel measurement */
 
 };
 
@@ -242,14 +231,6 @@ inline void Measurement::setVisibility(bool visibility)
 inline bool Measurement::isVisible() const
 {
     return m_bVisibility;
-}
-
-
-//*************************************************************************************************************
-
-inline bool Measurement::isSingleChannel() const
-{
-    return m_bIsSingleChannel;
 }
 
 } // NAMESPACE

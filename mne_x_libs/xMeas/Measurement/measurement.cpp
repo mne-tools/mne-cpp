@@ -55,7 +55,7 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Measurement::Measurement(bool p_pIsSingleChannel)
+Measurement::Measurement()
 : Subject()
 , m_qString_Name("")
 //, m_MDL_ID(MDL_ID::_default)
@@ -63,7 +63,6 @@ Measurement::Measurement(bool p_pIsSingleChannel)
 , m_bVisibility(true)
 , m_MDL_ID_new(MDL_ID::_default)
 , m_iMSR_idx(-1)
-, m_bIsSingleChannel(p_pIsSingleChannel)
 {
 
 }

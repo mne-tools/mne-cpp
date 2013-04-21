@@ -179,6 +179,8 @@ public:
     virtual VectorXd getValue() const;
 
 private:
+    FiffInfo    m_FiffInfo_orig;    /**< Original Fiff Info if initialized by fiff info. */
+
     double                      m_dSamplingRate;    /**< Sampling rate of the RealTimeSampleArray.*/
     VectorXd                    m_vecValue;         /**< The current attached sample vector.*/
     unsigned char               m_ucMultiArraySize; /**< Sample size of the multi sample array.*/

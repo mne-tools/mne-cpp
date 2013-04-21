@@ -146,8 +146,8 @@ namespace FIFFLIB
 /*
 * 4. Others we need
 */
-#define FIFF_UNIT_T_M 201	/* T/m */
-#define FIFF_UNIT_AM  202	/* Am  */
+#define FIFF_UNIT_T_M 201   /* T/m */
+#define FIFF_UNIT_AM  202   /* Am  */
 /*
 * 5. Multipliers
 */

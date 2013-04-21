@@ -56,7 +56,7 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 MltChnMeasurement::MltChnMeasurement()
-: Measurement(false)
+: Measurement()
 {
 
 }

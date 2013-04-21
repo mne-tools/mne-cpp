@@ -56,7 +56,7 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 SngChnMeasurement::SngChnMeasurement()
-: Measurement(true)
+: Measurement()
 {
 
 }
