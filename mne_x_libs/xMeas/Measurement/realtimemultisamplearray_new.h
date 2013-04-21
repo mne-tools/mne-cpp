@@ -44,6 +44,9 @@
 
 #include "../xmeas_global.h"
 #include "mltchnmeasurement.h"
+#include "realtimesamplearraychinfo.h"
+
+#include <fiff/fiff_info.h>
 
 
 //*************************************************************************************************************
@@ -52,6 +55,7 @@
 //=============================================================================================================
 
 #include <QVector>
+#include <QList>
 
 
 //*************************************************************************************************************
@@ -68,7 +72,7 @@ namespace XMEASLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-//using namespace IOBuffer;
+using namespace FIFFLIB;
 
 
 //=========================================================================================================
@@ -83,10 +87,8 @@ public:
     //=========================================================================================================
     /**
     * Constructs a RealTimeMultiSampleArrayNew.
-    *
-    * @param [in] uiNumChannels the number of channels.
     */
-    RealTimeMultiSampleArrayNew(unsigned int uiNumChannels);
+    RealTimeMultiSampleArrayNew();
 
     //=========================================================================================================
     /**
@@ -96,9 +98,25 @@ public:
 
     //=========================================================================================================
     /**
+    * Inits RealTimeMultiSampleArrayNew and adds uiNumChannels empty channel information
+    *
+    * @param [in] uiNumChannels     the number of channels to init.
+    */
+    inline void init(unsigned int uiNumChannels);
+
+    //=========================================================================================================
+    /**
+    * Init channel infos using fiff info
+    *
+    * @param[in] p_FiffInfo     Info to init from
+    */
+    void initFromFiffInfo(FiffInfo p_FiffInfo);
+
+    //=========================================================================================================
+    /**
     * Sets the sampling rate of the RealTimeMultiSampleArrayNew Measurement.
     *
-    * @param [in] dSamplingRate the sampling rate of the RealTimeMultiSampleArrayNew.
+    * @param[in] dSamplingRate the sampling rate of the RealTimeMultiSampleArrayNew.
     */
     inline void setSamplingRate(double dSamplingRate);
 
@@ -109,14 +127,6 @@ public:
     * @return the sampling rate of the RealTimeMultiSampleArrayNew.
     */
     inline double getSamplingRate() const;
-
-    //=========================================================================================================
-    /**
-    * Sets the number of channels of .
-    *
-    * @param [in] uiNumChannels the number of channels.
-    */
-    inline void setNumChannels(unsigned int uiNumChannels);
 
     //=========================================================================================================
     /**
@@ -169,14 +179,11 @@ public:
     virtual VectorXd getValue() const;
 
 private:
-    double              m_dMinValue;                /**< Holds the minimal value.*/
-    double              m_dMaxValue;                /**< Holds the maximal value.*/
-    double              m_dSamplingRate;            /**< Holds sampling rate of the RealTimeSampleArray.*/
-    QString             m_qString_Unit;             /**< Holds unit of the data of the measurement.*/
-    unsigned int        m_uiNumChannels;            /**< Holds the number of channels.*/
-    VectorXd            m_vecValue;                 /**< Holds the current attached sample vector.*/
-    unsigned char       m_ucMultiArraySize;         /**< Holds sample size of the multi sample array.*/
-    QVector< VectorXd >     m_matSamples;           /**< Holds the multi sample array.*/
+    double                      m_dSamplingRate;    /**< Sampling rate of the RealTimeSampleArray.*/
+    VectorXd                    m_vecValue;         /**< The current attached sample vector.*/
+    unsigned char               m_ucMultiArraySize; /**< Sample size of the multi sample array.*/
+    QVector< VectorXd >         m_matSamples;       /**< The multi sample array.*/
+    QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
 };
 
 
@@ -201,17 +208,9 @@ inline double RealTimeMultiSampleArrayNew::getSamplingRate() const
 
 //*************************************************************************************************************
 
-inline void RealTimeMultiSampleArrayNew::setNumChannels(unsigned int uiNumChannels)
-{
-    m_uiNumChannels = uiNumChannels;
-}
-
-
-//*************************************************************************************************************
-
 inline unsigned int RealTimeMultiSampleArrayNew::getNumChannels() const
 {
-    return m_uiNumChannels;
+    return m_qListChInfo.size();
 }
 
 //*************************************************************************************************************

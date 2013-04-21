@@ -63,15 +63,10 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeMultiSampleArrayNew::RealTimeMultiSampleArrayNew(unsigned int uiNumChannels)
+RealTimeMultiSampleArrayNew::RealTimeMultiSampleArrayNew()
 : MltChnMeasurement()
-, m_dMinValue(0)
-, m_dMaxValue(65535)
 , m_dSamplingRate(0)
-, m_qString_Unit("")
-, m_uiNumChannels(uiNumChannels)
 , m_ucMultiArraySize(10)
-
 {
 
 }
@@ -80,6 +75,28 @@ RealTimeMultiSampleArrayNew::RealTimeMultiSampleArrayNew(unsigned int uiNumChann
 //*************************************************************************************************************
 
 RealTimeMultiSampleArrayNew::~RealTimeMultiSampleArrayNew()
+{
+
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayNew::init(unsigned int uiNumChannels)
+{
+    m_qListChInfo.clear();
+
+    for(quint32 i = 0; i < uiNumChannels; ++i)
+    {
+        RealTimeSampleArrayChInfo initChInfo;
+        m_qListChInfo.append(initChInfo);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void initFromFiffInfo(FiffInfo p_FiffInfo)
 {
 
 }
@@ -98,14 +115,14 @@ VectorXd RealTimeMultiSampleArrayNew::getValue() const
 void RealTimeMultiSampleArrayNew::setValue(VectorXd v)
 {
     //check vector size
-    if(v.size() != m_uiNumChannels)
+    if(v.size() != m_qListChInfo.size())
         qCritical() << "Error Occured in RealTimeMultiSampleArrayNew::setVector: Vector size does not matche the number of channels! ";
 
     //Check if maximum exceeded //ToDo speed this up
     for(qint32 i = 0; i < v.size(); ++i)
     {
-        if(v[i] < m_dMinValue) v[i] = m_dMinValue;
-        else if(v[i] > m_dMaxValue) v[i] = m_dMaxValue;
+        if(v[i] < m_qListChInfo[i].getMinValue()) v[i] = m_qListChInfo[i].getMinValue();
+        else if(v[i] > m_qListChInfo[i].getMaxValue()) v[i] = m_qListChInfo[i].getMaxValue();
     }
 
     //Store
