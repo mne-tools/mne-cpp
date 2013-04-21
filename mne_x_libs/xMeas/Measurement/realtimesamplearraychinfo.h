@@ -139,10 +139,10 @@ public:
     inline const QString& getUnit() const;
 
 private:
-    QString             m_qStringChName;            /**< Holds the channel name.*/
-    double              m_dMinValue;                /**< Holds the minimal value.*/
-    double              m_dMaxValue;                /**< Holds the maximal value.*/
-    QString             m_qString_Unit;             /**< Holds unit of the data of the measurement.*/
+    QString             m_qStringChName;            /**< The channel name.*/
+    double              m_dMinValue;                /**< The minimal value.*/
+    double              m_dMaxValue;                /**< The maximal value.*/
+    QString             m_qString_Unit;             /**< Unit of the data of the measurement.*/
 
 };
 
