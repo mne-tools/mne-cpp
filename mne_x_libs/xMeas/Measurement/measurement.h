@@ -116,15 +116,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the id of the Measurement.
-    *
-    * @param[in] p_MDL_ID   modul id
-    * @param[in] p_MSR_idx  measurement index
-    */
-    inline void setID_new(MDL_ID::Module_ID p_MDL_ID, qint32 p_MSR_idx); //NEW
-
-    //=========================================================================================================
-    /**
     * Returns the Measurement id.
     *
     * @return the Measurement id.
@@ -152,10 +143,6 @@ private:
 //    MDL_ID::Module_ID         m_MDL_ID;     /**< Holds the corresponding module id. */
     MSR_ID::Measurement_ID    m_MSR_ID;     /**< Holds the Measurement id. */
     bool        m_bVisibility;              /**< Holds the visibility status. */
-
-    /////////////// NEW
-    MDL_ID::Module_ID   m_MDL_ID_new;       /**< Holds the corresponding module id. */
-    qint32              m_iMSR_idx;
 
 };
 
@@ -198,15 +185,6 @@ inline const QString& Measurement::getName() const
 inline void Measurement::setID(MSR_ID::Measurement_ID id)
 {
     m_MSR_ID = id;
-}
-
-
-//*************************************************************************************************************
-
-inline void Measurement::setID_new(MDL_ID::Module_ID p_MDL_ID, qint32 p_MSR_idx)
-{
-    m_MDL_ID_new = p_MDL_ID;
-    m_iMSR_idx = p_MSR_idx;
 }
 
 

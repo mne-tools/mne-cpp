@@ -61,8 +61,6 @@ Measurement::Measurement()
 //, m_MDL_ID(MDL_ID::_default)
 , m_MSR_ID(MSR_ID::_default)
 , m_bVisibility(true)
-, m_MDL_ID_new(MDL_ID::_default)
-, m_iMSR_idx(-1)
 {
 
 }
