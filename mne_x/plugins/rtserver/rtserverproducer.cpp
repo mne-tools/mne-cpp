@@ -61,6 +61,7 @@ RtServerProducer::RtServerProducer(RtServer* p_pRtServer)
 , m_bDataClientIsConnected(false)
 , m_iDataClientId(-1)
 , m_bFlagInfoRequest(false)
+, m_bFlagMeasuring(false)
 {
 }
 
@@ -157,6 +158,16 @@ void RtServerProducer::run()
 
     m_bIsRunning = true;
 
+    //
+    // Inits
+    //
+    MatrixXf t_matRawBuffer;
+
+    fiff_int_t kind;
+
+    qint32 from = 0;
+    qint32 to = -1;
+
     while(m_bIsRunning)
     {
         if(m_bFlagInfoRequest)
@@ -171,5 +182,22 @@ void RtServerProducer::run()
             producerMutex.unlock();
         }
 
+        if(m_bFlagMeasuring)
+        {
+            m_pRtDataClient->readRawBuffer(m_pRtServer->m_fiffInfo.nchan, t_matRawBuffer, kind);
+
+            if(kind == FIFF_DATA_BUFFER)
+            {
+                to += t_matRawBuffer.cols();
+//                printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, ((float)from)/m_pRtServer->m_fiffInfo.sfreq, ((float)to)/m_pRtServer->m_fiffInfo.sfreq);
+                from += t_matRawBuffer.cols();
+
+                m_pRtServer->m_pRawMatrixBuffer_In->push(&t_matRawBuffer);
+            }
+            else if(FIFF_DATA_BUFFER == FIFF_BLOCK_END)
+                m_bFlagMeasuring = false;
+
+//            printf("[done]\n");
+        }
     }
 }

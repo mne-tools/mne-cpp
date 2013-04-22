@@ -46,7 +46,8 @@
 
 #include <mne_x/Interfaces/ISensor.h>
 #include <generics/circularbuffer_old.h>
-#include <xMeas/Measurement/realtimesamplearray.h>
+#include <generics/circularmatrixbuffer.h>
+#include <xMeas/Measurement/realtimemultisamplearray_new.h>
 
 
 //*************************************************************************************************************
@@ -62,7 +63,6 @@
 // MNE INCLUDES
 //=============================================================================================================
 
-#include <rtClient/rtcmdclient.h>
 #include <rtClient/rtcmdclient.h>
 
 
@@ -206,24 +206,13 @@ private:
 
     QMutex rtServerMutex;
 
-    QString m_sRtServerClientAlias;     /**< The rt server client alias.*/
 
-//    RealTimeSampleArray*    m_pRTSA_RtServer_I;     /**< Holds the RealTimeSampleArray to provide the channel ECG I.*/
-//    RealTimeSampleArray*    m_pRTSA_RtServer_II;    /**< Holds the RealTimeSampleArray to provide the channel ECG II.*/
-//    RealTimeSampleArray*    m_pRTSA_RtServer_III;   /**< Holds the RealTimeSampleArray to provide the channel ECG III.*/
+    QString m_sRtServerClientAlias;     /**< The rt server client alias.*/
 
 //    float           m_fSamplingRate;                /**< Holds the sampling rate.*/
 //    int             m_iDownsamplingFactor;          /**< Holds the down sampling factor.*/
-//    RtServerBuffer_old*      m_pInBuffer_I;         /**< Holds ECG I data which arrive from ECG producer.*/
-//    RtServerBuffer_old*      m_pInBuffer_II;        /**< Holds ECG II data which arrive from ECG producer.*/
-//    RtServerBuffer_old*      m_pInBuffer_III;       /**< Holds ECG III data which arrive from ECG producer.*/
-//    RtServerProducer*       m_pRtServerProducer;    /**< Holds the ECGProducer.*/
 
-//    QString m_qStringResourcePath;    /**< Holds the path to the ECG resource directory.*/
-
-//    RtServerChannel* m_pRtServerChannel_ECG_I;      /**< Holds the simulation channel for ECG I.*/
-//    RtServerChannel* m_pRtServerChannel_ECG_II;     /**< Holds the simulation channel for ECG II.*/
-//    RtServerChannel* m_pRtServerChannel_ECG_III;    /**< Holds the simulation channel for ECG III.*/
+    RealTimeMultiSampleArrayNew*    m_pRTMSA_RtServer;      /**< Holds the RealTimeMultiSampleArray to provide the rt_server Channels.*/
 
     RtCmdClient*       m_pRtCmdClient;      /**< The command client.*/
     bool m_bCmdClientIsConnected;           /**< If the command client is connected.*/
@@ -234,15 +223,15 @@ private:
 
 
     QMap<qint32, QString> m_qMapConnectors; /**< Connector map.*/
-
     qint32 m_iActiveConnectorId;            /**< The active connector.*/
 
     FiffInfo    m_fiffInfo;                 /**< Fiff measurement info.*/
-
     qint32 m_iBufferSize;                   /**< The raw data buffer size.*/
 
     QTimer m_cmdConnectionTimer;            /**< Timer for convinient command client connection. When timer times out a connection is tried to be established. */
 
+
+    RawMatrixBuffer*      m_pRawMatrixBuffer_In;         /**< Holds incoming raw data. */
 
 
 };

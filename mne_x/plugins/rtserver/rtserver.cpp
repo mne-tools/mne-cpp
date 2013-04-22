@@ -71,12 +71,14 @@ using namespace RtServerPlugin;
 //=============================================================================================================
 
 RtServer::RtServer()
-: m_sRtServerClientAlias("mne-x")
+: m_pRTMSA_RtServer(0)
+, m_sRtServerClientAlias("mne-x")
 , m_pRtCmdClient(NULL)
 , m_pRtServerProducer(new RtServerProducer(this))
 , m_sRtServerIP("127.0.0.1")//("172.21.16.88")//("127.0.0.1")
 , m_bCmdClientIsConnected(false)
 , m_iBufferSize(-1)
+, m_pRawMatrixBuffer_In(NULL)
 {
     m_MDL_ID = MDL_ID::RTSERVER;
 
@@ -84,8 +86,11 @@ RtServer::RtServer()
     m_pRtServerProducer->start();
 
 
-    //Convinience CMD connection timer
+    //Convinience CMD connection timer --> ToDo get rid of that -> it interrupts acquistion when not connected
     connect(&m_cmdConnectionTimer, &QTimer::timeout, this, &RtServer::connectCmdClient);
+
+    //init channels when fiff info is available
+    connect(this, &RtServer::fiffInfoAvailable, this, &RtServer::init);
 
     //Start convinience timer
     m_cmdConnectionTimer.start(5000);
@@ -101,6 +106,9 @@ RtServer::~RtServer()
 {
     if(m_pRtCmdClient)
         delete m_pRtCmdClient;
+
+    if(m_pRawMatrixBuffer_In)
+        delete m_pRawMatrixBuffer_In;
 }
 
 
@@ -243,7 +251,7 @@ void RtServer::requestInfo()
 
 bool RtServer::start()
 {
-    if(m_bCmdClientIsConnected)
+    if(m_bCmdClientIsConnected && !m_fiffInfo.isEmpty())
     {
         // Initialize real time measurements
         init();
@@ -252,12 +260,23 @@ bool RtServer::start()
         (*m_pRtCmdClient)["bufsize"].pValues()[0].setValue(m_iBufferSize);
         (*m_pRtCmdClient)["bufsize"].send();
 
+        // Buffer
+        if(m_pRawMatrixBuffer_In)
+            delete m_pRawMatrixBuffer_In;
+        m_pRawMatrixBuffer_In = new RawMatrixBuffer(8,m_fiffInfo.nchan,m_iBufferSize);
+
         // Start threads
         QThread::start();
 
         // Start Measurement at rt_Server
+        // start measurement
+        (*m_pRtCmdClient)["start"].pValues()[0].setValue(m_pRtServerProducer->m_iDataClientId);
         (*m_pRtCmdClient)["start"].send();
 
+        m_pRtServerProducer->producerMutex.lock();
+        m_pRtServerProducer->m_bFlagMeasuring = true;
+        m_pRtServerProducer->producerMutex.unlock();
+        m_pRtServerProducer->start();
 
         return true;
     }
@@ -274,6 +293,10 @@ bool RtServer::stop()
     {
         // Stop Measurement at rt_Server
         (*m_pRtCmdClient)["stop-all"].send();
+
+        m_pRtServerProducer->producerMutex.lock();
+        m_pRtServerProducer->m_bFlagMeasuring = false;
+        m_pRtServerProducer->producerMutex.unlock();
     }
 
     // Stop threads
@@ -331,6 +354,14 @@ QWidget* RtServer::runWidget()
 void RtServer::init()
 {
     qDebug() << "RtServer::init()";
+
+    if(!m_fiffInfo.isEmpty())
+    {
+        m_pRTMSA_RtServer = addProviderRealTimeMultiSampleArray_New(MSR_ID::MEGRTSERVER_OUTPUT);
+        m_pRTMSA_RtServer->initFromFiffInfo(m_fiffInfo);
+        m_pRTMSA_RtServer->setMultiArraySize(10);
+        m_pRTMSA_RtServer->setVisibility(true);
+    }
 }
 
 
@@ -338,8 +369,16 @@ void RtServer::init()
 
 void RtServer::run()
 {
+    MatrixXf matValue;
     while(true)
     {
+        matValue = m_pRawMatrixBuffer_In->pop();
 
+        for(qint32 i = 0; i < matValue.cols(); ++i)
+            m_pRTMSA_RtServer->setValue(matValue.col(i).cast<double>());
+
+//        qDebug() << "matrix popped.";
+
+//        m_pRTSA_ECG_I->setValue(dValue_I);
     }
 }
