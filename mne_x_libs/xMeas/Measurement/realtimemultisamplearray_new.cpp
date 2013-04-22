@@ -212,6 +212,7 @@ void RealTimeMultiSampleArrayNew::setValue(VectorXd v)
     if(m_matSamples.size() >= m_ucMultiArraySize && notifyEnabled)
     {
         notify();
+        qDebug() << "Notified";
         m_matSamples.clear();
     }
 }
