@@ -137,15 +137,65 @@ public slots:
 
 // public function
 public:
+    //=========================================================================================================
+    /**
+    * Convert an integer (4 bytes) to a 4-byte array
+    *
+    * @param[in] a -- <int>.
+    * @param[out] Byte array
+    */
     QByteArray MGH_LM_Int2Byte(int a);
-    int MGH_LM_Byte2Int(QByteArray InByte);
-    double MGH_LM_Byte2Double(QByteArray InByte);
-    void HexDisplay(double a);
-    void SetInfo(BabyMEGInfo *pInfo);
 
+    /**
+    * Convert a 4-byte array to an integer
+    *
+    * @param[in] InByte -- Byte array
+    * @param[out] <int>.
+    */
+    int MGH_LM_Byte2Int(QByteArray InByte);
+
+    /**
+    * Convert one 8-byte array to a double
+    *
+    * @param[in] InByte -- Byte array
+    * @param[out] <double>.
+    */
+    double MGH_LM_Byte2Double(QByteArray InByte);
+    /**
+    * Hex display
+    *
+    * @param[in] a -- double number
+    */
+    void HexDisplay(double a);
+    /**
+    * Set Head Info
+    *
+    * @param[in] pInfo -- struct of header information
+    */
+    void SetInfo(BabyMEGInfo *pInfo);
+    /**
+    * Dispatch the data package
+    *
+    * @param[in] tmp -- block size
+    */
     void DispatchDataPackage(int tmp);
+    /**
+    * Read next data block
+    *
+    * @param[in] tmp -- block size
+    */
     void ReadNextBlock(int tmp);
+    /**
+    * Send command with command format as string
+    *
+    * @param[in] s -- string
+    */
     void SendCommand(QString s);
+    /**
+    * Handle the data buffer connecting to the TCP socket
+    *
+    * @param[in] void
+    */
     void handleBuffer();
 };
 
