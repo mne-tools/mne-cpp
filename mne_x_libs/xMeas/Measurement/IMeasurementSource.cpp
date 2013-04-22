@@ -42,6 +42,7 @@
 #include "numeric.h"
 #include "realtimesamplearray.h"
 #include "realtimemultisamplearray.h"
+#include "realtimemultisamplearray_new.h"
 #include "progressbar.h"
 #include "text.h"
 //#include "alert.h"
@@ -91,16 +92,6 @@ RealTimeSampleArray* IMeasurementSource::addProviderRealTimeSampleArray(MSR_ID::
     return rtsa;
 }
 
-
-
-
-
-
-
-
-
-
-
 //*************************************************************************************************************
 
 RealTimeMultiSampleArray* IMeasurementSource::addProviderRealTimeMultiSampleArray(MSR_ID::Measurement_ID id, unsigned int uiNumChannels)
@@ -113,6 +104,16 @@ RealTimeMultiSampleArray* IMeasurementSource::addProviderRealTimeMultiSampleArra
 }
 
 
+//*************************************************************************************************************
+
+RealTimeMultiSampleArrayNew* IMeasurementSource::addProviderRealTimeMultiSampleArray_New(MSR_ID::Measurement_ID id)
+{
+    RealTimeMultiSampleArrayNew* rtmsa = new RealTimeMultiSampleArrayNew();
+    rtmsa->setID(id);
+    //rtsa->setModuleID(m_MDL_ID);
+    m_hashRealTimeMultiSampleArrayNew.insert(id, rtmsa);
+    return rtmsa;
+}
 
 
 //*************************************************************************************************************
@@ -201,6 +202,17 @@ QList<MSR_ID::Measurement_ID> IMeasurementSource::getProviderRTMSA_IDs() const
 
 //*************************************************************************************************************
 
+QList<MSR_ID::Measurement_ID> IMeasurementSource::getProviderRTMSA_New_IDs() const
+{
+    QList<MSR_ID::Measurement_ID> idList;
+    idList << m_hashRealTimeMultiSampleArrayNew.uniqueKeys();
+
+    return idList;
+}
+
+
+//*************************************************************************************************************
+
 QList<MSR_ID::Measurement_ID> IMeasurementSource::getProviderProgressbar_IDs() const
 {
 	QList<MSR_ID::Measurement_ID> idList;
@@ -237,19 +249,22 @@ QList<MSR_ID::Measurement_ID> IMeasurementSource::getProviderText_IDs() const
 void IMeasurementSource::cleanProvider()
 {
     foreach (Numeric* value, m_hashNumeric)
-    		delete value;
+            delete value;
 
     foreach (RealTimeSampleArray* value, m_hashRealTimeSampleArray)
-    		delete value;
+            delete value;
 
     foreach (RealTimeMultiSampleArray* value, m_hashRealTimeMultiSampleArray)
             delete value;
 
+    foreach (RealTimeMultiSampleArrayNew* value, m_hashRealTimeMultiSampleArrayNew)
+            delete value;
+
     foreach (ProgressBar* value, m_hashProgressBar)
-    		delete value;
+            delete value;
 
     foreach (Text* value, m_hashText)
-    		delete value;
+            delete value;
 
 //    foreach (Alert* value, m_hashAlert)
 //    		delete value;
@@ -257,6 +272,7 @@ void IMeasurementSource::cleanProvider()
     m_hashNumeric.clear();
     m_hashRealTimeSampleArray.clear();
     m_hashRealTimeMultiSampleArray.clear();
+    m_hashRealTimeMultiSampleArrayNew.clear();
     m_hashProgressBar.clear();
     m_hashText.clear();
 //    m_hashAlert.clear();

@@ -175,6 +175,10 @@ void RealTimeMultiSampleArrayNew::initFromFiffInfo(FiffInfo p_FiffInfo)
         m_qListChInfo.append(initChInfo);
     }
 
+    //Sampling rate
+    m_dSamplingRate = p_FiffInfo.sfreq;
+
+
     m_FiffInfo_orig = p_FiffInfo;
 }
 

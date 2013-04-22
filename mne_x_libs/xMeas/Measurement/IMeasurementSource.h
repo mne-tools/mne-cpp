@@ -75,6 +75,7 @@ namespace XMEASLIB
 class Numeric;
 class RealTimeSampleArray;
 class RealTimeMultiSampleArray;
+class RealTimeMultiSampleArrayNew;
 class ProgressBar;
 class Text;
 //class Alert;
@@ -166,9 +167,6 @@ public:
 
 
 
-
-
-
     //=========================================================================================================
     /**
     * Adds a Numeric measurement to provider.
@@ -194,6 +192,14 @@ public:
     * @return pointer to added RealTimeMultiSampleArray measurement.
     */
     RealTimeMultiSampleArray* addProviderRealTimeMultiSampleArray(MSR_ID::Measurement_ID id, unsigned int uiNumChannels);
+    //=========================================================================================================
+    /**
+    * Adds a RealTimeMultiSampleArray measurement to provider.
+    *
+    * @param [in] id of RealTimeMultiSampleArray measurement.
+    * @return pointer to added RealTimeMultiSampleArray measurement.
+    */
+    RealTimeMultiSampleArrayNew* addProviderRealTimeMultiSampleArray_New(MSR_ID::Measurement_ID id);
     //=========================================================================================================
     /**
     * Adds a ProgressBar measurement to provider.
@@ -241,6 +247,13 @@ public:
     * @return a list of all id's of provided RealTimeMultiSampleArray measurements.
     */
     virtual QList<MSR_ID::Measurement_ID> getProviderRTMSA_IDs() const;
+    //=========================================================================================================
+    /**
+    * Returns the id's of provided RealTimeMultiSampleArrayNew measurements.
+    *
+    * @return a list of all id's of provided RealTimeMultiSampleArrayNew measurements.
+    */
+    virtual QList<MSR_ID::Measurement_ID> getProviderRTMSA_New_IDs() const;
     //=========================================================================================================
     /**
     * Returns the id's of provided ProgressBar measurements.
@@ -303,11 +316,13 @@ public:
     virtual void cleanProvider();
 
 protected:
-    QHash<MSR_ID::Measurement_ID, Numeric*>                   m_hashNumeric;				/**< Holds the Numeric measurements.*/
-    QHash<MSR_ID::Measurement_ID, RealTimeSampleArray*>       m_hashRealTimeSampleArray;	/**< Holds the RealTimeSampleArray measurements.*/
-    QHash<MSR_ID::Measurement_ID, RealTimeMultiSampleArray*>      m_hashRealTimeMultiSampleArray;	/**< Holds the RealTimeSampleArray measurements.*/
-    QHash<MSR_ID::Measurement_ID, ProgressBar*>               m_hashProgressBar;			/**< Holds the ProgressBar measurements.*/
-    QHash<MSR_ID::Measurement_ID, Text*>                      m_hashText;		/**< Holds the Text measurements.*/
+    QHash<MSR_ID::Measurement_ID, Numeric*>                   m_hashNumeric;                    /**< Holds the Numeric measurements.*/
+    QHash<MSR_ID::Measurement_ID, RealTimeSampleArray*>       m_hashRealTimeSampleArray;        /**< Holds the RealTimeSampleArray measurements.*/
+    QHash<MSR_ID::Measurement_ID, RealTimeMultiSampleArray*>  m_hashRealTimeMultiSampleArray;   /**< Holds the RealTimeSampleArray measurements.*/
+    QHash<MSR_ID::Measurement_ID, RealTimeMultiSampleArrayNew*> m_hashRealTimeMultiSampleArrayNew;  /**< Holds the RealTimeSampleArray New measurements.*/
+
+    QHash<MSR_ID::Measurement_ID, ProgressBar*>               m_hashProgressBar;    /**< Holds the ProgressBar measurements.*/
+    QHash<MSR_ID::Measurement_ID, Text*>                      m_hashText;           /**< Holds the Text measurements.*/
 //    QHash<MSR_ID::Measurement_ID, Alert*>                 m_hashAlert;	/**< Holds the Alert measurements.*/
 };
 

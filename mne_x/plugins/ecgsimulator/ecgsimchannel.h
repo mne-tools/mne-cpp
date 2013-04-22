@@ -79,9 +79,10 @@ namespace ECGSimulatorModule {
 *
 * @brief The ECGChannel class provides a ECG channel.
 */
-class ECGSimChannel {
-public:
+class ECGSimChannel
+{
 
+public:
     //=========================================================================================================
     /**
     * Constructs a ECGSimChannel.
@@ -201,7 +202,6 @@ public:
     void clear();
 
 private:
-
     QString m_qStringResourceDataPath;	/**< Holds the path to the resource directory.*/
 
     QString m_qStringChannelFile;	/**< Holds the channel file.*/
