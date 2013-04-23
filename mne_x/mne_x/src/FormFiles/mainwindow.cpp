@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne_x/Management/PluginManager.h>
+#include <mne_x/Management/pluginmanager.h>
 #include <mne_x/Management/connector.h>
 #include <xDtMng/measurementmanager.h>
 
@@ -65,7 +65,7 @@
 
 //GUI
 #include "mainwindow.h"
-#include "PluginDockWidget.h"
+#include "plugindockwidget.h"
 #include "runwidget.h"
 #include "startupwidget.h"
 
