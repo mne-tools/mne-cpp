@@ -121,19 +121,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds a module which should be accepted by the acceptor
+    * Adds a plugin which should be accepted by the acceptor
     *
     * @param [in] id which should be accepted.
     */
-    void addModule(MDL_ID::Module_ID id);
+    void addPlugin(PLG_ID::Plugin_ID id);
 
     //=========================================================================================================
     /**
-    * Returns the module types from which are measurements accepted
+    * Returns the plugin types from which are measurements accepted
     *
-    * @return list of module id's of modules from which measurements are accepted.
+    * @return list of plugin id's of plugins from which measurements are accepted.
     */
-    inline QList<MDL_ID::Module_ID> getAcceptorModule_IDs() const;
+    inline QList<PLG_ID::Plugin_ID> getAcceptorPlugin_IDs() const;
 
     //=========================================================================================================
     /**
@@ -166,7 +166,7 @@ public:
     void cleanAcceptor();
 
 protected:
-    QList<MDL_ID::Module_ID>          m_qList_MDL_ID;	/**< Modules of which are measurements accepted of current module.*/
+    QList<PLG_ID::Plugin_ID>          m_qList_PLG_ID;   /**< Plugins of which are measurements accepted of current plugin.*/
 
     QHash<MSR_ID::Measurement_ID, Buffer_old*>*         m_pHashBuffers;	/**< accepted measurements */
 };
@@ -177,9 +177,9 @@ protected:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline QList<MDL_ID::Module_ID> IMeasurementSink::getAcceptorModule_IDs() const
+inline QList<PLG_ID::Plugin_ID> IMeasurementSink::getAcceptorPlugin_IDs() const
 {
-    return m_qList_MDL_ID;
+    return m_qList_PLG_ID;
 }
 
 

@@ -79,10 +79,10 @@ IMeasurementSink::~IMeasurementSink()
 
 //*************************************************************************************************************
 
-void IMeasurementSink::addModule(MDL_ID::Module_ID id)
+void IMeasurementSink::addPlugin(PLG_ID::Plugin_ID id)
 {
-    if(!m_qList_MDL_ID.contains(id))
-        m_qList_MDL_ID.append(id);
+    if(!m_qList_PLG_ID.contains(id))
+        m_qList_PLG_ID.append(id);
 }
 
 

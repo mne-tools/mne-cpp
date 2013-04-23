@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     IModule.h
+* @file     IPlugin.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains declaration of IModule interface class.
+* @brief    Contains declaration of IPlugin interface class.
 *
 */
 
-#ifndef IMODULE_H
-#define IMODULE_H
+#ifndef IPLUGIN_H
+#define IPLUGIN_H
 
 
 //*************************************************************************************************************
@@ -64,15 +64,15 @@ namespace MNEX
 
 //=============================================================================================================
 /**
-* Module Type enumeration.
+* Plugin Type enumeration.
 */
 enum Type
 {
-    _ISensor,				/**< Type for a sensor module. */
-    _IRTAlgorithm,			/**< Type for a real-time algorithm module. */
-    _IRTRecord,				/**< Type for a real-time record module. */
-    _IAlert,				/**< Type for a alert module. */
-    _IRTVisualization		/**< Type for a real-time visualization module. */
+    _ISensor,				/**< Type for a sensor plugin. */
+    _IRTAlgorithm,			/**< Type for a real-time algorithm plugin. */
+    _IRTRecord,				/**< Type for a real-time record plugin. */
+    _IAlert,				/**< Type for a alert plugin. */
+    _IRTVisualization		/**< Type for a real-time visualization plugin. */
 };
 
 using namespace XMEASLIB;
@@ -80,24 +80,24 @@ using namespace XMEASLIB;
 
 //=========================================================================================================
 /**
-* DECLARE CLASS IModule
+* DECLARE CLASS IPlugin
 *
-* @brief The IModule class is the base interface class of all modules.
+* @brief The IPlugin class is the base interface class of all plugins.
 */
-class IModule : public QThread
+class IPlugin : public QThread
 {
 
 public:
 
     //=========================================================================================================
     /**
-    * Destroys the IModule.
+    * Destroys the IPlugin.
     */
-    virtual ~IModule() {};
+    virtual ~IPlugin() {};
 
     //=========================================================================================================
     /**
-    * Starts the IModule.
+    * Starts the IPlugin.
     * Pure virtual method.
     *
     * @return true if success, false otherwise
@@ -106,7 +106,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Stops the IModule.
+    * Stops the IPlugin.
     * Pure virtual method.
     *
     * @return true if success, false otherwise
@@ -117,31 +117,31 @@ public:
     /**
     * Returns the provider id
     *
-    * @return the provider id (Module ID).
+    * @return the provider id (Plugin ID).
     */
-    inline MDL_ID::Module_ID getModule_ID() const;
+    inline PLG_ID::Plugin_ID getPlugin_ID() const;
 
     //=========================================================================================================
     /**
-    * Returns the module type.
+    * Returns the plugin type.
     * Pure virtual method.
     *
-    * @return type of the IModule
+    * @return type of the IPlugin
     */
     virtual Type getType() const = 0;
 
     //=========================================================================================================
     /**
-    * Returns the module name.
+    * Returns the plugin name.
     * Pure virtual method.
     *
-    * @return the name of module.
+    * @return the name of plugin.
     */
     virtual const char* getName() const = 0;
 
     //=========================================================================================================
     /**
-    * Returns the set up widget for configuration of the IModule.
+    * Returns the set up widget for configuration of the IPlugin.
     * Pure virtual method.
     *
     * @return the setup widget.
@@ -159,17 +159,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the activation status of the module.
+    * Sets the activation status of the plugin.
     *
-    * @param [in] status the new activation status of the module.
+    * @param [in] status the new activation status of the plugin.
     */
     inline void setStatus(bool status);
 
     //=========================================================================================================
     /**
-    * Returns the activation status of the module.
+    * Returns the activation status of the plugin.
     *
-    * @return true if module is activated.
+    * @return true if plugin is activated.
     */
     inline bool isActive() const;
 
@@ -183,7 +183,7 @@ protected:
     */
     virtual void run() = 0;
 
-    MDL_ID::Module_ID m_MDL_ID;     /**< Holds the module id.*/
+    PLG_ID::Plugin_ID m_PLG_ID;     /**< Holds the plugin id.*/
 
 private:
 
@@ -195,15 +195,15 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline MDL_ID::Module_ID IModule::getModule_ID() const
+inline PLG_ID::Plugin_ID IPlugin::getPlugin_ID() const
 {
-    return m_MDL_ID;
+    return m_PLG_ID;
 }
 
 
 //*************************************************************************************************************
 
-inline void IModule::setStatus(bool status)
+inline void IPlugin::setStatus(bool status)
 {
     m_bStatus = status;
 }
@@ -211,15 +211,13 @@ inline void IModule::setStatus(bool status)
 
 //*************************************************************************************************************
 
-inline bool IModule::isActive() const
+inline bool IPlugin::isActive() const
 {
     return m_bStatus;
 }
 
-
-
 } //Namespace
 
-Q_DECLARE_INTERFACE(MNEX::IModule, "mne_x/1.0")
+Q_DECLARE_INTERFACE(MNEX::IPlugin, "mne_x/1.0")
 
-#endif //IMODULE_H
+#endif //IPLUGIN_H

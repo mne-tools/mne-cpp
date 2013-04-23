@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne_x/Management/modulemanager.h>
+#include <mne_x/Management/PluginManager.h>
 #include <mne_x/Management/connector.h>
 #include <xDtMng/measurementmanager.h>
 
@@ -56,7 +56,7 @@
 #include <xDisp/progressbarwidget.h>
 #include <xDisp/textwidget.h>
 
-#include <mne_x/Interfaces/IModule.h>
+#include <mne_x/Interfaces/IPlugin.h>
 #include <mne_x/Interfaces/ISensor.h>
 #include <mne_x/Interfaces/IRTAlgorithm.h>
 #include <mne_x/Interfaces/IRTVisualization.h>
@@ -65,7 +65,7 @@
 
 //GUI
 #include "mainwindow.h"
-#include "moduledockwidget.h"
+#include "PluginDockWidget.h"
 #include "runwidget.h"
 #include "startupwidget.h"
 
@@ -99,7 +99,7 @@ using namespace XDISPLIB;
 // CONST
 //=============================================================================================================
 
-const char* moduleDir = "/mne_x_plugins";        /**< holds path to plugins.*/
+const char* pluginDir = "/mne_x_plugins";        /**< holds path to plugins.*/
 
 
 //*************************************************************************************************************
@@ -128,13 +128,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     setUnifiedTitleAndToolBarOnMac(true);
 
-    m_pModuleManager = new ModuleManager();
-    m_pModuleManager->loadModules(qApp->applicationDirPath()+moduleDir);
+    m_pPluginManager = new PluginManager();
+    m_pPluginManager->loadPlugins(qApp->applicationDirPath()+pluginDir);
 
     createActions();
     createMenus();
     createToolBars();
-    createModuleDockWindow();
+    createPluginDockWindow();
     createLogDockWindow();
 
     connect(this, SIGNAL(newLogMsg(const QString&, LogKind, LogLevel)), this, SLOT(writeToLog(const QString&, LogKind, LogLevel)));
@@ -416,18 +416,18 @@ void MainWindow::initStatusBar()
 
 //*************************************************************************************************************
 
-void MainWindow::createModuleDockWindow()
+void MainWindow::createPluginDockWindow()
 {
 
-    m_pModuleDockWidget = new ModuleDockWidget(tr("Modules"), this);
-    m_pModuleDockWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    m_pPluginDockWidget = new PluginDockWidget(tr("Plugins"), this);
+    m_pPluginDockWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
-    addDockWidget(Qt::LeftDockWidgetArea, m_pModuleDockWidget);
+    addDockWidget(Qt::LeftDockWidgetArea, m_pPluginDockWidget);
 
-    m_pMenuView->addAction(m_pModuleDockWidget->toggleViewAction());
+    m_pMenuView->addAction(m_pPluginDockWidget->toggleViewAction());
 
-    connect(m_pModuleDockWidget, SIGNAL(moduleChanged(int, const QTreeWidgetItem*)),
-            this, SLOT(CentralWidgetShowModule()));
+    connect(m_pPluginDockWidget, SIGNAL(pluginChanged(int, const QTreeWidgetItem*)),
+            this, SLOT(CentralWidgetShowPlugin()));
 }
 
 
@@ -454,39 +454,39 @@ void MainWindow::createLogDockWindow()
 
 
 //*************************************************************************************************************
-//Module stuff
-void MainWindow::CentralWidgetShowModule()//int iCurrentModuleNum, const QTreeWidgetItem* pCurrentItem)
+//Plugin stuff
+void MainWindow::CentralWidgetShowPlugin()//int iCurrentPluginNum, const QTreeWidgetItem* pCurrentItem)
 {
-    int iCurrentModuleNum = m_pModuleDockWidget->m_iCurrentModuleIdx;//m_pModulesDockWidget->getCurrentModuleNum()
+    int iCurrentPluginNum = m_pPluginDockWidget->m_iCurrentPluginIdx;//m_pPluginsDockWidget->getCurrentPluginNum()
 
      // ToDo for root menu options
-    //const QTreeWidgetItem* pCurrentItem = m_pModuleDockWidget->m_pCurrentItem; //m_pModulesDockWidget->getCurrentItem()
+    //const QTreeWidgetItem* pCurrentItem = m_pPluginDockWidget->m_pCurrentItem; //m_pPluginsDockWidget->getCurrentItem()
 
-    qDebug() << "MainCSART::CentralWidgetShowModule(): current module number " << iCurrentModuleNum;
+    qDebug() << "MainCSART::CentralWidgetShowPlugin(): current plugin number " << iCurrentPluginNum;
 
     Subject::notifyEnabled = false; //like Mutex.lock -> for now dirty hack - it's okay when values are queued -> than it"s like a Mutex
 
-    Connector::disconnectMeasurementWidgets(m_pListCurrentDisplayModules);//Make sure to only disconnect widgets
-    m_pListCurrentDisplayModules.clear();
+    Connector::disconnectMeasurementWidgets(m_pListCurrentDisplayPlugins);//Make sure to only disconnect widgets
+    m_pListCurrentDisplayPlugins.clear();
 
     QWidget* defaultWidget = new QWidget;
     setCentralWidget(defaultWidget);
 
-    if(m_pModuleDockWidget->isActivated(iCurrentModuleNum))
+    if(m_pPluginDockWidget->isActivated(iCurrentPluginNum))
     {
         if(!m_bIsRunning)
         {
-            setCentralWidget(ModuleManager::s_vecModules[iCurrentModuleNum]->setupWidget()); //QMainWindow takes ownership of the widget pointer and deletes it at the appropriate time.
+            setCentralWidget(PluginManager::s_vecPlugins[iCurrentPluginNum]->setupWidget()); //QMainWindow takes ownership of the widget pointer and deletes it at the appropriate time.
         }
         else if(m_bIsRunning)
         {
 
-            m_pListCurrentDisplayModules << ModuleManager::getModules()[iCurrentModuleNum]->getModule_ID();
+            m_pListCurrentDisplayPlugins << PluginManager::getPlugins()[iCurrentPluginNum]->getPlugin_ID();
 
-            Connector::connectMeasurementWidgets(m_pListCurrentDisplayModules, m_pTime);
+            Connector::connectMeasurementWidgets(m_pListCurrentDisplayPlugins, m_pTime);
 
             m_pRunWidget = new RunWidget(DisplayManager::show());
-            m_pRunWidget->addTab(ModuleManager::s_vecModules[iCurrentModuleNum]->runWidget(), tr("Confi&guration"));
+            m_pRunWidget->addTab(PluginManager::s_vecPlugins[iCurrentPluginNum]->runWidget(), tr("Confi&guration"));
 
             if(m_bDisplayMax)//ToDo send events to main window
             {
@@ -541,16 +541,16 @@ void MainWindow::startMeasurement()
     //MeasurementManager::clean();
     //DisplayManager::clean();
 
-    if(!ModuleManager::startModules())
+    if(!PluginManager::startPlugins())
     {
-        QMessageBox::information(0, QObject::tr("CSA RT - Start modules"), QString(QObject::tr("No Sensor module is active")), QMessageBox::Ok);
+        QMessageBox::information(0, QObject::tr("CSA RT - Start plugins"), QString(QObject::tr("No Sensor plugin is active")), QMessageBox::Ok);
         return;
     }
 
 
     uiSetupRunningState(true);
     startTimer(m_iTimeoutMSec);
-    CentralWidgetShowModule();
+    CentralWidgetShowPlugin();
 }
 
 
@@ -563,15 +563,15 @@ void MainWindow::stopMeasurement()
     qDebug() << "MainWindow::stopMeasurement()";
 
 
-    ModuleManager::stopModules();
+    PluginManager::stopPlugins();
 
-    Connector::disconnectMeasurementWidgets(m_pListCurrentDisplayModules);//was before stopModules();
+    Connector::disconnectMeasurementWidgets(m_pListCurrentDisplayPlugins);//was before stopPlugins();
 
     qDebug() << "set stopped UI";
 
     uiSetupRunningState(false);
     stopTimer();
-    CentralWidgetShowModule();
+    CentralWidgetShowPlugin();
 }
 
 
@@ -621,7 +621,7 @@ void MainWindow::toggleDisplayMax()
 
     m_pActionDisplayMax->setEnabled(!m_bDisplayMax);
 
-    CentralWidgetShowModule();
+    CentralWidgetShowPlugin();
 }
 
 

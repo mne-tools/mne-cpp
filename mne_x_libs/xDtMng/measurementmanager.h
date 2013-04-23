@@ -48,7 +48,7 @@
 
 
 
-#include <mne_x/Interfaces/IModule.h>
+#include <mne_x/Interfaces/IPlugin.h>
 
 
 //*************************************************************************************************************
@@ -139,7 +139,7 @@ public:
     *
     * @param [in] pMSRAcc pointer to IMeasurementSink.
     */
-    static void addMeasurementAcceptor(IModule* pMSRAcc);//IMeasurementSink* pMSRAcc);
+    static void addMeasurementAcceptor(IPlugin* pMSRAcc);//IMeasurementSink* pMSRAcc);
 
 //ToDo with Pattern Visitor
 
@@ -156,35 +156,35 @@ public:
     * Attaches an observer to all  real-time sample array measurements (subjects) of given measurement providers list
     *
     * @param [in] pObserver pointer to observer.
-    * @param [in] mdl_idList list of module (measurement provider) id's where the observer should attached to.
+    * @param [in] plg_idList list of plugin (measurement provider) id's where the observer should attached to.
     */
-    static void attachToRTSA(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList);
+    static void attachToRTSA(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList);
     //=========================================================================================================
     /**
     * Attaches an observer to given real-time sample array measurements (subjects) list of given measurement providers list
     *
     * @param [in] pObserver pointer to observer.
-    * @param [in] mdl_idList list of module (measurement provider) id's where the observer should attached to.
+    * @param [in] plg_idList list of plugin (measurement provider) id's where the observer should attached to.
     * @param [in] msr_idList list of measurement id's where the observer should be attached to.
     */
-    static void attachToRTSA(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList, QList<MSR_ID::Measurement_ID> msr_idList);
+    static void attachToRTSA(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList, QList<MSR_ID::Measurement_ID> msr_idList);
     //=========================================================================================================
     /**
-    * Attaches widgets to all real-time sample arrays of measurement provider list of given module
+    * Attaches widgets to all real-time sample arrays of measurement provider list of given plugin
     *
-    * @param [in] mdl_id id of the module.
+    * @param [in] plg_id id of the plugin.
     * @param [in] t pointer to the application measurement time.
     */
-    static void attachWidgetsToRTSA(MDL_ID::Module_ID mdl_id, QTime* t);
+    static void attachWidgetsToRTSA(PLG_ID::Plugin_ID plg_id, QTime* t);
     //=========================================================================================================
     /**
-    * Attaches a widget to a specific real-time sample array measurement of given module.
+    * Attaches a widget to a specific real-time sample array measurement of given plugin.
     *
-    * @param [in] mdl_id id of the module.
+    * @param [in] plg_id id of the plugin.
     * @param [in] msr_id id of the measurement.
     * @param [in] t pointer to the application measurement time.
     */
-    static void attachWidgetToRTSA(MDL_ID::Module_ID mdl_id, MSR_ID::Measurement_ID msr_id, QTime* t);
+    static void attachWidgetToRTSA(PLG_ID::Plugin_ID plg_id, MSR_ID::Measurement_ID msr_id, QTime* t);
 //detach RTSA
     //=========================================================================================================
     /**
@@ -195,21 +195,21 @@ public:
     static void detachFromRTSA(IObserver* pObserver);
     //=========================================================================================================
     /**
-    * Detaches an observer of all real-time sample array measurements (subjects) of given modules which contains the observer.
+    * Detaches an observer of all real-time sample array measurements (subjects) of given plugins which contains the observer.
     *
     * @param [in] pObserver pointer to observer which should be detached.
-    * @param [in] mdl_idList list of module id's where the observer should be detached from.
+    * @param [in] plg_idList list of plugin id's where the observer should be detached from.
     */
-    static void detachFromRTSA(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList);
+    static void detachFromRTSA(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList);
     //=========================================================================================================
     /**
-    * Detaches an observer of specific real-time sample array measurements (subjects) of given modules which contains the observer.
+    * Detaches an observer of specific real-time sample array measurements (subjects) of given plugins which contains the observer.
     *
     * @param [in] pObserver pointer to observer which should be detached.
-    * @param [in] mdl_idList list of module id's where the observer should be detached from.
+    * @param [in] plg_idList list of plugin id's where the observer should be detached from.
     * @param [in] msr_idList list of measurement id's where the observer should be detached from.
     */
-    static void detachFromRTSA(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList, QList<MSR_ID::Measurement_ID> msr_idList);
+    static void detachFromRTSA(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList, QList<MSR_ID::Measurement_ID> msr_idList);
 
 //attach RTMS
     //=========================================================================================================
@@ -224,35 +224,35 @@ public:
     * Attaches an observer to all  real-time multi sample array measurements (subjects) of given measurement providers list
     *
     * @param [in] pObserver pointer to observer.
-    * @param [in] mdl_idList list of module (measurement provider) id's where the observer should attached to.
+    * @param [in] plg_idList list of plugin (measurement provider) id's where the observer should attached to.
     */
-    static void attachToRTMSA(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList);
+    static void attachToRTMSA(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList);
     //=========================================================================================================
     /**
     * Attaches an observer to given real-time multi sample array measurements (subjects) list of given measurement providers list
     *
     * @param [in] pObserver pointer to observer.
-    * @param [in] mdl_idList list of module (measurement provider) id's where the observer should attached to.
+    * @param [in] plg_idList list of plugin (measurement provider) id's where the observer should attached to.
     * @param [in] msr_idList list of measurement id's where the observer should be attached to.
     */
-    static void attachToRTMSA(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList, QList<MSR_ID::Measurement_ID> msr_idList);
+    static void attachToRTMSA(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList, QList<MSR_ID::Measurement_ID> msr_idList);
     //=========================================================================================================
     /**
-    * Attaches widgets to all real-time multi sample array of measurement provider list of given module
+    * Attaches widgets to all real-time multi sample array of measurement provider list of given plugin
     *
-    * @param [in] mdl_id id of the module.
+    * @param [in] plg_id id of the plugin.
     * @param [in] t pointer to the application measurement time.
     */
-    static void attachWidgetsToRTMSA(MDL_ID::Module_ID mdl_id, QTime* t);
+    static void attachWidgetsToRTMSA(PLG_ID::Plugin_ID plg_id, QTime* t);
     //=========================================================================================================
     /**
-    * Attaches a widget to a specific real-time multi sample array measurement of given module.
+    * Attaches a widget to a specific real-time multi sample array measurement of given plugin.
     *
-    * @param [in] mdl_id id of the module.
+    * @param [in] plg_id id of the plugin.
     * @param [in] msr_id id of the measurement.
     * @param [in] t pointer to the application measurement time.
     */
-    static void attachWidgetToRTMSA(MDL_ID::Module_ID mdl_id, MSR_ID::Measurement_ID msr_id, QTime* t);
+    static void attachWidgetToRTMSA(PLG_ID::Plugin_ID plg_id, MSR_ID::Measurement_ID msr_id, QTime* t);
 //detach RTMS
     //=========================================================================================================
     /**
@@ -263,21 +263,21 @@ public:
     static void detachFromRTMSA(IObserver* pObserver);
     //=========================================================================================================
     /**
-    * Detaches an observer of all real-time multi sample array measurements (subjects) of given modules which contains the observer.
+    * Detaches an observer of all real-time multi sample array measurements (subjects) of given plugins which contains the observer.
     *
     * @param [in] pObserver pointer to observer which should be detached.
-    * @param [in] mdl_idList list of module id's where the observer should be detached from.
+    * @param [in] plg_idList list of plugin id's where the observer should be detached from.
     */
-    static void detachFromRTMSA(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList);
+    static void detachFromRTMSA(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList);
     //=========================================================================================================
     /**
-    * Detaches an observer of specific real-time multi sample array measurements (subjects) of given modules which contains the observer.
+    * Detaches an observer of specific real-time multi sample array measurements (subjects) of given plugins which contains the observer.
     *
     * @param [in] pObserver pointer to observer which should be detached.
-    * @param [in] mdl_idList list of module id's where the observer should be detached from.
+    * @param [in] plg_idList list of plugin id's where the observer should be detached from.
     * @param [in] msr_idList list of measurement id's where the observer should be detached from.
     */
-    static void detachFromRTMSA(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList, QList<MSR_ID::Measurement_ID> msr_idList);
+    static void detachFromRTMSA(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList, QList<MSR_ID::Measurement_ID> msr_idList);
 
 //attach RTMSANew
     //=========================================================================================================
@@ -292,35 +292,35 @@ public:
     * Attaches an observer to all  real-time multi sample array measurements (subjects) of given measurement providers list
     *
     * @param [in] pObserver pointer to observer.
-    * @param [in] mdl_idList list of module (measurement provider) id's where the observer should attached to.
+    * @param [in] plg_idList list of plugin (measurement provider) id's where the observer should attached to.
     */
-    static void attachToRTMSANew(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList);
+    static void attachToRTMSANew(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList);
     //=========================================================================================================
     /**
     * Attaches an observer to given real-time multi sample array measurements (subjects) list of given measurement providers list
     *
     * @param [in] pObserver pointer to observer.
-    * @param [in] mdl_idList list of module (measurement provider) id's where the observer should attached to.
+    * @param [in] plg_idList list of plugin (measurement provider) id's where the observer should attached to.
     * @param [in] msr_idList list of measurement id's where the observer should be attached to.
     */
-    static void attachToRTMSANew(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList, QList<MSR_ID::Measurement_ID> msr_idList);
+    static void attachToRTMSANew(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList, QList<MSR_ID::Measurement_ID> msr_idList);
     //=========================================================================================================
     /**
-    * Attaches widgets to all real-time multi sample array of measurement provider list of given module
+    * Attaches widgets to all real-time multi sample array of measurement provider list of given plugin
     *
-    * @param [in] mdl_id id of the module.
+    * @param [in] plg_id id of the plugin.
     * @param [in] t pointer to the application measurement time.
     */
-    static void attachWidgetsToRTMSANew(MDL_ID::Module_ID mdl_id, QTime* t);
+    static void attachWidgetsToRTMSANew(PLG_ID::Plugin_ID plg_id, QTime* t);
     //=========================================================================================================
     /**
-    * Attaches a widget to a specific real-time multi sample array measurement of given module.
+    * Attaches a widget to a specific real-time multi sample array measurement of given plugin.
     *
-    * @param [in] mdl_id id of the module.
+    * @param [in] plg_id id of the plugin.
     * @param [in] msr_id id of the measurement.
     * @param [in] t pointer to the application measurement time.
     */
-    static void attachWidgetToRTMSANew(MDL_ID::Module_ID mdl_id, MSR_ID::Measurement_ID msr_id, QTime* t);
+    static void attachWidgetToRTMSANew(PLG_ID::Plugin_ID plg_id, MSR_ID::Measurement_ID msr_id, QTime* t);
 //detach RTMSANew
     //=========================================================================================================
     /**
@@ -331,21 +331,21 @@ public:
     static void detachFromRTMSANew(IObserver* pObserver);
     //=========================================================================================================
     /**
-    * Detaches an observer of all real-time multi sample array measurements (subjects) of given modules which contains the observer.
+    * Detaches an observer of all real-time multi sample array measurements (subjects) of given plugins which contains the observer.
     *
     * @param [in] pObserver pointer to observer which should be detached.
-    * @param [in] mdl_idList list of module id's where the observer should be detached from.
+    * @param [in] plg_idList list of plugin id's where the observer should be detached from.
     */
-    static void detachFromRTMSANew(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList);
+    static void detachFromRTMSANew(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList);
     //=========================================================================================================
     /**
-    * Detaches an observer of specific real-time multi sample array measurements (subjects) of given modules which contains the observer.
+    * Detaches an observer of specific real-time multi sample array measurements (subjects) of given plugins which contains the observer.
     *
     * @param [in] pObserver pointer to observer which should be detached.
-    * @param [in] mdl_idList list of module id's where the observer should be detached from.
+    * @param [in] plg_idList list of plugin id's where the observer should be detached from.
     * @param [in] msr_idList list of measurement id's where the observer should be detached from.
     */
-    static void detachFromRTMSANew(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList, QList<MSR_ID::Measurement_ID> msr_idList);
+    static void detachFromRTMSANew(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList, QList<MSR_ID::Measurement_ID> msr_idList);
 
 //attach Numeric
     //=========================================================================================================
@@ -360,33 +360,33 @@ public:
     * Attaches an observer to all numeric measurements (subjects) of given measurement providers list
     *
     * @param [in] pObserver pointer to observer.
-    * @param [in] mdl_idList list of module (measurement provider) id's where the observer should attached to.
+    * @param [in] plg_idList list of plugin (measurement provider) id's where the observer should attached to.
     */
-    static void attachToNumeric(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList);
+    static void attachToNumeric(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList);
     //=========================================================================================================
     /**
     * Attaches an observer to given numeric measurements (subjects) list of given measurement providers list
     *
     * @param [in] pObserver pointer to observer.
-    * @param [in] mdl_idList list of module (measurement provider) id's where the observer should attached to.
+    * @param [in] plg_idList list of plugin (measurement provider) id's where the observer should attached to.
     * @param [in] msr_idList list of measurement id's where the observer should be attached to.
     */
-    static void attachToNumeric(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList, QList<MSR_ID::Measurement_ID> msr_idList);
+    static void attachToNumeric(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList, QList<MSR_ID::Measurement_ID> msr_idList);
     //=========================================================================================================
     /**
-    * Attaches widgets to all numeric of measurement provider list of given module
+    * Attaches widgets to all numeric of measurement provider list of given plugin
     *
-    * @param [in] mdl_id id of the module.
+    * @param [in] plg_id id of the plugin.
     */
-    static void attachWidgetsToNumeric(MDL_ID::Module_ID mdl_id);
+    static void attachWidgetsToNumeric(PLG_ID::Plugin_ID plg_id);
     //=========================================================================================================
     /**
-    * Attaches a widget to a specific numeric measurement of given module.
+    * Attaches a widget to a specific numeric measurement of given plugin.
     *
-    * @param [in] mdl_id id of the module.
+    * @param [in] plg_id id of the plugin.
     * @param [in] msr_id id of the measurement.
     */
-    static void attachWidgetToNumeric(MDL_ID::Module_ID mdl_id, MSR_ID::Measurement_ID msr_id) ;
+    static void attachWidgetToNumeric(PLG_ID::Plugin_ID plg_id, MSR_ID::Measurement_ID msr_id) ;
 //detach RTSA
     //=========================================================================================================
     /**
@@ -397,21 +397,21 @@ public:
     static void detachFromNumeric(IObserver* pObserver);
     //=========================================================================================================
     /**
-    * Detaches an observer of all numeric measurements (subjects) of given modules which contains the observer.
+    * Detaches an observer of all numeric measurements (subjects) of given plugins which contains the observer.
     *
     * @param [in] pObserver pointer to observer which should be detached.
-    * @param [in] mdl_idList list of module id's where the observer should be detached from.
+    * @param [in] plg_idList list of plugin id's where the observer should be detached from.
     */
-    static void detachFromNumeric(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList);
+    static void detachFromNumeric(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList);
     //=========================================================================================================
     /**
-    * Detaches an observer of specific numeric measurements (subjects) of given modules which contains the observer.
+    * Detaches an observer of specific numeric measurements (subjects) of given plugins which contains the observer.
     *
     * @param [in] pObserver pointer to observer which should be detached.
-    * @param [in] mdl_idList list of module id's where the observer should be detached from.
+    * @param [in] plg_idList list of plugin id's where the observer should be detached from.
     * @param [in] msr_idList list of measurement id's where the observer should be detached from.
     */
-    static void detachFromNumeric(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList, QList<MSR_ID::Measurement_ID> msr_idList);
+    static void detachFromNumeric(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList, QList<MSR_ID::Measurement_ID> msr_idList);
 
 //detach Widgets
     //=========================================================================================================
@@ -421,27 +421,27 @@ public:
     static void detachWidgets();
     //=========================================================================================================
     /**
-    * Detaches all widgets of given module
+    * Detaches all widgets of given plugin
     *
-    * @param [in] mdl_idList list of module id's where widgets should be detached from.
+    * @param [in] plg_idList list of plugin id's where widgets should be detached from.
     */
-    static void detachWidgets(QList<MDL_ID::Module_ID> mdl_idList);
+    static void detachWidgets(QList<PLG_ID::Plugin_ID> plg_idList);
 
 //get
     //=========================================================================================================
     /**
     * Returns all current measurement providers.
     *
-    * @return a hash of all current measurement providers and their corresponding module id's.
+    * @return a hash of all current measurement providers and their corresponding plugin id's.
     */
-    static QHash<MDL_ID::Module_ID, IMeasurementSource*>& getMeasurementProvider() {return s_hashMeasurementProvider;};
+    static QHash<PLG_ID::Plugin_ID, IMeasurementSource*>& getMeasurementProvider() {return s_hashMeasurementProvider;};
     //=========================================================================================================
     /**
     * Returns all current measurement acceptors.
     *
-    * @return a hash of all current measurement acceptors and their corresponding module id's.
+    * @return a hash of all current measurement acceptors and their corresponding plugin id's.
     */
-    static QHash<MDL_ID::Module_ID, IModule*>& getMeasurementAcceptors() {return s_hashMeasurementAcceptor;};
+    static QHash<PLG_ID::Plugin_ID, IPlugin*>& getMeasurementAcceptors() {return s_hashMeasurementAcceptor;};
 
 //clean
     //=========================================================================================================
@@ -451,8 +451,8 @@ public:
     static void clean();
 
 private:
-    static QHash<MDL_ID::Module_ID, IMeasurementSource*>    s_hashMeasurementProvider;	/**< Holds the measurement providers.*/
-    static QHash<MDL_ID::Module_ID, IModule*>    s_hashMeasurementAcceptor;	/**< Holds the measurement acceptors.*/
+    static QHash<PLG_ID::Plugin_ID, IMeasurementSource*>    s_hashMeasurementProvider;	/**< Holds the measurement providers.*/
+    static QHash<PLG_ID::Plugin_ID, IPlugin*>    s_hashMeasurementAcceptor;	/**< Holds the measurement acceptors.*/
 };
 
 } // NAMESPACE

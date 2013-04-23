@@ -60,7 +60,7 @@ namespace MNEX
 /**
 * DECLARE CLASS IRTAlgorithm
 *
-* @brief The ISensor class provides an interface for a sensor module.
+* @brief The ISensor class provides an interface for a sensor plugin.
 */
 class ISensor : public IMeasurementSource
 {
@@ -93,7 +93,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the module type.
+    * Returns the plugin type.
     * Pure virtual method inherited by IModule.
     *
     * @return type of the ISensor
@@ -102,7 +102,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the module name.
+    * Returns the plugin name.
     * Pure virtual method inherited by IModule.
     *
     * @return the name of the ISensor.

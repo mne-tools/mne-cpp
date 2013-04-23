@@ -85,7 +85,7 @@ ECGSimulator::ECGSimulator()
 , m_pECGChannel_ECG_II(new ECGSimChannel(m_qStringResourcePath+"data/", QString("ECG_II_256_s30661.txt")))
 , m_pECGChannel_ECG_III(new ECGSimChannel(m_qStringResourcePath+"data/", QString("ECG_III_256_s30661.txt")))
 {
-    m_MDL_ID = MDL_ID::ECGSIM;
+    m_PLG_ID = PLG_ID::ECGSIM;
 }
 
 

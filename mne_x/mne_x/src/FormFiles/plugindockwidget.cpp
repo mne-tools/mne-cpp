@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     moduledockwidget.cpp
+* @file     PluginDockWidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ModuleDockWidget class.
+* @brief    Contains the implementation of the PluginDockWidget class.
 *
 */
 
@@ -38,11 +38,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "moduledockwidget.h"
+#include "plugindockwidget.h"
 
-#include <mne_x/Management/modulemanager.h>
+#include <mne_x/Management/PluginManager.h>
 
-#include <mne_x/Interfaces/IModule.h>
+#include <mne_x/Interfaces/IPlugin.h>
 #include <mne_x/Interfaces/ISensor.h>
 #include <mne_x/Interfaces/IRTAlgorithm.h>
 #include <mne_x/Interfaces/IRTVisualization.h>
@@ -75,54 +75,54 @@ using namespace MNEX;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ModuleDockWidget::ModuleDockWidget( const QString & title, QWidget * parent, Qt::WindowFlags flags )
+PluginDockWidget::PluginDockWidget( const QString & title, QWidget * parent, Qt::WindowFlags flags )
 : QDockWidget(title, parent, flags)
-, m_iCurrentModuleIdx(-1)
+, m_iCurrentPluginIdx(-1)
 , m_pCurrentItem(0)
-, m_pTreeWidgetModuleList(new QTreeWidget(this))
+, m_pTreeWidgetPluginList(new QTreeWidget(this))
 {
-    QTreeWidgetItem* CSA_TreeView = new QTreeWidgetItem(m_pTreeWidgetModuleList);
+    QTreeWidgetItem* CSA_TreeView = new QTreeWidgetItem(m_pTreeWidgetPluginList);
     CSA_TreeView->setText(0, CInfo::AppNameShort());
     CSA_TreeView->setIcon(0, QIcon(":/images/csa_rt.png"));
     CSA_TreeView->setToolTip(0, tr("Some Tipps for CSA RT"));
     m_pCurrentItem = CSA_TreeView;
 
 
-    QTreeWidgetItem* sensors = new QTreeWidgetItem(m_pTreeWidgetModuleList);
+    QTreeWidgetItem* sensors = new QTreeWidgetItem(m_pTreeWidgetPluginList);
     sensors->setText(0, tr("Sensors"));
     sensors->setIcon(0, QIcon(":/images/sensor.png"));
     sensors->setToolTip(0, tr("Some Tipps for Sensors"));
 
-    QTreeWidgetItem* algorithms = new QTreeWidgetItem(m_pTreeWidgetModuleList);
+    QTreeWidgetItem* algorithms = new QTreeWidgetItem(m_pTreeWidgetPluginList);
     algorithms->setText(0, tr("Algorithms"));
     algorithms->setIcon(0, QIcon(":/images/algorithm.png"));
     algorithms->setToolTip(0, tr("Some Tipps for Algorithms"));
 
-    QTreeWidgetItem* displays = new QTreeWidgetItem(m_pTreeWidgetModuleList);
+    QTreeWidgetItem* displays = new QTreeWidgetItem(m_pTreeWidgetPluginList);
     displays->setText(0, tr("Visualisations"));
     displays->setIcon(0, QIcon(":/images/visualisation.png"));
     displays->setToolTip(0, tr("Some Tipps for Visualisations"));
 
 
-    QVector<IModule*>::const_iterator iterModules = ModuleManager::s_vecModules.begin();
+    QVector<IPlugin*>::const_iterator iterPlugins = PluginManager::s_vecPlugins.begin();
 
-    for(int i = 0; iterModules != ModuleManager::s_vecModules.end(); ++i, ++iterModules)
+    for(int i = 0; iterPlugins != PluginManager::s_vecPlugins.end(); ++i, ++iterPlugins)
     {
 
         QTreeWidgetItem* item(0);
-        QString name((*iterModules)->getName());
+        QString name((*iterPlugins)->getName());
 
-        int module_type = (*iterModules)->getType();
+        int plugin_type = (*iterPlugins)->getType();
 
-        if(module_type == _ISensor)
+        if(plugin_type == _ISensor)
         {
             item = new QTreeWidgetItem(sensors);
         }
-        else if(module_type == _IRTAlgorithm)
+        else if(plugin_type == _IRTAlgorithm)
         {
             item = new QTreeWidgetItem(algorithms);
         }
-        else if(module_type == _IRTVisualization)
+        else if(plugin_type == _IRTVisualization)
         {
             item = new QTreeWidgetItem(displays);
         }
@@ -131,20 +131,20 @@ ModuleDockWidget::ModuleDockWidget( const QString & title, QWidget * parent, Qt:
         m_ItemQMap[i] = item;
     }
 
-    m_pTreeWidgetModuleList->header()->hide();
+    m_pTreeWidgetPluginList->header()->hide();
 
-    setWidget(m_pTreeWidgetModuleList);
+    setWidget(m_pTreeWidgetPluginList);
 
     setMaximumWidth(250);//ToDo dirty hack; maybe its should be resize able as it want to be
 
-    connect(m_pTreeWidgetModuleList, SIGNAL(itemPressed(QTreeWidgetItem*, int)),
+    connect(m_pTreeWidgetPluginList, SIGNAL(itemPressed(QTreeWidgetItem*, int)),
             this, SLOT(itemSelected(QTreeWidgetItem*)));
 }
 
 
 //*************************************************************************************************************
 
-ModuleDockWidget::~ModuleDockWidget()
+PluginDockWidget::~PluginDockWidget()
 {
     //Todo
 }
@@ -152,35 +152,35 @@ ModuleDockWidget::~ModuleDockWidget()
 
 //*************************************************************************************************************
 
-bool ModuleDockWidget::isValidModule(QTreeWidgetItem *item)
+bool PluginDockWidget::isValidPlugin(QTreeWidgetItem *item)
 {
     //ToDo exception for CSA root Item
 
-    bool validModule = false;
-    int n = ModuleManager::findByName(item->text(0));
+    bool validPlugin = false;
+    int n = PluginManager::findByName(item->text(0));
 
-    qDebug() << "ModulesDockWidget::changeItem: " << item->text(0) << "ModuleNum: " << n;
+    qDebug() << "PluginsDockWidget::changeItem: " << item->text(0) << "PluginNum: " << n;
 
     if(n >= 0)
     {
-        m_iCurrentModuleIdx = n;
-        validModule = true;
+        m_iCurrentPluginIdx = n;
+        validPlugin = true;
     }
 
-    return validModule;
+    return validPlugin;
 }
 
 
 //*************************************************************************************************************
 
-void ModuleDockWidget::itemSelected(QTreeWidgetItem *selectedItem)
+void PluginDockWidget::itemSelected(QTreeWidgetItem *selectedItem)
 {
     if(m_pCurrentItem != selectedItem)
     {
         m_pCurrentItem = selectedItem;
 
-        if(isValidModule(selectedItem))
-            emit moduleChanged(m_iCurrentModuleIdx, m_pCurrentItem);
+        if(isValidPlugin(selectedItem))
+            emit pluginChanged(m_iCurrentPluginIdx, m_pCurrentItem);
 
         emit itemChanged();
     }
@@ -189,15 +189,15 @@ void ModuleDockWidget::itemSelected(QTreeWidgetItem *selectedItem)
 
 //*************************************************************************************************************
 
-void ModuleDockWidget::contextMenuEvent (QContextMenuEvent* event)
+void PluginDockWidget::contextMenuEvent (QContextMenuEvent* event)
 {
-    QPoint p(    event->pos().x()-m_pTreeWidgetModuleList->pos().x(),
-                event->pos().y()-m_pTreeWidgetModuleList->pos().y());
+    QPoint p(    event->pos().x()-m_pTreeWidgetPluginList->pos().x(),
+                event->pos().y()-m_pTreeWidgetPluginList->pos().y());
 
-    if (isValidModule(m_pTreeWidgetModuleList->itemAt(p)))
+    if (isValidPlugin(m_pTreeWidgetPluginList->itemAt(p)))
     {
         qDebug() << m_pCurrentItem->text(0);
-        int n = m_iCurrentModuleIdx;
+        int n = m_iCurrentPluginIdx;
 
         bool bNewStatus;//curiosity bool doesn't work in release mode
         if(isActivated(n))
@@ -205,7 +205,7 @@ void ModuleDockWidget::contextMenuEvent (QContextMenuEvent* event)
         else
             bNewStatus = true;
 
-        qDebug() << "ModulesDockWidget::contextMenuEvent -> new status: " << bNewStatus;
+        qDebug() << "PluginsDockWidget::contextMenuEvent -> new status: " << bNewStatus;
         activateItem(n, bNewStatus);
     }
 }
@@ -213,21 +213,21 @@ void ModuleDockWidget::contextMenuEvent (QContextMenuEvent* event)
 
 //*************************************************************************************************************
 
-bool ModuleDockWidget::isActivated(int n) const
+bool PluginDockWidget::isActivated(int n) const
 {
-    return n >= 0 ? ModuleManager::s_vecModules[n]->isActive() : false;
+    return n >= 0 ? PluginManager::s_vecPlugins[n]->isActive() : false;
 }
 
 
 //*************************************************************************************************************
 
-void ModuleDockWidget::activateItem(int n, bool& status)
+void PluginDockWidget::activateItem(int n, bool& status)
 {
-    qDebug() << "ModulesDockWidget::activateItem " << n << "; "<< status;
+    qDebug() << "PluginsDockWidget::activateItem " << n << "; "<< status;
 
-    if(n < ModuleManager::s_vecModules.size())
+    if(n < PluginManager::s_vecPlugins.size())
     {
-        ModuleManager::s_vecModules[n]->setStatus(status);
+        PluginManager::s_vecPlugins[n]->setStatus(status);
 
         QFont font = m_ItemQMap[n]->font(0);
         font.setStrikeOut(!status);

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     moduledockwidget.h
+* @file     plugindockwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ModuleDockWidget class.
+* @brief    Contains the declaration of the PluginDockWidget class.
 *
 */
 
-#ifndef MODULEDOCKWIDGET_H
-#define MODULEDOCKWIDGET_H
+#ifndef PLUGINDOCKWIDGET_H
+#define PLUGINDOCKWIDGET_H
 
 
 //*************************************************************************************************************
@@ -80,11 +80,11 @@ namespace MNEX
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ModuleDockWidget
+* DECLARE CLASS PluginDockWidget
 *
-* @brief The ModuleDockWidget class provides a tree view navigation through the program and its modules.
+* @brief The PluginDockWidget class provides a tree view navigation through the program and its plugins.
 */
-class ModuleDockWidget : public QDockWidget
+class PluginDockWidget : public QDockWidget
 {
     Q_OBJECT
 
@@ -94,36 +94,36 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a ModuleDockWidget which is a child of parent.
+    * Constructs a PluginDockWidget which is a child of parent.
     *
-    * @param [in] title of the new ModuleDockWidget
-    * @param [in] parent pointer to parent widget; If parent is 0, the new ModuleDockWidget becomes a window. If parent is another widget, ModuleDockWidget becomes a child window inside parent. ModuleDockWidget is deleted when its parent is deleted.
+    * @param [in] title of the new PluginDockWidget
+    * @param [in] parent pointer to parent widget; If parent is 0, the new PluginDockWidget becomes a window. If parent is another widget, PluginDockWidget becomes a child window inside parent. PluginDockWidget is deleted when its parent is deleted.
     * @param [in] flags are normally 0, but it can be set to customise the frame of a window (i.e. parent must be 0). To customise the frame, use a value composed from the bitwise OR of any of the window flags.
     */
-    ModuleDockWidget( const QString& title, QWidget* parent = 0, Qt::WindowFlags flags = 0 );
+    PluginDockWidget( const QString& title, QWidget* parent = 0, Qt::WindowFlags flags = 0 );
 
     //=========================================================================================================
     /**
-    * Destroys the ModuleDockWidget.
+    * Destroys the PluginDockWidget.
     */
-    virtual ~ModuleDockWidget();
+    virtual ~PluginDockWidget();
 
     //=========================================================================================================
     /**
-    * Tests whether item corresponds to a valid module.
+    * Tests whether item corresponds to a valid plugin.
     *
     * @param [in] item pointer to item which should be tested.
-    * @return true it item corresponds to a valid module.
+    * @return true it item corresponds to a valid plugin.
     */
-    bool isValidModule(QTreeWidgetItem* item);
+    bool isValidPlugin(QTreeWidgetItem* item);
 
     //=========================================================================================================
     /**
-    * Access function to last selected valid module index. In the case it hasn't been a valid module selected jet default value -1 is returned.
+    * Access function to last selected valid plugin index. In the case it hasn't been a valid plugin selected jet default value -1 is returned.
     *
-    * @return the last selected valid module index or -1.
+    * @return the last selected valid plugin index or -1.
     */
-    inline int getCurrentModuleIdx();
+    inline int getCurrentPluginIdx();
 
     //=========================================================================================================
     /**
@@ -135,19 +135,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Tests whether module n is activated.
+    * Tests whether plugin n is activated.
     *
-    * @param [in] n index of module which should be tested.
-    * @return whether module n is activated. If n is larger than module vector false is returned.
+    * @param [in] n index of plugin which should be tested.
+    * @return whether plugin n is activated. If n is larger than plugin vector false is returned.
     */
     bool isActivated(int n) const;
 
     //=========================================================================================================
     /**
-    * Changes activation status of module n.
+    * Changes activation status of plugin n.
     *
-    * @param [in] n index of module which's status should be changed.
-    * @param [in] status to which module should be changed.
+    * @param [in] n index of plugin which's status should be changed.
+    * @param [in] status to which plugin should be changed.
     */
     void activateItem(int n, bool& status);
 
@@ -160,11 +160,11 @@ signals:
 
     //=========================================================================================================
     /**
-    * This signal is emitted when the selected item changed to a valid module.
-    * @param [out] currentModuleNum index of current module.
+    * This signal is emitted when the selected item changed to a valid plugin.
+    * @param [out] currentPluginNum index of current plugin.
     * @param [out] currentItem corresponding tree item.
     */
-    void moduleChanged(int currentModuleNum, const QTreeWidgetItem* currentItem);
+    void pluginChanged(int currentPluginNum, const QTreeWidgetItem* currentItem);
 
 protected:
 
@@ -177,17 +177,17 @@ protected:
     virtual void contextMenuEvent (QContextMenuEvent* event);
 
 private:
-    //Tree View Module
+    //Tree View Plugin
     typedef QMap<int, QTreeWidgetItem*> t_ItemQMap;					/**< Defines a new tree widget item mapping type. */
     t_ItemQMap                          m_ItemQMap;					/**< Holds the tree widget item map. */
-    int                                 m_iCurrentModuleIdx;		/**< Holds the current module index. */
+    int                                 m_iCurrentPluginIdx;		/**< Holds the current plugin index. */
     QTreeWidgetItem*                    m_pCurrentItem;				/**< Holds the current tree item. */
-    QTreeWidget*                        m_pTreeWidgetModuleList;	/**< Holds the tree item list. */
+    QTreeWidget*                        m_pTreeWidgetPluginList;	/**< Holds the tree item list. */
 
 private slots:
     //=========================================================================================================
     /**
-    * Performs item validation. Depending on the validation result current item and current module index are set.
+    * Performs item validation. Depending on the validation result current item and current plugin index are set.
     *
     * @param [in] selectedItem whether program is running.
     */
@@ -200,15 +200,15 @@ private slots:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline int ModuleDockWidget::getCurrentModuleIdx()
+inline int PluginDockWidget::getCurrentPluginIdx()
 {
-    return m_iCurrentModuleIdx;
+    return m_iCurrentPluginIdx;
 }
 
 
 //*************************************************************************************************************
 
-inline const QTreeWidgetItem* ModuleDockWidget::getCurrentItem()
+inline const QTreeWidgetItem* PluginDockWidget::getCurrentItem()
 {
     return m_pCurrentItem;
 }
@@ -218,4 +218,4 @@ inline const QTreeWidgetItem* ModuleDockWidget::getCurrentItem()
 }//NAMESPACE
 
 
-#endif // MODULEDOCKWIDGET_H
+#endif // PLUGINDOCKWIDGET_H

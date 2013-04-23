@@ -60,7 +60,7 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MDL_ID::MDL_ID(int id)
+PLG_ID::PLG_ID(int id)
 : m_S32_ID(id)
 {
 
@@ -69,8 +69,8 @@ MDL_ID::MDL_ID(int id)
 
 //*************************************************************************************************************
 
-MDL_ID::MDL_ID(const MDL_ID &mdl_id)
-: m_S32_ID(mdl_id.m_S32_ID)
+PLG_ID::PLG_ID(const PLG_ID &plg_id)
+: m_S32_ID(plg_id.m_S32_ID)
 {
 
 }
@@ -78,7 +78,7 @@ MDL_ID::MDL_ID(const MDL_ID &mdl_id)
 
 //*************************************************************************************************************
 
-MDL_ID::MDL_ID(Module_ID standard_ID)
+PLG_ID::PLG_ID(Plugin_ID standard_ID)
 : m_S32_ID(standard_ID)
 {
 

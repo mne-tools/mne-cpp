@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     modulemanager.cpp
+* @file     pluginmanager.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ModuleManager class.
+* @brief    Contains the implementation of the PluginManager class.
 *
 */
 
@@ -38,11 +38,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "modulemanager.h"
+#include "pluginmanager.h"
 
 #include <xDtMng/measurementmanager.h>
 
-#include "../Interfaces/IModule.h"
+#include "../Interfaces/IPlugin.h"
 #include "../Interfaces/ISensor.h"
 #include "../Interfaces/IRTAlgorithm.h"
 #include "../Interfaces/IRTVisualization.h"
@@ -80,7 +80,7 @@ using namespace XDTMNGLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ModuleManager::ModuleManager(QObject *parent)
+PluginManager::PluginManager(QObject *parent)
 : QPluginLoader(parent)
 {
 
@@ -89,7 +89,7 @@ ModuleManager::ModuleManager(QObject *parent)
 
 //*************************************************************************************************************
 
-ModuleManager::~ModuleManager()
+PluginManager::~PluginManager()
 {
 
 }
@@ -97,31 +97,31 @@ ModuleManager::~ModuleManager()
 
 //*************************************************************************************************************
 
-void ModuleManager::loadModules(const QString& dir)
+void PluginManager::loadPlugins(const QString& dir)
 {
-    QDir ModulesDir(dir);
+    QDir PluginsDir(dir);
 
-    foreach(QString fileName, ModulesDir.entryList(QDir::Files))
+    foreach(QString fileName, PluginsDir.entryList(QDir::Files))
     {
-        this->setFileName(ModulesDir.absoluteFilePath(fileName));
-        QObject *pModule = this->instance();
+        this->setFileName(PluginsDir.absoluteFilePath(fileName));
+        QObject *pPlugin = this->instance();
 
-        // IModule
-        if(pModule)
+        // IPlugin
+        if(pPlugin)
         {
-        	qDebug() << "try to load Module " << fileName;
+            qDebug() << "try to load Plugin " << fileName;
 
-            s_vecModules.push_back(qobject_cast<IModule*>(pModule));
+            s_vecPlugins.push_back(qobject_cast<IPlugin*>(pPlugin));
 
-            Type module_type = qobject_cast<IModule*>(pModule)->getType();
+            Type module_type = qobject_cast<IPlugin*>(pPlugin)->getType();
 
             // ISensor
             if(module_type == _ISensor)
             {
-                ISensor* pSensor = qobject_cast<ISensor*>(pModule);
+                ISensor* pSensor = qobject_cast<ISensor*>(pPlugin);
                 if(pSensor)
                 {
-                    s_vecSensorModules.push_back(pSensor);
+                    s_vecSensorPlugins.push_back(pSensor);
                     qDebug() << "Sensor " << pSensor->getName() << " loaded.";
 
                     MeasurementManager::addMeasurementProvider(pSensor);
@@ -130,20 +130,20 @@ void ModuleManager::loadModules(const QString& dir)
             // IRTRecord
             else if(module_type == _IRTRecord)
             {
-            	IRTRecord* pRTRecord = qobject_cast<IRTRecord*>(pModule);
+                IRTRecord* pRTRecord = qobject_cast<IRTRecord*>(pPlugin);
                 if(pRTRecord)
                 {
-                    s_vecRTRecordModules.push_back(pRTRecord);
+                    s_vecRTRecordPlugins.push_back(pRTRecord);
                     qDebug() << "RTRecord " << pRTRecord->getName() << " loaded.";
                 }
             }
             // IAlgorithm
             else if(module_type == _IRTAlgorithm)
             {
-            	IRTAlgorithm* pRTAlgorithm = qobject_cast<IRTAlgorithm*>(pModule);
+                IRTAlgorithm* pRTAlgorithm = qobject_cast<IRTAlgorithm*>(pPlugin);
                 if(pRTAlgorithm)
                 {
-                    s_vecRTAlgorithmModules.push_back(pRTAlgorithm);
+                    s_vecRTAlgorithmPlugins.push_back(pRTAlgorithm);
                     qDebug() << "RTAlgorithm " << pRTAlgorithm->getName() << " loaded.";
 
                     MeasurementManager::addMeasurementProvider(pRTAlgorithm);
@@ -153,10 +153,10 @@ void ModuleManager::loadModules(const QString& dir)
             // IAlgorithm
             else if(module_type == _IRTVisualization)
             {
-                IRTVisualization* pRTVisualization = qobject_cast<IRTVisualization*>(pModule);
+                IRTVisualization* pRTVisualization = qobject_cast<IRTVisualization*>(pPlugin);
                 if(pRTVisualization)
                 {
-                    s_vecRTVisualizationModules.push_back(pRTVisualization);
+                    s_vecRTVisualizationPlugins.push_back(pRTVisualization);
                     qDebug() << "RTVisualization " << pRTVisualization->getName() << " loaded.";
 
                     MeasurementManager::addMeasurementProvider(pRTVisualization);
@@ -166,15 +166,15 @@ void ModuleManager::loadModules(const QString& dir)
             // IAlert
             else if(module_type == _IAlert)
             {
-                IAlert* pAlert = qobject_cast<IAlert*>(pModule);
+                IAlert* pAlert = qobject_cast<IAlert*>(pPlugin);
                 if(pAlert)
                 {
-                    s_vecAlertModules.push_back(pAlert);
+                    s_vecAlertPlugins.push_back(pAlert);
                     qDebug() << "Alert " << pAlert->getName() << " loaded.";
                 }
             }
 
-            //ToDo other Modules - like Visualization
+            //ToDo other Plugins - like Visualization
 
         }
         else
@@ -188,16 +188,16 @@ void ModuleManager::loadModules(const QString& dir)
 
 //*************************************************************************************************************
 
-bool ModuleManager::startModules()
+bool PluginManager::startPlugins()
 {
-	qDebug() << "ModuleManager::startModules()";
-    // Start ISensor and IRTAlgorithm modules first!
-    bool bFlag = startSensorModules();
-    startRTAlgorithmModules();
-    startRTVisualizationModules();
-    startRTRecordModules();
-    startAlertModules();
-    //ToDo other Modules
+    qDebug() << "PluginManager::startPlugins()";
+    // Start ISensor and IRTAlgorithm plugins first!
+    bool bFlag = startSensorPlugins();
+    startRTAlgorithmPlugins();
+    startRTVisualizationPlugins();
+    startRTRecordPlugins();
+    startAlertPlugins();
+    //ToDo other Plugins
 
     return bFlag;
 }
@@ -205,12 +205,12 @@ bool ModuleManager::startModules()
 
 //*************************************************************************************************************
 
-bool ModuleManager::startSensorModules()
+bool PluginManager::startSensorPlugins()
 {
     bool bFlag = false;
 
-    QVector<ISensor*>::const_iterator it = s_vecSensorModules.begin();
-    for( ; it != s_vecSensorModules.end(); ++it)
+    QVector<ISensor*>::const_iterator it = s_vecSensorPlugins.begin();
+    for( ; it != s_vecSensorPlugins.end(); ++it)
     {
 
     	qDebug() << "ISensor: " << (*it)->getName() << "; Active " << (*it)->isActive();
@@ -227,7 +227,7 @@ bool ModuleManager::startSensorModules()
                 if((*it)->getType() == _ISensor)
                 {
                     bFlag = true;
-                    s_vecActiveSensorModules.push_back(qobject_cast<ISensor*>(*it));
+                    s_vecActiveSensorPlugins.push_back(qobject_cast<ISensor*>(*it));
                 }
             }
         }
@@ -239,10 +239,10 @@ bool ModuleManager::startSensorModules()
 
 //*************************************************************************************************************
 
-void ModuleManager::startRTAlgorithmModules()
+void PluginManager::startRTAlgorithmPlugins()
 {
-    QVector<IRTAlgorithm*>::const_iterator it = s_vecRTAlgorithmModules.begin();
-    for( ; it != s_vecRTAlgorithmModules.end(); ++it)
+    QVector<IRTAlgorithm*>::const_iterator it = s_vecRTAlgorithmPlugins.begin();
+    for( ; it != s_vecRTAlgorithmPlugins.end(); ++it)
     {
         if((*it)->isActive())
         {
@@ -256,7 +256,7 @@ void ModuleManager::startRTAlgorithmModules()
                 // IRTAlgorithm
                 if((*it)->getType() == _IRTAlgorithm)
                 {
-                    s_vecActiveRTAlgorithmModules.push_back(qobject_cast<IRTAlgorithm*>(*it));
+                    s_vecActiveRTAlgorithmPlugins.push_back(qobject_cast<IRTAlgorithm*>(*it));
                 }
             }
         }
@@ -266,10 +266,10 @@ void ModuleManager::startRTAlgorithmModules()
 
 //*************************************************************************************************************
 
-void ModuleManager::startRTVisualizationModules()
+void PluginManager::startRTVisualizationPlugins()
 {
-    QVector<IRTVisualization*>::const_iterator it = s_vecRTVisualizationModules.begin();
-    for( ; it != s_vecRTVisualizationModules.end(); ++it)
+    QVector<IRTVisualization*>::const_iterator it = s_vecRTVisualizationPlugins.begin();
+    for( ; it != s_vecRTVisualizationPlugins.end(); ++it)
     {
         if((*it)->isActive())
         {
@@ -283,7 +283,7 @@ void ModuleManager::startRTVisualizationModules()
                 // IRTVisualization
                 if((*it)->getType() == _IRTVisualization)
                 {
-                    s_vecActiveRTVisualizationModules.push_back(qobject_cast<IRTVisualization*>(*it));
+                    s_vecActiveRTVisualizationPlugins.push_back(qobject_cast<IRTVisualization*>(*it));
                 }
             }
         }
@@ -293,10 +293,10 @@ void ModuleManager::startRTVisualizationModules()
 
 //*************************************************************************************************************
 
-void ModuleManager::startRTRecordModules()
+void PluginManager::startRTRecordPlugins()
 {
-	QVector<IRTRecord*>::const_iterator it = s_vecRTRecordModules.begin();
-    for( ; it != s_vecRTRecordModules.end(); ++it)
+    QVector<IRTRecord*>::const_iterator it = s_vecRTRecordPlugins.begin();
+    for( ; it != s_vecRTRecordPlugins.end(); ++it)
     {
         if((*it)->isActive())
         {
@@ -310,7 +310,7 @@ void ModuleManager::startRTRecordModules()
                 // IRTRecord
                 if((*it)->getType() == _IRTRecord)
                 {
-                    s_vecActiveRTRecordModules.push_back(qobject_cast<IRTRecord*>(*it));
+                    s_vecActiveRTRecordPlugins.push_back(qobject_cast<IRTRecord*>(*it));
                 }
             }
         }
@@ -320,10 +320,10 @@ void ModuleManager::startRTRecordModules()
 
 //*************************************************************************************************************
 
-void ModuleManager::startAlertModules()
+void PluginManager::startAlertPlugins()
 {
-	QVector<IAlert*>::const_iterator it = s_vecAlertModules.begin();
-    for( ; it != s_vecAlertModules.end(); ++it)
+    QVector<IAlert*>::const_iterator it = s_vecAlertPlugins.begin();
+    for( ; it != s_vecAlertPlugins.end(); ++it)
     {
         if((*it)->isActive())
         {
@@ -337,7 +337,7 @@ void ModuleManager::startAlertModules()
                 // IAlert
                 if((*it)->getType() == _IAlert)
                 {
-                    s_vecActiveAlertModules.push_back(qobject_cast<IAlert*>(*it));
+                    s_vecActiveAlertPlugins.push_back(qobject_cast<IAlert*>(*it));
                 }
             }
         }
@@ -347,12 +347,12 @@ void ModuleManager::startAlertModules()
 
 //*************************************************************************************************************
 
-void ModuleManager::stopModules()
+void PluginManager::stopPlugins()
 {
-    // Stop ISensor modules first!
-	qDebug() << "Try stopping sensor modules.";
-	QVector<IModule*>::const_iterator it = s_vecModules.begin();
-    for( ; it != s_vecModules.end(); ++it)
+    // Stop ISensor plugins first!
+    qDebug() << "Try stopping sensor Plugins.";
+    QVector<IPlugin*>::const_iterator it = s_vecPlugins.begin();
+    for( ; it != s_vecPlugins.end(); ++it)
     {
         if((*it)->isActive())
         {
@@ -360,16 +360,16 @@ void ModuleManager::stopModules()
             {
                 if(!(*it)->stop())
                 {
-                    qDebug() << "Could not stop IModule: " << (*it)->getName();
+                    qDebug() << "Could not stop IPlugin: " << (*it)->getName();
                 }
             }
         }
     }
 
-    // Stop all other modules!
-	qDebug() << "Try stopping all other modules";
-    it = s_vecModules.begin();
-    for( ; it != s_vecModules.end(); ++it)
+    // Stop all other plugins!
+    qDebug() << "Try stopping all other plugins";
+    it = s_vecPlugins.begin();
+    for( ; it != s_vecPlugins.end(); ++it)
     {
         if((*it)->isActive())
         {
@@ -377,26 +377,26 @@ void ModuleManager::stopModules()
             {
                 if(!(*it)->stop())
                 {
-                    qDebug() << "Could not stop IModule: " << (*it)->getName();
+                    qDebug() << "Could not stop IPlugin: " << (*it)->getName();
                 }
             }
         }
     }
 
-    s_vecActiveSensorModules.clear();
-    s_vecActiveRTRecordModules.clear();
-    s_vecActiveRTAlgorithmModules.clear();
-    s_vecActiveRTVisualizationModules.clear();
-    s_vecActiveAlertModules.clear();
+    s_vecActiveSensorPlugins.clear();
+    s_vecActiveRTRecordPlugins.clear();
+    s_vecActiveRTAlgorithmPlugins.clear();
+    s_vecActiveRTVisualizationPlugins.clear();
+    s_vecActiveAlertPlugins.clear();
 }
 
 
 //*************************************************************************************************************
 
-int ModuleManager::findByName(const QString& name)
+int PluginManager::findByName(const QString& name)
 {
-	QVector<IModule*>::const_iterator it = s_vecModules.begin();
-    for(int i = 0; it != s_vecModules.end(); ++i, ++it)
+    QVector<IPlugin*>::const_iterator it = s_vecPlugins.begin();
+    for(int i = 0; it != s_vecPlugins.end(); ++i, ++it)
         if((*it)->getName() == name)
             return i;
 
@@ -409,16 +409,16 @@ int ModuleManager::findByName(const QString& name)
 // STATIC DEFINITIONS
 //=============================================================================================================
 
-QVector<IModule*> ModuleManager::       s_vecModules;
+QVector<IPlugin*> PluginManager::       s_vecPlugins;
 
-QVector<ISensor*> ModuleManager::       s_vecSensorModules;
-QVector<IRTRecord*> ModuleManager::		s_vecRTRecordModules;
-QVector<IRTAlgorithm*> ModuleManager::  s_vecRTAlgorithmModules;
-QVector<IRTVisualization*> ModuleManager::s_vecRTVisualizationModules;
-QVector<IAlert*> ModuleManager::        s_vecAlertModules;
+QVector<ISensor*> PluginManager::       s_vecSensorPlugins;
+QVector<IRTRecord*> PluginManager::		s_vecRTRecordPlugins;
+QVector<IRTAlgorithm*> PluginManager::  s_vecRTAlgorithmPlugins;
+QVector<IRTVisualization*> PluginManager::s_vecRTVisualizationPlugins;
+QVector<IAlert*> PluginManager::        s_vecAlertPlugins;
 
-QVector<ISensor*> ModuleManager::       s_vecActiveSensorModules;
-QVector<IRTRecord*> ModuleManager::  	s_vecActiveRTRecordModules;
-QVector<IRTAlgorithm*> ModuleManager::  s_vecActiveRTAlgorithmModules;
-QVector<IRTVisualization*> ModuleManager::s_vecActiveRTVisualizationModules;
-QVector<IAlert*> ModuleManager::        s_vecActiveAlertModules;
+QVector<ISensor*> PluginManager::       s_vecActiveSensorPlugins;
+QVector<IRTRecord*> PluginManager::  	s_vecActiveRTRecordPlugins;
+QVector<IRTAlgorithm*> PluginManager::  s_vecActiveRTAlgorithmPlugins;
+QVector<IRTVisualization*> PluginManager::s_vecActiveRTVisualizationPlugins;
+QVector<IAlert*> PluginManager::        s_vecActiveAlertPlugins;

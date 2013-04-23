@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     modulemanager.h
+* @file     pluginmanager.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ModuleManager class.
+* @brief    Contains the declaration of the PluginManager class.
 *
 */
 
-#ifndef MODULEMANAGER_H
-#define MODULEMANAGER_H
+#ifndef PLUGINMANAGER_H
+#define PLUGINMANAGER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -67,7 +67,7 @@ namespace MNEX
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class IModule;
+class IPlugin;
 class ISensor;
 class IRTAlgorithm;
 class IRTVisualization;
@@ -77,200 +77,200 @@ class IAlert;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ModuleManager
+* DECLARE CLASS PluginManager
 *
-* @brief The ModuleManager class provides a dynamic module loader. As well as the handling of the loaded modules.
+* @brief The PluginManager class provides a dynamic plugin loader. As well as the handling of the loaded plugins.
 */
-class MNE_X_SHARED_EXPORT ModuleManager : public QPluginLoader
+class MNE_X_SHARED_EXPORT PluginManager : public QPluginLoader
 {
     Q_OBJECT
 
     friend class MainWindow;
-    friend class ModuleDockWidget;
+    friend class PluginDockWidget;
 
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a ModuleManager with the given parent.
+    * Constructs a PluginManager with the given parent.
     *
     * @param [in] parent pointer to parent Object. (It's normally the default value.)
     */
-    ModuleManager(QObject* parent = 0);
+    PluginManager(QObject* parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the ModuleManager.
+    * Destroys the PluginManager.
     */
-    virtual ~ModuleManager();
+    virtual ~PluginManager();
 
     //=========================================================================================================
     /**
-    * Loads modules from given directory.
+    * Loads plugins from given directory.
     *
-    * @param dir the module directory.
+    * @param dir the plugin directory.
     */
-    void loadModules(const QString& dir);
+    void loadPlugins(const QString& dir);
 
     //=========================================================================================================
     /**
-    * Starts all modules.
+    * Starts all plugins.
     *
-    * @return true if at least one ISensor module was started successfully, false otherwise.
+    * @return true if at least one ISensor plugin was started successfully, false otherwise.
     */
-    static bool startModules();
+    static bool startPlugins();
 
     //=========================================================================================================
     /**
-    * Starts ISensor modules
+    * Starts ISensor Plugins
     *
-    * @return true if at least one ISensor module was started successfully, false otherwise.
+    * @return true if at least one ISensor plugin was started successfully, false otherwise.
     */
-    static bool startSensorModules();
+    static bool startSensorPlugins();
 
     //=========================================================================================================
     /**
-    * Starts IRTAlgorithm modules.
+    * Starts IRTAlgorithm plugins.
     */
-    static void startRTAlgorithmModules();
+    static void startRTAlgorithmPlugins();
 
     //=========================================================================================================
     /**
-    * Starts IRTVisualization modules.
+    * Starts IRTVisualization plugins.
     */
-    static void startRTVisualizationModules();
+    static void startRTVisualizationPlugins();
 
     //=========================================================================================================
     /**
-    * Starts IRTRecord modules.
+    * Starts IRTRecord plugins.
     */
-    static void startRTRecordModules();
+    static void startRTRecordPlugins();
 
     //=========================================================================================================
     /**
-    * Starts IAlert modules.
+    * Starts IAlert plugins.
     */
-    static void startAlertModules();
+    static void startAlertPlugins();
 
 
     //=========================================================================================================
     /**
-    * Stops all modules.
+    * Stops all plugins.
     */
-    static void stopModules();
+    static void stopPlugins();
 
     //=========================================================================================================
     /**
-    * Finds index of module by name.
+    * Finds index of plugin by name.
     *
-    * @return index of module.
-    * @param name the module name.
+    * @return index of plugin.
+    * @param name the plugin name.
     */
     static int findByName(const QString& name);
 
     //=========================================================================================================
     /**
-    * Returns vector containing all modules.
+    * Returns vector containing all plugins.
     *
-    * @return reference to vector containing all modules.
+    * @return reference to vector containing all plugins.
     */
-    static inline const QVector<IModule*>& getModules();
+    static inline const QVector<IPlugin*>& getPlugins();
 
     //=========================================================================================================
     /**
-    * Returns vector containing ISensor modules.
+    * Returns vector containing ISensor plugins.
     *
-    * @return reference to vector containing ISensor modules.
+    * @return reference to vector containing ISensor plugins.
     */
-    static inline const QVector<ISensor*>& getSensorModules();
+    static inline const QVector<ISensor*>& getSensorPlugins();
 
     //=========================================================================================================
     /**
-    * Returns vector containing IRTAlgorithm modules
+    * Returns vector containing IRTAlgorithm plugins
     *
-    * @return reference to vector containing IRTAlgorithm modules
+    * @return reference to vector containing IRTAlgorithm plugins
     */
-    static inline const QVector<IRTAlgorithm*>& getRTAlgorithmModules();
+    static inline const QVector<IRTAlgorithm*>& getRTAlgorithmPlugins();
 
     //=========================================================================================================
     /**
-    * Returns vector containing IRTVisualization modules
+    * Returns vector containing IRTVisualization plugins
     *
-    * @return reference to vector containing IRTVisulaiztaion modules
+    * @return reference to vector containing IRTVisulaiztaion plugins
     */
-    static inline const QVector<IRTVisualization*>& getRTVisualizationModules();
+    static inline const QVector<IRTVisualization*>& getRTVisualizationPlugins();
 
     //=========================================================================================================
     /**
-    * Returns vector containing IRTRecord modules.
+    * Returns vector containing IRTRecord plugins.
     *
-    * @return reference to vector containing IRTRecord modules
+    * @return reference to vector containing IRTRecord plugins
     */
-    static inline const QVector<IRTRecord*>& getRTRecordModules();
+    static inline const QVector<IRTRecord*>& getRTRecordPlugins();
 
     //=========================================================================================================
     /**
-    * Returns vector containing IAlert modules.
+    * Returns vector containing IAlert plugins.
     *
-    * @return reference to vector containing IAlert modules.
+    * @return reference to vector containing IAlert plugins.
     */
-    static inline const QVector<IAlert*>& getAlertModules();
+    static inline const QVector<IAlert*>& getAlertPlugins();
 
     //=========================================================================================================
     /**
-    * Returns vector containing active ISensor modules.
+    * Returns vector containing active ISensor plugins.
     *
-    * @return reference to vector containing active ISensor modules.
+    * @return reference to vector containing active ISensor plugins.
     */
-    static inline const QVector<ISensor*>& getActiveSensorModules();
+    static inline const QVector<ISensor*>& getActiveSensorPlugins();
 
     //=========================================================================================================
     /**
-    * Returns vector containing active IRTAlgorithm modules.
+    * Returns vector containing active IRTAlgorithm plugins.
     *
-    * @return reference to vector containing active IAlgorithm modules.
+    * @return reference to vector containing active IAlgorithm plugins.
     */
-    static inline const QVector<IRTAlgorithm*>& getActiveRTAlgorithmModules();
+    static inline const QVector<IRTAlgorithm*>& getActiveRTAlgorithmPlugins();
 
     //=========================================================================================================
     /**
-    * Returns vector containing active IRTAlgorithm modules.
+    * Returns vector containing active IRTAlgorithm plugins.
     *
-    * @return reference to vector containing active IAlgorithm modules.
+    * @return reference to vector containing active IAlgorithm plugins.
     */
-    static inline const QVector<IRTVisualization*>& getActiveRTVisualizationModules();
+    static inline const QVector<IRTVisualization*>& getActiveRTVisualizationPlugins();
 
     //=========================================================================================================
     /**
-    * Returns vector containing active IRTRecord modules.
+    * Returns vector containing active IRTRecord plugins.
     *
-    * @return reference to vector containing active IRTRecord modules.
+    * @return reference to vector containing active IRTRecord plugins.
     */
-    static inline const QVector<IRTRecord*>& getActiveRTRecordModules();
+    static inline const QVector<IRTRecord*>& getActiveRTRecordPlugins();
 
     //=========================================================================================================
     /**
-    * Returns vector containing active IAlert modules.
+    * Returns vector containing active IAlert plugins.
     *
-    * @return reference to vector containing active IAlert modules.
+    * @return reference to vector containing active IAlert plugins.
     */
-    static inline const QVector<IAlert*>& getActiveAlertModules();
+    static inline const QVector<IAlert*>& getActiveAlertPlugins();
 
 private:
 
-    static QVector<IModule*>            s_vecModules;		/**< Holds vector of all modules. */
+    static QVector<IPlugin*>            s_vecPlugins;               /**< Holds vector of all plugins. */
 
-    static QVector<ISensor*>            s_vecSensorModules;			/**< Holds vector of all ISensor modules. */
-    static QVector<IRTAlgorithm*>       s_vecRTAlgorithmModules;	/**< Holds vector of all IRTAlgorithm modules. */
-    static QVector<IRTVisualization*>   s_vecRTVisualizationModules;/**< Holds vector of all IRTVisualization modules. */
-    static QVector<IRTRecord*>          s_vecRTRecordModules;		/**< Holds vector of all IRTRecord modules. */
-    static QVector<IAlert*>             s_vecAlertModules;			/**< Holds vector of all IAlert modules. */
+    static QVector<ISensor*>            s_vecSensorPlugins;         /**< Holds vector of all ISensor plugins. */
+    static QVector<IRTAlgorithm*>       s_vecRTAlgorithmPlugins;    /**< Holds vector of all IRTAlgorithm plugins. */
+    static QVector<IRTVisualization*>   s_vecRTVisualizationPlugins;/**< Holds vector of all IRTVisualization plugins. */
+    static QVector<IRTRecord*>          s_vecRTRecordPlugins;       /**< Holds vector of all IRTRecord plugins. */
+    static QVector<IAlert*>             s_vecAlertPlugins;          /**< Holds vector of all IAlert plugins. */
 
-    static QVector<ISensor*>            s_vecActiveSensorModules;		    /**< Holds vector of all active ISensor modules. */
-    static QVector<IRTAlgorithm*>       s_vecActiveRTAlgorithmModules;	    /**< Holds vector of all active IRTAlgorithm modules. */
-    static QVector<IRTVisualization*>   s_vecActiveRTVisualizationModules;  /**< Holds vector of all active IRTVisualization modules. */
-    static QVector<IRTRecord*>          s_vecActiveRTRecordModules;		    /**< Holds vector of all active IRTRecord modules. */
-    static QVector<IAlert*>             s_vecActiveAlertModules;		    /**< Holds vector of all active IAlert modules. */
+    static QVector<ISensor*>            s_vecActiveSensorPlugins;           /**< Holds vector of all active ISensor plugins. */
+    static QVector<IRTAlgorithm*>       s_vecActiveRTAlgorithmPlugins;      /**< Holds vector of all active IRTAlgorithm plugins. */
+    static QVector<IRTVisualization*>   s_vecActiveRTVisualizationPlugins;  /**< Holds vector of all active IRTVisualization plugins. */
+    static QVector<IRTRecord*>          s_vecActiveRTRecordPlugins;         /**< Holds vector of all active IRTRecord plugins. */
+    static QVector<IAlert*>             s_vecActiveAlertPlugins;            /**< Holds vector of all active IAlert plugins. */
 
 };
 
@@ -280,49 +280,49 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline const QVector<IModule*>& ModuleManager::getModules()
+inline const QVector<IPlugin*>& PluginManager::getPlugins()
 {
-    return s_vecModules;
+    return s_vecPlugins;
 }
 
 
 //*************************************************************************************************************
 
-inline const QVector<ISensor*>& ModuleManager::getSensorModules()
+inline const QVector<ISensor*>& PluginManager::getSensorPlugins()
 {
-    return s_vecSensorModules;
+    return s_vecSensorPlugins;
 }
 
 
 //*************************************************************************************************************
 
-inline const QVector<IRTAlgorithm*>& ModuleManager::getRTAlgorithmModules()
+inline const QVector<IRTAlgorithm*>& PluginManager::getRTAlgorithmPlugins()
 {
-    return s_vecRTAlgorithmModules;
+    return s_vecRTAlgorithmPlugins;
 }
 
 
 //*************************************************************************************************************
 
-inline const QVector<IRTVisualization*>& ModuleManager::getRTVisualizationModules()
+inline const QVector<IRTVisualization*>& PluginManager::getRTVisualizationPlugins()
 {
-    return s_vecRTVisualizationModules;
+    return s_vecRTVisualizationPlugins;
 }
 
 
 //*************************************************************************************************************
 
-inline const QVector<IRTRecord*>& ModuleManager::getRTRecordModules()
+inline const QVector<IRTRecord*>& PluginManager::getRTRecordPlugins()
 {
-    return s_vecRTRecordModules;
+    return s_vecRTRecordPlugins;
 }
 
 
 //*************************************************************************************************************
 
-inline const QVector<IAlert*>& ModuleManager::getAlertModules()
+inline const QVector<IAlert*>& PluginManager::getAlertPlugins()
 {
-    return s_vecAlertModules;
+    return s_vecAlertPlugins;
 }
 
 
@@ -341,44 +341,44 @@ inline const QVector<IAlert*>& ModuleManager::getAlertModules()
 
 //*************************************************************************************************************
 
-inline const QVector<ISensor*>& ModuleManager::getActiveSensorModules()
+inline const QVector<ISensor*>& PluginManager::getActiveSensorPlugins()
 {
-    return s_vecActiveSensorModules;
+    return s_vecActiveSensorPlugins;
 }
 
 
 //*************************************************************************************************************
 
-inline const QVector<IRTAlgorithm*>& ModuleManager::getActiveRTAlgorithmModules()
+inline const QVector<IRTAlgorithm*>& PluginManager::getActiveRTAlgorithmPlugins()
 {
-    return s_vecActiveRTAlgorithmModules;
+    return s_vecActiveRTAlgorithmPlugins;
 }
 
 
 
 //*************************************************************************************************************
 
-inline const QVector<IRTVisualization*>& ModuleManager::getActiveRTVisualizationModules()
+inline const QVector<IRTVisualization*>& PluginManager::getActiveRTVisualizationPlugins()
 {
-    return s_vecActiveRTVisualizationModules;
+    return s_vecActiveRTVisualizationPlugins;
 }
 
 
 //*************************************************************************************************************
 
-inline const QVector<IRTRecord*>& ModuleManager::getActiveRTRecordModules()
+inline const QVector<IRTRecord*>& PluginManager::getActiveRTRecordPlugins()
 {
-    return s_vecActiveRTRecordModules;
+    return s_vecActiveRTRecordPlugins;
 }
 
 
 //*************************************************************************************************************
 
-inline const QVector<IAlert*>& ModuleManager::getActiveAlertModules()
+inline const QVector<IAlert*>& PluginManager::getActiveAlertPlugins()
 {
-    return s_vecActiveAlertModules;
+    return s_vecActiveAlertPlugins;
 }
 
 } // NAMESPACE
 
-#endif // MODULEMANAGER_H
+#endif // PLUGINMANAGER_H

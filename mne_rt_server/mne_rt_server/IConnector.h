@@ -114,7 +114,7 @@ using namespace Eigen;
 /**
 * The IConnector class is the interface class for all connectors.
 *
-* @brief The IConnector class is the interface class of all modules.
+* @brief The IConnector class is the interface class of all plugins.
 */
 class IConnector : public QThread
 {
@@ -151,18 +151,18 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the module name.
+    * Returns the plugin name.
     * Pure virtual method.
     *
-    * @return the name of module.
+    * @return the name of plugin.
     */
     virtual const char* getName() const = 0;
 
     //=========================================================================================================
     /**
-    * Returns the activation status of the module.
+    * Returns the activation status of the plugin.
     *
-    * @return true if module is activated.
+    * @return true if plugin is activated.
     */
     inline bool isActive() const;
 
@@ -177,7 +177,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Stops the IModule.
+    * Stops the IPlugin.
     * Pure virtual method.
     *
     * @return true if success, false otherwise
@@ -188,15 +188,15 @@ public:
     /**
     * Sets itsmeta data of the plugin after it was laoded by the pluginmanager.
     *
-    * @param [in] status the new activation status of the module.
+    * @param [in] status the new activation status of the plugin.
     */
     inline void setMetaData(QJsonObject& p_MetaData);
 
     //=========================================================================================================
     /**
-    * Sets the activation status of the module.
+    * Sets the activation status of the plugin.
     *
-    * @param [in] status    the new activation status of the module.
+    * @param [in] status    the new activation status of the plugin.
     */
     inline void setStatus(bool status);
 

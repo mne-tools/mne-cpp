@@ -45,7 +45,7 @@
 #include "../xmeas_global.h"
 #include "../Nomenclature/nomenclature.h"
 
-#include <mne_x/Interfaces/IModule.h>
+#include <mne_x/Interfaces/IPlugin.h>
 
 
 //*************************************************************************************************************
@@ -101,7 +101,7 @@ using namespace MNEX;
 *
 * @brief The IMeasurementSource class provides an interface for a measurement provider. Todo check what's virtual and write this to inherits todo add measurement providers, if measurement provider with id exists already return pointer to MeasurementProvider
 */
-class XMEASSHARED_EXPORT IMeasurementSource : public IModule
+class XMEASSHARED_EXPORT IMeasurementSource : public IPlugin
 {
 public:
 
@@ -113,7 +113,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Starts the IModule.
+    * Starts the IPlugin.
     * Pure virtual method.
     *
     * @return true if success, false otherwise
@@ -122,7 +122,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Stops the IModule.
+    * Stops the IPlugin.
     * Pure virtual method.
     *
     * @return true if success, false otherwise
@@ -131,25 +131,25 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the module type.
+    * Returns the plugin type.
     * Pure virtual method.
     *
-    * @return type of the IModule
+    * @return type of the IPlugin
     */
     virtual Type getType() const = 0;
 
     //=========================================================================================================
     /**
-    * Returns the module name.
+    * Returns the plugin name.
     * Pure virtual method.
     *
-    * @return the name of module.
+    * @return the name of plugin.
     */
     virtual const char* getName() const = 0;
 
     //=========================================================================================================
     /**
-    * Returns the set up widget for configuration of the IModule.
+    * Returns the set up widget for configuration of the IPlugin.
     * Pure virtual method.
     *
     * @return the setup widget.

@@ -77,7 +77,7 @@ DummyToolbox::DummyToolbox()
 , m_pDummyBuffer(new DummyBuffer_old(1024))
 , m_pDummyMultiChannelBuffer(new _double_CircularMultiChannelBuffer_old(2, 1024))
 {
-    m_MDL_ID = MDL_ID::DUMMYTOOL;
+    m_PLG_ID = PLG_ID::DUMMYTOOL;
 }
 
 
@@ -242,18 +242,18 @@ void DummyToolbox::run()
 
 void DummyToolbox::init()
 {
-	qDebug() << "#### DummyToolbox Init; MSR_ECG_I: " << MSR_ID::ECGSIM_I;
+    qDebug() << "#### DummyToolbox Init; MSR_ECG_I: " << MSR_ID::ECGSIM_I;
 
 
-    this->addModule(MDL_ID::ECGSIM); //ToDo This should be obsolete -  measurement ID should be sufficient -> solve this by adding measurement IDs to subject?? attach observers to subjects with corresponding ID
-	this->addAcceptorMeasurementBuffer(MSR_ID::ECGSIM_I, m_pDummyBuffer);
+    this->addPlugin(PLG_ID::ECGSIM); //ToDo This should be obsolete -  measurement ID should be sufficient -> solve this by adding measurement IDs to subject?? attach observers to subjects with corresponding ID
+    this->addAcceptorMeasurementBuffer(MSR_ID::ECGSIM_I, m_pDummyBuffer);
 
     m_pDummy_Output = addProviderRealTimeSampleArray(MSR_ID::DUMMYTOOL_OUTPUT);
-	m_pDummy_Output->setName("Dummy Output");
-	m_pDummy_Output->setUnit("mV");
-	m_pDummy_Output->setMinValue(-200);
-	m_pDummy_Output->setMaxValue(360);
-	m_pDummy_Output->setSamplingRate(256.0/1.0);
+    m_pDummy_Output->setName("Dummy Output");
+    m_pDummy_Output->setUnit("mV");
+    m_pDummy_Output->setMinValue(-200);
+    m_pDummy_Output->setMaxValue(360);
+    m_pDummy_Output->setSamplingRate(256.0/1.0);
 
 
     this->addAcceptorMeasurementBuffer(MSR_ID::ECGSIM_II, m_pDummyMultiChannelBuffer);
