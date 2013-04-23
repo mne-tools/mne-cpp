@@ -40,7 +40,7 @@
 
 #include "plugindockwidget.h"
 
-#include <mne_x/Management/PluginManager.h>
+#include <mne_x/Management/pluginmanager.h>
 
 #include <mne_x/Interfaces/IPlugin.h>
 #include <mne_x/Interfaces/ISensor.h>
