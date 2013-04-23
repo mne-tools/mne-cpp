@@ -73,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -105,9 +105,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a371d1999222cfbe6b3c52339b65203ce"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a371d1999222cfbe6b3c52339b65203ce"></a>
-typedef std::pair&lt; int, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>IdxDoubleValue</b></td></tr>
-<tr class="separator:a371d1999222cfbe6b3c52339b65203ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3129ad163aae01f8855c1d5ae163e782"><td class="memItemLeft" align="right" valign="top">typedef std::pair&lt; int, int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a3129ad163aae01f8855c1d5ae163e782">IdxIntValue</a></td></tr>
 <tr class="separator:a3129ad163aae01f8855c1d5ae163e782"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -115,6 +112,34 @@ typedef std::pair&lt; int, double &gt;&#160;</td><td class="memItemRight" valign
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a52c52d62e3393a51837e7a12688d1439"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a52c52d62e3393a51837e7a12688d1439">~MNEMath</a> ()</td></tr>
 <tr class="separator:a52c52d62e3393a51837e7a12688d1439"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f803e78f5df5662f604eac88922ed6f"><td class="memTemplParams" colspan="2"><a class="anchor" id="a7f803e78f5df5662f604eac88922ed6f"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a7f803e78f5df5662f604eac88922ed6f"><td class="memTemplItemLeft" align="right" valign="top">VectorXi&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sort</b> (Matrix&lt; T, Dynamic, 1 &gt; &amp;v, bool desc)</td></tr>
+<tr class="separator:a7f803e78f5df5662f604eac88922ed6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46849426fe2b2de690ae2a60139f046c"><td class="memTemplParams" colspan="2"><a class="anchor" id="a46849426fe2b2de690ae2a60139f046c"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a46849426fe2b2de690ae2a60139f046c"><td class="memTemplItemLeft" align="right" valign="top">VectorXi&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sort</b> (Matrix&lt; T, Dynamic, 1 &gt; &amp;v_prime, Matrix&lt; T, Dynamic, Dynamic &gt; &amp;mat, bool desc)</td></tr>
+<tr class="separator:a46849426fe2b2de690ae2a60139f046c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7607cb06b13feda4c4fa7d9ff492f5c5"><td class="memTemplParams" colspan="2"><a class="anchor" id="a7607cb06b13feda4c4fa7d9ff492f5c5"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a7607cb06b13feda4c4fa7d9ff492f5c5"><td class="memTemplItemLeft" align="right" valign="top">std::vector&lt; Triplet&lt; T &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sortrows</b> (const std::vector&lt; Triplet&lt; T &gt; &gt; &amp;A, qint32 column)</td></tr>
+<tr class="separator:a7607cb06b13feda4c4fa7d9ff492f5c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a574c6bdbdc3df1ef765b8e3db44dc80f"><td class="memTemplParams" colspan="2"><a class="anchor" id="a574c6bdbdc3df1ef765b8e3db44dc80f"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a574c6bdbdc3df1ef765b8e3db44dc80f"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>compareIdxValuePairBiggerThan</b> (const std::pair&lt; int, T &gt; &amp;lhs, const std::pair&lt; int, T &gt; &amp;rhs)</td></tr>
+<tr class="separator:a574c6bdbdc3df1ef765b8e3db44dc80f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec4b1c309b2d8cf04bc176d7883a3498"><td class="memTemplParams" colspan="2"><a class="anchor" id="aec4b1c309b2d8cf04bc176d7883a3498"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:aec4b1c309b2d8cf04bc176d7883a3498"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>compareIdxValuePairSmallerThan</b> (const std::pair&lt; int, T &gt; &amp;lhs, const std::pair&lt; int, T &gt; &amp;rhs)</td></tr>
+<tr class="separator:aec4b1c309b2d8cf04bc176d7883a3498"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa4434423d6d6dc48715d1ba332a9b0b3"><td class="memTemplParams" colspan="2"><a class="anchor" id="aa4434423d6d6dc48715d1ba332a9b0b3"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:aa4434423d6d6dc48715d1ba332a9b0b3"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>compareTripletFirstEntry</b> (const Triplet&lt; T &gt; &amp;lhs, const Triplet&lt; T &gt; &amp;rhs)</td></tr>
+<tr class="separator:aa4434423d6d6dc48715d1ba332a9b0b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aabe9ed92c7541464546e791a09275609"><td class="memTemplParams" colspan="2"><a class="anchor" id="aabe9ed92c7541464546e791a09275609"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:aabe9ed92c7541464546e791a09275609"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>compareTripletSecondEntry</b> (const Triplet&lt; T &gt; &amp;lhs, const Triplet&lt; T &gt; &amp;rhs)</td></tr>
+<tr class="separator:aabe9ed92c7541464546e791a09275609"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -132,16 +157,27 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:a5e871e7bcca6042ca4d8837cd90bbd28"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a46d75f6834ab6bb6ddca24e395cff7de"><td class="memItemLeft" align="right" valign="top">static MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a46d75f6834ab6bb6ddca24e395cff7de">rescale</a> (const MatrixXd &amp;data, const RowVectorXf &amp;times, QPair&lt; QVariant, QVariant &gt; baseline, QString mode)</td></tr>
 <tr class="separator:a46d75f6834ab6bb6ddca24e395cff7de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a09e5e39b4110548afe5a881e41185a5e"><td class="memItemLeft" align="right" valign="top">static VectorXi&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a09e5e39b4110548afe5a881e41185a5e">sort</a> (VectorXd &amp;v, bool desc=true)</td></tr>
-<tr class="separator:a09e5e39b4110548afe5a881e41185a5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a294e213d25574b53c9f7433376d34a81"><td class="memItemLeft" align="right" valign="top">static VectorXi&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a294e213d25574b53c9f7433376d34a81">sort</a> (VectorXd &amp;v_prime, MatrixXd &amp;mat, bool desc=true)</td></tr>
-<tr class="separator:a294e213d25574b53c9f7433376d34a81"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a29c09ef19dd9e64074c499b7728fc682"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a29c09ef19dd9e64074c499b7728fc682">compareIdxDoublePairBiggerThan</a> (const IdxDoubleValue &amp;lhs, const IdxDoubleValue &amp;rhs)</td></tr>
-<tr class="separator:a29c09ef19dd9e64074c499b7728fc682"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaba4542ffa4e1eb08f9ef2639da4a770"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#aaba4542ffa4e1eb08f9ef2639da4a770">compareIdxDoublePairSmallerThan</a> (const IdxDoubleValue &amp;lhs, const IdxDoubleValue &amp;rhs)</td></tr>
-<tr class="separator:aaba4542ffa4e1eb08f9ef2639da4a770"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a68e69f9e932d7a640d9bca52f678994d"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a68e69f9e932d7a640d9bca52f678994d">compareIdxIntPairSmallerThan</a> (const <a class="el" href="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a3129ad163aae01f8855c1d5ae163e782">IdxIntValue</a> &amp;lhs, const <a class="el" href="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a3129ad163aae01f8855c1d5ae163e782">IdxIntValue</a> &amp;rhs)</td></tr>
-<tr class="separator:a68e69f9e932d7a640d9bca52f678994d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a35afa407b5c09e6a11cdd5fb1c1d06eb"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a35afa407b5c09e6a11cdd5fb1c1d06eb"><td class="memTemplItemLeft" align="right" valign="top">static VectorXi&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a35afa407b5c09e6a11cdd5fb1c1d06eb">sort</a> (Matrix&lt; T, Dynamic, 1 &gt; &amp;v, bool desc=true)</td></tr>
+<tr class="separator:a35afa407b5c09e6a11cdd5fb1c1d06eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7130bb3bc8868c20856d577b50fd74fa"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a7130bb3bc8868c20856d577b50fd74fa"><td class="memTemplItemLeft" align="right" valign="top">static VectorXi&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a7130bb3bc8868c20856d577b50fd74fa">sort</a> (Matrix&lt; T, Dynamic, 1 &gt; &amp;v_prime, Matrix&lt; T, Dynamic, Dynamic &gt; &amp;mat, bool desc=true)</td></tr>
+<tr class="separator:a7130bb3bc8868c20856d577b50fd74fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6895912c0813fc0752f5776dda800590"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a6895912c0813fc0752f5776dda800590"><td class="memTemplItemLeft" align="right" valign="top">static std::vector&lt; Triplet&lt; T &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a6895912c0813fc0752f5776dda800590">sortrows</a> (const std::vector&lt; Triplet&lt; T &gt; &gt; &amp;A, qint32 column=0)</td></tr>
+<tr class="separator:a6895912c0813fc0752f5776dda800590"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad4470e2d5a20957060311c026df71780"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:ad4470e2d5a20957060311c026df71780"><td class="memTemplItemLeft" align="right" valign="top">static bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#ad4470e2d5a20957060311c026df71780">compareIdxValuePairBiggerThan</a> (const std::pair&lt; int, T &gt; &amp;lhs, const std::pair&lt; int, T &gt; &amp;rhs)</td></tr>
+<tr class="separator:ad4470e2d5a20957060311c026df71780"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa7b5b8bbf7083927fc90fe58afb0747"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:aaa7b5b8bbf7083927fc90fe58afb0747"><td class="memTemplItemLeft" align="right" valign="top">static bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#aaa7b5b8bbf7083927fc90fe58afb0747">compareIdxValuePairSmallerThan</a> (const std::pair&lt; int, T &gt; &amp;lhs, const std::pair&lt; int, T &gt; &amp;rhs)</td></tr>
+<tr class="separator:aaa7b5b8bbf7083927fc90fe58afb0747"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa40f6a335d85bac8b479addaeb26c97f"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:aa40f6a335d85bac8b479addaeb26c97f"><td class="memTemplItemLeft" align="right" valign="top">static bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#aa40f6a335d85bac8b479addaeb26c97f">compareTripletFirstEntry</a> (const Triplet&lt; T &gt; &amp;lhs, const Triplet&lt; T &gt; &amp;rhs)</td></tr>
+<tr class="separator:aa40f6a335d85bac8b479addaeb26c97f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a857b932f587061a921592e1d285cfe9a"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a857b932f587061a921592e1d285cfe9a"><td class="memTemplItemLeft" align="right" valign="top">static bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a857b932f587061a921592e1d285cfe9a">compareTripletSecondEntry</a> (const Triplet&lt; T &gt; &amp;lhs, const Triplet&lt; T &gt; &amp;rhs)</td></tr>
+<tr class="separator:a857b932f587061a921592e1d285cfe9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Math methods. </p>
@@ -160,7 +196,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Typedef of a pair of ints. </p>
 
-<p>Definition at line <a class="el" href="mnemath_8h_source.html#l00105">105</a> of file <a class="el" href="mnemath_8h_source.html">mnemath.h</a>.</p>
+<p>Definition at line <a class="el" href="mnemath_8h_source.html#l00104">104</a> of file <a class="el" href="mnemath_8h_source.html">mnemath.h</a>.</p>
 
 </div>
 </div>
@@ -187,7 +223,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Destroys the <a class="el" href="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html" title="Math methods.">MNEMath</a> object </p>
 
-<p>Definition at line <a class="el" href="mnemath_8h_source.html#l00111">111</a> of file <a class="el" href="mnemath_8h_source.html">mnemath.h</a>.</p>
+<p>Definition at line <a class="el" href="mnemath_8h_source.html#l00110">110</a> of file <a class="el" href="mnemath_8h_source.html">mnemath.h</a>.</p>
 
 </div>
 </div>
@@ -229,23 +265,25 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a29c09ef19dd9e64074c499b7728fc682"></a>
+<a class="anchor" id="ad4470e2d5a20957060311c026df71780"></a>
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool UTILSLIB::MNEMath::compareIdxDoublePairBiggerThan </td>
+          <td class="memname">static bool UTILSLIB::MNEMath::compareIdxValuePairBiggerThan </td>
           <td>(</td>
-          <td class="paramtype">const IdxDoubleValue &amp;&#160;</td>
+          <td class="paramtype">const std::pair&lt; int, T &gt; &amp;&#160;</td>
           <td class="paramname"><em>lhs</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const IdxDoubleValue &amp;&#160;</td>
+          <td class="paramtype">const std::pair&lt; int, T &gt; &amp;&#160;</td>
           <td class="paramname"><em>rhs</em>&#160;</td>
         </tr>
         <tr>
@@ -270,27 +308,27 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if value of lhs is bigger than value of rhs </dd></dl>
 
-<p>Definition at line <a class="el" href="mnemath_8h_source.html#l00286">286</a> of file <a class="el" href="mnemath_8h_source.html">mnemath.h</a>.</p>
-
 </div>
 </div>
-<a class="anchor" id="aaba4542ffa4e1eb08f9ef2639da4a770"></a>
+<a class="anchor" id="aaa7b5b8bbf7083927fc90fe58afb0747"></a>
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool UTILSLIB::MNEMath::compareIdxDoublePairSmallerThan </td>
+          <td class="memname">static bool UTILSLIB::MNEMath::compareIdxValuePairSmallerThan </td>
           <td>(</td>
-          <td class="paramtype">const IdxDoubleValue &amp;&#160;</td>
+          <td class="paramtype">const std::pair&lt; int, T &gt; &amp;&#160;</td>
           <td class="paramname"><em>lhs</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const IdxDoubleValue &amp;&#160;</td>
+          <td class="paramtype">const std::pair&lt; int, T &gt; &amp;&#160;</td>
           <td class="paramname"><em>rhs</em>&#160;</td>
         </tr>
         <tr>
@@ -315,27 +353,27 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if value of lhs is smaller than value of rhs </dd></dl>
 
-<p>Definition at line <a class="el" href="mnemath_8h_source.html#l00294">294</a> of file <a class="el" href="mnemath_8h_source.html">mnemath.h</a>.</p>
-
 </div>
 </div>
-<a class="anchor" id="a68e69f9e932d7a640d9bca52f678994d"></a>
+<a class="anchor" id="aa40f6a335d85bac8b479addaeb26c97f"></a>
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool UTILSLIB::MNEMath::compareIdxIntPairSmallerThan </td>
+          <td class="memname">static bool UTILSLIB::MNEMath::compareTripletFirstEntry </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a3129ad163aae01f8855c1d5ae163e782">IdxIntValue</a> &amp;&#160;</td>
+          <td class="paramtype">const Triplet&lt; T &gt; &amp;&#160;</td>
           <td class="paramname"><em>lhs</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a3129ad163aae01f8855c1d5ae163e782">IdxIntValue</a> &amp;&#160;</td>
+          <td class="paramtype">const Triplet&lt; T &gt; &amp;&#160;</td>
           <td class="paramname"><em>rhs</em>&#160;</td>
         </tr>
         <tr>
@@ -350,17 +388,60 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Compeartor of two int pairs</p>
+<p>Compares triplet first entry</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">lhs</td><td>pair one </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">rhs</td><td>pair two</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">lhs</td><td>left hand side of the comparison </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">rhs</td><td>right hand side of the comparison</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if pair one is bigger, false otherwise </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if value of lhs is smaller than value of rhs </dd></dl>
 
-<p>Definition at line <a class="el" href="mnemath_8h_source.html#l00301">301</a> of file <a class="el" href="mnemath_8h_source.html">mnemath.h</a>.</p>
+</div>
+</div>
+<a class="anchor" id="a857b932f587061a921592e1d285cfe9a"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool UTILSLIB::MNEMath::compareTripletSecondEntry </td>
+          <td>(</td>
+          <td class="paramtype">const Triplet&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Triplet&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Compares triplet second entry</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">lhs</td><td>left hand side of the comparison </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">rhs</td><td>right hand side of the comparison</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if value of lhs is smaller than value of rhs </dd></dl>
 
 </div>
 </div>
@@ -465,7 +546,7 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Find the intersection of two arrays</p>
+<p>Find the intersection of two vectors</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">v1</td><td>Input vector 1 </td></tr>
@@ -669,17 +750,19 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a09e5e39b4110548afe5a881e41185a5e"></a>
+<a class="anchor" id="a35afa407b5c09e6a11cdd5fb1c1d06eb"></a>
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">VectorXi MNEMath::sort </td>
+          <td class="memname">static VectorXi UTILSLIB::MNEMath::sort </td>
           <td>(</td>
-          <td class="paramtype">VectorXd &amp;&#160;</td>
+          <td class="paramtype">Matrix&lt; T, Dynamic, 1 &gt; &amp;&#160;</td>
           <td class="paramname"><em>v</em>, </td>
         </tr>
         <tr>
@@ -710,27 +793,27 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Vector of the original indeces in the new order </dd></dl>
 
-<p>Definition at line <a class="el" href="mnemath_8cpp_source.html#l00388">388</a> of file <a class="el" href="mnemath_8cpp_source.html">mnemath.cpp</a>.</p>
-
 </div>
 </div>
-<a class="anchor" id="a294e213d25574b53c9f7433376d34a81"></a>
+<a class="anchor" id="a7130bb3bc8868c20856d577b50fd74fa"></a>
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">VectorXi MNEMath::sort </td>
+          <td class="memname">static VectorXi UTILSLIB::MNEMath::sort </td>
           <td>(</td>
-          <td class="paramtype">VectorXd &amp;&#160;</td>
+          <td class="paramtype">Matrix&lt; T, Dynamic, 1 &gt; &amp;&#160;</td>
           <td class="paramname"><em>v_prime</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">MatrixXd &amp;&#160;</td>
+          <td class="paramtype">Matrix&lt; T, Dynamic, Dynamic &gt; &amp;&#160;</td>
           <td class="paramname"><em>mat</em>, </td>
         </tr>
         <tr>
@@ -762,7 +845,50 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Vector of the original indeces in the new order </dd></dl>
 
-<p>Definition at line <a class="el" href="mnemath_8cpp_source.html#l00419">419</a> of file <a class="el" href="mnemath_8cpp_source.html">mnemath.cpp</a>.</p>
+</div>
+</div>
+<a class="anchor" id="a6895912c0813fc0752f5776dda800590"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static std::vector&lt;Triplet&lt;T&gt; &gt; UTILSLIB::MNEMath::sortrows </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; Triplet&lt; T &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>A</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">qint32&#160;</td>
+          <td class="paramname"><em>column</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Sort rows in ascending order</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">A</td><td>triplet vector to sort (sorted in place) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">column</td><td>sorts the triplet vector based on the column specified</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Vector of the original indeces in the new order </dd></dl>
 
 </div>
 </div>
@@ -773,7 +899,7 @@ Static Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 7 2013 16:51:33 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 23 2013 15:23:04 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

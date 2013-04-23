@@ -103,10 +103,10 @@ using namespace XMEASLIB;
 
 class StartUpWidget;
 
-class ModuleManager;
+class PluginManager;
 
 class RunWidget;
-class ModuleDockWidget;
+class PluginDockWidget;
 
 
 //=============================================================================================================
@@ -179,7 +179,7 @@ private:
     //Run
     RunWidget*                          m_pRunWidget;	/**< Holds the run widget.*/
     bool                                m_bDisplayMax;	/**< whether full screen mode is activated.*/
-    bool                                m_bIsRunning;	/**< whether program/modules is/are started.*/
+    bool                                m_bIsRunning;	/**< whether program/plugins is/are started.*/
 
     //=========================================================================================================
     /**
@@ -222,42 +222,41 @@ private:
     QAction*                             m_pActionDebugDisconnect;	/**< debug action -> for debug purpose */
 
     //Main Window Menu
-    QMenu*                                 m_pMenuFile;		/**< Holds the file menu.*/
-    QMenu*                                 m_pMenuView;		/**< Holds the view menu.*/
-    QMenu*                                 m_pMenuLgLv;		/**< Holds the log level sub menu.*/
-    QMenu*                                 m_pMenuHelp;		/**< Holds the help menu.*/
+    QMenu*                                 m_pMenuFile;     /**< Holds the file menu.*/
+    QMenu*                                 m_pMenuView;     /**< Holds the view menu.*/
+    QMenu*                                 m_pMenuLgLv;     /**< Holds the log level sub menu.*/
+    QMenu*                                 m_pMenuHelp;     /**< Holds the help menu.*/
 
-    QMenu*                                 m_pMenuDebug;	/**< Holds the debug menu.*/
+    QMenu*                                 m_pMenuDebug;    /**< Holds the debug menu.*/
 
     // Tool bar
-    QToolBar*                             m_pToolBar;		/**< Holds the tool bar.*/
+    QToolBar*                             m_pToolBar;       /**< Holds the tool bar.*/
     /*@}*/
 
 
-    QLabel*                             m_pLabel_Time;		/**< Holds the display label for the running time.*/
-    QTimer*                             m_pTimer;			/**< timer of the main application*/
-    QTime*                              m_pTime;			/**< Holds current time output, updated with timeout of timer.*/
-    int                                 m_iTimeoutMSec;		/**< Holds milliseconds after which timer timeouts.*/
+    QLabel*                             m_pLabel_Time;      /**< Holds the display label for the running time.*/
+    QTimer*                             m_pTimer;           /**< timer of the main application*/
+    QTime*                              m_pTime;            /**< Holds current time output, updated with timeout of timer.*/
+    int                                 m_iTimeoutMSec;     /**< Holds milliseconds after which timer timeouts.*/
 
-    void createModuleDockWindow();										/**< Creates module dock widget.*/
-    void createLogDockWindow();											/**< Creates log dock widget.*/
+    void createPluginDockWindow();                          /**< Creates plugin dock widget.*/
+    void createLogDockWindow();                             /**< Creates log dock widget.*/
 
-    //Module
-    ModuleDockWidget*                    m_pModuleDockWidget;			/**< Holds the dock widget containing the modules.*/
-    ModuleManager*                       m_pModuleManager;				/**< Holds log dock widget.*/
+    //Plugin
+    PluginDockWidget*                   m_pPluginDockWidget;            /**< Holds the dock widget containing the plugins.*/
+    PluginManager*                      m_pPluginManager;               /**< Holds log dock widget.*/
 
-    QList<MDL_ID::Module_ID>           m_pListCurrentDisplayModules;	/**< Holds list of module id's which should be displayed.*/
+    QList<PLG_ID::Plugin_ID>            m_pListCurrentDisplayPlugins;   /**< Holds list of plugin id's which should be displayed.*/
 
     //Log
-    QDockWidget*                         m_pDockWidget_Log;				/**< Holds the dock widget containing the log.*/
-    QTextBrowser*                        m_pTextBrowser_Log;			/**< Holds the text browser for the log.*/
+    QDockWidget*                        m_pDockWidget_Log;              /**< Holds the dock widget containing the log.*/
+    QTextBrowser*                       m_pTextBrowser_Log;             /**< Holds the text browser for the log.*/
 
-    LogLevel                             m_eLogLevelCurrent;			/**< Holds the current log level.*/
-
+    LogLevel                             m_eLogLevelCurrent;            /**< Holds the current log level.*/
 
 private slots:
 
-    void CentralWidgetShowModule();     /**< Sets a widget to central widget of MainWindow class depending on the current module selected in m_pDockWidgetModules.*/
+    void CentralWidgetShowPlugin();     /**< Sets a widget to central widget of MainWindow class depending on the current plugin selected in m_pDockWidgetPlugins.*/
 
     void newConfiguration();            /**< Implements new configuration tasks.*/
     void openConfiguration();           /**< Implements open configuration tasks.*/

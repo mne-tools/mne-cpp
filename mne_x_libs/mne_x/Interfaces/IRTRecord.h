@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "IModule.h"
+#include "IPlugin.h"
 #include <xMeas/Nomenclature/nomenclature.h>
 #include <generics/circularbuffer_old.h>
 
@@ -78,9 +78,9 @@ namespace MNEX
 /**
 * DECLARE CLASS IRTRecord
 *
-* @brief The IRTRecord class provides an interface for a real-time record module.
+* @brief The IRTRecord class provides an interface for a real-time record plugin.
 */
-class IRTRecord : public IModule, public IMeasurementSink
+class IRTRecord : public IPlugin, public IMeasurementSink
 {
 //ToDo virtual methods of IMeasurementSink
 public:
@@ -94,7 +94,7 @@ public:
     //=========================================================================================================
     /**
     * Starts the IRTRecord.
-    * Pure virtual method inherited by IModule.
+    * Pure virtual method inherited by IPlugin.
     *
     * @return true if success, false otherwise
     */
@@ -103,7 +103,7 @@ public:
     //=========================================================================================================
     /**
     * Stops the IRTRecord.
-    * Pure virtual method inherited by IModule.
+    * Pure virtual method inherited by IPlugin.
     *
     * @return true if success, false otherwise
     */
@@ -111,8 +111,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the module type.
-    * Pure virtual method inherited by IModule.
+    * Returns the plugin type.
+    * Pure virtual method inherited by IPlugin.
     *
     * @return type of the IRTRecord
     */
@@ -120,8 +120,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the module name.
-    * Pure virtual method inherited by IModule.
+    * Returns the plugin name.
+    * Pure virtual method inherited by IPlugin.
     *
     * @return the name of the IRTRecord.
     */
@@ -130,7 +130,7 @@ public:
     //=========================================================================================================
     /**
     * Returns the set up widget for configuration of IRTRecord.
-    * Pure virtual method inherited by IModule.
+    * Pure virtual method inherited by IPlugin.
     *
     * @return the setup widget.
     */
@@ -139,7 +139,7 @@ public:
     //=========================================================================================================
     /**
     * Returns the widget which is shown under configuration tab while running mode.
-    * Pure virtual method inherited by IModule.
+    * Pure virtual method inherited by IPlugin.
     *
     * @return the run widget.
     */

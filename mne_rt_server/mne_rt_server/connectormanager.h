@@ -97,7 +97,7 @@ class FiffStreamServer;
 /**
 * DECLARE CLASS ConnectorManager
 *
-* @brief The ConnectorManager class provides a dynamic module loader. As well as the handling of the loaded modules.
+* @brief The ConnectorManager class provides a dynamic plugin loader. As well as the handling of the loaded plugins.
 */
 class ConnectorManager : public QPluginLoader
 {
@@ -127,9 +127,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Loads modules from given directory.
+    * Loads plugins from given directory.
     *
-    * @param dir the module directory.
+    * @param dir the plugin directory.
     */
     void loadConnectors(const QString& dir);
 
@@ -141,17 +141,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns vector containing active ISensor modules.
+    * Returns vector containing active ISensor plugins.
     *
-    * @return reference to vector containing active ISensor modules.
+    * @return reference to vector containing active ISensor plugins.
     */
     IConnector* getActiveConnector();
 
     //=========================================================================================================
     /**
-    * Returns vector containing all modules.
+    * Returns vector containing all plugins.
     *
-    * @return reference to vector containing all modules.
+    * @return reference to vector containing all plugins.
     */
     static inline const QVector<IConnector*>& getConnectors();
 
@@ -213,7 +213,7 @@ private:
 
 
 
-    static QVector<IConnector*> s_vecConnectors;       /**< Holds vector of all modules. */
+    static QVector<IConnector*> s_vecConnectors;       /**< Holds vector of all plugins. */
 
     FiffStreamServer* m_pFiffStreamServer;
 };

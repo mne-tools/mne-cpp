@@ -12,7 +12,7 @@ var searchData=
   ['nent_5ftree',['nent_tree',['../class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#aea824dcf71b31ad4a3867c6b7fb60e1a',1,'FIFFLIB::FiffDirTree']]],
   ['next',['next',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#ae95266b76119bf235b6dd25b71288ed4',1,'FIFFLIB::FiffTag']]],
   ['nfree',['nfree',['../class_f_i_f_f_l_i_b_1_1_fiff_cov.html#a208a8bd71c3d0d4f93b554db8f7aef6a',1,'FIFFLIB::FiffCov']]],
-  ['nn',['nn',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a79f826f72f12b0b98c2ce44281201e28',1,'MNELIB::MNEHemisphere']]],
+  ['nn',['nn',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a92b928637b438f118a00c860e929ecae',1,'MNELIB::MNEHemisphere']]],
   ['noise_5fcov',['noise_cov',['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#aa5f2736974ee16605666442bf5cac1c8',1,'MNELIB::MNEInverseOperator']]],
   ['noisenorm',['noisenorm',['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a40f80ae63531d67ceb8a40ddd48f80d2',1,'MNELIB::MNEInverseOperator']]],
   ['notifyenabled',['notifyEnabled',['../class_subject.html#ad42e3984f551ca321a2c8ac67a7a0503',1,'Subject']]],

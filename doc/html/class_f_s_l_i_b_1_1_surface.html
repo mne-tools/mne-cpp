@@ -73,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -122,6 +122,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a89de75c95cb550d432f3ea4ed1429db0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aedc7bb57dc9f9b7198ae4f812491738c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_surface.html#aedc7bb57dc9f9b7198ae4f812491738c">clear</a> ()</td></tr>
 <tr class="separator:aedc7bb57dc9f9b7198ae4f812491738c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8df5bda3c300fcb72f2ffa597d8582f0"><td class="memItemLeft" align="right" valign="top">qint32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_surface.html#a8df5bda3c300fcb72f2ffa597d8582f0">getHemi</a> () const </td></tr>
+<tr class="separator:a8df5bda3c300fcb72f2ffa597d8582f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -264,6 +266,33 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a8df5bda3c300fcb72f2ffa597d8582f0"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">qint32 FSLIB::Surface::getHemi </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Returns the hemisphere id (0 = lh; 1 = rh)</p>
+<dl class="section return"><dt>Returns</dt><dd>hemisphere id </dd></dl>
+
+<p>Definition at line <a class="el" href="surface_8h_source.html#l00155">155</a> of file <a class="el" href="surface_8h_source.html">surface.h</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a1ff84f0339ef45075e66c22da67c155a"></a>
 <div class="memitem">
 <div class="memproto">
@@ -321,7 +350,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Hemisphere (lh = 0; rh = 1) </p>
 
-<p>Definition at line <a class="el" href="surface_8h_source.html#l00137">137</a> of file <a class="el" href="surface_8h_source.html">surface.h</a>.</p>
+<p>Definition at line <a class="el" href="surface_8h_source.html#l00145">145</a> of file <a class="el" href="surface_8h_source.html">surface.h</a>.</p>
 
 </div>
 </div>
@@ -336,7 +365,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p><a class="el" href="class_f_s_l_i_b_1_1_surface.html" title="FreeSurfer surface mesh.">Surface</a> file name. </p>
 
-<p>Definition at line <a class="el" href="surface_8h_source.html#l00136">136</a> of file <a class="el" href="surface_8h_source.html">surface.h</a>.</p>
+<p>Definition at line <a class="el" href="surface_8h_source.html#l00144">144</a> of file <a class="el" href="surface_8h_source.html">surface.h</a>.</p>
 
 </div>
 </div>
@@ -351,7 +380,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>alias verts. Vertex coordinates in meters </p>
 
-<p>Definition at line <a class="el" href="surface_8h_source.html#l00138">138</a> of file <a class="el" href="surface_8h_source.html">surface.h</a>.</p>
+<p>Definition at line <a class="el" href="surface_8h_source.html#l00146">146</a> of file <a class="el" href="surface_8h_source.html">surface.h</a>.</p>
 
 </div>
 </div>
@@ -366,7 +395,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>alias faces. The triangle descriptions </p>
 
-<p>Definition at line <a class="el" href="surface_8h_source.html#l00139">139</a> of file <a class="el" href="surface_8h_source.html">surface.h</a>.</p>
+<p>Definition at line <a class="el" href="surface_8h_source.html#l00147">147</a> of file <a class="el" href="surface_8h_source.html">surface.h</a>.</p>
 
 </div>
 </div>
@@ -377,7 +406,7 @@ Public Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 7 2013 16:51:32 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 23 2013 15:23:03 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

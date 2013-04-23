@@ -67,17 +67,17 @@ SOURCES += \
     src/main.cpp \
     src/FormFiles/startupwidget.cpp \
     src/FormFiles/runwidget.cpp \
-    src/FormFiles/moduledockwidget.cpp \
     src/FormFiles/mainwindow.cpp \
-    src/FormFiles/mainsplashscreen.cpp
+    src/FormFiles/mainsplashscreen.cpp \
+    src/FormFiles/plugindockwidget.cpp
 
 HEADERS += \
     src/FormFiles/startupwidget.h \
     src/FormFiles/runwidget.h \
-    src/FormFiles/moduledockwidget.h \
     src/FormFiles/mainwindow.h \
     src/FormFiles/mainsplashscreen.h \
-    src/preferences/info.h
+    src/preferences/info.h \
+    src/FormFiles/plugindockwidget.h
 
 FORMS   +=
 

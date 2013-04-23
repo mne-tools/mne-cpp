@@ -73,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -124,8 +124,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a4d84eb04f4f9ad588ac5df49de7f7a06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a16ef1e0a9ecbe79a0aa959fe2120ac4e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_label.html#a16ef1e0a9ecbe79a0aa959fe2120ac4e">isEmpty</a> () const </td></tr>
 <tr class="separator:a16ef1e0a9ecbe79a0aa959fe2120ac4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a005b78a2fc685ef35892c0d0c798c36b"><td class="memItemLeft" align="right" valign="top">MatrixX3i&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_label.html#a005b78a2fc685ef35892c0d0c798c36b">generateTris</a> (const <a class="el" href="class_f_s_l_i_b_1_1_surface.html">Surface</a> &amp;p_Surface)</td></tr>
-<tr class="separator:a005b78a2fc685ef35892c0d0c798c36b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ad2d98ee5a39cfbd77fb938e224a5a1"><td class="memItemLeft" align="right" valign="top">MatrixX3i&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_label.html#a3ad2d98ee5a39cfbd77fb938e224a5a1">selectTris</a> (const <a class="el" href="class_f_s_l_i_b_1_1_surface.html">Surface</a> &amp;p_Surface)</td></tr>
+<tr class="separator:a3ad2d98ee5a39cfbd77fb938e224a5a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8fbc25c3de7fe47c377d6b15a5f0ed8a"><td class="memItemLeft" align="right" valign="top">MatrixX3i&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_label.html#a8fbc25c3de7fe47c377d6b15a5f0ed8a">selectTris</a> (const MatrixX3i &amp;p_matTris)</td></tr>
+<tr class="separator:a8fbc25c3de7fe47c377d6b15a5f0ed8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -305,32 +307,6 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a005b78a2fc685ef35892c0d0c798c36b"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">MatrixX3i Label::generateTris </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_f_s_l_i_b_1_1_surface.html">Surface</a> &amp;&#160;</td>
-          <td class="paramname"><em>p_Surface</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Generates tris for this label using a given surface file.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_Surface</td><td>to generate the label tris from</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the generated tris. </dd></dl>
-
-<p>Definition at line <a class="el" href="label_8cpp_source.html#l00118">118</a> of file <a class="el" href="label_8cpp_source.html">label.cpp</a>.</p>
-
-</div>
-</div>
 <a class="anchor" id="a16ef1e0a9ecbe79a0aa959fe2120ac4e"></a>
 <div class="memitem">
 <div class="memproto">
@@ -354,7 +330,7 @@ Public Attributes</h2></td></tr>
 <p>True if <a class="el" href="class_f_s_l_i_b_1_1_label.html" title="Freesurfer/MNE label.">Label</a> is empty.</p>
 <dl class="section return"><dt>Returns</dt><dd>true if <a class="el" href="class_f_s_l_i_b_1_1_label.html" title="Freesurfer/MNE label.">Label</a> is empty, false otherwise. </dd></dl>
 
-<p>Definition at line <a class="el" href="label_8h_source.html#l00189">189</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
+<p>Definition at line <a class="el" href="label_8h_source.html#l00199">199</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
 
 </div>
 </div>
@@ -400,6 +376,58 @@ Public Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if successful, false otherwise </dd></dl>
 
+<p>Definition at line <a class="el" href="label_8cpp_source.html#l00186">186</a> of file <a class="el" href="label_8cpp_source.html">label.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a3ad2d98ee5a39cfbd77fb938e224a5a1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">MatrixX3i Label::selectTris </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_s_l_i_b_1_1_surface.html">Surface</a> &amp;&#160;</td>
+          <td class="paramname"><em>p_Surface</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Select tris for this label from a given surface file.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_Surface</td><td>to generate the label tris from</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the generated tris. </dd></dl>
+
+<p>Definition at line <a class="el" href="label_8cpp_source.html#l00118">118</a> of file <a class="el" href="label_8cpp_source.html">label.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a8fbc25c3de7fe47c377d6b15a5f0ed8a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">MatrixX3i Label::selectTris </td>
+          <td>(</td>
+          <td class="paramtype">const MatrixX3i &amp;&#160;</td>
+          <td class="paramname"><em>p_matTris</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Select tris for this label from a given tri matrix.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_matTris</td><td>tris from which the selection should be made</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the generated tris. </dd></dl>
+
 <p>Definition at line <a class="el" href="label_8cpp_source.html#l00152">152</a> of file <a class="el" href="label_8cpp_source.html">label.cpp</a>.</p>
 
 </div>
@@ -416,7 +444,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Comment from the first line of the label file. </p>
 
-<p>Definition at line <a class="el" href="label_8h_source.html#l00168">168</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
+<p>Definition at line <a class="el" href="label_8h_source.html#l00178">178</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
 
 </div>
 </div>
@@ -431,7 +459,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Hemisphere (lh = 0; rh = 1) </p>
 
-<p>Definition at line <a class="el" href="label_8h_source.html#l00169">169</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
+<p>Definition at line <a class="el" href="label_8h_source.html#l00179">179</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
 
 </div>
 </div>
@@ -446,7 +474,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p><a class="el" href="class_f_s_l_i_b_1_1_label.html" title="Freesurfer/MNE label.">Label</a> id (optional) </p>
 
-<p>Definition at line <a class="el" href="label_8h_source.html#l00176">176</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
+<p>Definition at line <a class="el" href="label_8h_source.html#l00186">186</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
 
 </div>
 </div>
@@ -461,7 +489,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Name of the label </p>
 
-<p>Definition at line <a class="el" href="label_8h_source.html#l00171">171</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
+<p>Definition at line <a class="el" href="label_8h_source.html#l00181">181</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
 
 </div>
 </div>
@@ -476,7 +504,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Locations in meters </p>
 
-<p>Definition at line <a class="el" href="label_8h_source.html#l00173">173</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
+<p>Definition at line <a class="el" href="label_8h_source.html#l00183">183</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
 
 </div>
 </div>
@@ -491,7 +519,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Values at the vertices </p>
 
-<p>Definition at line <a class="el" href="label_8h_source.html#l00174">174</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
+<p>Definition at line <a class="el" href="label_8h_source.html#l00184">184</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
 
 </div>
 </div>
@@ -506,7 +534,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Vertex indices (0 based) </p>
 
-<p>Definition at line <a class="el" href="label_8h_source.html#l00172">172</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
+<p>Definition at line <a class="el" href="label_8h_source.html#l00182">182</a> of file <a class="el" href="label_8h_source.html">label.h</a>.</p>
 
 </div>
 </div>
@@ -517,7 +545,7 @@ Public Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 7 2013 16:51:32 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 23 2013 15:23:03 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

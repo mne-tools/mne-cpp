@@ -73,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -124,15 +124,19 @@ Public Types</h2></td></tr>
 Signals</h2></td></tr>
 <tr class="memitem:a65bc6829f9fc55168053a8921608dd74"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_client.html#a65bc6829f9fc55168053a8921608dd74">rawBufferReceived</a> (Eigen::MatrixXf p_rawBuffer)</td></tr>
 <tr class="separator:a65bc6829f9fc55168053a8921608dd74"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4449ac2f6a6e0e56db1addc903d3653e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_client.html#a4449ac2f6a6e0e56db1addc903d3653e">connectionChanged</a> (bool p_bStatus)</td></tr>
+<tr class="separator:a4449ac2f6a6e0e56db1addc903d3653e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ac53a2fac10f4c1177a71333f49e33c0d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_client.html#ac53a2fac10f4c1177a71333f49e33c0d">RtClient</a> (QString p_sRtServerHostname, QObject *parent=0)</td></tr>
-<tr class="separator:ac53a2fac10f4c1177a71333f49e33c0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a62e2bf8b002e97dec1ae3bae9ddbd7e5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_client.html#a62e2bf8b002e97dec1ae3bae9ddbd7e5">RtClient</a> (QString p_sRtServerHostname, QString p_sClientAlias=&quot;rtclient&quot;, QObject *parent=0)</td></tr>
+<tr class="separator:a62e2bf8b002e97dec1ae3bae9ddbd7e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a33bb04ea1663bdd1aa126611976a5678"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_client.html#a33bb04ea1663bdd1aa126611976a5678">~RtClient</a> ()</td></tr>
 <tr class="separator:a33bb04ea1663bdd1aa126611976a5678"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f5b64162eb0bca563e0e00c6a05f779"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_client.html#a9f5b64162eb0bca563e0e00c6a05f779">getFiffInfo</a> ()</td></tr>
 <tr class="separator:a9f5b64162eb0bca563e0e00c6a05f779"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b3684e00ed4654835786118bfd5ef53"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_client.html#a0b3684e00ed4654835786118bfd5ef53">getConnectionStatus</a> ()</td></tr>
+<tr class="separator:a0b3684e00ed4654835786118bfd5ef53"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6fd81ed44e923137c8934f91057fdbef"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_client.html#a6fd81ed44e923137c8934f91057fdbef">stop</a> ()</td></tr>
 <tr class="separator:a6fd81ed44e923137c8934f91057fdbef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -178,7 +182,7 @@ Protected Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="ac53a2fac10f4c1177a71333f49e33c0d"></a>
+<a class="anchor" id="a62e2bf8b002e97dec1ae3bae9ddbd7e5"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -190,6 +194,12 @@ Protected Member Functions</h2></td></tr>
           <td>(</td>
           <td class="paramtype">QString&#160;</td>
           <td class="paramname"><em>p_sRtServerHostname</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QString&#160;</td>
+          <td class="paramname"><em>p_sClientAlias</em> = <code>&quot;rtclient&quot;</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -213,6 +223,7 @@ Protected Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">p_sRtServerHostname</td><td>The IP address of the mne_rt_server </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_sClientAlias</td><td>The client alias of the data client. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">parent</td><td>Parent QObject (optional) </td></tr>
   </table>
   </dd>
@@ -236,11 +247,61 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Destroys the real time client. </p>
 
-<p>Definition at line <a class="el" href="rtclient_8cpp_source.html#l00071">71</a> of file <a class="el" href="rtclient_8cpp_source.html">rtclient.cpp</a>.</p>
+<p>Definition at line <a class="el" href="rtclient_8cpp_source.html#l00074">74</a> of file <a class="el" href="rtclient_8cpp_source.html">rtclient.cpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a4449ac2f6a6e0e56db1addc903d3653e"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void RTCLIENTLIB::RtClient::connectionChanged </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>p_bStatus</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">signal</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Emitted when connection status changed</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_bStatus</td><td>connection status </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a0b3684e00ed4654835786118bfd5ef53"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool RtClient::getConnectionStatus </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Rt Server status, returns true when rt server is started.</p>
+<dl class="section return"><dt>Returns</dt><dd>true if started, false otherwise </dd></dl>
+
+<p>Definition at line <a class="el" href="rtclient_8cpp_source.html#l00082">82</a> of file <a class="el" href="rtclient_8cpp_source.html">rtclient.cpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a9f5b64162eb0bca563e0e00c6a05f779"></a>
 <div class="memitem">
 <div class="memproto">
@@ -320,7 +381,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>The starting point for the thread. After calling start(), the newly created thread calls this function. Returning from this method will end the execution of the thread. Pure virtual method inherited by QThread. </p>
 
-<p>Definition at line <a class="el" href="rtclient_8cpp_source.html#l00090">90</a> of file <a class="el" href="rtclient_8cpp_source.html">rtclient.cpp</a>.</p>
+<p>Definition at line <a class="el" href="rtclient_8cpp_source.html#l00101">101</a> of file <a class="el" href="rtclient_8cpp_source.html">rtclient.cpp</a>.</p>
 
 </div>
 </div>
@@ -347,7 +408,7 @@ Protected Member Functions</h2></td></tr>
 <p>Stops the <a class="el" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_client.html" title="Real-time client.">RtClient</a> by stopping the producer's thread.</p>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="rtclient_8cpp_source.html#l00079">79</a> of file <a class="el" href="rtclient_8cpp_source.html">rtclient.cpp</a>.</p>
+<p>Definition at line <a class="el" href="rtclient_8cpp_source.html#l00090">90</a> of file <a class="el" href="rtclient_8cpp_source.html">rtclient.cpp</a>.</p>
 
 </div>
 </div>
@@ -358,7 +419,7 @@ Protected Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 7 2013 16:51:32 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 23 2013 15:23:03 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

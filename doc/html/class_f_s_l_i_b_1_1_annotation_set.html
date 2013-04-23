@@ -73,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -124,6 +124,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a7f36fa0ac6ddc742a0a88498a24391dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a50e15835a32be178552134ee08def943"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_annotation_set.html#a50e15835a32be178552134ee08def943">clear</a> ()</td></tr>
 <tr class="separator:a50e15835a32be178552134ee08def943"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebd156d216d0d79380ca0cf63a74ebab"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_annotation_set.html#aebd156d216d0d79380ca0cf63a74ebab">toLabels</a> (const <a class="el" href="class_f_s_l_i_b_1_1_surface_set.html">SurfaceSet</a> &amp;p_surfSet, QList&lt; <a class="el" href="class_f_s_l_i_b_1_1_label.html">Label</a> &gt; &amp;p_qListLabels, QList&lt; RowVector4i &gt; &amp;p_qListLabelRGBAs) const </td></tr>
+<tr class="separator:aebd156d216d0d79380ca0cf63a74ebab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac2c85b6c78cb4d6c56c6732584ff8c2e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_s_l_i_b_1_1_annotation.html">Annotation</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_annotation_set.html#ac2c85b6c78cb4d6c56c6732584ff8c2e">operator[]</a> (qint32 idx)</td></tr>
 <tr class="separator:ac2c85b6c78cb4d6c56c6732584ff8c2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a21a44ee7fe417c705aa80a26baeee7a0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_s_l_i_b_1_1_annotation.html">Annotation</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_annotation_set.html#a21a44ee7fe417c705aa80a26baeee7a0">operator[]</a> (QString idt)</td></tr>
@@ -131,14 +133,14 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:ae20af70e4b063ce376eabe523b55f749"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_annotation_set.html#ae20af70e4b063ce376eabe523b55f749">read</a> (const QStringList &amp;p_qListFileNames, <a class="el" href="class_f_s_l_i_b_1_1_annotation_set.html">AnnotationSet</a> &amp;p_AnnotationSet)</td></tr>
-<tr class="separator:ae20af70e4b063ce376eabe523b55f749"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a000932b83fdb3a164a0f85e0af6f9c49"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_s_l_i_b_1_1_annotation_set.html#a000932b83fdb3a164a0f85e0af6f9c49">read</a> (const QString &amp;p_sLHFileName, const QString &amp;p_sRHFileName, <a class="el" href="class_f_s_l_i_b_1_1_annotation_set.html">AnnotationSet</a> &amp;p_AnnotationSet)</td></tr>
+<tr class="separator:a000932b83fdb3a164a0f85e0af6f9c49"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="class_f_s_l_i_b_1_1_annotation.html" title="Free surfer annotation.">Annotation</a> set. </p>
 <p><a class="el" href="class_f_s_l_i_b_1_1_annotation.html" title="Free surfer annotation.">Annotation</a> set </p>
 
-<p>Definition at line <a class="el" href="annotationset_8h_source.html#l00094">94</a> of file <a class="el" href="annotationset_8h_source.html">annotationset.h</a>.</p>
+<p>Definition at line <a class="el" href="annotationset_8h_source.html#l00096">96</a> of file <a class="el" href="annotationset_8h_source.html">annotationset.h</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a class="anchor" id="a2a19cbd53984028df0e93b9e320631cf"></a>
 <div class="memitem">
@@ -151,7 +153,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Const shared pointer type for <a class="el" href="class_f_s_l_i_b_1_1_annotation_set.html" title="Annotation set.">AnnotationSet</a>. </p>
 
-<p>Definition at line <a class="el" href="annotationset_8h_source.html#l00098">98</a> of file <a class="el" href="annotationset_8h_source.html">annotationset.h</a>.</p>
+<p>Definition at line <a class="el" href="annotationset_8h_source.html#l00100">100</a> of file <a class="el" href="annotationset_8h_source.html">annotationset.h</a>.</p>
 
 </div>
 </div>
@@ -166,7 +168,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Shared pointer type for <a class="el" href="class_f_s_l_i_b_1_1_annotation_set.html" title="Annotation set.">AnnotationSet</a>. </p>
 
-<p>Definition at line <a class="el" href="annotationset_8h_source.html#l00097">97</a> of file <a class="el" href="annotationset_8h_source.html">annotationset.h</a>.</p>
+<p>Definition at line <a class="el" href="annotationset_8h_source.html#l00099">99</a> of file <a class="el" href="annotationset_8h_source.html">annotationset.h</a>.</p>
 
 </div>
 </div>
@@ -185,7 +187,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Default constructor </p>
 
-<p>Definition at line <a class="el" href="annotationset_8cpp_source.html#l00060">60</a> of file <a class="el" href="annotationset_8cpp_source.html">annotationset.cpp</a>.</p>
+<p>Definition at line <a class="el" href="annotationset_8cpp_source.html#l00061">61</a> of file <a class="el" href="annotationset_8cpp_source.html">annotationset.cpp</a>.</p>
 
 </div>
 </div>
@@ -229,7 +231,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="annotationset_8cpp_source.html#l00068">68</a> of file <a class="el" href="annotationset_8cpp_source.html">annotationset.cpp</a>.</p>
+<p>Definition at line <a class="el" href="annotationset_8cpp_source.html#l00069">69</a> of file <a class="el" href="annotationset_8cpp_source.html">annotationset.cpp</a>.</p>
 
 </div>
 </div>
@@ -273,7 +275,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="annotationset_8cpp_source.html#l00085">85</a> of file <a class="el" href="annotationset_8cpp_source.html">annotationset.cpp</a>.</p>
+<p>Definition at line <a class="el" href="annotationset_8cpp_source.html#l00086">86</a> of file <a class="el" href="annotationset_8cpp_source.html">annotationset.cpp</a>.</p>
 
 </div>
 </div>
@@ -299,7 +301,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Destroys the annotation set. </p>
 
-<p>Definition at line <a class="el" href="annotationset_8h_source.html#l00128">128</a> of file <a class="el" href="annotationset_8h_source.html">annotationset.h</a>.</p>
+<p>Definition at line <a class="el" href="annotationset_8h_source.html#l00130">130</a> of file <a class="el" href="annotationset_8h_source.html">annotationset.h</a>.</p>
 
 </div>
 </div>
@@ -318,7 +320,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Initializes the <a class="el" href="class_f_s_l_i_b_1_1_annotation_set.html" title="Annotation set.">AnnotationSet</a>. </p>
 
-<p>Definition at line <a class="el" href="annotationset_8cpp_source.html#l00098">98</a> of file <a class="el" href="annotationset_8cpp_source.html">annotationset.cpp</a>.</p>
+<p>Definition at line <a class="el" href="annotationset_8cpp_source.html#l00096">96</a> of file <a class="el" href="annotationset_8cpp_source.html">annotationset.cpp</a>.</p>
 
 </div>
 </div>
@@ -344,7 +346,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="class_f_s_l_i_b_1_1_annotation.html" title="Free surfer annotation.">Annotation</a> related to the parameter index. </dd></dl>
 
-<p>Definition at line <a class="el" href="annotationset_8cpp_source.html#l00130">130</a> of file <a class="el" href="annotationset_8cpp_source.html">annotationset.cpp</a>.</p>
+<p>Definition at line <a class="el" href="annotationset_8cpp_source.html#l00144">144</a> of file <a class="el" href="annotationset_8cpp_source.html">annotationset.cpp</a>.</p>
 
 </div>
 </div>
@@ -370,11 +372,11 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="class_f_s_l_i_b_1_1_annotation.html" title="Free surfer annotation.">Annotation</a> related to the parameter identifier. </dd></dl>
 
-<p>Definition at line <a class="el" href="annotationset_8cpp_source.html#l00146">146</a> of file <a class="el" href="annotationset_8cpp_source.html">annotationset.cpp</a>.</p>
+<p>Definition at line <a class="el" href="annotationset_8cpp_source.html#l00160">160</a> of file <a class="el" href="annotationset_8cpp_source.html">annotationset.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ae20af70e4b063ce376eabe523b55f749"></a>
+<a class="anchor" id="a000932b83fdb3a164a0f85e0af6f9c49"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -384,8 +386,14 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">bool AnnotationSet::read </td>
           <td>(</td>
-          <td class="paramtype">const QStringList &amp;&#160;</td>
-          <td class="paramname"><em>p_qListFileNames</em>, </td>
+          <td class="paramtype">const QString &amp;&#160;</td>
+          <td class="paramname"><em>p_sLHFileName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const QString &amp;&#160;</td>
+          <td class="paramname"><em>p_sRHFileName</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -405,17 +413,63 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Reads different annotation files and assembles them to a SourceSpaceAnnotation</p>
+<p>Reads different annotation files and assembles them to a <a class="el" href="class_f_s_l_i_b_1_1_annotation_set.html" title="Annotation set.">AnnotationSet</a></p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_listFileNames</td><td>List annotation files to read (lh and rh) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_sLHFileName</td><td>Left hemisphere annotation file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_sRHFileName</td><td>Right hemisphere annotation file </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">p_AnnotationSet</td><td>The read annotation set</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succesfull, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="annotationset_8cpp_source.html#l00106">106</a> of file <a class="el" href="annotationset_8cpp_source.html">annotationset.cpp</a>.</p>
+<p>Definition at line <a class="el" href="annotationset_8cpp_source.html#l00104">104</a> of file <a class="el" href="annotationset_8cpp_source.html">annotationset.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aebd156d216d0d79380ca0cf63a74ebab"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool AnnotationSet::toLabels </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_s_l_i_b_1_1_surface_set.html">SurfaceSet</a> &amp;&#160;</td>
+          <td class="paramname"><em>p_surfSet</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QList&lt; <a class="el" href="class_f_s_l_i_b_1_1_label.html">Label</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>p_qListLabels</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QList&lt; RowVector4i &gt; &amp;&#160;</td>
+          <td class="paramname"><em>p_qListLabelRGBAs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>python labels_from_parc</p>
+<p>Converts annotation to a label list and colortable</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_surfSet</td><td>the <a class="el" href="class_f_s_l_i_b_1_1_surface_set.html" title="A hemisphere set of surfaces.">SurfaceSet</a> to read the vertex positions from </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">p_qListLabels</td><td>the converted labels are appended to a given list. Stored data are not affected. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">p_qListLabelRGBAs</td><td>the converted label RGBAs are appended to a given list. Stored data are not affected.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if successful, false otherwise </dd></dl>
+
+<p>Definition at line <a class="el" href="annotationset_8cpp_source.html#l00131">131</a> of file <a class="el" href="annotationset_8cpp_source.html">annotationset.cpp</a>.</p>
 
 </div>
 </div>
@@ -426,7 +480,7 @@ Static Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 7 2013 16:51:32 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 23 2013 15:23:03 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

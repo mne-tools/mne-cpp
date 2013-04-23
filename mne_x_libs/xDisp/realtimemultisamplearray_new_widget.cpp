@@ -271,7 +271,7 @@ void RealTimeMultiSampleArrayNewWidget::init()
 //    ui.m_qLabel_MinValue->setText(QString::number(m_pRTSM->getMinValue()));
 //    ui.m_qLabel_MaxValue->setText(QString::number(m_pRTSM->getMaxValue()));
 
-    m_uiNumChannels = 20;//m_pRTMSA_New->getNumChannels();
+    m_uiNumChannels = 100;//m_pRTMSA_New->getNumChannels();
 
     m_dMinValue_init = m_pRTMSA_New->chInfo()[0].getMinValue();
     m_dMaxValue_init = m_pRTMSA_New->chInfo()[0].getMaxValue();

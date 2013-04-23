@@ -140,7 +140,7 @@ public:
 
 private:
     QString         m_qString_Name;         /**< Holds the name of the Measurement. */
-//    MDL_ID::Module_ID         m_MDL_ID;     /**< Holds the corresponding module id. */
+//    PLG_ID::Plugin_ID         m_PLG_ID;     /**< Holds the corresponding plugin id. */
     MSR_ID::Measurement_ID    m_MSR_ID;     /**< Holds the Measurement id. */
     bool        m_bVisibility;              /**< Holds the visibility status. */
 

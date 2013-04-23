@@ -75,8 +75,8 @@ win32 {
 }
 
 SOURCES += \
-    Management/modulemanager.cpp \
-    Management/connector.cpp
+    Management/connector.cpp \
+    Management/pluginmanager.cpp
 
 
 HEADERS += \
@@ -85,10 +85,10 @@ HEADERS += \
     Interfaces/IRTVisualization.h \
     Interfaces/IRTRecord.h \
     Interfaces/IRTAlgorithm.h \
-    Interfaces/IModule.h \
     Interfaces/IAlert.h \
-    Management/modulemanager.h \
-    Management/connector.h
+    Management/connector.h \
+    Interfaces/IPlugin.h \
+    Management/pluginmanager.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

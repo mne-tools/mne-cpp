@@ -71,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -82,7 +82,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_d9f91708cdb6d7bc2d9cf00ef2519886.html">MNE</a></li><li class="navelem"><a class="el" href="dir_6ae064e4ae0e1eb153dd1e966c6cf246.html">fs</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_fba7b6d30909f9ec66000534e18b073e.html">MNE</a></li><li class="navelem"><a class="el" href="dir_a748eac5b594e51c109d7d0850221d09.html">fs</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -346,81 +346,78 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;    VectorXd values;</div>
 <div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    MatrixX3f pos;</div>
 <div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    QString name;</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;    MatrixX3i t_tris;</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    <span class="keywordflow">for</span>(qint32 i = 0; i &lt; label_rgbas.rows(); ++i)</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    {</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;        label_id = label_ids[i];</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;        label_rgba = label_rgbas.row(i);</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;        count = 0;</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;        vertices.resize(m_LabelIds.size());</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;        <span class="comment">//Where</span></div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;        <span class="keywordflow">for</span>(qint32 j = 0; j &lt; m_LabelIds.size(); ++j)</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;        {</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;            <span class="keywordflow">if</span>(m_LabelIds[j] == label_id)</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;            {</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;                vertices[count] = j;</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;                ++count;</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;            }</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;        }</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;        <span class="comment">// check if label is part of cortical surface</span></div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;        <span class="keywordflow">if</span>(count == 0)</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;            <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;        vertices.conservativeResize(count);</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;        pos.resize(count, 3);</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;        <span class="keywordflow">for</span>(qint32 j = 0; j &lt; count; ++j)</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;            pos.row(j) = vert_pos.row(vertices[j]);</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;        values = VectorXd::Zero(count);</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;        name = QString(<span class="stringliteral">&quot;%1-%2&quot;</span>).arg(label_names[i]).arg(this-&gt;hemi == 0 ? <span class="stringliteral">&quot;lh&quot;</span> : <span class="stringliteral">&quot;rh&quot;</span>);</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;        <span class="comment">// put it all together</span></div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;        <span class="comment">//t_tris</span></div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;        p_qListLabels.append(<a class="code" href="class_f_s_l_i_b_1_1_label.html" title="Freesurfer/MNE label.">Label</a>(vertices, pos, values, this-&gt;hemi, name, label_id));</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;        <span class="comment">// store the color</span></div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;        p_qListLabelRGBAs.append(label_rgba);</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;    }</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;    <span class="keywordflow">for</span>(qint32 i = 0; i &lt; label_rgbas.rows(); ++i)</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    {</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;        label_id = label_ids[i];</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;        label_rgba = label_rgbas.row(i);</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;        count = 0;</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;        vertices.resize(m_LabelIds.size());</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;        <span class="comment">//Where</span></div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;        <span class="keywordflow">for</span>(qint32 j = 0; j &lt; m_LabelIds.size(); ++j)</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;        {</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;            <span class="keywordflow">if</span>(m_LabelIds[j] == label_id)</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;            {</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;                vertices[count] = j;</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;                ++count;</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;            }</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;        }</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;        <span class="comment">// check if label is part of cortical surface</span></div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;        <span class="keywordflow">if</span>(count == 0)</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;            <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;        vertices.conservativeResize(count);</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;        pos.resize(count, 3);</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;        <span class="keywordflow">for</span>(qint32 j = 0; j &lt; count; ++j)</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;            pos.row(j) = vert_pos.row(vertices[j]);</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;        values = VectorXd::Zero(count);</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;        name = QString(<span class="stringliteral">&quot;%1-%2&quot;</span>).arg(label_names[i]).arg(this-&gt;hemi == 0 ? <span class="stringliteral">&quot;lh&quot;</span> : <span class="stringliteral">&quot;rh&quot;</span>);</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;        <span class="comment">// put it all together</span></div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;        <span class="comment">//t_tris</span></div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;        p_qListLabels.append(<a class="code" href="class_f_s_l_i_b_1_1_label.html" title="Freesurfer/MNE label.">Label</a>(vertices, pos, values, this-&gt;hemi, name, label_id));</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;        <span class="comment">// store the color</span></div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;        p_qListLabelRGBAs.append(label_rgba);</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;    }</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;</div>
 <div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;</div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;<span class="comment">//    for label_id, label_name, label_rgba in\</span></div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;<span class="comment">//            zip(label_ids, label_names, label_rgbas):</span></div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;<span class="comment">//        vertices = np.where(annot == label_id)[0]</span></div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;<span class="comment">//        if len(vertices) == 0:</span></div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;<span class="comment">//            # label is not part of cortical surface</span></div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;<span class="comment">//            continue</span></div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;<span class="comment">//        pos = vert_pos[vertices, :]</span></div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;<span class="comment">//        values = np.zeros(len(vertices))</span></div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;<span class="comment">//        name = label_name + &#39;-&#39; + hemi</span></div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;<span class="comment">//        label = Label(vertices, pos, values, hemi, name=name)</span></div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;<span class="comment">//        labels.append(label)</span></div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;<span class="comment">//        # store the color</span></div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;<span class="comment">//        label_rgba = tuple(label_rgba / 255.)</span></div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;<span class="comment">//        label_colors.append(label_rgba)</span></div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;<span class="comment">//    for label_id, label_name, label_rgba in\</span></div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;<span class="comment">//            zip(label_ids, label_names, label_rgbas):</span></div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;<span class="comment">//        vertices = np.where(annot == label_id)[0]</span></div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;<span class="comment">//        if len(vertices) == 0:</span></div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;<span class="comment">//            # label is not part of cortical surface</span></div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;<span class="comment">//            continue</span></div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;<span class="comment">//        pos = vert_pos[vertices, :]</span></div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;<span class="comment">//        values = np.zeros(len(vertices))</span></div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;<span class="comment">//        name = label_name + &#39;-&#39; + hemi</span></div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;<span class="comment">//        label = Label(vertices, pos, values, hemi, name=name)</span></div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;<span class="comment">//        labels.append(label)</span></div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;<span class="comment">//        # store the color</span></div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;<span class="comment">//        label_rgba = tuple(label_rgba / 255.)</span></div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;<span class="comment">//        label_colors.append(label_rgba)</span></div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;<span class="comment">//    n_read = len(labels) - n_read</span></div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;<span class="comment">//    logger.info(&#39;   read %d labels from %s&#39; % (n_read, fname))</span></div>
 <div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;<span class="comment">//    n_read = len(labels) - n_read</span></div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;<span class="comment">//    logger.info(&#39;   read %d labels from %s&#39; % (n_read, fname))</span></div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;<span class="comment">//# sort the labels and colors by label name</span></div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;<span class="comment">//names = [label.name for label in labels]</span></div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;<span class="comment">//labels, label_colors = zip(*((label, color) for (name, label, color)</span></div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;<span class="comment">//                           in sorted(zip(names, labels, label_colors))))</span></div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;<span class="comment">//# convert tuples to lists</span></div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;<span class="comment">//labels = list(labels)</span></div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;<span class="comment">//label_colors = list(label_colors)</span></div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;<span class="comment">//# sort the labels and colors by label name</span></div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;<span class="comment">//names = [label.name for label in labels]</span></div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;<span class="comment">//labels, label_colors = zip(*((label, color) for (name, label, color)</span></div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;<span class="comment">//                           in sorted(zip(names, labels, label_colors))))</span></div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;<span class="comment">//# convert tuples to lists</span></div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;<span class="comment">//labels = list(labels)</span></div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;<span class="comment">//label_colors = list(label_colors)</span></div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;</div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;    printf(<span class="stringliteral">&quot;[done]\n&quot;</span>);</div>
 <div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;</div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;</div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;    printf(<span class="stringliteral">&quot;[done]\n&quot;</span>);</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;}</div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 7 2013 16:51:27 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 23 2013 15:22:59 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

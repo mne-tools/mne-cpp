@@ -71,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -82,7 +82,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_9bcbbe2e1dde185a06a3667faf854858.html">mne_rt_server</a></li><li class="navelem"><a class="el" href="dir_cfab58a9cec41c23f00919539cdc8bb1.html">mne_rt_server</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_17123d6426fa89bf7e1cba3c47bbf9c6.html">mne_rt_server</a></li><li class="navelem"><a class="el" href="dir_4e9acbf38b96cbf6e13d8abde5034579.html">mne_rt_server</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -283,7 +283,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;        QList&lt;FiffChInfo&gt; chs;</div>
 <div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;</div>
 <div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;        <span class="keywordflow">for</span>(k = 0; k &lt; p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>; ++k)</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;            chs &lt;&lt; p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#aa07b3b770d7fe65ac065e01461688e04">chs</a>.at(k);</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;            chs &lt;&lt; p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#aa07b3b770d7fe65ac065e01461688e04">chs</a>[k];</div>
 <div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;</div>
 <div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;        fiff_int_t nchan = chs.size();</div>
 <div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;</div>
@@ -292,9 +292,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;        <span class="comment">//</span></div>
 <div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;        t_FiffStreamOut.start_block(FIFFB_MEAS);<span class="comment">//4</span></div>
 <div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;        t_FiffStreamOut.write_id(FIFF_BLOCK_ID);<span class="comment">//5</span></div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;        <span class="keywordflow">if</span>(p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a9c8f8d46ca2721658d3ab20f1dffb939">meas_id</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#ace3ce06929c786230382642f8ef596d3">version</a> != -1)</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;        <span class="keywordflow">if</span>(p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#a4e7cc06ad6cd39b9e554c09b0935f5d9">meas_id</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#ace3ce06929c786230382642f8ef596d3">version</a> != -1)</div>
 <div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;        {</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;            t_FiffStreamOut.write_id(FIFF_PARENT_BLOCK_ID,p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a9c8f8d46ca2721658d3ab20f1dffb939">meas_id</a>);<span class="comment">//6</span></div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;            t_FiffStreamOut.write_id(FIFF_PARENT_BLOCK_ID,p_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#a4e7cc06ad6cd39b9e554c09b0935f5d9">meas_id</a>);<span class="comment">//6</span></div>
 <div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;        }</div>
 <div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;        <span class="comment">//</span></div>
 <div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;        <span class="comment">//    Measurement info</span></div>
@@ -504,7 +504,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 7 2013 16:51:28 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 23 2013 15:23:00 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

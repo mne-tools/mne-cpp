@@ -94,10 +94,10 @@ MeasurementManager::~MeasurementManager()
 void MeasurementManager::addMeasurementProvider(IMeasurementSource* pMSRPrv)
 {
     qDebug() << "Number of Measurement Providers before: "<< s_hashMeasurementProvider.size() << "keys" << s_hashMeasurementProvider.keys();
-    qDebug() << "Adding Measurement Provider: "<< pMSRPrv->getModule_ID();
+    qDebug() << "Adding Measurement Provider: "<< pMSRPrv->getPlugin_ID();
     //check first if MeasurementProvider with id exists jet - and return existing first otherwise do the following stuff
-    if(!s_hashMeasurementProvider.contains(pMSRPrv->getModule_ID()))
-        s_hashMeasurementProvider.insert(pMSRPrv->getModule_ID(), pMSRPrv);
+    if(!s_hashMeasurementProvider.contains(pMSRPrv->getPlugin_ID()))
+        s_hashMeasurementProvider.insert(pMSRPrv->getPlugin_ID(), pMSRPrv);
 
     qDebug() << "Number of Measurement Providers: "<< s_hashMeasurementProvider.size() << "keys" << s_hashMeasurementProvider.keys();
 }
@@ -105,13 +105,13 @@ void MeasurementManager::addMeasurementProvider(IMeasurementSource* pMSRPrv)
 
 //*************************************************************************************************************
 
-void MeasurementManager::addMeasurementAcceptor(IModule* pMSRAcc)//IMeasurementSink* pMSRAcc)
+void MeasurementManager::addMeasurementAcceptor(IPlugin* pMSRAcc)//IMeasurementSink* pMSRAcc)
 {
     qDebug() << "Number of Measurement Acceptors before: "<< s_hashMeasurementAcceptor.size() << "keys" << s_hashMeasurementAcceptor.keys();
-    qDebug() << "Adding Measurement Acceptor: "<< pMSRAcc->getModule_ID();
+    qDebug() << "Adding Measurement Acceptor: "<< pMSRAcc->getPlugin_ID();
     //check first if MeasurementProvider with id exists jet - and return existing first otherwise do the following stuff
-    if(!s_hashMeasurementAcceptor.contains(pMSRAcc->getModule_ID()))
-        s_hashMeasurementAcceptor.insert(pMSRAcc->getModule_ID(), pMSRAcc);
+    if(!s_hashMeasurementAcceptor.contains(pMSRAcc->getPlugin_ID()))
+        s_hashMeasurementAcceptor.insert(pMSRAcc->getPlugin_ID(), pMSRAcc);
 
     qDebug() << "Number of Measurement Acceptor: "<< s_hashMeasurementAcceptor.size() << "keys" << s_hashMeasurementAcceptor.keys();
 }
@@ -123,40 +123,40 @@ void MeasurementManager::addMeasurementAcceptor(IModule* pMSRAcc)//IMeasurementS
 
 void MeasurementManager::attachToRTSA(IObserver* pObserver) //attaching to all Measurements of all Measurement Providers
 {
-    QList<MDL_ID::Module_ID> mdl_idList = s_hashMeasurementProvider.keys();
-    attachToRTSA(pObserver, mdl_idList);
+    QList<PLG_ID::Plugin_ID> plg_idList = s_hashMeasurementProvider.keys();
+    attachToRTSA(pObserver, plg_idList);
 }
 
 
 //*************************************************************************************************************
 
-void MeasurementManager::attachToRTSA(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList) //attaching to all Measurements of given Measurement Providers List
+void MeasurementManager::attachToRTSA(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList) //attaching to all Measurements of given Measurement Providers List
 {
     QList<MSR_ID::Measurement_ID> msr_idList;
 
-    foreach(MDL_ID::Module_ID mdl_id, mdl_idList)
+    foreach(PLG_ID::Plugin_ID plg_id, plg_idList)
     {
-        if(s_hashMeasurementProvider.contains(mdl_id))
+        if(s_hashMeasurementProvider.contains(plg_id))
         {
-            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
             msr_idList += pMsrPvr->getProviderRTSA().keys();
         }
         else
-            qDebug() << "Error while attachToRTSA: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+            qDebug() << "Error while attachToRTSA: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
     }
-    attachToRTSA(pObserver, mdl_idList, msr_idList);
+    attachToRTSA(pObserver, plg_idList, msr_idList);
 }
 
 
 //*************************************************************************************************************
 
-void MeasurementManager::attachToRTSA(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList, QList<MSR_ID::Measurement_ID> msr_idList) //attaching to given Measurements List of given Measurement Providers List
+void MeasurementManager::attachToRTSA(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList, QList<MSR_ID::Measurement_ID> msr_idList) //attaching to given Measurements List of given Measurement Providers List
 {
-    foreach(MDL_ID::Module_ID mdl_id, mdl_idList)
+    foreach(PLG_ID::Plugin_ID plg_id, plg_idList)
     {
-        if(s_hashMeasurementProvider.contains(mdl_id))
+        if(s_hashMeasurementProvider.contains(plg_id))
         {
-            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
             foreach(MSR_ID::Measurement_ID msr_id, msr_idList)
             {
                 if(pMsrPvr->getProviderRTSA().contains(msr_id))
@@ -166,13 +166,13 @@ void MeasurementManager::attachToRTSA(IObserver* pObserver, QList<MDL_ID::Module
                 }
                 else
                 {
-                    qDebug() << "Warning while attachToRTSA: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << mdl_id << ".";
+                    qDebug() << "Warning while attachToRTSA: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << plg_id << ".";
                 }
             }
         }
         else
         {
-            qDebug() << "Error while attachToRTSA: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+            qDebug() << "Error while attachToRTSA: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
         }
     }
 }
@@ -180,27 +180,27 @@ void MeasurementManager::attachToRTSA(IObserver* pObserver, QList<MDL_ID::Module
 
 //*************************************************************************************************************
 
-void MeasurementManager::attachWidgetsToRTSA(MDL_ID::Module_ID mdl_id, QTime* t) //attaching to given Measurements List of given Measurement Providers List
+void MeasurementManager::attachWidgetsToRTSA(PLG_ID::Plugin_ID plg_id, QTime* t) //attaching to given Measurements List of given Measurement Providers List
 {
     qDebug() << "Number of Measurement Providers to attach Widget RTSA to: " << s_hashMeasurementProvider.size();
-    if(s_hashMeasurementProvider.contains(mdl_id))
+    if(s_hashMeasurementProvider.contains(plg_id))
     {
-        IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+        IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
         foreach(MSR_ID::Measurement_ID msr_id, pMsrPvr->getProviderRTSA().keys())
-            attachWidgetToRTSA(mdl_id, msr_id, t);
+            attachWidgetToRTSA(plg_id, msr_id, t);
     }
     else
-        qDebug() << "Error while attachWidgetToRTSA: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+        qDebug() << "Error while attachWidgetToRTSA: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
 }
 
 
 //*************************************************************************************************************
 
-void MeasurementManager::attachWidgetToRTSA(MDL_ID::Module_ID mdl_id, MSR_ID::Measurement_ID msr_id, QTime* t) //attaching to given Measurements List of given Measurement Providers List
+void MeasurementManager::attachWidgetToRTSA(PLG_ID::Plugin_ID plg_id, MSR_ID::Measurement_ID msr_id, QTime* t) //attaching to given Measurements List of given Measurement Providers List
 {
-    if(s_hashMeasurementProvider.contains(mdl_id))
+    if(s_hashMeasurementProvider.contains(plg_id))
     {
-        IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+        IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
         if(pMsrPvr->getProviderRTSA().contains(msr_id))
         {
             RealTimeSampleArray* pRTSA = pMsrPvr->getProviderRTSA().value(msr_id);
@@ -212,11 +212,11 @@ void MeasurementManager::attachWidgetToRTSA(MDL_ID::Module_ID mdl_id, MSR_ID::Me
         }
         else
         {
-            qDebug() << "Warning while attachWidgetToRTSA: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << mdl_id << ".";
+            qDebug() << "Warning while attachWidgetToRTSA: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << plg_id << ".";
         }
     }
     else
-        qDebug() << "Error while attachWidgetToRTSA: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+        qDebug() << "Error while attachWidgetToRTSA: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
 }
 
 
@@ -224,42 +224,42 @@ void MeasurementManager::attachWidgetToRTSA(MDL_ID::Module_ID mdl_id, MSR_ID::Me
 
 void MeasurementManager::detachFromRTSA(IObserver* pObserver) //attaching to all Measurements of all Measurement Providers
 {
-    QList<MDL_ID::Module_ID> mdl_idList = s_hashMeasurementProvider.keys();
+    QList<PLG_ID::Plugin_ID> plg_idList = s_hashMeasurementProvider.keys();
 
-    detachFromRTSA(pObserver, mdl_idList);
+    detachFromRTSA(pObserver, plg_idList);
 }
 
 
 //*************************************************************************************************************
 
-void MeasurementManager::detachFromRTSA(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList) //attaching to all Measurements of given Measurement Providers List
+void MeasurementManager::detachFromRTSA(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList) //attaching to all Measurements of given Measurement Providers List
 {
     QList<MSR_ID::Measurement_ID> msr_idList;
 
-    foreach(MDL_ID::Module_ID mdl_id, mdl_idList)
+    foreach(PLG_ID::Plugin_ID plg_id, plg_idList)
     {
-        if(s_hashMeasurementProvider.contains(mdl_id))
+        if(s_hashMeasurementProvider.contains(plg_id))
         {
-            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
             msr_idList += pMsrPvr->getProviderRTSA().keys();
         }
         else
-            qDebug() << "Error while attachToRTSA: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+            qDebug() << "Error while attachToRTSA: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
     }
 
-    detachFromRTSA(pObserver, mdl_idList, msr_idList);
+    detachFromRTSA(pObserver, plg_idList, msr_idList);
 }
 
 
 //*************************************************************************************************************
 
-void MeasurementManager::detachFromRTSA(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList, QList<MSR_ID::Measurement_ID> msr_idList) //attaching to given Measurements List of given Measurement Providers List
+void MeasurementManager::detachFromRTSA(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList, QList<MSR_ID::Measurement_ID> msr_idList) //attaching to given Measurements List of given Measurement Providers List
 {
-    foreach(MDL_ID::Module_ID mdl_id, mdl_idList)
+    foreach(PLG_ID::Plugin_ID plg_id, plg_idList)
     {
-        if(s_hashMeasurementProvider.contains(mdl_id))
+        if(s_hashMeasurementProvider.contains(plg_id))
         {
-            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
             foreach(MSR_ID::Measurement_ID msr_id, msr_idList)
             {
                 if(pMsrPvr->getProviderRTSA().contains(msr_id))
@@ -269,13 +269,13 @@ void MeasurementManager::detachFromRTSA(IObserver* pObserver, QList<MDL_ID::Modu
                 }
                 else
                 {
-                    qDebug() << "Warning while detachFromRTSA: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << mdl_id << ".";
+                    qDebug() << "Warning while detachFromRTSA: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << plg_id << ".";
                 }
             }
         }
         else
         {
-            qDebug() << "Error while detachFromRTSA: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+            qDebug() << "Error while detachFromRTSA: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
         }
     }
 }
@@ -321,40 +321,40 @@ void MeasurementManager::detachFromRTSA(IObserver* pObserver, QList<MDL_ID::Modu
 
 void MeasurementManager::attachToRTMSA(IObserver* pObserver) //attaching to all Measurements of all Measurement Providers
 {
-    QList<MDL_ID::Module_ID> mdl_idList = s_hashMeasurementProvider.keys();
-    attachToRTMSA(pObserver, mdl_idList);
+    QList<PLG_ID::Plugin_ID> plg_idList = s_hashMeasurementProvider.keys();
+    attachToRTMSA(pObserver, plg_idList);
 }
 
 
 //*************************************************************************************************************
 
-void MeasurementManager::attachToRTMSA(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList) //attaching to all Measurements of given Measurement Providers List
+void MeasurementManager::attachToRTMSA(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList) //attaching to all Measurements of given Measurement Providers List
 {
     QList<MSR_ID::Measurement_ID> msr_idList;
 
-    foreach(MDL_ID::Module_ID mdl_id, mdl_idList)
+    foreach(PLG_ID::Plugin_ID plg_id, plg_idList)
     {
-        if(s_hashMeasurementProvider.contains(mdl_id))
+        if(s_hashMeasurementProvider.contains(plg_id))
         {
-            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
             msr_idList += pMsrPvr->getProviderRTMSA().keys();
         }
         else
-            qDebug() << "Error while attachToRTSA: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+            qDebug() << "Error while attachToRTSA: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
     }
-    attachToRTMSA(pObserver, mdl_idList, msr_idList);
+    attachToRTMSA(pObserver, plg_idList, msr_idList);
 }
 
 
 //*************************************************************************************************************
 
-void MeasurementManager::attachToRTMSA(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList, QList<MSR_ID::Measurement_ID> msr_idList) //attaching to given Measurements List of given Measurement Providers List
+void MeasurementManager::attachToRTMSA(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList, QList<MSR_ID::Measurement_ID> msr_idList) //attaching to given Measurements List of given Measurement Providers List
 {
-    foreach(MDL_ID::Module_ID mdl_id, mdl_idList)
+    foreach(PLG_ID::Plugin_ID plg_id, plg_idList)
     {
-        if(s_hashMeasurementProvider.contains(mdl_id))
+        if(s_hashMeasurementProvider.contains(plg_id))
         {
-            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
             foreach(MSR_ID::Measurement_ID msr_id, msr_idList)
             {
                 if(pMsrPvr->getProviderRTMSA().contains(msr_id))
@@ -364,13 +364,13 @@ void MeasurementManager::attachToRTMSA(IObserver* pObserver, QList<MDL_ID::Modul
                 }
                 else
                 {
-                    qDebug() << "Warning while attachToRTSA: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << mdl_id << ".";
+                    qDebug() << "Warning while attachToRTSA: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << plg_id << ".";
                 }
             }
         }
         else
         {
-            qDebug() << "Error while attachToRTSA: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+            qDebug() << "Error while attachToRTSA: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
         }
     }
 }
@@ -378,27 +378,27 @@ void MeasurementManager::attachToRTMSA(IObserver* pObserver, QList<MDL_ID::Modul
 
 //*************************************************************************************************************
 
-void MeasurementManager::attachWidgetsToRTMSA(MDL_ID::Module_ID mdl_id, QTime* t) //attaching to given Measurements List of given Measurement Providers List
+void MeasurementManager::attachWidgetsToRTMSA(PLG_ID::Plugin_ID plg_id, QTime* t) //attaching to given Measurements List of given Measurement Providers List
 {
     qDebug() << "Number of Measurement Providers to attach Widget RTSA to: " << s_hashMeasurementProvider.size();
-    if(s_hashMeasurementProvider.contains(mdl_id))
+    if(s_hashMeasurementProvider.contains(plg_id))
     {
-        IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+        IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
         foreach(MSR_ID::Measurement_ID msr_id, pMsrPvr->getProviderRTMSA().keys())
-            attachWidgetToRTMSA(mdl_id, msr_id, t);
+            attachWidgetToRTMSA(plg_id, msr_id, t);
     }
     else
-        qDebug() << "Error while attachWidgetToRTSA: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+        qDebug() << "Error while attachWidgetToRTSA: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
 }
 
 
 //*************************************************************************************************************
 
-void MeasurementManager::attachWidgetToRTMSA(MDL_ID::Module_ID mdl_id, MSR_ID::Measurement_ID msr_id, QTime* t) //attaching to given Measurements List of given Measurement Providers List
+void MeasurementManager::attachWidgetToRTMSA(PLG_ID::Plugin_ID plg_id, MSR_ID::Measurement_ID msr_id, QTime* t) //attaching to given Measurements List of given Measurement Providers List
 {
-    if(s_hashMeasurementProvider.contains(mdl_id))
+    if(s_hashMeasurementProvider.contains(plg_id))
     {
-        IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+        IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
         if(pMsrPvr->getProviderRTMSA().contains(msr_id))
         {
             RealTimeMultiSampleArray* pRTMSA = pMsrPvr->getProviderRTMSA().value(msr_id);
@@ -410,11 +410,11 @@ void MeasurementManager::attachWidgetToRTMSA(MDL_ID::Module_ID mdl_id, MSR_ID::M
         }
         else
         {
-            qDebug() << "Warning while attachWidgetToRTSA: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << mdl_id << ".";
+            qDebug() << "Warning while attachWidgetToRTSA: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << plg_id << ".";
         }
     }
     else
-        qDebug() << "Error while attachWidgetToRTSA: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+        qDebug() << "Error while attachWidgetToRTSA: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
 }
 
 
@@ -422,42 +422,42 @@ void MeasurementManager::attachWidgetToRTMSA(MDL_ID::Module_ID mdl_id, MSR_ID::M
 
 void MeasurementManager::detachFromRTMSA(IObserver* pObserver) //attaching to all Measurements of all Measurement Providers
 {
-    QList<MDL_ID::Module_ID> mdl_idList = s_hashMeasurementProvider.keys();
+    QList<PLG_ID::Plugin_ID> plg_idList = s_hashMeasurementProvider.keys();
 
-    detachFromRTMSA(pObserver, mdl_idList);
+    detachFromRTMSA(pObserver, plg_idList);
 }
 
 
 //*************************************************************************************************************
 
-void MeasurementManager::detachFromRTMSA(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList) //attaching to all Measurements of given Measurement Providers List
+void MeasurementManager::detachFromRTMSA(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList) //attaching to all Measurements of given Measurement Providers List
 {
     QList<MSR_ID::Measurement_ID> msr_idList;
 
-    foreach(MDL_ID::Module_ID mdl_id, mdl_idList)
+    foreach(PLG_ID::Plugin_ID plg_id, plg_idList)
     {
-        if(s_hashMeasurementProvider.contains(mdl_id))
+        if(s_hashMeasurementProvider.contains(plg_id))
         {
-            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
             msr_idList += pMsrPvr->getProviderRTMSA().keys();
         }
         else
-            qDebug() << "Error while attachToRTSA: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+            qDebug() << "Error while attachToRTSA: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
     }
 
-    detachFromRTMSA(pObserver, mdl_idList, msr_idList);
+    detachFromRTMSA(pObserver, plg_idList, msr_idList);
 }
 
 
 //*************************************************************************************************************
 
-void MeasurementManager::detachFromRTMSA(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList, QList<MSR_ID::Measurement_ID> msr_idList) //attaching to given Measurements List of given Measurement Providers List
+void MeasurementManager::detachFromRTMSA(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList, QList<MSR_ID::Measurement_ID> msr_idList) //attaching to given Measurements List of given Measurement Providers List
 {
-    foreach(MDL_ID::Module_ID mdl_id, mdl_idList)
+    foreach(PLG_ID::Plugin_ID plg_id, plg_idList)
     {
-        if(s_hashMeasurementProvider.contains(mdl_id))
+        if(s_hashMeasurementProvider.contains(plg_id))
         {
-            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
             foreach(MSR_ID::Measurement_ID msr_id, msr_idList)
             {
                 if(pMsrPvr->getProviderRTMSA().contains(msr_id))
@@ -467,13 +467,13 @@ void MeasurementManager::detachFromRTMSA(IObserver* pObserver, QList<MDL_ID::Mod
                 }
                 else
                 {
-                    qDebug() << "Warning while detachFromRTSA: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << mdl_id << ".";
+                    qDebug() << "Warning while detachFromRTSA: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << plg_id << ".";
                 }
             }
         }
         else
         {
-            qDebug() << "Error while detachFromRTSA: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+            qDebug() << "Error while detachFromRTSA: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
         }
     }
 }
@@ -486,40 +486,40 @@ void MeasurementManager::detachFromRTMSA(IObserver* pObserver, QList<MDL_ID::Mod
 
 void MeasurementManager::attachToRTMSANew(IObserver* pObserver) //attaching to all Measurements of all Measurement Providers
 {
-    QList<MDL_ID::Module_ID> mdl_idList = s_hashMeasurementProvider.keys();
-    attachToRTMSANew(pObserver, mdl_idList);
+    QList<PLG_ID::Plugin_ID> plg_idList = s_hashMeasurementProvider.keys();
+    attachToRTMSANew(pObserver, plg_idList);
 }
 
 
 //*************************************************************************************************************
 
-void MeasurementManager::attachToRTMSANew(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList) //attaching to all Measurements of given Measurement Providers List
+void MeasurementManager::attachToRTMSANew(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList) //attaching to all Measurements of given Measurement Providers List
 {
     QList<MSR_ID::Measurement_ID> msr_idList;
 
-    foreach(MDL_ID::Module_ID mdl_id, mdl_idList)
+    foreach(PLG_ID::Plugin_ID plg_id, plg_idList)
     {
-        if(s_hashMeasurementProvider.contains(mdl_id))
+        if(s_hashMeasurementProvider.contains(plg_id))
         {
-            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
             msr_idList += pMsrPvr->getProviderRTMSANew().keys();
         }
         else
-            qDebug() << "Error while attachToRTSA: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+            qDebug() << "Error while attachToRTSA: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
     }
-    attachToRTMSANew(pObserver, mdl_idList, msr_idList);
+    attachToRTMSANew(pObserver, plg_idList, msr_idList);
 }
 
 
 //*************************************************************************************************************
 
-void MeasurementManager::attachToRTMSANew(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList, QList<MSR_ID::Measurement_ID> msr_idList) //attaching to given Measurements List of given Measurement Providers List
+void MeasurementManager::attachToRTMSANew(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList, QList<MSR_ID::Measurement_ID> msr_idList) //attaching to given Measurements List of given Measurement Providers List
 {
-    foreach(MDL_ID::Module_ID mdl_id, mdl_idList)
+    foreach(PLG_ID::Plugin_ID plg_id, plg_idList)
     {
-        if(s_hashMeasurementProvider.contains(mdl_id))
+        if(s_hashMeasurementProvider.contains(plg_id))
         {
-            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
             foreach(MSR_ID::Measurement_ID msr_id, msr_idList)
             {
                 if(pMsrPvr->getProviderRTMSANew().contains(msr_id))
@@ -529,13 +529,13 @@ void MeasurementManager::attachToRTMSANew(IObserver* pObserver, QList<MDL_ID::Mo
                 }
                 else
                 {
-                    qDebug() << "Warning while attachToRTSA: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << mdl_id << ".";
+                    qDebug() << "Warning while attachToRTSA: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << plg_id << ".";
                 }
             }
         }
         else
         {
-            qDebug() << "Error while attachToRTSA: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+            qDebug() << "Error while attachToRTSA: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
         }
     }
 }
@@ -543,27 +543,27 @@ void MeasurementManager::attachToRTMSANew(IObserver* pObserver, QList<MDL_ID::Mo
 
 //*************************************************************************************************************
 
-void MeasurementManager::attachWidgetsToRTMSANew(MDL_ID::Module_ID mdl_id, QTime* t) //attaching to given Measurements List of given Measurement Providers List
+void MeasurementManager::attachWidgetsToRTMSANew(PLG_ID::Plugin_ID plg_id, QTime* t) //attaching to given Measurements List of given Measurement Providers List
 {
     qDebug() << "Number of Measurement Providers to attach Widget RTSA to: " << s_hashMeasurementProvider.size();
-    if(s_hashMeasurementProvider.contains(mdl_id))
+    if(s_hashMeasurementProvider.contains(plg_id))
     {
-        IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+        IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
         foreach(MSR_ID::Measurement_ID msr_id, pMsrPvr->getProviderRTMSANew().keys())
-            attachWidgetToRTMSANew(mdl_id, msr_id, t);
+            attachWidgetToRTMSANew(plg_id, msr_id, t);
     }
     else
-        qDebug() << "Error while attachWidgetToRTSA: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+        qDebug() << "Error while attachWidgetToRTSA: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
 }
 
 
 //*************************************************************************************************************
 
-void MeasurementManager::attachWidgetToRTMSANew(MDL_ID::Module_ID mdl_id, MSR_ID::Measurement_ID msr_id, QTime* t) //attaching to given Measurements List of given Measurement Providers List
+void MeasurementManager::attachWidgetToRTMSANew(PLG_ID::Plugin_ID plg_id, MSR_ID::Measurement_ID msr_id, QTime* t) //attaching to given Measurements List of given Measurement Providers List
 {
-    if(s_hashMeasurementProvider.contains(mdl_id))
+    if(s_hashMeasurementProvider.contains(plg_id))
     {
-        IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+        IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
         if(pMsrPvr->getProviderRTMSANew().contains(msr_id))
         {
             RealTimeMultiSampleArrayNew* pRTMSANew = pMsrPvr->getProviderRTMSANew().value(msr_id);
@@ -575,11 +575,11 @@ void MeasurementManager::attachWidgetToRTMSANew(MDL_ID::Module_ID mdl_id, MSR_ID
         }
         else
         {
-            qDebug() << "Warning while attachWidgetToRTSA: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << mdl_id << ".";
+            qDebug() << "Warning while attachWidgetToRTSA: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << plg_id << ".";
         }
     }
     else
-        qDebug() << "Error while attachWidgetToRTSA: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+        qDebug() << "Error while attachWidgetToRTSA: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
 }
 
 
@@ -587,42 +587,42 @@ void MeasurementManager::attachWidgetToRTMSANew(MDL_ID::Module_ID mdl_id, MSR_ID
 
 void MeasurementManager::detachFromRTMSANew(IObserver* pObserver) //attaching to all Measurements of all Measurement Providers
 {
-    QList<MDL_ID::Module_ID> mdl_idList = s_hashMeasurementProvider.keys();
+    QList<PLG_ID::Plugin_ID> plg_idList = s_hashMeasurementProvider.keys();
 
-    detachFromRTMSANew(pObserver, mdl_idList);
+    detachFromRTMSANew(pObserver, plg_idList);
 }
 
 
 //*************************************************************************************************************
 
-void MeasurementManager::detachFromRTMSANew(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList) //attaching to all Measurements of given Measurement Providers List
+void MeasurementManager::detachFromRTMSANew(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList) //attaching to all Measurements of given Measurement Providers List
 {
     QList<MSR_ID::Measurement_ID> msr_idList;
 
-    foreach(MDL_ID::Module_ID mdl_id, mdl_idList)
+    foreach(PLG_ID::Plugin_ID plg_id, plg_idList)
     {
-        if(s_hashMeasurementProvider.contains(mdl_id))
+        if(s_hashMeasurementProvider.contains(plg_id))
         {
-            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
             msr_idList += pMsrPvr->getProviderRTMSANew().keys();
         }
         else
-            qDebug() << "Error while attachToRTSA: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+            qDebug() << "Error while attachToRTSA: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
     }
 
-    detachFromRTMSANew(pObserver, mdl_idList, msr_idList);
+    detachFromRTMSANew(pObserver, plg_idList, msr_idList);
 }
 
 
 //*************************************************************************************************************
 
-void MeasurementManager::detachFromRTMSANew(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList, QList<MSR_ID::Measurement_ID> msr_idList) //attaching to given Measurements List of given Measurement Providers List
+void MeasurementManager::detachFromRTMSANew(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList, QList<MSR_ID::Measurement_ID> msr_idList) //attaching to given Measurements List of given Measurement Providers List
 {
-    foreach(MDL_ID::Module_ID mdl_id, mdl_idList)
+    foreach(PLG_ID::Plugin_ID plg_id, plg_idList)
     {
-        if(s_hashMeasurementProvider.contains(mdl_id))
+        if(s_hashMeasurementProvider.contains(plg_id))
         {
-            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
             foreach(MSR_ID::Measurement_ID msr_id, msr_idList)
             {
                 if(pMsrPvr->getProviderRTMSANew().contains(msr_id))
@@ -632,13 +632,13 @@ void MeasurementManager::detachFromRTMSANew(IObserver* pObserver, QList<MDL_ID::
                 }
                 else
                 {
-                    qDebug() << "Warning while detachFromRTSA: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << mdl_id << ".";
+                    qDebug() << "Warning while detachFromRTSA: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << plg_id << ".";
                 }
             }
         }
         else
         {
-            qDebug() << "Error while detachFromRTSA: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+            qDebug() << "Error while detachFromRTSA: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
         }
     }
 }
@@ -666,13 +666,13 @@ void MeasurementManager::attachToNumeric(IObserver* pObserver) //attaching to al
 
 //*************************************************************************************************************
 
-void MeasurementManager::attachToNumeric(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList) //attaching to all Measurements of given Measurement Providers List
+void MeasurementManager::attachToNumeric(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList) //attaching to all Measurements of given Measurement Providers List
 {
-    foreach(MDL_ID::Module_ID mdl_id, mdl_idList)
+    foreach(PLG_ID::Plugin_ID plg_id, plg_idList)
     {
-        if(s_hashMeasurementProvider.contains(mdl_id))
+        if(s_hashMeasurementProvider.contains(plg_id))
         {
-            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
             foreach(Numeric* pNum, pMsrPvr->getProviderNumeric().values())
             {
                 pNum->attach(pObserver);
@@ -680,7 +680,7 @@ void MeasurementManager::attachToNumeric(IObserver* pObserver, QList<MDL_ID::Mod
         }
         else
         {
-            qDebug() << "Error while attachToNumeric: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+            qDebug() << "Error while attachToNumeric: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
         }
     }
 }
@@ -688,13 +688,13 @@ void MeasurementManager::attachToNumeric(IObserver* pObserver, QList<MDL_ID::Mod
 
 //*************************************************************************************************************
 
-void MeasurementManager::attachToNumeric(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList, QList<MSR_ID::Measurement_ID> msr_idList) //attaching to given Measurements List of given Measurement Providers List
+void MeasurementManager::attachToNumeric(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList, QList<MSR_ID::Measurement_ID> msr_idList) //attaching to given Measurements List of given Measurement Providers List
 {
-    foreach(MDL_ID::Module_ID mdl_id, mdl_idList)
+    foreach(PLG_ID::Plugin_ID plg_id, plg_idList)
     {
-    	if(s_hashMeasurementProvider.contains(mdl_id))
+        if(s_hashMeasurementProvider.contains(plg_id))
     	{
-            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
 		    foreach(MSR_ID::Measurement_ID msr_id, msr_idList)
 		    {
 		    	if(pMsrPvr->getProviderNumeric().contains(msr_id))
@@ -704,13 +704,13 @@ void MeasurementManager::attachToNumeric(IObserver* pObserver, QList<MDL_ID::Mod
 		    	}
 		    	else
 		    	{
-		    		qDebug() << "Warning while attachToNumeric: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << mdl_id << ".";
+                    qDebug() << "Warning while attachToNumeric: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << plg_id << ".";
 		    	}
 		    }
     	}
     	else
     	{
-    		qDebug() << "Error while attachToNumeric: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+            qDebug() << "Error while attachToNumeric: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
     	}
     }
 }
@@ -718,26 +718,26 @@ void MeasurementManager::attachToNumeric(IObserver* pObserver, QList<MDL_ID::Mod
 
 //*************************************************************************************************************
 
-void MeasurementManager::attachWidgetsToNumeric(MDL_ID::Module_ID mdl_id) //attaching to given Measurements List of given Measurement Providers List
+void MeasurementManager::attachWidgetsToNumeric(PLG_ID::Plugin_ID plg_id) //attaching to given Measurements List of given Measurement Providers List
 {
-	if(s_hashMeasurementProvider.contains(mdl_id))
+    if(s_hashMeasurementProvider.contains(plg_id))
 	{
-        IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+        IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
 		foreach(MSR_ID::Measurement_ID msr_id, pMsrPvr->getProviderNumeric().keys())
-			attachWidgetToNumeric(mdl_id, msr_id);
+            attachWidgetToNumeric(plg_id, msr_id);
 	}
 	else
-		qDebug() << "Error while attachWidgetToRTSA: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+        qDebug() << "Error while attachWidgetToRTSA: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
 }
 
 
 //*************************************************************************************************************
 
-void MeasurementManager::attachWidgetToNumeric(MDL_ID::Module_ID mdl_id, MSR_ID::Measurement_ID msr_id) //attaching to given Measurements List of given Measurement Providers List
+void MeasurementManager::attachWidgetToNumeric(PLG_ID::Plugin_ID plg_id, MSR_ID::Measurement_ID msr_id) //attaching to given Measurements List of given Measurement Providers List
 {
-	if(s_hashMeasurementProvider.contains(mdl_id))
+    if(s_hashMeasurementProvider.contains(plg_id))
 	{
-        IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+        IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
 		if(pMsrPvr->getProviderNumeric().contains(msr_id))
 		{
 			Numeric* pNum = pMsrPvr->getProviderNumeric().value(msr_id);
@@ -749,11 +749,11 @@ void MeasurementManager::attachWidgetToNumeric(MDL_ID::Module_ID mdl_id, MSR_ID:
 		}
 		else
 		{
-			qDebug() << "Warning while attachWidgetToRTSA: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << mdl_id << ".";
+            qDebug() << "Warning while attachWidgetToRTSA: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << plg_id << ".";
 		}
 	}
 	else
-		qDebug() << "Error while attachWidgetToRTSA: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+        qDebug() << "Error while attachWidgetToRTSA: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
 }
 
 //*************************************************************************************************************
@@ -768,21 +768,21 @@ void MeasurementManager::detachFromNumeric(IObserver* pObserver) //attaching to 
 //		}
 //	}
 
-	QList<MDL_ID::Module_ID> mdl_idList = s_hashMeasurementProvider.keys();
+    QList<PLG_ID::Plugin_ID> plg_idList = s_hashMeasurementProvider.keys();
 
-	detachFromNumeric(pObserver, mdl_idList);
+    detachFromNumeric(pObserver, plg_idList);
 }
 
 
 //*************************************************************************************************************
 
-void MeasurementManager::detachFromNumeric(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList) //attaching to all Measurements of given Measurement Providers List
+void MeasurementManager::detachFromNumeric(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList) //attaching to all Measurements of given Measurement Providers List
 {
-    foreach(MDL_ID::Module_ID mdl_id, mdl_idList)
+    foreach(PLG_ID::Plugin_ID plg_id, plg_idList)
     {
-    	if(s_hashMeasurementProvider.contains(mdl_id))
+        if(s_hashMeasurementProvider.contains(plg_id))
     	{
-            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
 
             qDebug() << "MeasurementManager::detachFromNumeric: MSR_ID::Measurement_IDS: " << pMsrPvr->getProviderRTSA().keys();
 			foreach(Numeric* pNum, pMsrPvr->getProviderNumeric().values())
@@ -792,7 +792,7 @@ void MeasurementManager::detachFromNumeric(IObserver* pObserver, QList<MDL_ID::M
     	}
     	else
     	{
-    		qDebug() << "Error while detachFromNumeric: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+            qDebug() << "Error while detachFromNumeric: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
     	}
     }
 
@@ -800,30 +800,30 @@ void MeasurementManager::detachFromNumeric(IObserver* pObserver, QList<MDL_ID::M
     //ToDo ToDo
 //	QList<MSR_ID::Measurement_ID> msr_idList;
 //
-//    foreach(MDL_ID::Module_ID mdl_id, mdl_idList)
+//    foreach(PLG_ID::Plugin_ID plg_id, plg_idList)
 //    {
-//    	if(s_hashMeasurementProvider.contains(mdl_id))
+//    	if(s_hashMeasurementProvider.contains(plg_id))
 //    	{
-//			MeasurementProvider* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+//			MeasurementProvider* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
 //			msr_idList += pMsrPvr->getProviderRTSA().keys();
 //    	}
 //    	else
-//    		qDebug() << "Error while detachFromNumeric: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+//    		qDebug() << "Error while detachFromNumeric: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
 //    }
 //
-//    detachFromNumeric(pObserver, mdl_idList, msr_idList);
+//    detachFromNumeric(pObserver, plg_idList, msr_idList);
 }
 
 
 //*************************************************************************************************************
 
-void MeasurementManager::detachFromNumeric(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList, QList<MSR_ID::Measurement_ID> msr_idList) //attaching to given Measurements List of given Measurement Providers List
+void MeasurementManager::detachFromNumeric(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList, QList<MSR_ID::Measurement_ID> msr_idList) //attaching to given Measurements List of given Measurement Providers List
 {
-    foreach(MDL_ID::Module_ID mdl_id, mdl_idList)
+    foreach(PLG_ID::Plugin_ID plg_id, plg_idList)
     {
-        if(s_hashMeasurementProvider.contains(mdl_id))
+        if(s_hashMeasurementProvider.contains(plg_id))
         {
-            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
             foreach(MSR_ID::Measurement_ID msr_id, msr_idList)
             {
                 if(pMsrPvr->getProviderNumeric().contains(msr_id))
@@ -833,23 +833,23 @@ void MeasurementManager::detachFromNumeric(IObserver* pObserver, QList<MDL_ID::M
                 }
                 else
                 {
-                    qDebug() << "Warning while detachFromNumeric: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << mdl_id << ".";
+                    qDebug() << "Warning while detachFromNumeric: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << plg_id << ".";
                 }
             }
         }
         else
         {
-            qDebug() << "Error while detachFromNumeric: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+            qDebug() << "Error while detachFromNumeric: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
         }
     }
 
 
 
-//    foreach(MDL_ID::Module_ID mdl_id, mdl_idList)
+//    foreach(PLG_ID::Plugin_ID plg_id, plg_idList)
 //    {
-//    	if(s_hashMeasurementProvider.contains(mdl_id))
+//    	if(s_hashMeasurementProvider.contains(plg_id))
 //    	{
-//			MeasurementProvider* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+//			MeasurementProvider* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
 //		    foreach(MSR_ID::Measurement_ID msr_id, msr_idList)
 //		    {
 //		    	if(pMsrPvr->getProviderRTSA().contains(msr_id))
@@ -859,13 +859,13 @@ void MeasurementManager::detachFromNumeric(IObserver* pObserver, QList<MDL_ID::M
 //		    	}
 //		    	else
 //		    	{
-//		    		qDebug() << "Warning while detachFromRTSA: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << mdl_id << ".";
+//		    		qDebug() << "Warning while detachFromRTSA: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << plg_id << ".";
 //		    	}
 //		    }
 //    	}
 //    	else
 //    	{
-//    		qDebug() << "Error while detachFromRTSA: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+//    		qDebug() << "Error while detachFromRTSA: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
 //    	}
 //    }
 }
@@ -875,9 +875,9 @@ void MeasurementManager::detachFromNumeric(IObserver* pObserver, QList<MDL_ID::M
 
 //*************************************************************************************************************
 
-void MeasurementManager::detachWidgets(QList<MDL_ID::Module_ID> mdl_idList)
+void MeasurementManager::detachWidgets(QList<PLG_ID::Plugin_ID> plg_idList)
 {
-    qDebug() << "MeasurementManager::detachWidgets(QList<MDL_ID::Module_ID> mdl_idList)";
+    qDebug() << "MeasurementManager::detachWidgets(QList<PLG_ID::Plugin_ID> plg_idList)";
 
     qDebug() << "DisplayManager::getRTSAWidgets() Size: " << DisplayManager::getRTSAWidgets().size();
 
@@ -885,7 +885,7 @@ void MeasurementManager::detachWidgets(QList<MDL_ID::Module_ID> mdl_idList)
     {
         IObserver* pRTSAWidget = dynamic_cast<IObserver*>(pRTSAW);
 
-        detachFromRTSA(pRTSAWidget, mdl_idList);
+        detachFromRTSA(pRTSAWidget, plg_idList);
     }
 
     qDebug() << "DisplayManager::getRTMSAWidgets() Size: " << DisplayManager::getRTMSAWidgets().size();
@@ -894,7 +894,7 @@ void MeasurementManager::detachWidgets(QList<MDL_ID::Module_ID> mdl_idList)
     {
         IObserver* pRTMSAWidget = dynamic_cast<IObserver*>(pRTMSAW);
 
-        detachFromRTMSA(pRTMSAWidget, mdl_idList);
+        detachFromRTMSA(pRTMSAWidget, plg_idList);
     }
 
     qDebug() << "DisplayManager::getRTMSANewWidgets() Size: " << DisplayManager::getRTMSANewWidgets().size();
@@ -903,7 +903,7 @@ void MeasurementManager::detachWidgets(QList<MDL_ID::Module_ID> mdl_idList)
     {
         IObserver* pRTMSANewWidget = dynamic_cast<IObserver*>(pRTMSANewW);
 
-        detachFromRTMSANew(pRTMSANewWidget, mdl_idList);
+        detachFromRTMSANew(pRTMSANewWidget, plg_idList);
     }
 
 
@@ -913,7 +913,7 @@ void MeasurementManager::detachWidgets(QList<MDL_ID::Module_ID> mdl_idList)
     {
         IObserver* pNumWidget = dynamic_cast<IObserver*>(pNUMW);
 
-        detachFromNumeric(pNumWidget, mdl_idList);
+        detachFromNumeric(pNumWidget, plg_idList);
     }
 
 }
@@ -966,5 +966,5 @@ void MeasurementManager::clean()
 // STATIC DEFINITIONS
 //=============================================================================================================
 
-QHash<MDL_ID::Module_ID, IMeasurementSource*>    MeasurementManager::s_hashMeasurementProvider;
-QHash<MDL_ID::Module_ID, IModule*>    MeasurementManager::s_hashMeasurementAcceptor;
+QHash<PLG_ID::Plugin_ID, IMeasurementSource*>    MeasurementManager::s_hashMeasurementProvider;
+QHash<PLG_ID::Plugin_ID, IPlugin*>    MeasurementManager::s_hashMeasurementAcceptor;

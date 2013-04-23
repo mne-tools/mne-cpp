@@ -73,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -135,6 +135,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a29f05b2a9bd0297cff99a7c508eab0b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7d6a81d830e4cc5400bc580cc5f3d842"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html#a7d6a81d830e4cc5400bc580cc5f3d842">clear</a> ()</td></tr>
 <tr class="separator:a7d6a81d830e4cc5400bc580cc5f3d842"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeb866234b82099372a87266e529b79db"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html#aeb866234b82099372a87266e529b79db">isEmpty</a> () const </td></tr>
+<tr class="separator:aeb866234b82099372a87266e529b79db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a845443025e3ff3a38f5013d2f58c13cc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html">FiffCov</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html#a845443025e3ff3a38f5013d2f58c13cc">pick_channels</a> (const QStringList &amp;p_include=defaultQStringList, const QStringList &amp;p_exclude=defaultQStringList)</td></tr>
 <tr class="separator:a845443025e3ff3a38f5013d2f58c13cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad256bb84a37b7ce6261a76cc16f6b12b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html">FiffCov</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html#ad256bb84a37b7ce6261a76cc16f6b12b">prepare_noise_cov</a> (const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> &amp;p_info, const QStringList &amp;p_chNames) const </td></tr>
@@ -326,6 +328,33 @@ Friends</h2></td></tr>
 <p>Initializes the covariance data matrix. </p>
 
 <p>Definition at line <a class="el" href="fiff__cov_8cpp_source.html#l00145">145</a> of file <a class="el" href="fiff__cov_8cpp_source.html">fiff_cov.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aeb866234b82099372a87266e529b79db"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool FIFFLIB::FiffCov::isEmpty </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>True if FIFF covariance is empty.</p>
+<dl class="section return"><dt>Returns</dt><dd>true if FIFF covariance is empty </dd></dl>
+
+<p>Definition at line <a class="el" href="fiff__cov_8h_source.html#l00225">225</a> of file <a class="el" href="fiff__cov_8h_source.html">fiff_cov.h</a>.</p>
 
 </div>
 </div>
@@ -538,7 +567,7 @@ Friends</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the stream with the attached fiff covariance matrix </dd></dl>
 
-<p>Definition at line <a class="el" href="fiff__cov_8h_source.html#l00217">217</a> of file <a class="el" href="fiff__cov_8h_source.html">fiff_cov.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__cov_8h_source.html#l00233">233</a> of file <a class="el" href="fiff__cov_8h_source.html">fiff_cov.h</a>.</p>
 
 </div>
 </div>
@@ -554,7 +583,7 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 <p>List of bad channels. </p>
 
-<p>Definition at line <a class="el" href="fiff__cov_8h_source.html#l00205">205</a> of file <a class="el" href="fiff__cov_8h_source.html">fiff_cov.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__cov_8h_source.html#l00213">213</a> of file <a class="el" href="fiff__cov_8h_source.html">fiff_cov.h</a>.</p>
 
 </div>
 </div>
@@ -569,7 +598,7 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 <p>Covariance data </p>
 
-<p>Definition at line <a class="el" href="fiff__cov_8h_source.html#l00203">203</a> of file <a class="el" href="fiff__cov_8h_source.html">fiff_cov.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__cov_8h_source.html#l00211">211</a> of file <a class="el" href="fiff__cov_8h_source.html">fiff_cov.h</a>.</p>
 
 </div>
 </div>
@@ -584,7 +613,7 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 <p>If the covariance is stored in a diagonal order. </p>
 
-<p>Definition at line <a class="el" href="fiff__cov_8h_source.html#l00200">200</a> of file <a class="el" href="fiff__cov_8h_source.html">fiff_cov.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__cov_8h_source.html#l00208">208</a> of file <a class="el" href="fiff__cov_8h_source.html">fiff_cov.h</a>.</p>
 
 </div>
 </div>
@@ -599,7 +628,7 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 <p>Dimension of the covariance (dim x dim). </p>
 
-<p>Definition at line <a class="el" href="fiff__cov_8h_source.html#l00201">201</a> of file <a class="el" href="fiff__cov_8h_source.html">fiff_cov.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__cov_8h_source.html#l00209">209</a> of file <a class="el" href="fiff__cov_8h_source.html">fiff_cov.h</a>.</p>
 
 </div>
 </div>
@@ -614,7 +643,7 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 <p>Vector of eigenvalues. </p>
 
-<p>Definition at line <a class="el" href="fiff__cov_8h_source.html#l00207">207</a> of file <a class="el" href="fiff__cov_8h_source.html">fiff_cov.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__cov_8h_source.html#l00215">215</a> of file <a class="el" href="fiff__cov_8h_source.html">fiff_cov.h</a>.</p>
 
 </div>
 </div>
@@ -629,7 +658,7 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 <p>Matrix of eigenvectors (each row represents an eigenvector). </p>
 
-<p>Definition at line <a class="el" href="fiff__cov_8h_source.html#l00208">208</a> of file <a class="el" href="fiff__cov_8h_source.html">fiff_cov.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__cov_8h_source.html#l00216">216</a> of file <a class="el" href="fiff__cov_8h_source.html">fiff_cov.h</a>.</p>
 
 </div>
 </div>
@@ -644,7 +673,7 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 <p>Covariance kind -&gt; <a class="el" href="fiff__constants_8h.html" title="Fiff constants.">fiff_constants.h</a> </p>
 
-<p>Definition at line <a class="el" href="fiff__cov_8h_source.html#l00199">199</a> of file <a class="el" href="fiff__cov_8h_source.html">fiff_cov.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__cov_8h_source.html#l00207">207</a> of file <a class="el" href="fiff__cov_8h_source.html">fiff_cov.h</a>.</p>
 
 </div>
 </div>
@@ -659,7 +688,7 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 <p>Channel names. </p>
 
-<p>Definition at line <a class="el" href="fiff__cov_8h_source.html#l00202">202</a> of file <a class="el" href="fiff__cov_8h_source.html">fiff_cov.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__cov_8h_source.html#l00210">210</a> of file <a class="el" href="fiff__cov_8h_source.html">fiff_cov.h</a>.</p>
 
 </div>
 </div>
@@ -674,7 +703,7 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 <p>Number of degrees of freedom. </p>
 
-<p>Definition at line <a class="el" href="fiff__cov_8h_source.html#l00206">206</a> of file <a class="el" href="fiff__cov_8h_source.html">fiff_cov.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__cov_8h_source.html#l00214">214</a> of file <a class="el" href="fiff__cov_8h_source.html">fiff_cov.h</a>.</p>
 
 </div>
 </div>
@@ -689,7 +718,7 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 <p>List of available ssp projectors. </p>
 
-<p>Definition at line <a class="el" href="fiff__cov_8h_source.html#l00204">204</a> of file <a class="el" href="fiff__cov_8h_source.html">fiff_cov.h</a>.</p>
+<p>Definition at line <a class="el" href="fiff__cov_8h_source.html#l00212">212</a> of file <a class="el" href="fiff__cov_8h_source.html">fiff_cov.h</a>.</p>
 
 </div>
 </div>
@@ -700,7 +729,7 @@ Friends</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 7 2013 16:51:31 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 23 2013 15:23:02 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

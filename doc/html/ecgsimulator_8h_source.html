@@ -71,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -82,7 +82,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_807cd6f3fa1b113b47d6ac13bf5e8abb.html">mne_x</a></li><li class="navelem"><a class="el" href="dir_a83eed7cd68ad001ac794e7e9089b69f.html">plugins</a></li><li class="navelem"><a class="el" href="dir_f687f18581d38afba584fd0f08068c86.html">ecgsimulator</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_8a904de06506dbbbbd29d804f3583a01.html">mne_x</a></li><li class="navelem"><a class="el" href="dir_11b9dcbb8d36585ffbf4af4a628fb584.html">plugins</a></li><li class="navelem"><a class="el" href="dir_2da9981168a98ab17a8d9eb44ffb6e64.html">ecgsimulator</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -104,9 +104,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="ecgsimchannel_8h.html" title="Contains the declaration of the ECGChannel class.">ecgsimchannel.h</a>&quot;</span></div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">#include &quot;../../mne_x/mne_x/src/interfaces/ISensor.h&quot;</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">#include &lt;mne_x/Interfaces/ISensor.h&gt;</span></div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="circularbuffer__old_8h.html" title="Contains the declaration of the CircularBuffer_old class.">generics/circularbuffer_old.h</a>&gt;</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="realtimesamplearray_8h.html" title="Contains the declaration of the RealTimeSampleArray class.">rtMeas/Measurement/realtimesamplearray.h</a>&gt;</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor">#include &lt;xMeas/Measurement/realtimesamplearray.h&gt;</span></div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
@@ -146,12 +146,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00096"></a><span class="lineno"><a class="code" href="class_e_c_g_simulator_module_1_1_e_c_g_simulator.html">   96</a></span>&#160;<span class="comment"></span><span class="keyword">class </span><a class="code" href="ecgsimulator__global_8h.html#a7b3fa80c9820d0eb09451d8339c323d4">ECGSIMULATORSHARED_EXPORT</a> <a class="code" href="class_e_c_g_simulator_module_1_1_e_c_g_simulator.html" title="The ECGSimulator class provides a ECG simulator.">ECGSimulator</a> : <span class="keyword">public</span> <a class="code" href="class_m_n_e_x_1_1_i_sensor.html" title="The ISensor class provides an interface for a sensor module.">ISensor</a></div>
+<div class="line"><a name="l00096"></a><span class="lineno"><a class="code" href="class_e_c_g_simulator_module_1_1_e_c_g_simulator.html">   96</a></span>&#160;<span class="comment"></span><span class="keyword">class </span><a class="code" href="ecgsimulator__global_8h.html#a7b3fa80c9820d0eb09451d8339c323d4">ECGSIMULATORSHARED_EXPORT</a> <a class="code" href="class_e_c_g_simulator_module_1_1_e_c_g_simulator.html" title="The ECGSimulator class provides a ECG simulator.">ECGSimulator</a> : <span class="keyword">public</span> ISensor</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;{</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    Q_OBJECT</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    Q_PLUGIN_METADATA(IID <span class="stringliteral">&quot;mne_x/1.0&quot;</span> FILE <span class="stringliteral">&quot;ecgsimulator.json&quot;</span>) <span class="comment">//NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro</span></div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <span class="comment">// Use the Q_INTERFACES() macro to tell Qt&#39;s meta-object system about the interfaces</span></div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    Q_INTERFACES(<a class="code" href="class_m_n_e_x_1_1_i_sensor.html" title="The ISensor class provides an interface for a sensor module.">MNEX::ISensor</a>)</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    Q_INTERFACES(MNEX::ISensor)</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="class_e_c_g_simulator_module_1_1_e_c_g_producer.html" title="The ECGProducer class provides a ECG data producer for a given sampling rate.">ECGProducer</a>;</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="class_e_c_g_simulator_module_1_1_e_c_g_setup_widget.html" title="The ECGSetupWidget class provides the ECG configuration window.">ECGSetupWidget</a>;</div>
@@ -184,16 +184,16 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
 <div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> init();</div>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    <a class="code" href="class_r_t_m_e_a_s_l_i_b_1_1_real_time_sample_array.html" title="The RealTimeSampleArray class is the base class of every RealTimeSampleArray Measurement.">RealTimeSampleArray</a>*    m_pRTSA_ECG_I;      </div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    <a class="code" href="class_r_t_m_e_a_s_l_i_b_1_1_real_time_sample_array.html" title="The RealTimeSampleArray class is the base class of every RealTimeSampleArray Measurement.">RealTimeSampleArray</a>*    m_pRTSA_ECG_II;     </div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    <a class="code" href="class_r_t_m_e_a_s_l_i_b_1_1_real_time_sample_array.html" title="The RealTimeSampleArray class is the base class of every RealTimeSampleArray Measurement.">RealTimeSampleArray</a>*    m_pRTSA_ECG_III;    </div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    RealTimeSampleArray*    m_pRTSA_ECG_I;      </div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    RealTimeSampleArray*    m_pRTSA_ECG_II;     </div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    RealTimeSampleArray*    m_pRTSA_ECG_III;    </div>
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <span class="keywordtype">float</span>           m_fSamplingRate;            </div>
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="keywordtype">int</span>             m_iDownsamplingFactor;      </div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    ECGBuffer_old*      m_pInBuffer_I;              </div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    ECGBuffer_old*      m_pInBuffer_II;             </div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    ECGBuffer_old*      m_pInBuffer_III;            </div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    ECGBuffer_old*      m_pInBuffer_I;          </div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    ECGBuffer_old*      m_pInBuffer_II;         </div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    ECGBuffer_old*      m_pInBuffer_III;        </div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <a class="code" href="class_e_c_g_simulator_module_1_1_e_c_g_producer.html" title="The ECGProducer class provides a ECG data producer for a given sampling rate.">ECGProducer</a>*    m_pECGProducer;             </div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    QString m_qStringResourcePath;  </div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    QString m_qStringResourcePath;          </div>
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    <a class="code" href="class_e_c_g_simulator_module_1_1_e_c_g_sim_channel.html" title="The ECGChannel class provides a ECG channel.">ECGSimChannel</a>* m_pECGChannel_ECG_I;     </div>
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <a class="code" href="class_e_c_g_simulator_module_1_1_e_c_g_sim_channel.html" title="The ECGChannel class provides a ECG channel.">ECGSimChannel</a>* m_pECGChannel_ECG_II;    </div>
 <div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <a class="code" href="class_e_c_g_simulator_module_1_1_e_c_g_sim_channel.html" title="The ECGChannel class provides a ECG channel.">ECGSimChannel</a>* m_pECGChannel_ECG_III;   </div>
@@ -205,7 +205,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 7 2013 16:51:29 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 23 2013 15:23:00 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

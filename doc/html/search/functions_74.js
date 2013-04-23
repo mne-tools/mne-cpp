@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['text',['Text',['../class_r_t_m_e_a_s_l_i_b_1_1_text.html#ab3e26143fccc52699bcc5149cae852bc',1,'RTMEASLIB::Text']]],
-  ['textwidget',['TextWidget',['../class_d_i_s_p_l_i_b_1_1_text_widget.html#a70748a0d1c548bbf025def6ae8530cff',1,'DISPLIB::TextWidget']]],
   ['to_5ffixed_5fori',['to_fixed_ori',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a5090c26dd98d9a2bb1364a6f01793dcb',1,'MNELIB::MNEForwardSolution']]],
   ['tobyte',['toByte',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#ada15d83c2cca87f79b7eeb79aaf2dc23',1,'FIFFLIB::FiffTag']]],
   ['tochinfo',['toChInfo',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#aeda236f03bbca64ad81a319a557ae2e4',1,'FIFFLIB::FiffTag']]],
@@ -14,11 +12,11 @@ var searchData=
   ['todouble',['toDouble',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a52b6ea8eb82898c8ec5a121e6dc79b5f',1,'FIFFLIB::FiffTag']]],
   ['tofiffid',['toFiffID',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a227960340883c81cbc0614dca1a17dd6',1,'FIFFLIB::FiffTag']]],
   ['tofloat',['toFloat',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#aa36b1845c6f83d65fb73f60205c02849',1,'FIFFLIB::FiffTag']]],
-  ['tofloatmatrix',['toFloatMatrix',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a62e3199db07eb1892c6aaf182e171efd',1,'FIFFLIB::FiffTag']]],
+  ['tofloatmatrix',['toFloatMatrix',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a0737ad664a5a324795492a5b388e4a90',1,'FIFFLIB::FiffTag']]],
   ['toint',['toInt',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a88f8094d1f3b876708bd3d5779a30a49',1,'FIFFLIB::FiffTag']]],
   ['tointmatrix',['toIntMatrix',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#ae6e352d3ff566884190c7ce52896f94d',1,'FIFFLIB::FiffTag']]],
   ['tojsonobject',['toJsonObject',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html#a5ec7afa7dd94358a01ee72329a190486',1,'RTCOMMANDLIB::Command']]],
-  ['tolabels',['toLabels',['../class_f_s_l_i_b_1_1_annotation.html#a832df6b2077880e27508d16439640bbf',1,'FSLIB::Annotation']]],
+  ['tolabels',['toLabels',['../class_f_s_l_i_b_1_1_annotation.html#a832df6b2077880e27508d16439640bbf',1,'FSLIB::Annotation::toLabels()'],['../class_f_s_l_i_b_1_1_annotation_set.html#aebd156d216d0d79380ca0cf63a74ebab',1,'FSLIB::AnnotationSet::toLabels()']]],
   ['toshort',['toShort',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#ae482976adfb06db70a06cc0071c8628d',1,'FIFFLIB::FiffTag']]],
   ['tosparsefloatmatrix',['toSparseFloatMatrix',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a57ba4dde0f35b88ce8d6f0fa5ad1b71c',1,'FIFFLIB::FiffTag']]],
   ['tostring',['toString',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a2c6b9b9cf0ece41a5b2a7189db336748',1,'FIFFLIB::FiffTag']]],

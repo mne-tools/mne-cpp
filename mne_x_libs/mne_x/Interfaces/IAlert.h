@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "IModule.h"
+#include "IPlugin.h"
 #include <xMeas/Measurement/IMeasurementSink.h>
 
 
@@ -58,9 +58,9 @@ namespace MNEX
 /**
 * DECLARE CLASS IAlert
 *
-* @brief The IAlert class provides an interface for an alert module.
+* @brief The IAlert class provides an interface for an alert plugin.
 */
-class IAlert : public IModule, public IMeasurementSink
+class IAlert : public IPlugin, public IMeasurementSink
 {
 //ToDo virtual methods of IMeasurementSink
 public:
@@ -74,7 +74,7 @@ public:
     //=========================================================================================================
     /**
     * Starts the IAlert.
-    * Pure virtual method inherited by IModule.
+    * Pure virtual method inherited by IPlugin.
     *
     * @return true if success, false otherwise
     */
@@ -83,7 +83,7 @@ public:
     //=========================================================================================================
     /**
     * Stops the IAlert.
-    * Pure virtual method inherited by IModule.
+    * Pure virtual method inherited by IPlugin.
     *
     * @return true if success, false otherwise
     */
@@ -91,8 +91,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the module type.
-    * Pure virtual method inherited by IModule.
+    * Returns the plugin type.
+    * Pure virtual method inherited by IPlugin.
     *
     * @return type of the IAlert
     */
@@ -100,8 +100,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the module name.
-    * Pure virtual method inherited by IModule.
+    * Returns the plugin name.
+    * Pure virtual method inherited by IPlugin.
     *
     * @return the name of the IAlert.
     */
@@ -110,7 +110,7 @@ public:
     //=========================================================================================================
     /**
     * Returns the set up widget for configuration of IAlert.
-    * Pure virtual method inherited by IModule.
+    * Pure virtual method inherited by IPlugin.
     *
     * @return the setup widget.
     */
@@ -119,7 +119,7 @@ public:
     //=========================================================================================================
     /**
     * Returns the widget which is shown under configuration tab while running mode.
-    * Pure virtual method inherited by IModule.
+    * Pure virtual method inherited by IPlugin.
     *
     * @return the run widget.
     */

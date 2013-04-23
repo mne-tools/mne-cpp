@@ -61,7 +61,7 @@ namespace MNEX
 /**
 * DECLARE CLASS IRTVisualization
 *
-* @brief The IRTVisualization class provides an interface for a real-time algorithm module.
+* @brief The IRTVisualization class provides an interface for a real-time algorithm plugin.
 */
 class IRTVisualization :  public IMeasurementSource, public IMeasurementSink
 {
@@ -95,7 +95,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the module type.
+    * Returns the plugin type.
     * Pure virtual method inherited by IModule.
     *
     * @return type of the IRTVisualization
@@ -104,7 +104,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the module name.
+    * Returns the plugin name.
     * Pure virtual method inherited by IModule.
     *
     * @return the name of the IRTVisualization.

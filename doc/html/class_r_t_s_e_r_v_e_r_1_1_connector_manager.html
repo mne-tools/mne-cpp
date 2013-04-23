@@ -73,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -98,7 +98,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>The <a class="el" href="class_r_t_s_e_r_v_e_r_1_1_connector_manager.html" title="The ConnectorManager class provides a dynamic module loader. As well as the handling of the loaded mo...">ConnectorManager</a> class provides a dynamic module loader. As well as the handling of the loaded modules.  
+<p>The <a class="el" href="class_r_t_s_e_r_v_e_r_1_1_connector_manager.html" title="The ConnectorManager class provides a dynamic plugin loader. As well as the handling of the loaded pl...">ConnectorManager</a> class provides a dynamic plugin loader. As well as the handling of the loaded plugins.  
  <a href="class_r_t_s_e_r_v_e_r_1_1_connector_manager.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="connectormanager_8h_source.html">connectormanager.h</a>&gt;</code></p>
@@ -135,8 +135,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>disconnectActiveConne
 <tr class="separator:a5ba1313e2f90492b244777e733b1d35d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4311fdbc5c4c585ee5dc591d2565ed0e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_r_t_s_e_r_v_e_r_1_1_i_connector.html">IConnector</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_s_e_r_v_e_r_1_1_connector_manager.html#a4311fdbc5c4c585ee5dc591d2565ed0e">getActiveConnector</a> ()</td></tr>
 <tr class="separator:a4311fdbc5c4c585ee5dc591d2565ed0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acf31c2cac50fabb2f5caf75b9324c40a"><td class="memItemLeft" align="right" valign="top">QByteArray&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_s_e_r_v_e_r_1_1_connector_manager.html#acf31c2cac50fabb2f5caf75b9324c40a">getConnectorList</a> () const </td></tr>
-<tr class="separator:acf31c2cac50fabb2f5caf75b9324c40a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a746cf2f2bd57f529eb6c1c065db67042"><td class="memItemLeft" align="right" valign="top">QByteArray&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_s_e_r_v_e_r_1_1_connector_manager.html#a746cf2f2bd57f529eb6c1c065db67042">getConnectorList</a> (bool p_bFlagJSON=false) const </td></tr>
+<tr class="separator:a746cf2f2bd57f529eb6c1c065db67042"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af061a237c6ff0bed664b144a9b032d2c"><td class="memItemLeft" align="right" valign="top">QByteArray&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_t_s_e_r_v_e_r_1_1_connector_manager.html#af061a237c6ff0bed664b144a9b032d2c">setActiveConnector</a> (qint32 ID)</td></tr>
 <tr class="separator:af061a237c6ff0bed664b144a9b032d2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -150,8 +150,8 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><b>clearConnector
 <tr class="separator:a31f32ebb2b5dcfafdcc35f4f84ffa473"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The <a class="el" href="class_r_t_s_e_r_v_e_r_1_1_connector_manager.html" title="The ConnectorManager class provides a dynamic module loader. As well as the handling of the loaded mo...">ConnectorManager</a> class provides a dynamic module loader. As well as the handling of the loaded modules. </p>
-<p>DECLARE CLASS <a class="el" href="class_r_t_s_e_r_v_e_r_1_1_connector_manager.html" title="The ConnectorManager class provides a dynamic module loader. As well as the handling of the loaded mo...">ConnectorManager</a> </p>
+<div class="textblock"><p>The <a class="el" href="class_r_t_s_e_r_v_e_r_1_1_connector_manager.html" title="The ConnectorManager class provides a dynamic plugin loader. As well as the handling of the loaded pl...">ConnectorManager</a> class provides a dynamic plugin loader. As well as the handling of the loaded plugins. </p>
+<p>DECLARE CLASS <a class="el" href="class_r_t_s_e_r_v_e_r_1_1_connector_manager.html" title="The ConnectorManager class provides a dynamic plugin loader. As well as the handling of the loaded pl...">ConnectorManager</a> </p>
 
 <p>Definition at line <a class="el" href="connectormanager_8h_source.html#l00102">102</a> of file <a class="el" href="connectormanager_8h_source.html">connectormanager.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
@@ -178,7 +178,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><b>clearConnector
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Constructs a <a class="el" href="class_r_t_s_e_r_v_e_r_1_1_connector_manager.html" title="The ConnectorManager class provides a dynamic module loader. As well as the handling of the loaded mo...">ConnectorManager</a> with the given parent.</p>
+<p>Constructs a <a class="el" href="class_r_t_s_e_r_v_e_r_1_1_connector_manager.html" title="The ConnectorManager class provides a dynamic plugin loader. As well as the handling of the loaded pl...">ConnectorManager</a> with the given parent.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">parent</td><td>pointer to parent Object. (It's normally the default value.) </td></tr>
@@ -210,7 +210,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><b>clearConnector
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Destroys the <a class="el" href="class_r_t_s_e_r_v_e_r_1_1_connector_manager.html" title="The ConnectorManager class provides a dynamic module loader. As well as the handling of the loaded mo...">ConnectorManager</a>. </p>
+<p>Destroys the <a class="el" href="class_r_t_s_e_r_v_e_r_1_1_connector_manager.html" title="The ConnectorManager class provides a dynamic plugin loader. As well as the handling of the loaded pl...">ConnectorManager</a>. </p>
 
 <p>Definition at line <a class="el" href="connectormanager_8cpp_source.html#l00096">96</a> of file <a class="el" href="connectormanager_8cpp_source.html">connectormanager.cpp</a>.</p>
 
@@ -231,7 +231,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><b>clearConnector
 </div><div class="memdoc">
 <p>Connect connector manager to mne_rt_server commands </p>
 
-<p>Definition at line <a class="el" href="connectormanager_8cpp_source.html#l00294">294</a> of file <a class="el" href="connectormanager_8cpp_source.html">connectormanager.cpp</a>.</p>
+<p>Definition at line <a class="el" href="connectormanager_8cpp_source.html#l00344">344</a> of file <a class="el" href="connectormanager_8cpp_source.html">connectormanager.cpp</a>.</p>
 
 </div>
 </div>
@@ -247,28 +247,35 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><b>clearConnector
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Returns vector containing active ISensor modules.</p>
-<dl class="section return"><dt>Returns</dt><dd>reference to vector containing active ISensor modules. </dd></dl>
+<p>Returns vector containing active ISensor plugins.</p>
+<dl class="section return"><dt>Returns</dt><dd>reference to vector containing active ISensor plugins. </dd></dl>
 
-<p>Definition at line <a class="el" href="connectormanager_8cpp_source.html#l00256">256</a> of file <a class="el" href="connectormanager_8cpp_source.html">connectormanager.cpp</a>.</p>
+<p>Definition at line <a class="el" href="connectormanager_8cpp_source.html#l00277">277</a> of file <a class="el" href="connectormanager_8cpp_source.html">connectormanager.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="acf31c2cac50fabb2f5caf75b9324c40a"></a>
+<a class="anchor" id="a746cf2f2bd57f529eb6c1c065db67042"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">QByteArray ConnectorManager::getConnectorList </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>p_bFlagJSON</em> = <code>false</code></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Prints a list of all connectors and their status </p>
+<p>Prints a list of all connectors and their status</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_bFlagJSON</td><td>if true, function return JSON formatted (default = false) </td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p>Definition at line <a class="el" href="connectormanager_8cpp_source.html#l00271">271</a> of file <a class="el" href="connectormanager_8cpp_source.html">connectormanager.cpp</a>.</p>
+<p>Definition at line <a class="el" href="connectormanager_8cpp_source.html#l00292">292</a> of file <a class="el" href="connectormanager_8cpp_source.html">connectormanager.cpp</a>.</p>
 
 </div>
 </div>
@@ -292,10 +299,10 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><b>clearConnector
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Returns vector containing all modules.</p>
-<dl class="section return"><dt>Returns</dt><dd>reference to vector containing all modules. </dd></dl>
+<p>Returns vector containing all plugins.</p>
+<dl class="section return"><dt>Returns</dt><dd>reference to vector containing all plugins. </dd></dl>
 
-<p>Definition at line <a class="el" href="connectormanager_8h_source.html#l00225">225</a> of file <a class="el" href="connectormanager_8h_source.html">connectormanager.h</a>.</p>
+<p>Definition at line <a class="el" href="connectormanager_8h_source.html#l00227">227</a> of file <a class="el" href="connectormanager_8h_source.html">connectormanager.h</a>.</p>
 
 </div>
 </div>
@@ -312,15 +319,15 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><b>clearConnector
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Loads modules from given directory.</p>
+<p>Loads plugins from given directory.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">dir</td><td>the module directory. </td></tr>
+    <tr><td class="paramname">dir</td><td>the plugin directory. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="connectormanager_8cpp_source.html#l00308">308</a> of file <a class="el" href="connectormanager_8cpp_source.html">connectormanager.cpp</a>.</p>
+<p>Definition at line <a class="el" href="connectormanager_8cpp_source.html#l00358">358</a> of file <a class="el" href="connectormanager_8cpp_source.html">connectormanager.cpp</a>.</p>
 
 </div>
 </div>
@@ -339,7 +346,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><b>clearConnector
 </div><div class="memdoc">
 <p>ToDo </p>
 
-<p>Definition at line <a class="el" href="connectormanager_8cpp_source.html#l00406">406</a> of file <a class="el" href="connectormanager_8cpp_source.html">connectormanager.cpp</a>.</p>
+<p>Definition at line <a class="el" href="connectormanager_8cpp_source.html#l00456">456</a> of file <a class="el" href="connectormanager_8cpp_source.html">connectormanager.cpp</a>.</p>
 
 </div>
 </div>
@@ -350,7 +357,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><b>clearConnector
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 7 2013 16:51:33 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 23 2013 15:23:03 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

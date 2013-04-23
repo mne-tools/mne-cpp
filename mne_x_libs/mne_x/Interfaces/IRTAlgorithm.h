@@ -62,7 +62,7 @@ namespace MNEX
 /**
 * DECLARE CLASS IRTAlgorithm
 *
-* @brief The IRTAlgorithm class provides an interface for a real-time algorithm module.
+* @brief The IRTAlgorithm class provides an interface for a real-time algorithm plugin.
 */
 class IRTAlgorithm : public IMeasurementSource, public IMeasurementSink
 {
@@ -79,7 +79,7 @@ public:
     //=========================================================================================================
     /**
     * Starts the IRTAlgorithm.
-    * Pure virtual method inherited by IModule.
+    * Pure virtual method inherited by IPlugin.
     *
     * @return true if success, false otherwise
     */
@@ -88,7 +88,7 @@ public:
     //=========================================================================================================
     /**
     * Stops the IRTAlgorithm.
-    * Pure virtual method inherited by IModule.
+    * Pure virtual method inherited by IPlugin.
     *
     * @return true if success, false otherwise
     */
@@ -96,8 +96,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the module type.
-    * Pure virtual method inherited by IModule.
+    * Returns the plugin type.
+    * Pure virtual method inherited by IPlugin.
     *
     * @return type of the IRTAlgorithm
     */
@@ -105,8 +105,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the module name.
-    * Pure virtual method inherited by IModule.
+    * Returns the plugin name.
+    * Pure virtual method inherited by IPlugin.
     *
     * @return the name of the IRTAlgorithm.
     */
@@ -115,7 +115,7 @@ public:
     //=========================================================================================================
     /**
     * Returns the set up widget for configuration of IRTAlgorithm.
-    * Pure virtual method inherited by IModule.
+    * Pure virtual method inherited by IPlugin.
     *
     * @return the setup widget.
     */
@@ -124,7 +124,7 @@ public:
     //=========================================================================================================
     /**
     * Returns the widget which is shown under configuration tab while running mode.
-    * Pure virtual method inherited by IModule.
+    * Pure virtual method inherited by IPlugin.
     *
     * @return the run widget.
     */

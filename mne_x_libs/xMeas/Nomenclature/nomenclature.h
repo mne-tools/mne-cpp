@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the whole nomenclature: declaration of MDL_ID class (module id's); MSR_ID class (measurement id's) and definitions of new types.
+* @brief    Contains the whole nomenclature: declaration of PLG_ID class (plugin id's); MSR_ID class (measurement id's) and definitions of new types.
 *
 */
 
@@ -79,18 +79,18 @@ namespace XMEASLIB
 
 //=============================================================================================================
 /**
-* DECLARE CLASS MDL_ID
+* DECLARE CLASS PLG_ID
 *
-* @brief The MDL_ID class provides the module id's and check up functions. ToDo Add here new module id's!!!
+* @brief The PLG_ID class provides the plugin id's and check up functions. ToDo Add here new plugin id's!!!
 */
-class XMEASSHARED_EXPORT MDL_ID
+class XMEASSHARED_EXPORT PLG_ID
 {
 public:
     //=========================================================================================================
     /**
-    * Module id enumeration. ToDo In next version change this to QMap.
+    * Plugin id enumeration. ToDo In next version change this to QMap.
     */
-    enum Module_ID
+    enum Plugin_ID
     {
         ECGSIM = 0x00010000,                /**< Plugin id of the ECG simulator. */
         ECG = 0x00020000,                   /**< Plugin id of the ECG sensor (Not implemented - just a dummy). */
@@ -99,78 +99,78 @@ public:
         FILTERTOOL = 0x00050000,            /**< Plugin id of the filter toolbox. */
         GABORPARTICLETOOL = 0x00060000,     /**< Plugin id of the gabor toolbox. */
         BRAINMONITOR = 0x00070000,          /**< Plugin id of the brain monitor visualization. */
-        _default = -1                       /**< Default module id. */
+        _default = -1                       /**< Default plugin id. */
     };
 
     //=========================================================================================================
     /**
-    * Constructs a Module ID with a given ID.
+    * Constructs a Plugin ID with a given ID.
     *
-    * @param [in] id value which holds the Module ID.
+    * @param [in] id value which holds the Plugin ID.
     */
-    MDL_ID(int id);
+    PLG_ID(int id);
 
     //=========================================================================================================
     /**
-    * Copy constructor which creates a new Module ID from a given Module ID.
+    * Copy constructor which creates a new Plugin ID from a given Plugin ID.
     *
-    * @param [in] mdl_id reference to the Module ID which should be copied.
+    * @param [in] plg_id reference to the Plugin ID which should be copied.
     */
-    MDL_ID(const MDL_ID &mdl_id);
+    PLG_ID(const PLG_ID &plg_id);
 
     //=========================================================================================================
     /**
-    * Constructs a Module ID with a given enumeration ID.
+    * Constructs a Plugin ID with a given enumeration ID.
     *
-    * @param [in] standard_ID value which holds the enumeration Module ID.
+    * @param [in] standard_ID value which holds the enumeration Plugin ID.
     */
-    MDL_ID(Module_ID standard_ID);
+    PLG_ID(Plugin_ID standard_ID);
 
     //=========================================================================================================
     /**
-    * Destroys the Module ID.
+    * Destroys the Plugin ID.
     */
-    ~MDL_ID(){};
+    ~PLG_ID(){};
 
     //=========================================================================================================
     /**
-    * Returns a map where the Module_ID enumerations are mapped to corresponding strings.
+    * Returns a map where the Plugin_ID enumerations are mapped to corresponding strings.
     *
-    * @return the map of strings and corresponding Module_ID's.
+    * @return the map of strings and corresponding Plugin_ID's.
     */
-    static QMap<QString, int>  getModuleIDMap()
+    static QMap<QString, int>  getPluginIDMap()
     {
         QMap<QString, int> map;
-        map["ECG Simulator"] = MDL_ID::ECGSIM;
-        map["MNE RT Server)"] = MDL_ID::RTSERVER;
-        map["Dummy Toolbox"] = MDL_ID::DUMMYTOOL;
-        map["Filter Toolbox"] = MDL_ID::FILTERTOOL;
-        map["Gabor Particle Toolbox"] = MDL_ID::GABORPARTICLETOOL;
-        map["Brain Monitor"] = MDL_ID::BRAINMONITOR;
+        map["ECG Simulator"] = PLG_ID::ECGSIM;
+        map["MNE RT Server)"] = PLG_ID::RTSERVER;
+        map["Dummy Toolbox"] = PLG_ID::DUMMYTOOL;
+        map["Filter Toolbox"] = PLG_ID::FILTERTOOL;
+        map["Gabor Particle Toolbox"] = PLG_ID::GABORPARTICLETOOL;
+        map["Brain Monitor"] = PLG_ID::BRAINMONITOR;
         return map;
     }
 
     //=========================================================================================================
     /**
-    * Returns the Module_ID enumeration of a given index.
+    * Returns the Plugin_ID enumeration of a given index.
     *
     * @param [in] i holds the index.
     *
-    * @return the requested Module ID.
+    * @return the requested Plugin ID.
     */
-    Module_ID operator[](unsigned int i) const
-    { return (Module_ID)i; }
+    Plugin_ID operator[](unsigned int i) const
+    { return (Plugin_ID)i; }
 
 
     //=========================================================================================================
     /**
-    * Assigns the Module ID of an other Module ID and returns the Module ID with the new value.
+    * Assigns the Plugin ID of an other Plugin ID and returns the Plugin ID with the new value.
     *
-    * @param [in] other holds the Module ID which should be copied.
+    * @param [in] other holds the Plugin ID which should be copied.
     *
-    * @return the new Module ID.
+    * @return the new Plugin ID.
     */
-    MDL_ID &operator=(const MDL_ID &other)
+    PLG_ID &operator=(const PLG_ID &other)
     {
         m_S32_ID = other.m_S32_ID;
         return *this;
@@ -178,13 +178,13 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds a value to the Module ID to increase it and returns the Module ID with the new value.
+    * Adds a value to the Plugin ID to increase it and returns the Plugin ID with the new value.
     *
-    * @param [in] i the value which should be added to the Module ID.
+    * @param [in] i the value which should be added to the Plugin ID.
     *
-    * @return the new Module ID.
+    * @return the new Plugin ID.
     */
-    MDL_ID &operator+(int i)
+    PLG_ID &operator+(int i)
     {
         m_S32_ID = m_S32_ID + i < -1 ? -1 : m_S32_ID + i;
         return *this;
@@ -192,137 +192,137 @@ public:
 
     //=========================================================================================================
     /**
-    * Subtracts a value of the Module ID to decrease it and returns the Module ID with the new value.
+    * Subtracts a value of the Plugin ID to decrease it and returns the Plugin ID with the new value.
     *
-    * @param [in] i the value which should be subtracted from the Module ID.
+    * @param [in] i the value which should be subtracted from the Plugin ID.
     *
-    * @return the new Module ID.
+    * @return the new Plugin ID.
     */
-    MDL_ID &operator-(int i)
+    PLG_ID &operator-(int i)
     { return (*this + (-1)*i); }
 
     //=========================================================================================================
     /**
-    * Increments (praefix ++x) the Module ID and returns the Module ID with the new value.
+    * Increments (praefix ++x) the Plugin ID and returns the Plugin ID with the new value.
     *
-    * @return the new Module ID.
+    * @return the new Plugin ID.
     */
-    MDL_ID &operator++()//Praefix
+    PLG_ID &operator++()//Praefix
     { return (*this+1); }
 
     //=========================================================================================================
     /**
-    * Increments (postfix x++) the Module ID and returns the Module ID with the new value.
+    * Increments (postfix x++) the Plugin ID and returns the Plugin ID with the new value.
     *
-    * @return the new Module ID.
+    * @return the new Plugin ID.
     */
-    MDL_ID &operator++(int)//Postfix
+    PLG_ID &operator++(int)//Postfix
     { return (*this+1); }
 
     //=========================================================================================================
     /**
-    * Decreases (praefix --x) the Module ID and returns the Module ID with the new value.
+    * Decreases (praefix --x) the Plugin ID and returns the Plugin ID with the new value.
     *
-    * @return the new Module ID.
+    * @return the new Plugin ID.
     */
-    MDL_ID &operator--()//Praefix
+    PLG_ID &operator--()//Praefix
     { return (*this-1); }
 
     //=========================================================================================================
     /**
-    * Decreases (postfix x--) the Module ID and returns the Module ID with the new value.
+    * Decreases (postfix x--) the Plugin ID and returns the Plugin ID with the new value.
     *
-    * @return the new Module ID.
+    * @return the new Plugin ID.
     */
-    MDL_ID &operator--(int)//Postfix
+    PLG_ID &operator--(int)//Postfix
     { return (*this-1); }
 
     //=========================================================================================================
     /**
-    * Compares the Module ID with another Module ID returns the result.
+    * Compares the Plugin ID with another Plugin ID returns the result.
     *
-    * @param [in] other holds the other Module ID.
+    * @param [in] other holds the other Plugin ID.
     *
-    * @return true when the Module ID's are equal, false otherwise.
+    * @return true when the Plugin ID's are equal, false otherwise.
     */
-    bool operator==(const MDL_ID &other) const
+    bool operator==(const PLG_ID &other) const
     {return m_S32_ID==other.m_S32_ID;}
 
     //=========================================================================================================
     /**
-    * Compares the Module ID with another Module ID whether they are not eqal returns the result.
+    * Compares the Plugin ID with another Plugin ID whether they are not eqal returns the result.
     *
-    * @param [in] other holds the other Module ID.
+    * @param [in] other holds the other Plugin ID.
     *
-    * @return true when the Module ID's aren't equal, false otherwise.
+    * @return true when the Plugin ID's aren't equal, false otherwise.
     */
-    inline bool operator!= (const MDL_ID &other) const
+    inline bool operator!= (const PLG_ID &other) const
     { return !(*this == other); }
 
     //=========================================================================================================
     /**
-    * Compares the Module ID with another Module ID whether it's smaller.
+    * Compares the Plugin ID with another Plugin ID whether it's smaller.
     *
-    * @param [in] other holds the other Module ID.
+    * @param [in] other holds the other Plugin ID.
     *
-    * @return true when the Module ID is smaller, false otherwise.
+    * @return true when the Plugin ID is smaller, false otherwise.
     */
-    bool operator< (const MDL_ID &other) const
+    bool operator< (const PLG_ID &other) const
     { return m_S32_ID<other.m_S32_ID;}
 
     //=========================================================================================================
     /**
-    * Compares the Module ID with another Module ID whether it's bigger.
+    * Compares the Plugin ID with another Plugin ID whether it's bigger.
     *
-    * @param [in] other holds the other Module ID.
+    * @param [in] other holds the other Plugin ID.
     *
-    * @return true when the Module ID is bigger, false otherwise.
+    * @return true when the Plugin ID is bigger, false otherwise.
     */
-    inline bool operator> (const MDL_ID &other) const
+    inline bool operator> (const PLG_ID &other) const
     { return other < *this; }
 
     //=========================================================================================================
     /**
-    * Compares the Module ID with another Module ID whether it's smaller or equal.
+    * Compares the Plugin ID with another Plugin ID whether it's smaller or equal.
     *
-    * @param [in] other holds the other Module ID.
+    * @param [in] other holds the other Plugin ID.
     *
-    * @return true when the Module ID is smaller or equal, false otherwise.
+    * @return true when the Plugin ID is smaller or equal, false otherwise.
     */
-    inline bool operator<= (const MDL_ID &other) const
+    inline bool operator<= (const PLG_ID &other) const
     { return m_S32_ID<=other.m_S32_ID; }
 
     //=========================================================================================================
     /**
-    * Compares the Module ID with another Module ID whether it's bigger or equal.
+    * Compares the Plugin ID with another Plugin ID whether it's bigger or equal.
     *
-    * @param [in] other holds the other Module ID.
+    * @param [in] other holds the other Plugin ID.
     *
-    * @return true when the Module ID is bigger or equal, false otherwise.
+    * @return true when the Plugin ID is bigger or equal, false otherwise.
     */
-    inline bool operator>= (const MDL_ID &other) const
+    inline bool operator>= (const PLG_ID &other) const
     { return m_S32_ID>=other.m_S32_ID; }
 
     //=========================================================================================================
     /**
-    * Returns the Module_ID in integer format.
+    * Returns the Plugin_ID in integer format.
     *
-    * @return the Module ID.
+    * @return the Plugin ID.
     */
     inline int getIntID()
     { return m_S32_ID; }
 
     //=========================================================================================================
     /**
-    * Returns the Module_ID as an enumeration.
+    * Returns the Plugin_ID as an enumeration.
     *
-    * @return the Module ID as an enumeration.
+    * @return the Plugin ID as an enumeration.
     */
-    inline Module_ID getModuleID()
-    { return (Module_ID)m_S32_ID; }
+    inline Plugin_ID getPluginID()
+    { return (Plugin_ID)m_S32_ID; }
 
 private:
-    S32 m_S32_ID;	/**< Holds the Module ID.*/
+    S32 m_S32_ID;	/**< Holds the Plugin ID.*/
 
 
 };
@@ -343,30 +343,30 @@ public:
     enum Measurement_ID
     {
         // ECG
-        ECGSIM_I = MDL_ID::ECGSIM,      /**< Measurement id of the ECG I channel. */
+        ECGSIM_I = PLG_ID::ECGSIM,      /**< Measurement id of the ECG I channel. */
         ECGSIM_II,                      /**< Measurement id of the ECG II channel. */
         ECGSIM_III,                     /**< Measurement id of the ECG III channel. */
 
         // RTSERVER
-        MEGRTSERVER_OUTPUT = MDL_ID::RTSERVER,   /**< Measurement id of a MEG channel. */
+        MEGRTSERVER_OUTPUT = PLG_ID::RTSERVER,   /**< Measurement id of a MEG channel. */
 
         // DummyToolbox
-        DUMMYTOOL_OUTPUT = MDL_ID::DUMMYTOOL,   /**< Measurement id of the dummy tool box output channel. */
+        DUMMYTOOL_OUTPUT = PLG_ID::DUMMYTOOL,   /**< Measurement id of the dummy tool box output channel. */
         DUMMYTOOL_OUTPUT_II,                    /**< Measurement id of the dummy tool box output channel II. */
 
         // FilterToolbox
-        FILTERTOOL_INPUT = MDL_ID::FILTERTOOL,  /**< Measurement id of the filter tool box input channel. */
+        FILTERTOOL_INPUT = PLG_ID::FILTERTOOL,  /**< Measurement id of the filter tool box input channel. */
         FILTERTOOL_OUTPUT,                      /**< Measurement id of the filter tool box output channel. */
 
         // GaborParticleToolbox
-        GABORPARTICLETOOL_CURRENT = MDL_ID::GABORPARTICLETOOL,  /**< Measurement id of the gabor particle tool box output channel. */
+        GABORPARTICLETOOL_CURRENT = PLG_ID::GABORPARTICLETOOL,  /**< Measurement id of the gabor particle tool box output channel. */
         GABORPARTICLETOOL_FREQUENCY,                            /**< Measurement id of the gabor particle tool box estimated frequency. */
         GABORPARTICLETOOL_FREQUENCY_STD,                        /**< Measurement id of the gabor particle tool box estimated standard deviation of the frequency. */
         GABORPARTICLETOOL_SCALE,                                /**< Measurement id of the gabor particle tool box estimated scale of the particles. */
         GABORPARTICLETOOL_SCALE_STD,                            /**< Measurement id of the gabor particle tool box estimated standard deviation of the scale of the particles. */
 
         // BarinMonitor
-        BRAINMONITOR_OUTPUT = MDL_ID::BRAINMONITOR,         /**< Measurement id of the brain monitor output channel. */
+        BRAINMONITOR_OUTPUT = PLG_ID::BRAINMONITOR,         /**< Measurement id of the brain monitor output channel. */
 
 
         //Default
@@ -405,7 +405,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns a List which holds corresponding to all modules a string list with all measurements.
+    * Returns a List which holds corresponding to all plugins a string list with all measurements.
     *
     * @return the list of string list's.
     */

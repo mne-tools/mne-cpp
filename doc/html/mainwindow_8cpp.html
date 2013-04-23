@@ -71,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -82,7 +82,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_807cd6f3fa1b113b47d6ac13bf5e8abb.html">mne_x</a></li><li class="navelem"><a class="el" href="dir_8b2527f4bb01c67dde506337befa1b6f.html">mne_x</a></li><li class="navelem"><a class="el" href="dir_886d2c60ec13f0dbcf0ea5345194cc0c.html">src</a></li><li class="navelem"><a class="el" href="dir_3b0ff139d048c987a70bb3615bab5598.html">FormFiles</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_8a904de06506dbbbbd29d804f3583a01.html">mne_x</a></li><li class="navelem"><a class="el" href="dir_62ece3dc9eca71b501c397a13ca38422.html">mne_x</a></li><li class="navelem"><a class="el" href="dir_1fa6e9ac0ede134862dcf4da8deb2ae4.html">src</a></li><li class="navelem"><a class="el" href="dir_6b3e58a814eaa7579128f90749ae3ca1.html">FormFiles</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -95,27 +95,27 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <p>Contains the implementation of the MainWindow class.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &quot;<a class="el" href="modulemanager_8h_source.html">../management/modulemanager.h</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="connector_8h_source.html">../management/connector.h</a>&quot;</code><br/>
-<code>#include &lt;<a class="el" href="rtmeasurementmanager_8h_source.html">rtDtMng/rtmeasurementmanager.h</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="realtimesamplearray_8h_source.html">rtMeas/Measurement/realtimesamplearray.h</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="numeric_8h_source.html">rtMeas/Measurement/numeric.h</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="progressbar_8h_source.html">rtMeas/Measurement/progressbar.h</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="text_8h_source.html">rtMeas/Measurement/text.h</a>&gt;</code><br/>
+<div class="textblock"><code>#include &lt;mne_x/Management/PluginManager.h&gt;</code><br/>
+<code>#include &lt;mne_x/Management/connector.h&gt;</code><br/>
+<code>#include &lt;xDtMng/measurementmanager.h&gt;</code><br/>
+<code>#include &lt;xMeas/Measurement/realtimesamplearray.h&gt;</code><br/>
+<code>#include &lt;xMeas/Measurement/numeric.h&gt;</code><br/>
+<code>#include &lt;xMeas/Measurement/progressbar.h&gt;</code><br/>
+<code>#include &lt;xMeas/Measurement/text.h&gt;</code><br/>
 <code>#include &lt;<a class="el" href="observerpattern_8h_source.html">generics/observerpattern.h</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="displaymanager_8h_source.html">disp/displaymanager.h</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="realtimesamplearraywidget_8h_source.html">disp/realtimesamplearraywidget.h</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="numericwidget_8h_source.html">disp/numericwidget.h</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="progressbarwidget_8h_source.html">disp/progressbarwidget.h</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="textwidget_8h_source.html">disp/textwidget.h</a>&gt;</code><br/>
-<code>#include &quot;<a class="el" href="_i_module_8h_source.html">../interfaces/IModule.h</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="_i_sensor_8h_source.html">../interfaces/ISensor.h</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="_i_r_t_algorithm_8h_source.html">../interfaces/IRTAlgorithm.h</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="_i_r_t_visualization_8h_source.html">../interfaces/IRTVisualization.h</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="_i_r_t_record_8h_source.html">../interfaces/IRTRecord.h</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="_i_alert_8h_source.html">../interfaces/IAlert.h</a>&quot;</code><br/>
+<code>#include &lt;xDisp/displaymanager.h&gt;</code><br/>
+<code>#include &lt;xDisp/realtimesamplearraywidget.h&gt;</code><br/>
+<code>#include &lt;xDisp/numericwidget.h&gt;</code><br/>
+<code>#include &lt;xDisp/progressbarwidget.h&gt;</code><br/>
+<code>#include &lt;xDisp/textwidget.h&gt;</code><br/>
+<code>#include &lt;mne_x/Interfaces/IPlugin.h&gt;</code><br/>
+<code>#include &lt;mne_x/Interfaces/ISensor.h&gt;</code><br/>
+<code>#include &lt;mne_x/Interfaces/IRTAlgorithm.h&gt;</code><br/>
+<code>#include &lt;mne_x/Interfaces/IRTVisualization.h&gt;</code><br/>
+<code>#include &lt;mne_x/Interfaces/IRTRecord.h&gt;</code><br/>
+<code>#include &lt;mne_x/Interfaces/IAlert.h&gt;</code><br/>
 <code>#include &quot;<a class="el" href="mainwindow_8h_source.html">mainwindow.h</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="moduledockwidget_8h_source.html">moduledockwidget.h</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="plugindockwidget_8h_source.html">PluginDockWidget.h</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="runwidget_8h_source.html">runwidget.h</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="startupwidget_8h_source.html">startupwidget.h</a>&quot;</code><br/>
 <code>#include &lt;QMultiHash&gt;</code><br/>
@@ -128,8 +128,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a3c637fba2901a5b4dc84520258c0b4f2"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mainwindow_8cpp.html#a3c637fba2901a5b4dc84520258c0b4f2">moduleDir</a> = &quot;/mne_x_plugins&quot;</td></tr>
-<tr class="separator:a3c637fba2901a5b4dc84520258c0b4f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a912e7c043c3baa159e02191e57928b86"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mainwindow_8cpp.html#a912e7c043c3baa159e02191e57928b86">pluginDir</a> = &quot;/mne_x_plugins&quot;</td></tr>
+<tr class="separator:a912e7c043c3baa159e02191e57928b86"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Contains the implementation of the MainWindow class. </p>
@@ -149,12 +149,12 @@ LICENSE</h1>
 
 <p>Definition in file <a class="el" href="mainwindow_8cpp_source.html">mainwindow.cpp</a>.</p>
 </div><h2 class="groupheader">Variable Documentation</h2>
-<a class="anchor" id="a3c637fba2901a5b4dc84520258c0b4f2"></a>
+<a class="anchor" id="a912e7c043c3baa159e02191e57928b86"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const char* moduleDir = &quot;/mne_x_plugins&quot;</td>
+          <td class="memname">const char* pluginDir = &quot;/mne_x_plugins&quot;</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -167,7 +167,7 @@ LICENSE</h1>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 7 2013 16:51:30 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 23 2013 15:23:01 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

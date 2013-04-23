@@ -80,7 +80,7 @@ RtServer::RtServer()
 , m_iBufferSize(-1)
 , m_pRawMatrixBuffer_In(NULL)
 {
-    m_MDL_ID = MDL_ID::RTSERVER;
+    m_PLG_ID = PLG_ID::RTSERVER;
 
     // Start RtServerProducer
     m_pRtServerProducer->start();

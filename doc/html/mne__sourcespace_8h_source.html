@@ -71,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -82,7 +82,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_d9f91708cdb6d7bc2d9cf00ef2519886.html">MNE</a></li><li class="navelem"><a class="el" href="dir_03820bcac740aa4f9e7fd37e64f99512.html">mne</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_fba7b6d30909f9ec66000534e18b073e.html">MNE</a></li><li class="navelem"><a class="el" href="dir_2818de1e5b67557da8c9b7d659dc1661.html">mne</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -183,49 +183,82 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> clear();</div>
 <div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;</div>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> qint32 find_source_space_hemi(<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="Hemisphere provides geometry information.">MNEHemisphere</a>&amp; p_Hemisphere);</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;<span class="comment"></span>    QList&lt;VectorXi&gt; get_vertno() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;<span class="comment"></span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> isEmpty() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> qint32 find_source_space_hemi(<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="Hemisphere provides geometry information.">MNEHemisphere</a>&amp; p_Hemisphere);</div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;</div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;<span class="comment"></span>    QList&lt;VectorXi&gt; label_src_vertno_sel(<span class="keyword">const</span> <a class="code" href="class_f_s_l_i_b_1_1_label.html" title="Freesurfer/MNE label.">Label</a> &amp;p_label, VectorXi &amp;src_sel) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> patch_info(<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="Hemisphere provides geometry information.">MNEHemisphere</a> &amp;p_Hemisphere);<span class="comment">//VectorXi&amp; nearest, QList&lt;VectorXi&gt;&amp; pinfo);@param [in] nearest   The nearest vector of the source space.@param [out] pinfo    The requested patch information.</span></div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> read_source_spaces(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a>*&amp; p_pStream, <span class="keywordtype">bool</span> add_geom, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a>&amp; p_Tree, <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html" title="Source Space descritpion.">MNESourceSpace</a>&amp; p_SourceSpace);</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;<span class="comment"></span>    <span class="keywordtype">bool</span> transform_source_space_to(fiff_int_t dest, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="Coordinate transformation description.">FiffCoordTrans</a>&amp; trans);</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> complete_source_space_info(<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="Hemisphere provides geometry information.">MNEHemisphere</a>&amp; p_Hemisphere);</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;<span class="comment"></span>    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="Hemisphere provides geometry information.">MNEHemisphere</a>&amp; operator[] (qint32 idx);</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;<span class="comment"></span>    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="Hemisphere provides geometry information.">MNEHemisphere</a>&amp; operator[] (QString idt);</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> read_source_space(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a>* p_pStream, <span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a>&amp; p_Tree, <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="Hemisphere provides geometry information.">MNEHemisphere</a>&amp; p_Hemisphere);</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00273"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a9fc15a02c68b375d0194fc364370336e">  273</a></span>&#160;    QList&lt;MNEHemisphere&gt; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a9fc15a02c68b375d0194fc364370336e">hemispheres</a>;   </div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;};</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;} <span class="comment">// NAMESPACE</span></div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;<span class="preprocessor">#endif // MNE_SOURCESPACE_H</span></div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;<span class="comment"></span>    QList&lt;VectorXi&gt; get_vertno() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;<span class="comment"></span>    QList&lt;VectorXi&gt; label_src_vertno_sel(<span class="keyword">const</span> <a class="code" href="class_f_s_l_i_b_1_1_label.html" title="Freesurfer/MNE label.">Label</a> &amp;p_label, VectorXi &amp;src_sel) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> patch_info(<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="Hemisphere provides geometry information.">MNEHemisphere</a> &amp;p_Hemisphere);<span class="comment">//VectorXi&amp; nearest, QList&lt;VectorXi&gt;&amp; pinfo);@param [in] nearest   The nearest vector of the source space.@param [out] pinfo    The requested patch information.</span></div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> read_source_spaces(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a>*&amp; p_pStream, <span class="keywordtype">bool</span> add_geom, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a>&amp; p_Tree, <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html" title="Source Space descritpion.">MNESourceSpace</a>&amp; p_SourceSpace);</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;<span class="comment"></span>    <span class="keyword">inline</span> qint32 size() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;<span class="comment"></span>    <span class="keywordtype">bool</span> transform_source_space_to(fiff_int_t dest, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="Coordinate transformation description.">FiffCoordTrans</a>&amp; trans);</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> write_to_stream(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a>* p_pStream);</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;<span class="comment"></span>    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="Hemisphere provides geometry information.">MNEHemisphere</a>&amp; operator[] (qint32 idx);</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;<span class="comment"></span>    <span class="keyword">const</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="Hemisphere provides geometry information.">MNEHemisphere</a>&amp; operator[] (qint32 idx) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;<span class="comment"></span>    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="Hemisphere provides geometry information.">MNEHemisphere</a>&amp; operator[] (QString idt);</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;<span class="comment"></span>    <span class="keyword">const</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="Hemisphere provides geometry information.">MNEHemisphere</a>&amp; operator[] (QString idt) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> complete_source_space_info(<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="Hemisphere provides geometry information.">MNEHemisphere</a>&amp; p_Hemisphere);</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> read_source_space(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a>* p_pStream, <span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a>&amp; p_Tree, <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="Hemisphere provides geometry information.">MNEHemisphere</a>&amp; p_Hemisphere);</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;    QList&lt;MNEHemisphere&gt; m_qListHemispheres;    </div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;};</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;<span class="comment">// INLINE DEFINITIONS</span></div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;</div>
+<div class="line"><a name="l00327"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a43b3055101cbb51adaea2cc5aed25a95">  327</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a43b3055101cbb51adaea2cc5aed25a95">MNESourceSpace::isEmpty</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;    <span class="keywordflow">return</span> m_qListHemispheres.size() == 0;</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;}</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;</div>
+<div class="line"><a name="l00335"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a506dcb62cbc44957b2e4be9e7e32b429">  335</a></span>&#160;<span class="keyword">inline</span> qint32 <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a506dcb62cbc44957b2e4be9e7e32b429">MNESourceSpace::size</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;    <span class="keywordflow">return</span> m_qListHemispheres.size();</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;}</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;} <span class="comment">// NAMESPACE</span></div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;<span class="preprocessor">#endif // MNE_SOURCESPACE_H</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 7 2013 16:51:28 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 23 2013 15:22:59 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

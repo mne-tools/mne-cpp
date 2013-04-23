@@ -93,7 +93,7 @@ using namespace XMEASLIB;
 /**
 * DECLARE CLASS Connector
 *
-* @brief The Connector class is providing static functions which care about the module runtime connection.
+* @brief The Connector class is providing static functions which care about the plugin runtime connection.
 */
 class MNE_X_SHARED_EXPORT Connector
 {
@@ -135,20 +135,20 @@ public:
 
     //=========================================================================================================
     /**
-    * Connects all measurement widgets which are provided by modules of the module id list.
+    * Connects all measurement widgets which are provided by plugins of the plugin id list.
     *
-    * @param [in] idList list of module id's of which the provided measurements should be connected for displayed.
+    * @param [in] idList list of plugin id's of which the provided measurements should be connected for displayed.
     * @param [in] t time needed to initialise real time sample array widgets.
     */
-    static void connectMeasurementWidgets(QList<MDL_ID::Module_ID>& idList, QTime* t);
+    static void connectMeasurementWidgets(QList<PLG_ID::Plugin_ID>& idList, QTime* t);
 
     //=========================================================================================================
     /**
-    * Disconnects all measurement widgets which are provided by modules of the module id list.
+    * Disconnects all measurement widgets which are provided by plugins of the plugin id list.
     *
-    * @param [in] idList list of module id's of which the provided measurements should be disconnected from display.
+    * @param [in] idList list of plugin id's of which the provided measurements should be disconnected from display.
     */
-    static void disconnectMeasurementWidgets(QList<MDL_ID::Module_ID>& idList);
+    static void disconnectMeasurementWidgets(QList<PLG_ID::Plugin_ID>& idList);
 
 };
 

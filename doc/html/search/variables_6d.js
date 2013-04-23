@@ -2,21 +2,10 @@ var searchData=
 [
   ['m_5fcommandmanager',['m_commandManager',['../class_r_t_s_e_r_v_e_r_1_1_i_connector.html#a62a0e1c8e7c9b54522f8ac091900c270',1,'RTSERVER::IConnector']]],
   ['m_5ffilename',['m_fileName',['../class_f_s_l_i_b_1_1_surface.html#a390d601f3b4dd5a379989d86fe4d7c33',1,'FSLIB::Surface']]],
-  ['m_5fhashnumeric',['m_hashNumeric',['../class_r_t_m_e_a_s_l_i_b_1_1_i_measurement_provider.html#a1540dc878e2d9bea281261d0c6bc02ce',1,'RTMEASLIB::IMeasurementProvider']]],
-  ['m_5fhashprogressbar',['m_hashProgressBar',['../class_r_t_m_e_a_s_l_i_b_1_1_i_measurement_provider.html#a4ed3f0c998538157c72265327f449529',1,'RTMEASLIB::IMeasurementProvider']]],
-  ['m_5fhashrealtimemultisamplearray',['m_hashRealTimeMultiSampleArray',['../class_r_t_m_e_a_s_l_i_b_1_1_i_measurement_provider.html#abb7c46648739c7e76f941d68345ecc44',1,'RTMEASLIB::IMeasurementProvider']]],
-  ['m_5fhashrealtimesamplearray',['m_hashRealTimeSampleArray',['../class_r_t_m_e_a_s_l_i_b_1_1_i_measurement_provider.html#acc749073505f01acf4760e39e19164ad',1,'RTMEASLIB::IMeasurementProvider']]],
-  ['m_5fhashtext',['m_hashText',['../class_r_t_m_e_a_s_l_i_b_1_1_i_measurement_provider.html#a2d79161290a3a9f964d3b676498128f3',1,'RTMEASLIB::IMeasurementProvider']]],
-  ['m_5fmapfiles',['m_mapFiles',['../class_m_n_e_x_1_1_i_r_t_record.html#a0a4ad69f5161d67ecb20ffd1ec745941',1,'MNEX::IRTRecord']]],
-  ['m_5fmdl_5fid',['m_MDL_ID',['../class_m_n_e_x_1_1_i_module.html#afe5c940f1fd2c9b5f5779c1c62d08a20',1,'MNEX::IModule']]],
-  ['m_5fphashbuffers',['m_pHashBuffers',['../class_r_t_m_e_a_s_l_i_b_1_1_i_measurement_acceptor.html#a7a797ff21246ffaee51562d36cfffe6f',1,'RTMEASLIB::IMeasurementAcceptor']]],
   ['m_5fqjsonobjectmetadata',['m_qJsonObjectMetaData',['../class_r_t_s_e_r_v_e_r_1_1_i_connector.html#a7ce90dde9155f8310b7c88e130abcf90',1,'RTSERVER::IConnector']]],
-  ['m_5fqlist_5fmdl_5fid',['m_qList_MDL_ID',['../class_r_t_m_e_a_s_l_i_b_1_1_i_measurement_acceptor.html#a770e5d5c67fcd723b05c3b7877ba4c83',1,'RTMEASLIB::IMeasurementAcceptor']]],
-  ['m_5frtrecorddirname',['m_RTRecordDirName',['../class_m_n_e_x_1_1_i_r_t_record.html#abf8f929caad3ef0ed5b6aa517bb03600',1,'MNEX::IRTRecord']]],
   ['machid',['machid',['../class_f_i_f_f_l_i_b_1_1_fiff_id.html#a021e8aaacbaa01474e3a9c5b9cdc4d24',1,'FIFFLIB::FiffId']]],
   ['meas_5fdate',['meas_date',['../class_f_i_f_f_l_i_b_1_1_fiff_info.html#acc617eb0077fa0dda35ade4318abc209',1,'FIFFLIB::FiffInfo']]],
-  ['meas_5fid',['meas_id',['../class_f_i_f_f_l_i_b_1_1_fiff_info.html#a9c8f8d46ca2721658d3ab20f1dffb939',1,'FIFFLIB::FiffInfo']]],
+  ['meas_5fid',['meas_id',['../class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#a4e7cc06ad6cd39b9e554c09b0935f5d9',1,'FIFFLIB::FiffInfoBase']]],
   ['methods',['methods',['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#af494b48e6d9538b473d2c299b2aa8cea',1,'MNELIB::MNEInverseOperator']]],
-  ['moduledir',['moduleDir',['../mainwindow_8cpp.html#a3c637fba2901a5b4dc84520258c0b4f2',1,'mainwindow.cpp']]],
   ['mri_5fhead_5ft',['mri_head_t',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a17bd236b46fd5cb7096a30df6d4f475d',1,'MNELIB::MNEForwardSolution::mri_head_t()'],['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#aee97841ed32c50c581d5495a20aced24',1,'MNELIB::MNEInverseOperator::mri_head_t()']]]
 ];

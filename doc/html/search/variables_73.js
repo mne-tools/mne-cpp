@@ -9,9 +9,9 @@ var searchData=
   ['sol',['sol',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a247a4b2f503b6b246a4b8ea5f5b69c1c',1,'MNELIB::MNEForwardSolution']]],
   ['sol_5fgrad',['sol_grad',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a191e83f3719bf1cf34e5a4fd923b3ca1',1,'MNELIB::MNEForwardSolution']]],
   ['source_5fcov',['source_cov',['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a87a4f07a98479a04650f09d82ca48c51',1,'MNELIB::MNEInverseOperator']]],
-  ['source_5fnn',['source_nn',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a0070dd5bda4063846fc7bbc9a7b132c2',1,'MNELIB::MNEForwardSolution::source_nn()'],['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a1c4585dec95150caae294c7000184cdc',1,'MNELIB::MNEInverseOperator::source_nn()']]],
+  ['source_5fnn',['source_nn',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1f5964654bb0c2f19ff158b6ca312de4',1,'MNELIB::MNEForwardSolution::source_nn()'],['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a92edf496bf03e0fb6ce35818ab472a4a',1,'MNELIB::MNEInverseOperator::source_nn()']]],
   ['source_5fori',['source_ori',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a1988a88297362b6b34b0318577ad162d',1,'MNELIB::MNEForwardSolution::source_ori()'],['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ad9be3e35de623862f76a69aa5f3bfbf2',1,'MNELIB::MNEInverseOperator::source_ori()']]],
-  ['source_5frr',['source_rr',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aca622bbe1b6ff6d69834fbafd2ae69b5',1,'MNELIB::MNEForwardSolution']]],
+  ['source_5frr',['source_rr',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a26f0a506b8f0fafc4cfa3860dc8dcc1e',1,'MNELIB::MNEForwardSolution']]],
   ['src',['src',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a3d61876581eba25731926eb070d5a1fd',1,'MNELIB::MNEForwardSolution::src()'],['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a8074f2dd4963041afbe819487d0e3bd2',1,'MNELIB::MNEInverseOperator::src()']]],
   ['struct_5fnames',['struct_names',['../class_f_s_l_i_b_1_1_colortable.html#ab7804162918de82c37e9bac3943ff98e',1,'FSLIB::Colortable']]],
   ['surf_5fori',['surf_ori',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aee695468986dd2e920b5cad332a5a6a1',1,'MNELIB::MNEForwardSolution']]]
