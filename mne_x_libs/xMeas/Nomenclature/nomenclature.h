@@ -98,7 +98,8 @@ public:
         DUMMYTOOL = 0x00040000,             /**< Plugin id of the dummy toolbox. */
         FILTERTOOL = 0x00050000,            /**< Plugin id of the filter toolbox. */
         GABORPARTICLETOOL = 0x00060000,     /**< Plugin id of the gabor toolbox. */
-        BRAINMONITOR = 0x00070000,          /**< Plugin id of the brain monitor visualization. */
+        SOURCELAB = 0x00070000,             /**< Plugin id of the source lab visualization. */
+        BRAINMONITOR = 0x00080000,          /**< Plugin id of the brain monitor visualization. */
         _default = -1                       /**< Default plugin id. */
     };
 
@@ -146,6 +147,7 @@ public:
         map["Dummy Toolbox"] = PLG_ID::DUMMYTOOL;
         map["Filter Toolbox"] = PLG_ID::FILTERTOOL;
         map["Gabor Particle Toolbox"] = PLG_ID::GABORPARTICLETOOL;
+        map["Source Lab"] = PLG_ID::SOURCELAB;
         map["Brain Monitor"] = PLG_ID::BRAINMONITOR;
         return map;
     }
@@ -365,12 +367,14 @@ public:
         GABORPARTICLETOOL_SCALE,                                /**< Measurement id of the gabor particle tool box estimated scale of the particles. */
         GABORPARTICLETOOL_SCALE_STD,                            /**< Measurement id of the gabor particle tool box estimated standard deviation of the scale of the particles. */
 
+        // SourceLab
+        SOURCELAB_OUTPUT = PLG_ID::SOURCELAB,   /**< Measurement id of the source lab output channel. */
+
         // BarinMonitor
         BRAINMONITOR_OUTPUT = PLG_ID::BRAINMONITOR,         /**< Measurement id of the brain monitor output channel. */
 
-
         //Default
-        _default = -1		/**< Default measurement id. */
+        _default = -1       /**< Default measurement id. */
     };
 
     //=========================================================================================================

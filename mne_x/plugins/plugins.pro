@@ -16,6 +16,7 @@ SUBDIRS += \
     ecgsimulator \
     dummytoolbox \
     rtserver \
+    sourcelab \
 
 #    filtertoolbox \
 #    gaborparticletoolbox \
