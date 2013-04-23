@@ -129,7 +129,7 @@ void RealTimeMultiSampleArrayNew::initFromFiffInfo(FiffInfo p_FiffInfo)
             case 107:
                 initChInfo.setUnit("V");
                 initChInfo.setMinValue(0);
-                initChInfo.setMaxValue(1.0e-4);
+                initChInfo.setMaxValue(1.0e-3);
                 break;
             case 108:
                 initChInfo.setUnit("F");
@@ -145,8 +145,8 @@ void RealTimeMultiSampleArrayNew::initFromFiffInfo(FiffInfo p_FiffInfo)
                 break;
             case 112:
                 initChInfo.setUnit("T");
-                initChInfo.setMinValue(-1.0e-11);
-                initChInfo.setMaxValue(1.0e-11);
+                initChInfo.setMinValue(-1.0e-10);
+                initChInfo.setMaxValue(1.0e-10);
                 break;
             case 113:
                 initChInfo.setUnit("H");
@@ -162,8 +162,8 @@ void RealTimeMultiSampleArrayNew::initFromFiffInfo(FiffInfo p_FiffInfo)
                 break;
             case 201:
                 initChInfo.setUnit("T/m");
-                initChInfo.setMinValue(-1.0e-11);
-                initChInfo.setMaxValue(1.0e-11);
+                initChInfo.setMinValue(-1.0e-10);
+                initChInfo.setMaxValue(1.0e-10);
                 break;
             case 202:
                 initChInfo.setUnit("Am");
@@ -212,7 +212,6 @@ void RealTimeMultiSampleArrayNew::setValue(VectorXd v)
     if(m_matSamples.size() >= m_ucMultiArraySize && notifyEnabled)
     {
         notify();
-        qDebug() << "Notified";
         m_matSamples.clear();
     }
 }

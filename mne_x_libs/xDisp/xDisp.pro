@@ -77,7 +77,8 @@ SOURCES += \
         realtimemultisamplearraywidget.cpp \
         textwidget.cpp \
         progressbarwidget.cpp \
-        numericwidget.cpp
+        numericwidget.cpp \
+    realtimemultisamplearray_new_widget.cpp
 
 HEADERS += \
         xdisp_global.h \
@@ -88,7 +89,8 @@ HEADERS += \
         realtimemultisamplearraywidget.h \
         textwidget.h \
         progressbarwidget.h \
-        numericwidget.h
+        numericwidget.h \
+    realtimemultisamplearray_new_widget.h
 
 FORMS += \
     realtimesamplearraywidget.ui \
@@ -98,9 +100,12 @@ FORMS += \
     realtimemultisamplearraywidget.ui \
     textwidget.ui \
     progressbarwidget.ui \
-    numericwidget.ui
+    numericwidget.ui \
+    realtimemultisamplearray_new_widget.ui
 
 UI_DIR = $${PWD}
+
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_X_INCLUDE_DIR}

@@ -211,7 +211,7 @@ public:
     */
     static void detachFromRTSA(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList, QList<MSR_ID::Measurement_ID> msr_idList);
 
-//attach RTSM
+//attach RTMS
     //=========================================================================================================
     /**
     * Attaches an observer to all real-time multi sample array measurements (subjects) of all measurement providers
@@ -253,7 +253,7 @@ public:
     * @param [in] t pointer to the application measurement time.
     */
     static void attachWidgetToRTMSA(MDL_ID::Module_ID mdl_id, MSR_ID::Measurement_ID msr_id, QTime* t);
-//detach RTSM
+//detach RTMS
     //=========================================================================================================
     /**
     * Detaches an observer of all real-time multi sample array measurements (subjects) which contains the observer.
@@ -278,6 +278,74 @@ public:
     * @param [in] msr_idList list of measurement id's where the observer should be detached from.
     */
     static void detachFromRTMSA(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList, QList<MSR_ID::Measurement_ID> msr_idList);
+
+//attach RTMSANew
+    //=========================================================================================================
+    /**
+    * Attaches an observer to all real-time multi sample array measurements (subjects) of all measurement providers
+    *
+    * @param [in] pObserver pointer to observer.
+    */
+    static void attachToRTMSANew(IObserver* pObserver);
+    //=========================================================================================================
+    /**
+    * Attaches an observer to all  real-time multi sample array measurements (subjects) of given measurement providers list
+    *
+    * @param [in] pObserver pointer to observer.
+    * @param [in] mdl_idList list of module (measurement provider) id's where the observer should attached to.
+    */
+    static void attachToRTMSANew(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList);
+    //=========================================================================================================
+    /**
+    * Attaches an observer to given real-time multi sample array measurements (subjects) list of given measurement providers list
+    *
+    * @param [in] pObserver pointer to observer.
+    * @param [in] mdl_idList list of module (measurement provider) id's where the observer should attached to.
+    * @param [in] msr_idList list of measurement id's where the observer should be attached to.
+    */
+    static void attachToRTMSANew(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList, QList<MSR_ID::Measurement_ID> msr_idList);
+    //=========================================================================================================
+    /**
+    * Attaches widgets to all real-time multi sample array of measurement provider list of given module
+    *
+    * @param [in] mdl_id id of the module.
+    * @param [in] t pointer to the application measurement time.
+    */
+    static void attachWidgetsToRTMSANew(MDL_ID::Module_ID mdl_id, QTime* t);
+    //=========================================================================================================
+    /**
+    * Attaches a widget to a specific real-time multi sample array measurement of given module.
+    *
+    * @param [in] mdl_id id of the module.
+    * @param [in] msr_id id of the measurement.
+    * @param [in] t pointer to the application measurement time.
+    */
+    static void attachWidgetToRTMSANew(MDL_ID::Module_ID mdl_id, MSR_ID::Measurement_ID msr_id, QTime* t);
+//detach RTMSANew
+    //=========================================================================================================
+    /**
+    * Detaches an observer of all real-time multi sample array measurements (subjects) which contains the observer.
+    *
+    * @param [in] pObserver pointer to observer which should be detached.
+    */
+    static void detachFromRTMSANew(IObserver* pObserver);
+    //=========================================================================================================
+    /**
+    * Detaches an observer of all real-time multi sample array measurements (subjects) of given modules which contains the observer.
+    *
+    * @param [in] pObserver pointer to observer which should be detached.
+    * @param [in] mdl_idList list of module id's where the observer should be detached from.
+    */
+    static void detachFromRTMSANew(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList);
+    //=========================================================================================================
+    /**
+    * Detaches an observer of specific real-time multi sample array measurements (subjects) of given modules which contains the observer.
+    *
+    * @param [in] pObserver pointer to observer which should be detached.
+    * @param [in] mdl_idList list of module id's where the observer should be detached from.
+    * @param [in] msr_idList list of measurement id's where the observer should be detached from.
+    */
+    static void detachFromRTMSANew(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList, QList<MSR_ID::Measurement_ID> msr_idList);
 
 //attach Numeric
     //=========================================================================================================

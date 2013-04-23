@@ -132,7 +132,7 @@ void Connector::connectMeasurements()
         msr_idList << (ModuleManager::getActiveRTRecordModules()[j])->getAcceptorMeasurement_IDs();
         IObserver* pRTRecord = dynamic_cast<IObserver*>(ModuleManager::getActiveRTRecordModules()[j]);
 
-        qDebug() << "########1#########" << mdl_idList << " MSR " << msr_idList;
+        qDebug() << "########2#########" << mdl_idList << " MSR " << msr_idList;
         MeasurementManager::attachToRTSA(pRTRecord, mdl_idList, msr_idList);
     }
 
@@ -166,6 +166,124 @@ void Connector::connectMeasurements()
 
 
 
+
+
+    //*********************************************************************************************************
+    //=========================================================================================================
+    // Connect RealTimeMultiSampleArray (Subject) to all IObservers
+    //=========================================================================================================
+
+//    qDebug() << "Size " << MeasurementManager::getRTSA().size();
+
+    for(int j = 0; j < ModuleManager::getActiveRTRecordModules().size(); ++j)
+    {
+        mdl_idList.clear();
+        msr_idList.clear();
+        mdl_idList << (ModuleManager::getActiveRTRecordModules()[j])->getAcceptorModule_IDs();
+        msr_idList << (ModuleManager::getActiveRTRecordModules()[j])->getAcceptorMeasurement_IDs();
+        IObserver* pRTRecord = dynamic_cast<IObserver*>(ModuleManager::getActiveRTRecordModules()[j]);
+
+        qDebug() << "########3#########" << mdl_idList << " MSR " << msr_idList;
+        MeasurementManager::attachToRTMSA(pRTRecord, mdl_idList, msr_idList);
+    }
+
+    //ToDo not within here
+    // Connect RealTimeSampleArray (Subject) to IAlgorithm plug-ins (IObserver)
+    for(int j = 0; j < ModuleManager::getActiveRTAlgorithmModules().size(); ++j)
+    {
+        mdl_idList.clear();
+        msr_idList.clear();
+        mdl_idList << (ModuleManager::getActiveRTAlgorithmModules()[j])->getAcceptorModule_IDs();
+        msr_idList << (ModuleManager::getActiveRTAlgorithmModules()[j])->getAcceptorMeasurement_IDs();
+        IObserver* pRTAlgorithm = dynamic_cast<IObserver*>(ModuleManager::getActiveRTAlgorithmModules()[j]);
+
+        qDebug() << "########3#########" << mdl_idList << " MSR " << msr_idList;
+        MeasurementManager::attachToRTMSA(pRTAlgorithm, mdl_idList, msr_idList);
+    }
+
+    //ToDo not within here
+    // Connect RealTimeSampleArray (Subject) to IVisualization plug-ins (IObserver)
+    for(int j = 0; j < ModuleManager::getActiveRTVisualizationModules().size(); ++j)
+    {
+        mdl_idList.clear();
+        msr_idList.clear();
+        mdl_idList << (ModuleManager::getActiveRTVisualizationModules()[j])->getAcceptorModule_IDs();
+        msr_idList << (ModuleManager::getActiveRTVisualizationModules()[j])->getAcceptorMeasurement_IDs();
+        IObserver* pRTVisualization = dynamic_cast<IObserver*>(ModuleManager::getActiveRTVisualizationModules()[j]);
+
+        qDebug() << "########3#########" << mdl_idList << " MSR " << msr_idList;
+        MeasurementManager::attachToRTMSA(pRTVisualization, mdl_idList, msr_idList);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //*********************************************************************************************************
+    //=========================================================================================================
+    // Connect RealTimeMultiSampleArrayNew (Subject) to all IObservers
+    //=========================================================================================================
+
+//    qDebug() << "Size " << MeasurementManager::getRTSA().size();
+
+    for(int j = 0; j < ModuleManager::getActiveRTRecordModules().size(); ++j)
+    {
+        mdl_idList.clear();
+        msr_idList.clear();
+        mdl_idList << (ModuleManager::getActiveRTRecordModules()[j])->getAcceptorModule_IDs();
+        msr_idList << (ModuleManager::getActiveRTRecordModules()[j])->getAcceptorMeasurement_IDs();
+        IObserver* pRTRecord = dynamic_cast<IObserver*>(ModuleManager::getActiveRTRecordModules()[j]);
+
+        qDebug() << "########4#########" << mdl_idList << " MSR " << msr_idList;
+        MeasurementManager::attachToRTMSANew(pRTRecord, mdl_idList, msr_idList);
+    }
+
+    //ToDo not within here
+    // Connect RealTimeSampleArray (Subject) to IAlgorithm plug-ins (IObserver)
+    for(int j = 0; j < ModuleManager::getActiveRTAlgorithmModules().size(); ++j)
+    {
+        mdl_idList.clear();
+        msr_idList.clear();
+        mdl_idList << (ModuleManager::getActiveRTAlgorithmModules()[j])->getAcceptorModule_IDs();
+        msr_idList << (ModuleManager::getActiveRTAlgorithmModules()[j])->getAcceptorMeasurement_IDs();
+        IObserver* pRTAlgorithm = dynamic_cast<IObserver*>(ModuleManager::getActiveRTAlgorithmModules()[j]);
+
+        qDebug() << "########4#########" << mdl_idList << " MSR " << msr_idList;
+        MeasurementManager::attachToRTMSANew(pRTAlgorithm, mdl_idList, msr_idList);
+    }
+
+    //ToDo not within here
+    // Connect RealTimeSampleArray (Subject) to IVisualization plug-ins (IObserver)
+    for(int j = 0; j < ModuleManager::getActiveRTVisualizationModules().size(); ++j)
+    {
+        mdl_idList.clear();
+        msr_idList.clear();
+        mdl_idList << (ModuleManager::getActiveRTVisualizationModules()[j])->getAcceptorModule_IDs();
+        msr_idList << (ModuleManager::getActiveRTVisualizationModules()[j])->getAcceptorMeasurement_IDs();
+        IObserver* pRTVisualization = dynamic_cast<IObserver*>(ModuleManager::getActiveRTVisualizationModules()[j]);
+
+        qDebug() << "########4#########" << mdl_idList << " MSR " << msr_idList;
+        MeasurementManager::attachToRTMSANew(pRTVisualization, mdl_idList, msr_idList);
+    }
+
+
+
+
+
+
+
+
+
+
+
     //*********************************************************************************************************
     //=========================================================================================================
     // Connect Numeric (Subject) to all IObservers
@@ -181,7 +299,7 @@ void Connector::connectMeasurements()
         msr_idList << (ModuleManager::getActiveRTRecordModules()[j])->getAcceptorMeasurement_IDs();
         IObserver* pRTRecord = dynamic_cast<IObserver*>(ModuleManager::getActiveRTRecordModules()[j]);
 
-        qDebug() << "########3#########" << mdl_idList << " MSR " << msr_idList;
+        qDebug() << "########5#########" << mdl_idList << " MSR " << msr_idList;
         MeasurementManager::attachToNumeric(pRTRecord, mdl_idList, msr_idList);
     }
 
@@ -195,7 +313,7 @@ void Connector::connectMeasurements()
         msr_idList << (ModuleManager::getActiveRTAlgorithmModules()[j])->getAcceptorMeasurement_IDs();
         IObserver* pRTAlgorithm = dynamic_cast<IObserver*>(ModuleManager::getActiveRTAlgorithmModules()[j]);
 
-        qDebug() << "########4#########" << mdl_idList << " MSR " << msr_idList;
+        qDebug() << "########5#########" << mdl_idList << " MSR " << msr_idList;
         MeasurementManager::attachToNumeric(pRTAlgorithm, mdl_idList, msr_idList);
     }
 
@@ -209,7 +327,7 @@ void Connector::connectMeasurements()
         msr_idList << (ModuleManager::getActiveRTVisualizationModules()[j])->getAcceptorMeasurement_IDs();
         IObserver* pRTVisualization = dynamic_cast<IObserver*>(ModuleManager::getActiveRTVisualizationModules()[j]);
 
-        qDebug() << "########4#########" << mdl_idList << " MSR " << msr_idList;
+        qDebug() << "########5#########" << mdl_idList << " MSR " << msr_idList;
         MeasurementManager::attachToNumeric(pRTVisualization, mdl_idList, msr_idList);
     }
 
@@ -257,6 +375,19 @@ void Connector::connectMeasurementWidgets(QList<MDL_ID::Module_ID>& idList, QTim
 
     foreach(MDL_ID::Module_ID id, idList)
         MeasurementManager::attachWidgetsToRTMSA(id, t);
+
+
+
+
+    //*********************************************************************************************************
+    //=========================================================================================================
+    // Connect Widgets to current visible RealTimeMultiSampleArrayNew (Subject) to specific IObserver
+    //=========================================================================================================
+
+    //ToDo visibility has to solved
+
+    foreach(MDL_ID::Module_ID id, idList)
+        MeasurementManager::attachWidgetsToRTMSANew(id, t);
 
 
 

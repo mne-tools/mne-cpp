@@ -44,6 +44,7 @@
 
 #include <xMeas/Measurement/realtimesamplearray.h>
 #include <xMeas/Measurement/realtimemultisamplearray.h>
+#include <xMeas/Measurement/realtimemultisamplearray_new.h>
 #include <xMeas/Measurement/numeric.h>
 //#include "Measurement/progressbar.h"
 ////#include "Measurement/alert.h"
@@ -51,6 +52,7 @@
 
 #include <xDisp/realtimesamplearraywidget.h>
 #include <xDisp/realtimemultisamplearraywidget.h>
+#include <xDisp/realtimemultisamplearray_new_widget.h>
 #include <xDisp/numericwidget.h>
 #include <xDisp/displaymanager.h>
 
@@ -222,9 +224,9 @@ void MeasurementManager::attachWidgetToRTSA(MDL_ID::Module_ID mdl_id, MSR_ID::Me
 
 void MeasurementManager::detachFromRTSA(IObserver* pObserver) //attaching to all Measurements of all Measurement Providers
 {
-	QList<MDL_ID::Module_ID> mdl_idList = s_hashMeasurementProvider.keys();
+    QList<MDL_ID::Module_ID> mdl_idList = s_hashMeasurementProvider.keys();
 
-	detachFromRTSA(pObserver, mdl_idList);
+    detachFromRTSA(pObserver, mdl_idList);
 }
 
 
@@ -479,6 +481,167 @@ void MeasurementManager::detachFromRTMSA(IObserver* pObserver, QList<MDL_ID::Mod
 
 
 
+//RTMSANew
+//*************************************************************************************************************
+
+void MeasurementManager::attachToRTMSANew(IObserver* pObserver) //attaching to all Measurements of all Measurement Providers
+{
+    QList<MDL_ID::Module_ID> mdl_idList = s_hashMeasurementProvider.keys();
+    attachToRTMSANew(pObserver, mdl_idList);
+}
+
+
+//*************************************************************************************************************
+
+void MeasurementManager::attachToRTMSANew(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList) //attaching to all Measurements of given Measurement Providers List
+{
+    QList<MSR_ID::Measurement_ID> msr_idList;
+
+    foreach(MDL_ID::Module_ID mdl_id, mdl_idList)
+    {
+        if(s_hashMeasurementProvider.contains(mdl_id))
+        {
+            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            msr_idList += pMsrPvr->getProviderRTMSANew().keys();
+        }
+        else
+            qDebug() << "Error while attachToRTSA: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+    }
+    attachToRTMSANew(pObserver, mdl_idList, msr_idList);
+}
+
+
+//*************************************************************************************************************
+
+void MeasurementManager::attachToRTMSANew(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList, QList<MSR_ID::Measurement_ID> msr_idList) //attaching to given Measurements List of given Measurement Providers List
+{
+    foreach(MDL_ID::Module_ID mdl_id, mdl_idList)
+    {
+        if(s_hashMeasurementProvider.contains(mdl_id))
+        {
+            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            foreach(MSR_ID::Measurement_ID msr_id, msr_idList)
+            {
+                if(pMsrPvr->getProviderRTMSANew().contains(msr_id))
+                {
+                    RealTimeMultiSampleArrayNew* pRTMSANew = pMsrPvr->getProviderRTMSANew().value(msr_id);
+                    pRTMSANew->attach(pObserver);
+                }
+                else
+                {
+                    qDebug() << "Warning while attachToRTSA: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << mdl_id << ".";
+                }
+            }
+        }
+        else
+        {
+            qDebug() << "Error while attachToRTSA: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MeasurementManager::attachWidgetsToRTMSANew(MDL_ID::Module_ID mdl_id, QTime* t) //attaching to given Measurements List of given Measurement Providers List
+{
+    qDebug() << "Number of Measurement Providers to attach Widget RTSA to: " << s_hashMeasurementProvider.size();
+    if(s_hashMeasurementProvider.contains(mdl_id))
+    {
+        IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+        foreach(MSR_ID::Measurement_ID msr_id, pMsrPvr->getProviderRTMSANew().keys())
+            attachWidgetToRTMSANew(mdl_id, msr_id, t);
+    }
+    else
+        qDebug() << "Error while attachWidgetToRTSA: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+}
+
+
+//*************************************************************************************************************
+
+void MeasurementManager::attachWidgetToRTMSANew(MDL_ID::Module_ID mdl_id, MSR_ID::Measurement_ID msr_id, QTime* t) //attaching to given Measurements List of given Measurement Providers List
+{
+    if(s_hashMeasurementProvider.contains(mdl_id))
+    {
+        IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+        if(pMsrPvr->getProviderRTMSANew().contains(msr_id))
+        {
+            RealTimeMultiSampleArrayNew* pRTMSANew = pMsrPvr->getProviderRTMSANew().value(msr_id);
+            if(pRTMSANew->isVisible())
+            {
+                IObserver* pRTMSANewWidget = dynamic_cast<IObserver*>(DisplayManager::addRealTimeMultiSampleArrayNewWidget(pRTMSANew, 0, msr_id, t));
+                pRTMSANew->attach(pRTMSANewWidget);
+            }
+        }
+        else
+        {
+            qDebug() << "Warning while attachWidgetToRTSA: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << mdl_id << ".";
+        }
+    }
+    else
+        qDebug() << "Error while attachWidgetToRTSA: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+}
+
+
+//*************************************************************************************************************
+
+void MeasurementManager::detachFromRTMSANew(IObserver* pObserver) //attaching to all Measurements of all Measurement Providers
+{
+    QList<MDL_ID::Module_ID> mdl_idList = s_hashMeasurementProvider.keys();
+
+    detachFromRTMSANew(pObserver, mdl_idList);
+}
+
+
+//*************************************************************************************************************
+
+void MeasurementManager::detachFromRTMSANew(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList) //attaching to all Measurements of given Measurement Providers List
+{
+    QList<MSR_ID::Measurement_ID> msr_idList;
+
+    foreach(MDL_ID::Module_ID mdl_id, mdl_idList)
+    {
+        if(s_hashMeasurementProvider.contains(mdl_id))
+        {
+            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            msr_idList += pMsrPvr->getProviderRTMSANew().keys();
+        }
+        else
+            qDebug() << "Error while attachToRTSA: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+    }
+
+    detachFromRTMSANew(pObserver, mdl_idList, msr_idList);
+}
+
+
+//*************************************************************************************************************
+
+void MeasurementManager::detachFromRTMSANew(IObserver* pObserver, QList<MDL_ID::Module_ID> mdl_idList, QList<MSR_ID::Measurement_ID> msr_idList) //attaching to given Measurements List of given Measurement Providers List
+{
+    foreach(MDL_ID::Module_ID mdl_id, mdl_idList)
+    {
+        if(s_hashMeasurementProvider.contains(mdl_id))
+        {
+            IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(mdl_id);
+            foreach(MSR_ID::Measurement_ID msr_id, msr_idList)
+            {
+                if(pMsrPvr->getProviderRTMSANew().contains(msr_id))
+                {
+                    RealTimeMultiSampleArrayNew* pRTMSANew = pMsrPvr->getProviderRTMSANew().value(msr_id);
+                    pRTMSANew->detach(pObserver);
+                }
+                else
+                {
+                    qDebug() << "Warning while detachFromRTSA: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << mdl_id << ".";
+                }
+            }
+        }
+        else
+        {
+            qDebug() << "Error while detachFromRTSA: MDL_ID::Module_ID " << mdl_id << "is no measurement provider.";
+        }
+    }
+}
 
 
 
@@ -486,21 +649,7 @@ void MeasurementManager::detachFromRTMSA(IObserver* pObserver, QList<MDL_ID::Mod
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//Numeric
 //*************************************************************************************************************
 
 void MeasurementManager::attachToNumeric(IObserver* pObserver) //attaching to all Measurements of all Measurement Providers
@@ -730,24 +879,42 @@ void MeasurementManager::detachWidgets(QList<MDL_ID::Module_ID> mdl_idList)
 {
     qDebug() << "MeasurementManager::detachWidgets(QList<MDL_ID::Module_ID> mdl_idList)";
 
-	qDebug() << "DisplayManager::getRTSAWidgets() Size: " << DisplayManager::getRTSAWidgets().size();
+    qDebug() << "DisplayManager::getRTSAWidgets() Size: " << DisplayManager::getRTSAWidgets().size();
 
-	foreach(RealTimeSampleArrayWidget* pRTSAW, DisplayManager::getRTSAWidgets().values())
-	{
-    	IObserver* pRTSAWidget = dynamic_cast<IObserver*>(pRTSAW);
+    foreach(RealTimeSampleArrayWidget* pRTSAW, DisplayManager::getRTSAWidgets().values())
+    {
+        IObserver* pRTSAWidget = dynamic_cast<IObserver*>(pRTSAW);
 
-    	detachFromRTSA(pRTSAWidget, mdl_idList);
-	}
+        detachFromRTSA(pRTSAWidget, mdl_idList);
+    }
+
+    qDebug() << "DisplayManager::getRTMSAWidgets() Size: " << DisplayManager::getRTMSAWidgets().size();
+
+    foreach(RealTimeMultiSampleArrayWidget* pRTMSAW, DisplayManager::getRTMSAWidgets().values())
+    {
+        IObserver* pRTMSAWidget = dynamic_cast<IObserver*>(pRTMSAW);
+
+        detachFromRTMSA(pRTMSAWidget, mdl_idList);
+    }
+
+    qDebug() << "DisplayManager::getRTMSANewWidgets() Size: " << DisplayManager::getRTMSANewWidgets().size();
+
+    foreach(RealTimeMultiSampleArrayNewWidget* pRTMSANewW, DisplayManager::getRTMSANewWidgets().values())
+    {
+        IObserver* pRTMSANewWidget = dynamic_cast<IObserver*>(pRTMSANewW);
+
+        detachFromRTMSANew(pRTMSANewWidget, mdl_idList);
+    }
 
 
-	qDebug() << "DisplayManager::getNumericWidgets() Size: " << DisplayManager::getNumericWidgets().size();
+    qDebug() << "DisplayManager::getNumericWidgets() Size: " << DisplayManager::getNumericWidgets().size();
 
-	foreach(NumericWidget* pNUMW, DisplayManager::getNumericWidgets().values())
-	{
-    	IObserver* pNumWidget = dynamic_cast<IObserver*>(pNUMW);
+    foreach(NumericWidget* pNUMW, DisplayManager::getNumericWidgets().values())
+    {
+        IObserver* pNumWidget = dynamic_cast<IObserver*>(pNUMW);
 
-		detachFromNumeric(pNumWidget, mdl_idList);
-	}
+        detachFromNumeric(pNumWidget, mdl_idList);
+    }
 
 }
 
