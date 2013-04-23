@@ -294,6 +294,13 @@ public:
     virtual const QHash<MSR_ID::Measurement_ID, RealTimeMultiSampleArray*>& getProviderRTMSA() {return m_hashRealTimeMultiSampleArray;};
     //=========================================================================================================
     /**
+    * Returns provided RealTimeMultiSampleArray measurements and their id's.
+    *
+    * @return a hash of all provided RealTimeMultiSampleArray measurements and their id's.
+    */
+    virtual const QHash<MSR_ID::Measurement_ID, RealTimeMultiSampleArrayNew*>& getProviderRTMSANew() {return m_hashRealTimeMultiSampleArrayNew;};
+    //=========================================================================================================
+    /**
     * Returns provided ProgressBar measurements and their id's.
     *
     * @return a hash of all provided ProgressBar measurements and their id's.

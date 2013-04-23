@@ -43,10 +43,12 @@
 #include "numericwidget.h"
 #include "realtimesamplearraywidget.h"
 #include "realtimemultisamplearraywidget.h"
+#include "realtimemultisamplearray_new_widget.h"
 #include "progressbarwidget.h"
 #include "textwidget.h"
 
 #include <xMeas/Measurement/text.h>
+#include <xMeas/Measurement/realtimemultisamplearray_new.h>
 #include <xMeas/Measurement/realtimemultisamplearray.h>
 #include <xMeas/Measurement/realtimesamplearray.h>
 #include <xMeas/Measurement/progressbar.h>
@@ -130,6 +132,18 @@ RealTimeMultiSampleArrayWidget* DisplayManager::addRealTimeMultiSampleArrayWidge
 
 //*************************************************************************************************************
 
+RealTimeMultiSampleArrayNewWidget* DisplayManager::addRealTimeMultiSampleArrayNewWidget(RealTimeMultiSampleArrayNew* pRTSM, QWidget* parent, MSR_ID::Measurement_ID id, QTime* t)
+{
+    RealTimeMultiSampleArrayNewWidget* rtsmWidget = new RealTimeMultiSampleArrayNewWidget(pRTSM, t, parent);
+    rtsmWidget->hide();
+    s_hashMeasurementWidgets.insert(id, rtsmWidget);
+    s_hashRealTimeMultiSampleArrayNewWidgets.insert(id, rtsmWidget);
+    return rtsmWidget;
+}
+
+
+//*************************************************************************************************************
+
 ProgressBarWidget* DisplayManager::addProgressBarWidget(ProgressBar* pProgress, QWidget* parent, MSR_ID::Measurement_ID id)
 {
     ProgressBarWidget* progressWidget = new ProgressBarWidget(pProgress, parent);
@@ -176,8 +190,8 @@ QWidget* DisplayManager::show()
     QHBoxLayout* hboxLayout = new QHBoxLayout;
 
     // Add all widgets but NumericWidgets to layout and display them
-	foreach(MeasurementWidget* pMSRW, s_hashMeasurementWidgets.values())
-	{
+    foreach(MeasurementWidget* pMSRW, s_hashMeasurementWidgets.values())
+    {
         if(dynamic_cast<NumericWidget*>(pMSRW))
             continue;
         vboxLayout->addWidget(pMSRW);
@@ -186,8 +200,8 @@ QWidget* DisplayManager::show()
 
     foreach(NumericWidget* pNUMW, s_hashNumericWidgets.values())
     {
-    	hboxLayout->addWidget(pNUMW);
-    	pNUMW->show();
+        hboxLayout->addWidget(pNUMW);
+        pNUMW->show();
     }
 
     vboxLayout->addLayout(hboxLayout);
@@ -214,6 +228,7 @@ void DisplayManager::clean()
     s_hashNumericWidgets.clear();
     s_hashRealTimeSampleArrayWidgets.clear();
     s_hashRealTimeMultiSampleArrayWidgets.clear();
+    s_hashRealTimeMultiSampleArrayNewWidgets.clear();
     s_hashProgressBarWidgets.clear();
     s_hashTextWidgets.clear();
 
@@ -230,5 +245,6 @@ QHash<MSR_ID::Measurement_ID, MeasurementWidget*>         DisplayManager::s_hash
 QHash<MSR_ID::Measurement_ID, NumericWidget*>             DisplayManager::s_hashNumericWidgets;
 QHash<MSR_ID::Measurement_ID, RealTimeSampleArrayWidget*> DisplayManager::s_hashRealTimeSampleArrayWidgets;
 QHash<MSR_ID::Measurement_ID, RealTimeMultiSampleArrayWidget*> DisplayManager::s_hashRealTimeMultiSampleArrayWidgets;
+QHash<MSR_ID::Measurement_ID, RealTimeMultiSampleArrayNewWidget*> DisplayManager::s_hashRealTimeMultiSampleArrayNewWidgets;
 QHash<MSR_ID::Measurement_ID, ProgressBarWidget*>         DisplayManager::s_hashProgressBarWidgets;
 QHash<MSR_ID::Measurement_ID, TextWidget*>                DisplayManager::s_hashTextWidgets;
