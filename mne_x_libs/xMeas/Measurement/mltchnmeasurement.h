@@ -119,6 +119,14 @@ public:
     */
     virtual VectorXd getValue() const = 0;
 
+    //=========================================================================================================
+    /**
+    * Returns whether Measurement is single channel measurement.
+    *
+    * @return true if Measurement is single channel measurement, otherwise false.
+    */
+    virtual bool isSingleChannel() const;
+
 private:
 
 };

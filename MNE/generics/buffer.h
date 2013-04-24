@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     buffer_old.h
+* @file     buffer.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef BUFFEROLD_H
-#define BUFFEROLD_H
+#ifndef BUFFER_H
+#define BUFFER_H
 
 
 //*************************************************************************************************************
@@ -59,7 +59,7 @@ namespace IOBuffer
 *
 * @brief The Buffer class provides a base class for buffers.
 */
-class GENERICSSHARED_EXPORT Buffer_old
+class GENERICSSHARED_EXPORT Buffer
 {
 public:
 
@@ -69,7 +69,7 @@ public:
     *
     * @param [in] type_id pointer to RTTI type_id of the variables of the buffer.
     */
-    Buffer_old(const char* type_id) : m_cTypeId(type_id) {};
+    Buffer(const char* type_id) : m_cTypeId(type_id) {};
     //=========================================================================================================
     /**
     * Returns the type_id of the current Buffer.
@@ -79,7 +79,7 @@ public:
     inline const char* getTypeId();
 
 private:
-    const char* m_cTypeId;		/**< Holds the RTTI type_id.*/
+    const char* m_cTypeId;  /**< Holds the RTTI type_id.*/
 
 };
 
@@ -89,9 +89,9 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline const char*  Buffer_old::getTypeId()
+inline const char*  Buffer::getTypeId()
 {
-	return m_cTypeId;
+    return m_cTypeId;
 }
 
 

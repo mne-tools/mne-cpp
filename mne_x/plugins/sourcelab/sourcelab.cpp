@@ -41,8 +41,8 @@
 #include "sourcelab.h"
 
 #include <xMeas/Measurement/sngchnmeasurement.h>
-
 #include <xMeas/Measurement/realtimesamplearray.h>
+#include <xMeas/Measurement/realtimemultisamplearray_new.h>
 
 #include "FormFiles/sourcelabsetupwidget.h"
 #include "FormFiles/sourcelabrunwidget.h"
@@ -73,8 +73,7 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 SourceLab::SourceLab()
-: m_pSourceLab_Output(0)
-, m_pSourceLabBuffer(new _double_CircularBuffer_old(1024))
+: m_pSourceLabBuffer(NULL)
 {
     m_PLG_ID = PLG_ID::SOURCELAB;
 }
@@ -86,7 +85,8 @@ SourceLab::~SourceLab()
 {
     stop();
 
-    delete m_pSourceLabBuffer;
+    if(m_pSourceLabBuffer)
+        delete m_pSourceLabBuffer;
 }
 
 
@@ -110,7 +110,8 @@ bool SourceLab::stop()
     QThread::terminate();
     QThread::wait();
 
-    m_pSourceLabBuffer->clear();
+    if(m_pSourceLabBuffer)
+        m_pSourceLabBuffer->clear();
 
     return true;
 }
@@ -154,38 +155,40 @@ QWidget* SourceLab::runWidget()
 
 void SourceLab::update(Subject* pSubject)
 {
-    //donwsampled by arraysize of m_pRTSA -> then pick only the value
-    bool downsampled = false;
+    Measurement* meas = static_cast<Measurement*>(pSubject);
 
-    if(downsampled)
+    //MEG
+    if(!meas->isSingleChannel())
     {
-        SngChnMeasurement* pMeasurement = static_cast<SngChnMeasurement*>(pSubject);
+        RealTimeMultiSampleArrayNew* pRTMSANew = static_cast<RealTimeMultiSampleArrayNew*>(pSubject);
 
         //Using fast Hash Lookup instead of if then else clause
-        if(getAcceptorMeasurementBuffer(pMeasurement->getID()))
+        if(getAcceptorMeasurementBuffer(pRTMSANew->getID()))
         {
-                //ToDo: Cast to specific Buffer
-            static_cast<DummyBuffer_old*>(getAcceptorMeasurementBuffer(pMeasurement->getID()))->push(pMeasurement->getValue());//if only every (arraysize)th value is necessary
-        }
-    }
-    else
-    {
-        RealTimeSampleArray* pRTSA = static_cast<RealTimeSampleArray*>(pSubject);
-
-        //Using fast Hash Lookup instead of if then else clause
-        if(getAcceptorMeasurementBuffer(pRTSA->getID()))
-        {
-            if(pRTSA->getID() == MSR_ID::ECGSIM_I)
+            if(pRTMSANew->getID() == MSR_ID::MEGRTSERVER_OUTPUT)
             {
-                    //ToDo: Cast to specific Buffer
-                for(unsigned char i = 0; i < pRTSA->getArraySize(); ++i)
+                //Check if buffer initialized
+                if(m_pSourceLabBuffer->size() == 0)
                 {
-                    static_cast<DummyBuffer_old*>(getAcceptorMeasurementBuffer(pRTSA->getID()))
-                            ->push(pRTSA->getSampleArray()[i]);
-                    //m_pDummyMultiChannelBuffer->push(0,pRTSA->getSampleArray()[i]);
+                    mutex.lock();
+                    delete m_pSourceLabBuffer;
+                    m_pSourceLabBuffer = new _double_CircularMatrixBuffer(64, pRTMSANew->getNumChannels(), pRTMSANew->getMultiArraySize());
+                    mutex.unlock();
                 }
+
+                MatrixXd t_mat(pRTMSANew->getNumChannels(), pRTMSANew->getMultiArraySize());
+
+                //ToDo: Cast to specific Buffer
+                for(unsigned char i = 0; i < pRTMSANew->getMultiArraySize(); ++i)
+                    t_mat.col(i) = pRTMSANew->getMultiSampleArray()[i];
+
+//                static_cast<_double_CircularMatrixBuffer*>(getAcceptorMeasurementBuffer(pRTMSANew->getID()))
+//                        ->push(&t_mat);
+                m_pSourceLabBuffer->push(&t_mat);
+
             }
         }
+
     }
 }
 
@@ -195,20 +198,30 @@ void SourceLab::update(Subject* pSubject)
 
 void SourceLab::run()
 {
+    qint32 count = 0;
     while (true)
     {
-//        double v_one = m_pDummyMultiChannelBuffer->pop(0);
-
-//        double v_two = m_pDummyMultiChannelBuffer->pop(1);
-
-
         /* Dispatch the inputs */
 
-        double v = m_pSourceLabBuffer->pop();
+//        double v = m_pECGBuffer->pop();
 
-        //ToDo: Implement here the algorithm
+//        //ToDo: Implement here the algorithm
 
-        m_pSourceLab_Output->setValue(v);
+//        m_pSourceLab_Output->setValue(v);
+
+        mutex.lock();
+        qint32 nrows = m_pSourceLabBuffer->rows();
+        mutex.unlock();
+
+        if(nrows > 0) // check if init
+        {
+            MatrixXd t_mat = m_pSourceLabBuffer->pop();
+
+
+            qDebug() << count << ": m_pSourceLabBuffer->pop(); Matrix:" << t_mat.rows() << "x" << t_mat.cols();
+
+            ++count;
+        }
     }
 }
 
@@ -220,16 +233,21 @@ void SourceLab::run()
 
 void SourceLab::init()
 {
-    qDebug() << "#### DummyToolbox Init; MSR_ECG_I: " << MSR_ID::ECGSIM_I;
+    //Delete Buffer - will be initailzed with first incoming data
+    if(m_pSourceLabBuffer)
+        delete m_pSourceLabBuffer;
+    m_pSourceLabBuffer = new _double_CircularMatrixBuffer(0,0,0); // Init later
 
+    qDebug() << "#### SourceLab Init; MEGRTSERVER_OUTPUT: " << MSR_ID::MEGRTSERVER_OUTPUT;
 
-    this->addPlugin(PLG_ID::ECGSIM); //ToDo This should be obsolete -  measurement ID should be sufficient -> solve this by adding measurement IDs to subject?? attach observers to subjects with corresponding ID
-    this->addAcceptorMeasurementBuffer(MSR_ID::ECGSIM_I, m_pSourceLabBuffer);
+    this->addPlugin(PLG_ID::RTSERVER);
+    this->addAcceptorMeasurementBuffer(MSR_ID::MEGRTSERVER_OUTPUT, m_pSourceLabBuffer);
 
-    m_pSourceLab_Output = addProviderRealTimeSampleArray(MSR_ID::SOURCELAB_OUTPUT);
-    m_pSourceLab_Output->setName("Source Lab Output");
-    m_pSourceLab_Output->setUnit("mV");
-    m_pSourceLab_Output->setMinValue(-200);
-    m_pSourceLab_Output->setMaxValue(360);
-    m_pSourceLab_Output->setSamplingRate(256.0/1.0);
+//    m_pDummy_MSA_Output = addProviderRealTimeMultiSampleArray(MSR_ID::DUMMYTOOL_OUTPUT_II, 2);
+//    m_pDummy_MSA_Output->setName("Dummy Output II");
+//    m_pDummy_MSA_Output->setUnit("mV");
+//    m_pDummy_MSA_Output->setMinValue(-200);
+//    m_pDummy_MSA_Output->setMaxValue(360);
+//    m_pDummy_MSA_Output->setSamplingRate(256.0/1.0);
+
 }

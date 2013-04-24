@@ -87,7 +87,7 @@ namespace IOBuffer
 * @brief The TEMPLATE CIRCULAR BUFFER provides a template for thread safe circular buffers.
 */
 template<typename _Tp>
-class CircularMultiChannelBuffer_old : public Buffer_old
+class CircularMultiChannelBuffer_old : public Buffer
 //template<typename _Tp>
 //class RTMEAS_EXPORT CircularMultiChannelBuffer_old : public Buffer
 {
@@ -173,7 +173,7 @@ public:
 private:
     QVector< CircularBuffer_old<_Tp>* >* m_qVecBuffers;
 
-    unsigned int    m_uiMaxNumElements;		/**< Holds the maximal number of buffer elements.*/
+    unsigned int    m_uiMaxNumElements;     /**< Holds the maximal number of buffer elements.*/
 
 
 };
@@ -186,7 +186,7 @@ private:
 
 template<typename _Tp>
 CircularMultiChannelBuffer_old<_Tp>::CircularMultiChannelBuffer_old(unsigned int uiNumChannels, unsigned int uiMaxNumElements)
-: Buffer_old(typeid(_Tp).name())
+: Buffer(typeid(_Tp).name())
 , m_qVecBuffers(new QVector< CircularBuffer_old<_Tp>* >(uiNumChannels))
 , m_uiMaxNumElements(uiMaxNumElements)
 {

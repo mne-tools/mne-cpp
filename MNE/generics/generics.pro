@@ -65,7 +65,7 @@ SOURCES += \
     circularbuffer.cpp \
     circularmatrixbuffer.cpp \
     observerpattern.cpp \
-    buffer_old.cpp
+    buffer.cpp
 
 HEADERS += generics_global.h \
     circularmatrixbuffer.h \
@@ -73,9 +73,9 @@ HEADERS += generics_global.h \
     observerpattern.h \
     commandpattern.h \
     typename_old.h \
-    buffer_old.h \
     circularmultichannelbuffer_old.h \
-    circularbuffer_old.h
+    circularbuffer_old.h \
+    buffer.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
