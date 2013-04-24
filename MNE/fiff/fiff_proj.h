@@ -165,7 +165,7 @@ public:
     bool active;                    /**< If fiff projector active */
     QString desc;                   /**< Projector description */
 
-    FiffNamedMatrix::SDPtr data;    /**< Projector data */
+    FiffNamedMatrix::SDPtr data;    /**< Projector data, rows are equal to the length of channels */
 };
 
 
