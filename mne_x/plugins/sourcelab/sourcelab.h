@@ -47,6 +47,11 @@
 
 #include <generics/circularmatrixbuffer.h>
 
+#include <fs/annotationset.h>
+#include <fiff/fiff_info.h>
+#include <mne/mne_forwardsolution.h>
+
+
 #include <xMeas/Measurement/realtimemultisamplearray.h>
 
 
@@ -56,6 +61,7 @@
 //=============================================================================================================
 
 #include <QtWidgets>
+#include <QFile>
 
 
 //*************************************************************************************************************
@@ -72,6 +78,9 @@ namespace SourceLabPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace FSLIB;
+using namespace FIFFLIB;
+using namespace MNELIB;
 using namespace MNEX;
 using namespace IOBuffer;
 
@@ -132,6 +141,18 @@ private:
     QMutex mutex;
 
     _double_CircularMatrixBuffer* m_pSourceLabBuffer;   /**< Holds incoming rt server data.*/
+
+    bool m_bIsRunning;  /**< If source lab is running */
+
+    //MNE stuff
+    QFile m_qFileFwdSolution;           /**< File to forward solution. */
+    MNEForwardSolution m_Fwd;           /**< Forward solution. */
+    MNEForwardSolution m_clusteredFwd;  /**< Clustered forward solution. */
+
+    AnnotationSet m_annotationSet;  /**< Annotation set. */
+
+    FiffInfo m_fiffInfo;    /**< Fiff information. */
+
 };
 
 } // NAMESPACE
