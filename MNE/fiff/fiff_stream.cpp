@@ -2456,7 +2456,7 @@ void FiffStream::write_proj(const QList<FiffProj>& projs)
         qint32 bValue = (qint32)projs[k].active;
         this->write_int(FIFF_MNE_PROJ_ITEM_ACTIVE, &bValue);
         this->write_name_list(FIFF_PROJ_ITEM_CH_NAME_LIST, projs[k].data->col_names);
-        this->write_float_matrix(FIFF_PROJ_ITEM_VECTORS, projs[k].data->data.transpose().cast<float>());
+        this->write_float_matrix(FIFF_PROJ_ITEM_VECTORS, projs[k].data->data.cast<float>());//rows == length(names)
         this->end_block(FIFFB_PROJ_ITEM);
     }
     this->end_block(FIFFB_PROJ);
