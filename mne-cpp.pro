@@ -52,11 +52,6 @@ contains(MNECPP_CONFIG, isGui) {
     SUBDIRS += \
         mne_x_libs \
         mne_x
-
-    qtHaveModule(3d) {
-        message(Qt3D available: mne_source_lab configured!)
-        SUBDIRS += mne_source_lab
-    }
 }
 
 CONFIG += ordered
