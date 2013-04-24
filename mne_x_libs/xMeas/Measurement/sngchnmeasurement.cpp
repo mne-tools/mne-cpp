@@ -68,3 +68,11 @@ SngChnMeasurement::~SngChnMeasurement()
 {
 
 }
+
+
+//*************************************************************************************************************
+
+bool SngChnMeasurement::isSingleChannel() const
+{
+    return true;
+}

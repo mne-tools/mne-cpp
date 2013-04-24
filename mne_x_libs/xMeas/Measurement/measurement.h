@@ -138,12 +138,19 @@ public:
     */
     inline bool isVisible() const;
 
+    //=========================================================================================================
+    /**
+    * Returns whether Measurement is single channel measurement.
+    *
+    * @return true if Measurement is single channel measurement, otherwise false.
+    */
+    virtual bool isSingleChannel() const = 0;
+
 private:
     QString         m_qString_Name;         /**< Holds the name of the Measurement. */
 //    PLG_ID::Plugin_ID         m_PLG_ID;     /**< Holds the corresponding plugin id. */
     MSR_ID::Measurement_ID    m_MSR_ID;     /**< Holds the Measurement id. */
-    bool        m_bVisibility;              /**< Holds the visibility status. */
-
+    bool m_bVisibility;              /**< Holds the visibility status. */
 };
 
 

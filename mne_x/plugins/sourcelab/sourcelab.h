@@ -44,10 +44,9 @@
 
 #include "sourcelab_global.h"
 #include <mne_x/Interfaces/IRTAlgorithm.h>
-#include <generics/circularbuffer_old.h>
-#include <generics/circularmultichannelbuffer_old.h>
 
-#include <xMeas/Measurement/realtimesamplearray.h>
+#include <generics/circularmatrixbuffer.h>
+
 #include <xMeas/Measurement/realtimemultisamplearray.h>
 
 
@@ -130,9 +129,9 @@ private:
     */
     void init();
 
-    RealTimeSampleArray*        m_pSourceLab_Output;    /**< Holds the RealTimeSampleArray of the SourceLab output.*/
+    QMutex mutex;
 
-    _double_CircularBuffer_old* m_pSourceLabBuffer;     /**< Holds incoming data.*/
+    _double_CircularMatrixBuffer* m_pSourceLabBuffer;   /**< Holds incoming rt server data.*/
 };
 
 } // NAMESPACE

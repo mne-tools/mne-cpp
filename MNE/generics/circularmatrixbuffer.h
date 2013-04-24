@@ -43,6 +43,7 @@
 //=============================================================================================================
 
 #include "generics_global.h"
+#include "buffer.h"
 
 
 //*************************************************************************************************************
@@ -86,7 +87,7 @@ using namespace Eigen;
 * @brief The circular matrix buffer
 */
 template<typename _Tp>
-class CircularMatrixBuffer
+class CircularMatrixBuffer : public Buffer
 {
 public:
     //=========================================================================================================
@@ -128,6 +129,24 @@ public:
     */
     void clear();
 
+    //=========================================================================================================
+    /**
+    * Size of the buffer.
+    */
+    inline quint32 size() const;
+
+    //=========================================================================================================
+    /**
+    * Rows of the stored matrices of the buffer.
+    */
+    inline quint32 rows() const;
+
+    //=========================================================================================================
+    /**
+    * Cols of the stored matrices of the buffer.
+    */
+    inline quint32 cols() const;
+
 private:
     //=========================================================================================================
     /**
@@ -157,7 +176,8 @@ private:
 
 template<typename _Tp>
 CircularMatrixBuffer<_Tp>::CircularMatrixBuffer(unsigned int uiMaxNumMatrices, unsigned int uiRows, unsigned int uiCols)
-: m_uiMaxNumMatrices(uiMaxNumMatrices)
+: Buffer(typeid(_Tp).name())
+, m_uiMaxNumMatrices(uiMaxNumMatrices)
 , m_uiRows(uiRows)
 , m_uiCols(uiCols)
 , m_uiMaxNumElements(m_uiMaxNumMatrices*m_uiRows*m_uiCols)
@@ -236,6 +256,33 @@ void CircularMatrixBuffer<_Tp>::clear()
 
     m_iCurrentReadIndex = -1;
     m_iCurrentWriteIndex = -1;
+}
+
+
+//*************************************************************************************************************
+
+template<typename _Tp>
+inline quint32 CircularMatrixBuffer<_Tp>::size() const
+{
+    return m_uiMaxNumMatrices;
+}
+
+
+//*************************************************************************************************************
+
+template<typename _Tp>
+inline quint32 CircularMatrixBuffer<_Tp>::rows() const
+{
+    return m_uiRows;
+}
+
+
+//*************************************************************************************************************
+
+template<typename _Tp>
+inline quint32 CircularMatrixBuffer<_Tp>::cols() const
+{
+    return m_uiCols;
 }
 
 

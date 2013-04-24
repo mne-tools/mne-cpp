@@ -68,3 +68,11 @@ MltChnMeasurement::~MltChnMeasurement()
 {
 
 }
+
+
+//*************************************************************************************************************
+
+bool MltChnMeasurement::isSingleChannel() const
+{
+    return false;
+}
