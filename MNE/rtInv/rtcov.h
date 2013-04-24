@@ -131,7 +131,10 @@ public:
     *
     * @param[in] p_DataSegment  Data to estimate the covariance from -> ToDo Replace this by shared data pointer
     */
+    void append(const MatrixXf &p_DataSegment);
+
     void receiveDataSegment(MatrixXf p_DataSegment);
+
 
     //=========================================================================================================
     /**

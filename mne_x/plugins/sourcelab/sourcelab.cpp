@@ -74,8 +74,15 @@ using namespace XMEASLIB;
 
 SourceLab::SourceLab()
 : m_pSourceLabBuffer(NULL)
+, m_bIsRunning(false)
+, m_qFileFwdSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
+, m_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot")
 {
     m_PLG_ID = PLG_ID::SOURCELAB;
+
+    if(!MNEForwardSolution::read_forward_solution(m_qFileFwdSolution, m_Fwd))
+        qDebug() << "Couldn't read forward solution";
+
 }
 
 
@@ -112,6 +119,8 @@ bool SourceLab::stop()
 
     if(m_pSourceLabBuffer)
         m_pSourceLabBuffer->clear();
+
+    m_bIsRunning = false;
 
     return true;
 }
@@ -158,7 +167,7 @@ void SourceLab::update(Subject* pSubject)
     Measurement* meas = static_cast<Measurement*>(pSubject);
 
     //MEG
-    if(!meas->isSingleChannel())
+    if(!meas->isSingleChannel() && m_bIsRunning)
     {
         RealTimeMultiSampleArrayNew* pRTMSANew = static_cast<RealTimeMultiSampleArrayNew*>(pSubject);
 
@@ -175,6 +184,12 @@ void SourceLab::update(Subject* pSubject)
                     m_pSourceLabBuffer = new _double_CircularMatrixBuffer(64, pRTMSANew->getNumChannels(), pRTMSANew->getMultiArraySize());
                     mutex.unlock();
                 }
+
+                //Fiff information
+                mutex.lock();
+                if(m_fiffInfo.isEmpty())
+                    m_fiffInfo = pRTMSANew->getFiffInfo();
+                mutex.unlock();
 
                 MatrixXd t_mat(pRTMSANew->getNumChannels(), pRTMSANew->getMultiArraySize());
 
@@ -198,8 +213,32 @@ void SourceLab::update(Subject* pSubject)
 
 void SourceLab::run()
 {
+    //
+    // Cluster forward solution;
+    //
+    qDebug() << "Start Clustering";
+    m_clusteredFwd = m_Fwd.cluster_forward_solution(m_annotationSet, 40);
+    qDebug() << "Clustering finished";
+
+    //
+    // start receiving data
+    //
+    m_bIsRunning = true;
+
+
+    while(m_fiffInfo.isEmpty())
+    {
+        msleep(10);
+        qDebug() << "Wait for fiff Info";
+    }
+
+
+    qDebug() << "Fiff Info received.";
+
+
+
     qint32 count = 0;
-    while (true)
+    while(m_bIsRunning)
     {
         /* Dispatch the inputs */
 
@@ -208,6 +247,9 @@ void SourceLab::run()
 //        //ToDo: Implement here the algorithm
 
 //        m_pSourceLab_Output->setValue(v);
+
+
+
 
         mutex.lock();
         qint32 nrows = m_pSourceLabBuffer->rows();

@@ -92,6 +92,14 @@ RtCov::~RtCov()
 
 //*************************************************************************************************************
 
+void RtCov::append(const MatrixXf &p_DataSegment)
+{
+
+}
+
+
+//*************************************************************************************************************
+
 void RtCov::receiveDataSegment(MatrixXf p_DataSegment)
 {
 //    if(m_pRawMatrixBuffer) // ToDo handle change buffersize
