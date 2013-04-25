@@ -36,12 +36,13 @@
 
 #include "babymeginfo.h"
 
+
+
 //*************************************************************************************************************
 
 BabyMEGInfo::BabyMEGInfo()
+: g_maxlen(500)
 {
-    chnNum = 0; dataLength = 0;
-    g_maxlen = 500;
 }
 
 //*************************************************************************************************************
@@ -50,6 +51,70 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
 {
     chnNum = 400;
     dataLength = 5000;
+
+
+
+    // Parameters
+    m_FiffInfo.file_id.version = 0; //ToDo
+
+    m_FiffInfo.meas_date[0] = 0;
+    m_FiffInfo.meas_date[1] = 0;
+    m_FiffInfo.sfreq = 10000;
+    m_FiffInfo.highpass = 0;
+    m_FiffInfo.lowpass = m_FiffInfo.sfreq/2;
+    m_FiffInfo.acq_pars = QString("BabyMEG");
+    m_FiffInfo.acq_stim = QString("");
+    m_FiffInfo.filename = QString("");
+    m_FiffInfo.meas_id.version = 1;
+    m_FiffInfo.nchan = 464;
+
+    //MEG
+    for(qint32 i = 0; i < 400; ++i)
+    {
+        FiffChInfo t_ch;
+
+        t_ch.scanno = i;
+        t_ch.logno = i;
+        t_ch.cal = 1;
+        t_ch.kind = FIFFV_MEG_CH;
+        t_ch.range = 1;
+        t_ch.unit = FIFF_UNITM_T;
+        t_ch.unit_mul = FIFF_UNITM_NONE;
+        t_ch.coil_type = FIFFV_COIL_BABY_MAG;// ToDo FIFFV_COIL_BABY_REF_MAG
+
+        t_ch.loc.setZero(12,1);
+
+        t_ch.ch_name = QString("MEG%1").arg(i);
+
+        m_FiffInfo.chs.append(t_ch);
+
+        m_FiffInfo.ch_names.append(t_ch.ch_name);
+    }
+    //EEG
+    for(qint32 i = 0; i < 64; ++i)
+    {
+        FiffChInfo t_ch;
+
+        t_ch.scanno = 400+i;
+        t_ch.logno = 400+i;
+        t_ch.cal = 1;
+        t_ch.kind = FIFFV_EEG_CH;
+        t_ch.range = 1;
+        t_ch.unit = FIFF_UNIT_V;
+        t_ch.unit_mul = FIFF_UNITM_NONE;
+        t_ch.coil_type = FIFFV_COIL_EEG;
+        t_ch.loc.setZero(12,1);
+
+        t_ch.ch_name = QString("EEG%1").arg(i);
+
+        m_FiffInfo.chs.append(t_ch);
+
+        m_FiffInfo.ch_names.append(t_ch.ch_name);
+    }
+
+
+    emit fiffInfoAvailable(m_FiffInfo);
+
     return;
 }
 /*

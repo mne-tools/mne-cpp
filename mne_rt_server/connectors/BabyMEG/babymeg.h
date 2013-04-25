@@ -107,7 +107,6 @@ class BABYMEGSHARED_EXPORT BabyMEG : public IConnector
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(RTSERVER::IConnector)
 
-
     friend class BabyMEGProducer;
 
 public:
@@ -136,6 +135,9 @@ public:
 
     virtual bool stop();
 
+
+    void setFiffInfo(FIFFLIB::FiffInfo);
+
 protected:
     virtual void run();
 
@@ -158,6 +160,11 @@ private:
     */
     void comGetBufsize(Command p_command);
 
+
+
+
+
+
     //////////
 
     //=========================================================================================================
@@ -165,8 +172,6 @@ private:
     * Initialise the BabyMEG.
     */
     void init();
-
-    bool readRawInfo();
 
     QMutex mutex;
 
@@ -177,8 +182,11 @@ private:
     bool DataStartFlag;
 
 
+    FiffInfo    m_FiffInfoBabyMEG;      /**< Holds the fiff information. */
 
 
+
+    // OLD Simulation stuff
     BabyMEGProducer*    m_pBabyMEGProducer;        /**< Holds the DataProducer.*/
     FiffRawData         m_RawInfo;              /**< Holds the fiff raw measurement information. */
     QString             m_sResourceDataPath;    /**< Holds the path to the Fiff resource simulation file directory.*/
