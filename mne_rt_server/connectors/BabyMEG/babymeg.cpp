@@ -108,7 +108,7 @@ BabyMEG::BabyMEG()
 
 
 
-    myClient->ConnectToBabyMEG();
+//    myClient->ConnectToBabyMEG();
 
 
     this->init();

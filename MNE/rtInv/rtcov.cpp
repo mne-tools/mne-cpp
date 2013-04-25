@@ -68,13 +68,13 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtCov::RtCov(FiffInfo &p_fiffInfo, QObject *parent)
+RtCov::RtCov(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent)
 : QThread(parent)
-, m_fiffInfo(p_fiffInfo)
+, m_iMaxSamples(p_iMaxSamples)
+, m_pFiffInfo(p_pFiffInfo)
 , m_bIsRunning(false)
 , m_bIsRawBufferInit(false)
 , m_pRawMatrixBuffer(NULL)
-, m_iMaxSamples(10000)
 {
 
 }
@@ -172,9 +172,9 @@ void RtCov::run()
 
 
                 //ToDo do picks
-                cov.names = m_fiffInfo.ch_names;
-                cov.projs = m_fiffInfo.projs;
-                cov.bads  = m_fiffInfo.bads;
+                cov.names = m_pFiffInfo->ch_names;
+                cov.projs = m_pFiffInfo->projs;
+                cov.bads  = m_pFiffInfo->bads;
                 cov.nfree  = n_samples;
 
                 emit covCalculated(cov);

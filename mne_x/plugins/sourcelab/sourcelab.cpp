@@ -187,8 +187,8 @@ void SourceLab::update(Subject* pSubject)
 
                 //Fiff information
                 mutex.lock();
-                if(m_fiffInfo.isEmpty())
-                    m_fiffInfo = pRTMSANew->getFiffInfo();
+                if(m_pFiffInfo->isEmpty())
+                    m_pFiffInfo = FiffInfo::SPtr(new FiffInfo(pRTMSANew->getFiffInfo()));
                 mutex.unlock();
 
                 MatrixXd t_mat(pRTMSANew->getNumChannels(), pRTMSANew->getMultiArraySize());
@@ -225,15 +225,21 @@ void SourceLab::run()
     //
     m_bIsRunning = true;
 
-
-    while(m_fiffInfo.isEmpty())
+    //
+    // Read Fiff Info
+    //
+    while(m_pFiffInfo->isEmpty())
     {
         msleep(10);
         qDebug() << "Wait for fiff Info";
     }
 
-
     qDebug() << "Fiff Info received.";
+
+    //
+    // Init Real-Time Covariance estimator
+    //
+    m_pRtCov = RtCov::SPtr(new RtCov(1000, m_pFiffInfo));
 
 
 
