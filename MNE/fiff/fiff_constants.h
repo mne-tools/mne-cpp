@@ -199,10 +199,18 @@ namespace FIFFLIB
 #define FIFFV_COIL_VV_MAG_T2          3023  /**< Vectorview SQ20483-A magnetometer */
 #define FIFFV_COIL_VV_MAG_T3          3024  /**< Vectorview SQ20950N magnetometer */
 
-
 #define FIFFV_COIL_MAGNES_MAG         4001  /**< Magnes WH magnetometer */
 #define FIFFV_COIL_MAGNES_GRAD        4002  /**< Magnes WH gradiometer  */
 #define FIFFV_COIL_CTF_GRAD           5001  /**< CTF axial gradiometer */
+
+
+/*
+ * BabySQUID sensors
+ */
+#define FIFFV_COIL_BABY_GRAD          7001  /**< BabySQUID gradiometers */
+#define FIFFV_COIL_BABY_MAG           7002  /**< BabyMEG magnetometers */
+#define FIFFV_COIL_BABY_REF_MAG       7003  /**< BabyMEG reference magnetometers */
+
 
 #define FIFFM_IS_VV_COIL(c) ((c)/1000 == 3)
 
