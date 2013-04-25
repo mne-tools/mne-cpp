@@ -69,6 +69,7 @@ using namespace RtServerPlugin;
 RtServerSetupWidget::RtServerSetupWidget(RtServer* p_pRtServer, QWidget* parent)
 : QWidget(parent)
 , m_pRtServer(p_pRtServer)
+, m_bIsInit(false)
 {
     ui.setupUi(this);
 
@@ -161,7 +162,7 @@ void RtServerSetupWidget::checkedRecordDataChanged()
 
 void RtServerSetupWidget::connectorIdxChanged(int idx)
 {
-    if(ui.m_qComboBox_Connector->itemData(idx).toInt() != m_pRtServer->m_iActiveConnectorId)
+    if(ui.m_qComboBox_Connector->itemData(idx).toInt() != m_pRtServer->m_iActiveConnectorId && m_bIsInit)
         m_pRtServer->changeConnector(ui.m_qComboBox_Connector->itemData(idx).toInt());
 }
 
@@ -219,6 +220,8 @@ void RtServerSetupWidget::printToLog(QString logMsg)
 
 void RtServerSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
 {
+    m_bIsInit = false;
+
     if(p_bConnectionStatus)
     {
         //
@@ -256,6 +259,8 @@ void RtServerSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
         this->ui.m_qPushButton_Connect->setText(QString("Disconnect"));
         this->ui.m_qLineEdit_SendCLI->setEnabled(true);
         this->ui.m_qPushButton_SendCLI->setEnabled(true);
+
+        m_bIsInit = true;
     }
     else
     {

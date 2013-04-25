@@ -148,6 +148,9 @@ private:
 
     Ui::RtServerSetupWidgetClass ui;       /**< Holds the user interface for the RtServerSetupWidget.*/
 
+    bool m_bIsInit;     /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized */
+
+
 };
 
 } // NAMESPACE
