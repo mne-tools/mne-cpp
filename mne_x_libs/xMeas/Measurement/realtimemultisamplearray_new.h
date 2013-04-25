@@ -110,7 +110,7 @@ public:
     *
     * @param[in] p_FiffInfo     Info to init from
     */
-    void initFromFiffInfo(FiffInfo p_FiffInfo);
+    void initFromFiffInfo(const FiffInfo &p_FiffInfo);
 
     //=========================================================================================================
     /**

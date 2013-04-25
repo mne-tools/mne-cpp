@@ -111,13 +111,16 @@ public:
     typedef QSharedPointer<RtCov> SPtr;             /**< Shared pointer type for RtCov. */
     typedef QSharedPointer<const RtCov> ConstSPtr;  /**< Const shared pointer type for RtCov. */
 
+
     //=========================================================================================================
     /**
     * Creates the real-time covariance estimation object.
     *
+    * @param[in] p_iMaxSamples      Number of samples to use for each data chunk
+    * @param[in] p_pFiffInfo        Associated Fiff Information
     * @param[in] parent     Parent QObject (optional)
     */
-    explicit RtCov(FiffInfo &p_fiffInfo, QObject *parent = 0);
+    explicit RtCov(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -154,7 +157,7 @@ protected:
     virtual void run();
 
 private:
-    FiffInfo    m_fiffInfo;             /**< Holds the fiff measurement information. */
+    FiffInfo::SPtr  m_pFiffInfo;        /**< Holds the fiff measurement information. */
 
     QMutex      mutex;                  /**< Provides access serialization between threads*/
     bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/

@@ -314,6 +314,10 @@ FiffInfo RtDataClient::readInfo()
     for (qint32 c = 0; c < p_FiffInfo.nchan; ++c)
         p_FiffInfo.ch_names << p_FiffInfo.chs[c].ch_name;
 
+    //Garbage collecting
+    if(t_pTag)
+        delete t_pTag;
+
     return p_FiffInfo;
 }
 

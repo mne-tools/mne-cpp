@@ -96,7 +96,7 @@ void RealTimeMultiSampleArrayNew::init(unsigned int uiNumChannels)
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayNew::initFromFiffInfo(FiffInfo p_FiffInfo)
+void RealTimeMultiSampleArrayNew::initFromFiffInfo(const FiffInfo &p_FiffInfo)
 {
     m_qListChInfo.clear();
 
