@@ -88,7 +88,7 @@ void IMeasurementSink::addPlugin(PLG_ID::Plugin_ID id)
 
 //*************************************************************************************************************
 
-void IMeasurementSink::addAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id, Buffer::SPtr buffer)
+void IMeasurementSink::addAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id, Buffer::SPtr &buffer)
 {
 //ToDo test at the same time if measurement is accepted
     qDebug() << "inside adding Measurement";
@@ -105,6 +105,15 @@ Buffer::SPtr IMeasurementSink::getAcceptorMeasurementBuffer(MSR_ID::Measurement_
         return m_pHashBuffers->value(id);
 
     return Buffer::SPtr();
+}
+
+
+//*************************************************************************************************************
+
+void IMeasurementSink::setAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id, Buffer::SPtr &buffer)
+{
+    if(m_pHashBuffers->contains(id))
+        m_pHashBuffers->insert(id, buffer);
 }
 
 

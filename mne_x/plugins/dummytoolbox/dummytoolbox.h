@@ -134,7 +134,7 @@ private:
 
     RealTimeMultiSampleArray*    m_pDummy_MSA_Output;   /**< Holds the RealTimeMultiSampleArray of the DummyToolbox output.*/
 
-    DummyBuffer_old::SPtr   m_pDummyBuffer;             /**< Holds incoming data.*/
+    CircularBuffer_old<double>::SPtr   m_pDummyBuffer;             /**< Holds incoming data.*/
 
     CircularMultiChannelBuffer_old<double>::SPtr m_pDummyMultiChannelBuffer;    /**< Holds incoming multi sample data.*/
 

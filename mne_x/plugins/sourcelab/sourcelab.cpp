@@ -167,30 +167,28 @@ void SourceLab::update(Subject* pSubject)
     {
         RealTimeMultiSampleArrayNew* pRTMSANew = static_cast<RealTimeMultiSampleArrayNew*>(pSubject);
 
-        //Using fast Hash Lookup instead of if then else clause
-        if(getAcceptorMeasurementBuffer(pRTMSANew->getID()))
+
+        if(pRTMSANew->getID() == MSR_ID::MEGRTSERVER_OUTPUT)
         {
-            if(pRTMSANew->getID() == MSR_ID::MEGRTSERVER_OUTPUT)
+            //Check if buffer initialized
+            if(!m_pSourceLabBuffer)
             {
-                //Check if buffer initialized
-                if(!m_pSourceLabBuffer)
-                    m_pSourceLabBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSANew->getNumChannels(), pRTMSANew->getMultiArraySize()));
-
-                //Fiff information
-                if(!m_pFiffInfo)
-                    m_pFiffInfo = pRTMSANew->getFiffInfo();
-
-                MatrixXd t_mat(pRTMSANew->getNumChannels(), pRTMSANew->getMultiArraySize());
-
-                //ToDo: Cast to specific Buffer
-                for(unsigned char i = 0; i < pRTMSANew->getMultiArraySize(); ++i)
-                    t_mat.col(i) = pRTMSANew->getMultiSampleArray()[i];
-
-//                static_cast<_double_CircularMatrixBuffer*>(getAcceptorMeasurementBuffer(pRTMSANew->getID()))
-//                        ->push(&t_mat);
-                m_pSourceLabBuffer->push(&t_mat);
-
+                m_pSourceLabBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSANew->getNumChannels(), pRTMSANew->getMultiArraySize()));
+                setAcceptorMeasurementBuffer(pRTMSANew->getID(), m_pSourceLabBuffer.staticCast<Buffer>());
             }
+
+            //Fiff information
+            if(!m_pFiffInfo)
+                m_pFiffInfo = pRTMSANew->getFiffInfo();
+
+            MatrixXd t_mat(pRTMSANew->getNumChannels(), pRTMSANew->getMultiArraySize());
+
+            //ToDo: Cast to specific Buffer
+            for(unsigned char i = 0; i < pRTMSANew->getMultiArraySize(); ++i)
+                t_mat.col(i) = pRTMSANew->getMultiSampleArray()[i];
+
+            getAcceptorMeasurementBuffer(pRTMSANew->getID()).staticCast<CircularMatrixBuffer<double> >()
+                    ->push(&t_mat);
         }
 
     }
@@ -229,6 +227,8 @@ void SourceLab::run()
     // Init Real-Time Covariance estimator
     //
     m_pRtCov = RtCov::SPtr(new RtCov(1000, m_pFiffInfo));
+
+    m_pRtCov->start();
 
 
     qint32 count = 0;
@@ -276,7 +276,7 @@ void SourceLab::init()
     qDebug() << "#### SourceLab Init; MEGRTSERVER_OUTPUT: " << MSR_ID::MEGRTSERVER_OUTPUT;
 
     this->addPlugin(PLG_ID::RTSERVER);
-    this->addAcceptorMeasurementBuffer(MSR_ID::MEGRTSERVER_OUTPUT, m_pSourceLabBuffer);
+    this->addAcceptorMeasurementBuffer(MSR_ID::MEGRTSERVER_OUTPUT, m_pSourceLabBuffer.staticCast<Buffer>());
 
 //    m_pDummy_MSA_Output = addProviderRealTimeMultiSampleArray(MSR_ID::DUMMYTOOL_OUTPUT_II, 2);
 //    m_pDummy_MSA_Output->setName("Dummy Output II");
