@@ -122,7 +122,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool copy_tree(FiffStream* p_pStreamIn, FiffId& in_id, QList<FiffDirTree>& p_Nodes, FiffStream* p_pStreamOut);
+    static bool copy_tree(QSharedPointer<FiffStream> p_pStreamIn, FiffId& in_id, QList<FiffDirTree>& p_Nodes, QSharedPointer<FiffStream> p_pStreamOut);
 
     //=========================================================================================================
     /**

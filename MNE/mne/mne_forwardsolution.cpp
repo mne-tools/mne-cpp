@@ -766,7 +766,7 @@ void MNEForwardSolution::prepare_forward(const FiffInfo &p_info, const FiffCov &
 
 bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForwardSolution& fwd, bool force_fixed, bool surf_ori, const QStringList& include, const QStringList& exclude, bool bExcludeBads)
 {
-    FiffStream* t_pStream = new FiffStream(&p_IODevice);
+    FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
     FiffDirTree t_Tree;
     QList<FiffDirEntry> t_Dir;
 
@@ -782,9 +782,6 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
     {
         t_pStream->device()->close();
         std::cout << "No forward solutions in " << t_pStream->streamName().toUtf8().constData(); // ToDo throw error
-        //garbage collecting
-        if(t_pStream)
-            delete t_pStream;
         return false;
     }
     //
@@ -795,9 +792,6 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
     {
         t_pStream->device()->close();
         std::cout << "No parent MRI information in " << t_pStream->streamName().toUtf8().constData(); // ToDo throw error
-        //garbage collecting
-        if(t_pStream)
-            delete t_pStream;
         return false;
     }
 
@@ -807,9 +801,6 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
         t_pStream->device()->close();
         std::cout << "Could not read the source spaces\n"; // ToDo throw error
         //ToDo error(me,'Could not read the source spaces (%s)',mne_omit_first_line(lasterr));
-        //garbage collecting
-        if(t_pStream)
-            delete t_pStream;
         return false;
     }
 
@@ -840,13 +831,10 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
     FiffDirTree eegnode;
     for(qint32 k = 0; k < fwds.size(); ++k)
     {
-        if(!fwds[k].find_tag(t_pStream, FIFF_MNE_INCLUDED_METHODS, t_pTag))
+        if(!fwds[k].find_tag(t_pStream.data(), FIFF_MNE_INCLUDED_METHODS, t_pTag))
         {
             t_pStream->device()->close();
             std::cout << "Methods not listed for one of the forward solutions\n"; // ToDo throw error
-            //garbage collecting
-            if(t_pStream)
-                delete t_pStream;
             return false;
         }
         if (*t_pTag->toInt() == FIFFV_MNE_MEG)
@@ -863,7 +851,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
 
     MNEForwardSolution megfwd;
     QString ori;
-    if (read_one(t_pStream, megnode, megfwd))
+    if (read_one(t_pStream.data(), megnode, megfwd))
     {
         if (megfwd.source_ori == FIFFV_MNE_FIXED_ORI)
             ori = QString("fixed");
@@ -872,7 +860,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
         printf("\tRead MEG forward solution (%d sources, %d channels, %s orientations)\n", megfwd.nsource,megfwd.nchan,ori.toUtf8().constData());
     }
     MNEForwardSolution eegfwd;
-    if (read_one(t_pStream, eegnode, eegfwd))
+    if (read_one(t_pStream.data(), eegnode, eegfwd))
     {
         if (eegfwd.source_ori == FIFFV_MNE_FIXED_ORI)
             ori = QString("fixed");
@@ -895,9 +883,6 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
         {
             t_pStream->device()->close();
             std::cout << "The MEG and EEG forward solutions do not match\n"; // ToDo throw error
-            //garbage collecting
-            if(t_pStream)
-                delete t_pStream;
             return false;
         }
 
@@ -930,13 +915,10 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
     //
     //   Get the MRI <-> head coordinate transformation
     //
-    if(!parent_mri[0].find_tag(t_pStream, FIFF_COORD_TRANS, t_pTag))
+    if(!parent_mri[0].find_tag(t_pStream.data(), FIFF_COORD_TRANS, t_pTag))
     {
         t_pStream->device()->close();
         std::cout << "MRI/head coordinate transformation not found\n"; // ToDo throw error
-        //garbage collecting
-        if(t_pStream)
-            delete t_pStream;
         return false;
     }
     else
@@ -950,9 +932,6 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
             {
                 t_pStream->device()->close();
                 std::cout << "MRI/head coordinate transformation not found\n"; // ToDo throw error
-                //garbage collecting
-                if(t_pStream)
-                    delete t_pStream;
                 return false;
             }
         }
@@ -1268,8 +1247,6 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
 
     //garbage collecting
     t_pStream->device()->close();
-    if(t_pStream)
-        delete t_pStream;
 
     return true;
 }
