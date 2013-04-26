@@ -161,7 +161,7 @@ QList<VectorXi> MNESourceSpace::label_src_vertno_sel(const Label &p_label, Vecto
 
 //*************************************************************************************************************
 
-bool MNESourceSpace::read_source_spaces(FiffStream*& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNESourceSpace& p_SourceSpace)
+bool MNESourceSpace::read_source_spaces(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNESourceSpace& p_SourceSpace)
 {
 //    if (p_pSourceSpace != NULL)
 //        delete p_pSourceSpace;
@@ -177,11 +177,8 @@ bool MNESourceSpace::read_source_spaces(FiffStream*& p_pStream, bool add_geom, F
         QList<FiffDirEntry> t_Dir;
         QString t_sFileName = p_pStream->streamName();
 
-        if(p_pStream)
-            delete p_pStream;
-
-        QFile* t_pFile = new QFile(t_sFileName);//ToDo TCPSocket;
-        p_pStream = new FiffStream(t_pFile);
+        QFile t_file(t_sFileName);//ToDo TCPSocket;
+        p_pStream = FiffStream::SPtr(new FiffStream(&t_file));
         if(!p_pStream->open(p_Tree, t_Dir))
             return false;
         open_here = true;
@@ -204,7 +201,7 @@ bool MNESourceSpace::read_source_spaces(FiffStream*& p_pStream, bool add_geom, F
     {
         MNEHemisphere p_Hemisphere;
         printf("\tReading a source space...");
-        MNESourceSpace::read_source_space(p_pStream, spaces[k], p_Hemisphere);
+        MNESourceSpace::read_source_space(p_pStream.data(), spaces[k], p_Hemisphere);
         printf("\t[done]\n" );
         if (add_geom)
             complete_source_space_info(p_Hemisphere);

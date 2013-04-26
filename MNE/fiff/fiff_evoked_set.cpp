@@ -170,7 +170,7 @@ bool FiffEvokedSet::read(QIODevice& p_IODevice, FiffEvokedSet& p_FiffEvokedSet, 
     //
     //   Open the file
     //
-    FiffStream* t_pStream = new FiffStream(&p_IODevice);
+    FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
     QString t_sFileName = t_pStream->streamName();
 
     printf("Exploring %s ...\n",t_sFileName.toUtf8().constData());
@@ -178,11 +178,7 @@ bool FiffEvokedSet::read(QIODevice& p_IODevice, FiffEvokedSet& p_FiffEvokedSet, 
     QList<FiffDirEntry> t_Dir;
 
     if(!t_pStream->open(t_Tree, t_Dir))
-    {
-        if(t_pStream)
-            delete t_pStream;
         return false;
-    }
     //
     //   Read the measurement info
     //
@@ -196,8 +192,6 @@ bool FiffEvokedSet::read(QIODevice& p_IODevice, FiffEvokedSet& p_FiffEvokedSet, 
     QList<FiffDirTree> processed = meas.dir_tree_find(FIFFB_PROCESSED_DATA);
     if (processed.size() == 0)
     {
-        if(t_pStream)
-            delete t_pStream;
         qWarning("Could not find processed data");
         return false;
     }
@@ -205,8 +199,6 @@ bool FiffEvokedSet::read(QIODevice& p_IODevice, FiffEvokedSet& p_FiffEvokedSet, 
     QList<FiffDirTree> evoked_node = meas.dir_tree_find(FIFFB_EVOKED);
     if (evoked_node.size() == 0)
     {
-        if(t_pStream)
-            delete t_pStream;
         qWarning("Could not find evoked data");
         return false;
     }
@@ -216,8 +208,6 @@ bool FiffEvokedSet::read(QIODevice& p_IODevice, FiffEvokedSet& p_FiffEvokedSet, 
     QString t;
     if(!t_pStream->get_evoked_entries(evoked_node, comments, aspect_kinds, t))
         t = QString("None found, must use integer");
-    if(t_pStream)
-        delete t_pStream;
     printf("\tFound %d datasets\n", evoked_node.size());
 
     for(qint32 i = 0; i < comments.size(); ++i)
@@ -243,7 +233,7 @@ bool FiffEvokedSet::read(QIODevice& p_IODevice, FiffEvokedSet& p_FiffEvokedSet, 
 //    //
 //    //   Open the file
 //    //
-//    FiffStream* t_pStream = new FiffStream(&p_IODevice);
+//    FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
 //    QString t_sFileName = t_pStream->streamName();
 
 //    printf("Reading %s ...\n",t_sFileName.toUtf8().constData());

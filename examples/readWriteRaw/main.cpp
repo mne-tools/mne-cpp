@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
     //
     MatrixXd cals;
 
-    FiffStream* outfid = Fiff::start_writing_raw(&t_fileOut,raw.info, cals, picks);
+    FiffStream::SPtr outfid = Fiff::start_writing_raw(t_fileOut,raw.info, cals, picks);
     //
     //   Set up the reading parameters
     //
@@ -149,7 +149,6 @@ int main(int argc, char *argv[])
 
         if (!raw.read_raw_segment(data,times,first,last,picks))
         {
-                delete outfid;
                 printf("error during read_raw_segment\n");
                 return -1;
         }
@@ -168,8 +167,6 @@ int main(int argc, char *argv[])
     }
 
     outfid->finish_writing_raw();
-
-    delete outfid;
 
     printf("Finished\n");
 

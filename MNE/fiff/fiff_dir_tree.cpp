@@ -112,7 +112,7 @@ void FiffDirTree::clear()
 
 //*************************************************************************************************************
 
-bool FiffDirTree::copy_tree(FiffStream* p_pStreamIn, FiffId& in_id, QList<FiffDirTree>& p_Nodes, FiffStream* p_pStreamOut)
+bool FiffDirTree::copy_tree(FiffStream::SPtr p_pStreamIn, FiffId& in_id, QList<FiffDirTree>& p_Nodes, FiffStream::SPtr p_pStreamOut)
 {
     if(p_Nodes.size() <= 0)
         return false;
@@ -150,7 +150,7 @@ bool FiffDirTree::copy_tree(FiffStream* p_pStreamIn, FiffId& in_id, QList<FiffDi
 //ToDo this is the same like read_tag
             FiffTag::SPtr tag(new FiffTag());
             //QDataStream in(fidin);
-            FiffStream* in = p_pStreamIn;
+            FiffStream::SPtr in = p_pStreamIn;
             in->setByteOrder(QDataStream::BigEndian);
 
             //
@@ -173,7 +173,7 @@ bool FiffDirTree::copy_tree(FiffStream* p_pStreamIn, FiffId& in_id, QList<FiffDi
             }
 
             //QDataStream out(p_pStreamOut);
-            FiffStream* out = p_pStreamOut;
+            FiffStream::SPtr out = p_pStreamOut;
             out->setByteOrder(QDataStream::BigEndian);
 
             *out << (qint32)tag->kind;

@@ -72,7 +72,7 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FiffStream::FiffStream(QIODevice* p_pIODevice)
+FiffStream::FiffStream(QIODevice *p_pIODevice)
 : QDataStream(p_pIODevice)
 {
     this->setFloatingPointPrecision(QDataStream::SinglePrecision);
@@ -1304,7 +1304,7 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
     //
     //   Open the file
     //
-    FiffStream::SPtr p_pStream = FiffStream::SPtr(new FiffStream(&p_IODevice));
+    FiffStream::SPtr p_pStream(new FiffStream(&p_IODevice));
     QString t_sFileName = p_pStream->streamName();
 
     printf("Opening raw data %s...\n",t_sFileName.toUtf8().constData());
@@ -1512,16 +1512,16 @@ void FiffStream::start_block(fiff_int_t kind)
 
 //*************************************************************************************************************
 
-FiffStream* FiffStream::start_file(QIODevice* p_pIODevice)
+FiffStream::SPtr FiffStream::start_file(QIODevice& p_IODevice)
 {
-    FiffStream* p_pStream = new FiffStream(p_pIODevice);
+    FiffStream::SPtr p_pStream(new FiffStream(&p_IODevice));
     QString t_sFileName = p_pStream->streamName();
 
     if(!p_pStream->device()->open(QIODevice::WriteOnly))
     {
         printf("Cannot write to %s\n", t_sFileName.toUtf8().constData());//consider throw
-        delete p_pStream;
-        return NULL;
+        FiffStream::SPtr p_pEmptyStream;
+        return p_pEmptyStream;
     }
 
     //
@@ -1540,7 +1540,7 @@ FiffStream* FiffStream::start_file(QIODevice* p_pIODevice)
 
 //*************************************************************************************************************
 
-FiffStream* FiffStream::start_writing_raw(QIODevice* p_pIODevice, const FiffInfo& info, MatrixXd& cals, MatrixXi sel)
+FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const FiffInfo& info, MatrixXd& cals, MatrixXi sel)
 {
     //
     //   We will always write floats
@@ -1565,7 +1565,7 @@ FiffStream* FiffStream::start_writing_raw(QIODevice* p_pIODevice, const FiffInfo
     //
     //  Create the file and save the essentials
     //
-    FiffStream* t_pStream = start_file(p_pIODevice);//1, 2, 3
+    FiffStream::SPtr t_pStream = start_file(p_IODevice);//1, 2, 3
     t_pStream->start_block(FIFFB_MEAS);//4
     t_pStream->write_id(FIFF_BLOCK_ID);//5
     if(info.meas_id.version != -1)
@@ -1586,8 +1586,8 @@ FiffStream* FiffStream::start_writing_raw(QIODevice* p_pIODevice, const FiffInfo
     bool have_isotrak    = false;
     if (blocks.size() > 0 && !info.filename.isEmpty())
     {
-        QFile* t_pFile = new QFile(info.filename);//ToDo this has to be adapted for TCPSocket
-        FiffStream* t_pStream2 = new FiffStream(t_pFile);
+        QFile t_qFile(info.filename);//ToDo this has to be adapted for TCPSocket
+        FiffStream::SPtr t_pStream2(new FiffStream(&t_qFile));
 
         FiffDirTree t_Tree;
         QList<FiffDirEntry> t_Dir;
@@ -1604,8 +1604,7 @@ FiffStream* FiffStream::start_writing_raw(QIODevice* p_pIODevice, const FiffInfo
                 have_isotrak = true;
         }
 
-        delete t_pStream2;
-        t_pStream2 = NULL;
+        t_pStream2 = FiffStream::SPtr();
     }
     //
     //    megacq parameters
