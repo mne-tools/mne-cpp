@@ -107,10 +107,8 @@ BabyMEG::BabyMEG()
     myClientComm->SetInfo(pInfo);
     myClientComm->start();
 
-
-
-//    myClient->ConnectToBabyMEG();
-
+    myClient->ConnectToBabyMEG();
+    myClient->DisConnectBabyMEG();
 
     this->init();
 }
