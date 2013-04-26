@@ -57,7 +57,7 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 IMeasurementSink::IMeasurementSink()
-: m_pHashBuffers(new QHash<MSR_ID::Measurement_ID, Buffer*>)
+: m_pHashBuffers(new QHash<MSR_ID::Measurement_ID, Buffer::SPtr>)
 {
 
 }
@@ -88,7 +88,7 @@ void IMeasurementSink::addPlugin(PLG_ID::Plugin_ID id)
 
 //*************************************************************************************************************
 
-void IMeasurementSink::addAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id, Buffer* buffer)
+void IMeasurementSink::addAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id, Buffer::SPtr buffer)
 {
 //ToDo test at the same time if measurement is accepted
     qDebug() << "inside adding Measurement";
@@ -99,12 +99,12 @@ void IMeasurementSink::addAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id, B
 
 //*************************************************************************************************************
 
-Buffer* IMeasurementSink::getAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id)
+Buffer::SPtr IMeasurementSink::getAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id)
 {
     if(m_pHashBuffers->contains(id))
         return m_pHashBuffers->value(id);
 
-    return NULL;
+    return Buffer::SPtr();
 }
 
 

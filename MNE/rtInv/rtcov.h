@@ -134,10 +134,7 @@ public:
     *
     * @param[in] p_DataSegment  Data to estimate the covariance from -> ToDo Replace this by shared data pointer
     */
-    void append(const MatrixXf &p_DataSegment);
-
-    void receiveDataSegment(MatrixXf p_DataSegment);
-
+    void append(const MatrixXd &p_DataSegment);
 
     //=========================================================================================================
     /**
@@ -161,11 +158,10 @@ private:
 
     QMutex      mutex;                  /**< Provides access serialization between threads*/
     bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
-    bool        m_bIsRawBufferInit;     /**< If raw buffer is initialized.*/
 
     quint32      m_iMaxSamples;         /**< Maximal amount of samples received, before covariance is estimated.*/
 
-    RawMatrixBuffer* m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
+    CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;   /**< The Circular Raw Matrix Buffer. */
 
 signals:
     //=========================================================================================================

@@ -141,7 +141,7 @@ private:
 
     QMutex mutex;
 
-    _double_CircularMatrixBuffer* m_pSourceLabBuffer;   /**< Holds incoming rt server data.*/
+    CircularMatrixBuffer<double>::SPtr m_pSourceLabBuffer;   /**< Holds incoming rt server data.*/
 
     bool m_bIsRunning;  /**< If source lab is running */
 

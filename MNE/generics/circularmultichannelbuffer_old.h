@@ -92,6 +92,9 @@ class CircularMultiChannelBuffer_old : public Buffer
 //class RTMEAS_EXPORT CircularMultiChannelBuffer_old : public Buffer
 {
 public:
+    typedef QSharedPointer<CircularMultiChannelBuffer_old> SPtr;              /**< Shared pointer type for CircularMultiChannelBuffer_old. */
+    typedef QSharedPointer<const CircularMultiChannelBuffer_old> ConstSPtr;   /**< Const shared pointer type for CircularMultiChannelBuffer_old. */
+
     //=========================================================================================================
     /**
     * Constructs a CircularMultiChannelBuffer_old.
