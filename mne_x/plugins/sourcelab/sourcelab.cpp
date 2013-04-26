@@ -73,8 +73,7 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 SourceLab::SourceLab()
-: m_pSourceLabBuffer(NULL)
-, m_bIsRunning(false)
+: m_bIsRunning(false)
 , m_qFileFwdSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
 , m_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot")
 {
@@ -91,9 +90,6 @@ SourceLab::SourceLab()
 SourceLab::~SourceLab()
 {
     stop();
-
-    if(m_pSourceLabBuffer)
-        delete m_pSourceLabBuffer;
 }
 
 
@@ -177,13 +173,8 @@ void SourceLab::update(Subject* pSubject)
             if(pRTMSANew->getID() == MSR_ID::MEGRTSERVER_OUTPUT)
             {
                 //Check if buffer initialized
-                if(m_pSourceLabBuffer->size() == 0)
-                {
-                    mutex.lock();
-                    delete m_pSourceLabBuffer;
-                    m_pSourceLabBuffer = new _double_CircularMatrixBuffer(64, pRTMSANew->getNumChannels(), pRTMSANew->getMultiArraySize());
-                    mutex.unlock();
-                }
+                if(!m_pSourceLabBuffer)
+                    m_pSourceLabBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSANew->getNumChannels(), pRTMSANew->getMultiArraySize()));
 
                 //Fiff information
                 if(!m_pFiffInfo)
@@ -237,8 +228,7 @@ void SourceLab::run()
     //
     // Init Real-Time Covariance estimator
     //
-//    m_pRtCov = RtCov::SPtr(new RtCov(1000, ));
-
+    m_pRtCov = RtCov::SPtr(new RtCov(1000, m_pFiffInfo));
 
 
     qint32 count = 0;
@@ -254,10 +244,7 @@ void SourceLab::run()
 
 
 
-
-        mutex.lock();
         qint32 nrows = m_pSourceLabBuffer->rows();
-        mutex.unlock();
 
         if(nrows > 0) // check if init
         {
@@ -265,6 +252,9 @@ void SourceLab::run()
 
 
             qDebug() << count << ": m_pSourceLabBuffer->pop(); Matrix:" << t_mat.rows() << "x" << t_mat.cols();
+
+            m_pRtCov->append(t_mat);
+
 
             ++count;
         }
@@ -281,8 +271,7 @@ void SourceLab::init()
 {
     //Delete Buffer - will be initailzed with first incoming data
     if(m_pSourceLabBuffer)
-        delete m_pSourceLabBuffer;
-    m_pSourceLabBuffer = new _double_CircularMatrixBuffer(0,0,0); // Init later
+        m_pSourceLabBuffer = CircularMatrixBuffer<double>::SPtr();
 
     qDebug() << "#### SourceLab Init; MEGRTSERVER_OUTPUT: " << MSR_ID::MEGRTSERVER_OUTPUT;
 

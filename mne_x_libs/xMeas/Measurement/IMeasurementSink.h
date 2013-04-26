@@ -142,7 +142,7 @@ public:
     * @param [in] id of measurement which should be added.
     * @param [in] buffer pointer to the corresponding buffer of the accepted measurement.
     */
-    void addAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id, Buffer* buffer);
+    void addAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id, Buffer::SPtr buffer);
     //=========================================================================================================
     /**
     * Returns accepted measurements.
@@ -157,7 +157,7 @@ public:
     * @param [in] id of measurement of which the buffer should be returned.
     * @return the buffer of the requested measurement.
     */
-    Buffer* getAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id);
+    Buffer::SPtr getAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id);
 
     //=========================================================================================================
     /**
@@ -168,7 +168,7 @@ public:
 protected:
     QList<PLG_ID::Plugin_ID>          m_qList_PLG_ID;   /**< Plugins of which are measurements accepted of current plugin.*/
 
-    QHash<MSR_ID::Measurement_ID, Buffer*>*     m_pHashBuffers;	/**< accepted measurements */
+    QHash<MSR_ID::Measurement_ID, Buffer::SPtr>*     m_pHashBuffers;	/**< accepted measurements */
 };
 
 

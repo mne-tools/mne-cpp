@@ -63,6 +63,7 @@
 
 #include <QPair>
 #include <QSemaphore>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -92,6 +93,9 @@ template<typename _Tp>
 class CircularMatrixBuffer : public Buffer
 {
 public:
+    typedef QSharedPointer<CircularMatrixBuffer> SPtr;              /**< Shared pointer type for CircularMatrixBuffer. */
+    typedef QSharedPointer<const CircularMatrixBuffer> ConstSPtr;   /**< Const shared pointer type for CircularMatrixBuffer. */
+
     //=========================================================================================================
     /**
     * Constructs a CircularMatrixBuffer.

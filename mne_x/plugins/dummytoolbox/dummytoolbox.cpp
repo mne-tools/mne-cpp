@@ -86,8 +86,6 @@ DummyToolbox::DummyToolbox()
 DummyToolbox::~DummyToolbox()
 {
     stop();
-
-    delete m_pDummyBuffer;
 }
 
 
@@ -166,7 +164,7 @@ void DummyToolbox::update(Subject* pSubject)
         if(getAcceptorMeasurementBuffer(pMeasurement->getID()))
         {
                 //ToDo: Cast to specific Buffer
-            static_cast<DummyBuffer_old*>(getAcceptorMeasurementBuffer(pMeasurement->getID()))->push(pMeasurement->getValue());//if only every (arraysize)th value is necessary
+            (getAcceptorMeasurementBuffer(pMeasurement->getID())).staticCast<DummyBuffer_old>()->push(pMeasurement->getValue());//if only every (arraysize)th value is necessary
         }
     }
     else
@@ -181,7 +179,7 @@ void DummyToolbox::update(Subject* pSubject)
                     //ToDo: Cast to specific Buffer
                 for(unsigned char i = 0; i < pRTSA->getArraySize(); ++i)
                 {
-                    static_cast<DummyBuffer_old*>(getAcceptorMeasurementBuffer(pRTSA->getID()))
+                    (getAcceptorMeasurementBuffer(pRTSA->getID())).staticCast<DummyBuffer_old>()
                             ->push(pRTSA->getSampleArray()[i]);
                     //m_pDummyMultiChannelBuffer->push(0,pRTSA->getSampleArray()[i]);
                 }
