@@ -111,7 +111,7 @@ bool DacqServer::getMeasInfo(FiffInfo& p_fiffInfo)
     m_pCollectorSock->server_start();
 #endif
 
-    FiffTag* t_pTag = NULL;
+    FiffTag::SPtr t_pTag;
     bool t_bReadHeader = true;
 
     while(t_bReadHeader)
@@ -247,8 +247,6 @@ bool DacqServer::getMeasInfo(FiffInfo& p_fiffInfo)
         }
     }
 
-    delete t_pTag;
-
     printf("\tProcessing channels... ");
     for(qint32 i = 0; i < p_fiffInfo.chs.size(); ++i)
         p_fiffInfo.ch_names.append(p_fiffInfo.chs[i].ch_name);
@@ -350,7 +348,7 @@ void DacqServer::run()
     qint32 nchan = -1;
     float sfreq = -1.0f;
 
-    FiffTag* t_pTag = NULL;
+    FiffTag::SPtr t_pTag;
     
     qint32 t_nSamples = 0;
     qint32 t_nSamplesNew = 0;
@@ -465,8 +463,7 @@ void DacqServer::run()
     
     m_pShmemSock->disconnect_client();
     m_pCollectorSock->close();
-    
-    delete t_pTag;
+
     delete m_pCollectorSock;
     m_pCollectorSock = NULL;
 

@@ -98,7 +98,7 @@ ShmemSocket::~ShmemSocket()
 // client_socket.c
 //=============================================================================================================
 
-int ShmemSocket::receive_tag (FiffTag*& p_pTag)
+int ShmemSocket::receive_tag (FiffTag::SPtr& p_pTag)
 {
     struct  sockaddr_un from;	/* Address (not used) */
     socklen_t fromlen;
@@ -107,9 +107,7 @@ int ShmemSocket::receive_tag (FiffTag*& p_pTag)
     int rlen;
     int data_ok = 0;
 
-    if(p_pTag)
-        delete p_pTag;
-    p_pTag = new FiffTag();
+    p_pTag = FiffTag::SPtr(new FiffTag());
     dacqShmBlock  shmem = this->get_shmem();
     dacqShmBlock  shmBlock;
     dacqShmClient shmClient;
