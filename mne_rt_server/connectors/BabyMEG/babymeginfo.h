@@ -104,6 +104,13 @@ public:
     void MGH_LM_Parse_Para(QByteArray cmdstr);
     //=========================================================================================================
     /**
+    * Send data package
+    *
+    * @param[in] DATA - QByteArray contains MEG data.
+    */
+    void MGH_LM_Send_DataPackage(QByteArray DATA);
+    //=========================================================================================================
+    /**
     * Put data block into a queue
     *
     * @param[in] DataIn - Input Data Block (QByteArray).

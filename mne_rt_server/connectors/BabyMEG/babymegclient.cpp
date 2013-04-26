@@ -407,6 +407,7 @@ void BabyMEGClient::DispatchDataPackage(int tmp)
 //    qDebug()<<"Acq data from buffer  [buffer size() =" << buffer.size()<<"]";
     QByteArray DATA = buffer.left(tmp);
     qDebug()<< "5.Readbytes:"<<DATA.size();
+    myBabyMEGInfo->MGH_LM_Send_DataPackage(DATA);
 //    myBabyMEGInfo->EnQueue(DATA);
     buffer.remove(0,tmp);
 //    qDebug()<<"Rest buffer  [buffer size() =" << buffer.size()<<"]";

@@ -47,6 +47,14 @@ BabyMEGInfo::BabyMEGInfo()
 
 //*************************************************************************************************************
 
+void BabyMEGInfo::MGH_LM_Send_DataPackage(QByteArray DATA)
+{
+    qDebug()<<"Data Size:"<<DATA.size();
+}
+
+
+//*************************************************************************************************************
+
 void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
 {
     chnNum = 400;
