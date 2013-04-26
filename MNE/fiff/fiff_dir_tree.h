@@ -71,7 +71,6 @@ namespace FIFFLIB
 class FiffStream;
 class FiffTag;
 
-
 //=============================================================================================================
 /**
 * Replaces _fiffDirNode struct
@@ -177,7 +176,7 @@ public:
     *
     * @return true if found, false otherwise
     */
-    bool find_tag(FiffStream* p_pStream, fiff_int_t findkind, FiffTag*& p_pTag) const;
+    bool find_tag(FiffStream* p_pStream, fiff_int_t findkind, QSharedPointer<FiffTag>& p_pTag) const;
 
     //=========================================================================================================
     /**

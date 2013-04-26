@@ -556,7 +556,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    inline static bool read_tag(FiffStream* p_pStream, FiffTag*& p_pTag, qint64 pos = -1)
+    inline static bool read_tag(FiffStream* p_pStream, FiffTag::SPtr& p_pTag, qint64 pos = -1)
     {
         return FiffTag::read_tag(p_pStream, p_pTag, pos);
     }
@@ -577,7 +577,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static inline bool read_tag_info(FiffStream* p_pStream, FiffTag*& p_pTag)
+    static inline bool read_tag_info(FiffStream* p_pStream, FiffTag::SPtr& p_pTag)
     {
         return FiffTag::read_tag_info(p_pStream, p_pTag);
     }
