@@ -835,7 +835,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
     //
     //   Locate and read the forward solutions
     //
-    FIFFLIB::FiffTag* t_pTag = NULL;
+    FiffTag::SPtr t_pTag;
     FiffDirTree megnode;
     FiffDirTree eegnode;
     for(qint32 k = 0; k < fwds.size(); ++k)
@@ -937,8 +937,6 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
         //garbage collecting
         if(t_pStream)
             delete t_pStream;
-        if(t_pTag)
-            delete t_pTag;
         return false;
     }
     else
@@ -955,8 +953,6 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
                 //garbage collecting
                 if(t_pStream)
                     delete t_pStream;
-                if(t_pTag)
-                    delete t_pTag;
                 return false;
             }
         }
@@ -1274,8 +1270,6 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
     t_pStream->device()->close();
     if(t_pStream)
         delete t_pStream;
-    if(t_pTag)
-        delete t_pTag;
 
     return true;
 }
@@ -1292,7 +1286,7 @@ bool MNEForwardSolution::read_one(FiffStream* p_pStream, const FiffDirTree& p_No
         return false;
 
     one.clear();
-    FIFFLIB::FiffTag* t_pTag = NULL;
+    FiffTag::SPtr t_pTag;
 
     if(!p_Node.find_tag(p_pStream, FIFF_MNE_SOURCE_ORIENTATION, t_pTag))
     {
@@ -1364,8 +1358,6 @@ bool MNEForwardSolution::read_one(FiffStream* p_pStream, const FiffDirTree& p_No
             //error(me,'Forward solution gradient matrix has wrong dimensions');
         }
     }
-    if (t_pTag)
-        delete t_pTag;
     return true;
 }
 

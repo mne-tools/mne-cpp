@@ -88,12 +88,10 @@ qint32 RtDataClient::getClientId()
 
         this->waitForReadyRead(100);
         // ID is send as answer
-        FiffTag* t_pTag = NULL;
+        FiffTag::SPtr t_pTag;
         FiffTag::read_tag(&t_fiffStream, t_pTag);
         if (t_pTag->kind == FIFF_MNE_RT_CLIENT_ID)
             m_clientID = *t_pTag->toInt();
-
-        delete t_pTag;
     }
     return m_clientID;
 }
@@ -111,7 +109,7 @@ FiffInfo::SPtr RtDataClient::readInfo()
     //
     // Find the start
     //
-    FiffTag* t_pTag = NULL;
+    FiffTag::SPtr t_pTag;
     while(!t_bReadMeasBlockStart)
     {
         FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
@@ -314,10 +312,6 @@ FiffInfo::SPtr RtDataClient::readInfo()
     for (qint32 c = 0; c < p_pFiffInfo->nchan; ++c)
         p_pFiffInfo->ch_names << p_pFiffInfo->chs[c].ch_name;
 
-    //Garbage collecting
-    if(t_pTag)
-        delete t_pTag;
-
     return p_pFiffInfo;
 }
 
@@ -332,7 +326,7 @@ void RtDataClient::readRawBuffer(qint32 p_nChannels, MatrixXf& data, fiff_int_t&
     //
     // Find the start
     //
-    FiffTag* t_pTag = NULL;
+    FiffTag::SPtr t_pTag;
 
     FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
 

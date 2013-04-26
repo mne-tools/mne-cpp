@@ -139,7 +139,7 @@ void FiffStreamThread::stopMeas(qint32 ID)
 
 //*************************************************************************************************************
 
-void FiffStreamThread::parseCommand(FiffTag* p_pTag)
+void FiffStreamThread::parseCommand(FiffTag::SPtr p_pTag)
 {
     if(p_pTag->size() >= 4)
     {
@@ -416,7 +416,7 @@ void FiffStreamThread::run()
 
         if (t_qTcpSocket.bytesAvailable() >= (int)sizeof(qint32)*4)
         {
-            FiffTag* t_pTag = NULL;
+            FiffTag::SPtr t_pTag;
             FiffTag::read_tag_info(&t_FiffStreamIn, t_pTag, false);
 
             //

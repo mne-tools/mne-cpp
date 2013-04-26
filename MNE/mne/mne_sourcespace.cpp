@@ -261,7 +261,7 @@ bool MNESourceSpace::read_source_space(FiffStream* p_pStream, const FiffDirTree&
 {
     p_Hemisphere.clear();
 
-    FIFFLIB::FiffTag* t_pTag = NULL;
+    FiffTag::SPtr t_pTag;
 
     //=====================================================================
     if(!p_Tree.find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_ID, t_pTag))
@@ -431,8 +431,8 @@ bool MNESourceSpace::read_source_space(FiffStream* p_pStream, const FiffDirTree&
     //
     //   Use triangulation
     //
-    FIFFLIB::FiffTag* t_pTag1 = NULL;
-    FIFFLIB::FiffTag* t_pTag2 = NULL;
+    FiffTag::SPtr t_pTag1;
+    FiffTag::SPtr t_pTag2;
     if(!p_Tree.find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NUSE_TRI, t_pTag1) || !p_Tree.find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES, t_pTag2))
     {
         MatrixX3i p_defaultMatrix(0, 0);
@@ -488,10 +488,6 @@ bool MNESourceSpace::read_source_space(FiffStream* p_pStream, const FiffDirTree&
         SparseMatrix<double> distT = p_Hemisphere.dist.transpose();
         p_Hemisphere.dist += distT;
     }
-
-    delete t_pTag2;
-    delete t_pTag1;
-    delete t_pTag;
 
     return true;
 }

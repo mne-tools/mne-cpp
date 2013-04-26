@@ -100,7 +100,7 @@ bool MNE::read_events(QIODevice &p_IODevice, MatrixXi& eventlist)
 
     qint32 k, nelem;
     fiff_int_t kind, pos;
-    FiffTag* t_pTag = NULL;
+    FiffTag::SPtr t_pTag;
     quint32* serial_eventlist = NULL;
     for(k = 0; k < events[0].nent; ++k)
     {
@@ -123,7 +123,7 @@ bool MNE::read_events(QIODevice &p_IODevice, MatrixXi& eventlist)
         delete t_pFile;
 //        delete t_pTree;
 //        delete t_pDir;
-        delete t_pTag;
+//        delete t_pTag;
         printf("Could not find any events\n");
         return false;
     }
@@ -141,7 +141,7 @@ bool MNE::read_events(QIODevice &p_IODevice, MatrixXi& eventlist)
     delete t_pFile;
 //    delete t_pTree;
 //    delete t_pDir;
-    delete t_pTag;
+//    delete t_pTag;
     return true;
 }
 

@@ -297,7 +297,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
     float sfreq = -1.0f;
     QList<FiffChInfo> chs;
     fiff_int_t kind, pos, first, last;
-    FiffTag* t_pTag = NULL;
+    FiffTag::SPtr t_pTag;
     QString comment("");
     qint32 k;
     for (k = 0; k < my_evoked.nent; ++k)
@@ -393,7 +393,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
                 break;
             case FIFF_EPOCH:
                 FiffTag::read_tag(t_pStream, t_pTag, pos);
-                epoch.append(FiffTag(t_pTag));
+                epoch.append(FiffTag(t_pTag.data()));
                 break;
         }
     }
@@ -506,8 +506,6 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
     p_FiffEvoked.data = all_data;
 
     //Garbage collecting
-    if(t_pTag)
-        delete t_pTag;
     if(t_pStream)
         delete t_pStream;
 
