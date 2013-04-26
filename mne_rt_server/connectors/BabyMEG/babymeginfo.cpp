@@ -49,115 +49,197 @@ BabyMEGInfo::BabyMEGInfo()
 
 void BabyMEGInfo::MGH_LM_Send_DataPackage(QByteArray DATA)
 {
-    qDebug()<<"Data Size:"<<DATA.size();
+    qDebug()<<"[BabyMEGInfo]Data Size:"<<DATA.size();
+    emit SendDataPackage(DATA);
 }
 
+//*************************************************************************************************************
+
+QByteArray BabyMEGInfo::MGH_LM_Get_Field(QByteArray cmdstr)
+{
+    bool Start = false;
+    qint32 bPos = 0;
+    qint32 ePos = 0;
+    qint32 cn = 0;
+    for(qint32 i=0;i<cmdstr.size();i++)
+    {
+        if (cmdstr[i] == ':')
+        { // get channel number
+            Start = !Start;
+            if (Start)
+            {
+                bPos = i;
+            }
+            else
+            {
+                ePos = i;
+            }
+            cn ++;
+        }
+        if (cn == 2)
+        { // find the first ":" and the next ":"
+            break;
+        }
+
+    }
+
+    return cmdstr.mid(bPos,ePos-bPos);
+
+}
+
+//*************************************************************************************************************
+
+QStringList BabyMEGInfo::MGH_LM_Exact_Single_Channel_Info(QByteArray cmdstr)
+{
+    QStringList sList;
+    qint32 sp =0;
+    qint32 ep =0;
+    //extract single channel information by char ';'
+    for (qint32 i=0;i<cmdstr.size();i++)
+    {
+        if (cmdstr[i]==';')
+        {
+            ep = i;
+            QString t =  cmdstr.mid(sp,ep-sp);
+            //qDebug()<<"[BabyMEGInfo] chan-name"<<t;
+            sList.append(t);
+            sp = i+1;
+        }
+    }
+
+    return sList;
+
+}
+
+//*************************************************************************************************************
+
+void BabyMEGInfo::MGH_LM_Get_Channel_Info(QByteArray cmdstr)
+{
+    //operation about lm_ch_names
+    if (cmdstr[0]==':')
+        cmdstr.remove(0,1);
+
+    QStringList sList = MGH_LM_Exact_Single_Channel_Info(cmdstr);
+
+    lm_ch_names.clear();
+    // parse the information for each channel
+    for(qint32 k =0; k<sList.size(); k++)
+    {
+        QString t = sList.at(k);
+        for (qint32 z=0;z<t.size();z++)
+        {
+            if (t[z]=='|')
+            {
+                lm_ch_names.append(t.left(z));
+                //qDebug()<<t.left(z);
+            }
+        }
+    }
+    return;
+}
 
 //*************************************************************************************************************
 
 void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
 {
-    chnNum = 400;
-    dataLength = 5000;
 
+    QByteArray CMD = cmdstr.left(4);
+    if (CMD == "INFO")
+    {
+        //remove INFO
+        cmdstr.remove(0,4);
+        //ACQ the number of channels
+        QByteArray T = MGH_LM_Get_Field(cmdstr);
+        cmdstr.remove(0,T.size());
+        T.remove(0,1);
+        chnNum = T.toInt();
+        //ACQ the length of data package
+        T = MGH_LM_Get_Field(cmdstr);
+        cmdstr.remove(0,T.size());
+        T.remove(0,1);
+        dataLength = T.toInt();
+        // ACQ sampling rate
+        T = MGH_LM_Get_Field(cmdstr);
+        cmdstr.remove(0,T.size());
+        T.remove(0,1);
+        sfreq = T.toDouble();
+        qDebug()<<"[babyMEGinfo] chnNum:" << chnNum << "Data Length" <<dataLength<<"sampling rate"<<sfreq;
+        //qDebug()<<"cmdstr"<<cmdstr;
+        // Start to acquire the channel's name and channel's scale
+        MGH_LM_Get_Channel_Info(cmdstr);
 
+    }
+    else
+    {
+        chnNum = 464;
+        dataLength = 5000;
+        sfreq = 10000;
+    }
 
     // Parameters
     m_FiffInfo.file_id.version = 0; //ToDo
 
     m_FiffInfo.meas_date[0] = 0;
     m_FiffInfo.meas_date[1] = 0;
-    m_FiffInfo.sfreq = 10000;
+    m_FiffInfo.sfreq = sfreq;
     m_FiffInfo.highpass = 0;
     m_FiffInfo.lowpass = m_FiffInfo.sfreq/2;
     m_FiffInfo.acq_pars = QString("BabyMEG");
     m_FiffInfo.acq_stim = QString("");
     m_FiffInfo.filename = QString("");
     m_FiffInfo.meas_id.version = 1;
-    m_FiffInfo.nchan = 464;
+    m_FiffInfo.nchan = chnNum; //464;
 
     //MEG
-    for(qint32 i = 0; i < 400; ++i)
+    for(qint32 i = 0; i < chnNum; i++)
     {
         FiffChInfo t_ch;
 
+        t_ch.ch_name = lm_ch_names.at(i); //QString("MEG%1").arg(i);
+        qDebug()<<t_ch.ch_name;
         t_ch.scanno = i;
-        t_ch.logno = i;
+        t_ch.logno = i+1;
         t_ch.cal = 1;
-        t_ch.kind = FIFFV_MEG_CH;
         t_ch.range = 1;
-        t_ch.unit = FIFF_UNITM_T;
-        t_ch.unit_mul = FIFF_UNITM_NONE;
-        t_ch.coil_type = FIFFV_COIL_BABY_MAG;// ToDo FIFFV_COIL_BABY_REF_MAG
-
         t_ch.loc.setZero(12,1);
 
-        t_ch.ch_name = QString("MEG%1").arg(i);
+        QString type = t_ch.ch_name.left(3);
+        int ntype = 0;
+        if (type == "MEG")
+            ntype = 1;
+        else if (type == "EEG")
+            ntype = 2;
+        switch (ntype)
+        {
+        case 1:
+                t_ch.kind = FIFFV_MEG_CH;
+                t_ch.unit = FIFF_UNITM_T;
+                t_ch.unit_mul = FIFF_UNITM_NONE;
+                t_ch.coil_type = FIFFV_COIL_BABY_MAG;// ToDo FIFFV_COIL_BABY_REF_MAG
+            break;
+        case 2:
+                t_ch.kind = FIFFV_EEG_CH;
+                t_ch.unit = FIFF_UNIT_V;
+                t_ch.unit_mul = FIFF_UNITM_NONE;
+                t_ch.coil_type = FIFFV_COIL_EEG;
+            break;
+        default:
+            t_ch.kind = FIFFV_MEG_CH;
+            t_ch.unit = FIFF_UNITM_T;
+            t_ch.unit_mul = FIFF_UNITM_NONE;
+            t_ch.coil_type = FIFFV_COIL_BABY_MAG;// ToDo FIFFV_COIL_BABY_REF_MAG
 
+            break;
+        }
         m_FiffInfo.chs.append(t_ch);
-
         m_FiffInfo.ch_names.append(t_ch.ch_name);
     }
-    //EEG
-    for(qint32 i = 0; i < 64; ++i)
-    {
-        FiffChInfo t_ch;
-
-        t_ch.scanno = 400+i;
-        t_ch.logno = 400+i;
-        t_ch.cal = 1;
-        t_ch.kind = FIFFV_EEG_CH;
-        t_ch.range = 1;
-        t_ch.unit = FIFF_UNIT_V;
-        t_ch.unit_mul = FIFF_UNITM_NONE;
-        t_ch.coil_type = FIFFV_COIL_EEG;
-        t_ch.loc.setZero(12,1);
-
-        t_ch.ch_name = QString("EEG%1").arg(i);
-
-        m_FiffInfo.chs.append(t_ch);
-
-        m_FiffInfo.ch_names.append(t_ch.ch_name);
-    }
-
 
     emit fiffInfoAvailable(m_FiffInfo);
 
     return;
 }
-/*
-void BabyMEGInfo::EnQueue(QByteArray DataIn)
-{
-    g_mutex.lock();
-    if (g_queue.size() == g_maxlen) {
-        qDebug() << "g_queue is full, data lost!";
-    }
-    else
-    {
-        g_queue.enqueue(DataIn);
-        qDebug() << "Data In...[size="<<g_queue.size()<<"]";
-    }
-    g_mutex.unlock();
 
-}
-QByteArray BabyMEGInfo::DeQueue()
-{
-    QByteArray val;
-    g_mutex.lock();
-    if (g_queue.isEmpty()) {
-        qDebug() << "g_queue empty, no data acquired!";
-        val.clear();
-    }
-    else
-    {
-        val = g_queue.dequeue();
-
-    }
-    qDebug() << "Data Out...[size="<<g_queue.size()<<"]";
-    g_mutex.unlock();
-    return val;
-}
-*/
 //*************************************************************************************************************
 
 void BabyMEGInfo::EnQueue(QByteArray DataIn)

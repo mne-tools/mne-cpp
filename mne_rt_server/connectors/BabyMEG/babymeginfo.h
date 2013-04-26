@@ -55,6 +55,7 @@
 #include <QQueue>
 #include <QtCore>
 
+#include <QStringList>
 
 
 using namespace FIFFLIB;
@@ -78,6 +79,8 @@ public:
 public:
     int chnNum;
     int dataLength;
+    double sfreq;
+    QStringList lm_ch_names;
 
     //BB_QUEUE
     QQueue<QByteArray> g_queue;
@@ -93,8 +96,32 @@ public:
 
 signals:
     void fiffInfoAvailable(FIFFLIB::FiffInfo);
+    void SendDataPackage(QByteArray DATA);
 
 public:
+    //=========================================================================================================
+    /**
+    * extract information from string with separate char ":"
+    *
+    * @param[in] cmdstr - QByteArray contains the header information.
+    * @param[out] QByteArray  - returned information.
+    */
+    QStringList MGH_LM_Exact_Single_Channel_Info(QByteArray cmdstr);
+    //=========================================================================================================
+    /**
+    * extract information from string with separate char ":"
+    *
+    * @param[in] cmdstr - QByteArray contains the header information.
+    * @param[out] QByteArray  - returned information.
+    */
+    QByteArray MGH_LM_Get_Field(QByteArray cmdstr);
+    //=========================================================================================================
+    /**
+    * extract channel information from string with separate char ":","|",";"
+    *
+    * @param[in] cmdstr - QByteArray contains the channel information.
+    */
+    void MGH_LM_Get_Channel_Info(QByteArray cmdstr);
     //=========================================================================================================
     /**
     * Parse the information about header information
