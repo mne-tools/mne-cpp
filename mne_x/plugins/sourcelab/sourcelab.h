@@ -152,9 +152,9 @@ private:
 
     AnnotationSet m_annotationSet;  /**< Annotation set. */
 
-    FiffInfo::SPtr m_pFiffInfo;     /**< Fiff information. */
+    FiffInfo::SPtr m_pFiffInfo;    /**< Fiff information. */
 
-    RtCov::SPtr m_pRtCov;           /**< Real time covariance. */
+    RtCov::SPtr m_pRtCov;          /**< Real time covariance. */
 };
 
 } // NAMESPACE

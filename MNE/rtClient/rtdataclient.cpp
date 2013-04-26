@@ -101,9 +101,9 @@ qint32 RtDataClient::getClientId()
 
 //*************************************************************************************************************
 
-FiffInfo RtDataClient::readInfo()
+FiffInfo::SPtr RtDataClient::readInfo()
 {
-    FiffInfo p_FiffInfo;
+    FiffInfo::SPtr p_pFiffInfo(new FiffInfo());
     bool t_bReadMeasBlockStart = false;
     bool t_bReadMeasBlockEnd = false;
 
@@ -141,9 +141,9 @@ FiffInfo RtDataClient::readInfo()
             {
                 FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
                 if(t_pTag->kind == FIFF_DACQ_PARS)
-                    p_FiffInfo.acq_pars = t_pTag->toString();
+                    p_pFiffInfo->acq_pars = t_pTag->toString();
                 else if(t_pTag->kind == FIFF_DACQ_STIM)
-                    p_FiffInfo.acq_stim = t_pTag->toString();
+                    p_pFiffInfo->acq_stim = t_pTag->toString();
             }
         }
         //
@@ -153,12 +153,12 @@ FiffInfo RtDataClient::readInfo()
         {
             if (!dev_head_t_read)
             {
-                p_FiffInfo.dev_head_t = t_pTag->toCoordTrans();
+                p_pFiffInfo->dev_head_t = t_pTag->toCoordTrans();
                 dev_head_t_read = true;
             }
             else if (!ctf_head_t_read)
             {
-                p_FiffInfo.ctf_head_t = t_pTag->toCoordTrans();
+                p_pFiffInfo->ctf_head_t = t_pTag->toCoordTrans();
                 ctf_head_t_read = true;
             }
         }
@@ -172,7 +172,7 @@ FiffInfo RtDataClient::readInfo()
                 FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
 
                 if(t_pTag->kind == FIFF_DIG_POINT)
-                    p_FiffInfo.dig.append(t_pTag->toDigPoint());
+                    p_pFiffInfo->dig.append(t_pTag->toDigPoint());
             }
         }
         //
@@ -186,7 +186,7 @@ FiffInfo RtDataClient::readInfo()
                 if(t_pTag->kind == FIFF_BLOCK_START && *(t_pTag->toInt()) == FIFFB_PROJ_ITEM)
                 {
                     FiffProj proj;
-                    qint32 countProj = p_FiffInfo.projs.size();
+                    qint32 countProj = p_pFiffInfo->projs.size();
                     while(t_pTag->kind != FIFF_BLOCK_END || *(t_pTag->toInt()) != FIFFB_PROJ_ITEM)
                     {
                         FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
@@ -194,27 +194,27 @@ FiffInfo RtDataClient::readInfo()
                         {
                         case FIFF_NAME: // First proj -> Proj is created
                             proj = FiffProj();
-                            p_FiffInfo.projs.append(proj);
-                            p_FiffInfo.projs[countProj].desc = t_pTag->toString();
+                            p_pFiffInfo->projs.append(proj);
+                            p_pFiffInfo->projs[countProj].desc = t_pTag->toString();
                             break;
                         case FIFF_PROJ_ITEM_KIND:
-                            p_FiffInfo.projs[countProj].kind = *(t_pTag->toInt());
+                            p_pFiffInfo->projs[countProj].kind = *(t_pTag->toInt());
                             break;
                         case FIFF_NCHAN: // First data -> FiffNamedMatrix is created
-//                                p_FiffInfo.projs[countProj].data = FiffNamedMatrix();//obsolete
-                            p_FiffInfo.projs[countProj].data->ncol = *(t_pTag->toInt());
+//                                p_pFiffInfo->projs[countProj].data = FiffNamedMatrix();//obsolete
+                            p_pFiffInfo->projs[countProj].data->ncol = *(t_pTag->toInt());
                             break;
                         case FIFF_PROJ_ITEM_NVEC:
-                            p_FiffInfo.projs[countProj].data->nrow = *(t_pTag->toInt());
+                            p_pFiffInfo->projs[countProj].data->nrow = *(t_pTag->toInt());
                             break;
                         case FIFF_MNE_PROJ_ITEM_ACTIVE:
-                            p_FiffInfo.projs[countProj].active = *(t_pTag->toInt());
+                            p_pFiffInfo->projs[countProj].active = *(t_pTag->toInt());
                             break;
                         case FIFF_PROJ_ITEM_CH_NAME_LIST:
-                            p_FiffInfo.projs[countProj].data->col_names = FiffStream::split_name_list(t_pTag->toString());
+                            p_pFiffInfo->projs[countProj].data->col_names = FiffStream::split_name_list(t_pTag->toString());
                             break;
                         case FIFF_PROJ_ITEM_VECTORS:
-                            p_FiffInfo.projs[countProj].data->data = t_pTag->toFloatMatrix().cast<double>();
+                            p_pFiffInfo->projs[countProj].data->data = t_pTag->toFloatMatrix().cast<double>();
                             break;
                         }
                     }
@@ -222,10 +222,10 @@ FiffInfo RtDataClient::readInfo()
             }
         }
         // Check consisty
-        for(qint32 i = 0; i < p_FiffInfo.projs.size(); ++i)
+        for(qint32 i = 0; i < p_pFiffInfo->projs.size(); ++i)
         {
-            if(p_FiffInfo.projs[i].data->data.rows() != p_FiffInfo.projs[i].data->nrow)
-                p_FiffInfo.projs[i].data->data.transposeInPlace();
+            if(p_pFiffInfo->projs[i].data->data.rows() != p_pFiffInfo->projs[i].data->nrow)
+                p_pFiffInfo->projs[i].data->data.transposeInPlace();
         }
 
         //
@@ -239,7 +239,7 @@ FiffInfo RtDataClient::readInfo()
                 if(t_pTag->kind == FIFF_BLOCK_START && *(t_pTag->toInt()) == FIFFB_MNE_CTF_COMP_DATA)
                 {
                     FiffCtfComp comp;
-                    qint32 countComp = p_FiffInfo.comps.size();
+                    qint32 countComp = p_pFiffInfo->comps.size();
                     while(t_pTag->kind != FIFF_BLOCK_END || *(t_pTag->toInt()) != FIFFB_MNE_CTF_COMP_DATA)
                     {
                         FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
@@ -247,14 +247,14 @@ FiffInfo RtDataClient::readInfo()
                         {
                         case FIFF_MNE_CTF_COMP_KIND: //First comp -> create comp
                             comp = FiffCtfComp();
-                            p_FiffInfo.comps.append(comp);
-                            p_FiffInfo.comps[countComp].ctfkind = *(t_pTag->toInt());
+                            p_pFiffInfo->comps.append(comp);
+                            p_pFiffInfo->comps[countComp].ctfkind = *(t_pTag->toInt());
                             break;
                         case FIFF_MNE_CTF_COMP_CALIBRATED:
-                            p_FiffInfo.comps[countComp].save_calibrated = *(t_pTag->toInt());
+                            p_pFiffInfo->comps[countComp].save_calibrated = *(t_pTag->toInt());
                             break;
 //                            case FIFF_MNE_CTF_COMP_DATA:
-//                                p_FiffInfo.comps[countComp]->data = *(t_pTag->toNamedMatrix());
+//                                p_pFiffInfo->comps[countComp]->data = *(t_pTag->toNamedMatrix());
 //                                break;
                         }
                     }
@@ -270,7 +270,7 @@ FiffInfo RtDataClient::readInfo()
             {
                 FiffTag::read_rt_tag(&t_fiffStream, t_pTag);
                 if(t_pTag->kind == FIFF_MNE_CH_NAME_LIST)
-                    p_FiffInfo.bads = FiffStream::split_name_list(t_pTag->data());
+                    p_pFiffInfo->bads = FiffStream::split_name_list(t_pTag->data());
             }
         }
         //
@@ -279,25 +279,25 @@ FiffInfo RtDataClient::readInfo()
         switch(t_pTag->kind)
         {
         case FIFF_SFREQ:
-            p_FiffInfo.sfreq = *(t_pTag->toFloat());
+            p_pFiffInfo->sfreq = *(t_pTag->toFloat());
             break;
         case FIFF_HIGHPASS:
-            p_FiffInfo.highpass = *(t_pTag->toFloat());
+            p_pFiffInfo->highpass = *(t_pTag->toFloat());
             break;
         case FIFF_LOWPASS:
-            p_FiffInfo.lowpass = *(t_pTag->toFloat());
+            p_pFiffInfo->lowpass = *(t_pTag->toFloat());
             break;
         case FIFF_NCHAN:
-            p_FiffInfo.nchan = *(t_pTag->toInt());
+            p_pFiffInfo->nchan = *(t_pTag->toInt());
             break;
         case FIFF_MEAS_DATE:
-            p_FiffInfo.meas_date[0] = t_pTag->toInt()[0];
-            p_FiffInfo.meas_date[1] = t_pTag->toInt()[1];
+            p_pFiffInfo->meas_date[0] = t_pTag->toInt()[0];
+            p_pFiffInfo->meas_date[1] = t_pTag->toInt()[1];
             break;
         }
 
         if (t_pTag->kind == FIFF_CH_INFO)
-            p_FiffInfo.chs.append(t_pTag->toChInfo());
+            p_pFiffInfo->chs.append(t_pTag->toChInfo());
 
         // END MEAS
         if(t_pTag->kind == FIFF_BLOCK_END && *t_pTag->toInt() == FIFFB_MEAS_INFO)
@@ -311,14 +311,14 @@ FiffInfo RtDataClient::readInfo()
     //   Add the channel information and make a list of channel names
     //   for convenience
     //
-    for (qint32 c = 0; c < p_FiffInfo.nchan; ++c)
-        p_FiffInfo.ch_names << p_FiffInfo.chs[c].ch_name;
+    for (qint32 c = 0; c < p_pFiffInfo->nchan; ++c)
+        p_pFiffInfo->ch_names << p_pFiffInfo->chs[c].ch_name;
 
     //Garbage collecting
     if(t_pTag)
         delete t_pTag;
 
-    return p_FiffInfo;
+    return p_pFiffInfo;
 }
 
 

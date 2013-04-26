@@ -129,7 +129,7 @@ public:
     /**
     * Request Fiff Info
     */
-    inline FiffInfo& getFiffInfo();
+    inline FiffInfo::SPtr& getFiffInfo();
 
     //=========================================================================================================
     /**
@@ -163,7 +163,7 @@ private:
     bool        m_bIsRunning;           /**< Holds whether RtClient is running.*/
     QString     m_sClientAlias;         /**< The clien alias of the data client */
     QString     m_sRtServerHostName;    /**< The IP Adress of mne_rt_server.*/
-    FiffInfo    m_fiffInfo;        /**< Fiff measurement info.*/
+    FiffInfo::SPtr  m_pFiffInfo;        /**< Fiff measurement info.*/
 
 signals:
     //=========================================================================================================
@@ -189,9 +189,9 @@ signals:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline FiffInfo& RtClient::getFiffInfo()
+inline FiffInfo::SPtr& RtClient::getFiffInfo()
 {
-    return m_fiffInfo;
+    return m_pFiffInfo;
 }
 
 } // NAMESPACE

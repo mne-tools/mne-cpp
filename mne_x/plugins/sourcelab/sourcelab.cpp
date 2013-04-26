@@ -186,10 +186,8 @@ void SourceLab::update(Subject* pSubject)
                 }
 
                 //Fiff information
-                mutex.lock();
-                if(m_pFiffInfo->isEmpty())
-                    m_pFiffInfo = FiffInfo::SPtr(new FiffInfo(pRTMSANew->getFiffInfo()));
-                mutex.unlock();
+                if(!m_pFiffInfo)
+                    m_pFiffInfo = pRTMSANew->getFiffInfo();
 
                 MatrixXd t_mat(pRTMSANew->getNumChannels(), pRTMSANew->getMultiArraySize());
 
@@ -216,9 +214,9 @@ void SourceLab::run()
     //
     // Cluster forward solution;
     //
-    qDebug() << "Start Clustering";
-    m_clusteredFwd = m_Fwd.cluster_forward_solution(m_annotationSet, 40);
-    qDebug() << "Clustering finished";
+//    qDebug() << "Start Clustering";
+//    m_clusteredFwd = m_Fwd.cluster_forward_solution(m_annotationSet, 40);
+//    qDebug() << "Clustering finished";
 
     //
     // start receiving data
@@ -228,7 +226,7 @@ void SourceLab::run()
     //
     // Read Fiff Info
     //
-    while(m_pFiffInfo->isEmpty())
+    while(!m_pFiffInfo)
     {
         msleep(10);
         qDebug() << "Wait for fiff Info";
@@ -239,7 +237,7 @@ void SourceLab::run()
     //
     // Init Real-Time Covariance estimator
     //
-    m_pRtCov = RtCov::SPtr(new RtCov(1000, m_pFiffInfo));
+//    m_pRtCov = RtCov::SPtr(new RtCov(1000, ));
 
 
 
