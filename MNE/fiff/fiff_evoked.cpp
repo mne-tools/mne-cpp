@@ -170,7 +170,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
     //
     //   Open the file
     //
-    FiffStream* t_pStream = new FiffStream(&p_IODevice);
+    FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
     QString t_sFileName = t_pStream->streamName();
 
     printf("Reading %s ...\n",t_sFileName.toUtf8().constData());
@@ -178,11 +178,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
     QList<FiffDirEntry> t_Dir;
 
     if(!t_pStream->open(t_Tree, t_Dir))
-    {
-        if(t_pStream)
-            delete t_pStream;
         return false;
-    }
     //
     //   Read the measurement info
     //
@@ -197,8 +193,6 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
     QList<FiffDirTree> processed = meas.dir_tree_find(FIFFB_PROCESSED_DATA);
     if (processed.size() == 0)
     {
-        if(t_pStream)
-            delete t_pStream;
         qWarning("Could not find processed data");
         return false;
     }
@@ -206,8 +200,6 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
     QList<FiffDirTree> evoked_node = meas.dir_tree_find(FIFFB_EVOKED);
     if (evoked_node.size() == 0)
     {
-        if(t_pStream)
-            delete t_pStream;
         qWarning("Could not find evoked data");
         return false;
     }
@@ -222,8 +214,6 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
             QString t;
             if(!t_pStream->get_evoked_entries(evoked_node, comments, aspect_kinds, t))
                 t = QString("None found, must use integer");
-            if(t_pStream)
-                delete t_pStream;
             qWarning("%d datasets present, setno parameter must be set. Candidate setno names:\n%s", evoked_node.size(), t.toLatin1().constData());
             return false;
         }
@@ -239,8 +229,6 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
         {
             if(p_aspect_kind != FIFFV_ASPECT_AVERAGE && p_aspect_kind != FIFFV_ASPECT_STD_ERR)
             {
-                if(t_pStream)
-                    delete t_pStream;
                 qWarning("kindStat must be \"FIFFV_ASPECT_AVERAGE\" or \"FIFFV_ASPECT_STD_ERR\"");
                 return false;
             }
@@ -262,8 +250,6 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
             }
             if(!found)
             {
-                if(t_pStream)
-                    delete t_pStream;
                 qWarning() << "setno " << setno << " (" << p_aspect_kind << ") not found, out of found datasets:\n " << t;
                 return false;
             }
@@ -272,8 +258,6 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
 
     if (setno.toInt() >= evoked_node.size() || setno.toInt() < 0)
     {
-        if(t_pStream)
-            delete t_pStream;
         qWarning("Data set selector out of range");
         return false;
     }
@@ -297,7 +281,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
     float sfreq = -1.0f;
     QList<FiffChInfo> chs;
     fiff_int_t kind, pos, first, last;
-    FiffTag* t_pTag = NULL;
+    FiffTag::SPtr t_pTag;
     QString comment("");
     qint32 k;
     for (k = 0; k < my_evoked.nent; ++k)
@@ -307,27 +291,27 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
         switch (kind)
         {
             case FIFF_COMMENT:
-                FiffTag::read_tag(t_pStream,t_pTag,pos);
+                FiffTag::read_tag(t_pStream.data(),t_pTag,pos);
                 comment = t_pTag->toString();
                 break;
             case FIFF_FIRST_SAMPLE:
-                FiffTag::read_tag(t_pStream,t_pTag,pos);
+                FiffTag::read_tag(t_pStream.data(),t_pTag,pos);
                 first = *t_pTag->toInt();
                 break;
             case FIFF_LAST_SAMPLE:
-                FiffTag::read_tag(t_pStream,t_pTag,pos);
+                FiffTag::read_tag(t_pStream.data(),t_pTag,pos);
                 last = *t_pTag->toInt();
                 break;
             case FIFF_NCHAN:
-                FiffTag::read_tag(t_pStream,t_pTag,pos);
+                FiffTag::read_tag(t_pStream.data(),t_pTag,pos);
                 nchan = *t_pTag->toInt();
                 break;
             case FIFF_SFREQ:
-                FiffTag::read_tag(t_pStream,t_pTag,pos);
+                FiffTag::read_tag(t_pStream.data(),t_pTag,pos);
                 sfreq = *t_pTag->toFloat();
                 break;
             case FIFF_CH_INFO:
-                FiffTag::read_tag(t_pStream, t_pTag, pos);
+                FiffTag::read_tag(t_pStream.data(), t_pTag, pos);
                 chs.append( t_pTag->toChInfo() );
                 break;
         }
@@ -342,15 +326,11 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
     {
         if (chs.size() == 0)
         {
-            if(t_pStream)
-                delete t_pStream;
             qWarning("Local channel information was not found when it was expected.");
             return false;
         }
         if (chs.size() != nchan)
         {
-            if(t_pStream)
-                delete t_pStream;
             qWarning("Number of channels and number of channel definitions are different.");
             return false;
         }
@@ -380,20 +360,20 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
         switch (kind)
         {
             case FIFF_COMMENT:
-                FiffTag::read_tag(t_pStream, t_pTag, pos);
+                FiffTag::read_tag(t_pStream.data(), t_pTag, pos);
                 comment = t_pTag->toString();
                 break;
             case FIFF_ASPECT_KIND:
-                FiffTag::read_tag(t_pStream, t_pTag, pos);
+                FiffTag::read_tag(t_pStream.data(), t_pTag, pos);
                 aspect_kind = *t_pTag->toInt();
                 break;
             case FIFF_NAVE:
-                FiffTag::read_tag(t_pStream, t_pTag, pos);
+                FiffTag::read_tag(t_pStream.data(), t_pTag, pos);
                 nave = *t_pTag->toInt();
                 break;
             case FIFF_EPOCH:
-                FiffTag::read_tag(t_pStream, t_pTag, pos);
-                epoch.append(FiffTag(t_pTag));
+                FiffTag::read_tag(t_pStream.data(), t_pTag, pos);
+                epoch.append(FiffTag(t_pTag.data()));
                 break;
         }
     }
@@ -435,8 +415,6 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
     }
     if (all_data.cols() != nsamp)
     {
-        if(t_pStream)
-            delete t_pStream;
         qWarning("Incorrect number of samples (%d instead of %d)", all_data.cols(), nsamp);
         return false;
     }
@@ -504,12 +482,6 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
     p_FiffEvoked.comment = comment;
     p_FiffEvoked.times = times;
     p_FiffEvoked.data = all_data;
-
-    //Garbage collecting
-    if(t_pTag)
-        delete t_pTag;
-    if(t_pStream)
-        delete t_pStream;
 
     return true;
 }

@@ -114,7 +114,7 @@ public:
     *
     * \return Status OK or FAIL.
     */
-    int receive_tag (FiffTag*& p_pTag );
+    int receive_tag (FiffTag::SPtr& p_pTag);
 
     //ToDo Connect is different? to: telnet localhost collector ???
     //=========================================================================================================

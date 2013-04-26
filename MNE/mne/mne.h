@@ -411,7 +411,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_source_spaces(FiffStream*& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNESourceSpace& p_SourceSpace)
+    static bool read_source_spaces(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNESourceSpace& p_SourceSpace)
     {
         return MNESourceSpace::read_source_spaces(p_pStream, add_geom, p_Tree, p_SourceSpace);
     }

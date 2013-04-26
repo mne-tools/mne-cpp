@@ -68,13 +68,11 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtCov::RtCov(FiffInfo &p_fiffInfo, QObject *parent)
+RtCov::RtCov(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent)
 : QThread(parent)
-, m_fiffInfo(p_fiffInfo)
+, m_iMaxSamples(p_iMaxSamples)
+, m_pFiffInfo(p_pFiffInfo)
 , m_bIsRunning(false)
-, m_bIsRawBufferInit(false)
-, m_pRawMatrixBuffer(NULL)
-, m_iMaxSamples(10000)
 {
 
 }
@@ -85,33 +83,17 @@ RtCov::RtCov(FiffInfo &p_fiffInfo, QObject *parent)
 RtCov::~RtCov()
 {
     stop();
-    if(m_pRawMatrixBuffer)
-        delete m_pRawMatrixBuffer;
 }
 
 
 //*************************************************************************************************************
 
-void RtCov::append(const MatrixXf &p_DataSegment)
-{
-
-}
-
-
-//*************************************************************************************************************
-
-void RtCov::receiveDataSegment(MatrixXf p_DataSegment)
+void RtCov::append(const MatrixXd &p_DataSegment)
 {
 //    if(m_pRawMatrixBuffer) // ToDo handle change buffersize
 
     if(!m_pRawMatrixBuffer)
-    {
-        mutex.lock();
-        m_pRawMatrixBuffer = new RawMatrixBuffer(10, p_DataSegment.rows(), p_DataSegment.cols());
-
-        m_bIsRawBufferInit = true;
-        mutex.unlock();
-    }
+        m_pRawMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(32, p_DataSegment.rows(), p_DataSegment.cols()));
 
     m_pRawMatrixBuffer->push(&p_DataSegment);
 }
@@ -142,9 +124,9 @@ void RtCov::run()
 
     while(m_bIsRunning)
     {
-        if(m_bIsRawBufferInit)
+        if(m_pRawMatrixBuffer)
         {
-            MatrixXd rawSegment = m_pRawMatrixBuffer->pop().cast<double>();
+            MatrixXd rawSegment = m_pRawMatrixBuffer->pop();
 
             if(n_samples == 0)
             {
@@ -172,9 +154,9 @@ void RtCov::run()
 
 
                 //ToDo do picks
-                cov.names = m_fiffInfo.ch_names;
-                cov.projs = m_fiffInfo.projs;
-                cov.bads  = m_fiffInfo.bads;
+                cov.names = m_pFiffInfo->ch_names;
+                cov.projs = m_pFiffInfo->projs;
+                cov.bads  = m_pFiffInfo->bads;
                 cov.nfree  = n_samples;
 
                 emit covCalculated(cov);

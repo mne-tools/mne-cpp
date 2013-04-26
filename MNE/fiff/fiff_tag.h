@@ -197,7 +197,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_tag_data(FiffStream* p_pStream, FiffTag*& p_pTag, qint64 pos = -1);
+    static bool read_tag_data(FiffStream* p_pStream, FiffTag::SPtr& p_pTag, qint64 pos = -1);
 
     //=========================================================================================================
     /**
@@ -212,7 +212,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_tag_info(FiffStream* p_pStream, FiffTag*& p_pTag, bool p_bDoSkip = true);
+    static bool read_tag_info(FiffStream* p_pStream, FiffTag::SPtr& p_pTag, bool p_bDoSkip = true);
 
     //=========================================================================================================
     /**
@@ -224,7 +224,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_rt_tag(FiffStream* p_pStream, FiffTag*& p_pTag);
+    static bool read_rt_tag(FiffStream* p_pStream, FiffTag::SPtr& p_pTag);
 
     //=========================================================================================================
     /**
@@ -239,7 +239,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_tag(FiffStream* p_pStream, FiffTag*& p_pTag, qint64 pos = -1);
+    static bool read_tag(FiffStream* p_pStream, FiffTag::SPtr& p_pTag, qint64 pos = -1);
 
     //=========================================================================================================
     /**
@@ -515,7 +515,7 @@ public:
     *
     * @param[in, out] tag    matrix data to convert
     */
-    static void convert_matrix_from_file_data(FiffTag* tag);
+    static void convert_matrix_from_file_data(FiffTag::SPtr tag);
 
     //=========================================================================================================
     /**
@@ -523,7 +523,7 @@ public:
     *
     * @param[in, out] tag    matrix data to convert
     */
-    static void convert_matrix_to_file_data(FiffTag* tag);
+    static void convert_matrix_to_file_data(FiffTag::SPtr tag);
 
     //
     // Data type conversions for the little endian systems.
@@ -542,7 +542,7 @@ public:
     * @param[in] from_endian    from endian encoding
     * @param[in] to_endian      to endian encoding
     */
-    static void convert_tag_data(FiffTag* tag, int from_endian, int to_endian);
+    static void convert_tag_data(FiffTag::SPtr tag, int from_endian, int to_endian);
 
     //
     // from fiff_type_spec.c

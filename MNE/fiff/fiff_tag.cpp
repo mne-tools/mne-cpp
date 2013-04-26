@@ -106,14 +106,14 @@ FiffTag::~FiffTag()
 
 //*************************************************************************************************************
 
-bool FiffTag::read_tag_data(FiffStream* p_pStream, FiffTag*& p_pTag, qint64 pos)
+bool FiffTag::read_tag_data(FiffStream* p_pStream, FiffTag::SPtr& p_pTag, qint64 pos)
 {
-    if (pos >= 0)
+    if(pos >= 0)
     {
         p_pStream->device()->seek(pos);
     }
 
-    if (p_pTag == NULL)
+    if(!p_pTag)
         return false;
 
     //
@@ -134,11 +134,9 @@ bool FiffTag::read_tag_data(FiffStream* p_pStream, FiffTag*& p_pTag, qint64 pos)
 
 //*************************************************************************************************************
 
-bool FiffTag::read_tag_info(FiffStream* p_pStream, FiffTag*& p_pTag, bool p_bDoSkip)
+bool FiffTag::read_tag_info(FiffStream* p_pStream, FiffTag::SPtr &p_pTag, bool p_bDoSkip)
 {
-    if (p_pTag != NULL)
-        delete p_pTag;
-    p_pTag = new FiffTag();
+    p_pTag = FiffTag::SPtr(new FiffTag());
 
     //Option 1
 //    t_DataStream.readRawData((char *)p_pTag, FIFFC_TAG_INFO_SIZE);
@@ -183,7 +181,7 @@ bool FiffTag::read_tag_info(FiffStream* p_pStream, FiffTag*& p_pTag, bool p_bDoS
 
 //*************************************************************************************************************
 
-bool FiffTag::read_rt_tag(FiffStream* p_pStream, FiffTag*& p_pTag)
+bool FiffTag::read_rt_tag(FiffStream* p_pStream, FiffTag::SPtr& p_pTag)
 {
     while(p_pStream->device()->bytesAvailable() < 16)
         p_pStream->device()->waitForReadyRead(10);
@@ -203,16 +201,14 @@ bool FiffTag::read_rt_tag(FiffStream* p_pStream, FiffTag*& p_pTag)
 
 //*************************************************************************************************************
 
-bool FiffTag::read_tag(FiffStream* p_pStream, FiffTag*& p_pTag, qint64 pos)
+bool FiffTag::read_tag(FiffStream* p_pStream, FiffTag::SPtr& p_pTag, qint64 pos)
 {
     if (pos >= 0)
     {
         p_pStream->device()->seek(pos);
     }
 
-    if (p_pTag != NULL)
-        delete p_pTag;
-    p_pTag = new FiffTag();
+    p_pTag = FiffTag::SPtr(new FiffTag());
 
     //
     // Read fiff tag header from stream
@@ -466,7 +462,7 @@ void FiffTag::convert_ch_pos(FiffChPos* pos)
 
 //*************************************************************************************************************
 
-void FiffTag::convert_matrix_from_file_data(FiffTag* tag)
+void FiffTag::convert_matrix_from_file_data(FiffTag::SPtr tag)
 /*
  * Assumes that the input is in the non-native byte order and needs to be swapped to the other one
  */
@@ -541,7 +537,7 @@ void FiffTag::convert_matrix_from_file_data(FiffTag* tag)
 
 //*************************************************************************************************************
 
-void FiffTag::convert_matrix_to_file_data(FiffTag* tag)
+void FiffTag::convert_matrix_to_file_data(FiffTag::SPtr tag)
 /*
  * Assumes that the input is in the NATIVE_ENDIAN byte order and needs to be swapped to the other one
  */
@@ -618,7 +614,7 @@ void FiffTag::convert_matrix_to_file_data(FiffTag* tag)
 
 //*************************************************************************************************************
 //ToDo remove this function by swapping -> define little endian big endian, QByteArray
-void FiffTag::convert_tag_data(FiffTag* tag, int from_endian, int to_endian)
+void FiffTag::convert_tag_data(FiffTag::SPtr tag, int from_endian, int to_endian)
 {
     int            np;
     int            k,r;//,c;

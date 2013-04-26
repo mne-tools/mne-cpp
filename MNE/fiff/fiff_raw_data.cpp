@@ -281,7 +281,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
             }
             else
             {
-                FIFFLIB::FiffTag* t_pTag = NULL;
+                FiffTag::SPtr t_pTag;
                 FiffTag::read_tag(fid.data(), t_pTag, thisRawDir.ent.pos);
                 //
                 //   Depending on the state of the projection and selection
@@ -346,8 +346,6 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
                     else
                         printf("Data Storage Format not known jet [3]!! Type: %d\n", t_pTag->type);
                 }
-                if(t_pTag)
-                    delete t_pTag;
             }
             //
             //  The picking logic is a bit complicated

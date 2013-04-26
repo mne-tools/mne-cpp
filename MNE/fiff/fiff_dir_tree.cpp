@@ -112,7 +112,7 @@ void FiffDirTree::clear()
 
 //*************************************************************************************************************
 
-bool FiffDirTree::copy_tree(FiffStream* p_pStreamIn, FiffId& in_id, QList<FiffDirTree>& p_Nodes, FiffStream* p_pStreamOut)
+bool FiffDirTree::copy_tree(FiffStream::SPtr p_pStreamIn, FiffId& in_id, QList<FiffDirTree>& p_Nodes, FiffStream::SPtr p_pStreamOut)
 {
     if(p_Nodes.size() <= 0)
         return false;
@@ -148,40 +148,40 @@ bool FiffDirTree::copy_tree(FiffStream* p_pStreamIn, FiffId& in_id, QList<FiffDi
             }
 
 //ToDo this is the same like read_tag
-            FiffTag tag;
+            FiffTag::SPtr tag(new FiffTag());
             //QDataStream in(fidin);
-            FiffStream* in = p_pStreamIn;
+            FiffStream::SPtr in = p_pStreamIn;
             in->setByteOrder(QDataStream::BigEndian);
 
             //
             // Read fiff tag header from stream
             //
-            *in >> tag.kind;
-            *in >> tag.type;
+            *in >> tag->kind;
+            *in >> tag->type;
             qint32 size;
             *in >> size;
-            tag.resize(size);
-            *in >> tag.next;
+            tag->resize(size);
+            *in >> tag->next;
 
             //
             // Read data when available
             //
-            if (tag.size() > 0)
+            if (tag->size() > 0)
             {
-                in->readRawData(tag.data(), tag.size());
-                FiffTag::convert_tag_data(&tag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
+                in->readRawData(tag->data(), tag->size());
+                FiffTag::convert_tag_data(tag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
             }
 
             //QDataStream out(p_pStreamOut);
-            FiffStream* out = p_pStreamOut;
+            FiffStream::SPtr out = p_pStreamOut;
             out->setByteOrder(QDataStream::BigEndian);
 
-            *out << (qint32)tag.kind;
-            *out << (qint32)tag.type;
-            *out << (qint32)tag.size();
+            *out << (qint32)tag->kind;
+            *out << (qint32)tag->type;
+            *out << (qint32)tag->size();
             *out << (qint32)FIFFV_NEXT_SEQ;
 
-            out->writeRawData(tag.data(),tag.size());
+            out->writeRawData(tag->data(),tag->size());
         }
         for(p = 0; p < p_Nodes[k].nchild; ++p)
         {
@@ -203,7 +203,7 @@ qint32 FiffDirTree::make_dir_tree(FiffStream* p_pStream, QList<FiffDirEntry>& p_
 //        delete p_pTree;
     p_Tree.clear();
 
-    FIFFLIB::FiffTag* t_pTag = NULL;
+    FiffTag::SPtr t_pTag;
 
     qint32 block;
     if(p_Dir[start].kind == FIFF_BLOCK_START)
@@ -284,8 +284,6 @@ qint32 FiffDirTree::make_dir_tree(FiffStream* p_pStream, QList<FiffDirEntry>& p_
 //    qDebug() << "block =" << p_pTree->block << "nent =" << p_pTree->nent << "nchild =" << p_pTree->nchild;
 //    qDebug() << "end } " << block;
 
-    delete t_pTag;
-
     return current;
 }
 
@@ -308,7 +306,7 @@ QList<FiffDirTree> FiffDirTree::dir_tree_find(fiff_int_t p_kind) const
 
 //*************************************************************************************************************
 
-bool FiffDirTree::find_tag(FiffStream* p_pStream, fiff_int_t findkind, FiffTag*& p_pTag) const
+bool FiffDirTree::find_tag(FiffStream* p_pStream, fiff_int_t findkind, FiffTag::SPtr& p_pTag) const
 {
     for (qint32 p = 0; p < this->nent; ++p)
     {
@@ -318,11 +316,9 @@ bool FiffDirTree::find_tag(FiffStream* p_pStream, fiff_int_t findkind, FiffTag*&
           return true;
        }
     }
-    if (p_pTag != NULL)
-    {
-        delete p_pTag;
-        p_pTag = NULL;
-    }
+    if (p_pTag)
+        p_pTag.clear();
+
     return false;
 }
 
