@@ -96,17 +96,17 @@ void RealTimeMultiSampleArrayNew::init(unsigned int uiNumChannels)
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayNew::initFromFiffInfo(const FiffInfo &p_FiffInfo)
+void RealTimeMultiSampleArrayNew::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
 {
     m_qListChInfo.clear();
 
-    for(qint32 i = 0; i < p_FiffInfo.nchan; ++i)
+    for(qint32 i = 0; i < p_pFiffInfo->nchan; ++i)
     {
         RealTimeSampleArrayChInfo initChInfo;
-        initChInfo.setChannelName(p_FiffInfo.chs[i].ch_name);
+        initChInfo.setChannelName(p_pFiffInfo->chs[i].ch_name);
 
         //Unit
-        switch(p_FiffInfo.chs[i].unit)
+        switch(p_pFiffInfo->chs[i].unit)
         {
             case 101:
                 initChInfo.setUnit("Hz");
@@ -176,10 +176,10 @@ void RealTimeMultiSampleArrayNew::initFromFiffInfo(const FiffInfo &p_FiffInfo)
     }
 
     //Sampling rate
-    m_dSamplingRate = p_FiffInfo.sfreq;
+    m_dSamplingRate = p_pFiffInfo->sfreq;
 
 
-    m_FiffInfo_orig = p_FiffInfo;
+    m_pFiffInfo_orig = p_pFiffInfo;
 }
 
 

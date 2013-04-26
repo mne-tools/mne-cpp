@@ -126,7 +126,7 @@ public:
     *
     * @return the read fiff measurement information
     */
-    FiffInfo readInfo();
+    FiffInfo::SPtr readInfo();
 
     //=========================================================================================================
     /**

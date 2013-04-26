@@ -108,9 +108,9 @@ public:
     /**
     * Init channel infos using fiff info
     *
-    * @param[in] p_FiffInfo     Info to init from
+    * @param[in] p_pFiffInfo     Info to init from
     */
-    void initFromFiffInfo(const FiffInfo &p_FiffInfo);
+    void initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -150,7 +150,7 @@ public:
     *
     * @return the reference to the orig FiffInfo.
     */
-    inline FiffInfo& getFiffInfo();
+    inline FiffInfo::SPtr& getFiffInfo();
 
     //=========================================================================================================
     /**
@@ -195,7 +195,7 @@ public:
     virtual VectorXd getValue() const;
 
 private:
-    FiffInfo    m_FiffInfo_orig;    /**< Original Fiff Info if initialized by fiff info. */
+    FiffInfo::SPtr    m_pFiffInfo_orig;    /**< Original Fiff Info if initialized by fiff info. */
 
     double                      m_dSamplingRate;    /**< Sampling rate of the RealTimeSampleArray.*/
     VectorXd                    m_vecValue;         /**< The current attached sample vector.*/
@@ -242,9 +242,9 @@ inline QList<RealTimeSampleArrayChInfo>& RealTimeMultiSampleArrayNew::chInfo()
 
 //*************************************************************************************************************
 
-inline FiffInfo& RealTimeMultiSampleArrayNew::getFiffInfo()
+inline FiffInfo::SPtr& RealTimeMultiSampleArrayNew::getFiffInfo()
 {
-    return m_FiffInfo_orig;
+    return m_pFiffInfo_orig;
 }
 
 
