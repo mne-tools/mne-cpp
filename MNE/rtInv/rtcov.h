@@ -115,9 +115,11 @@ public:
     /**
     * Creates the real-time covariance estimation object.
     *
+    * @param[in] p_iMaxSamples      Number of samples to use for each data chunk
+    * @param[in] p_pFiffInfo        Associated Fiff Information
     * @param[in] parent     Parent QObject (optional)
     */
-    explicit RtCov(FiffInfo &p_fiffInfo, QObject *parent = 0);
+    explicit RtCov(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -131,10 +133,7 @@ public:
     *
     * @param[in] p_DataSegment  Data to estimate the covariance from -> ToDo Replace this by shared data pointer
     */
-    void append(const MatrixXf &p_DataSegment);
-
-    void receiveDataSegment(MatrixXf p_DataSegment);
-
+    void append(const MatrixXd &p_DataSegment);
 
     //=========================================================================================================
     /**
@@ -154,15 +153,14 @@ protected:
     virtual void run();
 
 private:
-    FiffInfo    m_fiffInfo;             /**< Holds the fiff measurement information. */
+    FiffInfo::SPtr  m_pFiffInfo;        /**< Holds the fiff measurement information. */
 
     QMutex      mutex;                  /**< Provides access serialization between threads*/
     bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
-    bool        m_bIsRawBufferInit;     /**< If raw buffer is initialized.*/
 
     quint32      m_iMaxSamples;         /**< Maximal amount of samples received, before covariance is estimated.*/
 
-    RawMatrixBuffer* m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
+    CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;   /**< The Circular Raw Matrix Buffer. */
 
 signals:
     //=========================================================================================================

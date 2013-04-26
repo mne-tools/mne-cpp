@@ -173,7 +173,7 @@ void RtServerProducer::run()
         if(m_bFlagInfoRequest)
         {
             m_pRtServer->rtServerMutex.lock();
-            m_pRtServer->m_fiffInfo = m_pRtDataClient->readInfo();
+            m_pRtServer->m_pFiffInfo = m_pRtDataClient->readInfo();
             emit m_pRtServer->fiffInfoAvailable();
             m_pRtServer->rtServerMutex.unlock();
 
@@ -184,12 +184,12 @@ void RtServerProducer::run()
 
         if(m_bFlagMeasuring)
         {
-            m_pRtDataClient->readRawBuffer(m_pRtServer->m_fiffInfo.nchan, t_matRawBuffer, kind);
+            m_pRtDataClient->readRawBuffer(m_pRtServer->m_pFiffInfo->nchan, t_matRawBuffer, kind);
 
             if(kind == FIFF_DATA_BUFFER)
             {
                 to += t_matRawBuffer.cols();
-//                printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, ((float)from)/m_pRtServer->m_fiffInfo.sfreq, ((float)to)/m_pRtServer->m_fiffInfo.sfreq);
+//                printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, ((float)from)/m_pRtServer->m_pFiffInfo->sfreq, ((float)to)/m_pRtServer->m_pFiffInfo->sfreq);
                 from += t_matRawBuffer.cols();
 
                 m_pRtServer->m_pRawMatrixBuffer_In->push(&t_matRawBuffer);

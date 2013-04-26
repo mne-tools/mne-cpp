@@ -74,8 +74,8 @@ using namespace XMEASLIB;
 
 DummyToolbox::DummyToolbox()
 : m_pDummy_Output(0)
-, m_pDummyBuffer(new DummyBuffer_old(1024))
-, m_pDummyMultiChannelBuffer(new _double_CircularMultiChannelBuffer_old(2, 1024))
+, m_pDummyBuffer(new CircularBuffer_old<double>(1024))
+, m_pDummyMultiChannelBuffer(new CircularMultiChannelBuffer_old<double>(2, 1024))
 {
     m_PLG_ID = PLG_ID::DUMMYTOOL;
 }
@@ -86,8 +86,6 @@ DummyToolbox::DummyToolbox()
 DummyToolbox::~DummyToolbox()
 {
     stop();
-
-    delete m_pDummyBuffer;
 }
 
 
@@ -166,7 +164,7 @@ void DummyToolbox::update(Subject* pSubject)
         if(getAcceptorMeasurementBuffer(pMeasurement->getID()))
         {
                 //ToDo: Cast to specific Buffer
-            static_cast<DummyBuffer_old*>(getAcceptorMeasurementBuffer(pMeasurement->getID()))->push(pMeasurement->getValue());//if only every (arraysize)th value is necessary
+            getAcceptorMeasurementBuffer(pMeasurement->getID()).staticCast<DummyBuffer_old>()->push(pMeasurement->getValue());//if only every (arraysize)th value is necessary
         }
     }
     else
@@ -181,7 +179,7 @@ void DummyToolbox::update(Subject* pSubject)
                     //ToDo: Cast to specific Buffer
                 for(unsigned char i = 0; i < pRTSA->getArraySize(); ++i)
                 {
-                    static_cast<DummyBuffer_old*>(getAcceptorMeasurementBuffer(pRTSA->getID()))
+                    getAcceptorMeasurementBuffer(pRTSA->getID()).staticCast<DummyBuffer_old>()
                             ->push(pRTSA->getSampleArray()[i]);
                     //m_pDummyMultiChannelBuffer->push(0,pRTSA->getSampleArray()[i]);
                 }
@@ -246,7 +244,8 @@ void DummyToolbox::init()
 
 
     this->addPlugin(PLG_ID::ECGSIM); //ToDo This should be obsolete -  measurement ID should be sufficient -> solve this by adding measurement IDs to subject?? attach observers to subjects with corresponding ID
-    this->addAcceptorMeasurementBuffer(MSR_ID::ECGSIM_I, m_pDummyBuffer);
+    Buffer::SPtr t_buf = m_pDummyBuffer.staticCast<Buffer>(); //unix fix
+    this->addAcceptorMeasurementBuffer(MSR_ID::ECGSIM_I, t_buf);
 
     m_pDummy_Output = addProviderRealTimeSampleArray(MSR_ID::DUMMYTOOL_OUTPUT);
     m_pDummy_Output->setName("Dummy Output");
@@ -256,7 +255,8 @@ void DummyToolbox::init()
     m_pDummy_Output->setSamplingRate(256.0/1.0);
 
 
-    this->addAcceptorMeasurementBuffer(MSR_ID::ECGSIM_II, m_pDummyMultiChannelBuffer);
+    t_buf = m_pDummyMultiChannelBuffer.staticCast<Buffer>(); //unix fix
+    this->addAcceptorMeasurementBuffer(MSR_ID::ECGSIM_II, t_buf);
 
     m_pDummy_MSA_Output = addProviderRealTimeMultiSampleArray(MSR_ID::DUMMYTOOL_OUTPUT_II, 2);
     m_pDummy_MSA_Output->setName("Dummy Output II");

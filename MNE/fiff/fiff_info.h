@@ -61,8 +61,6 @@
 
 #include <QList>
 #include <QStringList>
-#include <QSharedData>
-#include <QSharedDataPointer>
 #include <QSharedPointer>
 
 

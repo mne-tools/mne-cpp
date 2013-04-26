@@ -43,6 +43,7 @@
 //=============================================================================================================
 
 #include "generics_global.h"
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -62,6 +63,8 @@ namespace IOBuffer
 class GENERICSSHARED_EXPORT Buffer
 {
 public:
+    typedef QSharedPointer<Buffer> SPtr;              /**< Shared pointer type for Buffer. */
+    typedef QSharedPointer<const Buffer> ConstSPtr;   /**< Const shared pointer type for Buffer. */
 
     //=========================================================================================================
     /**
@@ -70,6 +73,7 @@ public:
     * @param [in] type_id pointer to RTTI type_id of the variables of the buffer.
     */
     Buffer(const char* type_id) : m_cTypeId(type_id) {};
+
     //=========================================================================================================
     /**
     * Returns the type_id of the current Buffer.

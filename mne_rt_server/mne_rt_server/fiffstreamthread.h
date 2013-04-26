@@ -53,6 +53,7 @@
 #include <QThread>
 #include <QTcpSocket>
 #include <QMutex>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -94,7 +95,7 @@ public:
 //    void deactivateRawBufferSending();
 
 
-    void parseCommand(FiffTag* p_pTag);
+    void parseCommand(QSharedPointer<FiffTag> p_pTag);
 
     void writeClientId();
 

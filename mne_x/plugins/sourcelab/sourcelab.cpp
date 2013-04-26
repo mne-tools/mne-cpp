@@ -73,8 +73,7 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 SourceLab::SourceLab()
-: m_pSourceLabBuffer(NULL)
-, m_bIsRunning(false)
+: m_bIsRunning(false)
 , m_qFileFwdSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
 , m_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot")
 {
@@ -91,9 +90,6 @@ SourceLab::SourceLab()
 SourceLab::~SourceLab()
 {
     stop();
-
-    if(m_pSourceLabBuffer)
-        delete m_pSourceLabBuffer;
 }
 
 
@@ -171,37 +167,29 @@ void SourceLab::update(Subject* pSubject)
     {
         RealTimeMultiSampleArrayNew* pRTMSANew = static_cast<RealTimeMultiSampleArrayNew*>(pSubject);
 
-        //Using fast Hash Lookup instead of if then else clause
-        if(getAcceptorMeasurementBuffer(pRTMSANew->getID()))
+
+        if(pRTMSANew->getID() == MSR_ID::MEGRTSERVER_OUTPUT)
         {
-            if(pRTMSANew->getID() == MSR_ID::MEGRTSERVER_OUTPUT)
+            //Check if buffer initialized
+            if(!m_pSourceLabBuffer)
             {
-                //Check if buffer initialized
-                if(m_pSourceLabBuffer->size() == 0)
-                {
-                    mutex.lock();
-                    delete m_pSourceLabBuffer;
-                    m_pSourceLabBuffer = new _double_CircularMatrixBuffer(64, pRTMSANew->getNumChannels(), pRTMSANew->getMultiArraySize());
-                    mutex.unlock();
-                }
-
-                //Fiff information
-                mutex.lock();
-                if(m_fiffInfo.isEmpty())
-                    m_fiffInfo = pRTMSANew->getFiffInfo();
-                mutex.unlock();
-
-                MatrixXd t_mat(pRTMSANew->getNumChannels(), pRTMSANew->getMultiArraySize());
-
-                //ToDo: Cast to specific Buffer
-                for(unsigned char i = 0; i < pRTMSANew->getMultiArraySize(); ++i)
-                    t_mat.col(i) = pRTMSANew->getMultiSampleArray()[i];
-
-//                static_cast<_double_CircularMatrixBuffer*>(getAcceptorMeasurementBuffer(pRTMSANew->getID()))
-//                        ->push(&t_mat);
-                m_pSourceLabBuffer->push(&t_mat);
-
+                m_pSourceLabBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSANew->getNumChannels(), pRTMSANew->getMultiArraySize()));
+                Buffer::SPtr t_buf = m_pSourceLabBuffer.staticCast<Buffer>();// unix fix
+                setAcceptorMeasurementBuffer(pRTMSANew->getID(), t_buf);
             }
+
+            //Fiff information
+            if(!m_pFiffInfo)
+                m_pFiffInfo = pRTMSANew->getFiffInfo();
+
+            MatrixXd t_mat(pRTMSANew->getNumChannels(), pRTMSANew->getMultiArraySize());
+
+            //ToDo: Cast to specific Buffer
+            for(unsigned char i = 0; i < pRTMSANew->getMultiArraySize(); ++i)
+                t_mat.col(i) = pRTMSANew->getMultiSampleArray()[i];
+
+            getAcceptorMeasurementBuffer(pRTMSANew->getID()).staticCast<CircularMatrixBuffer<double> >()
+                    ->push(&t_mat);
         }
 
     }
@@ -216,25 +204,32 @@ void SourceLab::run()
     //
     // Cluster forward solution;
     //
-    qDebug() << "Start Clustering";
-    m_clusteredFwd = m_Fwd.cluster_forward_solution(m_annotationSet, 40);
-    qDebug() << "Clustering finished";
+//    qDebug() << "Start Clustering";
+//    m_clusteredFwd = m_Fwd.cluster_forward_solution(m_annotationSet, 40);
+//    qDebug() << "Clustering finished";
 
     //
     // start receiving data
     //
     m_bIsRunning = true;
 
-
-    while(m_fiffInfo.isEmpty())
+    //
+    // Read Fiff Info
+    //
+    while(!m_pFiffInfo)
     {
         msleep(10);
         qDebug() << "Wait for fiff Info";
     }
 
-
     qDebug() << "Fiff Info received.";
 
+    //
+    // Init Real-Time Covariance estimator
+    //
+    m_pRtCov = RtCov::SPtr(new RtCov(1000, m_pFiffInfo));
+
+    m_pRtCov->start();
 
 
     qint32 count = 0;
@@ -250,10 +245,7 @@ void SourceLab::run()
 
 
 
-
-        mutex.lock();
         qint32 nrows = m_pSourceLabBuffer->rows();
-        mutex.unlock();
 
         if(nrows > 0) // check if init
         {
@@ -261,6 +253,9 @@ void SourceLab::run()
 
 
             qDebug() << count << ": m_pSourceLabBuffer->pop(); Matrix:" << t_mat.rows() << "x" << t_mat.cols();
+
+            m_pRtCov->append(t_mat);
+
 
             ++count;
         }
@@ -277,13 +272,13 @@ void SourceLab::init()
 {
     //Delete Buffer - will be initailzed with first incoming data
     if(m_pSourceLabBuffer)
-        delete m_pSourceLabBuffer;
-    m_pSourceLabBuffer = new _double_CircularMatrixBuffer(0,0,0); // Init later
+        m_pSourceLabBuffer = CircularMatrixBuffer<double>::SPtr();
 
     qDebug() << "#### SourceLab Init; MEGRTSERVER_OUTPUT: " << MSR_ID::MEGRTSERVER_OUTPUT;
 
     this->addPlugin(PLG_ID::RTSERVER);
-    this->addAcceptorMeasurementBuffer(MSR_ID::MEGRTSERVER_OUTPUT, m_pSourceLabBuffer);
+    Buffer::SPtr t_buf = m_pSourceLabBuffer.staticCast<Buffer>(); //unix fix
+    this->addAcceptorMeasurementBuffer(MSR_ID::MEGRTSERVER_OUTPUT, t_buf);
 
 //    m_pDummy_MSA_Output = addProviderRealTimeMultiSampleArray(MSR_ID::DUMMYTOOL_OUTPUT_II, 2);
 //    m_pDummy_MSA_Output->setName("Dummy Output II");

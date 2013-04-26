@@ -101,7 +101,7 @@ void BabyMEGProducer::run()
 
     // reopen file in this thread
     QFile t_File(m_pBabyMEG->m_RawInfo.info.filename);
-    FiffStream::SPtr p_pStream = FiffStream::SPtr(new FiffStream(&t_File));
+    FiffStream::SPtr p_pStream(new FiffStream(&t_File));
     m_pBabyMEG->m_RawInfo.file = p_pStream;
 
     //

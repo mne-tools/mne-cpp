@@ -138,7 +138,7 @@ public:
     *
     * @param[in] p_pIODevice    A fiff IO device like a fiff QFile or QTCPSocket
     */
-    explicit FiffStream(QIODevice* p_pIODevice);
+    explicit FiffStream(QIODevice *p_pIODevice);
 
     //=========================================================================================================
     /**
@@ -380,11 +380,11 @@ public:
     *
     * Opens a fiff file for writing and writes the compulsory header tags
     *
-    * @param[in] p_pIODevice    The IODevice (like QFile or QTCPSocket) to open. It is recommended that the name ends with .fif
+    * @param[in] p_IODevice    The IODevice (like QFile or QTCPSocket) to open. It is recommended that the name ends with .fif
     *
     * @return The opened file.
     */
-    static FiffStream* start_file(QIODevice* p_pIODevice);
+    static FiffStream::SPtr start_file(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**
@@ -394,14 +394,14 @@ public:
     *
     * function [fid,cals] = fiff_start_writing_raw(name,info,sel)
     *
-    * @param[in] p_pIODevice    A fiff IO device like a fiff QFile or QTCPSocket
+    * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
     * @param[in] info           The measurement info block of the source file
     * @param[out] cals          Thecalibration matrix
     * @param[in] sel            Which channels will be included in the output file (optional)
     *
     * @return the started fiff file
     */
-    static FiffStream* start_writing_raw(QIODevice* p_pIODevice, const FiffInfo& info, MatrixXd& cals, MatrixXi sel = defaultMatrixXi);
+    static FiffStream::SPtr start_writing_raw(QIODevice &p_IODevice, const FiffInfo& info, MatrixXd& cals, MatrixXi sel = defaultMatrixXi);
 
     //=========================================================================================================
     /**

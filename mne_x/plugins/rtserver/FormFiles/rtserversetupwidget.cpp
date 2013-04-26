@@ -227,8 +227,8 @@ void RtServerSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
         //
         // set frequency txt
         //
-        if(!m_pRtServer->m_fiffInfo.isEmpty())
-            this->ui.m_qLabel_sps->setText(QString("%1").arg(m_pRtServer->m_fiffInfo.sfreq));
+        if(m_pRtServer->m_pFiffInfo)
+            this->ui.m_qLabel_sps->setText(QString("%1").arg(m_pRtServer->m_pFiffInfo->sfreq));
 
         //
         // set buffer size txt
@@ -286,8 +286,8 @@ void RtServerSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
 
 void RtServerSetupWidget::fiffInfoReceived()
 {
-    if(!m_pRtServer->m_fiffInfo.isEmpty())
-        this->ui.m_qLabel_sps->setText(QString("%1").arg(m_pRtServer->m_fiffInfo.sfreq));
+    if(m_pRtServer->m_pFiffInfo)
+        this->ui.m_qLabel_sps->setText(QString("%1").arg(m_pRtServer->m_pFiffInfo->sfreq));
 }
 
 

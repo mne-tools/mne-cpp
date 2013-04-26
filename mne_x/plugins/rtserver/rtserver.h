@@ -225,7 +225,7 @@ private:
     QMap<qint32, QString> m_qMapConnectors; /**< Connector map.*/
     qint32 m_iActiveConnectorId;            /**< The active connector.*/
 
-    FiffInfo    m_fiffInfo;                 /**< Fiff measurement info.*/
+    FiffInfo::SPtr m_pFiffInfo;             /**< Fiff measurement info.*/
     qint32 m_iBufferSize;                   /**< The raw data buffer size.*/
 
     QTimer m_cmdConnectionTimer;            /**< Timer for convinient command client connection. When timer times out a connection is tried to be established. */

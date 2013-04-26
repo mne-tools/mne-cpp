@@ -135,7 +135,7 @@ void RtServer::changeConnector(qint32 p_iNewConnectorId)
         //
         // Read Info
         //
-        if(m_fiffInfo.isEmpty())
+        if(!m_pFiffInfo)
             requestInfo();
 
         //
@@ -152,7 +152,7 @@ void RtServer::changeConnector(qint32 p_iNewConnectorId)
 
 void RtServer::clear()
 {
-    m_fiffInfo.clear ();
+    m_pFiffInfo.reset();
     m_iBufferSize = -1;
 }
 
@@ -191,7 +191,7 @@ void RtServer::connectCmdClient()
             //
             // Read Info
             //
-            if(m_fiffInfo.isEmpty())
+            if(!m_pFiffInfo)
                 requestInfo();
 
             //
@@ -251,7 +251,7 @@ void RtServer::requestInfo()
 
 bool RtServer::start()
 {
-    if(m_bCmdClientIsConnected && !m_fiffInfo.isEmpty())
+    if(m_bCmdClientIsConnected && m_pFiffInfo)
     {
         // Initialize real time measurements
         init();
@@ -263,7 +263,7 @@ bool RtServer::start()
         // Buffer
         if(m_pRawMatrixBuffer_In)
             delete m_pRawMatrixBuffer_In;
-        m_pRawMatrixBuffer_In = new RawMatrixBuffer(8,m_fiffInfo.nchan,m_iBufferSize);
+        m_pRawMatrixBuffer_In = new RawMatrixBuffer(8,m_pFiffInfo->nchan,m_iBufferSize);
 
         // Start threads
         QThread::start();
@@ -355,10 +355,10 @@ void RtServer::init()
 {
     qDebug() << "RtServer::init()";
 
-    if(!m_fiffInfo.isEmpty())
+    if(m_pFiffInfo)
     {
         m_pRTMSA_RtServer = addProviderRealTimeMultiSampleArray_New(MSR_ID::MEGRTSERVER_OUTPUT);
-        m_pRTMSA_RtServer->initFromFiffInfo(m_fiffInfo);
+        m_pRTMSA_RtServer->initFromFiffInfo(m_pFiffInfo);
         m_pRTMSA_RtServer->setMultiArraySize(10);
         m_pRTMSA_RtServer->setVisibility(true);
     }

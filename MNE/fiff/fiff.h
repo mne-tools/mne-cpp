@@ -140,7 +140,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    inline static bool copy_tree(FiffStream* p_pStreamIn, FiffId& in_id, QList<FiffDirTree>& p_Nodes, FiffStream* p_pStreamOut)
+    inline static bool copy_tree(FiffStream::SPtr p_pStreamIn, FiffId& in_id, QList<FiffDirTree>& p_Nodes, FiffStream::SPtr p_pStreamOut)
     {
         return FiffDirTree::copy_tree(p_pStreamIn, in_id, p_Nodes, p_pStreamOut);
     }
@@ -266,19 +266,16 @@ public:
     *
     * Opens a fif file and provides the directory of tags
     *
-    * @param[in] p_pIODevice    A fiff IO device like a fiff QFile or QTCPSocket
+    * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
     * @param[out] p_pStream     file which is openened
     * @param[out] p_Tree       tag directory organized into a tree
     * @param[out] p_Dir        the sequential tag directory
     *
     * @return true if succeeded, false otherwise
     */
-    static bool open(QIODevice* p_pIODevice, FiffStream*& p_pStream, FiffDirTree& p_Tree, QList<FiffDirEntry>& p_Dir)
+    static bool open(QIODevice& p_IODevice, FiffStream::SPtr& p_pStream, FiffDirTree& p_Tree, QList<FiffDirEntry>& p_Dir)
     {
-        if(p_pStream)
-            delete p_pStream;
-
-        p_pStream = new FiffStream(p_pIODevice);
+        p_pStream = FiffStream::SPtr(new FiffStream(&p_IODevice));
 
         return p_pStream->open(p_Tree, p_Dir);
     }
@@ -556,7 +553,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    inline static bool read_tag(FiffStream* p_pStream, FiffTag*& p_pTag, qint64 pos = -1)
+    inline static bool read_tag(FiffStream* p_pStream, FiffTag::SPtr& p_pTag, qint64 pos = -1)
     {
         return FiffTag::read_tag(p_pStream, p_pTag, pos);
     }
@@ -577,7 +574,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static inline bool read_tag_info(FiffStream* p_pStream, FiffTag*& p_pTag)
+    static inline bool read_tag_info(FiffStream* p_pStream, FiffTag::SPtr& p_pTag)
     {
         return FiffTag::read_tag_info(p_pStream, p_pTag);
     }
@@ -650,13 +647,13 @@ public:
     *
     * Opens a fiff file for writing and writes the compulsory header tags
     *
-    * @param[in] p_pIODevice   A fiff IO device like a fiff QFile or QTCPSocket
+    * @param[in] p_IODevice   A fiff IO device like a fiff QFile or QTCPSocket
     *
     * @return The opened file.
     */
-    inline static FiffStream* start_file(QIODevice* p_pIODevice)
+    inline static FiffStream::SPtr start_file(QIODevice& p_IODevice)
     {
-        return FiffStream::start_file(p_pIODevice);
+        return FiffStream::start_file(p_IODevice);
     }
 
     //=========================================================================================================
@@ -669,16 +666,16 @@ public:
     *
     * function [fid,cals] = fiff_start_writing_raw(name,info,sel)
     *
-    * @param[in] p_pIODevice    A fiff IO device like a fiff QFile or QTCPSocket
+    * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
     * @param[in] info           The measurement info block of the source file
     * @param[out] cals          Thecalibration matrix
     * @param[in] sel            Which channels will be included in the output file (optional)
     *
     * @return the started fiff file
     */
-    inline static FiffStream* start_writing_raw(QIODevice* p_pIODevice, const FiffInfo& info, MatrixXd& cals, MatrixXi sel = defaultMatrixXi)
+    inline static FiffStream::SPtr start_writing_raw(QIODevice &p_IODevice, const FiffInfo& info, MatrixXd& cals, MatrixXi sel = defaultMatrixXi)
     {
-        return FiffStream::start_writing_raw(p_pIODevice, info, cals, sel);
+        return FiffStream::start_writing_raw(p_IODevice, info, cals, sel);
     }
 
     //=========================================================================================================

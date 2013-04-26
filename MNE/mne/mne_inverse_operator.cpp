@@ -741,18 +741,13 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //
     //   Open the file, create directory
     //
-    FiffStream* t_pStream = new FiffStream(&p_IODevice);
+    FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
     printf("Reading inverse operator decomposition from %s...\n",t_pStream->streamName().toUtf8().constData());
     FiffDirTree t_Tree;
     QList<FiffDirEntry> t_Dir;
 
     if(!t_pStream->open(t_Tree, t_Dir))
-    {
-        if(t_pStream)
-            delete t_pStream;
-
         return false;
-    }
     //
     //   Find all inverse operators
     //
@@ -760,8 +755,6 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     if ( invs_list.size()== 0)
     {
         printf("No inverse solutions in %s\n", t_pStream->streamName().toUtf8().constData());
-        if(t_pStream)
-            delete t_pStream;
         return false;
     }
     FiffDirTree* invs = &invs_list[0];
@@ -772,46 +765,32 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     if (parent_mri.size() == 0)
     {
         printf("No parent MRI information in %s", t_pStream->streamName().toUtf8().constData());
-        if(t_pStream)
-            delete t_pStream;
         return false;
     }
     printf("\tReading inverse operator info...");
     //
     //   Methods and source orientations
     //
-    FiffTag* t_pTag = NULL;
-    if (!invs->find_tag(t_pStream, FIFF_MNE_INCLUDED_METHODS, t_pTag))
+    FiffTag::SPtr t_pTag;
+    if (!invs->find_tag(t_pStream.data(), FIFF_MNE_INCLUDED_METHODS, t_pTag))
     {
         printf("Modalities not found\n");
-        if(t_pTag)
-            delete t_pTag;
-        if(t_pStream)
-            delete t_pStream;
         return false;
     }
 
     inv = MNEInverseOperator();
     inv.methods = *t_pTag->toInt();
     //
-    if (!invs->find_tag(t_pStream, FIFF_MNE_SOURCE_ORIENTATION, t_pTag))
+    if (!invs->find_tag(t_pStream.data(), FIFF_MNE_SOURCE_ORIENTATION, t_pTag))
     {
         printf("Source orientation constraints not found\n");
-        if(t_pTag)
-            delete t_pTag;
-        if(t_pStream)
-            delete t_pStream;
         return false;
     }
     inv.source_ori = *t_pTag->toInt();
     //
-    if (!invs->find_tag(t_pStream, FIFF_MNE_SOURCE_SPACE_NPOINTS, t_pTag))
+    if (!invs->find_tag(t_pStream.data(), FIFF_MNE_SOURCE_SPACE_NPOINTS, t_pTag))
     {
         printf("Number of sources not found\n");
-        if(t_pTag)
-            delete t_pTag;
-        if(t_pStream)
-            delete t_pStream;
         return false;
     }
     inv.nsource = *t_pTag->toInt();
@@ -819,26 +798,18 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //
     //   Coordinate frame
     //
-    if (!invs->find_tag(t_pStream, FIFF_MNE_COORD_FRAME, t_pTag))
+    if (!invs->find_tag(t_pStream.data(), FIFF_MNE_COORD_FRAME, t_pTag))
     {
         printf("Coordinate frame tag not found\n");
-        if(t_pTag)
-            delete t_pTag;
-        if(t_pStream)
-            delete t_pStream;
         return false;
     }
     inv.coord_frame = *t_pTag->toInt();
     //
     //   The actual source orientation vectors
     //
-    if (!invs->find_tag(t_pStream, FIFF_MNE_INVERSE_SOURCE_ORIENTATIONS, t_pTag))
+    if (!invs->find_tag(t_pStream.data(), FIFF_MNE_INVERSE_SOURCE_ORIENTATIONS, t_pTag))
     {
         printf("Source orientation information not found\n");
-        if(t_pTag)
-            delete t_pTag;
-        if(t_pStream)
-            delete t_pStream;
         return false;
     }
 
@@ -852,13 +823,9 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //   The SVD decomposition...
     //
     printf("\tReading inverse operator decomposition...");
-    if (!invs->find_tag(t_pStream, FIFF_MNE_INVERSE_SING, t_pTag))
+    if (!invs->find_tag(t_pStream.data(), FIFF_MNE_INVERSE_SING, t_pTag))
     {
         printf("Singular values not found\n");
-        if(t_pTag)
-            delete t_pTag;
-        if(t_pStream)
-            delete t_pStream;
         return false;
     }
 
@@ -870,16 +837,12 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //   The eigenleads and eigenfields
     //
     inv.eigen_leads_weighted = false;
-    if(!Fiff::read_named_matrix(t_pStream, *invs, FIFF_MNE_INVERSE_LEADS, *inv.eigen_leads.data()))
+    if(!t_pStream->read_named_matrix(*invs, FIFF_MNE_INVERSE_LEADS, *inv.eigen_leads.data()))
     {
         inv.eigen_leads_weighted = true;
-        if(!Fiff::read_named_matrix(t_pStream, *invs, FIFF_MNE_INVERSE_LEADS_WEIGHTED, *inv.eigen_leads.data()))
+        if(!t_pStream->read_named_matrix(*invs, FIFF_MNE_INVERSE_LEADS_WEIGHTED, *inv.eigen_leads.data()))
         {
             printf("Error reading eigenleads named matrix.\n");
-            if(t_pTag)
-                delete t_pTag;
-            if(t_pStream)
-                delete t_pStream;
             return false;
         }
     }
@@ -888,14 +851,9 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //
     inv.eigen_leads->transpose_named_matrix();
 
-
-    if(!Fiff::read_named_matrix(t_pStream, *invs, FIFF_MNE_INVERSE_FIELDS, *inv.eigen_fields.data()))
+    if(!t_pStream->read_named_matrix(*invs, FIFF_MNE_INVERSE_FIELDS, *inv.eigen_fields.data()))
     {
         printf("Error reading eigenfields named matrix.\n");
-        if(t_pTag)
-            delete t_pTag;
-        if(t_pStream)
-            delete t_pStream;
         return false;
     }
     printf("[done]\n");
@@ -909,10 +867,6 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     else
     {
         printf("\tError: Not able to read noise covariance matrix.\n");
-        if(t_pTag)
-            delete t_pTag;
-        if(t_pStream)
-            delete t_pStream;
         return false;
     }
 
@@ -923,10 +877,6 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     else
     {
         printf("\tError: Not able to read source covariance matrix.\n");
-        if(t_pTag)
-            delete t_pTag;
-        if(t_pStream)
-            delete t_pStream;
         return false;
     }
     //
@@ -961,10 +911,6 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     if(!MNESourceSpace::read_source_spaces(t_pStream, false, t_Tree, inv.src))
     {
         printf("\tError: Could not read the source spaces.\n");
-        if(t_pTag)
-            delete t_pTag;
-        if(t_pStream)
-            delete t_pStream;
         return false;
     }
     for (qint32 k = 0; k < inv.src.size(); ++k)
@@ -973,13 +919,9 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //   Get the MRI <-> head coordinate transformation
     //
     FiffCoordTrans mri_head_t;// = NULL;
-    if (!parent_mri[0].find_tag(t_pStream, FIFF_COORD_TRANS, t_pTag))
+    if (!parent_mri[0].find_tag(t_pStream.data(), FIFF_COORD_TRANS, t_pTag))
     {
         printf("MRI/head coordinate transformation not found\n");
-        if(t_pTag)
-            delete t_pTag;
-        if(t_pStream)
-            delete t_pStream;
         return false;
     }
     else
@@ -993,10 +935,6 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
                 printf("MRI/head coordinate transformation not found");
 //                if(mri_head_t)
 //                    delete mri_head_t;
-                if(t_pTag)
-                    delete t_pTag;
-                if(t_pStream)
-                    delete t_pStream;
                 return false;
             }
         }
@@ -1013,13 +951,7 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //   if necessary
     //
     if (inv.coord_frame != FIFFV_COORD_MRI && inv.coord_frame != FIFFV_COORD_HEAD)
-    {
         printf("Only inverse solutions computed in MRI or head coordinates are acceptable");
-        if(t_pTag)
-            delete t_pTag;
-        if(t_pStream)
-            delete t_pStream;
-    }
     //
     //  Number of averages is initially one
     //
@@ -1045,10 +977,6 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //
     //   Done!
     //
-    if(t_pTag)
-        delete t_pTag;
-    if(t_pStream)
-        delete t_pStream;
 
     return true;
 }
@@ -1063,7 +991,7 @@ void MNEInverseOperator::write_inverse_operator(QIODevice &p_IODevice)
     //
 
     // Create the file and save the essentials
-    FiffStream* t_pStream = FiffStream::start_file(&p_IODevice);
+    FiffStream::SPtr t_pStream = FiffStream::start_file(p_IODevice);
     printf("Write inverse operator decomposition in %s...", t_pStream->streamName().toUtf8().constData());
 
     t_pStream->start_block(FIFFB_MNE_INVERSE_SOLUTION);
@@ -1132,7 +1060,7 @@ void MNEInverseOperator::write_inverse_operator(QIODevice &p_IODevice)
     //   Write the source spaces
     //
     if(!src.isEmpty())
-        this->src.write_to_stream(t_pStream);
+        this->src.write_to_stream(t_pStream.data());
 
     //
     //  We also need the SSP operator
@@ -1143,6 +1071,4 @@ void MNEInverseOperator::write_inverse_operator(QIODevice &p_IODevice)
     //
     t_pStream->end_block(FIFFB_MNE_INVERSE_SOLUTION);
     t_pStream->end_file();
-
-    delete t_pStream;
 }

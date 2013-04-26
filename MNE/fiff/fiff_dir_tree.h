@@ -71,7 +71,6 @@ namespace FIFFLIB
 class FiffStream;
 class FiffTag;
 
-
 //=============================================================================================================
 /**
 * Replaces _fiffDirNode struct
@@ -123,7 +122,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool copy_tree(FiffStream* p_pStreamIn, FiffId& in_id, QList<FiffDirTree>& p_Nodes, FiffStream* p_pStreamOut);
+    static bool copy_tree(QSharedPointer<FiffStream> p_pStreamIn, FiffId& in_id, QList<FiffDirTree>& p_Nodes, QSharedPointer<FiffStream> p_pStreamOut);
 
     //=========================================================================================================
     /**
@@ -177,7 +176,7 @@ public:
     *
     * @return true if found, false otherwise
     */
-    bool find_tag(FiffStream* p_pStream, fiff_int_t findkind, FiffTag*& p_pTag) const;
+    bool find_tag(FiffStream* p_pStream, fiff_int_t findkind, QSharedPointer<FiffTag>& p_pTag) const;
 
     //=========================================================================================================
     /**
