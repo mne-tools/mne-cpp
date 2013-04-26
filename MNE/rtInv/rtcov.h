@@ -111,7 +111,6 @@ public:
     typedef QSharedPointer<RtCov> SPtr;             /**< Shared pointer type for RtCov. */
     typedef QSharedPointer<const RtCov> ConstSPtr;  /**< Const shared pointer type for RtCov. */
 
-
     //=========================================================================================================
     /**
     * Creates the real-time covariance estimation object.

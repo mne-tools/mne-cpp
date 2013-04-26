@@ -142,7 +142,8 @@ public:
     * @param [in] id of measurement which should be added.
     * @param [in] buffer pointer to the corresponding buffer of the accepted measurement.
     */
-    void addAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id, Buffer::SPtr buffer);
+    void addAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id, Buffer::SPtr &buffer);
+
     //=========================================================================================================
     /**
     * Returns accepted measurements.
@@ -150,6 +151,7 @@ public:
     * @return id's of measurements which are accepted.
     */
     inline QList<MSR_ID::Measurement_ID> getAcceptorMeasurement_IDs() const;
+
     //=========================================================================================================
     /**
     * Returns the buffer of a specific accepted measurement.
@@ -158,6 +160,15 @@ public:
     * @return the buffer of the requested measurement.
     */
     Buffer::SPtr getAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id);
+
+    //=========================================================================================================
+    /**
+    * Sets the buffer of a specific accepted measurement.
+    *
+    * @param[in] id         of measurement of which the buffer should be returned.
+    * @param[in] buffer     the new measurement buffer
+    */
+    void setAcceptorMeasurementBuffer(MSR_ID::Measurement_ID id, Buffer::SPtr &buffer);
 
     //=========================================================================================================
     /**

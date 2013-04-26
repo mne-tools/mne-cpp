@@ -73,6 +73,7 @@ public:
     * @param [in] type_id pointer to RTTI type_id of the variables of the buffer.
     */
     Buffer(const char* type_id) : m_cTypeId(type_id) {};
+
     //=========================================================================================================
     /**
     * Returns the type_id of the current Buffer.
