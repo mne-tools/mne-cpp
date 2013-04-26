@@ -98,6 +98,7 @@ BabyMEG::BabyMEG()
     //BabyMEG Inits
     pInfo = new BabyMEGInfo();
     connect(pInfo, &BabyMEGInfo::fiffInfoAvailable, this, &BabyMEG::setFiffInfo);
+    connect(pInfo, &BabyMEGInfo::SendDataPackage, this, &BabyMEG::setFiffData);
 
     myClient = new BabyMEGClient(6340,this);
     myClient->SetInfo(pInfo);
@@ -106,10 +107,8 @@ BabyMEG::BabyMEG()
     myClientComm->SetInfo(pInfo);
     myClientComm->start();
 
-
-
-//    myClient->ConnectToBabyMEG();
-
+    myClient->ConnectToBabyMEG();
+    myClient->DisConnectBabyMEG();
 
     this->init();
 }
@@ -227,6 +226,11 @@ void BabyMEG::setFiffInfo(FiffInfo p_FiffInfo)
     m_FiffInfoBabyMEG = p_FiffInfo;
 }
 
+void BabyMEG::setFiffData(QByteArray DATA)
+{
+    qDebug()<<"[BabyMEG]Data Size:"<<DATA.size();
+
+}
 
 //*************************************************************************************************************
 

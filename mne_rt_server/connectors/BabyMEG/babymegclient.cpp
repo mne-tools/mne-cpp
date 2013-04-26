@@ -187,7 +187,7 @@ void BabyMEGClient::ConnectToBabyMEG()
 
     for(int i=0;i<5;i++){
         tcpSocket->connectToHost(name,port,QIODevice::ReadWrite);
-        if (tcpSocket->waitForConnected(10000))
+        if (tcpSocket->waitForConnected(5000))
         {
             SocketIsConnected = true;
             qDebug("Connect to BabyMEG Server ... Ok");
@@ -407,6 +407,7 @@ void BabyMEGClient::DispatchDataPackage(int tmp)
 //    qDebug()<<"Acq data from buffer  [buffer size() =" << buffer.size()<<"]";
     QByteArray DATA = buffer.left(tmp);
     qDebug()<< "5.Readbytes:"<<DATA.size();
+    myBabyMEGInfo->MGH_LM_Send_DataPackage(DATA);
 //    myBabyMEGInfo->EnQueue(DATA);
     buffer.remove(0,tmp);
 //    qDebug()<<"Rest buffer  [buffer size() =" << buffer.size()<<"]";

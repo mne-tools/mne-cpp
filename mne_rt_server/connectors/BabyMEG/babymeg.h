@@ -137,6 +137,7 @@ public:
 
 
     void setFiffInfo(FIFFLIB::FiffInfo);
+    void setFiffData(QByteArray DATA);
 
 protected:
     virtual void run();
