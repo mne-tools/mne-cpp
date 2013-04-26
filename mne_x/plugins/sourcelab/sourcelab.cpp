@@ -174,7 +174,8 @@ void SourceLab::update(Subject* pSubject)
             if(!m_pSourceLabBuffer)
             {
                 m_pSourceLabBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSANew->getNumChannels(), pRTMSANew->getMultiArraySize()));
-                setAcceptorMeasurementBuffer(pRTMSANew->getID(), m_pSourceLabBuffer.staticCast<Buffer>());
+                Buffer::SPtr t_buf = m_pSourceLabBuffer.staticCast<Buffer>();// unix fix
+                setAcceptorMeasurementBuffer(pRTMSANew->getID(), t_buf);
             }
 
             //Fiff information
@@ -276,7 +277,8 @@ void SourceLab::init()
     qDebug() << "#### SourceLab Init; MEGRTSERVER_OUTPUT: " << MSR_ID::MEGRTSERVER_OUTPUT;
 
     this->addPlugin(PLG_ID::RTSERVER);
-    this->addAcceptorMeasurementBuffer(MSR_ID::MEGRTSERVER_OUTPUT, m_pSourceLabBuffer.staticCast<Buffer>());
+    Buffer::SPtr t_buf = m_pSourceLabBuffer.staticCast<Buffer>(); //unix fix
+    this->addAcceptorMeasurementBuffer(MSR_ID::MEGRTSERVER_OUTPUT, t_buf);
 
 //    m_pDummy_MSA_Output = addProviderRealTimeMultiSampleArray(MSR_ID::DUMMYTOOL_OUTPUT_II, 2);
 //    m_pDummy_MSA_Output->setName("Dummy Output II");

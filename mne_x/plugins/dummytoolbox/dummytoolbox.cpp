@@ -244,7 +244,8 @@ void DummyToolbox::init()
 
 
     this->addPlugin(PLG_ID::ECGSIM); //ToDo This should be obsolete -  measurement ID should be sufficient -> solve this by adding measurement IDs to subject?? attach observers to subjects with corresponding ID
-    this->addAcceptorMeasurementBuffer(MSR_ID::ECGSIM_I, m_pDummyBuffer.staticCast<Buffer>());
+    Buffer::SPtr t_buf = m_pDummyBuffer.staticCast<Buffer>(); //unix fix
+    this->addAcceptorMeasurementBuffer(MSR_ID::ECGSIM_I, t_buf);
 
     m_pDummy_Output = addProviderRealTimeSampleArray(MSR_ID::DUMMYTOOL_OUTPUT);
     m_pDummy_Output->setName("Dummy Output");
@@ -254,7 +255,8 @@ void DummyToolbox::init()
     m_pDummy_Output->setSamplingRate(256.0/1.0);
 
 
-    this->addAcceptorMeasurementBuffer(MSR_ID::ECGSIM_II, m_pDummyMultiChannelBuffer.staticCast<Buffer>());
+    t_buf = m_pDummyMultiChannelBuffer.staticCast<Buffer>(); //unix fix
+    this->addAcceptorMeasurementBuffer(MSR_ID::ECGSIM_II, t_buf);
 
     m_pDummy_MSA_Output = addProviderRealTimeMultiSampleArray(MSR_ID::DUMMYTOOL_OUTPUT_II, 2);
     m_pDummy_MSA_Output->setName("Dummy Output II");
