@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     sourcelabrunwidget.h
+* @file     rtave.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*
 * @version  1.0
-* @date     February, 2013
+* @date     July, 2012
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +30,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the SourceLabRunWidget class.
+* @brief     implementation of the RtCov Class.
 *
 */
-
-#ifndef SOURCELABRUNWIDGET_H
-#define SOURCELABRUNWIDGET_H
 
 
 //*************************************************************************************************************
@@ -42,7 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_sourcelabrun.h"
+#include "rtave.h"
 
 
 //*************************************************************************************************************
@@ -50,24 +48,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE SourceLabPlugin
-//=============================================================================================================
-
-namespace SourceLabPlugin
-{
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class SourceLab;
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -75,58 +56,77 @@ class SourceLab;
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace RTINVLIB;
+using namespace FIFFLIB;
 
+
+//*************************************************************************************************************
 //=============================================================================================================
-/**
-* DECLARE CLASS SourceLabRunWidget
-*
-* @brief The SourceLabRunWidget class provides the SourceLab configuration window for the run mode.
-*/
-class SourceLabRunWidget : public QWidget
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+RtAve::RtAve(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent)
+: QThread(parent)
+, m_iMaxSamples(p_iMaxSamples)
+, m_pFiffInfo(p_pFiffInfo)
+, m_bIsRunning(false)
 {
-    Q_OBJECT
+    qRegisterMetaType<FiffEvoked::SPtr>("FiffEvoked::SPtr");
+}
 
-public:
 
-    //=========================================================================================================
-    /**
-    * Constructs a SourceLabRunWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding SourceLab.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummyRunWidget becomes a window. If parent is another widget, DummyRunWidget becomes a child window inside parent. DummyRunWidget is deleted when its parent is deleted.
-    */
-    SourceLabRunWidget(SourceLab* toolbox, QWidget *parent = 0);
+//*************************************************************************************************************
 
-    //=========================================================================================================
-    /**
-    * Destroys the SourceLabRunWidget.
-    * All SourceLabRunWidget's children are deleted first. The application exits if SourceLabRunWidget is the main widget.
-    */
-    ~SourceLabRunWidget();
+RtAve::~RtAve()
+{
+    stop();
+}
 
-    //=========================================================================================================
-    /**
-    * Writes to SourceLab run log
-    *
-    * @param[in] p_sLogMsg     status message to append
-    */
-    void writeToLog(QString p_sLogMsg);
 
-private slots:
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
+//*************************************************************************************************************
 
-private:
+void RtAve::append(const MatrixXd &p_DataSegment)
+{
+//    if(m_pRawMatrixBuffer) // ToDo handle change buffersize
 
-    SourceLab*    m_pSourceLab;     /**< Holds a pointer to corresponding DummyToolbox.*/
+    if(!m_pRawMatrixBuffer)
+        m_pRawMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(128, p_DataSegment.rows(), p_DataSegment.cols()));
 
-    Ui::SourceLabRunWidgetClass ui; /**< Holds the user interface for the DummyRunWidget.*/
-};
+    m_pRawMatrixBuffer->push(&p_DataSegment);
+}
 
-} // NAMESPACE
 
-#endif // SOURCELABRUNWIDGET_H
+//*************************************************************************************************************
+
+bool RtAve::stop()
+{
+    m_bIsRunning = false;
+    QThread::wait();
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+void RtAve::run()
+{
+    m_bIsRunning = true;
+
+
+    quint32 n_samples = 0;
+
+    FiffEvoked::SPtr evoked(new FiffEvoked());
+    VectorXd mu;
+
+    while(m_bIsRunning)
+    {
+        if(m_pRawMatrixBuffer)
+        {
+            MatrixXd rawSegment = m_pRawMatrixBuffer->pop();
+
+
+            emit evokedCalculated(evoked);
+        }
+    }
+}

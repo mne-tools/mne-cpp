@@ -77,6 +77,7 @@ using namespace XMEASLIB;
 
 SourceLab::SourceLab()
 : m_bIsRunning(false)
+, m_bReceiveData(false)
 , m_qFileFwdSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
 , m_pFwd(new MNEForwardSolution(m_qFileFwdSolution))
 , m_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot")
@@ -109,6 +110,8 @@ bool SourceLab::start()
 
 bool SourceLab::stop()
 {
+    m_bIsRunning = false;
+
     // Stop threads
     QThread::terminate();
     QThread::wait();
@@ -116,10 +119,13 @@ bool SourceLab::stop()
     if(m_pRtCov->isRunning())
         m_pRtCov->stop();
 
+    if(m_pRtInvOp->isRunning())
+        m_pRtInvOp->stop();
+
     if(m_pSourceLabBuffer)
         m_pSourceLabBuffer->clear();
 
-    m_bIsRunning = false;
+    m_bReceiveData = false;
 
     return true;
 }
@@ -166,7 +172,7 @@ void SourceLab::update(Subject* pSubject)
     Measurement* meas = static_cast<Measurement*>(pSubject);
 
     //MEG
-    if(!meas->isSingleChannel() && m_bIsRunning)
+    if(!meas->isSingleChannel() && m_bReceiveData)
     {
         RealTimeMultiSampleArrayNew* pRTMSANew = static_cast<RealTimeMultiSampleArrayNew*>(pSubject);
 
@@ -232,17 +238,19 @@ void SourceLab::updateInvOp(MNEInverseOperator::SPtr p_pInvOp)
 
 void SourceLab::run()
 {
+    m_bIsRunning = true;
+
     //
     // Cluster forward solution;
     //
-    qDebug() << "Start Clustering";
+    emit statMsg("Start Clustering");
     m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(m_annotationSet, 40)));
-    qDebug() << "Clustering finished";
+    emit statMsg("Clustering finished");
 
     //
     // start receiving data
     //
-    m_bIsRunning = true;
+    m_bReceiveData = true;
 
     //
     // Read Fiff Info
@@ -267,6 +275,9 @@ void SourceLab::run()
     m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pClusteredFwd, this));
     connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated, this, &SourceLab::updateInvOp);
 
+    //
+    // Start the rt helpers
+    //
     m_pRtCov->start();
     m_pRtInvOp->start();
 

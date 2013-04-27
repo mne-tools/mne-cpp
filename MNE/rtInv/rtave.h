@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     sourcelab.h
+* @file     rtave.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     July, 2012
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,33 +29,35 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the SourceLab class.
+* @brief     RtAve class declaration.
 *
 */
 
-#ifndef SOURCELAB_H
-#define SOURCELAB_H
-
+#ifndef RTAVE_H
+#define RTAVE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "sourcelab_global.h"
-#include <mne_x/Interfaces/IRTAlgorithm.h>
+#include "rtinv_global.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FIFF INCLUDES
+//=============================================================================================================
+
+#include <fiff/fiff_evoked.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Generics INCLUDES
+//=============================================================================================================
 
 #include <generics/circularmatrixbuffer.h>
-
-#include <fs/annotationset.h>
-#include <fiff/fiff_info.h>
-#include <mne/mne_forwardsolution.h>
-#include <inverse/sourceestimate.h>
-#include <inverse/minimumNorm/minimumnorm.h>
-#include <rtInv/rtcov.h>
-#include <rtInv/rtinvop.h>
-
-#include <xMeas/Measurement/realtimemultisamplearray.h>
 
 
 //*************************************************************************************************************
@@ -63,16 +65,25 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-#include <QFile>
+#include <QThread>
+#include <QMutex>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE SourceLabPlugin
+// Eigen INCLUDES
 //=============================================================================================================
 
-namespace SourceLabPlugin
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE INVRTLIB
+//=============================================================================================================
+
+namespace RTINVLIB
 {
 
 
@@ -81,120 +92,108 @@ namespace SourceLabPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FSLIB;
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace INVERSELIB;
-using namespace RTINVLIB;
-using namespace MNEX;
+using namespace Eigen;
 using namespace IOBuffer;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
+using namespace FIFFLIB;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS SourceLab
+* Real-time averaging and returns evoked data
 *
-* @brief The SourceLab class provides a dummy algorithm structure.
+* @brief Real-time averaging helper
 */
-class SOURCELABSHARED_EXPORT SourceLab : public IRTAlgorithm
+class RTINVSHARED_EXPORT RtAve : public QThread
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "sourcelab.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::IRTAlgorithm)
-
 public:
+    typedef QSharedPointer<RtAve> SPtr;             /**< Shared pointer type for RtCov. */
+    typedef QSharedPointer<const RtAve> ConstSPtr;  /**< Const shared pointer type for RtCov. */
 
     //=========================================================================================================
     /**
-    * Constructs a SourceLab.
+    * Creates the real-time covariance estimation object.
+    *
+    * @param[in] p_iMaxSamples      Number of samples to use for each data chunk
+    * @param[in] p_pFiffInfo        Associated Fiff Information
+    * @param[in] parent     Parent QObject (optional)
     */
-    SourceLab();
+    explicit RtAve(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent = 0);
+
     //=========================================================================================================
     /**
-    * Destroys the SourceLab.
+    * Destroys the Real-time covariance estimation object.
     */
-    ~SourceLab();
+    ~RtAve();
 
-    virtual bool start();
+    //=========================================================================================================
+    /**
+    * Slot to receive incoming data.
+    *
+    * @param[in] p_DataSegment  Data to estimate the covariance from -> ToDo Replace this by shared data pointer
+    */
+    void append(const MatrixXd &p_DataSegment);
+
+    //=========================================================================================================
+    /**
+    * Stops the RtCov by stopping the producer's thread.
+    *
+    * @return true if succeeded, false otherwise
+    */
     virtual bool stop();
 
-    virtual Type getType() const;
-    virtual const char* getName() const;
-
-    virtual QWidget* setupWidget();
-    virtual QWidget* runWidget();
-
-    virtual void update(Subject* pSubject);
-
-//slot
     //=========================================================================================================
     /**
-    * Slot to update the fiff covariance
+    * Returns true if is running, otherwise false.
     *
-    * @param[in] p_pFiffCov    The covariance to update
+    * @return true if is running, false otherwise
     */
-    void updateFiffCov(FiffCov::SPtr p_pFiffCov);
-
-    //=========================================================================================================
-    /**
-    * Slot to update the inverse operator
-    *
-    * @param[in] p_pInvOp    The inverse operator to update
-    */
-    void updateInvOp(MNEInverseOperator::SPtr p_pInvOp);
+    inline bool isRunning();
 
 signals:
     //=========================================================================================================
     /**
-    * Emits status messages
+    * Signal which is emitted when new evoked data are available.
     *
-    * @param[in] p_qStringMsg   The status message
+    * @param[out] p_pEvoked     The evoked data
     */
-    void statMsg(QString p_qStringMsg);
+    void evokedCalculated(FIFFLIB::FiffEvoked::SPtr p_pEvoked);
 
 protected:
+    //=========================================================================================================
+    /**
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread.
+    */
     virtual void run();
 
 private:
-    //=========================================================================================================
-    /**
-    * Initialise the SourceLab.
-    */
-    void init();
+    FiffInfo::SPtr  m_pFiffInfo;        /**< Holds the fiff measurement information. */
 
-    QMutex mutex;
+    QMutex      mutex;                  /**< Provides access serialization between threads*/
+    bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
 
-    CircularMatrixBuffer<double>::SPtr m_pSourceLabBuffer;   /**< Holds incoming rt server data.*/
+    quint32      m_iMaxSamples;         /**< Maximal amount of samples received, before covariance is estimated.*/
 
-    bool m_bIsRunning;      /**< If source lab is running */
-    bool m_bReceiveData;    /**< If thread is ready to receive data */
-
-    //MNE stuff
-    QFile m_qFileFwdSolution;           /**< File to forward solution. */
-    MNEForwardSolution::SPtr m_pFwd;            /**< Forward solution. */
-    MNEForwardSolution::SPtr m_pClusteredFwd;   /**< Clustered forward solution. */
-
-    AnnotationSet m_annotationSet;  /**< Annotation set. */
-
-    FiffInfo::SPtr m_pFiffInfo;     /**< Fiff information. */
-
-    RtCov::SPtr m_pRtCov;           /**< Real time covariance. */
-    FiffCov::SPtr m_pFiffCov;       /**< The estimated covariance. */
-
-    RtInvOp::SPtr m_pRtInvOp;           /**< Real time inverse operator. */
-    MNEInverseOperator::SPtr m_pInvOp;  /**< The inverse operator. */
-
-
-    MinimumNorm::SPtr m_pMinimumNorm;
+    CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;   /**< The Circular Raw Matrix Buffer. */
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline bool RtAve::isRunning()
+{
+    return m_bIsRunning;
+}
 
 } // NAMESPACE
 
-#endif // SOURCELAB_H
+#ifndef metatype_fiffevokedsptr
+#define metatype_fiffevokedsptr
+Q_DECLARE_METATYPE(FIFFLIB::FiffEvoked::SPtr); /**< Provides QT META type declaration of the FIFFLIB::FiffEvoked type. For signal/slot usage.*/
+#endif
+
+#endif // RTAVE_H
