@@ -207,8 +207,8 @@ void SourceLab::updateFiffCov(FiffCov::SPtr p_pFiffCov)
 
     m_pFiffCov = p_pFiffCov;
 
-    if(m_pRtInv)
-        m_pRtInv->appendNoiseCov(m_pFiffCov);
+    if(m_pRtInvOp)
+        m_pRtInvOp->appendNoiseCov(m_pFiffCov);
 }
 
 
@@ -264,11 +264,11 @@ void SourceLab::run()
     //
     // Init Real-Time inverse estimator
     //
-    m_pRtInv = RtInv::SPtr(new RtInv(m_pFiffInfo, m_pClusteredFwd, this));
-    connect(m_pRtInv.data(), &RtInv::invOperatorCalculated, this, &SourceLab::updateInvOp);
+    m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pClusteredFwd, this));
+    connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated, this, &SourceLab::updateInvOp);
 
     m_pRtCov->start();
-    m_pRtInv->start();
+    m_pRtInvOp->start();
 
     // Replace this with a rt average class
     FiffEvoked t_evoked;

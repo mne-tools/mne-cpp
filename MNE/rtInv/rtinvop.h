@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtinv.h
+* @file     rtinvop.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     RtInv class declaration.
+* @brief     RtInvOp class declaration.
 *
 */
 
-#ifndef RTINV_H
-#define RTINV_H
+#ifndef RTINVOP_H
+#define RTINVOP_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -103,12 +103,12 @@ using namespace MNELIB;
 *
 * @brief Real-time inverse operator estimation
 */
-class RTINVSHARED_EXPORT RtInv : public QThread
+class RTINVSHARED_EXPORT RtInvOp : public QThread
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<RtInv> SPtr;             /**< Shared pointer type for RtInv. */
-    typedef QSharedPointer<const RtInv> ConstSPtr;  /**< Const shared pointer type for RtInv. */
+    typedef QSharedPointer<RtInvOp> SPtr;             /**< Shared pointer type for RtInvOp. */
+    typedef QSharedPointer<const RtInvOp> ConstSPtr;  /**< Const shared pointer type for RtInvOp. */
 
     //=========================================================================================================
     /**
@@ -118,13 +118,13 @@ public:
     * @param[in] p_pFwd         Forward solution
     * @param[in] parent         Parent QObject (optional)
     */
-    explicit RtInv(FiffInfo::SPtr &p_pFiffInfo, MNEForwardSolution::SPtr &p_pFwd, QObject *parent = 0);
+    explicit RtInvOp(FiffInfo::SPtr &p_pFiffInfo, MNEForwardSolution::SPtr &p_pFwd, QObject *parent = 0);
 
     //=========================================================================================================
     /**
     * Destroys the inverse operator estimation object.
     */
-    ~RtInv();
+    ~RtInvOp();
 
     //=========================================================================================================
     /**
@@ -183,7 +183,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool RtInv::isRunning()
+inline bool RtInvOp::isRunning()
 {
     return m_bIsRunning;
 }
