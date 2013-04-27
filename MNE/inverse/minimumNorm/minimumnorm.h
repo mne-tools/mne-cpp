@@ -46,6 +46,8 @@
 
 #include <mne/mne_inverse_operator.h>
 
+#include <QSharedPointer>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -78,6 +80,8 @@ using namespace MNELIB;
 class INVERSESHARED_EXPORT MinimumNorm : public IInverseAlgorithm
 {
 public:
+    typedef QSharedPointer<MinimumNorm> SPtr;             /**< Shared pointer type for MinimumNorm. */
+    typedef QSharedPointer<const MinimumNorm> ConstSPtr;  /**< Const shared pointer type for MinimumNorm. */
 
     //=========================================================================================================
     /**

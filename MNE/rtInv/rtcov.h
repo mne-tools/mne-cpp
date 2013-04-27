@@ -143,6 +143,23 @@ public:
     */
     virtual bool stop();
 
+    //=========================================================================================================
+    /**
+    * Returns true if is running, otherwise false.
+    *
+    * @return true if is running, false otherwise
+    */
+    inline bool isRunning();
+
+signals:
+    //=========================================================================================================
+    /**
+    * Signal which is emitted when a new covariance Matrix is estimated.
+    *
+    * @param[out] p_pCov  The covariance matrix
+    */
+    void covCalculated(FIFFLIB::FiffCov::SPtr p_pCov);
+
 protected:
     //=========================================================================================================
     /**
@@ -161,22 +178,23 @@ private:
     quint32      m_iMaxSamples;         /**< Maximal amount of samples received, before covariance is estimated.*/
 
     CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;   /**< The Circular Raw Matrix Buffer. */
-
-signals:
-    //=========================================================================================================
-    /**
-    * Signal which is emitted when a new covariance Matrix is estimated.
-    *
-    * @param[out] p_Cov  The covariance matrix -> ToDo replace this by fiffCov Shared Data Pointer.
-    */
-    void covCalculated(FIFFLIB::FiffCov p_Cov);
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline bool RtCov::isRunning()
+{
+    return m_bIsRunning;
+}
 
 } // NAMESPACE
 
-#ifndef metatype_fiffcov
-#define metatype_fiffcov
-Q_DECLARE_METATYPE(FIFFLIB::FiffCov); /**< Provides QT META type declaration of the FIFFLIB::FiffCov type. For signal/slot usage.*/
+#ifndef metatype_fiffcovsptr
+#define metatype_fiffcovsptr
+Q_DECLARE_METATYPE(FIFFLIB::FiffCov::SPtr); /**< Provides QT META type declaration of the FIFFLIB::FiffCov type. For signal/slot usage.*/
 #endif
 
 #endif // RTCOV_H

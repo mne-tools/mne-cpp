@@ -85,7 +85,6 @@ FiffEvoked::FiffEvoked(QIODevice& p_IODevice, QVariant setno, QPair<QVariant,QVa
 
 FiffEvoked::FiffEvoked(const FiffEvoked& p_FiffEvoked)
 : info(p_FiffEvoked.info)
-, ch_names(p_FiffEvoked.ch_names)
 , nave(p_FiffEvoked.nave)
 , aspect_kind(p_FiffEvoked.aspect_kind)
 , first(p_FiffEvoked.first)
@@ -112,7 +111,6 @@ FiffEvoked::~FiffEvoked()
 void FiffEvoked::clear()
 {
     info.clear();
-    ch_names.clear();
     nave = -1;
     aspect_kind = -1;
     first = -1;
@@ -484,4 +482,39 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
     p_FiffEvoked.data = all_data;
 
     return true;
+}
+
+
+//*************************************************************************************************************
+
+void FiffEvoked::setInfo(FiffInfo &p_info, bool proj)
+{
+    info = p_info;
+    //
+    // Set up projection
+    //
+    if(info.projs.size() == 0 || !proj)
+    {
+        printf("\tNo projector specified for these data.\n");
+        this->proj = MatrixXd();
+    }
+    else
+    {
+        //   Create the projector
+        MatrixXd projection;
+        qint32 nproj = info.make_projector(projection);
+        if(nproj == 0)
+        {
+            printf("\tThe projection vectors do not apply to these channels\n");
+            this->proj = MatrixXd();
+        }
+        else
+        {
+            printf("\tCreated an SSP operator (subspace dimension = %d)\n", nproj);
+            this->proj = projection;
+        }
+
+        //   The projection items have been activated
+        FiffProj::activate_projs(info.projs);
+    }
 }

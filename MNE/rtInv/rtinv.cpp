@@ -63,11 +63,12 @@ using namespace RTINVLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtInv::RtInv(FiffInfo &p_fiffInfo, MNEForwardSolution::SPtr p_pFwd, QObject *parent)
+RtInv::RtInv(FiffInfo::SPtr &p_pFiffInfo, MNEForwardSolution::SPtr &p_pFwd, QObject *parent)
 : QThread(parent)
-, m_fiffInfo(p_fiffInfo)
+, m_pFiffInfo(p_pFiffInfo)
 , m_pFwd(p_pFwd)
 {
+    qRegisterMetaType<MNEInverseOperator::SPtr>("MNEInverseOperator::SPtr");
 }
 
 
@@ -80,12 +81,12 @@ RtInv::~RtInv()
 
 
 //*************************************************************************************************************
-//ToDo use shared pointer for public slot
-void RtInv::receiveNoiseCov(FiffCov p_NoiseCov)
+
+void RtInv::appendNoiseCov(FiffCov::SPtr p_pNoiseCov)
 {
     mutex.lock();
     //Use here a circular buffer
-    m_vecNoiseCov.push_back(FiffCov::SDPtr(new FiffCov(p_NoiseCov)));
+    m_vecNoiseCov.push_back(p_pNoiseCov);
 
     mutex.unlock();
 }
@@ -112,23 +113,17 @@ void RtInv::run()
     {
         if(m_vecNoiseCov.size() > 0)
         {
-
             // Restrict forward solution as necessary for MEG
-            MNEForwardSolution forward_meg = m_pFwd->pick_types(true, false);
+            MNEForwardSolution t_forwardMeg = m_pFwd->pick_types(true, false);
 
-            //Put this inside make_inverse_operator
 
-            qDebug() << "Inverse operator";
+            MNEInverseOperator::SPtr t_invOpMeg(new MNEInverseOperator(*m_pFiffInfo.data(), t_forwardMeg, *m_vecNoiseCov[0].data(), 0.2f, 0.8f));
 
-//            inverse_operator_meeg = make_inverse_operator(info, forward_meeg, noise_cov,
-//                                                          loose=0.2, depth=0.8)
-            MNEInverseOperator::make_inverse_operator(m_fiffInfo, forward_meg, *m_vecNoiseCov[0].data(), 0.2f, 0.8f);
-
-            FiffCov::SDPtr t_NoiseCov(new FiffCov(m_vecNoiseCov[0]->prepare_noise_cov(m_fiffInfo, m_fiffInfo.ch_names)));
+            mutex.lock();
             m_vecNoiseCov.pop_front();
+            mutex.unlock();
 
-//            prepare_noise_cov;
-
+            emit invOperatorCalculated(t_invOpMeg);
         }
     }
 }
