@@ -118,7 +118,7 @@ public:
     * @param[in] p_pFwd         Forward solution
     * @param[in] parent         Parent QObject (optional)
     */
-    explicit RtInv(FiffInfo& p_fiffInfo, MNEForwardSolution::SPtr p_pFwd, QObject *parent = 0);
+    explicit RtInv(FiffInfo::SPtr &p_pFiffInfo, MNEForwardSolution::SPtr &p_pFwd, QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -130,9 +130,9 @@ public:
     /**
     * Slot to receive incoming noise covariance estimations.
     *
-    * @param[in] p_noiseCov     Noise covariance estiamtion -> ToDo Replace this by fiffCov shared data pointer
+    * @param[in] p_pNoiseCov     Noise covariance estimation
     */
-    void receiveNoiseCov(FiffCov p_noiseCov);
+    void appendNoiseCov(FiffCov::SPtr p_pNoiseCov);
 
     //=========================================================================================================
     /**
@@ -141,6 +141,23 @@ public:
     * @return true if succeeded, false otherwise
     */
     virtual bool stop();
+
+    //=========================================================================================================
+    /**
+    * Returns true if is running, otherwise false.
+    *
+    * @return true if is running, false otherwise
+    */
+    inline bool isRunning();
+
+signals:
+    //=========================================================================================================
+    /**
+    * Signal which is emitted when a inverse operator is calculated.
+    *
+    * @param[out] p_InvOp  The inverse operator
+    */
+    void invOperatorCalculated(MNELIB::MNEInverseOperator::SPtr p_pInvOp);
 
 protected:
     //=========================================================================================================
@@ -153,28 +170,29 @@ protected:
 
 private:
     QMutex      mutex;                  /**< Provides access serialization between threads. */
-    bool        m_bIsRunning;           /**< Holds whether RtInv is running. */
+    bool        m_bIsRunning;           /**< Whether RtInv is running. */
 
-    QVector<FiffCov::SDPtr> m_vecNoiseCov;/**< Noise covariance matrix. */
+    QVector<FiffCov::SPtr> m_vecNoiseCov;/**< Noise covariance matrices. */
 
-    FiffInfo             m_fiffInfo;    /**< Holds the fiff measurement information. */
-    MNEForwardSolution::SPtr m_pFwd;    /**< Holds the forward solution. */
-
-signals:
-    //=========================================================================================================
-    /**
-    * Signal which is emitted when a inverse operator is available.
-    *
-    * @param[out] p_InvOp  The inverse operator -> ToDo replace this by Shared Data Pointer.
-    */
-    void invOperatorAvailable(MNELIB::MNEInverseOperator p_InvOp);
+    FiffInfo::SPtr m_pFiffInfo;         /**< The fiff measurement information. */
+    MNEForwardSolution::SPtr m_pFwd;    /**< The forward solution. */
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline bool RtInv::isRunning()
+{
+    return m_bIsRunning;
+}
 
 } // NAMESPACE
 
-#ifndef metatype_mneinverseoperator
-#define metatype_mneinverseoperator
-Q_DECLARE_METATYPE(MNELIB::MNEInverseOperator); /**< Provides QT META type declaration of the MNELIB::MNEInverseOperator type. For signal/slot usage.*/
+#ifndef metatype_mneinverseoperatorsptr
+#define metatype_mneinverseoperatorsptr
+Q_DECLARE_METATYPE(MNELIB::MNEInverseOperator::SPtr); /**< Provides QT META type declaration of the MNELIB::MNEInverseOperator type. For signal/slot usage.*/
 #endif
 
 #endif // RTINV_H

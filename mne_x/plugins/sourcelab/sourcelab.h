@@ -50,7 +50,10 @@
 #include <fs/annotationset.h>
 #include <fiff/fiff_info.h>
 #include <mne/mne_forwardsolution.h>
+#include <inverse/sourceestimate.h>
+#include <inverse/minimumNorm/minimumnorm.h>
 #include <rtInv/rtcov.h>
+#include <rtInv/rtinv.h>
 
 #include <xMeas/Measurement/realtimemultisamplearray.h>
 
@@ -81,8 +84,9 @@ namespace SourceLabPlugin
 using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace MNELIB;
-using namespace MNEX;
+using namespace INVERSELIB;
 using namespace RTINVLIB;
+using namespace MNEX;
 using namespace IOBuffer;
 
 
@@ -129,6 +133,23 @@ public:
 
     virtual void update(Subject* pSubject);
 
+//slot
+    //=========================================================================================================
+    /**
+    * Slot to update the fiff covariance
+    *
+    * @param[in] p_pFiffCov    The covariance to update
+    */
+    void updateFiffCov(FiffCov::SPtr p_pFiffCov);
+
+    //=========================================================================================================
+    /**
+    * Slot to update the inverse operator
+    *
+    * @param[in] p_pInvOp    The inverse operator to update
+    */
+    void updateInvOp(MNEInverseOperator::SPtr p_pInvOp);
+
 protected:
     virtual void run();
 
@@ -147,14 +168,21 @@ private:
 
     //MNE stuff
     QFile m_qFileFwdSolution;           /**< File to forward solution. */
-    MNEForwardSolution m_Fwd;           /**< Forward solution. */
-    MNEForwardSolution m_clusteredFwd;  /**< Clustered forward solution. */
+    MNEForwardSolution::SPtr m_pFwd;            /**< Forward solution. */
+    MNEForwardSolution::SPtr m_pClusteredFwd;   /**< Clustered forward solution. */
 
     AnnotationSet m_annotationSet;  /**< Annotation set. */
 
-    FiffInfo::SPtr m_pFiffInfo;    /**< Fiff information. */
+    FiffInfo::SPtr m_pFiffInfo;     /**< Fiff information. */
 
-    RtCov::SPtr m_pRtCov;          /**< Real time covariance. */
+    RtCov::SPtr m_pRtCov;           /**< Real time covariance. */
+    FiffCov::SPtr m_pFiffCov;       /**< The estimated covariance. */
+
+    RtInv::SPtr m_pRtInv;               /**< Real time inverse operator. */
+    MNEInverseOperator::SPtr m_pInvOp;  /**< The inverse operator. */
+
+
+    MinimumNorm::SPtr m_pMinimumNorm;
 };
 
 } // NAMESPACE

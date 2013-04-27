@@ -44,6 +44,8 @@
 #include <xMeas/Measurement/realtimesamplearray.h>
 #include <xMeas/Measurement/realtimemultisamplearray_new.h>
 
+#include <fiff/fiff_evoked.h>
+
 #include "FormFiles/sourcelabsetupwidget.h"
 #include "FormFiles/sourcelabrunwidget.h"
 
@@ -63,6 +65,7 @@
 //=============================================================================================================
 
 using namespace SourceLabPlugin;
+using namespace FIFFLIB;
 using namespace MNEX;
 using namespace XMEASLIB;
 
@@ -75,13 +78,10 @@ using namespace XMEASLIB;
 SourceLab::SourceLab()
 : m_bIsRunning(false)
 , m_qFileFwdSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
+, m_pFwd(new MNEForwardSolution(m_qFileFwdSolution))
 , m_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot")
 {
     m_PLG_ID = PLG_ID::SOURCELAB;
-
-    if(!MNEForwardSolution::read_forward_solution(m_qFileFwdSolution, m_Fwd))
-        qDebug() << "Couldn't read forward solution";
-
 }
 
 
@@ -112,6 +112,9 @@ bool SourceLab::stop()
     // Stop threads
     QThread::terminate();
     QThread::wait();
+
+    if(m_pRtCov->isRunning())
+        m_pRtCov->stop();
 
     if(m_pSourceLabBuffer)
         m_pSourceLabBuffer->clear();
@@ -196,6 +199,34 @@ void SourceLab::update(Subject* pSubject)
 }
 
 
+//*************************************************************************************************************
+
+void SourceLab::updateFiffCov(FiffCov::SPtr p_pFiffCov)
+{
+    std::cout << "Covariance:\n" << p_pFiffCov->data.block(0,0,10,10) << std::endl;
+
+    m_pFiffCov = p_pFiffCov;
+
+    if(m_pRtInv)
+        m_pRtInv->appendNoiseCov(m_pFiffCov);
+}
+
+
+//*************************************************************************************************************
+
+void SourceLab::updateInvOp(MNEInverseOperator::SPtr p_pInvOp)
+{
+    m_pInvOp = p_pInvOp;
+
+
+    double snr = 3.0;
+    double lambda2 = 1.0 / pow(snr, 2); //ToDO estimate lambda using covariance
+
+    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
+
+    m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(*m_pInvOp.data(), lambda2, method));
+}
+
 
 //*************************************************************************************************************
 
@@ -204,9 +235,9 @@ void SourceLab::run()
     //
     // Cluster forward solution;
     //
-//    qDebug() << "Start Clustering";
-//    m_clusteredFwd = m_Fwd.cluster_forward_solution(m_annotationSet, 40);
-//    qDebug() << "Clustering finished";
+    qDebug() << "Start Clustering";
+    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(m_annotationSet, 40)));
+    qDebug() << "Clustering finished";
 
     //
     // start receiving data
@@ -227,37 +258,110 @@ void SourceLab::run()
     //
     // Init Real-Time Covariance estimator
     //
-    m_pRtCov = RtCov::SPtr(new RtCov(1000, m_pFiffInfo));
+    m_pRtCov = RtCov::SPtr(new RtCov(5000, m_pFiffInfo, this));
+    connect(m_pRtCov.data(), &RtCov::covCalculated, this, &SourceLab::updateFiffCov);
+
+    //
+    // Init Real-Time inverse estimator
+    //
+    m_pRtInv = RtInv::SPtr(new RtInv(m_pFiffInfo, m_pClusteredFwd, this));
+    connect(m_pRtInv.data(), &RtInv::invOperatorCalculated, this, &SourceLab::updateInvOp);
 
     m_pRtCov->start();
+    m_pRtInv->start();
 
+    // Replace this with a rt average class
+    FiffEvoked t_evoked;
+    t_evoked.setInfo(*m_pFiffInfo);
+    t_evoked.nave = 1;
+    t_evoked.aspect_kind = FIFFV_ASPECT_AVERAGE;
+    t_evoked.comment = QString("Real-time average");
 
-    qint32 count = 0;
+    qint32 t_iSampleCount = 0;
+    qint32 i = 0;
+    float T = 1/m_pFiffInfo->sfreq;
+
+    qint32 matSize = 100; //80 critical when print to console, its recommended to have a higher buffer size
+    qint32 curSize = 0;
+    MatrixXd curMat;
+    bool bMatInit = false;
+    QVector<MatrixXd> t_evokedDataVec;
+
     while(m_bIsRunning)
     {
-        /* Dispatch the inputs */
-
-//        double v = m_pECGBuffer->pop();
-
-//        //ToDo: Implement here the algorithm
-
-//        m_pSourceLab_Output->setValue(v);
-
-
-
         qint32 nrows = m_pSourceLabBuffer->rows();
 
         if(nrows > 0) // check if init
         {
+            /* Dispatch the inputs */
             MatrixXd t_mat = m_pSourceLabBuffer->pop();
 
-
-            qDebug() << count << ": m_pSourceLabBuffer->pop(); Matrix:" << t_mat.rows() << "x" << t_mat.cols();
-
+            //Add to covariance estimation
             m_pRtCov->append(t_mat);
 
 
-            ++count;
+            if(m_pMinimumNorm && t_mat.cols() > 0)
+            {
+                if(!bMatInit)
+                    curMat = MatrixXd::Zero(t_mat.rows(), matSize);
+
+                // assemble matrix to matrices of matSize cols
+                if(curSize + t_mat.cols() < matSize)
+                {
+                    curMat.block(0,curSize,t_mat.rows(),t_mat.cols()) = t_mat;
+                    curSize += t_mat.cols();
+                }
+                else
+                {
+                    //Fill last part
+                    curMat.block(0,curSize,t_mat.rows(),matSize-curSize) = t_mat.block(0,0,t_mat.rows(),matSize-curSize);
+
+                    t_evokedDataVec.push_back(curMat);
+
+                    //Fill first part of new matrix
+                    qint32 iOffset = t_mat.cols()-(matSize-curSize);
+
+                    if(iOffset != 0)
+                    {
+                        curMat.block(0,0,t_mat.rows(),iOffset) = t_mat.block(0,matSize-curSize,t_mat.rows(),iOffset);
+                        curSize = iOffset;
+                    }
+                    else
+                        curSize = 0;
+                }
+
+                qDebug() << "Evoked Data Vector size" << t_evokedDataVec.size();
+
+                if(t_evokedDataVec.size() > 0)
+                {
+                    MatrixXd bufferedMat = t_evokedDataVec[0];
+
+                    // without average -> maybe not fast enough
+
+                    RowVectorXf times(bufferedMat.cols());
+                    times[0] = T*t_iSampleCount;
+                    for(i = 1; i < bufferedMat.cols(); ++i)
+                        times[i] = times[i-1] + T;
+
+                    t_evoked.first = times[0];
+                    t_evoked.last = times[bufferedMat.cols()-1];
+                    t_evoked.times = times;
+                    t_evoked.data = bufferedMat;
+
+
+                    //
+                    // calculate the inverse
+                    //
+                    SourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_evoked);
+
+                    qDebug() << t_iSampleCount << " : SourceEstimate";
+
+                    t_iSampleCount += bufferedMat.cols();
+
+                    t_evokedDataVec.pop_front();
+                }
+            }
+
         }
     }
 }

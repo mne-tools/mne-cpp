@@ -74,7 +74,7 @@ RtCov::RtCov(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent)
 , m_pFiffInfo(p_pFiffInfo)
 , m_bIsRunning(false)
 {
-
+    qRegisterMetaType<FiffCov::SPtr>("FiffCov::SPtr");
 }
 
 
@@ -119,7 +119,7 @@ void RtCov::run()
 
     quint32 n_samples = 0;
 
-    FiffCov cov;
+    FiffCov::SPtr cov(new FiffCov());
     VectorXd mu;
 
     while(m_bIsRunning)
@@ -131,37 +131,37 @@ void RtCov::run()
             if(n_samples == 0)
             {
                 mu = rawSegment.rowwise().sum();
-                cov.data = rawSegment * rawSegment.transpose();
+                cov->data = rawSegment * rawSegment.transpose();
             }
             else
             {
                 mu.array() += rawSegment.rowwise().sum().array();
-                cov.data += rawSegment * rawSegment.transpose();
+                cov->data += rawSegment * rawSegment.transpose();
             }
             n_samples += rawSegment.cols();
 
             if(n_samples > m_iMaxSamples)
             {
                 mu /= (float)n_samples;
-                cov.data.array() -= n_samples * (mu * mu.transpose()).array();
-                cov.data.array() /= (n_samples - 1);
+                cov->data.array() -= n_samples * (mu * mu.transpose()).array();
+                cov->data.array() /= (n_samples - 1);
 
-                std::cout << "Covariance:\n" << cov.data.block(0,0,10,10) << std::endl;
-
-                cov.kind = FIFFV_MNE_NOISE_COV;
-                cov.diag = false;
-                cov.dim = cov.data.rows();
-
+                cov->kind = FIFFV_MNE_NOISE_COV;
+                cov->diag = false;
+                cov->dim = cov->data.rows();
 
                 //ToDo do picks
-                cov.names = m_pFiffInfo->ch_names;
-                cov.projs = m_pFiffInfo->projs;
-                cov.bads  = m_pFiffInfo->bads;
-                cov.nfree  = n_samples;
+                cov->names = m_pFiffInfo->ch_names;
+                cov->projs = m_pFiffInfo->projs;
+                cov->bads  = m_pFiffInfo->bads;
+                cov->nfree  = n_samples;
+
+                // regularize noise covariance
+                *cov.data() = cov->regularize(*m_pFiffInfo, 0.05, 0.05, 0.1, true);
 
                 emit covCalculated(cov);
 
-                cov.clear();
+                cov = FiffCov::SPtr(new FiffCov());
                 n_samples = 0;
             }
 

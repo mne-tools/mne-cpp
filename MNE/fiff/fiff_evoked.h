@@ -131,6 +131,12 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns list of channel names stored in fiff info -> this is to stay consistent with python
+    */
+    inline QStringList ch_names();
+
+    //=========================================================================================================
+    /**
     * Initializes fiff evoked data.
     */
     void clear();
@@ -191,9 +197,17 @@ public:
     */
     static bool read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant setno = 0, QPair<QVariant,QVariant> baseline = defaultVariantPair, bool proj = true, fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE);
 
+    //=========================================================================================================
+    /**
+    * Set a new fiff measurement info
+    *
+    * @param[in] p_info     Info to set
+    * @param[in] proj       Apply SSP projection vectors (optional, default = true)
+    */
+    void setInfo(FiffInfo &p_info, bool proj = true);
+
 public:
     FiffInfo    info;           /**< Measurement info. */
-    QStringList ch_names;       /**< List of channels' names. */
     fiff_int_t  nave;           /**< Number of averaged epochs. */
     fiff_int_t  aspect_kind;    /**< Aspect identifier, either FIFFV_ASPECT_AVERAGE or FIFFV_ASPECT_STD_ERR.  */
     fiff_int_t  first;          /**< First time sample. */
@@ -204,11 +218,19 @@ public:
     MatrixXd    proj;           /**< SSP projection */
 };
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+
+inline QStringList FiffEvoked::ch_names()
+{
+    return info.ch_names;
+}
+
+
+//*************************************************************************************************************
 
 inline QString FiffEvoked::aspectKindToString()
 {
