@@ -63,6 +63,8 @@ SourceLabRunWidget::SourceLabRunWidget(SourceLab* toolbox, QWidget *parent)
 {
     ui.setupUi(this);
 
+    connect(toolbox, &SourceLab::statMsg, this, &SourceLabRunWidget::writeToLog);
+
     connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
 }
 
@@ -72,6 +74,20 @@ SourceLabRunWidget::SourceLabRunWidget(SourceLab* toolbox, QWidget *parent)
 SourceLabRunWidget::~SourceLabRunWidget()
 {
 
+}
+
+
+//*************************************************************************************************************
+
+void SourceLabRunWidget::writeToLog(QString p_sLogMsg)
+{
+    ui.m_qTextBrowser_Information->insertHtml(p_sLogMsg);
+
+    ui.m_qTextBrowser_Information->insertPlainText("\n"); // new line
+    //scroll down to the newest entry
+    QTextCursor c = ui.m_qTextBrowser_Information->textCursor();
+    c.movePosition(QTextCursor::End);
+    ui.m_qTextBrowser_Information->setTextCursor(c);
 }
 
 
