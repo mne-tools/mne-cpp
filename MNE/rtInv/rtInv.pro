@@ -77,13 +77,13 @@ win32 {
 }
 
 SOURCES += \
-        rtinv.cpp \
         rtcov.cpp \
+    rtinvop.cpp
 
 HEADERS +=  \
-        rtinv.h\
         rtinv_global.h \
-        rtcov.h
+        rtcov.h \
+    rtinvop.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

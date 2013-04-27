@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtinv.cpp
+* @file     rtinvop.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 *
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the RtInv Class.
+* @brief     implementation of the RtInvOp Class.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rtinv.h"
+#include "rtinvop.h"
 
 
 //*************************************************************************************************************
@@ -63,7 +63,7 @@ using namespace RTINVLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtInv::RtInv(FiffInfo::SPtr &p_pFiffInfo, MNEForwardSolution::SPtr &p_pFwd, QObject *parent)
+RtInvOp::RtInvOp(FiffInfo::SPtr &p_pFiffInfo, MNEForwardSolution::SPtr &p_pFwd, QObject *parent)
 : QThread(parent)
 , m_pFiffInfo(p_pFiffInfo)
 , m_pFwd(p_pFwd)
@@ -74,7 +74,7 @@ RtInv::RtInv(FiffInfo::SPtr &p_pFiffInfo, MNEForwardSolution::SPtr &p_pFwd, QObj
 
 //*************************************************************************************************************
 
-RtInv::~RtInv()
+RtInvOp::~RtInvOp()
 {
     stop();
 }
@@ -82,7 +82,7 @@ RtInv::~RtInv()
 
 //*************************************************************************************************************
 
-void RtInv::appendNoiseCov(FiffCov::SPtr p_pNoiseCov)
+void RtInvOp::appendNoiseCov(FiffCov::SPtr p_pNoiseCov)
 {
     mutex.lock();
     //Use here a circular buffer
@@ -94,7 +94,7 @@ void RtInv::appendNoiseCov(FiffCov::SPtr p_pNoiseCov)
 
 //*************************************************************************************************************
 
-bool RtInv::stop()
+bool RtInvOp::stop()
 {
     m_bIsRunning = false;
     QThread::wait();
@@ -105,7 +105,7 @@ bool RtInv::stop()
 
 //*************************************************************************************************************
 
-void RtInv::run()
+void RtInvOp::run()
 {
     m_bIsRunning = true;
 
