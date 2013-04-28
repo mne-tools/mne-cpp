@@ -68,6 +68,9 @@
 #include <QThread>
 #include <QMutex>
 #include <QSharedPointer>
+#include <QSet>
+#include <QList>
+#include <QVector>
 
 
 //*************************************************************************************************************
@@ -177,6 +180,14 @@ private:
     quint32      m_iMaxSamples;         /**< Maximal amount of samples received, before covariance is estimated.*/
 
     CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;   /**< The Circular Raw Matrix Buffer. */
+
+    bool m_bAutoAspect; /**< Auto aspect detection on or off. */
+
+    QSet<fiff_int_t>  m_qSetAspectKinds;     /**< Set of aspects to average. Each aspect is averaged separetely and released stored in evoked data.*/
+
+    QList< QVector<MatrixXd> > m_qListQVectorPreStimuli;    /**< averages the pre stimuli */
+    QList< QVector<MatrixXd> > m_qListQVectorPostStimuli;    /**< averages the post stimuli */
+
 };
 
 //*************************************************************************************************************

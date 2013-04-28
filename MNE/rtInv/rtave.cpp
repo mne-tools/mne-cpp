@@ -70,6 +70,7 @@ RtAve::RtAve(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent)
 , m_iMaxSamples(p_iMaxSamples)
 , m_pFiffInfo(p_pFiffInfo)
 , m_bIsRunning(false)
+, m_bAutoAspect(true)
 {
     qRegisterMetaType<FiffEvoked::SPtr>("FiffEvoked::SPtr");
 }
