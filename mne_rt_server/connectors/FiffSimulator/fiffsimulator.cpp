@@ -41,6 +41,7 @@
 
 #include "fiffsimulator.h"
 #include "fiffproducer.h"
+#include <stdlib.h>
 
 
 //*************************************************************************************************************
@@ -88,7 +89,7 @@ using namespace MNELIB;
 
 FiffSimulator::FiffSimulator()
 : m_pFiffProducer(new FiffProducer(this))
-, m_sResourceDataPath("../../mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
+, m_sResourceDataPath(QString("%1/bin/MNE-sample-data/MEG/sample/sample_audvis_raw.fif").arg(getenv("MNE_CPP")))
 , m_bIsRunning(false)
 , m_uiBufferSampleSize(1000)
 , m_pRawMatrixBuffer(NULL)
