@@ -69,6 +69,7 @@
 
 #include <QtCore/QtPlugin>
 #include <QFile>
+#include <QCoreApplication>
 #include <QDebug>
 
 
@@ -89,7 +90,7 @@ using namespace MNELIB;
 
 FiffSimulator::FiffSimulator()
 : m_pFiffProducer(new FiffProducer(this))
-, m_sResourceDataPath(QString("%1/bin/MNE-sample-data/MEG/sample/sample_audvis_raw.fif").arg(getenv("MNE_CPP")))
+, m_sResourceDataPath(QString("%1/MNE-sample-data/MEG/sample/sample_audvis_raw.fif").arg(QCoreApplication::applicationDirPath()))
 , m_bIsRunning(false)
 , m_uiBufferSampleSize(1000)
 , m_pRawMatrixBuffer(NULL)
