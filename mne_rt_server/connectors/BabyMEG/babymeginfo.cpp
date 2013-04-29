@@ -196,7 +196,7 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
         FiffChInfo t_ch;
 
         t_ch.ch_name = lm_ch_names.at(i); //QString("MEG%1").arg(i);
-        qDebug()<<t_ch.ch_name;
+        //qDebug()<<t_ch.ch_name;
         t_ch.scanno = i;
         t_ch.logno = i+1;
         t_ch.cal = 1;
