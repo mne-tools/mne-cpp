@@ -105,71 +105,81 @@ void RealTimeMultiSampleArrayNew::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
         RealTimeSampleArrayChInfo initChInfo;
         initChInfo.setChannelName(p_pFiffInfo->chs[i].ch_name);
 
-        //Unit
-        switch(p_pFiffInfo->chs[i].unit)
+        //Treat stimulus channels different
+        if(p_pFiffInfo->chs[i].kind == FIFFV_STIM_CH)
         {
-            case 101:
-                initChInfo.setUnit("Hz");
-                break;
-            case 102:
-                initChInfo.setUnit("N");
-                break;
-            case 103:
-                initChInfo.setUnit("Pa");
-                break;
-            case 104:
-                initChInfo.setUnit("J");
-                break;
-            case 105:
-                initChInfo.setUnit("W");
-                break;
-            case 106:
-                initChInfo.setUnit("C");
-                break;
-            case 107:
-                initChInfo.setUnit("V");
-                initChInfo.setMinValue(0);
-                initChInfo.setMaxValue(1.0e-3);
-                break;
-            case 108:
-                initChInfo.setUnit("F");
-                break;
-            case 109:
-                initChInfo.setUnit("Ohm");
-                break;
-            case 110:
-                initChInfo.setUnit("MHO");
-                break;
-            case 111:
-                initChInfo.setUnit("Wb");
-                break;
-            case 112:
-                initChInfo.setUnit("T");
-                initChInfo.setMinValue(-1.0e-10);
-                initChInfo.setMaxValue(1.0e-10);
-                break;
-            case 113:
-                initChInfo.setUnit("H");
-                break;
-            case 114:
-                initChInfo.setUnit("Cel");
-                break;
-            case 115:
-                initChInfo.setUnit("Lm");
-                break;
-            case 116:
-                initChInfo.setUnit("Lx");
-                break;
-            case 201:
-                initChInfo.setUnit("T/m");
-                initChInfo.setMinValue(-1.0e-10);
-                initChInfo.setMaxValue(1.0e-10);
-                break;
-            case 202:
-                initChInfo.setUnit("Am");
-                break;
-            default:
-                initChInfo.setUnit("");
+            initChInfo.setUnit("");
+            initChInfo.setMinValue(0);
+            initChInfo.setMaxValue(1.0e6);
+        }
+        else
+        {
+            //Unit
+            switch(p_pFiffInfo->chs[i].unit)
+            {
+                case 101:
+                    initChInfo.setUnit("Hz");
+                    break;
+                case 102:
+                    initChInfo.setUnit("N");
+                    break;
+                case 103:
+                    initChInfo.setUnit("Pa");
+                    break;
+                case 104:
+                    initChInfo.setUnit("J");
+                    break;
+                case 105:
+                    initChInfo.setUnit("W");
+                    break;
+                case 106:
+                    initChInfo.setUnit("C");
+                    break;
+                case 107:
+                    initChInfo.setUnit("V");
+                    initChInfo.setMinValue(0);
+                    initChInfo.setMaxValue(1.0e-3);
+                    break;
+                case 108:
+                    initChInfo.setUnit("F");
+                    break;
+                case 109:
+                    initChInfo.setUnit("Ohm");
+                    break;
+                case 110:
+                    initChInfo.setUnit("MHO");
+                    break;
+                case 111:
+                    initChInfo.setUnit("Wb");
+                    break;
+                case 112:
+                    initChInfo.setUnit("T");
+                    initChInfo.setMinValue(-1.0e-10);
+                    initChInfo.setMaxValue(1.0e-10);
+                    break;
+                case 113:
+                    initChInfo.setUnit("H");
+                    break;
+                case 114:
+                    initChInfo.setUnit("Cel");
+                    break;
+                case 115:
+                    initChInfo.setUnit("Lm");
+                    break;
+                case 116:
+                    initChInfo.setUnit("Lx");
+                    break;
+                case 201:
+                    initChInfo.setUnit("T/m");
+                    initChInfo.setMinValue(-1.0e-10);
+                    initChInfo.setMaxValue(1.0e-10);
+                    break;
+                case 202:
+                    initChInfo.setUnit("Am");
+                    break;
+                default:
+                    initChInfo.setUnit("");
+            }
         }
 
         m_qListChInfo.append(initChInfo);

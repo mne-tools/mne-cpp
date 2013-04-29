@@ -44,6 +44,8 @@
 #include "FormFiles/rtserversetupwidget.h"
 #include "FormFiles/rtserverrunwidget.h"
 
+#include <utils/ioutils.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -54,6 +56,7 @@
 #include <QtCore/QTextStream>
 #include <QtCore/QFile>
 
+#include <QList>
 #include <QDebug>
 
 
@@ -63,6 +66,7 @@
 //=============================================================================================================
 
 using namespace RtServerPlugin;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -369,6 +373,14 @@ void RtServer::init()
 
 void RtServer::run()
 {
+
+//    //get stim channels
+//    QList<qint32> m_qListStimChannelIdcs;
+//    for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i)
+//        if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH)
+//            m_qListStimChannelIdcs.append(i);
+
+
     MatrixXf matValue;
     while(true)
     {
@@ -376,6 +388,29 @@ void RtServer::run()
 
         for(qint32 i = 0; i < matValue.cols(); ++i)
             m_pRTMSA_RtServer->setValue(matValue.col(i).cast<double>());
+
+
+
+
+
+
+//        //detect stimuli
+//        for(qint32 i = 0; i < m_qListStimChannelIdcs.size(); ++i)
+//        {
+//            qint32 idx = m_qListStimChannelIdcs[i];
+//            RowVectorXi stimSegment = matValue.row(idx).cast<int>();
+//            int iMax = stimSegment.maxCoeff();
+
+
+//            if(iMax > 0)
+//                qDebug() << m_pFiffInfo->chs[idx].ch_name << "Max:" << iMax;
+
+//        }
+
+
+
+
+
 
 //        qDebug() << "matrix popped.";
 

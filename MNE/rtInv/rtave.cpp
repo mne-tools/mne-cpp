@@ -42,6 +42,8 @@
 
 #include "rtave.h"
 
+#include <utils/ioutils.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -58,6 +60,7 @@
 
 using namespace RTINVLIB;
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -119,6 +122,13 @@ void RtAve::run()
 
     FiffEvoked::SPtr evoked(new FiffEvoked());
     VectorXd mu;
+    qint32 i = 0;
+
+    //get stim channels
+    m_qListStimChannelIdcs.clear();
+    for(i = 0; i < m_pFiffInfo->nchan; ++i)
+        if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH)
+            m_qListStimChannelIdcs.append(i);
 
     while(m_bIsRunning)
     {
@@ -126,8 +136,18 @@ void RtAve::run()
         {
             MatrixXd rawSegment = m_pRawMatrixBuffer->pop();
 
+            //detect stimuli
+            for(i = 0; i < m_qListStimChannelIdcs.size(); ++i)
+            {
+                qint32 idx = m_qListStimChannelIdcs[i];
+                RowVectorXi stimSegment = rawSegment.row(idx).cast<int>();
+                int iMax = stimSegment.maxCoeff();
 
-            emit evokedCalculated(evoked);
+                if(iMax > 0)
+                    qDebug() << m_pFiffInfo->chs[idx].ch_name << "Max:" << iMax;
+            }
+
+//            emit evokedCalculated(evoked);
         }
     }
 }
