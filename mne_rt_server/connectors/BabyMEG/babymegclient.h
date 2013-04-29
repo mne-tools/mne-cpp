@@ -131,9 +131,9 @@ public slots:
     /**
     * Send Command to BabyMEG command server with short sync connection
     *
-    * @param[in] void.
+    * @param[in] String s - the string will be sent to server.
     */
-    void SendCommandToBabyMEGShortConnection();
+    void SendCommandToBabyMEGShortConnection(QByteArray s);
 
 // public function
 public:
