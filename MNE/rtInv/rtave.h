@@ -50,6 +50,7 @@
 //=============================================================================================================
 
 #include <fiff/fiff_evoked.h>
+#include <fiff/fiff_info.h>
 
 
 //*************************************************************************************************************
@@ -182,6 +183,9 @@ private:
     CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;   /**< The Circular Raw Matrix Buffer. */
 
     bool m_bAutoAspect; /**< Auto aspect detection on or off. */
+
+
+    QList<qint32> m_qListStimChannelIdcs;      /**< Stimulus channel indeces. */
 
     QSet<fiff_int_t>  m_qSetAspectKinds;     /**< Set of aspects to average. Each aspect is averaged separetely and released stored in evoked data.*/
 

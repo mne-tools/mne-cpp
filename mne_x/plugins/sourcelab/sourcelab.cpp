@@ -276,10 +276,20 @@ void SourceLab::run()
     connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated, this, &SourceLab::updateInvOp);
 
     //
+    // Init Real-Time inverse estimator
+    //
+    m_pRtAve = RtAve::SPtr(new RtAve(1000, m_pFiffInfo, this));
+//    connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated, this, &SourceLab::updateInvOp);
+
+
+    //
     // Start the rt helpers
     //
     m_pRtCov->start();
     m_pRtInvOp->start();
+    m_pRtAve->start();
+
+
 
     // Replace this with a rt average class
     FiffEvoked t_evoked;
@@ -309,6 +319,7 @@ void SourceLab::run()
 
             //Add to covariance estimation
             m_pRtCov->append(t_mat);
+            m_pRtAve->append(t_mat);
 
 
             if(m_pMinimumNorm && t_mat.cols() > 0)

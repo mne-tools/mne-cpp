@@ -54,6 +54,7 @@
 #include <inverse/minimumNorm/minimumnorm.h>
 #include <rtInv/rtcov.h>
 #include <rtInv/rtinvop.h>
+#include <rtInv/rtave.h>
 
 #include <xMeas/Measurement/realtimemultisamplearray.h>
 
@@ -185,11 +186,14 @@ private:
 
     FiffInfo::SPtr m_pFiffInfo;     /**< Fiff information. */
 
-    RtCov::SPtr m_pRtCov;           /**< Real time covariance. */
+    RtCov::SPtr m_pRtCov;           /**< Real-time covariance. */
     FiffCov::SPtr m_pFiffCov;       /**< The estimated covariance. */
 
-    RtInvOp::SPtr m_pRtInvOp;           /**< Real time inverse operator. */
+    RtInvOp::SPtr m_pRtInvOp;           /**< Real-time inverse operator. */
     MNEInverseOperator::SPtr m_pInvOp;  /**< The inverse operator. */
+
+    RtAve::SPtr m_pRtAve;           /**< Real-time average. */
+
 
 
     MinimumNorm::SPtr m_pMinimumNorm;
