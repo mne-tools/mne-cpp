@@ -68,9 +68,10 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtAve::RtAve(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent)
+RtAve::RtAve(quint32 p_iPreStimSamples, quint32 p_iPostStimSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent)
 : QThread(parent)
-, m_iMaxSamples(p_iMaxSamples)
+, m_iPreStimSamples(p_iPreStimSamples)
+, m_iPostStimSamples(p_iPostStimSamples)
 , m_pFiffInfo(p_pFiffInfo)
 , m_bIsRunning(false)
 , m_bAutoAspect(true)
@@ -118,7 +119,12 @@ void RtAve::run()
     m_bIsRunning = true;
 
 
-    quint32 n_samples = 0;
+    //
+    //
+    //
+    quint32 t_nSamplesPerBuf = 0;
+    QList<QPair<QList<qint32>, MatrixXd> > t_qListRawMatBuf;
+
 
     FiffEvoked::SPtr evoked(new FiffEvoked());
     VectorXd mu;
@@ -127,25 +133,63 @@ void RtAve::run()
     //get stim channels
     m_qListStimChannelIdcs.clear();
     for(i = 0; i < m_pFiffInfo->nchan; ++i)
-        if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH)
+        if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH && (m_pFiffInfo->chs[i].ch_name != QString("STI 014")))
             m_qListStimChannelIdcs.append(i);
 
+    qDebug() << "m_qListStimChannelIdcs" << m_qListStimChannelIdcs;
+
+    qint32 count = 0;
     while(m_bIsRunning)
     {
+        ++count;
+
         if(m_pRawMatrixBuffer)
         {
+            //
+            // Acquire Data
+            //
             MatrixXd rawSegment = m_pRawMatrixBuffer->pop();
+            if(t_nSamplesPerBuf == 0)
+                t_nSamplesPerBuf = rawSegment.cols();
 
-            //detect stimuli
+            //
+            // Detect Stimuli
+            //
+            QList<qint32> t_qListStimuli;
             for(i = 0; i < m_qListStimChannelIdcs.size(); ++i)
             {
                 qint32 idx = m_qListStimChannelIdcs[i];
                 RowVectorXi stimSegment = rawSegment.row(idx).cast<int>();
                 int iMax = stimSegment.maxCoeff();
 
+//                qDebug() << i << m_pFiffInfo->chs[idx].ch_name << "Max:" << iMax;
+
                 if(iMax > 0)
+                {
+                    qDebug() << count;
+                    t_qListStimuli.append(iMax);
                     qDebug() << m_pFiffInfo->chs[idx].ch_name << "Max:" << iMax;
+                }
             }
+
+            //
+            // Store
+            //
+            t_qListRawMatBuf.push_back(qMakePair(t_qListStimuli, rawSegment));
+
+            if(t_nSamplesPerBuf*t_qListRawMatBuf.size() > (m_iPreStimSamples+m_iPostStimSamples + (2 * t_nSamplesPerBuf)))
+                t_qListRawMatBuf.pop_front();
+
+
+//            qDebug() << "t_qListRawMatBuf size" << t_qListRawMatBuf.size();
+
+            //
+            // Average
+            //
+
+
+
+
 
 //            emit evokedCalculated(evoked);
         }
