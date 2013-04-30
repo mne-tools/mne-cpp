@@ -196,7 +196,8 @@ void BabyMEGClient::ConnectToBabyMEG()
             if (tcpSocket->state()==QAbstractSocket::ConnectedState)
             {
                 buffer.clear();
-                SendCommand("INFO");
+//                SendCommand("INFO");
+                SendCommand("DATA");
             }
             return;
         }
@@ -221,7 +222,7 @@ void BabyMEGClient::DisConnectBabyMEG()
 
 //*************************************************************************************************************
 
-void BabyMEGClient::SendCommandToBabyMEGShortConnection()
+void BabyMEGClient::SendCommandToBabyMEGShortConnection(QByteArray s)
 {
     qDebug() << "SendCommandToBabyMEGShortConnection";
     tcpSocket->connectToHost(name,port,QIODevice::ReadWrite);
@@ -232,13 +233,13 @@ void BabyMEGClient::SendCommandToBabyMEGShortConnection()
 
         if(tcpSocket->state()==QAbstractSocket::ConnectedState)
         {
-            qDebug()<<"Send Command [COMS]";
-            tcpSocket->write("COMS");
-            int strlen = 3;
-            QByteArray Scmd = MGH_LM_Int2Byte(strlen);
+            qDebug()<<"Send String [" << s << "]";
+            tcpSocket->write(s);
+//            int strlen = s.size();
+//            QByteArray Scmd = MGH_LM_Int2Byte(strlen);
 
-            tcpSocket->write(Scmd);
-            tcpSocket->write("SLM");
+//            tcpSocket->write(Scmd);
+//            tcpSocket->write("SLM");
             tcpSocket->waitForBytesWritten();
         }
     }
@@ -336,8 +337,9 @@ void BabyMEGClient::handleBuffer()
                 //Parse parameters from PARA string
                 myBabyMEGInfo->MGH_LM_Parse_Para(PARA);
                 buffer.remove(0,tmp);
-                qDebug()<<"ACQ Start";
-                SendCommand("DATA");
+                qDebug()<<"INFO has been received!!!!";
+//                qDebug()<<"ACQ Start";
+//                SendCommand("DATA");
                 }
                 break;
             case 2:
