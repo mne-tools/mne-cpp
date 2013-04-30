@@ -250,8 +250,6 @@ void BabyMEG::setFiffData(QByteArray DATA)
 
     std::cout << "first ten elements \n" << rawData.block(0,0,1,10) << std::endl;
 
-//    QByteArray t = DATA.left(64);
-//    qDebug()<<"Data"<<t.toHex();
 //    MatrixXd m_M(rows,cols);
 
 //    int Nbytes = sizeof(double);
