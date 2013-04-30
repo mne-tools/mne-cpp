@@ -16,6 +16,7 @@ SUBDIRS += \
     ecgsimulator \
     dummytoolbox \
     rtserver \
+    rtsss \
     sourcelab \
 
 #    filtertoolbox \
