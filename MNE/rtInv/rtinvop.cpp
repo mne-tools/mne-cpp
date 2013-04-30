@@ -116,7 +116,6 @@ void RtInvOp::run()
             // Restrict forward solution as necessary for MEG
             MNEForwardSolution t_forwardMeg = m_pFwd->pick_types(true, false);
 
-
             MNEInverseOperator::SPtr t_invOpMeg(new MNEInverseOperator(*m_pFiffInfo.data(), t_forwardMeg, *m_vecNoiseCov[0].data(), 0.2f, 0.8f));
 
             mutex.lock();

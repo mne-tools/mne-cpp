@@ -118,11 +118,12 @@ public:
     /**
     * Creates the real-time covariance estimation object.
     *
-    * @param[in] p_iMaxSamples      Number of samples to use for each data chunk
+    * @param[in] p_iPreStimSamples  Number of samples averaged before the stimulus
+    * @param[in] p_iPostStimSamples Number of samples averaged after the stimulus (including the stimulus)
     * @param[in] p_pFiffInfo        Associated Fiff Information
     * @param[in] parent     Parent QObject (optional)
     */
-    explicit RtAve(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent = 0);
+    explicit RtAve(quint32 p_iPreStimSamples, quint32 p_iPostStimSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -178,7 +179,8 @@ private:
     QMutex      mutex;                  /**< Provides access serialization between threads*/
     bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
 
-    quint32      m_iMaxSamples;         /**< Maximal amount of samples received, before covariance is estimated.*/
+    quint32     m_iPreStimSamples;      /**< Amount of samples averaged before the stimulus. */
+    quint32     m_iPostStimSamples;     /**< Amount of samples averaged after the stimulus, including the stimulus sample.*/
 
     CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;   /**< The Circular Raw Matrix Buffer. */
 

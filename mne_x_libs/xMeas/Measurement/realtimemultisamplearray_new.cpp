@@ -182,6 +182,9 @@ void RealTimeMultiSampleArrayNew::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
             }
         }
 
+        // set channel Kind
+        initChInfo.setKind(p_pFiffInfo->chs[i].kind);
+
         m_qListChInfo.append(initChInfo);
     }
 

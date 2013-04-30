@@ -184,7 +184,7 @@ void RealTimeMultiSampleArrayNewWidget::maxValueChanged(double maxValue)
 {
 //    m_pRTMSA_New->setMaxValue(maxValue);
     for(quint32 i = 0; i < m_pRTMSA_New->getNumChannels(); ++i)
-        m_pRTMSA_New->chInfo()[i].setMaxValue(maxValue);
+            m_pRTMSA_New->chInfo()[i].setMaxValue(maxValue);
 
 //    ui.m_qLabel_MaxValue->setText(QString::number(maxValue));
     actualize();

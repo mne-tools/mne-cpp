@@ -43,6 +43,8 @@
 
 #include "../xmeas_global.h"
 
+#include <fiff/fiff_constants.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -66,7 +68,7 @@ namespace XMEASLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-//using namespace FIFFLIB;
+using namespace FIFFLIB;
 
 
 //=========================================================================================================
@@ -105,6 +107,22 @@ public:
     * @return the channel name.
     */
     inline QString getChannelName() const;
+
+    //=========================================================================================================
+    /**
+    * Sets the channel kind
+    *
+    * @param[in] p_iKind    channel kind
+    */
+    inline void setKind(qint32 p_iKind);
+
+    //=========================================================================================================
+    /**
+    * Returns the channel kind
+    *
+    * @return the channel kind.
+    */
+    inline qint32 getKind() const;
 
     //=========================================================================================================
     /**
@@ -158,6 +176,7 @@ private:
     QString     m_qStringChName;    /**< The channel name.*/
     double      m_dMinValue;        /**< The minimal value.*/
     double      m_dMaxValue;        /**< The maximal value.*/
+    qint32      m_iKind;            /**< The channel kind.*/
     QString     m_qString_Unit;     /**< Unit of the data of the measurement.*/
 
 };
@@ -184,6 +203,22 @@ inline QString RealTimeSampleArrayChInfo::getChannelName() const
 
 //*************************************************************************************************************
 
+inline void RealTimeSampleArrayChInfo::setKind(qint32 p_iKind)
+{
+    m_iKind = p_iKind;
+}
+
+
+//*************************************************************************************************************
+
+inline qint32 RealTimeSampleArrayChInfo::getKind() const
+{
+    return m_iKind;
+}
+
+
+//*************************************************************************************************************
+
 inline void RealTimeSampleArrayChInfo::setMinValue(double minValue)
 {
     m_dMinValue = minValue;
@@ -202,7 +237,8 @@ inline double RealTimeSampleArrayChInfo::getMinValue() const
 
 inline void RealTimeSampleArrayChInfo::setMaxValue(double maxValue)
 {
-    m_dMaxValue = maxValue;
+    if(m_iKind != FIFFV_STIM_CH) // ToDo dirty hack // don't set max for stim channels
+        m_dMaxValue = maxValue;
 }
 
 

@@ -207,24 +207,26 @@ void RtSss::run()
     //
     // Read Fiff Info
     //
-    while(!m_pFiffInfo)
-    {
-        msleep(10);
-        qDebug() << "Wait for fiff Info";
-    }
+//    while(!m_pFiffInfo)
+//    {
+//        msleep(10);
+//        qDebug() << "Wait for fiff Info";
+//    }
 
     //
     // Main thread loop
     //
     while(m_bIsRunning)
     {
-        qint32 nrows = m_pRtSssBuffer->rows();
+//        qint32 nrows = m_pRtSssBuffer->rows();
 
-        if(nrows > 0) // check if init
-        {
-            /* Dispatch the inputs */
-            MatrixXd t_mat = m_pRtSssBuffer->pop();
-        }
+//        if(nrows > 0) // check if init
+//        {
+//            /* Dispatch the inputs */
+//            MatrixXd t_mat = m_pRtSssBuffer->pop();
+//        }
+
+        msleep(1000);//DEBUG
     }
 }
 

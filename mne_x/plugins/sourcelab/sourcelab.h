@@ -196,7 +196,7 @@ private:
 
 
 
-    MinimumNorm::SPtr m_pMinimumNorm;
+    MinimumNorm::SPtr m_pMinimumNorm;   /**< Minimum Norm Estimation. */
 };
 
 } // NAMESPACE
