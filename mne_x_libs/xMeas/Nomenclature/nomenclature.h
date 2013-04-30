@@ -98,8 +98,9 @@ public:
         DUMMYTOOL = 0x00040000,             /**< Plugin id of the dummy toolbox. */
         FILTERTOOL = 0x00050000,            /**< Plugin id of the filter toolbox. */
         GABORPARTICLETOOL = 0x00060000,     /**< Plugin id of the gabor toolbox. */
-        SOURCELAB = 0x00070000,             /**< Plugin id of the source lab visualization. */
-        BRAINMONITOR = 0x00080000,          /**< Plugin id of the brain monitor visualization. */
+        SOURCELAB = 0x00070000,             /**< Plugin id of the source lab toolbox. */
+        RTSSS = 0x00080000,             /**< Plugin id of the rtsss toolbox. */
+        BRAINMONITOR = 0x00090000,          /**< Plugin id of the brain monitor visualization. */
         _default = -1                       /**< Default plugin id. */
     };
 
