@@ -238,15 +238,30 @@ void BabyMEG::setFiffData(QByteArray DATA)
 
     qint32 rows = m_FiffInfoBabyMEG.nchan;
     qint32 cols = (DATA.size()/8)/rows;
+    qDebug() << "Matrix " << rows << "x" << cols;
 
-    Map<MatrixXd> rawData((double*)DATA.data(),rows,cols);
+//    Map<MatrixXd> rawData((double*)DATA.data(),rows,cols);
+
+    Map < Matrix <double, Dynamic, Dynamic, RowMajor>  > rawData((double*)DATA.data(),rows,cols);
+
 
     for(qint32 i = 0; i < rows*cols; ++i)
         IOUtils::swap_doublep(rawData.data()+i);
 
-    qDebug() << "Matrix " << rows << "x" << cols;
-
     std::cout << "first ten elements \n" << rawData.block(0,0,1,10) << std::endl;
+
+//    QByteArray t = DATA.left(64);
+//    qDebug()<<"Data"<<t.toHex();
+//    MatrixXd m_M(rows,cols);
+
+//    int Nbytes = sizeof(double);
+//    // convert every 8 bytes to one double
+//    for(int i=0;i<rows;i++)
+//        for(int j=0; j<cols; j++)
+//            m_M(i,j) = myClient->MGH_LM_Byte2Double(DATA.mid(Nbytes*(i*cols+j),Nbytes));
+
+//    qDebug()<<m_M(0,0)<<"|"<<m_M(0,1)<<"|"<<m_M(0,2);
+//    qDebug()<<m_M(0,1)<<"|"<<m_M(1,1)<<"|"<<m_M(2,1);
 
 }
 
