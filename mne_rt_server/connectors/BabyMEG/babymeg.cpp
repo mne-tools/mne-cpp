@@ -51,6 +51,7 @@
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_types.h>
+#include <utils/ioutils.h>
 
 
 //*************************************************************************************************************
@@ -80,6 +81,7 @@
 using namespace BabyMEGPlugin;
 using namespace FIFFLIB;
 using namespace MNELIB;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -107,8 +109,10 @@ BabyMEG::BabyMEG()
     myClientComm->SetInfo(pInfo);
     myClientComm->start();
 
+    myClientComm->SendCommandToBabyMEGShortConnection("INFO");
+
     myClient->ConnectToBabyMEG();
-    myClient->DisConnectBabyMEG();
+//    myClient->DisConnectBabyMEG();
 
     this->init();
 }
@@ -226,9 +230,23 @@ void BabyMEG::setFiffInfo(FiffInfo p_FiffInfo)
     m_FiffInfoBabyMEG = p_FiffInfo;
 }
 
+//*************************************************************************************************************
+
 void BabyMEG::setFiffData(QByteArray DATA)
 {
     qDebug()<<"[BabyMEG]Data Size:"<<DATA.size();
+
+    qint32 rows = m_FiffInfoBabyMEG.nchan;
+    qint32 cols = (DATA.size()/8)/rows;
+
+    Map<MatrixXd> rawData((double*)DATA.data(),rows,cols);
+
+    for(qint32 i = 0; i < rows*cols; ++i)
+        IOUtils::swap_doublep(rawData.data()+i);
+
+    qDebug() << "Matrix " << rows << "x" << cols;
+
+    std::cout << "first ten elements \n" << rawData.block(0,0,1,10) << std::endl;
 
 }
 
@@ -238,12 +256,12 @@ void BabyMEG::init()
 {
 
     ///////////////////////////////////////////////// OLD
-    if(m_pRawMatrixBuffer)
-        delete m_pRawMatrixBuffer;
-    m_pRawMatrixBuffer = NULL;
+//    if(m_pRawMatrixBuffer)
+//        delete m_pRawMatrixBuffer;
+//    m_pRawMatrixBuffer = NULL;
 
-    if(!m_RawInfo.isEmpty())
-        m_pRawMatrixBuffer = new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_RawInfo.info.nchan, this->m_uiBufferSampleSize);
+//    if(!m_RawInfo.isEmpty())
+//        m_pRawMatrixBuffer = new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_RawInfo.info.nchan, this->m_uiBufferSampleSize);
 }
 
 
@@ -257,11 +275,6 @@ bool BabyMEG::start()
 
     myClient->ConnectToBabyMEG();
 
-
-    ////////////////////////////////// OLD
-
-    m_pBabyMEGProducer->start();
-
     QThread::start();
 
     return true;
@@ -274,12 +287,6 @@ bool BabyMEG::stop()
 {
 
     myClient->DisConnectBabyMEG();
-
-
-
-
-    ///////////////////////////////////// OLD
-    this->m_pBabyMEGProducer->stop();
 
     m_bIsRunning = false;
     QThread::wait();
@@ -306,19 +313,16 @@ void BabyMEG::run()
 {
     m_bIsRunning = true;
 
-    float t_fSamplingFrequency = m_RawInfo.info.sfreq;
-    float t_fBuffSampleSize = (float)m_uiBufferSampleSize;
-
-    quint32 uiSamplePeriod = (unsigned int) ((t_fBuffSampleSize/t_fSamplingFrequency)*1000000.0f);
+    quint32 uiSamplePeriod = 1000;
     quint32 count = 0;
 
     while(m_bIsRunning)
     {
-        MatrixXf tmp = m_pRawMatrixBuffer->pop();
+//        MatrixXf tmp = m_pRawMatrixBuffer->pop();
         ++count;
 //        printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
 
-        emit remitRawBuffer(tmp);
+//        emit remitRawBuffer(tmp);
         usleep(uiSamplePeriod);
     }
 }
