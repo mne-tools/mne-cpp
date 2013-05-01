@@ -122,68 +122,68 @@ void RtAve::assemblePostStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p
 //        std::cout << t_iRowIdx
 //                     << ": " << p_qListRawMatBuf[t_iMidIdx].second.row(t_iRowIdx) << std::endl;
 
-        qint32 nSampleCount = m_iPreStimSamples;
+        qint32 nSampleCount = 0;
 
-        MatrixXd t_matPreStim(nrows, m_iPreStimSamples);
+        MatrixXd t_matPostStim(nrows, m_iPostStimSamples);
         qint32 t_curBufIdx = t_iMidIdx;
 
-        qint32 t_iStart = 0;
+        qint32 t_iSize = 0;
 
         qint32 pos = 0;
         p_qListRawMatBuf[t_iMidIdx].second.row(t_iRowIdx).maxCoeff(&pos);
 //        std::cout << "Position: " << pos << std::endl;
 
         //
-        // assemble prestimulus
+        // assemble poststimulus
         //
 
         // start from the stimulus itself
         if(pos > 0)
         {
-            t_iStart = m_iPreStimSamples - pos;
-            if(t_iStart >= 0)
+            t_iSize = ncols - pos;
+            if(t_iSize <= m_iPostStimSamples)
             {
-                t_matPreStim.block(0, t_iStart, nrows, pos) = p_qListRawMatBuf[t_iMidIdx].second.block(0, 0, nrows, pos);
-                nSampleCount -= pos;
+                t_matPostStim.block(0, 0, nrows, t_iSize) = p_qListRawMatBuf[t_iMidIdx].second.block(0, pos, nrows, t_iSize);
+                nSampleCount += t_iSize;
 
-//                qDebug() << "t_matPreStim.block" << nSampleCount;
+                qDebug() << "t_matPostStim.block" << nSampleCount;
             }
             else
             {
-                t_matPreStim.block(0, 0, nrows, m_iPreStimSamples) = p_qListRawMatBuf[t_iMidIdx].second.block(0, -t_iStart, nrows, m_iPreStimSamples);
-                nSampleCount = 0;
+                t_matPostStim.block(0, 0, nrows, m_iPostStimSamples) = p_qListRawMatBuf[t_iMidIdx].second.block(0, pos, nrows, m_iPostStimSamples);
+                nSampleCount = m_iPostStimSamples;
 
-//                qDebug() << "t_matPreStim.block" << nSampleCount;
+                qDebug() << "t_matPostStim.block" << nSampleCount;
             }
 
-            --t_curBufIdx;
+            ++t_curBufIdx;
         }
 
         // remaining samples
-        while(nSampleCount > 0)
+        while(nSampleCount < m_iPostStimSamples)
         {
-            t_iStart = nSampleCount - ncols;
+            t_iSize = m_iPostStimSamples-nSampleCount;
 
-            if(t_iStart >= 0)
+            if(ncols <= t_iSize)
             {
-                t_matPreStim.block(0, t_iStart, nrows, ncols) = p_qListRawMatBuf[t_curBufIdx].second.block(0, 0, nrows, ncols);
-                nSampleCount -= ncols;
+                t_matPostStim.block(0, nSampleCount, nrows, ncols) = p_qListRawMatBuf[t_curBufIdx].second.block(0, 0, nrows, ncols);
+                nSampleCount += ncols;
             }
             else
             {
-                t_matPreStim.block(0, 0, nrows, nSampleCount) = p_qListRawMatBuf[t_curBufIdx].second.block(0, -t_iStart, nrows, nSampleCount);
-                nSampleCount = 0;
+                t_matPostStim.block(0, nSampleCount, nrows, t_iSize) = p_qListRawMatBuf[t_curBufIdx].second.block(0, 0, nrows, t_iSize);
+                nSampleCount = m_iPostStimSamples;
             }
 
-            --t_curBufIdx;
+            ++t_curBufIdx;
 
 //            qDebug() << "Sample count" << nSampleCount;
         }
 
         //
-        //Store in right pre stimulus buffer vector
+        //Store in right post stimulus buffer vector
         //
-        m_qListQVectorPostStimAve[p_iStimIdx].append(t_matPreStim);
+        m_qListQVectorPostStimAve[p_iStimIdx].append(t_matPostStim);
     }
 }
 
@@ -384,6 +384,11 @@ void RtAve::run()
                             if(m_qListQVectorPreStimAve[t_iStimIndex].size() > m_iNumAverages)
                                 m_qListQVectorPreStimAve[t_iStimIndex].pop_front();
 
+
+                            qDebug() << "Averages of post-stimulus" << t_iStimIndex << ":" << m_qListQVectorPostStimAve[t_iStimIndex].size();
+                            if(m_qListQVectorPostStimAve[t_iStimIndex].size() > m_iNumAverages)
+                                m_qListQVectorPostStimAve[t_iStimIndex].pop_front();
+
                         }
                     }
                 }
@@ -394,8 +399,6 @@ void RtAve::run()
                 //
                 t_qListRawMatBuf.pop_front();
             }
-
-
 
 
 
