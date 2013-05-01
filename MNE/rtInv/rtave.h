@@ -187,9 +187,9 @@ private:
     bool m_bAutoAspect; /**< Auto aspect detection on or off. */
 
 
-    QList<qint32> m_qListStimChannelIdcs;      /**< Stimulus channel indeces. */
+    QList<qint32> m_qListStimChannelIdcs;   /**< Stimulus channel indeces. */
 
-    QSet<fiff_int_t>  m_qSetAspectKinds;     /**< Set of aspects to average. Each aspect is averaged separetely and released stored in evoked data.*/
+//    QList<fiff_int_t>  m_qSetAspectKinds;   /**< List of aspects to average. Each aspect is averaged separetely and released stored in evoked data.*/
 
     QList< QVector<MatrixXd> > m_qListQVectorPreStimuli;    /**< averages the pre stimuli */
     QList< QVector<MatrixXd> > m_qListQVectorPostStimuli;    /**< averages the post stimuli */
