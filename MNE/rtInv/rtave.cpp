@@ -131,11 +131,23 @@ void RtAve::run()
     VectorXd mu;
     qint32 i = 0;
 
-    //get stim channels
+    //
+    // get num stim channels
+    //
     m_qListStimChannelIdcs.clear();
+    m_qListQVectorPreStimAve.clear();
+    m_qListQVectorPostStimAve.clear();
+    QVector<MatrixXd> t_qVecMat;
     for(i = 0; i < m_pFiffInfo->nchan; ++i)
+    {
         if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH && (m_pFiffInfo->chs[i].ch_name != QString("STI 014")))
+        {
             m_qListStimChannelIdcs.append(i);
+
+            m_qListQVectorPreStimAve.push_back(t_qVecMat);
+            m_qListQVectorPostStimAve.push_back(t_qVecMat);
+        }
+    }
 
     qint32 count = 0;
 
@@ -164,7 +176,7 @@ void RtAve::run()
                 int iMax = stimSegment.maxCoeff();
 
                 if(iMax > 0)
-                    t_qListStimuli.append(idx);
+                    t_qListStimuli.append(i);
             }
 
             //
@@ -187,14 +199,73 @@ void RtAve::run()
                     {
                         if(!t_qListRawMatBuf[t_iMidIdx-1].first.contains(t_qListRawMatBuf[t_iMidIdx].first[i]))//make sure that previous buffer does not conatin this stim - prevent multiple detection
                         {
+
+                            qint32 t_iRowIdx = m_qListStimChannelIdcs[t_qListRawMatBuf[t_iMidIdx].first[i]];
+
+
+
                             std::cout << "Count: " << count << std::endl;
 
-                            std::cout << t_qListRawMatBuf[t_iMidIdx].first[i] << " " << t_qListRawMatBuf[t_iMidIdx].second.row(t_qListRawMatBuf[t_iMidIdx].first[i]) << std::endl;
+                            std::cout << t_iRowIdx
+                                         << ": " << t_qListRawMatBuf[t_iMidIdx].second.row(t_iRowIdx) << std::endl;
 
 
                             qint32 pos = 0;
-                            t_qListRawMatBuf[t_iMidIdx].second.row(t_qListRawMatBuf[t_iMidIdx].first[i]).maxCoeff(&pos);
+                            t_qListRawMatBuf[t_iMidIdx].second.row(t_iRowIdx).maxCoeff(&pos);
                             std::cout << "Position: " << pos << std::endl;
+
+                            //
+                            // assemble prestimulus
+                            //
+                            qint32 nrows = t_qListRawMatBuf[t_iMidIdx].second.rows();
+                            qint32 ncols = t_qListRawMatBuf[t_iMidIdx].second.rows();
+
+                            if(m_iPreStimSamples > 0)
+                            {
+                                qint32 nSampleCount = m_iPreStimSamples;
+
+                                MatrixXd t_matPreStim(nrows, m_iPreStimSamples);
+                                qint32 t_curBufIdx = t_iMidIdx;
+
+                                // start from the stimulus itself
+                                if(pos > 0)
+                                {
+                                    qint32 t_iStart = m_iPreStimSamples - pos;
+                                    if(t_iStart >= 0)
+                                    {
+                                        t_matPreStim.block(0, t_iStart, nrows, pos) = t_qListRawMatBuf[t_iMidIdx].second.block(0, 0, nrows, pos);
+                                        nSampleCount -= pos;
+
+                                        qDebug() << "t_matPreStim.block" << nSampleCount;
+                                    }
+                                    else
+                                    {
+                                        t_matPreStim.block(0, 0, nrows, m_iPreStimSamples) = t_qListRawMatBuf[t_iMidIdx].second.block(0, -t_iStart, nrows, m_iPreStimSamples);
+                                        nSampleCount = 0;
+
+                                        qDebug() << "t_matPreStim.block" << nSampleCount;
+                                    }
+
+                                    --t_curBufIdx;
+                                }
+
+                                // remaining samples
+//                                while(nSampleCount > 0)
+//                                {
+
+
+//                                    --t_curBufIdx;
+//                                }
+
+
+
+                            }
+
+
+
+
+
+
 
                         }
                     }
