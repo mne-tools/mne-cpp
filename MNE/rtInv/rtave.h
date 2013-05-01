@@ -174,10 +174,30 @@ protected:
     virtual void run();
 
 private:
+    //=========================================================================================================
+    /**
+    * Assemble the poststimulus
+    *
+    * @param[in] p_qListRawMatBuf   List of raw buffers
+    * @param[in] p_iStimIdx         Stimulus index to investigate
+    */
+    void assemblePostStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p_qListRawMatBuf, qint32 p_iStimIdx);
+
+    //=========================================================================================================
+    /**
+    * Assemble the prestimulus
+    *
+    * @param[in] p_qListRawMatBuf   List of raw buffers
+    * @param[in] p_iStimIdx         Stimulus index to investigate
+    */
+    void assemblePreStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p_qListRawMatBuf, qint32 p_iStimIdx);
+
     FiffInfo::SPtr  m_pFiffInfo;        /**< Holds the fiff measurement information. */
 
     QMutex      mutex;                  /**< Provides access serialization between threads*/
     bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
+
+    qint32 m_iNumAverages;              /**< Number of averages */
 
     quint32     m_iPreStimSamples;      /**< Amount of samples averaged before the stimulus. */
     quint32     m_iPostStimSamples;     /**< Amount of samples averaged after the stimulus, including the stimulus sample.*/
