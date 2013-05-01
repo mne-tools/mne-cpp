@@ -72,6 +72,7 @@ using namespace UTILSLIB;
 
 RtAve::RtAve(quint32 p_iPreStimSamples, quint32 p_iPostStimSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent)
 : QThread(parent)
+, m_iNumAverages(4)
 , m_iPreStimSamples(p_iPreStimSamples)
 , m_iPostStimSamples(p_iPostStimSamples)
 , m_pFiffInfo(p_pFiffInfo)
@@ -100,6 +101,174 @@ void RtAve::append(const MatrixXd &p_DataSegment)
         m_pRawMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(128, p_DataSegment.rows(), p_DataSegment.cols()));
 
     m_pRawMatrixBuffer->push(&p_DataSegment);
+}
+
+
+//*************************************************************************************************************
+
+void RtAve::assemblePostStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p_qListRawMatBuf, qint32 p_iStimIdx)
+{
+    if(m_iPreStimSamples > 0)
+    {
+        // middle of the assembled buffers
+        qint32 t_iMidIdx = p_qListRawMatBuf.size()/2;
+
+        qint32 nrows = p_qListRawMatBuf[t_iMidIdx].second.rows();
+        qint32 ncols = p_qListRawMatBuf[t_iMidIdx].second.cols();
+
+        //Stimulus channel row
+        qint32 t_iRowIdx = m_qListStimChannelIdcs[p_iStimIdx];
+
+//        std::cout << t_iRowIdx
+//                     << ": " << p_qListRawMatBuf[t_iMidIdx].second.row(t_iRowIdx) << std::endl;
+
+        qint32 nSampleCount = m_iPreStimSamples;
+
+        MatrixXd t_matPreStim(nrows, m_iPreStimSamples);
+        qint32 t_curBufIdx = t_iMidIdx;
+
+        qint32 t_iStart = 0;
+
+        qint32 pos = 0;
+        p_qListRawMatBuf[t_iMidIdx].second.row(t_iRowIdx).maxCoeff(&pos);
+//        std::cout << "Position: " << pos << std::endl;
+
+        //
+        // assemble prestimulus
+        //
+
+        // start from the stimulus itself
+        if(pos > 0)
+        {
+            t_iStart = m_iPreStimSamples - pos;
+            if(t_iStart >= 0)
+            {
+                t_matPreStim.block(0, t_iStart, nrows, pos) = p_qListRawMatBuf[t_iMidIdx].second.block(0, 0, nrows, pos);
+                nSampleCount -= pos;
+
+//                qDebug() << "t_matPreStim.block" << nSampleCount;
+            }
+            else
+            {
+                t_matPreStim.block(0, 0, nrows, m_iPreStimSamples) = p_qListRawMatBuf[t_iMidIdx].second.block(0, -t_iStart, nrows, m_iPreStimSamples);
+                nSampleCount = 0;
+
+//                qDebug() << "t_matPreStim.block" << nSampleCount;
+            }
+
+            --t_curBufIdx;
+        }
+
+        // remaining samples
+        while(nSampleCount > 0)
+        {
+            t_iStart = nSampleCount - ncols;
+
+            if(t_iStart >= 0)
+            {
+                t_matPreStim.block(0, t_iStart, nrows, ncols) = p_qListRawMatBuf[t_curBufIdx].second.block(0, 0, nrows, ncols);
+                nSampleCount -= ncols;
+            }
+            else
+            {
+                t_matPreStim.block(0, 0, nrows, nSampleCount) = p_qListRawMatBuf[t_curBufIdx].second.block(0, -t_iStart, nrows, nSampleCount);
+                nSampleCount = 0;
+            }
+
+            --t_curBufIdx;
+
+//            qDebug() << "Sample count" << nSampleCount;
+        }
+
+        //
+        //Store in right pre stimulus buffer vector
+        //
+        m_qListQVectorPostStimAve[p_iStimIdx].append(t_matPreStim);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void RtAve::assemblePreStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p_qListRawMatBuf, qint32 p_iStimIdx)
+{
+    if(m_iPreStimSamples > 0)
+    {
+        // middle of the assembled buffers
+        qint32 t_iMidIdx = p_qListRawMatBuf.size()/2;
+
+        qint32 nrows = p_qListRawMatBuf[t_iMidIdx].second.rows();
+        qint32 ncols = p_qListRawMatBuf[t_iMidIdx].second.cols();
+
+        //Stimulus channel row
+        qint32 t_iRowIdx = m_qListStimChannelIdcs[p_iStimIdx];
+
+//        std::cout << t_iRowIdx
+//                     << ": " << p_qListRawMatBuf[t_iMidIdx].second.row(t_iRowIdx) << std::endl;
+
+        qint32 nSampleCount = m_iPreStimSamples;
+
+        MatrixXd t_matPreStim(nrows, m_iPreStimSamples);
+        qint32 t_curBufIdx = t_iMidIdx;
+
+        qint32 t_iStart = 0;
+
+        qint32 pos = 0;
+        p_qListRawMatBuf[t_iMidIdx].second.row(t_iRowIdx).maxCoeff(&pos);
+//        std::cout << "Position: " << pos << std::endl;
+
+        //
+        // assemble prestimulus
+        //
+
+        // start from the stimulus itself
+        if(pos > 0)
+        {
+            t_iStart = m_iPreStimSamples - pos;
+            if(t_iStart >= 0)
+            {
+                t_matPreStim.block(0, t_iStart, nrows, pos) = p_qListRawMatBuf[t_iMidIdx].second.block(0, 0, nrows, pos);
+                nSampleCount -= pos;
+
+//                qDebug() << "t_matPreStim.block" << nSampleCount;
+            }
+            else
+            {
+                t_matPreStim.block(0, 0, nrows, m_iPreStimSamples) = p_qListRawMatBuf[t_iMidIdx].second.block(0, -t_iStart, nrows, m_iPreStimSamples);
+                nSampleCount = 0;
+
+//                qDebug() << "t_matPreStim.block" << nSampleCount;
+            }
+
+            --t_curBufIdx;
+        }
+
+        // remaining samples
+        while(nSampleCount > 0)
+        {
+            t_iStart = nSampleCount - ncols;
+
+            if(t_iStart >= 0)
+            {
+                t_matPreStim.block(0, t_iStart, nrows, ncols) = p_qListRawMatBuf[t_curBufIdx].second.block(0, 0, nrows, ncols);
+                nSampleCount -= ncols;
+            }
+            else
+            {
+                t_matPreStim.block(0, 0, nrows, nSampleCount) = p_qListRawMatBuf[t_curBufIdx].second.block(0, -t_iStart, nrows, nSampleCount);
+                nSampleCount = 0;
+            }
+
+            --t_curBufIdx;
+
+//            qDebug() << "Sample count" << nSampleCount;
+        }
+
+        //
+        //Store in right pre stimulus buffer vector
+        //
+        m_qListQVectorPreStimAve[p_iStimIdx].append(t_matPreStim);
+    }
 }
 
 
@@ -199,73 +368,21 @@ void RtAve::run()
                     {
                         if(!t_qListRawMatBuf[t_iMidIdx-1].first.contains(t_qListRawMatBuf[t_iMidIdx].first[i]))//make sure that previous buffer does not conatin this stim - prevent multiple detection
                         {
-
-                            qint32 t_iRowIdx = m_qListStimChannelIdcs[t_qListRawMatBuf[t_iMidIdx].first[i]];
-
-
-
-                            std::cout << "Count: " << count << std::endl;
-
-                            std::cout << t_iRowIdx
-                                         << ": " << t_qListRawMatBuf[t_iMidIdx].second.row(t_iRowIdx) << std::endl;
-
-
-                            qint32 pos = 0;
-                            t_qListRawMatBuf[t_iMidIdx].second.row(t_iRowIdx).maxCoeff(&pos);
-                            std::cout << "Position: " << pos << std::endl;
+                            qint32 t_iStimIndex = t_qListRawMatBuf[t_iMidIdx].first[i];
 
                             //
                             // assemble prestimulus
                             //
-                            qint32 nrows = t_qListRawMatBuf[t_iMidIdx].second.rows();
-                            qint32 ncols = t_qListRawMatBuf[t_iMidIdx].second.rows();
+                            this->assemblePreStimulus(t_qListRawMatBuf, t_iStimIndex);
 
-                            if(m_iPreStimSamples > 0)
-                            {
-                                qint32 nSampleCount = m_iPreStimSamples;
+                            //
+                            // assemble poststimulus
+                            //
+                            this->assemblePostStimulus(t_qListRawMatBuf, t_iStimIndex);
 
-                                MatrixXd t_matPreStim(nrows, m_iPreStimSamples);
-                                qint32 t_curBufIdx = t_iMidIdx;
-
-                                // start from the stimulus itself
-                                if(pos > 0)
-                                {
-                                    qint32 t_iStart = m_iPreStimSamples - pos;
-                                    if(t_iStart >= 0)
-                                    {
-                                        t_matPreStim.block(0, t_iStart, nrows, pos) = t_qListRawMatBuf[t_iMidIdx].second.block(0, 0, nrows, pos);
-                                        nSampleCount -= pos;
-
-                                        qDebug() << "t_matPreStim.block" << nSampleCount;
-                                    }
-                                    else
-                                    {
-                                        t_matPreStim.block(0, 0, nrows, m_iPreStimSamples) = t_qListRawMatBuf[t_iMidIdx].second.block(0, -t_iStart, nrows, m_iPreStimSamples);
-                                        nSampleCount = 0;
-
-                                        qDebug() << "t_matPreStim.block" << nSampleCount;
-                                    }
-
-                                    --t_curBufIdx;
-                                }
-
-                                // remaining samples
-//                                while(nSampleCount > 0)
-//                                {
-
-
-//                                    --t_curBufIdx;
-//                                }
-
-
-
-                            }
-
-
-
-
-
-
+                            qDebug() << "Averages of pre-stimulus" << t_iStimIndex << ":" << m_qListQVectorPreStimAve[t_iStimIndex].size();
+                            if(m_qListQVectorPreStimAve[t_iStimIndex].size() > m_iNumAverages)
+                                m_qListQVectorPreStimAve[t_iStimIndex].pop_front();
 
                         }
                     }
