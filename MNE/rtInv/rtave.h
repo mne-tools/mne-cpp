@@ -199,8 +199,8 @@ private:
 
     qint32 m_iNumAverages;              /**< Number of averages */
 
-    quint32     m_iPreStimSamples;      /**< Amount of samples averaged before the stimulus. */
-    quint32     m_iPostStimSamples;     /**< Amount of samples averaged after the stimulus, including the stimulus sample.*/
+    qint32     m_iPreStimSamples;       /**< Amount of samples averaged before the stimulus. */
+    qint32     m_iPostStimSamples;      /**< Amount of samples averaged after the stimulus, including the stimulus sample.*/
 
     CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;   /**< The Circular Raw Matrix Buffer. */
 
