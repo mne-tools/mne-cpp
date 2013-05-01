@@ -91,8 +91,6 @@ using namespace IOBuffer;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class BabyMEGProducer;
-
 
 //=============================================================================================================
 /**
@@ -106,8 +104,6 @@ class BABYMEGSHARED_EXPORT BabyMEG : public IConnector
     Q_PLUGIN_METADATA(IID "mne_rt_server/1.0" FILE "babymeg.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(RTSERVER::IConnector)
-
-    friend class BabyMEGProducer;
 
 public:
 
@@ -181,17 +177,14 @@ private:
 
     FiffInfo    m_FiffInfoBabyMEG;      /**< Holds the fiff information. */
 
-
+    bool    m_bIsRunning;
 
     // OLD Simulation stuff
-    BabyMEGProducer*    m_pBabyMEGProducer;        /**< Holds the DataProducer.*/
     FiffRawData         m_RawInfo;              /**< Holds the fiff raw measurement information. */
-    QString             m_sResourceDataPath;    /**< Holds the path to the Fiff resource simulation file directory.*/
     quint32             m_uiBufferSampleSize;   /**< Sample size of the buffer */
 
-    RawMatrixBuffer*    m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
+    CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
 
-    bool                m_bIsRunning;
 };
 
 } // NAMESPACE

@@ -72,14 +72,12 @@ else {
 DESTDIR = $${MNE_BINARY_DIR}/mne_rt_server_plugins
 
 SOURCES += \
-    babymegproducer.cpp \
     babymeg.cpp \
     babymeginfo.cpp \
     babymegclient.cpp
 
 HEADERS += \
     ../../mne_rt_server/IConnector.h \  #IConnector is a Q_OBJECT and the resulting moc file needs to be known -> that's why inclution is important!
-    babymegproducer.h \
     babymeg_global.h \
     babymeg.h \
     babymeginfo.h \
