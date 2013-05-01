@@ -41,7 +41,6 @@
 //=============================================================================================================
 
 #include "babymeg.h"
-#include "babymegproducer.h"
 
 
 //*************************************************************************************************************
@@ -90,9 +89,7 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 BabyMEG::BabyMEG()
-: m_pBabyMEGProducer(new BabyMEGProducer(this))
-, m_sResourceDataPath("../../mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
-, m_bIsRunning(false)
+:m_bIsRunning(false)
 , m_uiBufferSampleSize(1000)
 , m_pRawMatrixBuffer(NULL)
 , pInfo(NULL)
@@ -111,7 +108,7 @@ BabyMEG::BabyMEG()
 
     myClientComm->SendCommandToBabyMEGShortConnection("INFO");
 
-    myClient->ConnectToBabyMEG();
+//    myClient->ConnectToBabyMEG();
 //    myClient->DisConnectBabyMEG();
 
     this->init();
@@ -123,9 +120,6 @@ BabyMEG::BabyMEG()
 BabyMEG::~BabyMEG()
 {
     qDebug() << "Destroy BabyMEG::~BabyMEG()";
-
-    if(m_pBabyMEGProducer)
-        delete m_pBabyMEGProducer;
 
     if(myClient)
         delete myClient;
@@ -151,18 +145,15 @@ void BabyMEG::comBufsize(Command p_command)
     {
 //        printf("bufsize %d\n", t_uiBuffSize);
 
-            bool t_bWasRunning = m_bIsRunning;
+//            bool t_bWasRunning = m_bIsRunning;
 
-            if(m_bIsRunning)
-            {
-                m_pBabyMEGProducer->stop();
-                this->stop();
-            }
+//            if(m_bIsRunning)
+//                this->stop();
 
-            m_uiBufferSampleSize = t_uiBuffSize;
+//            m_uiBufferSampleSize = t_uiBuffSize;
 
-            if(t_bWasRunning)
-                this->start();
+//            if(t_bWasRunning)
+//                this->start();
 
         QString str = QString("\tSet %1 buffer sample size to %2 samples\r\n\n").arg(getName()).arg(t_uiBuffSize);
 
@@ -228,6 +219,8 @@ const char* BabyMEG::getName() const
 void BabyMEG::setFiffInfo(FiffInfo p_FiffInfo)
 {
     m_FiffInfoBabyMEG = p_FiffInfo;
+
+    m_uiBufferSampleSize = pInfo->dataLength;
 }
 
 //*************************************************************************************************************
@@ -240,15 +233,28 @@ void BabyMEG::setFiffData(QByteArray DATA)
     qint32 cols = (DATA.size()/8)/rows;
     qDebug() << "Matrix " << rows << "x" << cols;
 
-//    Map<MatrixXd> rawData((double*)DATA.data(),rows,cols);
+//    Map < Matrix <double, Dynamic, Dynamic, RowMajor>  > rawData((double*)DATA.data(),rows,cols);
 
-    Map < Matrix <double, Dynamic, Dynamic, RowMajor>  > rawData((double*)DATA.data(),rows,cols);
+//    Map < MatrixXd  > rawData((double*)DATA.data(), cols, rows);
+    MatrixXd rawData(Map<MatrixXd>( (double*)DATA.data(), cols, rows));
 
+//    rawData.transposeInPlace();
 
     for(qint32 i = 0; i < rows*cols; ++i)
         IOUtils::swap_doublep(rawData.data()+i);
 
-    std::cout << "first ten elements \n" << rawData.block(0,0,1,10) << std::endl;
+//    std::cout << "first ten elements \n" << rawData.block(0,0,1,10) << std::endl;
+
+//    MatrixXd test = MatrixXd::Zero(20,20);
+
+    if(!m_pRawMatrixBuffer)
+        m_pRawMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, rows, cols));
+
+    m_pRawMatrixBuffer->push(&rawData);
+
+
+//    if(m_bIsRunning)
+//        emit remitRawBuffer(rawData.cast<float>());
 
 //    MatrixXd m_M(rows,cols);
 
@@ -285,10 +291,12 @@ bool BabyMEG::start()
     this->init();
 
     // Start threads
+    m_bIsRunning = true;
+    QThread::start();
 
     myClient->ConnectToBabyMEG();
 
-    QThread::start();
+
 
     return true;
 }
@@ -298,11 +306,10 @@ bool BabyMEG::start()
 
 bool BabyMEG::stop()
 {
-
-    myClient->DisConnectBabyMEG();
-
     m_bIsRunning = false;
     QThread::wait();
+
+    myClient->DisConnectBabyMEG();
 
     return true;
 }
@@ -326,16 +333,20 @@ void BabyMEG::run()
 {
     m_bIsRunning = true;
 
-    quint32 uiSamplePeriod = 1000;
     quint32 count = 0;
 
     while(m_bIsRunning)
     {
-//        MatrixXf tmp = m_pRawMatrixBuffer->pop();
-        ++count;
-//        printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
+        if(m_pRawMatrixBuffer)
+        {
+            MatrixXd tmp = m_pRawMatrixBuffer->pop();
 
-//        emit remitRawBuffer(tmp);
-        usleep(uiSamplePeriod);
+            ++count;
+            printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
+
+//            MatrixXf test = MatrixXf::Zero(tmp.rows(), 500);
+
+            emit remitRawBuffer(tmp.cast<float>());
+        }
     }
 }
