@@ -108,10 +108,10 @@ BabyMEG::BabyMEG()
 
     myClientComm->SendCommandToBabyMEGShortConnection("INFO");
 
-    myClient->ConnectToBabyMEG();
-//    myClient->DisConnectBabyMEG();
-    m_bIsRunning = true;
-    QThread::start();
+//    myClient->ConnectToBabyMEG();
+////    myClient->DisConnectBabyMEG();
+//    m_bIsRunning = true;
+//    QThread::start();
 
     this->init();
 }
@@ -229,7 +229,7 @@ void BabyMEG::setFiffInfo(FiffInfo p_FiffInfo)
 
 void BabyMEG::setFiffData(QByteArray DATA)
 {
-    qDebug()<<"[BabyMEG]Data Size:"<<DATA.size();
+//    qDebug() << "[BabyMEG] Data Size:"<<DATA.size();
 
     //get the first byte -- the data format
     int dformat = DATA.left(1).toInt();
@@ -237,18 +237,15 @@ void BabyMEG::setFiffData(QByteArray DATA)
     DATA.remove(0,1);
     qint32 rows = m_FiffInfoBabyMEG.nchan;
     qint32 cols = (DATA.size()/dformat)/rows;
-    qDebug() << "Matrix " << rows << "x" << cols <<" [Data bytes:" <<dformat<<"]";
 
-////    Map < Matrix <double, Dynamic, Dynamic, RowMajor>  > rawData((double*)DATA.data(),rows,cols);
-
-////    Map < MatrixXd  > rawData((double*)DATA.data(), cols, rows);
+    qDebug() << "[BabyMEG] Matrix " << rows << "x" << cols << " [Data bytes:" << dformat << "]";
 
     MatrixXf rawData(Map<MatrixXf>( (float*)DATA.data(),rows, cols ));
 
     for(qint32 i = 0; i < rows*cols; ++i)
         IOUtils::swap_floatp(rawData.data()+i);
 
-    std::cout << "first ten elements \n" << rawData.block(0,0,1,10) << std::endl;
+//    std::cout << "first ten elements \n" << rawData.block(0,0,2,10) << std::endl;
 
     if(!m_pRawMatrixBuffer)
         m_pRawMatrixBuffer = CircularMatrixBuffer<float>::SPtr(new CircularMatrixBuffer<float>(64, rows, cols));
@@ -283,8 +280,6 @@ bool BabyMEG::start()
     QThread::start();
 
     myClient->ConnectToBabyMEG();
-
-
 
     return true;
 }
@@ -327,15 +322,13 @@ void BabyMEG::run()
     {
         if(m_pRawMatrixBuffer)
         {
-            MatrixXf tmp = m_pRawMatrixBuffer->pop();
+            MatrixXf t_rawBuffer = m_pRawMatrixBuffer->pop();
 
             ++count;
-            printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
+//            printf("%d raw buffer (%d x %d) generated\r\n", count, t_rawBuffer.rows(), t_rawBuffer.cols());
+//            std::cout << "first 100 elements \n" << t_rawBuffer.block(0,0,1,100) << std::endl;
 
-//            MatrixXf test = MatrixXf::Zero(tmp.rows(), 500);
-
-//            emit remitRawBuffer(tmp.cast<float>());
-//            emit remitRawBuffer(tmp);
+            emit remitRawBuffer(t_rawBuffer);
         }
     }
 }

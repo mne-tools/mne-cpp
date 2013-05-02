@@ -90,14 +90,14 @@ RtServer::RtServer()
     m_pRtServerProducer->start();
 
 
-    //Convinience CMD connection timer --> ToDo get rid of that -> it interrupts acquistion when not connected
-    connect(&m_cmdConnectionTimer, &QTimer::timeout, this, &RtServer::connectCmdClient);
+//    //Convinience CMD connection timer --> ToDo get rid of that -> it interrupts acquistion when not connected
+//    connect(&m_cmdConnectionTimer, &QTimer::timeout, this, &RtServer::connectCmdClient);
 
     //init channels when fiff info is available
     connect(this, &RtServer::fiffInfoAvailable, this, &RtServer::init);
 
-    //Start convinience timer
-    m_cmdConnectionTimer.start(5000);
+//    //Start convinience timer
+//    m_cmdConnectionTimer.start(5000);
 
     //Try to connect the cmd client on start up using localhost connection
     this->connectCmdClient();
@@ -178,7 +178,7 @@ void RtServer::connectCmdClient()
         rtServerMutex.lock();
 
         //Stop convinience timer
-        m_cmdConnectionTimer.stop();
+//        m_cmdConnectionTimer.stop();
 
         if(!m_bCmdClientIsConnected)
         {
@@ -361,6 +361,7 @@ void RtServer::init()
 
     if(m_pFiffInfo)
     {
+//        m_pFiffInfo->sfreq /= 100;
         m_pRTMSA_RtServer = addProviderRealTimeMultiSampleArray_New(MSR_ID::MEGRTSERVER_OUTPUT);
         m_pRTMSA_RtServer->initFromFiffInfo(m_pFiffInfo);
         m_pRTMSA_RtServer->setMultiArraySize(10);
@@ -380,8 +381,12 @@ void RtServer::run()
         //pop matrix
         matValue = m_pRawMatrixBuffer_In->pop();
 
+//        std::cout << "matValue " << matValue.block(0,0,1,50) << std::endl;
+
         //emit values
         for(qint32 i = 0; i < matValue.cols(); ++i)
             m_pRTMSA_RtServer->setValue(matValue.col(i).cast<double>());
+//        for(qint32 i = 0; i < matValue.cols(); i += 100)
+//            m_pRTMSA_RtServer->setValue(matValue.col(i).cast<double>());
     }
 }
