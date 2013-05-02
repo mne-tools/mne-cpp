@@ -211,9 +211,12 @@ private:
 
 //    QList<fiff_int_t>  m_qSetAspectKinds;   /**< List of aspects to average. Each aspect is averaged separetely and released stored in evoked data.*/
 
-    QList<QVector<MatrixXd> > m_qListQVectorPreStimAve;     /**< averages the pre stimuli */
-    QList<QVector<MatrixXd> > m_qListQVectorPostStimAve;    /**< averages the post stimuli */
+    QList<QVector<MatrixXd> > m_qListQVectorPreStimBuf;     /**< assembles the pre stimulus data */
+    QList<QVector<MatrixXd> > m_qListQVectorPostStimBuf;    /**< assembles the post stimulus data */
 
+    QList<MatrixXd> m_qListPreStimAve;     /**< the current pre stimulus average */
+    QList<MatrixXd> m_qListPostStimAve;    /**< the current post stimulus average */
+    QList<MatrixXd> m_qListStimAve;     /**< the current stimulus average */
 };
 
 //*************************************************************************************************************
