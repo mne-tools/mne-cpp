@@ -100,6 +100,11 @@ void RealTimeMultiSampleArrayNew::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
 {
     m_qListChInfo.clear();
 
+    bool t_bIsBabyMEG = false;
+
+    if(p_pFiffInfo->acq_pars == "BabyMEG")
+        t_bIsBabyMEG = true;
+
     for(qint32 i = 0; i < p_pFiffInfo->nchan; ++i)
     {
         RealTimeSampleArrayChInfo initChInfo;
@@ -114,6 +119,8 @@ void RealTimeMultiSampleArrayNew::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
         }
         else
         {
+//            qDebug() << "kind" << p_pFiffInfo->chs[i].kind << "unit" << p_pFiffInfo->chs[i].unit;
+
             //Unit
             switch(p_pFiffInfo->chs[i].unit)
             {
@@ -154,8 +161,16 @@ void RealTimeMultiSampleArrayNew::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
                     break;
                 case 112:
                     initChInfo.setUnit("T");
-                    initChInfo.setMinValue(-1.0e-10);
-                    initChInfo.setMaxValue(1.0e-10);
+                    if(t_bIsBabyMEG)
+                    {
+                        initChInfo.setMinValue(-1.0e-4);
+                        initChInfo.setMaxValue(1.0e-4);
+                    }
+                    else
+                    {
+                        initChInfo.setMinValue(-1.0e-10);
+                        initChInfo.setMaxValue(1.0e-10);
+                    }
                     break;
                 case 113:
                     initChInfo.setUnit("H");
@@ -171,8 +186,16 @@ void RealTimeMultiSampleArrayNew::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
                     break;
                 case 201:
                     initChInfo.setUnit("T/m");
-                    initChInfo.setMinValue(-1.0e-10);
-                    initChInfo.setMaxValue(1.0e-10);
+                    if(t_bIsBabyMEG)
+                    {
+                        initChInfo.setMinValue(-1.0e-4);
+                        initChInfo.setMaxValue(1.0e-4);
+                    }
+                    else
+                    {
+                        initChInfo.setMinValue(-1.0e-10);
+                        initChInfo.setMaxValue(1.0e-10);
+                    }
                     break;
                 case 202:
                     initChInfo.setUnit("Am");
