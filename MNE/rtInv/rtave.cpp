@@ -327,6 +327,49 @@ void RtAve::run()
         }
     }
 
+
+    float T = 1/m_pFiffInfo->sfreq;
+
+    // pre real-time evoked response
+    FiffEvoked t_preStimEvoked;
+    t_preStimEvoked.setInfo(*m_pFiffInfo.data());
+    t_preStimEvoked.nave = m_iNumAverages;
+    t_preStimEvoked.aspect_kind = FIFFV_ASPECT_AVERAGE;
+    t_preStimEvoked.comment = QString("Real-time evoked pre stimulus response");
+    t_preStimEvoked.times.resize(m_iPreStimSamples);
+    t_preStimEvoked.times[0] = -T*m_iPreStimSamples;
+    for(i = 1; i < t_preStimEvoked.times.size(); ++i)
+        t_preStimEvoked.times[i] = t_preStimEvoked.times[i-1] + T;
+    t_preStimEvoked.first = t_preStimEvoked.times[0];
+    t_preStimEvoked.last = t_preStimEvoked.times[t_preStimEvoked.times.size()-1];
+
+    // post real-time evoked full response
+    FiffEvoked t_postStimEvoked;
+    t_postStimEvoked.setInfo(*m_pFiffInfo.data());
+    t_postStimEvoked.nave = m_iNumAverages;
+    t_postStimEvoked.aspect_kind = FIFFV_ASPECT_AVERAGE;
+    t_postStimEvoked.comment = QString("Real-time evoked post stimulus response");
+    t_postStimEvoked.times.resize(m_iPostStimSamples);
+    t_postStimEvoked.times[0] = 0;
+    for(i = 1; i < t_postStimEvoked.times.size(); ++i)
+        t_postStimEvoked.times[i] = t_postStimEvoked.times[i-1] + T;
+    t_postStimEvoked.first = t_postStimEvoked.times[0];
+    t_postStimEvoked.last = t_postStimEvoked.times[t_postStimEvoked.times.size()-1];
+
+    // Full real-time evoked response
+    FiffEvoked t_stimEvoked;
+    t_stimEvoked.setInfo(*m_pFiffInfo.data());
+    t_stimEvoked.nave = m_iNumAverages;
+    t_stimEvoked.aspect_kind = FIFFV_ASPECT_AVERAGE;
+    t_stimEvoked.comment = QString("Real-time evoked full response");
+    t_stimEvoked.times.resize(m_iPreStimSamples+m_iPostStimSamples);
+    t_stimEvoked.times[0] = -T*m_iPreStimSamples;
+    for(i = 1; i < t_stimEvoked.times.size(); ++i)
+        t_stimEvoked.times[i] = t_stimEvoked.times[i-1] + T;
+    t_stimEvoked.first = t_stimEvoked.times[0];
+    t_stimEvoked.last = t_stimEvoked.times[t_stimEvoked.times.size()-1];
+
+
     qint32 count = 0;
 
     //Enter the main loop
@@ -424,24 +467,35 @@ void RtAve::run()
                                 qDebug() << "Post-stim average" << t_iStimIndex;
                             }
 
-                            //
-                            // concatenate pre + post stimulus
-                            //
-                            m_qListStimAve[t_iStimIndex].resize(m_qListPreStimAve[t_iStimIndex].rows(), m_qListPreStimAve[t_iStimIndex].cols() + m_qListPostStimAve[t_iStimIndex].cols());
-                            // Pre
-                            m_qListStimAve[t_iStimIndex].block(0,0,m_qListPreStimAve[t_iStimIndex].rows(),m_qListPreStimAve[t_iStimIndex].cols()) = m_qListPreStimAve[t_iStimIndex];
-                            // Post
-                            m_qListStimAve[t_iStimIndex].block(0,m_qListPreStimAve[t_iStimIndex].cols(),m_qListPostStimAve[t_iStimIndex].rows(),m_qListPostStimAve[t_iStimIndex].cols()) = m_qListPostStimAve[t_iStimIndex];
+                            //if averages are available
+                            if(m_qListQVectorPreStimBuf[t_iStimIndex].size() == m_iNumAverages)
+                            {
+                                //
+                                // concatenate pre + post stimulus to full stimulus
+                                //
+                                m_qListStimAve[t_iStimIndex].resize(m_qListPreStimAve[t_iStimIndex].rows(), m_qListPreStimAve[t_iStimIndex].cols() + m_qListPostStimAve[t_iStimIndex].cols());
+                                // Pre
+                                m_qListStimAve[t_iStimIndex].block(0,0,m_qListPreStimAve[t_iStimIndex].rows(),m_qListPreStimAve[t_iStimIndex].cols()) = m_qListPreStimAve[t_iStimIndex];
+                                // Post
+                                m_qListStimAve[t_iStimIndex].block(0,m_qListPreStimAve[t_iStimIndex].cols(),m_qListPostStimAve[t_iStimIndex].rows(),m_qListPostStimAve[t_iStimIndex].cols()) = m_qListPostStimAve[t_iStimIndex];
 
 
-                            //
-                            // Emit evoked
-                            //
-//                            emit evokedPreStim(FIFFLIB::FiffEvoked::SPtr p_pEvokedPreStim);
+                                //
+                                // Emit evoked
+                                //
+                                FiffEvoked::SPtr t_pEvokedPreStim(new FiffEvoked(t_preStimEvoked));
+                                t_pEvokedPreStim->data = m_qListPreStimAve[t_iStimIndex];
+                                emit evokedPreStim(t_pEvokedPreStim);
 
-//                            emit evokedPostStim(FIFFLIB::FiffEvoked::SPtr p_pEvokedPostStim);
+                                FiffEvoked::SPtr t_pEvokedPostStim(new FiffEvoked(t_postStimEvoked));
+                                t_pEvokedPostStim->data = m_qListPostStimAve[t_iStimIndex];
+                                emit evokedPostStim(t_pEvokedPostStim);
 
-//                            emit evokedStim(FIFFLIB::FiffEvoked::SPtr p_pEvokedStim);
+                                FiffEvoked::SPtr t_pEvokedStim(new FiffEvoked(t_stimEvoked));
+                                t_pEvokedStim->data = m_qListStimAve[t_iStimIndex];
+                                emit evokedStim(t_pEvokedStim);
+                                qDebug() << "Evoked emitted";
+                            }
                         }
                     }
                 }
