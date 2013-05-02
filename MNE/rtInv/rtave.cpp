@@ -146,14 +146,14 @@ void RtAve::assemblePostStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p
                 t_matPostStim.block(0, 0, nrows, t_iSize) = p_qListRawMatBuf[t_iMidIdx].second.block(0, pos, nrows, t_iSize);
                 nSampleCount += t_iSize;
 
-                qDebug() << "t_matPostStim.block" << nSampleCount;
+//                qDebug() << "t_matPostStim.block" << nSampleCount;
             }
             else
             {
                 t_matPostStim.block(0, 0, nrows, m_iPostStimSamples) = p_qListRawMatBuf[t_iMidIdx].second.block(0, pos, nrows, m_iPostStimSamples);
                 nSampleCount = m_iPostStimSamples;
 
-                qDebug() << "t_matPostStim.block" << nSampleCount;
+//                qDebug() << "t_matPostStim.block" << nSampleCount;
             }
 
             ++t_curBufIdx;
@@ -183,7 +183,7 @@ void RtAve::assemblePostStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p
         //
         //Store in right post stimulus buffer vector
         //
-        m_qListQVectorPostStimAve[p_iStimIdx].append(t_matPostStim);
+        m_qListQVectorPostStimBuf[p_iStimIdx].append(t_matPostStim);
     }
 }
 
@@ -267,7 +267,7 @@ void RtAve::assemblePreStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p_
         //
         //Store in right pre stimulus buffer vector
         //
-        m_qListQVectorPreStimAve[p_iStimIdx].append(t_matPreStim);
+        m_qListQVectorPreStimBuf[p_iStimIdx].append(t_matPreStim);
     }
 }
 
@@ -291,7 +291,7 @@ void RtAve::run()
 
 
     //
-    //
+    // Inits & Clears
     //
     quint32 t_nSamplesPerBuf = 0;
     QList<QPair<QList<qint32>, MatrixXd> > t_qListRawMatBuf;
@@ -299,13 +299,19 @@ void RtAve::run()
     FiffEvoked::SPtr evoked(new FiffEvoked());
     VectorXd mu;
     qint32 i = 0;
+    qint32 j = 0;
+
+    m_qListQVectorPreStimBuf.clear();
+    m_qListQVectorPostStimBuf.clear();
+    m_qListPreStimAve.clear();
+    m_qListPostStimAve.clear();
+    m_qListStimAve.clear();
 
     //
     // get num stim channels
     //
     m_qListStimChannelIdcs.clear();
-    m_qListQVectorPreStimAve.clear();
-    m_qListQVectorPostStimAve.clear();
+    MatrixXd t_mat;
     QVector<MatrixXd> t_qVecMat;
     for(i = 0; i < m_pFiffInfo->nchan; ++i)
     {
@@ -313,8 +319,11 @@ void RtAve::run()
         {
             m_qListStimChannelIdcs.append(i);
 
-            m_qListQVectorPreStimAve.push_back(t_qVecMat);
-            m_qListQVectorPostStimAve.push_back(t_qVecMat);
+            m_qListQVectorPreStimBuf.push_back(t_qVecMat);
+            m_qListQVectorPostStimBuf.push_back(t_qVecMat);
+            m_qListPreStimAve.push_back(t_mat);
+            m_qListPostStimAve.push_back(t_mat);
+            m_qListStimAve.push_back(t_mat);
         }
     }
 
@@ -380,14 +389,49 @@ void RtAve::run()
                             //
                             this->assemblePostStimulus(t_qListRawMatBuf, t_iStimIndex);
 
-                            qDebug() << "Averages of pre-stimulus" << t_iStimIndex << ":" << m_qListQVectorPreStimAve[t_iStimIndex].size();
-                            if(m_qListQVectorPreStimAve[t_iStimIndex].size() > m_iNumAverages)
-                                m_qListQVectorPreStimAve[t_iStimIndex].pop_front();
+//                            qDebug() << "Buffers of pre-stimulus" << t_iStimIndex << ":" << m_qListQVectorPreStimBuf[t_iStimIndex].size();
+                            //
+                            // Prestimulus average
+                            //
+                            if(m_qListQVectorPreStimBuf[t_iStimIndex].size() > m_iNumAverages)
+                            {
+                                m_qListQVectorPreStimBuf[t_iStimIndex].pop_front();
+
+                                m_qListPreStimAve[t_iStimIndex] = m_qListQVectorPreStimBuf[t_iStimIndex][0];
+                                for(j = 1; j < m_qListQVectorPreStimBuf[t_iStimIndex].size(); ++j)
+                                    m_qListPreStimAve[t_iStimIndex] += m_qListQVectorPreStimBuf[t_iStimIndex][j];
+
+                                m_qListPreStimAve[t_iStimIndex].array() /= (double)m_iNumAverages;
+
+                                qDebug() << "Pre-stim average" << t_iStimIndex;
+                            }
 
 
-                            qDebug() << "Averages of post-stimulus" << t_iStimIndex << ":" << m_qListQVectorPostStimAve[t_iStimIndex].size();
-                            if(m_qListQVectorPostStimAve[t_iStimIndex].size() > m_iNumAverages)
-                                m_qListQVectorPostStimAve[t_iStimIndex].pop_front();
+//                            qDebug() << "Buffers of post-stimulus" << t_iStimIndex << ":" << m_qListQVectorPostStimBuf[t_iStimIndex].size();
+                            //
+                            // Poststimulus average
+                            //
+                            if(m_qListQVectorPostStimBuf[t_iStimIndex].size() > m_iNumAverages)
+                            {
+                                m_qListQVectorPostStimBuf[t_iStimIndex].pop_front();
+
+                                m_qListPostStimAve[t_iStimIndex] = m_qListQVectorPostStimBuf[t_iStimIndex][0];
+                                for(j = 1; j < m_qListQVectorPostStimBuf[t_iStimIndex].size(); ++j)
+                                    m_qListPostStimAve[t_iStimIndex] += m_qListQVectorPostStimBuf[t_iStimIndex][j];
+
+                                m_qListPostStimAve[t_iStimIndex].array() /= (double)m_iNumAverages;
+
+                                qDebug() << "Post-stim average" << t_iStimIndex;
+                            }
+
+                            //
+                            // concatenate pre + post stimulus
+                            //
+                            m_qListStimAve[t_iStimIndex].resize(m_qListPreStimAve[t_iStimIndex].rows(), m_qListPreStimAve[t_iStimIndex].cols() + m_qListPostStimAve[t_iStimIndex].cols());
+                            // Pre
+                            m_qListStimAve[t_iStimIndex].block(0,0,m_qListPreStimAve[t_iStimIndex].rows(),m_qListPreStimAve[t_iStimIndex].cols()) = m_qListPreStimAve[t_iStimIndex];
+                            // Post
+                            m_qListStimAve[t_iStimIndex].block(0,m_qListPreStimAve[t_iStimIndex].cols(),m_qListPostStimAve[t_iStimIndex].rows(),m_qListPostStimAve[t_iStimIndex].cols()) = m_qListPostStimAve[t_iStimIndex];
 
                         }
                     }
