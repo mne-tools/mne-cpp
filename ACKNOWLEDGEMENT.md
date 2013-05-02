@@ -7,7 +7,7 @@ People
 ------
 
   * Jens Haueisen (Ilmenau University of Technology, Ilmenau, GER)
-  * Yoshio Okada (Childrens Hospital, Boston, USA)
+  * Yoshio Okada (Boston Children's Hospital, Boston, USA)
   * Daniel Güllmar (Jena University Hospital, Jena, GER)
   * Daniel Baumgarten (Ilmenau University of Technology, Ilmenau, GER)
   * ...
