@@ -183,7 +183,7 @@ private:
     FiffRawData         m_RawInfo;              /**< Holds the fiff raw measurement information. */
     quint32             m_uiBufferSampleSize;   /**< Sample size of the buffer */
 
-    CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
+    CircularMatrixBuffer<float>::SPtr m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
 
 };
 
