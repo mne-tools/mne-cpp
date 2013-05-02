@@ -49,7 +49,7 @@ BabyMEGInfo::BabyMEGInfo()
 
 void BabyMEGInfo::MGH_LM_Send_DataPackage(QByteArray DATA)
 {
-    qDebug()<<"[BabyMEGInfo]Data Size:"<<DATA.size();
+//    qDebug()<<"[BabyMEGInfo]Data Size:"<<DATA.size();
     emit SendDataPackage(DATA);
 }
 
