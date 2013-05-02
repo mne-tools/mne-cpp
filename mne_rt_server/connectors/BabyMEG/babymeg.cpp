@@ -109,7 +109,9 @@ BabyMEG::BabyMEG()
     myClientComm->SendCommandToBabyMEGShortConnection("INFO");
 
 //    myClient->ConnectToBabyMEG();
-//    myClient->DisConnectBabyMEG();
+////    myClient->DisConnectBabyMEG();
+//    m_bIsRunning = true;
+//    QThread::start();
 
     this->init();
 }
@@ -227,45 +229,28 @@ void BabyMEG::setFiffInfo(FiffInfo p_FiffInfo)
 
 void BabyMEG::setFiffData(QByteArray DATA)
 {
-    qDebug()<<"[BabyMEG]Data Size:"<<DATA.size();
+//    qDebug() << "[BabyMEG] Data Size:"<<DATA.size();
 
+    //get the first byte -- the data format
+    int dformat = DATA.left(1).toInt();
+
+    DATA.remove(0,1);
     qint32 rows = m_FiffInfoBabyMEG.nchan;
-    qint32 cols = (DATA.size()/8)/rows;
-    qDebug() << "Matrix " << rows << "x" << cols;
+    qint32 cols = (DATA.size()/dformat)/rows;
 
-//    Map < Matrix <double, Dynamic, Dynamic, RowMajor>  > rawData((double*)DATA.data(),rows,cols);
+    qDebug() << "[BabyMEG] Matrix " << rows << "x" << cols << " [Data bytes:" << dformat << "]";
 
-//    Map < MatrixXd  > rawData((double*)DATA.data(), cols, rows);
-    MatrixXd rawData(Map<MatrixXd>( (double*)DATA.data(), cols, rows));
-
-//    rawData.transposeInPlace();
+    MatrixXf rawData(Map<MatrixXf>( (float*)DATA.data(),rows, cols ));
 
     for(qint32 i = 0; i < rows*cols; ++i)
-        IOUtils::swap_doublep(rawData.data()+i);
+        IOUtils::swap_floatp(rawData.data()+i);
 
-//    std::cout << "first ten elements \n" << rawData.block(0,0,1,10) << std::endl;
-
-//    MatrixXd test = MatrixXd::Zero(20,20);
+//    std::cout << "first ten elements \n" << rawData.block(0,0,2,10) << std::endl;
 
     if(!m_pRawMatrixBuffer)
-        m_pRawMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, rows, cols));
+        m_pRawMatrixBuffer = CircularMatrixBuffer<float>::SPtr(new CircularMatrixBuffer<float>(64, rows, cols));
 
     m_pRawMatrixBuffer->push(&rawData);
-
-
-//    if(m_bIsRunning)
-//        emit remitRawBuffer(rawData.cast<float>());
-
-//    MatrixXd m_M(rows,cols);
-
-//    int Nbytes = sizeof(double);
-//    // convert every 8 bytes to one double
-//    for(int i=0;i<rows;i++)
-//        for(int j=0; j<cols; j++)
-//            m_M(i,j) = myClient->MGH_LM_Byte2Double(DATA.mid(Nbytes*(i*cols+j),Nbytes));
-
-//    qDebug()<<m_M(0,0)<<"|"<<m_M(0,1)<<"|"<<m_M(0,2);
-//    qDebug()<<m_M(0,1)<<"|"<<m_M(1,1)<<"|"<<m_M(2,1);
 
 }
 
@@ -295,8 +280,6 @@ bool BabyMEG::start()
     QThread::start();
 
     myClient->ConnectToBabyMEG();
-
-
 
     return true;
 }
@@ -339,14 +322,13 @@ void BabyMEG::run()
     {
         if(m_pRawMatrixBuffer)
         {
-            MatrixXd tmp = m_pRawMatrixBuffer->pop();
+            MatrixXf t_rawBuffer = m_pRawMatrixBuffer->pop();
 
             ++count;
-            printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
+//            printf("%d raw buffer (%d x %d) generated\r\n", count, t_rawBuffer.rows(), t_rawBuffer.cols());
+//            std::cout << "first 100 elements \n" << t_rawBuffer.block(0,0,1,100) << std::endl;
 
-//            MatrixXf test = MatrixXf::Zero(tmp.rows(), 500);
-
-            emit remitRawBuffer(tmp.cast<float>());
+            emit remitRawBuffer(t_rawBuffer);
         }
     }
 }
