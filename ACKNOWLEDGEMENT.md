@@ -8,7 +8,7 @@ People
 
   * Jens Haueisen (Ilmenau University of Technology, Ilmenau, GER)
   * Yoshio Okada (Childrens Hospital, Boston, USA)
-  * Daniel G�llmar (Jena University Hospital, Jena, GER)
+  * Daniel Güllmar (Jena University Hospital, Jena, GER)
   * Daniel Baumgarten (Ilmenau University of Technology, Ilmenau, GER)
   * ...
 
@@ -20,4 +20,4 @@ Institutions
   * Jena University Hospital (IZKF)
   * German Academic Exchange Service (DAAD)
   * German National Academic Foundation (Studienstiftung des deutschen Volkes e.V.)
-  ...
+  * ...
