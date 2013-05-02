@@ -433,6 +433,15 @@ void RtAve::run()
                             // Post
                             m_qListStimAve[t_iStimIndex].block(0,m_qListPreStimAve[t_iStimIndex].cols(),m_qListPostStimAve[t_iStimIndex].rows(),m_qListPostStimAve[t_iStimIndex].cols()) = m_qListPostStimAve[t_iStimIndex];
 
+
+                            //
+                            // Emit evoked
+                            //
+//                            emit evokedPreStim(FIFFLIB::FiffEvoked::SPtr p_pEvokedPreStim);
+
+//                            emit evokedPostStim(FIFFLIB::FiffEvoked::SPtr p_pEvokedPostStim);
+
+//                            emit evokedStim(FIFFLIB::FiffEvoked::SPtr p_pEvokedStim);
                         }
                     }
                 }
@@ -443,11 +452,6 @@ void RtAve::run()
                 //
                 t_qListRawMatBuf.pop_front();
             }
-
-
-
-
-//            emit evokedCalculated(evoked);
         }
     }
 }

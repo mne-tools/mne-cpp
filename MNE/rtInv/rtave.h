@@ -158,11 +158,27 @@ public:
 signals:
     //=========================================================================================================
     /**
-    * Signal which is emitted when new evoked data are available.
+    * Signal which is emitted when new evoked pre stimulus data are available.
     *
-    * @param[out] p_pEvoked     The evoked data
+    * @param[out] p_pEvokedPreStim     The evoked pre stimulus data
     */
-    void evokedCalculated(FIFFLIB::FiffEvoked::SPtr p_pEvoked);
+    void evokedPreStim(FIFFLIB::FiffEvoked::SPtr p_pEvokedPreStim);
+
+    //=========================================================================================================
+    /**
+    * Signal which is emitted when new evoked post stimulus data are available.
+    *
+    * @param[out] p_pEvokedPostStim     The evoked post stimulus data
+    */
+    void evokedPostStim(FIFFLIB::FiffEvoked::SPtr p_pEvokedPostStim);
+
+    //=========================================================================================================
+    /**
+    * Signal which is emitted when new evoked stimulus data are available.
+    *
+    * @param[out] p_pEvokedStim     The evoked stimulus data
+    */
+    void evokedStim(FIFFLIB::FiffEvoked::SPtr p_pEvokedStim);
 
 protected:
     //=========================================================================================================
