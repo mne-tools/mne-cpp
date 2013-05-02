@@ -49,7 +49,7 @@ BabyMEGInfo::BabyMEGInfo()
 
 void BabyMEGInfo::MGH_LM_Send_DataPackage(QByteArray DATA)
 {
-    qDebug()<<"[BabyMEGInfo]Data Size:"<<DATA.size();
+//    qDebug()<<"[BabyMEGInfo]Data Size:"<<DATA.size();
     emit SendDataPackage(DATA);
 }
 
@@ -213,7 +213,7 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
         {
         case 1:
                 t_ch.kind = FIFFV_MEG_CH;
-                t_ch.unit = FIFF_UNITM_T;
+                t_ch.unit = FIFF_UNIT_T;
                 t_ch.unit_mul = FIFF_UNITM_NONE;
                 t_ch.coil_type = FIFFV_COIL_BABY_MAG;// ToDo FIFFV_COIL_BABY_REF_MAG
             break;
@@ -225,7 +225,7 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
             break;
         default:
             t_ch.kind = FIFFV_MEG_CH;
-            t_ch.unit = FIFF_UNITM_T;
+            t_ch.unit = FIFF_UNIT_T;
             t_ch.unit_mul = FIFF_UNITM_NONE;
             t_ch.coil_type = FIFFV_COIL_BABY_MAG;// ToDo FIFFV_COIL_BABY_REF_MAG
 
