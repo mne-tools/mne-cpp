@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>DummyRunWidget</string>
+   <string>SourceLabRunWidget</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -23,7 +23,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Source Lab Configuration</string>
+      <string>SourceLab Configuration</string>
      </property>
     </widget>
    </item>

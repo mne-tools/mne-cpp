@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>DummySetupWidget</string>
+   <string>SourceLabSetupWidget</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -23,7 +23,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Source Lab Configuration</string>
+      <string>SourceLab Configuration</string>
      </property>
     </widget>
    </item>
@@ -65,7 +65,22 @@
        <property name="flat">
         <bool>false</bool>
        </property>
-       <layout class="QGridLayout" name="m_qGridLayout_Properties"/>
+       <layout class="QGridLayout" name="m_qGridLayout_Properties">
+        <item row="0" column="1">
+         <widget class="QSpinBox" name="m_qSpinBoxStimChannel">
+          <property name="maximum">
+           <number>26</number>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="m_qLabelStimChannel">
+          <property name="text">
+           <string>Stimulus Channel</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
      <item row="1" column="0">
