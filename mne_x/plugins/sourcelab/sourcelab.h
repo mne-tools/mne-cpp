@@ -203,7 +203,7 @@ private:
 
     RtAve::SPtr m_pRtAve;                   /**< Real-time average. */
     QVector<FiffEvoked::SPtr> m_qVecEvokedData; /**< Evoked data set */
-
+    qint32 m_iStimChan;     /**< Stimulus Channel to use for source estimation */
 
     MinimumNorm::SPtr m_pMinimumNorm;   /**< Minimum Norm Estimation. */
 };

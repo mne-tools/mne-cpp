@@ -80,6 +80,7 @@ SourceLab::SourceLab()
 , m_qFileFwdSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
 , m_pFwd(new MNEForwardSolution(m_qFileFwdSolution))
 , m_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot")
+, m_iStimChan(0)
 {
     m_PLG_ID = PLG_ID::SOURCELAB;
 }
@@ -142,7 +143,7 @@ Type SourceLab::getType() const
 
 const char* SourceLab::getName() const
 {
-    return "Source Lab";
+    return "SourceLab";
 }
 
 
@@ -208,8 +209,10 @@ void SourceLab::update(Subject* pSubject)
 
 void SourceLab::appendEvoked(FiffEvoked::SPtr p_pEvoked)
 {
-    if(p_pEvoked->comment == "Stim 0")
+    if(p_pEvoked->comment == QString("Stim %1").arg(m_iStimChan))
     {
+        qDebug() << p_pEvoked->comment << "append";
+
         mutex.lock();
         m_qVecEvokedData.push_back(p_pEvoked);
         mutex.unlock();
@@ -221,8 +224,6 @@ void SourceLab::appendEvoked(FiffEvoked::SPtr p_pEvoked)
 
 void SourceLab::updateFiffCov(FiffCov::SPtr p_pFiffCov)
 {
-    std::cout << "Covariance:\n" << p_pFiffCov->data.block(0,0,10,10) << std::endl;
-
     m_pFiffCov = p_pFiffCov;
 
     if(m_pRtInvOp)
@@ -235,7 +236,6 @@ void SourceLab::updateFiffCov(FiffCov::SPtr p_pFiffCov)
 void SourceLab::updateInvOp(MNEInverseOperator::SPtr p_pInvOp)
 {
     m_pInvOp = p_pInvOp;
-
 
     double snr = 3.0;
     double lambda2 = 1.0 / pow(snr, 2); //ToDO estimate lambda using covariance
@@ -301,16 +301,12 @@ void SourceLab::run()
     m_pRtAve = RtAve::SPtr(new RtAve(750, 750, m_pFiffInfo));
     connect(m_pRtAve.data(), &RtAve::evokedStim, this, &SourceLab::appendEvoked);
 
-
-
     //
     // Start the rt helpers
     //
     m_pRtCov->start();
     m_pRtInvOp->start();
     m_pRtAve->start();
-
-
 
 //    // Replace this with a rt average class
 //    FiffEvoked t_evoked;
@@ -344,19 +340,15 @@ void SourceLab::run()
 
             if(m_pMinimumNorm && m_qVecEvokedData.size() > 0)
             {
-
-                qDebug() << "Evoked size" << m_qVecEvokedData.size();
-
                 FiffEvoked t_evoked = *m_qVecEvokedData[0].data();
                 SourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_evoked);
-                qDebug() << "SourceEstimated";
+
+                std::cout << "SourceEstimated:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
 
                 mutex.lock();
                 m_qVecEvokedData.pop_front();
                 mutex.unlock();
             }
-
-
 
 //            if(m_pMinimumNorm && t_mat.cols() > 0)
 //            {
