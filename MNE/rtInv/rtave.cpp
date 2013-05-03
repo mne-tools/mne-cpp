@@ -335,7 +335,6 @@ void RtAve::run()
     t_preStimEvoked.setInfo(*m_pFiffInfo.data());
     t_preStimEvoked.nave = m_iNumAverages;
     t_preStimEvoked.aspect_kind = FIFFV_ASPECT_AVERAGE;
-    t_preStimEvoked.comment = QString("Real-time evoked pre stimulus response");
     t_preStimEvoked.times.resize(m_iPreStimSamples);
     t_preStimEvoked.times[0] = -T*m_iPreStimSamples;
     for(i = 1; i < t_preStimEvoked.times.size(); ++i)
@@ -348,7 +347,6 @@ void RtAve::run()
     t_postStimEvoked.setInfo(*m_pFiffInfo.data());
     t_postStimEvoked.nave = m_iNumAverages;
     t_postStimEvoked.aspect_kind = FIFFV_ASPECT_AVERAGE;
-    t_postStimEvoked.comment = QString("Real-time evoked post stimulus response");
     t_postStimEvoked.times.resize(m_iPostStimSamples);
     t_postStimEvoked.times[0] = 0;
     for(i = 1; i < t_postStimEvoked.times.size(); ++i)
@@ -361,7 +359,6 @@ void RtAve::run()
     t_stimEvoked.setInfo(*m_pFiffInfo.data());
     t_stimEvoked.nave = m_iNumAverages;
     t_stimEvoked.aspect_kind = FIFFV_ASPECT_AVERAGE;
-    t_stimEvoked.comment = QString("Real-time evoked full response");
     t_stimEvoked.times.resize(m_iPreStimSamples+m_iPostStimSamples);
     t_stimEvoked.times[0] = -T*m_iPreStimSamples;
     for(i = 1; i < t_stimEvoked.times.size(); ++i)
@@ -436,15 +433,15 @@ void RtAve::run()
                             //
                             // Prestimulus average
                             //
-                            if(m_qListQVectorPreStimBuf[t_iStimIndex].size() > m_iNumAverages)
+                            if(m_qListQVectorPreStimBuf[t_iStimIndex].size() >= m_iNumAverages)
                             {
-                                m_qListQVectorPreStimBuf[t_iStimIndex].pop_front();
-
                                 m_qListPreStimAve[t_iStimIndex] = m_qListQVectorPreStimBuf[t_iStimIndex][0];
                                 for(j = 1; j < m_qListQVectorPreStimBuf[t_iStimIndex].size(); ++j)
                                     m_qListPreStimAve[t_iStimIndex] += m_qListQVectorPreStimBuf[t_iStimIndex][j];
 
                                 m_qListPreStimAve[t_iStimIndex].array() /= (double)m_iNumAverages;
+
+                                m_qListQVectorPreStimBuf[t_iStimIndex].pop_front();
 
                                 qDebug() << "Pre-stim average" << t_iStimIndex;
                             }
@@ -454,21 +451,21 @@ void RtAve::run()
                             //
                             // Poststimulus average
                             //
-                            if(m_qListQVectorPostStimBuf[t_iStimIndex].size() > m_iNumAverages)
+                            if(m_qListQVectorPostStimBuf[t_iStimIndex].size() >= m_iNumAverages)
                             {
-                                m_qListQVectorPostStimBuf[t_iStimIndex].pop_front();
-
                                 m_qListPostStimAve[t_iStimIndex] = m_qListQVectorPostStimBuf[t_iStimIndex][0];
                                 for(j = 1; j < m_qListQVectorPostStimBuf[t_iStimIndex].size(); ++j)
                                     m_qListPostStimAve[t_iStimIndex] += m_qListQVectorPostStimBuf[t_iStimIndex][j];
 
                                 m_qListPostStimAve[t_iStimIndex].array() /= (double)m_iNumAverages;
 
+                                m_qListQVectorPostStimBuf[t_iStimIndex].pop_front();
+
                                 qDebug() << "Post-stim average" << t_iStimIndex;
                             }
 
-                            //if averages are available
-                            if(m_qListQVectorPreStimBuf[t_iStimIndex].size() == m_iNumAverages)
+                            //if averages are available -> buffers are filled and first average is stored
+                            if(m_qListPreStimAve[t_iStimIndex].size() > 0)
                             {
                                 //
                                 // concatenate pre + post stimulus to full stimulus
@@ -484,17 +481,20 @@ void RtAve::run()
                                 // Emit evoked
                                 //
                                 FiffEvoked::SPtr t_pEvokedPreStim(new FiffEvoked(t_preStimEvoked));
+                                t_pEvokedPreStim->comment = QString("Stim %1").arg(t_iStimIndex);
                                 t_pEvokedPreStim->data = m_qListPreStimAve[t_iStimIndex];
                                 emit evokedPreStim(t_pEvokedPreStim);
 
                                 FiffEvoked::SPtr t_pEvokedPostStim(new FiffEvoked(t_postStimEvoked));
+                                t_pEvokedPostStim->comment = QString("Stim %1").arg(t_iStimIndex);
                                 t_pEvokedPostStim->data = m_qListPostStimAve[t_iStimIndex];
                                 emit evokedPostStim(t_pEvokedPostStim);
 
                                 FiffEvoked::SPtr t_pEvokedStim(new FiffEvoked(t_stimEvoked));
+                                t_pEvokedStim->comment = QString("Stim %1").arg(t_iStimIndex);
                                 t_pEvokedStim->data = m_qListStimAve[t_iStimIndex];
                                 emit evokedStim(t_pEvokedStim);
-                                qDebug() << "Evoked emitted";
+                                qDebug() << "Evoked emitted" << t_pEvokedPreStim->comment;
                             }
                         }
                     }
