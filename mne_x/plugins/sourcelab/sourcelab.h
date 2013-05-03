@@ -49,6 +49,7 @@
 
 #include <fs/annotationset.h>
 #include <fiff/fiff_info.h>
+#include <fiff/fiff_evoked.h>
 #include <mne/mne_forwardsolution.h>
 #include <inverse/sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
@@ -137,6 +138,14 @@ public:
 //slot
     //=========================================================================================================
     /**
+    * Append evoked
+    *
+    * @param[in] p_pEvoked  The evoked to be appended
+    */
+    void appendEvoked(FiffEvoked::SPtr p_pEvoked);
+
+    //=========================================================================================================
+    /**
     * Slot to update the fiff covariance
     *
     * @param[in] p_pFiffCov    The covariance to update
@@ -192,8 +201,8 @@ private:
     RtInvOp::SPtr m_pRtInvOp;           /**< Real-time inverse operator. */
     MNEInverseOperator::SPtr m_pInvOp;  /**< The inverse operator. */
 
-    RtAve::SPtr m_pRtAve;           /**< Real-time average. */
-
+    RtAve::SPtr m_pRtAve;                   /**< Real-time average. */
+    QVector<FiffEvoked::SPtr> m_qVecEvokedData; /**< Evoked data set */
 
 
     MinimumNorm::SPtr m_pMinimumNorm;   /**< Minimum Norm Estimation. */
