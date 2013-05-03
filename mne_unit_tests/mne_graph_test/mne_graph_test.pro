@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mne_unit_tests.pro
+# @file     mne_graph_test.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,20 +29,36 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile to build the unit tests.
+# @brief    This project file generates the makefile to build the mne_graph_test app.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../mne-cpp.pri)
+include(../../mne-cpp.pri)
 
-TEMPLATE = subdirs
+TEMPLATE = app
 
-SUBDIRS += \
-    mne_lib_tests \
-    mne_rt_tests
+QT += core gui
+QT += widgets
 
-contains(MNECPP_CONFIG, isGui) {
-    SUBDIRS += \
-        mne_disp_test \
-        mne_graph_test
+TARGET = mne_graph_test
+
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
 }
+
+DESTDIR = $${MNE_BINARY_DIR}
+
+SOURCES += main.cpp \
+    matrixview.cpp
+
+HEADERS  += \
+    matrixview.h
+
+FORMS    += \
+    matrixview.ui
+
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
+
+# Put generated form headers into the origin --> cause other src is pointing at them
+UI_DIR = $$PWD
