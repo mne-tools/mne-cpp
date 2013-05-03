@@ -44,8 +44,6 @@
 #include <xMeas/Measurement/realtimesamplearray.h>
 #include <xMeas/Measurement/realtimemultisamplearray_new.h>
 
-#include <fiff/fiff_evoked.h>
-
 #include "FormFiles/sourcelabsetupwidget.h"
 #include "FormFiles/sourcelabrunwidget.h"
 
@@ -56,6 +54,7 @@
 //=============================================================================================================
 
 #include <QtCore/QtPlugin>
+//#include <QtConcurrent>
 #include <QDebug>
 
 
@@ -207,6 +206,19 @@ void SourceLab::update(Subject* pSubject)
 
 //*************************************************************************************************************
 
+void SourceLab::appendEvoked(FiffEvoked::SPtr p_pEvoked)
+{
+    if(p_pEvoked->comment == "Stim 0")
+    {
+        mutex.lock();
+        m_qVecEvokedData.push_back(p_pEvoked);
+        mutex.unlock();
+    }
+}
+
+
+//*************************************************************************************************************
+
 void SourceLab::updateFiffCov(FiffCov::SPtr p_pFiffCov)
 {
     std::cout << "Covariance:\n" << p_pFiffCov->data.block(0,0,10,10) << std::endl;
@@ -230,7 +242,9 @@ void SourceLab::updateInvOp(MNEInverseOperator::SPtr p_pInvOp)
 
     QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
 
+    mutex.lock();
     m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(*m_pInvOp.data(), lambda2, method));
+    mutex.unlock();
 }
 
 
@@ -243,9 +257,15 @@ void SourceLab::run()
     //
     // Cluster forward solution;
     //
-//    emit statMsg("Start Clustering");
-//    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(m_annotationSet, 40)));
-//    emit statMsg("Clustering finished");
+//    qDebug() << "Start Clustering";
+//    QFuture<MNEForwardSolution> future = QtConcurrent::run(this->m_pFwd.data(), &MNEForwardSolution::cluster_forward_solution, m_annotationSet, 40);
+//    qDebug() << "Run Clustering";
+//    future.waitForFinished();
+//    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(future.result()));
+
+    emit statMsg("Start Clustering");
+    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(m_annotationSet, 40)));
+    emit statMsg("Clustering finished");
 
     //
     // start receiving data
@@ -266,26 +286,28 @@ void SourceLab::run()
     //
     // Init Real-Time Covariance estimator
     //
-//    m_pRtCov = RtCov::SPtr(new RtCov(5000, m_pFiffInfo, this));
-//    connect(m_pRtCov.data(), &RtCov::covCalculated, this, &SourceLab::updateFiffCov);
+    m_pRtCov = RtCov::SPtr(new RtCov(5000, m_pFiffInfo));
+    connect(m_pRtCov.data(), &RtCov::covCalculated, this, &SourceLab::updateFiffCov);
 
     //
     // Init Real-Time inverse estimator
     //
-//    m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pClusteredFwd, this));
-//    connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated, this, &SourceLab::updateInvOp);
+    m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pClusteredFwd));
+    connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated, this, &SourceLab::updateInvOp);
 
     //
-    // Init Real-Time inverse estimator
+    // Init Real-Time average
     //
     m_pRtAve = RtAve::SPtr(new RtAve(750, 750, m_pFiffInfo));
+    connect(m_pRtAve.data(), &RtAve::evokedStim, this, &SourceLab::appendEvoked);
+
 
 
     //
     // Start the rt helpers
     //
-//    m_pRtCov->start();
-//    m_pRtInvOp->start();
+    m_pRtCov->start();
+    m_pRtInvOp->start();
     m_pRtAve->start();
 
 
@@ -317,8 +339,23 @@ void SourceLab::run()
             MatrixXd t_mat = m_pSourceLabBuffer->pop();
 
             //Add to covariance estimation
-//            m_pRtCov->append(t_mat);
+            m_pRtCov->append(t_mat);
             m_pRtAve->append(t_mat);
+
+            if(m_pMinimumNorm && m_qVecEvokedData.size() > 0)
+            {
+
+                qDebug() << "Evoked size" << m_qVecEvokedData.size();
+
+                FiffEvoked t_evoked = *m_qVecEvokedData[0].data();
+                SourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_evoked);
+                qDebug() << "SourceEstimated";
+
+                mutex.lock();
+                m_qVecEvokedData.pop_front();
+                mutex.unlock();
+            }
+
 
 
 //            if(m_pMinimumNorm && t_mat.cols() > 0)
