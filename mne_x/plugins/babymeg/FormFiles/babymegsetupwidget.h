@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtserveraboutwidget.h
+* @file     babymegsetupwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RtServerAboutWidget class.
+* @brief    Contains the declaration of the BabyMegSetupWidget class.
 *
 */
 
-#ifndef RTSERVERABOUTWIDGET_H
-#define RTSERVERABOUTWIDGET_H
+#ifndef BABYMEGSETUPWIDGET_H
+#define BABYMEGSETUPWIDGET_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_rtserverabout.h"
+#include "../ui_babymegsetup.h"
 
 
 //*************************************************************************************************************
@@ -55,17 +55,11 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RtServerPlugin
+// DEFINE NAMESPACE BabyMegPlugin
 //=============================================================================================================
 
-namespace RtServerPlugin
+namespace BabyMegPlugin
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -73,14 +67,16 @@ namespace RtServerPlugin
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class BabyMeg;
+
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RtServerAboutWidget
+* DECLARE CLASS BabyMegSetupWidget
 *
-* @brief The RtServerAboutWidget class provides the about dialog for the RtServer.
+* @brief The BabyMegSetupWidget class provides the ECG configuration window.
 */
-class RtServerAboutWidget : public QDialog
+class BabyMegSetupWidget : public QWidget
 {
     Q_OBJECT
 
@@ -88,23 +84,75 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RtServerAboutWidget dialog which is a child of parent.
+    * Constructs a BabyMegSetupWidget which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new RtServerAboutWidget becomes a window. If parent is another widget, RtServerAboutWidget becomes a child window inside parent. ECGAboutWidget is deleted when its parent is deleted.
+    * @param [in] p_pBabyMeg   a pointer to the corresponding BabyMeg.
+    * @param [in] parent        pointer to parent widget; If parent is 0, the new BabyMegSetupWidget becomes a window. If parent is another widget, BabyMegSetupWidget becomes a child window inside parent. BabyMegSetupWidget is deleted when its parent is deleted.
     */
-    RtServerAboutWidget(QWidget *parent = 0);
+    BabyMegSetupWidget(BabyMeg* p_pBabyMeg, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RtServerAboutWidget.
-    * All RtServerAboutWidget's children are deleted first. The application exits if RtServerAboutWidget is the main widget.
+    * Destroys the BabyMegSetupWidget.
+    * All BabyMegSetupWidget's children are deleted first. The application exits if BabyMegSetupWidget is the main widget.
     */
-    ~RtServerAboutWidget();
+    ~BabyMegSetupWidget();
+
+    //=========================================================================================================
+    /**
+    * Inits the setup widget
+    */
+    void init();
+
+//slots
+    void bufferSizeEdited();        /**< Buffer size edited and set new buffer size.*/
+
+    void checkedRecordDataChanged();    /**< Record Data checkbox changed. */
+
+    //=========================================================================================================
+    /**
+    * Connector selection index changed
+    *
+    * @param [in] idx   new connector combo box index
+    */
+    void connectorIdxChanged(int idx);
+
+    void printToLog(QString message);   /**< Implements printing messages to rtproc log.*/
+
+    void pressedFiffRecordFile();   /**< Triggers file dialog to select record file.*/
+
+    void pressedConnect();          /**< Triggers a connection trial to rt_server.*/
+
+    void pressedSendCLI();          /**< Triggers a send request of a cli command.*/
+
+    void fiffInfoReceived();        /**< Triggered when new fiff info is recieved by producer and stored intor rt_server */
+
 
 private:
-    Ui::RtServerAboutWidgetClass ui;    /**< Holds the user interface for the DummyAboutWidget.*/
+    //=========================================================================================================
+    /**
+    * Set command connection status
+    *
+    * @param[in] p_bConnectionStatus    the connection status
+    */
+    void cmdConnectionChanged(bool p_bConnectionStatus);
+
+    //=========================================================================================================
+    /**
+    * Shows the About Dialog
+    *
+    */
+    void showAboutDialog();
+
+    BabyMeg*   m_pBabyMeg;    /**< Holds a pointer to corresponding ECGSimulator.*/
+
+    Ui::BabyMegSetupWidgetClass ui;       /**< Holds the user interface for the BabyMegSetupWidget.*/
+
+    bool m_bIsInit;     /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized */
+
+
 };
 
 } // NAMESPACE
 
-#endif // RTSERVERABOUTWIDGET_H
+#endif // BABYMEGSETUPWIDGET_H

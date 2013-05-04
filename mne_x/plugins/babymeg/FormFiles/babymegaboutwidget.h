@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtserveraboutwidget.h
+* @file     babymegaboutwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RtServerAboutWidget class.
+* @brief    Contains the declaration of the BabyMegAboutWidget class.
 *
 */
 
-#ifndef RTSERVERABOUTWIDGET_H
-#define RTSERVERABOUTWIDGET_H
+#ifndef BABYMEGABOUTWIDGET_H
+#define BABYMEGABOUTWIDGET_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_rtserverabout.h"
+#include "../ui_babymegabout.h"
 
 
 //*************************************************************************************************************
@@ -55,10 +55,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RtServerPlugin
+// DEFINE NAMESPACE BabyMegPlugin
 //=============================================================================================================
 
-namespace RtServerPlugin
+namespace BabyMegPlugin
 {
 
 
@@ -76,11 +76,11 @@ namespace RtServerPlugin
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RtServerAboutWidget
+* DECLARE CLASS BabyMegAboutWidget
 *
-* @brief The RtServerAboutWidget class provides the about dialog for the RtServer.
+* @brief The BabyMegAboutWidget class provides the about dialog for the BabyMeg.
 */
-class RtServerAboutWidget : public QDialog
+class BabyMegAboutWidget : public QDialog
 {
     Q_OBJECT
 
@@ -88,23 +88,23 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RtServerAboutWidget dialog which is a child of parent.
+    * Constructs a BabyMegAboutWidget dialog which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new RtServerAboutWidget becomes a window. If parent is another widget, RtServerAboutWidget becomes a child window inside parent. ECGAboutWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new BabyMegAboutWidget becomes a window. If parent is another widget, BabyMegAboutWidget becomes a child window inside parent. ECGAboutWidget is deleted when its parent is deleted.
     */
-    RtServerAboutWidget(QWidget *parent = 0);
+    BabyMegAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RtServerAboutWidget.
-    * All RtServerAboutWidget's children are deleted first. The application exits if RtServerAboutWidget is the main widget.
+    * Destroys the BabyMegAboutWidget.
+    * All BabyMegAboutWidget's children are deleted first. The application exits if BabyMegAboutWidget is the main widget.
     */
-    ~RtServerAboutWidget();
+    ~BabyMegAboutWidget();
 
 private:
-    Ui::RtServerAboutWidgetClass ui;    /**< Holds the user interface for the DummyAboutWidget.*/
+    Ui::BabyMegAboutWidgetClass ui;    /**< Holds the user interface for the DummyAboutWidget.*/
 };
 
 } // NAMESPACE
 
-#endif // RTSERVERABOUTWIDGET_H
+#endif // BABYMEGABOUTWIDGET_H

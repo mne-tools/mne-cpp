@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtserveraboutwidget.h
+* @file     babymegproducer.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RtServerAboutWidget class.
+* @brief    Contains the declaration of the RTServerProducer class.
 *
 */
 
-#ifndef RTSERVERABOUTWIDGET_H
-#define RTSERVERABOUTWIDGET_H
+#ifndef BABYMEGPRODUCER_H
+#define BABYMEGPRODUCER_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_rtserverabout.h"
+#include <generics/circularbuffer_old.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// MNE INCLUDES
+//=============================================================================================================
+
+#include <rtClient/rtdataclient.h>
 
 
 //*************************************************************************************************************
@@ -50,15 +58,16 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QThread>
+#include <QMutex>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RtServerPlugin
+// DEFINE NAMESPACE BabyMegPlugin
 //=============================================================================================================
 
-namespace RtServerPlugin
+namespace BabyMegPlugin
 {
 
 
@@ -67,44 +76,100 @@ namespace RtServerPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
+//using namespace IOBuffer;
+using namespace RTCLIENTLIB;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class BabyMeg;
+
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RtServerAboutWidget
+* DECLARE CLASS ECGProducer
 *
-* @brief The RtServerAboutWidget class provides the about dialog for the RtServer.
+* @brief The ECGProducer class provides a ECG data producer for a given sampling rate.
 */
-class RtServerAboutWidget : public QDialog
+class BabyMegProducer : public QThread
 {
     Q_OBJECT
 
+    friend class BabyMeg;
+
 public:
-
     //=========================================================================================================
     /**
-    * Constructs a RtServerAboutWidget dialog which is a child of parent.
+    * Constructs a BabyMegProducer.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new RtServerAboutWidget becomes a window. If parent is another widget, RtServerAboutWidget becomes a child window inside parent. ECGAboutWidget is deleted when its parent is deleted.
+    * @param [in] p_pBabyMeg   a pointer to the corresponding BabyMeg.
     */
-    RtServerAboutWidget(QWidget *parent = 0);
+    BabyMegProducer(BabyMeg* p_pBabyMeg);
 
     //=========================================================================================================
     /**
-    * Destroys the RtServerAboutWidget.
-    * All RtServerAboutWidget's children are deleted first. The application exits if RtServerAboutWidget is the main widget.
+    * Destroys the BabyMegProducer.
     */
-    ~RtServerAboutWidget();
+    ~BabyMegProducer();
+
+    //=========================================================================================================
+    /**
+    * Connects the data client.
+    *
+    * @param[in] p_sRtSeverIP   real-time server ip
+    */
+    void connectDataClient(QString p_sRtSeverIP);
+
+    //=========================================================================================================
+    /**
+    * Disconnects the data client.
+    */
+    void disconnectDataClient();
+
+    //=========================================================================================================
+    /**
+    * Stops the BabyMegProducer by stopping the producer's thread.
+    */
+    void stop();
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emitted when data clients connection status changed
+    *
+    * @param[in] p_bStatus  connection status
+    */
+    void dataConnectionChanged(bool p_bStatus);
+
+protected:
+    //=========================================================================================================
+    /**
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread.
+    */
+    virtual void run();
 
 private:
-    Ui::RtServerAboutWidgetClass ui;    /**< Holds the user interface for the DummyAboutWidget.*/
+
+    QMutex producerMutex;
+
+    BabyMeg*   m_pBabyMeg;    /**< Holds a pointer to corresponding BabyMeg.*/
+    bool        m_bIsRunning;   /**< Whether BabyMegProducer is running.*/
+
+    RtDataClient* m_pRtDataClient;  /**< The data client.*/
+    bool m_bDataClientIsConnected;  /**< If the data client is connected.*/
+
+    qint32 m_iDataClientId;
+
+    //Acquisition flags
+    bool m_bFlagInfoRequest;    /**< Read Fiff Info flag */
+    bool m_bFlagMeasuring;      /**< Read Fiff raw Buffers */
 };
 
 } // NAMESPACE
 
-#endif // RTSERVERABOUTWIDGET_H
+#endif // BABYMEGPRODUCER_H

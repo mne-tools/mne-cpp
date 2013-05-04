@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtserveraboutwidget.h
+* @file     babymegrunwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RtServerAboutWidget class.
+* @brief    Contains the declaration of the BabyMegRunWidget class.
 *
 */
 
-#ifndef RTSERVERABOUTWIDGET_H
-#define RTSERVERABOUTWIDGET_H
+#ifndef BABYMEGRUNWIDGET_H
+#define BABYMEGRUNWIDGET_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_rtserverabout.h"
+#include "../ui_babymegrun.h"
 
 
 //*************************************************************************************************************
@@ -55,17 +55,11 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RtServerPlugin
+// DEFINE NAMESPACE BabyMegPlugin
 //=============================================================================================================
 
-namespace RtServerPlugin
+namespace BabyMegPlugin
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -73,14 +67,16 @@ namespace RtServerPlugin
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class BabyMeg;
+
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RtServerAboutWidget
+* DECLARE CLASS BabyMegRunWidget
 *
-* @brief The RtServerAboutWidget class provides the about dialog for the RtServer.
+* @brief The BabyMegRunWidget class provides the ECG configuration window for the run mode.
 */
-class RtServerAboutWidget : public QDialog
+class BabyMegRunWidget : public QWidget
 {
     Q_OBJECT
 
@@ -88,23 +84,34 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RtServerAboutWidget dialog which is a child of parent.
+    * Constructs a BabyMegRunWidget which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new RtServerAboutWidget becomes a window. If parent is another widget, RtServerAboutWidget becomes a child window inside parent. ECGAboutWidget is deleted when its parent is deleted.
+    * @param [in] simulator a pointer to the corresponding ECG Simulator.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new BabyMegRunWidget becomes a window. If parent is another widget, BabyMegRunWidget becomes a child window inside parent. BabyMegRunWidget is deleted when its parent is deleted.
     */
-    RtServerAboutWidget(QWidget *parent = 0);
+    BabyMegRunWidget(BabyMeg* simulator, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RtServerAboutWidget.
-    * All RtServerAboutWidget's children are deleted first. The application exits if RtServerAboutWidget is the main widget.
+    * Destroys the BabyMegRunWidget.
+    * All BabyMegRunWidget's children are deleted first. The application exits if BabyMegRunWidget is the main widget.
     */
-    ~RtServerAboutWidget();
+    ~BabyMegRunWidget();
+
+private slots:
+    //=========================================================================================================
+    /**
+    * Shows the About Dialog
+    *
+    */
+    void showAboutDialog();
 
 private:
-    Ui::RtServerAboutWidgetClass ui;    /**< Holds the user interface for the DummyAboutWidget.*/
+    BabyMeg* m_pBabyMeg;      /**< Holds a pointer to corresponding ECGSimulator.*/
+
+    Ui::BabyMegRunClass ui;    /**< Holds the user interface for the BabyMegRunWidget.*/
 };
 
 } // NAMESPACE
 
-#endif // RTSERVERABOUTWIDGET_H
+#endif // BABYMEGRUNWIDGET_H
