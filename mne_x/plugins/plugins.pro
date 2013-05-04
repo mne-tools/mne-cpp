@@ -15,9 +15,17 @@ TEMPLATE = subdirs
 SUBDIRS += \
     ecgsimulator \
     dummytoolbox \
-    rtserver \
-    rtsss \
     sourcelab \
+    rtsss \
+
+contains(MNECPP_CONFIG, babyMEG) {
+    message(BabyMEG plugin configured!)
+    SUBDIRS += babymeg
+}
+else {
+    message(RtServer plugin configured!)
+    SUBDIRS += rtserver
+}
 
 #    filtertoolbox \
 #    gaborparticletoolbox \

@@ -95,12 +95,13 @@ public:
         ECGSIM = 0x00010000,                /**< Plugin id of the ECG simulator. */
         ECG = 0x00020000,                   /**< Plugin id of the ECG sensor (Not implemented - just a dummy). */
         RTSERVER = 0x00030000,              /**< Plugin id of the MNE rt server. */
-        DUMMYTOOL = 0x00040000,             /**< Plugin id of the dummy toolbox. */
-        FILTERTOOL = 0x00050000,            /**< Plugin id of the filter toolbox. */
-        GABORPARTICLETOOL = 0x00060000,     /**< Plugin id of the gabor toolbox. */
-        SOURCELAB = 0x00070000,             /**< Plugin id of the source lab toolbox. */
-        RTSSS = 0x00080000,             /**< Plugin id of the rtsss toolbox. */
-        BRAINMONITOR = 0x00090000,          /**< Plugin id of the brain monitor visualization. */
+        BABYMEG = 0x00040000,              /**< Plugin id of the MNE rt server. */
+        DUMMYTOOL = 0x00050000,             /**< Plugin id of the dummy toolbox. */
+        FILTERTOOL = 0x00060000,            /**< Plugin id of the filter toolbox. */
+        GABORPARTICLETOOL = 0x00070000,     /**< Plugin id of the gabor toolbox. */
+        SOURCELAB = 0x00080000,             /**< Plugin id of the source lab toolbox. */
+        RTSSS = 0x00090000,             /**< Plugin id of the rtsss toolbox. */
+        BRAINMONITOR = 0x000A0000,          /**< Plugin id of the brain monitor visualization. */
         _default = -1                       /**< Default plugin id. */
     };
 

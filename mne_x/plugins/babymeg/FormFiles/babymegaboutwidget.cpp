@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtserveraboutwidget.h
+* @file     babymegaboutwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,20 +29,16 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RtServerAboutWidget class.
+* @brief    Contains the implementation of the BabyMegAboutWidget class.
 *
 */
-
-#ifndef RTSERVERABOUTWIDGET_H
-#define RTSERVERABOUTWIDGET_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_rtserverabout.h"
+#include "babymegaboutwidget.h"
 
 
 //*************************************************************************************************************
@@ -50,16 +46,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE RtServerPlugin
-//=============================================================================================================
-
-namespace RtServerPlugin
-{
 
 
 //*************************************************************************************************************
@@ -67,44 +53,24 @@ namespace RtServerPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace BabyMegPlugin;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
-//=============================================================================================================
-/**
-* DECLARE CLASS RtServerAboutWidget
-*
-* @brief The RtServerAboutWidget class provides the about dialog for the RtServer.
-*/
-class RtServerAboutWidget : public QDialog
+BabyMegAboutWidget::BabyMegAboutWidget(QWidget *parent)
+: QDialog(parent)
 {
-    Q_OBJECT
+    ui.setupUi(this);
+}
 
-public:
 
-    //=========================================================================================================
-    /**
-    * Constructs a RtServerAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new RtServerAboutWidget becomes a window. If parent is another widget, RtServerAboutWidget becomes a child window inside parent. ECGAboutWidget is deleted when its parent is deleted.
-    */
-    RtServerAboutWidget(QWidget *parent = 0);
+//*************************************************************************************************************
 
-    //=========================================================================================================
-    /**
-    * Destroys the RtServerAboutWidget.
-    * All RtServerAboutWidget's children are deleted first. The application exits if RtServerAboutWidget is the main widget.
-    */
-    ~RtServerAboutWidget();
+BabyMegAboutWidget::~BabyMegAboutWidget()
+{
 
-private:
-    Ui::RtServerAboutWidgetClass ui;    /**< Holds the user interface for the DummyAboutWidget.*/
-};
-
-} // NAMESPACE
-
-#endif // RTSERVERABOUTWIDGET_H
+}
