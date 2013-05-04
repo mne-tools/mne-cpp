@@ -106,7 +106,7 @@ MNEForwardSolution::MNEForwardSolution(QIODevice &p_IODevice, bool force_fixed, 
 , source_rr(MatrixX3f::Zero(0,3))
 , source_nn(MatrixX3f::Zero(0,3))
 {
-    if(!read_forward_solution(p_IODevice, *this, force_fixed, surf_ori, include, exclude, bExcludeBads))
+    if(!read(p_IODevice, *this, force_fixed, surf_ori, include, exclude, bExcludeBads))
     {
         printf("\tForward solution not found.\n");//ToDo Throw here
         return;
@@ -764,7 +764,7 @@ void MNEForwardSolution::prepare_forward(const FiffInfo &p_info, const FiffCov &
 
 //*************************************************************************************************************
 
-bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForwardSolution& fwd, bool force_fixed, bool surf_ori, const QStringList& include, const QStringList& exclude, bool bExcludeBads)
+bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bool force_fixed, bool surf_ori, const QStringList& include, const QStringList& exclude, bool bExcludeBads)
 {
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
     FiffDirTree t_Tree;
@@ -796,7 +796,7 @@ bool MNEForwardSolution::read_forward_solution(QIODevice& p_IODevice, MNEForward
     }
 
     MNESourceSpace t_SourceSpace;// = NULL;
-    if(!MNESourceSpace::read_source_spaces(t_pStream, true, t_Tree, t_SourceSpace))
+    if(!MNESourceSpace::readFromStream(t_pStream, true, t_Tree, t_SourceSpace))
     {
         t_pStream->device()->close();
         std::cout << "Could not read the source spaces\n"; // ToDo throw error

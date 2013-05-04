@@ -223,7 +223,7 @@ bool MNEHemisphere::transform_hemisphere_to(fiff_int_t dest, const FiffCoordTran
 
 //*************************************************************************************************************
 //ToDo
-void MNEHemisphere::write_to_stream(FiffStream* p_pStream)
+void MNEHemisphere::writeToStream(FiffStream* p_pStream)
 {
     if(this->type == 1 || this->type == 2)
         p_pStream->write_int(FIFF_MNE_SOURCE_SPACE_TYPE, &this->type);

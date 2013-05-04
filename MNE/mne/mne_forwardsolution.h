@@ -340,7 +340,9 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_forward_solution(QIODevice& p_IODevice, MNEForwardSolution& fwd, bool force_fixed = false, bool surf_ori = false, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList, bool bExcludeBads = true);
+    static bool read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bool force_fixed = false, bool surf_ori = false, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList, bool bExcludeBads = true);
+
+    //ToDo readFromStream
 
     //=========================================================================================================
     /**

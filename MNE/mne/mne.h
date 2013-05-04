@@ -390,7 +390,7 @@ public:
     */
     static inline bool read_forward_solution(QIODevice& p_IODevice, MNEForwardSolution& fwd, bool force_fixed = false, bool surf_ori = false, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList)
     {
-        return MNEForwardSolution::read_forward_solution(p_IODevice, fwd, force_fixed, surf_ori, include, exclude);
+        return MNEForwardSolution::read(p_IODevice, fwd, force_fixed, surf_ori, include, exclude);
     }
 
     //=========================================================================================================
@@ -413,7 +413,7 @@ public:
     */
     static bool read_source_spaces(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNESourceSpace& p_SourceSpace)
     {
-        return MNESourceSpace::read_source_spaces(p_pStream, add_geom, p_Tree, p_SourceSpace);
+        return MNESourceSpace::readFromStream(p_pStream, add_geom, p_Tree, p_SourceSpace);
     }
 
     //ToDo FiffChInfoList Class

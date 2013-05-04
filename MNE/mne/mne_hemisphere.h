@@ -176,7 +176,9 @@ public:
     *
     * @param[in] p_pStream  The stream to write to.
     */
-    void write_to_stream(FiffStream* p_pStream);
+    void writeToStream(FiffStream* p_pStream);
+
+    //ToDo write(IODevice &)
 
     //=========================================================================================================
     /**
