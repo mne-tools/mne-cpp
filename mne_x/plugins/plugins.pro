@@ -14,18 +14,10 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     ecgsimulator \
+    rtserver \
     dummytoolbox \
     sourcelab \
     rtsss \
-
-contains(MNECPP_CONFIG, babyMEG) {
-    message(BabyMEG plugin configured!)
-    SUBDIRS += babymeg
-}
-else {
-    message(RtServer plugin configured!)
-    SUBDIRS += rtserver
-}
 
 #    filtertoolbox \
 #    gaborparticletoolbox \
@@ -40,3 +32,13 @@ qtHaveModule(3d) {
     message(Qt3D available: brainmonitor library configured!)
     SUBDIRS += brainmonitor \
 }
+
+### BabyMEG alternative ###
+#contains(MNECPP_CONFIG, babyMEG) {
+#    message(BabyMEG plugin configured!)
+#    SUBDIRS += babymeg
+#}
+#else {
+#    message(RtServer plugin configured!)
+#    SUBDIRS += rtserver
+#}
