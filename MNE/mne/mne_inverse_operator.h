@@ -244,7 +244,15 @@ public:
     *
     * @param [in] p_IODevice   IO device to write the inverse operator to.
     */
-    void write_inverse_operator(QIODevice &p_IODevice);
+    void write(QIODevice &p_IODevice);
+
+    //=========================================================================================================
+    /**
+    * Writes the inverse operator to a FIFF stream
+    *
+    * @param[in] p_pStream  The stream to write to.
+    */
+    void writeToStream(FiffStream* p_pStream);
 
     //=========================================================================================================
     /**

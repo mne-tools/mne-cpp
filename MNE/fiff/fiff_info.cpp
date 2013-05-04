@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include "fiff_info.h"
+#include "fiff_stream.h"
 
 
 //*************************************************************************************************************
@@ -340,4 +341,125 @@ QList<FiffChInfo> FiffInfo::set_current_comp(QList<FiffChInfo>& chs, fiff_int_t 
         }
     }
     return new_chs;
+}
+
+
+//*************************************************************************************************************
+
+void FiffInfo::writeToStream(FiffStream* p_pStream)
+{
+    //
+    //   We will always write floats
+    //
+    fiff_int_t data_type = 4;
+    qint32 k;
+    QList<FiffChInfo> chs;
+
+    for(k = 0; k < this->nchan; ++k)
+        chs << this->chs[k];
+
+    fiff_int_t nchan = chs.size();
+
+    //
+    // write the essentials
+    //
+    p_pStream->start_block(FIFFB_MEAS);//4
+    p_pStream->write_id(FIFF_BLOCK_ID);//5
+    if(this->meas_id.version != -1)
+    {
+        p_pStream->write_id(FIFF_PARENT_BLOCK_ID,this->meas_id);//6
+    }
+    //
+    //    Measurement info
+    //
+    p_pStream->start_block(FIFFB_MEAS_INFO);//7
+
+    //
+    //    Blocks from the original -> skip this
+    //
+//        QList<fiff_int_t> blocks;
+//        blocks << FIFFB_SUBJECT << FIFFB_HPI_MEAS << FIFFB_HPI_RESULT << FIFFB_ISOTRAK << FIFFB_PROCESSING_HISTORY;
+    bool have_hpi_result = false;
+    bool have_isotrak    = false;
+    //
+    //    megacq parameters
+    //
+    if (!this->acq_pars.isEmpty() || !this->acq_stim.isEmpty())
+    {
+        p_pStream->start_block(FIFFB_DACQ_PARS);
+        if (!this->acq_pars.isEmpty())
+            p_pStream->write_string(FIFF_DACQ_PARS, this->acq_pars);
+
+        if (!this->acq_stim.isEmpty())
+            p_pStream->write_string(FIFF_DACQ_STIM, this->acq_stim);
+
+        p_pStream->end_block(FIFFB_DACQ_PARS);
+    }
+    //
+    //    Coordinate transformations if the HPI result block was not there
+    //
+    if (!have_hpi_result)
+    {
+        if (!this->dev_head_t.isEmpty())
+            p_pStream->write_coord_trans(this->dev_head_t);
+
+        if (!this->ctf_head_t.isEmpty())
+            p_pStream->write_coord_trans(this->ctf_head_t);
+    }
+    //
+    //    Polhemus data
+    //
+    if (this->dig.size() > 0 && !have_isotrak)
+    {
+        p_pStream->start_block(FIFFB_ISOTRAK);
+        for (qint32 k = 0; k < this->dig.size(); ++k)
+            p_pStream->write_dig_point(this->dig[k]);
+
+        p_pStream->end_block(FIFFB_ISOTRAK);
+    }
+    //
+    //    Projectors
+    //
+    p_pStream->write_proj(this->projs);
+    //
+    //    CTF compensation info
+    //
+    p_pStream->write_ctf_comp(this->comps);
+    //
+    //    Bad channels
+    //
+    if (this->bads.size() > 0)
+    {
+        p_pStream->start_block(FIFFB_MNE_BAD_CHANNELS);
+        p_pStream->write_name_list(FIFF_MNE_CH_NAME_LIST,this->bads);
+        p_pStream->end_block(FIFFB_MNE_BAD_CHANNELS);
+    }
+    //
+    //    General
+    //
+    p_pStream->write_float(FIFF_SFREQ,&this->sfreq);
+    p_pStream->write_float(FIFF_HIGHPASS,&this->highpass);
+    p_pStream->write_float(FIFF_LOWPASS,&this->lowpass);
+    p_pStream->write_int(FIFF_NCHAN,&nchan);
+    p_pStream->write_int(FIFF_DATA_PACK,&data_type);
+    if (this->meas_date[0] != -1)
+        p_pStream->write_int(FIFF_MEAS_DATE,this->meas_date, 2);
+    //
+    //    Channel info
+    //
+    MatrixXd cals(1,nchan);
+
+    for(k = 0; k < nchan; ++k)
+    {
+        //
+        //    Scan numbers may have been messed up
+        //
+        chs[k].scanno = k+1;//+1 because
+        chs[k].range  = 1.0f;//Why? -> cause its already calibrated through reading
+        cals(0,k) = chs[k].cal; //ToDo whats going on with cals?
+        p_pStream->write_ch_info(&chs[k]);
+    }
+    //
+    //
+    p_pStream->end_block(FIFFB_MEAS_INFO);
 }

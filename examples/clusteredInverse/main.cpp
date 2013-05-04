@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
 
     MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
 
-    inverse_operator.write_inverse_operator(t_fileClusteredInverse);
+    inverse_operator.write(t_fileClusteredInverse);
 
     //
     // Compute inverse solution

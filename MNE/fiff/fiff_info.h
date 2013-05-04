@@ -79,6 +79,14 @@ namespace FIFFLIB
 //=============================================================================================================
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class FiffStream;
+
+
 //=============================================================================================================
 /**
 * Provides fiff measurement file information
@@ -215,8 +223,24 @@ public:
     */
     static QList<FiffChInfo> set_current_comp(QList<FiffChInfo>& chs, fiff_int_t value);
 
-private:
+// ToDo
+//    //=========================================================================================================
+//    /**
+//    * Writes the fiff information to an I/O Device, e.g. fiff file
+//    *
+//    * @param [in] p_IODevice   IO device to write the fiff info to.
+//    */
+//    void write(QIODevice &p_IODevice);
 
+    //=========================================================================================================
+    /**
+    * Writes the fiff information to a FIF stream
+    *
+    * @param[in] p_pStream  The stream to write to.
+    */
+    void writeToStream(FiffStream* p_pStream);
+
+private:
     //=========================================================================================================
     /**
     * function this_comp = make_compensator(info,kind)
@@ -229,7 +253,6 @@ private:
     * @return true if succeeded, false otherwise
     */
     bool make_compensator(fiff_int_t kind, MatrixXd& this_comp) const;
-
 
 public: //Public because it's a mne struct
     FiffId      file_id;        /**< File ID. */

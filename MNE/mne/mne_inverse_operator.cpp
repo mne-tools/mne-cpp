@@ -908,7 +908,7 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //
     //   Read the source spaces
     //
-    if(!MNESourceSpace::read_source_spaces(t_pStream, false, t_Tree, inv.src))
+    if(!MNESourceSpace::readFromStream(t_pStream, false, t_Tree, inv.src))
     {
         printf("\tError: Could not read the source spaces.\n");
         return false;
@@ -984,7 +984,7 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
 
 //*************************************************************************************************************
 
-void MNEInverseOperator::write_inverse_operator(QIODevice &p_IODevice)
+void MNEInverseOperator::write(QIODevice &p_IODevice)
 {
     //
     //   Open the file, create directory
@@ -993,18 +993,25 @@ void MNEInverseOperator::write_inverse_operator(QIODevice &p_IODevice)
     // Create the file and save the essentials
     FiffStream::SPtr t_pStream = FiffStream::start_file(p_IODevice);
     printf("Write inverse operator decomposition in %s...", t_pStream->streamName().toUtf8().constData());
+    this->writeToStream(t_pStream.data());
+}
 
-    t_pStream->start_block(FIFFB_MNE_INVERSE_SOLUTION);
+
+//*************************************************************************************************************
+
+void MNEInverseOperator::writeToStream(FiffStream* p_pStream)
+{
+    p_pStream->start_block(FIFFB_MNE_INVERSE_SOLUTION);
 
     printf("\tWriting inverse operator info...\n");
 
-    t_pStream->write_int(FIFF_MNE_INCLUDED_METHODS, &this->methods);
-    t_pStream->write_int(FIFF_MNE_SOURCE_ORIENTATION, &this->source_ori);
-    t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NPOINTS, &this->nsource);
-    t_pStream->write_int(FIFF_MNE_COORD_FRAME, &this->coord_frame);
-    t_pStream->write_float_matrix(FIFF_MNE_INVERSE_SOURCE_ORIENTATIONS, this->source_nn);
+    p_pStream->write_int(FIFF_MNE_INCLUDED_METHODS, &this->methods);
+    p_pStream->write_int(FIFF_MNE_SOURCE_ORIENTATION, &this->source_ori);
+    p_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NPOINTS, &this->nsource);
+    p_pStream->write_int(FIFF_MNE_COORD_FRAME, &this->coord_frame);
+    p_pStream->write_float_matrix(FIFF_MNE_INVERSE_SOURCE_ORIENTATIONS, this->source_nn);
     VectorXf tmp_sing = this->sing.cast<float>();
-    t_pStream->write_float(FIFF_MNE_INVERSE_SING, tmp_sing.data(), tmp_sing.size());
+    p_pStream->write_float(FIFF_MNE_INVERSE_SING, tmp_sing.data(), tmp_sing.size());
 
     //
     //   The eigenleads and eigenfields
@@ -1013,62 +1020,62 @@ void MNEInverseOperator::write_inverse_operator(QIODevice &p_IODevice)
     {
         FiffNamedMatrix tmpMatrix(*this->eigen_leads.data());
         tmpMatrix.transpose_named_matrix();
-        t_pStream->write_named_matrix(FIFF_MNE_INVERSE_LEADS_WEIGHTED, tmpMatrix);
+        p_pStream->write_named_matrix(FIFF_MNE_INVERSE_LEADS_WEIGHTED, tmpMatrix);
     }
     else
     {
         FiffNamedMatrix tmpMatrix(*this->eigen_leads.data());
         tmpMatrix.transpose_named_matrix();
-        t_pStream->write_named_matrix(FIFF_MNE_INVERSE_LEADS, tmpMatrix);
+        p_pStream->write_named_matrix(FIFF_MNE_INVERSE_LEADS, tmpMatrix);
     }
 
-    t_pStream->write_named_matrix(FIFF_MNE_INVERSE_FIELDS, *this->eigen_fields.data());
+    p_pStream->write_named_matrix(FIFF_MNE_INVERSE_FIELDS, *this->eigen_fields.data());
     printf("\t[done]\n");
     //
     //   write the covariance matrices
     //
     printf("\tWriting noise covariance matrix.");
-    t_pStream->write_cov(*this->noise_cov.data());
+    p_pStream->write_cov(*this->noise_cov.data());
 
     printf("\tWriting source covariance matrix.\n");
-    t_pStream->write_cov(*this->source_cov.data());
+    p_pStream->write_cov(*this->source_cov.data());
     //
     //   write the various priors
     //
     printf("\tWriting orientation priors.\n");
     if(!this->orient_prior->isEmpty())
-        t_pStream->write_cov(*this->orient_prior.data());
+        p_pStream->write_cov(*this->orient_prior.data());
     if(!this->depth_prior->isEmpty())
-        t_pStream->write_cov(*this->depth_prior.data());
+        p_pStream->write_cov(*this->depth_prior.data());
     if(!this->fmri_prior->isEmpty())
-        t_pStream->write_cov(*this->fmri_prior.data());
+        p_pStream->write_cov(*this->fmri_prior.data());
 
     //
     //   Parent MRI data
     //
-    t_pStream->start_block(FIFFB_MNE_PARENT_MRI_FILE);
+    p_pStream->start_block(FIFFB_MNE_PARENT_MRI_FILE);
     //   write the MRI <-> head coordinate transformation
-    t_pStream->write_coord_trans(this->mri_head_t);
-    t_pStream->end_block(FIFFB_MNE_PARENT_MRI_FILE);
+    p_pStream->write_coord_trans(this->mri_head_t);
+    p_pStream->end_block(FIFFB_MNE_PARENT_MRI_FILE);
 
     //
     //   Parent MEG measurement info
     //
-    t_pStream->write_info_base(this->info);
+    p_pStream->write_info_base(this->info);
 
     //
     //   Write the source spaces
     //
     if(!src.isEmpty())
-        this->src.write_to_stream(t_pStream.data());
+        this->src.writeToStream(p_pStream);
 
     //
     //  We also need the SSP operator
     //
-    t_pStream->write_proj(this->projs);
+    p_pStream->write_proj(this->projs);
     //
     //   Done!
     //
-    t_pStream->end_block(FIFFB_MNE_INVERSE_SOLUTION);
-    t_pStream->end_file();
+    p_pStream->end_block(FIFFB_MNE_INVERSE_SOLUTION);
+    p_pStream->end_file();
 }

@@ -161,7 +161,7 @@ QList<VectorXi> MNESourceSpace::label_src_vertno_sel(const Label &p_label, Vecto
 
 //*************************************************************************************************************
 
-bool MNESourceSpace::read_source_spaces(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNESourceSpace& p_SourceSpace)
+bool MNESourceSpace::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNESourceSpace& p_SourceSpace)
 {
 //    if (p_pSourceSpace != NULL)
 //        delete p_pSourceSpace;
@@ -677,13 +677,13 @@ bool MNESourceSpace::complete_source_space_info(MNEHemisphere& p_Hemisphere)
 
 //*************************************************************************************************************
 
-void MNESourceSpace::write_to_stream(FiffStream* p_pStream)
+void MNESourceSpace::writeToStream(FiffStream* p_pStream)
 {
     for(qint32 h = 0; h < m_qListHemispheres.size(); ++h)
     {
         printf("\tWrite a source space... ");
         p_pStream->start_block(FIFFB_MNE_SOURCE_SPACE);
-        m_qListHemispheres[h].write_to_stream(p_pStream);
+        m_qListHemispheres[h].writeToStream(p_pStream);
         p_pStream->end_block(FIFFB_MNE_SOURCE_SPACE);
         printf("[done]\n");
     }
