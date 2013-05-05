@@ -211,7 +211,7 @@ public:
 signals:
     void remitMeasInfo(qint32, FIFFLIB::FiffInfo);
 
-    void remitRawBuffer(Eigen::MatrixXf);
+    void remitRawBuffer(QSharedPointer<Eigen::MatrixXf>);
 
 protected:
 

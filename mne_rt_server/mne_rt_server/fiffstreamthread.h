@@ -80,7 +80,6 @@ using namespace FIFFLIB;
 class FiffStreamThread : public QThread
 {
     Q_OBJECT
-
 public:
     FiffStreamThread(qint32 id, int socketDescriptor, QObject *parent);
 
@@ -119,7 +118,7 @@ private:
     void startMeas(qint32 ID);
     void stopMeas(qint32 ID);
     void sendMeasurementInfo(qint32 ID, FiffInfo p_fiffInfo);
-    void sendRawBuffer(Eigen::MatrixXf m_matRawData);
+    void sendRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRawData);
 };
 
 

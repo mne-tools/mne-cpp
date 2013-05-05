@@ -177,7 +177,7 @@ void FiffStreamThread::parseCommand(FiffTag::SPtr p_pTag)
 
 //*************************************************************************************************************
 
-void FiffStreamThread::sendRawBuffer(Eigen::MatrixXf m_matRawData)
+void FiffStreamThread::sendRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRawData)
 {
     if(m_bIsSendingRawBuffer)
     {
@@ -186,7 +186,7 @@ void FiffStreamThread::sendRawBuffer(Eigen::MatrixXf m_matRawData)
         m_qMutex.lock();
 
         FiffStream t_FiffStreamOut(&m_qSendBlock, QIODevice::WriteOnly);
-        t_FiffStreamOut.write_float(FIFF_DATA_BUFFER,m_matRawData.data(),m_matRawData.rows()*m_matRawData.cols());
+        t_FiffStreamOut.write_float(FIFF_DATA_BUFFER,m_pMatRawData->data(),m_pMatRawData->rows()*m_pMatRawData->cols());
 
         m_qMutex.unlock();
 

@@ -370,9 +370,9 @@ void FiffStreamServer::forwardMeasInfo(qint32 ID, FiffInfo p_fiffInfo)
 
 //*************************************************************************************************************
 //ToDo increase preformance --> try inline
-void FiffStreamServer::forwardRawBuffer(Eigen::MatrixXf m_matRawData)
+void FiffStreamServer::forwardRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRawData)
 {
-    emit remitRawBuffer(m_matRawData);
+    emit remitRawBuffer(m_pMatRawData);
 }
 
 
