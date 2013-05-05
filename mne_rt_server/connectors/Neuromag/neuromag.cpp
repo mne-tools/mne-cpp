@@ -274,15 +274,18 @@ void Neuromag::run()
 {
     m_bIsRunning = true;
 
+    qint32 count = 0;
+
     while(m_bIsRunning)
     {
         if(m_pRawMatrixBuffer)
         {
             // Pop available Buffers
-            MatrixXf tmp = m_pRawMatrixBuffer->pop();
-//            printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
+            QSharedPointer<Eigen::MatrixXf> t_pRawBuffer(new Eigen::MatrixXf(m_pRawMatrixBuffer->pop()));
+//            ++count;
+//            printf("%d raw buffer (%d x %d) generated\r\n", count, t_pRawBuffer->rows(), t_pRawBuffer->cols());
 
-            emit remitRawBuffer(tmp);
+            emit remitRawBuffer(t_pRawBuffer);
         }
     }
 }
