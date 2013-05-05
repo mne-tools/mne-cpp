@@ -83,6 +83,7 @@ MNERTServer::MNERTServer()
 , m_connectorManager(&m_fiffStreamServer, this)
 {
     qRegisterMetaType<MatrixXf>("MatrixXf");
+    qRegisterMetaType<QSharedPointer<Eigen::MatrixXf> >("QSharedPointer<Eigen::MatrixXf>");
 
     //
     // init mne_rt_server
@@ -97,7 +98,6 @@ MNERTServer::MNERTServer()
 
     // command manager
     m_commandServer.registerCommandManager(this->getCommandManager());
-
 
     // ### Load everything ###
     //

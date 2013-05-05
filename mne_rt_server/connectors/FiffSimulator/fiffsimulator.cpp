@@ -412,11 +412,11 @@ void FiffSimulator::run()
 
     while(m_bIsRunning)
     {
-        MatrixXf tmp = m_pRawMatrixBuffer->pop();
+        QSharedPointer<Eigen::MatrixXf> t_pMat(new Eigen::MatrixXf(m_pRawMatrixBuffer->pop()));
         ++count;
-//        printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
+//        printf("%d raw buffer (%d x %d) generated\r\n", count, t_pMat->rows(), t_pMat->cols());
 
-        emit remitRawBuffer(tmp);
+        emit remitRawBuffer(t_pMat);
         usleep(uiSamplePeriod);
     }
 }
