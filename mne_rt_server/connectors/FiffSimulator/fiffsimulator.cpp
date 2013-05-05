@@ -408,15 +408,15 @@ void FiffSimulator::run()
     float t_fBuffSampleSize = (float)m_uiBufferSampleSize;
 
     quint32 uiSamplePeriod = (unsigned int) ((t_fBuffSampleSize/t_fSamplingFrequency)*1000000.0f);
-    quint32 count = 0;
+//    quint32 count = 0;
 
     while(m_bIsRunning)
     {
-        QSharedPointer<Eigen::MatrixXf> t_pMat(new Eigen::MatrixXf(m_pRawMatrixBuffer->pop()));
-        ++count;
-//        printf("%d raw buffer (%d x %d) generated\r\n", count, t_pMat->rows(), t_pMat->cols());
+        QSharedPointer<Eigen::MatrixXf> t_pRawBuffer(new Eigen::MatrixXf(m_pRawMatrixBuffer->pop()));
+//        ++count;
+//        printf("%d raw buffer (%d x %d) generated\r\n", count, t_pRawBuffer->rows(), t_pRawBuffer->cols());
 
-        emit remitRawBuffer(t_pMat);
+        emit remitRawBuffer(t_pRawBuffer);
         usleep(uiSamplePeriod);
     }
 }

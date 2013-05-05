@@ -315,20 +315,19 @@ void BabyMEG::info(qint32 ID)
 void BabyMEG::run()
 {
     m_bIsRunning = true;
-
-    quint32 count = 0;
+//    quint32 count = 0;
 
     while(m_bIsRunning)
     {
         if(m_pRawMatrixBuffer)
         {
-            MatrixXf t_rawBuffer = m_pRawMatrixBuffer->pop();
+            QSharedPointer<Eigen::MatrixXf> t_pRawBuffer(new Eigen::MatrixXf(m_pRawMatrixBuffer->pop()));
 
-            ++count;
-//            printf("%d raw buffer (%d x %d) generated\r\n", count, t_rawBuffer.rows(), t_rawBuffer.cols());
+//            ++count;
+//            printf("%d raw buffer (%d x %d) generated\r\n", count, t_pRawBuffer->rows(), t_pRawBuffer->cols());
 //            std::cout << "first 100 elements \n" << t_rawBuffer.block(0,0,1,100) << std::endl;
 
-            emit remitRawBuffer(t_rawBuffer);
+            emit remitRawBuffer(t_pRawBuffer);
         }
     }
 }
