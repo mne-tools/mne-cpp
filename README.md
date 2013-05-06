@@ -23,7 +23,7 @@ To build the mne libraries [Qt5](http://qt-project.org/downloads) is required.
 
 It’s really recommended to always download the source code of Qt5 and compile it from scratch, to make sure everything is compatible.
 
-    [Download](http://releases.qt-project.org/qt5/5.0.1/single/qt-everywhere-opensource-src-5.0.1.tar.gz) and extract Qt5 
+[Download](http://releases.qt-project.org/qt5/5.0.1/single/qt-everywhere-opensource-src-5.0.1.tar.gz) and extract Qt5 
 
 To compile use the following steps:
 
@@ -40,7 +40,7 @@ To compile the qt creator do the following
 
 To use the mne-cpp 3D libraries download and compile also the qt3d module.
 
-    Clone the [qt3d git repo](http://qt.gitorious.org/qt/qt3d)
+Clone the [qt3d git repo](http://qt.gitorious.org/qt/qt3d)
 
 To compile qt3d it’s highly recommended to make use of qt creator, since it supports shadow builds. This prevents the source folder from being messed up.
 
