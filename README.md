@@ -44,9 +44,9 @@ Clone the [qt3d git repo](http://qt.gitorious.org/qt/qt3d)
 
 To compile qt3d it’s highly recommended to make use of qt creator, since it supports shadow builds. This prevents the source folder from being messed up.
 
-    First open qt creator make sure Tools->Options->Qt Versions/Kits are setup correctly (Qt 5.0.1)
-    Then open qt3d in qt creator. After configuring the shadow build, make sure release mode is selected. Then compile it.
-    After compilation, go to the shadow build directory open a terminal and type make install. Qt3d now installs itself to the Qt5.0.1 folder
+First open qt creator make sure Tools->Options->Qt Versions/Kits are setup correctly (Qt 5.0.1)
+Then open qt3d in qt creator. After configuring the shadow build, make sure release mode is selected. Then compile it.
+After compilation, go to the shadow build directory open a terminal and type make install. Qt3d now installs itself to the Qt5.0.1 folder
 
 Tip: Windows users should just use nmake of Visual Studio instead of make.
 
