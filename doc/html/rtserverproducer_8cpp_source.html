@@ -231,7 +231,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        <span class="keywordflow">if</span>(m_bFlagInfoRequest)</div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        {</div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;            m_pRtServer-&gt;rtServerMutex.lock();</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;            m_pRtServer-&gt;m_fiffInfo = m_pRtDataClient-&gt;<a class="code" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_data_client.html#a8fc1a06173ef598cfee81ee50ed9c413">readInfo</a>();</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;            m_pRtServer-&gt;m_pFiffInfo = m_pRtDataClient-&gt;<a class="code" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_data_client.html#ae4bdaccf6bf9fc04f7e4b35c77323cd3">readInfo</a>();</div>
 <div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;            emit m_pRtServer-&gt;<a class="code" href="class_rt_server_plugin_1_1_rt_server.html#a2f81d8a3e72df93fbec4c3ad2339ae1e">fiffInfoAvailable</a>();</div>
 <div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;            m_pRtServer-&gt;rtServerMutex.unlock();</div>
 <div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;</div>
@@ -242,12 +242,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;</div>
 <div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;        <span class="keywordflow">if</span>(m_bFlagMeasuring)</div>
 <div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;        {</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;            m_pRtDataClient-&gt;<a class="code" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_data_client.html#a6d70061f07a7e12a7c42394fe29e3327">readRawBuffer</a>(m_pRtServer-&gt;m_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>, t_matRawBuffer, kind);</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;            m_pRtDataClient-&gt;<a class="code" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_data_client.html#a6d70061f07a7e12a7c42394fe29e3327">readRawBuffer</a>(m_pRtServer-&gt;m_pFiffInfo-&gt;nchan, t_matRawBuffer, kind);</div>
 <div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;</div>
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;            <span class="keywordflow">if</span>(kind == <a class="code" href="fiff__constants_8h.html#a0136b998f6acc7a0a02f8c46a7300d59">FIFF_DATA_BUFFER</a>)</div>
 <div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;            {</div>
 <div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;                to += t_matRawBuffer.cols();</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;<span class="comment">//                printf(&quot;Reading %d ... %d  =  %9.3f ... %9.3f secs...&quot;, from, to, ((float)from)/m_pRtServer-&gt;m_fiffInfo.sfreq, ((float)to)/m_pRtServer-&gt;m_fiffInfo.sfreq);</span></div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;<span class="comment">//                printf(&quot;Reading %d ... %d  =  %9.3f ... %9.3f secs...&quot;, from, to, ((float)from)/m_pRtServer-&gt;m_pFiffInfo-&gt;sfreq, ((float)to)/m_pRtServer-&gt;m_pFiffInfo-&gt;sfreq);</span></div>
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;                from += t_matRawBuffer.cols();</div>
 <div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;</div>
 <div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;                m_pRtServer-&gt;m_pRawMatrixBuffer_In-&gt;push(&amp;t_matRawBuffer);</div>
@@ -262,7 +262,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 23 2013 15:23:00 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 6 2013 17:08:37 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

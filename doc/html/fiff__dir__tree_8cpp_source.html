@@ -170,7 +170,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;</div>
-<div class="line"><a name="l00115"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a334b1d1d89e627cf8f9afe210fc3ad01">  115</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a334b1d1d89e627cf8f9afe210fc3ad01">FiffDirTree::copy_tree</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a>* p_pStreamIn, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html" title="Universially unique identifier.">FiffId</a>&amp; in_id, QList&lt;FiffDirTree&gt;&amp; p_Nodes, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a>* p_pStreamOut)</div>
+<div class="line"><a name="l00115"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ad11316c8b752ede1bdddc6897a13d4c4">  115</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ad11316c8b752ede1bdddc6897a13d4c4">FiffDirTree::copy_tree</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#afc5bb6ae857cf5e93e4e0271bf0bee05">FiffStream::SPtr</a> p_pStreamIn, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html" title="Universially unique identifier.">FiffId</a>&amp; in_id, QList&lt;FiffDirTree&gt;&amp; p_Nodes, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#afc5bb6ae857cf5e93e4e0271bf0bee05">FiffStream::SPtr</a> p_pStreamOut)</div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;{</div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="keywordflow">if</span>(p_Nodes.size() &lt;= 0)</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
@@ -179,14 +179,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="keywordflow">for</span>(k = 0; k &lt; p_Nodes.size(); ++k)</div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    {</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        p_pStreamOut-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aca5c9df67313a344df12ebf61e57409c">start_block</a>(p_Nodes[k].<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ae7a0a42675b015ba4b5ff83586a2394a">block</a>);<span class="comment">//8</span></div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        p_pStreamOut-&gt;start_block(p_Nodes[k].<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ae7a0a42675b015ba4b5ff83586a2394a">block</a>);<span class="comment">//8</span></div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        <span class="keywordflow">if</span> (p_Nodes[k].<span class="keywordtype">id</span>.version != -1)</div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        {</div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;            <span class="keywordflow">if</span> (in_id.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#ace3ce06929c786230382642f8ef596d3">version</a> != -1)</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;                p_pStreamOut-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aa3c211f31289f0f0dd9f884fd601122c">write_id</a>(FIFF_PARENT_FILE_ID, in_id);<span class="comment">//9</span></div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;                p_pStreamOut-&gt;write_id(FIFF_PARENT_FILE_ID, in_id);<span class="comment">//9</span></div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;            p_pStreamOut-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aa3c211f31289f0f0dd9f884fd601122c">write_id</a>(FIFF_BLOCK_ID);<span class="comment">//10</span></div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;            p_pStreamOut-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aa3c211f31289f0f0dd9f884fd601122c">write_id</a>(FIFF_PARENT_BLOCK_ID, p_Nodes[k].<span class="keywordtype">id</span>);<span class="comment">//11</span></div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;            p_pStreamOut-&gt;write_id(FIFF_BLOCK_ID);<span class="comment">//10</span></div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;            p_pStreamOut-&gt;write_id(FIFF_PARENT_BLOCK_ID, p_Nodes[k].<span class="keywordtype">id</span>);<span class="comment">//11</span></div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        }</div>
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        <span class="keywordflow">for</span> (p = 0; p &lt; p_Nodes[k].nent; ++p)</div>
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;        {</div>
@@ -206,48 +206,48 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;            }</div>
 <div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;</div>
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;<span class="comment">//ToDo this is the same like read_tag</span></div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;            <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html" title="FIFF data tag.">FiffTag</a> tag;</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;            <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a81dd3125f347ffdcae77188caf6670f5">FiffTag::SPtr</a> tag(<span class="keyword">new</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html" title="FIFF data tag.">FiffTag</a>());</div>
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;            <span class="comment">//QDataStream in(fidin);</span></div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;            <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a>* in = p_pStreamIn;</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;            <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#afc5bb6ae857cf5e93e4e0271bf0bee05">FiffStream::SPtr</a> in = p_pStreamIn;</div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;            in-&gt;setByteOrder(QDataStream::BigEndian);</div>
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;</div>
 <div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;            <span class="comment">//</span></div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;            <span class="comment">// Read fiff tag header from stream</span></div>
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;            <span class="comment">//</span></div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;            *in &gt;&gt; tag.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a28600eedaead7b0db5d22d71fce1200b">kind</a>;</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;            *in &gt;&gt; tag.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#acd412f0127525d8749b6606cd87fd5ff">type</a>;</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;            *in &gt;&gt; tag-&gt;kind;</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;            *in &gt;&gt; tag-&gt;type;</div>
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;            qint32 size;</div>
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;            *in &gt;&gt; size;</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;            tag.resize(size);</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;            *in &gt;&gt; tag.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#ae95266b76119bf235b6dd25b71288ed4">next</a>;</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;            tag-&gt;resize(size);</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;            *in &gt;&gt; tag-&gt;next;</div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;</div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;            <span class="comment">//</span></div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;            <span class="comment">// Read data when available</span></div>
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;            <span class="comment">//</span></div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;            <span class="keywordflow">if</span> (tag.size() &gt; 0)</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;            <span class="keywordflow">if</span> (tag-&gt;size() &gt; 0)</div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;            {</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;                in-&gt;readRawData(tag.data(), tag.size());</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;                <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a62f14624acb557bbc23839b8478b460e">FiffTag::convert_tag_data</a>(&amp;tag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;                in-&gt;readRawData(tag-&gt;data(), tag-&gt;size());</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;                <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#af8c7b52de530ad5a6b8d58933b59afcb">FiffTag::convert_tag_data</a>(tag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);</div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;            }</div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;</div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;            <span class="comment">//QDataStream out(p_pStreamOut);</span></div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;            <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a>* out = p_pStreamOut;</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;            <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#afc5bb6ae857cf5e93e4e0271bf0bee05">FiffStream::SPtr</a> out = p_pStreamOut;</div>
 <div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;            out-&gt;setByteOrder(QDataStream::BigEndian);</div>
 <div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;            *out &lt;&lt; (qint32)tag.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a28600eedaead7b0db5d22d71fce1200b">kind</a>;</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;            *out &lt;&lt; (qint32)tag.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#acd412f0127525d8749b6606cd87fd5ff">type</a>;</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;            *out &lt;&lt; (qint32)tag.size();</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;            *out &lt;&lt; (qint32)tag-&gt;kind;</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;            *out &lt;&lt; (qint32)tag-&gt;type;</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;            *out &lt;&lt; (qint32)tag-&gt;size();</div>
 <div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;            *out &lt;&lt; (qint32)FIFFV_NEXT_SEQ;</div>
 <div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;            out-&gt;writeRawData(tag.data(),tag.size());</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;            out-&gt;writeRawData(tag-&gt;data(),tag-&gt;size());</div>
 <div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;        }</div>
 <div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;        <span class="keywordflow">for</span>(p = 0; p &lt; p_Nodes[k].nchild; ++p)</div>
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;        {</div>
 <div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;            QList&lt;FiffDirTree&gt; childList;</div>
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;            childList &lt;&lt; p_Nodes[k].children[p];</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;            <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a334b1d1d89e627cf8f9afe210fc3ad01">FiffDirTree::copy_tree</a>(p_pStreamIn, in_id, childList, p_pStreamOut);</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;            <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ad11316c8b752ede1bdddc6897a13d4c4">FiffDirTree::copy_tree</a>(p_pStreamIn, in_id, childList, p_pStreamOut);</div>
 <div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;        }</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;        p_pStreamOut-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a904df8f48da1564a8d5a975a22aa6b54">end_block</a>(p_Nodes[k].block);</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;        p_pStreamOut-&gt;end_block(p_Nodes[k].block);</div>
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    }</div>
 <div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;}</div>
@@ -261,13 +261,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;<span class="comment">//        delete p_pTree;</span></div>
 <div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    p_Tree.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a44eabac7e1d8f14850643935b1cbe86c">clear</a>();</div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html" title="FIFF data tag.">FIFFLIB::FiffTag</a>* t_pTag = NULL;</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a81dd3125f347ffdcae77188caf6670f5">FiffTag::SPtr</a> t_pTag;</div>
 <div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;</div>
 <div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    qint32 <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ae7a0a42675b015ba4b5ff83586a2394a">block</a>;</div>
 <div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    <span class="keywordflow">if</span>(p_Dir[start].kind == FIFF_BLOCK_START)</div>
 <div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    {</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a8de4b8d5dec25923cef3b3a7915e3ed7">FiffTag::read_tag</a>(p_pStream, t_pTag, p_Dir[start].pos);</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;        block = *t_pTag-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a88f8094d1f3b876708bd3d5779a30a49">toInt</a>();</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a982a42024ec666c049685dd98ddf3545">FiffTag::read_tag</a>(p_pStream, t_pTag, p_Dir[start].pos);</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;        block = *t_pTag-&gt;toInt();</div>
 <div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    }</div>
 <div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    {</div>
@@ -296,8 +296,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;        }</div>
 <div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(p_Dir[current].kind == FIFF_BLOCK_END)</div>
 <div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;        {</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;            <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a8de4b8d5dec25923cef3b3a7915e3ed7">FiffTag::read_tag</a>(p_pStream, t_pTag, p_Dir[start].pos);</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;            <span class="keywordflow">if</span> (*t_pTag-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a88f8094d1f3b876708bd3d5779a30a49">toInt</a>() == p_Tree.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ae7a0a42675b015ba4b5ff83586a2394a">block</a>)</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;            <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a982a42024ec666c049685dd98ddf3545">FiffTag::read_tag</a>(p_pStream, t_pTag, p_Dir[start].pos);</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;            <span class="keywordflow">if</span> (*t_pTag-&gt;toInt() == p_Tree.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ae7a0a42675b015ba4b5ff83586a2394a">block</a>)</div>
 <div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;                <span class="keywordflow">break</span>;</div>
 <div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;        }</div>
 <div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;        <span class="keywordflow">else</span></div>
@@ -312,21 +312,21 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;            {</div>
 <div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;                <span class="keywordflow">if</span> (p_Dir[current].kind == FIFF_FILE_ID)</div>
 <div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;                {</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;                    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a8de4b8d5dec25923cef3b3a7915e3ed7">FiffTag::read_tag</a>(p_pStream, t_pTag, p_Dir[current].pos);</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;                    p_Tree.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a90124c28555f4b58de04f116730b1c59">id</a> = t_pTag-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a227960340883c81cbc0614dca1a17dd6">toFiffID</a>();</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;                    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a982a42024ec666c049685dd98ddf3545">FiffTag::read_tag</a>(p_pStream, t_pTag, p_Dir[current].pos);</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;                    p_Tree.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a90124c28555f4b58de04f116730b1c59">id</a> = t_pTag-&gt;toFiffID();</div>
 <div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;                }</div>
 <div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;            }</div>
 <div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;            <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;            {</div>
 <div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;                <span class="keywordflow">if</span> (p_Dir[current].kind == FIFF_BLOCK_ID)</div>
 <div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;                {</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;                    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a8de4b8d5dec25923cef3b3a7915e3ed7">FiffTag::read_tag</a>(p_pStream, t_pTag, p_Dir[current].pos);</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;                    p_Tree.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a90124c28555f4b58de04f116730b1c59">id</a> = t_pTag-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a227960340883c81cbc0614dca1a17dd6">toFiffID</a>();</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;                    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a982a42024ec666c049685dd98ddf3545">FiffTag::read_tag</a>(p_pStream, t_pTag, p_Dir[current].pos);</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;                    p_Tree.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a90124c28555f4b58de04f116730b1c59">id</a> = t_pTag-&gt;toFiffID();</div>
 <div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;                }</div>
 <div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;                <span class="keywordflow">else</span> <span class="keywordflow">if</span> (p_Dir[current].kind == FIFF_PARENT_BLOCK_ID)</div>
 <div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;                {</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;                    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a8de4b8d5dec25923cef3b3a7915e3ed7">FiffTag::read_tag</a>(p_pStream, t_pTag, p_Dir[current].pos);</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;                    p_Tree.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a8611ccc7bd0762298f403a34a8ca9330">parent_id</a> = t_pTag-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a227960340883c81cbc0614dca1a17dd6">toFiffID</a>();</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;                    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a982a42024ec666c049685dd98ddf3545">FiffTag::read_tag</a>(p_pStream, t_pTag, p_Dir[current].pos);</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;                    p_Tree.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a8611ccc7bd0762298f403a34a8ca9330">parent_id</a> = t_pTag-&gt;toFiffID();</div>
 <div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;                }</div>
 <div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;            }</div>
 <div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;        }</div>
@@ -342,63 +342,59 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;<span class="comment">//    qDebug() &lt;&lt; &quot;block =&quot; &lt;&lt; p_pTree-&gt;block &lt;&lt; &quot;nent =&quot; &lt;&lt; p_pTree-&gt;nent &lt;&lt; &quot;nchild =&quot; &lt;&lt; p_pTree-&gt;nchild;</span></div>
 <div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;<span class="comment">//    qDebug() &lt;&lt; &quot;end } &quot; &lt;&lt; block;</span></div>
 <div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;    <span class="keyword">delete</span> t_pTag;</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;    <span class="keywordflow">return</span> current;</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;}</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;    <span class="keywordflow">return</span> current;</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;}</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;</div>
-<div class="line"><a name="l00295"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a70da2b06043102864248454470946a81">  295</a></span>&#160;QList&lt;FiffDirTree&gt; <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a70da2b06043102864248454470946a81">FiffDirTree::dir_tree_find</a>(fiff_int_t p_kind)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;    QList&lt;FiffDirTree&gt; nodes;</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;    <span class="keywordflow">if</span>(this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ae7a0a42675b015ba4b5ff83586a2394a">block</a> == p_kind)</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;        nodes.append(*<span class="keyword">this</span>);</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;    QList&lt;FiffDirTree&gt;::const_iterator i;</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;    <span class="keywordflow">for</span> (i = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a5ff78be4cfb6ead6a251f094c581dc66">children</a>.begin(); i != this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a5ff78be4cfb6ead6a251f094c581dc66">children</a>.end(); ++i)</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;        nodes.append((*i).dir_tree_find(p_kind));</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;    <span class="keywordflow">return</span> nodes;</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;}</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;</div>
+<div class="line"><a name="l00293"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a70da2b06043102864248454470946a81">  293</a></span>&#160;QList&lt;FiffDirTree&gt; <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a70da2b06043102864248454470946a81">FiffDirTree::dir_tree_find</a>(fiff_int_t p_kind)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;    QList&lt;FiffDirTree&gt; nodes;</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;    <span class="keywordflow">if</span>(this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ae7a0a42675b015ba4b5ff83586a2394a">block</a> == p_kind)</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;        nodes.append(*<span class="keyword">this</span>);</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;    QList&lt;FiffDirTree&gt;::const_iterator i;</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;    <span class="keywordflow">for</span> (i = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a5ff78be4cfb6ead6a251f094c581dc66">children</a>.begin(); i != this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a5ff78be4cfb6ead6a251f094c581dc66">children</a>.end(); ++i)</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;        nodes.append((*i).dir_tree_find(p_kind));</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;    <span class="keywordflow">return</span> nodes;</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;}</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;</div>
-<div class="line"><a name="l00311"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a887f9cb482001d8d41f6504ff2f6308d">  311</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a887f9cb482001d8d41f6504ff2f6308d">FiffDirTree::find_tag</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a>* p_pStream, fiff_int_t findkind, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html" title="FIFF data tag.">FiffTag</a>*&amp; p_pTag)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;    <span class="keywordflow">for</span> (qint32 p = 0; p &lt; this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a37e90c64f3b2e3a5cd89204ec7fbfa53">nent</a>; ++p)</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    {</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;       <span class="keywordflow">if</span> (this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#aea407f354fd58a8691e22ca7ae448ede">dir</a>[p].kind == findkind)</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;       {</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;          <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a8de4b8d5dec25923cef3b3a7915e3ed7">FiffTag::read_tag</a>(p_pStream,p_pTag,this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#aea407f354fd58a8691e22ca7ae448ede">dir</a>[p].pos);</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;       }</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;    }</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;    <span class="keywordflow">if</span> (p_pTag != NULL)</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;    {</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;        <span class="keyword">delete</span> p_pTag;</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;        p_pTag = NULL;</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;    }</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;}</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;</div>
-<div class="line"><a name="l00332"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ace0a94dbb1d7d86bbf5099ec78ec2e0c">  332</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ace0a94dbb1d7d86bbf5099ec78ec2e0c">FiffDirTree::has_tag</a>(fiff_int_t findkind)</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;{</div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;    <span class="keywordflow">for</span>(qint32 p = 0; p &lt; this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a37e90c64f3b2e3a5cd89204ec7fbfa53">nent</a>; ++p)</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;        <span class="keywordflow">if</span>(this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#aea407f354fd58a8691e22ca7ae448ede">dir</a>.at(p).kind == findkind)</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;   <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;}</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;</div>
+<div class="line"><a name="l00309"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a589bc602a07f1f2e5d9b8c7585cd1530">  309</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a589bc602a07f1f2e5d9b8c7585cd1530">FiffDirTree::find_tag</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a>* p_pStream, fiff_int_t findkind, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a81dd3125f347ffdcae77188caf6670f5">FiffTag::SPtr</a>&amp; p_pTag)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;    <span class="keywordflow">for</span> (qint32 p = 0; p &lt; this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a37e90c64f3b2e3a5cd89204ec7fbfa53">nent</a>; ++p)</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    {</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;       <span class="keywordflow">if</span> (this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#aea407f354fd58a8691e22ca7ae448ede">dir</a>[p].kind == findkind)</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;       {</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;          <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a982a42024ec666c049685dd98ddf3545">FiffTag::read_tag</a>(p_pStream,p_pTag,this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#aea407f354fd58a8691e22ca7ae448ede">dir</a>[p].pos);</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;       }</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;    }</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;    <span class="keywordflow">if</span> (p_pTag)</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;        p_pTag.clear();</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;}</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;</div>
+<div class="line"><a name="l00328"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ace0a94dbb1d7d86bbf5099ec78ec2e0c">  328</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ace0a94dbb1d7d86bbf5099ec78ec2e0c">FiffDirTree::has_tag</a>(fiff_int_t findkind)</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;{</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;    <span class="keywordflow">for</span>(qint32 p = 0; p &lt; this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a37e90c64f3b2e3a5cd89204ec7fbfa53">nent</a>; ++p)</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;        <span class="keywordflow">if</span>(this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#aea407f354fd58a8691e22ca7ae448ede">dir</a>.at(p).kind == findkind)</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;   <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;}</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;</div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 23 2013 15:22:58 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 6 2013 17:08:36 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

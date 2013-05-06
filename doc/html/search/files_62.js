@@ -1,10 +1,17 @@
 var searchData=
 [
-  ['babymeg_2ecpp',['babymeg.cpp',['../babymeg_8cpp.html',1,'']]],
-  ['babymeg_2eh',['babymeg.h',['../babymeg_8h.html',1,'']]],
-  ['babymeg_5fglobal_2eh',['babymeg_global.h',['../babymeg__global_8h.html',1,'']]],
+  ['babymegaboutwidget_2ecpp',['babymegaboutwidget.cpp',['../babymegaboutwidget_8cpp.html',1,'']]],
+  ['babymegaboutwidget_2eh',['babymegaboutwidget.h',['../babymegaboutwidget_8h.html',1,'']]],
+  ['babymegclient_2ecpp',['babymegclient.cpp',['../babymegclient_8cpp.html',1,'']]],
+  ['babymegclient_2eh',['babymegclient.h',['../babymegclient_8h.html',1,'']]],
+  ['babymeginfo_2ecpp',['babymeginfo.cpp',['../babymeginfo_8cpp.html',1,'']]],
+  ['babymeginfo_2eh',['babymeginfo.h',['../babymeginfo_8h.html',1,'']]],
   ['babymegproducer_2ecpp',['babymegproducer.cpp',['../babymegproducer_8cpp.html',1,'']]],
   ['babymegproducer_2eh',['babymegproducer.h',['../babymegproducer_8h.html',1,'']]],
+  ['babymegrunwidget_2ecpp',['babymegrunwidget.cpp',['../babymegrunwidget_8cpp.html',1,'']]],
+  ['babymegrunwidget_2eh',['babymegrunwidget.h',['../babymegrunwidget_8h.html',1,'']]],
+  ['babymegsetupwidget_2ecpp',['babymegsetupwidget.cpp',['../babymegsetupwidget_8cpp.html',1,'']]],
+  ['babymegsetupwidget_2eh',['babymegsetupwidget.h',['../babymegsetupwidget_8h.html',1,'']]],
   ['brainmonitor_2ecpp',['brainmonitor.cpp',['../brainmonitor_8cpp.html',1,'']]],
   ['brainmonitor_2eh',['brainmonitor.h',['../brainmonitor_8h.html',1,'']]],
   ['brainmonitor_5fglobal_2eh',['brainmonitor_global.h',['../brainmonitor__global_8h.html',1,'']]],
@@ -13,6 +20,6 @@ var searchData=
   ['brainmonitorrunwidget_2ecpp',['brainmonitorrunwidget.cpp',['../brainmonitorrunwidget_8cpp.html',1,'']]],
   ['brainmonitorrunwidget_2eh',['brainmonitorrunwidget.h',['../brainmonitorrunwidget_8h.html',1,'']]],
   ['brainmonitorsetupwidget_2eh',['brainmonitorsetupwidget.h',['../brainmonitorsetupwidget_8h.html',1,'']]],
-  ['buffer_5fold_2ecpp',['buffer_old.cpp',['../buffer__old_8cpp.html',1,'']]],
-  ['buffer_5fold_2eh',['buffer_old.h',['../buffer__old_8h.html',1,'']]]
+  ['buffer_2ecpp',['buffer.cpp',['../buffer_8cpp.html',1,'']]],
+  ['buffer_2eh',['buffer.h',['../buffer_8h.html',1,'']]]
 ];

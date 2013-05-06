@@ -2,7 +2,6 @@ var searchData=
 [
   ['dacqserver_2ecpp',['dacqserver.cpp',['../dacqserver_8cpp.html',1,'']]],
   ['dacqserver_2eh',['dacqserver.h',['../dacqserver_8h.html',1,'']]],
-  ['directrecord_2eh',['directrecord.h',['../directrecord_8h.html',1,'']]],
   ['disp3d_5fglobal_2eh',['disp3D_global.h',['../disp3_d__global_8h.html',1,'']]],
   ['dummyaboutwidget_2ecpp',['dummyaboutwidget.cpp',['../dummyaboutwidget_8cpp.html',1,'']]],
   ['dummyaboutwidget_2eh',['dummyaboutwidget.h',['../dummyaboutwidget_8h.html',1,'']]],

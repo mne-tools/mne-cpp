@@ -224,7 +224,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    t_cmdClient[<span class="stringliteral">&quot;measinfo&quot;</span>].pValues()[0].setValue(clientId);</div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    t_cmdClient[<span class="stringliteral">&quot;measinfo&quot;</span>].send();</div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    m_fiffInfo = t_dataClient.<a class="code" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_data_client.html#a8fc1a06173ef598cfee81ee50ed9c413">readInfo</a>();</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    m_pFiffInfo = t_dataClient.<a class="code" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_data_client.html#ae4bdaccf6bf9fc04f7e4b35c77323cd3">readInfo</a>();</div>
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;</div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <span class="comment">// start measurement</span></div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    t_cmdClient[<span class="stringliteral">&quot;start&quot;</span>].pValues()[0].setValue(clientId);</div>
@@ -236,12 +236,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;<span class="comment">//        while(m_bIsMeasuring)</span></div>
 <div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;</div>
 <div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;        t_dataClient.<a class="code" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_data_client.html#a6d70061f07a7e12a7c42394fe29e3327">readRawBuffer</a>(m_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>, t_matRawBuffer, kind);</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;        t_dataClient.<a class="code" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_data_client.html#a6d70061f07a7e12a7c42394fe29e3327">readRawBuffer</a>(m_pFiffInfo-&gt;nchan, t_matRawBuffer, kind);</div>
 <div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;</div>
 <div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;        <span class="keywordflow">if</span>(kind == <a class="code" href="fiff__constants_8h.html#a0136b998f6acc7a0a02f8c46a7300d59">FIFF_DATA_BUFFER</a>)</div>
 <div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;        {</div>
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;            to += t_matRawBuffer.cols();</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;            printf(<span class="stringliteral">&quot;Reading %d ... %d  =  %9.3f ... %9.3f secs...&quot;</span>, from, to, ((<span class="keywordtype">float</span>)from)/m_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a963c80bf73b01ed07eb1a31540cf308c">sfreq</a>, ((<span class="keywordtype">float</span>)to)/m_fiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a963c80bf73b01ed07eb1a31540cf308c">sfreq</a>);</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;            printf(<span class="stringliteral">&quot;Reading %d ... %d  =  %9.3f ... %9.3f secs...&quot;</span>, from, to, ((<span class="keywordtype">float</span>)from)/m_pFiffInfo-&gt;sfreq, ((<span class="keywordtype">float</span>)to)/m_pFiffInfo-&gt;sfreq);</div>
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;            from += t_matRawBuffer.cols();</div>
 <div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;</div>
 <div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;            emit <a class="code" href="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_client.html#a65bc6829f9fc55168053a8921608dd74">rawBufferReceived</a>(t_matRawBuffer);</div>
@@ -267,7 +267,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 23 2013 15:22:59 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 6 2013 17:08:36 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

@@ -198,7 +198,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> patch_info(<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="Hemisphere provides geometry information.">MNEHemisphere</a> &amp;p_Hemisphere);<span class="comment">//VectorXi&amp; nearest, QList&lt;VectorXi&gt;&amp; pinfo);@param [in] nearest   The nearest vector of the source space.@param [out] pinfo    The requested patch information.</span></div>
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;</div>
 <div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> read_source_spaces(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a>*&amp; p_pStream, <span class="keywordtype">bool</span> add_geom, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a>&amp; p_Tree, <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html" title="Source Space descritpion.">MNESourceSpace</a>&amp; p_SourceSpace);</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> readFromStream(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#afc5bb6ae857cf5e93e4e0271bf0bee05">FiffStream::SPtr</a>&amp; p_pStream, <span class="keywordtype">bool</span> add_geom, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a>&amp; p_Tree, <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html" title="Source Space descritpion.">MNESourceSpace</a>&amp; p_SourceSpace);</div>
 <div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;</div>
 <div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
 <div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;<span class="comment"></span>    <span class="keyword">inline</span> qint32 size() <span class="keyword">const</span>;</div>
@@ -207,7 +207,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;<span class="comment"></span>    <span class="keywordtype">bool</span> transform_source_space_to(fiff_int_t dest, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="Coordinate transformation description.">FiffCoordTrans</a>&amp; trans);</div>
 <div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;</div>
 <div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> write_to_stream(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a>* p_pStream);</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> writeToStream(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a>* p_pStream);</div>
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;</div>
 <div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
 <div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;<span class="comment"></span>    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" title="Hemisphere provides geometry information.">MNEHemisphere</a>&amp; operator[] (qint32 idx);</div>
@@ -258,7 +258,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 23 2013 15:22:59 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 6 2013 17:08:36 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

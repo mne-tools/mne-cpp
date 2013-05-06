@@ -164,45 +164,58 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00111"></a><span class="lineno"><a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_cov.html#a78d46c00af966d1fd9b81633e1f8fff4">  111</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;RtCov&gt; <a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_cov.html#a78d46c00af966d1fd9b81633e1f8fff4">SPtr</a>;             </div>
 <div class="line"><a name="l00112"></a><span class="lineno"><a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_cov.html#a73bac2789698692f59be10c17b3387e9">  112</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;const RtCov&gt; <a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_cov.html#a73bac2789698692f59be10c17b3387e9">ConstSPtr</a>;  </div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;<span class="comment"></span>    <span class="keyword">explicit</span> <a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_cov.html" title="Real-time covariance estimation.">RtCov</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a> &amp;p_fiffInfo, QObject *parent = 0);</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_cov.html" title="Real-time covariance estimation.">RtCov</a>();</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> receiveDataSegment(MatrixXf p_DataSegment);</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;<span class="comment"></span>    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> stop();</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;<span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;<span class="comment"></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> run();</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a>    m_fiffInfo;             </div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    QMutex      mutex;                  </div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <span class="keywordtype">bool</span>        m_bIsRunning;           </div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    <span class="keywordtype">bool</span>        m_bIsRawBufferInit;     </div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    quint32      m_iMaxSamples;         </div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    RawMatrixBuffer* m_pRawMatrixBuffer;    </div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;signals:</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> covCalculated(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html" title="covariance data">FIFFLIB::FiffCov</a> p_Cov);</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;};</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;} <span class="comment">// NAMESPACE</span></div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;<span class="preprocessor">#ifndef metatype_fiffcov</span></div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define metatype_fiffcov</span></div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;<span class="preprocessor"></span><a class="code" href="rtclient_8h.html#a7fee6e56a316cd0690c26c2bf01d57b9">Q_DECLARE_METATYPE</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html" title="covariance data">FIFFLIB::FiffCov</a>); </div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;<span class="preprocessor">#endif // RTCOV_H</span></div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;<span class="comment"></span>    <span class="keyword">explicit</span> <a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_cov.html" title="Real-time covariance estimation.">RtCov</a>(qint32 p_iMaxSamples, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#abfce6128814de61b3fdd324a97918338">FiffInfo::SPtr</a> p_pFiffInfo, QObject *parent = 0);</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_cov.html" title="Real-time covariance estimation.">RtCov</a>();</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> append(<span class="keyword">const</span> MatrixXd &amp;p_DataSegment);</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;<span class="comment"></span>    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> stop();</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;<span class="comment"></span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> isRunning();</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;signals:</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> covCalculated(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html#a7f0d362771b373634b69b23646e7bfef">FIFFLIB::FiffCov::SPtr</a> p_pCov);</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;<span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;<span class="comment"></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> run();</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#abfce6128814de61b3fdd324a97918338">FiffInfo::SPtr</a>  m_pFiffInfo;        </div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    QMutex      mutex;                  </div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    <span class="keywordtype">bool</span>        m_bIsRunning;           </div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    quint32      m_iMaxSamples;         </div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    <a class="code" href="class_i_o_buffer_1_1_circular_matrix_buffer.html" title="The circular matrix buffer.">CircularMatrixBuffer&lt;double&gt;::SPtr</a> m_pRawMatrixBuffer;   </div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;};</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;<span class="comment">// INLINE DEFINITIONS</span></div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;</div>
+<div class="line"><a name="l00188"></a><span class="lineno"><a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_cov.html#a5922d41d26378b13ee888cb8c7575bcb">  188</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="class_r_t_i_n_v_l_i_b_1_1_rt_cov.html#a5922d41d26378b13ee888cb8c7575bcb">RtCov::isRunning</a>()</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;{</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    <span class="keywordflow">return</span> m_bIsRunning;</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;}</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;} <span class="comment">// NAMESPACE</span></div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;<span class="preprocessor">#ifndef metatype_fiffcovsptr</span></div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define metatype_fiffcovsptr</span></div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;<span class="preprocessor"></span><a class="code" href="rtclient_8h.html#a7fee6e56a316cd0690c26c2bf01d57b9">Q_DECLARE_METATYPE</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html#a7f0d362771b373634b69b23646e7bfef">FIFFLIB::FiffCov::SPtr</a>); </div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;<span class="preprocessor">#endif // RTCOV_H</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 23 2013 15:22:59 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 6 2013 17:08:36 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

@@ -3,7 +3,7 @@ var searchData=
   ['cal',['cal',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#a280ad3b0f38b3f8ecee6669aa652885d',1,'FIFFLIB::FiffChInfo']]],
   ['cals',['cals',['../class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a58a1c11cf348af6a2b02b7bc98d16cb1',1,'FIFFLIB::FiffRawData']]],
   ['ch_5fname',['ch_name',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#ab3cf2e116d285cdab2313b9adb9ee3bd',1,'FIFFLIB::FiffChInfo']]],
-  ['ch_5fnames',['ch_names',['../class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#a48e9d0e2fd02603948494535d70ac7f7',1,'FIFFLIB::FiffEvoked::ch_names()'],['../class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#af15ed691efe28790897198f06306ab29',1,'FIFFLIB::FiffInfoBase::ch_names()']]],
+  ['ch_5fnames',['ch_names',['../class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#af15ed691efe28790897198f06306ab29',1,'FIFFLIB::FiffInfoBase']]],
   ['children',['children',['../class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a5ff78be4cfb6ead6a251f094c581dc66',1,'FIFFLIB::FiffDirTree']]],
   ['chs',['chs',['../class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#aa07b3b770d7fe65ac065e01461688e04',1,'FIFFLIB::FiffInfoBase']]],
   ['cluster_5finfo',['cluster_info',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab1012beacc853d8443acdcd62364cbd6',1,'MNELIB::MNEHemisphere']]],

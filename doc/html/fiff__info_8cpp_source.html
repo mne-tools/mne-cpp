@@ -97,312 +97,434 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="fiff__info_8h.html" title="FiffInfo class declaration.">fiff_info.h</a>&quot;</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="fiff__stream_8h.html" title="FiffStream class declaration.">fiff_stream.h</a>&quot;</span></div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="comment">// USED NAMESPACES</span></div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keyword">using namespace </span>FIFFLIB;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="comment">// USED NAMESPACES</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="keyword">using namespace </span>FIFFLIB;</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="comment">// DEFINE MEMBER METHODS</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;</div>
-<div class="line"><a name="l00057"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a6d75a5e2e5f1ba918ac70a4200c7dad0">   57</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a6d75a5e2e5f1ba918ac70a4200c7dad0">FiffInfo::FiffInfo</a>()</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;: <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html" title="light measurement info">FiffInfoBase</a>()<span class="comment">//nchan(-1)</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;, sfreq(-1.0)</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;, highpass(-1.0)</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;, lowpass(-1.0)</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;, acq_pars(<span class="stringliteral">&quot;&quot;</span>)</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;, acq_stim(<span class="stringliteral">&quot;&quot;</span>)</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;{</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#acc617eb0077fa0dda35ade4318abc209">meas_date</a>[0] = -1;</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;}</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="comment">// DEFINE MEMBER METHODS</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;</div>
+<div class="line"><a name="l00058"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a6d75a5e2e5f1ba918ac70a4200c7dad0">   58</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a6d75a5e2e5f1ba918ac70a4200c7dad0">FiffInfo::FiffInfo</a>()</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;: <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html" title="light measurement info">FiffInfoBase</a>()<span class="comment">//nchan(-1)</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;, sfreq(-1.0)</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;, highpass(-1.0)</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;, lowpass(-1.0)</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;, acq_pars(<span class="stringliteral">&quot;&quot;</span>)</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;, acq_stim(<span class="stringliteral">&quot;&quot;</span>)</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;{</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#acc617eb0077fa0dda35ade4318abc209">meas_date</a>[0] = -1;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;}</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;</div>
-<div class="line"><a name="l00071"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#af145392bb787bc8984f126306c2017ff">   71</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a6d75a5e2e5f1ba918ac70a4200c7dad0">FiffInfo::FiffInfo</a>(<span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a>&amp; p_FiffInfo)</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;: <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html" title="light measurement info">FiffInfoBase</a>(p_FiffInfo)</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;, file_id(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html" title="Universially unique identifier.">FiffId</a>(p_FiffInfo.file_id))<span class="comment">//: QSharedData(p_FiffInfo)</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;, sfreq(p_FiffInfo.sfreq)</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;, highpass(p_FiffInfo.highpass)</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;, lowpass(p_FiffInfo.lowpass)</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;, dev_ctf_t(p_FiffInfo.dev_ctf_t)</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;, dig_trans(p_FiffInfo.dig_trans)</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;, acq_pars(p_FiffInfo.acq_pars)</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;, acq_stim(p_FiffInfo.acq_stim)</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;{</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#acc617eb0077fa0dda35ade4318abc209">meas_date</a>[0] = p_FiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#acc617eb0077fa0dda35ade4318abc209">meas_date</a>[0];</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#acc617eb0077fa0dda35ade4318abc209">meas_date</a>[1] = p_FiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#acc617eb0077fa0dda35ade4318abc209">meas_date</a>[1];</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    qint32 i;</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keywordflow">for</span>(i = 0; i &lt; p_FiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#add2630e0a5269622bfbe15acae9ee5ac">dig</a>.size(); ++i)</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#add2630e0a5269622bfbe15acae9ee5ac">dig</a>.append(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dig_point.html" title="Digitization point description.">FiffDigPoint</a>(p_FiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#add2630e0a5269622bfbe15acae9ee5ac">dig</a>[i]));</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keywordflow">for</span>(i = 0; i &lt; p_FiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ae71b753c51dfd23ddd3a8a18e0f19ebe">projs</a>.size(); ++i)</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ae71b753c51dfd23ddd3a8a18e0f19ebe">projs</a>.append(p_FiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ae71b753c51dfd23ddd3a8a18e0f19ebe">projs</a>[i]);</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="keywordflow">for</span>(i = 0; i &lt; p_FiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#abe1b8e3c8986cba9e001f96480f905e9">comps</a>.size(); ++i)</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#abe1b8e3c8986cba9e001f96480f905e9">comps</a>.append(p_FiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#abe1b8e3c8986cba9e001f96480f905e9">comps</a>[i]);</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;}</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
+<div class="line"><a name="l00072"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#af145392bb787bc8984f126306c2017ff">   72</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a6d75a5e2e5f1ba918ac70a4200c7dad0">FiffInfo::FiffInfo</a>(<span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a>&amp; p_FiffInfo)</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;: <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html" title="light measurement info">FiffInfoBase</a>(p_FiffInfo)</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;, file_id(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html" title="Universially unique identifier.">FiffId</a>(p_FiffInfo.file_id))<span class="comment">//: QSharedData(p_FiffInfo)</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;, sfreq(p_FiffInfo.sfreq)</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;, highpass(p_FiffInfo.highpass)</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;, lowpass(p_FiffInfo.lowpass)</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;, dev_ctf_t(p_FiffInfo.dev_ctf_t)</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;, dig_trans(p_FiffInfo.dig_trans)</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;, acq_pars(p_FiffInfo.acq_pars)</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;, acq_stim(p_FiffInfo.acq_stim)</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;{</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#acc617eb0077fa0dda35ade4318abc209">meas_date</a>[0] = p_FiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#acc617eb0077fa0dda35ade4318abc209">meas_date</a>[0];</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#acc617eb0077fa0dda35ade4318abc209">meas_date</a>[1] = p_FiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#acc617eb0077fa0dda35ade4318abc209">meas_date</a>[1];</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    qint32 i;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="keywordflow">for</span>(i = 0; i &lt; p_FiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#add2630e0a5269622bfbe15acae9ee5ac">dig</a>.size(); ++i)</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#add2630e0a5269622bfbe15acae9ee5ac">dig</a>.append(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dig_point.html" title="Digitization point description.">FiffDigPoint</a>(p_FiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#add2630e0a5269622bfbe15acae9ee5ac">dig</a>[i]));</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <span class="keywordflow">for</span>(i = 0; i &lt; p_FiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ae71b753c51dfd23ddd3a8a18e0f19ebe">projs</a>.size(); ++i)</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ae71b753c51dfd23ddd3a8a18e0f19ebe">projs</a>.append(p_FiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ae71b753c51dfd23ddd3a8a18e0f19ebe">projs</a>[i]);</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="keywordflow">for</span>(i = 0; i &lt; p_FiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#abe1b8e3c8986cba9e001f96480f905e9">comps</a>.size(); ++i)</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#abe1b8e3c8986cba9e001f96480f905e9">comps</a>.append(p_FiffInfo.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#abe1b8e3c8986cba9e001f96480f905e9">comps</a>[i]);</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;}</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;</div>
-<div class="line"><a name="l00099"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#add8bdec4260deab126d6aa3cdf367e8e">   99</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#add8bdec4260deab126d6aa3cdf367e8e">FiffInfo::~FiffInfo</a>()</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;{</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;}</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;</div>
+<div class="line"><a name="l00100"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#add8bdec4260deab126d6aa3cdf367e8e">  100</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#add8bdec4260deab126d6aa3cdf367e8e">FiffInfo::~FiffInfo</a>()</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;{</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;}</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;</div>
-<div class="line"><a name="l00107"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#adc07a81c63cfb3796fde6b49bfa419d1">  107</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#adc07a81c63cfb3796fde6b49bfa419d1">FiffInfo::clear</a>()</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;{</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#a4232a707da9f18c2ddb1b79832cdf0b2">FiffInfoBase::clear</a>();</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a74d71ad1c22f639bfd0a04984d3ddf6b">file_id</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#a7d99275a9abb36ccb1c7c82885476bee">clear</a>();</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#acc617eb0077fa0dda35ade4318abc209">meas_date</a>[0] = -1;</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a963c80bf73b01ed07eb1a31540cf308c">sfreq</a> = -1.0;</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a19c7faa33c199e6606b7c3f48a613d32">highpass</a> = -1.0;</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ad6d3937c2aca7f34012e6d5f25444b45">lowpass</a> = -1.0;</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a500a52afee39d74fc5d7efcf3469f83b">dev_ctf_t</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ae2fe4e310a2c902fac26b547cad3a5f2">clear</a>();</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#add2630e0a5269622bfbe15acae9ee5ac">dig</a>.clear();</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ab5f87f59e6718c18dd682d2acc00be58">dig_trans</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ae2fe4e310a2c902fac26b547cad3a5f2">clear</a>();</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ae71b753c51dfd23ddd3a8a18e0f19ebe">projs</a>.clear();</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#abe1b8e3c8986cba9e001f96480f905e9">comps</a>.clear();</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ac5441674648831c0e691f4022360755e">acq_pars</a> = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a40a96f92d6d21fbd0678c1f6d0abcee0">acq_stim</a> = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;}</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;</div>
+<div class="line"><a name="l00108"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#adc07a81c63cfb3796fde6b49bfa419d1">  108</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#adc07a81c63cfb3796fde6b49bfa419d1">FiffInfo::clear</a>()</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;{</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#a4232a707da9f18c2ddb1b79832cdf0b2">FiffInfoBase::clear</a>();</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a74d71ad1c22f639bfd0a04984d3ddf6b">file_id</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#a7d99275a9abb36ccb1c7c82885476bee">clear</a>();</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#acc617eb0077fa0dda35ade4318abc209">meas_date</a>[0] = -1;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a963c80bf73b01ed07eb1a31540cf308c">sfreq</a> = -1.0;</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a19c7faa33c199e6606b7c3f48a613d32">highpass</a> = -1.0;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ad6d3937c2aca7f34012e6d5f25444b45">lowpass</a> = -1.0;</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a500a52afee39d74fc5d7efcf3469f83b">dev_ctf_t</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ae2fe4e310a2c902fac26b547cad3a5f2">clear</a>();</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#add2630e0a5269622bfbe15acae9ee5ac">dig</a>.clear();</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ab5f87f59e6718c18dd682d2acc00be58">dig_trans</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ae2fe4e310a2c902fac26b547cad3a5f2">clear</a>();</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ae71b753c51dfd23ddd3a8a18e0f19ebe">projs</a>.clear();</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#abe1b8e3c8986cba9e001f96480f905e9">comps</a>.clear();</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ac5441674648831c0e691f4022360755e">acq_pars</a> = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a40a96f92d6d21fbd0678c1f6d0abcee0">acq_stim</a> = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;}</div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;</div>
-<div class="line"><a name="l00127"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#abf6d5e56f0acb167039e2187c093bae0">  127</a></span>&#160;qint32 <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#abf6d5e56f0acb167039e2187c093bae0">FiffInfo::get_current_comp</a>()</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;{</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    qint32 comp = 0;</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    qint32 first_comp = -1;</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    qint32 k = 0;</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="keywordflow">for</span> (k = 0; k &lt; this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>; ++k)</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    {</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;        <span class="keywordflow">if</span> (this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#aa07b3b770d7fe65ac065e01461688e04">chs</a>[k].kind == FIFFV_MEG_CH)</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        {</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;            comp = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#aa07b3b770d7fe65ac065e01461688e04">chs</a>[k].coil_type &gt;&gt; 16;</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;            <span class="keywordflow">if</span> (first_comp &lt; 0)</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;                first_comp = comp;</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (comp != first_comp)</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;                printf(<span class="stringliteral">&quot;Compensation is not set equally on all MEG channels&quot;</span>);</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;        }</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    }</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    <span class="keywordflow">return</span> comp;</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;}</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;</div>
+<div class="line"><a name="l00128"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#abf6d5e56f0acb167039e2187c093bae0">  128</a></span>&#160;qint32 <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#abf6d5e56f0acb167039e2187c093bae0">FiffInfo::get_current_comp</a>()</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;{</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    qint32 comp = 0;</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    qint32 first_comp = -1;</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    qint32 k = 0;</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="keywordflow">for</span> (k = 0; k &lt; this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>; ++k)</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    {</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        <span class="keywordflow">if</span> (this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#aa07b3b770d7fe65ac065e01461688e04">chs</a>[k].kind == FIFFV_MEG_CH)</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;        {</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;            comp = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#aa07b3b770d7fe65ac065e01461688e04">chs</a>[k].coil_type &gt;&gt; 16;</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;            <span class="keywordflow">if</span> (first_comp &lt; 0)</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;                first_comp = comp;</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (comp != first_comp)</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;                printf(<span class="stringliteral">&quot;Compensation is not set equally on all MEG channels&quot;</span>);</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;        }</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    }</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    <span class="keywordflow">return</span> comp;</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;}</div>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;</div>
-<div class="line"><a name="l00150"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ae06f9e30af317e74beb4de6c69863475">  150</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ae06f9e30af317e74beb4de6c69863475">FiffInfo::make_compensator</a>(fiff_int_t from, fiff_int_t to, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html" title="CTF software compensation data.">FiffCtfComp</a>&amp; ctf_comp, <span class="keywordtype">bool</span> exclude_comp_chs)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    qDebug() &lt;&lt; <span class="stringliteral">&quot;make_compensator not debugged jet&quot;</span>;</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    MatrixXd C1, C2, comp_tmp;</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    qDebug() &lt;&lt; <span class="stringliteral">&quot;Todo add all need ctf variables.&quot;</span>;</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;<span class="comment">//    if(ctf_comp.data)</span></div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;<span class="comment">//        delete ctf_comp.data;</span></div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    ctf_comp.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a59d3cc5600aa876c0f8bcfc3b31e4e65">data</a>-&gt;clear();</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    <span class="keywordflow">if</span> (from == to)</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    {</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;        ctf_comp.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a59d3cc5600aa876c0f8bcfc3b31e4e65">data</a>-&gt;data = MatrixXd::Zero(this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>, this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>);</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    }</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    <span class="keywordflow">if</span> (from == 0)</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;        C1 = MatrixXd::Zero(this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>,this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>);</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    {</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        <span class="keywordflow">if</span> (!this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ae06f9e30af317e74beb4de6c69863475">make_compensator</a>(from, C1))</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        {</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;            printf(<span class="stringliteral">&quot;Cannot create compensator C1\n&quot;</span>);</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;            printf(<span class="stringliteral">&quot;Desired compensation matrix (kind = %d) not found\n&quot;</span>,from);</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;        }</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    }</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    <span class="keywordflow">if</span> (to == 0)</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;        C2 = MatrixXd::Zero(this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>,this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>);</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    {</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;        <span class="keywordflow">if</span> (!this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ae06f9e30af317e74beb4de6c69863475">make_compensator</a>(to, C2))</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        {</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;            printf(<span class="stringliteral">&quot;Cannot create compensator C2\n&quot;</span>);</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;            printf(<span class="stringliteral">&quot;Desired compensation matrix (kind = %d) not found\n&quot;</span>,to);</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;        }</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    }</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    <span class="comment">//   s_orig = s_from + C1*s_from = (I + C1)*s_from</span></div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    <span class="comment">//   s_to   = s_orig - C2*s_orig = (I - C2)*s_orig</span></div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    <span class="comment">//   s_to   = (I - C2)*(I + C1)*s_from = (I + C1 - C2 - C2*C1)*s_from</span></div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    comp_tmp = MatrixXd::Identity(this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>,this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>) + C1 - C2 - C2*C1;</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    qint32 k;</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    <span class="keywordflow">if</span> (exclude_comp_chs)</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    {</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;        VectorXi pick  = MatrixXi::Zero(1,this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>);</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;        qint32 npick = 0;</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        <span class="keywordflow">for</span> (k = 0; k &lt; this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>; ++k)</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;        {</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;            <span class="keywordflow">if</span> (this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#aa07b3b770d7fe65ac065e01461688e04">chs</a>[k].kind != FIFFV_REF_MEG_CH)</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;            {</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;                pick(npick) = k;</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;                ++npick;</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;            }</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;        }</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;        <span class="keywordflow">if</span> (npick == 0)</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;        {</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;            printf(<span class="stringliteral">&quot;Nothing remains after excluding the compensation channels\n&quot;</span>);</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;        }</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;        ctf_comp.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a59d3cc5600aa876c0f8bcfc3b31e4e65">data</a>-&gt;data.resize(npick,this-&gt;nchan);</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;        <span class="keywordflow">for</span> (k = 0; k &lt; npick; ++k)</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;            ctf_comp.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a59d3cc5600aa876c0f8bcfc3b31e4e65">data</a>-&gt;data.row(k) = comp_tmp.block(pick(k), 0, 1, this-&gt;nchan);</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    }</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;}</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;</div>
+<div class="line"><a name="l00151"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ae06f9e30af317e74beb4de6c69863475">  151</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ae06f9e30af317e74beb4de6c69863475">FiffInfo::make_compensator</a>(fiff_int_t from, fiff_int_t to, <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html" title="CTF software compensation data.">FiffCtfComp</a>&amp; ctf_comp, <span class="keywordtype">bool</span> exclude_comp_chs)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    qDebug() &lt;&lt; <span class="stringliteral">&quot;make_compensator not debugged jet&quot;</span>;</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    MatrixXd C1, C2, comp_tmp;</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    qDebug() &lt;&lt; <span class="stringliteral">&quot;Todo add all need ctf variables.&quot;</span>;</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;<span class="comment">//    if(ctf_comp.data)</span></div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;<span class="comment">//        delete ctf_comp.data;</span></div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    ctf_comp.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a59d3cc5600aa876c0f8bcfc3b31e4e65">data</a>-&gt;clear();</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <span class="keywordflow">if</span> (from == to)</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    {</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;        ctf_comp.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a59d3cc5600aa876c0f8bcfc3b31e4e65">data</a>-&gt;data = MatrixXd::Zero(this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>, this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>);</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    }</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="keywordflow">if</span> (from == 0)</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;        C1 = MatrixXd::Zero(this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>,this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>);</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    {</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        <span class="keywordflow">if</span> (!this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ae06f9e30af317e74beb4de6c69863475">make_compensator</a>(from, C1))</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        {</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;            printf(<span class="stringliteral">&quot;Cannot create compensator C1\n&quot;</span>);</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;            printf(<span class="stringliteral">&quot;Desired compensation matrix (kind = %d) not found\n&quot;</span>,from);</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;        }</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    }</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    <span class="keywordflow">if</span> (to == 0)</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;        C2 = MatrixXd::Zero(this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>,this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>);</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    {</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        <span class="keywordflow">if</span> (!this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ae06f9e30af317e74beb4de6c69863475">make_compensator</a>(to, C2))</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;        {</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;            printf(<span class="stringliteral">&quot;Cannot create compensator C2\n&quot;</span>);</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;            printf(<span class="stringliteral">&quot;Desired compensation matrix (kind = %d) not found\n&quot;</span>,to);</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;        }</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    }</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    <span class="comment">//   s_orig = s_from + C1*s_from = (I + C1)*s_from</span></div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    <span class="comment">//   s_to   = s_orig - C2*s_orig = (I - C2)*s_orig</span></div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    <span class="comment">//   s_to   = (I - C2)*(I + C1)*s_from = (I + C1 - C2 - C2*C1)*s_from</span></div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    comp_tmp = MatrixXd::Identity(this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>,this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>) + C1 - C2 - C2*C1;</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    qint32 k;</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    <span class="keywordflow">if</span> (exclude_comp_chs)</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    {</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;        VectorXi pick  = MatrixXi::Zero(1,this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>);</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        qint32 npick = 0;</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;        <span class="keywordflow">for</span> (k = 0; k &lt; this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>; ++k)</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;        {</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;            <span class="keywordflow">if</span> (this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#aa07b3b770d7fe65ac065e01461688e04">chs</a>[k].kind != FIFFV_REF_MEG_CH)</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;            {</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;                pick(npick) = k;</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;                ++npick;</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;            }</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;        }</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;        <span class="keywordflow">if</span> (npick == 0)</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;        {</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;            printf(<span class="stringliteral">&quot;Nothing remains after excluding the compensation channels\n&quot;</span>);</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;        }</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;        ctf_comp.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a59d3cc5600aa876c0f8bcfc3b31e4e65">data</a>-&gt;data.resize(npick,this-&gt;nchan);</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;        <span class="keywordflow">for</span> (k = 0; k &lt; npick; ++k)</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;            ctf_comp.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a59d3cc5600aa876c0f8bcfc3b31e4e65">data</a>-&gt;data.row(k) = comp_tmp.block(pick(k), 0, 1, this-&gt;nchan);</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    }</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;}</div>
 <div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ae06f9e30af317e74beb4de6c69863475">FiffInfo::make_compensator</a>(fiff_int_t kind, MatrixXd&amp; this_comp) <span class="keyword">const</span><span class="comment">//private method</span></div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;{</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    qDebug() &lt;&lt; <span class="stringliteral">&quot;make_compensator not debugged jet&quot;</span>;</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#a013471cfe5f75de645b42e1bc71f0651">FiffNamedMatrix::SDPtr</a> this_data;</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    MatrixXd presel, postsel;</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    qint32 k, col, c, ch, row, row_ch, channelAvailable;</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    <span class="keywordflow">for</span> (k = 0; k &lt; this-&gt;comps.size(); ++k)</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    {</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;        <span class="keywordflow">if</span> (this-&gt;comps[k].kind == kind)</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;        {                this_data = this-&gt;comps[k].data;</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;            <span class="comment">//</span></div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;            <span class="comment">//   Create the preselector</span></div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;            <span class="comment">//</span></div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;            presel  = MatrixXd::Zero(this_data-&gt;ncol,this-&gt;nchan);</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;            <span class="keywordflow">for</span>(col = 0; col &lt; this_data-&gt;ncol; ++col)</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;            {</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;                channelAvailable = 0;</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;                <span class="keywordflow">for</span> (c = 0; c &lt; this-&gt;ch_names.size(); ++c)</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;                {</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;                    <span class="keywordflow">if</span> (QString::compare(this_data-&gt;col_names.at(col),this-&gt;ch_names.at(c)) == 0)</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;                    {</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;                        ++channelAvailable;</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;                        ch = c;</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;                    }</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;                }</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;                <span class="keywordflow">if</span> (channelAvailable == 0)</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;                {</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;                    printf(<span class="stringliteral">&quot;Channel %s is not available in data\n&quot;</span>,this_data-&gt;col_names.at(col).toUtf8().constData());</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;                    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;                }</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;                <span class="keywordflow">else</span> <span class="keywordflow">if</span> (channelAvailable &gt; 1)</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;                {</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;                    printf(<span class="stringliteral">&quot;Ambiguous channel %s&quot;</span>,this_data-&gt;col_names.at(col).toUtf8().constData());</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;                    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;                }</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;                presel(col,ch) = 1.0;</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;            }</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;            <span class="comment">//</span></div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;            <span class="comment">//   Create the postselector</span></div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;            <span class="comment">//</span></div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;            postsel = MatrixXd::Zero(this-&gt;nchan,this_data-&gt;nrow);</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;            <span class="keywordflow">for</span> (c = 0; c  &lt; this-&gt;nchan; ++c)</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;            {</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;                channelAvailable = 0;</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;                <span class="keywordflow">for</span> (row = 0; row &lt; this_data-&gt;row_names.size(); ++row)</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;                {</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;                    <span class="keywordflow">if</span> (QString::compare(this_data-&gt;col_names.at(c),this-&gt;ch_names.at(row)) == 0)</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;                    {</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;                        ++channelAvailable;</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;                        row_ch = row;</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;                    }</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;                }</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;                <span class="keywordflow">if</span> (channelAvailable &gt; 1)</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;                {</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;                    printf(<span class="stringliteral">&quot;Ambiguous channel %s&quot;</span>, this-&gt;ch_names.at(c).toUtf8().constData());</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;                    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;                }</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;                <span class="keywordflow">else</span> <span class="keywordflow">if</span> (channelAvailable == 1)</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;                {</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;                    postsel(c,row_ch) = 1.0;</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;                }</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;            }</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;            this_comp = postsel*this_data-&gt;data*presel;</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;        }</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    }</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;    this_comp = defaultMatrixXd;</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;}</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ae06f9e30af317e74beb4de6c69863475">FiffInfo::make_compensator</a>(fiff_int_t kind, MatrixXd&amp; this_comp) <span class="keyword">const</span><span class="comment">//private method</span></div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;{</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    qDebug() &lt;&lt; <span class="stringliteral">&quot;make_compensator not debugged jet&quot;</span>;</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#a013471cfe5f75de645b42e1bc71f0651">FiffNamedMatrix::SDPtr</a> this_data;</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    MatrixXd presel, postsel;</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    qint32 k, col, c, ch, row, row_ch, channelAvailable;</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    <span class="keywordflow">for</span> (k = 0; k &lt; this-&gt;comps.size(); ++k)</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    {</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;        <span class="keywordflow">if</span> (this-&gt;comps[k].kind == kind)</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;        {                this_data = this-&gt;comps[k].data;</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;            <span class="comment">//</span></div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;            <span class="comment">//   Create the preselector</span></div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;            <span class="comment">//</span></div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;            presel  = MatrixXd::Zero(this_data-&gt;ncol,this-&gt;nchan);</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;            <span class="keywordflow">for</span>(col = 0; col &lt; this_data-&gt;ncol; ++col)</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;            {</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;                channelAvailable = 0;</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;                <span class="keywordflow">for</span> (c = 0; c &lt; this-&gt;ch_names.size(); ++c)</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;                {</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;                    <span class="keywordflow">if</span> (QString::compare(this_data-&gt;col_names.at(col),this-&gt;ch_names.at(c)) == 0)</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;                    {</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;                        ++channelAvailable;</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;                        ch = c;</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;                    }</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;                }</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;                <span class="keywordflow">if</span> (channelAvailable == 0)</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;                {</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;                    printf(<span class="stringliteral">&quot;Channel %s is not available in data\n&quot;</span>,this_data-&gt;col_names.at(col).toUtf8().constData());</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;                    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;                }</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;                <span class="keywordflow">else</span> <span class="keywordflow">if</span> (channelAvailable &gt; 1)</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;                {</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;                    printf(<span class="stringliteral">&quot;Ambiguous channel %s&quot;</span>,this_data-&gt;col_names.at(col).toUtf8().constData());</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;                    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;                }</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;                presel(col,ch) = 1.0;</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;            }</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;            <span class="comment">//</span></div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;            <span class="comment">//   Create the postselector</span></div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;            <span class="comment">//</span></div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;            postsel = MatrixXd::Zero(this-&gt;nchan,this_data-&gt;nrow);</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;            <span class="keywordflow">for</span> (c = 0; c  &lt; this-&gt;nchan; ++c)</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;            {</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;                channelAvailable = 0;</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;                <span class="keywordflow">for</span> (row = 0; row &lt; this_data-&gt;row_names.size(); ++row)</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;                {</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;                    <span class="keywordflow">if</span> (QString::compare(this_data-&gt;col_names.at(c),this-&gt;ch_names.at(row)) == 0)</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;                    {</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;                        ++channelAvailable;</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;                        row_ch = row;</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;                    }</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;                }</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;                <span class="keywordflow">if</span> (channelAvailable &gt; 1)</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;                {</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;                    printf(<span class="stringliteral">&quot;Ambiguous channel %s&quot;</span>, this-&gt;ch_names.at(c).toUtf8().constData());</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;                    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;                }</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;                <span class="keywordflow">else</span> <span class="keywordflow">if</span> (channelAvailable == 1)</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;                {</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;                    postsel(c,row_ch) = 1.0;</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;                }</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;            }</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;            this_comp = postsel*this_data-&gt;data*presel;</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;        }</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;    }</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    this_comp = defaultMatrixXd;</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;}</div>
 <div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;</div>
-<div class="line"><a name="l00299"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a691929a984fb9471b8e8da984a43c6c5">  299</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a691929a984fb9471b8e8da984a43c6c5">FiffInfo::pick_info</a>(<span class="keyword">const</span> RowVectorXi &amp;sel)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a> res = *<span class="keyword">this</span>;<span class="comment">//new FiffInfo(this);</span></div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;    <span class="keywordflow">if</span> (sel.size() == 0)</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;        <span class="keywordflow">return</span> res;</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;    <span class="comment">//ToDo when pointer List do delation</span></div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    res.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#aa07b3b770d7fe65ac065e01461688e04">chs</a>.clear();</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;    res.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#af15ed691efe28790897198f06306ab29">ch_names</a>.clear();</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    qint32 idx;</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;    <span class="keywordflow">for</span>(qint32 i = 0; i &lt; sel.size(); ++i)</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;    {</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;        idx = sel[i];</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;        res.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#aa07b3b770d7fe65ac065e01461688e04">chs</a>.append(this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#aa07b3b770d7fe65ac065e01461688e04">chs</a>[idx]);</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;        res.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#af15ed691efe28790897198f06306ab29">ch_names</a>.append(this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#af15ed691efe28790897198f06306ab29">ch_names</a>[idx]);</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    }</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;    res.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>  = sel.size();</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;    <span class="keywordflow">return</span> res;</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;}</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;</div>
+<div class="line"><a name="l00300"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a691929a984fb9471b8e8da984a43c6c5">  300</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a691929a984fb9471b8e8da984a43c6c5">FiffInfo::pick_info</a>(<span class="keyword">const</span> RowVectorXi &amp;sel)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html" title="FIFF measurement file information.">FiffInfo</a> res = *<span class="keyword">this</span>;<span class="comment">//new FiffInfo(this);</span></div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;    <span class="keywordflow">if</span> (sel.size() == 0)</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;        <span class="keywordflow">return</span> res;</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    <span class="comment">//ToDo when pointer List do delation</span></div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;    res.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#aa07b3b770d7fe65ac065e01461688e04">chs</a>.clear();</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;    res.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#af15ed691efe28790897198f06306ab29">ch_names</a>.clear();</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;    qint32 idx;</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;    <span class="keywordflow">for</span>(qint32 i = 0; i &lt; sel.size(); ++i)</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    {</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;        idx = sel[i];</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;        res.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#aa07b3b770d7fe65ac065e01461688e04">chs</a>.append(this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#aa07b3b770d7fe65ac065e01461688e04">chs</a>[idx]);</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;        res.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#af15ed691efe28790897198f06306ab29">ch_names</a>.append(this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#af15ed691efe28790897198f06306ab29">ch_names</a>[idx]);</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;    }</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;    res.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>  = sel.size();</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;    <span class="keywordflow">return</span> res;</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;}</div>
 <div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;</div>
-<div class="line"><a name="l00324"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a7cf472348e39ec15ecc24bda81305192">  324</a></span>&#160;QList&lt;FiffChInfo&gt; <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a10d48ebfa8dfb2391d6b20c9d927f7ac">FiffInfo::set_current_comp</a>(QList&lt;FiffChInfo&gt;&amp; chs, fiff_int_t value)</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;{</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;    QList&lt;FiffChInfo&gt; new_chs;</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    qint32 k;</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;    fiff_int_t coil_type;</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;    <span class="keywordflow">for</span>(k = 0; k &lt; chs.size(); ++k)</div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;        new_chs.append(chs[k]);</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;    qint32 lower_half = 65535;<span class="comment">// hex2dec(&#39;FFFF&#39;);</span></div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;    <span class="keywordflow">for</span> (k = 0; k &lt; chs.size(); ++k)</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;    {</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;        <span class="keywordflow">if</span> (chs[k].kind == FIFFV_MEG_CH)</div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;        {</div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;            coil_type = chs[k].coil_type &amp; lower_half;</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;            new_chs[k].coil_type = (coil_type | (value &lt;&lt; 16));</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;        }</div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;    }</div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;    <span class="keywordflow">return</span> new_chs;</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;}</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;</div>
+<div class="line"><a name="l00325"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a7cf472348e39ec15ecc24bda81305192">  325</a></span>&#160;QList&lt;FiffChInfo&gt; <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a10d48ebfa8dfb2391d6b20c9d927f7ac">FiffInfo::set_current_comp</a>(QList&lt;FiffChInfo&gt;&amp; chs, fiff_int_t value)</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;{</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    QList&lt;FiffChInfo&gt; new_chs;</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;    qint32 k;</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;    fiff_int_t coil_type;</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;    <span class="keywordflow">for</span>(k = 0; k &lt; chs.size(); ++k)</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;        new_chs.append(chs[k]);</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;</div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;    qint32 lower_half = 65535;<span class="comment">// hex2dec(&#39;FFFF&#39;);</span></div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;    <span class="keywordflow">for</span> (k = 0; k &lt; chs.size(); ++k)</div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;    {</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;        <span class="keywordflow">if</span> (chs[k].kind == FIFFV_MEG_CH)</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;        {</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;            coil_type = chs[k].coil_type &amp; lower_half;</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;            new_chs[k].coil_type = (coil_type | (value &lt;&lt; 16));</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;        }</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;    }</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;    <span class="keywordflow">return</span> new_chs;</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;}</div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;</div>
+<div class="line"><a name="l00349"></a><span class="lineno"><a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a6b54366185ca46f0bb17cff710353603">  349</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a6b54366185ca46f0bb17cff710353603">FiffInfo::writeToStream</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a>* p_pStream)</div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;{</div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;    <span class="comment">//   We will always write floats</span></div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;    fiff_int_t data_type = 4;</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;    qint32 k;</div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;    QList&lt;FiffChInfo&gt; <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#aa07b3b770d7fe65ac065e01461688e04">chs</a>;</div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;</div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;    <span class="keywordflow">for</span>(k = 0; k &lt; this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>; ++k)</div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;        chs &lt;&lt; this-&gt;chs[k];</div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;</div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;    fiff_int_t nchan = chs.size();</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;    <span class="comment">// write the essentials</span></div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aca5c9df67313a344df12ebf61e57409c">start_block</a>(FIFFB_MEAS);<span class="comment">//4</span></div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aa3c211f31289f0f0dd9f884fd601122c">write_id</a>(FIFF_BLOCK_ID);<span class="comment">//5</span></div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;    <span class="keywordflow">if</span>(this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#a4e7cc06ad6cd39b9e554c09b0935f5d9">meas_id</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_id.html#ace3ce06929c786230382642f8ef596d3">version</a> != -1)</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;    {</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;        p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aa3c211f31289f0f0dd9f884fd601122c">write_id</a>(FIFF_PARENT_BLOCK_ID,this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#a4e7cc06ad6cd39b9e554c09b0935f5d9">meas_id</a>);<span class="comment">//6</span></div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;    }</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;    <span class="comment">//    Measurement info</span></div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aca5c9df67313a344df12ebf61e57409c">start_block</a>(FIFFB_MEAS_INFO);<span class="comment">//7</span></div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;    <span class="comment">//    Blocks from the original -&gt; skip this</span></div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;<span class="comment">//        QList&lt;fiff_int_t&gt; blocks;</span></div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;<span class="comment">//        blocks &lt;&lt; FIFFB_SUBJECT &lt;&lt; FIFFB_HPI_MEAS &lt;&lt; FIFFB_HPI_RESULT &lt;&lt; FIFFB_ISOTRAK &lt;&lt; FIFFB_PROCESSING_HISTORY;</span></div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;    <span class="keywordtype">bool</span> have_hpi_result = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;    <span class="keywordtype">bool</span> have_isotrak    = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;    <span class="comment">//    megacq parameters</span></div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;    <span class="keywordflow">if</span> (!this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ac5441674648831c0e691f4022360755e">acq_pars</a>.isEmpty() || !this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a40a96f92d6d21fbd0678c1f6d0abcee0">acq_stim</a>.isEmpty())</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;    {</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;        p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aca5c9df67313a344df12ebf61e57409c">start_block</a>(FIFFB_DACQ_PARS);</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;        <span class="keywordflow">if</span> (!this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ac5441674648831c0e691f4022360755e">acq_pars</a>.isEmpty())</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;            p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a5af2bc22118117e438770e9dcefa91bb">write_string</a>(FIFF_DACQ_PARS, this-&gt;acq_pars);</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;        <span class="keywordflow">if</span> (!this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a40a96f92d6d21fbd0678c1f6d0abcee0">acq_stim</a>.isEmpty())</div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;            p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a5af2bc22118117e438770e9dcefa91bb">write_string</a>(FIFF_DACQ_STIM, this-&gt;acq_stim);</div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;        p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a904df8f48da1564a8d5a975a22aa6b54">end_block</a>(FIFFB_DACQ_PARS);</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;    }</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;    <span class="comment">//    Coordinate transformations if the HPI result block was not there</span></div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;    <span class="keywordflow">if</span> (!have_hpi_result)</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;    {</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;        <span class="keywordflow">if</span> (!this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#af928d3bcb3e2a26e386647587b48579e">dev_head_t</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ac23a4cd08fe45a1ebee372749068fe3d">isEmpty</a>())</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;            p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#ad96d325ae45544d1cc276181421d5f7c">write_coord_trans</a>(this-&gt;dev_head_t);</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;        <span class="keywordflow">if</span> (!this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#aa4ff7b1f98b00a295617c1aaa80e1146">ctf_head_t</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ac23a4cd08fe45a1ebee372749068fe3d">isEmpty</a>())</div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;            p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#ad96d325ae45544d1cc276181421d5f7c">write_coord_trans</a>(this-&gt;ctf_head_t);</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;    }</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;    <span class="comment">//    Polhemus data</span></div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;    <span class="keywordflow">if</span> (this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#add2630e0a5269622bfbe15acae9ee5ac">dig</a>.size() &gt; 0 &amp;&amp; !have_isotrak)</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;    {</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;        p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aca5c9df67313a344df12ebf61e57409c">start_block</a>(FIFFB_ISOTRAK);</div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;        <span class="keywordflow">for</span> (qint32 k = 0; k &lt; this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#add2630e0a5269622bfbe15acae9ee5ac">dig</a>.size(); ++k)</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;            p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a5e0147ed498c8faa4febf80ea05880f7">write_dig_point</a>(this-&gt;dig[k]);</div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;</div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;        p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a904df8f48da1564a8d5a975a22aa6b54">end_block</a>(FIFFB_ISOTRAK);</div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;    }</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;    <span class="comment">//    Projectors</span></div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#afa13482b528ba5a7fcd15e8cf707663f">write_proj</a>(this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ae71b753c51dfd23ddd3a8a18e0f19ebe">projs</a>);</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;    <span class="comment">//    CTF compensation info</span></div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a2cb18e9250fd6a11fe7d7dfae4621603">write_ctf_comp</a>(this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#abe1b8e3c8986cba9e001f96480f905e9">comps</a>);</div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;    <span class="comment">//    Bad channels</span></div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;    <span class="keywordflow">if</span> (this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#abb2b7b298afe7439c1012962c2a8c43c">bads</a>.size() &gt; 0)</div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;    {</div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;        p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aca5c9df67313a344df12ebf61e57409c">start_block</a>(FIFFB_MNE_BAD_CHANNELS);</div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;        p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a6990479b9b65f5516b71ffd59b22a0dc">write_name_list</a>(FIFF_MNE_CH_NAME_LIST,this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#abb2b7b298afe7439c1012962c2a8c43c">bads</a>);</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;        p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a904df8f48da1564a8d5a975a22aa6b54">end_block</a>(FIFFB_MNE_BAD_CHANNELS);</div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;    }</div>
+<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;    <span class="comment">//    General</span></div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a769e1b3f385d18a4489ffcdcab3e93c0">write_float</a>(FIFF_SFREQ,&amp;this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a963c80bf73b01ed07eb1a31540cf308c">sfreq</a>);</div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a769e1b3f385d18a4489ffcdcab3e93c0">write_float</a>(FIFF_HIGHPASS,&amp;this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a19c7faa33c199e6606b7c3f48a613d32">highpass</a>);</div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a769e1b3f385d18a4489ffcdcab3e93c0">write_float</a>(FIFF_LOWPASS,&amp;this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ad6d3937c2aca7f34012e6d5f25444b45">lowpass</a>);</div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a1c36acd27cd6c6624d3b56df2d9e3def">write_int</a>(FIFF_NCHAN,&amp;nchan);</div>
+<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a1c36acd27cd6c6624d3b56df2d9e3def">write_int</a>(FIFF_DATA_PACK,&amp;data_type);</div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;    <span class="keywordflow">if</span> (this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#acc617eb0077fa0dda35ade4318abc209">meas_date</a>[0] != -1)</div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;        p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a1c36acd27cd6c6624d3b56df2d9e3def">write_int</a>(FIFF_MEAS_DATE,this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#acc617eb0077fa0dda35ade4318abc209">meas_date</a>, 2);</div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;    <span class="comment">//    Channel info</span></div>
+<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;    MatrixXd cals(1,nchan);</div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;</div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;    <span class="keywordflow">for</span>(k = 0; k &lt; <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>; ++k)</div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;    {</div>
+<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;        <span class="comment">//</span></div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;        <span class="comment">//    Scan numbers may have been messed up</span></div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;        <span class="comment">//</span></div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;        chs[k].scanno = k+1;<span class="comment">//+1 because</span></div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;        chs[k].range  = 1.0f;<span class="comment">//Why? -&gt; cause its already calibrated through reading</span></div>
+<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;        cals(0,k) = chs[k].cal; <span class="comment">//ToDo whats going on with cals?</span></div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;        p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a4dfad2ac6bc2afb42d2c180a972cf635">write_ch_info</a>(&amp;chs[k]);</div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;    }</div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a904df8f48da1564a8d5a975a22aa6b54">end_block</a>(FIFFB_MEAS_INFO);</div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 23 2013 15:22:59 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 6 2013 17:08:36 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

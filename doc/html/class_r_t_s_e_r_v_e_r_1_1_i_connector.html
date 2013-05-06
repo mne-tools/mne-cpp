@@ -120,9 +120,9 @@ Signals</h2></td></tr>
 <tr class="memitem:a852e710c6f0836c0c1de5da09efd0d5e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a852e710c6f0836c0c1de5da09efd0d5e"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>remitMeasInfo</b> (qint32, <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FIFFLIB::FiffInfo</a>)</td></tr>
 <tr class="separator:a852e710c6f0836c0c1de5da09efd0d5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a705c9af85add7d90938b93e843d8d124"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a705c9af85add7d90938b93e843d8d124"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>remitRawBuffer</b> (Eigen::MatrixXf)</td></tr>
-<tr class="separator:a705c9af85add7d90938b93e843d8d124"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6aefb32cede56c3627a76ff2cb49c611"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6aefb32cede56c3627a76ff2cb49c611"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>remitRawBuffer</b> (QSharedPointer&lt; Eigen::MatrixXf &gt;)</td></tr>
+<tr class="separator:a6aefb32cede56c3627a76ff2cb49c611"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -216,7 +216,7 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Connects the command manager to the available slots. </p>
 
-<p>Implemented in <a class="el" href="class_baby_m_e_g_plugin_1_1_baby_m_e_g.html#a5ac3e7e94978e8f026e9a2cffad74f44">BabyMEGPlugin::BabyMEG</a>, <a class="el" href="class_neuromag_plugin_1_1_neuromag.html#a61ee0ec4ebd02d9d2f502cb41de1875a">NeuromagPlugin::Neuromag</a>, and <a class="el" href="class_fiff_simulator_plugin_1_1_fiff_simulator.html#ac7f862967b858dcde2688d76e7aea8dc">FiffSimulatorPlugin::FiffSimulator</a>.</p>
+<p>Implemented in <a class="el" href="class_neuromag_plugin_1_1_neuromag.html#a61ee0ec4ebd02d9d2f502cb41de1875a">NeuromagPlugin::Neuromag</a>, and <a class="el" href="class_fiff_simulator_plugin_1_1_fiff_simulator.html#ac7f862967b858dcde2688d76e7aea8dc">FiffSimulatorPlugin::FiffSimulator</a>.</p>
 
 </div>
 </div>
@@ -270,7 +270,7 @@ Protected Attributes</h2></td></tr>
 <p>Returns the unique connector id Pure virtual method.</p>
 <dl class="section return"><dt>Returns</dt><dd>the connector ID. </dd></dl>
 
-<p>Implemented in <a class="el" href="class_baby_m_e_g_plugin_1_1_baby_m_e_g.html#a320ac39c8c408ce74e01a193f70f4c72">BabyMEGPlugin::BabyMEG</a>, <a class="el" href="class_neuromag_plugin_1_1_neuromag.html#a221e2c203c6a99acef40d3cfcdc83405">NeuromagPlugin::Neuromag</a>, and <a class="el" href="class_fiff_simulator_plugin_1_1_fiff_simulator.html#af124c82e2400f58b440ab4d81799dc04">FiffSimulatorPlugin::FiffSimulator</a>.</p>
+<p>Implemented in <a class="el" href="class_neuromag_plugin_1_1_neuromag.html#a221e2c203c6a99acef40d3cfcdc83405">NeuromagPlugin::Neuromag</a>, and <a class="el" href="class_fiff_simulator_plugin_1_1_fiff_simulator.html#af124c82e2400f58b440ab4d81799dc04">FiffSimulatorPlugin::FiffSimulator</a>.</p>
 
 </div>
 </div>
@@ -297,7 +297,7 @@ Protected Attributes</h2></td></tr>
 <p>Returns the plugin name. Pure virtual method.</p>
 <dl class="section return"><dt>Returns</dt><dd>the name of plugin. </dd></dl>
 
-<p>Implemented in <a class="el" href="class_baby_m_e_g_plugin_1_1_baby_m_e_g.html#abd7c97d72f80989e438be8c7f089121c">BabyMEGPlugin::BabyMEG</a>, <a class="el" href="class_neuromag_plugin_1_1_neuromag.html#ac9f412844272849ab37b6adc423f5a13">NeuromagPlugin::Neuromag</a>, and <a class="el" href="class_fiff_simulator_plugin_1_1_fiff_simulator.html#aa04459de016b055a2b90fd4ff62f5a9f">FiffSimulatorPlugin::FiffSimulator</a>.</p>
+<p>Implemented in <a class="el" href="class_neuromag_plugin_1_1_neuromag.html#ac9f412844272849ab37b6adc423f5a13">NeuromagPlugin::Neuromag</a>, and <a class="el" href="class_fiff_simulator_plugin_1_1_fiff_simulator.html#aa04459de016b055a2b90fd4ff62f5a9f">FiffSimulatorPlugin::FiffSimulator</a>.</p>
 
 </div>
 </div>
@@ -330,7 +330,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_baby_m_e_g_plugin_1_1_baby_m_e_g.html#a217e2ecadae4778c70c05595268c0437">BabyMEGPlugin::BabyMEG</a>, <a class="el" href="class_neuromag_plugin_1_1_neuromag.html#a8e000385a961d7b60041f765726977b1">NeuromagPlugin::Neuromag</a>, and <a class="el" href="class_fiff_simulator_plugin_1_1_fiff_simulator.html#afa8355133066a3a1c938aacf3d9a7ab5">FiffSimulatorPlugin::FiffSimulator</a>.</p>
+<p>Implemented in <a class="el" href="class_neuromag_plugin_1_1_neuromag.html#a8e000385a961d7b60041f765726977b1">NeuromagPlugin::Neuromag</a>, and <a class="el" href="class_fiff_simulator_plugin_1_1_fiff_simulator.html#afa8355133066a3a1c938aacf3d9a7ab5">FiffSimulatorPlugin::FiffSimulator</a>.</p>
 
 </div>
 </div>
@@ -476,7 +476,7 @@ Protected Attributes</h2></td></tr>
 <p>Starts the <a class="el" href="class_r_t_s_e_r_v_e_r_1_1_i_connector.html" title="The IConnector class is the interface class of all plugins.">IConnector</a>. Pure virtual method.</p>
 <dl class="section return"><dt>Returns</dt><dd>true if successful, false otherwise </dd></dl>
 
-<p>Implemented in <a class="el" href="class_baby_m_e_g_plugin_1_1_baby_m_e_g.html#a1b7862e223df5e0aec874b03ab12902d">BabyMEGPlugin::BabyMEG</a>, <a class="el" href="class_neuromag_plugin_1_1_neuromag.html#a631f3f774dfb24a86f2845168bdce82a">NeuromagPlugin::Neuromag</a>, and <a class="el" href="class_fiff_simulator_plugin_1_1_fiff_simulator.html#a9e7ef070b71e39a1036fe66021fd2322">FiffSimulatorPlugin::FiffSimulator</a>.</p>
+<p>Implemented in <a class="el" href="class_neuromag_plugin_1_1_neuromag.html#a631f3f774dfb24a86f2845168bdce82a">NeuromagPlugin::Neuromag</a>, and <a class="el" href="class_fiff_simulator_plugin_1_1_fiff_simulator.html#a9e7ef070b71e39a1036fe66021fd2322">FiffSimulatorPlugin::FiffSimulator</a>.</p>
 
 </div>
 </div>
@@ -503,7 +503,7 @@ Protected Attributes</h2></td></tr>
 <p>Stops the IPlugin. Pure virtual method.</p>
 <dl class="section return"><dt>Returns</dt><dd>true if success, false otherwise </dd></dl>
 
-<p>Implemented in <a class="el" href="class_baby_m_e_g_plugin_1_1_baby_m_e_g.html#ad16e6b4a19f6b089ab3d95cf0c20eb48">BabyMEGPlugin::BabyMEG</a>, <a class="el" href="class_neuromag_plugin_1_1_neuromag.html#a9da6195e0d4b8ed545819f76bb759542">NeuromagPlugin::Neuromag</a>, and <a class="el" href="class_fiff_simulator_plugin_1_1_fiff_simulator.html#ad39340aeabdb354dff5b2eb263287ce8">FiffSimulatorPlugin::FiffSimulator</a>.</p>
+<p>Implemented in <a class="el" href="class_neuromag_plugin_1_1_neuromag.html#a9da6195e0d4b8ed545819f76bb759542">NeuromagPlugin::Neuromag</a>, and <a class="el" href="class_fiff_simulator_plugin_1_1_fiff_simulator.html#ad39340aeabdb354dff5b2eb263287ce8">FiffSimulatorPlugin::FiffSimulator</a>.</p>
 
 </div>
 </div>
@@ -560,7 +560,7 @@ Protected Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 23 2013 15:23:03 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 6 2013 17:08:40 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

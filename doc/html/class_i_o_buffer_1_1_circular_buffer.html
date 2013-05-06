@@ -89,6 +89,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="class_i_o_buffer_1_1_circular_buffer-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -101,6 +102,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <p><code>#include &lt;<a class="el" href="circularbuffer_8h_source.html">circularbuffer.h</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a6dfc1dd6c495c4a617fa8a034e7e07fb"><td class="memItemLeft" align="right" valign="top">typedef QSharedPointer<br class="typebreak"/>
+&lt; <a class="el" href="class_i_o_buffer_1_1_circular_buffer.html">CircularBuffer</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_o_buffer_1_1_circular_buffer.html#a6dfc1dd6c495c4a617fa8a034e7e07fb">SPtr</a></td></tr>
+<tr class="separator:a6dfc1dd6c495c4a617fa8a034e7e07fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8e0a391a688ef3c137f00cda00a37fea"><td class="memItemLeft" align="right" valign="top">typedef QSharedPointer&lt; const <br class="typebreak"/>
+<a class="el" href="class_i_o_buffer_1_1_circular_buffer.html">CircularBuffer</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_o_buffer_1_1_circular_buffer.html#a8e0a391a688ef3c137f00cda00a37fea">ConstSPtr</a></td></tr>
+<tr class="separator:a8e0a391a688ef3c137f00cda00a37fea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a7e3316b1e7023eb2dc12be7505237eb5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_o_buffer_1_1_circular_buffer.html#a7e3316b1e7023eb2dc12be7505237eb5">CircularBuffer</a> (unsigned int uiMaxNumElements)</td></tr>
@@ -123,8 +133,43 @@ class IOBuffer::CircularBuffer&lt; _Tp &gt;</h3>
 <p>The TEMPLATE CIRCULAR BUFFER provides a template for thread safe circular buffers. </p>
 <p>TEMPLATE CIRCULAR BUFFER </p>
 
-<p>Definition at line <a class="el" href="circularbuffer_8h_source.html#l00079">79</a> of file <a class="el" href="circularbuffer_8h_source.html">circularbuffer.h</a>.</p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<p>Definition at line <a class="el" href="circularbuffer_8h_source.html#l00080">80</a> of file <a class="el" href="circularbuffer_8h_source.html">circularbuffer.h</a>.</p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a class="anchor" id="a8e0a391a688ef3c137f00cda00a37fea"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename _Tp &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef QSharedPointer&lt;const <a class="el" href="class_i_o_buffer_1_1_circular_buffer.html">CircularBuffer</a>&gt; <a class="el" href="class_i_o_buffer_1_1_circular_buffer.html">IOBuffer::CircularBuffer</a>&lt; _Tp &gt;::<a class="el" href="class_i_o_buffer_1_1_circular_buffer.html#a8e0a391a688ef3c137f00cda00a37fea">ConstSPtr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Const shared pointer type for <a class="el" href="class_i_o_buffer_1_1_circular_buffer.html" title="The TEMPLATE CIRCULAR BUFFER provides a template for thread safe circular buffers.">CircularBuffer</a>. </p>
+
+<p>Definition at line <a class="el" href="circularbuffer_8h_source.html#l00084">84</a> of file <a class="el" href="circularbuffer_8h_source.html">circularbuffer.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a6dfc1dd6c495c4a617fa8a034e7e07fb"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename _Tp &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef QSharedPointer&lt;<a class="el" href="class_i_o_buffer_1_1_circular_buffer.html">CircularBuffer</a>&gt; <a class="el" href="class_i_o_buffer_1_1_circular_buffer.html">IOBuffer::CircularBuffer</a>&lt; _Tp &gt;::<a class="el" href="class_i_o_buffer_1_1_circular_buffer.html#a6dfc1dd6c495c4a617fa8a034e7e07fb">SPtr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Shared pointer type for <a class="el" href="class_i_o_buffer_1_1_circular_buffer.html" title="The TEMPLATE CIRCULAR BUFFER provides a template for thread safe circular buffers.">CircularBuffer</a>. </p>
+
+<p>Definition at line <a class="el" href="circularbuffer_8h_source.html#l00083">83</a> of file <a class="el" href="circularbuffer_8h_source.html">circularbuffer.h</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a7e3316b1e7023eb2dc12be7505237eb5"></a>
 <div class="memitem">
 <div class="memproto">
@@ -156,7 +201,7 @@ template&lt;typename _Tp &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="circularbuffer_8h_source.html#l00151">151</a> of file <a class="el" href="circularbuffer_8h_source.html">circularbuffer.h</a>.</p>
+<p>Definition at line <a class="el" href="circularbuffer_8h_source.html#l00155">155</a> of file <a class="el" href="circularbuffer_8h_source.html">circularbuffer.h</a>.</p>
 
 </div>
 </div>
@@ -176,7 +221,7 @@ template&lt;typename _Tp &gt; </div>
 </div><div class="memdoc">
 <p>Destroys the <a class="el" href="class_i_o_buffer_1_1_circular_buffer.html" title="The TEMPLATE CIRCULAR BUFFER provides a template for thread safe circular buffers.">CircularBuffer</a>. </p>
 
-<p>Definition at line <a class="el" href="circularbuffer_8h_source.html#l00166">166</a> of file <a class="el" href="circularbuffer_8h_source.html">circularbuffer.h</a>.</p>
+<p>Definition at line <a class="el" href="circularbuffer_8h_source.html#l00170">170</a> of file <a class="el" href="circularbuffer_8h_source.html">circularbuffer.h</a>.</p>
 
 </div>
 </div>
@@ -197,7 +242,7 @@ template&lt;typename _Tp &gt; </div>
 </div><div class="memdoc">
 <p>Clears the buffer. </p>
 
-<p>Definition at line <a class="el" href="circularbuffer_8h_source.html#l00222">222</a> of file <a class="el" href="circularbuffer_8h_source.html">circularbuffer.h</a>.</p>
+<p>Definition at line <a class="el" href="circularbuffer_8h_source.html#l00226">226</a> of file <a class="el" href="circularbuffer_8h_source.html">circularbuffer.h</a>.</p>
 
 </div>
 </div>
@@ -226,7 +271,7 @@ template&lt;typename _Tp &gt; </div>
 <p>Returns the first element (first in first out).</p>
 <dl class="section return"><dt>Returns</dt><dd>the first element </dd></dl>
 
-<p>Definition at line <a class="el" href="circularbuffer_8h_source.html#l00200">200</a> of file <a class="el" href="circularbuffer_8h_source.html">circularbuffer.h</a>.</p>
+<p>Definition at line <a class="el" href="circularbuffer_8h_source.html#l00204">204</a> of file <a class="el" href="circularbuffer_8h_source.html">circularbuffer.h</a>.</p>
 
 </div>
 </div>
@@ -272,7 +317,7 @@ template&lt;typename _Tp &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="circularbuffer_8h_source.html#l00177">177</a> of file <a class="el" href="circularbuffer_8h_source.html">circularbuffer.h</a>.</p>
+<p>Definition at line <a class="el" href="circularbuffer_8h_source.html#l00181">181</a> of file <a class="el" href="circularbuffer_8h_source.html">circularbuffer.h</a>.</p>
 
 </div>
 </div>
@@ -307,7 +352,7 @@ template&lt;typename _Tp &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="circularbuffer_8h_source.html#l00189">189</a> of file <a class="el" href="circularbuffer_8h_source.html">circularbuffer.h</a>.</p>
+<p>Definition at line <a class="el" href="circularbuffer_8h_source.html#l00193">193</a> of file <a class="el" href="circularbuffer_8h_source.html">circularbuffer.h</a>.</p>
 
 </div>
 </div>
@@ -317,7 +362,7 @@ template&lt;typename _Tp &gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 23 2013 15:23:03 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 6 2013 17:08:40 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

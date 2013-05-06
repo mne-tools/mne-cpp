@@ -799,415 +799,348 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;    <span class="comment">//   Open the file, create directory</span></div>
 <div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a>* t_pStream = <span class="keyword">new</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a>(&amp;p_IODevice);</div>
-<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;    printf(<span class="stringliteral">&quot;Reading inverse operator decomposition from %s...\n&quot;</span>,t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aaef2f46402149d34b308bbaf6ecb95e8">streamName</a>().toUtf8().constData());</div>
+<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#afc5bb6ae857cf5e93e4e0271bf0bee05">FiffStream::SPtr</a> t_pStream(<span class="keyword">new</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a>(&amp;p_IODevice));</div>
+<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;    printf(<span class="stringliteral">&quot;Reading inverse operator decomposition from %s...\n&quot;</span>,t_pStream-&gt;streamName().toUtf8().constData());</div>
 <div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a> t_Tree;</div>
 <div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;    QList&lt;FiffDirEntry&gt; t_Dir;</div>
 <div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;</div>
-<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;    <span class="keywordflow">if</span>(!t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aa6a81dd8a8a58e5c9c5034b3062106ed">open</a>(t_Tree, t_Dir))</div>
-<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;    {</div>
-<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
-<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;</div>
-<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;    }</div>
-<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;    <span class="comment">//   Find all inverse operators</span></div>
-<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;    QList &lt;FiffDirTree&gt; invs_list = t_Tree.dir_tree_find(FIFFB_MNE_INVERSE_SOLUTION);</div>
-<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;    <span class="keywordflow">if</span> ( invs_list.size()== 0)</div>
-<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;    {</div>
-<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;        printf(<span class="stringliteral">&quot;No inverse solutions in %s\n&quot;</span>, t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aaef2f46402149d34b308bbaf6ecb95e8">streamName</a>().toUtf8().constData());</div>
-<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
-<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160;    }</div>
-<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a>* invs = &amp;invs_list[0];</div>
-<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;    <span class="comment">//   Parent MRI data</span></div>
-<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;    QList &lt;FiffDirTree&gt; parent_mri = t_Tree.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a70da2b06043102864248454470946a81">dir_tree_find</a>(FIFFB_MNE_PARENT_MRI_FILE);</div>
-<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;    <span class="keywordflow">if</span> (parent_mri.size() == 0)</div>
-<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;    {</div>
-<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;        printf(<span class="stringliteral">&quot;No parent MRI information in %s&quot;</span>, t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aaef2f46402149d34b308bbaf6ecb95e8">streamName</a>().toUtf8().constData());</div>
-<div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
-<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160;    }</div>
-<div class="line"><a name="l00779"></a><span class="lineno">  779</span>&#160;    printf(<span class="stringliteral">&quot;\tReading inverse operator info...&quot;</span>);</div>
-<div class="line"><a name="l00780"></a><span class="lineno">  780</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00781"></a><span class="lineno">  781</span>&#160;    <span class="comment">//   Methods and source orientations</span></div>
-<div class="line"><a name="l00782"></a><span class="lineno">  782</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00783"></a><span class="lineno">  783</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html" title="FIFF data tag.">FiffTag</a>* t_pTag = NULL;</div>
-<div class="line"><a name="l00784"></a><span class="lineno">  784</span>&#160;    <span class="keywordflow">if</span> (!invs-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a887f9cb482001d8d41f6504ff2f6308d">find_tag</a>(t_pStream, FIFF_MNE_INCLUDED_METHODS, t_pTag))</div>
+<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;    <span class="keywordflow">if</span>(!t_pStream-&gt;open(t_Tree, t_Dir))</div>
+<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;    <span class="comment">//   Find all inverse operators</span></div>
+<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;    QList &lt;FiffDirTree&gt; invs_list = t_Tree.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a70da2b06043102864248454470946a81">dir_tree_find</a>(FIFFB_MNE_INVERSE_SOLUTION);</div>
+<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;    <span class="keywordflow">if</span> ( invs_list.size()== 0)</div>
+<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;    {</div>
+<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;        printf(<span class="stringliteral">&quot;No inverse solutions in %s\n&quot;</span>, t_pStream-&gt;streamName().toUtf8().constData());</div>
+<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;    }</div>
+<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html" title="Directory tree structure.">FiffDirTree</a>* invs = &amp;invs_list[0];</div>
+<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;    <span class="comment">//   Parent MRI data</span></div>
+<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;    QList &lt;FiffDirTree&gt; parent_mri = t_Tree.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a70da2b06043102864248454470946a81">dir_tree_find</a>(FIFFB_MNE_PARENT_MRI_FILE);</div>
+<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;    <span class="keywordflow">if</span> (parent_mri.size() == 0)</div>
+<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160;    {</div>
+<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160;        printf(<span class="stringliteral">&quot;No parent MRI information in %s&quot;</span>, t_pStream-&gt;streamName().toUtf8().constData());</div>
+<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;    }</div>
+<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;    printf(<span class="stringliteral">&quot;\tReading inverse operator info...&quot;</span>);</div>
+<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;    <span class="comment">//   Methods and source orientations</span></div>
+<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a81dd3125f347ffdcae77188caf6670f5">FiffTag::SPtr</a> t_pTag;</div>
+<div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160;    <span class="keywordflow">if</span> (!invs-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a589bc602a07f1f2e5d9b8c7585cd1530">find_tag</a>(t_pStream.data(), FIFF_MNE_INCLUDED_METHODS, t_pTag))</div>
+<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;    {</div>
+<div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;        printf(<span class="stringliteral">&quot;Modalities not found\n&quot;</span>);</div>
+<div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00779"></a><span class="lineno">  779</span>&#160;    }</div>
+<div class="line"><a name="l00780"></a><span class="lineno">  780</span>&#160;</div>
+<div class="line"><a name="l00781"></a><span class="lineno">  781</span>&#160;    inv = <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a04cfac3beac1c70cf2df93b4ef85565e">MNEInverseOperator</a>();</div>
+<div class="line"><a name="l00782"></a><span class="lineno">  782</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#af494b48e6d9538b473d2c299b2aa8cea">methods</a> = *t_pTag-&gt;toInt();</div>
+<div class="line"><a name="l00783"></a><span class="lineno">  783</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00784"></a><span class="lineno">  784</span>&#160;    <span class="keywordflow">if</span> (!invs-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a589bc602a07f1f2e5d9b8c7585cd1530">find_tag</a>(t_pStream.data(), <a class="code" href="fiff__constants_8h.html#a3271879db122798d290ee16bf50c72be">FIFF_MNE_SOURCE_ORIENTATION</a>, t_pTag))</div>
 <div class="line"><a name="l00785"></a><span class="lineno">  785</span>&#160;    {</div>
-<div class="line"><a name="l00786"></a><span class="lineno">  786</span>&#160;        printf(<span class="stringliteral">&quot;Modalities not found\n&quot;</span>);</div>
-<div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160;        <span class="keywordflow">if</span>(t_pTag)</div>
-<div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160;            <span class="keyword">delete</span> t_pTag;</div>
-<div class="line"><a name="l00789"></a><span class="lineno">  789</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
-<div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;    }</div>
-<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;</div>
-<div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;    inv = <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a04cfac3beac1c70cf2df93b4ef85565e">MNEInverseOperator</a>();</div>
-<div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#af494b48e6d9538b473d2c299b2aa8cea">methods</a> = *t_pTag-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a88f8094d1f3b876708bd3d5779a30a49">toInt</a>();</div>
-<div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160;    <span class="keywordflow">if</span> (!invs-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a887f9cb482001d8d41f6504ff2f6308d">find_tag</a>(t_pStream, <a class="code" href="fiff__constants_8h.html#a3271879db122798d290ee16bf50c72be">FIFF_MNE_SOURCE_ORIENTATION</a>, t_pTag))</div>
-<div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160;    {</div>
-<div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160;        printf(<span class="stringliteral">&quot;Source orientation constraints not found\n&quot;</span>);</div>
-<div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160;        <span class="keywordflow">if</span>(t_pTag)</div>
-<div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;            <span class="keyword">delete</span> t_pTag;</div>
-<div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
-<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
+<div class="line"><a name="l00786"></a><span class="lineno">  786</span>&#160;        printf(<span class="stringliteral">&quot;Source orientation constraints not found\n&quot;</span>);</div>
+<div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160;    }</div>
+<div class="line"><a name="l00789"></a><span class="lineno">  789</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ad9be3e35de623862f76a69aa5f3bfbf2">source_ori</a> = *t_pTag-&gt;toInt();</div>
+<div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;    <span class="keywordflow">if</span> (!invs-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a589bc602a07f1f2e5d9b8c7585cd1530">find_tag</a>(t_pStream.data(), <a class="code" href="fiff__constants_8h.html#a95d9fd959918262db89fc80cbc6023f1">FIFF_MNE_SOURCE_SPACE_NPOINTS</a>, t_pTag))</div>
+<div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;    {</div>
+<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;        printf(<span class="stringliteral">&quot;Number of sources not found\n&quot;</span>);</div>
+<div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;    }</div>
+<div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a46e0b1b46763a8b6f90158af33f2b119">nsource</a> = *t_pTag-&gt;toInt();</div>
+<div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a5ab16a16ee9efc33692ffdf90d126b1d">nchan</a>   = 0;</div>
+<div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160;    <span class="comment">//   Coordinate frame</span></div>
+<div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;    <span class="keywordflow">if</span> (!invs-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a589bc602a07f1f2e5d9b8c7585cd1530">find_tag</a>(t_pStream.data(), <a class="code" href="fiff__constants_8h.html#a2ab63fa8acb70b4809ec6fa4944b7bc2">FIFF_MNE_COORD_FRAME</a>, t_pTag))</div>
+<div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160;    {</div>
+<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;        printf(<span class="stringliteral">&quot;Coordinate frame tag not found\n&quot;</span>);</div>
 <div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;    }</div>
-<div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ad9be3e35de623862f76a69aa5f3bfbf2">source_ori</a> = *t_pTag-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a88f8094d1f3b876708bd3d5779a30a49">toInt</a>();</div>
+<div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a2e42af80e3698692e08313cf591bce52">coord_frame</a> = *t_pTag-&gt;toInt();</div>
 <div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160;    <span class="keywordflow">if</span> (!invs-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a887f9cb482001d8d41f6504ff2f6308d">find_tag</a>(t_pStream, <a class="code" href="fiff__constants_8h.html#a95d9fd959918262db89fc80cbc6023f1">FIFF_MNE_SOURCE_SPACE_NPOINTS</a>, t_pTag))</div>
-<div class="line"><a name="l00809"></a><span class="lineno">  809</span>&#160;    {</div>
-<div class="line"><a name="l00810"></a><span class="lineno">  810</span>&#160;        printf(<span class="stringliteral">&quot;Number of sources not found\n&quot;</span>);</div>
-<div class="line"><a name="l00811"></a><span class="lineno">  811</span>&#160;        <span class="keywordflow">if</span>(t_pTag)</div>
-<div class="line"><a name="l00812"></a><span class="lineno">  812</span>&#160;            <span class="keyword">delete</span> t_pTag;</div>
-<div class="line"><a name="l00813"></a><span class="lineno">  813</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
-<div class="line"><a name="l00814"></a><span class="lineno">  814</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00815"></a><span class="lineno">  815</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00816"></a><span class="lineno">  816</span>&#160;    }</div>
-<div class="line"><a name="l00817"></a><span class="lineno">  817</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a46e0b1b46763a8b6f90158af33f2b119">nsource</a> = *t_pTag-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a88f8094d1f3b876708bd3d5779a30a49">toInt</a>();</div>
-<div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a5ab16a16ee9efc33692ffdf90d126b1d">nchan</a>   = 0;</div>
-<div class="line"><a name="l00819"></a><span class="lineno">  819</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00820"></a><span class="lineno">  820</span>&#160;    <span class="comment">//   Coordinate frame</span></div>
-<div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;    <span class="keywordflow">if</span> (!invs-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a887f9cb482001d8d41f6504ff2f6308d">find_tag</a>(t_pStream, <a class="code" href="fiff__constants_8h.html#a2ab63fa8acb70b4809ec6fa4944b7bc2">FIFF_MNE_COORD_FRAME</a>, t_pTag))</div>
-<div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;    {</div>
-<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;        printf(<span class="stringliteral">&quot;Coordinate frame tag not found\n&quot;</span>);</div>
-<div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160;        <span class="keywordflow">if</span>(t_pTag)</div>
-<div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160;            <span class="keyword">delete</span> t_pTag;</div>
-<div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
-<div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
+<div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160;    <span class="comment">//   The actual source orientation vectors</span></div>
+<div class="line"><a name="l00809"></a><span class="lineno">  809</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00810"></a><span class="lineno">  810</span>&#160;    <span class="keywordflow">if</span> (!invs-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a589bc602a07f1f2e5d9b8c7585cd1530">find_tag</a>(t_pStream.data(), <a class="code" href="fiff__constants_8h.html#a23b3b0968c7ae392a2e50561dcf81090">FIFF_MNE_INVERSE_SOURCE_ORIENTATIONS</a>, t_pTag))</div>
+<div class="line"><a name="l00811"></a><span class="lineno">  811</span>&#160;    {</div>
+<div class="line"><a name="l00812"></a><span class="lineno">  812</span>&#160;        printf(<span class="stringliteral">&quot;Source orientation information not found\n&quot;</span>);</div>
+<div class="line"><a name="l00813"></a><span class="lineno">  813</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00814"></a><span class="lineno">  814</span>&#160;    }</div>
+<div class="line"><a name="l00815"></a><span class="lineno">  815</span>&#160;</div>
+<div class="line"><a name="l00816"></a><span class="lineno">  816</span>&#160;<span class="comment">//    if(inv.source_nn)</span></div>
+<div class="line"><a name="l00817"></a><span class="lineno">  817</span>&#160;<span class="comment">//        delete inv.source_nn;</span></div>
+<div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a92edf496bf03e0fb6ce35818ab472a4a">source_nn</a> = t_pTag-&gt;toFloatMatrix();</div>
+<div class="line"><a name="l00819"></a><span class="lineno">  819</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a92edf496bf03e0fb6ce35818ab472a4a">source_nn</a>.transposeInPlace();</div>
+<div class="line"><a name="l00820"></a><span class="lineno">  820</span>&#160;</div>
+<div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;    printf(<span class="stringliteral">&quot;[done]\n&quot;</span>);</div>
+<div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;    <span class="comment">//   The SVD decomposition...</span></div>
+<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160;    printf(<span class="stringliteral">&quot;\tReading inverse operator decomposition...&quot;</span>);</div>
+<div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160;    <span class="keywordflow">if</span> (!invs-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a589bc602a07f1f2e5d9b8c7585cd1530">find_tag</a>(t_pStream.data(), <a class="code" href="fiff__constants_8h.html#acf9c57d8b406b1ac21f08664ddff0e08">FIFF_MNE_INVERSE_SING</a>, t_pTag))</div>
+<div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;    {</div>
+<div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160;        printf(<span class="stringliteral">&quot;Singular values not found\n&quot;</span>);</div>
 <div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00830"></a><span class="lineno">  830</span>&#160;    }</div>
-<div class="line"><a name="l00831"></a><span class="lineno">  831</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a2e42af80e3698692e08313cf591bce52">coord_frame</a> = *t_pTag-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a88f8094d1f3b876708bd3d5779a30a49">toInt</a>();</div>
-<div class="line"><a name="l00832"></a><span class="lineno">  832</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00833"></a><span class="lineno">  833</span>&#160;    <span class="comment">//   The actual source orientation vectors</span></div>
-<div class="line"><a name="l00834"></a><span class="lineno">  834</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00835"></a><span class="lineno">  835</span>&#160;    <span class="keywordflow">if</span> (!invs-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a887f9cb482001d8d41f6504ff2f6308d">find_tag</a>(t_pStream, <a class="code" href="fiff__constants_8h.html#a23b3b0968c7ae392a2e50561dcf81090">FIFF_MNE_INVERSE_SOURCE_ORIENTATIONS</a>, t_pTag))</div>
-<div class="line"><a name="l00836"></a><span class="lineno">  836</span>&#160;    {</div>
-<div class="line"><a name="l00837"></a><span class="lineno">  837</span>&#160;        printf(<span class="stringliteral">&quot;Source orientation information not found\n&quot;</span>);</div>
-<div class="line"><a name="l00838"></a><span class="lineno">  838</span>&#160;        <span class="keywordflow">if</span>(t_pTag)</div>
-<div class="line"><a name="l00839"></a><span class="lineno">  839</span>&#160;            <span class="keyword">delete</span> t_pTag;</div>
-<div class="line"><a name="l00840"></a><span class="lineno">  840</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
-<div class="line"><a name="l00841"></a><span class="lineno">  841</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00842"></a><span class="lineno">  842</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00843"></a><span class="lineno">  843</span>&#160;    }</div>
-<div class="line"><a name="l00844"></a><span class="lineno">  844</span>&#160;</div>
-<div class="line"><a name="l00845"></a><span class="lineno">  845</span>&#160;<span class="comment">//    if(inv.source_nn)</span></div>
-<div class="line"><a name="l00846"></a><span class="lineno">  846</span>&#160;<span class="comment">//        delete inv.source_nn;</span></div>
-<div class="line"><a name="l00847"></a><span class="lineno">  847</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a92edf496bf03e0fb6ce35818ab472a4a">source_nn</a> = t_pTag-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a0737ad664a5a324795492a5b388e4a90">toFloatMatrix</a>();</div>
-<div class="line"><a name="l00848"></a><span class="lineno">  848</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a92edf496bf03e0fb6ce35818ab472a4a">source_nn</a>.transposeInPlace();</div>
-<div class="line"><a name="l00849"></a><span class="lineno">  849</span>&#160;</div>
-<div class="line"><a name="l00850"></a><span class="lineno">  850</span>&#160;    printf(<span class="stringliteral">&quot;[done]\n&quot;</span>);</div>
+<div class="line"><a name="l00831"></a><span class="lineno">  831</span>&#160;</div>
+<div class="line"><a name="l00832"></a><span class="lineno">  832</span>&#160;<span class="comment">//    if(inv.sing)</span></div>
+<div class="line"><a name="l00833"></a><span class="lineno">  833</span>&#160;<span class="comment">//        delete inv.sing;</span></div>
+<div class="line"><a name="l00834"></a><span class="lineno">  834</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#aeed4a8ce7ef123affc36f686c517ccb2">sing</a> = Map&lt;VectorXf&gt;(t_pTag-&gt;toFloat(), t_pTag-&gt;size()/4).cast&lt;double&gt;();</div>
+<div class="line"><a name="l00835"></a><span class="lineno">  835</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a5ab16a16ee9efc33692ffdf90d126b1d">nchan</a> = inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#aeed4a8ce7ef123affc36f686c517ccb2">sing</a>.rows();</div>
+<div class="line"><a name="l00836"></a><span class="lineno">  836</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00837"></a><span class="lineno">  837</span>&#160;    <span class="comment">//   The eigenleads and eigenfields</span></div>
+<div class="line"><a name="l00838"></a><span class="lineno">  838</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00839"></a><span class="lineno">  839</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a5d27190215db612df4141865f4340e07">eigen_leads_weighted</a> = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00840"></a><span class="lineno">  840</span>&#160;    <span class="keywordflow">if</span>(!t_pStream-&gt;read_named_matrix(*invs, <a class="code" href="fiff__constants_8h.html#a0b7cf8c987b2f44ee394b4b28ad90403">FIFF_MNE_INVERSE_LEADS</a>, *inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a2dc0c2da948869c91bb9d5ecf96a94ca">eigen_leads</a>.data()))</div>
+<div class="line"><a name="l00841"></a><span class="lineno">  841</span>&#160;    {</div>
+<div class="line"><a name="l00842"></a><span class="lineno">  842</span>&#160;        inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a5d27190215db612df4141865f4340e07">eigen_leads_weighted</a> = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00843"></a><span class="lineno">  843</span>&#160;        <span class="keywordflow">if</span>(!t_pStream-&gt;read_named_matrix(*invs, <a class="code" href="fiff__constants_8h.html#a818ac5cd521c8282f075147b14395be5">FIFF_MNE_INVERSE_LEADS_WEIGHTED</a>, *inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a2dc0c2da948869c91bb9d5ecf96a94ca">eigen_leads</a>.data()))</div>
+<div class="line"><a name="l00844"></a><span class="lineno">  844</span>&#160;        {</div>
+<div class="line"><a name="l00845"></a><span class="lineno">  845</span>&#160;            printf(<span class="stringliteral">&quot;Error reading eigenleads named matrix.\n&quot;</span>);</div>
+<div class="line"><a name="l00846"></a><span class="lineno">  846</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00847"></a><span class="lineno">  847</span>&#160;        }</div>
+<div class="line"><a name="l00848"></a><span class="lineno">  848</span>&#160;    }</div>
+<div class="line"><a name="l00849"></a><span class="lineno">  849</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00850"></a><span class="lineno">  850</span>&#160;    <span class="comment">//   Having the eigenleads as columns is better for the inverse calculations</span></div>
 <div class="line"><a name="l00851"></a><span class="lineno">  851</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00852"></a><span class="lineno">  852</span>&#160;    <span class="comment">//   The SVD decomposition...</span></div>
-<div class="line"><a name="l00853"></a><span class="lineno">  853</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00854"></a><span class="lineno">  854</span>&#160;    printf(<span class="stringliteral">&quot;\tReading inverse operator decomposition...&quot;</span>);</div>
-<div class="line"><a name="l00855"></a><span class="lineno">  855</span>&#160;    <span class="keywordflow">if</span> (!invs-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a887f9cb482001d8d41f6504ff2f6308d">find_tag</a>(t_pStream, <a class="code" href="fiff__constants_8h.html#acf9c57d8b406b1ac21f08664ddff0e08">FIFF_MNE_INVERSE_SING</a>, t_pTag))</div>
-<div class="line"><a name="l00856"></a><span class="lineno">  856</span>&#160;    {</div>
-<div class="line"><a name="l00857"></a><span class="lineno">  857</span>&#160;        printf(<span class="stringliteral">&quot;Singular values not found\n&quot;</span>);</div>
-<div class="line"><a name="l00858"></a><span class="lineno">  858</span>&#160;        <span class="keywordflow">if</span>(t_pTag)</div>
-<div class="line"><a name="l00859"></a><span class="lineno">  859</span>&#160;            <span class="keyword">delete</span> t_pTag;</div>
-<div class="line"><a name="l00860"></a><span class="lineno">  860</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
-<div class="line"><a name="l00861"></a><span class="lineno">  861</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00862"></a><span class="lineno">  862</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00863"></a><span class="lineno">  863</span>&#160;    }</div>
-<div class="line"><a name="l00864"></a><span class="lineno">  864</span>&#160;</div>
-<div class="line"><a name="l00865"></a><span class="lineno">  865</span>&#160;<span class="comment">//    if(inv.sing)</span></div>
-<div class="line"><a name="l00866"></a><span class="lineno">  866</span>&#160;<span class="comment">//        delete inv.sing;</span></div>
-<div class="line"><a name="l00867"></a><span class="lineno">  867</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#aeed4a8ce7ef123affc36f686c517ccb2">sing</a> = Map&lt;VectorXf&gt;(t_pTag-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#aa36b1845c6f83d65fb73f60205c02849">toFloat</a>(), t_pTag-&gt;size()/4).cast&lt;double&gt;();</div>
-<div class="line"><a name="l00868"></a><span class="lineno">  868</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a5ab16a16ee9efc33692ffdf90d126b1d">nchan</a> = inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#aeed4a8ce7ef123affc36f686c517ccb2">sing</a>.rows();</div>
-<div class="line"><a name="l00869"></a><span class="lineno">  869</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00870"></a><span class="lineno">  870</span>&#160;    <span class="comment">//   The eigenleads and eigenfields</span></div>
-<div class="line"><a name="l00871"></a><span class="lineno">  871</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00872"></a><span class="lineno">  872</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a5d27190215db612df4141865f4340e07">eigen_leads_weighted</a> = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00873"></a><span class="lineno">  873</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff.html#acf2ac5f58740a306ff182e285829a421">Fiff::read_named_matrix</a>(t_pStream, *invs, <a class="code" href="fiff__constants_8h.html#a0b7cf8c987b2f44ee394b4b28ad90403">FIFF_MNE_INVERSE_LEADS</a>, *inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a2dc0c2da948869c91bb9d5ecf96a94ca">eigen_leads</a>.data()))</div>
+<div class="line"><a name="l00852"></a><span class="lineno">  852</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a2dc0c2da948869c91bb9d5ecf96a94ca">eigen_leads</a>-&gt;transpose_named_matrix();</div>
+<div class="line"><a name="l00853"></a><span class="lineno">  853</span>&#160;</div>
+<div class="line"><a name="l00854"></a><span class="lineno">  854</span>&#160;    <span class="keywordflow">if</span>(!t_pStream-&gt;read_named_matrix(*invs, <a class="code" href="fiff__constants_8h.html#a07b44259f38a66719104e562dc823030">FIFF_MNE_INVERSE_FIELDS</a>, *inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#afb102fbfd585dede44d1bf1c0069ad9a">eigen_fields</a>.data()))</div>
+<div class="line"><a name="l00855"></a><span class="lineno">  855</span>&#160;    {</div>
+<div class="line"><a name="l00856"></a><span class="lineno">  856</span>&#160;        printf(<span class="stringliteral">&quot;Error reading eigenfields named matrix.\n&quot;</span>);</div>
+<div class="line"><a name="l00857"></a><span class="lineno">  857</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00858"></a><span class="lineno">  858</span>&#160;    }</div>
+<div class="line"><a name="l00859"></a><span class="lineno">  859</span>&#160;    printf(<span class="stringliteral">&quot;[done]\n&quot;</span>);</div>
+<div class="line"><a name="l00860"></a><span class="lineno">  860</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00861"></a><span class="lineno">  861</span>&#160;    <span class="comment">//   Read the covariance matrices</span></div>
+<div class="line"><a name="l00862"></a><span class="lineno">  862</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00863"></a><span class="lineno">  863</span>&#160;    <span class="keywordflow">if</span>(t_pStream-&gt;read_cov(*invs, <a class="code" href="fiff__constants_8h.html#a6911436eca83244fc1682319df22a967">FIFFV_MNE_NOISE_COV</a>, *inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#aa5f2736974ee16605666442bf5cac1c8">noise_cov</a>.data()))</div>
+<div class="line"><a name="l00864"></a><span class="lineno">  864</span>&#160;    {</div>
+<div class="line"><a name="l00865"></a><span class="lineno">  865</span>&#160;        printf(<span class="stringliteral">&quot;\tNoise covariance matrix read.\n&quot;</span>);</div>
+<div class="line"><a name="l00866"></a><span class="lineno">  866</span>&#160;    }</div>
+<div class="line"><a name="l00867"></a><span class="lineno">  867</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00868"></a><span class="lineno">  868</span>&#160;    {</div>
+<div class="line"><a name="l00869"></a><span class="lineno">  869</span>&#160;        printf(<span class="stringliteral">&quot;\tError: Not able to read noise covariance matrix.\n&quot;</span>);</div>
+<div class="line"><a name="l00870"></a><span class="lineno">  870</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00871"></a><span class="lineno">  871</span>&#160;    }</div>
+<div class="line"><a name="l00872"></a><span class="lineno">  872</span>&#160;</div>
+<div class="line"><a name="l00873"></a><span class="lineno">  873</span>&#160;    <span class="keywordflow">if</span>(t_pStream-&gt;read_cov(*invs, FIFFV_MNE_SOURCE_COV, *inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a87a4f07a98479a04650f09d82ca48c51">source_cov</a>.data()))</div>
 <div class="line"><a name="l00874"></a><span class="lineno">  874</span>&#160;    {</div>
-<div class="line"><a name="l00875"></a><span class="lineno">  875</span>&#160;        inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a5d27190215db612df4141865f4340e07">eigen_leads_weighted</a> = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00876"></a><span class="lineno">  876</span>&#160;        <span class="keywordflow">if</span>(!<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff.html#acf2ac5f58740a306ff182e285829a421">Fiff::read_named_matrix</a>(t_pStream, *invs, <a class="code" href="fiff__constants_8h.html#a818ac5cd521c8282f075147b14395be5">FIFF_MNE_INVERSE_LEADS_WEIGHTED</a>, *inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a2dc0c2da948869c91bb9d5ecf96a94ca">eigen_leads</a>.data()))</div>
-<div class="line"><a name="l00877"></a><span class="lineno">  877</span>&#160;        {</div>
-<div class="line"><a name="l00878"></a><span class="lineno">  878</span>&#160;            printf(<span class="stringliteral">&quot;Error reading eigenleads named matrix.\n&quot;</span>);</div>
-<div class="line"><a name="l00879"></a><span class="lineno">  879</span>&#160;            <span class="keywordflow">if</span>(t_pTag)</div>
-<div class="line"><a name="l00880"></a><span class="lineno">  880</span>&#160;                <span class="keyword">delete</span> t_pTag;</div>
-<div class="line"><a name="l00881"></a><span class="lineno">  881</span>&#160;            <span class="keywordflow">if</span>(t_pStream)</div>
-<div class="line"><a name="l00882"></a><span class="lineno">  882</span>&#160;                <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00883"></a><span class="lineno">  883</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00884"></a><span class="lineno">  884</span>&#160;        }</div>
-<div class="line"><a name="l00885"></a><span class="lineno">  885</span>&#160;    }</div>
-<div class="line"><a name="l00886"></a><span class="lineno">  886</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00887"></a><span class="lineno">  887</span>&#160;    <span class="comment">//   Having the eigenleads as columns is better for the inverse calculations</span></div>
-<div class="line"><a name="l00888"></a><span class="lineno">  888</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00889"></a><span class="lineno">  889</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a2dc0c2da948869c91bb9d5ecf96a94ca">eigen_leads</a>-&gt;transpose_named_matrix();</div>
-<div class="line"><a name="l00890"></a><span class="lineno">  890</span>&#160;</div>
+<div class="line"><a name="l00875"></a><span class="lineno">  875</span>&#160;        printf(<span class="stringliteral">&quot;\tSource covariance matrix read.\n&quot;</span>);</div>
+<div class="line"><a name="l00876"></a><span class="lineno">  876</span>&#160;    }</div>
+<div class="line"><a name="l00877"></a><span class="lineno">  877</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00878"></a><span class="lineno">  878</span>&#160;    {</div>
+<div class="line"><a name="l00879"></a><span class="lineno">  879</span>&#160;        printf(<span class="stringliteral">&quot;\tError: Not able to read source covariance matrix.\n&quot;</span>);</div>
+<div class="line"><a name="l00880"></a><span class="lineno">  880</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00881"></a><span class="lineno">  881</span>&#160;    }</div>
+<div class="line"><a name="l00882"></a><span class="lineno">  882</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00883"></a><span class="lineno">  883</span>&#160;    <span class="comment">//   Read the various priors</span></div>
+<div class="line"><a name="l00884"></a><span class="lineno">  884</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00885"></a><span class="lineno">  885</span>&#160;    <span class="keywordflow">if</span>(t_pStream-&gt;read_cov(*invs, <a class="code" href="fiff__constants_8h.html#ae62c2adb55799c9d615060b58f7043a3">FIFFV_MNE_ORIENT_PRIOR_COV</a>, *inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a475310abba23a952aa535f6ee140328a">orient_prior</a>.data()))</div>
+<div class="line"><a name="l00886"></a><span class="lineno">  886</span>&#160;    {</div>
+<div class="line"><a name="l00887"></a><span class="lineno">  887</span>&#160;        printf(<span class="stringliteral">&quot;\tOrientation priors read.\n&quot;</span>);</div>
+<div class="line"><a name="l00888"></a><span class="lineno">  888</span>&#160;    }</div>
+<div class="line"><a name="l00889"></a><span class="lineno">  889</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00890"></a><span class="lineno">  890</span>&#160;        inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a475310abba23a952aa535f6ee140328a">orient_prior</a>-&gt;clear();</div>
 <div class="line"><a name="l00891"></a><span class="lineno">  891</span>&#160;</div>
-<div class="line"><a name="l00892"></a><span class="lineno">  892</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff.html#acf2ac5f58740a306ff182e285829a421">Fiff::read_named_matrix</a>(t_pStream, *invs, <a class="code" href="fiff__constants_8h.html#a07b44259f38a66719104e562dc823030">FIFF_MNE_INVERSE_FIELDS</a>, *inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#afb102fbfd585dede44d1bf1c0069ad9a">eigen_fields</a>.data()))</div>
+<div class="line"><a name="l00892"></a><span class="lineno">  892</span>&#160;    <span class="keywordflow">if</span>(t_pStream-&gt;read_cov(*invs, <a class="code" href="fiff__constants_8h.html#af3eb09a421703c3f071c2a03a073c743">FIFFV_MNE_DEPTH_PRIOR_COV</a>, *inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a97d5c5ce56758fea2d9928cd32d5af81">depth_prior</a>.data()))</div>
 <div class="line"><a name="l00893"></a><span class="lineno">  893</span>&#160;    {</div>
-<div class="line"><a name="l00894"></a><span class="lineno">  894</span>&#160;        printf(<span class="stringliteral">&quot;Error reading eigenfields named matrix.\n&quot;</span>);</div>
-<div class="line"><a name="l00895"></a><span class="lineno">  895</span>&#160;        <span class="keywordflow">if</span>(t_pTag)</div>
-<div class="line"><a name="l00896"></a><span class="lineno">  896</span>&#160;            <span class="keyword">delete</span> t_pTag;</div>
-<div class="line"><a name="l00897"></a><span class="lineno">  897</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
-<div class="line"><a name="l00898"></a><span class="lineno">  898</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00899"></a><span class="lineno">  899</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00900"></a><span class="lineno">  900</span>&#160;    }</div>
-<div class="line"><a name="l00901"></a><span class="lineno">  901</span>&#160;    printf(<span class="stringliteral">&quot;[done]\n&quot;</span>);</div>
-<div class="line"><a name="l00902"></a><span class="lineno">  902</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00903"></a><span class="lineno">  903</span>&#160;    <span class="comment">//   Read the covariance matrices</span></div>
-<div class="line"><a name="l00904"></a><span class="lineno">  904</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00905"></a><span class="lineno">  905</span>&#160;    <span class="keywordflow">if</span>(t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a1e0d80049ea5ff4b65629db24d27f8c1">read_cov</a>(*invs, <a class="code" href="fiff__constants_8h.html#a6911436eca83244fc1682319df22a967">FIFFV_MNE_NOISE_COV</a>, *inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#aa5f2736974ee16605666442bf5cac1c8">noise_cov</a>.data()))</div>
-<div class="line"><a name="l00906"></a><span class="lineno">  906</span>&#160;    {</div>
-<div class="line"><a name="l00907"></a><span class="lineno">  907</span>&#160;        printf(<span class="stringliteral">&quot;\tNoise covariance matrix read.\n&quot;</span>);</div>
-<div class="line"><a name="l00908"></a><span class="lineno">  908</span>&#160;    }</div>
-<div class="line"><a name="l00909"></a><span class="lineno">  909</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00910"></a><span class="lineno">  910</span>&#160;    {</div>
-<div class="line"><a name="l00911"></a><span class="lineno">  911</span>&#160;        printf(<span class="stringliteral">&quot;\tError: Not able to read noise covariance matrix.\n&quot;</span>);</div>
-<div class="line"><a name="l00912"></a><span class="lineno">  912</span>&#160;        <span class="keywordflow">if</span>(t_pTag)</div>
-<div class="line"><a name="l00913"></a><span class="lineno">  913</span>&#160;            <span class="keyword">delete</span> t_pTag;</div>
-<div class="line"><a name="l00914"></a><span class="lineno">  914</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
-<div class="line"><a name="l00915"></a><span class="lineno">  915</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00916"></a><span class="lineno">  916</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00917"></a><span class="lineno">  917</span>&#160;    }</div>
-<div class="line"><a name="l00918"></a><span class="lineno">  918</span>&#160;</div>
-<div class="line"><a name="l00919"></a><span class="lineno">  919</span>&#160;    <span class="keywordflow">if</span>(t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a1e0d80049ea5ff4b65629db24d27f8c1">read_cov</a>(*invs, FIFFV_MNE_SOURCE_COV, *inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a87a4f07a98479a04650f09d82ca48c51">source_cov</a>.data()))</div>
-<div class="line"><a name="l00920"></a><span class="lineno">  920</span>&#160;    {</div>
-<div class="line"><a name="l00921"></a><span class="lineno">  921</span>&#160;        printf(<span class="stringliteral">&quot;\tSource covariance matrix read.\n&quot;</span>);</div>
-<div class="line"><a name="l00922"></a><span class="lineno">  922</span>&#160;    }</div>
-<div class="line"><a name="l00923"></a><span class="lineno">  923</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00924"></a><span class="lineno">  924</span>&#160;    {</div>
-<div class="line"><a name="l00925"></a><span class="lineno">  925</span>&#160;        printf(<span class="stringliteral">&quot;\tError: Not able to read source covariance matrix.\n&quot;</span>);</div>
-<div class="line"><a name="l00926"></a><span class="lineno">  926</span>&#160;        <span class="keywordflow">if</span>(t_pTag)</div>
-<div class="line"><a name="l00927"></a><span class="lineno">  927</span>&#160;            <span class="keyword">delete</span> t_pTag;</div>
-<div class="line"><a name="l00928"></a><span class="lineno">  928</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
-<div class="line"><a name="l00929"></a><span class="lineno">  929</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00930"></a><span class="lineno">  930</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00931"></a><span class="lineno">  931</span>&#160;    }</div>
-<div class="line"><a name="l00932"></a><span class="lineno">  932</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00933"></a><span class="lineno">  933</span>&#160;    <span class="comment">//   Read the various priors</span></div>
-<div class="line"><a name="l00934"></a><span class="lineno">  934</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00935"></a><span class="lineno">  935</span>&#160;    <span class="keywordflow">if</span>(t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a1e0d80049ea5ff4b65629db24d27f8c1">read_cov</a>(*invs, <a class="code" href="fiff__constants_8h.html#ae62c2adb55799c9d615060b58f7043a3">FIFFV_MNE_ORIENT_PRIOR_COV</a>, *inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a475310abba23a952aa535f6ee140328a">orient_prior</a>.data()))</div>
-<div class="line"><a name="l00936"></a><span class="lineno">  936</span>&#160;    {</div>
-<div class="line"><a name="l00937"></a><span class="lineno">  937</span>&#160;        printf(<span class="stringliteral">&quot;\tOrientation priors read.\n&quot;</span>);</div>
-<div class="line"><a name="l00938"></a><span class="lineno">  938</span>&#160;    }</div>
-<div class="line"><a name="l00939"></a><span class="lineno">  939</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00940"></a><span class="lineno">  940</span>&#160;        inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a475310abba23a952aa535f6ee140328a">orient_prior</a>-&gt;clear();</div>
-<div class="line"><a name="l00941"></a><span class="lineno">  941</span>&#160;</div>
-<div class="line"><a name="l00942"></a><span class="lineno">  942</span>&#160;    <span class="keywordflow">if</span>(t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a1e0d80049ea5ff4b65629db24d27f8c1">read_cov</a>(*invs, <a class="code" href="fiff__constants_8h.html#af3eb09a421703c3f071c2a03a073c743">FIFFV_MNE_DEPTH_PRIOR_COV</a>, *inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a97d5c5ce56758fea2d9928cd32d5af81">depth_prior</a>.data()))</div>
-<div class="line"><a name="l00943"></a><span class="lineno">  943</span>&#160;    {</div>
-<div class="line"><a name="l00944"></a><span class="lineno">  944</span>&#160;        printf(<span class="stringliteral">&quot;\tDepth priors read.\n&quot;</span>);</div>
-<div class="line"><a name="l00945"></a><span class="lineno">  945</span>&#160;    }</div>
-<div class="line"><a name="l00946"></a><span class="lineno">  946</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00947"></a><span class="lineno">  947</span>&#160;    {</div>
-<div class="line"><a name="l00948"></a><span class="lineno">  948</span>&#160;        inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a97d5c5ce56758fea2d9928cd32d5af81">depth_prior</a>-&gt;clear();</div>
-<div class="line"><a name="l00949"></a><span class="lineno">  949</span>&#160;    }</div>
-<div class="line"><a name="l00950"></a><span class="lineno">  950</span>&#160;    <span class="keywordflow">if</span>(t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a1e0d80049ea5ff4b65629db24d27f8c1">read_cov</a>(*invs, FIFFV_MNE_FMRI_PRIOR_COV, *inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#abc92f17dd1d0c054dc9be774f2f3b3a4">fmri_prior</a>.data()))</div>
-<div class="line"><a name="l00951"></a><span class="lineno">  951</span>&#160;    {</div>
-<div class="line"><a name="l00952"></a><span class="lineno">  952</span>&#160;        printf(<span class="stringliteral">&quot;\tfMRI priors read.\n&quot;</span>);</div>
-<div class="line"><a name="l00953"></a><span class="lineno">  953</span>&#160;    }</div>
-<div class="line"><a name="l00954"></a><span class="lineno">  954</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00955"></a><span class="lineno">  955</span>&#160;    {</div>
-<div class="line"><a name="l00956"></a><span class="lineno">  956</span>&#160;        inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#abc92f17dd1d0c054dc9be774f2f3b3a4">fmri_prior</a>-&gt;clear();</div>
-<div class="line"><a name="l00957"></a><span class="lineno">  957</span>&#160;    }</div>
-<div class="line"><a name="l00958"></a><span class="lineno">  958</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00959"></a><span class="lineno">  959</span>&#160;    <span class="comment">//   Read the source spaces</span></div>
-<div class="line"><a name="l00960"></a><span class="lineno">  960</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00961"></a><span class="lineno">  961</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a55956b9f004c9c7aab463afa403c0da7">MNESourceSpace::read_source_spaces</a>(t_pStream, <span class="keyword">false</span>, t_Tree, inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a8074f2dd4963041afbe819487d0e3bd2">src</a>))</div>
-<div class="line"><a name="l00962"></a><span class="lineno">  962</span>&#160;    {</div>
-<div class="line"><a name="l00963"></a><span class="lineno">  963</span>&#160;        printf(<span class="stringliteral">&quot;\tError: Could not read the source spaces.\n&quot;</span>);</div>
-<div class="line"><a name="l00964"></a><span class="lineno">  964</span>&#160;        <span class="keywordflow">if</span>(t_pTag)</div>
-<div class="line"><a name="l00965"></a><span class="lineno">  965</span>&#160;            <span class="keyword">delete</span> t_pTag;</div>
-<div class="line"><a name="l00966"></a><span class="lineno">  966</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
-<div class="line"><a name="l00967"></a><span class="lineno">  967</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00968"></a><span class="lineno">  968</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00969"></a><span class="lineno">  969</span>&#160;    }</div>
-<div class="line"><a name="l00970"></a><span class="lineno">  970</span>&#160;    <span class="keywordflow">for</span> (qint32 k = 0; k &lt; inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a8074f2dd4963041afbe819487d0e3bd2">src</a>.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a506dcb62cbc44957b2e4be9e7e32b429">size</a>(); ++k)</div>
-<div class="line"><a name="l00971"></a><span class="lineno">  971</span>&#160;       inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a8074f2dd4963041afbe819487d0e3bd2">src</a>[k].id = <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a2f8b00c1ed22ac6d76b5bb94771f37ab">MNESourceSpace::find_source_space_hemi</a>(inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a8074f2dd4963041afbe819487d0e3bd2">src</a>[k]);</div>
-<div class="line"><a name="l00972"></a><span class="lineno">  972</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00973"></a><span class="lineno">  973</span>&#160;    <span class="comment">//   Get the MRI &lt;-&gt; head coordinate transformation</span></div>
-<div class="line"><a name="l00974"></a><span class="lineno">  974</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00975"></a><span class="lineno">  975</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="Coordinate transformation description.">FiffCoordTrans</a> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#aee97841ed32c50c581d5495a20aced24">mri_head_t</a>;<span class="comment">// = NULL;</span></div>
-<div class="line"><a name="l00976"></a><span class="lineno">  976</span>&#160;    <span class="keywordflow">if</span> (!parent_mri[0].find_tag(t_pStream, FIFF_COORD_TRANS, t_pTag))</div>
-<div class="line"><a name="l00977"></a><span class="lineno">  977</span>&#160;    {</div>
-<div class="line"><a name="l00978"></a><span class="lineno">  978</span>&#160;        printf(<span class="stringliteral">&quot;MRI/head coordinate transformation not found\n&quot;</span>);</div>
-<div class="line"><a name="l00979"></a><span class="lineno">  979</span>&#160;        <span class="keywordflow">if</span>(t_pTag)</div>
-<div class="line"><a name="l00980"></a><span class="lineno">  980</span>&#160;            <span class="keyword">delete</span> t_pTag;</div>
-<div class="line"><a name="l00981"></a><span class="lineno">  981</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
-<div class="line"><a name="l00982"></a><span class="lineno">  982</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l00983"></a><span class="lineno">  983</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00984"></a><span class="lineno">  984</span>&#160;    }</div>
-<div class="line"><a name="l00985"></a><span class="lineno">  985</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00986"></a><span class="lineno">  986</span>&#160;    {</div>
-<div class="line"><a name="l00987"></a><span class="lineno">  987</span>&#160;        mri_head_t = t_pTag-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a3d48f44d196201ada4eb481677e74632">toCoordTrans</a>();</div>
-<div class="line"><a name="l00988"></a><span class="lineno">  988</span>&#160;        <span class="keywordflow">if</span> (mri_head_t.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ab0cacc34492c4e9842e9de5f59368435">from</a> != FIFFV_COORD_MRI || mri_head_t.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a0d4f29ae5b9affe90e2cfadf922e36f7">to</a> != FIFFV_COORD_HEAD)</div>
-<div class="line"><a name="l00989"></a><span class="lineno">  989</span>&#160;        {</div>
-<div class="line"><a name="l00990"></a><span class="lineno">  990</span>&#160;            mri_head_t.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a4a258913a8b23cb3c05858449ff25370">invert_transform</a>();</div>
-<div class="line"><a name="l00991"></a><span class="lineno">  991</span>&#160;            <span class="keywordflow">if</span> (mri_head_t.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ab0cacc34492c4e9842e9de5f59368435">from</a> != FIFFV_COORD_MRI || mri_head_t.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a0d4f29ae5b9affe90e2cfadf922e36f7">to</a> != FIFFV_COORD_HEAD)</div>
-<div class="line"><a name="l00992"></a><span class="lineno">  992</span>&#160;            {</div>
-<div class="line"><a name="l00993"></a><span class="lineno">  993</span>&#160;                printf(<span class="stringliteral">&quot;MRI/head coordinate transformation not found&quot;</span>);</div>
-<div class="line"><a name="l00994"></a><span class="lineno">  994</span>&#160;<span class="comment">//                if(mri_head_t)</span></div>
-<div class="line"><a name="l00995"></a><span class="lineno">  995</span>&#160;<span class="comment">//                    delete mri_head_t;</span></div>
-<div class="line"><a name="l00996"></a><span class="lineno">  996</span>&#160;                <span class="keywordflow">if</span>(t_pTag)</div>
-<div class="line"><a name="l00997"></a><span class="lineno">  997</span>&#160;                    <span class="keyword">delete</span> t_pTag;</div>
-<div class="line"><a name="l00998"></a><span class="lineno">  998</span>&#160;                <span class="keywordflow">if</span>(t_pStream)</div>
-<div class="line"><a name="l00999"></a><span class="lineno">  999</span>&#160;                    <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l01000"></a><span class="lineno"> 1000</span>&#160;                <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l01001"></a><span class="lineno"> 1001</span>&#160;            }</div>
-<div class="line"><a name="l01002"></a><span class="lineno"> 1002</span>&#160;        }</div>
-<div class="line"><a name="l01003"></a><span class="lineno"> 1003</span>&#160;    }</div>
-<div class="line"><a name="l01004"></a><span class="lineno"> 1004</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#aee97841ed32c50c581d5495a20aced24">mri_head_t</a>  = <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#aee97841ed32c50c581d5495a20aced24">mri_head_t</a>;</div>
+<div class="line"><a name="l00894"></a><span class="lineno">  894</span>&#160;        printf(<span class="stringliteral">&quot;\tDepth priors read.\n&quot;</span>);</div>
+<div class="line"><a name="l00895"></a><span class="lineno">  895</span>&#160;    }</div>
+<div class="line"><a name="l00896"></a><span class="lineno">  896</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00897"></a><span class="lineno">  897</span>&#160;    {</div>
+<div class="line"><a name="l00898"></a><span class="lineno">  898</span>&#160;        inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a97d5c5ce56758fea2d9928cd32d5af81">depth_prior</a>-&gt;clear();</div>
+<div class="line"><a name="l00899"></a><span class="lineno">  899</span>&#160;    }</div>
+<div class="line"><a name="l00900"></a><span class="lineno">  900</span>&#160;    <span class="keywordflow">if</span>(t_pStream-&gt;read_cov(*invs, FIFFV_MNE_FMRI_PRIOR_COV, *inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#abc92f17dd1d0c054dc9be774f2f3b3a4">fmri_prior</a>.data()))</div>
+<div class="line"><a name="l00901"></a><span class="lineno">  901</span>&#160;    {</div>
+<div class="line"><a name="l00902"></a><span class="lineno">  902</span>&#160;        printf(<span class="stringliteral">&quot;\tfMRI priors read.\n&quot;</span>);</div>
+<div class="line"><a name="l00903"></a><span class="lineno">  903</span>&#160;    }</div>
+<div class="line"><a name="l00904"></a><span class="lineno">  904</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00905"></a><span class="lineno">  905</span>&#160;    {</div>
+<div class="line"><a name="l00906"></a><span class="lineno">  906</span>&#160;        inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#abc92f17dd1d0c054dc9be774f2f3b3a4">fmri_prior</a>-&gt;clear();</div>
+<div class="line"><a name="l00907"></a><span class="lineno">  907</span>&#160;    }</div>
+<div class="line"><a name="l00908"></a><span class="lineno">  908</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00909"></a><span class="lineno">  909</span>&#160;    <span class="comment">//   Read the source spaces</span></div>
+<div class="line"><a name="l00910"></a><span class="lineno">  910</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00911"></a><span class="lineno">  911</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a9da28f6120a0f8164824c2a5e693e6cd">MNESourceSpace::readFromStream</a>(t_pStream, <span class="keyword">false</span>, t_Tree, inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a8074f2dd4963041afbe819487d0e3bd2">src</a>))</div>
+<div class="line"><a name="l00912"></a><span class="lineno">  912</span>&#160;    {</div>
+<div class="line"><a name="l00913"></a><span class="lineno">  913</span>&#160;        printf(<span class="stringliteral">&quot;\tError: Could not read the source spaces.\n&quot;</span>);</div>
+<div class="line"><a name="l00914"></a><span class="lineno">  914</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00915"></a><span class="lineno">  915</span>&#160;    }</div>
+<div class="line"><a name="l00916"></a><span class="lineno">  916</span>&#160;    <span class="keywordflow">for</span> (qint32 k = 0; k &lt; inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a8074f2dd4963041afbe819487d0e3bd2">src</a>.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a506dcb62cbc44957b2e4be9e7e32b429">size</a>(); ++k)</div>
+<div class="line"><a name="l00917"></a><span class="lineno">  917</span>&#160;       inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a8074f2dd4963041afbe819487d0e3bd2">src</a>[k].id = <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a2f8b00c1ed22ac6d76b5bb94771f37ab">MNESourceSpace::find_source_space_hemi</a>(inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a8074f2dd4963041afbe819487d0e3bd2">src</a>[k]);</div>
+<div class="line"><a name="l00918"></a><span class="lineno">  918</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00919"></a><span class="lineno">  919</span>&#160;    <span class="comment">//   Get the MRI &lt;-&gt; head coordinate transformation</span></div>
+<div class="line"><a name="l00920"></a><span class="lineno">  920</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00921"></a><span class="lineno">  921</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html" title="Coordinate transformation description.">FiffCoordTrans</a> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#aee97841ed32c50c581d5495a20aced24">mri_head_t</a>;<span class="comment">// = NULL;</span></div>
+<div class="line"><a name="l00922"></a><span class="lineno">  922</span>&#160;    <span class="keywordflow">if</span> (!parent_mri[0].find_tag(t_pStream.data(), FIFF_COORD_TRANS, t_pTag))</div>
+<div class="line"><a name="l00923"></a><span class="lineno">  923</span>&#160;    {</div>
+<div class="line"><a name="l00924"></a><span class="lineno">  924</span>&#160;        printf(<span class="stringliteral">&quot;MRI/head coordinate transformation not found\n&quot;</span>);</div>
+<div class="line"><a name="l00925"></a><span class="lineno">  925</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00926"></a><span class="lineno">  926</span>&#160;    }</div>
+<div class="line"><a name="l00927"></a><span class="lineno">  927</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00928"></a><span class="lineno">  928</span>&#160;    {</div>
+<div class="line"><a name="l00929"></a><span class="lineno">  929</span>&#160;        mri_head_t = t_pTag-&gt;toCoordTrans();</div>
+<div class="line"><a name="l00930"></a><span class="lineno">  930</span>&#160;        <span class="keywordflow">if</span> (mri_head_t.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ab0cacc34492c4e9842e9de5f59368435">from</a> != FIFFV_COORD_MRI || mri_head_t.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a0d4f29ae5b9affe90e2cfadf922e36f7">to</a> != FIFFV_COORD_HEAD)</div>
+<div class="line"><a name="l00931"></a><span class="lineno">  931</span>&#160;        {</div>
+<div class="line"><a name="l00932"></a><span class="lineno">  932</span>&#160;            mri_head_t.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a4a258913a8b23cb3c05858449ff25370">invert_transform</a>();</div>
+<div class="line"><a name="l00933"></a><span class="lineno">  933</span>&#160;            <span class="keywordflow">if</span> (mri_head_t.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#ab0cacc34492c4e9842e9de5f59368435">from</a> != FIFFV_COORD_MRI || mri_head_t.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_coord_trans.html#a0d4f29ae5b9affe90e2cfadf922e36f7">to</a> != FIFFV_COORD_HEAD)</div>
+<div class="line"><a name="l00934"></a><span class="lineno">  934</span>&#160;            {</div>
+<div class="line"><a name="l00935"></a><span class="lineno">  935</span>&#160;                printf(<span class="stringliteral">&quot;MRI/head coordinate transformation not found&quot;</span>);</div>
+<div class="line"><a name="l00936"></a><span class="lineno">  936</span>&#160;<span class="comment">//                if(mri_head_t)</span></div>
+<div class="line"><a name="l00937"></a><span class="lineno">  937</span>&#160;<span class="comment">//                    delete mri_head_t;</span></div>
+<div class="line"><a name="l00938"></a><span class="lineno">  938</span>&#160;                <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00939"></a><span class="lineno">  939</span>&#160;            }</div>
+<div class="line"><a name="l00940"></a><span class="lineno">  940</span>&#160;        }</div>
+<div class="line"><a name="l00941"></a><span class="lineno">  941</span>&#160;    }</div>
+<div class="line"><a name="l00942"></a><span class="lineno">  942</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#aee97841ed32c50c581d5495a20aced24">mri_head_t</a>  = <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#aee97841ed32c50c581d5495a20aced24">mri_head_t</a>;</div>
+<div class="line"><a name="l00943"></a><span class="lineno">  943</span>&#160;</div>
+<div class="line"><a name="l00944"></a><span class="lineno">  944</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00945"></a><span class="lineno">  945</span>&#160;    <span class="comment">// get parent MEG info</span></div>
+<div class="line"><a name="l00946"></a><span class="lineno">  946</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00947"></a><span class="lineno">  947</span>&#160;    t_pStream-&gt;read_meas_info_base(t_Tree, inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ab3a60435927ae1a66709158e609e6fee">info</a>);</div>
+<div class="line"><a name="l00948"></a><span class="lineno">  948</span>&#160;</div>
+<div class="line"><a name="l00949"></a><span class="lineno">  949</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00950"></a><span class="lineno">  950</span>&#160;    <span class="comment">//   Transform the source spaces to the correct coordinate frame</span></div>
+<div class="line"><a name="l00951"></a><span class="lineno">  951</span>&#160;    <span class="comment">//   if necessary</span></div>
+<div class="line"><a name="l00952"></a><span class="lineno">  952</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00953"></a><span class="lineno">  953</span>&#160;    <span class="keywordflow">if</span> (inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a2e42af80e3698692e08313cf591bce52">coord_frame</a> != FIFFV_COORD_MRI &amp;&amp; inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a2e42af80e3698692e08313cf591bce52">coord_frame</a> != FIFFV_COORD_HEAD)</div>
+<div class="line"><a name="l00954"></a><span class="lineno">  954</span>&#160;        printf(<span class="stringliteral">&quot;Only inverse solutions computed in MRI or head coordinates are acceptable&quot;</span>);</div>
+<div class="line"><a name="l00955"></a><span class="lineno">  955</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00956"></a><span class="lineno">  956</span>&#160;    <span class="comment">//  Number of averages is initially one</span></div>
+<div class="line"><a name="l00957"></a><span class="lineno">  957</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00958"></a><span class="lineno">  958</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ac0d085ad6c61c13cca4253fbe13d9a21">nave</a> = 1;</div>
+<div class="line"><a name="l00959"></a><span class="lineno">  959</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00960"></a><span class="lineno">  960</span>&#160;    <span class="comment">//  We also need the SSP operator</span></div>
+<div class="line"><a name="l00961"></a><span class="lineno">  961</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00962"></a><span class="lineno">  962</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a6d8463b551857f34c8426ea5d76c228a">projs</a>     = t_pStream-&gt;read_proj(t_Tree);</div>
+<div class="line"><a name="l00963"></a><span class="lineno">  963</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00964"></a><span class="lineno">  964</span>&#160;    <span class="comment">//  Some empty fields to be filled in later</span></div>
+<div class="line"><a name="l00965"></a><span class="lineno">  965</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00966"></a><span class="lineno">  966</span>&#160;<span class="comment">//        inv.proj      = [];      %   This is the projector to apply to the data</span></div>
+<div class="line"><a name="l00967"></a><span class="lineno">  967</span>&#160;<span class="comment">//        inv.whitener  = [];      %   This whitens the data</span></div>
+<div class="line"><a name="l00968"></a><span class="lineno">  968</span>&#160;<span class="comment">//        inv.reginv    = [];      %   This the diagonal matrix implementing</span></div>
+<div class="line"><a name="l00969"></a><span class="lineno">  969</span>&#160;<span class="comment">//                                 %   regularization and the inverse</span></div>
+<div class="line"><a name="l00970"></a><span class="lineno">  970</span>&#160;<span class="comment">//        inv.noisenorm = [];      %   These are the noise-normalization factors</span></div>
+<div class="line"><a name="l00971"></a><span class="lineno">  971</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00972"></a><span class="lineno">  972</span>&#160;    <span class="keywordflow">if</span>(!inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a8074f2dd4963041afbe819487d0e3bd2">src</a>.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a38654bb9875091c2cb5a04e2531653d7">transform_source_space_to</a>(inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a2e42af80e3698692e08313cf591bce52">coord_frame</a>, mri_head_t))</div>
+<div class="line"><a name="l00973"></a><span class="lineno">  973</span>&#160;    {</div>
+<div class="line"><a name="l00974"></a><span class="lineno">  974</span>&#160;        printf(<span class="stringliteral">&quot;Could not transform source space.\n&quot;</span>);</div>
+<div class="line"><a name="l00975"></a><span class="lineno">  975</span>&#160;    }</div>
+<div class="line"><a name="l00976"></a><span class="lineno">  976</span>&#160;    printf(<span class="stringliteral">&quot;\tSource spaces transformed to the inverse solution coordinate frame\n&quot;</span>);</div>
+<div class="line"><a name="l00977"></a><span class="lineno">  977</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00978"></a><span class="lineno">  978</span>&#160;    <span class="comment">//   Done!</span></div>
+<div class="line"><a name="l00979"></a><span class="lineno">  979</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00980"></a><span class="lineno">  980</span>&#160;</div>
+<div class="line"><a name="l00981"></a><span class="lineno">  981</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00982"></a><span class="lineno">  982</span>&#160;}</div>
+<div class="line"><a name="l00983"></a><span class="lineno">  983</span>&#160;</div>
+<div class="line"><a name="l00984"></a><span class="lineno">  984</span>&#160;</div>
+<div class="line"><a name="l00985"></a><span class="lineno">  985</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00986"></a><span class="lineno">  986</span>&#160;</div>
+<div class="line"><a name="l00987"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ab0622588294dd34c9bcb12215f7b2bce">  987</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ab0622588294dd34c9bcb12215f7b2bce">MNEInverseOperator::write</a>(QIODevice &amp;p_IODevice)</div>
+<div class="line"><a name="l00988"></a><span class="lineno">  988</span>&#160;{</div>
+<div class="line"><a name="l00989"></a><span class="lineno">  989</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00990"></a><span class="lineno">  990</span>&#160;    <span class="comment">//   Open the file, create directory</span></div>
+<div class="line"><a name="l00991"></a><span class="lineno">  991</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00992"></a><span class="lineno">  992</span>&#160;</div>
+<div class="line"><a name="l00993"></a><span class="lineno">  993</span>&#160;    <span class="comment">// Create the file and save the essentials</span></div>
+<div class="line"><a name="l00994"></a><span class="lineno">  994</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#afc5bb6ae857cf5e93e4e0271bf0bee05">FiffStream::SPtr</a> t_pStream = <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#ad09867f1fa24c662b66f2a4789ba5782">FiffStream::start_file</a>(p_IODevice);</div>
+<div class="line"><a name="l00995"></a><span class="lineno">  995</span>&#160;    printf(<span class="stringliteral">&quot;Write inverse operator decomposition in %s...&quot;</span>, t_pStream-&gt;streamName().toUtf8().constData());</div>
+<div class="line"><a name="l00996"></a><span class="lineno">  996</span>&#160;    this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a0af34a4cdbecd04ad4f2ddabe35a258a">writeToStream</a>(t_pStream.data());</div>
+<div class="line"><a name="l00997"></a><span class="lineno">  997</span>&#160;}</div>
+<div class="line"><a name="l00998"></a><span class="lineno">  998</span>&#160;</div>
+<div class="line"><a name="l00999"></a><span class="lineno">  999</span>&#160;</div>
+<div class="line"><a name="l01000"></a><span class="lineno"> 1000</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l01001"></a><span class="lineno"> 1001</span>&#160;</div>
+<div class="line"><a name="l01002"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a0af34a4cdbecd04ad4f2ddabe35a258a"> 1002</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a0af34a4cdbecd04ad4f2ddabe35a258a">MNEInverseOperator::writeToStream</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a>* p_pStream)</div>
+<div class="line"><a name="l01003"></a><span class="lineno"> 1003</span>&#160;{</div>
+<div class="line"><a name="l01004"></a><span class="lineno"> 1004</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aca5c9df67313a344df12ebf61e57409c">start_block</a>(FIFFB_MNE_INVERSE_SOLUTION);</div>
 <div class="line"><a name="l01005"></a><span class="lineno"> 1005</span>&#160;</div>
-<div class="line"><a name="l01006"></a><span class="lineno"> 1006</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01007"></a><span class="lineno"> 1007</span>&#160;    <span class="comment">// get parent MEG info</span></div>
-<div class="line"><a name="l01008"></a><span class="lineno"> 1008</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01009"></a><span class="lineno"> 1009</span>&#160;    t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#ace9106cbfbdb16f78b3f6cd3f9275305">read_meas_info_base</a>(t_Tree, inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ab3a60435927ae1a66709158e609e6fee">info</a>);</div>
-<div class="line"><a name="l01010"></a><span class="lineno"> 1010</span>&#160;</div>
-<div class="line"><a name="l01011"></a><span class="lineno"> 1011</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01012"></a><span class="lineno"> 1012</span>&#160;    <span class="comment">//   Transform the source spaces to the correct coordinate frame</span></div>
-<div class="line"><a name="l01013"></a><span class="lineno"> 1013</span>&#160;    <span class="comment">//   if necessary</span></div>
-<div class="line"><a name="l01014"></a><span class="lineno"> 1014</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01015"></a><span class="lineno"> 1015</span>&#160;    <span class="keywordflow">if</span> (inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a2e42af80e3698692e08313cf591bce52">coord_frame</a> != FIFFV_COORD_MRI &amp;&amp; inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a2e42af80e3698692e08313cf591bce52">coord_frame</a> != FIFFV_COORD_HEAD)</div>
-<div class="line"><a name="l01016"></a><span class="lineno"> 1016</span>&#160;    {</div>
-<div class="line"><a name="l01017"></a><span class="lineno"> 1017</span>&#160;        printf(<span class="stringliteral">&quot;Only inverse solutions computed in MRI or head coordinates are acceptable&quot;</span>);</div>
-<div class="line"><a name="l01018"></a><span class="lineno"> 1018</span>&#160;        <span class="keywordflow">if</span>(t_pTag)</div>
-<div class="line"><a name="l01019"></a><span class="lineno"> 1019</span>&#160;            <span class="keyword">delete</span> t_pTag;</div>
-<div class="line"><a name="l01020"></a><span class="lineno"> 1020</span>&#160;        <span class="keywordflow">if</span>(t_pStream)</div>
-<div class="line"><a name="l01021"></a><span class="lineno"> 1021</span>&#160;            <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l01022"></a><span class="lineno"> 1022</span>&#160;    }</div>
-<div class="line"><a name="l01023"></a><span class="lineno"> 1023</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01024"></a><span class="lineno"> 1024</span>&#160;    <span class="comment">//  Number of averages is initially one</span></div>
-<div class="line"><a name="l01025"></a><span class="lineno"> 1025</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01026"></a><span class="lineno"> 1026</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ac0d085ad6c61c13cca4253fbe13d9a21">nave</a> = 1;</div>
-<div class="line"><a name="l01027"></a><span class="lineno"> 1027</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01028"></a><span class="lineno"> 1028</span>&#160;    <span class="comment">//  We also need the SSP operator</span></div>
-<div class="line"><a name="l01029"></a><span class="lineno"> 1029</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01030"></a><span class="lineno"> 1030</span>&#160;    inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a6d8463b551857f34c8426ea5d76c228a">projs</a>     = t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a0bc3172cfee00571ee3d63de335b3eb2">read_proj</a>(t_Tree);</div>
-<div class="line"><a name="l01031"></a><span class="lineno"> 1031</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01032"></a><span class="lineno"> 1032</span>&#160;    <span class="comment">//  Some empty fields to be filled in later</span></div>
-<div class="line"><a name="l01033"></a><span class="lineno"> 1033</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01034"></a><span class="lineno"> 1034</span>&#160;<span class="comment">//        inv.proj      = [];      %   This is the projector to apply to the data</span></div>
-<div class="line"><a name="l01035"></a><span class="lineno"> 1035</span>&#160;<span class="comment">//        inv.whitener  = [];      %   This whitens the data</span></div>
-<div class="line"><a name="l01036"></a><span class="lineno"> 1036</span>&#160;<span class="comment">//        inv.reginv    = [];      %   This the diagonal matrix implementing</span></div>
-<div class="line"><a name="l01037"></a><span class="lineno"> 1037</span>&#160;<span class="comment">//                                 %   regularization and the inverse</span></div>
-<div class="line"><a name="l01038"></a><span class="lineno"> 1038</span>&#160;<span class="comment">//        inv.noisenorm = [];      %   These are the noise-normalization factors</span></div>
-<div class="line"><a name="l01039"></a><span class="lineno"> 1039</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01040"></a><span class="lineno"> 1040</span>&#160;    <span class="keywordflow">if</span>(!inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a8074f2dd4963041afbe819487d0e3bd2">src</a>.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a38654bb9875091c2cb5a04e2531653d7">transform_source_space_to</a>(inv.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a2e42af80e3698692e08313cf591bce52">coord_frame</a>, mri_head_t))</div>
-<div class="line"><a name="l01041"></a><span class="lineno"> 1041</span>&#160;    {</div>
-<div class="line"><a name="l01042"></a><span class="lineno"> 1042</span>&#160;        printf(<span class="stringliteral">&quot;Could not transform source space.\n&quot;</span>);</div>
-<div class="line"><a name="l01043"></a><span class="lineno"> 1043</span>&#160;    }</div>
-<div class="line"><a name="l01044"></a><span class="lineno"> 1044</span>&#160;    printf(<span class="stringliteral">&quot;\tSource spaces transformed to the inverse solution coordinate frame\n&quot;</span>);</div>
-<div class="line"><a name="l01045"></a><span class="lineno"> 1045</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01046"></a><span class="lineno"> 1046</span>&#160;    <span class="comment">//   Done!</span></div>
-<div class="line"><a name="l01047"></a><span class="lineno"> 1047</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01048"></a><span class="lineno"> 1048</span>&#160;    <span class="keywordflow">if</span>(t_pTag)</div>
-<div class="line"><a name="l01049"></a><span class="lineno"> 1049</span>&#160;        <span class="keyword">delete</span> t_pTag;</div>
-<div class="line"><a name="l01050"></a><span class="lineno"> 1050</span>&#160;    <span class="keywordflow">if</span>(t_pStream)</div>
-<div class="line"><a name="l01051"></a><span class="lineno"> 1051</span>&#160;        <span class="keyword">delete</span> t_pStream;</div>
+<div class="line"><a name="l01006"></a><span class="lineno"> 1006</span>&#160;    printf(<span class="stringliteral">&quot;\tWriting inverse operator info...\n&quot;</span>);</div>
+<div class="line"><a name="l01007"></a><span class="lineno"> 1007</span>&#160;</div>
+<div class="line"><a name="l01008"></a><span class="lineno"> 1008</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a1c36acd27cd6c6624d3b56df2d9e3def">write_int</a>(FIFF_MNE_INCLUDED_METHODS, &amp;this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#af494b48e6d9538b473d2c299b2aa8cea">methods</a>);</div>
+<div class="line"><a name="l01009"></a><span class="lineno"> 1009</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a1c36acd27cd6c6624d3b56df2d9e3def">write_int</a>(<a class="code" href="fiff__constants_8h.html#a3271879db122798d290ee16bf50c72be">FIFF_MNE_SOURCE_ORIENTATION</a>, &amp;this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ad9be3e35de623862f76a69aa5f3bfbf2">source_ori</a>);</div>
+<div class="line"><a name="l01010"></a><span class="lineno"> 1010</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a1c36acd27cd6c6624d3b56df2d9e3def">write_int</a>(<a class="code" href="fiff__constants_8h.html#a95d9fd959918262db89fc80cbc6023f1">FIFF_MNE_SOURCE_SPACE_NPOINTS</a>, &amp;this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a46e0b1b46763a8b6f90158af33f2b119">nsource</a>);</div>
+<div class="line"><a name="l01011"></a><span class="lineno"> 1011</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a1c36acd27cd6c6624d3b56df2d9e3def">write_int</a>(<a class="code" href="fiff__constants_8h.html#a2ab63fa8acb70b4809ec6fa4944b7bc2">FIFF_MNE_COORD_FRAME</a>, &amp;this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a2e42af80e3698692e08313cf591bce52">coord_frame</a>);</div>
+<div class="line"><a name="l01012"></a><span class="lineno"> 1012</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a2c1cc6edac22f4e685b6e3a74b153f41">write_float_matrix</a>(<a class="code" href="fiff__constants_8h.html#a23b3b0968c7ae392a2e50561dcf81090">FIFF_MNE_INVERSE_SOURCE_ORIENTATIONS</a>, this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a92edf496bf03e0fb6ce35818ab472a4a">source_nn</a>);</div>
+<div class="line"><a name="l01013"></a><span class="lineno"> 1013</span>&#160;    VectorXf tmp_sing = this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#aeed4a8ce7ef123affc36f686c517ccb2">sing</a>.cast&lt;<span class="keywordtype">float</span>&gt;();</div>
+<div class="line"><a name="l01014"></a><span class="lineno"> 1014</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a769e1b3f385d18a4489ffcdcab3e93c0">write_float</a>(<a class="code" href="fiff__constants_8h.html#acf9c57d8b406b1ac21f08664ddff0e08">FIFF_MNE_INVERSE_SING</a>, tmp_sing.data(), tmp_sing.size());</div>
+<div class="line"><a name="l01015"></a><span class="lineno"> 1015</span>&#160;</div>
+<div class="line"><a name="l01016"></a><span class="lineno"> 1016</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l01017"></a><span class="lineno"> 1017</span>&#160;    <span class="comment">//   The eigenleads and eigenfields</span></div>
+<div class="line"><a name="l01018"></a><span class="lineno"> 1018</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l01019"></a><span class="lineno"> 1019</span>&#160;    <span class="keywordflow">if</span>(this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a5d27190215db612df4141865f4340e07">eigen_leads_weighted</a>)</div>
+<div class="line"><a name="l01020"></a><span class="lineno"> 1020</span>&#160;    {</div>
+<div class="line"><a name="l01021"></a><span class="lineno"> 1021</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="A named matrix.">FiffNamedMatrix</a> tmpMatrix(*this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a2dc0c2da948869c91bb9d5ecf96a94ca">eigen_leads</a>.data());</div>
+<div class="line"><a name="l01022"></a><span class="lineno"> 1022</span>&#160;        tmpMatrix.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#acfc42a46812792ab7b36a5de046c37b6">transpose_named_matrix</a>();</div>
+<div class="line"><a name="l01023"></a><span class="lineno"> 1023</span>&#160;        p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a622451104ef8a11df98c83338379ab7d">write_named_matrix</a>(<a class="code" href="fiff__constants_8h.html#a818ac5cd521c8282f075147b14395be5">FIFF_MNE_INVERSE_LEADS_WEIGHTED</a>, tmpMatrix);</div>
+<div class="line"><a name="l01024"></a><span class="lineno"> 1024</span>&#160;    }</div>
+<div class="line"><a name="l01025"></a><span class="lineno"> 1025</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01026"></a><span class="lineno"> 1026</span>&#160;    {</div>
+<div class="line"><a name="l01027"></a><span class="lineno"> 1027</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="A named matrix.">FiffNamedMatrix</a> tmpMatrix(*this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a2dc0c2da948869c91bb9d5ecf96a94ca">eigen_leads</a>.data());</div>
+<div class="line"><a name="l01028"></a><span class="lineno"> 1028</span>&#160;        tmpMatrix.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#acfc42a46812792ab7b36a5de046c37b6">transpose_named_matrix</a>();</div>
+<div class="line"><a name="l01029"></a><span class="lineno"> 1029</span>&#160;        p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a622451104ef8a11df98c83338379ab7d">write_named_matrix</a>(<a class="code" href="fiff__constants_8h.html#a0b7cf8c987b2f44ee394b4b28ad90403">FIFF_MNE_INVERSE_LEADS</a>, tmpMatrix);</div>
+<div class="line"><a name="l01030"></a><span class="lineno"> 1030</span>&#160;    }</div>
+<div class="line"><a name="l01031"></a><span class="lineno"> 1031</span>&#160;</div>
+<div class="line"><a name="l01032"></a><span class="lineno"> 1032</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a622451104ef8a11df98c83338379ab7d">write_named_matrix</a>(<a class="code" href="fiff__constants_8h.html#a07b44259f38a66719104e562dc823030">FIFF_MNE_INVERSE_FIELDS</a>, *this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#afb102fbfd585dede44d1bf1c0069ad9a">eigen_fields</a>.data());</div>
+<div class="line"><a name="l01033"></a><span class="lineno"> 1033</span>&#160;    printf(<span class="stringliteral">&quot;\t[done]\n&quot;</span>);</div>
+<div class="line"><a name="l01034"></a><span class="lineno"> 1034</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l01035"></a><span class="lineno"> 1035</span>&#160;    <span class="comment">//   write the covariance matrices</span></div>
+<div class="line"><a name="l01036"></a><span class="lineno"> 1036</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l01037"></a><span class="lineno"> 1037</span>&#160;    printf(<span class="stringliteral">&quot;\tWriting noise covariance matrix.&quot;</span>);</div>
+<div class="line"><a name="l01038"></a><span class="lineno"> 1038</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a463b656163719712f4271561d85514b2">write_cov</a>(*this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#aa5f2736974ee16605666442bf5cac1c8">noise_cov</a>.data());</div>
+<div class="line"><a name="l01039"></a><span class="lineno"> 1039</span>&#160;</div>
+<div class="line"><a name="l01040"></a><span class="lineno"> 1040</span>&#160;    printf(<span class="stringliteral">&quot;\tWriting source covariance matrix.\n&quot;</span>);</div>
+<div class="line"><a name="l01041"></a><span class="lineno"> 1041</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a463b656163719712f4271561d85514b2">write_cov</a>(*this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a87a4f07a98479a04650f09d82ca48c51">source_cov</a>.data());</div>
+<div class="line"><a name="l01042"></a><span class="lineno"> 1042</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l01043"></a><span class="lineno"> 1043</span>&#160;    <span class="comment">//   write the various priors</span></div>
+<div class="line"><a name="l01044"></a><span class="lineno"> 1044</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l01045"></a><span class="lineno"> 1045</span>&#160;    printf(<span class="stringliteral">&quot;\tWriting orientation priors.\n&quot;</span>);</div>
+<div class="line"><a name="l01046"></a><span class="lineno"> 1046</span>&#160;    <span class="keywordflow">if</span>(!this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a475310abba23a952aa535f6ee140328a">orient_prior</a>-&gt;isEmpty())</div>
+<div class="line"><a name="l01047"></a><span class="lineno"> 1047</span>&#160;        p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a463b656163719712f4271561d85514b2">write_cov</a>(*this-&gt;orient_prior.data());</div>
+<div class="line"><a name="l01048"></a><span class="lineno"> 1048</span>&#160;    <span class="keywordflow">if</span>(!this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a97d5c5ce56758fea2d9928cd32d5af81">depth_prior</a>-&gt;isEmpty())</div>
+<div class="line"><a name="l01049"></a><span class="lineno"> 1049</span>&#160;        p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a463b656163719712f4271561d85514b2">write_cov</a>(*this-&gt;depth_prior.data());</div>
+<div class="line"><a name="l01050"></a><span class="lineno"> 1050</span>&#160;    <span class="keywordflow">if</span>(!this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#abc92f17dd1d0c054dc9be774f2f3b3a4">fmri_prior</a>-&gt;isEmpty())</div>
+<div class="line"><a name="l01051"></a><span class="lineno"> 1051</span>&#160;        p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a463b656163719712f4271561d85514b2">write_cov</a>(*this-&gt;fmri_prior.data());</div>
 <div class="line"><a name="l01052"></a><span class="lineno"> 1052</span>&#160;</div>
-<div class="line"><a name="l01053"></a><span class="lineno"> 1053</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l01054"></a><span class="lineno"> 1054</span>&#160;}</div>
-<div class="line"><a name="l01055"></a><span class="lineno"> 1055</span>&#160;</div>
-<div class="line"><a name="l01056"></a><span class="lineno"> 1056</span>&#160;</div>
-<div class="line"><a name="l01057"></a><span class="lineno"> 1057</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l01058"></a><span class="lineno"> 1058</span>&#160;</div>
-<div class="line"><a name="l01059"></a><span class="lineno"><a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ac6239d32266aeadd81fdce94eb9078b8"> 1059</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ac6239d32266aeadd81fdce94eb9078b8">MNEInverseOperator::write_inverse_operator</a>(QIODevice &amp;p_IODevice)</div>
-<div class="line"><a name="l01060"></a><span class="lineno"> 1060</span>&#160;{</div>
+<div class="line"><a name="l01053"></a><span class="lineno"> 1053</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l01054"></a><span class="lineno"> 1054</span>&#160;    <span class="comment">//   Parent MRI data</span></div>
+<div class="line"><a name="l01055"></a><span class="lineno"> 1055</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l01056"></a><span class="lineno"> 1056</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aca5c9df67313a344df12ebf61e57409c">start_block</a>(FIFFB_MNE_PARENT_MRI_FILE);</div>
+<div class="line"><a name="l01057"></a><span class="lineno"> 1057</span>&#160;    <span class="comment">//   write the MRI &lt;-&gt; head coordinate transformation</span></div>
+<div class="line"><a name="l01058"></a><span class="lineno"> 1058</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#ad96d325ae45544d1cc276181421d5f7c">write_coord_trans</a>(this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#aee97841ed32c50c581d5495a20aced24">mri_head_t</a>);</div>
+<div class="line"><a name="l01059"></a><span class="lineno"> 1059</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a904df8f48da1564a8d5a975a22aa6b54">end_block</a>(FIFFB_MNE_PARENT_MRI_FILE);</div>
+<div class="line"><a name="l01060"></a><span class="lineno"> 1060</span>&#160;</div>
 <div class="line"><a name="l01061"></a><span class="lineno"> 1061</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01062"></a><span class="lineno"> 1062</span>&#160;    <span class="comment">//   Open the file, create directory</span></div>
+<div class="line"><a name="l01062"></a><span class="lineno"> 1062</span>&#160;    <span class="comment">//   Parent MEG measurement info</span></div>
 <div class="line"><a name="l01063"></a><span class="lineno"> 1063</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01064"></a><span class="lineno"> 1064</span>&#160;</div>
-<div class="line"><a name="l01065"></a><span class="lineno"> 1065</span>&#160;    <span class="comment">// Create the file and save the essentials</span></div>
-<div class="line"><a name="l01066"></a><span class="lineno"> 1066</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" title="FIFF File I/O routines.">FiffStream</a>* t_pStream = <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a3b21512402afb9e30283a1566103276f">FiffStream::start_file</a>(&amp;p_IODevice);</div>
-<div class="line"><a name="l01067"></a><span class="lineno"> 1067</span>&#160;    printf(<span class="stringliteral">&quot;Write inverse operator decomposition in %s...&quot;</span>, t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aaef2f46402149d34b308bbaf6ecb95e8">streamName</a>().toUtf8().constData());</div>
-<div class="line"><a name="l01068"></a><span class="lineno"> 1068</span>&#160;</div>
-<div class="line"><a name="l01069"></a><span class="lineno"> 1069</span>&#160;    t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aca5c9df67313a344df12ebf61e57409c">start_block</a>(FIFFB_MNE_INVERSE_SOLUTION);</div>
-<div class="line"><a name="l01070"></a><span class="lineno"> 1070</span>&#160;</div>
-<div class="line"><a name="l01071"></a><span class="lineno"> 1071</span>&#160;    printf(<span class="stringliteral">&quot;\tWriting inverse operator info...\n&quot;</span>);</div>
-<div class="line"><a name="l01072"></a><span class="lineno"> 1072</span>&#160;</div>
-<div class="line"><a name="l01073"></a><span class="lineno"> 1073</span>&#160;    t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a1c36acd27cd6c6624d3b56df2d9e3def">write_int</a>(FIFF_MNE_INCLUDED_METHODS, &amp;this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#af494b48e6d9538b473d2c299b2aa8cea">methods</a>);</div>
-<div class="line"><a name="l01074"></a><span class="lineno"> 1074</span>&#160;    t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a1c36acd27cd6c6624d3b56df2d9e3def">write_int</a>(<a class="code" href="fiff__constants_8h.html#a3271879db122798d290ee16bf50c72be">FIFF_MNE_SOURCE_ORIENTATION</a>, &amp;this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ad9be3e35de623862f76a69aa5f3bfbf2">source_ori</a>);</div>
-<div class="line"><a name="l01075"></a><span class="lineno"> 1075</span>&#160;    t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a1c36acd27cd6c6624d3b56df2d9e3def">write_int</a>(<a class="code" href="fiff__constants_8h.html#a95d9fd959918262db89fc80cbc6023f1">FIFF_MNE_SOURCE_SPACE_NPOINTS</a>, &amp;this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a46e0b1b46763a8b6f90158af33f2b119">nsource</a>);</div>
-<div class="line"><a name="l01076"></a><span class="lineno"> 1076</span>&#160;    t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a1c36acd27cd6c6624d3b56df2d9e3def">write_int</a>(<a class="code" href="fiff__constants_8h.html#a2ab63fa8acb70b4809ec6fa4944b7bc2">FIFF_MNE_COORD_FRAME</a>, &amp;this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a2e42af80e3698692e08313cf591bce52">coord_frame</a>);</div>
-<div class="line"><a name="l01077"></a><span class="lineno"> 1077</span>&#160;    t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a2c1cc6edac22f4e685b6e3a74b153f41">write_float_matrix</a>(<a class="code" href="fiff__constants_8h.html#a23b3b0968c7ae392a2e50561dcf81090">FIFF_MNE_INVERSE_SOURCE_ORIENTATIONS</a>, this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a92edf496bf03e0fb6ce35818ab472a4a">source_nn</a>);</div>
-<div class="line"><a name="l01078"></a><span class="lineno"> 1078</span>&#160;    VectorXf tmp_sing = this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#aeed4a8ce7ef123affc36f686c517ccb2">sing</a>.cast&lt;<span class="keywordtype">float</span>&gt;();</div>
-<div class="line"><a name="l01079"></a><span class="lineno"> 1079</span>&#160;    t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a769e1b3f385d18a4489ffcdcab3e93c0">write_float</a>(<a class="code" href="fiff__constants_8h.html#acf9c57d8b406b1ac21f08664ddff0e08">FIFF_MNE_INVERSE_SING</a>, tmp_sing.data(), tmp_sing.size());</div>
-<div class="line"><a name="l01080"></a><span class="lineno"> 1080</span>&#160;</div>
-<div class="line"><a name="l01081"></a><span class="lineno"> 1081</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01082"></a><span class="lineno"> 1082</span>&#160;    <span class="comment">//   The eigenleads and eigenfields</span></div>
-<div class="line"><a name="l01083"></a><span class="lineno"> 1083</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01084"></a><span class="lineno"> 1084</span>&#160;    <span class="keywordflow">if</span>(this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a5d27190215db612df4141865f4340e07">eigen_leads_weighted</a>)</div>
-<div class="line"><a name="l01085"></a><span class="lineno"> 1085</span>&#160;    {</div>
-<div class="line"><a name="l01086"></a><span class="lineno"> 1086</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="A named matrix.">FiffNamedMatrix</a> tmpMatrix(*this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a2dc0c2da948869c91bb9d5ecf96a94ca">eigen_leads</a>.data());</div>
-<div class="line"><a name="l01087"></a><span class="lineno"> 1087</span>&#160;        tmpMatrix.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#acfc42a46812792ab7b36a5de046c37b6">transpose_named_matrix</a>();</div>
-<div class="line"><a name="l01088"></a><span class="lineno"> 1088</span>&#160;        t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a622451104ef8a11df98c83338379ab7d">write_named_matrix</a>(<a class="code" href="fiff__constants_8h.html#a818ac5cd521c8282f075147b14395be5">FIFF_MNE_INVERSE_LEADS_WEIGHTED</a>, tmpMatrix);</div>
-<div class="line"><a name="l01089"></a><span class="lineno"> 1089</span>&#160;    }</div>
-<div class="line"><a name="l01090"></a><span class="lineno"> 1090</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01091"></a><span class="lineno"> 1091</span>&#160;    {</div>
-<div class="line"><a name="l01092"></a><span class="lineno"> 1092</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" title="A named matrix.">FiffNamedMatrix</a> tmpMatrix(*this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a2dc0c2da948869c91bb9d5ecf96a94ca">eigen_leads</a>.data());</div>
-<div class="line"><a name="l01093"></a><span class="lineno"> 1093</span>&#160;        tmpMatrix.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#acfc42a46812792ab7b36a5de046c37b6">transpose_named_matrix</a>();</div>
-<div class="line"><a name="l01094"></a><span class="lineno"> 1094</span>&#160;        t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a622451104ef8a11df98c83338379ab7d">write_named_matrix</a>(<a class="code" href="fiff__constants_8h.html#a0b7cf8c987b2f44ee394b4b28ad90403">FIFF_MNE_INVERSE_LEADS</a>, tmpMatrix);</div>
-<div class="line"><a name="l01095"></a><span class="lineno"> 1095</span>&#160;    }</div>
-<div class="line"><a name="l01096"></a><span class="lineno"> 1096</span>&#160;</div>
-<div class="line"><a name="l01097"></a><span class="lineno"> 1097</span>&#160;    t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a622451104ef8a11df98c83338379ab7d">write_named_matrix</a>(<a class="code" href="fiff__constants_8h.html#a07b44259f38a66719104e562dc823030">FIFF_MNE_INVERSE_FIELDS</a>, *this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#afb102fbfd585dede44d1bf1c0069ad9a">eigen_fields</a>.data());</div>
-<div class="line"><a name="l01098"></a><span class="lineno"> 1098</span>&#160;    printf(<span class="stringliteral">&quot;\t[done]\n&quot;</span>);</div>
-<div class="line"><a name="l01099"></a><span class="lineno"> 1099</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01100"></a><span class="lineno"> 1100</span>&#160;    <span class="comment">//   write the covariance matrices</span></div>
-<div class="line"><a name="l01101"></a><span class="lineno"> 1101</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01102"></a><span class="lineno"> 1102</span>&#160;    printf(<span class="stringliteral">&quot;\tWriting noise covariance matrix.&quot;</span>);</div>
-<div class="line"><a name="l01103"></a><span class="lineno"> 1103</span>&#160;    t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a463b656163719712f4271561d85514b2">write_cov</a>(*this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#aa5f2736974ee16605666442bf5cac1c8">noise_cov</a>.data());</div>
-<div class="line"><a name="l01104"></a><span class="lineno"> 1104</span>&#160;</div>
-<div class="line"><a name="l01105"></a><span class="lineno"> 1105</span>&#160;    printf(<span class="stringliteral">&quot;\tWriting source covariance matrix.\n&quot;</span>);</div>
-<div class="line"><a name="l01106"></a><span class="lineno"> 1106</span>&#160;    t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a463b656163719712f4271561d85514b2">write_cov</a>(*this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a87a4f07a98479a04650f09d82ca48c51">source_cov</a>.data());</div>
-<div class="line"><a name="l01107"></a><span class="lineno"> 1107</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01108"></a><span class="lineno"> 1108</span>&#160;    <span class="comment">//   write the various priors</span></div>
-<div class="line"><a name="l01109"></a><span class="lineno"> 1109</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01110"></a><span class="lineno"> 1110</span>&#160;    printf(<span class="stringliteral">&quot;\tWriting orientation priors.\n&quot;</span>);</div>
-<div class="line"><a name="l01111"></a><span class="lineno"> 1111</span>&#160;    <span class="keywordflow">if</span>(!this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a475310abba23a952aa535f6ee140328a">orient_prior</a>-&gt;isEmpty())</div>
-<div class="line"><a name="l01112"></a><span class="lineno"> 1112</span>&#160;        t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a463b656163719712f4271561d85514b2">write_cov</a>(*this-&gt;orient_prior.data());</div>
-<div class="line"><a name="l01113"></a><span class="lineno"> 1113</span>&#160;    <span class="keywordflow">if</span>(!this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a97d5c5ce56758fea2d9928cd32d5af81">depth_prior</a>-&gt;isEmpty())</div>
-<div class="line"><a name="l01114"></a><span class="lineno"> 1114</span>&#160;        t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a463b656163719712f4271561d85514b2">write_cov</a>(*this-&gt;depth_prior.data());</div>
-<div class="line"><a name="l01115"></a><span class="lineno"> 1115</span>&#160;    <span class="keywordflow">if</span>(!this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#abc92f17dd1d0c054dc9be774f2f3b3a4">fmri_prior</a>-&gt;isEmpty())</div>
-<div class="line"><a name="l01116"></a><span class="lineno"> 1116</span>&#160;        t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a463b656163719712f4271561d85514b2">write_cov</a>(*this-&gt;fmri_prior.data());</div>
-<div class="line"><a name="l01117"></a><span class="lineno"> 1117</span>&#160;</div>
-<div class="line"><a name="l01118"></a><span class="lineno"> 1118</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01119"></a><span class="lineno"> 1119</span>&#160;    <span class="comment">//   Parent MRI data</span></div>
-<div class="line"><a name="l01120"></a><span class="lineno"> 1120</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01121"></a><span class="lineno"> 1121</span>&#160;    t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aca5c9df67313a344df12ebf61e57409c">start_block</a>(FIFFB_MNE_PARENT_MRI_FILE);</div>
-<div class="line"><a name="l01122"></a><span class="lineno"> 1122</span>&#160;    <span class="comment">//   write the MRI &lt;-&gt; head coordinate transformation</span></div>
-<div class="line"><a name="l01123"></a><span class="lineno"> 1123</span>&#160;    t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#ad96d325ae45544d1cc276181421d5f7c">write_coord_trans</a>(this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#aee97841ed32c50c581d5495a20aced24">mri_head_t</a>);</div>
-<div class="line"><a name="l01124"></a><span class="lineno"> 1124</span>&#160;    t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a904df8f48da1564a8d5a975a22aa6b54">end_block</a>(FIFFB_MNE_PARENT_MRI_FILE);</div>
-<div class="line"><a name="l01125"></a><span class="lineno"> 1125</span>&#160;</div>
-<div class="line"><a name="l01126"></a><span class="lineno"> 1126</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01127"></a><span class="lineno"> 1127</span>&#160;    <span class="comment">//   Parent MEG measurement info</span></div>
-<div class="line"><a name="l01128"></a><span class="lineno"> 1128</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01129"></a><span class="lineno"> 1129</span>&#160;    t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#af826e00dd3f5ed2e45fbc04b8b900b24">write_info_base</a>(this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ab3a60435927ae1a66709158e609e6fee">info</a>);</div>
-<div class="line"><a name="l01130"></a><span class="lineno"> 1130</span>&#160;</div>
-<div class="line"><a name="l01131"></a><span class="lineno"> 1131</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01132"></a><span class="lineno"> 1132</span>&#160;    <span class="comment">//   Write the source spaces</span></div>
-<div class="line"><a name="l01133"></a><span class="lineno"> 1133</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01134"></a><span class="lineno"> 1134</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a8074f2dd4963041afbe819487d0e3bd2">src</a>.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a43b3055101cbb51adaea2cc5aed25a95">isEmpty</a>())</div>
-<div class="line"><a name="l01135"></a><span class="lineno"> 1135</span>&#160;        this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a8074f2dd4963041afbe819487d0e3bd2">src</a>.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a48acf19765d7c0ced161ab95b6303b8a">write_to_stream</a>(t_pStream);</div>
-<div class="line"><a name="l01136"></a><span class="lineno"> 1136</span>&#160;</div>
-<div class="line"><a name="l01137"></a><span class="lineno"> 1137</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01138"></a><span class="lineno"> 1138</span>&#160;    <span class="comment">//  We also need the SSP operator</span></div>
-<div class="line"><a name="l01139"></a><span class="lineno"> 1139</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01140"></a><span class="lineno"> 1140</span>&#160;    t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#afa13482b528ba5a7fcd15e8cf707663f">write_proj</a>(this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a6d8463b551857f34c8426ea5d76c228a">projs</a>);</div>
-<div class="line"><a name="l01141"></a><span class="lineno"> 1141</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01142"></a><span class="lineno"> 1142</span>&#160;    <span class="comment">//   Done!</span></div>
-<div class="line"><a name="l01143"></a><span class="lineno"> 1143</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l01144"></a><span class="lineno"> 1144</span>&#160;    t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a904df8f48da1564a8d5a975a22aa6b54">end_block</a>(FIFFB_MNE_INVERSE_SOLUTION);</div>
-<div class="line"><a name="l01145"></a><span class="lineno"> 1145</span>&#160;    t_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#ae1aa8744d83c7aee9dc57c2f9c9919a8">end_file</a>();</div>
-<div class="line"><a name="l01146"></a><span class="lineno"> 1146</span>&#160;</div>
-<div class="line"><a name="l01147"></a><span class="lineno"> 1147</span>&#160;    <span class="keyword">delete</span> t_pStream;</div>
-<div class="line"><a name="l01148"></a><span class="lineno"> 1148</span>&#160;}</div>
+<div class="line"><a name="l01064"></a><span class="lineno"> 1064</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#af826e00dd3f5ed2e45fbc04b8b900b24">write_info_base</a>(this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ab3a60435927ae1a66709158e609e6fee">info</a>);</div>
+<div class="line"><a name="l01065"></a><span class="lineno"> 1065</span>&#160;</div>
+<div class="line"><a name="l01066"></a><span class="lineno"> 1066</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l01067"></a><span class="lineno"> 1067</span>&#160;    <span class="comment">//   Write the source spaces</span></div>
+<div class="line"><a name="l01068"></a><span class="lineno"> 1068</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l01069"></a><span class="lineno"> 1069</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a8074f2dd4963041afbe819487d0e3bd2">src</a>.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a43b3055101cbb51adaea2cc5aed25a95">isEmpty</a>())</div>
+<div class="line"><a name="l01070"></a><span class="lineno"> 1070</span>&#160;        this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a8074f2dd4963041afbe819487d0e3bd2">src</a>.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#ae078c1f063f047c677e933366cac1ffc">writeToStream</a>(p_pStream);</div>
+<div class="line"><a name="l01071"></a><span class="lineno"> 1071</span>&#160;</div>
+<div class="line"><a name="l01072"></a><span class="lineno"> 1072</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l01073"></a><span class="lineno"> 1073</span>&#160;    <span class="comment">//  We also need the SSP operator</span></div>
+<div class="line"><a name="l01074"></a><span class="lineno"> 1074</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l01075"></a><span class="lineno"> 1075</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#afa13482b528ba5a7fcd15e8cf707663f">write_proj</a>(this-&gt;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a6d8463b551857f34c8426ea5d76c228a">projs</a>);</div>
+<div class="line"><a name="l01076"></a><span class="lineno"> 1076</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l01077"></a><span class="lineno"> 1077</span>&#160;    <span class="comment">//   Done!</span></div>
+<div class="line"><a name="l01078"></a><span class="lineno"> 1078</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l01079"></a><span class="lineno"> 1079</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a904df8f48da1564a8d5a975a22aa6b54">end_block</a>(FIFFB_MNE_INVERSE_SOLUTION);</div>
+<div class="line"><a name="l01080"></a><span class="lineno"> 1080</span>&#160;    p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#ae1aa8744d83c7aee9dc57c2f9c9919a8">end_file</a>();</div>
+<div class="line"><a name="l01081"></a><span class="lineno"> 1081</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 23 2013 15:22:59 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 6 2013 17:08:36 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

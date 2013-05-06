@@ -2,6 +2,13 @@ var searchData=
 [
   ['shmemsocket',['ShmemSocket',['../class_neuromag_plugin_1_1_shmem_socket.html',1,'NeuromagPlugin']]],
   ['sourceestimate',['SourceEstimate',['../class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html',1,'INVERSELIB']]],
+  ['sourcelab',['SourceLab',['../class_source_lab_plugin_1_1_source_lab.html',1,'SourceLabPlugin']]],
+  ['sourcelababoutwidget',['SourceLabAboutWidget',['../class_source_lab_plugin_1_1_source_lab_about_widget.html',1,'SourceLabPlugin']]],
+  ['sourcelababoutwidgetclass',['SourceLabAboutWidgetClass',['../class_ui_1_1_source_lab_about_widget_class.html',1,'Ui']]],
+  ['sourcelabrunwidget',['SourceLabRunWidget',['../class_source_lab_plugin_1_1_source_lab_run_widget.html',1,'SourceLabPlugin']]],
+  ['sourcelabrunwidgetclass',['SourceLabRunWidgetClass',['../class_ui_1_1_source_lab_run_widget_class.html',1,'Ui']]],
+  ['sourcelabsetupwidget',['SourceLabSetupWidget',['../class_source_lab_plugin_1_1_source_lab_setup_widget.html',1,'SourceLabPlugin']]],
+  ['sourcelabsetupwidgetclass',['SourceLabSetupWidgetClass',['../class_ui_1_1_source_lab_setup_widget_class.html',1,'Ui']]],
   ['startupwidget',['StartUpWidget',['../class_m_n_e_x_1_1_start_up_widget.html',1,'MNEX']]],
   ['subject',['Subject',['../class_subject.html',1,'']]],
   ['surface',['Surface',['../class_f_s_l_i_b_1_1_surface.html',1,'FSLIB']]],

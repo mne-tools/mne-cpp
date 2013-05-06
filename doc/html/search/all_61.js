@@ -15,6 +15,8 @@ var searchData=
   ['annotationset',['AnnotationSet',['../class_f_s_l_i_b_1_1_annotation_set.html#ad81692abf6c66ee7d55d49fcde32da85',1,'FSLIB::AnnotationSet::AnnotationSet()'],['../class_f_s_l_i_b_1_1_annotation_set.html#ac7bbeadb21f0a2976e8805316b6cc7d7',1,'FSLIB::AnnotationSet::AnnotationSet(const Annotation &amp;p_sLHAnnotation, const Annotation &amp;p_sRHAnnotation)'],['../class_f_s_l_i_b_1_1_annotation_set.html#a7ef5bdecdcd1451761f34fdebaf47d4d',1,'FSLIB::AnnotationSet::AnnotationSet(const QString &amp;p_sLHFileName, const QString &amp;p_sRHFileName)']]],
   ['annotationset_2ecpp',['annotationset.cpp',['../annotationset_8cpp.html',1,'']]],
   ['annotationset_2eh',['annotationset.h',['../annotationset_8h.html',1,'']]],
+  ['append',['append',['../class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#a93644080694b38ba14f990525828f6e1',1,'RTINVLIB::RtAve::append()'],['../class_r_t_i_n_v_l_i_b_1_1_rt_cov.html#a8cef42692b921fe23703189f8d7a3702',1,'RTINVLIB::RtCov::append()']]],
+  ['appendnoisecov',['appendNoiseCov',['../class_r_t_i_n_v_l_i_b_1_1_rt_inv_op.html#af72d320572ecde9774c38c08eaa8196e',1,'RTINVLIB::RtInvOp']]],
   ['appname',['AppName',['../class_m_n_e_x_1_1_c_info.html#a5023b7f1c37f48fa1a22b167bb27df60',1,'MNEX::CInfo']]],
   ['appnameshort',['AppNameShort',['../class_m_n_e_x_1_1_c_info.html#aaa67eea5b8221e558343dc9a414171cc',1,'MNEX::CInfo']]],
   ['appversion',['AppVersion',['../class_m_n_e_x_1_1_c_info.html#ae4507311b49c6cc3e1352dbc97e3ac4a',1,'MNEX::CInfo']]],
