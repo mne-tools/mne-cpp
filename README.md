@@ -1,8 +1,7 @@
 mne-cpp (beta)
 ==================
 
-MNE Qt 5 based C++ library (beta status)
-
+MNE cross-platform standalone MEG/EEG (real-time) applications using [Qt5](http://qt-project.org/downloads)'s and [Eigen](http://eigen.tuxfamily.org)'s C++ libraries
 
 Getting the latest code
 =========================
@@ -22,7 +21,29 @@ To build the mne libraries [Qt5](http://qt-project.org/downloads) is required.
 
     Build and install Qt5.
 
-To build the whole mne-cpp librarie, do the following steps:
+It’s really recommended to always download the source code of Qt5 and compile it from scratch, to make sure everything is compatible.
+    [Download](http://releases.qt-project.org/qt5/5.0.1/single/qt-everywhere-opensource-src-5.0.1.tar.gz) and extract Qt5 
+    To compile use the following steps:
+        ./configure -debug-and-release -opensource -opengl desktop -prefix /path/to/your/Qt/Qt5.0.1
+        make
+        make install
+For convinience download and extract Qt Creator
+http://releases.qt-project.org/qtcreator/2.6.2/qt-creator-2.6.2-src.tar.gz
+To compile the qt creator do the following
+        qmake –r
+        make
+        make install INSTALL_ROOT=/path/to/your/Qt/qt-creator-2.6.2
+
+To use the mne-cpp 3D libraries download and compile also the qt3d module.
+       Clone the [qt3d git repo](http://qt.gitorious.org/qt/qt3d)
+To compile qt3d it’s highly recommended to make use of qt creator, since it supports shadow builds. This prevents the source folder from being messed up.
+        First open qt creator make sure Tools->Options->Qt Versions/Kits are setup correctly (Qt 5.0.1)
+        Then open qt3d in qt creator. After configuring the shadow build, make sure release mode is selected. Then compile it.
+        After compilation, go to the shadow build directory open a terminal and type make install. Qt3d now installs itself to the Qt5.0.1 folder
+
+Hint: Windows users should just use nmake of Visual Studio instead of make.
+
+Now you're ready to build the whole mne-cpp librarie by doing the following steps:
 
 Generate the Makefiles using qmake:
 
