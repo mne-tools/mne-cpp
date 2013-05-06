@@ -34,7 +34,7 @@ To compile use the following steps:
 For convinience download and extract [Qt Creator](http://download.qt-project.org/official_releases/qtcreator/2.7/2.7.0/qt-creator-2.7.0-src.tar.gz)
 To compile the qt creator do the following
 
-    qmake –r
+    qmake –recursive
     make
     make install INSTALL_ROOT=/path/to/your/Qt/qt-creator-2.6.2
 
