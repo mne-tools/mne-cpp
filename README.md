@@ -36,7 +36,7 @@ To compile the qt creator do the following
 
     qmake –recursive
     make
-    make install INSTALL_ROOT=/path/to/your/Qt/qt-creator-2.6.2
+    make install INSTALL_ROOT=/path/to/your/Qt/qt-creator-2.7.0
 
 To use the mne-cpp 3D libraries download and compile also the qt3d module.
 
