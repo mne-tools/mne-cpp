@@ -59,7 +59,7 @@
 #if defined(__hpux) || defined(__Lynx__) || defined(__sun)
 #define BIG_ENDIAN_ARCH
 #else
-#if defined(__linux) || defined(WIN32)
+#if defined(__linux) || defined(WIN32) || defined(__APPLE__)
 #define INTEL_X86_ARCH
 #endif
 
