@@ -20,7 +20,7 @@ Building
 To build the mne libraries [Qt5](http://qt-project.org/downloads) is required.
 
 To build mne-cpp follow the wiki-guide:
-* [1. Build Qt5](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5): This page describes how to build Qt5 for [Windows](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5#windows)/[Linux](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5#linux)/[Mac](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5#mac-os-x)
+* [1. Build Qt5](https://github.com/mne-tools/mne-cpp/wiki/1.-Build-Qt5): This page describes how to build Qt5 for [Windows](https://github.com/mne-tools/mne-cpp/wiki/1.-Build-Qt5#windows)/[Linux](https://github.com/mne-tools/mne-cpp/wiki/1.-Build-Qt5#linux)/[Mac OS X](https://github.com/mne-tools/mne-cpp/wiki/1.-Build-Qt5#mac-os-x)
 
 * (optional) [2. Install Qt Creator](https://github.com/mne-tools/mne-cpp/wiki/2.-Install-Qt-Creator): For convinience of the further processing it's recommended to install Qt Creator at this point.
 
