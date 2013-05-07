@@ -21,13 +21,7 @@ To build the mne libraries [Qt5](http://qt-project.org/downloads) is required.
 
 The mne-cpp wikipage [1. Building Qt5](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5) describes how to build Qt5 for [Windows](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5#windows)/[Linux](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5#linux)/[Mac](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5#mac-os-x)
 
-
-For convinience download and extract [Qt Creator](http://download.qt-project.org/official_releases/qtcreator/2.7/2.7.0/qt-creator-2.7.0-src.tar.gz)
-To compile the qt creator do the following
-
-    qmake –recursive
-    make
-    make install INSTALL_ROOT=/path/to/your/Qt/qt-creator-2.7.0
+For convinience of the further processing it's recommended to install [Qt Creator](https://github.com/mne-tools/mne-cpp/wiki/2.-Install-Qt-Creator) at this point.
 
 To use the mne-cpp 3D libraries download and compile also the qt3d module.
 
