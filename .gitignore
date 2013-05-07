@@ -136,3 +136,7 @@ bin/mne_rt_tests
 bin/plotSurfaces
 
 bin/readFwdDisp3D
+
+bin/mne_x.app/Contents/MacOS/mne_x
+
+bin/mne_x.app/Contents/PkgInfo
