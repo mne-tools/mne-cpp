@@ -24,7 +24,7 @@ To build mne-cpp follow the wiki-guide:
 
 * [2. Install Qt Creator](https://github.com/mne-tools/mne-cpp/wiki/2.-Install-Qt-Creator) For convinience of the further processing it's recommended to install Qt Creator at this point.
 
-* [3. Install Qt Creator (Optional)](https://github.com/mne-tools/mne-cpp/wiki/3.-Install-Qt3D) To use the mne-cpp 3D libraries download and compile also the qt3d module. This step can be skipped when its intended to build mne-cpp for Neuromag Linux machines.
+* (Optional Step) [3. Install Qt 3D](https://github.com/mne-tools/mne-cpp/wiki/3.-Install-Qt3D) To use the mne-cpp 3D libraries download and compile also the qt3d module. This step can be skipped when its intended to build mne-cpp for Neuromag Linux machines.
 
 * [4. Compile mne-cpp](https://github.com/mne-tools/mne-cpp/wiki/4.-Compile-mne-cpp) 
 
