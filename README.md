@@ -19,35 +19,14 @@ Building
 
 To build the mne libraries [Qt5](http://qt-project.org/downloads) is required.
 
-The mne-cpp wikipage [1. Building Qt5](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5) describes how to build Qt5 for [Windows](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5#windows)/[Linux](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5#linux)/[Mac](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5#mac-os-x)
+To build mne-cpp follow the wiki-guide:
+* [1. Build Qt5](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5) describes how to build Qt5 for [Windows](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5#windows)/[Linux](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5#linux)/[Mac](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5#mac-os-x)
 
-For convinience of the further processing it's recommended to install [Qt Creator](https://github.com/mne-tools/mne-cpp/wiki/2.-Install-Qt-Creator) at this point.
+* [2. Install Qt Creator](https://github.com/mne-tools/mne-cpp/wiki/2.-Install-Qt-Creator) For convinience of the further processing it's recommended to install Qt Creator at this point.
 
-To use the mne-cpp 3D libraries download and compile also the qt3d module.
+* [3. Install Qt Creator (Optional)](https://github.com/mne-tools/mne-cpp/wiki/3.-Install-Qt3D) To use the mne-cpp 3D libraries download and compile also the qt3d module. This step can be skipped when its intended to build mne-cpp for Neuromag Linux machines.
 
-Clone the [qt3d git repo](http://qt.gitorious.org/qt/qt3d)
-
-To compile qt3d it’s highly recommended to make use of qt creator, since it supports shadow builds. This prevents the source folder from being messed up.
-
-First open qt creator make sure Tools->Options->Qt Versions/Kits are setup correctly (Qt 5.0.1)
-Then open qt3d in qt creator. After configuring the shadow build, make sure release mode is selected. Then compile it.
-After compilation, go to the shadow build directory open a terminal and type make install. Qt3d now installs itself to the Qt5.0.1 folder
-
-Tip: Windows users should just use nmake of Visual Studio instead of make.
-
-Now you're ready to build the whole mne-cpp librarie by doing the following steps:
-
-Generate the Makefiles using qmake:
-
-    qmake -recursive
-
-Make the libraries and examples by running:
-
-    make
-
-Tip: It's convinient to use the Qt Creator of the [QtSDK](http://qt-project.org/downloads) to build the libraries.
-Don't forget to add mne-cpp documentation to Qt Creator (Tools->Options->Help->Documentation->Add...). You'll find the qt creator documentation under: /doc/qt-creator_doc/mne-cpp.qch
-
+* [4. Compile mne-cpp](https://github.com/mne-tools/mne-cpp/wiki/4.-Compile-mne-cpp) 
 
 Dependencies
 ============
