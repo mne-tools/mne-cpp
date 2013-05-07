@@ -46,7 +46,7 @@ contains(MNECPP_CONFIG, babyMEG) {
 
 
 # Build Neuromag Plugin only for Unix Systems - cause of unix specific shmem commands
-unix{
+unix:!macx{
     SUBDIRS += \
         Neuromag
 }
