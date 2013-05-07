@@ -19,17 +19,8 @@ Building
 
 To build the mne libraries [Qt5](http://qt-project.org/downloads) is required.
 
-    Build and install Qt5.
+The mne-cpp wikipage [1. Building Qt5](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5) describes how to build Qt5 for [Windows](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5#windows)/[Linux](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5#linux)/[Mac](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5#mac-os-x)
 
-It’s really recommended to always download the source code of Qt5 and compile it from scratch, to make sure everything is compatible.
-
-[Download](http://releases.qt-project.org/qt5/5.0.1/single/qt-everywhere-opensource-src-5.0.1.tar.gz) and extract Qt5 
-
-To compile use the following steps:
-
-    ./configure -debug-and-release -opensource -opengl desktop -prefix /path/to/your/Qt/Qt5.0.1
-    make
-    make install
 
 For convinience download and extract [Qt Creator](http://download.qt-project.org/official_releases/qtcreator/2.7/2.7.0/qt-creator-2.7.0-src.tar.gz)
 To compile the qt creator do the following
