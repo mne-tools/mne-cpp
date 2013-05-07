@@ -140,3 +140,5 @@ bin/readFwdDisp3D
 bin/mne_x.app/Contents/MacOS/mne_x
 
 bin/mne_x.app/Contents/PkgInfo
+
+bin/.DS_Store
