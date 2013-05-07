@@ -20,13 +20,13 @@ Building
 To build the mne libraries [Qt5](http://qt-project.org/downloads) is required.
 
 To build mne-cpp follow the wiki-guide:
-* [1. Build Qt5](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5) describes how to build Qt5 for [Windows](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5#windows)/[Linux](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5#linux)/[Mac](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5#mac-os-x)
+* [1. Build Qt5](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5): This page describes how to build Qt5 for [Windows](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5#windows)/[Linux](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5#linux)/[Mac](https://github.com/mne-tools/mne-cpp/wiki/1.-Building-Qt5#mac-os-x)
 
-* (optional) [2. Install Qt Creator](https://github.com/mne-tools/mne-cpp/wiki/2.-Install-Qt-Creator) For convinience of the further processing it's recommended to install Qt Creator at this point.
+* (optional) [2. Install Qt Creator](https://github.com/mne-tools/mne-cpp/wiki/2.-Install-Qt-Creator): For convinience of the further processing it's recommended to install Qt Creator at this point.
 
-* (optional) [3. Install Qt 3D](https://github.com/mne-tools/mne-cpp/wiki/3.-Install-Qt3D) To use the mne-cpp 3D libraries download and compile also the qt3d module. This step can be skipped when its intended to build mne-cpp for Neuromag Linux machines.
+* (optional) [3. Install Qt 3D](https://github.com/mne-tools/mne-cpp/wiki/3.-Install-Qt3D): To use the mne-cpp 3D libraries download and compile also the qt3d module. This step can be skipped when its intended to build mne-cpp for Neuromag Linux machines.
 
-* [4. Compile mne-cpp](https://github.com/mne-tools/mne-cpp/wiki/4.-Compile-mne-cpp) Now you're ready to build the whole mne-cpp library
+* [4. Compile mne-cpp](https://github.com/mne-tools/mne-cpp/wiki/4.-Compile-mne-cpp): Now you're ready to build the whole mne-cpp library
 
 Dependencies
 ============
