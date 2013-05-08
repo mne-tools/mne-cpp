@@ -16,7 +16,7 @@ isEmpty( MNE_INCLUDE_DIR ) {
 }
 MNE_X_INCLUDE_DIR = $$MNE_X_INCLUDE_DIR
 isEmpty( MNE_X_INCLUDE_DIR ) {
-    MNE_X_INCLUDE_DIR = $${PWD}/mne_x_libs
+    MNE_X_INCLUDE_DIR = $${PWD}/applications/mne_x_libs
 }
 # lib
 MNE_LIBRARY_DIR = $$MNE_LIBRARY_DIR

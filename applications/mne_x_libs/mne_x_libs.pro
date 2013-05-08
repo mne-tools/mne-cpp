@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mne-cpp.pro
+# @file     mne_x_libs.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,23 +29,20 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds all libraries and examples of the mne-cpp project.
+# @brief    This project file builds all mne_x libraries.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(mne-cpp.pri)
+include(../../mne-cpp.pri)
 
 TEMPLATE = subdirs
 
-#At least major version 5
-lessThan(QT_MAJOR_VERSION, 5){
-    error(mne-cpp requires at least Qt version 5!)
+contains(MNECPP_CONFIG, isGui) {
+    SUBDIRS += \
+        xMeas \
+        xDisp \
+        xDtMng \
+        mne_x
 }
-
-SUBDIRS += \
-    MNE \
-    unit_tests \
-    examples \
-    applications
 
 CONFIG += ordered

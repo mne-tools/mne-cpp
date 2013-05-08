@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mne-cpp.pro
+# @file     ecgsimulator.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -18,7 +18,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
@@ -29,23 +29,70 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds all libraries and examples of the mne-cpp project.
+# @brief    This project file generates the makefile for the ecgsimulator plug-in.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(mne-cpp.pri)
+include(../../../../mne-cpp.pri)
 
-TEMPLATE = subdirs
+TEMPLATE = lib
 
-#At least major version 5
-lessThan(QT_MAJOR_VERSION, 5){
-    error(mne-cpp requires at least Qt version 5!)
+CONFIG += plugin
+
+DEFINES += ECGSIMULATOR_LIBRARY
+
+QT += core widgets
+
+TARGET = ecgsimulator
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
 }
 
-SUBDIRS += \
-    MNE \
-    unit_tests \
-    examples \
-    applications
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lxMeasd \
+            -lxDispd \
+            -lxDtMngd \
+            -lmne_xd
+}
+else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lxMeas \
+            -lxDisp \
+            -lxDtMng \
+            -lmne_x
+}
 
-CONFIG += ordered
+DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
+
+SOURCES += \
+        ecgsimulator.cpp \
+        ecgsimchannel.cpp \
+        ecgproducer.cpp \
+        FormFiles/ecgsetupwidget.cpp \
+        FormFiles/ecgrunwidget.cpp \
+        FormFiles/ecgaboutwidget.cpp
+
+HEADERS += \
+        ecgsimulator.h\
+        ecgsimulator_global.h \
+        ecgsimchannel.h \
+        ecgproducer.h \
+        FormFiles/ecgsetupwidget.h \
+        FormFiles/ecgrunwidget.h \
+        FormFiles/ecgaboutwidget.h
+
+FORMS += \
+        FormFiles/ecgsetup.ui \
+        FormFiles/ecgrun.ui \
+        FormFiles/ecgabout.ui
+
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
+
+OTHER_FILES += ecgsimulator.json
+
+# Put generated form headers into the origin --> cause other src is pointing at them
+UI_DIR = $${PWD}

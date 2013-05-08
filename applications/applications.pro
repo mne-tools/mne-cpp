@@ -1,10 +1,10 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mne-cpp.pro
+# @file     applications.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     July, 2012
+# @date     May, 2013
 #
 # @section  LICENSE
 #
@@ -29,23 +29,21 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds all libraries and examples of the mne-cpp project.
+# @brief    This project file builds all applications.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(mne-cpp.pri)
+include(../mne-cpp.pri)
 
 TEMPLATE = subdirs
 
-#At least major version 5
-lessThan(QT_MAJOR_VERSION, 5){
-    error(mne-cpp requires at least Qt version 5!)
-}
-
 SUBDIRS += \
-    MNE \
-    unit_tests \
-    examples \
-    applications
+    mne_rt_server \
+
+contains(MNECPP_CONFIG, isGui) {
+    SUBDIRS += \
+        mne_x_libs \
+        mne_x
+}
 
 CONFIG += ordered

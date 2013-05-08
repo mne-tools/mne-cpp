@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mne-cpp.pro
+# @file     unit_tests.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -18,7 +18,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
@@ -29,23 +29,20 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds all libraries and examples of the mne-cpp project.
+# @brief    This project file generates the makefile to build the unit tests.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(mne-cpp.pri)
+include(../mne-cpp.pri)
 
 TEMPLATE = subdirs
 
-#At least major version 5
-lessThan(QT_MAJOR_VERSION, 5){
-    error(mne-cpp requires at least Qt version 5!)
-}
-
 SUBDIRS += \
-    MNE \
-    unit_tests \
-    examples \
-    applications
+    mne_lib_tests \
+    mne_rt_tests
 
-CONFIG += ordered
+contains(MNECPP_CONFIG, isGui) {
+    SUBDIRS += \
+        mne_disp_test \
+        mne_graph_test
+}
