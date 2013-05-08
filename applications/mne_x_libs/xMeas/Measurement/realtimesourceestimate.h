@@ -166,8 +166,8 @@ private:
 
     double                      m_dSamplingRate;    /**< Sampling rate of the RealTimeSampleArray.*/
     VectorXd                    m_vecValue;         /**< The current attached sample vector.*/
-    unsigned char               m_ucMultiArraySize; /**< Sample size of the multi sample array.*/
-    QVector< VectorXd >         m_matSamples;       /**< The source estiamte array.*/
+    unsigned char               m_ucArraySize; /**< Sample size of the multi sample array.*/
+    QVector< VectorXd >         m_matSamples;       /**< The source estimate array.*/
 };
 
 
@@ -176,39 +176,16 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline void RealTimeMultiSampleArrayNew::setSamplingRate(double dSamplingRate)
+
+inline unsigned int RealTimeSourceEstimate::getNumSources() const
 {
-    m_dSamplingRate = dSamplingRate;
+    return 0;
 }
 
 
 //*************************************************************************************************************
 
-inline double RealTimeMultiSampleArrayNew::getSamplingRate() const
-{
-    return m_dSamplingRate;
-}
-
-
-//*************************************************************************************************************
-
-inline unsigned int RealTimeMultiSampleArrayNew::getNumChannels() const
-{
-    return m_qListChInfo.size();
-}
-
-
-//*************************************************************************************************************
-
-inline QList<RealTimeSampleArrayChInfo>& RealTimeMultiSampleArrayNew::chInfo()
-{
-    return m_qListChInfo;
-}
-
-
-//*************************************************************************************************************
-
-inline FiffInfo::SPtr& RealTimeMultiSampleArrayNew::getFiffInfo()
+inline FiffInfo::SPtr& RealTimeSourceEstimate::getFiffInfo()
 {
     return m_pFiffInfo_orig;
 }
@@ -216,61 +193,31 @@ inline FiffInfo::SPtr& RealTimeMultiSampleArrayNew::getFiffInfo()
 
 //*************************************************************************************************************
 
-inline void RealTimeMultiSampleArrayNew::setMultiArraySize(unsigned char ucMultiArraySize)
+inline void RealTimeSourceEstimate::setArraySize(unsigned char ucArraySize)
 {
     //Obsolete unsigned char can't be bigger
 //    if(ucArraySize > 255)
 //        m_ucArraySize = 255;
 //    else
-        m_ucMultiArraySize = ucMultiArraySize;
+        m_ucArraySize = ucArraySize;
 }
 
 
 //*************************************************************************************************************
 
-unsigned char RealTimeMultiSampleArrayNew::getMultiArraySize() const
+unsigned char RealTimeSourceEstimate::getArraySize() const
 {
-    return m_ucMultiArraySize;
+    return m_ucArraySize;
 }
 
 
 //*************************************************************************************************************
 
-inline const QVector< VectorXd >& RealTimeMultiSampleArrayNew::getMultiSampleArray()
+inline const QVector< VectorXd >& RealTimeSourceEstimate::getSourceArray()
 {
     return m_matSamples;
 }
 
 } // NAMESPACE
-
-#endif // REALTIMESOURCEESTIMATE_H
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#ifndef REALTIMESOURCEESTIMATE_H
-#define REALTIMESOURCEESTIMATE_H
-
-class RealTimeSourceEstimate
-{
-public:
-    RealTimeSourceEstimate();
-};
 
 #endif // REALTIMESOURCEESTIMATE_H
