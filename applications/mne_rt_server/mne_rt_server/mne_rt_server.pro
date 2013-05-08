@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mne-cpp.pro
+# @file     mne_rt_server.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -18,7 +18,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
@@ -29,23 +29,67 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds all libraries and examples of the mne-cpp project.
+# @brief    This project file generates the makefile to build the core app.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(mne-cpp.pri)
+include(../../../mne-cpp.pri)
 
-TEMPLATE = subdirs
+TEMPLATE = app
 
-#At least major version 5
-lessThan(QT_MAJOR_VERSION, 5){
-    error(mne-cpp requires at least Qt version 5!)
+QT += network
+QT -= gui
+
+CONFIG   += console
+CONFIG   -= app_bundle
+
+TARGET = mne_rt_server
+
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
 }
 
-SUBDIRS += \
-    MNE \
-    unit_tests \
-    examples \
-    applications
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}RtCommandd \
+            -lMNE$${MNE_LIB_VERSION}Utilsd \
+}
+else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lMNE$${MNE_LIB_VERSION}Fs \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}RtCommand \
+            -lMNE$${MNE_LIB_VERSION}Utils \
+}
 
-CONFIG += ordered
+DESTDIR = $${MNE_BINARY_DIR}
+
+SOURCES += \
+    main.cpp \
+    connectormanager.cpp \
+    mne_rt_server.cpp \
+    fiffstreamserver.cpp \
+    fiffstreamthread.cpp \
+    commandserver.cpp \
+    commandthread.cpp
+
+
+HEADERS += \
+# has to be moved to connectors
+    IConnector.h \
+    connectormanager.h \
+    mne_rt_server.h \
+    mne_rt_server.h \
+    fiffstreamserver.h \
+    fiffstreamthread.h \
+    commandserver.h \
+    commandthread.h \
+    mne_rt_commands.h
+
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}

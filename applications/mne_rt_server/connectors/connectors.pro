@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mne-cpp.pro
+# @file     connectors.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,23 +29,26 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds all libraries and examples of the mne-cpp project.
+# @brief    This project file builds all connector modules.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(mne-cpp.pri)
+include(../../../mne-cpp.pri)
 
 TEMPLATE = subdirs
 
-#At least major version 5
-lessThan(QT_MAJOR_VERSION, 5){
-    error(mne-cpp requires at least Qt version 5!)
+SUBDIRS += \
+    FiffSimulator \
+
+contains(MNECPP_CONFIG, babyMEG) {
+    SUBDIRS += BabyMEG
 }
 
-SUBDIRS += \
-    MNE \
-    unit_tests \
-    examples \
-    applications
+
+# Build Neuromag Plugin only for Unix Systems - cause of unix specific shmem commands
+unix:!macx{
+    SUBDIRS += \
+        Neuromag
+}
 
 CONFIG += ordered
