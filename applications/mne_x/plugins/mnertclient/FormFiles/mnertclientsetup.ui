@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>RtServerSetupWidgetClass</class>
- <widget class="QWidget" name="RtServerSetupWidgetClass">
+ <class>MneRtClientSetupWidgetClass</class>
+ <widget class="QWidget" name="MneRtClientSetupWidgetClass">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -97,7 +97,7 @@
           </widget>
          </item>
          <item row="3" column="0">
-          <widget class="QGroupBox" name="m_qGroupBox_RtServerProperties">
+          <widget class="QGroupBox" name="m_qGroupBox_MneRtClientProperties">
            <property name="title">
             <string>Rt Server Properties</string>
            </property>

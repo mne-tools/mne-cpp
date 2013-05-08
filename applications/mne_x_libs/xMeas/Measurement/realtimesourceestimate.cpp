@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtserver_global.h
+* @file     realtimesourceestimate.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,18 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the RTServer library export/import macros.
+* @brief    Contains the implementation of the RealTimeSourceEstimate class.
 *
 */
 
-#ifndef RTSERVER_GLOBAL_H
-#define RTSERVER_GLOBAL_H
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "realtimemultisamplearray_new.h"
+
+#include "realtimesourceestimate.h"
 
 
 //*************************************************************************************************************
@@ -42,18 +48,34 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/qglobal.h>
+#include <QDebug>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// PREPROCESSOR DEFINES
+// USED NAMESPACES
 //=============================================================================================================
 
-#if defined(RTSERVER_LIBRARY)
-#  define RTSERVERSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-#else
-#  define RTSERVERSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-#endif
+using namespace XMEASLIB;
+//using namespace IOBuffer;
 
-#endif // RTSERVER_GLOBAL_H
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+RealTimeSourceEstimate::RealTimeSourceEstimate()
+: MltChnMeasurement()
+, m_ucMultiArraySize(10)
+{
+
+}
+
+
+//*************************************************************************************************************
+
+RealTimeSourceEstimate::~RealTimeSourceEstimate()
+{
+
+}

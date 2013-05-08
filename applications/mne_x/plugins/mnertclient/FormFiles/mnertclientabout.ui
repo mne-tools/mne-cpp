@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>RtServerAboutWidgetClass</class>
- <widget class="QDialog" name="RtServerAboutWidgetClass">
+ <class>MneRtClientAboutWidgetClass</class>
+ <widget class="QDialog" name="MneRtClientAboutWidgetClass">
   <property name="geometry">
    <rect>
     <x>0</x>

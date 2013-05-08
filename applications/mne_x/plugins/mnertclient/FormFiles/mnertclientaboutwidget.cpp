@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtserveraboutwidget.cpp
+* @file     mnertclientaboutwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RtServerAboutWidget class.
+* @brief    Contains the implementation of the MneRtClientAboutWidget class.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rtserveraboutwidget.h"
+#include "mnertclientaboutwidget.h"
 
 
 //*************************************************************************************************************
@@ -53,7 +53,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace RtServerPlugin;
+using namespace MneRtClientPlugin;
 
 
 //*************************************************************************************************************
@@ -61,7 +61,7 @@ using namespace RtServerPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtServerAboutWidget::RtServerAboutWidget(QWidget *parent)
+MneRtClientAboutWidget::MneRtClientAboutWidget(QWidget *parent)
 : QDialog(parent)
 {
     ui.setupUi(this);
@@ -70,7 +70,7 @@ RtServerAboutWidget::RtServerAboutWidget(QWidget *parent)
 
 //*************************************************************************************************************
 
-RtServerAboutWidget::~RtServerAboutWidget()
+MneRtClientAboutWidget::~MneRtClientAboutWidget()
 {
 
 }

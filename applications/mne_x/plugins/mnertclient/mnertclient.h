@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtserver.h
+* @file     mnertclient.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RtServer class.
+* @brief    Contains the declaration of the MneRtClient class.
 *
 */
 
-#ifndef RTSERVER_H
-#define RTSERVER_H
+#ifndef MNERTCLIENT_H
+#define MNERTCLIENT_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rtserver_global.h"
+#include "mnertclient_global.h"
 
 #include <mne_x/Interfaces/ISensor.h>
 #include <generics/circularbuffer_old.h>
@@ -78,10 +78,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RtServerPlugin
+// DEFINE NAMESPACE MneRtClientPlugin
 //=============================================================================================================
 
-namespace RtServerPlugin
+namespace MneRtClientPlugin
 {
 
 
@@ -101,40 +101,40 @@ using namespace FIFFLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class RtServerProducer;
+class MneRtClientProducer;
 //class ECGChannel;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RtServer
+* DECLARE CLASS MneRtClient
 *
-* @brief The RtServer class provides a RT server connection.
+* @brief The MneRtClient class provides a RT server connection.
 */
-class RTSERVERSHARED_EXPORT RtServer : public ISensor
+class MNERTCLIENTSHARED_EXPORT MneRtClient : public ISensor
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "rtserver.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "mnertclient.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MNEX::ISensor)
 
-    friend class RtServerProducer;
-    friend class RtServerSetupWidget;
-    friend class RtServerRunWidget;
+    friend class MneRtClientProducer;
+    friend class MneRtClientSetupWidget;
+    friend class MneRtClientRunWidget;
 
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a RtServer.
+    * Constructs a MneRtClient.
     */
-    RtServer();
+    MneRtClient();
 
     //=========================================================================================================
     /**
-    * Destroys the RtServer.
+    * Destroys the MneRtClient.
     */
-    virtual ~RtServer();
+    virtual ~MneRtClient();
 
     //=========================================================================================================
     /**
@@ -199,7 +199,7 @@ protected:
 private:
     //=========================================================================================================
     /**
-    * Initialise the RtServer.
+    * Initialise the MneRtClient.
     */
     void init();
 
@@ -207,19 +207,19 @@ private:
     QMutex rtServerMutex;
 
 
-    QString m_sRtServerClientAlias;     /**< The rt server client alias.*/
+    QString m_sMneRtClientClientAlias;     /**< The rt server client alias.*/
 
 //    float           m_fSamplingRate;                /**< Holds the sampling rate.*/
 //    int             m_iDownsamplingFactor;          /**< Holds the down sampling factor.*/
 
-    RealTimeMultiSampleArrayNew*    m_pRTMSA_RtServer;      /**< Holds the RealTimeMultiSampleArray to provide the rt_server Channels.*/
+    RealTimeMultiSampleArrayNew*    m_pRTMSA_MneRtClient;      /**< Holds the RealTimeMultiSampleArray to provide the rt_server Channels.*/
 
     RtCmdClient*       m_pRtCmdClient;      /**< The command client.*/
     bool m_bCmdClientIsConnected;           /**< If the command client is connected.*/
 
-    QString     m_sRtServerIP;              /**< The IP Adress of mne_rt_server.*/
+    QString     m_sMneRtClientIP;              /**< The IP Adress of mne_rt_server.*/
 
-    RtServerProducer*   m_pRtServerProducer;/**< Holds the RtServerProducer.*/
+    MneRtClientProducer*   m_pMneRtClientProducer;/**< Holds the MneRtClientProducer.*/
 
 
     QMap<qint32, QString> m_qMapConnectors; /**< Connector map.*/
@@ -238,4 +238,4 @@ private:
 
 } // NAMESPACE
 
-#endif // RTSERVER_H
+#endif // MNERTCLIENT_H

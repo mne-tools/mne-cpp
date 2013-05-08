@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtserversetupwidget.h
+* @file     mnertclientaboutwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RtServerSetupWidget class.
+* @brief    Contains the declaration of the MneRtClientAboutWidget class.
 *
 */
 
-#ifndef RTSERVERSETUPWIDGET_H
-#define RTSERVERSETUPWIDGET_H
+#ifndef MNERTCLIENTABOUTWIDGET_H
+#define MNERTCLIENTABOUTWIDGET_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_rtserversetup.h"
+#include "../ui_mnertclientabout.h"
 
 
 //*************************************************************************************************************
@@ -55,11 +55,17 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RtServerPlugin
+// DEFINE NAMESPACE MneRtClientPlugin
 //=============================================================================================================
 
-namespace RtServerPlugin
+namespace MneRtClientPlugin
 {
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -67,16 +73,14 @@ namespace RtServerPlugin
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class RtServer;
-
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RtServerSetupWidget
+* DECLARE CLASS MneRtClientAboutWidget
 *
-* @brief The RtServerSetupWidget class provides the ECG configuration window.
+* @brief The MneRtClientAboutWidget class provides the about dialog for the MneRtClient.
 */
-class RtServerSetupWidget : public QWidget
+class MneRtClientAboutWidget : public QDialog
 {
     Q_OBJECT
 
@@ -84,75 +88,23 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RtServerSetupWidget which is a child of parent.
+    * Constructs a MneRtClientAboutWidget dialog which is a child of parent.
     *
-    * @param [in] p_pRtServer   a pointer to the corresponding RtServer.
-    * @param [in] parent        pointer to parent widget; If parent is 0, the new RtServerSetupWidget becomes a window. If parent is another widget, RtServerSetupWidget becomes a child window inside parent. RtServerSetupWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new MneRtClientAboutWidget becomes a window. If parent is another widget, MneRtClientAboutWidget becomes a child window inside parent. ECGAboutWidget is deleted when its parent is deleted.
     */
-    RtServerSetupWidget(RtServer* p_pRtServer, QWidget *parent = 0);
+    MneRtClientAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RtServerSetupWidget.
-    * All RtServerSetupWidget's children are deleted first. The application exits if RtServerSetupWidget is the main widget.
+    * Destroys the MneRtClientAboutWidget.
+    * All MneRtClientAboutWidget's children are deleted first. The application exits if MneRtClientAboutWidget is the main widget.
     */
-    ~RtServerSetupWidget();
-
-    //=========================================================================================================
-    /**
-    * Inits the setup widget
-    */
-    void init();
-
-//slots
-    void bufferSizeEdited();        /**< Buffer size edited and set new buffer size.*/
-
-    void checkedRecordDataChanged();    /**< Record Data checkbox changed. */
-
-    //=========================================================================================================
-    /**
-    * Connector selection index changed
-    *
-    * @param [in] idx   new connector combo box index
-    */
-    void connectorIdxChanged(int idx);
-
-    void printToLog(QString message);   /**< Implements printing messages to rtproc log.*/
-
-    void pressedFiffRecordFile();   /**< Triggers file dialog to select record file.*/
-
-    void pressedConnect();          /**< Triggers a connection trial to rt_server.*/
-
-    void pressedSendCLI();          /**< Triggers a send request of a cli command.*/
-
-    void fiffInfoReceived();        /**< Triggered when new fiff info is recieved by producer and stored intor rt_server */
-
+    ~MneRtClientAboutWidget();
 
 private:
-    //=========================================================================================================
-    /**
-    * Set command connection status
-    *
-    * @param[in] p_bConnectionStatus    the connection status
-    */
-    void cmdConnectionChanged(bool p_bConnectionStatus);
-
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
-
-    RtServer*   m_pRtServer;    /**< Holds a pointer to corresponding ECGSimulator.*/
-
-    Ui::RtServerSetupWidgetClass ui;       /**< Holds the user interface for the RtServerSetupWidget.*/
-
-    bool m_bIsInit;     /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized */
-
-
+    Ui::MneRtClientAboutWidgetClass ui;    /**< Holds the user interface for the DummyAboutWidget.*/
 };
 
 } // NAMESPACE
 
-#endif // RTSERVERSETUPWIDGET_H
+#endif // MNERTCLIENTABOUTWIDGET_H

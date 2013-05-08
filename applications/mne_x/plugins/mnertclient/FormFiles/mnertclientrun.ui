@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>RtServerRunClass</class>
- <widget class="QWidget" name="RtServerRunClass">
+ <class>MneRtClientRunClass</class>
+ <widget class="QWidget" name="MneRtClientRunClass">
   <property name="geometry">
    <rect>
     <x>0</x>
