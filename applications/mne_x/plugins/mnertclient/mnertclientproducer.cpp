@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtserverproducer.cpp
+* @file     mnertclientproducer.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RtServerProducer class.
+* @brief    Contains the implementation of the MneRtClientProducer class.
 *
 */
 
@@ -38,8 +38,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rtserverproducer.h"
-#include "rtserver.h"
+#include "mnertclientproducer.h"
+#include "mnertclient.h"
 
 
 //*************************************************************************************************************
@@ -47,7 +47,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace RtServerPlugin;
+using namespace MneRtClientPlugin;
 
 
 //*************************************************************************************************************
@@ -55,8 +55,8 @@ using namespace RtServerPlugin;
 // QT INCLUDES
 //=============================================================================================================
 
-RtServerProducer::RtServerProducer(RtServer* p_pRtServer)
-: m_pRtServer(p_pRtServer)
+MneRtClientProducer::MneRtClientProducer(MneRtClient* p_pMneRtClient)
+: m_pMneRtClient(p_pMneRtClient)
 , m_pRtDataClient(NULL)
 , m_bDataClientIsConnected(false)
 , m_iDataClientId(-1)
@@ -68,7 +68,7 @@ RtServerProducer::RtServerProducer(RtServer* p_pRtServer)
 
 //*************************************************************************************************************
 
-RtServerProducer::~RtServerProducer()
+MneRtClientProducer::~MneRtClientProducer()
 {
     if(m_pRtDataClient)
         delete m_pRtDataClient;
@@ -77,7 +77,7 @@ RtServerProducer::~RtServerProducer()
 
 //*************************************************************************************************************
 
-void RtServerProducer::connectDataClient(QString p_sRtSeverIP)
+void MneRtClientProducer::connectDataClient(QString p_sRtSeverIP)
 {
     if(!m_pRtDataClient)
         m_pRtDataClient = new RtDataClient();
@@ -100,7 +100,7 @@ void RtServerProducer::connectDataClient(QString p_sRtSeverIP)
             //
             // set data client alias -> for convinience (optional)
             //
-            m_pRtDataClient->setClientAlias(m_pRtServer->m_sRtServerClientAlias); // used in option 2 later on
+            m_pRtDataClient->setClientAlias(m_pMneRtClient->m_sMneRtClientClientAlias); // used in option 2 later on
 
             //
             // set new state
@@ -115,7 +115,7 @@ void RtServerProducer::connectDataClient(QString p_sRtSeverIP)
 
 //*************************************************************************************************************
 
-void RtServerProducer::disconnectDataClient()
+void MneRtClientProducer::disconnectDataClient()
 {
     if(m_bDataClientIsConnected)
     {
@@ -132,7 +132,7 @@ void RtServerProducer::disconnectDataClient()
 
 //*************************************************************************************************************
 
-void RtServerProducer::stop()
+void MneRtClientProducer::stop()
 {
     m_bIsRunning = false;
     QThread::wait();
@@ -141,17 +141,17 @@ void RtServerProducer::stop()
 
 //*************************************************************************************************************
 
-void RtServerProducer::run()
+void MneRtClientProducer::run()
 {
     //
     // Connect data client
     //
-    this->connectDataClient(m_pRtServer->m_sRtServerIP);
+    this->connectDataClient(m_pMneRtClient->m_sMneRtClientIP);
 
     while(m_pRtDataClient->state() != QTcpSocket::ConnectedState)
     {
         msleep(100);
-        this->connectDataClient(m_pRtServer->m_sRtServerIP);
+        this->connectDataClient(m_pMneRtClient->m_sMneRtClientIP);
     }
 
     msleep(1000);
@@ -172,10 +172,10 @@ void RtServerProducer::run()
     {
         if(m_bFlagInfoRequest)
         {
-            m_pRtServer->rtServerMutex.lock();
-            m_pRtServer->m_pFiffInfo = m_pRtDataClient->readInfo();
-            emit m_pRtServer->fiffInfoAvailable();
-            m_pRtServer->rtServerMutex.unlock();
+            m_pMneRtClient->rtServerMutex.lock();
+            m_pMneRtClient->m_pFiffInfo = m_pRtDataClient->readInfo();
+            emit m_pMneRtClient->fiffInfoAvailable();
+            m_pMneRtClient->rtServerMutex.unlock();
 
             producerMutex.lock();
             m_bFlagInfoRequest = false;
@@ -184,15 +184,15 @@ void RtServerProducer::run()
 
         if(m_bFlagMeasuring)
         {
-            m_pRtDataClient->readRawBuffer(m_pRtServer->m_pFiffInfo->nchan, t_matRawBuffer, kind);
+            m_pRtDataClient->readRawBuffer(m_pMneRtClient->m_pFiffInfo->nchan, t_matRawBuffer, kind);
 
             if(kind == FIFF_DATA_BUFFER)
             {
                 to += t_matRawBuffer.cols();
-//                printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, ((float)from)/m_pRtServer->m_pFiffInfo->sfreq, ((float)to)/m_pRtServer->m_pFiffInfo->sfreq);
+//                printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, ((float)from)/m_pMneRtClient->m_pFiffInfo->sfreq, ((float)to)/m_pMneRtClient->m_pFiffInfo->sfreq);
                 from += t_matRawBuffer.cols();
 
-                m_pRtServer->m_pRawMatrixBuffer_In->push(&t_matRawBuffer);
+                m_pMneRtClient->m_pRawMatrixBuffer_In->push(&t_matRawBuffer);
             }
             else if(FIFF_DATA_BUFFER == FIFF_BLOCK_END)
                 m_bFlagMeasuring = false;

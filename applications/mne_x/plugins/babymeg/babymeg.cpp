@@ -362,7 +362,7 @@ void BabyMeg::init()
     if(m_pFiffInfo)
     {
 //        m_pFiffInfo->sfreq /= 100;
-        m_pRTMSA_BabyMeg = addProviderRealTimeMultiSampleArray_New(MSR_ID::MEGRTSERVER_OUTPUT);//Same as rt server - cause one should only run at one time
+        m_pRTMSA_BabyMeg = addProviderRealTimeMultiSampleArray_New(MSR_ID::MEGRTCLIENT_OUTPUT);//Same as rt server - cause one should only run at one time
         m_pRTMSA_BabyMeg->initFromFiffInfo(m_pFiffInfo);
         m_pRTMSA_BabyMeg->setMultiArraySize(10);
         m_pRTMSA_BabyMeg->setVisibility(true);

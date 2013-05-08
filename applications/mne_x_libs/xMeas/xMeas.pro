@@ -87,7 +87,8 @@ SOURCES += \
     Measurement/measurement.cpp \
     Measurement/mltchnmeasurement.cpp \
     Measurement/realtimemultisamplearray_new.cpp \
-    Measurement/realtimesamplearraychinfo.cpp
+    Measurement/realtimesamplearraychinfo.cpp \
+    Measurement/realtimesourceestimate.cpp
 
 HEADERS += \
     xmeas_global.h \
@@ -103,7 +104,8 @@ HEADERS += \
     Measurement/measurement.h \
     Measurement/mltchnmeasurement.h \
     Measurement/realtimemultisamplearray_new.h \
-    Measurement/realtimesamplearraychinfo.h
+    Measurement/realtimesamplearraychinfo.h \
+    Measurement/realtimesourceestimate.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

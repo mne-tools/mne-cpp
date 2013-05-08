@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtserverrunwidget.cpp
+* @file     mnertclientrunwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,57 +29,89 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RtServerRunWidget class.
+* @brief    Contains the declaration of the MneRtClientRunWidget class.
 *
 */
+
+#ifndef MNERTCLIENTRUNWIDGET_H
+#define MNERTCLIENTRUNWIDGET_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "rtserverrunwidget.h"
-#include "rtserveraboutwidget.h"
-#include "../rtserver.h"
+#include "../ui_mnertclientrun.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// QT INCLUDES
 //=============================================================================================================
 
-using namespace RtServerPlugin;
+#include <QtWidgets>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE NAMESPACE MneRtClientPlugin
 //=============================================================================================================
 
-RtServerRunWidget::RtServerRunWidget(RtServer *p_pRtServer, QWidget *parent)
-: QWidget(parent)
-, m_pRtServer(p_pRtServer)
-{
-    ui.setupUi(this);
-
-    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
-
-    ui.m_qTextBrowser_Information->insertHtml(QString("Sampling Rate: %1sps").arg(1));
-}
-
-
-//*************************************************************************************************************
-
-RtServerRunWidget::~RtServerRunWidget()
+namespace MneRtClientPlugin
 {
 
-}
-
 
 //*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
-void RtServerRunWidget::showAboutDialog()
+class MneRtClient;
+
+
+//=============================================================================================================
+/**
+* DECLARE CLASS MneRtClientRunWidget
+*
+* @brief The MneRtClientRunWidget class provides the ECG configuration window for the run mode.
+*/
+class MneRtClientRunWidget : public QWidget
 {
-    RtServerAboutWidget aboutDialog(this);
-    aboutDialog.exec();
-}
+    Q_OBJECT
+
+public:
+
+    //=========================================================================================================
+    /**
+    * Constructs a MneRtClientRunWidget which is a child of parent.
+    *
+    * @param [in] simulator a pointer to the corresponding ECG Simulator.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new MneRtClientRunWidget becomes a window. If parent is another widget, MneRtClientRunWidget becomes a child window inside parent. MneRtClientRunWidget is deleted when its parent is deleted.
+    */
+    MneRtClientRunWidget(MneRtClient* simulator, QWidget *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Destroys the MneRtClientRunWidget.
+    * All MneRtClientRunWidget's children are deleted first. The application exits if MneRtClientRunWidget is the main widget.
+    */
+    ~MneRtClientRunWidget();
+
+private slots:
+    //=========================================================================================================
+    /**
+    * Shows the About Dialog
+    *
+    */
+    void showAboutDialog();
+
+private:
+    MneRtClient* m_pMneRtClient;      /**< Holds a pointer to corresponding ECGSimulator.*/
+
+    Ui::MneRtClientRunClass ui;    /**< Holds the user interface for the MneRtClientRunWidget.*/
+};
+
+} // NAMESPACE
+
+#endif // MNERTCLIENTRUNWIDGET_H

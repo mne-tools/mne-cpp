@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtserverrunwidget.h
+* @file     mnertclientsetupwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RtServerRunWidget class.
+* @brief    Contains the declaration of the MneRtClientSetupWidget class.
 *
 */
 
-#ifndef RTSERVERRUNWIDGET_H
-#define RTSERVERRUNWIDGET_H
+#ifndef MNERTCLIENTSETUPWIDGET_H
+#define MNERTCLIENTSETUPWIDGET_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_rtserverrun.h"
+#include "../ui_mnertclientsetup.h"
 
 
 //*************************************************************************************************************
@@ -55,10 +55,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RtServerPlugin
+// DEFINE NAMESPACE MneRtClientPlugin
 //=============================================================================================================
 
-namespace RtServerPlugin
+namespace MneRtClientPlugin
 {
 
 
@@ -67,16 +67,16 @@ namespace RtServerPlugin
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class RtServer;
+class MneRtClient;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RtServerRunWidget
+* DECLARE CLASS MneRtClientSetupWidget
 *
-* @brief The RtServerRunWidget class provides the ECG configuration window for the run mode.
+* @brief The MneRtClientSetupWidget class provides the ECG configuration window.
 */
-class RtServerRunWidget : public QWidget
+class MneRtClientSetupWidget : public QWidget
 {
     Q_OBJECT
 
@@ -84,21 +84,59 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RtServerRunWidget which is a child of parent.
+    * Constructs a MneRtClientSetupWidget which is a child of parent.
     *
-    * @param [in] simulator a pointer to the corresponding ECG Simulator.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new RtServerRunWidget becomes a window. If parent is another widget, RtServerRunWidget becomes a child window inside parent. RtServerRunWidget is deleted when its parent is deleted.
+    * @param [in] p_pMneRtClient   a pointer to the corresponding MneRtClient.
+    * @param [in] parent        pointer to parent widget; If parent is 0, the new MneRtClientSetupWidget becomes a window. If parent is another widget, MneRtClientSetupWidget becomes a child window inside parent. MneRtClientSetupWidget is deleted when its parent is deleted.
     */
-    RtServerRunWidget(RtServer* simulator, QWidget *parent = 0);
+    MneRtClientSetupWidget(MneRtClient* p_pMneRtClient, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RtServerRunWidget.
-    * All RtServerRunWidget's children are deleted first. The application exits if RtServerRunWidget is the main widget.
+    * Destroys the MneRtClientSetupWidget.
+    * All MneRtClientSetupWidget's children are deleted first. The application exits if MneRtClientSetupWidget is the main widget.
     */
-    ~RtServerRunWidget();
+    ~MneRtClientSetupWidget();
 
-private slots:
+    //=========================================================================================================
+    /**
+    * Inits the setup widget
+    */
+    void init();
+
+//slots
+    void bufferSizeEdited();        /**< Buffer size edited and set new buffer size.*/
+
+    void checkedRecordDataChanged();    /**< Record Data checkbox changed. */
+
+    //=========================================================================================================
+    /**
+    * Connector selection index changed
+    *
+    * @param [in] idx   new connector combo box index
+    */
+    void connectorIdxChanged(int idx);
+
+    void printToLog(QString message);   /**< Implements printing messages to rtproc log.*/
+
+    void pressedFiffRecordFile();   /**< Triggers file dialog to select record file.*/
+
+    void pressedConnect();          /**< Triggers a connection trial to rt_server.*/
+
+    void pressedSendCLI();          /**< Triggers a send request of a cli command.*/
+
+    void fiffInfoReceived();        /**< Triggered when new fiff info is recieved by producer and stored intor rt_server */
+
+
+private:
+    //=========================================================================================================
+    /**
+    * Set command connection status
+    *
+    * @param[in] p_bConnectionStatus    the connection status
+    */
+    void cmdConnectionChanged(bool p_bConnectionStatus);
+
     //=========================================================================================================
     /**
     * Shows the About Dialog
@@ -106,12 +144,15 @@ private slots:
     */
     void showAboutDialog();
 
-private:
-    RtServer* m_pRtServer;      /**< Holds a pointer to corresponding ECGSimulator.*/
+    MneRtClient*   m_pMneRtClient;    /**< Holds a pointer to corresponding ECGSimulator.*/
 
-    Ui::RtServerRunClass ui;    /**< Holds the user interface for the RtServerRunWidget.*/
+    Ui::MneRtClientSetupWidgetClass ui;       /**< Holds the user interface for the MneRtClientSetupWidget.*/
+
+    bool m_bIsInit;     /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized */
+
+
 };
 
 } // NAMESPACE
 
-#endif // RTSERVERRUNWIDGET_H
+#endif // MNERTCLIENTSETUPWIDGET_H

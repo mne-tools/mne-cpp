@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtserveraboutwidget.h
+* @file     mnertclientrunwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,37 +29,18 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RtServerAboutWidget class.
+* @brief    Contains the implementation of the MneRtClientRunWidget class.
 *
 */
-
-#ifndef RTSERVERABOUTWIDGET_H
-#define RTSERVERABOUTWIDGET_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_rtserverabout.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QtWidgets>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE RtServerPlugin
-//=============================================================================================================
-
-namespace RtServerPlugin
-{
+#include "mnertclientrunwidget.h"
+#include "mnertclientaboutwidget.h"
+#include "../mnertclient.h"
 
 
 //*************************************************************************************************************
@@ -67,44 +48,38 @@ namespace RtServerPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace MneRtClientPlugin;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
-//=============================================================================================================
-/**
-* DECLARE CLASS RtServerAboutWidget
-*
-* @brief The RtServerAboutWidget class provides the about dialog for the RtServer.
-*/
-class RtServerAboutWidget : public QDialog
+MneRtClientRunWidget::MneRtClientRunWidget(MneRtClient *p_pMneRtClient, QWidget *parent)
+: QWidget(parent)
+, m_pMneRtClient(p_pMneRtClient)
 {
-    Q_OBJECT
+    ui.setupUi(this);
 
-public:
+    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
 
-    //=========================================================================================================
-    /**
-    * Constructs a RtServerAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new RtServerAboutWidget becomes a window. If parent is another widget, RtServerAboutWidget becomes a child window inside parent. ECGAboutWidget is deleted when its parent is deleted.
-    */
-    RtServerAboutWidget(QWidget *parent = 0);
+    ui.m_qTextBrowser_Information->insertHtml(QString("Sampling Rate: %1sps").arg(1));
+}
 
-    //=========================================================================================================
-    /**
-    * Destroys the RtServerAboutWidget.
-    * All RtServerAboutWidget's children are deleted first. The application exits if RtServerAboutWidget is the main widget.
-    */
-    ~RtServerAboutWidget();
 
-private:
-    Ui::RtServerAboutWidgetClass ui;    /**< Holds the user interface for the DummyAboutWidget.*/
-};
+//*************************************************************************************************************
 
-} // NAMESPACE
+MneRtClientRunWidget::~MneRtClientRunWidget()
+{
 
-#endif // RTSERVERABOUTWIDGET_H
+}
+
+
+//*************************************************************************************************************
+
+void MneRtClientRunWidget::showAboutDialog()
+{
+    MneRtClientAboutWidget aboutDialog(this);
+    aboutDialog.exec();
+}

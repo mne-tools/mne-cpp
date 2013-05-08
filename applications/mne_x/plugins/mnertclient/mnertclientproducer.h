@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtserverproducer.h
+* @file     mnertclientproducer.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef RTSERVERPRODUCER_H
-#define RTSERVERPRODUCER_H
+#ifndef MNERTCLIENTPRODUCER_H
+#define MNERTCLIENTPRODUCER_H
 
 
 //*************************************************************************************************************
@@ -64,10 +64,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RtServerPlugin
+// DEFINE NAMESPACE MneRtClientPlugin
 //=============================================================================================================
 
-namespace RtServerPlugin
+namespace MneRtClientPlugin
 {
 
 
@@ -85,7 +85,7 @@ using namespace RTCLIENTLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class RtServer;
+class MneRtClient;
 
 
 //=============================================================================================================
@@ -94,26 +94,26 @@ class RtServer;
 *
 * @brief The ECGProducer class provides a ECG data producer for a given sampling rate.
 */
-class RtServerProducer : public QThread
+class MneRtClientProducer : public QThread
 {
     Q_OBJECT
 
-    friend class RtServer;
+    friend class MneRtClient;
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a RtServerProducer.
+    * Constructs a MneRtClientProducer.
     *
-    * @param [in] p_pRtServer   a pointer to the corresponding RtServer.
+    * @param [in] p_pMneRtClient   a pointer to the corresponding MneRtClient.
     */
-    RtServerProducer(RtServer* p_pRtServer);
+    MneRtClientProducer(MneRtClient* p_pMneRtClient);
 
     //=========================================================================================================
     /**
-    * Destroys the RtServerProducer.
+    * Destroys the MneRtClientProducer.
     */
-    ~RtServerProducer();
+    ~MneRtClientProducer();
 
     //=========================================================================================================
     /**
@@ -131,7 +131,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Stops the RtServerProducer by stopping the producer's thread.
+    * Stops the MneRtClientProducer by stopping the producer's thread.
     */
     void stop();
 
@@ -157,8 +157,8 @@ private:
 
     QMutex producerMutex;
 
-    RtServer*   m_pRtServer;    /**< Holds a pointer to corresponding RtServer.*/
-    bool        m_bIsRunning;   /**< Whether RtServerProducer is running.*/
+    MneRtClient*   m_pMneRtClient;    /**< Holds a pointer to corresponding MneRtClient.*/
+    bool        m_bIsRunning;   /**< Whether MneRtClientProducer is running.*/
 
     RtDataClient* m_pRtDataClient;  /**< The data client.*/
     bool m_bDataClientIsConnected;  /**< If the data client is connected.*/
@@ -172,4 +172,4 @@ private:
 
 } // NAMESPACE
 
-#endif // RTSERVERPRODUCER_H
+#endif // MNERTCLIENTPRODUCER_H

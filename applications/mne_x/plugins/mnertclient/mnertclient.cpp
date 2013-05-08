@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtserver.cpp
+* @file     mnertclient.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RtServer class.
+* @brief    Contains the implementation of the MneRtClient class.
 *
 */
 
@@ -38,11 +38,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rtserver.h"
-#include "rtserverproducer.h"
+#include "mnertclient.h"
+#include "mnertclientproducer.h"
 
-#include "FormFiles/rtserversetupwidget.h"
-#include "FormFiles/rtserverrunwidget.h"
+#include "FormFiles/mnertclientsetupwidget.h"
+#include "FormFiles/mnertclientrunwidget.h"
 
 #include <utils/ioutils.h>
 
@@ -65,7 +65,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace RtServerPlugin;
+using namespace MneRtClientPlugin;
 using namespace UTILSLIB;
 
 
@@ -74,27 +74,27 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtServer::RtServer()
-: m_pRTMSA_RtServer(0)
-, m_sRtServerClientAlias("mne-x")
+MneRtClient::MneRtClient()
+: m_pRTMSA_MneRtClient(0)
+, m_sMneRtClientClientAlias("mne-x")
 , m_pRtCmdClient(NULL)
-, m_pRtServerProducer(new RtServerProducer(this))
-, m_sRtServerIP("127.0.0.1")//("172.21.16.88")//("127.0.0.1")
+, m_pMneRtClientProducer(new MneRtClientProducer(this))
+, m_sMneRtClientIP("127.0.0.1")//("172.21.16.88")//("127.0.0.1")
 , m_bCmdClientIsConnected(false)
 , m_iBufferSize(-1)
 , m_pRawMatrixBuffer_In(NULL)
 {
-    m_PLG_ID = PLG_ID::RTSERVER;
+    m_PLG_ID = PLG_ID::MNERTCLIENT;
 
-    // Start RtServerProducer
-    m_pRtServerProducer->start();
+    // Start MneRtClientProducer
+    m_pMneRtClientProducer->start();
 
 
 //    //Convinience CMD connection timer --> ToDo get rid of that -> it interrupts acquistion when not connected
-//    connect(&m_cmdConnectionTimer, &QTimer::timeout, this, &RtServer::connectCmdClient);
+//    connect(&m_cmdConnectionTimer, &QTimer::timeout, this, &MneRtClient::connectCmdClient);
 
     //init channels when fiff info is available
-    connect(this, &RtServer::fiffInfoAvailable, this, &RtServer::init);
+    connect(this, &MneRtClient::fiffInfoAvailable, this, &MneRtClient::init);
 
 //    //Start convinience timer
 //    m_cmdConnectionTimer.start(5000);
@@ -106,7 +106,7 @@ RtServer::RtServer()
 
 //*************************************************************************************************************
 
-RtServer::~RtServer()
+MneRtClient::~MneRtClient()
 {
     if(m_pRtCmdClient)
         delete m_pRtCmdClient;
@@ -118,7 +118,7 @@ RtServer::~RtServer()
 
 //*************************************************************************************************************
 
-void RtServer::changeConnector(qint32 p_iNewConnectorId)
+void MneRtClient::changeConnector(qint32 p_iNewConnectorId)
 {
     if(p_iNewConnectorId != m_iActiveConnectorId)
     {
@@ -154,7 +154,7 @@ void RtServer::changeConnector(qint32 p_iNewConnectorId)
 
 //*************************************************************************************************************
 
-void RtServer::clear()
+void MneRtClient::clear()
 {
     m_pFiffInfo.reset();
     m_iBufferSize = -1;
@@ -163,14 +163,14 @@ void RtServer::clear()
 
 //*************************************************************************************************************
 
-void RtServer::connectCmdClient()
+void MneRtClient::connectCmdClient()
 {
     if(!m_pRtCmdClient)
         m_pRtCmdClient = new RtCmdClient();
     else if(m_bCmdClientIsConnected)
         this->disconnectCmdClient();
 
-    m_pRtCmdClient->connectToHost(m_sRtServerIP);
+    m_pRtCmdClient->connectToHost(m_sMneRtClientIP);
     m_pRtCmdClient->waitForConnected(1000);
 
     if(m_pRtCmdClient->state() == QTcpSocket::ConnectedState)
@@ -218,7 +218,7 @@ void RtServer::connectCmdClient()
 
 //*************************************************************************************************************
 
-void RtServer::disconnectCmdClient()
+void MneRtClient::disconnectCmdClient()
 {
     if(m_bCmdClientIsConnected)
     {
@@ -234,26 +234,26 @@ void RtServer::disconnectCmdClient()
 
 //*************************************************************************************************************
 
-void RtServer::requestInfo()
+void MneRtClient::requestInfo()
 {
-    if(m_pRtServerProducer->m_iDataClientId > -1 && m_bCmdClientIsConnected)
+    if(m_pMneRtClientProducer->m_iDataClientId > -1 && m_bCmdClientIsConnected)
     {
         // read meas info
-        (*m_pRtCmdClient)["measinfo"].pValues()[0].setValue(m_pRtServerProducer->m_iDataClientId);
+        (*m_pRtCmdClient)["measinfo"].pValues()[0].setValue(m_pMneRtClientProducer->m_iDataClientId);
         (*m_pRtCmdClient)["measinfo"].send();
 
-        m_pRtServerProducer->producerMutex.lock();
-        m_pRtServerProducer->m_bFlagInfoRequest = true;
-        m_pRtServerProducer->producerMutex.unlock();
+        m_pMneRtClientProducer->producerMutex.lock();
+        m_pMneRtClientProducer->m_bFlagInfoRequest = true;
+        m_pMneRtClientProducer->producerMutex.unlock();
     }
     else
-        qWarning() << "RtServerProducer is not connected!";
+        qWarning() << "MneRtClientProducer is not connected!";
 }
 
 
 //*************************************************************************************************************
 
-bool RtServer::start()
+bool MneRtClient::start()
 {
     if(m_bCmdClientIsConnected && m_pFiffInfo)
     {
@@ -274,13 +274,13 @@ bool RtServer::start()
 
         // Start Measurement at rt_Server
         // start measurement
-        (*m_pRtCmdClient)["start"].pValues()[0].setValue(m_pRtServerProducer->m_iDataClientId);
+        (*m_pRtCmdClient)["start"].pValues()[0].setValue(m_pMneRtClientProducer->m_iDataClientId);
         (*m_pRtCmdClient)["start"].send();
 
-        m_pRtServerProducer->producerMutex.lock();
-        m_pRtServerProducer->m_bFlagMeasuring = true;
-        m_pRtServerProducer->producerMutex.unlock();
-        m_pRtServerProducer->start();
+        m_pMneRtClientProducer->producerMutex.lock();
+        m_pMneRtClientProducer->m_bFlagMeasuring = true;
+        m_pMneRtClientProducer->producerMutex.unlock();
+        m_pMneRtClientProducer->start();
 
         return true;
     }
@@ -291,16 +291,16 @@ bool RtServer::start()
 
 //*************************************************************************************************************
 
-bool RtServer::stop()
+bool MneRtClient::stop()
 {
     if(m_bCmdClientIsConnected) //ToDo replace this with is running
     {
         // Stop Measurement at rt_Server
         (*m_pRtCmdClient)["stop-all"].send();
 
-        m_pRtServerProducer->producerMutex.lock();
-        m_pRtServerProducer->m_bFlagMeasuring = false;
-        m_pRtServerProducer->producerMutex.unlock();
+        m_pMneRtClientProducer->producerMutex.lock();
+        m_pMneRtClientProducer->m_bFlagMeasuring = false;
+        m_pMneRtClientProducer->producerMutex.unlock();
     }
 
     // Stop threads
@@ -315,7 +315,7 @@ bool RtServer::stop()
 
 //*************************************************************************************************************
 
-Type RtServer::getType() const
+Type MneRtClient::getType() const
 {
     return _ISensor;
 }
@@ -323,17 +323,17 @@ Type RtServer::getType() const
 
 //*************************************************************************************************************
 
-const char* RtServer::getName() const
+const char* MneRtClient::getName() const
 {
-    return "RT Server";
+    return "RT Client";
 }
 
 
 //*************************************************************************************************************
 
-QWidget* RtServer::setupWidget()
+QWidget* MneRtClient::setupWidget()
 {
-    RtServerSetupWidget* widget = new RtServerSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    MneRtClientSetupWidget* widget = new MneRtClientSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
 
     //init dialog
 
@@ -343,9 +343,9 @@ QWidget* RtServer::setupWidget()
 
 //*************************************************************************************************************
 
-QWidget* RtServer::runWidget()
+QWidget* MneRtClient::runWidget()
 {
-    RtServerRunWidget* widget = new RtServerRunWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    MneRtClientRunWidget* widget = new MneRtClientRunWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
     return widget;
 }
 
@@ -355,24 +355,24 @@ QWidget* RtServer::runWidget()
 // Create measurement instances and config them
 //=============================================================================================================
 
-void RtServer::init()
+void MneRtClient::init()
 {
-    qDebug() << "RtServer::init()";
+    qDebug() << "MneRtClient::init()";
 
     if(m_pFiffInfo)
     {
 //        m_pFiffInfo->sfreq /= 100;
-        m_pRTMSA_RtServer = addProviderRealTimeMultiSampleArray_New(MSR_ID::MEGRTSERVER_OUTPUT);
-        m_pRTMSA_RtServer->initFromFiffInfo(m_pFiffInfo);
-        m_pRTMSA_RtServer->setMultiArraySize(10);
-        m_pRTMSA_RtServer->setVisibility(true);
+        m_pRTMSA_MneRtClient = addProviderRealTimeMultiSampleArray_New(MSR_ID::MEGMNERTCLIENT_OUTPUT);
+        m_pRTMSA_MneRtClient->initFromFiffInfo(m_pFiffInfo);
+        m_pRTMSA_MneRtClient->setMultiArraySize(10);
+        m_pRTMSA_MneRtClient->setVisibility(true);
     }
 }
 
 
 //*************************************************************************************************************
 
-void RtServer::run()
+void MneRtClient::run()
 {
 
     MatrixXf matValue;
@@ -385,8 +385,8 @@ void RtServer::run()
 
         //emit values
         for(qint32 i = 0; i < matValue.cols(); ++i)
-            m_pRTMSA_RtServer->setValue(matValue.col(i).cast<double>());
+            m_pRTMSA_MneRtClient->setValue(matValue.col(i).cast<double>());
 //        for(qint32 i = 0; i < matValue.cols(); i += 100)
-//            m_pRTMSA_RtServer->setValue(matValue.col(i).cast<double>());
+//            m_pRTMSA_MneRtClient->setValue(matValue.col(i).cast<double>());
     }
 }

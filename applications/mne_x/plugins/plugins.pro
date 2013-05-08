@@ -14,7 +14,7 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     ecgsimulator \
-    rtserver \
+    mnertclient \
     dummytoolbox \
     sourcelab \
     rtsss \
@@ -39,5 +39,5 @@ qtHaveModule(3d) {
 #}
 #else {
 #    message(RtServer plugin configured!)
-#    SUBDIRS += rtserver
+#    SUBDIRS += rtclient
 #}

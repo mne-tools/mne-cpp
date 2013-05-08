@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     rtserver.pro
+# @file     mnertclient.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the rtserver plug-in.
+# @brief    This project file generates the makefile for the mnertclient plug-in.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -39,12 +39,12 @@ TEMPLATE = lib
 
 CONFIG += plugin
 
-DEFINES += RTSERVER_LIBRARY
+DEFINES += MNERTCLIENT_LIBRARY
 
 QT += widgets
 QT += network
 
-TARGET = rtserver
+TARGET = mnertclient
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -80,32 +80,32 @@ else {
 DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
 SOURCES += \
-        rtserver.cpp \
-        FormFiles/rtserversetupwidget.cpp \
-        FormFiles/rtserverrunwidget.cpp \
-        FormFiles/rtserveraboutwidget.cpp \
-    directrecord.cpp \
-    rtserverproducer.cpp
+        mnertclient.cpp \
+        FormFiles/mnertclientsetupwidget.cpp \
+        FormFiles/mnertclientrunwidget.cpp \
+        FormFiles/mnertclientaboutwidget.cpp \
+        directrecord.cpp \
+        mnertclientproducer.cpp
 
 HEADERS += \
-        rtserver.h\
-        rtserver_global.h \
-        FormFiles/rtserversetupwidget.h \
-        FormFiles/rtserverrunwidget.h \
-        FormFiles/rtserveraboutwidget.h \
-    directrecord.h \
-    rtserverproducer.h
+        mnertclient.h\
+        mnertclient_global.h \
+        FormFiles/mnertclientsetupwidget.h \
+        FormFiles/mnertclientrunwidget.h \
+        FormFiles/mnertclientaboutwidget.h \
+        directrecord.h \
+        mnertclientproducer.h
 
 FORMS += \
-        FormFiles/rtserversetup.ui \
-        FormFiles/rtserverrun.ui \
-        FormFiles/rtserverabout.ui
+        FormFiles/mnertclientsetup.ui \
+        FormFiles/mnertclientrun.ui \
+        FormFiles/mnertclientabout.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 
-OTHER_FILES += rtserver.json
+OTHER_FILES += mnertclient.json
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $${PWD}

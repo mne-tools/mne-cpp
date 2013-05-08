@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtserversetupwidget.cpp
+* @file     mnertclientsetupwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -38,9 +38,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rtserversetupwidget.h"
-#include "rtserveraboutwidget.h"
-#include "../rtserver.h"
+#include "mnertclientsetupwidget.h"
+#include "mnertclientaboutwidget.h"
+#include "../mnertclient.h"
 
 
 //*************************************************************************************************************
@@ -58,7 +58,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace RtServerPlugin;
+using namespace MneRtClientPlugin;
 
 
 //*************************************************************************************************************
@@ -66,41 +66,41 @@ using namespace RtServerPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtServerSetupWidget::RtServerSetupWidget(RtServer* p_pRtServer, QWidget* parent)
+MneRtClientSetupWidget::MneRtClientSetupWidget(MneRtClient* p_pMneRtClient, QWidget* parent)
 : QWidget(parent)
-, m_pRtServer(p_pRtServer)
+, m_pMneRtClient(p_pMneRtClient)
 , m_bIsInit(false)
 {
     ui.setupUi(this);
 
 
-    connect(ui.m_qCheckBox_RecordData, &QCheckBox::stateChanged, this, &RtServerSetupWidget::checkedRecordDataChanged);
+    connect(ui.m_qCheckBox_RecordData, &QCheckBox::stateChanged, this, &MneRtClientSetupWidget::checkedRecordDataChanged);
 
     //Fiff Record File
-    connect(ui.m_qPushButton_FiffRecordFile, &QPushButton::released, this, &RtServerSetupWidget::pressedFiffRecordFile);
+    connect(ui.m_qPushButton_FiffRecordFile, &QPushButton::released, this, &MneRtClientSetupWidget::pressedFiffRecordFile);
 
     //Select Connector
     connect(ui.m_qComboBox_Connector, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &RtServerSetupWidget::connectorIdxChanged);
+            this, &MneRtClientSetupWidget::connectorIdxChanged);
 
     //rt server connection
-    this->ui.m_qLineEdit_Ip->setText(m_pRtServer->m_sRtServerIP);
+    this->ui.m_qLineEdit_Ip->setText(m_pMneRtClient->m_sMneRtClientIP);
 
-    connect(ui.m_qPushButton_Connect, &QPushButton::released, this, &RtServerSetupWidget::pressedConnect);
+    connect(ui.m_qPushButton_Connect, &QPushButton::released, this, &MneRtClientSetupWidget::pressedConnect);
 
-    connect(m_pRtServer, &RtServer::cmdConnectionChanged, this, &RtServerSetupWidget::cmdConnectionChanged);
+    connect(m_pMneRtClient, &MneRtClient::cmdConnectionChanged, this, &MneRtClientSetupWidget::cmdConnectionChanged);
 
     //rt server fiffInfo received
-    connect(m_pRtServer, &RtServer::fiffInfoAvailable, this, &RtServerSetupWidget::fiffInfoReceived);
+    connect(m_pMneRtClient, &MneRtClient::fiffInfoAvailable, this, &MneRtClientSetupWidget::fiffInfoReceived);
 
     //Buffer
-    connect(ui.m_qLineEdit_BufferSize, &QLineEdit::editingFinished, this, &RtServerSetupWidget::bufferSizeEdited);
+    connect(ui.m_qLineEdit_BufferSize, &QLineEdit::editingFinished, this, &MneRtClientSetupWidget::bufferSizeEdited);
 
     //CLI
-    connect(ui.m_qPushButton_SendCLI, &QPushButton::released, this, &RtServerSetupWidget::pressedSendCLI);
+    connect(ui.m_qPushButton_SendCLI, &QPushButton::released, this, &MneRtClientSetupWidget::pressedSendCLI);
 
     //About
-    connect(ui.m_qPushButton_About, &QPushButton::released, this, &RtServerSetupWidget::showAboutDialog);
+    connect(ui.m_qPushButton_About, &QPushButton::released, this, &MneRtClientSetupWidget::showAboutDialog);
 
     this->init();
 }
@@ -108,7 +108,7 @@ RtServerSetupWidget::RtServerSetupWidget(RtServer* p_pRtServer, QWidget* parent)
 
 //*************************************************************************************************************
 
-RtServerSetupWidget::~RtServerSetupWidget()
+MneRtClientSetupWidget::~MneRtClientSetupWidget()
 {
 
 }
@@ -116,30 +116,30 @@ RtServerSetupWidget::~RtServerSetupWidget()
 
 //*************************************************************************************************************
 
-void RtServerSetupWidget::init()
+void MneRtClientSetupWidget::init()
 {
     checkedRecordDataChanged();
-    cmdConnectionChanged(m_pRtServer->m_bCmdClientIsConnected);
+    cmdConnectionChanged(m_pMneRtClient->m_bCmdClientIsConnected);
 }
 
 
 //*************************************************************************************************************
 
-void RtServerSetupWidget::bufferSizeEdited()
+void MneRtClientSetupWidget::bufferSizeEdited()
 {
     bool t_bSuccess = false;
     qint32 t_iBufferSize = ui.m_qLineEdit_BufferSize->text().toInt(&t_bSuccess);
 
     if(t_bSuccess && t_iBufferSize > 0)
-        m_pRtServer->m_iBufferSize = t_iBufferSize;
+        m_pMneRtClient->m_iBufferSize = t_iBufferSize;
     else
-        ui.m_qLineEdit_BufferSize->setText(QString("%1").arg(m_pRtServer->m_iBufferSize));
+        ui.m_qLineEdit_BufferSize->setText(QString("%1").arg(m_pMneRtClient->m_iBufferSize));
 }
 
 
 //*************************************************************************************************************
 
-void RtServerSetupWidget::checkedRecordDataChanged()
+void MneRtClientSetupWidget::checkedRecordDataChanged()
 {
     if(ui.m_qCheckBox_RecordData->checkState() == Qt::Checked)
     {
@@ -160,16 +160,16 @@ void RtServerSetupWidget::checkedRecordDataChanged()
 
 //*************************************************************************************************************
 
-void RtServerSetupWidget::connectorIdxChanged(int idx)
+void MneRtClientSetupWidget::connectorIdxChanged(int idx)
 {
-    if(ui.m_qComboBox_Connector->itemData(idx).toInt() != m_pRtServer->m_iActiveConnectorId && m_bIsInit)
-        m_pRtServer->changeConnector(ui.m_qComboBox_Connector->itemData(idx).toInt());
+    if(ui.m_qComboBox_Connector->itemData(idx).toInt() != m_pMneRtClient->m_iActiveConnectorId && m_bIsInit)
+        m_pMneRtClient->changeConnector(ui.m_qComboBox_Connector->itemData(idx).toInt());
 }
 
 
 //*************************************************************************************************************
 
-void RtServerSetupWidget::pressedFiffRecordFile()
+void MneRtClientSetupWidget::pressedFiffRecordFile()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Fiff Record File"), "", tr("Fiff Record File (*.fif)"));
 
@@ -179,26 +179,26 @@ void RtServerSetupWidget::pressedFiffRecordFile()
 
 //*************************************************************************************************************
 
-void RtServerSetupWidget::pressedConnect()
+void MneRtClientSetupWidget::pressedConnect()
 {
-    if(m_pRtServer->m_bCmdClientIsConnected)
-        m_pRtServer->disconnectCmdClient();
+    if(m_pMneRtClient->m_bCmdClientIsConnected)
+        m_pMneRtClient->disconnectCmdClient();
     else
     {
-        m_pRtServer->m_sRtServerIP = this->ui.m_qLineEdit_Ip->text();
-        m_pRtServer->connectCmdClient();
+        m_pMneRtClient->m_sMneRtClientIP = this->ui.m_qLineEdit_Ip->text();
+        m_pMneRtClient->connectCmdClient();
     }
 }
 
 
 //*************************************************************************************************************
 
-void RtServerSetupWidget::pressedSendCLI()
+void MneRtClientSetupWidget::pressedSendCLI()
 {
-    if(m_pRtServer->m_bCmdClientIsConnected)
+    if(m_pMneRtClient->m_bCmdClientIsConnected)
     {
         this->printToLog(this->ui.m_qLineEdit_SendCLI->text());
-        QString t_sReply = m_pRtServer->m_pRtCmdClient->sendCLICommand(this->ui.m_qLineEdit_SendCLI->text());
+        QString t_sReply = m_pMneRtClient->m_pRtCmdClient->sendCLICommand(this->ui.m_qLineEdit_SendCLI->text());
         this->printToLog(t_sReply);
     }
 }
@@ -206,7 +206,7 @@ void RtServerSetupWidget::pressedSendCLI()
 
 //*************************************************************************************************************
 
-void RtServerSetupWidget::printToLog(QString logMsg)
+void MneRtClientSetupWidget::printToLog(QString logMsg)
 {
     ui.m_qTextBrowser_ServerMessage->insertPlainText(logMsg+"\n");
     //scroll down to the newest entry
@@ -218,7 +218,7 @@ void RtServerSetupWidget::printToLog(QString logMsg)
 
 //*************************************************************************************************************
 
-void RtServerSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
+void MneRtClientSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
 {
     m_bIsInit = false;
 
@@ -227,21 +227,21 @@ void RtServerSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
         //
         // set frequency txt
         //
-        if(m_pRtServer->m_pFiffInfo)
-            this->ui.m_qLabel_sps->setText(QString("%1").arg(m_pRtServer->m_pFiffInfo->sfreq));
+        if(m_pMneRtClient->m_pFiffInfo)
+            this->ui.m_qLabel_sps->setText(QString("%1").arg(m_pMneRtClient->m_pFiffInfo->sfreq));
 
         //
         // set buffer size txt
         //
-        this->ui.m_qLineEdit_BufferSize->setText(QString("%1").arg(m_pRtServer->m_iBufferSize));
+        this->ui.m_qLineEdit_BufferSize->setText(QString("%1").arg(m_pMneRtClient->m_iBufferSize));
 
         //
         // set connectors
         //
-        QMap<qint32, QString>::ConstIterator it = m_pRtServer->m_qMapConnectors.begin();
+        QMap<qint32, QString>::ConstIterator it = m_pMneRtClient->m_qMapConnectors.begin();
         qint32 idx = 0;
 
-        for(; it != m_pRtServer->m_qMapConnectors.end(); ++it)
+        for(; it != m_pMneRtClient->m_qMapConnectors.end(); ++it)
         {
             if(this->ui.m_qComboBox_Connector->findData(it.key()) == -1)
             {
@@ -251,7 +251,7 @@ void RtServerSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
             else
                 idx = this->ui.m_qComboBox_Connector->findData(it.key()) + 1;
         }
-        this->ui.m_qComboBox_Connector->setCurrentIndex(this->ui.m_qComboBox_Connector->findData(m_pRtServer->m_iActiveConnectorId));
+        this->ui.m_qComboBox_Connector->setCurrentIndex(this->ui.m_qComboBox_Connector->findData(m_pMneRtClient->m_iActiveConnectorId));
 
         //UI enables/disables
         this->ui.m_qLabel_ConnectionStatus->setText(QString("Connected"));
@@ -265,9 +265,9 @@ void RtServerSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
     else
     {
         //clear connectors --> ToDO create a clear function
-        m_pRtServer->m_qMapConnectors.clear();
+        m_pMneRtClient->m_qMapConnectors.clear();
         this->ui.m_qComboBox_Connector->clear();
-        m_pRtServer->m_iBufferSize = -1;
+        m_pMneRtClient->m_iBufferSize = -1;
 
         //UI enables/disables
         this->ui.m_qLabel_ConnectionStatus->setText(QString("Not connected"));
@@ -284,17 +284,17 @@ void RtServerSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
 
 //*************************************************************************************************************
 
-void RtServerSetupWidget::fiffInfoReceived()
+void MneRtClientSetupWidget::fiffInfoReceived()
 {
-    if(m_pRtServer->m_pFiffInfo)
-        this->ui.m_qLabel_sps->setText(QString("%1").arg(m_pRtServer->m_pFiffInfo->sfreq));
+    if(m_pMneRtClient->m_pFiffInfo)
+        this->ui.m_qLabel_sps->setText(QString("%1").arg(m_pMneRtClient->m_pFiffInfo->sfreq));
 }
 
 
 //*************************************************************************************************************
 
-void RtServerSetupWidget::showAboutDialog()
+void MneRtClientSetupWidget::showAboutDialog()
 {
-    RtServerAboutWidget aboutDialog(this);
+    MneRtClientAboutWidget aboutDialog(this);
     aboutDialog.exec();
 }

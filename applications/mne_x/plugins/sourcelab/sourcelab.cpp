@@ -177,7 +177,7 @@ void SourceLab::update(Subject* pSubject)
         RealTimeMultiSampleArrayNew* pRTMSANew = static_cast<RealTimeMultiSampleArrayNew*>(pSubject);
 
 
-        if(pRTMSANew->getID() == MSR_ID::MEGRTSERVER_OUTPUT)
+        if(pRTMSANew->getID() == MSR_ID::MEGMNERTCLIENT_OUTPUT)
         {
             //Check if buffer initialized
             if(!m_pSourceLabBuffer)
@@ -428,11 +428,11 @@ void SourceLab::init()
     if(m_pSourceLabBuffer)
         m_pSourceLabBuffer = CircularMatrixBuffer<double>::SPtr();
 
-    qDebug() << "#### SourceLab Init; MEGRTSERVER_OUTPUT: " << MSR_ID::MEGRTSERVER_OUTPUT;
+    qDebug() << "#### SourceLab Init; MEGRTCLIENT_OUTPUT: " << MSR_ID::MEGMNERTCLIENT_OUTPUT;
 
-    this->addPlugin(PLG_ID::RTSERVER);
+    this->addPlugin(PLG_ID::MNERTCLIENT);
     Buffer::SPtr t_buf = m_pSourceLabBuffer.staticCast<Buffer>(); //unix fix
-    this->addAcceptorMeasurementBuffer(MSR_ID::MEGRTSERVER_OUTPUT, t_buf);
+    this->addAcceptorMeasurementBuffer(MSR_ID::MEGMNERTCLIENT_OUTPUT, t_buf);
 
 //    m_pDummy_MSA_Output = addProviderRealTimeMultiSampleArray(MSR_ID::DUMMYTOOL_OUTPUT_II, 2);
 //    m_pDummy_MSA_Output->setName("Dummy Output II");
