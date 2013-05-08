@@ -345,6 +345,10 @@ void SourceLab::run()
 
                 std::cout << "SourceEstimated:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
 
+                //emit source estimates sample wise
+                for(qint32 i = 0; i < sourceEstimate.data.cols(); ++i)
+                    m_pRTSE_SourceLab->setValue(sourceEstimate.data.col(i));
+
                 mutex.lock();
                 m_qVecEvokedData.pop_front();
                 mutex.unlock();
@@ -433,6 +437,15 @@ void SourceLab::init()
     this->addPlugin(PLG_ID::MNERTCLIENT);
     Buffer::SPtr t_buf = m_pSourceLabBuffer.staticCast<Buffer>(); //unix fix
     this->addAcceptorMeasurementBuffer(MSR_ID::MEGMNERTCLIENT_OUTPUT, t_buf);
+
+
+
+    m_pRTSE_SourceLab = addProviderRealTimeSourceEstimate(MSR_ID::SOURCELAB_OUTPUT);
+//    m_pRTSE_SourceLab->initFromFiffInfo(m_pFiffInfo);
+    m_pRTSE_SourceLab->setArraySize(10);
+    m_pRTSE_SourceLab->setVisibility(true);
+
+
 
 //    m_pDummy_MSA_Output = addProviderRealTimeMultiSampleArray(MSR_ID::DUMMYTOOL_OUTPUT_II, 2);
 //    m_pDummy_MSA_Output->setName("Dummy Output II");

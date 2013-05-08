@@ -43,6 +43,7 @@
 #include "realtimesamplearray.h"
 #include "realtimemultisamplearray.h"
 #include "realtimemultisamplearray_new.h"
+#include "realtimesourceestimate.h"
 #include "progressbar.h"
 #include "text.h"
 //#include "alert.h"
@@ -118,6 +119,18 @@ RealTimeMultiSampleArrayNew* IMeasurementSource::addProviderRealTimeMultiSampleA
 
 //*************************************************************************************************************
 
+RealTimeSourceEstimate* IMeasurementSource::addProviderRealTimeSourceEstimate(MSR_ID::Measurement_ID id)
+{
+    RealTimeSourceEstimate* rtse = new RealTimeSourceEstimate();
+    rtse->setID(id);
+    //rtsa->setModuleID(m_MDL_ID);
+    m_hashRealTimeSourceEstimate.insert(id, rtse);
+    return rtse;
+}
+
+
+//*************************************************************************************************************
+
 ProgressBar* IMeasurementSource::addProviderProgressBar(MSR_ID::Measurement_ID id)
 {
     ProgressBar* progress = new ProgressBar;
@@ -155,13 +168,16 @@ Text* IMeasurementSource::addProviderText(MSR_ID::Measurement_ID id)
 //*************************************************************************************************************
 
 QList<MSR_ID::Measurement_ID> IMeasurementSource::getProviderMeasurement_IDs() const
-{
-	QList<MSR_ID::Measurement_ID> idList;
-	idList << getProviderNumeric_IDs();
-	idList << getProviderRTSA_IDs();
-	idList << getProviderProgressbar_IDs();
-	idList << getProviderText_IDs();
-//	idList << getProviderAlert_IDs();
+    {
+    QList<MSR_ID::Measurement_ID> idList;
+    idList << getProviderNumeric_IDs();
+    idList << getProviderRTSA_IDs();
+    idList << getProviderRTMSA_IDs();
+    idList << getProviderRTMSA_New_IDs();
+    idList << getProviderRTSE_IDs();
+    idList << getProviderProgressbar_IDs();
+    idList << getProviderText_IDs();
+//    idList << getProviderAlert_IDs();
 
     return idList;
 }
@@ -171,8 +187,8 @@ QList<MSR_ID::Measurement_ID> IMeasurementSource::getProviderMeasurement_IDs() c
 
 QList<MSR_ID::Measurement_ID> IMeasurementSource::getProviderNumeric_IDs() const
 {
-	QList<MSR_ID::Measurement_ID> idList;
-	idList << m_hashNumeric.uniqueKeys();
+    QList<MSR_ID::Measurement_ID> idList;
+    idList << m_hashNumeric.uniqueKeys();
 
     return idList;
 }
@@ -182,8 +198,8 @@ QList<MSR_ID::Measurement_ID> IMeasurementSource::getProviderNumeric_IDs() const
 
 QList<MSR_ID::Measurement_ID> IMeasurementSource::getProviderRTSA_IDs() const
 {
-	QList<MSR_ID::Measurement_ID> idList;
-	idList << m_hashRealTimeSampleArray.uniqueKeys();
+    QList<MSR_ID::Measurement_ID> idList;
+    idList << m_hashRealTimeSampleArray.uniqueKeys();
 
     return idList;
 }
@@ -213,10 +229,21 @@ QList<MSR_ID::Measurement_ID> IMeasurementSource::getProviderRTMSA_New_IDs() con
 
 //*************************************************************************************************************
 
+QList<MSR_ID::Measurement_ID> IMeasurementSource::getProviderRTSE_IDs() const
+{
+    QList<MSR_ID::Measurement_ID> idList;
+    idList << m_hashRealTimeSourceEstimate.uniqueKeys();
+
+    return idList;
+}
+
+
+//*************************************************************************************************************
+
 QList<MSR_ID::Measurement_ID> IMeasurementSource::getProviderProgressbar_IDs() const
 {
-	QList<MSR_ID::Measurement_ID> idList;
-	idList << m_hashProgressBar.uniqueKeys();
+    QList<MSR_ID::Measurement_ID> idList;
+    idList << m_hashProgressBar.uniqueKeys();
 
     return idList;
 }
@@ -260,6 +287,9 @@ void IMeasurementSource::cleanProvider()
     foreach (RealTimeMultiSampleArrayNew* value, m_hashRealTimeMultiSampleArrayNew)
             delete value;
 
+    foreach (RealTimeSourceEstimate* value, m_hashRealTimeSourceEstimate)
+            delete value;
+
     foreach (ProgressBar* value, m_hashProgressBar)
             delete value;
 
@@ -267,12 +297,13 @@ void IMeasurementSource::cleanProvider()
             delete value;
 
 //    foreach (Alert* value, m_hashAlert)
-//    		delete value;
+//            delete value;
 
     m_hashNumeric.clear();
     m_hashRealTimeSampleArray.clear();
     m_hashRealTimeMultiSampleArray.clear();
     m_hashRealTimeMultiSampleArrayNew.clear();
+    m_hashRealTimeSourceEstimate.clear();
     m_hashProgressBar.clear();
     m_hashText.clear();
 //    m_hashAlert.clear();

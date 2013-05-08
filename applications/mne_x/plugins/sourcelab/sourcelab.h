@@ -57,7 +57,7 @@
 #include <rtInv/rtinvop.h>
 #include <rtInv/rtave.h>
 
-#include <xMeas/Measurement/realtimemultisamplearray.h>
+#include <xMeas/Measurement/realtimesourceestimate.h>
 
 
 //*************************************************************************************************************
@@ -206,6 +206,8 @@ private:
     qint32 m_iStimChan;     /**< Stimulus Channel to use for source estimation */
 
     MinimumNorm::SPtr m_pMinimumNorm;   /**< Minimum Norm Estimation. */
+
+    RealTimeSourceEstimate* m_pRTSE_SourceLab;   /**< Source Estimate output channel. */
 };
 
 } // NAMESPACE

@@ -76,6 +76,7 @@ class Numeric;
 class RealTimeSampleArray;
 class RealTimeMultiSampleArray;
 class RealTimeMultiSampleArrayNew;
+class RealTimeSourceEstimate;
 class ProgressBar;
 class Text;
 //class Alert;
@@ -202,6 +203,14 @@ public:
     RealTimeMultiSampleArrayNew* addProviderRealTimeMultiSampleArray_New(MSR_ID::Measurement_ID id);
     //=========================================================================================================
     /**
+    * Adds a RealTimeSourceEstimate measurement to provider.
+    *
+    * @param [in] id of RealTimeSourceEstimate measurement.
+    * @return pointer to added RealTimeSourceEstimate measurement.
+    */
+    RealTimeSourceEstimate* addProviderRealTimeSourceEstimate(MSR_ID::Measurement_ID id);
+    //=========================================================================================================
+    /**
     * Adds a ProgressBar measurement to provider.
     *
     * @param [in] id of ProgressBar measurement.
@@ -254,6 +263,13 @@ public:
     * @return a list of all id's of provided RealTimeMultiSampleArrayNew measurements.
     */
     virtual QList<MSR_ID::Measurement_ID> getProviderRTMSA_New_IDs() const;
+    //=========================================================================================================
+    /**
+    * Returns the id's of provided RealTimeSourceEstimates measurements.
+    *
+    * @return a list of all id's of provided RealTimeSourceEstimates measurements.
+    */
+    virtual QList<MSR_ID::Measurement_ID> getProviderRTSE_IDs() const;
     //=========================================================================================================
     /**
     * Returns the id's of provided ProgressBar measurements.
@@ -323,10 +339,12 @@ public:
     virtual void cleanProvider();
 
 protected:
-    QHash<MSR_ID::Measurement_ID, Numeric*>                   m_hashNumeric;                    /**< Holds the Numeric measurements.*/
-    QHash<MSR_ID::Measurement_ID, RealTimeSampleArray*>       m_hashRealTimeSampleArray;        /**< Holds the RealTimeSampleArray measurements.*/
-    QHash<MSR_ID::Measurement_ID, RealTimeMultiSampleArray*>  m_hashRealTimeMultiSampleArray;   /**< Holds the RealTimeSampleArray measurements.*/
-    QHash<MSR_ID::Measurement_ID, RealTimeMultiSampleArrayNew*> m_hashRealTimeMultiSampleArrayNew;  /**< Holds the RealTimeSampleArray New measurements.*/
+    QHash<MSR_ID::Measurement_ID, Numeric*>                   m_hashNumeric;                    /**< The Numeric measurements.*/
+    QHash<MSR_ID::Measurement_ID, RealTimeSampleArray*>       m_hashRealTimeSampleArray;        /**< The RealTimeSampleArray measurements.*/
+    QHash<MSR_ID::Measurement_ID, RealTimeMultiSampleArray*>  m_hashRealTimeMultiSampleArray;   /**< The RealTimeSampleArray measurements.*/
+    QHash<MSR_ID::Measurement_ID, RealTimeMultiSampleArrayNew*> m_hashRealTimeMultiSampleArrayNew;  /**< The RealTimeSampleArray New measurements.*/
+    QHash<MSR_ID::Measurement_ID, RealTimeSourceEstimate*> m_hashRealTimeSourceEstimate;        /**< The RealTimeSourceEstimate measurements.*/
+
 
     QHash<MSR_ID::Measurement_ID, ProgressBar*>               m_hashProgressBar;    /**< Holds the ProgressBar measurements.*/
     QHash<MSR_ID::Measurement_ID, Text*>                      m_hashText;           /**< Holds the Text measurements.*/
