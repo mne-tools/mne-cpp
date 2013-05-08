@@ -67,7 +67,7 @@ using namespace XMEASLIB;
 
 RealTimeSourceEstimate::RealTimeSourceEstimate()
 : MltChnMeasurement()
-, m_ucMultiArraySize(10)
+, m_ucArraySize(10)
 {
 
 }
@@ -79,3 +79,38 @@ RealTimeSourceEstimate::~RealTimeSourceEstimate()
 {
 
 }
+
+
+//*************************************************************************************************************
+
+VectorXd RealTimeSourceEstimate::getValue() const
+{
+    return m_vecValue;
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeSourceEstimate::setValue(VectorXd v)
+{
+//    //check vector size
+//    if(v.size() != m_qListChInfo.size())
+//        qCritical() << "Error Occured in RealTimeMultiSampleArrayNew::setVector: Vector size does not matche the number of channels! ";
+
+//    //Check if maximum exceeded //ToDo speed this up
+//    for(qint32 i = 0; i < v.size(); ++i)
+//    {
+//        if(v[i] < m_qListChInfo[i].getMinValue()) v[i] = m_qListChInfo[i].getMinValue();
+//        else if(v[i] > m_qListChInfo[i].getMaxValue()) v[i] = m_qListChInfo[i].getMaxValue();
+//    }
+
+    //Store
+    m_vecValue = v;
+    m_matSamples.push_back(m_vecValue);
+    if(m_matSamples.size() >= m_ucArraySize && notifyEnabled)
+    {
+        notify();
+        m_matSamples.clear();
+    }
+}
+
