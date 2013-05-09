@@ -47,9 +47,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// STL INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
+#include <QSharedPointer>
 #include <QVector>
 
 
@@ -79,6 +80,8 @@ namespace XMEASLIB
 class XMEASSHARED_EXPORT RealTimeSampleArray : public SngChnMeasurement
 {
 public:
+    typedef QSharedPointer<RealTimeSampleArray> SPtr;               /**< Shared pointer type for RealTimeSampleArray. */
+    typedef QSharedPointer<const RealTimeSampleArray> ConstSPtr;    /**< Const shared pointer type for RealTimeSampleArray. */
 
     //=========================================================================================================
     /**

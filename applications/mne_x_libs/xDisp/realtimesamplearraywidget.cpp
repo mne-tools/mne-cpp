@@ -81,7 +81,7 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeSampleArrayWidget::RealTimeSampleArrayWidget(RealTimeSampleArray* pRTSA, QTime* pTime, QWidget* parent)
+RealTimeSampleArrayWidget::RealTimeSampleArrayWidget(RealTimeSampleArray* pRTSA, QSharedPointer<QTime> pTime, QWidget* parent)
 : MeasurementWidget(parent)
 , m_pRTSA(pRTSA)
 , m_bMeasurement(false)
@@ -123,9 +123,8 @@ RealTimeSampleArrayWidget::RealTimeSampleArrayWidget(RealTimeSampleArray* pRTSA,
 
 RealTimeSampleArrayWidget::~RealTimeSampleArrayWidget()
 {
-	delete m_pTimerToolDisplay;
-	delete m_pTimerUpdate;
-	delete m_pTimeCurrentDisplay;
+    delete m_pTimerToolDisplay;
+    delete m_pTimerUpdate;
 
     // Clear sampling rate vector
     RealTimeSampleArrayWidget::s_listSamplingRates.clear();
@@ -136,7 +135,7 @@ RealTimeSampleArrayWidget::~RealTimeSampleArrayWidget()
 
 void RealTimeSampleArrayWidget::actualize()
 {
-	m_dPosY = ui.m_qFrame->pos().y()+0.5*ui.m_qFrame->height();
+    m_dPosY = ui.m_qFrame->pos().y()+0.5*ui.m_qFrame->height();
 
 
     // Compute scaling factor
@@ -255,9 +254,7 @@ void RealTimeSampleArrayWidget::init()
     m_qPainterPath = QPainterPath();
     m_bStartFlag = true;
 
-    if(m_pTimeCurrentDisplay)
-        delete m_pTimeCurrentDisplay;
-    m_pTimeCurrentDisplay = new QTime(0, 0);
+    m_pTimeCurrentDisplay = QSharedPointer<QTime>(new QTime(0, 0));
 
     actualize();
 }

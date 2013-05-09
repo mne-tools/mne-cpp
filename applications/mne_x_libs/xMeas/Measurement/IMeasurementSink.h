@@ -60,6 +60,7 @@
 //#include <QVector>
 #include <QHash>
 #include <QList>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -99,6 +100,8 @@ using namespace IOBuffer;
 class XMEASSHARED_EXPORT IMeasurementSink : public IObserver
 {
 public:
+    typedef QSharedPointer<IMeasurementSink> SPtr;               /**< Shared pointer type for IMeasurementSink. */
+    typedef QSharedPointer<const IMeasurementSink> ConstSPtr;    /**< Const shared pointer type for IMeasurementSink. */
 
     //=========================================================================================================
     /**

@@ -84,7 +84,7 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeMultiSampleArrayNewWidget::RealTimeMultiSampleArrayNewWidget(RealTimeMultiSampleArrayNew* pRTMSA_New, QTime* pTime, QWidget* parent)
+RealTimeMultiSampleArrayNewWidget::RealTimeMultiSampleArrayNewWidget(RealTimeMultiSampleArrayNew* pRTMSA_New, QSharedPointer<QTime> pTime, QWidget* parent)
 : MeasurementWidget(parent)
 , m_pRTMSA_New(pRTMSA_New)
 , m_bMeasurement(false)
@@ -128,7 +128,6 @@ RealTimeMultiSampleArrayNewWidget::~RealTimeMultiSampleArrayNewWidget()
 {
     delete m_pTimerToolDisplay;
     delete m_pTimerUpdate;
-    delete m_pTimeCurrentDisplay;
 
     // Clear sampling rate vector
     RealTimeMultiSampleArrayNewWidget::s_listSamplingRates.clear();
@@ -292,9 +291,7 @@ void RealTimeMultiSampleArrayNewWidget::init()
 
     m_bStartFlag = true;
 
-    if(m_pTimeCurrentDisplay)
-        delete m_pTimeCurrentDisplay;
-    m_pTimeCurrentDisplay = new QTime(0, 0);
+    m_pTimeCurrentDisplay = QSharedPointer<QTime>(new QTime(0, 0));
 
     actualize();
 }

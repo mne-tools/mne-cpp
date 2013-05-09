@@ -49,9 +49,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
+#include <QSharedPointer>
 #include <QString>
 
 
@@ -72,6 +73,9 @@ namespace XMEASLIB
 class XMEASSHARED_EXPORT SngChnMeasurement : public Measurement
 {
 public:
+    typedef QSharedPointer<SngChnMeasurement> SPtr;               /**< Shared pointer type for SngChnMeasurement. */
+    typedef QSharedPointer<const SngChnMeasurement> ConstSPtr;    /**< Const shared pointer type for SngChnMeasurement. */
+
     //=========================================================================================================
     /**
     * Constructs a SngChnMeasurement.

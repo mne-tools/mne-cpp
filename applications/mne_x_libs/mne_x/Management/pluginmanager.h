@@ -89,6 +89,8 @@ class MNE_X_SHARED_EXPORT PluginManager : public QPluginLoader
     friend class PluginDockWidget;
 
 public:
+    typedef QSharedPointer<PluginManager> SPtr;               /**< Shared pointer type for PluginManager. */
+    typedef QSharedPointer<const PluginManager> ConstSPtr;    /**< Const shared pointer type for PluginManager. */
 
     //=========================================================================================================
     /**

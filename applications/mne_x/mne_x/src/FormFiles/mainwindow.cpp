@@ -110,11 +110,12 @@ const char* pluginDir = "/mne_x_plugins";        /**< holds path to plugins.*/
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
 , m_pStartUpWidget(new StartUpWidget())
-, m_pRunWidget(0)
+, m_pRunWidget(NULL)
 , m_bDisplayMax(false)
 , m_bIsRunning(false)
-, m_pTimer(0)
-, m_pTime(0)
+, m_pLabel_Time(NULL)
+, m_pTimer(NULL)
+, m_pTime(NULL)
 , m_iTimeoutMSec(1000)
 , m_eLogLevelCurrent(_LogLvMax)
 {
@@ -154,7 +155,11 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    //ToDo cleanup work
+    //cleanup work
+    if(m_pStartUpWidget)
+        delete m_pStartUpWidget;
+    if(m_pRunWidget)
+        delete m_pRunWidget;
 }
 
 
@@ -267,7 +272,6 @@ void MainWindow::createActions()
     m_pActionExit->setStatusTip(tr("Exit the application"));
     connect(m_pActionExit, SIGNAL(triggered()), this, SLOT(close()));
 
-
     //View QMenu
     m_pActionMinLgLv = new QAction(tr("&Minimal"), this);
     m_pActionMinLgLv->setCheckable(true);
@@ -313,7 +317,6 @@ void MainWindow::createActions()
 //ToDo    connect(m_pActionDebugDisconnect, SIGNAL(triggered()), this, SLOT(Connector::disconnectMeasurementWidgets()));// Function is not anmyore valid
 
     //QToolbar
-
     m_pActionRun = new QAction(QIcon(":/images/run.png"), tr("Run (F5)"), this);
     m_pActionRun->setShortcut(tr("F5"));
     m_pActionRun->setStatusTip(tr("Runs (F5) ")+CInfo::AppNameShort());
@@ -484,6 +487,10 @@ void MainWindow::CentralWidgetShowPlugin()//int iCurrentPluginNum, const QTreeWi
             m_pListCurrentDisplayPlugins << PluginManager::getPlugins()[iCurrentPluginNum]->getPlugin_ID();
 
             Connector::connectMeasurementWidgets(m_pListCurrentDisplayPlugins, m_pTime);
+
+            //Garbage collecting
+            if(m_pRunWidget)
+                delete m_pRunWidget;
 
             m_pRunWidget = new RunWidget(DisplayManager::show());
             m_pRunWidget->addTab(PluginManager::s_vecPlugins[iCurrentPluginNum]->runWidget(), tr("Confi&guration"));
@@ -656,14 +663,10 @@ void MainWindow::uiSetupRunningState(bool state)
 
 void MainWindow::startTimer(int msec)
 {
-    if(m_pTimer)
-        delete m_pTimer;
-    m_pTimer = new QTimer(this);
-    connect(m_pTimer, SIGNAL(timeout()), this, SLOT(updateTime()));
+    m_pTimer = QSharedPointer<QTimer>(new QTimer(this));
+    connect(m_pTimer.data(), SIGNAL(timeout()), this, SLOT(updateTime()));
     m_pTimer->start(msec);
-    if(m_pTime)
-        delete m_pTime;
-    m_pTime = new QTime(0, 0);
+    m_pTime = QSharedPointer<QTime>(new QTime(0, 0));
     QString strTime = m_pTime->toString();
     m_pLabel_Time->setText(strTime);
 }
@@ -673,13 +676,7 @@ void MainWindow::startTimer(int msec)
 
 void MainWindow::stopTimer()
 {
-    disconnect(m_pTimer, SIGNAL(timeout()), this, SLOT(updateTime()));
-
-    delete m_pTimer;
-    m_pTimer = 0;
-
-    delete m_pTime;
-    m_pTime = 0;
+    disconnect(m_pTimer.data(), SIGNAL(timeout()), this, SLOT(updateTime()));
 }
 
 

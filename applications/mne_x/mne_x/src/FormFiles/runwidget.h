@@ -49,6 +49,7 @@
 //=============================================================================================================
 
 #include <QWidget>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -77,8 +78,9 @@ namespace MNEX
 class RunWidget : public QWidget //not inherit from QTabWidget cause resizeEvent is slower
 {
     Q_OBJECT
-
 public:
+    typedef QSharedPointer<RunWidget> SPtr;               /**< Shared pointer type for RunWidget. */
+    typedef QSharedPointer<const RunWidget> ConstSPtr;    /**< Const shared pointer type for RunWidget. */
 
     //=========================================================================================================
     /**

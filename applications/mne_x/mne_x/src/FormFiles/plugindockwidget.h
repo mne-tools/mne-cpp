@@ -53,6 +53,7 @@
 #include <QDockWidget>
 #include <QMap>
 #include <QVector>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -89,8 +90,9 @@ class PluginDockWidget : public QDockWidget
     Q_OBJECT
 
     friend class MainWindow;
-
 public:
+    typedef QSharedPointer<PluginDockWidget> SPtr;               /**< Shared pointer type for PluginDockWidget. */
+    typedef QSharedPointer<const PluginDockWidget> ConstSPtr;    /**< Const shared pointer type for PluginDockWidget. */
 
     //=========================================================================================================
     /**

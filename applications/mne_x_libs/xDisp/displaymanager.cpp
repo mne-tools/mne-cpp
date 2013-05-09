@@ -108,7 +108,7 @@ NumericWidget* DisplayManager::addNumericWidget(Numeric* pNum, QWidget* parent, 
 
 //*************************************************************************************************************
 
-RealTimeSampleArrayWidget* DisplayManager::addRealTimeSampleArrayWidget(RealTimeSampleArray* pRTSA, QWidget* parent, MSR_ID::Measurement_ID id, QTime* t)
+RealTimeSampleArrayWidget* DisplayManager::addRealTimeSampleArrayWidget(RealTimeSampleArray* pRTSA, QWidget* parent, MSR_ID::Measurement_ID id, QSharedPointer<QTime> t)
 {
     RealTimeSampleArrayWidget* rtsaWidget = new RealTimeSampleArrayWidget(pRTSA, t, parent);
     rtsaWidget->hide();
@@ -120,7 +120,7 @@ RealTimeSampleArrayWidget* DisplayManager::addRealTimeSampleArrayWidget(RealTime
 
 //*************************************************************************************************************
 
-RealTimeMultiSampleArrayWidget* DisplayManager::addRealTimeMultiSampleArrayWidget(RealTimeMultiSampleArray* pRTSM, QWidget* parent, MSR_ID::Measurement_ID id, QTime* t)
+RealTimeMultiSampleArrayWidget* DisplayManager::addRealTimeMultiSampleArrayWidget(RealTimeMultiSampleArray* pRTSM, QWidget* parent, MSR_ID::Measurement_ID id, QSharedPointer<QTime> t)
 {
     RealTimeMultiSampleArrayWidget* rtsmWidget = new RealTimeMultiSampleArrayWidget(pRTSM, t, parent);
     rtsmWidget->hide();
@@ -132,7 +132,7 @@ RealTimeMultiSampleArrayWidget* DisplayManager::addRealTimeMultiSampleArrayWidge
 
 //*************************************************************************************************************
 
-RealTimeMultiSampleArrayNewWidget* DisplayManager::addRealTimeMultiSampleArrayNewWidget(RealTimeMultiSampleArrayNew* pRTSM, QWidget* parent, MSR_ID::Measurement_ID id, QTime* t)
+RealTimeMultiSampleArrayNewWidget* DisplayManager::addRealTimeMultiSampleArrayNewWidget(RealTimeMultiSampleArrayNew* pRTSM, QWidget* parent, MSR_ID::Measurement_ID id, QSharedPointer<QTime> t)
 {
     RealTimeMultiSampleArrayNewWidget* rtsmWidget = new RealTimeMultiSampleArrayNewWidget(pRTSM, t, parent);
     rtsmWidget->hide();

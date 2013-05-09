@@ -122,7 +122,7 @@ public:
     * @param [in] pTime pointer to application time.
     * @param [in] parent pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
     */
-    RealTimeSampleArrayWidget(RealTimeSampleArray* pRTSA, QTime* pTime, QWidget* parent = 0);
+    RealTimeSampleArrayWidget(RealTimeSampleArray* pRTSA, QSharedPointer<QTime> pTime, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -258,8 +258,8 @@ private:
     unsigned char                   m_ucToolIndex;                  /**< Holds the selected tool index. */
     QTimer*                         m_pTimerToolDisplay;            /**< Timer for blending the tool label. */
     QTimer*                         m_pTimerUpdate;                 /**< Timer which is caring about a continuous paint update of the widget. */
-    QTime*                          m_pTime;                        /**< Holds the application time. */
-    QTime*                          m_pTimeCurrentDisplay;          /**< Time which corresponds to the x starting position of each segment. */
+    QSharedPointer<QTime>           m_pTime;                        /**< Holds the application time. */
+    QSharedPointer<QTime>           m_pTimeCurrentDisplay;          /**< Time which corresponds to the x starting position of each segment. */
     static QList<double>            s_listSamplingRates;            /**< Holds all real-time sample array sampling rates of the current display. */
 
 };

@@ -66,6 +66,19 @@ using namespace MNELIB;
 MNELibTests::MNELibTests(QObject *parent)
 : QObject(parent)
 {
+    MNEForwardSolution::SPtr t_pFwd(new MNEForwardSolution);
+
+    QSharedPointer<MNEForwardSolution>  t_pFwdNew(new MNEForwardSolution);
+
+
+
+
+
+    MNEForwardSolution* t_pFwdOld = new MNEForwardSolution();
+    delete t_pFwdOld;
+
+
+
 
 }
 
