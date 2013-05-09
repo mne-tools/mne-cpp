@@ -94,7 +94,7 @@ public:
     * @param [in] pText pointer to Text measurement.
     * @param [in] parent pointer to parent widget; If parent is 0, the new TextWidget becomes a window. If parent is another widget, TextWidget becomes a child window inside parent. TextWidget is deleted when its parent is deleted.
     */
-    TextWidget(Text* pText, QWidget *parent = 0);
+    TextWidget(QSharedPointer<Text> pText, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
@@ -118,8 +118,8 @@ public:
     virtual void init();
 
 private:
-    Ui::TextWidgetClass ui;			/**< Holds the user interface of the numeric widget. */
-    Text*               m_pText;	/**< Holds the pointer to the Text measurement. */
+    Ui::TextWidgetClass ui;         /**< Holds the user interface of the numeric widget. */
+    QSharedPointer<Text> m_pText;   /**< Holds the pointer to the Text measurement. */
 };
 
 } // NAMESPACE

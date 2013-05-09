@@ -96,7 +96,7 @@ DisplayManager::~DisplayManager()
 
 //*************************************************************************************************************
 
-NumericWidget* DisplayManager::addNumericWidget(Numeric* pNum, QWidget* parent, MSR_ID::Measurement_ID id)
+NumericWidget* DisplayManager::addNumericWidget(QSharedPointer<Numeric> pNum, QWidget* parent, MSR_ID::Measurement_ID id)
 {
     NumericWidget* numWidget = new NumericWidget(pNum, parent);
     numWidget->hide();
@@ -108,7 +108,7 @@ NumericWidget* DisplayManager::addNumericWidget(Numeric* pNum, QWidget* parent, 
 
 //*************************************************************************************************************
 
-RealTimeSampleArrayWidget* DisplayManager::addRealTimeSampleArrayWidget(RealTimeSampleArray* pRTSA, QWidget* parent, MSR_ID::Measurement_ID id, QSharedPointer<QTime> t)
+RealTimeSampleArrayWidget* DisplayManager::addRealTimeSampleArrayWidget(QSharedPointer<RealTimeSampleArray> pRTSA, QWidget* parent, MSR_ID::Measurement_ID id, QSharedPointer<QTime> t)
 {
     RealTimeSampleArrayWidget* rtsaWidget = new RealTimeSampleArrayWidget(pRTSA, t, parent);
     rtsaWidget->hide();
@@ -120,7 +120,7 @@ RealTimeSampleArrayWidget* DisplayManager::addRealTimeSampleArrayWidget(RealTime
 
 //*************************************************************************************************************
 
-RealTimeMultiSampleArrayWidget* DisplayManager::addRealTimeMultiSampleArrayWidget(RealTimeMultiSampleArray* pRTSM, QWidget* parent, MSR_ID::Measurement_ID id, QSharedPointer<QTime> t)
+RealTimeMultiSampleArrayWidget* DisplayManager::addRealTimeMultiSampleArrayWidget(QSharedPointer<RealTimeMultiSampleArray> pRTSM, QWidget* parent, MSR_ID::Measurement_ID id, QSharedPointer<QTime> t)
 {
     RealTimeMultiSampleArrayWidget* rtsmWidget = new RealTimeMultiSampleArrayWidget(pRTSM, t, parent);
     rtsmWidget->hide();
@@ -132,7 +132,7 @@ RealTimeMultiSampleArrayWidget* DisplayManager::addRealTimeMultiSampleArrayWidge
 
 //*************************************************************************************************************
 
-RealTimeMultiSampleArrayNewWidget* DisplayManager::addRealTimeMultiSampleArrayNewWidget(RealTimeMultiSampleArrayNew* pRTSM, QWidget* parent, MSR_ID::Measurement_ID id, QSharedPointer<QTime> t)
+RealTimeMultiSampleArrayNewWidget* DisplayManager::addRealTimeMultiSampleArrayNewWidget(QSharedPointer<RealTimeMultiSampleArrayNew> pRTSM, QWidget* parent, MSR_ID::Measurement_ID id, QSharedPointer<QTime> t)
 {
     RealTimeMultiSampleArrayNewWidget* rtsmWidget = new RealTimeMultiSampleArrayNewWidget(pRTSM, t, parent);
     rtsmWidget->hide();
@@ -144,7 +144,7 @@ RealTimeMultiSampleArrayNewWidget* DisplayManager::addRealTimeMultiSampleArrayNe
 
 //*************************************************************************************************************
 
-ProgressBarWidget* DisplayManager::addProgressBarWidget(ProgressBar* pProgress, QWidget* parent, MSR_ID::Measurement_ID id)
+ProgressBarWidget* DisplayManager::addProgressBarWidget(QSharedPointer<ProgressBar> pProgress, QWidget* parent, MSR_ID::Measurement_ID id)
 {
     ProgressBarWidget* progressWidget = new ProgressBarWidget(pProgress, parent);
     progressWidget->hide();
@@ -156,7 +156,7 @@ ProgressBarWidget* DisplayManager::addProgressBarWidget(ProgressBar* pProgress, 
 
 //*************************************************************************************************************
 
-TextWidget* DisplayManager::addTextWidget(Text* pText, QWidget* parent, MSR_ID::Measurement_ID id)
+TextWidget* DisplayManager::addTextWidget(QSharedPointer<Text> pText, QWidget* parent, MSR_ID::Measurement_ID id)
 {
     TextWidget* textWidget = new TextWidget(pText, parent);
     textWidget->hide();

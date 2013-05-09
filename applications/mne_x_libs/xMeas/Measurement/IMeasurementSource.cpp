@@ -70,11 +70,11 @@ IMeasurementSource::~IMeasurementSource()
 
 //*************************************************************************************************************
 
-Numeric* IMeasurementSource::addProviderNumeric(MSR_ID::Measurement_ID id)
+QSharedPointer<Numeric> IMeasurementSource::addProviderNumeric(MSR_ID::Measurement_ID id)
 {
-	//ToDo Check if belongs to group (division with group id)
-	// if id already exists push warning and return the existing channel Todo Todo
-    Numeric* num = new Numeric;
+    //ToDo Check if belongs to group (division with group id)
+    // if id already exists push warning and return the existing channel Todo Todo
+    QSharedPointer<Numeric> num = QSharedPointer<Numeric>(new Numeric);
     num->setID(id);
     //num->setModuleID(m_MDL_ID);
     m_hashNumeric.insert(id, num);
@@ -84,9 +84,9 @@ Numeric* IMeasurementSource::addProviderNumeric(MSR_ID::Measurement_ID id)
 
 //*************************************************************************************************************
 
-RealTimeSampleArray* IMeasurementSource::addProviderRealTimeSampleArray(MSR_ID::Measurement_ID id)
+QSharedPointer<RealTimeSampleArray> IMeasurementSource::addProviderRealTimeSampleArray(MSR_ID::Measurement_ID id)
 {
-    RealTimeSampleArray* rtsa = new RealTimeSampleArray;
+    QSharedPointer<RealTimeSampleArray> rtsa = QSharedPointer<RealTimeSampleArray>(new RealTimeSampleArray);
     rtsa->setID(id);
     //rtsa->setModuleID(m_MDL_ID);
     m_hashRealTimeSampleArray.insert(id, rtsa);
@@ -95,9 +95,9 @@ RealTimeSampleArray* IMeasurementSource::addProviderRealTimeSampleArray(MSR_ID::
 
 //*************************************************************************************************************
 
-RealTimeMultiSampleArray* IMeasurementSource::addProviderRealTimeMultiSampleArray(MSR_ID::Measurement_ID id, unsigned int uiNumChannels)
+QSharedPointer<RealTimeMultiSampleArray> IMeasurementSource::addProviderRealTimeMultiSampleArray(MSR_ID::Measurement_ID id, unsigned int uiNumChannels)
 {
-    RealTimeMultiSampleArray* rtmsa = new RealTimeMultiSampleArray(uiNumChannels);
+    QSharedPointer<RealTimeMultiSampleArray> rtmsa = QSharedPointer<RealTimeMultiSampleArray>(new RealTimeMultiSampleArray(uiNumChannels));
     rtmsa->setID(id);
     //rtsa->setModuleID(m_MDL_ID);
     m_hashRealTimeMultiSampleArray.insert(id, rtmsa);
@@ -107,9 +107,9 @@ RealTimeMultiSampleArray* IMeasurementSource::addProviderRealTimeMultiSampleArra
 
 //*************************************************************************************************************
 
-RealTimeMultiSampleArrayNew* IMeasurementSource::addProviderRealTimeMultiSampleArray_New(MSR_ID::Measurement_ID id)
+QSharedPointer<RealTimeMultiSampleArrayNew> IMeasurementSource::addProviderRealTimeMultiSampleArray_New(MSR_ID::Measurement_ID id)
 {
-    RealTimeMultiSampleArrayNew* rtmsa = new RealTimeMultiSampleArrayNew();
+    QSharedPointer<RealTimeMultiSampleArrayNew> rtmsa = QSharedPointer<RealTimeMultiSampleArrayNew>(new RealTimeMultiSampleArrayNew());
     rtmsa->setID(id);
     //rtsa->setModuleID(m_MDL_ID);
     m_hashRealTimeMultiSampleArrayNew.insert(id, rtmsa);
@@ -119,9 +119,9 @@ RealTimeMultiSampleArrayNew* IMeasurementSource::addProviderRealTimeMultiSampleA
 
 //*************************************************************************************************************
 
-RealTimeSourceEstimate* IMeasurementSource::addProviderRealTimeSourceEstimate(MSR_ID::Measurement_ID id)
+QSharedPointer<RealTimeSourceEstimate> IMeasurementSource::addProviderRealTimeSourceEstimate(MSR_ID::Measurement_ID id)
 {
-    RealTimeSourceEstimate* rtse = new RealTimeSourceEstimate();
+    QSharedPointer<RealTimeSourceEstimate> rtse = QSharedPointer<RealTimeSourceEstimate>(new RealTimeSourceEstimate());
     rtse->setID(id);
     //rtsa->setModuleID(m_MDL_ID);
     m_hashRealTimeSourceEstimate.insert(id, rtse);
@@ -131,9 +131,9 @@ RealTimeSourceEstimate* IMeasurementSource::addProviderRealTimeSourceEstimate(MS
 
 //*************************************************************************************************************
 
-ProgressBar* IMeasurementSource::addProviderProgressBar(MSR_ID::Measurement_ID id)
+QSharedPointer<ProgressBar> IMeasurementSource::addProviderProgressBar(MSR_ID::Measurement_ID id)
 {
-    ProgressBar* progress = new ProgressBar;
+    QSharedPointer<ProgressBar> progress = QSharedPointer<ProgressBar>(new ProgressBar);
     progress->setID(id);
     //progress->setModuleID(m_MDL_ID);
     m_hashProgressBar.insert(id, progress);
@@ -143,9 +143,9 @@ ProgressBar* IMeasurementSource::addProviderProgressBar(MSR_ID::Measurement_ID i
 
 //*************************************************************************************************************
 
-Text* IMeasurementSource::addProviderText(MSR_ID::Measurement_ID id)
+QSharedPointer<Text> IMeasurementSource::addProviderText(MSR_ID::Measurement_ID id)
 {
-    Text* text = new Text;
+    QSharedPointer<Text> text = QSharedPointer<Text>(new Text);
     text->setID(id);
     //text->setModuleID(m_MDL_ID);
     m_hashText.insert(id, text);
@@ -253,8 +253,8 @@ QList<MSR_ID::Measurement_ID> IMeasurementSource::getProviderProgressbar_IDs() c
 
 QList<MSR_ID::Measurement_ID> IMeasurementSource::getProviderText_IDs() const
 {
-	QList<MSR_ID::Measurement_ID> idList;
-	idList << m_hashText.uniqueKeys();
+    QList<MSR_ID::Measurement_ID> idList;
+    idList << m_hashText.uniqueKeys();
 
     return idList;
 }
@@ -275,26 +275,26 @@ QList<MSR_ID::Measurement_ID> IMeasurementSource::getProviderText_IDs() const
 
 void IMeasurementSource::cleanProvider()
 {
-    foreach (Numeric* value, m_hashNumeric)
-            delete value;
+//    foreach (Numeric* value, m_hashNumeric)
+//            delete value;
 
-    foreach (RealTimeSampleArray* value, m_hashRealTimeSampleArray)
-            delete value;
+//    foreach (RealTimeSampleArray* value, m_hashRealTimeSampleArray)
+//            delete value;
 
-    foreach (RealTimeMultiSampleArray* value, m_hashRealTimeMultiSampleArray)
-            delete value;
+//    foreach (RealTimeMultiSampleArray* value, m_hashRealTimeMultiSampleArray)
+//            delete value;
 
-    foreach (RealTimeMultiSampleArrayNew* value, m_hashRealTimeMultiSampleArrayNew)
-            delete value;
+//    foreach (RealTimeMultiSampleArrayNew* value, m_hashRealTimeMultiSampleArrayNew)
+//            delete value;
 
-    foreach (RealTimeSourceEstimate* value, m_hashRealTimeSourceEstimate)
-            delete value;
+//    foreach (RealTimeSourceEstimate* value, m_hashRealTimeSourceEstimate)
+//            delete value;
 
-    foreach (ProgressBar* value, m_hashProgressBar)
-            delete value;
+//    foreach (ProgressBar* value, m_hashProgressBar)
+//            delete value;
 
-    foreach (Text* value, m_hashText)
-            delete value;
+//    foreach (Text* value, m_hashText)
+//            delete value;
 
 //    foreach (Alert* value, m_hashAlert)
 //            delete value;

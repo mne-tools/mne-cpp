@@ -56,7 +56,7 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NumericWidget::NumericWidget(Numeric* pNumeric, QWidget* parent)
+NumericWidget::NumericWidget(QSharedPointer<Numeric> pNumeric, QWidget* parent)
 : MeasurementWidget(parent)
 , m_pNumeric(pNumeric)
 

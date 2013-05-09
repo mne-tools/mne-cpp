@@ -122,7 +122,7 @@ public:
     * @param [in] pTime pointer to application time.
     * @param [in] parent pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
     */
-    RealTimeSampleArrayWidget(RealTimeSampleArray* pRTSA, QSharedPointer<QTime> pTime, QWidget* parent = 0);
+    RealTimeSampleArrayWidget(QSharedPointer<RealTimeSampleArray> pRTSA, QSharedPointer<QTime> pTime, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -234,7 +234,7 @@ private slots:
 private:
     void actualize();		/**< Actualize member variables. Like y position, scaling factor, middle value of the frame and the highest sampling rate to calculate the sample width.*/
     Ui::RealTimeSampleArrayClass    ui;                             /**< Holds the user interface of the RealTimeSampleArray widget. */
-    RealTimeSampleArray*            m_pRTSA;                        /**< Holds the real-time sample array measurement. */
+    QSharedPointer<RealTimeSampleArray> m_pRTSA;                    /**< Holds the real-time sample array measurement. */
     QPainterPath                    m_qPainterPath;                 /**< Holds the current painter path which is the real-time curve. */
     QPainterPath                    m_qPainterPath_Freeze;          /**< Holds the frozen painter path which is the frozen real-time curve. */
     QMutex                          m_qMutex;                       /**< Holds a mutex to make the access to the painter path thread safe. */

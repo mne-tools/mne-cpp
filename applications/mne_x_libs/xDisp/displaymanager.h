@@ -145,7 +145,7 @@ public:
     * @param [in] id of the numeric measurement provider.
     * @return pointer to the new numeric widget.
     */
-    static NumericWidget* addNumericWidget(Numeric* pNum, QWidget* parent, MSR_ID::Measurement_ID id);
+    static NumericWidget* addNumericWidget(QSharedPointer<Numeric> pNum, QWidget* parent, MSR_ID::Measurement_ID id);
 
     //=========================================================================================================
     /**
@@ -157,7 +157,7 @@ public:
     * @param [in] t pointer to application time.
     * @return pointer to the new real-time sample array widget.
     */
-    static RealTimeSampleArrayWidget* addRealTimeSampleArrayWidget(RealTimeSampleArray* pRTSA, QWidget* parent, MSR_ID::Measurement_ID id, QSharedPointer<QTime> t);
+    static RealTimeSampleArrayWidget* addRealTimeSampleArrayWidget(QSharedPointer<RealTimeSampleArray> pRTSA, QWidget* parent, MSR_ID::Measurement_ID id, QSharedPointer<QTime> t);
 
     //=========================================================================================================
     /**
@@ -169,7 +169,7 @@ public:
     * @param [in] t pointer to application time.
     * @return pointer to the new real-time multi sample array widget.
     */
-    static RealTimeMultiSampleArrayWidget* addRealTimeMultiSampleArrayWidget(RealTimeMultiSampleArray* pRTSM, QWidget* parent, MSR_ID::Measurement_ID id, QSharedPointer<QTime> t);
+    static RealTimeMultiSampleArrayWidget* addRealTimeMultiSampleArrayWidget(QSharedPointer<RealTimeMultiSampleArray> pRTSM, QWidget* parent, MSR_ID::Measurement_ID id, QSharedPointer<QTime> t);
 
     //=========================================================================================================
     /**
@@ -181,7 +181,7 @@ public:
     * @param [in] t pointer to application time.
     * @return pointer to the new real-time multi sample array widget.
     */
-    static RealTimeMultiSampleArrayNewWidget* addRealTimeMultiSampleArrayNewWidget(RealTimeMultiSampleArrayNew* pRTSM, QWidget* parent, MSR_ID::Measurement_ID id, QSharedPointer<QTime> t);
+    static RealTimeMultiSampleArrayNewWidget* addRealTimeMultiSampleArrayNewWidget(QSharedPointer<RealTimeMultiSampleArrayNew> pRTSM, QWidget* parent, MSR_ID::Measurement_ID id, QSharedPointer<QTime> t);
 
     //=========================================================================================================
     /**
@@ -192,7 +192,7 @@ public:
     * @param [in] id of the progress bar measurement provider.
     * @return pointer to the new progress bar widget.
     */
-    static ProgressBarWidget* addProgressBarWidget(ProgressBar* pProgress, QWidget* parent, MSR_ID::Measurement_ID id);
+    static ProgressBarWidget* addProgressBarWidget(QSharedPointer<ProgressBar> pProgress, QWidget* parent, MSR_ID::Measurement_ID id);
 
     //=========================================================================================================
     /**
@@ -203,7 +203,7 @@ public:
     * @param [in] id of the text measurement provider.
     * @return pointer to the new text widget.
     */
-    static TextWidget* addTextWidget(Text* pText, QWidget* parent, MSR_ID::Measurement_ID id);
+    static TextWidget* addTextWidget(QSharedPointer<Text> pText, QWidget* parent, MSR_ID::Measurement_ID id);
 
 //get
     //=========================================================================================================

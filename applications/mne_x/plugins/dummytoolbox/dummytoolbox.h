@@ -130,11 +130,11 @@ private:
     */
     void init();
 
-    RealTimeSampleArray*     m_pDummy_Output;           /**< Holds the RealTimeSampleArray of the DummyToolbox output.*/
+    RealTimeSampleArray::SPtr       m_pDummy_Output;        /**< Holds the RealTimeSampleArray of the DummyToolbox output.*/
 
-    RealTimeMultiSampleArray*    m_pDummy_MSA_Output;   /**< Holds the RealTimeMultiSampleArray of the DummyToolbox output.*/
+    RealTimeMultiSampleArray::SPtr  m_pDummy_MSA_Output;    /**< Holds the RealTimeMultiSampleArray of the DummyToolbox output.*/
 
-    CircularBuffer_old<double>::SPtr   m_pDummyBuffer;             /**< Holds incoming data.*/
+    CircularBuffer_old<double>::SPtr   m_pDummyBuffer;      /**< Holds incoming data.*/
 
     CircularMultiChannelBuffer_old<double>::SPtr m_pDummyMultiChannelBuffer;    /**< Holds incoming multi sample data.*/
 

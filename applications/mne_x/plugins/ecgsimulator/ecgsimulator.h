@@ -145,9 +145,9 @@ private:
     */
     void init();
 
-    RealTimeSampleArray*    m_pRTSA_ECG_I;      /**< Holds the RealTimeSampleArray to provide the channel ECG I.*/
-    RealTimeSampleArray*    m_pRTSA_ECG_II;     /**< Holds the RealTimeSampleArray to provide the channel ECG II.*/
-    RealTimeSampleArray*    m_pRTSA_ECG_III;    /**< Holds the RealTimeSampleArray to provide the channel ECG III.*/
+    RealTimeSampleArray::SPtr m_pRTSA_ECG_I;      /**< Holds the RealTimeSampleArray to provide the channel ECG I.*/
+    RealTimeSampleArray::SPtr m_pRTSA_ECG_II;     /**< Holds the RealTimeSampleArray to provide the channel ECG II.*/
+    RealTimeSampleArray::SPtr m_pRTSA_ECG_III;    /**< Holds the RealTimeSampleArray to provide the channel ECG III.*/
 
     float           m_fSamplingRate;            /**< Holds the sampling rate.*/
     int             m_iDownsamplingFactor;      /**< Holds the down sampling factor.*/

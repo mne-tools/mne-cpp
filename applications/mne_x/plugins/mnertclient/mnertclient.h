@@ -212,7 +212,7 @@ private:
 //    float           m_fSamplingRate;                /**< Holds the sampling rate.*/
 //    int             m_iDownsamplingFactor;          /**< Holds the down sampling factor.*/
 
-    RealTimeMultiSampleArrayNew*    m_pRTMSA_MneRtClient;      /**< Holds the RealTimeMultiSampleArray to provide the rt_server Channels.*/
+    RealTimeMultiSampleArrayNew::SPtr m_pRTMSA_MneRtClient; /**< Holds the RealTimeMultiSampleArray to provide the rt_server Channels.*/
 
     RtCmdClient*       m_pRtCmdClient;      /**< The command client.*/
     bool m_bCmdClientIsConnected;           /**< If the command client is connected.*/

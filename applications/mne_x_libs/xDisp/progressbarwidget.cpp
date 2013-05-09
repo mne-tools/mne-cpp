@@ -66,7 +66,7 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ProgressBarWidget::ProgressBarWidget(ProgressBar* pProgressBar, QWidget *parent)
+ProgressBarWidget::ProgressBarWidget(QSharedPointer<ProgressBar> pProgressBar, QWidget *parent)
 : MeasurementWidget(parent)
 , m_pProgressBar(pProgressBar)
 , m_dSegmentSize(0.0)
