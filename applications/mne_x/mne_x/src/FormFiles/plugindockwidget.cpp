@@ -146,7 +146,12 @@ PluginDockWidget::PluginDockWidget( const QString & title, QWidget * parent, Qt:
 
 PluginDockWidget::~PluginDockWidget()
 {
-    //Todo
+    //Garbage collecting
+    foreach(QTreeWidgetItem* item, m_ItemQMap)
+        delete item;
+
+    if(m_pTreeWidgetPluginList)
+        delete m_pTreeWidgetPluginList;
 }
 
 

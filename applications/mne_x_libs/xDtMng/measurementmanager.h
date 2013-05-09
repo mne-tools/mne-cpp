@@ -454,8 +454,8 @@ public:
     static void clean();
 
 private:
-    static QHash<PLG_ID::Plugin_ID, IMeasurementSource*>    s_hashMeasurementProvider;	/**< Holds the measurement providers.*/
-    static QHash<PLG_ID::Plugin_ID, IPlugin*>    s_hashMeasurementAcceptor;	/**< Holds the measurement acceptors.*/
+    static QHash<PLG_ID::Plugin_ID, IMeasurementSource*>    s_hashMeasurementProvider;  /**< Holds the measurement providers.*/
+    static QHash<PLG_ID::Plugin_ID, IPlugin*>    s_hashMeasurementAcceptor;             /**< Holds the measurement acceptors.*/
 };
 
 } // NAMESPACE

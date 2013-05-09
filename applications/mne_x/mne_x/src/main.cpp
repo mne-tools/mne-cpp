@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     QPixmap pixmap(":/images/splashscreen.png");
-    MainSplashScreen *splashscreen = new MainSplashScreen(pixmap);
+    MainSplashScreen::SPtr splashscreen(new MainSplashScreen(pixmap));
     splashscreen->show();
 
     //ToDo Debug Some waiting stuff to see splash screen -> remove this in final release

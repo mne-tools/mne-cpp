@@ -144,10 +144,9 @@ protected:
     virtual void closeEvent(QCloseEvent* );
 
 private:
+    QTabWidget*     m_pTabWidgetMain;   /**< Holds the tab widget. */
 
-    QTabWidget*     m_pTabWidgetMain;	/**< Holds the tab widget. */
-
-    QScrollArea*    m_pScrollArea;		/**< Holds the scroll area inside the display tab. */
+    QScrollArea*    m_pScrollArea;      /**< Holds the scroll area inside the display tab. */
 
 };
 

@@ -97,9 +97,7 @@ public:
     ~StartUpWidget();
 
 private:
-
-    QLabel* m_pLabel_Info;		/**< Holds the start up widget label. */
-
+    QLabel* m_pLabel_Info;      /**< Holds the start up widget label. */
 };
 
 }//NAMESPACE

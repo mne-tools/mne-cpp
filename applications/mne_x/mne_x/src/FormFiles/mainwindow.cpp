@@ -117,6 +117,7 @@ MainWindow::MainWindow(QWidget *parent)
 , m_pTimer(NULL)
 , m_pTime(NULL)
 , m_iTimeoutMSec(1000)
+, m_pPluginManager(new PluginManager())
 , m_eLogLevelCurrent(_LogLvMax)
 {
     qDebug() << "Clinical Sensing and Analysis - Version" << CInfo::AppVersion();
@@ -129,7 +130,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     setUnifiedTitleAndToolBarOnMac(true);
 
-    m_pPluginManager = new PluginManager();
     m_pPluginManager->loadPlugins(qApp->applicationDirPath()+pluginDir);
 
     createActions();
@@ -155,11 +155,74 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    //cleanup work
+    //garbage collection
     if(m_pStartUpWidget)
         delete m_pStartUpWidget;
     if(m_pRunWidget)
         delete m_pRunWidget;
+
+    if(m_pActionNewConfig)
+        delete m_pActionNewConfig;
+    if(m_pActionOpenConfig)
+        delete m_pActionOpenConfig;
+    if(m_pActionSaveConfig)
+        delete m_pActionSaveConfig;
+    if(m_pActionExit)
+        delete m_pActionExit;
+    if(m_pActionGroupLgLv)
+        delete m_pActionGroupLgLv;
+    if(m_pActionMinLgLv)
+        delete m_pActionMinLgLv;
+    if(m_pActionNormLgLv)
+        delete m_pActionNormLgLv;
+    if(m_pActionMaxLgLv)
+        delete m_pActionMaxLgLv;
+    if(m_pActionHelpContents)
+        delete m_pActionHelpContents;
+    if(m_pActionAbout)
+        delete m_pActionAbout;
+    if(m_pActionRun)
+        delete m_pActionRun;
+    if(m_pActionStop)
+        delete m_pActionStop;
+    if(m_pActionZoomStd)
+        delete m_pActionZoomStd;
+    if(m_pActionZoomIn)
+        delete m_pActionZoomIn;
+    if(m_pActionZoomOut)
+        delete m_pActionZoomOut;
+    if(m_pActionDisplayMax)
+        delete m_pActionDisplayMax;
+
+    if(m_pActionDebugDisconnect)
+        delete m_pActionDebugDisconnect;
+
+    if(m_pMenuFile)
+        delete m_pMenuFile;
+    if(m_pMenuView)
+        delete m_pMenuView;
+    if(m_pMenuLgLv)
+        delete m_pMenuLgLv;
+    if(m_pMenuHelp)
+        delete m_pMenuHelp;
+
+    if(m_pMenuDebug)
+        delete m_pMenuDebug;
+
+    if(m_pToolBar)
+        delete m_pToolBar;
+
+    if(m_pLabel_Time)
+        delete m_pLabel_Time;
+
+    if(m_pPluginDockWidget)
+        delete m_pPluginDockWidget;
+
+    if(m_pDockWidget_Log)
+        delete m_pDockWidget_Log;
+    if(m_pTextBrowser_Log)
+        delete m_pTextBrowser_Log;
+
 }
 
 

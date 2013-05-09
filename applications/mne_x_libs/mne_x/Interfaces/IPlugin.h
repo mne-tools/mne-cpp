@@ -44,6 +44,7 @@
 
 #include <QThread>
 #include <QCoreApplication>
+#include <QSharedPointer>
 
 #include <xMeas/Nomenclature/nomenclature.h>
 
@@ -68,11 +69,11 @@ namespace MNEX
 */
 enum Type
 {
-    _ISensor,				/**< Type for a sensor plugin. */
-    _IRTAlgorithm,			/**< Type for a real-time algorithm plugin. */
-    _IRTRecord,				/**< Type for a real-time record plugin. */
-    _IAlert,				/**< Type for a alert plugin. */
-    _IRTVisualization		/**< Type for a real-time visualization plugin. */
+    _ISensor,               /**< Type for a sensor plugin. */
+    _IRTAlgorithm,          /**< Type for a real-time algorithm plugin. */
+    _IRTRecord,             /**< Type for a real-time record plugin. */
+    _IAlert,                /**< Type for a alert plugin. */
+    _IRTVisualization       /**< Type for a real-time visualization plugin. */
 };
 
 using namespace XMEASLIB;
@@ -86,8 +87,9 @@ using namespace XMEASLIB;
 */
 class IPlugin : public QThread
 {
-
 public:
+    typedef QSharedPointer<IPlugin> SPtr;               /**< Shared pointer type for IPlugin. */
+    typedef QSharedPointer<const IPlugin> ConstSPtr;    /**< Const shared pointer type for IPlugin. */
 
     //=========================================================================================================
     /**

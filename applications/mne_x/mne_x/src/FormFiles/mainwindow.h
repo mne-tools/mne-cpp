@@ -196,33 +196,33 @@ private:
      * \defgroup Class MainWindow user interface
      */
     /*@{*/
-    void createActions();		/**< Creates all actions for user interface of MainWindow class. */
-    void createMenus(); 		/**< Creates all menus for user interface of MainWindow class. */
-    void createToolBars();		/**< Creates all tool bars for user interface of MainWindow class. */
+    void createActions();       /**< Creates all actions for user interface of MainWindow class. */
+    void createMenus();         /**< Creates all menus for user interface of MainWindow class. */
+    void createToolBars();      /**< Creates all tool bars for user interface of MainWindow class. */
 
-    void initStatusBar();		/**< Creates QToolBar for user interface of MainWindow class. */
+    void initStatusBar();       /**< Creates QToolBar for user interface of MainWindow class. */
 
-    QAction*                             m_pActionNewConfig;		/**< new configuration */
-    QAction*                             m_pActionOpenConfig;		/**< open configuration */
-    QAction*                             m_pActionSaveConfig;		/**< save configuration */
-    QAction*                             m_pActionExit;				/**< exit application */
+    QAction*                             m_pActionNewConfig;        /**< new configuration */
+    QAction*                             m_pActionOpenConfig;       /**< open configuration */
+    QAction*                             m_pActionSaveConfig;       /**< save configuration */
+    QAction*                             m_pActionExit;             /**< exit application */
 
-    QActionGroup*                        m_pActionGroupLgLv;		/**< group log level */
-    QAction*                             m_pActionMinLgLv;			/**< set minimal log level */
-    QAction*                             m_pActionNormLgLv;			/**< set normal log level */
-    QAction*                             m_pActionMaxLgLv;			/**< set maximal log level */
+    QActionGroup*                        m_pActionGroupLgLv;        /**< group log level */
+    QAction*                             m_pActionMinLgLv;          /**< set minimal log level */
+    QAction*                             m_pActionNormLgLv;         /**< set normal log level */
+    QAction*                             m_pActionMaxLgLv;          /**< set maximal log level */
 
-    QAction*                             m_pActionHelpContents;		/**< open help contents */
-    QAction*                             m_pActionAbout;			/**< show about dialog */
+    QAction*                             m_pActionHelpContents;     /**< open help contents */
+    QAction*                             m_pActionAbout;            /**< show about dialog */
 
-    QAction*                             m_pActionRun;				/**< run application */
-    QAction*                             m_pActionStop;				/**< stop application */
-    QAction*                             m_pActionZoomStd;			/**< standard zoom */
-    QAction*                             m_pActionZoomIn;			/**< zoom in */
-    QAction*                             m_pActionZoomOut;			/**< zoom out */
-    QAction*                             m_pActionDisplayMax;		/**< show full screen mode */
+    QAction*                             m_pActionRun;              /**< run application */
+    QAction*                             m_pActionStop;             /**< stop application */
+    QAction*                             m_pActionZoomStd;          /**< standard zoom */
+    QAction*                             m_pActionZoomIn;           /**< zoom in */
+    QAction*                             m_pActionZoomOut;          /**< zoom out */
+    QAction*                             m_pActionDisplayMax;       /**< show full screen mode */
 
-    QAction*                             m_pActionDebugDisconnect;	/**< debug action -> for debug purpose */
+    QAction*                             m_pActionDebugDisconnect;  /**< debug action -> for debug purpose */
 
     //Main Window Menu
     QMenu*                                 m_pMenuFile;     /**< Holds the file menu.*/
@@ -247,7 +247,7 @@ private:
 
     //Plugin
     PluginDockWidget*                   m_pPluginDockWidget;            /**< Holds the dock widget containing the plugins.*/
-    PluginManager*                      m_pPluginManager;               /**< Holds log dock widget.*/
+    QSharedPointer<PluginManager>       m_pPluginManager;               /**< Holds log dock widget.*/
 
     QList<PLG_ID::Plugin_ID>            m_pListCurrentDisplayPlugins;   /**< Holds list of plugin id's which should be displayed.*/
 
