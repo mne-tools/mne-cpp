@@ -50,9 +50,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
+#include <QSharedPointer>
 #include <QHash>
 #include <QWidget>
 #include <QLabel>
@@ -119,6 +120,8 @@ class MeasurementWidget;
 class XDISPSHARED_EXPORT DisplayManager
 {
 public:
+    typedef QSharedPointer<DisplayManager> SPtr;               /**< Shared pointer type for DisplayManager. */
+    typedef QSharedPointer<const DisplayManager> ConstSPtr;    /**< Const shared pointer type for DisplayManager. */
 
     //=========================================================================================================
     /**
@@ -154,7 +157,7 @@ public:
     * @param [in] t pointer to application time.
     * @return pointer to the new real-time sample array widget.
     */
-    static RealTimeSampleArrayWidget* addRealTimeSampleArrayWidget(RealTimeSampleArray* pRTSA, QWidget* parent, MSR_ID::Measurement_ID id, QTime* t);
+    static RealTimeSampleArrayWidget* addRealTimeSampleArrayWidget(RealTimeSampleArray* pRTSA, QWidget* parent, MSR_ID::Measurement_ID id, QSharedPointer<QTime> t);
 
     //=========================================================================================================
     /**
@@ -166,7 +169,7 @@ public:
     * @param [in] t pointer to application time.
     * @return pointer to the new real-time multi sample array widget.
     */
-    static RealTimeMultiSampleArrayWidget* addRealTimeMultiSampleArrayWidget(RealTimeMultiSampleArray* pRTSM, QWidget* parent, MSR_ID::Measurement_ID id, QTime* t);
+    static RealTimeMultiSampleArrayWidget* addRealTimeMultiSampleArrayWidget(RealTimeMultiSampleArray* pRTSM, QWidget* parent, MSR_ID::Measurement_ID id, QSharedPointer<QTime> t);
 
     //=========================================================================================================
     /**
@@ -178,7 +181,7 @@ public:
     * @param [in] t pointer to application time.
     * @return pointer to the new real-time multi sample array widget.
     */
-    static RealTimeMultiSampleArrayNewWidget* addRealTimeMultiSampleArrayNewWidget(RealTimeMultiSampleArrayNew* pRTSM, QWidget* parent, MSR_ID::Measurement_ID id, QTime* t);
+    static RealTimeMultiSampleArrayNewWidget* addRealTimeMultiSampleArrayNewWidget(RealTimeMultiSampleArrayNew* pRTSM, QWidget* parent, MSR_ID::Measurement_ID id, QSharedPointer<QTime> t);
 
     //=========================================================================================================
     /**

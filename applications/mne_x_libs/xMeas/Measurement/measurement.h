@@ -53,6 +53,7 @@
 //=============================================================================================================
 
 #include <QString>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -73,6 +74,8 @@ namespace XMEASLIB
 class XMEASSHARED_EXPORT Measurement : public Subject
 {
 public:
+    typedef QSharedPointer<Measurement> SPtr;               /**< Shared pointer type for Measurement. */
+    typedef QSharedPointer<const Measurement> ConstSPtr;    /**< Const shared pointer type for Measurement. */
 
     //=========================================================================================================
     /**

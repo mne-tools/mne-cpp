@@ -51,9 +51,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// STL INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
+#include <QSharedPointer>
 #include <QVector>
 #include <QList>
 
@@ -84,6 +85,9 @@ using namespace FIFFLIB;
 class XMEASSHARED_EXPORT RealTimeMultiSampleArrayNew : public MltChnMeasurement
 {
 public:
+    typedef QSharedPointer<RealTimeMultiSampleArrayNew> SPtr;               /**< Shared pointer type for RealTimeMultiSampleArrayNew. */
+    typedef QSharedPointer<const RealTimeMultiSampleArrayNew> ConstSPtr;    /**< Const shared pointer type for RealTimeMultiSampleArrayNew. */
+
     //=========================================================================================================
     /**
     * Constructs a RealTimeMultiSampleArrayNew.

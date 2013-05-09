@@ -56,6 +56,7 @@
 //#include <QVector>
 #include <QHash>
 #include <QList>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -105,6 +106,8 @@ using namespace MNEX;
 class XMEASSHARED_EXPORT IMeasurementSource : public IPlugin
 {
 public:
+    typedef QSharedPointer<IMeasurementSource> SPtr;               /**< Shared pointer type for IMeasurementSource. */
+    typedef QSharedPointer<const IMeasurementSource> ConstSPtr;    /**< Const shared pointer type for IMeasurementSource. */
 
     //=========================================================================================================
     /**

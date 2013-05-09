@@ -61,6 +61,7 @@
 //=============================================================================================================
 
 #include <QString>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -89,6 +90,9 @@ using namespace Eigen;
 class XMEASSHARED_EXPORT MltChnMeasurement : public Measurement
 {
 public:
+    typedef QSharedPointer<MltChnMeasurement> SPtr;               /**< Shared pointer type for MltChnMeasurement. */
+    typedef QSharedPointer<const MltChnMeasurement> ConstSPtr;    /**< Const shared pointer type for MltChnMeasurement. */
+
     //=========================================================================================================
     /**
     * Constructs a MltChnMeasurement.

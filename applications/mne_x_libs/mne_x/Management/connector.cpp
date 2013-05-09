@@ -346,7 +346,7 @@ void Connector::disconnectMeasurements()//disconnect observer elements from subj
 
 //*************************************************************************************************************
 
-void Connector::connectMeasurementWidgets(QList<PLG_ID::Plugin_ID>& idList, QTime* t)//(PLG_ID::Plugin_ID id) ToDO GRP List
+void Connector::connectMeasurementWidgets(QList<PLG_ID::Plugin_ID>& idList, QSharedPointer<QTime> t)//(PLG_ID::Plugin_ID id) ToDO GRP List
 {
     DisplayManager::init();
 

@@ -50,9 +50,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// STL INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
+#include <QSharedPointer>
 #include <QVector>
 #include <QList>
 
@@ -83,6 +84,9 @@ using namespace FIFFLIB;
 class XMEASSHARED_EXPORT RealTimeSourceEstimate : public MltChnMeasurement
 {
 public:
+    typedef QSharedPointer<RealTimeSourceEstimate> SPtr;               /**< Shared pointer type for RealTimeSourceEstimate. */
+    typedef QSharedPointer<const RealTimeSourceEstimate> ConstSPtr;    /**< Const shared pointer type for RealTimeSourceEstimate. */
+
     //=========================================================================================================
     /**
     * Constructs a RealTimeSourceEstimate.

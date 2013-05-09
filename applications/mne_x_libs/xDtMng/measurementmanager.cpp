@@ -180,7 +180,7 @@ void MeasurementManager::attachToRTSA(IObserver* pObserver, QList<PLG_ID::Plugin
 
 //*************************************************************************************************************
 
-void MeasurementManager::attachWidgetsToRTSA(PLG_ID::Plugin_ID plg_id, QTime* t) //attaching to given Measurements List of given Measurement Providers List
+void MeasurementManager::attachWidgetsToRTSA(PLG_ID::Plugin_ID plg_id, QSharedPointer<QTime> t) //attaching to given Measurements List of given Measurement Providers List
 {
     qDebug() << "Number of Measurement Providers to attach Widget RTSA to: " << s_hashMeasurementProvider.size();
     if(s_hashMeasurementProvider.contains(plg_id))
@@ -196,7 +196,7 @@ void MeasurementManager::attachWidgetsToRTSA(PLG_ID::Plugin_ID plg_id, QTime* t)
 
 //*************************************************************************************************************
 
-void MeasurementManager::attachWidgetToRTSA(PLG_ID::Plugin_ID plg_id, MSR_ID::Measurement_ID msr_id, QTime* t) //attaching to given Measurements List of given Measurement Providers List
+void MeasurementManager::attachWidgetToRTSA(PLG_ID::Plugin_ID plg_id, MSR_ID::Measurement_ID msr_id, QSharedPointer<QTime> t) //attaching to given Measurements List of given Measurement Providers List
 {
     if(s_hashMeasurementProvider.contains(plg_id))
     {
@@ -378,7 +378,7 @@ void MeasurementManager::attachToRTMSA(IObserver* pObserver, QList<PLG_ID::Plugi
 
 //*************************************************************************************************************
 
-void MeasurementManager::attachWidgetsToRTMSA(PLG_ID::Plugin_ID plg_id, QTime* t) //attaching to given Measurements List of given Measurement Providers List
+void MeasurementManager::attachWidgetsToRTMSA(PLG_ID::Plugin_ID plg_id, QSharedPointer<QTime> t) //attaching to given Measurements List of given Measurement Providers List
 {
     qDebug() << "Number of Measurement Providers to attach Widget RTSA to: " << s_hashMeasurementProvider.size();
     if(s_hashMeasurementProvider.contains(plg_id))
@@ -394,7 +394,7 @@ void MeasurementManager::attachWidgetsToRTMSA(PLG_ID::Plugin_ID plg_id, QTime* t
 
 //*************************************************************************************************************
 
-void MeasurementManager::attachWidgetToRTMSA(PLG_ID::Plugin_ID plg_id, MSR_ID::Measurement_ID msr_id, QTime* t) //attaching to given Measurements List of given Measurement Providers List
+void MeasurementManager::attachWidgetToRTMSA(PLG_ID::Plugin_ID plg_id, MSR_ID::Measurement_ID msr_id, QSharedPointer<QTime> t) //attaching to given Measurements List of given Measurement Providers List
 {
     if(s_hashMeasurementProvider.contains(plg_id))
     {
@@ -543,7 +543,7 @@ void MeasurementManager::attachToRTMSANew(IObserver* pObserver, QList<PLG_ID::Pl
 
 //*************************************************************************************************************
 
-void MeasurementManager::attachWidgetsToRTMSANew(PLG_ID::Plugin_ID plg_id, QTime* t) //attaching to given Measurements List of given Measurement Providers List
+void MeasurementManager::attachWidgetsToRTMSANew(PLG_ID::Plugin_ID plg_id, QSharedPointer<QTime> t) //attaching to given Measurements List of given Measurement Providers List
 {
     qDebug() << "Number of Measurement Providers to attach Widget RTSA to: " << s_hashMeasurementProvider.size();
     if(s_hashMeasurementProvider.contains(plg_id))
@@ -559,7 +559,7 @@ void MeasurementManager::attachWidgetsToRTMSANew(PLG_ID::Plugin_ID plg_id, QTime
 
 //*************************************************************************************************************
 
-void MeasurementManager::attachWidgetToRTMSANew(PLG_ID::Plugin_ID plg_id, MSR_ID::Measurement_ID msr_id, QTime* t) //attaching to given Measurements List of given Measurement Providers List
+void MeasurementManager::attachWidgetToRTMSANew(PLG_ID::Plugin_ID plg_id, MSR_ID::Measurement_ID msr_id, QSharedPointer<QTime> t) //attaching to given Measurements List of given Measurement Providers List
 {
     if(s_hashMeasurementProvider.contains(plg_id))
     {

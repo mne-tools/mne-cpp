@@ -102,6 +102,8 @@ class MNE_X_SHARED_EXPORT Connector
 //    friend class MainCSART;
 
 public:
+    typedef QSharedPointer<Connector> SPtr;               /**< Shared pointer type for Connector. */
+    typedef QSharedPointer<const Connector> ConstSPtr;    /**< Const shared pointer type for Connector. */
 
     //=========================================================================================================
     /**
@@ -140,7 +142,7 @@ public:
     * @param [in] idList list of plugin id's of which the provided measurements should be connected for displayed.
     * @param [in] t time needed to initialise real time sample array widgets.
     */
-    static void connectMeasurementWidgets(QList<PLG_ID::Plugin_ID>& idList, QTime* t);
+    static void connectMeasurementWidgets(QList<PLG_ID::Plugin_ID>& idList, QSharedPointer<QTime> t);
 
     //=========================================================================================================
     /**

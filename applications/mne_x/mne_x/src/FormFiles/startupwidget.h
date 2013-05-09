@@ -49,6 +49,7 @@
 //=============================================================================================================
 
 #include <QWidget>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -77,8 +78,9 @@ namespace MNEX
 class StartUpWidget : public QWidget
 {
     Q_OBJECT
-
 public:
+    typedef QSharedPointer<StartUpWidget> SPtr;               /**< Shared pointer type for StartUpWidget. */
+    typedef QSharedPointer<const StartUpWidget> ConstSPtr;    /**< Const shared pointer type for StartUpWidget. */
 
     //=========================================================================================================
     /**

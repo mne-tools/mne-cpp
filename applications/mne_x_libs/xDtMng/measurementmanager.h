@@ -53,9 +53,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// STL INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
+#include <QSharedPointer>
 //#include <QVector>
 #include <QHash>
 #include <QList>
@@ -112,6 +113,8 @@ using namespace MNEX;
 class XDTMNGSHARED_EXPORT MeasurementManager
 {
 public:
+    typedef QSharedPointer<MeasurementManager> SPtr;               /**< Shared pointer type for MeasurementManager. */
+    typedef QSharedPointer<const MeasurementManager> ConstSPtr;    /**< Const shared pointer type for MeasurementManager. */
 
     //=========================================================================================================
     /**
@@ -175,7 +178,7 @@ public:
     * @param [in] plg_id id of the plugin.
     * @param [in] t pointer to the application measurement time.
     */
-    static void attachWidgetsToRTSA(PLG_ID::Plugin_ID plg_id, QTime* t);
+    static void attachWidgetsToRTSA(PLG_ID::Plugin_ID plg_id, QSharedPointer<QTime> t);
     //=========================================================================================================
     /**
     * Attaches a widget to a specific real-time sample array measurement of given plugin.
@@ -184,7 +187,7 @@ public:
     * @param [in] msr_id id of the measurement.
     * @param [in] t pointer to the application measurement time.
     */
-    static void attachWidgetToRTSA(PLG_ID::Plugin_ID plg_id, MSR_ID::Measurement_ID msr_id, QTime* t);
+    static void attachWidgetToRTSA(PLG_ID::Plugin_ID plg_id, MSR_ID::Measurement_ID msr_id, QSharedPointer<QTime> t);
 //detach RTSA
     //=========================================================================================================
     /**
@@ -243,7 +246,7 @@ public:
     * @param [in] plg_id id of the plugin.
     * @param [in] t pointer to the application measurement time.
     */
-    static void attachWidgetsToRTMSA(PLG_ID::Plugin_ID plg_id, QTime* t);
+    static void attachWidgetsToRTMSA(PLG_ID::Plugin_ID plg_id, QSharedPointer<QTime> t);
     //=========================================================================================================
     /**
     * Attaches a widget to a specific real-time multi sample array measurement of given plugin.
@@ -252,7 +255,7 @@ public:
     * @param [in] msr_id id of the measurement.
     * @param [in] t pointer to the application measurement time.
     */
-    static void attachWidgetToRTMSA(PLG_ID::Plugin_ID plg_id, MSR_ID::Measurement_ID msr_id, QTime* t);
+    static void attachWidgetToRTMSA(PLG_ID::Plugin_ID plg_id, MSR_ID::Measurement_ID msr_id, QSharedPointer<QTime> t);
 //detach RTMS
     //=========================================================================================================
     /**
@@ -311,7 +314,7 @@ public:
     * @param [in] plg_id id of the plugin.
     * @param [in] t pointer to the application measurement time.
     */
-    static void attachWidgetsToRTMSANew(PLG_ID::Plugin_ID plg_id, QTime* t);
+    static void attachWidgetsToRTMSANew(PLG_ID::Plugin_ID plg_id, QSharedPointer<QTime> t);
     //=========================================================================================================
     /**
     * Attaches a widget to a specific real-time multi sample array measurement of given plugin.
@@ -320,7 +323,7 @@ public:
     * @param [in] msr_id id of the measurement.
     * @param [in] t pointer to the application measurement time.
     */
-    static void attachWidgetToRTMSANew(PLG_ID::Plugin_ID plg_id, MSR_ID::Measurement_ID msr_id, QTime* t);
+    static void attachWidgetToRTMSANew(PLG_ID::Plugin_ID plg_id, MSR_ID::Measurement_ID msr_id, QSharedPointer<QTime> t);
 //detach RTMSANew
     //=========================================================================================================
     /**

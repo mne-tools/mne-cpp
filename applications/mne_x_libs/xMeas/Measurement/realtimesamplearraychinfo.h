@@ -51,6 +51,7 @@
 // Qt INCLUDES
 //=============================================================================================================
 
+#include <QSharedPointer>
 #include <QString>
 
 
@@ -80,6 +81,9 @@ using namespace FIFFLIB;
 class XMEASSHARED_EXPORT RealTimeSampleArrayChInfo
 {
 public:
+    typedef QSharedPointer<RealTimeSampleArrayChInfo> SPtr;               /**< Shared pointer type for RealTimeSampleArrayChInfo. */
+    typedef QSharedPointer<const RealTimeSampleArrayChInfo> ConstSPtr;    /**< Const shared pointer type for RealTimeSampleArrayChInfo. */
+
     //=========================================================================================================
     /**
     * Constructs a RealTimeSampleArrayChInfo.

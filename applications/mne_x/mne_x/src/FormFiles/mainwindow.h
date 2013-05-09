@@ -57,6 +57,7 @@
 #include <QString>
 #include <QVBoxLayout>
 #include <QContextMenuEvent>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -118,8 +119,9 @@ class PluginDockWidget;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-
 public:
+    typedef QSharedPointer<MainWindow> SPtr;               /**< Shared pointer type for MainWindow. */
+    typedef QSharedPointer<const MainWindow> ConstSPtr;    /**< Const shared pointer type for MainWindow. */
 
     //=========================================================================================================
     /**
@@ -174,12 +176,13 @@ public slots:
 
 private:
     //StartUp
-    StartUpWidget*    m_pStartUpWidget;		/**< holds the StartUpWidget.*/
+    StartUpWidget* m_pStartUpWidget;    /**< holds the StartUpWidget.*/
 
     //Run
-    RunWidget*                          m_pRunWidget;	/**< Holds the run widget.*/
-    bool                                m_bDisplayMax;	/**< whether full screen mode is activated.*/
-    bool                                m_bIsRunning;	/**< whether program/plugins is/are started.*/
+    RunWidget* m_pRunWidget;            /**< Holds the run widget.*/
+
+    bool m_bDisplayMax;                 /**< whether full screen mode is activated.*/
+    bool m_bIsRunning;                  /**< whether program/plugins is/are started.*/
 
     //=========================================================================================================
     /**
@@ -235,8 +238,8 @@ private:
 
 
     QLabel*                             m_pLabel_Time;      /**< Holds the display label for the running time.*/
-    QTimer*                             m_pTimer;           /**< timer of the main application*/
-    QTime*                              m_pTime;            /**< Holds current time output, updated with timeout of timer.*/
+    QSharedPointer<QTimer>              m_pTimer;           /**< timer of the main application*/
+    QSharedPointer<QTime>               m_pTime;            /**< Holds current time output, updated with timeout of timer.*/
     int                                 m_iTimeoutMSec;     /**< Holds milliseconds after which timer timeouts.*/
 
     void createPluginDockWindow();                          /**< Creates plugin dock widget.*/
