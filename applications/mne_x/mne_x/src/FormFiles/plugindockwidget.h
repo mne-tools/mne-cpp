@@ -180,11 +180,11 @@ protected:
 
 private:
     //Tree View Plugin
-    typedef QMap<int, QTreeWidgetItem*> t_ItemQMap;					/**< Defines a new tree widget item mapping type. */
-    t_ItemQMap                          m_ItemQMap;					/**< Holds the tree widget item map. */
-    int                                 m_iCurrentPluginIdx;		/**< Holds the current plugin index. */
-    QTreeWidgetItem*                    m_pCurrentItem;				/**< Holds the current tree item. */
-    QTreeWidget*                        m_pTreeWidgetPluginList;	/**< Holds the tree item list. */
+    typedef QMap<int, QTreeWidgetItem*> t_ItemQMap;                 /**< Defines a new tree widget item mapping type. */
+    t_ItemQMap                          m_ItemQMap;                 /**< Holds the tree widget item map. */
+    int                                 m_iCurrentPluginIdx;        /**< Holds the current plugin index. */
+    QTreeWidgetItem*                    m_pCurrentItem;             /**< Holds the current tree item. */
+    QTreeWidget*                        m_pTreeWidgetPluginList;    /**< Holds the tree item list. */
 
 private slots:
     //=========================================================================================================

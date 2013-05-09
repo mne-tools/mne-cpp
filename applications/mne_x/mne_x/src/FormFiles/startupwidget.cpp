@@ -94,4 +94,6 @@ StartUpWidget::StartUpWidget(QWidget *parent)
 StartUpWidget::~StartUpWidget()
 {
     qDebug() << "StartUp destroyed automatically.";
+    if(m_pLabel_Info)
+        delete m_pLabel_Info;
 }
