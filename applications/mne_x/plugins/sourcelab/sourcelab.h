@@ -187,27 +187,27 @@ private:
     bool m_bReceiveData;    /**< If thread is ready to receive data */
 
     //MNE stuff
-    QFile m_qFileFwdSolution;           /**< File to forward solution. */
-    MNEForwardSolution::SPtr m_pFwd;            /**< Forward solution. */
-    MNEForwardSolution::SPtr m_pClusteredFwd;   /**< Clustered forward solution. */
+    QFile                       m_qFileFwdSolution; /**< File to forward solution. */
+    MNEForwardSolution::SPtr    m_pFwd;             /**< Forward solution. */
+    MNEForwardSolution::SPtr    m_pClusteredFwd;    /**< Clustered forward solution. */
 
-    AnnotationSet m_annotationSet;  /**< Annotation set. */
+    AnnotationSet               m_annotationSet;    /**< Annotation set. */
 
-    FiffInfo::SPtr m_pFiffInfo;     /**< Fiff information. */
+    FiffInfo::SPtr              m_pFiffInfo;        /**< Fiff information. */
 
-    RtCov::SPtr m_pRtCov;           /**< Real-time covariance. */
-    FiffCov::SPtr m_pFiffCov;       /**< The estimated covariance. */
+    RtCov::SPtr                 m_pRtCov;           /**< Real-time covariance. */
+    FiffCov::SPtr               m_pFiffCov;         /**< The estimated covariance. */
 
-    RtInvOp::SPtr m_pRtInvOp;           /**< Real-time inverse operator. */
-    MNEInverseOperator::SPtr m_pInvOp;  /**< The inverse operator. */
+    RtInvOp::SPtr               m_pRtInvOp;         /**< Real-time inverse operator. */
+    MNEInverseOperator::SPtr    m_pInvOp;           /**< The inverse operator. */
 
-    RtAve::SPtr m_pRtAve;                   /**< Real-time average. */
-    QVector<FiffEvoked::SPtr> m_qVecEvokedData; /**< Evoked data set */
-    qint32 m_iStimChan;     /**< Stimulus Channel to use for source estimation */
+    RtAve::SPtr                 m_pRtAve;           /**< Real-time average. */
+    QVector<FiffEvoked::SPtr>   m_qVecEvokedData;   /**< Evoked data set */
+    qint32 m_iStimChan;                             /**< Stimulus Channel to use for source estimation */
 
-    MinimumNorm::SPtr m_pMinimumNorm;   /**< Minimum Norm Estimation. */
+    MinimumNorm::SPtr           m_pMinimumNorm;     /**< Minimum Norm Estimation. */
 
-    RealTimeSourceEstimate* m_pRTSE_SourceLab;   /**< Source Estimate output channel. */
+    RealTimeSourceEstimate::SPtr m_pRTSE_SourceLab; /**< Source Estimate output channel. */
 };
 
 } // NAMESPACE

@@ -109,7 +109,7 @@ public:
     * @param [in] pProgressBar pointer to ProgressBar measurement.
     * @param [in] parent pointer to parent widget; If parent is 0, the new ProgressBarWidget becomes a window. If parent is another widget, ProgressBarWidget becomes a child window inside parent. ProgressBarWidget is deleted when its parent is deleted.
     */
-    ProgressBarWidget(ProgressBar* pProgressBar, QWidget *parent = 0);
+    ProgressBarWidget(QSharedPointer<ProgressBar> pProgressBar, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
@@ -141,13 +141,13 @@ public:
     virtual void paintEvent(QPaintEvent* event);
 
 private:
-    Ui::ProgressBarWidgetClass  ui;					/**< Holds the user interface of the ProgressBar widget. */
-    ProgressBar*                m_pProgressBar;		/**< Holds ProgressBar measurement. */
-    double                      m_dSegmentSize;		/**< Holds the segment size. */
-    unsigned short              m_usXPos;			/**< Holds the horizontal start position. */
-    QBrush                      m_Brush;			/**< Holds the progress bar brush. */
-    QFont                       m_Font;				/**< Holds the progress bar text font. */
-    QString                     m_Text;				/**< Holds the progress bar progress text. */
+    Ui::ProgressBarWidgetClass  ui;                 /**< Holds the user interface of the ProgressBar widget. */
+    QSharedPointer<ProgressBar> m_pProgressBar;     /**< Holds ProgressBar measurement. */
+    double                      m_dSegmentSize;     /**< Holds the segment size. */
+    unsigned short              m_usXPos;           /**< Holds the horizontal start position. */
+    QBrush                      m_Brush;            /**< Holds the progress bar brush. */
+    QFont                       m_Font;             /**< Holds the progress bar text font. */
+    QString                     m_Text;             /**< Holds the progress bar progress text. */
 };
 
 } // NAMESPACE

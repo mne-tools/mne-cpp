@@ -56,10 +56,9 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TextWidget::TextWidget(Text* pText, QWidget *parent)
+TextWidget::TextWidget(QSharedPointer<Text> pText, QWidget *parent)
 : MeasurementWidget(parent)
 , m_pText(pText)
-
 {
     ui.setupUi(this);
 }

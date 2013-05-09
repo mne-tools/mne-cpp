@@ -178,7 +178,7 @@ public:
     * @param [in] id of Numeric measurement.
     * @return pointer to added Numeric measurement.
     */
-    Numeric* addProviderNumeric(MSR_ID::Measurement_ID id);
+    QSharedPointer<Numeric> addProviderNumeric(MSR_ID::Measurement_ID id);
     //=========================================================================================================
     /**
     * Adds a RealTimeSampleArray measurement to provider.
@@ -186,7 +186,7 @@ public:
     * @param [in] id of RealTimeSampleArray measurement.
     * @return pointer to added RealTimeSampleArray measurement.
     */
-    RealTimeSampleArray* addProviderRealTimeSampleArray(MSR_ID::Measurement_ID id);
+    QSharedPointer<RealTimeSampleArray> addProviderRealTimeSampleArray(MSR_ID::Measurement_ID id);
     //=========================================================================================================
     /**
     * Adds a RealTimeMultiSampleArray measurement to provider.
@@ -195,7 +195,7 @@ public:
     * @param [in] uiNumChannels number of channels of the RTMSA.
     * @return pointer to added RealTimeMultiSampleArray measurement.
     */
-    RealTimeMultiSampleArray* addProviderRealTimeMultiSampleArray(MSR_ID::Measurement_ID id, unsigned int uiNumChannels);
+    QSharedPointer<RealTimeMultiSampleArray> addProviderRealTimeMultiSampleArray(MSR_ID::Measurement_ID id, unsigned int uiNumChannels);
     //=========================================================================================================
     /**
     * Adds a RealTimeMultiSampleArray measurement to provider.
@@ -203,7 +203,7 @@ public:
     * @param [in] id of RealTimeMultiSampleArray measurement.
     * @return pointer to added RealTimeMultiSampleArray measurement.
     */
-    RealTimeMultiSampleArrayNew* addProviderRealTimeMultiSampleArray_New(MSR_ID::Measurement_ID id);
+    QSharedPointer<RealTimeMultiSampleArrayNew> addProviderRealTimeMultiSampleArray_New(MSR_ID::Measurement_ID id);
     //=========================================================================================================
     /**
     * Adds a RealTimeSourceEstimate measurement to provider.
@@ -211,7 +211,7 @@ public:
     * @param [in] id of RealTimeSourceEstimate measurement.
     * @return pointer to added RealTimeSourceEstimate measurement.
     */
-    RealTimeSourceEstimate* addProviderRealTimeSourceEstimate(MSR_ID::Measurement_ID id);
+    QSharedPointer<RealTimeSourceEstimate> addProviderRealTimeSourceEstimate(MSR_ID::Measurement_ID id);
     //=========================================================================================================
     /**
     * Adds a ProgressBar measurement to provider.
@@ -219,7 +219,7 @@ public:
     * @param [in] id of ProgressBar measurement.
     * @return pointer to added ProgressBar measurement.
     */
-    ProgressBar* addProviderProgressBar(MSR_ID::Measurement_ID id);
+    QSharedPointer<ProgressBar> addProviderProgressBar(MSR_ID::Measurement_ID id);
     //=========================================================================================================
     /**
     * Adds a Text measurement to provider.
@@ -227,9 +227,9 @@ public:
     * @param [in] id of Text measurement.
     * @return pointer to added Text measurement.
     */
-    Text* addProviderText(MSR_ID::Measurement_ID id);
+    QSharedPointer<Text> addProviderText(MSR_ID::Measurement_ID id);
 
-//    virtual Alert* addProviderAlert(MSR_ID::Measurement_ID id);
+//    virtual QSharedPointer<Alert> addProviderAlert(MSR_ID::Measurement_ID id);
 
     //=========================================================================================================
     /**
@@ -296,42 +296,42 @@ public:
     *
     * @return a hash of all provided Numeric measurements and their id's.
     */
-    virtual const QHash<MSR_ID::Measurement_ID, Numeric*>& getProviderNumeric() {return m_hashNumeric;};
+    virtual const QHash<MSR_ID::Measurement_ID, QSharedPointer<Numeric> >& getProviderNumeric() {return m_hashNumeric;};
     //=========================================================================================================
     /**
     * Returns provided RealTimeSampleArray measurements and their id's.
     *
     * @return a hash of all provided RealTimeSampleArray measurements and their id's.
     */
-    virtual const QHash<MSR_ID::Measurement_ID, RealTimeSampleArray*>& getProviderRTSA() {return m_hashRealTimeSampleArray;};
+    virtual const QHash<MSR_ID::Measurement_ID, QSharedPointer<RealTimeSampleArray> >& getProviderRTSA() {return m_hashRealTimeSampleArray;};
     //=========================================================================================================
     /**
     * Returns provided RealTimeMultiSampleArray measurements and their id's.
     *
     * @return a hash of all provided RealTimeMultiSampleArray measurements and their id's.
     */
-    virtual const QHash<MSR_ID::Measurement_ID, RealTimeMultiSampleArray*>& getProviderRTMSA() {return m_hashRealTimeMultiSampleArray;};
+    virtual const QHash<MSR_ID::Measurement_ID, QSharedPointer<RealTimeMultiSampleArray> >& getProviderRTMSA() {return m_hashRealTimeMultiSampleArray;};
     //=========================================================================================================
     /**
     * Returns provided RealTimeMultiSampleArray measurements and their id's.
     *
     * @return a hash of all provided RealTimeMultiSampleArray measurements and their id's.
     */
-    virtual const QHash<MSR_ID::Measurement_ID, RealTimeMultiSampleArrayNew*>& getProviderRTMSANew() {return m_hashRealTimeMultiSampleArrayNew;};
+    virtual const QHash<MSR_ID::Measurement_ID, QSharedPointer<RealTimeMultiSampleArrayNew> >& getProviderRTMSANew() {return m_hashRealTimeMultiSampleArrayNew;};
     //=========================================================================================================
     /**
     * Returns provided ProgressBar measurements and their id's.
     *
     * @return a hash of all provided ProgressBar measurements and their id's.
     */
-    virtual const QHash<MSR_ID::Measurement_ID, ProgressBar*>& getProviderProgressBar() {return m_hashProgressBar;};
+    virtual const QHash<MSR_ID::Measurement_ID, QSharedPointer<ProgressBar> >& getProviderProgressBar() {return m_hashProgressBar;};
     //=========================================================================================================
     /**
     * Returns provided Text measurements and their id's.
     *
     * @return a hash of all provided Text measurements and their id's.
     */
-    virtual const QHash<MSR_ID::Measurement_ID, Text*>& getProviderText() {return m_hashText;};
+    virtual const QHash<MSR_ID::Measurement_ID, QSharedPointer<Text> >& getProviderText() {return m_hashText;};
 
 //    virtual const QHash<MSR_ID::Measurement_ID, Alert*>& getProviderAlert() {return m_hashAlert;};
 
@@ -342,16 +342,16 @@ public:
     virtual void cleanProvider();
 
 protected:
-    QHash<MSR_ID::Measurement_ID, Numeric*>                   m_hashNumeric;                    /**< The Numeric measurements.*/
-    QHash<MSR_ID::Measurement_ID, RealTimeSampleArray*>       m_hashRealTimeSampleArray;        /**< The RealTimeSampleArray measurements.*/
-    QHash<MSR_ID::Measurement_ID, RealTimeMultiSampleArray*>  m_hashRealTimeMultiSampleArray;   /**< The RealTimeSampleArray measurements.*/
-    QHash<MSR_ID::Measurement_ID, RealTimeMultiSampleArrayNew*> m_hashRealTimeMultiSampleArrayNew;  /**< The RealTimeSampleArray New measurements.*/
-    QHash<MSR_ID::Measurement_ID, RealTimeSourceEstimate*> m_hashRealTimeSourceEstimate;        /**< The RealTimeSourceEstimate measurements.*/
+    QHash<MSR_ID::Measurement_ID, QSharedPointer<Numeric> >                   m_hashNumeric;                    /**< The Numeric measurements.*/
+    QHash<MSR_ID::Measurement_ID, QSharedPointer<RealTimeSampleArray> >       m_hashRealTimeSampleArray;        /**< The RealTimeSampleArray measurements.*/
+    QHash<MSR_ID::Measurement_ID, QSharedPointer<RealTimeMultiSampleArray> >  m_hashRealTimeMultiSampleArray;   /**< The RealTimeSampleArray measurements.*/
+    QHash<MSR_ID::Measurement_ID, QSharedPointer<RealTimeMultiSampleArrayNew> > m_hashRealTimeMultiSampleArrayNew;  /**< The RealTimeSampleArray New measurements.*/
+    QHash<MSR_ID::Measurement_ID, QSharedPointer<RealTimeSourceEstimate> > m_hashRealTimeSourceEstimate;        /**< The RealTimeSourceEstimate measurements.*/
 
 
-    QHash<MSR_ID::Measurement_ID, ProgressBar*>               m_hashProgressBar;    /**< Holds the ProgressBar measurements.*/
-    QHash<MSR_ID::Measurement_ID, Text*>                      m_hashText;           /**< Holds the Text measurements.*/
-//    QHash<MSR_ID::Measurement_ID, Alert*>                 m_hashAlert;	/**< Holds the Alert measurements.*/
+    QHash<MSR_ID::Measurement_ID, QSharedPointer<ProgressBar> >               m_hashProgressBar;    /**< Holds the ProgressBar measurements.*/
+    QHash<MSR_ID::Measurement_ID, QSharedPointer<Text> >                      m_hashText;           /**< Holds the Text measurements.*/
+//    QHash<MSR_ID::Measurement_ID, QSharedPointer<Alert> >                 m_hashAlert;	/**< Holds the Alert measurements.*/
 };
 
 

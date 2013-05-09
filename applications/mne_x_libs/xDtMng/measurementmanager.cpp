@@ -161,7 +161,7 @@ void MeasurementManager::attachToRTSA(IObserver* pObserver, QList<PLG_ID::Plugin
             {
                 if(pMsrPvr->getProviderRTSA().contains(msr_id))
                 {
-                    RealTimeSampleArray* pRTSA = pMsrPvr->getProviderRTSA().value(msr_id);
+                    RealTimeSampleArray::SPtr pRTSA = pMsrPvr->getProviderRTSA().value(msr_id);
                     pRTSA->attach(pObserver);
                 }
                 else
@@ -203,7 +203,7 @@ void MeasurementManager::attachWidgetToRTSA(PLG_ID::Plugin_ID plg_id, MSR_ID::Me
         IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
         if(pMsrPvr->getProviderRTSA().contains(msr_id))
         {
-            RealTimeSampleArray* pRTSA = pMsrPvr->getProviderRTSA().value(msr_id);
+            RealTimeSampleArray::SPtr pRTSA = pMsrPvr->getProviderRTSA().value(msr_id);
             if(pRTSA->isVisible())
             {
                 IObserver* pRTSAWidget = dynamic_cast<IObserver*>(DisplayManager::addRealTimeSampleArrayWidget(pRTSA, 0, msr_id, t));
@@ -264,7 +264,7 @@ void MeasurementManager::detachFromRTSA(IObserver* pObserver, QList<PLG_ID::Plug
             {
                 if(pMsrPvr->getProviderRTSA().contains(msr_id))
                 {
-                    RealTimeSampleArray* pRTSA = pMsrPvr->getProviderRTSA().value(msr_id);
+                    QSharedPointer<RealTimeSampleArray> pRTSA = pMsrPvr->getProviderRTSA().value(msr_id);
                     pRTSA->detach(pObserver);
                 }
                 else
@@ -359,7 +359,7 @@ void MeasurementManager::attachToRTMSA(IObserver* pObserver, QList<PLG_ID::Plugi
             {
                 if(pMsrPvr->getProviderRTMSA().contains(msr_id))
                 {
-                    RealTimeMultiSampleArray* pRTMSA = pMsrPvr->getProviderRTMSA().value(msr_id);
+                    QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMsrPvr->getProviderRTMSA().value(msr_id);
                     pRTMSA->attach(pObserver);
                 }
                 else
@@ -401,7 +401,7 @@ void MeasurementManager::attachWidgetToRTMSA(PLG_ID::Plugin_ID plg_id, MSR_ID::M
         IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
         if(pMsrPvr->getProviderRTMSA().contains(msr_id))
         {
-            RealTimeMultiSampleArray* pRTMSA = pMsrPvr->getProviderRTMSA().value(msr_id);
+            QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMsrPvr->getProviderRTMSA().value(msr_id);
             if(pRTMSA->isVisible())
             {
                 IObserver* pRTMSAWidget = dynamic_cast<IObserver*>(DisplayManager::addRealTimeMultiSampleArrayWidget(pRTMSA, 0, msr_id, t));
@@ -462,7 +462,7 @@ void MeasurementManager::detachFromRTMSA(IObserver* pObserver, QList<PLG_ID::Plu
             {
                 if(pMsrPvr->getProviderRTMSA().contains(msr_id))
                 {
-                    RealTimeMultiSampleArray* pRTMSA = pMsrPvr->getProviderRTMSA().value(msr_id);
+                    QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMsrPvr->getProviderRTMSA().value(msr_id);
                     pRTMSA->detach(pObserver);
                 }
                 else
@@ -524,7 +524,7 @@ void MeasurementManager::attachToRTMSANew(IObserver* pObserver, QList<PLG_ID::Pl
             {
                 if(pMsrPvr->getProviderRTMSANew().contains(msr_id))
                 {
-                    RealTimeMultiSampleArrayNew* pRTMSANew = pMsrPvr->getProviderRTMSANew().value(msr_id);
+                    QSharedPointer<RealTimeMultiSampleArrayNew> pRTMSANew = pMsrPvr->getProviderRTMSANew().value(msr_id);
                     pRTMSANew->attach(pObserver);
                 }
                 else
@@ -566,7 +566,7 @@ void MeasurementManager::attachWidgetToRTMSANew(PLG_ID::Plugin_ID plg_id, MSR_ID
         IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
         if(pMsrPvr->getProviderRTMSANew().contains(msr_id))
         {
-            RealTimeMultiSampleArrayNew* pRTMSANew = pMsrPvr->getProviderRTMSANew().value(msr_id);
+            QSharedPointer<RealTimeMultiSampleArrayNew> pRTMSANew = pMsrPvr->getProviderRTMSANew().value(msr_id);
             if(pRTMSANew->isVisible())
             {
                 IObserver* pRTMSANewWidget = dynamic_cast<IObserver*>(DisplayManager::addRealTimeMultiSampleArrayNewWidget(pRTMSANew, 0, msr_id, t));
@@ -627,7 +627,7 @@ void MeasurementManager::detachFromRTMSANew(IObserver* pObserver, QList<PLG_ID::
             {
                 if(pMsrPvr->getProviderRTMSANew().contains(msr_id))
                 {
-                    RealTimeMultiSampleArrayNew* pRTMSANew = pMsrPvr->getProviderRTMSANew().value(msr_id);
+                    QSharedPointer<RealTimeMultiSampleArrayNew> pRTMSANew = pMsrPvr->getProviderRTMSANew().value(msr_id);
                     pRTMSANew->detach(pObserver);
                 }
                 else
@@ -656,7 +656,7 @@ void MeasurementManager::attachToNumeric(IObserver* pObserver) //attaching to al
 {
     foreach(IMeasurementSource* pMsrPvr, s_hashMeasurementProvider.values())
     {
-        foreach(Numeric* pNum, pMsrPvr->getProviderNumeric().values())
+        foreach(QSharedPointer<Numeric> pNum, pMsrPvr->getProviderNumeric().values())
         {
             pNum->attach(pObserver);
         }
@@ -673,7 +673,7 @@ void MeasurementManager::attachToNumeric(IObserver* pObserver, QList<PLG_ID::Plu
         if(s_hashMeasurementProvider.contains(plg_id))
         {
             IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
-            foreach(Numeric* pNum, pMsrPvr->getProviderNumeric().values())
+            foreach(QSharedPointer<Numeric> pNum, pMsrPvr->getProviderNumeric().values())
             {
                 pNum->attach(pObserver);
             }
@@ -699,8 +699,8 @@ void MeasurementManager::attachToNumeric(IObserver* pObserver, QList<PLG_ID::Plu
 		    {
 		    	if(pMsrPvr->getProviderNumeric().contains(msr_id))
 		    	{
-		    		Numeric* pNum = pMsrPvr->getProviderNumeric().value(msr_id);
-					pNum->attach(pObserver);
+                    QSharedPointer<Numeric> pNum = pMsrPvr->getProviderNumeric().value(msr_id);
+                    pNum->attach(pObserver);
 		    	}
 		    	else
 		    	{
@@ -736,23 +736,23 @@ void MeasurementManager::attachWidgetsToNumeric(PLG_ID::Plugin_ID plg_id) //atta
 void MeasurementManager::attachWidgetToNumeric(PLG_ID::Plugin_ID plg_id, MSR_ID::Measurement_ID msr_id) //attaching to given Measurements List of given Measurement Providers List
 {
     if(s_hashMeasurementProvider.contains(plg_id))
-	{
+    {
         IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
-		if(pMsrPvr->getProviderNumeric().contains(msr_id))
-		{
-			Numeric* pNum = pMsrPvr->getProviderNumeric().value(msr_id);
-			if(pNum->isVisible())
-			{
-				IObserver* pNumWidget = dynamic_cast<IObserver*>(DisplayManager::addNumericWidget(pNum, 0, msr_id));
-				pNum->attach(pNumWidget);
-			}
-		}
-		else
-		{
+        if(pMsrPvr->getProviderNumeric().contains(msr_id))
+        {
+            QSharedPointer<Numeric> pNum = pMsrPvr->getProviderNumeric().value(msr_id);
+            if(pNum->isVisible())
+            {
+                IObserver* pNumWidget = dynamic_cast<IObserver*>(DisplayManager::addNumericWidget(pNum, 0, msr_id));
+                pNum->attach(pNumWidget);
+            }
+        }
+        else
+        {
             qDebug() << "Warning while attachWidgetToRTSA: MSR_ID::Measurement_ID " << msr_id << "is not part of measurement provider " << plg_id << ".";
-		}
-	}
-	else
+        }
+    }
+    else
         qDebug() << "Error while attachWidgetToRTSA: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
 }
 
@@ -781,19 +781,19 @@ void MeasurementManager::detachFromNumeric(IObserver* pObserver, QList<PLG_ID::P
     foreach(PLG_ID::Plugin_ID plg_id, plg_idList)
     {
         if(s_hashMeasurementProvider.contains(plg_id))
-    	{
+        {
             IMeasurementSource* pMsrPvr = s_hashMeasurementProvider.value(plg_id);
 
             qDebug() << "MeasurementManager::detachFromNumeric: MSR_ID::Measurement_IDS: " << pMsrPvr->getProviderRTSA().keys();
-			foreach(Numeric* pNum, pMsrPvr->getProviderNumeric().values())
-			{
-				pNum->detach(pObserver);
-			}
-    	}
-    	else
-    	{
+            foreach(QSharedPointer<Numeric> pNum, pMsrPvr->getProviderNumeric().values())
+            {
+                pNum->detach(pObserver);
+            }
+        }
+        else
+        {
             qDebug() << "Error while detachFromNumeric: PLG_ID::Plugin_ID " << plg_id << "is no measurement provider.";
-    	}
+        }
     }
 
 
@@ -828,7 +828,7 @@ void MeasurementManager::detachFromNumeric(IObserver* pObserver, QList<PLG_ID::P
             {
                 if(pMsrPvr->getProviderNumeric().contains(msr_id))
                 {
-                    Numeric* pNum = pMsrPvr->getProviderNumeric().value(msr_id);
+                    QSharedPointer<Numeric> pNum = pMsrPvr->getProviderNumeric().value(msr_id);
                     pNum->detach(pObserver);
                 }
                 else

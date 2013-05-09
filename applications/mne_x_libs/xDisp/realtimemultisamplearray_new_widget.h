@@ -128,7 +128,7 @@ public:
     * @param [in] pTime         pointer to application time.
     * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
     */
-    RealTimeMultiSampleArrayNewWidget(RealTimeMultiSampleArrayNew* pRTMSA_New, QSharedPointer<QTime> pTime, QWidget* parent = 0);
+    RealTimeMultiSampleArrayNewWidget(QSharedPointer<RealTimeMultiSampleArrayNew> pRTMSA_New, QSharedPointer<QTime> pTime, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -240,7 +240,7 @@ private slots:
 private:
     void actualize();                                               /**< Actualize member variables. Like y position, scaling factor, middle value of the frame and the highest sampling rate to calculate the sample width.*/
     Ui::RealTimeMultiSampleArrayNewClass   ui;                      /**< Holds the user interface of the RealTimeSampleArray widget. */
-    RealTimeMultiSampleArrayNew*    m_pRTMSA_New;                   /**< Holds the real-time sample array measurement. */
+    QSharedPointer<RealTimeMultiSampleArrayNew> m_pRTMSA_New;       /**< Holds the real-time sample array measurement. */
 
     unsigned int                    m_uiNumChannels;
 

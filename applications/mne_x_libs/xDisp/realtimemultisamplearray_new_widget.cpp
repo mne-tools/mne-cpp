@@ -84,7 +84,7 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeMultiSampleArrayNewWidget::RealTimeMultiSampleArrayNewWidget(RealTimeMultiSampleArrayNew* pRTMSA_New, QSharedPointer<QTime> pTime, QWidget* parent)
+RealTimeMultiSampleArrayNewWidget::RealTimeMultiSampleArrayNewWidget(QSharedPointer<RealTimeMultiSampleArrayNew> pRTMSA_New, QSharedPointer<QTime> pTime, QWidget* parent)
 : MeasurementWidget(parent)
 , m_pRTMSA_New(pRTMSA_New)
 , m_bMeasurement(false)

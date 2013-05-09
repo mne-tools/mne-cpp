@@ -93,7 +93,7 @@ public:
     * @param [in] pNumeric pointer to Numeric measurement.
     * @param [in] parent pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
     */
-    NumericWidget(Numeric* pNumeric, QWidget* parent = 0);
+    NumericWidget(QSharedPointer<Numeric> pNumeric, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -118,9 +118,9 @@ public:
 
 private:
 
-    Ui::NumericWidgetClass  ui;					/**< Holds the user interface of the numeric widget. */
-    Numeric*                m_pNumeric;			/**< Holds the pointer to the Numeric measurement. */
-    QString                 m_qString_Unit;		/**< Holds the unit of the measurement. */
+    Ui::NumericWidgetClass  ui;                 /**< Holds the user interface of the numeric widget. */
+    QSharedPointer<Numeric> m_pNumeric;         /**< Holds the pointer to the Numeric measurement. */
+    QString                 m_qString_Unit;     /**< Holds the unit of the measurement. */
 };
 
 } // NAMESPACE

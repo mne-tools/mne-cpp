@@ -182,7 +182,7 @@ public:
 protected:
     QList<PLG_ID::Plugin_ID>          m_qList_PLG_ID;   /**< Plugins of which are measurements accepted of current plugin.*/
 
-    QHash<MSR_ID::Measurement_ID, Buffer::SPtr>*     m_pHashBuffers;	/**< accepted measurements */
+    QHash<MSR_ID::Measurement_ID, Buffer::SPtr>*     m_pHashBuffers;    /**< accepted measurements */
 };
 
 
