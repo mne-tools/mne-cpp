@@ -73,7 +73,8 @@ IMeasurementSink::~IMeasurementSink()
 //    m_pBuffInp_phi->clear();
 //    m_pBuffInp_theta->clear();
 //ToDo Cleanup STuff inside the buffer
-    delete m_pHashBuffers;
+    if(m_pHashBuffers)
+        delete m_pHashBuffers;
 }
 
 
