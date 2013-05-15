@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the RealTimeMultiSampleArrayNewWidget Class.
+* @brief    Declaration of the RealTimeSourceEstimateWidget Class.
 *
 */
 
-#ifndef REALTIMEMULTISAMPLEARRAYNEWWIDGET_H
-#define REALTIMEMULTISAMPLEARRAYNEWWIDGET_H
+#ifndef REALTIMESOURCEESTIMATEWIDGET_H
+#define REALTIMESOURCEESTIMATEWIDGET_H
 
 
 //*************************************************************************************************************
@@ -44,8 +44,7 @@
 
 #include "xdisp_global.h"
 #include "measurementwidget.h"
-#include "realtimesamplearraywidget.h"
-#include "ui_realtimemultisamplearray_new_widget.h"
+#include "ui_realtimesourceestimatewidget.h"
 
 
 //*************************************************************************************************************
@@ -71,7 +70,7 @@ class QTime;
 
 namespace XMEASLIB
 {
-class RealTimeMultiSampleArrayNew;
+class RealTimeSourceEstimate;
 }
 
 
@@ -114,7 +113,7 @@ using namespace XMEASLIB;
 * @brief The RealTimeMultiSampleArrayNewWidget class provides a real-time curve display.
 */
 
-class XDISPSHARED_EXPORT RealTimeMultiSampleArrayNewWidget : public MeasurementWidget
+class XDISPSHARED_EXPORT RealTimeSourceEstimateWidget : public MeasurementWidget
 {
     Q_OBJECT
 
@@ -128,13 +127,13 @@ public:
     * @param [in] pTime         pointer to application time.
     * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
     */
-    RealTimeMultiSampleArrayNewWidget(QSharedPointer<RealTimeMultiSampleArrayNew> pRTMSA_New, QSharedPointer<QTime> pTime, QWidget* parent = 0);
+    RealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> pRTMSA_New, QSharedPointer<QTime> pTime, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
     * Destroys the RealTimeMultiSampleArrayWidget.
     */
-    ~RealTimeMultiSampleArrayNewWidget();
+    ~RealTimeSourceEstimateWidget();
 
     //=========================================================================================================
     /**
@@ -239,8 +238,8 @@ private slots:
 
 private:
     void actualize();                                               /**< Actualize member variables. Like y position, scaling factor, middle value of the frame and the highest sampling rate to calculate the sample width.*/
-    Ui::RealTimeMultiSampleArrayNewClass   ui;                      /**< Holds the user interface of the RealTimeSampleArray widget. */
-    QSharedPointer<RealTimeMultiSampleArrayNew> m_pRTMSA_New;       /**< Holds the real-time sample array measurement. */
+    Ui::RealTimeSourceEstimateClass   ui;                      /**< Holds the user interface of the RealTimeSampleArray widget. */
+    QSharedPointer<RealTimeSourceEstimate> m_pRTMSA_New;       /**< Holds the real-time sample array measurement. */
 
     unsigned int                    m_uiNumChannels;
 
@@ -281,4 +280,4 @@ private:
 
 } // NAMESPACE
 
-#endif // REALTIMEMULTISAMPLEARRAYNEWWIDGET_H
+#endif // REALTIMESOURCEESTIMATEWIDGET_H
