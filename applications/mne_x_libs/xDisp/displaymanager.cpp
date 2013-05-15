@@ -44,10 +44,12 @@
 #include "realtimesamplearraywidget.h"
 #include "realtimemultisamplearraywidget.h"
 #include "realtimemultisamplearray_new_widget.h"
+#include "realtimesourceestimatewidget.h"
 #include "progressbarwidget.h"
 #include "textwidget.h"
 
 #include <xMeas/Measurement/text.h>
+#include <xMeas/Measurement/realtimesourceestimate.h>
 #include <xMeas/Measurement/realtimemultisamplearray_new.h>
 #include <xMeas/Measurement/realtimemultisamplearray.h>
 #include <xMeas/Measurement/realtimesamplearray.h>
@@ -144,6 +146,18 @@ RealTimeMultiSampleArrayNewWidget* DisplayManager::addRealTimeMultiSampleArrayNe
 
 //*************************************************************************************************************
 
+RealTimeSourceEstimateWidget* DisplayManager::addRealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> pRTSE, QWidget* parent, MSR_ID::Measurement_ID id, QSharedPointer<QTime> t)
+{
+    RealTimeSourceEstimateWidget* rtseWidget = new RealTimeSourceEstimateWidget(pRTSE, t, parent);
+    rtseWidget->hide();
+    s_hashMeasurementWidgets.insert(id, rtseWidget);
+    s_hashRealTimeSourceEstimateWidgets.insert(id, rtseWidget);
+    return rtseWidget;
+}
+
+
+//*************************************************************************************************************
+
 ProgressBarWidget* DisplayManager::addProgressBarWidget(QSharedPointer<ProgressBar> pProgress, QWidget* parent, MSR_ID::Measurement_ID id)
 {
     ProgressBarWidget* progressWidget = new ProgressBarWidget(pProgress, parent);
@@ -229,6 +243,7 @@ void DisplayManager::clean()
     s_hashRealTimeSampleArrayWidgets.clear();
     s_hashRealTimeMultiSampleArrayWidgets.clear();
     s_hashRealTimeMultiSampleArrayNewWidgets.clear();
+    s_hashRealTimeSourceEstimateWidgets.clear();
     s_hashProgressBarWidgets.clear();
     s_hashTextWidgets.clear();
 
@@ -246,5 +261,6 @@ QHash<MSR_ID::Measurement_ID, NumericWidget*>             DisplayManager::s_hash
 QHash<MSR_ID::Measurement_ID, RealTimeSampleArrayWidget*> DisplayManager::s_hashRealTimeSampleArrayWidgets;
 QHash<MSR_ID::Measurement_ID, RealTimeMultiSampleArrayWidget*> DisplayManager::s_hashRealTimeMultiSampleArrayWidgets;
 QHash<MSR_ID::Measurement_ID, RealTimeMultiSampleArrayNewWidget*> DisplayManager::s_hashRealTimeMultiSampleArrayNewWidgets;
+QHash<MSR_ID::Measurement_ID, RealTimeSourceEstimateWidget*> DisplayManager::s_hashRealTimeSourceEstimateWidgets;
 QHash<MSR_ID::Measurement_ID, ProgressBarWidget*>         DisplayManager::s_hashProgressBarWidgets;
 QHash<MSR_ID::Measurement_ID, TextWidget*>                DisplayManager::s_hashTextWidgets;

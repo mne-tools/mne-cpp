@@ -74,6 +74,7 @@ class Numeric;
 class RealTimeSampleArray;
 class RealTimeMultiSampleArray;
 class RealTimeMultiSampleArrayNew;
+class RealTimeSourceEstimate;
 class ProgressBar;
 class Text;
 }
@@ -106,6 +107,7 @@ class NumericWidget;
 class RealTimeSampleArrayWidget;
 class RealTimeMultiSampleArrayWidget;
 class RealTimeMultiSampleArrayNewWidget;
+class RealTimeSourceEstimateWidget;
 class ProgressBarWidget;
 class TextWidget;
 class MeasurementWidget;
@@ -182,6 +184,18 @@ public:
     * @return pointer to the new real-time multi sample array widget.
     */
     static RealTimeMultiSampleArrayNewWidget* addRealTimeMultiSampleArrayNewWidget(QSharedPointer<RealTimeMultiSampleArrayNew> pRTSM, QWidget* parent, MSR_ID::Measurement_ID id, QSharedPointer<QTime> t);
+
+    //=========================================================================================================
+    /**
+    * Adds a real-time multi sample array widget.
+    *
+    * @param [in] pRTSM pointer to real-time sample array measurement.
+    * @param [in] parent pointer to parent widget.
+    * @param [in] id of the real-time sample array measurement provider.
+    * @param [in] t pointer to application time.
+    * @return pointer to the new real-time multi sample array widget.
+    */
+    static RealTimeSourceEstimateWidget* addRealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> pRTSE, QWidget* parent, MSR_ID::Measurement_ID id, QSharedPointer<QTime> t);
 
     //=========================================================================================================
     /**
@@ -283,13 +297,14 @@ public:
     static void clean();
 
 private:
-    static QHash<MSR_ID::Measurement_ID, MeasurementWidget*>              s_hashMeasurementWidgets;                     /**< Holds all measurement widgets and corresponding measurement id's.*/
-    static QHash<MSR_ID::Measurement_ID, NumericWidget*>                  s_hashNumericWidgets;                         /**< Holds all numeric widgets and corresponding numeric measurement id's.*/
-    static QHash<MSR_ID::Measurement_ID, RealTimeSampleArrayWidget*>      s_hashRealTimeSampleArrayWidgets;             /**< Holds all real-time sample array widgets and corresponding real-time sample array id's.*/
-    static QHash<MSR_ID::Measurement_ID, RealTimeMultiSampleArrayWidget*> s_hashRealTimeMultiSampleArrayWidgets;        /**< Holds all real-time multi sample array widgets and corresponding real-time multi sample array id's.*/
-    static QHash<MSR_ID::Measurement_ID, RealTimeMultiSampleArrayNewWidget*> s_hashRealTimeMultiSampleArrayNewWidgets;  /**< Holds all real-time multi sample array widgets and corresponding real-time multi sample array id's.*/
-    static QHash<MSR_ID::Measurement_ID, ProgressBarWidget*>              s_hashProgressBarWidgets;                     /**< Holds all progress bar widgets and corresponding progress bar id's.*/
-    static QHash<MSR_ID::Measurement_ID, TextWidget*>                     s_hashTextWidgets;                            /**< Holds all text widgets and text measurement id's.*/
+    static QHash<MSR_ID::Measurement_ID, MeasurementWidget*>                s_hashMeasurementWidgets;                   /**< Holds all measurement widgets and corresponding measurement id's.*/
+    static QHash<MSR_ID::Measurement_ID, NumericWidget*>                    s_hashNumericWidgets;                       /**< Holds all numeric widgets and corresponding numeric measurement id's.*/
+    static QHash<MSR_ID::Measurement_ID, RealTimeSampleArrayWidget*>        s_hashRealTimeSampleArrayWidgets;           /**< Holds all real-time sample array widgets and corresponding real-time sample array id's.*/
+    static QHash<MSR_ID::Measurement_ID, RealTimeMultiSampleArrayWidget*>   s_hashRealTimeMultiSampleArrayWidgets;      /**< Holds all real-time multi sample array widgets and corresponding real-time multi sample array id's.*/
+    static QHash<MSR_ID::Measurement_ID, RealTimeMultiSampleArrayNewWidget*>s_hashRealTimeMultiSampleArrayNewWidgets;   /**< Holds all real-time multi sample array widgets and corresponding real-time multi sample array id's.*/
+    static QHash<MSR_ID::Measurement_ID, RealTimeSourceEstimateWidget*>     s_hashRealTimeSourceEstimateWidgets;         /**< Holds all real-time source estimate widgets and corresponding real-time source estimate id's.*/
+    static QHash<MSR_ID::Measurement_ID, ProgressBarWidget*>                s_hashProgressBarWidgets;                   /**< Holds all progress bar widgets and corresponding progress bar id's.*/
+    static QHash<MSR_ID::Measurement_ID, TextWidget*>                       s_hashTextWidgets;                          /**< Holds all text widgets and text measurement id's.*/
 
 };
 
