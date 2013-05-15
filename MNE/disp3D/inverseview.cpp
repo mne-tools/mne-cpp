@@ -88,8 +88,8 @@ InverseView::InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qL
 , m_pSceneNode(0)
 , m_nTimeSteps(0)
 {
-    m_pCameraFrontal = new QGLCamera(this);
-    m_pCameraFrontal->setAdjustForAspectRatio(false);
+//    m_pCameraFrontal = new QGLCamera(this);
+//    m_pCameraFrontal->setAdjustForAspectRatio(false);
 
     qDebug() << "p_qListLabels" << p_qListLabels.size();
 
@@ -155,6 +155,10 @@ void InverseView::initializeGL(QGLPainter *painter)
         {
             MatrixX3i tris;
             MatrixX3f rr = m_sourceSpace[h].rr;
+
+            //LNdT DEMO
+            rr.col(2) = rr.col(2).array() + 0.8;
+            //LNdT DEMO end
 
             builder.pushNode();
             //
@@ -254,16 +258,22 @@ void InverseView::initializeGL(QGLPainter *painter)
     painter->setMainLight(m_pLightParametersScene);
 
 
-
     simCount = 0;
 
     //
     // Set stereo type
     //
     if (m_bStereo) {
-        this->setStereoType(QGLView::RedCyanAnaglyph);
+        this->setStereoType(QGLView::StretchedLeftRight);
+//        camera()->setEyeSeparation(0.4f);
+//        m_pCameraFrontal->setEyeSeparation(0.1f);
+
+        //LNdT DEMO
         camera()->setEyeSeparation(0.4f);
-        m_pCameraFrontal->setEyeSeparation(0.1f);
+        camera()->setFieldOfView(30);
+        camera()->setEye(QVector3D(0,0,60));
+        //LNdT DEMO end
+
     }
 
     //set background to light grey-blue
