@@ -87,8 +87,8 @@ GeometryView::GeometryView(QWindow *parent)
     m_vecAnnotation.append(Annotation::SPtr(new Annotation("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot")));
     m_vecAnnotation.append(Annotation::SPtr(new Annotation("./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot")));
 
-    m_pCameraFrontal = new QGLCamera(this);
-    m_pCameraFrontal->setAdjustForAspectRatio(false);
+//    m_pCameraFrontal = new QGLCamera(this);
+//    m_pCameraFrontal->setAdjustForAspectRatio(false);
 }
 
 
@@ -129,6 +129,10 @@ void GeometryView::initializeGL(QGLPainter *painter)
 
                 MatrixX3i tris = m_forwardSolution.src[h].tris;
                 MatrixX3f rr = m_forwardSolution.src[h].rr;
+
+                //LNdT DEMO
+                rr.col(2) = rr.col(2).array() + 0.8;
+                //LNdT DEMO end
 
                 builder.pushNode();
                 //
@@ -217,9 +221,17 @@ void GeometryView::initializeGL(QGLPainter *painter)
         // Set stereo type
         //
         if (m_bStereo) {
-            this->setStereoType(QGLView::RedCyanAnaglyph);
+            this->setStereoType(QGLView::StretchedLeftRight);
+//            camera()->setEyeSeparation(0.4f);
+//            m_pCameraFrontal->setEyeSeparation(0.1f);
+
+            //LNdT DEMO
             camera()->setEyeSeparation(0.4f);
-            m_pCameraFrontal->setEyeSeparation(0.1f);
+            camera()->setFieldOfView(30);
+            camera()->setEye(QVector3D(0,0,60));
+            //LNdT DEMO end
+
+//            m_pCameraFrontal->setEyeSeparation(0.1f);
         }
 
         //set background to white

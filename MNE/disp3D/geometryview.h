@@ -141,7 +141,7 @@ private:
     QGLSceneNode *m_pSceneNodeBrain;               /**< Scene node of the hemisphere models. */
     QGLSceneNode *m_pSceneNode;                    /**< Node of the scene. */
 
-    QGLCamera *m_pCameraFrontal;     /**< frontal camera. */
+//    QGLCamera *m_pCameraFrontal;     /**< frontal camera. */
 };
 
 } // NAMESPACE
