@@ -221,6 +221,7 @@ void GeometryView::initializeGL(QGLPainter *painter)
         // Set stereo type
         //
         if (m_bStereo) {
+//            this->setStereoType(QGLView::RedCyanAnaglyph);
             this->setStereoType(QGLView::StretchedLeftRight);
 //            camera()->setEyeSeparation(0.4f);
 //            m_pCameraFrontal->setEyeSeparation(0.1f);
