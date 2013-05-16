@@ -84,9 +84,9 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> pRTMSA_New, QSharedPointer<QTime> pTime, QWidget* parent)
+RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> pRTMSE, QSharedPointer<QTime> pTime, QWidget* parent)
 : MeasurementWidget(parent)
-, m_pRTMSA_New(pRTMSA_New)
+, m_pRTMSE(pRTMSE)
 , m_bMeasurement(false)
 , m_bPosition(true)
 , m_bFrozen(false)

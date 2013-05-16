@@ -88,11 +88,11 @@ RunWidget::~RunWidget()
 {
     qDebug() << "RunCSART destroyed automatically.";
 
-    if(m_pTabWidgetMain)
-        delete m_pTabWidgetMain;
+//    if(m_pTabWidgetMain)
+//        delete m_pTabWidgetMain;
 
-    if(m_pScrollArea)
-        delete m_pScrollArea;
+//    if(m_pScrollArea)
+//        delete m_pScrollArea;
 }
 
 

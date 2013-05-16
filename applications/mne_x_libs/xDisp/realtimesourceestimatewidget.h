@@ -123,11 +123,11 @@ public:
     /**
     * Constructs a RealTimeMultiSampleArrayWidget which is a child of parent.
     *
-    * @param [in] pRTMSA_New    pointer to real-time multi sample array measurement.
+    * @param [in] pRTMSE        pointer to real-time multi sample array measurement.
     * @param [in] pTime         pointer to application time.
     * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
     */
-    RealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> pRTMSA_New, QSharedPointer<QTime> pTime, QWidget* parent = 0);
+    RealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> pRTMSE, QSharedPointer<QTime> pTime, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -238,8 +238,8 @@ private slots:
 
 private:
     void actualize();                                               /**< Actualize member variables. Like y position, scaling factor, middle value of the frame and the highest sampling rate to calculate the sample width.*/
-    Ui::RealTimeSourceEstimateClass   ui;                      /**< Holds the user interface of the RealTimeSampleArray widget. */
-    QSharedPointer<RealTimeSourceEstimate> m_pRTMSA_New;       /**< Holds the real-time sample array measurement. */
+    Ui::RealTimeSourceEstimateClass   ui;                           /**< Holds the user interface of the RealTimeSampleArray widget. */
+    QSharedPointer<RealTimeSourceEstimate> m_pRTMSE;                /**< Holds the real-time source estimate measurement. */
 
     unsigned int                    m_uiNumChannels;
 
