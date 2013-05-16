@@ -350,6 +350,74 @@ public:
     */
     static void detachFromRTMSANew(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList, QList<MSR_ID::Measurement_ID> msr_idList);
 
+//attach RTSE
+    //=========================================================================================================
+    /**
+    * Attaches an observer to all real-time source estimate (subjects) of all measurement providers
+    *
+    * @param [in] pObserver pointer to observer.
+    */
+    static void attachToRTSE(IObserver* pObserver);
+    //=========================================================================================================
+    /**
+    * Attaches an observer to all  real-time source estimate (subjects) of given measurement providers list
+    *
+    * @param [in] pObserver pointer to observer.
+    * @param [in] plg_idList list of plugin (measurement provider) id's where the observer should attached to.
+    */
+    static void attachToRTSE(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList);
+    //=========================================================================================================
+    /**
+    * Attaches an observer to given real-time source estimate (subjects) list of given measurement providers list
+    *
+    * @param [in] pObserver pointer to observer.
+    * @param [in] plg_idList list of plugin (measurement provider) id's where the observer should attached to.
+    * @param [in] msr_idList list of measurement id's where the observer should be attached to.
+    */
+    static void attachToRTSE(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList, QList<MSR_ID::Measurement_ID> msr_idList);
+    //=========================================================================================================
+    /**
+    * Attaches widgets to all real-time multi sample array of measurement provider list of given plugin
+    *
+    * @param [in] plg_id id of the plugin.
+    * @param [in] t pointer to the application measurement time.
+    */
+    static void attachWidgetsToRTSE(PLG_ID::Plugin_ID plg_id, QSharedPointer<QTime> t);
+    //=========================================================================================================
+    /**
+    * Attaches a widget to a specific real-time multi sample array measurement of given plugin.
+    *
+    * @param [in] plg_id id of the plugin.
+    * @param [in] msr_id id of the measurement.
+    * @param [in] t pointer to the application measurement time.
+    */
+    static void attachWidgetToRTSE(PLG_ID::Plugin_ID plg_id, MSR_ID::Measurement_ID msr_id, QSharedPointer<QTime> t);
+//detach RTSE
+    //=========================================================================================================
+    /**
+    * Detaches an observer of all real-time source estimate (subjects) which contains the observer.
+    *
+    * @param [in] pObserver pointer to observer which should be detached.
+    */
+    static void detachFromRTSE(IObserver* pObserver);
+    //=========================================================================================================
+    /**
+    * Detaches an observer of all real-time source estimate (subjects) of given plugins which contains the observer.
+    *
+    * @param [in] pObserver pointer to observer which should be detached.
+    * @param [in] plg_idList list of plugin id's where the observer should be detached from.
+    */
+    static void detachFromRTSE(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList);
+    //=========================================================================================================
+    /**
+    * Detaches an observer of specific real-time source estimate (subjects) of given plugins which contains the observer.
+    *
+    * @param [in] pObserver pointer to observer which should be detached.
+    * @param [in] plg_idList list of plugin id's where the observer should be detached from.
+    * @param [in] msr_idList list of measurement id's where the observer should be detached from.
+    */
+    static void detachFromRTSE(IObserver* pObserver, QList<PLG_ID::Plugin_ID> plg_idList, QList<MSR_ID::Measurement_ID> msr_idList);
+
 //attach Numeric
     //=========================================================================================================
     /**

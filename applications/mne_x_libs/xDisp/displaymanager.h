@@ -262,6 +262,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns a hash of all real-time multi sample array widgets and their provider id's.
+    *
+    * @return a reference to a hash containing the real-time sample array widgets and their corresponding real-time sample array provider id's .
+    */
+    static QHash<MSR_ID::Measurement_ID, RealTimeSourceEstimateWidget*>& getRTSEWidgets() {return s_hashRealTimeSourceEstimateWidgets;};
+
+    //=========================================================================================================
+    /**
     * Returns a hash of all progress bar widgets and their provider id's.
     *
     * @return a reference to a hash containing the progress bar widgets and their corresponding progress bar provider id's.

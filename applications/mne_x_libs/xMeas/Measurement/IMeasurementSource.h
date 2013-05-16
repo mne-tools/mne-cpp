@@ -320,6 +320,13 @@ public:
     virtual const QHash<MSR_ID::Measurement_ID, QSharedPointer<RealTimeMultiSampleArrayNew> >& getProviderRTMSANew() {return m_hashRealTimeMultiSampleArrayNew;};
     //=========================================================================================================
     /**
+    * Returns provided RealTimeSourceEstimate measurements and their id's.
+    *
+    * @return a hash of all provided RealTimeMultiSampleArray measurements and their id's.
+    */
+    virtual const QHash<MSR_ID::Measurement_ID, QSharedPointer<RealTimeSourceEstimate> >& getProviderRTSE() {return m_hashRealTimeSourceEstimate;};
+    //=========================================================================================================
+    /**
     * Returns provided ProgressBar measurements and their id's.
     *
     * @return a hash of all provided ProgressBar measurements and their id's.
