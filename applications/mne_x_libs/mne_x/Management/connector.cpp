@@ -392,6 +392,18 @@ void Connector::connectMeasurementWidgets(QList<PLG_ID::Plugin_ID>& idList, QSha
 
 
 
+    //*********************************************************************************************************
+    //=========================================================================================================
+    // Connect Widgets to current visible RealTimeSourceEstimate (Subject) to specific IObserver
+    //=========================================================================================================
+
+    //ToDo visibility has to solved
+
+    foreach(PLG_ID::Plugin_ID id, idList)
+        MeasurementManager::attachWidgetsToRTSE(id, t);
+
+
+
 
 
 
