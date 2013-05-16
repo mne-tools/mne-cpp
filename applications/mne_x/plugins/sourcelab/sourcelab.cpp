@@ -441,6 +441,7 @@ void SourceLab::init()
 
 
     m_pRTSE_SourceLab = addProviderRealTimeSourceEstimate(MSR_ID::SOURCELAB_OUTPUT);
+    m_pRTSE_SourceLab->setName("Real-Time Source Estimate");
 //    m_pRTSE_SourceLab->initFromFiffInfo(m_pFiffInfo);
     m_pRTSE_SourceLab->setArraySize(10);
     m_pRTSE_SourceLab->setVisibility(true);

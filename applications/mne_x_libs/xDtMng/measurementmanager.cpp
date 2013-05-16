@@ -1100,15 +1100,14 @@ void MeasurementManager::detachWidgets(QList<PLG_ID::Plugin_ID> plg_idList)
         detachFromRTMSA(pRTMSAWidget, plg_idList);
     }
 
-    qDebug() << "DisplayManager::getRTSEWidgets() Size: " << DisplayManager::getRTSEWidgets().size();
+    qDebug() << "DisplayManager::getRTMSANewWidgets() Size: " << DisplayManager::getRTMSANewWidgets().size();
 
-    foreach(RealTimeSourceEstimateWidget* pRTSEW, DisplayManager::getRTSEWidgets().values())
+    foreach(RealTimeMultiSampleArrayNewWidget* pRTMSANewW, DisplayManager::getRTMSANewWidgets().values())
     {
-        IObserver* pRTSEWidget = dynamic_cast<IObserver*>(pRTSEW);
+        IObserver* pRTMSANewWidget = dynamic_cast<IObserver*>(pRTMSANewW);
 
-        detachFromRTSE(pRTSEWidget, plg_idList);
+        detachFromRTMSANew(pRTMSANewWidget, plg_idList);
     }
-
 
     qDebug() << "DisplayManager::getRTSEWidgets() Size: " << DisplayManager::getRTSEWidgets().size();
 
@@ -1144,6 +1143,20 @@ void MeasurementManager::detachWidgets()
         IObserver* pRTSAWidget = dynamic_cast<IObserver*>(pRTSAW);
 
         detachFromRTSA(pRTSAWidget);
+    }
+
+    foreach(RealTimeMultiSampleArrayWidget* pRTMSAW, DisplayManager::getRTMSAWidgets().values())
+    {
+        IObserver* pRTMSAWidget = dynamic_cast<IObserver*>(pRTMSAW);
+
+        detachFromRTMSA(pRTMSAWidget);
+    }
+
+    foreach(RealTimeMultiSampleArrayNewWidget* pRTMSANewW, DisplayManager::getRTMSANewWidgets().values())
+    {
+        IObserver* pRTMSANewWidget = dynamic_cast<IObserver*>(pRTMSANewW);
+
+        detachFromRTMSANew(pRTMSANewWidget);
     }
 
     foreach(NumericWidget* pNUMW, DisplayManager::getNumericWidgets().values())
