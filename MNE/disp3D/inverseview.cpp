@@ -133,7 +133,7 @@ void InverseView::initializeGL(QGLPainter *painter)
     // in the constructor construct a builder on the stack
     QGLBuilder builder;
 
-    float fac = 10.0f;
+    float fac = 100.0f; // too small vertices distances cause clipping errors --> 100 is a good value for freesurfer brain measures
 
     builder << QGL::Faceted;
     m_pSceneNodeBrain = builder.currentNode();
@@ -146,6 +146,27 @@ void InverseView::initializeGL(QGLPainter *painter)
 
     m_qListMapLabelIdIndex << QMap<qint32, qint32>() << QMap<qint32, qint32>();
 
+
+    //get bounding box
+    m_vecBoundingBoxMin.setX(m_sourceSpace[0].rr.col(0).minCoeff()); // X lh min
+    m_vecBoundingBoxMin.setY(m_sourceSpace[0].rr.col(1).minCoeff()); // Y lh min
+    m_vecBoundingBoxMin.setZ(m_sourceSpace[0].rr.col(2).minCoeff()); // Z lh min
+    m_vecBoundingBoxMax.setX(m_sourceSpace[0].rr.col(0).maxCoeff()); // X lh max
+    m_vecBoundingBoxMax.setY(m_sourceSpace[0].rr.col(1).maxCoeff()); // Y lh max
+    m_vecBoundingBoxMax.setZ(m_sourceSpace[0].rr.col(2).maxCoeff()); // Z lh max
+
+    m_vecBoundingBoxMin.setX(m_vecBoundingBoxMin.x() < m_sourceSpace[1].rr.col(0).minCoeff() ? m_vecBoundingBoxMin.x() : m_sourceSpace[1].rr.col(0).minCoeff()); // X rh min
+    m_vecBoundingBoxMin.setY(m_vecBoundingBoxMin.y() < m_sourceSpace[1].rr.col(1).minCoeff() ? m_vecBoundingBoxMin.y() : m_sourceSpace[1].rr.col(1).minCoeff()); // Y rh min
+    m_vecBoundingBoxMin.setZ(m_vecBoundingBoxMin.z() < m_sourceSpace[1].rr.col(2).minCoeff() ? m_vecBoundingBoxMin.z() : m_sourceSpace[1].rr.col(2).minCoeff()); // Z rh min
+    m_vecBoundingBoxMax.setX(m_vecBoundingBoxMax.x() > m_sourceSpace[1].rr.col(0).maxCoeff() ? m_vecBoundingBoxMax.x() : m_sourceSpace[1].rr.col(0).maxCoeff()); // X rh max
+    m_vecBoundingBoxMax.setY(m_vecBoundingBoxMax.y() > m_sourceSpace[1].rr.col(1).maxCoeff() ? m_vecBoundingBoxMax.y() : m_sourceSpace[1].rr.col(1).maxCoeff()); // Y rh max
+    m_vecBoundingBoxMax.setZ(m_vecBoundingBoxMax.z() > m_sourceSpace[1].rr.col(2).maxCoeff() ? m_vecBoundingBoxMax.z() : m_sourceSpace[1].rr.col(2).maxCoeff()); // Z rh max
+
+    m_vecBoundingBoxCenter.setX((m_vecBoundingBoxMin.x()+m_vecBoundingBoxMax.x())/2.0f);
+    m_vecBoundingBoxCenter.setY((m_vecBoundingBoxMin.y()+m_vecBoundingBoxMax.y())/2.0f);
+    m_vecBoundingBoxCenter.setZ((m_vecBoundingBoxMin.z()+m_vecBoundingBoxMax.z())/2.0f);
+
+
     //
     // Build each hemisphere in its separate node
     //
@@ -156,8 +177,13 @@ void InverseView::initializeGL(QGLPainter *painter)
             MatrixX3i tris;
             MatrixX3f rr = m_sourceSpace[h].rr;
 
+            //Centralize
+            rr.col(0) = rr.col(0).array() - m_vecBoundingBoxCenter.x();
+            rr.col(1) = rr.col(1).array() - m_vecBoundingBoxCenter.y();
+            rr.col(2) = rr.col(2).array() - m_vecBoundingBoxCenter.z();
+
             //LNdT DEMO
-            rr.col(2) = rr.col(2).array() + 0.8;
+//            rr.col(2) = rr.col(2).array() + 0.2;//0.8;
             //LNdT DEMO end
 
             builder.pushNode();
@@ -264,11 +290,12 @@ void InverseView::initializeGL(QGLPainter *painter)
     // Set stereo type
     //
     if (m_bStereo) {
-        this->setStereoType(QGLView::StretchedLeftRight);
+        this->setStereoType(QGLView::RedCyanAnaglyph);//QGLView::StretchedLeftRight);
 //        camera()->setEyeSeparation(0.4f);
 //        m_pCameraFrontal->setEyeSeparation(0.1f);
 
         //LNdT DEMO
+//        camera()->setCenter(QVector3D(0,0,-100.0f));//0.8f*fac));
         camera()->setEyeSeparation(0.4f);
         camera()->setFieldOfView(30);
         camera()->setEye(QVector3D(0,0,60));
