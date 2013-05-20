@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     inverseview.h
+* @file     inverseviewproducer.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
@@ -29,23 +29,17 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    InverseView class declaration
+* @brief    InverseViewProducer class declaration
 *
 */
 
-#ifndef INVERSEVIEW_H
-#define INVERSEVIEW_H
+#ifndef INVERSEVIEWPRODUCER_H
+#define INVERSEVIEWPRODUCER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-
-#include "disp3D_global.h"
-
-#include <mne/mne_sourcespace.h>
-#include <fs/surfaceset.h>
-#include <inverse/sourceestimate.h>
 
 
 //*************************************************************************************************************
@@ -53,30 +47,12 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include "qglview.h"
-#include <QGeometryData>
-#include <QGLColorMaterial>
-#include <QSharedPointer>
-#include <QList>
-#include <QMap>
+#include <QThread>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class QTimer;
-
-namespace FSLIB
-{
-class Label;
-}
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE FSLIB
+// DEFINE NAMESPACE DISP3DLIB
 //=============================================================================================================
 
 namespace DISP3DLIB
@@ -87,9 +63,7 @@ namespace DISP3DLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace FSLIB;
-using namespace INVERSELIB;
+//using namespace IOBuffer;
 
 
 //*************************************************************************************************************
@@ -97,103 +71,62 @@ using namespace INVERSELIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class InverseView;
 
 //=============================================================================================================
 /**
-* Visualize labels using a stereoscopic view. Coloring is done per label.
+* Functionality of a timer
 *
 * @brief 3D stereoscopic labels
 */
-class DISP3DSHARED_EXPORT InverseView : public QGLView
+class InverseViewProducer : public QThread
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<InverseView> SPtr;            /**< Shared pointer type for InverseView class. */
-    typedef QSharedPointer<const InverseView> ConstSPtr; /**< Const shared pointer type for InverseView class. */
+    typedef QSharedPointer<InverseViewProducer> SPtr;            /**< Shared pointer type for InverseView class. */
+    typedef QSharedPointer<const InverseViewProducer> ConstSPtr; /**< Const shared pointer type for InverseView class. */
     
     //=========================================================================================================
     /**
     * Default constructor
     *
     *
-    *
-    *
-    *
-    *
-    * @param[in] parent     Parent QObject (optional)
+    * @param[in] pInverseView   Parent inverse view
     */
-    InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, QWindow *parent = 0);
+    InverseViewProducer(InverseView *pInverseView);
     
     //=========================================================================================================
     /**
     * Destroys the InverseView class.
     */
-    ~InverseView();
+    ~InverseViewProducer();
 
 
-    void pushSourceEstimate(SourceEstimate &p_sourceEstimate);
+    void pushSourceEstimate();//SourceEstimate &p_sourceEstimate);
 
+
+    //=========================================================================================================
+    /**
+    * Stops the InverseViewProducer by stopping the producer's thread.
+    */
+    void stop();
 
 protected:
     //=========================================================================================================
     /**
-    * Initializes the current GL context represented by painter.
-    *
-    * @param[in] painter    GL painter which should be initialized
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread.
     */
-    void initializeGL(QGLPainter *painter);
+    virtual void run();
 
-    //=========================================================================================================
-    /**
-    * Paints the scene onto painter. The color and depth buffers will have already been cleared, and the camera() position set.
-    *
-    * @param[in] painter    GL painter which is updated
-    */
-    void paintGL(QGLPainter *painter);
 
 private:
 
-    qint32 m_iColorMode;                            /**< used colorization mode. */
-    //Data Stuff
-    MNESourceSpace m_sourceSpace;                   /**< The used source space. */
-    QList<Label> m_qListLabels;                     /**< The labels. */
-    QList<RowVector4i> m_qListRGBAs;                /**< The label colors encoded in RGBA. */
+    InverseView* m_pInverseView;
 
-    //GL Stuff
-    bool m_bStereo;
-
-    QGLLightModel *m_pLightModel;                   /**< The selected light model. */
-    QGLLightParameters *m_pLightParametersScene;    /**< The selected light parameters. */
-
-    QGLColorMaterial material;
-
-    QGLSceneNode *m_pSceneNodeBrain;               /**< Scene node of the hemisphere models. */
-    QGLSceneNode *m_pSceneNode;                    /**< Node of the scene. */
-
-//    QGLCamera *m_pCameraFrontal;     /**< frontal camera. */
-
-
-    QList< QMap<qint32, qint32> > m_qListMapLabelIdIndex;
-
-    SourceEstimate m_curSourceEstimate;
-    RowVectorXd m_dMaxActivation;
-    double m_dGlobalMaximum;
-
-    qint32 simCount;
-    qint32 m_nTimeSteps;
-    QTimer *m_timer;
-    void updateData();
-
-
-
-    //=========================================================================================================
-    /**
-    * Creates the scene
-    *
-    * @return the root scene noode
-    */
-//    QGLSceneNode *createScene();
-
+//    SourceEstimate m_curSourceEstimate;
+//    RowVectorXd m_dMaxActivation;
 };
 
 //*************************************************************************************************************
@@ -204,5 +137,5 @@ private:
 
 } // NAMESPACE
 
-#endif // INVERSEVIEW_H
+#endif // INVERSEVIEWPRODUCER_H
 
