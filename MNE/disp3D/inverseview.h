@@ -151,6 +151,22 @@ protected:
     */
     void paintGL(QGLPainter *painter);
 
+    //=========================================================================================================
+    /**
+    * Processes the mouse move event e.
+    *
+    * @param[in] e  the mouse move event.
+    */
+    void mouseMoveEvent(QMouseEvent *e);
+
+    //=========================================================================================================
+    /**
+    * Processes the mouse press event e.
+    *
+    * @param[in] e  the mouse press event.
+    */
+    void mousePressEvent(QMouseEvent *e);
+
 private:
 
     qint32 m_iColorMode;                            /**< used colorization mode. */
@@ -171,6 +187,11 @@ private:
     QVector3D m_vecBoundingBoxMin;                  /**< X, Y, Z minima. */
     QVector3D m_vecBoundingBoxMax;                  /**< X, Y, Z maxima. */
     QVector3D m_vecBoundingBoxCenter;               /**< X, Y, Z center. */
+
+    float m_fOffsetZ;                               /**< Z offset for pop-out effect. */
+
+    QPoint m_qPointLastPosition;                    /**< Mouse move last postion. */
+
     QGLSceneNode *m_pSceneNode;                     /**< Node of the scene. */
 
 //    QGLCamera *m_pCameraFrontal;     /**< frontal camera. */
