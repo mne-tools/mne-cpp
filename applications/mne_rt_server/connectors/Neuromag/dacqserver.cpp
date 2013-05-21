@@ -42,8 +42,8 @@
 #include "neuromag.h"
 #include "collectorsocket.h"
 #include "shmemsocket.h"
-#include "../../../MNE/fiff/fiff_constants.h"
-#include "../../../MNE/fiff/fiff_stream.h"
+#include <fiff/fiff_constants.h>
+#include <fiff/fiff_stream.h>
 
 
 //*************************************************************************************************************
@@ -81,8 +81,6 @@ DacqServer::DacqServer(Neuromag* p_pNeuromag, QObject * parent)
 , m_bMeasStopRequest(false)
 , m_bSetBuffersizeRequest(false)
 {
-
-    
 }
 
 
