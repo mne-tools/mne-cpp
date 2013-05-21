@@ -54,6 +54,7 @@
 #include <QtCore/qurl.h>
 #include <QArray>
 #include <QTimer>
+#include <QMouseEvent>
 
 
 //*************************************************************************************************************
@@ -146,6 +147,10 @@ void InverseView::initializeGL(QGLPainter *painter)
 
     m_qListMapLabelIdIndex << QMap<qint32, qint32>() << QMap<qint32, qint32>();
 
+    m_fOffsetZ = -100.0f;
+
+    m_fRotationX = 0.0;
+    m_fRotationY = 0.0;
 
     //get bounding box
     m_vecBoundingBoxMin.setX(m_sourceSpace[0].rr.col(0).minCoeff()); // X lh min
@@ -295,7 +300,7 @@ void InverseView::initializeGL(QGLPainter *painter)
 //        m_pCameraFrontal->setEyeSeparation(0.1f);
 
         //LNdT DEMO
-//        camera()->setCenter(QVector3D(0,0,-100.0f));//0.8f*fac));
+        camera()->setCenter(QVector3D(0,0,m_fOffsetZ));//0.8f*fac));
         camera()->setEyeSeparation(0.4f);
         camera()->setFieldOfView(30);
         camera()->setEye(QVector3D(0,0,60));
@@ -332,6 +337,55 @@ void InverseView::paintGL(QGLPainter *painter)
 
     painter->modelViewMatrix().pop();
     painter->projectionMatrix().pop();
+}
+
+
+//*************************************************************************************************************
+
+void InverseView::mouseMoveEvent(QMouseEvent *e)
+{
+    if (e->buttons() & Qt::LeftButton){
+        QVector3D t_qVecCenter = camera()->center();
+        QVector3D t_qVecEye = camera()->eye();
+
+        t_qVecCenter.setZ(t_qVecCenter.z() - m_fOffsetZ);
+        t_qVecEye.setZ(t_qVecEye.z() - m_fOffsetZ);
+
+        camera()->setCenter(t_qVecCenter);
+        camera()->setEye(t_qVecCenter);
+
+
+        QGLView::mouseMoveEvent(e);
+
+//        int dx = e->x() - m_qPointLastPosition.x();
+//        int dy = e->y() - m_qPointLastPosition.y();
+
+//        camera()->setEye(t_qVecCenter);
+//        camera()->setEye(t_qVecCenter);
+
+        t_qVecCenter = camera()->center();
+        t_qVecEye = camera()->eye();
+
+        t_qVecCenter.setZ(t_qVecCenter.z() + m_fOffsetZ);
+        t_qVecEye.setZ(t_qVecEye.z() + m_fOffsetZ);
+
+        camera()->setCenter(t_qVecCenter);
+        camera()->setEye(t_qVecCenter);
+
+        this->update();
+
+        m_qPointLastPosition = e->pos();
+    }
+    else
+        QGLView::mouseMoveEvent(e);
+}
+
+
+//*************************************************************************************************************
+
+void InverseView::mousePressEvent(QMouseEvent *e)
+{
+    m_qPointLastPosition = e->pos();
 }
 
 
