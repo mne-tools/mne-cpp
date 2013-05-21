@@ -85,6 +85,8 @@ InverseView::InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qL
 , m_qListLabels(p_qListLabels)
 , m_qListRGBAs(p_qListRGBAs)
 , m_bStereo(true)
+, m_fOffsetZ(-100.0f)
+, m_fOffsetZEye(60.0f)
 , m_pSceneNodeBrain(0)
 , m_pSceneNode(0)
 , m_nTimeSteps(0)
@@ -146,11 +148,6 @@ void InverseView::initializeGL(QGLPainter *painter)
     QSharedPointer<QGLMaterialCollection> palette = builder.sceneNode()->palette(); // register color palette within the root node
 
     m_qListMapLabelIdIndex << QMap<qint32, qint32>() << QMap<qint32, qint32>();
-
-    m_fOffsetZ = -100.0f;
-
-    m_fRotationX = 0.0;
-    m_fRotationY = 0.0;
 
     //get bounding box
     m_vecBoundingBoxMin.setX(m_sourceSpace[0].rr.col(0).minCoeff()); // X lh min
@@ -254,7 +251,8 @@ void InverseView::initializeGL(QGLPainter *painter)
                         b = m_qListRGBAs[k][2];
                     }
 
-                    t_pMaterialROI->setColor(QColor(r,g,b,200));
+//                    t_pMaterialROI->setColor(QColor(r,g,b,200));
+                    t_pMaterialROI->setColor(QColor(r,g,b,230));
 //                        t_pMaterialROI->setEmittedLight(QColor(100,100,100,255));
 //                        t_pMaterialROI->setSpecularColor(QColor(10,10,10,20));
 
@@ -295,7 +293,7 @@ void InverseView::initializeGL(QGLPainter *painter)
     // Set stereo type
     //
     if (m_bStereo) {
-        this->setStereoType(QGLView::RedCyanAnaglyph);//QGLView::StretchedLeftRight);
+        this->setStereoType(QGLView::StretchedLeftRight);
 //        camera()->setEyeSeparation(0.4f);
 //        m_pCameraFrontal->setEyeSeparation(0.1f);
 
@@ -303,7 +301,7 @@ void InverseView::initializeGL(QGLPainter *painter)
         camera()->setCenter(QVector3D(0,0,m_fOffsetZ));//0.8f*fac));
         camera()->setEyeSeparation(0.4f);
         camera()->setFieldOfView(30);
-        camera()->setEye(QVector3D(0,0,60));
+        camera()->setEye(QVector3D(0,0,m_fOffsetZEye));
         //LNdT DEMO end
 
     }
@@ -344,40 +342,21 @@ void InverseView::paintGL(QGLPainter *painter)
 
 void InverseView::mouseMoveEvent(QMouseEvent *e)
 {
-    if (e->buttons() & Qt::LeftButton){
-        QVector3D t_qVecCenter = camera()->center();
-        QVector3D t_qVecEye = camera()->eye();
+    camera()->setCenter(QVector3D(0,0,0));
 
-        t_qVecCenter.setZ(t_qVecCenter.z() - m_fOffsetZ);
-        t_qVecEye.setZ(t_qVecEye.z() - m_fOffsetZ);
+    float normEyeOld = sqrt(pow(camera()->eye().x(),2) + pow(camera()->eye().y(),2) + pow(camera()->eye().z(),2));
 
-        camera()->setCenter(t_qVecCenter);
-        camera()->setEye(t_qVecCenter);
+    QGLView::mouseMoveEvent(e);
 
+    float dx = (camera()->eye().x()*m_fOffsetZ)/m_fOffsetZEye;
+    float dy = (camera()->eye().y()*m_fOffsetZ)/m_fOffsetZEye;
+    float dz = (camera()->eye().z()*m_fOffsetZ)/m_fOffsetZEye;
 
-        QGLView::mouseMoveEvent(e);
+    float normEye = sqrt(pow(camera()->eye().x(),2) + pow(camera()->eye().y(),2) + pow(camera()->eye().z(),2));
+    float scaleEye = normEyeOld/normEye;//m_fOffsetZEye/normEye;
+    camera()->setEye(QVector3D(camera()->eye().x()*scaleEye,camera()->eye().y()*scaleEye,camera()->eye().z()*scaleEye));
 
-//        int dx = e->x() - m_qPointLastPosition.x();
-//        int dy = e->y() - m_qPointLastPosition.y();
-
-//        camera()->setEye(t_qVecCenter);
-//        camera()->setEye(t_qVecCenter);
-
-        t_qVecCenter = camera()->center();
-        t_qVecEye = camera()->eye();
-
-        t_qVecCenter.setZ(t_qVecCenter.z() + m_fOffsetZ);
-        t_qVecEye.setZ(t_qVecEye.z() + m_fOffsetZ);
-
-        camera()->setCenter(t_qVecCenter);
-        camera()->setEye(t_qVecCenter);
-
-        this->update();
-
-        m_qPointLastPosition = e->pos();
-    }
-    else
-        QGLView::mouseMoveEvent(e);
+    camera()->setCenter(QVector3D(dx,dy,dz));
 }
 
 
@@ -385,8 +364,17 @@ void InverseView::mouseMoveEvent(QMouseEvent *e)
 
 void InverseView::mousePressEvent(QMouseEvent *e)
 {
-    m_qPointLastPosition = e->pos();
+
+    if(e->buttons() & Qt::RightButton)
+    {
+        float normEye = sqrt(pow(camera()->eye().x(),2) + pow(camera()->eye().y(),2) + pow(camera()->eye().z(),2));
+        camera()->setCenter(QVector3D(0,0,m_fOffsetZ));
+        camera()->setEye(QVector3D(0,0,normEye));
+    }
+
+    QGLView::mousePressEvent(e);
 }
+
 
 
 //*************************************************************************************************************
