@@ -155,7 +155,7 @@ protected:
     /**
     * Processes the mouse move event e.
     *
-    * @param[in] e  the mouse move event.
+    * @param[in] e      the mouse move event.
     */
     void mouseMoveEvent(QMouseEvent *e);
 
@@ -163,7 +163,7 @@ protected:
     /**
     * Processes the mouse press event e.
     *
-    * @param[in] e  the mouse press event.
+    * @param[in] e      the mouse press event.
     */
     void mousePressEvent(QMouseEvent *e);
 
@@ -189,8 +189,8 @@ private:
     QVector3D m_vecBoundingBoxCenter;               /**< X, Y, Z center. */
 
     float m_fOffsetZ;                               /**< Z offset for pop-out effect. */
+    float m_fOffsetZEye;                            /**< Z offset eye. */
 
-    QPoint m_qPointLastPosition;                    /**< Mouse move last postion. */
 
     QGLSceneNode *m_pSceneNode;                     /**< Node of the scene. */
 
