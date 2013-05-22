@@ -110,7 +110,7 @@ void InverseViewProducer::run()
     qint32 simCount = 0;
     qint32 currentSample = 0;
 
-    float t_fFpu = m_iFps/(1000000);
+    float t_fFpu = ((float)m_iFps)/(1000000.0f);
 
     m_bIsRunning = true;
 
