@@ -122,7 +122,7 @@ public slots:
     void stopMeas(qint32 ID);
     void sendMeasurementInfo(qint32 ID, FiffInfo p_fiffInfo);
     void sendRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRawData);
-    //void ReadToBuffer1();
+    void ReadProc();
 
 public:
     QTcpSocket *t_qTcpSocket;

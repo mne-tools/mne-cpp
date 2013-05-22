@@ -388,11 +388,10 @@ void FiffStreamServer::incomingConnection(qintptr socketDescriptor)
     m_qClientList.insert(m_iNextClientId, t_pStreamThread);
     ++m_iNextClientId;
 
-    //when thread has finished it gets deleted
     connect(t_pStreamThread, SIGNAL(finished()), t_pStreamThread, SLOT(deleteLater()));
     connect(this, SIGNAL(closeFiffStreamServer()), t_pStreamThread, SLOT(deleteLater()));
 
-    //connect(tcp_sock_tmp,SIGNAL(readyRead()),t_pStreamThread,SLOT(ReadToBuffer1()));
+//    connect(tcp_sock_tmp,SIGNAL(readyRead()),t_pStreamThread,SLOT(ReadProc()));
 
     connect(this, &FiffStreamServer::remitMeasInfo,
             t_pStreamThread, &FiffStreamThread::sendMeasurementInfo);
