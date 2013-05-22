@@ -91,11 +91,8 @@ InverseView::InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qL
 , m_fOffsetZEye(60.0f)
 , m_pSceneNodeBrain(0)
 , m_pSceneNode(0)
-//, m_nTimeSteps(0)
 {
     qRegisterMetaType<QSharedPointer<Eigen::VectorXd> >("QSharedPointer<Eigen::VectorXd>");
-
-
 
 
 //    m_pCameraFrontal = new QGLCamera(this);
@@ -103,11 +100,7 @@ InverseView::InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qL
 
     qDebug() << "p_qListLabels" << p_qListLabels.size();
 
-
-//    m_timer = new QTimer(this);
-//    QObject::connect(m_timer, &QTimer::timeout, this, &InverseView::updateData);
-
-    QObject::connect(m_pInverseViewProducer.data(), &InverseViewProducer::sourceEstimateSample, this, &InverseView::newUpdate);
+    QObject::connect(m_pInverseViewProducer.data(), &InverseViewProducer::sourceEstimateSample, this, &InverseView::updateActivation);
 }
 
 
@@ -126,19 +119,6 @@ InverseView::~InverseView()
 void InverseView::pushSourceEstimate(SourceEstimate &p_sourceEstimate)
 {
     m_pInverseViewProducer->pushSourceEstimate(p_sourceEstimate);
-
-//    m_timer->stop();
-//    m_curSourceEstimate = p_sourceEstimate;
-
-//    m_nTimeSteps = m_curSourceEstimate.times.size();
-
-//    qDebug() << "source estimates" << m_curSourceEstimate.data.rows();
-
-//    m_dMaxActivation = m_curSourceEstimate.data.colwise().maxCoeff();
-
-//    m_dGlobalMaximum = m_dMaxActivation.maxCoeff();
-
-//    m_timer->start(m_curSourceEstimate.tstep*1000);
 }
 
 
@@ -299,9 +279,6 @@ void InverseView::initializeGL(QGLPainter *painter)
     m_pLightParametersScene->setPosition(QVector3D(0.0f, 0.0f, 3.0f));
     painter->setMainLight(m_pLightParametersScene);
 
-
-//    simCount = 0;
-
     //
     // Set stereo type
     //
@@ -407,58 +384,7 @@ void InverseView::mousePressEvent(QMouseEvent *e)
 
 //*************************************************************************************************************
 
-//void InverseView::updateData()
-//{
-//    qint32 currentSample = simCount%m_nTimeSteps;
-
-//    VectorXd t_curLabelActivation = VectorXd::Zero(m_pSceneNode->palette()->size());
-
-//    for(qint32 h = 0; h < 2; ++h)
-//    {
-//        for(qint32 i = 0; i < m_sourceSpace[h].cluster_info.numClust(); ++i)
-//        {
-//            qint32 labelId = m_sourceSpace[h].cluster_info.clusterLabelIds[i];
-//            qint32 colorIdx = m_qListMapLabelIdIndex[h][labelId];
-//            //search for max activation within one label - by checking if there is already an assigned value
-//            if(abs(t_curLabelActivation[colorIdx]) < abs(m_curSourceEstimate.data(i, currentSample)))
-//                t_curLabelActivation[colorIdx] = m_curSourceEstimate.data(i, currentSample);
-//        }
-//    }
-
-//    for(qint32 i = 0; i < m_pSceneNode->palette()->size(); ++i)
-//    {
-//        if(m_dMaxActivation[i] != 0)
-//        {
-//            qint32 iVal = (t_curLabelActivation[i]/m_dGlobalMaximum/*m_dMaxActivation[currentSample]*/) * 255;
-//            iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
-
-//            int r, g, b;
-//            if(m_iColorMode == 0)
-//            {
-//                r = iVal;
-//                g = iVal;
-//                b = iVal;
-//            }
-//            else if(m_iColorMode == 1)
-//            {
-//                r = iVal;
-//                g = iVal;
-//                b = iVal;
-//            }
-
-//            m_pSceneNode->palette()->material(i)->setSpecularColor(QColor(r,g,b,200));
-//        }
-//    }
-
-//    ++simCount;
-
-//    this->update();
-//}
-
-
-//*************************************************************************************************************
-
-void InverseView::newUpdate(QSharedPointer<Eigen::VectorXd> p_pVecActivation)
+void InverseView::updateActivation(QSharedPointer<Eigen::VectorXd> p_pVecActivation)
 {
     VectorXd t_curLabelActivation = VectorXd::Zero(m_pSceneNode->palette()->size());
 

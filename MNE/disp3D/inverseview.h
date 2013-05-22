@@ -212,25 +212,13 @@ private:
 
     QList< QMap<qint32, qint32> > m_qListMapLabelIdIndex;
 
-
-//    SourceEstimate m_curSourceEstimate;
-//    RowVectorXd m_dMaxActivation;
-//    double m_dGlobalMaximum;
-
-//    qint32 simCount;
-//    qint32 m_nTimeSteps;
-//    QTimer *m_timer;
-//    void updateData();
-
-
     //=========================================================================================================
     /**
-    * New update
+    * update source activation
     *
     * @param[in] p_pVecActivation   new activation vector.
     */
-    void newUpdate(QSharedPointer<Eigen::VectorXd> p_pVecActivation);
-
+    void updateActivation(QSharedPointer<Eigen::VectorXd> p_pVecActivation);
 
     //=========================================================================================================
     /**
