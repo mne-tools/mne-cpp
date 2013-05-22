@@ -41,6 +41,16 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <inverse/sourceestimate.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -48,6 +58,7 @@
 //=============================================================================================================
 
 #include <QThread>
+#include <QMutex>
 
 
 //*************************************************************************************************************
@@ -63,7 +74,8 @@ namespace DISP3DLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-//using namespace IOBuffer;
+using namespace Eigen;
+using namespace INVERSELIB;
 
 
 //*************************************************************************************************************
@@ -91,9 +103,9 @@ public:
     * Default constructor
     *
     *
-    * @param[in] pInverseView   Parent inverse view
+    * @param[in] p_fT   Time between each sample (default 1000)
     */
-    InverseViewProducer(InverseView *pInverseView);
+    InverseViewProducer(float p_fT = 1000);
     
     //=========================================================================================================
     /**
@@ -101,15 +113,22 @@ public:
     */
     ~InverseViewProducer();
 
-
-    void pushSourceEstimate();//SourceEstimate &p_sourceEstimate);
-
+    //=========================================================================================================
+    /**
+    * Appends a new source estimate
+    *
+    * @param[in] p_sourceEstimate   Source estimate to push
+    */
+    void pushSourceEstimate(SourceEstimate &p_sourceEstimate);
 
     //=========================================================================================================
     /**
     * Stops the InverseViewProducer by stopping the producer's thread.
     */
     void stop();
+
+signals:
+    void sourceEstimateSample(QSharedPointer<Eigen::VectorXd>);
 
 protected:
     //=========================================================================================================
@@ -122,10 +141,19 @@ protected:
 
 
 private:
+    QMutex mutex;
 
-    InverseView* m_pInverseView;
+    bool m_bIsRunning;      /**< If inverse view producer is running. */
 
-//    SourceEstimate m_curSourceEstimate;
+    SourceEstimate m_curSourceEstimate; /**< Current source estimate.*/
+
+    float m_fT;                         /**< Time step.*/
+    qint32 m_nTimeSteps;                /**< Number of time steps.*/
+
+//    CircularMatrixBuffer<double>::SPtr m_pSourceEstimateBuffer; /**< Holds incoming source estimate sample data.*/
+
+
+
 //    RowVectorXd m_dMaxActivation;
 };
 
@@ -133,7 +161,6 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 
 } // NAMESPACE
 

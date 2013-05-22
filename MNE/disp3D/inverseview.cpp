@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include "inverseview.h"
+#include "inverseviewproducer.h"
 
 #include <fs/label.h>
 
@@ -80,6 +81,7 @@ using namespace DISP3DLIB;
 
 InverseView::InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, QWindow *parent)
 : QGLView(parent)
+, m_pInverseViewProducer(new InverseViewProducer)
 , m_iColorMode(0)
 , m_sourceSpace(p_sourceSpace)
 , m_qListLabels(p_qListLabels)
@@ -91,6 +93,11 @@ InverseView::InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qL
 , m_pSceneNode(0)
 , m_nTimeSteps(0)
 {
+    qRegisterMetaType<QSharedPointer<Eigen::VectorXd> >("QSharedPointer<Eigen::VectorXd>");
+
+
+
+
 //    m_pCameraFrontal = new QGLCamera(this);
 //    m_pCameraFrontal->setAdjustForAspectRatio(false);
 
@@ -99,6 +106,8 @@ InverseView::InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qL
 
     m_timer = new QTimer(this);
     QObject::connect(m_timer, &QTimer::timeout, this, &InverseView::updateData);
+
+    m_pInverseViewProducer->start();
 }
 
 
@@ -114,6 +123,10 @@ InverseView::~InverseView()
 
 void InverseView::pushSourceEstimate(SourceEstimate &p_sourceEstimate)
 {
+
+
+
+
     m_timer->stop();
     m_curSourceEstimate = p_sourceEstimate;
 
@@ -433,7 +446,6 @@ void InverseView::updateData()
             m_pSceneNode->palette()->material(i)->setSpecularColor(QColor(r,g,b,200));
         }
     }
-
 
     ++simCount;
 

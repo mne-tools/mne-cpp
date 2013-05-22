@@ -43,6 +43,8 @@
 
 #include "disp3D_global.h"
 
+#include "inverseviewproducer.h"
+
 #include <mne/mne_sourcespace.h>
 #include <fs/surfaceset.h>
 #include <inverse/sourceestimate.h>
@@ -59,6 +61,14 @@
 #include <QSharedPointer>
 #include <QList>
 #include <QMap>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -90,6 +100,7 @@ namespace DISP3DLIB
 using namespace MNELIB;
 using namespace FSLIB;
 using namespace INVERSELIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -114,10 +125,6 @@ public:
     //=========================================================================================================
     /**
     * Default constructor
-    *
-    *
-    *
-    *
     *
     *
     * @param[in] parent     Parent QObject (optional)
@@ -169,6 +176,8 @@ protected:
 
 private:
 
+    InverseViewProducer::SPtr m_pInverseViewProducer;   /**< Inverse view producer. */
+
     qint32 m_iColorMode;                            /**< used colorization mode. */
     //Data Stuff
     MNESourceSpace m_sourceSpace;                   /**< The used source space. */
@@ -199,6 +208,7 @@ private:
 
     QList< QMap<qint32, qint32> > m_qListMapLabelIdIndex;
 
+
     SourceEstimate m_curSourceEstimate;
     RowVectorXd m_dMaxActivation;
     double m_dGlobalMaximum;
@@ -207,6 +217,7 @@ private:
     qint32 m_nTimeSteps;
     QTimer *m_timer;
     void updateData();
+
 
 
 
