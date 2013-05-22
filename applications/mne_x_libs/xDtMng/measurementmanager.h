@@ -505,14 +505,14 @@ public:
     *
     * @return a hash of all current measurement providers and their corresponding plugin id's.
     */
-    static QHash<PLG_ID::Plugin_ID, IMeasurementSource*>& getMeasurementProvider() {return s_hashMeasurementProvider;};
+    static QHash<PLG_ID::Plugin_ID, IMeasurementSource*>& getMeasurementProvider() {return s_hashMeasurementProvider;}
     //=========================================================================================================
     /**
     * Returns all current measurement acceptors.
     *
     * @return a hash of all current measurement acceptors and their corresponding plugin id's.
     */
-    static QHash<PLG_ID::Plugin_ID, IPlugin*>& getMeasurementAcceptors() {return s_hashMeasurementAcceptor;};
+    static QHash<PLG_ID::Plugin_ID, IPlugin*>& getMeasurementAcceptors() {return s_hashMeasurementAcceptor;}
 
 //clean
     //=========================================================================================================

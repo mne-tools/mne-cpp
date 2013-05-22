@@ -245,10 +245,10 @@ void BabyMEG::setFiffData(QByteArray DATA)
     for(qint32 i = 0; i < rows*cols; ++i)
         IOUtils::swap_floatp(rawData.data()+i);
 
-//    std::cout << "first ten elements \n" << rawData.block(0,0,2,10) << std::endl;
+//   std::cout << "first ten elements \n" << rawData.block(0,0,1,10) << std::endl;
 
     if(!m_pRawMatrixBuffer)
-        m_pRawMatrixBuffer = CircularMatrixBuffer<float>::SPtr(new CircularMatrixBuffer<float>(64, rows, cols));
+        m_pRawMatrixBuffer = CircularMatrixBuffer<float>::SPtr(new CircularMatrixBuffer<float>(40, rows, cols));
 
     m_pRawMatrixBuffer->push(&rawData);
 
