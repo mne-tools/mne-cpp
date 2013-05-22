@@ -118,6 +118,7 @@ InverseView::~InverseView()
 
 void InverseView::pushSourceEstimate(SourceEstimate &p_sourceEstimate)
 {
+    qDebug() << "Push Source Estimate 1";
     m_pInverseViewProducer->pushSourceEstimate(p_sourceEstimate);
 }
 
