@@ -56,10 +56,12 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-InverseViewProducer::InverseViewProducer(float p_fT)
+InverseViewProducer::InverseViewProducer(qint32 p_iT)
 : m_bIsRunning(false)
-, m_fT(p_fT)
+, m_iFps(60)
+, m_iT(p_iT)
 , m_nTimeSteps(0)
+, m_dGlobalMaximum(0)
 {
 
 }
@@ -79,8 +81,11 @@ void InverseViewProducer::pushSourceEstimate(SourceEstimate &p_sourceEstimate)
     mutex.lock();
 
     m_curSourceEstimate = p_sourceEstimate;
-    m_fT = p_sourceEstimate.tstep;
+    m_iT = (qint32)floor(p_sourceEstimate.tstep*1000000);
     m_nTimeSteps = p_sourceEstimate.data.cols();
+
+    m_vecMaxActivation = m_curSourceEstimate.data.rowwise().maxCoeff();
+    m_dGlobalMaximum = m_vecMaxActivation.maxCoeff();
 
     mutex.unlock();
 }
@@ -105,6 +110,8 @@ void InverseViewProducer::run()
     qint32 simCount = 0;
     qint32 currentSample = 0;
 
+    float t_fFpu = m_iFps/(1000000);
+
     m_bIsRunning = true;
 
     while(m_bIsRunning)
@@ -113,14 +120,19 @@ void InverseViewProducer::run()
         mutex.lock();
         if(m_nTimeSteps > 0)
         {
-            currentSample = simCount%m_nTimeSteps;
-            QSharedPointer<VectorXd> p_qVecCurrentActivation(new VectorXd(m_curSourceEstimate.data.col(currentSample)));
-            ++simCount;
+            qint32 t_iDownSampling = (qint32)floor(1/(m_iT*t_fFpu));
+            //downsample to 60Hz
+            if(simCount%t_iDownSampling == 0)
+            {
+                currentSample = simCount%m_nTimeSteps;
+                QSharedPointer<VectorXd> p_qVecCurrentActivation(new VectorXd(m_curSourceEstimate.data.col(currentSample)));
+                emit sourceEstimateSample(p_qVecCurrentActivation);
+            }
 
-            emit p_qVecCurrentActivation;
+            ++simCount;
         }
         mutex.unlock();
 
-        msleep(m_fT);
+        usleep(m_iT);
     }
 }

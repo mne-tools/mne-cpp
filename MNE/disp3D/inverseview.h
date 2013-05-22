@@ -137,9 +137,13 @@ public:
     */
     ~InverseView();
 
-
+    //=========================================================================================================
+    /**
+    * Appends a new source estimate to the internal inverse producer
+    *
+    * @param[in] p_sourceEstimate   Source estimate to push
+    */
     void pushSourceEstimate(SourceEstimate &p_sourceEstimate);
-
 
 protected:
     //=========================================================================================================
@@ -209,16 +213,23 @@ private:
     QList< QMap<qint32, qint32> > m_qListMapLabelIdIndex;
 
 
-    SourceEstimate m_curSourceEstimate;
-    RowVectorXd m_dMaxActivation;
-    double m_dGlobalMaximum;
+//    SourceEstimate m_curSourceEstimate;
+//    RowVectorXd m_dMaxActivation;
+//    double m_dGlobalMaximum;
 
-    qint32 simCount;
-    qint32 m_nTimeSteps;
-    QTimer *m_timer;
-    void updateData();
+//    qint32 simCount;
+//    qint32 m_nTimeSteps;
+//    QTimer *m_timer;
+//    void updateData();
 
 
+    //=========================================================================================================
+    /**
+    * New update
+    *
+    * @param[in] p_pVecActivation   new activation vector.
+    */
+    void newUpdate(QSharedPointer<Eigen::VectorXd> p_pVecActivation);
 
 
     //=========================================================================================================

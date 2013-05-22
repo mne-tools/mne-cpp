@@ -103,15 +103,31 @@ public:
     * Default constructor
     *
     *
-    * @param[in] p_fT   Time between each sample (default 1000)
+    * @param[in] p_iT   Time in us between each sample (default 1000)
     */
-    InverseViewProducer(float p_fT = 1000);
+    InverseViewProducer(qint32 p_iT = 1000);
     
     //=========================================================================================================
     /**
     * Destroys the InverseView class.
     */
     ~InverseViewProducer();
+
+    //=========================================================================================================
+    /**
+    * Returns the maximal activation.
+    *
+    * @return the maximal activation.
+    */
+    inline double getGlobalMax() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the maximal activation of each source.
+    *
+    * @return the maximal activation source vector.
+    */
+    inline VectorXd getMaxActivation() const;
 
     //=========================================================================================================
     /**
@@ -147,8 +163,12 @@ private:
 
     SourceEstimate m_curSourceEstimate; /**< Current source estimate.*/
 
-    float m_fT;                         /**< Time step.*/
-    qint32 m_nTimeSteps;                /**< Number of time steps.*/
+    VectorXd m_vecMaxActivation;      /**< Maximum of each source. */
+    double m_dGlobalMaximum;             /**< Global maximum. */
+
+    qint32 m_iFps;          /**< Frames per second.*/
+    qint32 m_iT;            /**< Time in us between each step.*/
+    qint32 m_nTimeSteps;    /**< Number of time steps.*/
 
 //    CircularMatrixBuffer<double>::SPtr m_pSourceEstimateBuffer; /**< Holds incoming source estimate sample data.*/
 
@@ -161,6 +181,20 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+double InverseViewProducer::getGlobalMax() const
+{
+    return m_dGlobalMaximum;
+}
+
+
+//*************************************************************************************************************
+
+VectorXd InverseViewProducer::getMaxActivation() const
+{
+    return m_vecMaxActivation;
+}
+
 
 } // NAMESPACE
 
