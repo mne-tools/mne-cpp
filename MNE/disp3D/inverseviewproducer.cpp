@@ -62,6 +62,7 @@ InverseViewProducer::InverseViewProducer(qint32 p_iT)
 , m_iT(p_iT)
 , m_nTimeSteps(0)
 , m_dGlobalMaximum(0)
+, m_iDownSampling(1)
 {
 
 }
@@ -87,6 +88,10 @@ void InverseViewProducer::pushSourceEstimate(SourceEstimate &p_sourceEstimate)
     m_vecMaxActivation = m_curSourceEstimate.data.rowwise().maxCoeff();
     m_dGlobalMaximum = m_vecMaxActivation.maxCoeff();
 
+    float t_fFpu = ((float)m_iFps)/(1000000.0f);
+
+    m_iDownSampling = (qint32)floor(1/(m_iT*t_fFpu));
+
     mutex.unlock();
 }
 
@@ -110,8 +115,6 @@ void InverseViewProducer::run()
     qint32 simCount = 0;
     qint32 currentSample = 0;
 
-    float t_fFpu = ((float)m_iFps)/(1000000.0f);
-
     m_bIsRunning = true;
 
     while(m_bIsRunning)
@@ -120,9 +123,8 @@ void InverseViewProducer::run()
         mutex.lock();
         if(m_nTimeSteps > 0)
         {
-            qint32 t_iDownSampling = (qint32)floor(1/(m_iT*t_fFpu));
             //downsample to 60Hz
-            if(simCount%t_iDownSampling == 0)
+            if(simCount%m_iDownSampling == 0)
             {
                 currentSample = simCount%m_nTimeSteps;
                 QSharedPointer<VectorXd> p_qVecCurrentActivation(new VectorXd(m_curSourceEstimate.data.col(currentSample)));

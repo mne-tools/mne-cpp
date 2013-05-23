@@ -170,6 +170,8 @@ private:
     qint32 m_iT;            /**< Time in us between each step.*/
     qint32 m_nTimeSteps;    /**< Number of time steps.*/
 
+    qint32 m_iDownSampling; /**< Downsampling factor */
+
 //    CircularMatrixBuffer<double>::SPtr m_pSourceEstimateBuffer; /**< Holds incoming source estimate sample data.*/
 
 
