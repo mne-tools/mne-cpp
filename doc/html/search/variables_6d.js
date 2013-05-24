@@ -1,8 +1,6 @@
 var searchData=
 [
-  ['m_5fcommandmanager',['m_commandManager',['../class_r_t_s_e_r_v_e_r_1_1_i_connector.html#a62a0e1c8e7c9b54522f8ac091900c270',1,'RTSERVER::IConnector']]],
   ['m_5ffilename',['m_fileName',['../class_f_s_l_i_b_1_1_surface.html#a390d601f3b4dd5a379989d86fe4d7c33',1,'FSLIB::Surface']]],
-  ['m_5fqjsonobjectmetadata',['m_qJsonObjectMetaData',['../class_r_t_s_e_r_v_e_r_1_1_i_connector.html#a7ce90dde9155f8310b7c88e130abcf90',1,'RTSERVER::IConnector']]],
   ['machid',['machid',['../class_f_i_f_f_l_i_b_1_1_fiff_id.html#a021e8aaacbaa01474e3a9c5b9cdc4d24',1,'FIFFLIB::FiffId']]],
   ['meas_5fdate',['meas_date',['../class_f_i_f_f_l_i_b_1_1_fiff_info.html#acc617eb0077fa0dda35ade4318abc209',1,'FIFFLIB::FiffInfo']]],
   ['meas_5fid',['meas_id',['../class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#a4e7cc06ad6cd39b9e554c09b0935f5d9',1,'FIFFLIB::FiffInfoBase']]],

@@ -44,6 +44,5 @@ var searchData=
   ['tris',['tris',['../class_f_s_l_i_b_1_1_surface.html#acce9e22ae0113996f262217e14c3ea30',1,'FSLIB::Surface::tris()'],['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab2084cf6ed3de33ef78ef11c0e6f83b6',1,'MNELIB::MNEHemisphere::tris()']]],
   ['tstep',['tstep',['../class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#ac34303f7634fe3cc5741ea7b7b308b9e',1,'INVERSELIB::SourceEstimate']]],
   ['type',['type',['../class_f_i_f_f_l_i_b_1_1_fiff_dir_entry.html#a365e3bf2f5b6d8ef1865db8a1731a50b',1,'FIFFLIB::FiffDirEntry::type()'],['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#acd412f0127525d8749b6606cd87fd5ff',1,'FIFFLIB::FiffTag::type()'],['../struct_f_i_f_f_l_i_b_1_1__fiff__data__ref.html#ad6543d32696c0e71fc3efa96e4172675',1,'FIFFLIB::_fiff_data_ref::type()'],['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a0ed4484b91d8b422dd9800a887487a50',1,'MNELIB::MNEHemisphere::type()']]],
-  ['typename_5fold_2eh',['typename_old.h',['../typename__old_8h.html',1,'']]],
-  ['types_5fdefinitions_2eh',['types_definitions.h',['../types__definitions_8h.html',1,'']]]
+  ['typename_5fold_2eh',['typename_old.h',['../typename__old_8h.html',1,'']]]
 ];

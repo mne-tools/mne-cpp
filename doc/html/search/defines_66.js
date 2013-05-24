@@ -57,7 +57,6 @@ var searchData=
   ['fiff_5funit_5ft_5fm',['FIFF_UNIT_T_M',['../fiff__constants_8h.html#ae772550aceede71f6a7595227c44e261',1,'FIFF_UNIT_T_M():&#160;fiff_constants.h'],['../fiff__constants_8h.html#ae772550aceede71f6a7595227c44e261',1,'FIFF_UNIT_T_M():&#160;fiff_constants.h']]],
   ['fiffb_5fmne_5frt_5fmeas_5finfo',['FIFFB_MNE_RT_MEAS_INFO',['../fiff__constants_8h.html#a55e61168958e1e00a300b17682d408c1',1,'fiff_constants.h']]],
   ['fiffshared_5fexport',['FIFFSHARED_EXPORT',['../fiff__global_8h.html#aab6c6e9f74ed9d6762feab45287c6ad8',1,'fiff_global.h']]],
-  ['fiffsimulatorshared_5fexport',['FIFFSIMULATORSHARED_EXPORT',['../fiffsimulator__global_8h.html#aad8ee892de975b17d24b8b47b40b2ead',1,'fiffsimulator_global.h']]],
   ['fiffv_5faspect_5faltaverage',['FIFFV_ASPECT_ALTAVERAGE',['../fiff__constants_8h.html#ae4871050039404e9e5b4e978196d19a2',1,'fiff_constants.h']]],
   ['fiffv_5faspect_5faverage',['FIFFV_ASPECT_AVERAGE',['../fiff__constants_8h.html#a5dab727c9be8983aee7be8d73fabe64e',1,'fiff_constants.h']]],
   ['fiffv_5faspect_5fdipole_5fwave',['FIFFV_ASPECT_DIPOLE_WAVE',['../fiff__constants_8h.html#a6d07f8d88ad9cddfedec387bc54b8d17',1,'fiff_constants.h']]],
