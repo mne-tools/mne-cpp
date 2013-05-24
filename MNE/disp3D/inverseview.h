@@ -164,6 +164,14 @@ protected:
 
     //=========================================================================================================
     /**
+    * Processes the key press event e.
+    *
+    * @param[in] e      the key press event.
+    */
+    void keyPressEvent(QKeyEvent *e);
+
+    //=========================================================================================================
+    /**
     * Processes the mouse move event e.
     *
     * @param[in] e      the mouse move event.
