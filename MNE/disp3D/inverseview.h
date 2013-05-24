@@ -126,8 +126,10 @@ public:
     /**
     * Default constructor
     *
-    *
-    * @param[in] parent     Parent QObject (optional)
+    * @param[in] p_sourceSpace  Source space which contains the geometry information
+    * @param[in] p_qListLabels  region of interest labels
+    * @param[in] p_qListRGBAs   color information for given region of interest
+    * @param[in] parent         Parent QObject (optional)
     */
     InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, QWindow *parent = 0);
     
