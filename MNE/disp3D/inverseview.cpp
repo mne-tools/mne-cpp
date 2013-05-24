@@ -334,6 +334,28 @@ void InverseView::paintGL(QGLPainter *painter)
 
 //*************************************************************************************************************
 
+void InverseView::keyPressEvent(QKeyEvent *e)
+{
+    camera()->setCenter(QVector3D(0,0,0));
+
+    float normEyeOld = sqrt(pow(camera()->eye().x(),2) + pow(camera()->eye().y(),2) + pow(camera()->eye().z(),2));
+
+    QGLView::keyPressEvent(e);
+
+    float dx = (camera()->eye().x()*m_fOffsetZ)/m_fOffsetZEye;
+    float dy = (camera()->eye().y()*m_fOffsetZ)/m_fOffsetZEye;
+    float dz = (camera()->eye().z()*m_fOffsetZ)/m_fOffsetZEye;
+
+    float normEye = sqrt(pow(camera()->eye().x(),2) + pow(camera()->eye().y(),2) + pow(camera()->eye().z(),2));
+    float scaleEye = normEyeOld/normEye;//m_fOffsetZEye/normEye;
+    camera()->setEye(QVector3D(camera()->eye().x()*scaleEye,camera()->eye().y()*scaleEye,camera()->eye().z()*scaleEye));
+
+    camera()->setCenter(QVector3D(dx,dy,dz));
+}
+
+
+//*************************************************************************************************************
+
 void InverseView::mouseMoveEvent(QMouseEvent *e)
 {
     camera()->setCenter(QVector3D(0,0,0));
