@@ -111,6 +111,8 @@ int main(int argc, char *argv[])
     if(evoked.isEmpty())
         return 1;
 
+    std::cout << "Evoked description: " << evoked.comment.toLatin1().constData() << std::endl;
+
     MNEForwardSolution t_Fwd(t_fileFwd);
     if(t_Fwd.isEmpty())
         return 1;
@@ -192,7 +194,7 @@ int main(int argc, char *argv[])
     {
         view.resize(800, 600);
     }
-    view.setTitle(QString("Lange Nacht der Technik :: Ilmenau University of Technology"));
+    view.setTitle(QString("Lange Nacht der Technik :: Ilmenau University of Technology - %1").arg(evoked.comment));
     view.show();
 
     //Push Estimate
