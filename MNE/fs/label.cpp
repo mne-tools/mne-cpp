@@ -240,7 +240,7 @@ bool Label::read(const QString& p_sFileName, Label &p_Label)
 //    p_Label.pos.insert(p_Label.hemi, data.cast<float>().block(0,1,data.rows(),3).array() * 1e-3);
 //    p_Label.values.insert(p_Label.hemi, data.block(0,4,data.rows(),1));
     p_Label.vertices = data.cast<int>().block(0,0,data.rows(),1);
-    p_Label.pos = data.cast<float>().block(0,1,data.rows(),3).array() * 1e-3;
+    p_Label.pos = data.cast<float>().block(0,1,data.rows(),3).array() * 1e-3f;
     p_Label.values = data.block(0,4,data.rows(),1);
 
     if(t_File.fileName().contains("lh.label"))

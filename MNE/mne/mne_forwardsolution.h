@@ -198,7 +198,7 @@ public:
     *
     * @return the depth prior
     */
-    static FiffCov compute_depth_prior(const MatrixXd &Gain, const FiffInfo &gain_info, bool is_fixed_ori, double exp = 0.8, double limit = 10.0, MatrixXd &patch_areas = defaultMatrixXd, bool limit_depth_chs = false);
+    static FiffCov compute_depth_prior(const MatrixXd &Gain, const FiffInfo &gain_info, bool is_fixed_ori, double exp = 0.8, double limit = 10.0, const MatrixXd &patch_areas = defaultConstMatrixXd, bool limit_depth_chs = false);
 
     //=========================================================================================================
     /**

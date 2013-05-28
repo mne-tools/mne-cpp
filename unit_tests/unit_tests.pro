@@ -43,6 +43,6 @@ SUBDIRS += \
 
 contains(MNECPP_CONFIG, isGui) {
     SUBDIRS += \
-        mne_disp_test \
+#        mne_disp_test \
         mne_graph_test
 }

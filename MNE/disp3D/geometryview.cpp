@@ -131,7 +131,7 @@ void GeometryView::initializeGL(QGLPainter *painter)
                 MatrixX3f rr = m_forwardSolution.src[h].rr;
 
                 //LNdT DEMO
-                rr.col(2) = rr.col(2).array() + 0.8;
+                rr.col(2) = rr.col(2).array() + 0.8f;
                 //LNdT DEMO end
 
                 builder.pushNode();

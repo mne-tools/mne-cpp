@@ -436,7 +436,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
 
 //*************************************************************************************************************
 
-FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd &Gain, const FiffInfo &gain_info, bool is_fixed_ori, double exp, double limit, MatrixXd &patch_areas, bool limit_depth_chs)
+FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd &Gain, const FiffInfo &gain_info, bool is_fixed_ori, double exp, double limit, const MatrixXd &patch_areas, bool limit_depth_chs)
 {
     printf("\tCreating the depth weighting matrix...\n");
 
@@ -466,10 +466,11 @@ FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd &Gain, const Fiff
     }
 
     // ToDo Currently the fwd solns never have "patch_areas" defined
-//        if patch_areas is not None:
+    if(patch_areas.cols() > 0)
+    {
 //            d /= patch_areas ** 2
-//            logger.info('    Patch areas taken into account in the depth '
-//                        'weighting')
+        printf("\tToDo!!!!! >>> Patch areas taken into account in the depth weighting\n");
+    }
 
     qint32 n_limit;
     VectorXd w = d.cwiseInverse();
