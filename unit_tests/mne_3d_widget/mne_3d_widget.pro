@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     unit_tests.pro
+# @file     mne_3d_widget.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,25 +29,54 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile to build the unit tests.
+# @brief    Example to display the forward solution source space using 3D stereoscopic view.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../mne-cpp.pri)
+include(../../mne-cpp.pri)
 
-TEMPLATE = subdirs
+TEMPLATE = app
 
-SUBDIRS += \
-    mne_lib_tests \
-    mne_rt_tests
+VERSION = $${MNE_CPP_VERSION}
 
-contains(MNECPP_CONFIG, isGui) {
-    SUBDIRS += \
-#        mne_disp_test \
-        mne_graph_test \
+QT       += 3d
 
-    qtHaveModule(3d) {
-        message(Qt3D available: mne 3D tests configured!)
-        SUBDIRS += mne_3d_widget
-    }
+CONFIG   += console
+CONFIG   -= app_bundle
+
+TARGET = mne_3d_widget
+
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
 }
+
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Inversed \
+            -lMNE$${MNE_LIB_VERSION}Disp3Dd
+}
+else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
+            -lMNE$${MNE_LIB_VERSION}Fs \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Inverse \
+            -lMNE$${MNE_LIB_VERSION}Disp3D
+}
+
+DESTDIR =  $${MNE_BINARY_DIR}
+
+TEMPLATE = app
+
+
+SOURCES += \
+        main.cpp \
+
+HEADERS += \
+
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
