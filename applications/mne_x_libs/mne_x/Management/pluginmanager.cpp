@@ -179,7 +179,7 @@ void PluginManager::loadPlugins(const QString& dir)
         }
         else
         {
-            qDebug() << "Module " << fileName << " could not be instantiated!";
+         //   qDebug() << "Module " << fileName << " could not be instantiated!";
         }
     }
 

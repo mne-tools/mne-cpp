@@ -393,7 +393,7 @@
            <widget class="QPushButton" name="m_qPushButton_SQUIDControl">
             <property name="geometry">
              <rect>
-              <x>80</x>
+              <x>85</x>
               <y>20</y>
               <width>151</width>
               <height>28</height>

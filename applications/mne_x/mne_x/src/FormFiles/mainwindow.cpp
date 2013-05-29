@@ -478,7 +478,7 @@ void MainWindow::CentralWidgetShowPlugin()//int iCurrentPluginNum, const QTreeWi
         {
             setCentralWidget(PluginManager::s_vecPlugins[iCurrentPluginNum]->setupWidget()); //QMainWindow takes ownership of the widget pointer and deletes it at the appropriate time.
         }
-        else if(m_bIsRunning)
+        else //if(m_bIsRunning)
         {
 
             m_pListCurrentDisplayPlugins << PluginManager::getPlugins()[iCurrentPluginNum]->getPlugin_ID();

@@ -308,6 +308,6 @@ void MneRtClientSetupWidget::showAboutDialog()
 
 void MneRtClientSetupWidget::SQUIDControlDialog()
 {
-    mnertclientSQUIDControlDgl SQUIDCtrlDlg(this);
+    mnertclientSQUIDControlDgl SQUIDCtrlDlg(m_pMneRtClient,this);
     SQUIDCtrlDlg.exec();
 }
