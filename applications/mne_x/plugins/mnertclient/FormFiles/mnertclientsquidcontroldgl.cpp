@@ -33,18 +33,51 @@
 *
 */
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
 
+#include "../mnertclient.h"
 #include "mnertclientsquidcontroldgl.h"
 #include "ui_mnertclientsquidcontroldgl.h"
 
-mnertclientSQUIDControlDgl::mnertclientSQUIDControlDgl(QWidget *parent) :
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace MneRtClientPlugin;
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+mnertclientSQUIDControlDgl::mnertclientSQUIDControlDgl(MneRtClient* p_pMneRtClient,QWidget *parent) :
     QDialog(parent),
+    m_pMneRtClient(p_pMneRtClient),
     ui(new Ui::mnertclientSQUIDControlDgl)
 {
     ui->setupUi(this);
+
+    // retune
+    connect(ui->m_Qbn_retune, &QPushButton::released, this, &mnertclientSQUIDControlDgl::SendRetune);
+
 }
 
 mnertclientSQUIDControlDgl::~mnertclientSQUIDControlDgl()
 {
     delete ui;
+}
+
+void mnertclientSQUIDControlDgl::SendRetune()
+{
+    // Send FLL command to cmdclient
+    if(m_pMneRtClient->m_bCmdClientIsConnected)
+    {
+        this->ui->m_tx_info->setText(QString("Send Retune Command"));
+        QString t_sReply = m_pMneRtClient->m_pRtCmdClient->sendCLICommand(QString("RETUNE"));
+        this->ui->m_tx_info->setText(QString("Reply:")+t_sReply);
+    }
 }

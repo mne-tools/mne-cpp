@@ -121,6 +121,7 @@ class MNERTCLIENTSHARED_EXPORT MneRtClient : public ISensor
     friend class MneRtClientProducer;
     friend class MneRtClientSetupWidget;
     friend class MneRtClientRunWidget;
+    friend class mnertclientSQUIDControlDgl;
 
 public:
 

@@ -111,6 +111,7 @@ PluginDockWidget::PluginDockWidget( const QString & title, QWidget * parent, Qt:
 
         QTreeWidgetItem* item(0);
         QString name((*iterPlugins)->getName());
+//        qDebug()<<"SLM:"<<name;
 
         int plugin_type = (*iterPlugins)->getType();
 
