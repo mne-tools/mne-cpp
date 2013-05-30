@@ -75,8 +75,13 @@ TEMPLATE = app
 
 SOURCES += \
         main.cpp \
+        mainwindow.cpp \
 
 HEADERS += \
+        mainwindow.h \
+
+FORMS += \
+        mainwindow.ui \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
