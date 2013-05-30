@@ -111,6 +111,9 @@ void PluginManager::loadPlugins(const QString& dir)
         {
             qDebug() << "try to load Plugin " << fileName;
 
+            // plugins are always disabled when they are first loaded
+            qobject_cast<IPlugin*>(pPlugin)->setStatus(false);
+
             s_vecPlugins.push_back(qobject_cast<IPlugin*>(pPlugin));
 
             Type module_type = qobject_cast<IPlugin*>(pPlugin)->getType();

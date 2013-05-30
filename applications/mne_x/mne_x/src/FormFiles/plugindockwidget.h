@@ -151,7 +151,15 @@ public:
     * @param [in] n index of plugin which's status should be changed.
     * @param [in] status to which plugin should be changed.
     */
-    void activateItem(int n, bool& status);
+    void activateItem(int n, bool status);
+
+     //=========================================================================================================
+    /**
+    * Set whether setting plugins active/inactive (toggling) is allowed.
+    *
+    * @param [in] if true toggling is enabled.
+    */
+    void setTogglingEnabled(bool enabled);
 
 signals:
     //=========================================================================================================
@@ -194,6 +202,14 @@ private slots:
     * @param [in] selectedItem whether program is running.
     */
     void itemSelected(QTreeWidgetItem* selectedItem);    /**< creates all actions for user interface of MainWindow class. */
+
+     //=========================================================================================================
+    /**
+    * Handles activating/deactivating of a plugin.
+    *
+    * @param [in] item which was toggled.
+    */
+    void itemToggled(QTreeWidgetItem* item);
 };
 
 
