@@ -567,6 +567,12 @@ void MainWindow::CentralWidgetShowPlugin()//int iCurrentPluginNum, const QTreeWi
                 setCentralWidget(m_pRunWidget);
         }
     }
+    else
+    {
+        if(m_pRunWidget)
+            delete m_pRunWidget;
+        m_pRunWidget = NULL;
+    }
 
     Subject::notifyEnabled = true; //like Mutex.unlock
 }
@@ -617,7 +623,7 @@ void MainWindow::startMeasurement()
         return;
     }
 
-
+    m_pPluginDockWidget->setTogglingEnabled(false);
     uiSetupRunningState(true);
     startTimer(m_iTimeoutMSec);
     CentralWidgetShowPlugin();
@@ -639,6 +645,7 @@ void MainWindow::stopMeasurement()
 
     qDebug() << "set stopped UI";
 
+    m_pPluginDockWidget->setTogglingEnabled(true);
     uiSetupRunningState(false);
     stopTimer();
     CentralWidgetShowPlugin();
