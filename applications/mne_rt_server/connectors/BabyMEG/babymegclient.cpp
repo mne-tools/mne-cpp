@@ -84,11 +84,17 @@ BabyMEGClient::BabyMEGClient(int myPort, QObject *parent) :
 
 //*************************************************************************************************************
 
+BabyMEGClient::~BabyMEGClient()
+{
+    delete tcpSocket;   // added 5.31.2013
+}
+
+//*************************************************************************************************************
+
 void BabyMEGClient::SetInfo(BabyMEGInfo *pInfo)
 {
     myBabyMEGInfo = pInfo;
 }
-
 
 //*************************************************************************************************************
 
@@ -377,6 +383,7 @@ void BabyMEGClient::handleBuffer()
                 QByteArray RESP = buffer.left(tmp);
                 qDebug()<< "5.Readbytes:"<<RESP.size();
                 qDebug() << RESP;
+                myBabyMEGInfo->MGH_LM_Send_CMDPackage(RESP);
                 }
                 buffer.remove(0,tmp);
                 SendCommand("QUIT");
