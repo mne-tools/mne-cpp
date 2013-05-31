@@ -81,10 +81,10 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
-//    GeometryView view;
+    GeometryView *view = new GeometryView();
 
-//    if (view.stereoType() != QGLView::RedCyanAnaglyph)
-//        view.camera()->setEyeSeparation(0.3f);
+    if (view->stereoType() != QGLView::RedCyanAnaglyph)
+        view->camera()->setEyeSeparation(0.3f);
 //    QStringList args = QCoreApplication::arguments();
 //    int w_pos = args.indexOf("-width");
 //    int h_pos = args.indexOf("-height");
@@ -110,6 +110,15 @@ int main(int argc, char *argv[])
 //        view.resize(800, 600);
 //    }
 //    view.show();
+
+
+    QWidget *container = QWidget::createWindowContainer(view);
+//    container->setMinimumSize(...);
+//    container->setMaximumSize(...);
+    container->setFocusPolicy(Qt::TabFocus);
+
+    w.setCentralWidget(container);
+//    widgetLayout->addWidget(container);
 
     return app.exec();
 }
