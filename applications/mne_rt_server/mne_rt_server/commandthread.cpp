@@ -93,6 +93,38 @@ void CommandThread::attachCommandReply(QByteArray p_blockReply, qint32 p_iID)
     }
 }
 
+//*************************************************************************************************************
+
+int CommandThread::MGH_LM_Byte2Int(QByteArray b)
+{
+    int value= 0;
+    for (int i=0;i<2;i++)
+    {
+        QByteArray t;
+        t[0] = b[i];
+        b[i] = b[3-i];
+        b[3-i] = t[0];
+    }
+    memcpy((char *)&value,b,4);
+    return value;
+}
+
+//*************************************************************************************************************
+
+QByteArray CommandThread::MGH_LM_Int2Byte(int a)
+{
+    QByteArray b = QByteArray::fromRawData((char *)&a,4);
+
+    for (int i=0;i<2;i++)
+    {
+        QByteArray t;
+        t[0] = b[i];
+        b[i] = b[3-i];
+        b[3-i] = t[0];
+    }
+    return b;
+}
+
 
 //*************************************************************************************************************
 
@@ -126,6 +158,7 @@ void CommandThread::run()
         {
             qint32 t_iBlockSize = m_qSendBlock.size();
             m_qMutex.lock();
+            qDebug()<<"SLM Reply"<<m_qSendBlock;
             qint32 t_iBytesWritten = t_qTcpSocket.write(m_qSendBlock);
             t_qTcpSocket.waitForBytesWritten();
             if(t_iBytesWritten == t_iBlockSize)
@@ -141,11 +174,38 @@ void CommandThread::run()
         //ToDo its not the best solution in terms of receiving the command for sure
         t_qTcpSocket.waitForReadyRead(100);
 
+        /*
+        if (t_qTcpSocket.bytesAvailable()>4)
+        {
+            // read the first 4 bytes -- the length of command package
+            QByteArray clen = t_qTcpSocket.read(4);
+            qint32 cmdlen = MGH_LM_Byte2Int(clen);
+            for (;;){
+                t_qTcpSocket.waitForReadyRead(100);
+                if (t_qTcpSocket.bytesAvailable()>=cmdlen)
+                {
+                    QByteArray t_qByteArrayRaw = t_qTcpSocket.read(cmdlen);
+                    QString t_sCommand = QString(t_qByteArrayRaw).simplified();
+                    qDebug()<<"SLM receive command"<<t_sCommand;
+                    //
+                    // Parse command
+                    //
+                    if(!t_sCommand.isEmpty())
+                        emit newCommand(t_sCommand, m_iThreadID);
+                    break;
+                }
+            }
+        }
+        */
+
         if (t_qTcpSocket.bytesAvailable() > 0 && t_qTcpSocket.canReadLine())
         {
+
+
             QByteArray t_qByteArrayRaw = t_qTcpSocket.readLine(t_iMaxBufSize);
             QString t_sCommand = QString(t_qByteArrayRaw).simplified();
 
+            qDebug()<<"SLM receive command"<<t_sCommand;
             //
             // Parse command
             //
@@ -156,6 +216,7 @@ void CommandThread::run()
         {
             t_qTcpSocket.readAll();//readAll that QTcpSocket is empty again -> prevent overflow
         }
+
     }
 
     t_qTcpSocket.disconnectFromHost();

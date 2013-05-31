@@ -82,6 +82,10 @@ private:
     QMutex m_qMutex;
     QByteArray m_qSendBlock;
 
+    int CommandThread::MGH_LM_Byte2Int(QByteArray b);
+    QByteArray CommandThread::MGH_LM_Int2Byte(int a);
+
+
 };
 
 } // NAMESPACE

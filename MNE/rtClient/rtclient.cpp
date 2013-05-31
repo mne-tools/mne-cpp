@@ -44,6 +44,7 @@
 #include "rtcmdclient.h"
 #include "rtdataclient.h"
 
+#include <QDebug>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -109,8 +110,11 @@ void RtClient::run()
     t_cmdClient.connectToHost(m_sRtServerHostName);
     t_cmdClient.waitForConnected(1000);
 
+    qDebug()<<"Start to command server";
     while(t_cmdClient.state() != QTcpSocket::ConnectedState)
     {
+        qDebug()<<"Start to command server again...";
+
         msleep(100);
         t_cmdClient.connectToHost(m_sRtServerHostName);
         t_cmdClient.waitForConnected(1000);

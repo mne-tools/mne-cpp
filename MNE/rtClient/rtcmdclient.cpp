@@ -49,6 +49,8 @@
 #include <QDateTime>
 #include <QThread>
 
+#include <QDebug>
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -77,6 +79,75 @@ void RtCmdClient::connectToHost(QString &p_sRtServerHostName)
 
 //*************************************************************************************************************
 
+int RtCmdClient::MGH_LM_Byte2Int(QByteArray b)
+{
+    int value= 0;
+    for (int i=0;i<2;i++)
+    {
+        QByteArray t;
+        t[0] = b[i];
+        b[i] = b[3-i];
+        b[3-i] = t[0];
+    }
+    memcpy((char *)&value,b,4);
+    return value;
+}
+
+//*************************************************************************************************************
+
+QByteArray RtCmdClient::MGH_LM_Int2Byte(int a)
+{
+    QByteArray b = QByteArray::fromRawData((char *)&a,4);
+
+    for (int i=0;i<2;i++)
+    {
+        QByteArray t;
+        t[0] = b[i];
+        b[i] = b[3-i];
+        b[3-i] = t[0];
+    }
+    return b;
+}
+
+
+//*************************************************************************************************************
+
+QString RtCmdClient::sendCLICommandFLL(const QString &p_sCommand)
+{
+    QString t_sCommand = QString("%1\n").arg(p_sCommand);
+    QString p_sReply;
+
+    if (this->state() == QAbstractSocket::ConnectedState)
+    {
+        qDebug() << "Write FLL command: " << t_sCommand;
+
+//        qint32 t_iBlockSize = t_sCommand.size();
+//        QByteArray Scmd = MGH_LM_Int2Byte(t_iBlockSize);
+//        this->write(Scmd);
+        this->write(t_sCommand.toUtf8().constData(), t_sCommand.size());
+        this->waitForBytesWritten();
+
+        //thats not the most elegant way
+        for (;;){
+            this->waitForReadyRead(1000);
+            int nbytes = this->bytesAvailable();
+            QByteArray t_qByteArrayRaw;
+            if (nbytes >0){
+                t_qByteArrayRaw += this->read(nbytes);
+                p_sReply = QString(t_qByteArrayRaw);
+                qDebug() << "SLM Request: " << p_sReply;
+                break;
+            }
+        }
+
+    }
+
+    return p_sReply;
+}
+
+
+//*************************************************************************************************************
+
 QString RtCmdClient::sendCLICommand(const QString &p_sCommand)
 {
     QString t_sCommand = QString("%1\n").arg(p_sCommand);
@@ -84,6 +155,8 @@ QString RtCmdClient::sendCLICommand(const QString &p_sCommand)
 
     if (this->state() == QAbstractSocket::ConnectedState)
     {
+        qDebug() << "Write command: " << t_sCommand;
+
         this->write(t_sCommand.toUtf8().constData(), t_sCommand.size());
         this->waitForBytesWritten();
 
@@ -96,6 +169,8 @@ QString RtCmdClient::sendCLICommand(const QString &p_sCommand)
             t_qByteArrayRaw += this->readAll();
 
         p_sReply = QString(t_qByteArrayRaw);
+        qDebug() << "SLM Request: " << p_sReply;
+
     }
     return p_sReply;
 }
@@ -109,11 +184,16 @@ void RtCmdClient::sendCommandJSON(const Command &p_command)
 
     QString t_sReply;
 
+    qDebug() << "JSON Command Start " << t_sCommand;
+
     if (this->state() == QAbstractSocket::ConnectedState)
     {
-        qDebug() << "Request: " << t_sCommand;
+        qDebug() << "JSON Request: " << t_sCommand;
 
         // Send request
+//        qint32 t_iBlockSize = t_sCommand.size();
+//        QByteArray Scmd = MGH_LM_Int2Byte(t_iBlockSize);
+//        this->write(Scmd);
         this->write(t_sCommand.toUtf8().constData(), t_sCommand.size());
         this->waitForBytesWritten();
 
@@ -132,6 +212,7 @@ void RtCmdClient::sendCommandJSON(const Command &p_command)
             }
             qDebug() << "Response: " << t_qByteArrayRaw.size() << " bytes";
         } while (!respComplete);
+
         t_sReply = QString(t_qByteArrayRaw);
     }
     else
