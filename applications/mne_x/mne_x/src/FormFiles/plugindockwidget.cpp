@@ -128,6 +128,11 @@ PluginDockWidget::PluginDockWidget( const QString & title, QWidget * parent, Qt:
         }
 
         item->setText(0, name);
+        if ((*iterPlugins)->isActive())
+            item->setCheckState(0, Qt::Checked);
+        else
+            item->setCheckState(0, Qt::Unchecked);
+
         m_ItemQMap[i] = item;
     }
 
@@ -139,6 +144,9 @@ PluginDockWidget::PluginDockWidget( const QString & title, QWidget * parent, Qt:
 
     connect(m_pTreeWidgetPluginList, SIGNAL(itemPressed(QTreeWidgetItem*, int)),
             this, SLOT(itemSelected(QTreeWidgetItem*)));
+
+    connect(m_pTreeWidgetPluginList, SIGNAL(itemChanged(QTreeWidgetItem*, int)),
+            this, SLOT(itemToggled(QTreeWidgetItem*)));
 }
 
 
@@ -194,6 +202,45 @@ void PluginDockWidget::itemSelected(QTreeWidgetItem *selectedItem)
 
 //*************************************************************************************************************
 
+void PluginDockWidget::itemToggled(QTreeWidgetItem *item)
+{
+    if (isValidPlugin(item))
+    {
+       int n = PluginManager::findByName(item->text(0));
+
+       if (item->checkState(0) == Qt::Checked)
+           activateItem(n, true);
+       else
+           activateItem(n, false);
+
+        if (m_pCurrentItem == item)
+        {
+            // the status of the current item changed, emit signal so the gui updates
+            emit pluginChanged(m_iCurrentPluginIdx, m_pCurrentItem);
+        }
+    }
+}
+
+//*************************************************************************************************************
+
+void PluginDockWidget::setTogglingEnabled(bool enabled)
+{
+    Qt::ItemFlags flags;
+    QTreeWidgetItemIterator it(m_pTreeWidgetPluginList);
+    while (*it)
+    {
+        flags = (*it)->flags();
+        if (enabled)
+            flags |=  Qt::ItemIsUserCheckable;
+        else
+            flags = ~(flags & Qt::ItemIsUserCheckable);
+        (*it)->setFlags(flags);
+        ++it;
+    }
+}
+
+//*************************************************************************************************************
+
 void PluginDockWidget::contextMenuEvent (QContextMenuEvent* event)
 {
     QPoint p(    event->pos().x()-m_pTreeWidgetPluginList->pos().x(),
@@ -201,20 +248,9 @@ void PluginDockWidget::contextMenuEvent (QContextMenuEvent* event)
 
     if (isValidPlugin(m_pTreeWidgetPluginList->itemAt(p)))
     {
-        qDebug() << m_pCurrentItem->text(0);
-        int n = m_iCurrentPluginIdx;
-
-        bool bNewStatus;//curiosity bool doesn't work in release mode
-        if(isActivated(n))
-            bNewStatus = false;
-        else
-            bNewStatus = true;
-
-        qDebug() << "PluginsDockWidget::contextMenuEvent -> new status: " << bNewStatus;
-        activateItem(n, bNewStatus);
+        // TODO: context menu
     }
 }
-
 
 //*************************************************************************************************************
 
@@ -226,20 +262,12 @@ bool PluginDockWidget::isActivated(int n) const
 
 //*************************************************************************************************************
 
-void PluginDockWidget::activateItem(int n, bool& status)
+void PluginDockWidget::activateItem(int n, bool status)
 {
     qDebug() << "PluginsDockWidget::activateItem " << n << "; "<< status;
 
     if(n < PluginManager::s_vecPlugins.size())
     {
         PluginManager::s_vecPlugins[n]->setStatus(status);
-
-        QFont font = m_ItemQMap[n]->font(0);
-        font.setStrikeOut(!status);
-
-        QColor color = status ? QColor(Qt::black) : QColor(Qt::gray);
-
-        m_ItemQMap[n]->setFont(0,font);
-        m_ItemQMap[n]->setTextColor(0, color);
     }
 }
