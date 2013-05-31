@@ -193,6 +193,7 @@ void FiffProducer::run()
             first += quantum;
         }
 
+        // call blocks until there is free space in the buffer
         m_pFiffSimulator->m_pRawMatrixBuffer->push(&tmp);
     }
 

@@ -94,6 +94,8 @@ FiffSimulator::FiffSimulator()
 , m_bIsRunning(false)
 , m_uiBufferSampleSize(1000)
 , m_pRawMatrixBuffer(NULL)
+, m_AccelerationFactor(1.0)
+, m_TrueSamplingRate(0.0)
 {
     this->init();
 }
@@ -169,6 +171,61 @@ void FiffSimulator::comGetBufsize(Command p_command)
     }
 }
 
+//*************************************************************************************************************
+
+void FiffSimulator::comAccel(Command p_command)
+{
+    //ToDO JSON
+
+    float t_uiAccel = p_command.pValues()[0].toFloat();
+
+    if(t_uiAccel > 0)
+    {
+
+            bool t_bWasRunning = m_bIsRunning;
+
+            if(m_bIsRunning)
+            {
+                m_pFiffProducer->stop();
+                this->stop();
+            }
+
+            m_AccelerationFactor = t_uiAccel;
+            m_RawInfo.info.sfreq = m_AccelerationFactor * m_TrueSamplingRate;
+
+            if(t_bWasRunning)
+                this->start();
+
+        QString str = QString("\tSet acceleration factor to %0.3f\r\n\n").arg(t_uiAccel);
+
+        m_commandManager["accel"].reply(str);
+    }
+    else
+        m_commandManager["accel"].reply("Acceleration facor not set\r\n");
+}
+
+//*************************************************************************************************************
+
+void FiffSimulator::comGetAccel(Command p_command)
+{
+    bool t_bCommandIsJson = p_command.isJson();
+    if(t_bCommandIsJson)
+    {
+        //
+        //create JSON help object
+        //
+        QJsonObject t_qJsonObjectRoot;
+        t_qJsonObjectRoot.insert("accel", QJsonValue((double)m_AccelerationFactor));
+        QJsonDocument p_qJsonDocument(t_qJsonObjectRoot);
+
+        m_commandManager["getaccel"].reply(p_qJsonDocument.toJson());
+    }
+    else
+    {
+        QString str = QString("\t%0.3f\r\n\n").arg(m_AccelerationFactor);
+        m_commandManager["getaccel"].reply(str);
+    }
+}
 
 //*************************************************************************************************************
 
@@ -211,6 +268,8 @@ void FiffSimulator::connectCommandManager()
     //Connect slots
     QObject::connect(&m_commandManager["bufsize"], &Command::executed, this, &FiffSimulator::comBufsize);
     QObject::connect(&m_commandManager["getbufsize"], &Command::executed, this, &FiffSimulator::comGetBufsize);
+    QObject::connect(&m_commandManager["accel"], &Command::executed, this, &FiffSimulator::comAccel);
+    QObject::connect(&m_commandManager["getaccel"], &Command::executed, this, &FiffSimulator::comGetAccel);
     QObject::connect(&m_commandManager["simfile"], &Command::executed, this, &FiffSimulator::comSimfile);
 }
 
@@ -300,6 +359,9 @@ bool FiffSimulator::readRawInfo()
             m_RawInfo.clear();
             return false;
         }
+
+        m_TrueSamplingRate = m_RawInfo.info.sfreq;
+        m_RawInfo.info.sfreq *= m_AccelerationFactor;
 
 //        bool in_samples = false;
 //
@@ -408,6 +470,7 @@ void FiffSimulator::run()
     float t_fBuffSampleSize = (float)m_uiBufferSampleSize;
 
     quint32 uiSamplePeriod = (unsigned int) ((t_fBuffSampleSize/t_fSamplingFrequency)*1000000.0f);
+
 //    quint32 count = 0;
 
     while(m_bIsRunning)
