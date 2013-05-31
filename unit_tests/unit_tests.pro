@@ -47,9 +47,9 @@ contains(MNECPP_CONFIG, isGui) {
         mne_graph_test \
 
     qtHaveModule(3d) {
-        isEqual(QT_MAJOR_VERSION_VERSION, 5){
-            greaterThan(QT_MINOR_VERSION, 0){
-                message(Qt3D available! and >= Qt 5.1: mne 3D tests configured!)
+        isEqual(QT_MAJOR_VERSION, 5){
+            isEqual(QT_MINOR_VERSION, 1){
+                message(Qt3D available && QTVersion >= Qt 5.1: mne 3D tests configured!)
                 SUBDIRS += mne_3d_widget
             }
         }
