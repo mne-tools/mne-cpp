@@ -126,6 +126,30 @@ protected:
     */
     void paintGL(QGLPainter *painter);
 
+    //=========================================================================================================
+    /**
+    * Processes the key press event e.
+    *
+    * @param[in] e      the key press event.
+    */
+    void keyPressEvent(QKeyEvent *e);
+
+    //=========================================================================================================
+    /**
+    * Processes the mouse move event e.
+    *
+    * @param[in] e      the mouse move event.
+    */
+    void mouseMoveEvent(QMouseEvent *e);
+
+    //=========================================================================================================
+    /**
+    * Processes the mouse press event e.
+    *
+    * @param[in] e      the mouse press event.
+    */
+    void mousePressEvent(QMouseEvent *e);
+
 private:
     MNEForwardSolution m_forwardSolution;   /**< Holds the forward soultion -> ToDo change this to shraed data pointer */
 
@@ -139,6 +163,13 @@ private:
     QVector<Annotation::SPtr> m_vecAnnotation;
 
     QGLSceneNode *m_pSceneNodeBrain;               /**< Scene node of the hemisphere models. */
+    QVector3D m_vecBoundingBoxMin;                  /**< X, Y, Z minima. */
+    QVector3D m_vecBoundingBoxMax;                  /**< X, Y, Z maxima. */
+    QVector3D m_vecBoundingBoxCenter;               /**< X, Y, Z center. */
+
+    float m_fOffsetZ;                               /**< Z offset for pop-out effect. */
+    float m_fOffsetZEye;                            /**< Z offset eye. */
+
     QGLSceneNode *m_pSceneNode;                    /**< Node of the scene. */
 
 //    QGLCamera *m_pCameraFrontal;     /**< frontal camera. */
