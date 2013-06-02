@@ -2,6 +2,7 @@
 /**
 * @file     plugindockwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Martin Luessi <mluessi@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     February, 2013
@@ -98,9 +99,9 @@ public:
     /**
     * Constructs a PluginDockWidget which is a child of parent.
     *
-    * @param [in] title of the new PluginDockWidget
-    * @param [in] parent pointer to parent widget; If parent is 0, the new PluginDockWidget becomes a window. If parent is another widget, PluginDockWidget becomes a child window inside parent. PluginDockWidget is deleted when its parent is deleted.
-    * @param [in] flags are normally 0, but it can be set to customise the frame of a window (i.e. parent must be 0). To customise the frame, use a value composed from the bitwise OR of any of the window flags.
+    * @param[in] title  of the new PluginDockWidget
+    * @param[in] parent pointer to parent widget; If parent is 0, the new PluginDockWidget becomes a window. If parent is another widget, PluginDockWidget becomes a child window inside parent. PluginDockWidget is deleted when its parent is deleted.
+    * @param[in] flags  are normally 0, but it can be set to customise the frame of a window (i.e. parent must be 0). To customise the frame, use a value composed from the bitwise OR of any of the window flags.
     */
     PluginDockWidget( const QString& title, QWidget* parent = 0, Qt::WindowFlags flags = 0 );
 
@@ -114,7 +115,7 @@ public:
     /**
     * Tests whether item corresponds to a valid plugin.
     *
-    * @param [in] item pointer to item which should be tested.
+    * @param[in] item   pointer to item which should be tested.
     * @return true it item corresponds to a valid plugin.
     */
     bool isValidPlugin(QTreeWidgetItem* item);
@@ -139,7 +140,7 @@ public:
     /**
     * Tests whether plugin n is activated.
     *
-    * @param [in] n index of plugin which should be tested.
+    * @param[in] n index of plugin which should be tested.
     * @return whether plugin n is activated. If n is larger than plugin vector false is returned.
     */
     bool isActivated(int n) const;
@@ -148,8 +149,8 @@ public:
     /**
     * Changes activation status of plugin n.
     *
-    * @param [in] n index of plugin which's status should be changed.
-    * @param [in] status to which plugin should be changed.
+    * @param[in] n      index of plugin which's status should be changed.
+    * @param[in] status to which plugin should be changed.
     */
     void activateItem(int n, bool status);
 
@@ -157,7 +158,7 @@ public:
     /**
     * Set whether setting plugins active/inactive (toggling) is allowed.
     *
-    * @param [in] if true toggling is enabled.
+    * @param[in] enabled    if true toggling is enabled.
     */
     void setTogglingEnabled(bool enabled);
 
@@ -171,8 +172,8 @@ signals:
     //=========================================================================================================
     /**
     * This signal is emitted when the selected item changed to a valid plugin.
-    * @param [out] currentPluginNum index of current plugin.
-    * @param [out] currentItem corresponding tree item.
+    * @param[out] currentPluginNum index of current plugin.
+    * @param[out] currentItem corresponding tree item.
     */
     void pluginChanged(int currentPluginNum, const QTreeWidgetItem* currentItem);
 
@@ -207,7 +208,7 @@ private slots:
     /**
     * Handles activating/deactivating of a plugin.
     *
-    * @param [in] item which was toggled.
+    * @param[in] item   item which was toggled.
     */
     void itemToggled(QTreeWidgetItem* item);
 };
