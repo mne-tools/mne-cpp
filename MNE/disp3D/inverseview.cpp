@@ -2,6 +2,7 @@
 /**
 * @file     inverseview.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
 * @date     March, 2013
@@ -178,10 +179,6 @@ void InverseView::initializeGL(QGLPainter *painter)
             rr.col(1) = rr.col(1).array() - m_vecBoundingBoxCenter.y();
             rr.col(2) = rr.col(2).array() - m_vecBoundingBoxCenter.z();
 
-            //LNdT DEMO
-//            rr.col(2) = rr.col(2).array() + 0.2;//0.8;
-            //LNdT DEMO end
-
             builder.pushNode();
             //
             // Create each ROI in its own node
@@ -284,6 +281,7 @@ void InverseView::initializeGL(QGLPainter *painter)
     // Set stereo type
     //
     if (m_bStereo) {
+//            this->setStereoType(QGLView::RedCyanAnaglyph);
         this->setStereoType(QGLView::StretchedLeftRight);
 //        camera()->setEyeSeparation(0.4f);
 //        m_pCameraFrontal->setEyeSeparation(0.1f);

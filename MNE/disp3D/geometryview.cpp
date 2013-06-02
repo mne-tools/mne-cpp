@@ -2,6 +2,7 @@
 /**
 * @file     geometryview.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2012
@@ -51,6 +52,7 @@
 
 #include <QtCore/qurl.h>
 #include <QArray>
+#include <QMouseEvent>
 
 
 //*************************************************************************************************************
@@ -77,6 +79,8 @@ using namespace DISP3DLIB;
 GeometryView::GeometryView(QWindow *parent)
 : QGLView(parent)
 , m_bStereo(true)
+, m_fOffsetZ(-100.0f)
+, m_fOffsetZEye(60.0f)
 , m_pSceneNodeBrain(0)
 , m_pSceneNode(0)
 {
@@ -108,7 +112,7 @@ void GeometryView::initializeGL(QGLPainter *painter)
         // in the constructor construct a builder on the stack
         QGLBuilder builder;
 
-        float fac = 10.0f;
+        float fac = 100.0f;
 
         builder << QGL::Faceted;
         m_pSceneNodeBrain = builder.currentNode();
@@ -118,6 +122,26 @@ void GeometryView::initializeGL(QGLPainter *painter)
         // Collor palette
         qint32 index;
         QSharedPointer<QGLMaterialCollection> palette = builder.sceneNode()->palette(); // register color palette within the root node
+
+        //get bounding box // ToDo separate function
+        m_vecBoundingBoxMin.setX(m_forwardSolution.src[0].rr.col(0).minCoeff()); // X lh min
+        m_vecBoundingBoxMin.setY(m_forwardSolution.src[0].rr.col(1).minCoeff()); // Y lh min
+        m_vecBoundingBoxMin.setZ(m_forwardSolution.src[0].rr.col(2).minCoeff()); // Z lh min
+        m_vecBoundingBoxMax.setX(m_forwardSolution.src[0].rr.col(0).maxCoeff()); // X lh max
+        m_vecBoundingBoxMax.setY(m_forwardSolution.src[0].rr.col(1).maxCoeff()); // Y lh max
+        m_vecBoundingBoxMax.setZ(m_forwardSolution.src[0].rr.col(2).maxCoeff()); // Z lh max
+
+        m_vecBoundingBoxMin.setX(m_vecBoundingBoxMin.x() < m_forwardSolution.src[1].rr.col(0).minCoeff() ? m_vecBoundingBoxMin.x() : m_forwardSolution.src[1].rr.col(0).minCoeff()); // X rh min
+        m_vecBoundingBoxMin.setY(m_vecBoundingBoxMin.y() < m_forwardSolution.src[1].rr.col(1).minCoeff() ? m_vecBoundingBoxMin.y() : m_forwardSolution.src[1].rr.col(1).minCoeff()); // Y rh min
+        m_vecBoundingBoxMin.setZ(m_vecBoundingBoxMin.z() < m_forwardSolution.src[1].rr.col(2).minCoeff() ? m_vecBoundingBoxMin.z() : m_forwardSolution.src[1].rr.col(2).minCoeff()); // Z rh min
+        m_vecBoundingBoxMax.setX(m_vecBoundingBoxMax.x() > m_forwardSolution.src[1].rr.col(0).maxCoeff() ? m_vecBoundingBoxMax.x() : m_forwardSolution.src[1].rr.col(0).maxCoeff()); // X rh max
+        m_vecBoundingBoxMax.setY(m_vecBoundingBoxMax.y() > m_forwardSolution.src[1].rr.col(1).maxCoeff() ? m_vecBoundingBoxMax.y() : m_forwardSolution.src[1].rr.col(1).maxCoeff()); // Y rh max
+        m_vecBoundingBoxMax.setZ(m_vecBoundingBoxMax.z() > m_forwardSolution.src[1].rr.col(2).maxCoeff() ? m_vecBoundingBoxMax.z() : m_forwardSolution.src[1].rr.col(2).maxCoeff()); // Z rh max
+
+        m_vecBoundingBoxCenter.setX((m_vecBoundingBoxMin.x()+m_vecBoundingBoxMax.x())/2.0f);
+        m_vecBoundingBoxCenter.setY((m_vecBoundingBoxMin.y()+m_vecBoundingBoxMax.y())/2.0f);
+        m_vecBoundingBoxCenter.setZ((m_vecBoundingBoxMin.z()+m_vecBoundingBoxMax.z())/2.0f);
+
 
         //
         // Build each hemisphere in its separate node
@@ -130,9 +154,10 @@ void GeometryView::initializeGL(QGLPainter *painter)
                 MatrixX3i tris = m_forwardSolution.src[h].tris;
                 MatrixX3f rr = m_forwardSolution.src[h].rr;
 
-                //LNdT DEMO
-                rr.col(2) = rr.col(2).array() + 0.8f;
-                //LNdT DEMO end
+                //Centralize
+                rr.col(0) = rr.col(0).array() - m_vecBoundingBoxCenter.x();
+                rr.col(1) = rr.col(1).array() - m_vecBoundingBoxCenter.y();
+                rr.col(2) = rr.col(2).array() - m_vecBoundingBoxCenter.z();
 
                 builder.pushNode();
                 //
@@ -227,17 +252,19 @@ void GeometryView::initializeGL(QGLPainter *painter)
 //            m_pCameraFrontal->setEyeSeparation(0.1f);
 
             //LNdT DEMO
+            camera()->setCenter(QVector3D(0,0,m_fOffsetZ));//0.8f*fac));
             camera()->setEyeSeparation(0.4f);
             camera()->setFieldOfView(30);
-            camera()->setEye(QVector3D(0,0,60));
+            camera()->setEye(QVector3D(0,0,m_fOffsetZEye));
             //LNdT DEMO end
 
 //            m_pCameraFrontal->setEyeSeparation(0.1f);
         }
 
-        //set background to white
-        glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-
+//        //set background to white
+//        glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+        //set background to light grey-blue
+        glClearColor(0.8f, 0.8f, 1.0f, 0.0f);
     }
 
 }
@@ -266,3 +293,63 @@ void GeometryView::paintGL(QGLPainter *painter)
     painter->modelViewMatrix().pop();
     painter->projectionMatrix().pop();
 }
+
+//*************************************************************************************************************
+
+void GeometryView::keyPressEvent(QKeyEvent *e)
+{
+    camera()->setCenter(QVector3D(0,0,0));
+
+    float normEyeOld = sqrt(pow(camera()->eye().x(),2) + pow(camera()->eye().y(),2) + pow(camera()->eye().z(),2));
+
+    QGLView::keyPressEvent(e);
+
+    float dx = (camera()->eye().x()*m_fOffsetZ)/m_fOffsetZEye;
+    float dy = (camera()->eye().y()*m_fOffsetZ)/m_fOffsetZEye;
+    float dz = (camera()->eye().z()*m_fOffsetZ)/m_fOffsetZEye;
+
+    float normEye = sqrt(pow(camera()->eye().x(),2) + pow(camera()->eye().y(),2) + pow(camera()->eye().z(),2));
+    float scaleEye = normEyeOld/normEye;//m_fOffsetZEye/normEye;
+    camera()->setEye(QVector3D(camera()->eye().x()*scaleEye,camera()->eye().y()*scaleEye,camera()->eye().z()*scaleEye));
+
+    camera()->setCenter(QVector3D(dx,dy,dz));
+}
+
+
+//*************************************************************************************************************
+
+void GeometryView::mouseMoveEvent(QMouseEvent *e)
+{
+    camera()->setCenter(QVector3D(0,0,0));
+
+    float normEyeOld = sqrt(pow(camera()->eye().x(),2) + pow(camera()->eye().y(),2) + pow(camera()->eye().z(),2));
+
+    QGLView::mouseMoveEvent(e);
+
+    float dx = (camera()->eye().x()*m_fOffsetZ)/m_fOffsetZEye;
+    float dy = (camera()->eye().y()*m_fOffsetZ)/m_fOffsetZEye;
+    float dz = (camera()->eye().z()*m_fOffsetZ)/m_fOffsetZEye;
+
+    float normEye = sqrt(pow(camera()->eye().x(),2) + pow(camera()->eye().y(),2) + pow(camera()->eye().z(),2));
+    float scaleEye = normEyeOld/normEye;//m_fOffsetZEye/normEye;
+    camera()->setEye(QVector3D(camera()->eye().x()*scaleEye,camera()->eye().y()*scaleEye,camera()->eye().z()*scaleEye));
+
+    camera()->setCenter(QVector3D(dx,dy,dz));
+}
+
+
+//*************************************************************************************************************
+
+void GeometryView::mousePressEvent(QMouseEvent *e)
+{
+
+    if(e->buttons() & Qt::RightButton)
+    {
+        float normEye = sqrt(pow(camera()->eye().x(),2) + pow(camera()->eye().y(),2) + pow(camera()->eye().z(),2));
+        camera()->setCenter(QVector3D(0,0,m_fOffsetZ));
+        camera()->setEye(QVector3D(0,0,normEye));
+    }
+
+    QGLView::mousePressEvent(e);
+}
+

@@ -111,6 +111,7 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
+* ToDo: derive this from geometryview!
 * Visualize labels using a stereoscopic view. Coloring is done per label.
 *
 * @brief 3D stereoscopic labels
