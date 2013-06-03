@@ -118,14 +118,16 @@ QString RtCmdClient::RecvData()
     bool respComplete = false;
     QByteArray t_qByteArrayRaw;
 
+    bool lenflag = true;
     do {
         qint32 cmdlen;
         this->waitForReadyRead(100);
-        if(this->bytesAvailable()>4){
+        if(this->bytesAvailable()>4 && lenflag){
             QByteArray clen = this->read(4);
             cmdlen = MGH_LM_Byte2Int(clen);
+            lenflag = false;
         }
-        if(this->bytesAvailable()>=cmdlen)
+        if(this->bytesAvailable()>=cmdlen && !lenflag)
         {
             t_qByteArrayRaw = this->read(cmdlen);
             respComplete = true;

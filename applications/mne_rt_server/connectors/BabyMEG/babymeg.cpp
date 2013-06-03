@@ -139,6 +139,8 @@ BabyMEG::~BabyMEG()
 void BabyMEG::comFLL(Command p_command)
 {
     qDebug()<<"FLL commands";
+
+
     int strlen = 3;
     QByteArray Scmd = myClientComm->MGH_LM_Int2Byte(strlen);
     QByteArray SC = QByteArray("COMS")+Scmd+QByteArray("SLM");
