@@ -224,7 +224,8 @@ private:
 public:
     QByteArray RtCmdClient::MGH_LM_Int2Byte(int a);
     int RtCmdClient::MGH_LM_Byte2Int(QByteArray b);
-
+    QString RtCmdClient::RecvData();
+    void RtCmdClient::SendData(QString t_sCommand);
 
 };
 

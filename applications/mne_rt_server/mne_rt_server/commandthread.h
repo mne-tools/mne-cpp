@@ -82,9 +82,11 @@ private:
     QMutex m_qMutex;
     QByteArray m_qSendBlock;
 
+    QTcpSocket t_qTcpSocket;
+
     int CommandThread::MGH_LM_Byte2Int(QByteArray b);
     QByteArray CommandThread::MGH_LM_Int2Byte(int a);
-
+    void CommandThread::SocketReadProc();
 
 };
 

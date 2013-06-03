@@ -68,6 +68,18 @@ CommandThread::CommandThread(int socketDescriptor, qint32 p_iId, QObject *parent
 , m_bIsRunning(false)
 , m_iThreadID(p_iId)
 {
+  //  connect(&t_qTcpSocket,SIGNAL(readyRead()),this,SLOT(SocketReadProc()));
+
+    if (!t_qTcpSocket.setSocketDescriptor(socketDescriptor)) {
+        emit error(t_qTcpSocket.error());
+        return;
+    }
+    else
+    {
+        printf("CommandClient connection accepted from\n\tIP:\t%s\n\tPort:\t%d\n\n",
+               QHostAddress(t_qTcpSocket.peerAddress()).toString().toUtf8().constData(),
+               t_qTcpSocket.peerPort());
+    }
 
 }
 
@@ -89,7 +101,22 @@ void CommandThread::attachCommandReply(QByteArray p_blockReply, qint32 p_iID)
     {
         m_qMutex.lock();
         m_qSendBlock.append(p_blockReply);
+        //
+        // Write available data
+        //
+        if(m_qSendBlock.size() > 0)
+        {
+            qDebug()<<"SLM1 Reply"<<m_qSendBlock;
+            qint32 t_iBlockSize = m_qSendBlock.size();
+            QByteArray Scmd = MGH_LM_Int2Byte(t_iBlockSize);
+            t_qTcpSocket.write(Scmd);
+            t_qTcpSocket.write(m_qSendBlock);
+            //qint32 t_iBytesWritten = t_qTcpSocket.write(m_qSendBlock);
+            t_qTcpSocket.waitForBytesWritten();
+            m_qSendBlock.clear();
+        }
         m_qMutex.unlock();
+
     }
 }
 
@@ -125,6 +152,35 @@ QByteArray CommandThread::MGH_LM_Int2Byte(int a)
     return b;
 }
 
+void CommandThread::SocketReadProc()
+{
+    qint64 t_iMaxBufSize = 1024;
+
+    if(t_qTcpSocket.state() != QAbstractSocket::UnconnectedState && m_bIsRunning)
+    {
+
+        t_qTcpSocket.waitForReadyRead(100);
+
+        if (t_qTcpSocket.bytesAvailable()> 4 && t_qTcpSocket.canReadLine())
+        {
+            t_qTcpSocket.read(4);
+            QByteArray t_qByteArrayRaw = t_qTcpSocket.readLine(t_iMaxBufSize);
+            QString t_sCommand = QString(t_qByteArrayRaw).simplified();
+            qDebug()<<"SLM receive command"<<t_sCommand;
+            //
+            // Parse command
+            //
+            if(!t_sCommand.isEmpty())
+                emit newCommand(t_sCommand, m_iThreadID);
+
+        }
+    }
+else{
+    t_qTcpSocket.disconnectFromHost();
+    if(t_qTcpSocket.state() != QAbstractSocket::UnconnectedState)
+        t_qTcpSocket.waitForDisconnected();
+    }
+}
 
 //*************************************************************************************************************
 
@@ -132,94 +188,30 @@ void CommandThread::run()
 {
     m_bIsRunning = true;
 
-    QTcpSocket t_qTcpSocket;
-
-    if (!t_qTcpSocket.setSocketDescriptor(socketDescriptor)) {
-        emit error(t_qTcpSocket.error());
-        return;
-    }
-    else
-    {
-        printf("CommandClient connection accepted from\n\tIP:\t%s\n\tPort:\t%d\n\n",
-               QHostAddress(t_qTcpSocket.peerAddress()).toString().toUtf8().constData(),
-               t_qTcpSocket.peerPort());
-    }
-
-    QDataStream t_FiffStreamIn(&t_qTcpSocket);
-
     qint64 t_iMaxBufSize = 1024;
 
     while(t_qTcpSocket.state() != QAbstractSocket::UnconnectedState && m_bIsRunning)
     {
-        //
-        // Write available data
-        //
-        if(m_qSendBlock.size() > 0)
-        {
-            qint32 t_iBlockSize = m_qSendBlock.size();
-            m_qMutex.lock();
-            qDebug()<<"SLM Reply"<<m_qSendBlock;
-            qint32 t_iBytesWritten = t_qTcpSocket.write(m_qSendBlock);
-            t_qTcpSocket.waitForBytesWritten();
-            if(t_iBytesWritten == t_iBlockSize)
-                m_qSendBlock.clear();
-            else
-                m_qSendBlock = m_qSendBlock.mid(t_iBytesWritten, t_iBlockSize-t_iBytesWritten);
-            m_qMutex.unlock();
-        }
 
-        //
-        // Read: Wait 100ms for incomming tag header, read and continue
-        //
-        //ToDo its not the best solution in terms of receiving the command for sure
         t_qTcpSocket.waitForReadyRead(100);
 
-        /*
-        if (t_qTcpSocket.bytesAvailable()>4)
+        if (t_qTcpSocket.bytesAvailable()> 4 && t_qTcpSocket.canReadLine())
         {
-            // read the first 4 bytes -- the length of command package
-            QByteArray clen = t_qTcpSocket.read(4);
-            qint32 cmdlen = MGH_LM_Byte2Int(clen);
-            for (;;){
-                t_qTcpSocket.waitForReadyRead(100);
-                if (t_qTcpSocket.bytesAvailable()>=cmdlen)
-                {
-                    QByteArray t_qByteArrayRaw = t_qTcpSocket.read(cmdlen);
-                    QString t_sCommand = QString(t_qByteArrayRaw).simplified();
-                    qDebug()<<"SLM receive command"<<t_sCommand;
-                    //
-                    // Parse command
-                    //
-                    if(!t_sCommand.isEmpty())
-                        emit newCommand(t_sCommand, m_iThreadID);
-                    break;
-                }
-            }
-        }
-        */
-
-        if (t_qTcpSocket.bytesAvailable() > 0 && t_qTcpSocket.canReadLine())
-        {
-
-
+            t_qTcpSocket.read(4);
             QByteArray t_qByteArrayRaw = t_qTcpSocket.readLine(t_iMaxBufSize);
             QString t_sCommand = QString(t_qByteArrayRaw).simplified();
-
             qDebug()<<"SLM receive command"<<t_sCommand;
             //
             // Parse command
             //
             if(!t_sCommand.isEmpty())
                 emit newCommand(t_sCommand, m_iThreadID);
-        }
-        else if(t_qTcpSocket.bytesAvailable() > t_iMaxBufSize)
-        {
-            t_qTcpSocket.readAll();//readAll that QTcpSocket is empty again -> prevent overflow
-        }
 
+        }
     }
 
     t_qTcpSocket.disconnectFromHost();
     if(t_qTcpSocket.state() != QAbstractSocket::UnconnectedState)
         t_qTcpSocket.waitForDisconnected();
+
 }

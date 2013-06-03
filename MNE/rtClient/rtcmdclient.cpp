@@ -2,15 +2,16 @@
 /**
  * @file     rtcmdclient.cpp
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+ *           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           To Be continued...
  *
  * @version  1.0
- * @date     July, 2012
+ * @date     July, 2012; May, 2013 (modified by Limin Sun)
  *
  * @section  LICENSE
  *
- * Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+ * Copyright (C) 2012, Christoph Dinh, Limin Sun and Matti Hamalainen. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -109,6 +110,44 @@ QByteArray RtCmdClient::MGH_LM_Int2Byte(int a)
     return b;
 }
 
+//*************************************************************************************************************
+
+QString RtCmdClient::RecvData()
+{
+    // Receive response
+    bool respComplete = false;
+    QByteArray t_qByteArrayRaw;
+
+    do {
+        qint32 cmdlen;
+        this->waitForReadyRead(100);
+        if(this->bytesAvailable()>4){
+            QByteArray clen = this->read(4);
+            cmdlen = MGH_LM_Byte2Int(clen);
+        }
+        if(this->bytesAvailable()>=cmdlen)
+        {
+            t_qByteArrayRaw = this->read(cmdlen);
+            respComplete = true;
+        }
+
+    }while (!respComplete);
+
+
+    return QString(t_qByteArrayRaw);
+
+}
+
+//*************************************************************************************************************
+
+void RtCmdClient::SendData(QString t_sCommand)
+{
+    qint32 t_iBlockSize = t_sCommand.size();
+    QByteArray Scmd = MGH_LM_Int2Byte(t_iBlockSize);
+    this->write(Scmd);
+    this->write(t_sCommand.toUtf8().constData(), t_sCommand.size());
+    this->waitForBytesWritten();
+}
 
 //*************************************************************************************************************
 
@@ -120,26 +159,8 @@ QString RtCmdClient::sendCLICommandFLL(const QString &p_sCommand)
     if (this->state() == QAbstractSocket::ConnectedState)
     {
         qDebug() << "Write FLL command: " << t_sCommand;
-
-//        qint32 t_iBlockSize = t_sCommand.size();
-//        QByteArray Scmd = MGH_LM_Int2Byte(t_iBlockSize);
-//        this->write(Scmd);
-        this->write(t_sCommand.toUtf8().constData(), t_sCommand.size());
-        this->waitForBytesWritten();
-
-        //thats not the most elegant way
-        for (;;){
-            this->waitForReadyRead(1000);
-            int nbytes = this->bytesAvailable();
-            QByteArray t_qByteArrayRaw;
-            if (nbytes >0){
-                t_qByteArrayRaw += this->read(nbytes);
-                p_sReply = QString(t_qByteArrayRaw);
-                qDebug() << "SLM Request: " << p_sReply;
-                break;
-            }
-        }
-
+        SendData(t_sCommand);
+        p_sReply = RtCmdClient::RecvData();
     }
 
     return p_sReply;
@@ -156,21 +177,9 @@ QString RtCmdClient::sendCLICommand(const QString &p_sCommand)
     if (this->state() == QAbstractSocket::ConnectedState)
     {
         qDebug() << "Write command: " << t_sCommand;
+        SendData(t_sCommand);
 
-        this->write(t_sCommand.toUtf8().constData(), t_sCommand.size());
-        this->waitForBytesWritten();
-
-        //thats not the most elegant way
-        this->waitForReadyRead(1000);
-        QByteArray t_qByteArrayRaw;
-        // TODO(cpieloth): We need a break condition e.g. last byte == \0 or \n
-        // Large responses can be split to more than one packet which could be a problem on big network latencies.
-        while (this->bytesAvailable() > 0 && this->canReadLine())
-            t_qByteArrayRaw += this->readAll();
-
-        p_sReply = QString(t_qByteArrayRaw);
-        qDebug() << "SLM Request: " << p_sReply;
-
+        p_sReply = RtCmdClient::RecvData();
     }
     return p_sReply;
 }
@@ -191,29 +200,11 @@ void RtCmdClient::sendCommandJSON(const Command &p_command)
         qDebug() << "JSON Request: " << t_sCommand;
 
         // Send request
-//        qint32 t_iBlockSize = t_sCommand.size();
-//        QByteArray Scmd = MGH_LM_Int2Byte(t_iBlockSize);
-//        this->write(Scmd);
-        this->write(t_sCommand.toUtf8().constData(), t_sCommand.size());
-        this->waitForBytesWritten();
+        SendData(t_sCommand);
 
         // Receive response
-        bool respComplete = false;
-        QByteArray t_qByteArrayRaw;
-        do
-        {
-            if (this->waitForReadyRead(100))
-            {
-                t_qByteArrayRaw += this->readAll();
-                // We need a break condition,
-                // because we do not have a stop character and do not know how many bytes to receive.
-                respComplete = t_qByteArrayRaw.count('{')
-                        == t_qByteArrayRaw.count('}');
-            }
-            qDebug() << "Response: " << t_qByteArrayRaw.size() << " bytes";
-        } while (!respComplete);
+        t_sReply = RtCmdClient::RecvData();
 
-        t_sReply = QString(t_qByteArrayRaw);
     }
     else
     {
