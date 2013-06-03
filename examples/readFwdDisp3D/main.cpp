@@ -40,6 +40,8 @@
 
 #include <disp3D/geometryview.h>
 
+#include <mne/mne_forwardsolution.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -75,7 +77,10 @@ int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
-    GeometryView view;
+    QFile t_File("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    MNEForwardSolution t_forwardSolution(t_File);
+
+    GeometryView view(t_forwardSolution.src);
 
     if (view.stereoType() != QGLView::RedCyanAnaglyph)
         view.camera()->setEyeSeparation(0.3f);

@@ -50,7 +50,7 @@
 //=============================================================================================================
 
 #include <fs/annotation.h>
-#include <mne/mne.h>
+#include <mne/mne_sourcespace.h>
 
 
 //*************************************************************************************************************
@@ -99,9 +99,10 @@ public:
     /**
     * Creates the geometry view.
     *
-    * @param[in] parent     Parent QObject (optional)
+    * @param[in] p_sourceSpace  Source space which contains the geometry information
+    * @param[in] parent         Parent QObject (optional)
     */
-    GeometryView(QWindow *parent = 0);
+    GeometryView(const MNESourceSpace &p_sourceSpace, QWindow *parent = 0);
 
     //=========================================================================================================
     /**
@@ -151,7 +152,9 @@ protected:
     void mousePressEvent(QMouseEvent *e);
 
 private:
-    MNEForwardSolution m_forwardSolution;   /**< Holds the forward soultion -> ToDo change this to shraed data pointer */
+//    MNEForwardSolution m_forwardSolution;   /**< Holds the forward soultion -> ToDo change this to shraed data pointer */
+    MNESourceSpace m_sourceSpace;           /**< The used source space. */
+
 
     bool m_bStereo;
 
