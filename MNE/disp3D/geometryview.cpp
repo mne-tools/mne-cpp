@@ -76,18 +76,15 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-GeometryView::GeometryView(QWindow *parent)
+GeometryView::GeometryView(const MNESourceSpace &p_sourceSpace, QWindow *parent)
 : QGLView(parent)
+, m_sourceSpace(p_sourceSpace)
 , m_bStereo(true)
 , m_fOffsetZ(-100.0f)
 , m_fOffsetZEye(60.0f)
 , m_pSceneNodeBrain(0)
 , m_pSceneNode(0)
 {
-    QFile t_File("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    if(!MNE::read_forward_solution(t_File, m_forwardSolution))
-        m_forwardSolution.clear();
-
     m_vecAnnotation.append(Annotation::SPtr(new Annotation("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot")));
     m_vecAnnotation.append(Annotation::SPtr(new Annotation("./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot")));
 
@@ -107,7 +104,7 @@ GeometryView::~GeometryView()
 
 void GeometryView::initializeGL(QGLPainter *painter)
 {
-    if(!m_forwardSolution.isEmpty())
+    if(!m_sourceSpace.isEmpty())
     {
         // in the constructor construct a builder on the stack
         QGLBuilder builder;
@@ -124,19 +121,19 @@ void GeometryView::initializeGL(QGLPainter *painter)
         QSharedPointer<QGLMaterialCollection> palette = builder.sceneNode()->palette(); // register color palette within the root node
 
         //get bounding box // ToDo separate function
-        m_vecBoundingBoxMin.setX(m_forwardSolution.src[0].rr.col(0).minCoeff()); // X lh min
-        m_vecBoundingBoxMin.setY(m_forwardSolution.src[0].rr.col(1).minCoeff()); // Y lh min
-        m_vecBoundingBoxMin.setZ(m_forwardSolution.src[0].rr.col(2).minCoeff()); // Z lh min
-        m_vecBoundingBoxMax.setX(m_forwardSolution.src[0].rr.col(0).maxCoeff()); // X lh max
-        m_vecBoundingBoxMax.setY(m_forwardSolution.src[0].rr.col(1).maxCoeff()); // Y lh max
-        m_vecBoundingBoxMax.setZ(m_forwardSolution.src[0].rr.col(2).maxCoeff()); // Z lh max
+        m_vecBoundingBoxMin.setX(m_sourceSpace[0].rr.col(0).minCoeff()); // X lh min
+        m_vecBoundingBoxMin.setY(m_sourceSpace[0].rr.col(1).minCoeff()); // Y lh min
+        m_vecBoundingBoxMin.setZ(m_sourceSpace[0].rr.col(2).minCoeff()); // Z lh min
+        m_vecBoundingBoxMax.setX(m_sourceSpace[0].rr.col(0).maxCoeff()); // X lh max
+        m_vecBoundingBoxMax.setY(m_sourceSpace[0].rr.col(1).maxCoeff()); // Y lh max
+        m_vecBoundingBoxMax.setZ(m_sourceSpace[0].rr.col(2).maxCoeff()); // Z lh max
 
-        m_vecBoundingBoxMin.setX(m_vecBoundingBoxMin.x() < m_forwardSolution.src[1].rr.col(0).minCoeff() ? m_vecBoundingBoxMin.x() : m_forwardSolution.src[1].rr.col(0).minCoeff()); // X rh min
-        m_vecBoundingBoxMin.setY(m_vecBoundingBoxMin.y() < m_forwardSolution.src[1].rr.col(1).minCoeff() ? m_vecBoundingBoxMin.y() : m_forwardSolution.src[1].rr.col(1).minCoeff()); // Y rh min
-        m_vecBoundingBoxMin.setZ(m_vecBoundingBoxMin.z() < m_forwardSolution.src[1].rr.col(2).minCoeff() ? m_vecBoundingBoxMin.z() : m_forwardSolution.src[1].rr.col(2).minCoeff()); // Z rh min
-        m_vecBoundingBoxMax.setX(m_vecBoundingBoxMax.x() > m_forwardSolution.src[1].rr.col(0).maxCoeff() ? m_vecBoundingBoxMax.x() : m_forwardSolution.src[1].rr.col(0).maxCoeff()); // X rh max
-        m_vecBoundingBoxMax.setY(m_vecBoundingBoxMax.y() > m_forwardSolution.src[1].rr.col(1).maxCoeff() ? m_vecBoundingBoxMax.y() : m_forwardSolution.src[1].rr.col(1).maxCoeff()); // Y rh max
-        m_vecBoundingBoxMax.setZ(m_vecBoundingBoxMax.z() > m_forwardSolution.src[1].rr.col(2).maxCoeff() ? m_vecBoundingBoxMax.z() : m_forwardSolution.src[1].rr.col(2).maxCoeff()); // Z rh max
+        m_vecBoundingBoxMin.setX(m_vecBoundingBoxMin.x() < m_sourceSpace[1].rr.col(0).minCoeff() ? m_vecBoundingBoxMin.x() : m_sourceSpace[1].rr.col(0).minCoeff()); // X rh min
+        m_vecBoundingBoxMin.setY(m_vecBoundingBoxMin.y() < m_sourceSpace[1].rr.col(1).minCoeff() ? m_vecBoundingBoxMin.y() : m_sourceSpace[1].rr.col(1).minCoeff()); // Y rh min
+        m_vecBoundingBoxMin.setZ(m_vecBoundingBoxMin.z() < m_sourceSpace[1].rr.col(2).minCoeff() ? m_vecBoundingBoxMin.z() : m_sourceSpace[1].rr.col(2).minCoeff()); // Z rh min
+        m_vecBoundingBoxMax.setX(m_vecBoundingBoxMax.x() > m_sourceSpace[1].rr.col(0).maxCoeff() ? m_vecBoundingBoxMax.x() : m_sourceSpace[1].rr.col(0).maxCoeff()); // X rh max
+        m_vecBoundingBoxMax.setY(m_vecBoundingBoxMax.y() > m_sourceSpace[1].rr.col(1).maxCoeff() ? m_vecBoundingBoxMax.y() : m_sourceSpace[1].rr.col(1).maxCoeff()); // Y rh max
+        m_vecBoundingBoxMax.setZ(m_vecBoundingBoxMax.z() > m_sourceSpace[1].rr.col(2).maxCoeff() ? m_vecBoundingBoxMax.z() : m_sourceSpace[1].rr.col(2).maxCoeff()); // Z rh max
 
         m_vecBoundingBoxCenter.setX((m_vecBoundingBoxMin.x()+m_vecBoundingBoxMax.x())/2.0f);
         m_vecBoundingBoxCenter.setY((m_vecBoundingBoxMin.y()+m_vecBoundingBoxMax.y())/2.0f);
@@ -151,8 +148,8 @@ void GeometryView::initializeGL(QGLPainter *painter)
             builder.newNode();//create new hemisphere node
             {
 
-                MatrixX3i tris = m_forwardSolution.src[h].tris;
-                MatrixX3f rr = m_forwardSolution.src[h].rr;
+                MatrixX3i tris = m_sourceSpace[h].tris;
+                MatrixX3f rr = m_sourceSpace[h].rr;
 
                 //Centralize
                 rr.col(0) = rr.col(0).array() - m_vecBoundingBoxCenter.x();
