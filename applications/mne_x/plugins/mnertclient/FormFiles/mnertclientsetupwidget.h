@@ -43,6 +43,9 @@
 //=============================================================================================================
 
 #include "../ui_mnertclientsetup.h"
+#include "mnertclientsetupfifffilesimulatorwidget.h"
+#include "mnertclientsetupbabymegwidget.h"
+#include "mnertclientsetupneuromagwidget.h"
 
 
 //*************************************************************************************************************
@@ -125,6 +128,8 @@ public:
 
     void pressedSendCLI();          /**< Triggers a send request of a cli command.*/
 
+    void pressedConfigure();        /**< Triggers file dialog to configure the plugins.*/
+
     void fiffInfoReceived();        /**< Triggered when new fiff info is recieved by producer and stored intor rt_server */
 
 
@@ -144,13 +149,16 @@ private:
     */
     void showAboutDialog();
 
-    MneRtClient*   m_pMneRtClient;    /**< Holds a pointer to corresponding ECGSimulator.*/
+    MneRtClient*   m_pMneRtClient;      /**< a pointer to corresponding mne rt client.*/
 
-    Ui::MneRtClientSetupWidgetClass ui;       /**< Holds the user interface for the MneRtClientSetupWidget.*/
+    Ui::MneRtClientSetupWidgetClass ui; /**< the user interface for the MneRtClientSetupWidget.*/
 
-    bool m_bIsInit;     /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized */
+    bool m_bIsInit;                     /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized */
 
 
+    MneRtClientSetupFiffFileSimulatorWidget::SPtr m_pMneRtClientSetupFiffFileSimulatorWidget; /**< a pointer to mne rt client setup Fiff File Simulator widget.*/
+    MneRtClientSetupNeuromagWidget::SPtr m_pMneRtClientSetupNeuromagWidget; /**< a pointer to mne rt client setup Neuromag widget.*/
+    MneRtClientSetupBabyMegWidget::SPtr m_pMneRtClientSetupBabyMegWidget;   /**< a pointer to mne rt client setup BabyMEG widget.*/
 };
 
 } // NAMESPACE

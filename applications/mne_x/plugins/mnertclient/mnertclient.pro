@@ -85,7 +85,10 @@ SOURCES += \
         FormFiles/mnertclientrunwidget.cpp \
         FormFiles/mnertclientaboutwidget.cpp \
         directrecord.cpp \
-        mnertclientproducer.cpp
+        mnertclientproducer.cpp \
+    FormFiles/mnertclientsetupbabymegwidget.cpp \
+    FormFiles/mnertclientsetupneuromagwidget.cpp \
+    FormFiles/mnertclientsetupfifffilesimulatorwidget.cpp
 
 HEADERS += \
         mnertclient.h\
@@ -94,12 +97,18 @@ HEADERS += \
         FormFiles/mnertclientrunwidget.h \
         FormFiles/mnertclientaboutwidget.h \
         directrecord.h \
-        mnertclientproducer.h
+        mnertclientproducer.h \
+    FormFiles/mnertclientsetupbabymegwidget.h \
+    FormFiles/mnertclientsetupneuromagwidget.h \
+    FormFiles/mnertclientsetupfifffilesimulatorwidget.h
 
 FORMS += \
         FormFiles/mnertclientsetup.ui \
         FormFiles/mnertclientrun.ui \
-        FormFiles/mnertclientabout.ui
+        FormFiles/mnertclientabout.ui \
+    FormFiles/mnertclientsetupbabymeg.ui \
+    FormFiles/mnertclientsetupneuromag.ui \
+    FormFiles/mnertclientsetupfifffilesimulator.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
