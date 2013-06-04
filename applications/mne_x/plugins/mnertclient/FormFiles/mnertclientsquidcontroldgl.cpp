@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     commandthread.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     mnertclientsquidcontroldgl.cpp
+* @author   Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2012
+* @date     May, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Limin Sun and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,67 +29,65 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the CommandThread Class.
+* @brief    Contains the implementation of the mnertclientSQUIDControlDgl class.
 *
 */
 
-#ifndef COMMANDTHREAD_H
-#define COMMANDTHREAD_H
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "../mnertclient.h"
+#include "mnertclientsquidcontroldgl.h"
+#include "ui_mnertclientsquidcontroldgl.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <QThread>
-#include <QMutex>
-#include <QTcpSocket>
-
+using namespace MneRtClientPlugin;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RTSERVER
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace RTSERVER
+mnertclientSQUIDControlDgl::mnertclientSQUIDControlDgl(MneRtClient* p_pMneRtClient,QWidget *parent) :
+    QDialog(parent),
+    m_pMneRtClient(p_pMneRtClient),
+    ui(new Ui::mnertclientSQUIDControlDgl)
 {
+    ui->setupUi(this);
 
-class CommandThread : public QThread
+    // retune
+    connect(ui->m_Qbn_retune, &QPushButton::released, this, &mnertclientSQUIDControlDgl::SendRetune);
+
+}
+
+mnertclientSQUIDControlDgl::~mnertclientSQUIDControlDgl()
 {
-    Q_OBJECT
+    delete ui;
+}
 
-public:
-    CommandThread(int socketDescriptor, qint32 p_iId, QObject *parent);
+void mnertclientSQUIDControlDgl::SendRetune()
+{
+    QString t_sJsonCommand =
+            "{"
+            "   \"commands\": {"
+            "       \"FLL\": {"
+            "           \"description\": \"FLL hardware control\","
+            "           \"parameters\": {}"
+            "        }"
+            "    }"
+            "}";
 
-    ~CommandThread();
-
-    void attachCommandReply(QByteArray p_blockReply, qint32 p_iID);
-
-    void run();
-
-signals:
-    void error(QTcpSocket::SocketError socketError);
-
-    void newCommand(QString p_sCommand, qint32 p_iThreadID);
-
-private:
-
-    int socketDescriptor;
-
-    bool m_bIsRunning;
-    qint32 m_iThreadID;
-
-    QMutex m_qMutex;
-    QByteArray m_qSendBlock;
-
-    QTcpSocket t_qTcpSocket;
-
-    int CommandThread::MGH_LM_Byte2Int(QByteArray b);
-    QByteArray CommandThread::MGH_LM_Int2Byte(int a);
-    void CommandThread::SocketReadProc();
-
-};
-
-} // NAMESPACE
-
-#endif //COMMANDTHREAD_H
+    // Send FLL command to cmdclient
+    if(m_pMneRtClient->m_bCmdClientIsConnected)
+    {
+        this->ui->m_tx_info->setText(QString("Send Retune Command"));
+        QString t_sReply = m_pMneRtClient->m_pRtCmdClient->sendCLICommandFLL(t_sJsonCommand);
+        this->ui->m_tx_info->setText(QString("Reply:")+t_sReply);
+    }
+}

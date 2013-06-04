@@ -84,11 +84,17 @@ BabyMEGClient::BabyMEGClient(int myPort, QObject *parent) :
 
 //*************************************************************************************************************
 
+BabyMEGClient::~BabyMEGClient()
+{
+    delete tcpSocket;   // added 5.31.2013
+}
+
+//*************************************************************************************************************
+
 void BabyMEGClient::SetInfo(BabyMEGInfo *pInfo)
 {
     myBabyMEGInfo = pInfo;
 }
-
 
 //*************************************************************************************************************
 
@@ -377,6 +383,7 @@ void BabyMEGClient::handleBuffer()
                 QByteArray RESP = buffer.left(tmp);
                 qDebug()<< "5.Readbytes:"<<RESP.size();
                 qDebug() << RESP;
+                myBabyMEGInfo->MGH_LM_Send_CMDPackage(RESP);
                 }
                 buffer.remove(0,tmp);
                 SendCommand("QUIT");
@@ -417,7 +424,7 @@ void BabyMEGClient::DispatchDataPackage(int tmp)
     qDebug()<< "Next Block ..." << numBlock;
 //    DATA.clear();
 
-//    ReadNextBlock(tmp);
+    ReadNextBlock(tmp);
 }
 
 //*************************************************************************************************************
@@ -442,7 +449,8 @@ void BabyMEGClient::ReadNextBlock(int tmp)
 
             buffer.remove(0,8);
             DATA1 = buffer.left(tmp1);
-            myBabyMEGInfo->EnQueue(DATA1);
+            myBabyMEGInfo->MGH_LM_Send_DataPackage(DATA1);
+//            myBabyMEGInfo->EnQueue(DATA1);
             buffer.remove(0,tmp1);
             qDebug()<<"End of DataPackeage" << buffer.left(3);
             qDebug()<<"[2]Rest buffer  [buffer size() =" << buffer.size()<<"]";

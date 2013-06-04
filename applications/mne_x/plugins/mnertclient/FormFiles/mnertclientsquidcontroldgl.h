@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     commandthread.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     mnertclientsquidcontroldgl.h
+* @author   Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2012
+* @date     May, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Limin Sun and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,67 +29,65 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the CommandThread Class.
+* @brief    Contains the declaration of the MneRtClientSQUIDControlDGL class.
 *
 */
 
-#ifndef COMMANDTHREAD_H
-#define COMMANDTHREAD_H
+#ifndef MNERTCLIENTSQUIDCONTROLDGL_H
+#define MNERTCLIENTSQUIDCONTROLDGL_H
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "../ui_mnertclientsquidcontroldgl.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QThread>
-#include <QMutex>
-#include <QTcpSocket>
+#include <QDialog>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RTSERVER
+// DEFINE NAMESPACE MneRtClientPlugin
 //=============================================================================================================
 
-namespace RTSERVER
+namespace MneRtClientPlugin   //Ui
 {
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+class MneRtClient;
 
-class CommandThread : public QThread
+
+//=============================================================================================================
+/**
+* DECLARE CLASS mnertclientSQUIDControlDgl
+*
+* @brief The mnertclientSQUIDControlDgl class provides the SQUID control dialog.
+*/
+class mnertclientSQUIDControlDgl : public QDialog
 {
     Q_OBJECT
 
+
 public:
-    CommandThread(int socketDescriptor, qint32 p_iId, QObject *parent);
-
-    ~CommandThread();
-
-    void attachCommandReply(QByteArray p_blockReply, qint32 p_iID);
-
-    void run();
-
-signals:
-    void error(QTcpSocket::SocketError socketError);
-
-    void newCommand(QString p_sCommand, qint32 p_iThreadID);
-
+    explicit mnertclientSQUIDControlDgl(MneRtClient* p_pMneRtClient,QWidget *parent = 0);
+    ~mnertclientSQUIDControlDgl();
+    
 private:
+    Ui::mnertclientSQUIDControlDgl *ui;
 
-    int socketDescriptor;
-
-    bool m_bIsRunning;
-    qint32 m_iThreadID;
-
-    QMutex m_qMutex;
-    QByteArray m_qSendBlock;
-
-    QTcpSocket t_qTcpSocket;
-
-    int CommandThread::MGH_LM_Byte2Int(QByteArray b);
-    QByteArray CommandThread::MGH_LM_Int2Byte(int a);
-    void CommandThread::SocketReadProc();
-
+public:
+    MneRtClient*   m_pMneRtClient;
+    void SendRetune();
 };
 
-} // NAMESPACE
-
-#endif //COMMANDTHREAD_H
+}//namespace
+#endif // MNERTCLIENTSQUIDCONTROLDGL_H

@@ -128,6 +128,16 @@ public:
 
     //=========================================================================================================
     /**
+    * Sends a FLL command line formatted command to a connected mne_rt_server
+    *
+    * @param[in] p_sCommand    The command to send
+    *
+    * @return mne_rt_server reply
+    */
+    QString sendCLICommandFLL(const QString &p_sCommand);
+
+    //=========================================================================================================
+    /**
     * Sends a command to a connected mne_rt_server
     *
     * @param[in] p_command    The command to send
@@ -209,6 +219,14 @@ private:
     CommandManager  m_commandManager;   /**< The command manager. */
     QMutex          m_qMutex;           /**< Access serialization between threads */
     QString         m_sAvailableData;   /**< The last received response. */
+
+
+public:
+    QByteArray RtCmdClient::MGH_LM_Int2Byte(int a);
+    int RtCmdClient::MGH_LM_Byte2Int(QByteArray b);
+    QString RtCmdClient::RecvData();
+    void RtCmdClient::SendData(QString t_sCommand);
+
 };
 
 //*************************************************************************************************************

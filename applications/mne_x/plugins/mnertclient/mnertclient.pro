@@ -84,8 +84,9 @@ SOURCES += \
         FormFiles/mnertclientsetupwidget.cpp \
         FormFiles/mnertclientrunwidget.cpp \
         FormFiles/mnertclientaboutwidget.cpp \
+        FormFiles/mnertclientsquidcontroldgl.cpp \
         directrecord.cpp \
-        mnertclientproducer.cpp
+        mnertclientproducer.cpp \
 
 HEADERS += \
         mnertclient.h\
@@ -93,13 +94,15 @@ HEADERS += \
         FormFiles/mnertclientsetupwidget.h \
         FormFiles/mnertclientrunwidget.h \
         FormFiles/mnertclientaboutwidget.h \
+        FormFiles/mnertclientsquidcontroldgl.h \
         directrecord.h \
-        mnertclientproducer.h
+        mnertclientproducer.h \
 
 FORMS += \
         FormFiles/mnertclientsetup.ui \
         FormFiles/mnertclientrun.ui \
-        FormFiles/mnertclientabout.ui
+        FormFiles/mnertclientabout.ui \
+        FormFiles/mnertclientsquidcontroldgl.ui \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

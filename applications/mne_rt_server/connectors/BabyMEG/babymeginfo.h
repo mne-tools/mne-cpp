@@ -97,6 +97,7 @@ public:
 signals:
     void fiffInfoAvailable(FIFFLIB::FiffInfo);
     void SendDataPackage(QByteArray DATA);
+    void SendCMDPackage(QByteArray DATA);
 
 public:
     //=========================================================================================================
@@ -136,6 +137,13 @@ public:
     * @param[in] DATA - QByteArray contains MEG data.
     */
     void MGH_LM_Send_DataPackage(QByteArray DATA);
+    //=========================================================================================================
+    /**
+    * Send command reply package
+    *
+    * @param[in] DATA - QByteArray contains MEG data.
+    */
+    void MGH_LM_Send_CMDPackage(QByteArray DATA);
     //=========================================================================================================
     /**
     * Put data block into a queue

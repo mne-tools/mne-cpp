@@ -174,7 +174,6 @@ void CommandManager::update(Subject* p_pSubject)
             else
                 return;
         }
-
         m_qMapCommands[t_sCommandName].execute();
     }
 }

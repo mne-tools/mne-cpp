@@ -147,6 +147,7 @@ bool CommandParser::parse(const QString &p_sInput, QStringList &p_qListCommandsP
     }
     else
     {
+
         QStringList t_qCommandList = p_sInput.split(" ");
 
         //Print command
@@ -174,6 +175,7 @@ bool CommandParser::parse(const QString &p_sInput, QStringList &p_qListCommandsP
             }
         }
         printf("\r\n");
+
         notify();
     }
 

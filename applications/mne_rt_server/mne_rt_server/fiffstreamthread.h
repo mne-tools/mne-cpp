@@ -44,6 +44,7 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_info.h>
 
+#include "fiffstreamserver.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -81,7 +82,7 @@ class FiffStreamThread : public QThread
 {
     Q_OBJECT
 public:
-    FiffStreamThread(qint32 id, int socketDescriptor, QObject *parent);
+    FiffStreamThread(qint32 id, QTcpSocket *socket, QObject *parent);
 
     ~FiffStreamThread();
 
@@ -97,6 +98,7 @@ public:
     void parseCommand(QSharedPointer<FiffTag> p_pTag);
 
     void writeClientId();
+    void send_data();
 
 signals:
     void error(QTcpSocket::SocketError socketError);
@@ -115,10 +117,17 @@ private:
     bool m_bIsRunning;
 
 //private slots: --> in Qt 5 not anymore declared as slot
+public slots:
     void startMeas(qint32 ID);
     void stopMeas(qint32 ID);
     void sendMeasurementInfo(qint32 ID, FiffInfo p_fiffInfo);
     void sendRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRawData);
+    void ReadProc();
+
+public:
+    QTcpSocket *t_qTcpSocket;
+    FiffStreamServer* t_pParentServer;
+
 };
 
 

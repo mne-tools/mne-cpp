@@ -134,6 +134,7 @@ public:
 
     void setFiffInfo(FIFFLIB::FiffInfo);
     void setFiffData(QByteArray DATA);
+    void setCMDData(QByteArray DATA);
 
 protected:
     virtual void run();
@@ -157,6 +158,13 @@ private:
     */
     void comGetBufsize(Command p_command);
 
+    //=========================================================================================================
+    /**
+    * Returns information from FLL hardware
+    *
+    * @param[in] p_command  FLL command.
+    */
+    void comFLL(Command p_command);
 
     //////////
 
