@@ -172,6 +172,8 @@ private:
 
     qint32 m_iDownSampling; /**< Downsampling factor */
 
+    bool m_bBeep;           /**< Indicate stimulus onset with a beep tone. */
+
 //    CircularMatrixBuffer<double>::SPtr m_pSourceEstimateBuffer; /**< Holds incoming source estimate sample data.*/
 
 

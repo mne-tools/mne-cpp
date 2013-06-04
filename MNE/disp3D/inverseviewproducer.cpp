@@ -65,6 +65,7 @@ InverseViewProducer::InverseViewProducer(qint32 p_iT)
 , m_nTimeSteps(0)
 , m_dGlobalMaximum(0)
 , m_iDownSampling(1)
+, m_bBeep(true)
 {
 
 }
@@ -117,7 +118,7 @@ void InverseViewProducer::run()
     qint32 simCount = 0;
     qint32 currentSample = 0;
 
-    float t_old = -1.0;
+    float t_fTimeOld = -1.0;
 
     m_bIsRunning = true;
 
@@ -131,12 +132,12 @@ void InverseViewProducer::run()
             if(simCount%m_iDownSampling == 0)
             {
                 currentSample = simCount%m_nTimeSteps;
-                if ((t_old < 0.0) && (m_curSourceEstimate.times(currentSample) >= 0.0))
+                if (m_bBeep && ((t_fTimeOld < 0.0) && (m_curSourceEstimate.times(currentSample) >= 0.0)))
                 {
                     QApplication::beep();
                     qDebug("beep");
                 }
-                t_old = m_curSourceEstimate.times(currentSample);
+                t_fTimeOld = m_curSourceEstimate.times(currentSample);
                 QSharedPointer<VectorXd> p_qVecCurrentActivation(new VectorXd(m_curSourceEstimate.data.col(currentSample)));
                 emit sourceEstimateSample(p_qVecCurrentActivation);
             }
