@@ -37,7 +37,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       += 3d
+QT       += widgets 3d
 
 DEFINES += DISP3D_LIBRARY
 

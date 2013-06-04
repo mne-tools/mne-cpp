@@ -42,6 +42,8 @@
 
 #include "inverseview.h"
 
+#include <QApplication>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -115,6 +117,8 @@ void InverseViewProducer::run()
     qint32 simCount = 0;
     qint32 currentSample = 0;
 
+    float t_old = -1.0;
+
     m_bIsRunning = true;
 
     while(m_bIsRunning)
@@ -127,6 +131,12 @@ void InverseViewProducer::run()
             if(simCount%m_iDownSampling == 0)
             {
                 currentSample = simCount%m_nTimeSteps;
+                if ((t_old < 0.0) && (m_curSourceEstimate.times(currentSample) >= 0.0))
+                {
+                    QApplication::beep();
+                    qDebug("beep");
+                }
+                t_old = m_curSourceEstimate.times(currentSample);
                 QSharedPointer<VectorXd> p_qVecCurrentActivation(new VectorXd(m_curSourceEstimate.data.col(currentSample)));
                 emit sourceEstimateSample(p_qVecCurrentActivation);
             }
