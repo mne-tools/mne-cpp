@@ -40,6 +40,9 @@
 
 #include "mnertclientsetupwidget.h"
 #include "mnertclientaboutwidget.h"
+
+#include "mnertclientsetupbabymegwidget.h"
+
 #include "../mnertclient.h"
 
 
@@ -69,19 +72,25 @@ using namespace MneRtClientPlugin;
 MneRtClientSetupWidget::MneRtClientSetupWidget(MneRtClient* p_pMneRtClient, QWidget* parent)
 : QWidget(parent)
 , m_pMneRtClient(p_pMneRtClient)
+, m_pMneRtClientSetupFiffFileSimulatorWidget(new MneRtClientSetupFiffFileSimulatorWidget)
+, m_pMneRtClientSetupNeuromagWidget(new MneRtClientSetupNeuromagWidget)
+, m_pMneRtClientSetupBabyMegWidget(new MneRtClientSetupBabyMegWidget)
 , m_bIsInit(false)
 {
     ui.setupUi(this);
 
-
+    //Record data checkbox
     connect(ui.m_qCheckBox_RecordData, &QCheckBox::stateChanged, this, &MneRtClientSetupWidget::checkedRecordDataChanged);
 
-    //Fiff Record File
+    //Fiff record file
     connect(ui.m_qPushButton_FiffRecordFile, &QPushButton::released, this, &MneRtClientSetupWidget::pressedFiffRecordFile);
 
-    //Select Connector
+    //Select connector
     connect(ui.m_qComboBox_Connector, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             this, &MneRtClientSetupWidget::connectorIdxChanged);
+
+    //Configure connector
+    connect(ui.m_qPushButton_Configure, &QCheckBox::released, this, &MneRtClientSetupWidget::pressedConfigure);
 
     //rt server connection
     this->ui.m_qLineEdit_Ip->setText(m_pMneRtClient->m_sMneRtClientIP);
@@ -203,6 +212,19 @@ void MneRtClientSetupWidget::pressedSendCLI()
     }
 }
 
+
+//*************************************************************************************************************
+
+void MneRtClientSetupWidget::pressedConfigure()
+{
+    QString t_sConnector = ui.m_qComboBox_Connector->currentText();
+    if(t_sConnector ==  QString("Fiff File Simulator"))
+        m_pMneRtClientSetupFiffFileSimulatorWidget->show();
+    else if(t_sConnector == QString("Neuromag Connector"))
+        m_pMneRtClientSetupNeuromagWidget->show();
+    else if(t_sConnector == QString("BabyMEG"))
+        m_pMneRtClientSetupBabyMegWidget->show();
+}
 
 //*************************************************************************************************************
 
