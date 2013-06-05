@@ -98,6 +98,8 @@ public:
 
     void writeClientId();
 
+    void send_data();
+
 signals:
     void error(QTcpSocket::SocketError socketError);
 
@@ -114,11 +116,12 @@ private:
 
     bool m_bIsRunning;
 
-//private slots: --> in Qt 5 not anymore declared as slot
+//public slots: --> in Qt 5 not anymore declared as slot
     void startMeas(qint32 ID);
     void stopMeas(qint32 ID);
     void sendMeasurementInfo(qint32 ID, FiffInfo p_fiffInfo);
     void sendRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRawData);
+    //void ReadToBuffer1();
 };
 
 

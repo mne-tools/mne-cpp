@@ -184,6 +184,24 @@ void MneRtClientProducer::run()
 
         if(m_bFlagMeasuring)
         {
+//            QByteArray buffer;
+//            QByteArray dat;
+
+//            int numBytes = m_pRtDataClient->bytesAvailable();
+//            qDebug() << "MNE_X. byte available: " << numBytes;
+//            if (numBytes > 0){
+//                dat = m_pRtDataClient->read(numBytes); // read all pending data
+//                qDebug()<<"[dat Size]"<<dat.size();
+//                if (!dat.isEmpty()){
+//                    buffer.append(dat); // and append it to your own buffer
+//                    qDebug()<<"[ReadToBuffer: Buffer Size]"<<buffer.size();
+//                }
+//                else
+//                {
+//                    qDebug()<<"[Empty dat: error]";
+//                }
+//            }
+
             m_pRtDataClient->readRawBuffer(m_pMneRtClient->m_pFiffInfo->nchan, t_matRawBuffer, kind);
 
             if(kind == FIFF_DATA_BUFFER)
