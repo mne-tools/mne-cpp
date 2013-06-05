@@ -2,13 +2,14 @@
 /**
 * @file     fiffstreamthread.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2012
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh, Limin Sun and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -269,6 +270,7 @@ void FiffStreamThread::run()
 
     FiffStream t_FiffStreamIn(&t_qTcpSocket);
 
+//    int i = 0;
     while(t_qTcpSocket.state() != QAbstractSocket::UnconnectedState && m_bIsRunning)
     {
         //
@@ -281,7 +283,7 @@ void FiffStreamThread::run()
 //            qDebug() << "data available" << t_iBlockSize;
             m_qMutex.lock();
             qint32 t_iBytesWritten = t_qTcpSocket.write(m_qSendBlock);
-//            qDebug() << "wrote bytes " << t_iBytesWritten;
+//            qDebug() << ++i<< "[wrote bytes] " << t_iBytesWritten;
             t_qTcpSocket.waitForBytesWritten();
             if(t_iBytesWritten == t_iBlockSize)
             {
@@ -289,7 +291,9 @@ void FiffStreamThread::run()
             }
             else
             {
-                m_qSendBlock = m_qSendBlock.mid(t_iBytesWritten, t_iBlockSize-t_iBytesWritten);
+                //we have to store bytes which were not written to the socket, due to writing limit
+                //m_qSendBlock = m_qSendBlock.mid(t_iBytesWritten, t_iBlockSize-t_iBytesWritten);
+                m_qSendBlock.remove(0,t_iBytesWritten); //higher performance then mid
             }
             m_qMutex.unlock();
         }
@@ -301,6 +305,7 @@ void FiffStreamThread::run()
 
         if (t_qTcpSocket.bytesAvailable() >= (int)sizeof(qint32)*4)
         {
+//            qDebug() << "goes to read bytes " ;
             FiffTag::SPtr t_pTag;
             FiffTag::read_tag_info(&t_FiffStreamIn, t_pTag, false);
 
