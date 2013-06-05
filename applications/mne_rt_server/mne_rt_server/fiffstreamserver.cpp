@@ -379,7 +379,7 @@ void FiffStreamServer::forwardRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRa
 //*************************************************************************************************************
 
 void FiffStreamServer::incomingConnection(qintptr socketDescriptor)
-{    
+{
     FiffStreamThread* t_pStreamThread = new FiffStreamThread(m_iNextClientId, socketDescriptor, this);
 
     m_qClientList.insert(m_iNextClientId, t_pStreamThread);
