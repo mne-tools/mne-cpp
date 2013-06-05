@@ -280,20 +280,22 @@ void FiffStreamThread::run()
         if(m_qSendBlock.size() > 0)
         {
 //            qDebug() << "is writeable " << t_qTcpSocket.isWritable();
-//            qint32 t_iBlockSize = m_qSendBlock.size();
+            qint32 t_iBlockSize = m_qSendBlock.size();
 //            qDebug() << "data available" << t_iBlockSize;
             m_qMutex.lock();
-            t_qTcpSocket.write(m_qSendBlock);// qint32 t_iBytesWritten = t_qTcpSocket.write(m_qSendBlock);
+            qint32 t_iBytesWritten = t_qTcpSocket.write(m_qSendBlock);
 //            qDebug() << ++i<< "[wrote bytes] " << t_iBytesWritten;
             t_qTcpSocket.waitForBytesWritten();
-//            if(t_iBytesWritten == t_iBlockSize)
-//            {
-//                m_qSendBlock.clear();
-//            }
-//            else
-//            {
-//                m_qSendBlock = m_qSendBlock.mid(t_iBytesWritten, t_iBlockSize-t_iBytesWritten);
-//            }
+            if(t_iBytesWritten == t_iBlockSize)
+            {
+                m_qSendBlock.clear();
+            }
+            else
+            {
+                //we have to store bytes which were not written to the socket, due to writing limit
+                //m_qSendBlock = m_qSendBlock.mid(t_iBytesWritten, t_iBlockSize-t_iBytesWritten);
+                m_qSendBlock.remove(0,t_iBytesWritten); //higher performance then mid
+            }
             m_qMutex.unlock();
         }
 
