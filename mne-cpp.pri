@@ -32,7 +32,7 @@ isEmpty( MNE_BINARY_DIR ) {
 #QT Packages use new qtHaveModule(<package>):
 #MNE cpp config
 MNECPP_CONFIG += isGui
-MNECPP_CONFIG += babyMEG
+#MNECPP_CONFIG += babyMEG
 
 QMAKE_TARGET_PRODUCT = mne-cpp
 QMAKE_TARGET_DESCRIPTION = MNE Qt 5 based C++ library.
