@@ -2,14 +2,14 @@
 /**
 * @file     fiffstreamthread.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Limin Sun <liminsun@nmr.mgh.harvard.edu>
+*           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2012
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh, Limin Sun and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -34,10 +34,6 @@
 *
 */
 
-//*
-//* May, 2013 modified by Dr. -Ing. Limin Sun
-//* Changes : The socket pointor was passed from the top level
-//*
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -82,12 +78,12 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FiffStreamThread::FiffStreamThread(qint32 id, QTcpSocket *socket, QObject *parent)
+FiffStreamThread::FiffStreamThread(qint32 id, int socketDescriptor, QObject *parent)
 : QThread(parent)
 , m_iDataClientId(id)
 , m_sDataClientAlias(QString(""))
 , m_bIsSendingRawBuffer(false)
-, t_qTcpSocket(socket)
+, m_iSocketDescriptor(socketDescriptor)
 , m_bIsRunning(false)
 {
 }
@@ -104,7 +100,6 @@ FiffStreamThread::~FiffStreamThread()
 
     m_bIsRunning = false;
     QThread::wait();
-    delete t_qTcpSocket;
 }
 
 
@@ -249,16 +244,35 @@ void FiffStreamThread::run()
 {
     m_bIsRunning = true;
 
-    printf("FiffStreamClient (assigned ID %d) accepted from\n\tIP:\t%s\n\tPort:\t%d\n\n",
+    FiffStreamServer* t_pParentServer = qobject_cast<FiffStreamServer*>(this->parent());
+
+    connect(t_pParentServer, &FiffStreamServer::remitMeasInfo,
+            this, &FiffStreamThread::sendMeasurementInfo);
+    connect(t_pParentServer, &FiffStreamServer::remitRawBuffer,
+            this, &FiffStreamThread::sendRawBuffer);
+    connect(t_pParentServer, &FiffStreamServer::startMeasFiffStreamClient,
+            this, &FiffStreamThread::startMeas);
+    connect(t_pParentServer, &FiffStreamServer::stopMeasFiffStreamClient,
+            this, &FiffStreamThread::stopMeas);
+
+    QTcpSocket t_qTcpSocket;
+    if (!t_qTcpSocket.setSocketDescriptor(m_iSocketDescriptor)) {
+        emit error(t_qTcpSocket.error());
+        return;
+    }
+    else
+    {
+        printf("FiffStreamClient (assigned ID %d) accepted from\n\tIP:\t%s\n\tPort:\t%d\n\n",
                m_iDataClientId,
-               QHostAddress(t_qTcpSocket->peerAddress()).toString().toUtf8().constData(),
-               t_qTcpSocket->peerPort());
+               QHostAddress(t_qTcpSocket.peerAddress()).toString().toUtf8().constData(),
+               t_qTcpSocket.peerPort());
+    }
 
 
-    FiffStream t_FiffStreamIn(t_qTcpSocket);
+    FiffStream t_FiffStreamIn(&t_qTcpSocket);
 
-    int i=0;
-    while(t_qTcpSocket->state() != QAbstractSocket::UnconnectedState && m_bIsRunning)
+//    int i = 0;
+    while(t_qTcpSocket.state() != QAbstractSocket::UnconnectedState && m_bIsRunning)
     {
         //
         // Write available data
@@ -266,12 +280,12 @@ void FiffStreamThread::run()
         if(m_qSendBlock.size() > 0)
         {
 //            qDebug() << "is writeable " << t_qTcpSocket.isWritable();
-            qint32 t_iBlockSize = m_qSendBlock.size();
+//            qint32 t_iBlockSize = m_qSendBlock.size();
 //            qDebug() << "data available" << t_iBlockSize;
             m_qMutex.lock();
-            qint32 t_iBytesWritten = t_qTcpSocket->write(m_qSendBlock);
-            qDebug() << ++i<< "[wrote bytes] " << t_iBytesWritten;
-            t_qTcpSocket->waitForBytesWritten();
+            t_qTcpSocket.write(m_qSendBlock);// qint32 t_iBytesWritten = t_qTcpSocket.write(m_qSendBlock);
+//            qDebug() << ++i<< "[wrote bytes] " << t_iBytesWritten;
+            t_qTcpSocket.waitForBytesWritten();
 //            if(t_iBytesWritten == t_iBlockSize)
 //            {
 //                m_qSendBlock.clear();
@@ -286,20 +300,20 @@ void FiffStreamThread::run()
         //
         // Read: Wait 10ms for incomming tag header, read and continue
         //
-        t_qTcpSocket->waitForReadyRead(10);
+        t_qTcpSocket.waitForReadyRead(10);
 
-        if (t_qTcpSocket->bytesAvailable() >= (int)sizeof(qint32)*4)
+        if (t_qTcpSocket.bytesAvailable() >= (int)sizeof(qint32)*4)
         {
-            qDebug() << "goes to read bytes " ;
+//            qDebug() << "goes to read bytes " ;
             FiffTag::SPtr t_pTag;
             FiffTag::read_tag_info(&t_FiffStreamIn, t_pTag, false);
 
             //
             // wait until tag size data are available and read the data
             //
-            while (t_qTcpSocket->bytesAvailable() < t_pTag->size())
+            while (t_qTcpSocket.bytesAvailable() < t_pTag->size())
             {
-                t_qTcpSocket->waitForReadyRead(10);
+                t_qTcpSocket.waitForReadyRead(10);
             }
             FiffTag::read_tag_data(&t_FiffStreamIn, t_pTag);
 
@@ -314,7 +328,7 @@ void FiffStreamThread::run()
 //        usleep(1000);
     }
 
-    t_qTcpSocket->disconnectFromHost();
-    if(t_qTcpSocket->state() != QAbstractSocket::UnconnectedState)
-        t_qTcpSocket->waitForDisconnected();
+    t_qTcpSocket.disconnectFromHost();
+    if(t_qTcpSocket.state() != QAbstractSocket::UnconnectedState)
+        t_qTcpSocket.waitForDisconnected();
 }

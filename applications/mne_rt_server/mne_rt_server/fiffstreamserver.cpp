@@ -380,10 +380,7 @@ void FiffStreamServer::forwardRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRa
 
 void FiffStreamServer::incomingConnection(qintptr socketDescriptor)
 {    
-    QTcpSocket *tcp_sock_tmp = new QTcpSocket();
-    tcp_sock_tmp->setSocketDescriptor(socketDescriptor);
-
-    FiffStreamThread* t_pStreamThread = new FiffStreamThread(m_iNextClientId, tcp_sock_tmp, this);
+    FiffStreamThread* t_pStreamThread = new FiffStreamThread(m_iNextClientId, socketDescriptor, this);
 
     m_qClientList.insert(m_iNextClientId, t_pStreamThread);
     ++m_iNextClientId;
@@ -391,17 +388,6 @@ void FiffStreamServer::incomingConnection(qintptr socketDescriptor)
     //when thread has finished it gets deleted
     connect(t_pStreamThread, SIGNAL(finished()), t_pStreamThread, SLOT(deleteLater()));
     connect(this, SIGNAL(closeFiffStreamServer()), t_pStreamThread, SLOT(deleteLater()));
-
-    //connect(tcp_sock_tmp,SIGNAL(readyRead()),t_pStreamThread,SLOT(ReadToBuffer1()));
-
-    connect(this, &FiffStreamServer::remitMeasInfo,
-            t_pStreamThread, &FiffStreamThread::sendMeasurementInfo);
-    connect(this, &FiffStreamServer::remitRawBuffer,
-            t_pStreamThread, &FiffStreamThread::sendRawBuffer);
-    connect(this, &FiffStreamServer::startMeasFiffStreamClient,
-            t_pStreamThread, &FiffStreamThread::startMeas);
-    connect(this, &FiffStreamServer::stopMeasFiffStreamClient,
-            t_pStreamThread, &FiffStreamThread::stopMeas);
 
     t_pStreamThread->start();
 }
