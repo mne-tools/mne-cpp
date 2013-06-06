@@ -5,7 +5,7 @@
 *           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2012
+* @date     April, 2013
 *
 * @section  LICENSE
 *
@@ -98,6 +98,7 @@ BabyMEG::BabyMEG()
     pInfo = new BabyMEGInfo();
     connect(pInfo, &BabyMEGInfo::fiffInfoAvailable, this, &BabyMEG::setFiffInfo);
     connect(pInfo, &BabyMEGInfo::SendDataPackage, this, &BabyMEG::setFiffData);
+    connect(pInfo, &BabyMEGInfo::SendCMDPackage, this, &BabyMEG::setCMDData);
 
     myClient = new BabyMEGClient(6340,this);
     myClient->SetInfo(pInfo);
@@ -134,6 +135,15 @@ BabyMEG::~BabyMEG()
     QThread::wait();
 }
 
+//*************************************************************************************************************
+void BabyMEG::comFLL(Command p_command)
+{
+    qDebug()<<"FLL commands";
+    int strlen = 3;
+    QByteArray Scmd = myClientComm->MGH_LM_Int2Byte(strlen);
+    QByteArray SC = QByteArray("COMS")+Scmd+QByteArray("SLM");
+    myClientComm->SendCommandToBabyMEGShortConnection(SC);
+}
 
 //*************************************************************************************************************
 
@@ -197,6 +207,7 @@ void BabyMEG::connectCommandManager()
     //Connect slots
     QObject::connect(&m_commandManager["bufsize"], &Command::executed, this, &BabyMEG::comBufsize);
     QObject::connect(&m_commandManager["getbufsize"], &Command::executed, this, &BabyMEG::comGetBufsize);
+    QObject::connect(&m_commandManager["FLL"], &Command::executed, this, &BabyMEG::comFLL);
 }
 
 
@@ -253,6 +264,16 @@ void BabyMEG::setFiffData(QByteArray DATA)
     m_pRawMatrixBuffer->push(&rawData);
 
 }
+
+
+//*************************************************************************************************************
+
+void BabyMEG::setCMDData(QByteArray DATA)
+{
+    m_commandManager["FLL"].reply("FLL-OK"+DATA);
+}
+
+
 
 //*************************************************************************************************************
 

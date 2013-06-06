@@ -77,6 +77,7 @@ public:
     * Constructs a BabyMEG.
     */
     explicit BabyMEGClient(int myPort, QObject *parent = 0);
+    ~BabyMEGClient();
 public:
     QString name;
     int port;
