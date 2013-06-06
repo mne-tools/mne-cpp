@@ -42,6 +42,7 @@
 #include "mnertclientaboutwidget.h"
 
 #include "mnertclientsetupbabymegwidget.h"
+#include "mnertclientsquidcontroldgl.h"
 
 #include "../mnertclient.h"
 
@@ -110,6 +111,9 @@ MneRtClientSetupWidget::MneRtClientSetupWidget(MneRtClient* p_pMneRtClient, QWid
 
     //About
     connect(ui.m_qPushButton_About, &QPushButton::released, this, &MneRtClientSetupWidget::showAboutDialog);
+
+    //SQUID Control
+    connect(ui.m_qPushButton_SQUIDControl, &QPushButton::released, this, &MneRtClientSetupWidget::SQUIDControlDialog);
 
     this->init();
 }
@@ -319,4 +323,13 @@ void MneRtClientSetupWidget::showAboutDialog()
 {
     MneRtClientAboutWidget aboutDialog(this);
     aboutDialog.exec();
+}
+
+
+//*************************************************************************************************************
+
+void MneRtClientSetupWidget::SQUIDControlDialog()
+{
+    mnertclientSQUIDControlDgl SQUIDCtrlDlg(this);
+    SQUIDCtrlDlg.exec();
 }
