@@ -149,6 +149,13 @@ private:
     */
     void showAboutDialog();
 
+    //=========================================================================================================
+    /**
+    * Shows the SQUID Control Dialog
+    *
+    */
+    void SQUIDControlDialog();
+
     MneRtClient*   m_pMneRtClient;      /**< a pointer to corresponding mne rt client.*/
 
     Ui::MneRtClientSetupWidgetClass ui; /**< the user interface for the MneRtClientSetupWidget.*/
