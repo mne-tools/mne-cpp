@@ -84,12 +84,12 @@ SOURCES += \
         FormFiles/mnertclientsetupwidget.cpp \
         FormFiles/mnertclientrunwidget.cpp \
         FormFiles/mnertclientaboutwidget.cpp \
-        directrecord.cpp \
-        mnertclientproducer.cpp \
         FormFiles/mnertclientsetupbabymegwidget.cpp \
         FormFiles/mnertclientsetupneuromagwidget.cpp \
         FormFiles/mnertclientsetupfifffilesimulatorwidget.cpp \
-        FormFiles/mnertclientsquidcontroldgl.cpp
+        FormFiles/mnertclientsquidcontroldgl.cpp \
+        directrecord.cpp \
+        mnertclientproducer.cpp \
 
 HEADERS += \
         mnertclient.h\
@@ -97,12 +97,12 @@ HEADERS += \
         FormFiles/mnertclientsetupwidget.h \
         FormFiles/mnertclientrunwidget.h \
         FormFiles/mnertclientaboutwidget.h \
-        directrecord.h \
-        mnertclientproducer.h \
         FormFiles/mnertclientsetupbabymegwidget.h \
         FormFiles/mnertclientsetupneuromagwidget.h \
         FormFiles/mnertclientsetupfifffilesimulatorwidget.h \
-        FormFiles/mnertclientsquidcontroldgl.h
+        FormFiles/mnertclientsquidcontroldgl.h \
+        directrecord.h \
+        mnertclientproducer.h \
 
 FORMS += \
         FormFiles/mnertclientsetup.ui \

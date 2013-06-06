@@ -32,28 +32,62 @@
 * @brief    Contains the declaration of the MneRtClientSQUIDControlDGL class.
 *
 */
+
 #ifndef MNERTCLIENTSQUIDCONTROLDGL_H
 #define MNERTCLIENTSQUIDCONTROLDGL_H
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "../ui_mnertclientsquidcontroldgl.h"
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
 #include <QDialog>
 
-namespace Ui
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MneRtClientPlugin
+//=============================================================================================================
+
+namespace MneRtClientPlugin   //Ui
 {
-    class mnertclientSQUIDControlDgl;
-}
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+class MneRtClient;
 
 
+//=============================================================================================================
+/**
+* DECLARE CLASS mnertclientSQUIDControlDgl
+*
+* @brief The mnertclientSQUIDControlDgl class provides the SQUID control dialog.
+*/
 class mnertclientSQUIDControlDgl : public QDialog
 {
     Q_OBJECT
-    
+
+
 public:
-    explicit mnertclientSQUIDControlDgl(QWidget *parent = 0);
+    explicit mnertclientSQUIDControlDgl(MneRtClient* p_pMneRtClient,QWidget *parent = 0);
     ~mnertclientSQUIDControlDgl();
     
 private:
     Ui::mnertclientSQUIDControlDgl *ui;
+
+public:
+    MneRtClient*   m_pMneRtClient;
+    void SendRetune();
 };
 
-
+}//namespace
 #endif // MNERTCLIENTSQUIDCONTROLDGL_H
