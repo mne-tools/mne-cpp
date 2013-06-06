@@ -98,7 +98,7 @@ public:
 
     void writeClientId();
 
-    void send_data();
+    void sendData(QTcpSocket& p_qTcpSocket);
 
 signals:
     void error(QTcpSocket::SocketError socketError);
@@ -121,7 +121,8 @@ private:
     void stopMeas(qint32 ID);
     void sendMeasurementInfo(qint32 ID, FiffInfo p_fiffInfo);
     void sendRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRawData);
-    //void ReadToBuffer1();
+    //void readToBuffer1();
+    void readProc(QTcpSocket& p_qTcpSocket);
 };
 
 
