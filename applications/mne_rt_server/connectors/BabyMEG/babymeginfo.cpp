@@ -44,7 +44,13 @@ BabyMEGInfo::BabyMEGInfo()
 : g_maxlen(500)
 {
 }
+//*************************************************************************************************************
 
+void BabyMEGInfo::MGH_LM_Send_CMDPackage(QByteArray DATA)
+{
+//    qDebug()<<"[BabyMEGInfo]CMD Size:"<<DATA.size();
+    emit SendCMDPackage(DATA);
+}
 //*************************************************************************************************************
 
 void BabyMEGInfo::MGH_LM_Send_DataPackage(QByteArray DATA)
