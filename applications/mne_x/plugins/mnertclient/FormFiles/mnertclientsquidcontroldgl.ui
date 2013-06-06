@@ -697,7 +697,7 @@ background-color:rgb(216, 216, 216);</string>
       <item row="0" column="0">
        <layout class="QGridLayout" name="gridLayout_10">
         <item row="0" column="0">
-         <widget class="QTextEdit" name="textEdit">
+         <widget class="QTextEdit" name="m_tx_info">
           <property name="styleSheet">
            <string notr="true">background-color: rgb(255, 255, 255);</string>
           </property>
