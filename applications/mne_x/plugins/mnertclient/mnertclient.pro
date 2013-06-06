@@ -88,7 +88,7 @@ SOURCES += \
         mnertclientproducer.cpp \
         FormFiles/mnertclientsetupbabymegwidget.cpp \
         FormFiles/mnertclientsetupneuromagwidget.cpp \
-        FormFiles/mnertclientsetupfifffilesimulatorwidget.cpp
+        FormFiles/mnertclientsetupfifffilesimulatorwidget.cpp \
         FormFiles/mnertclientsquidcontroldgl.cpp
 
 HEADERS += \
@@ -101,7 +101,7 @@ HEADERS += \
         mnertclientproducer.h \
         FormFiles/mnertclientsetupbabymegwidget.h \
         FormFiles/mnertclientsetupneuromagwidget.h \
-        FormFiles/mnertclientsetupfifffilesimulatorwidget.h
+        FormFiles/mnertclientsetupfifffilesimulatorwidget.h \
         FormFiles/mnertclientsquidcontroldgl.h
 
 FORMS += \
@@ -110,7 +110,7 @@ FORMS += \
         FormFiles/mnertclientabout.ui \
         FormFiles/mnertclientsetupbabymeg.ui \
         FormFiles/mnertclientsetupneuromag.ui \
-        FormFiles/mnertclientsetupfifffilesimulator.ui
+        FormFiles/mnertclientsetupfifffilesimulator.ui \
         FormFiles/mnertclientsquidcontroldgl.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
