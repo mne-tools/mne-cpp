@@ -86,9 +86,10 @@ SOURCES += \
         FormFiles/mnertclientaboutwidget.cpp \
         directrecord.cpp \
         mnertclientproducer.cpp \
-    FormFiles/mnertclientsetupbabymegwidget.cpp \
-    FormFiles/mnertclientsetupneuromagwidget.cpp \
-    FormFiles/mnertclientsetupfifffilesimulatorwidget.cpp
+        FormFiles/mnertclientsetupbabymegwidget.cpp \
+        FormFiles/mnertclientsetupneuromagwidget.cpp \
+        FormFiles/mnertclientsetupfifffilesimulatorwidget.cpp
+        FormFiles/mnertclientsquidcontroldgl.cpp
 
 HEADERS += \
         mnertclient.h\
@@ -98,17 +99,19 @@ HEADERS += \
         FormFiles/mnertclientaboutwidget.h \
         directrecord.h \
         mnertclientproducer.h \
-    FormFiles/mnertclientsetupbabymegwidget.h \
-    FormFiles/mnertclientsetupneuromagwidget.h \
-    FormFiles/mnertclientsetupfifffilesimulatorwidget.h
+        FormFiles/mnertclientsetupbabymegwidget.h \
+        FormFiles/mnertclientsetupneuromagwidget.h \
+        FormFiles/mnertclientsetupfifffilesimulatorwidget.h
+        FormFiles/mnertclientsquidcontroldgl.h
 
 FORMS += \
         FormFiles/mnertclientsetup.ui \
         FormFiles/mnertclientrun.ui \
         FormFiles/mnertclientabout.ui \
-    FormFiles/mnertclientsetupbabymeg.ui \
-    FormFiles/mnertclientsetupneuromag.ui \
-    FormFiles/mnertclientsetupfifffilesimulator.ui
+        FormFiles/mnertclientsetupbabymeg.ui \
+        FormFiles/mnertclientsetupneuromag.ui \
+        FormFiles/mnertclientsetupfifffilesimulator.ui
+        FormFiles/mnertclientsquidcontroldgl.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
