@@ -73,11 +73,21 @@ mnertclientSQUIDControlDgl::~mnertclientSQUIDControlDgl()
 
 void mnertclientSQUIDControlDgl::SendRetune()
 {
+    QString t_sJsonCommand =
+            "{"
+            "   \"commands\": {"
+            "       \"FLL\": {"
+            "           \"description\": \"FLL hardware control\","
+            "           \"parameters\": {}"
+            "        }"
+            "    }"
+            "}";
+
     // Send FLL command to cmdclient
     if(m_pMneRtClient->m_bCmdClientIsConnected)
     {
         this->ui->m_tx_info->setText(QString("Send Retune Command"));
-        QString t_sReply = m_pMneRtClient->m_pRtCmdClient->sendCLICommand(QString("RETUNE"));
+        QString t_sReply = m_pMneRtClient->m_pRtCmdClient->sendCLICommandFLL(t_sJsonCommand);
         this->ui->m_tx_info->setText(QString("Reply:")+t_sReply);
     }
 }
