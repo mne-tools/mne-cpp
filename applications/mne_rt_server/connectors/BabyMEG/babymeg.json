@@ -1,7 +1,7 @@
 {
     "encoding": "UTF-8",
     "device": "BabyMEG",
-    "description": "BabyMEG 2",
+    "description": "BabyMEG",
     "commands": {
         "bufsize": {
             "description": "Sets the buffer size of the FiffStreamClient raw data buffer.",
@@ -14,6 +14,10 @@
         },
         "getbufsize": {
             "description": "Returns the current buffer size of the FiffStreamClient raw data buffer.",
+            "parameters": {}
+        },
+        "retune" : {
+            "description":"redo tune",
             "parameters": {}
         },
         "FLL":{
