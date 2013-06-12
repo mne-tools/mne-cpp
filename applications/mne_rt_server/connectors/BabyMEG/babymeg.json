@@ -22,7 +22,12 @@
         },
         "FLL":{
             "description": "FLL hardware control",
-            "parameters":{}
+            "parameters": {
+                "control": {
+                    "description": "string formatted control instruction",
+                    "type": "string"
+                }
+            }
         }
     }
 }

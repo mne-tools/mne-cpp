@@ -139,10 +139,13 @@ BabyMEG::~BabyMEG()
 void BabyMEG::comFLL(Command p_command)
 {
     qDebug()<<"FLL commands";
-    int strlen = 3;
-    QByteArray Scmd = myClientComm->MGH_LM_Int2Byte(strlen);
-    QByteArray SC = QByteArray("COMS")+Scmd+QByteArray("SLM");
-    myClientComm->SendCommandToBabyMEGShortConnection(SC);
+
+    QString t_sFLLControlCommand = p_command.pValues()[0].toString();
+
+//    int strlen = 3;
+//    QByteArray Scmd = myClientComm->MGH_LM_Int2Byte(strlen);
+//    QByteArray SC = QByteArray("COMS")+Scmd+QByteArray("SLM");
+//    myClientComm->SendCommandToBabyMEGShortConnection(SC);
 }
 
 //*************************************************************************************************************
