@@ -87,7 +87,7 @@ void mnertclientSQUIDControlDgl::SendRetune()
     if(m_pMneRtClient->m_bCmdClientIsConnected)
     {
         this->ui->m_tx_info->setText(QString("Send Retune Command"));
-        QString t_sReply = m_pMneRtClient->m_pRtCmdClient->sendCLICommandFLL(t_sJsonCommand);
-        this->ui->m_tx_info->setText(QString("Reply:")+t_sReply);
+//        QString t_sReply = m_pMneRtClient->m_pRtCmdClient->sendCLICommandFLL(t_sJsonCommand);
+//        this->ui->m_tx_info->setText(QString("Reply:")+t_sReply);
     }
 }
