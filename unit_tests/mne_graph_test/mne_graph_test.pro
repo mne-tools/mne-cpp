@@ -54,8 +54,7 @@ SOURCES += main.cpp \
 HEADERS  += \
     matrixview.h
 
-FORMS    += \
-    matrixview.ui
+FORMS    +=
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

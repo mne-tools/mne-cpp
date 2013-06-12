@@ -39,6 +39,9 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "matrixview.h"
+
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -68,39 +71,58 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    qint32 x = 300;
-    qint32 y = 300;
-    QImage image(x, y, QImage::Format_RGB32);
-    QRgb value;
+//    qint32 x = 255;
+//    qint32 y = 255;
+//    QImage image(x, y, QImage::Format_RGB32);
+//    QRgb value;
 
-    value = qRgb(189, 149, 39); // 0xffbd9527
-    for(qint32 i = 0; i < x; ++i)
+//    value = qRgb(189, 149, 39); // 0xffbd9527
+//    for(qint32 i = 0; i < x; ++i)
+//    {
+//        for(qint32 j = 0; j < y; ++j)
+//        {
+//            value = qRgb(i % 255, j % 255, 100);
+//            image.setPixel(i, j, value);
+//        }
+//    }
+
+////    value = qRgb(122, 163, 39); // 0xff7aa327
+////    image.setPixel(0, 1, value);
+////    image.setPixel(1, 0, value);
+
+////    value = qRgb(237, 187, 51); // 0xffedba31
+////    image.setPixel(2, 1, value);
+
+
+//    QPixmap pixmap = QPixmap::fromImage(image);
+
+//    QGraphicsScene scene;
+
+////    scene.addText("Hello, world!");
+//    scene.addPixmap(pixmap);
+
+//    QGraphicsView view(&scene);
+//    view.show();
+
+
+    MatrixXd test(200,300);
+
+    int count = 200;
+
+    for(int i = 0; i < 200; ++i)
     {
-        for(qint32 j = 0; j < y; ++j)
+        for(int j = 0; j < 300; ++j)
         {
-            value = qRgb(i % 255, j % 255, 100);
-            image.setPixel(i, j, value);
+            test(i,j) = i+j;
+            ++count;
         }
     }
 
-//    value = qRgb(122, 163, 39); // 0xff7aa327
-//    image.setPixel(0, 1, value);
-//    image.setPixel(1, 0, value);
 
-//    value = qRgb(237, 187, 51); // 0xffedba31
-//    image.setPixel(2, 1, value);
+    MatrixView mview;
 
-
-    QPixmap pixmap = QPixmap::fromImage(image);
-
-    QGraphicsScene scene;
-//    scene.addText("Hello, world!");
-    scene.addPixmap(pixmap);
-
-    QGraphicsView view(&scene);
-    view.show();
-
-
+    mview.updateMatrix(test);
+    mview.show();
 
 
     
