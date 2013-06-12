@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     disp_global.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     June, 2013
 *
 * @section  LICENSE
 *
@@ -29,22 +29,36 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the main() application function.
+* @brief    disp library export/import macros.
 *
 */
 
+#ifndef MATRIX2DVIEW_H
+#define MATRIX2DVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <disp/matrix2dview.h>
+#include "disp_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
+//=============================================================================================================
+
+#include <QWidget>
+#include <QImage>
+#include <QString>
+#include <QPen>
+#include <QSharedPointer>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
@@ -52,13 +66,11 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// DEFINE NAMESPACE DISP3DLIB
 //=============================================================================================================
 
-#include <QApplication>
-#include <QImage>
-#include <QGraphicsView>
-
+namespace DISPLIB
+{
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -66,43 +78,86 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace DISPLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MAIN
+// FORWARD DECLARATIONS
 //=============================================================================================================
+
+
 
 //=============================================================================================================
 /**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
+* Visualizes Eigen matrizes labels using a HSV colormap
 *
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+* @brief Eigen matrix visualization
 */
-int main(int argc, char *argv[])
+class DISPSHARED_EXPORT Matrix2DView : public QWidget
 {
-    QApplication a(argc, argv);
+    Q_OBJECT
+public:
+    typedef QSharedPointer<Matrix2DView> SPtr;            /**< Shared pointer type for MatrixView class. */
+    typedef QSharedPointer<const Matrix2DView> ConstSPtr; /**< Const shared pointer type for MatrixView class. */
+
+    explicit Matrix2DView(QWidget *parent = 0);
+
+    explicit Matrix2DView(MatrixXd &p_dMat, QWidget *parent = 0);
+
+    explicit Matrix2DView(MatrixXf &p_fMat, QWidget *parent = 0);
+
+    explicit Matrix2DView(MatrixXi &p_iMat, QWidget *parent = 0);
+
+    ~Matrix2DView();
+
+    void init();
+
+    void updateMatrix(MatrixXd &p_dMat);
+
+    void updateMatrix(MatrixXf &p_fMat);
+
+    void updateMatrix(MatrixXi &p_iMat);
+
+protected:
+
+    int R(double v);
+    int G(double v);
+    int B(double v);
+    double slopeMRaising(double x, double n);
+    double slopeMFalling(double x, double n);
 
 
-    MatrixXi mat(200,300);
+    void paintEvent(QPaintEvent*);
+    void resizeEvent(QResizeEvent*);
+    
+private:
+//    MatrixXd
+    QPixmap* pixmap;
+    QSize widgetSize;
 
-    int count = 200;
-    for(int i = 0; i < 200; ++i)
-    {
-        for(int j = 0; j < 300; ++j)
-        {
-            mat(i,j) = i+j;
-            ++count;
-        }
-    }
+    qint32 m_iBorderTopBottom;
+    qint32 m_iBorderLeftRight;
 
-    Matrix2DView mview(mat);
-    mview.show();
-    mview.setWindowTitle("2D View");
+    double m_qMinValue;
+    double m_qMaxValue;
 
-    return a.exec();
-}
+    QString m_sTitle;
+    QFont m_qFontTitle;
+    QPen m_qPenTitle;
+
+    QString m_sXLabel;
+    QString m_sYLabel;
+    QFont m_qFontAxes;
+    QPen m_qPenAxes;
+
+
+};
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+} // NAMESPACE
+
+#endif // MATRIX2DVIEW_H
