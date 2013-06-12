@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     colormap.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     February, 2013
+* @date     March, 2013
 *
 * @section  LICENSE
 *
@@ -29,35 +29,16 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the main() application function.
+* @brief    Implementation of the ColorMap class.
 *
 */
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <disp/matrix2dview.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QApplication>
-#include <QImage>
-#include <QGraphicsView>
+#include "colormap.h"
 
 
 //*************************************************************************************************************
@@ -65,44 +46,91 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
 using namespace DISPLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MAIN
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-//=============================================================================================================
-/**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
-*
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
-*/
-int main(int argc, char *argv[])
+ColorMap::ColorMap()
 {
-    QApplication a(argc, argv);
+}
 
 
-    MatrixXi mat(200,300);
+//*************************************************************************************************************
 
-    int count = 200;
-    for(int i = 0; i < 200; ++i)
-    {
-        for(int j = 0; j < 300; ++j)
-        {
-            mat(i,j) = i+j;
-            ++count;
-        }
-    }
+ColorMap::~ColorMap()
+{
+}
 
-    Matrix2DView mview(mat);
-    mview.show();
-    mview.setWindowTitle("2D View");
 
-    return a.exec();
+//*************************************************************************************************************
+//HSV Colormap
+int ColorMap::hsvR(double x)
+{
+    //Describe the red fuzzy set
+    if(x < 0.375)
+        return 0;
+    else if(x >= 0.375 && x < 0.625)
+        return (int)floor(hsvSlopeMRaising(x, -1.5)*255);
+    else if(x >= 0.625 && x < 0.875)
+        return (int)floor(1.0*255);
+    else if(x >= 0.875)
+        return (int)floor(hsvSlopeMFalling(x, 4.5)*255);
+    else
+        return 0;
+}
+
+
+//*************************************************************************************************************
+
+int ColorMap::hsvG(double x)
+{
+    //Describe the green fuzzy set
+    if(x < 0.125)
+        return 0;
+    else if(x >= 0.125 && x < 0.375)
+        return (int)floor(hsvSlopeMRaising(x, -0.5)*255);
+    else if(x >= 0.375 && x < 0.625)
+        return (int)floor(1.0*255);
+    else if(x >= 0.625 && x < 0.875)
+        return (int)floor(hsvSlopeMFalling(x, 2.5)*255);
+    else
+        return 0;
+}
+
+
+//*************************************************************************************************************
+
+int ColorMap::hsvB(double x)
+{
+    //Describe the blue fuzzy set
+    if(x < 0.125)
+        return (int)floor(hsvSlopeMRaising(x, 0.5)*255);
+    else if(x >= 0.125 && x < 0.375)
+        return (int)floor(1.0*255);
+    else if(x >= 0.375 && x < 0.625)
+        return (int)floor(hsvSlopeMFalling(x, 2.5)*255);
+    else
+        return 0;
+}
+
+
+//*************************************************************************************************************
+
+double ColorMap::hsvSlopeMRaising(double x, double n)
+{
+    //f = m*x + n
+    return 4*x + n;
+}
+
+
+//*************************************************************************************************************
+
+double ColorMap::hsvSlopeMFalling(double x,double n)
+{
+    //f = m*x + n
+    return -4*x + n;
 }

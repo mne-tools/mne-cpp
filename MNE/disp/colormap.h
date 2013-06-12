@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     colormap.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     February, 2013
+* @date     March, 2013
 *
 * @section  LICENSE
 *
@@ -29,17 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the main() application function.
+* @brief    ColorMap class declaration
 *
 */
 
+#ifndef COLORMAP_H
+#define COLORMAP_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <disp/matrix2dview.h>
+#include "disp_global.h"
 
 
 //*************************************************************************************************************
@@ -47,62 +49,79 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
+#include <QSharedPointer>
+#include <QColor>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// DEFINE NAMESPACE FSLIB
 //=============================================================================================================
 
-#include <QApplication>
-#include <QImage>
-#include <QGraphicsView>
-
+namespace DISPLIB
+{
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
-using namespace DISPLIB;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MAIN
+// FORWARD DECLARATIONS
 //=============================================================================================================
+
 
 //=============================================================================================================
 /**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
+* Provides diffenrent color maps like HSV,...
 *
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+* @brief Color map RGB transformations
 */
-int main(int argc, char *argv[])
+class DISPSHARED_EXPORT ColorMap
 {
-    QApplication a(argc, argv);
+public:
+    typedef QSharedPointer<ColorMap> SPtr;            /**< Shared pointer type for ColorMap class. */
+    typedef QSharedPointer<const ColorMap> ConstSPtr; /**< Const shared pointer type for ColorMap class. */
+    
+    //=========================================================================================================
+    /**
+    * Default constructor
+    */
+    ColorMap();
+    
+    //=========================================================================================================
+    /**
+    * Destroys the ColorMap class.
+    */
+    ~ColorMap();
 
+    static inline QRgb valueToHsv(double v);
+    
+protected:
+    static int hsvR(double v);
+    static int hsvG(double v);
+    static int hsvB(double v);
+    static double hsvSlopeMRaising(double x, double n);
+    static double hsvSlopeMFalling(double x, double n);
 
-    MatrixXi mat(200,300);
+private:
+    
+};
 
-    int count = 200;
-    for(int i = 0; i < 200; ++i)
-    {
-        for(int j = 0; j < 300; ++j)
-        {
-            mat(i,j) = i+j;
-            ++count;
-        }
-    }
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
 
-    Matrix2DView mview(mat);
-    mview.show();
-    mview.setWindowTitle("2D View");
-
-    return a.exec();
+inline QRgb ColorMap::valueToHsv(double v)
+{
+    QRgb p_qRgb = qRgb(hsvR(v), hsvG(v), hsvB(v));
+    return p_qRgb;
 }
+
+} // NAMESPACE
+
+#endif // COLORMAP_H
+
