@@ -15,6 +15,15 @@
         "getbufsize": {
             "description": "Returns the current buffer size of the FiffStreamClient raw data buffer.",
             "parameters": {}
+        },
+        "mode": {
+            "description": "Turns the connector into the active or passive mode.",
+            "parameters": {
+                "control": {
+                    "description": "active or passive",
+                    "type": "QString"
+                }
+            }
         }
     }
 }
