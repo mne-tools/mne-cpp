@@ -266,7 +266,6 @@ void Matrix2DView::paintEvent(QPaintEvent *)
 
         painter.drawPixmap(t_qPointCenter,t_qPixmapScaledLegend);
 
-
         painter.setPen(m_qPenAxes);
         painter.setFont(m_qFontAxes);
 
