@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
     {
         for(int j = 0; j < 300; ++j)
         {
-            mat(i,j) = i+j;
+            mat(i,j) = count;//i+j;
             ++count;
         }
     }
