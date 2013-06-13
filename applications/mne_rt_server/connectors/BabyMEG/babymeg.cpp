@@ -142,16 +142,32 @@ void BabyMEG::comFLL(Command p_command)
 
     QString t_sFLLControlCommand = p_command.pValues()[0].toString();
 
-//    int strlen = 3;
-//    QByteArray Scmd = myClientComm->MGH_LM_Int2Byte(strlen);
-//    QByteArray SC = QByteArray("COMS")+Scmd+QByteArray("SLM");
-//    myClientComm->SendCommandToBabyMEGShortConnection(SC);
+
+    qDebug() << "BabyMeg Received" << t_sFLLControlCommand;
+    int strlen = t_sFLLControlCommand.size();
+    QByteArray Scmd = myClientComm->MGH_LM_Int2Byte(strlen);
+    QByteArray SC = QByteArray("COMS")+Scmd+QByteArray("SLM");
+    myClientComm->SendCommandToBabyMEGShortConnection(SC);
+
+
 }
+
+
+//*************************************************************************************************************
+
+void BabyMEG::setCMDData(QByteArray DATA)
+{
+    m_commandManager["FLL"].reply("FLL-OK"+DATA);
+}
+
 
 //*************************************************************************************************************
 
 void BabyMEG::comBufsize(Command p_command)
 {
+
+    qDebug() << "Here Inside void BabyMEG::comBufsize(Command p_command)";
+
     //ToDO JSON
 
     quint32 t_uiBuffSize = p_command.pValues()[0].toUInt();
@@ -267,15 +283,6 @@ void BabyMEG::setFiffData(QByteArray DATA)
     m_pRawMatrixBuffer->push(&rawData);
 
 }
-
-
-//*************************************************************************************************************
-
-void BabyMEG::setCMDData(QByteArray DATA)
-{
-    m_commandManager["FLL"].reply("FLL-OK"+DATA);
-}
-
 
 
 //*************************************************************************************************************
