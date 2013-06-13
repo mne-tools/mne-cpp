@@ -69,7 +69,8 @@ using namespace DISPLIB;
 
 Matrix2DView::Matrix2DView(QWidget *parent)
 : QWidget(parent)
-, pixmap(NULL)
+, m_qPixmapData(NULL)
+, m_qPixmapLegend(NULL)
 {
     init();
 }
@@ -79,7 +80,8 @@ Matrix2DView::Matrix2DView(QWidget *parent)
 
 Matrix2DView::Matrix2DView(MatrixXd &p_dMat, QWidget *parent)
 : QWidget(parent)
-, pixmap(NULL)
+, m_qPixmapData(NULL)
+, m_qPixmapLegend(NULL)
 {
     init();
     updateMatrix(p_dMat);
@@ -90,7 +92,8 @@ Matrix2DView::Matrix2DView(MatrixXd &p_dMat, QWidget *parent)
 
 Matrix2DView::Matrix2DView(MatrixXf &p_fMat, QWidget *parent)
 : QWidget(parent)
-, pixmap(NULL)
+, m_qPixmapData(NULL)
+, m_qPixmapLegend(NULL)
 {
     init();
     updateMatrix(p_fMat);
@@ -101,7 +104,8 @@ Matrix2DView::Matrix2DView(MatrixXf &p_fMat, QWidget *parent)
 
 Matrix2DView::Matrix2DView(MatrixXi &p_iMat, QWidget *parent)
 : QWidget(parent)
-, pixmap(NULL)
+, m_qPixmapData(NULL)
+, m_qPixmapLegend(NULL)
 {
     init();
     updateMatrix(p_iMat);
@@ -112,12 +116,10 @@ Matrix2DView::Matrix2DView(MatrixXi &p_iMat, QWidget *parent)
 
 Matrix2DView::~Matrix2DView()
 {
-//    delete ui;
-    if(pixmap)
-    {
-        delete pixmap;
-    }
-
+    if(m_qPixmapData)
+        delete m_qPixmapData;
+    if(m_qPixmapLegend)
+        delete m_qPixmapLegend;
 }
 
 
@@ -127,7 +129,7 @@ void Matrix2DView::init()
 {
     //Set Borders
     m_iBorderTopBottom = 50;
-    m_iBorderLeftRight = 50;
+    m_iBorderLeftRight = 100;
 
     //Set Fonts
     m_qFontAxes.setPixelSize(12);
@@ -143,34 +145,57 @@ void Matrix2DView::init()
 
 void Matrix2DView::updateMatrix(MatrixXd &p_dMat)
 {
-    if(pixmap)
+    if(m_qPixmapData)
     {
-        delete pixmap;
-        pixmap = NULL;
+        delete m_qPixmapData;
+        m_qPixmapData = NULL;
+    }
+    if(m_qPixmapLegend)
+    {
+        delete m_qPixmapLegend;
+        m_qPixmapLegend = NULL;
     }
 
     if(p_dMat.rows() > 0 && p_dMat.cols())
     {
-        m_sTitle = QString("Test Matrix");
-        m_sXLabel = QString("XXX");
-        m_sYLabel = QString("YYY");
+        m_sTitle = QString("");
+        m_sXLabel = QString("");
+        m_sYLabel = QString("");
 
+        m_dMinValue = p_dMat.minCoeff();
+        m_dMaxValue = p_dMat.maxCoeff();
+
+        // -- data --
         MatrixXd dataNormalized = p_dMat;
-
         double minValue = dataNormalized.minCoeff();
         dataNormalized.array() -= minValue;
-
         double maxValue = dataNormalized.maxCoeff();
         dataNormalized.array() /= maxValue;
 
         qint32 x = p_dMat.cols();
         qint32 y = p_dMat.rows();
-        QImage image(x, y, QImage::Format_RGB32);
-        for(qint32 i = 0; i < x; ++i)
-            for(qint32 j = 0; j < y; ++j)
-                image.setPixel(i, j, ColorMap::valueToHsv(dataNormalized(j,i)));
+        qint32 i, j;
+        QImage t_qImageData(x, y, QImage::Format_RGB32);
+        for(i = 0; i < x; ++i)
+            for(j = 0; j < y; ++j)
+                t_qImageData.setPixel(i, j, ColorMap::valueToHsv(dataNormalized(j,i)));
 
-        pixmap = new QPixmap(QPixmap::fromImage(image));
+        m_qPixmapData = new QPixmap(QPixmap::fromImage(t_qImageData));
+
+        // -- legend --
+        qint32 t_iLegendWidth = 20;
+
+        QImage t_qImageLegend(t_iLegendWidth, y, QImage::Format_RGB32);
+
+        double t_dQuantile = 1.0/((double)y);
+        for(j = 0; j < y; ++j)
+        {
+            QRgb t_qRgb = ColorMap::valueToHsv(t_dQuantile*((double)j));
+            for(i = 0; i < t_iLegendWidth; ++i)
+                t_qImageLegend.setPixel(i, j, t_qRgb);
+        }
+
+        m_qPixmapLegend = new QPixmap(QPixmap::fromImage(t_qImageLegend));
     }
     update();
 }
@@ -209,126 +234,106 @@ void Matrix2DView::resizeEvent (QResizeEvent* event)
 void Matrix2DView::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    if (!pixmap->isNull())
+    if (!m_qPixmapData->isNull())
     {
-        QPoint centerPoint(0,0);
+        QPoint t_qPointCenter(0,0);
 
-        QSize pixmapSize = widgetSize;
+        // -- Data --
 
-        pixmapSize.setHeight(pixmapSize.height()-m_iBorderTopBottom*2);
-        pixmapSize.setWidth(pixmapSize.width()-m_iBorderLeftRight*2);
+        QSize t_qSizePixmapData = widgetSize;
+
+        t_qSizePixmapData.setHeight(t_qSizePixmapData.height()-m_iBorderTopBottom*2);
+        t_qSizePixmapData.setWidth(t_qSizePixmapData.width()-m_iBorderLeftRight*2);
 
         // Scale new image which size is widgetSize
-        QPixmap scaledPixmap = pixmap->scaled(pixmapSize, Qt::KeepAspectRatio);
+        QPixmap t_qPixmapScaledData = m_qPixmapData->scaled(t_qSizePixmapData, Qt::KeepAspectRatio);
         // Calculate image center position into screen
-        centerPoint.setX((widgetSize.width()-scaledPixmap.width())/2);
-        centerPoint.setY((widgetSize.height()-scaledPixmap.height())/2);
-        // Draw image
-        painter.drawPixmap(centerPoint,scaledPixmap);
+        t_qPointCenter.setX((widgetSize.width()-t_qPixmapScaledData.width())/2);
+        t_qPointCenter.setY((widgetSize.height()-t_qPixmapScaledData.height())/2);
+
+        painter.drawPixmap(t_qPointCenter,t_qPixmapScaledData);
+
+        // -- Legend --
+        QSize t_qSizePixmapLegend = widgetSize;
+
+        t_qSizePixmapLegend.setHeight(t_qSizePixmapLegend.height()-m_iBorderTopBottom*2);
+        t_qSizePixmapLegend.setWidth(m_iBorderLeftRight/3);
+
+        // Scale new image which size is widgetSize
+        QPixmap t_qPixmapScaledLegend = m_qPixmapLegend->scaled(t_qSizePixmapLegend, Qt::KeepAspectRatio);
+        // Calculate image center position into screen
+        t_qPointCenter.setX(widgetSize.width()-(m_iBorderLeftRight/3));
+
+        painter.drawPixmap(t_qPointCenter,t_qPixmapScaledLegend);
+
 
         painter.setPen(m_qPenAxes);
         painter.setFont(m_qFontAxes);
 
-
-        qint32 t_iLabelWidth = scaledPixmap.width();
+        qint32 t_iLabelWidth = t_qPixmapScaledData.width();
         qint32 t_iLabelHeight = 100;
 
-        painter.save();
-
         // -- Title --
-        painter.setPen(m_qPenTitle);
-        painter.setFont(m_qFontTitle);
+        if(!m_sTitle.isEmpty())
+        {
+            painter.save();
+            painter.setPen(m_qPenTitle);
+            painter.setFont(m_qFontTitle);
 
-        painter.translate((widgetSize.width()-t_iLabelWidth)/2, (widgetSize.height()-scaledPixmap.height())/2 - m_iBorderTopBottom*1.5);
-        painter.drawText(QRect(0, 0, t_iLabelWidth, t_iLabelHeight), Qt::AlignCenter, m_sTitle);
+            painter.translate((widgetSize.width()-t_iLabelWidth)/2, (widgetSize.height()-t_qPixmapScaledData.height())/2 - m_iBorderTopBottom*1.5);
+            painter.drawText(QRect(0, 0, t_iLabelWidth, t_iLabelHeight), Qt::AlignCenter, m_sTitle);
 
-        painter.restore();
-        painter.save();
+            painter.restore();
+        }
 
         // -- Axes --
-
         painter.setPen(m_qPenAxes);
         painter.setFont(m_qFontAxes);
 
-        //X Label
-        painter.translate((widgetSize.width()-t_iLabelWidth)/2, scaledPixmap.height()+((widgetSize.height()-scaledPixmap.height()-m_iBorderTopBottom)/2));
-        painter.drawText(QRect(0, 0, t_iLabelWidth, t_iLabelHeight), Qt::AlignCenter, m_sXLabel);
-
-        painter.restore();
+        // X Label
+        if(!m_sXLabel.isEmpty())
+        {
+            painter.save();
+            painter.translate((widgetSize.width()-t_iLabelWidth)/2, t_qPixmapScaledData.height()+((widgetSize.height()-t_qPixmapScaledData.height()-m_iBorderTopBottom)/2));
+            painter.drawText(QRect(0, 0, t_iLabelWidth, t_iLabelHeight), Qt::AlignCenter, m_sXLabel);
+            painter.restore();
+        }
 
         //Y Label
-        painter.rotate(270);
-        painter.translate(-(widgetSize.height()+t_iLabelWidth)/2,(widgetSize.width()-scaledPixmap.width())/2-t_iLabelHeight*0.75);
-        painter.drawText(QRect(0, 0, t_iLabelWidth, t_iLabelHeight), Qt::AlignCenter, m_sYLabel);
+        if(!m_sYLabel.isEmpty())
+        {
+            painter.save();
+            painter.rotate(270);
+            painter.translate(-(widgetSize.height()+t_iLabelWidth)/2,(widgetSize.width()-t_qPixmapScaledData.width())/2-t_iLabelHeight*0.75);
+            painter.drawText(QRect(0, 0, t_iLabelWidth, t_iLabelHeight), Qt::AlignCenter, m_sYLabel);
+            painter.restore();
+        }
     }
 }
 
 
 //*************************************************************************************************************
-//HSV Colormap
-int Matrix2DView::R(double x)
+
+void Matrix2DView::setTitle(const QString &p_sTitle)
 {
-    //Describe the red fuzzy set
-    if(x < 0.375)
-        return 0;
-    else if(x >= 0.375 && x < 0.625)
-        return (int)floor(slopeMRaising(x, -1.5)*255);
-    else if(x >= 0.625 && x < 0.875)
-        return (int)floor(1.0*255);
-    else if(x >= 0.875)
-        return (int)floor(slopeMFalling(x, 4.5)*255);
-    else
-        return 0;
+    m_sTitle = p_sTitle;
+    update();
 }
 
 
 //*************************************************************************************************************
 
-int Matrix2DView::G(double x)
+void Matrix2DView::setXLabel(const QString &p_sXLabel)
 {
-    //Describe the green fuzzy set
-    if(x < 0.125)
-        return 0;
-    else if(x >= 0.125 && x < 0.375)
-        return (int)floor(slopeMRaising(x, -0.5)*255);
-    else if(x >= 0.375 && x < 0.625)
-        return (int)floor(1.0*255);
-    else if(x >= 0.625 && x < 0.875)
-        return (int)floor(slopeMFalling(x, 2.5)*255);
-    else
-        return 0;
+    m_sXLabel = p_sXLabel;
+    update();
 }
 
 
 //*************************************************************************************************************
 
-int Matrix2DView::B(double x)
+void Matrix2DView::setYLabel(const QString &p_sYLabel)
 {
-    //Describe the blue fuzzy set
-    if(x < 0.125)
-        return (int)floor(slopeMRaising(x, 0.5)*255);
-    else if(x >= 0.125 && x < 0.375)
-        return (int)floor(1.0*255);
-    else if(x >= 0.375 && x < 0.625)
-        return (int)floor(slopeMFalling(x, 2.5)*255);
-    else
-        return 0;
-}
-
-
-//*************************************************************************************************************
-
-double Matrix2DView::slopeMRaising(double x, double n)
-{
-    //f = m*x + n
-    return 4*x + n;
-}
-
-
-//*************************************************************************************************************
-
-double Matrix2DView::slopeMFalling(double x,double n)
-{
-    //f = m*x + n
-    return -4*x + n;
+    m_sYLabel = p_sYLabel;
+    update();
 }

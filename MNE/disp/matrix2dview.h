@@ -101,11 +101,8 @@ public:
     typedef QSharedPointer<const Matrix2DView> ConstSPtr; /**< Const shared pointer type for MatrixView class. */
 
     explicit Matrix2DView(QWidget *parent = 0);
-
     explicit Matrix2DView(MatrixXd &p_dMat, QWidget *parent = 0);
-
     explicit Matrix2DView(MatrixXf &p_fMat, QWidget *parent = 0);
-
     explicit Matrix2DView(MatrixXi &p_iMat, QWidget *parent = 0);
 
     ~Matrix2DView();
@@ -113,33 +110,30 @@ public:
     void init();
 
     void updateMatrix(MatrixXd &p_dMat);
-
     void updateMatrix(MatrixXf &p_fMat);
-
     void updateMatrix(MatrixXi &p_iMat);
 
+    void setTitle(const QString &p_sTitle);
+    void setXLabel(const QString &p_sXLabel);
+    void setYLabel(const QString &p_sYLabel);
+
+
 protected:
-
-    int R(double v);
-    int G(double v);
-    int B(double v);
-    double slopeMRaising(double x, double n);
-    double slopeMFalling(double x, double n);
-
-
     void paintEvent(QPaintEvent*);
     void resizeEvent(QResizeEvent*);
     
 private:
 //    MatrixXd
-    QPixmap* pixmap;
+    QPixmap* m_qPixmapData;
+    QPixmap* m_qPixmapLegend;
+
     QSize widgetSize;
 
     qint32 m_iBorderTopBottom;
     qint32 m_iBorderLeftRight;
 
-    double m_qMinValue;
-    double m_qMaxValue;
+    double m_dMinValue;
+    double m_dMaxValue;
 
     QString m_sTitle;
     QFont m_qFontTitle;
