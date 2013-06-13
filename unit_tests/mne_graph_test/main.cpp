@@ -101,6 +101,10 @@ int main(int argc, char *argv[])
     }
 
     Matrix2DView mview(mat);
+    mview.setTitle("Test Matrix");
+    mview.setXLabel("X Achse");
+    mview.setYLabel("Y Achse");
+
     mview.show();
     mview.setWindowTitle("2D View");
 
