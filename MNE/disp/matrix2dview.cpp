@@ -190,10 +190,7 @@ void Matrix2DView::updateMatrix(MatrixXd &p_dMat)
         double t_dQuantile = 1.0/((double)y);
         for(j = 0; j < y; ++j)
         {
-            QRgb t_qRgb = ColorMap::valueToHsv(t_dQuantile*((double)j));
-
-            qDebug() << "RGB" << t_dQuantile*((double)j);
-
+            QRgb t_qRgb = ColorMap::valueToHsv(t_dQuantile*((double)j)*1.0);
             for(i = 0; i < t_iLegendWidth; ++i)
                 t_qImageLegend.setPixel(i, j, t_qRgb);
         }
@@ -265,7 +262,9 @@ void Matrix2DView::paintEvent(QPaintEvent *)
         // Scale new image which size is widgetSize
         QPixmap t_qPixmapScaledLegend = m_qPixmapLegend->scaled(t_qSizePixmapLegend, Qt::IgnoreAspectRatio);
         // Calculate image center position into screen
-        t_qPointCenter.setX(widgetSize.width()-(m_iBorderLeftRight/3));
+        t_qPointCenter.setY(t_qPointCenter.y());
+
+        t_qPointCenter.setX(t_qPointCenter.x() + t_qPixmapScaledData.width() + m_iBorderLeftRight/2);
 
         painter.drawPixmap(t_qPointCenter,t_qPixmapScaledLegend);
 
