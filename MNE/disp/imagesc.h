@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     disp_global.h
+* @file     imagesc.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    disp library export/import macros.
+* @brief    ImageSc class declaration
 *
 */
 
-#ifndef MATRIX2DVIEW_H
-#define MATRIX2DVIEW_H
+#ifndef IMAGESC_H
+#define IMAGESC_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -93,19 +93,19 @@ using namespace Eigen;
 *
 * @brief Eigen matrix visualization
 */
-class DISPSHARED_EXPORT Matrix2DView : public QWidget
+class DISPSHARED_EXPORT ImageSc : public QWidget
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<Matrix2DView> SPtr;            /**< Shared pointer type for MatrixView class. */
-    typedef QSharedPointer<const Matrix2DView> ConstSPtr; /**< Const shared pointer type for MatrixView class. */
+    typedef QSharedPointer<ImageSc> SPtr;            /**< Shared pointer type for MatrixView class. */
+    typedef QSharedPointer<const ImageSc> ConstSPtr; /**< Const shared pointer type for MatrixView class. */
 
-    explicit Matrix2DView(QWidget *parent = 0);
-    explicit Matrix2DView(MatrixXd &p_dMat, QWidget *parent = 0);
-    explicit Matrix2DView(MatrixXf &p_fMat, QWidget *parent = 0);
-    explicit Matrix2DView(MatrixXi &p_iMat, QWidget *parent = 0);
+    explicit ImageSc(QWidget *parent = 0);
+    explicit ImageSc(MatrixXd &p_dMat, QWidget *parent = 0);
+    explicit ImageSc(MatrixXf &p_fMat, QWidget *parent = 0);
+    explicit ImageSc(MatrixXi &p_iMat, QWidget *parent = 0);
 
-    ~Matrix2DView();
+    ~ImageSc();
 
     void init();
 
@@ -154,4 +154,4 @@ private:
 
 } // NAMESPACE
 
-#endif // MATRIX2DVIEW_H
+#endif // IMAGESC_H

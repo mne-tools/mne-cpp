@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp/matrix2dview.h>
+#include <disp/imagesc.h>
 
 
 //*************************************************************************************************************
@@ -100,13 +100,13 @@ int main(int argc, char *argv[])
         }
     }
 
-    Matrix2DView mview(mat);
-    mview.setTitle("Test Matrix");
-    mview.setXLabel("X Achse");
-    mview.setYLabel("Y Achse");
+    ImageSc imagesc(mat);
+    imagesc.setTitle("Test Matrix");
+    imagesc.setXLabel("X Achse");
+    imagesc.setYLabel("Y Achse");
 
-    mview.show();
-    mview.setWindowTitle("2D View");
+    imagesc.setWindowTitle("Corresponding function to MATLABs imagesc");
+    imagesc.show();
 
     return a.exec();
 }

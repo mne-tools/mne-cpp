@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     matrix2dview.cpp
+* @file     imagesc.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the Matrix2DView class.
+* @brief    Implementation of the ImageSc class.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "matrix2dview.h"
+#include "imagesc.h"
 #include "colormap.h"
 
 
@@ -67,7 +67,7 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Matrix2DView::Matrix2DView(QWidget *parent)
+ImageSc::ImageSc(QWidget *parent)
 : QWidget(parent)
 , m_qPixmapData(NULL)
 , m_qPixmapLegend(NULL)
@@ -78,7 +78,7 @@ Matrix2DView::Matrix2DView(QWidget *parent)
 
 //*************************************************************************************************************
 
-Matrix2DView::Matrix2DView(MatrixXd &p_dMat, QWidget *parent)
+ImageSc::ImageSc(MatrixXd &p_dMat, QWidget *parent)
 : QWidget(parent)
 , m_qPixmapData(NULL)
 , m_qPixmapLegend(NULL)
@@ -90,7 +90,7 @@ Matrix2DView::Matrix2DView(MatrixXd &p_dMat, QWidget *parent)
 
 //*************************************************************************************************************
 
-Matrix2DView::Matrix2DView(MatrixXf &p_fMat, QWidget *parent)
+ImageSc::ImageSc(MatrixXf &p_fMat, QWidget *parent)
 : QWidget(parent)
 , m_qPixmapData(NULL)
 , m_qPixmapLegend(NULL)
@@ -102,7 +102,7 @@ Matrix2DView::Matrix2DView(MatrixXf &p_fMat, QWidget *parent)
 
 //*************************************************************************************************************
 
-Matrix2DView::Matrix2DView(MatrixXi &p_iMat, QWidget *parent)
+ImageSc::ImageSc(MatrixXi &p_iMat, QWidget *parent)
 : QWidget(parent)
 , m_qPixmapData(NULL)
 , m_qPixmapLegend(NULL)
@@ -114,7 +114,7 @@ Matrix2DView::Matrix2DView(MatrixXi &p_iMat, QWidget *parent)
 
 //*************************************************************************************************************
 
-Matrix2DView::~Matrix2DView()
+ImageSc::~ImageSc()
 {
     if(m_qPixmapData)
         delete m_qPixmapData;
@@ -125,7 +125,7 @@ Matrix2DView::~Matrix2DView()
 
 //*************************************************************************************************************
 
-void Matrix2DView::init()
+void ImageSc::init()
 {
     //Set Borders
     m_iBorderTopBottom = 50;
@@ -143,7 +143,7 @@ void Matrix2DView::init()
 
 //*************************************************************************************************************
 
-void Matrix2DView::updateMatrix(MatrixXd &p_dMat)
+void ImageSc::updateMatrix(MatrixXd &p_dMat)
 {
     if(m_qPixmapData)
     {
@@ -203,7 +203,7 @@ void Matrix2DView::updateMatrix(MatrixXd &p_dMat)
 
 //*************************************************************************************************************
 
-void Matrix2DView::updateMatrix(MatrixXf &p_fMat)
+void ImageSc::updateMatrix(MatrixXf &p_fMat)
 {
     MatrixXd t_dMat = p_fMat.cast<double>();
     updateMatrix(t_dMat);
@@ -212,7 +212,7 @@ void Matrix2DView::updateMatrix(MatrixXf &p_fMat)
 
 //*************************************************************************************************************
 
-void Matrix2DView::updateMatrix(MatrixXi &p_iMat)
+void ImageSc::updateMatrix(MatrixXi &p_iMat)
 {
     MatrixXd t_dMat = p_iMat.cast<double>();
     updateMatrix(t_dMat);
@@ -221,7 +221,7 @@ void Matrix2DView::updateMatrix(MatrixXi &p_iMat)
 
 //*************************************************************************************************************
 
-void Matrix2DView::resizeEvent (QResizeEvent* event)
+void ImageSc::resizeEvent (QResizeEvent* event)
 {
     widgetSize = event->size();
     // Call base class impl
@@ -231,7 +231,7 @@ void Matrix2DView::resizeEvent (QResizeEvent* event)
 
 //*************************************************************************************************************
 
-void Matrix2DView::paintEvent(QPaintEvent *)
+void ImageSc::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     if (!m_qPixmapData->isNull())
@@ -315,7 +315,7 @@ void Matrix2DView::paintEvent(QPaintEvent *)
 
 //*************************************************************************************************************
 
-void Matrix2DView::setTitle(const QString &p_sTitle)
+void ImageSc::setTitle(const QString &p_sTitle)
 {
     m_sTitle = p_sTitle;
     update();
@@ -324,7 +324,7 @@ void Matrix2DView::setTitle(const QString &p_sTitle)
 
 //*************************************************************************************************************
 
-void Matrix2DView::setXLabel(const QString &p_sXLabel)
+void ImageSc::setXLabel(const QString &p_sXLabel)
 {
     m_sXLabel = p_sXLabel;
     update();
@@ -333,7 +333,7 @@ void Matrix2DView::setXLabel(const QString &p_sXLabel)
 
 //*************************************************************************************************************
 
-void Matrix2DView::setYLabel(const QString &p_sYLabel)
+void ImageSc::setYLabel(const QString &p_sYLabel)
 {
     m_sYLabel = p_sYLabel;
     update();
