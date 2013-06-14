@@ -82,6 +82,17 @@ using namespace FiffSimulatorPlugin;
 using namespace FIFFLIB;
 using namespace MNELIB;
 
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER CONSTANTS
+//=============================================================================================================
+
+const QString FiffSimulator::Commands::BUFSIZE = "bufsize";
+const QString FiffSimulator::Commands::GETBUFSIZE = "getbufsize";
+const QString FiffSimulator::Commands::ACCEL = "accel";
+const QString FiffSimulator::Commands::GETACCEL = "getaccel";
+const QString FiffSimulator::Commands::SIMFILE = "simfile";
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -141,10 +152,10 @@ void FiffSimulator::comBufsize(Command p_command)
 
         QString str = QString("\tSet %1 buffer sample size to %2 samples\r\n\n").arg(getName()).arg(t_uiBuffSize);
 
-        m_commandManager["bufsize"].reply(str);
+        m_commandManager[Commands::BUFSIZE].reply(str);
     }
     else
-        m_commandManager["bufsize"].reply("Buffer size not set\r\n");
+        m_commandManager[Commands::BUFSIZE].reply("Buffer size not set\r\n");
 }
 
 
@@ -159,15 +170,15 @@ void FiffSimulator::comGetBufsize(Command p_command)
         //create JSON help object
         //
         QJsonObject t_qJsonObjectRoot;
-        t_qJsonObjectRoot.insert("bufsize", QJsonValue((double)m_uiBufferSampleSize));
+        t_qJsonObjectRoot.insert(Commands::BUFSIZE, QJsonValue((double)m_uiBufferSampleSize));
         QJsonDocument p_qJsonDocument(t_qJsonObjectRoot);
 
-        m_commandManager["getbufsize"].reply(p_qJsonDocument.toJson());
+        m_commandManager[Commands::GETBUFSIZE].reply(p_qJsonDocument.toJson());
     }
     else
     {
         QString str = QString("\t%1\r\n\n").arg(m_uiBufferSampleSize);
-        m_commandManager["getbufsize"].reply(str);
+        m_commandManager[Commands::GETBUFSIZE].reply(str);
     }
 }
 
@@ -198,10 +209,10 @@ void FiffSimulator::comAccel(Command p_command)
 
         QString str = QString("\tSet acceleration factor to %0.3f\r\n\n").arg(t_uiAccel);
 
-        m_commandManager["accel"].reply(str);
+        m_commandManager[Commands::ACCEL].reply(str);
     }
     else
-        m_commandManager["accel"].reply("Acceleration facor not set\r\n");
+        m_commandManager[Commands::ACCEL].reply("Acceleration facor not set\r\n");
 }
 
 //*************************************************************************************************************
@@ -215,15 +226,15 @@ void FiffSimulator::comGetAccel(Command p_command)
         //create JSON help object
         //
         QJsonObject t_qJsonObjectRoot;
-        t_qJsonObjectRoot.insert("accel", QJsonValue((double)m_AccelerationFactor));
+        t_qJsonObjectRoot.insert(Commands::ACCEL, QJsonValue((double)m_AccelerationFactor));
         QJsonDocument p_qJsonDocument(t_qJsonObjectRoot);
 
-        m_commandManager["getaccel"].reply(p_qJsonDocument.toJson());
+        m_commandManager[Commands::GETACCEL].reply(p_qJsonDocument.toJson());
     }
     else
     {
         QString str = QString("\t%0.3f\r\n\n").arg(m_AccelerationFactor);
-        m_commandManager["getaccel"].reply(str);
+        m_commandManager[Commands::GETACCEL].reply(str);
     }
 }
 
@@ -248,15 +259,21 @@ void FiffSimulator::comSimfile(Command p_command)
             m_pFiffProducer->stop();
             this->stop();
 
-            m_commandManager["simfile"].reply("New simulation file set succefully.\r\n");
+            m_commandManager[Commands::SIMFILE].reply("New simulation file set succefully.\r\n");
         }
         else
         {
             qDebug() << "Didn't set new file";
             m_sResourceDataPath = t_sResourceDataPathOld;
 
-            m_commandManager["simfile"].reply("Simulation file not set.\r\n");
+            m_commandManager[Commands::SIMFILE].reply("Simulation file not set.\r\n");
         }
+    }
+    else
+    {
+        qDebug() << "File does not exist on server!";
+        m_sResourceDataPath = t_sResourceDataPathOld;
+        m_commandManager[Commands::SIMFILE].reply("Simulation file not set.\r\n");
     }
 }
 
@@ -266,11 +283,11 @@ void FiffSimulator::comSimfile(Command p_command)
 void FiffSimulator::connectCommandManager()
 {
     //Connect slots
-    QObject::connect(&m_commandManager["bufsize"], &Command::executed, this, &FiffSimulator::comBufsize);
-    QObject::connect(&m_commandManager["getbufsize"], &Command::executed, this, &FiffSimulator::comGetBufsize);
-    QObject::connect(&m_commandManager["accel"], &Command::executed, this, &FiffSimulator::comAccel);
-    QObject::connect(&m_commandManager["getaccel"], &Command::executed, this, &FiffSimulator::comGetAccel);
-    QObject::connect(&m_commandManager["simfile"], &Command::executed, this, &FiffSimulator::comSimfile);
+    QObject::connect(&m_commandManager[Commands::BUFSIZE], &Command::executed, this, &FiffSimulator::comBufsize);
+    QObject::connect(&m_commandManager[Commands::GETBUFSIZE], &Command::executed, this, &FiffSimulator::comGetBufsize);
+    QObject::connect(&m_commandManager[Commands::ACCEL], &Command::executed, this, &FiffSimulator::comAccel);
+    QObject::connect(&m_commandManager[Commands::GETACCEL], &Command::executed, this, &FiffSimulator::comGetAccel);
+    QObject::connect(&m_commandManager[Commands::SIMFILE], &Command::executed, this, &FiffSimulator::comSimfile);
 }
 
 
