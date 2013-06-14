@@ -88,14 +88,14 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
 
-    MatrixXi mat(300,400);
+    MatrixXd mat(300,400);
 
     int count = 200;
     for(int i = 0; i < 300; ++i)
     {
         for(int j = 0; j < 400; ++j)
         {
-            mat(i,j) = i+j;//count;//
+            mat(i,j) = ((double)(i+j))*0.1;//count;//
             ++count;
         }
     }
