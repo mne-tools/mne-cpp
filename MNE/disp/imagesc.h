@@ -123,9 +123,9 @@ protected:
     void resizeEvent(QResizeEvent*);
     
 private:
-//    MatrixXd
+
     QPixmap* m_qPixmapData;
-    QPixmap* m_qPixmapLegend;
+    QPixmap* m_qPixmapColorbar;
 
     QSize widgetSize;
 
@@ -144,6 +144,10 @@ private:
     QFont m_qFontAxes;
     QPen m_qPenAxes;
 
+    bool m_bColorbar;
+    qint32 m_iColorbarWidth;
+    QFont m_qFontColorbar;
+    QPen m_qPenColorbar;
 
 };
 
