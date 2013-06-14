@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include "colormap.h"
+#include <math.h>
 
 
 //*************************************************************************************************************
@@ -67,18 +68,18 @@ ColorMap::~ColorMap()
 
 
 //*************************************************************************************************************
-//HSV Colormap
-int ColorMap::hsvR(double x)
+//Jet Colormap
+int ColorMap::jetR(double x)
 {
     //Describe the red fuzzy set
     if(x < 0.375)
         return 0;
     else if(x >= 0.375 && x < 0.625)
-        return (int)floor(hsvSlopeMRaising(x, -1.5)*255);
+        return (int)floor(jetSlopeMRaising(x, -1.5)*255);
     else if(x >= 0.625 && x < 0.875)
         return (int)floor(1.0*255);
     else if(x >= 0.875)
-        return (int)floor(hsvSlopeMFalling(x, 4.5)*255);
+        return (int)floor(jetSlopeMFalling(x, 4.5)*255);
     else
         return 0;
 }
@@ -86,17 +87,17 @@ int ColorMap::hsvR(double x)
 
 //*************************************************************************************************************
 
-int ColorMap::hsvG(double x)
+int ColorMap::jetG(double x)
 {
     //Describe the green fuzzy set
     if(x < 0.125)
         return 0;
     else if(x >= 0.125 && x < 0.375)
-        return (int)floor(hsvSlopeMRaising(x, -0.5)*255);
+        return (int)floor(jetSlopeMRaising(x, -0.5)*255);
     else if(x >= 0.375 && x < 0.625)
         return (int)floor(1.0*255);
     else if(x >= 0.625 && x < 0.875)
-        return (int)floor(hsvSlopeMFalling(x, 2.5)*255);
+        return (int)floor(jetSlopeMFalling(x, 2.5)*255);
     else
         return 0;
 }
@@ -104,15 +105,15 @@ int ColorMap::hsvG(double x)
 
 //*************************************************************************************************************
 
-int ColorMap::hsvB(double x)
+int ColorMap::jetB(double x)
 {
     //Describe the blue fuzzy set
     if(x < 0.125)
-        return (int)floor(hsvSlopeMRaising(x, 0.5)*255);
+        return (int)floor(jetSlopeMRaising(x, 0.5)*255);
     else if(x >= 0.125 && x < 0.375)
         return (int)floor(1.0*255);
     else if(x >= 0.375 && x < 0.625)
-        return (int)floor(hsvSlopeMFalling(x, 2.5)*255);
+        return (int)floor(jetSlopeMFalling(x, 2.5)*255);
     else
         return 0;
 }
@@ -120,7 +121,7 @@ int ColorMap::hsvB(double x)
 
 //*************************************************************************************************************
 
-double ColorMap::hsvSlopeMRaising(double x, double n)
+double ColorMap::jetSlopeMRaising(double x, double n)
 {
     //f = m*x + n
     return 4*x + n;
@@ -129,7 +130,7 @@ double ColorMap::hsvSlopeMRaising(double x, double n)
 
 //*************************************************************************************************************
 
-double ColorMap::hsvSlopeMFalling(double x,double n)
+double ColorMap::jetSlopeMFalling(double x,double n)
 {
     //f = m*x + n
     return -4*x + n;
