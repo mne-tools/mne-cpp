@@ -178,7 +178,7 @@ void ImageSc::updateMatrix(MatrixXd &p_dMat)
         QImage t_qImageData(x, y, QImage::Format_RGB32);
         for(i = 0; i < x; ++i)
             for(j = 0; j < y; ++j)
-                t_qImageData.setPixel(i, j, ColorMap::valueToHsv(dataNormalized(j,i)));
+                t_qImageData.setPixel(i, j, ColorMap::valueToJet(dataNormalized(j,i)));
 
         m_qPixmapData = new QPixmap(QPixmap::fromImage(t_qImageData));
 
@@ -190,7 +190,7 @@ void ImageSc::updateMatrix(MatrixXd &p_dMat)
         double t_dQuantile = 1.0/((double)y);
         for(j = 0; j < y; ++j)
         {
-            QRgb t_qRgb = ColorMap::valueToHsv(t_dQuantile*((double)j)*1.0);
+            QRgb t_qRgb = ColorMap::valueToJet(t_dQuantile*((double)j)*1.0);
             for(i = 0; i < t_iLegendWidth; ++i)
                 t_qImageLegend.setPixel(i, j, t_qRgb);
         }
