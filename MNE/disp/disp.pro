@@ -76,14 +76,14 @@ win32 {
 }
 
 SOURCES += \
-    matrix2dview.cpp \
-    colormap.cpp
+    colormap.cpp \
+    imagesc.cpp
 
 
 HEADERS += \
     disp_global.h \
-    matrix2dview.h \
-    colormap.h
+    colormap.h \
+    imagesc.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
