@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     matrix2dview.cpp
+* @file     imagesc.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the Matrix2DView class.
+* @brief    Implementation of the ImageSc class.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "matrix2dview.h"
+#include "imagesc.h"
 #include "colormap.h"
 
 
@@ -67,10 +67,11 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Matrix2DView::Matrix2DView(QWidget *parent)
+ImageSc::ImageSc(QWidget *parent)
 : QWidget(parent)
 , m_qPixmapData(NULL)
-, m_qPixmapLegend(NULL)
+, m_bColorbar(true)
+, m_qPixmapColorbar(NULL)
 {
     init();
 }
@@ -78,10 +79,10 @@ Matrix2DView::Matrix2DView(QWidget *parent)
 
 //*************************************************************************************************************
 
-Matrix2DView::Matrix2DView(MatrixXd &p_dMat, QWidget *parent)
+ImageSc::ImageSc(MatrixXd &p_dMat, QWidget *parent)
 : QWidget(parent)
 , m_qPixmapData(NULL)
-, m_qPixmapLegend(NULL)
+, m_qPixmapColorbar(NULL)
 {
     init();
     updateMatrix(p_dMat);
@@ -90,10 +91,10 @@ Matrix2DView::Matrix2DView(MatrixXd &p_dMat, QWidget *parent)
 
 //*************************************************************************************************************
 
-Matrix2DView::Matrix2DView(MatrixXf &p_fMat, QWidget *parent)
+ImageSc::ImageSc(MatrixXf &p_fMat, QWidget *parent)
 : QWidget(parent)
 , m_qPixmapData(NULL)
-, m_qPixmapLegend(NULL)
+, m_qPixmapColorbar(NULL)
 {
     init();
     updateMatrix(p_fMat);
@@ -102,10 +103,10 @@ Matrix2DView::Matrix2DView(MatrixXf &p_fMat, QWidget *parent)
 
 //*************************************************************************************************************
 
-Matrix2DView::Matrix2DView(MatrixXi &p_iMat, QWidget *parent)
+ImageSc::ImageSc(MatrixXi &p_iMat, QWidget *parent)
 : QWidget(parent)
 , m_qPixmapData(NULL)
-, m_qPixmapLegend(NULL)
+, m_qPixmapColorbar(NULL)
 {
     init();
     updateMatrix(p_iMat);
@@ -114,18 +115,18 @@ Matrix2DView::Matrix2DView(MatrixXi &p_iMat, QWidget *parent)
 
 //*************************************************************************************************************
 
-Matrix2DView::~Matrix2DView()
+ImageSc::~ImageSc()
 {
     if(m_qPixmapData)
         delete m_qPixmapData;
-    if(m_qPixmapLegend)
-        delete m_qPixmapLegend;
+    if(m_qPixmapColorbar)
+        delete m_qPixmapColorbar;
 }
 
 
 //*************************************************************************************************************
 
-void Matrix2DView::init()
+void ImageSc::init()
 {
     //Set Borders
     m_iBorderTopBottom = 50;
@@ -138,22 +139,26 @@ void Matrix2DView::init()
     m_qFontTitle.setPixelSize(20);
     m_qFontTitle.setBold(true);
     m_qPenTitle = QPen(Qt::black);
+
+    m_qFontColorbar.setPixelSize(10);
+    m_qPenColorbar = QPen(Qt::black);
+    m_iColorbarWidth = 12;
 }
 
 
 //*************************************************************************************************************
 
-void Matrix2DView::updateMatrix(MatrixXd &p_dMat)
+void ImageSc::updateMatrix(MatrixXd &p_dMat)
 {
     if(m_qPixmapData)
     {
         delete m_qPixmapData;
         m_qPixmapData = NULL;
     }
-    if(m_qPixmapLegend)
+    if(m_qPixmapColorbar)
     {
-        delete m_qPixmapLegend;
-        m_qPixmapLegend = NULL;
+        delete m_qPixmapColorbar;
+        m_qPixmapColorbar = NULL;
     }
 
     if(p_dMat.rows() > 0 && p_dMat.cols())
@@ -178,24 +183,22 @@ void Matrix2DView::updateMatrix(MatrixXd &p_dMat)
         QImage t_qImageData(x, y, QImage::Format_RGB32);
         for(i = 0; i < x; ++i)
             for(j = 0; j < y; ++j)
-                t_qImageData.setPixel(i, j, ColorMap::valueToHsv(dataNormalized(j,i)));
+                t_qImageData.setPixel(i, j, ColorMap::valueToJet(dataNormalized(j,i)));
 
         m_qPixmapData = new QPixmap(QPixmap::fromImage(t_qImageData));
 
-        // -- legend --
-        qint32 t_iLegendWidth = 20;
-
-        QImage t_qImageLegend(t_iLegendWidth, y, QImage::Format_RGB32);
+        // -- Colorbar --
+        QImage t_qImageColorbar(m_iColorbarWidth, y, QImage::Format_RGB32);
 
         double t_dQuantile = 1.0/((double)y);
-        for(j = 0; j < y; ++j)
+        for(j = 0; j <= y; ++j)
         {
-            QRgb t_qRgb = ColorMap::valueToHsv(t_dQuantile*((double)j));
-            for(i = 0; i < t_iLegendWidth; ++i)
-                t_qImageLegend.setPixel(i, j, t_qRgb);
+            QRgb t_qRgb = ColorMap::valueToJet(t_dQuantile*((double)(y-j))*1.0);
+            for(i = 0; i < m_iColorbarWidth; ++i)
+                t_qImageColorbar.setPixel(i, j, t_qRgb);
         }
 
-        m_qPixmapLegend = new QPixmap(QPixmap::fromImage(t_qImageLegend));
+        m_qPixmapColorbar = new QPixmap(QPixmap::fromImage(t_qImageColorbar));
     }
     update();
 }
@@ -203,7 +206,7 @@ void Matrix2DView::updateMatrix(MatrixXd &p_dMat)
 
 //*************************************************************************************************************
 
-void Matrix2DView::updateMatrix(MatrixXf &p_fMat)
+void ImageSc::updateMatrix(MatrixXf &p_fMat)
 {
     MatrixXd t_dMat = p_fMat.cast<double>();
     updateMatrix(t_dMat);
@@ -212,7 +215,7 @@ void Matrix2DView::updateMatrix(MatrixXf &p_fMat)
 
 //*************************************************************************************************************
 
-void Matrix2DView::updateMatrix(MatrixXi &p_iMat)
+void ImageSc::updateMatrix(MatrixXi &p_iMat)
 {
     MatrixXd t_dMat = p_iMat.cast<double>();
     updateMatrix(t_dMat);
@@ -221,7 +224,7 @@ void Matrix2DView::updateMatrix(MatrixXi &p_iMat)
 
 //*************************************************************************************************************
 
-void Matrix2DView::resizeEvent (QResizeEvent* event)
+void ImageSc::resizeEvent (QResizeEvent* event)
 {
     widgetSize = event->size();
     // Call base class impl
@@ -231,7 +234,7 @@ void Matrix2DView::resizeEvent (QResizeEvent* event)
 
 //*************************************************************************************************************
 
-void Matrix2DView::paintEvent(QPaintEvent *)
+void ImageSc::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     if (!m_qPixmapData->isNull())
@@ -253,19 +256,43 @@ void Matrix2DView::paintEvent(QPaintEvent *)
 
         painter.drawPixmap(t_qPointCenter,t_qPixmapScaledData);
 
-        // -- Legend --
-        QSize t_qSizePixmapLegend = widgetSize;
 
-        t_qSizePixmapLegend.setHeight(t_qSizePixmapLegend.height()-m_iBorderTopBottom*2);
-        t_qSizePixmapLegend.setWidth(m_iBorderLeftRight/3);
+        // -- Colorbar --
+        if(m_bColorbar)
+        {
+            QSize t_qSizePixmapColorbar = widgetSize;
 
-        // Scale new image which size is widgetSize
-        QPixmap t_qPixmapScaledLegend = m_qPixmapLegend->scaled(t_qSizePixmapLegend, Qt::KeepAspectRatio);
-        // Calculate image center position into screen
-        t_qPointCenter.setX(widgetSize.width()-(m_iBorderLeftRight/3));
+            t_qSizePixmapColorbar.setHeight(t_qPixmapScaledData.height());//t_qSizePixmapColorbar.height()-m_iBorderTopBottom*2);
+            t_qSizePixmapColorbar.setWidth(m_iColorbarWidth);
 
-        painter.drawPixmap(t_qPointCenter,t_qPixmapScaledLegend);
+            // Scale new image which size is widgetSize
+            QPixmap t_qPixmapScaledColorbar = m_qPixmapColorbar->scaled(t_qSizePixmapColorbar, Qt::IgnoreAspectRatio);
+            // Calculate image center position into screen
+            t_qPointCenter.setY(t_qPointCenter.y());
 
+            t_qPointCenter.setX(t_qPointCenter.x() + t_qPixmapScaledData.width() + m_iBorderLeftRight/3);
+
+            painter.drawPixmap(t_qPointCenter,t_qPixmapScaledColorbar);
+
+            // -- Scale --
+            painter.save();
+
+            QPoint t_qPointTopLeft = t_qPointCenter;
+
+            painter.setPen(m_qPenColorbar);
+            painter.setFont(m_qFontColorbar);
+
+            // -- MAX --
+            painter.translate(t_qPointTopLeft.x()+ m_iColorbarWidth + m_qFontColorbar.pixelSize()/2, t_qPointTopLeft.y() - m_qFontColorbar.pixelSize()/2);
+            painter.drawText(QRect(0, 0, 100, 12), Qt::AlignLeft, QString::number(m_dMaxValue));
+            painter.restore();
+
+            // --MIN--
+            painter.save();
+            painter.translate(t_qPointTopLeft.x()+ m_iColorbarWidth + m_qFontColorbar.pixelSize()/2, t_qPointTopLeft.y() + t_qSizePixmapColorbar.height() - m_qFontColorbar.pixelSize()/2);
+            painter.drawText(QRect(0, 0, 100, 12), Qt::AlignLeft, QString::number(m_dMinValue));
+            painter.restore();
+        }
 
         painter.setPen(m_qPenAxes);
         painter.setFont(m_qFontAxes);
@@ -314,7 +341,7 @@ void Matrix2DView::paintEvent(QPaintEvent *)
 
 //*************************************************************************************************************
 
-void Matrix2DView::setTitle(const QString &p_sTitle)
+void ImageSc::setTitle(const QString &p_sTitle)
 {
     m_sTitle = p_sTitle;
     update();
@@ -323,7 +350,7 @@ void Matrix2DView::setTitle(const QString &p_sTitle)
 
 //*************************************************************************************************************
 
-void Matrix2DView::setXLabel(const QString &p_sXLabel)
+void ImageSc::setXLabel(const QString &p_sXLabel)
 {
     m_sXLabel = p_sXLabel;
     update();
@@ -332,7 +359,7 @@ void Matrix2DView::setXLabel(const QString &p_sXLabel)
 
 //*************************************************************************************************************
 
-void Matrix2DView::setYLabel(const QString &p_sYLabel)
+void ImageSc::setYLabel(const QString &p_sYLabel)
 {
     m_sYLabel = p_sYLabel;
     update();

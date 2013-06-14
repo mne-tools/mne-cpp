@@ -75,7 +75,7 @@ namespace DISPLIB
 
 //=============================================================================================================
 /**
-* Provides diffenrent color maps like HSV,...
+* Provides diffenrent color maps like Jet,...
 *
 * @brief Color map RGB transformations
 */
@@ -97,14 +97,14 @@ public:
     */
     ~ColorMap();
 
-    static inline QRgb valueToHsv(double v);
+    static inline QRgb valueToJet(double v);
     
 protected:
-    static int hsvR(double v);
-    static int hsvG(double v);
-    static int hsvB(double v);
-    static double hsvSlopeMRaising(double x, double n);
-    static double hsvSlopeMFalling(double x, double n);
+    static int jetR(double v);
+    static int jetG(double v);
+    static int jetB(double v);
+    static double jetSlopeMRaising(double x, double n);
+    static double jetSlopeMFalling(double x, double n);
 
 private:
     
@@ -115,9 +115,9 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline QRgb ColorMap::valueToHsv(double v)
+inline QRgb ColorMap::valueToJet(double v)
 {
-    QRgb p_qRgb = qRgb(hsvR(v), hsvG(v), hsvB(v));
+    QRgb p_qRgb = qRgb(jetR(v), jetG(v), jetB(v));
     return p_qRgb;
 }
 

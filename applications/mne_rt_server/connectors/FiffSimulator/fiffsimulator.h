@@ -105,6 +105,14 @@ class FIFFSIMULATORSHARED_EXPORT FiffSimulator : public IConnector
     friend class FiffProducer;
 
 public:
+    struct Commands
+    {
+        static const QString BUFSIZE;
+        static const QString GETBUFSIZE;
+        static const QString ACCEL;
+        static const QString GETACCEL;
+        static const QString SIMFILE;
+    };
 
     //=========================================================================================================
     /**

@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp/matrix2dview.h>
+#include <disp/imagesc.h>
 
 
 //*************************************************************************************************************
@@ -88,25 +88,25 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
 
-    MatrixXi mat(200,300);
+    MatrixXd mat(300,400);
 
     int count = 200;
-    for(int i = 0; i < 200; ++i)
+    for(int i = 0; i < 300; ++i)
     {
-        for(int j = 0; j < 300; ++j)
+        for(int j = 0; j < 400; ++j)
         {
-            mat(i,j) = i+j;
+            mat(i,j) = ((double)(i+j))*0.1;//count;//
             ++count;
         }
     }
 
-    Matrix2DView mview(mat);
-    mview.setTitle("Test Matrix");
-    mview.setXLabel("X Achse");
-    mview.setYLabel("Y Achse");
+    ImageSc imagesc(mat);
+    imagesc.setTitle("Test Matrix");
+    imagesc.setXLabel("X Achse");
+    imagesc.setYLabel("Y Achse");
 
-    mview.show();
-    mview.setWindowTitle("2D View");
+    imagesc.setWindowTitle("Corresponding function to MATLABs imagesc");
+    imagesc.show();
 
     return a.exec();
 }
