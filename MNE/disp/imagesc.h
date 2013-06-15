@@ -124,8 +124,8 @@ protected:
     
 private:
 
-    QPixmap* m_qPixmapData;
-    QPixmap* m_qPixmapColorbar;
+    QPixmap* m_pPixmapData;
+    QPixmap* m_pPixmapColorbar;
 
     QSize widgetSize;
 
@@ -146,6 +146,7 @@ private:
 
     bool m_bColorbar;
     qint32 m_iColorbarWidth;
+    qint32 m_iColorbarSteps;
     QFont m_qFontColorbar;
     QPen m_qPenColorbar;
 

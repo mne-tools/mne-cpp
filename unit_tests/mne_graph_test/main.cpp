@@ -87,18 +87,13 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    qint32 width = 30;
+    qint32 height = 40;
+    MatrixXd mat(width,40);
 
-    MatrixXd mat(300,400);
-
-    int count = 200;
-    for(int i = 0; i < 300; ++i)
-    {
-        for(int j = 0; j < 400; ++j)
-        {
-            mat(i,j) = ((double)(i+j))*0.1;//count;//
-            ++count;
-        }
-    }
+    for(int i = 0; i < width; ++i)
+        for(int j = 0; j < height; ++j)
+            mat(i,j) = ((double)(i+j))*0.1-1.5;
 
     ImageSc imagesc(mat);
     imagesc.setTitle("Test Matrix");
