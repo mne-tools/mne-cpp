@@ -144,7 +144,9 @@ void ImageSc::init()
     m_qFontColorbar.setPixelSize(10);
     m_qPenColorbar = QPen(Qt::black);
     m_iColorbarWidth = 12;
-    m_iColorbarSteps = 200;
+    m_iColorbarSteps = 7;//>= 2!!
+    m_iColorbarGradSteps = 200;
+
 }
 
 
@@ -190,16 +192,45 @@ void ImageSc::updateMatrix(MatrixXd &p_dMat)
         m_pPixmapData = new QPixmap(QPixmap::fromImage(t_qImageData));
 
         // -- Colorbar --
-        QImage t_qImageColorbar(1, m_iColorbarSteps, QImage::Format_RGB32);
+        QImage t_qImageColorbar(1, m_iColorbarGradSteps, QImage::Format_RGB32);
 
-        double t_dQuantile = 1.0/((double)m_iColorbarSteps-1);
-        for(j = 0; j < m_iColorbarSteps; ++j)
+        double t_dQuantile = 1.0/((double)m_iColorbarGradSteps-1);
+        for(j = 0; j < m_iColorbarGradSteps; ++j)
         {
-            QRgb t_qRgb = ColorMap::valueToJet(t_dQuantile*((double)(m_iColorbarSteps-1-j))*1.0);
+            QRgb t_qRgb = ColorMap::valueToJet(t_dQuantile*((double)(m_iColorbarGradSteps-1-j))*1.0);
             t_qImageColorbar.setPixel(0, j, t_qRgb);
         }
-
         m_pPixmapColorbar = new QPixmap(QPixmap::fromImage(t_qImageColorbar));
+
+
+        // --Scale Values--
+        m_qVecScaleValues.clear();
+
+        double scale = pow(10, floor(log(m_dMaxValue-m_dMinValue)/log(10.0)));
+
+        //Zero Based Scale?
+        if(m_dMaxValue > 0 && m_dMinValue < 0)
+        {
+            double quantum = floor((((m_dMaxValue-m_dMinValue)/scale)/(m_iColorbarSteps-1))*10.0)*(scale/10.0);
+            double start = 0;
+            while(m_dMinValue < (start - quantum))
+                start -= quantum;
+            //Create Steps
+            m_qVecScaleValues.push_back(start);
+            for(qint32 i = 1; i < m_iColorbarSteps-1; ++i)
+                m_qVecScaleValues.push_back(m_qVecScaleValues[i-1]+quantum);
+        }
+        else
+        {
+            double quantum = floor((((m_dMaxValue-m_dMinValue)/scale)/(m_iColorbarSteps-1))*10.0)*(scale/10.0);
+            double start = floor(((m_dMaxValue-m_dMinValue)/2.0 + m_dMinValue)/scale)*scale;
+            while(m_dMinValue < (start - quantum))
+                start -= quantum;
+            //Create Steps
+            m_qVecScaleValues.push_back(start);
+            for(qint32 i = 1; i < m_iColorbarSteps-1; ++i)
+                m_qVecScaleValues.push_back(m_qVecScaleValues[i-1]+quantum);
+        }
     }
     update();
 }
@@ -259,7 +290,7 @@ void ImageSc::paintEvent(QPaintEvent *)
 
 
         // -- Colorbar --
-        if(m_bColorbar && m_pPixmapColorbar)
+        if(m_bColorbar && m_pPixmapColorbar && m_qVecScaleValues.size() >= 2)
         {
             QSize t_qSizePixmapColorbar = widgetSize;
 
@@ -276,23 +307,39 @@ void ImageSc::paintEvent(QPaintEvent *)
             painter.drawPixmap(t_qPointCenter,t_qPixmapScaledColorbar);
 
             // -- Scale --
-            painter.save();
-
             QPoint t_qPointTopLeft = t_qPointCenter;
-
             painter.setPen(m_qPenColorbar);
             painter.setFont(m_qFontColorbar);
 
-            // -- MAX --
-            painter.translate(t_qPointTopLeft.x()+ m_iColorbarWidth + m_qFontColorbar.pixelSize()/2, t_qPointTopLeft.y() - m_qFontColorbar.pixelSize()/2);
+            qint32 x = t_qPointTopLeft.x()+ m_iColorbarWidth + m_qFontColorbar.pixelSize()/2;
+            // max
+            painter.save();
+            qint32 y_max = t_qPointTopLeft.y() - m_qFontColorbar.pixelSize()/2;
+            painter.translate(x, y_max);
             painter.drawText(QRect(0, 0, 100, 12), Qt::AlignLeft, QString::number(m_dMaxValue));
             painter.restore();
 
-            // --MIN--
+            // min
             painter.save();
-            painter.translate(t_qPointTopLeft.x()+ m_iColorbarWidth + m_qFontColorbar.pixelSize()/2, t_qPointTopLeft.y() + t_qSizePixmapColorbar.height() - m_qFontColorbar.pixelSize()/2);
+            qint32 y_min = t_qPointTopLeft.y() + t_qSizePixmapColorbar.height() - m_qFontColorbar.pixelSize()/2;
+            painter.translate(x, y_min);
             painter.drawText(QRect(0, 0, 100, 12), Qt::AlignLeft, QString::number(m_dMinValue));
             painter.restore();
+
+            qint32 y_dist = y_min - y_max;
+            double minPercent = (m_qVecScaleValues[0]- m_dMinValue)/(m_dMaxValue-m_dMinValue);
+            double distPercent = (m_qVecScaleValues[1]-m_qVecScaleValues[0])/(m_dMaxValue-m_dMinValue);
+            qint32 y_current = y_min - (minPercent*y_dist);
+
+            //Scale values
+            for(qint32 i = 0; i < m_qVecScaleValues.size(); ++i)
+            {
+                painter.save();
+                painter.translate(x, y_current);
+                painter.drawText(QRect(0, 0, 100, 12), Qt::AlignLeft, QString::number(m_qVecScaleValues[i]));
+                y_current -= distPercent*y_dist;
+                painter.restore();
+            }
         }
 
         painter.setPen(m_qPenAxes);
