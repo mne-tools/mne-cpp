@@ -145,8 +145,10 @@ private:
     QPen m_qPenAxes;
 
     bool m_bColorbar;
+    QVector<double> m_qVecScaleValues;
     qint32 m_iColorbarWidth;
     qint32 m_iColorbarSteps;
+    qint32 m_iColorbarGradSteps;
     QFont m_qFontColorbar;
     QPen m_qPenColorbar;
 
