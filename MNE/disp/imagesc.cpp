@@ -69,9 +69,8 @@ using namespace DISPLIB;
 
 ImageSc::ImageSc(QWidget *parent)
 : QWidget(parent)
-, m_qPixmapData(NULL)
-, m_bColorbar(true)
-, m_qPixmapColorbar(NULL)
+, m_pPixmapData(NULL)
+, m_pPixmapColorbar(NULL)
 {
     init();
 }
@@ -81,8 +80,8 @@ ImageSc::ImageSc(QWidget *parent)
 
 ImageSc::ImageSc(MatrixXd &p_dMat, QWidget *parent)
 : QWidget(parent)
-, m_qPixmapData(NULL)
-, m_qPixmapColorbar(NULL)
+, m_pPixmapData(NULL)
+, m_pPixmapColorbar(NULL)
 {
     init();
     updateMatrix(p_dMat);
@@ -93,8 +92,8 @@ ImageSc::ImageSc(MatrixXd &p_dMat, QWidget *parent)
 
 ImageSc::ImageSc(MatrixXf &p_fMat, QWidget *parent)
 : QWidget(parent)
-, m_qPixmapData(NULL)
-, m_qPixmapColorbar(NULL)
+, m_pPixmapData(NULL)
+, m_pPixmapColorbar(NULL)
 {
     init();
     updateMatrix(p_fMat);
@@ -105,8 +104,8 @@ ImageSc::ImageSc(MatrixXf &p_fMat, QWidget *parent)
 
 ImageSc::ImageSc(MatrixXi &p_iMat, QWidget *parent)
 : QWidget(parent)
-, m_qPixmapData(NULL)
-, m_qPixmapColorbar(NULL)
+, m_pPixmapData(NULL)
+, m_pPixmapColorbar(NULL)
 {
     init();
     updateMatrix(p_iMat);
@@ -117,10 +116,10 @@ ImageSc::ImageSc(MatrixXi &p_iMat, QWidget *parent)
 
 ImageSc::~ImageSc()
 {
-    if(m_qPixmapData)
-        delete m_qPixmapData;
-    if(m_qPixmapColorbar)
-        delete m_qPixmapColorbar;
+    if(m_pPixmapData)
+        delete m_pPixmapData;
+    if(m_pPixmapColorbar)
+        delete m_pPixmapColorbar;
 }
 
 
@@ -140,9 +139,12 @@ void ImageSc::init()
     m_qFontTitle.setBold(true);
     m_qPenTitle = QPen(Qt::black);
 
+    //Colorbar
+    m_bColorbar = true;
     m_qFontColorbar.setPixelSize(10);
     m_qPenColorbar = QPen(Qt::black);
     m_iColorbarWidth = 12;
+    m_iColorbarSteps = 200;
 }
 
 
@@ -150,15 +152,15 @@ void ImageSc::init()
 
 void ImageSc::updateMatrix(MatrixXd &p_dMat)
 {
-    if(m_qPixmapData)
+    if(m_pPixmapData)
     {
-        delete m_qPixmapData;
-        m_qPixmapData = NULL;
+        delete m_pPixmapData;
+        m_pPixmapData = NULL;
     }
-    if(m_qPixmapColorbar)
+    if(m_pPixmapColorbar)
     {
-        delete m_qPixmapColorbar;
-        m_qPixmapColorbar = NULL;
+        delete m_pPixmapColorbar;
+        m_pPixmapColorbar = NULL;
     }
 
     if(p_dMat.rows() > 0 && p_dMat.cols())
@@ -185,20 +187,19 @@ void ImageSc::updateMatrix(MatrixXd &p_dMat)
             for(j = 0; j < y; ++j)
                 t_qImageData.setPixel(i, j, ColorMap::valueToJet(dataNormalized(j,i)));
 
-        m_qPixmapData = new QPixmap(QPixmap::fromImage(t_qImageData));
+        m_pPixmapData = new QPixmap(QPixmap::fromImage(t_qImageData));
 
         // -- Colorbar --
-        QImage t_qImageColorbar(m_iColorbarWidth, y, QImage::Format_RGB32);
+        QImage t_qImageColorbar(1, m_iColorbarSteps, QImage::Format_RGB32);
 
-        double t_dQuantile = 1.0/((double)y);
-        for(j = 0; j <= y; ++j)
+        double t_dQuantile = 1.0/((double)m_iColorbarSteps-1);
+        for(j = 0; j < m_iColorbarSteps; ++j)
         {
-            QRgb t_qRgb = ColorMap::valueToJet(t_dQuantile*((double)(y-j))*1.0);
-            for(i = 0; i < m_iColorbarWidth; ++i)
-                t_qImageColorbar.setPixel(i, j, t_qRgb);
+            QRgb t_qRgb = ColorMap::valueToJet(t_dQuantile*((double)(m_iColorbarSteps-1-j))*1.0);
+            t_qImageColorbar.setPixel(0, j, t_qRgb);
         }
 
-        m_qPixmapColorbar = new QPixmap(QPixmap::fromImage(t_qImageColorbar));
+        m_pPixmapColorbar = new QPixmap(QPixmap::fromImage(t_qImageColorbar));
     }
     update();
 }
@@ -237,7 +238,7 @@ void ImageSc::resizeEvent (QResizeEvent* event)
 void ImageSc::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    if (!m_qPixmapData->isNull())
+    if (m_pPixmapData)
     {
         QPoint t_qPointCenter(0,0);
 
@@ -249,7 +250,7 @@ void ImageSc::paintEvent(QPaintEvent *)
         t_qSizePixmapData.setWidth(t_qSizePixmapData.width()-m_iBorderLeftRight*2);
 
         // Scale new image which size is widgetSize
-        QPixmap t_qPixmapScaledData = m_qPixmapData->scaled(t_qSizePixmapData, Qt::KeepAspectRatio);
+        QPixmap t_qPixmapScaledData = m_pPixmapData->scaled(t_qSizePixmapData, Qt::KeepAspectRatio);
         // Calculate image center position into screen
         t_qPointCenter.setX((widgetSize.width()-t_qPixmapScaledData.width())/2);
         t_qPointCenter.setY((widgetSize.height()-t_qPixmapScaledData.height())/2);
@@ -258,7 +259,7 @@ void ImageSc::paintEvent(QPaintEvent *)
 
 
         // -- Colorbar --
-        if(m_bColorbar)
+        if(m_bColorbar && m_pPixmapColorbar)
         {
             QSize t_qSizePixmapColorbar = widgetSize;
 
@@ -266,7 +267,7 @@ void ImageSc::paintEvent(QPaintEvent *)
             t_qSizePixmapColorbar.setWidth(m_iColorbarWidth);
 
             // Scale new image which size is widgetSize
-            QPixmap t_qPixmapScaledColorbar = m_qPixmapColorbar->scaled(t_qSizePixmapColorbar, Qt::IgnoreAspectRatio);
+            QPixmap t_qPixmapScaledColorbar = m_pPixmapColorbar->scaled(t_qSizePixmapColorbar, Qt::IgnoreAspectRatio);
             // Calculate image center position into screen
             t_qPointCenter.setY(t_qPointCenter.y());
 
