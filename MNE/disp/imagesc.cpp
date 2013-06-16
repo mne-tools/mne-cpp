@@ -285,7 +285,7 @@ void ImageSc::paintEvent(QPaintEvent *)
         t_qSizePixmapData.setHeight(t_qSizePixmapData.height()-m_iBorderTopBottom*2);
         t_qSizePixmapData.setWidth(t_qSizePixmapData.width()-m_iBorderLeftRight*2);
         // Scale data
-        QPixmap t_qPixmapScaledData = m_pPixmapData->scaled(t_qSizePixmapData, Qt::KeepAspectRatio);
+        QPixmap t_qPixmapScaledData = m_pPixmapData->scaled(t_qSizePixmapData,  Qt::IgnoreAspectRatio);//Qt::KeepAspectRatio);
         // Calculate data position
         t_qPointTopLeft.setX((m_qSizeWidget.width()-t_qPixmapScaledData.width())/2);
         t_qPointTopLeft.setY((m_qSizeWidget.height()-t_qPixmapScaledData.height())/2);

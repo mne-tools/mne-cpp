@@ -52,7 +52,8 @@
 #include <QWidget>
 #include <QString>
 #include <QList>
-#include <QPainterPath>
+#include <QVector>
+#include <QPointF>
 #include <QSharedPointer>
 
 
@@ -110,6 +111,15 @@ public:
 
     //=========================================================================================================
     /**
+    * Creates the plot using a given double vector.
+    *
+    * @param[in] p_dVec     The double data vector
+    * @param[in] parent     Parent QObject (optional)
+    */
+    explicit Plot(VectorXd &p_dVec, QWidget *parent = 0);
+
+    //=========================================================================================================
+    /**
     * Destructs the Plot object
     */
     ~Plot();
@@ -120,13 +130,25 @@ public:
     */
     void init();
 
+    //=========================================================================================================
+    /**
+    * Updates the plot using a given double vector without given X data.
+    *
+    * @param[in] p_dVec     The double data vector
+    */
+    void updateData(VectorXd &p_dVec);
+
 protected:
     void paintEvent(QPaintEvent*);
 
-    VectorXd* m_pVecData;
+    bool m_bHoldOn;             /**< If multiple plots */
 
-//    QList<QPainterPath*> m_qListPainterPaths;
+    QList<QVector<QPointF> > m_qListVecPointFPaths;
 
+    double m_dMinX;             /**< Minimal X value */
+    double m_dMaxX;             /**< Maximal X value */
+    double m_dMinY;             /**< Minimal Y value */
+    double m_dMaxY;             /**< Maximal Y value */
 };
 
 //*************************************************************************************************************
