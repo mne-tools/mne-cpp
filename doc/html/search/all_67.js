@@ -2,8 +2,8 @@ var searchData=
 [
   ['generics_5fglobal_2eh',['generics_global.h',['../generics__global_8h.html',1,'']]],
   ['genericsshared_5fexport',['GENERICSSHARED_EXPORT',['../generics__global_8h.html#a130c651d8996a3ba06528cf9bf302479',1,'generics_global.h']]],
-  ['geometryview',['GeometryView',['../class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html',1,'DISP3DLIB']]],
   ['geometryview',['GeometryView',['../class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#aaaa88d83201df1cb25888278da5a1762',1,'DISP3DLIB::GeometryView']]],
+  ['geometryview',['GeometryView',['../class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html',1,'DISP3DLIB']]],
   ['geometryview_2ecpp',['geometryview.cpp',['../geometryview_8cpp.html',1,'']]],
   ['geometryview_2eh',['geometryview.h',['../geometryview_8h.html',1,'']]],
   ['get_5fcurrent_5fcomp',['get_current_comp',['../class_f_i_f_f_l_i_b_1_1_fiff_info.html#abf6d5e56f0acb167039e2187c093bae0',1,'FIFFLIB::FiffInfo::get_current_comp()'],['../class_m_n_e_l_i_b_1_1_m_n_e.html#a1f5e3af9a23a6240144414ab6aa07c56',1,'MNELIB::MNE::get_current_comp()']]],
@@ -30,5 +30,8 @@ var searchData=
   ['gettricoords',['getTriCoords',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a5a6e6a0f5f9de937b2732d2fb7f4d500',1,'MNELIB::MNEHemisphere']]],
   ['gettype',['getType',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#aab091e676b13f297052e66e40a3bc004',1,'FIFFLIB::FiffTag']]],
   ['gettypeid',['getTypeId',['../class_i_o_buffer_1_1_buffer.html#a587586f369e9d5df00a7fc77fc8f7f86',1,'IOBuffer::Buffer']]],
-  ['getvertices',['getVertices',['../class_f_s_l_i_b_1_1_annotation.html#a1fe1a658d5c9020add3c8d884f4f1f24',1,'FSLIB::Annotation']]]
+  ['getvertices',['getVertices',['../class_f_s_l_i_b_1_1_annotation.html#a1fe1a658d5c9020add3c8d884f4f1f24',1,'FSLIB::Annotation']]],
+  ['graph',['Graph',['../class_d_i_s_p_l_i_b_1_1_graph.html',1,'DISPLIB']]],
+  ['graph_2ecpp',['graph.cpp',['../graph_8cpp.html',1,'']]],
+  ['graph_2eh',['graph.h',['../graph_8h.html',1,'']]]
 ];

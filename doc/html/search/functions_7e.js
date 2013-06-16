@@ -47,6 +47,7 @@ var searchData=
   ['_7emneinverseoperator',['~MNEInverseOperator',['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#ad67ea2b10e4a96c86ac1887af2430fcf',1,'MNELIB::MNEInverseOperator']]],
   ['_7emnemath',['~MNEMath',['../class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a52c52d62e3393a51837e7a12688d1439',1,'UTILSLIB::MNEMath']]],
   ['_7emnesourcespace',['~MNESourceSpace',['../class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a2dcc53eec782e14a65530db6195ec629',1,'MNELIB::MNESourceSpace']]],
+  ['_7eplot',['~Plot',['../class_d_i_s_p_l_i_b_1_1_plot.html#a277e9c79c4357b3a317d74d61dabefcf',1,'DISPLIB::Plot']]],
   ['_7ertave',['~RtAve',['../class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#a17f21c3faa0eeeccae2fc04f9ce9515f',1,'RTINVLIB::RtAve']]],
   ['_7ertclient',['~RtClient',['../class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_client.html#a33bb04ea1663bdd1aa126611976a5678',1,'RTCLIENTLIB::RtClient']]],
   ['_7ertcov',['~RtCov',['../class_r_t_i_n_v_l_i_b_1_1_rt_cov.html#a8c95e4a83ab2f0b7507af82d8ed3a992',1,'RTINVLIB::RtCov']]],
