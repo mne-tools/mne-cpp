@@ -135,3 +135,68 @@ double ColorMap::jetSlopeMFalling(double x,double n)
     //f = m*x + n
     return -4*x + n;
 }
+
+
+//*************************************************************************************************************
+//Hot Colormap
+int ColorMap::hotR(double x)
+{
+    //Describe the red fuzzy set
+    if(x < 0.375)
+        return (int)floor(hotSlopeRRaising(x, 0.0392)*255);
+    else
+        return (int)floor(1.0*255);
+}
+
+
+//*************************************************************************************************************
+
+int ColorMap::hotG(double x)
+{
+    //Describe the green fuzzy set
+    if(x < 0.375)
+        return 0;
+    else if(x >= 0.375 && x < 0.75)
+        return (int)floor(hotSlopeGRaising(x, -1.0)*255);
+    else if(x >= 0.75)
+        return (int)floor(1.0*255);
+}
+
+
+//*************************************************************************************************************
+
+int ColorMap::hotB(double x)
+{
+    //Describe the blue fuzzy set
+    if(x < 0.75)
+        return 0;
+    else
+        return (int)floor(hotSlopeBRaising(x, -3)*255);
+}
+
+
+//*************************************************************************************************************
+
+double ColorMap::hotSlopeRRaising(double x, double n)
+{
+    //f = m*x + n
+    return 2.5621*x + n;
+}
+
+
+//*************************************************************************************************************
+
+double ColorMap::hotSlopeGRaising(double x,double n)
+{
+    //f = m*x + n
+    return 2.6667*x + n;
+}
+
+
+//*************************************************************************************************************
+
+double ColorMap::hotSlopeBRaising(double x,double n)
+{
+    //f = m*x + n
+    return 4*x + n;
+}
