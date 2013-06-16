@@ -5,7 +5,7 @@
 *           Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     March, 2013
+* @date     June, 2013
 *
 * @section  LICENSE
 *
@@ -48,9 +48,7 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QResizeEvent>
 #include <QPainter>
-#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -61,14 +59,13 @@
 using namespace DISPLIB;
 
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
 ImageSc::ImageSc(QWidget *parent)
-: QWidget(parent)
+: Graph(parent)
 , m_pPixmapData(NULL)
 , m_pPixmapColorbar(NULL)
 {
@@ -79,7 +76,7 @@ ImageSc::ImageSc(QWidget *parent)
 //*************************************************************************************************************
 
 ImageSc::ImageSc(MatrixXd &p_dMat, QWidget *parent)
-: QWidget(parent)
+: Graph(parent)
 , m_pPixmapData(NULL)
 , m_pPixmapColorbar(NULL)
 {
@@ -91,7 +88,7 @@ ImageSc::ImageSc(MatrixXd &p_dMat, QWidget *parent)
 //*************************************************************************************************************
 
 ImageSc::ImageSc(MatrixXf &p_fMat, QWidget *parent)
-: QWidget(parent)
+: Graph(parent)
 , m_pPixmapData(NULL)
 , m_pPixmapColorbar(NULL)
 {
@@ -103,7 +100,7 @@ ImageSc::ImageSc(MatrixXf &p_fMat, QWidget *parent)
 //*************************************************************************************************************
 
 ImageSc::ImageSc(MatrixXi &p_iMat, QWidget *parent)
-: QWidget(parent)
+: Graph(parent)
 , m_pPixmapData(NULL)
 , m_pPixmapColorbar(NULL)
 {
@@ -127,21 +124,8 @@ ImageSc::~ImageSc()
 
 void ImageSc::init()
 {
-    m_sTitle = QString("");
-    m_sXLabel = QString("");
-    m_sYLabel = QString("");
-
-    //Set Borders
-    m_iBorderTopBottom = 50;
-    m_iBorderLeftRight = 100;
-
-    //Set Fonts
-    m_qFontAxes.setPixelSize(12);
-    m_qPenAxes = QPen(Qt::black);
-
-    m_qFontTitle.setPixelSize(20);
-    m_qFontTitle.setBold(true);
-    m_qPenTitle = QPen(Qt::black);
+    //Parent init
+    Graph::init();
 
     //Colormap
     pColorMapper = ColorMap::valueToJet;
@@ -271,11 +255,18 @@ void ImageSc::updateMaps()
 
 //*************************************************************************************************************
 
-void ImageSc::resizeEvent (QResizeEvent* event)
+void ImageSc::setColorMap(const QString &p_sColorMap)
 {
-    m_qSizeWidget = event->size();
-    // Call base class impl
-    QWidget::resizeEvent(event);
+    if(p_sColorMap == "Jet")
+        pColorMapper = ColorMap::valueToJet;
+    else if(p_sColorMap == "Hot")
+        pColorMapper = ColorMap::valueToHot;
+    else if(p_sColorMap == "Bone")
+        pColorMapper = ColorMap::valueToBone;
+    else
+        pColorMapper = ColorMap::valueToJet;
+
+    updateMaps();
 }
 
 
@@ -373,89 +364,7 @@ void ImageSc::paintEvent(QPaintEvent *)
             }
         }
 
-        painter.setPen(m_qPenAxes);
-        painter.setFont(m_qFontAxes);
-
-        qint32 t_iLabelWidth = t_qPixmapScaledData.width();
-        qint32 t_iLabelHeight = 100;
-
-        // -- Title --
-        if(!m_sTitle.isEmpty())
-        {
-            painter.save();
-            painter.setPen(m_qPenTitle);
-            painter.setFont(m_qFontTitle);
-
-            painter.translate((m_qSizeWidget.width()-t_iLabelWidth)/2, (m_qSizeWidget.height()-t_qPixmapScaledData.height())/2 - m_iBorderTopBottom*1.5);
-            painter.drawText(QRect(0, 0, t_iLabelWidth, t_iLabelHeight), Qt::AlignCenter, m_sTitle);
-
-            painter.restore();
-        }
-
-        // -- Axes --
-        painter.setPen(m_qPenAxes);
-        painter.setFont(m_qFontAxes);
-
-        // X Label
-        if(!m_sXLabel.isEmpty())
-        {
-            painter.save();
-            painter.translate((m_qSizeWidget.width()-t_iLabelWidth)/2, t_qPixmapScaledData.height()+((m_qSizeWidget.height()-t_qPixmapScaledData.height()-m_iBorderTopBottom)/2));
-            painter.drawText(QRect(0, 0, t_iLabelWidth, t_iLabelHeight), Qt::AlignCenter, m_sXLabel);
-            painter.restore();
-        }
-
-        //Y Label
-        if(!m_sYLabel.isEmpty())
-        {
-            painter.save();
-            painter.rotate(270);
-            painter.translate(-(m_qSizeWidget.height()+t_iLabelWidth)/2,(m_qSizeWidget.width()-t_qPixmapScaledData.width())/2-t_iLabelHeight*0.75);
-            painter.drawText(QRect(0, 0, t_iLabelWidth, t_iLabelHeight), Qt::AlignCenter, m_sYLabel);
-            painter.restore();
-        }
+        //Draw title & axes
+        Graph::drawLabels(t_qPixmapScaledData.width(), t_qPixmapScaledData.height());
     }
-}
-
-//*************************************************************************************************************
-
-void ImageSc::setColorMap(const QString &p_sColorMap)
-{
-    if(p_sColorMap == "Jet")
-        pColorMapper = ColorMap::valueToJet;
-    else if(p_sColorMap == "Hot")
-        pColorMapper = ColorMap::valueToHot;
-    else if(p_sColorMap == "Bone")
-        pColorMapper = ColorMap::valueToBone;
-    else
-        pColorMapper = ColorMap::valueToJet;
-
-    updateMaps();
-}
-
-
-//*************************************************************************************************************
-
-void ImageSc::setTitle(const QString &p_sTitle)
-{
-    m_sTitle = p_sTitle;
-    update();
-}
-
-
-//*************************************************************************************************************
-
-void ImageSc::setXLabel(const QString &p_sXLabel)
-{
-    m_sXLabel = p_sXLabel;
-    update();
-}
-
-
-//*************************************************************************************************************
-
-void ImageSc::setYLabel(const QString &p_sYLabel)
-{
-    m_sYLabel = p_sYLabel;
-    update();
 }

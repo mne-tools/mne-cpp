@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     imagesc.h
+* @file     graph.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ImageSc class declaration
+* @brief    Graph class declaration
 *
 */
 
-#ifndef IMAGESC_H
-#define IMAGESC_H
+#ifndef GRAPH_H
+#define GRAPH_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -42,7 +42,6 @@
 //=============================================================================================================
 
 #include "disp_global.h"
-#include "graph.h"
 
 
 //*************************************************************************************************************
@@ -51,7 +50,6 @@
 //=============================================================================================================
 
 #include <QWidget>
-#include <QImage>
 #include <QString>
 #include <QPen>
 #include <QSharedPointer>
@@ -87,122 +85,62 @@ using namespace Eigen;
 //=============================================================================================================
 
 
+
 //=============================================================================================================
 /**
-* Visualizes Eigen matrizes, similiar to MATLABs imagesc function; Available colormaps are: Jet, Hot, Bone
+* Graph base class
 *
-* @brief Eigen matrix visualization
+* @brief Base class for graphs
 */
-class DISPSHARED_EXPORT ImageSc : public Graph
+class DISPSHARED_EXPORT Graph : public QWidget
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<ImageSc> SPtr;            /**< Shared pointer type for MatrixView class. */
-    typedef QSharedPointer<const ImageSc> ConstSPtr; /**< Const shared pointer type for MatrixView class. */
-
-    //=========================================================================================================
-    /**
-    * Creates the scaled image view.
-    *
-    * @param[in] parent     Parent QObject (optional)
-    */
-    explicit ImageSc(QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Creates the scaled image view with a given double matrix.
-    *
-    * @param[in] p_dMat     The double data matrix
-    * @param[in] parent     Parent QObject (optional)
-    */
-    explicit ImageSc(MatrixXd &p_dMat, QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Creates the scaled image view with a given float matrix.
-    *
-    * @param[in] p_fMat     The float data matrix
-    * @param[in] parent     Parent QObject (optional)
-    */
-    explicit ImageSc(MatrixXf &p_fMat, QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Creates the scaled image view with a given integer matrix.
-    *
-    * @param[in] p_iMat     The integer data matrix
-    * @param[in] parent     Parent QObject (optional)
-    */
-    explicit ImageSc(MatrixXi &p_iMat, QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destructs the ImageSc object
-    */
-    ~ImageSc();
-
-    //=========================================================================================================
-    /**
-    * Initializes the ImageSc object
-    */
+    explicit Graph(QWidget *parent = 0);
+    
     void init();
 
     //=========================================================================================================
     /**
-    * Updates the scaled image view with a given double matrix.
+    * Sets the scaled image view title.
     *
-    * @param[in] p_dMat     The double data matrix
+    * @param[in] p_sTitle   The title
     */
-    void updateData(MatrixXd &p_dMat);
+    void setTitle(const QString &p_sTitle);
     //=========================================================================================================
     /**
-    * Updates the scaled image view with a given float matrix.
+    * Sets the label of the y axes
     *
-    * @param[in] p_fMat     The float data matrix
+    * @param[in] p_sXLabel   The x axes label
     */
-    void updateData(MatrixXf &p_fMat);
+    void setXLabel(const QString &p_sXLabel);
     //=========================================================================================================
     /**
-    * Updates the scaled image view with a given integer matrix.
+    * Sets the label of the y axes
     *
-    * @param[in] p_dMat     The integer data matrix
+    * @param[in] p_sXLabel   The y axes label
     */
-    void updateData(MatrixXi &p_iMat);
-
-    //=========================================================================================================
-    /**
-    * Sets the color map to use, e.g. "Jet", "Hot", "Bone"
-    *
-    * @param[in] p_sColorMap    The colormap to use
-    */
-    void setColorMap(const QString &p_sColorMap);
+    void setYLabel(const QString &p_sYLabel);
 
 protected:
-    //=========================================================================================================
-    /**
-    * Updates data and colorbar pixmap
-    */
-    void updateMaps();
+//    void paintEvent(QPaintEvent*);
+    void resizeEvent(QResizeEvent*);
 
-    void paintEvent(QPaintEvent*);
+    void drawLabels(qint32 p_iContentWidth, qint32 p_iContentHeight);
 
-    QPixmap* m_pPixmapData;         /**< data pixmap */
-    QPixmap* m_pPixmapColorbar;     /**< colorbar pixmap */
+    QSize m_qSizeWidget;            /**< current widget size */
 
-    MatrixXd m_matCentNormData;     /**< centralized and normalized data */
+    QString m_sTitle;               /**< Title */
+    QFont m_qFontTitle;             /**< Title font */
+    QPen m_qPenTitle;               /**< Title pen */
 
-    double m_dMinValue;             /**< Minimal data value */
-    double m_dMaxValue;             /**< Maximal data value */
+    qint32 m_iBorderTopBottom;      /**< distance to top and bottom */
+    qint32 m_iBorderLeftRight;      /**< distance to left and right */
 
-    QRgb (*pColorMapper)(double);   /**< Function pointer to current colormap */
-
-    bool m_bColorbar;                   /**< If colorbar is visible */
-    QVector<double> m_qVecScaleValues;  /**< Scale values */
-    qint32 m_iColorbarWidth;            /**< Colorbar width */
-    qint32 m_iColorbarSteps;            /**< Number of colorbar vaues to display */
-    qint32 m_iColorbarGradSteps;        /**< Gradient steps of the colorbar */
-    QFont m_qFontColorbar;              /**< Colorbar font */
-    QPen m_qPenColorbar;                /**< Colorbar pen */
+    QString m_sXLabel;              /**< X axes label */
+    QString m_sYLabel;              /**< Y axes label */
+    QFont m_qFontAxes;              /**< Axes font */
+    QPen m_qPenAxes;                /**< Axes pen */
 };
 
 //*************************************************************************************************************
@@ -212,4 +150,4 @@ protected:
 
 } // NAMESPACE
 
-#endif // IMAGESC_H
+#endif // GRAPH_H

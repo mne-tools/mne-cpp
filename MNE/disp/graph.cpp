@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     plot.cpp
+* @file     graph.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the Plot class.
+* @brief    Implementation of the Graph class.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "plot.h"
+#include "graph.h"
 
 
 //*************************************************************************************************************
@@ -47,6 +47,7 @@
 // Qt INCLUDES
 //=============================================================================================================
 
+#include <QResizeEvent>
 #include <QPainter>
 
 
@@ -63,9 +64,8 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Plot::Plot(QWidget *parent)
-: Graph(parent)
-, m_pVecData(NULL)
+Graph::Graph(QWidget *parent)
+: QWidget(parent)
 {
     init();
 }
@@ -73,31 +73,106 @@ Plot::Plot(QWidget *parent)
 
 //*************************************************************************************************************
 
-Plot::~Plot()
+void Graph::init()
 {
+    m_sTitle = QString("");
+    m_sXLabel = QString("");
+    m_sYLabel = QString("");
 
+    //Set Borders
+    m_iBorderTopBottom = 50;
+    m_iBorderLeftRight = 100;
+
+    //Set Fonts
+    m_qFontAxes.setPixelSize(12);
+    m_qPenAxes = QPen(Qt::black);
+
+    m_qFontTitle.setPixelSize(20);
+    m_qFontTitle.setBold(true);
+    m_qPenTitle = QPen(Qt::black);
 }
 
 
 //*************************************************************************************************************
 
-void Plot::init()
+void Graph::setTitle(const QString &p_sTitle)
 {
-    //Parent init
-    Graph::init();
+    m_sTitle = p_sTitle;
+    update();
 }
 
 
 //*************************************************************************************************************
 
-void Plot::paintEvent(QPaintEvent *)
+void Graph::setXLabel(const QString &p_sXLabel)
+{
+    m_sXLabel = p_sXLabel;
+    update();
+}
+
+
+//*************************************************************************************************************
+
+void Graph::setYLabel(const QString &p_sYLabel)
+{
+    m_sYLabel = p_sYLabel;
+    update();
+}
+
+
+//*************************************************************************************************************
+
+void Graph::drawLabels(qint32 p_iContentWidth, qint32 p_iContentHeight)
 {
     QPainter painter(this);
-    if (m_pVecData)
-    {
 
-        //Draw title & axes
-        Graph::drawLabels(0, 0);
+    qint32 t_iLabelWidth = m_qSizeWidget.width()-2*m_iBorderLeftRight;
+    qint32 t_iLabelHeight = 100;
+
+    // -- Title --
+    if(!m_sTitle.isEmpty())
+    {
+        painter.save();
+        painter.setPen(m_qPenTitle);
+        painter.setFont(m_qFontTitle);
+
+        painter.translate((m_qSizeWidget.width()-t_iLabelWidth)/2, (m_qSizeWidget.height()-p_iContentHeight)/2 - m_iBorderTopBottom*1.5);
+        painter.drawText(QRect(0, 0, t_iLabelWidth, t_iLabelHeight), Qt::AlignCenter, m_sTitle);
+
+        painter.restore();
     }
+
+    // -- Axes --
+    painter.setPen(m_qPenAxes);
+    painter.setFont(m_qFontAxes);
+
+    // X Label
+    if(!m_sXLabel.isEmpty())
+    {
+        painter.save();
+        painter.translate((m_qSizeWidget.width()-t_iLabelWidth)/2, p_iContentHeight+((m_qSizeWidget.height()-p_iContentHeight-m_iBorderTopBottom)/2));
+        painter.drawText(QRect(0, 0, t_iLabelWidth, t_iLabelHeight), Qt::AlignCenter, m_sXLabel);
+        painter.restore();
+    }
+
+    //Y Label
+    if(!m_sYLabel.isEmpty())
+    {
+        painter.save();
+        painter.rotate(270);
+        painter.translate(-(m_qSizeWidget.height()+t_iLabelWidth)/2,(m_qSizeWidget.width()-p_iContentWidth)/2-t_iLabelHeight*0.75);
+        painter.drawText(QRect(0, 0, t_iLabelWidth, t_iLabelHeight), Qt::AlignCenter, m_sYLabel);
+        painter.restore();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void Graph::resizeEvent(QResizeEvent* event)
+{
+    m_qSizeWidget = event->size();
+    // Call base class impl
+    QWidget::resizeEvent(event);
 }
 
