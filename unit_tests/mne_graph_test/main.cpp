@@ -33,13 +33,13 @@
 *
 */
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include <disp/imagesc.h>
+#include <disp/plot.h>
 
 
 //*************************************************************************************************************
@@ -87,6 +87,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    //ImageSc Test
     qint32 width = 30;
     qint32 height = 40;
     MatrixXd mat(width,40);
@@ -100,10 +101,26 @@ int main(int argc, char *argv[])
     imagesc.setXLabel("X Axes");
     imagesc.setYLabel("Y Axes");
 
-    imagesc.setColorMap("Bone");//imagesc.setColorMap("Jet");
+    imagesc.setColorMap("Bone");//imagesc.setColorMap("Jet");//imagesc.setColorMap("Hot");
 
     imagesc.setWindowTitle("Corresponding function to MATLABs imagesc");
     imagesc.show();
+
+    //Plot Test
+    qint32 t_iSize = 20;
+    VectorXd vec(t_iSize);
+    for(int i = 0; i < t_iSize; ++i)
+        vec[i] = i * 0.231;
+
+    Plot plot;
+
+    plot.setTitle("Test Plot");
+    plot.setXLabel("X Axes");
+    plot.setYLabel("Y Axes");
+
+    plot.setWindowTitle("Corresponding function to MATLABs plot");
+    plot.show();
+
 
     return a.exec();
 }
