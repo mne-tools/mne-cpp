@@ -127,6 +127,8 @@ private:
     QPixmap* m_pPixmapData;
     QPixmap* m_pPixmapColorbar;
 
+    MatrixXd m_matCentNormData;
+
     QSize widgetSize;
 
     qint32 m_iBorderTopBottom;

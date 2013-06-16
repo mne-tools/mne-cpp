@@ -175,11 +175,11 @@ void ImageSc::updateMatrix(MatrixXd &p_dMat)
         m_dMaxValue = p_dMat.maxCoeff();
 
         // -- data --
-        MatrixXd dataNormalized = p_dMat;
-        double minValue = dataNormalized.minCoeff();
-        dataNormalized.array() -= minValue;
-        double maxValue = dataNormalized.maxCoeff();
-        dataNormalized.array() /= maxValue;
+        m_matCentNormData = p_dMat;
+        double minValue = m_matCentNormData.minCoeff();
+        m_matCentNormData.array() -= minValue;
+        double maxValue = m_matCentNormData.maxCoeff();
+        m_matCentNormData.array() /= maxValue;
 
         qint32 x = p_dMat.cols();
         qint32 y = p_dMat.rows();
@@ -187,7 +187,7 @@ void ImageSc::updateMatrix(MatrixXd &p_dMat)
         QImage t_qImageData(x, y, QImage::Format_RGB32);
         for(i = 0; i < x; ++i)
             for(j = 0; j < y; ++j)
-                t_qImageData.setPixel(i, j, ColorMap::valueToJet(dataNormalized(j,i)));
+                t_qImageData.setPixel(i, j, ColorMap::valueToJet(m_matCentNormData(j,i)));
 
         m_pPixmapData = new QPixmap(QPixmap::fromImage(t_qImageData));
 
@@ -271,7 +271,7 @@ void ImageSc::paintEvent(QPaintEvent *)
     QPainter painter(this);
     if (m_pPixmapData)
     {
-        QPoint t_qPointCenter(0,0);
+        QPoint t_qPointTopLeft(0,0);
 
         // -- Data --
 
@@ -280,13 +280,13 @@ void ImageSc::paintEvent(QPaintEvent *)
         t_qSizePixmapData.setHeight(t_qSizePixmapData.height()-m_iBorderTopBottom*2);
         t_qSizePixmapData.setWidth(t_qSizePixmapData.width()-m_iBorderLeftRight*2);
 
-        // Scale new image which size is widgetSize
+        // Scale data
         QPixmap t_qPixmapScaledData = m_pPixmapData->scaled(t_qSizePixmapData, Qt::KeepAspectRatio);
-        // Calculate image center position into screen
-        t_qPointCenter.setX((widgetSize.width()-t_qPixmapScaledData.width())/2);
-        t_qPointCenter.setY((widgetSize.height()-t_qPixmapScaledData.height())/2);
-
-        painter.drawPixmap(t_qPointCenter,t_qPixmapScaledData);
+        // Calculate data position
+        t_qPointTopLeft.setX((widgetSize.width()-t_qPixmapScaledData.width())/2);
+        t_qPointTopLeft.setY((widgetSize.height()-t_qPixmapScaledData.height())/2);
+        //Draw data
+        painter.drawPixmap(t_qPointTopLeft,t_qPixmapScaledData);
 
 
         // -- Colorbar --
@@ -294,51 +294,69 @@ void ImageSc::paintEvent(QPaintEvent *)
         {
             QSize t_qSizePixmapColorbar = widgetSize;
 
-            t_qSizePixmapColorbar.setHeight(t_qPixmapScaledData.height());//t_qSizePixmapColorbar.height()-m_iBorderTopBottom*2);
             t_qSizePixmapColorbar.setWidth(m_iColorbarWidth);
+            t_qSizePixmapColorbar.setHeight(t_qPixmapScaledData.height());
 
-            // Scale new image which size is widgetSize
+            // Scale colorbar
             QPixmap t_qPixmapScaledColorbar = m_pPixmapColorbar->scaled(t_qSizePixmapColorbar, Qt::IgnoreAspectRatio);
-            // Calculate image center position into screen
-            t_qPointCenter.setY(t_qPointCenter.y());
+            // Calculate colorbar position
+            t_qPointTopLeft.setY(t_qPointTopLeft.y());
+            t_qPointTopLeft.setX(t_qPointTopLeft.x() + t_qPixmapScaledData.width() + m_iBorderLeftRight/3);
+            //Draw colorbar
+            painter.drawPixmap(t_qPointTopLeft,t_qPixmapScaledColorbar);
 
-            t_qPointCenter.setX(t_qPointCenter.x() + t_qPixmapScaledData.width() + m_iBorderLeftRight/3);
-
-            painter.drawPixmap(t_qPointCenter,t_qPixmapScaledColorbar);
+            //Draw border
+            painter.drawRect(t_qPointTopLeft.x()-1, t_qPointTopLeft.y()-1, m_iColorbarWidth+1, t_qPixmapScaledData.height()+1);
 
             // -- Scale --
-            QPoint t_qPointTopLeft = t_qPointCenter;
             painter.setPen(m_qPenColorbar);
             painter.setFont(m_qFontColorbar);
 
             qint32 x = t_qPointTopLeft.x()+ m_iColorbarWidth + m_qFontColorbar.pixelSize()/2;
+            qint32 x_markLeft = x - m_iColorbarWidth - m_qFontColorbar.pixelSize()/2;
+            qint32 x_markRight = x_markLeft + m_iColorbarWidth;
+
             // max
             painter.save();
             qint32 y_max = t_qPointTopLeft.y() - m_qFontColorbar.pixelSize()/2;
-            painter.translate(x, y_max);
+            painter.translate(x, y_max-1);
             painter.drawText(QRect(0, 0, 100, 12), Qt::AlignLeft, QString::number(m_dMaxValue));
             painter.restore();
+            //draw max marks
+            qint32 y_max_mark = y_max + m_qFontColorbar.pixelSize()/2;
+            painter.drawLine(x_markLeft,y_max_mark,x_markLeft+2,y_max_mark);
+            painter.drawLine(x_markRight-3,y_max_mark,x_markRight-1,y_max_mark);
 
             // min
             painter.save();
-            qint32 y_min = t_qPointTopLeft.y() + t_qSizePixmapColorbar.height() - m_qFontColorbar.pixelSize()/2;
-            painter.translate(x, y_min);
+            qint32 y_min = t_qPointTopLeft.y() + t_qSizePixmapColorbar.height()-1 - m_qFontColorbar.pixelSize()/2;
+            painter.translate(x, y_min-1);
             painter.drawText(QRect(0, 0, 100, 12), Qt::AlignLeft, QString::number(m_dMinValue));
             painter.restore();
+            //draw min marks
+            qint32 y_min_mark = y_min + m_qFontColorbar.pixelSize()/2;
+            painter.drawLine(x_markLeft,y_min_mark,x_markLeft+2,y_min_mark);
+            painter.drawLine(x_markRight-3,y_min_mark,x_markRight-1,y_min_mark);
 
+            //Scale values
             qint32 y_dist = y_min - y_max;
             double minPercent = (m_qVecScaleValues[0]- m_dMinValue)/(m_dMaxValue-m_dMinValue);
             double distPercent = (m_qVecScaleValues[1]-m_qVecScaleValues[0])/(m_dMaxValue-m_dMinValue);
             qint32 y_current = y_min - (minPercent*y_dist);
-
-            //Scale values
+            qint32 y_current_mark;
+            //draw scale
             for(qint32 i = 0; i < m_qVecScaleValues.size(); ++i)
             {
                 painter.save();
-                painter.translate(x, y_current);
+                painter.translate(x, y_current-1);
                 painter.drawText(QRect(0, 0, 100, 12), Qt::AlignLeft, QString::number(m_qVecScaleValues[i]));
-                y_current -= distPercent*y_dist;
                 painter.restore();
+                //draw marks
+                y_current_mark =  y_current + m_qFontColorbar.pixelSize()/2;
+                painter.drawLine(x_markLeft,y_current_mark,x_markLeft+2,y_current_mark);
+                painter.drawLine(x_markRight-3,y_current_mark,x_markRight-1,y_current_mark);
+                //update y_current
+                y_current -= distPercent*y_dist;
             }
         }
 
