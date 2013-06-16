@@ -51,7 +51,7 @@ var searchData=
   ['mneshared_5fexport',['MNESHARED_EXPORT',['../mne__global_8h.html#ae182e5976a87d895a5eecf737aafefc3',1,'mne_global.h']]],
   ['mnesourcespace',['MNESourceSpace',['../class_m_n_e_l_i_b_1_1_m_n_e_source_space.html',1,'MNELIB']]],
   ['mnesourcespace',['MNESourceSpace',['../class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a973304d2448b348bbd8f7c67b045c5b8',1,'MNELIB::MNESourceSpace::MNESourceSpace()'],['../class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a6f4b6968b3018599c0add9b7888f9b64',1,'MNELIB::MNESourceSpace::MNESourceSpace(const MNESourceSpace &amp;p_MNESourceSpace)']]],
-  ['mousemoveevent',['mouseMoveEvent',['../class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#a1ca2212ed86b6b4f5f83387467cde465',1,'DISP3DLIB::InverseView']]],
-  ['mousepressevent',['mousePressEvent',['../class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#aedb11c859919e99a1a4bf680864f5ffe',1,'DISP3DLIB::InverseView']]],
+  ['mousemoveevent',['mouseMoveEvent',['../class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a66b50280e22d3b6563f0649b311324a0',1,'DISP3DLIB::GeometryView::mouseMoveEvent()'],['../class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#a1ca2212ed86b6b4f5f83387467cde465',1,'DISP3DLIB::InverseView::mouseMoveEvent()']]],
+  ['mousepressevent',['mousePressEvent',['../class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a9d497baab79bf08d84de5a4ea983d518',1,'DISP3DLIB::GeometryView::mousePressEvent()'],['../class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#aedb11c859919e99a1a4bf680864f5ffe',1,'DISP3DLIB::InverseView::mousePressEvent()']]],
   ['mri_5fhead_5ft',['mri_head_t',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a17bd236b46fd5cb7096a30df6d4f475d',1,'MNELIB::MNEForwardSolution::mri_head_t()'],['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#aee97841ed32c50c581d5495a20aced24',1,'MNELIB::MNEInverseOperator::mri_head_t()']]]
 ];

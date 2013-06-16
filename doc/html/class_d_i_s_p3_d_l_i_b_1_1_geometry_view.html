@@ -110,8 +110,8 @@ Inheritance diagram for DISP3DLIB::GeometryView:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a4d825a6fb8c46d2158107c56af28d1b4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a4d825a6fb8c46d2158107c56af28d1b4">GeometryView</a> (QWindow *parent=0)</td></tr>
-<tr class="separator:a4d825a6fb8c46d2158107c56af28d1b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaaa88d83201df1cb25888278da5a1762"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#aaaa88d83201df1cb25888278da5a1762">GeometryView</a> (const <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html">MNESourceSpace</a> &amp;p_sourceSpace, QWindow *parent=0)</td></tr>
+<tr class="separator:aaaa88d83201df1cb25888278da5a1762"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab4bb78457615996a1be0c44add508ff9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#ab4bb78457615996a1be0c44add508ff9">~GeometryView</a> ()</td></tr>
 <tr class="separator:ab4bb78457615996a1be0c44add508ff9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -121,6 +121,12 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:a816a10949d2879546377239cc72f9cd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a394ff6a0626e1cc306d40df437a34718"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a394ff6a0626e1cc306d40df437a34718">paintGL</a> (QGLPainter *painter)</td></tr>
 <tr class="separator:a394ff6a0626e1cc306d40df437a34718"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8af2c881eb7650d99b21b7dc604609c5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a8af2c881eb7650d99b21b7dc604609c5">keyPressEvent</a> (QKeyEvent *e)</td></tr>
+<tr class="separator:a8af2c881eb7650d99b21b7dc604609c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a66b50280e22d3b6563f0649b311324a0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a66b50280e22d3b6563f0649b311324a0">mouseMoveEvent</a> (QMouseEvent *e)</td></tr>
+<tr class="separator:a66b50280e22d3b6563f0649b311324a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d497baab79bf08d84de5a4ea983d518"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a9d497baab79bf08d84de5a4ea983d518">mousePressEvent</a> (QMouseEvent *e)</td></tr>
+<tr class="separator:a9d497baab79bf08d84de5a4ea983d518"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Geometry View. </p>
@@ -128,28 +134,39 @@ Protected Member Functions</h2></td></tr>
 
 <p>Definition at line <a class="el" href="geometryview_8h_source.html#l00093">93</a> of file <a class="el" href="geometryview_8h_source.html">geometryview.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a4d825a6fb8c46d2158107c56af28d1b4"></a>
+<a class="anchor" id="aaaa88d83201df1cb25888278da5a1762"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">GeometryView::GeometryView </td>
           <td>(</td>
-          <td class="paramtype">QWindow *&#160;</td>
-          <td class="paramname"><em>parent</em> = <code>0</code>)</td><td></td>
+          <td class="paramtype">const <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html">MNESourceSpace</a> &amp;&#160;</td>
+          <td class="paramname"><em>p_sourceSpace</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">QWindow *&#160;</td>
+          <td class="paramname"><em>parent</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 <p>Creates the geometry view.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_sourceSpace</td><td>Source space which contains the geometry information </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">parent</td><td>Parent QObject (optional) </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="geometryview_8cpp_source.html#l00077">77</a> of file <a class="el" href="geometryview_8cpp_source.html">geometryview.cpp</a>.</p>
+<p>Definition at line <a class="el" href="geometryview_8cpp_source.html#l00079">79</a> of file <a class="el" href="geometryview_8cpp_source.html">geometryview.cpp</a>.</p>
 
 </div>
 </div>
@@ -167,7 +184,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Destroys the geometry view. </p>
 
-<p>Definition at line <a class="el" href="geometryview_8cpp_source.html#l00097">97</a> of file <a class="el" href="geometryview_8cpp_source.html">geometryview.cpp</a>.</p>
+<p>Definition at line <a class="el" href="geometryview_8cpp_source.html#l00098">98</a> of file <a class="el" href="geometryview_8cpp_source.html">geometryview.cpp</a>.</p>
 
 </div>
 </div>
@@ -201,7 +218,106 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="geometryview_8cpp_source.html#l00104">104</a> of file <a class="el" href="geometryview_8cpp_source.html">geometryview.cpp</a>.</p>
+<p>Definition at line <a class="el" href="geometryview_8cpp_source.html#l00105">105</a> of file <a class="el" href="geometryview_8cpp_source.html">geometryview.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a8af2c881eb7650d99b21b7dc604609c5"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void GeometryView::keyPressEvent </td>
+          <td>(</td>
+          <td class="paramtype">QKeyEvent *&#160;</td>
+          <td class="paramname"><em>e</em>)</td><td></td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Processes the key press event e.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">e</td><td>the key press event. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="geometryview_8cpp_source.html#l00296">296</a> of file <a class="el" href="geometryview_8cpp_source.html">geometryview.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a66b50280e22d3b6563f0649b311324a0"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void GeometryView::mouseMoveEvent </td>
+          <td>(</td>
+          <td class="paramtype">QMouseEvent *&#160;</td>
+          <td class="paramname"><em>e</em>)</td><td></td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Processes the mouse move event e.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">e</td><td>the mouse move event. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="geometryview_8cpp_source.html#l00318">318</a> of file <a class="el" href="geometryview_8cpp_source.html">geometryview.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a9d497baab79bf08d84de5a4ea983d518"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void GeometryView::mousePressEvent </td>
+          <td>(</td>
+          <td class="paramtype">QMouseEvent *&#160;</td>
+          <td class="paramname"><em>e</em>)</td><td></td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Processes the mouse press event e.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">e</td><td>the mouse press event. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="geometryview_8cpp_source.html#l00340">340</a> of file <a class="el" href="geometryview_8cpp_source.html">geometryview.cpp</a>.</p>
 
 </div>
 </div>
@@ -234,7 +350,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="geometryview_8cpp_source.html#l00247">247</a> of file <a class="el" href="geometryview_8cpp_source.html">geometryview.cpp</a>.</p>
+<p>Definition at line <a class="el" href="geometryview_8cpp_source.html#l00271">271</a> of file <a class="el" href="geometryview_8cpp_source.html">geometryview.cpp</a>.</p>
 
 </div>
 </div>
@@ -245,7 +361,7 @@ Protected Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat May 25 2013 00:25:08 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Jun 16 2013 16:13:42 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.4
 </small></address>

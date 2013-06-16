@@ -97,8 +97,8 @@ int main(int argc, char *argv[])
 
     ImageSc imagesc(mat);
     imagesc.setTitle("Test Matrix");
-    imagesc.setXLabel("X Achse");
-    imagesc.setYLabel("Y Achse");
+    imagesc.setXLabel("X Axes");
+    imagesc.setYLabel("Y Axes");
 
     imagesc.setColorMap("Bone");//imagesc.setColorMap("Jet");
 

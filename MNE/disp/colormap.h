@@ -93,29 +93,135 @@ public:
     
     //=========================================================================================================
     /**
-    * Destroys the ColorMap class.
+    * Destructs the ColorMap class.
     */
     ~ColorMap();
 
+    //=========================================================================================================
+    /**
+    * Returns a Jet RGB to a given double value [0,1]
+    *
+    * @param[in] v      the double which has to be part of the intervall [0,1]
+    *
+    * @return the corresponding Jet RGB
+    */
     static inline QRgb valueToJet(double v);
 
+    //=========================================================================================================
+    /**
+    * Returns a Hot RGB to a given double value [0,1]
+    *
+    * @param[in] v      the double which has to be part of the intervall [0,1]
+    *
+    * @return the corresponding Hot RGB
+    */
     static inline QRgb valueToHot(double v);
 
+    //=========================================================================================================
+    /**
+    * Returns a Bone RGB to a given double value [0,1]
+    *
+    * @param[in] v      the double which has to be part of the intervall [0,1]
+    *
+    * @return the corresponding Bone RGB
+    */
     static inline QRgb valueToBone(double v);
     
 protected:
+    //=========================================================================================================
+    /**
+    * Describes a linear function (y = mx + n) and returns the output value y
+    *
+    * @param[in] x  input value
+    * @param[in] m  slope
+    * @param[in] n  offset
+    *
+    * @return the output value
+    */
     static double linearSlope(double x, double m, double n);
 
+    //=========================================================================================================
+    /**
+    * Describes the red Jet fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
+    *
+    * @param[in] v  input value [0,1]
+    *
+    * @return the output color value [0.255]
+    */
     static int jetR(double v);
+    //=========================================================================================================
+    /**
+    * Describes the green Jet fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
+    *
+    * @param[in] v  input value [0,1]
+    *
+    * @return the output color value [0.255]
+    */
     static int jetG(double v);
+    //=========================================================================================================
+    /**
+    * Describes the blue Jet fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
+    *
+    * @param[in] v  input value [0,1]
+    *
+    * @return the output color value [0.255]
+    */
     static int jetB(double v);
 
+    //=========================================================================================================
+    /**
+    * Describes the red Hot fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
+    *
+    * @param[in] v  input value [0,1]
+    *
+    * @return the output color value [0.255]
+    */
     static int hotR(double v);
+    //=========================================================================================================
+    /**
+    * Describes the green Hot fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
+    *
+    * @param[in] v  input value [0,1]
+    *
+    * @return the output color value [0.255]
+    */
     static int hotG(double v);
+    //=========================================================================================================
+    /**
+    * Describes the blue Hot fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
+    *
+    * @param[in] v  input value [0,1]
+    *
+    * @return the output color value [0.255]
+    */
     static int hotB(double v);
 
+    //=========================================================================================================
+    /**
+    * Describes the red Bone fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
+    *
+    * @param[in] v  input value [0,1]
+    *
+    * @return the output color value [0.255]
+    */
     static int boneR(double v);
+    //=========================================================================================================
+    /**
+    * Describes the green Bone fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
+    *
+    * @param[in] v  input value [0,1]
+    *
+    * @return the output color value [0.255]
+    */
     static int boneG(double v);
+    //=========================================================================================================
+    /**
+    * Describes the blue Bone fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
+    *
+    * @param[in] v  input value [0,1]
+    *
+    * @return the output color value [0.255]
+    */
     static int boneB(double v);
 
 private:

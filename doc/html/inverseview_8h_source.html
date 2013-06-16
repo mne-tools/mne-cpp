@@ -166,86 +166,86 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00118"></a><span class="lineno"><a class="code" href="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html">  118</a></span>&#160;<span class="comment"></span><span class="keyword">class </span><a class="code" href="disp3_d__global_8h.html#a9e0813af0c7548e2ee60e9033fdf045e">DISP3DSHARED_EXPORT</a> <a class="code" href="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html" title="3D stereoscopic labels ">InverseView</a> : <span class="keyword">public</span> QGLView</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;{</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    Q_OBJECT</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00122"></a><span class="lineno"><a class="code" href="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#a29a09132596437680ba804eb676dd00e">  122</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;InverseView&gt; <a class="code" href="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#a29a09132596437680ba804eb676dd00e">SPtr</a>;            </div>
-<div class="line"><a name="l00123"></a><span class="lineno"><a class="code" href="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#acbd3608fef565cbfdaeabc7ecd83a83e">  123</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;const InverseView&gt; <a class="code" href="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#acbd3608fef565cbfdaeabc7ecd83a83e">ConstSPtr</a>; </div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;<span class="comment"></span>    <a class="code" href="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html" title="3D stereoscopic labels ">InverseView</a>(<span class="keyword">const</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html" title="Source Space descritpion. ">MNESourceSpace</a> &amp;p_sourceSpace, QList&lt;Label&gt; &amp;p_qListLabels, QList&lt;RowVector4i&gt; &amp;p_qListRGBAs, QWindow *parent = 0);</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    </div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html" title="3D stereoscopic labels ">InverseView</a>();</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> pushSourceEstimate(<a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html" title="Source estimation. ">SourceEstimate</a> &amp;p_sourceEstimate);</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;<span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> initializeGL(QGLPainter *painter);</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> paintGL(QGLPainter *painter);</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> keyPressEvent(QKeyEvent *e);</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> mouseMoveEvent(QMouseEvent *e);</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> mousePressEvent(QMouseEvent *e);</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    <a class="code" href="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#a222f9d3411f1210337d9e3e552d1eb93">InverseViewProducer::SPtr</a> m_pInverseViewProducer;   </div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    qint32 m_iColorMode;                            </div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="comment">//Data Stuff</span></div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html" title="Source Space descritpion. ">MNESourceSpace</a> m_sourceSpace;                   </div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    QList&lt;Label&gt; m_qListLabels;                     </div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    QList&lt;RowVector4i&gt; m_qListRGBAs;                </div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    <span class="comment">//GL Stuff</span></div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <span class="keywordtype">bool</span> m_bStereo;</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    QGLLightModel *m_pLightModel;                   </div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    QGLLightParameters *m_pLightParametersScene;    </div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    QGLColorMaterial material;</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    QGLSceneNode *m_pSceneNodeBrain;                </div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    QVector3D m_vecBoundingBoxMin;                  </div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    QVector3D m_vecBoundingBoxMax;                  </div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    QVector3D m_vecBoundingBoxCenter;               </div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    <span class="keywordtype">float</span> m_fOffsetZ;                               </div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    <span class="keywordtype">float</span> m_fOffsetZEye;                            </div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    QGLSceneNode *m_pSceneNode;                     </div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;<span class="comment">//    QGLCamera *m_pCameraFrontal;     /**&lt; frontal camera. */</span></div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;</div>
+<div class="line"><a name="l00119"></a><span class="lineno"><a class="code" href="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html">  119</a></span>&#160;<span class="comment"></span><span class="keyword">class </span><a class="code" href="disp3_d__global_8h.html#a9e0813af0c7548e2ee60e9033fdf045e">DISP3DSHARED_EXPORT</a> <a class="code" href="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html" title="3D stereoscopic labels ">InverseView</a> : <span class="keyword">public</span> QGLView</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;{</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    Q_OBJECT</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00123"></a><span class="lineno"><a class="code" href="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#a29a09132596437680ba804eb676dd00e">  123</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;InverseView&gt; <a class="code" href="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#a29a09132596437680ba804eb676dd00e">SPtr</a>;            </div>
+<div class="line"><a name="l00124"></a><span class="lineno"><a class="code" href="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#acbd3608fef565cbfdaeabc7ecd83a83e">  124</a></span>&#160;    <span class="keyword">typedef</span> QSharedPointer&lt;const InverseView&gt; <a class="code" href="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#acbd3608fef565cbfdaeabc7ecd83a83e">ConstSPtr</a>; </div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;<span class="comment"></span>    <a class="code" href="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html" title="3D stereoscopic labels ">InverseView</a>(<span class="keyword">const</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html" title="Source Space descritpion. ">MNESourceSpace</a> &amp;p_sourceSpace, QList&lt;Label&gt; &amp;p_qListLabels, QList&lt;RowVector4i&gt; &amp;p_qListRGBAs, QWindow *parent = 0);</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    </div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;<span class="comment"></span>    ~<a class="code" href="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html" title="3D stereoscopic labels ">InverseView</a>();</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> pushSourceEstimate(<a class="code" href="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html" title="Source estimation. ">SourceEstimate</a> &amp;p_sourceEstimate);</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;<span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> initializeGL(QGLPainter *painter);</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> paintGL(QGLPainter *painter);</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> keyPressEvent(QKeyEvent *e);</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> mouseMoveEvent(QMouseEvent *e);</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> mousePressEvent(QMouseEvent *e);</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    <a class="code" href="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#a222f9d3411f1210337d9e3e552d1eb93">InverseViewProducer::SPtr</a> m_pInverseViewProducer;   </div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    qint32 m_iColorMode;                            </div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <span class="comment">//Data Stuff</span></div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html" title="Source Space descritpion. ">MNESourceSpace</a> m_sourceSpace;                   </div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    QList&lt;Label&gt; m_qListLabels;                     </div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    QList&lt;RowVector4i&gt; m_qListRGBAs;                </div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <span class="comment">//GL Stuff</span></div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    <span class="keywordtype">bool</span> m_bStereo;</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    QGLLightModel *m_pLightModel;                   </div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    QGLLightParameters *m_pLightParametersScene;    </div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    QGLColorMaterial material;</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    QGLSceneNode *m_pSceneNodeBrain;                </div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    QVector3D m_vecBoundingBoxMin;                  </div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    QVector3D m_vecBoundingBoxMax;                  </div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    QVector3D m_vecBoundingBoxCenter;               </div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    <span class="keywordtype">float</span> m_fOffsetZ;                               </div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    <span class="keywordtype">float</span> m_fOffsetZEye;                            </div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    QGLSceneNode *m_pSceneNode;                     </div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;<span class="comment">//    QGLCamera *m_pCameraFrontal;     /**&lt; frontal camera. */</span></div>
 <div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    QList&lt; QMap&lt;qint32, qint32&gt; &gt; m_qListMapLabelIdIndex;</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> updateActivation(QSharedPointer&lt;Eigen::VectorXd&gt; p_pVecActivation);</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;<span class="comment"></span><span class="comment">//    QGLSceneNode *createScene();</span></div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;};</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;<span class="comment">// INLINE DEFINITIONS</span></div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    QList&lt; QMap&lt;qint32, qint32&gt; &gt; m_qListMapLabelIdIndex;</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> updateActivation(QSharedPointer&lt;Eigen::VectorXd&gt; p_pVecActivation);</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    <span class="comment">//=========================================================================================================</span></div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;<span class="comment"></span><span class="comment">//    QGLSceneNode *createScene();</span></div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;};</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;<span class="comment">//=============================================================================================================</span></div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;<span class="comment">// INLINE DEFINITIONS</span></div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;} <span class="comment">// NAMESPACE</span></div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;<span class="preprocessor">#endif // INVERSEVIEW_H</span></div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;} <span class="comment">// NAMESPACE</span></div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;<span class="preprocessor">#endif // INVERSEVIEW_H</span></div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;<span class="preprocessor"></span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat May 25 2013 00:25:06 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Jun 16 2013 16:13:40 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.4
 </small></address>

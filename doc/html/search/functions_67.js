@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['geometryview',['GeometryView',['../class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a4d825a6fb8c46d2158107c56af28d1b4',1,'DISP3DLIB::GeometryView']]],
+  ['geometryview',['GeometryView',['../class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#aaaa88d83201df1cb25888278da5a1762',1,'DISP3DLIB::GeometryView']]],
   ['get_5fcurrent_5fcomp',['get_current_comp',['../class_f_i_f_f_l_i_b_1_1_fiff_info.html#abf6d5e56f0acb167039e2187c093bae0',1,'FIFFLIB::FiffInfo::get_current_comp()'],['../class_m_n_e_l_i_b_1_1_m_n_e.html#a1f5e3af9a23a6240144414ab6aa07c56',1,'MNELIB::MNE::get_current_comp()']]],
   ['get_5fevoked_5fentries',['get_evoked_entries',['../class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a62a33607e63f137b79ef30035e8fcd4a',1,'FIFFLIB::FiffStream']]],
   ['get_5fvertno',['get_vertno',['../class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#afd545fff36165135b89261c1d232ea0d',1,'MNELIB::MNESourceSpace']]],

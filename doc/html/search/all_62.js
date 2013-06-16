@@ -2,6 +2,9 @@ var searchData=
 [
   ['bads',['bads',['../class_f_i_f_f_l_i_b_1_1_fiff_cov.html#ab8dc4bd79129bad78d569e17a4a7bf8f',1,'FIFFLIB::FiffCov::bads()'],['../class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#abb2b7b298afe7439c1012962c2a8c43c',1,'FIFFLIB::FiffInfoBase::bads()']]],
   ['block',['block',['../class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ae7a0a42675b015ba4b5ff83586a2394a',1,'FIFFLIB::FiffDirTree']]],
+  ['boneb',['boneB',['../class_d_i_s_p_l_i_b_1_1_color_map.html#abb251bb7603ba90d567f8c2d44d06745',1,'DISPLIB::ColorMap']]],
+  ['boneg',['boneG',['../class_d_i_s_p_l_i_b_1_1_color_map.html#ad15b6e9517fecd18bc6c6654662f3cb2',1,'DISPLIB::ColorMap']]],
+  ['boner',['boneR',['../class_d_i_s_p_l_i_b_1_1_color_map.html#a476f9ed39c73ad05a556cd3860b1af90',1,'DISPLIB::ColorMap']]],
   ['buffer',['Buffer',['../class_i_o_buffer_1_1_buffer.html',1,'IOBuffer']]],
   ['buffer',['Buffer',['../class_i_o_buffer_1_1_buffer.html#a2071703c082f507144349ffbccf6b2f3',1,'IOBuffer::Buffer']]],
   ['buffer_2ecpp',['buffer.cpp',['../buffer_8cpp.html',1,'']]],
