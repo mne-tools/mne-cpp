@@ -41,10 +41,12 @@
 #include <disp/imagesc.h>
 #include <disp/plot.h>
 
+#include <math.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Eigen
 //=============================================================================================================
 
 #include <Eigen/Core>
@@ -107,12 +109,15 @@ int main(int argc, char *argv[])
     imagesc.show();
 
     //Plot Test
-    qint32 t_iSize = 20;
+    qint32 t_iSize = 100;
     VectorXd vec(t_iSize);
     for(int i = 0; i < t_iSize; ++i)
-        vec[i] = i * 0.231;
+    {
+        double t = 0.01 * i;
+        vec[i] = sin(2 * 3.1416 * 4 * t); //4 Hz
+    }
 
-    Plot plot;
+    Plot plot(vec);
 
     plot.setTitle("Test Plot");
     plot.setXLabel("X Axes");

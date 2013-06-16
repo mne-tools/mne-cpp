@@ -80,8 +80,11 @@ void Graph::init()
     m_sYLabel = QString("");
 
     //Set Borders
-    m_iBorderTopBottom = 50;
     m_iBorderLeftRight = 100;
+    m_iBorderTopBottom = 50;
+
+    this->setMinimumWidth(m_iBorderLeftRight*2.5);
+    this->setMinimumHeight(m_iBorderTopBottom*2.5);
 
     //Set Fonts
     m_qFontAxes.setPixelSize(12);
