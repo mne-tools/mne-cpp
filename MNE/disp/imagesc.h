@@ -89,7 +89,7 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* Visualizes Eigen matrizes labels using a HSV colormap
+* Visualizes Eigen matrizes, similiar to MATLABs imagesc function; Available colormaps are: Jet, Hot, Bone
 *
 * @brief Eigen matrix visualization
 */
@@ -100,66 +100,147 @@ public:
     typedef QSharedPointer<ImageSc> SPtr;            /**< Shared pointer type for MatrixView class. */
     typedef QSharedPointer<const ImageSc> ConstSPtr; /**< Const shared pointer type for MatrixView class. */
 
+    //=========================================================================================================
+    /**
+    * Creates the scaled image view.
+    *
+    * @param[in] parent         Parent QObject (optional)
+    */
     explicit ImageSc(QWidget *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Creates the scaled image view with a given double matrix.
+    *
+    * @param[in] p_dMat     The double data matrix
+    * @param[in] parent     Parent QObject (optional)
+    */
     explicit ImageSc(MatrixXd &p_dMat, QWidget *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Creates the scaled image view with a given float matrix.
+    *
+    * @param[in] p_fMat     The float data matrix
+    * @param[in] parent     Parent QObject (optional)
+    */
     explicit ImageSc(MatrixXf &p_fMat, QWidget *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Creates the scaled image view with a given integer matrix.
+    *
+    * @param[in] p_iMat     The integer data matrix
+    * @param[in] parent     Parent QObject (optional)
+    */
     explicit ImageSc(MatrixXi &p_iMat, QWidget *parent = 0);
 
+    //=========================================================================================================
+    /**
+    * Destructs the ImageSc object
+    */
     ~ImageSc();
 
+    //=========================================================================================================
+    /**
+    * Initializes the ImageSc object
+    */
     void init();
 
+    //=========================================================================================================
+    /**
+    * Updates the scaled image view with a given double matrix.
+    *
+    * @param[in] p_dMat     The double data matrix
+    */
     void updateData(MatrixXd &p_dMat);
+    //=========================================================================================================
+    /**
+    * Updates the scaled image view with a given float matrix.
+    *
+    * @param[in] p_fMat     The float data matrix
+    */
     void updateData(MatrixXf &p_fMat);
+    //=========================================================================================================
+    /**
+    * Updates the scaled image view with a given integer matrix.
+    *
+    * @param[in] p_dMat     The integer data matrix
+    */
     void updateData(MatrixXi &p_iMat);
 
+    //=========================================================================================================
+    /**
+    * Sets the color map to use, e.g. "Jet", "Hot", "Bone"
+    *
+    * @param[in] p_sColorMap    The colormap to use
+    */
     void setColorMap(const QString &p_sColorMap);
 
+    //=========================================================================================================
+    /**
+    * Sets the scaled image view title.
+    *
+    * @param[in] p_sTitle   The title
+    */
     void setTitle(const QString &p_sTitle);
+    //=========================================================================================================
+    /**
+    * Sets the label of the y axes
+    *
+    * @param[in] p_sXLabel   The x axes label
+    */
     void setXLabel(const QString &p_sXLabel);
+    //=========================================================================================================
+    /**
+    * Sets the label of the y axes
+    *
+    * @param[in] p_sXLabel   The y axes label
+    */
     void setYLabel(const QString &p_sYLabel);
 
-
 protected:
+    //=========================================================================================================
+    /**
+    * Updates data and colorbar pixmap
+    */
     void updateMaps();
 
     void paintEvent(QPaintEvent*);
     void resizeEvent(QResizeEvent*);
 
 private:
+    QPixmap* m_pPixmapData;         /**< data pixmap */
+    QPixmap* m_pPixmapColorbar;     /**< colorbar pixmap */
 
-    QPixmap* m_pPixmapData;
-    QPixmap* m_pPixmapColorbar;
+    MatrixXd m_matCentNormData;     /**< centralized and normalized data */
 
-    MatrixXd m_matCentNormData;
+    QSize m_qSizeWidget;            /**< current widget size */
 
-    QSize widgetSize;
+    qint32 m_iBorderTopBottom;      /**< distance to top and bottom */
+    qint32 m_iBorderLeftRight;      /**< distance to left and right */
 
-    qint32 m_iBorderTopBottom;
-    qint32 m_iBorderLeftRight;
+    double m_dMinValue;             /**< Minimal data value */
+    double m_dMaxValue;             /**< Maximal data value */
 
-    double m_dMinValue;
-    double m_dMaxValue;
+    QString m_sTitle;               /**< Title */
+    QFont m_qFontTitle;             /**< Title font */
+    QPen m_qPenTitle;               /**< Title pen */
 
-    QString m_sTitle;
-    QFont m_qFontTitle;
-    QPen m_qPenTitle;
+    QString m_sXLabel;              /**< X axes label */
+    QString m_sYLabel;              /**< Y axes label */
+    QFont m_qFontAxes;              /**< Axes font */
+    QPen m_qPenAxes;                /**< Axes pen */
 
-    QString m_sXLabel;
-    QString m_sYLabel;
-    QFont m_qFontAxes;
-    QPen m_qPenAxes;
+    QRgb (*pColorMapper)(double);   /**< Function pointer to current colormap */
 
-    QRgb (*pColorMapper)(double);
-
-    bool m_bColorbar;
-    QVector<double> m_qVecScaleValues;
-    qint32 m_iColorbarWidth;
-    qint32 m_iColorbarSteps;
-    qint32 m_iColorbarGradSteps;
-    QFont m_qFontColorbar;
-    QPen m_qPenColorbar;
-
+    bool m_bColorbar;                   /**< If colorbar is visible */
+    QVector<double> m_qVecScaleValues;  /**< Scale values */
+    qint32 m_iColorbarWidth;            /**< Colorbar width */
+    qint32 m_iColorbarSteps;            /**< Number of colorbar vaues to display */
+    qint32 m_iColorbarGradSteps;        /**< Gradient steps of the colorbar */
+    QFont m_qFontColorbar;              /**< Colorbar font */
+    QPen m_qPenColorbar;                /**< Colorbar pen */
 };
 
 //*************************************************************************************************************

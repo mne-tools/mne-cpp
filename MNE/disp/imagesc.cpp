@@ -224,7 +224,7 @@ void ImageSc::updateMaps()
 
         m_pPixmapData = new QPixmap(QPixmap::fromImage(t_qImageData));
 
-        // -- Colorbar --
+        // --Colorbar--
         QImage t_qImageColorbar(1, m_iColorbarGradSteps, QImage::Format_RGB32);
 
         double t_dQuantile = 1.0/((double)m_iColorbarGradSteps-1);
@@ -273,7 +273,7 @@ void ImageSc::updateMaps()
 
 void ImageSc::resizeEvent (QResizeEvent* event)
 {
-    widgetSize = event->size();
+    m_qSizeWidget = event->size();
     // Call base class impl
     QWidget::resizeEvent(event);
 }
@@ -289,15 +289,15 @@ void ImageSc::paintEvent(QPaintEvent *)
         QPoint t_qPointTopLeft(0,0);
 
         // -- Data --
-        QSize t_qSizePixmapData = widgetSize;
+        QSize t_qSizePixmapData = m_qSizeWidget;
 
         t_qSizePixmapData.setHeight(t_qSizePixmapData.height()-m_iBorderTopBottom*2);
         t_qSizePixmapData.setWidth(t_qSizePixmapData.width()-m_iBorderLeftRight*2);
         // Scale data
         QPixmap t_qPixmapScaledData = m_pPixmapData->scaled(t_qSizePixmapData, Qt::KeepAspectRatio);
         // Calculate data position
-        t_qPointTopLeft.setX((widgetSize.width()-t_qPixmapScaledData.width())/2);
-        t_qPointTopLeft.setY((widgetSize.height()-t_qPixmapScaledData.height())/2);
+        t_qPointTopLeft.setX((m_qSizeWidget.width()-t_qPixmapScaledData.width())/2);
+        t_qPointTopLeft.setY((m_qSizeWidget.height()-t_qPixmapScaledData.height())/2);
         //Draw data
         painter.drawPixmap(t_qPointTopLeft,t_qPixmapScaledData);
         //Draw border
@@ -306,7 +306,7 @@ void ImageSc::paintEvent(QPaintEvent *)
         // -- Colorbar --
         if(m_bColorbar && m_pPixmapColorbar && m_qVecScaleValues.size() >= 2)
         {
-            QSize t_qSizePixmapColorbar = widgetSize;
+            QSize t_qSizePixmapColorbar = m_qSizeWidget;
 
             t_qSizePixmapColorbar.setWidth(m_iColorbarWidth);
             t_qSizePixmapColorbar.setHeight(t_qPixmapScaledData.height());
@@ -386,7 +386,7 @@ void ImageSc::paintEvent(QPaintEvent *)
             painter.setPen(m_qPenTitle);
             painter.setFont(m_qFontTitle);
 
-            painter.translate((widgetSize.width()-t_iLabelWidth)/2, (widgetSize.height()-t_qPixmapScaledData.height())/2 - m_iBorderTopBottom*1.5);
+            painter.translate((m_qSizeWidget.width()-t_iLabelWidth)/2, (m_qSizeWidget.height()-t_qPixmapScaledData.height())/2 - m_iBorderTopBottom*1.5);
             painter.drawText(QRect(0, 0, t_iLabelWidth, t_iLabelHeight), Qt::AlignCenter, m_sTitle);
 
             painter.restore();
@@ -400,7 +400,7 @@ void ImageSc::paintEvent(QPaintEvent *)
         if(!m_sXLabel.isEmpty())
         {
             painter.save();
-            painter.translate((widgetSize.width()-t_iLabelWidth)/2, t_qPixmapScaledData.height()+((widgetSize.height()-t_qPixmapScaledData.height()-m_iBorderTopBottom)/2));
+            painter.translate((m_qSizeWidget.width()-t_iLabelWidth)/2, t_qPixmapScaledData.height()+((m_qSizeWidget.height()-t_qPixmapScaledData.height()-m_iBorderTopBottom)/2));
             painter.drawText(QRect(0, 0, t_iLabelWidth, t_iLabelHeight), Qt::AlignCenter, m_sXLabel);
             painter.restore();
         }
@@ -410,7 +410,7 @@ void ImageSc::paintEvent(QPaintEvent *)
         {
             painter.save();
             painter.rotate(270);
-            painter.translate(-(widgetSize.height()+t_iLabelWidth)/2,(widgetSize.width()-t_qPixmapScaledData.width())/2-t_iLabelHeight*0.75);
+            painter.translate(-(m_qSizeWidget.height()+t_iLabelWidth)/2,(m_qSizeWidget.width()-t_qPixmapScaledData.width())/2-t_iLabelHeight*0.75);
             painter.drawText(QRect(0, 0, t_iLabelWidth, t_iLabelHeight), Qt::AlignCenter, m_sYLabel);
             painter.restore();
         }
