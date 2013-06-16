@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
     imagesc.setXLabel("X Achse");
     imagesc.setYLabel("Y Achse");
 
-    imagesc.setColorMap("Hot");//imagesc.setColorMap("Jet");
+    imagesc.setColorMap("Bone");//imagesc.setColorMap("Jet");
 
     imagesc.setWindowTitle("Corresponding function to MATLABs imagesc");
     imagesc.show();

@@ -425,6 +425,8 @@ void ImageSc::setColorMap(const QString &p_sColorMap)
         pColorMapper = ColorMap::valueToJet;
     else if(p_sColorMap == "Hot")
         pColorMapper = ColorMap::valueToHot;
+    else if(p_sColorMap == "Bone")
+        pColorMapper = ColorMap::valueToBone;
     else
         pColorMapper = ColorMap::valueToJet;
 

@@ -100,20 +100,23 @@ public:
     static inline QRgb valueToJet(double v);
 
     static inline QRgb valueToHot(double v);
+
+    static inline QRgb valueToBone(double v);
     
 protected:
+    static double linearSlope(double x, double m, double n);
+
     static int jetR(double v);
     static int jetG(double v);
     static int jetB(double v);
-    static double jetSlopeMRaising(double x, double n);
-    static double jetSlopeMFalling(double x, double n);
 
     static int hotR(double v);
     static int hotG(double v);
     static int hotB(double v);
-    static double hotSlopeRRaising(double x, double n);
-    static double hotSlopeGRaising(double x, double n);
-    static double hotSlopeBRaising(double x, double n);
+
+    static int boneR(double v);
+    static int boneG(double v);
+    static int boneB(double v);
 
 private:
     
@@ -136,6 +139,15 @@ inline QRgb ColorMap::valueToJet(double v)
 inline QRgb ColorMap::valueToHot(double v)
 {
     QRgb p_qRgb = qRgb(hotR(v), hotG(v), hotB(v));
+    return p_qRgb;
+}
+
+
+//*************************************************************************************************************
+
+inline QRgb ColorMap::valueToBone(double v)
+{
+    QRgb p_qRgb = qRgb(boneR(v), boneG(v), boneB(v));
     return p_qRgb;
 }
 
