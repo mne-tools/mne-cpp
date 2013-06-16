@@ -109,9 +109,11 @@ public:
 
     void init();
 
-    void updateMatrix(MatrixXd &p_dMat);
-    void updateMatrix(MatrixXf &p_fMat);
-    void updateMatrix(MatrixXi &p_iMat);
+    void updateData(MatrixXd &p_dMat);
+    void updateData(MatrixXf &p_fMat);
+    void updateData(MatrixXi &p_iMat);
+
+    void setColorMap(const QString &p_sColorMap);
 
     void setTitle(const QString &p_sTitle);
     void setXLabel(const QString &p_sXLabel);
@@ -119,9 +121,11 @@ public:
 
 
 protected:
+    void updateMaps();
+
     void paintEvent(QPaintEvent*);
     void resizeEvent(QResizeEvent*);
-    
+
 private:
 
     QPixmap* m_pPixmapData;
@@ -145,6 +149,8 @@ private:
     QString m_sYLabel;
     QFont m_qFontAxes;
     QPen m_qPenAxes;
+
+    QRgb (*pColorMapper)(double);
 
     bool m_bColorbar;
     QVector<double> m_qVecScaleValues;

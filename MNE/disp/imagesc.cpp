@@ -84,7 +84,7 @@ ImageSc::ImageSc(MatrixXd &p_dMat, QWidget *parent)
 , m_pPixmapColorbar(NULL)
 {
     init();
-    updateMatrix(p_dMat);
+    updateData(p_dMat);
 }
 
 
@@ -96,7 +96,7 @@ ImageSc::ImageSc(MatrixXf &p_fMat, QWidget *parent)
 , m_pPixmapColorbar(NULL)
 {
     init();
-    updateMatrix(p_fMat);
+    updateData(p_fMat);
 }
 
 
@@ -108,7 +108,7 @@ ImageSc::ImageSc(MatrixXi &p_iMat, QWidget *parent)
 , m_pPixmapColorbar(NULL)
 {
     init();
-    updateMatrix(p_iMat);
+    updateData(p_iMat);
 }
 
 
@@ -127,6 +127,10 @@ ImageSc::~ImageSc()
 
 void ImageSc::init()
 {
+    m_sTitle = QString("");
+    m_sXLabel = QString("");
+    m_sYLabel = QString("");
+
     //Set Borders
     m_iBorderTopBottom = 50;
     m_iBorderLeftRight = 100;
@@ -138,6 +142,9 @@ void ImageSc::init()
     m_qFontTitle.setPixelSize(20);
     m_qFontTitle.setBold(true);
     m_qPenTitle = QPen(Qt::black);
+
+    //Colormap
+    pColorMapper = ColorMap::valueToJet;
 
     //Colorbar
     m_bColorbar = true;
@@ -152,7 +159,46 @@ void ImageSc::init()
 
 //*************************************************************************************************************
 
-void ImageSc::updateMatrix(MatrixXd &p_dMat)
+void ImageSc::updateData(MatrixXd &p_dMat)
+{
+    if(p_dMat.rows() > 0 && p_dMat.cols() > 0)
+    {
+        m_dMinValue = p_dMat.minCoeff();
+        m_dMaxValue = p_dMat.maxCoeff();
+
+        // -- data --
+        m_matCentNormData = p_dMat;
+        double minValue = m_matCentNormData.minCoeff();
+        m_matCentNormData.array() -= minValue;
+        double maxValue = m_matCentNormData.maxCoeff();
+        m_matCentNormData.array() /= maxValue;
+
+        updateMaps();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void ImageSc::updateData(MatrixXf &p_fMat)
+{
+    MatrixXd t_dMat = p_fMat.cast<double>();
+    updateData(t_dMat);
+}
+
+
+//*************************************************************************************************************
+
+void ImageSc::updateData(MatrixXi &p_iMat)
+{
+    MatrixXd t_dMat = p_iMat.cast<double>();
+    updateData(t_dMat);
+}
+
+
+//*************************************************************************************************************
+
+void ImageSc::updateMaps()
 {
     if(m_pPixmapData)
     {
@@ -165,29 +211,16 @@ void ImageSc::updateMatrix(MatrixXd &p_dMat)
         m_pPixmapColorbar = NULL;
     }
 
-    if(p_dMat.rows() > 0 && p_dMat.cols())
+    if(m_matCentNormData.rows() > 0 && m_matCentNormData.cols() > 0)
     {
-        m_sTitle = QString("");
-        m_sXLabel = QString("");
-        m_sYLabel = QString("");
-
-        m_dMinValue = p_dMat.minCoeff();
-        m_dMaxValue = p_dMat.maxCoeff();
-
-        // -- data --
-        m_matCentNormData = p_dMat;
-        double minValue = m_matCentNormData.minCoeff();
-        m_matCentNormData.array() -= minValue;
-        double maxValue = m_matCentNormData.maxCoeff();
-        m_matCentNormData.array() /= maxValue;
-
-        qint32 x = p_dMat.cols();
-        qint32 y = p_dMat.rows();
+        // --Data--
+        qint32 x = m_matCentNormData.cols();
+        qint32 y = m_matCentNormData.rows();
         qint32 i, j;
         QImage t_qImageData(x, y, QImage::Format_RGB32);
         for(i = 0; i < x; ++i)
             for(j = 0; j < y; ++j)
-                t_qImageData.setPixel(i, j, ColorMap::valueToJet(m_matCentNormData(j,i)));
+                t_qImageData.setPixel(i, j, pColorMapper(m_matCentNormData(j,i)));
 
         m_pPixmapData = new QPixmap(QPixmap::fromImage(t_qImageData));
 
@@ -197,7 +230,7 @@ void ImageSc::updateMatrix(MatrixXd &p_dMat)
         double t_dQuantile = 1.0/((double)m_iColorbarGradSteps-1);
         for(j = 0; j < m_iColorbarGradSteps; ++j)
         {
-            QRgb t_qRgb = ColorMap::valueToJet(t_dQuantile*((double)(m_iColorbarGradSteps-1-j))*1.0);
+            QRgb t_qRgb = pColorMapper(t_dQuantile*((double)(m_iColorbarGradSteps-1-j))*1.0);
             t_qImageColorbar.setPixel(0, j, t_qRgb);
         }
         m_pPixmapColorbar = new QPixmap(QPixmap::fromImage(t_qImageColorbar));
@@ -231,26 +264,8 @@ void ImageSc::updateMatrix(MatrixXd &p_dMat)
             for(qint32 i = 1; i < m_iColorbarSteps-1; ++i)
                 m_qVecScaleValues.push_back(m_qVecScaleValues[i-1]+quantum);
         }
+        update();
     }
-    update();
-}
-
-
-//*************************************************************************************************************
-
-void ImageSc::updateMatrix(MatrixXf &p_fMat)
-{
-    MatrixXd t_dMat = p_fMat.cast<double>();
-    updateMatrix(t_dMat);
-}
-
-
-//*************************************************************************************************************
-
-void ImageSc::updateMatrix(MatrixXi &p_iMat)
-{
-    MatrixXd t_dMat = p_iMat.cast<double>();
-    updateMatrix(t_dMat);
 }
 
 
@@ -274,7 +289,6 @@ void ImageSc::paintEvent(QPaintEvent *)
         QPoint t_qPointTopLeft(0,0);
 
         // -- Data --
-
         QSize t_qSizePixmapData = widgetSize;
 
         t_qSizePixmapData.setHeight(t_qSizePixmapData.height()-m_iBorderTopBottom*2);
@@ -288,7 +302,6 @@ void ImageSc::paintEvent(QPaintEvent *)
         painter.drawPixmap(t_qPointTopLeft,t_qPixmapScaledData);
         //Draw border
         painter.drawRect(t_qPointTopLeft.x()-1, t_qPointTopLeft.y()-1, t_qPixmapScaledData.width()+1, t_qPixmapScaledData.height()+1);
-
 
         // -- Colorbar --
         if(m_bColorbar && m_pPixmapColorbar && m_qVecScaleValues.size() >= 2)
@@ -402,6 +415,20 @@ void ImageSc::paintEvent(QPaintEvent *)
             painter.restore();
         }
     }
+}
+
+//*************************************************************************************************************
+
+void ImageSc::setColorMap(const QString &p_sColorMap)
+{
+    if(p_sColorMap == "Jet")
+        pColorMapper = ColorMap::valueToJet;
+    else if(p_sColorMap == "Hot")
+        pColorMapper = ColorMap::valueToHot;
+    else
+        pColorMapper = ColorMap::valueToJet;
+
+    updateMaps();
 }
 
 
