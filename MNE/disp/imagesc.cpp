@@ -279,7 +279,6 @@ void ImageSc::paintEvent(QPaintEvent *)
 
         t_qSizePixmapData.setHeight(t_qSizePixmapData.height()-m_iBorderTopBottom*2);
         t_qSizePixmapData.setWidth(t_qSizePixmapData.width()-m_iBorderLeftRight*2);
-
         // Scale data
         QPixmap t_qPixmapScaledData = m_pPixmapData->scaled(t_qSizePixmapData, Qt::KeepAspectRatio);
         // Calculate data position
@@ -287,6 +286,8 @@ void ImageSc::paintEvent(QPaintEvent *)
         t_qPointTopLeft.setY((widgetSize.height()-t_qPixmapScaledData.height())/2);
         //Draw data
         painter.drawPixmap(t_qPointTopLeft,t_qPixmapScaledData);
+        //Draw border
+        painter.drawRect(t_qPointTopLeft.x()-1, t_qPointTopLeft.y()-1, t_qPixmapScaledData.width()+1, t_qPixmapScaledData.height()+1);
 
 
         // -- Colorbar --
@@ -304,7 +305,6 @@ void ImageSc::paintEvent(QPaintEvent *)
             t_qPointTopLeft.setX(t_qPointTopLeft.x() + t_qPixmapScaledData.width() + m_iBorderLeftRight/3);
             //Draw colorbar
             painter.drawPixmap(t_qPointTopLeft,t_qPixmapScaledColorbar);
-
             //Draw border
             painter.drawRect(t_qPointTopLeft.x()-1, t_qPointTopLeft.y()-1, m_iColorbarWidth+1, t_qPixmapScaledData.height()+1);
 
