@@ -126,6 +126,16 @@ public:
     * @return the corresponding Bone RGB
     */
     static inline QRgb valueToBone(double v);
+
+    //=========================================================================================================
+    /**
+    * Returns a RedBlue RGB to a given double value [0,1]
+    *
+    * @param[in] v      the double which has to be part of the intervall [0,1]
+    *
+    * @return the corresponding Bone RGB
+    */
+    static inline QRgb valueToRedBlue(double v);
     
 protected:
     //=========================================================================================================
@@ -224,6 +234,34 @@ protected:
     */
     static int boneB(double v);
 
+    //=========================================================================================================
+    /**
+    * Describes the red RedBlue fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
+    *
+    * @param[in] v  input value [0,1]
+    *
+    * @return the output color value [0.255]
+    */
+    static int rbR(double v);
+    //=========================================================================================================
+    /**
+    * Describes the green RedBlue fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
+    *
+    * @param[in] v  input value [0,1]
+    *
+    * @return the output color value [0.255]
+    */
+    static int rbG(double v);
+    //=========================================================================================================
+    /**
+    * Describes the blue RedBlue fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
+    *
+    * @param[in] v  input value [0,1]
+    *
+    * @return the output color value [0.255]
+    */
+    static int rbB(double v);
+
 private:
     
 };
@@ -256,6 +294,16 @@ inline QRgb ColorMap::valueToBone(double v)
     QRgb p_qRgb = qRgb(boneR(v), boneG(v), boneB(v));
     return p_qRgb;
 }
+
+
+//*************************************************************************************************************
+
+inline QRgb ColorMap::valueToRedBlue(double v)
+{
+    QRgb p_qRgb = qRgb(rbR(v), rbG(v), rbB(v));
+    return p_qRgb;
+}
+
 
 } // NAMESPACE
 

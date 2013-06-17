@@ -90,9 +90,9 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     //ImageSc Test
-    qint32 width = 30;
-    qint32 height = 40;
-    MatrixXd mat(width,40);
+    qint32 width = 300;
+    qint32 height = 400;
+    MatrixXd mat(width,height);
 
     for(int i = 0; i < width; ++i)
         for(int j = 0; j < height; ++j)
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
     imagesc.setXLabel("X Axes");
     imagesc.setYLabel("Y Axes");
 
-    imagesc.setColorMap("Bone");//imagesc.setColorMap("Jet");//imagesc.setColorMap("Hot");
+    imagesc.setColorMap("RedBlue");//imagesc.setColorMap("Bone");//imagesc.setColorMap("Jet");//imagesc.setColorMap("Hot");
 
     imagesc.setWindowTitle("Corresponding function to MATLABs imagesc");
     imagesc.show();
