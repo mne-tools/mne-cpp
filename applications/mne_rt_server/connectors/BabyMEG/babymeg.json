@@ -25,7 +25,7 @@
             "parameters": {
                 "control": {
                     "description": "string formatted control instruction",
-                    "type": "string"
+                    "type": "QString"
                 }
             }
         }
