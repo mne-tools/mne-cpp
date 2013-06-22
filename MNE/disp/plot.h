@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     imagesc.h
+* @file     plot.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,11 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ImageSc class declaration
+* @brief    Plot class declaration
 *
 */
-
-#ifndef IMAGESC_H
-#define IMAGESC_H
+#ifndef PLOT_H
+#define PLOT_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -51,9 +50,10 @@
 //=============================================================================================================
 
 #include <QWidget>
-#include <QImage>
 #include <QString>
-#include <QPen>
+#include <QList>
+#include <QVector>
+#include <QPointF>
 #include <QSharedPointer>
 
 
@@ -87,122 +87,68 @@ using namespace Eigen;
 //=============================================================================================================
 
 
+
 //=============================================================================================================
 /**
-* Visualizes Eigen matrizes, similiar to MATLABs imagesc function; Available colormaps are: Jet, Hot, Bone
+* Plots vector data, similiar to MATLABs plot
 *
-* @brief Eigen matrix visualization
+* @brief Vector plot
 */
-class DISPSHARED_EXPORT ImageSc : public Graph
+class DISPSHARED_EXPORT Plot : public Graph
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<ImageSc> SPtr;            /**< Shared pointer type for MatrixView class. */
-    typedef QSharedPointer<const ImageSc> ConstSPtr; /**< Const shared pointer type for MatrixView class. */
+    typedef QSharedPointer<Plot> SPtr;            /**< Shared pointer type for MatrixView class. */
+    typedef QSharedPointer<const Plot> ConstSPtr; /**< Const shared pointer type for MatrixView class. */
 
     //=========================================================================================================
     /**
-    * Creates the scaled image view.
+    * Creates the plot.
     *
     * @param[in] parent     Parent QObject (optional)
     */
-    explicit ImageSc(QWidget *parent = 0);
+    explicit Plot(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Creates the scaled image view with a given double matrix.
+    * Creates the plot using a given double vector.
     *
-    * @param[in] p_dMat     The double data matrix
+    * @param[in] p_dVec     The double data vector
     * @param[in] parent     Parent QObject (optional)
     */
-    explicit ImageSc(MatrixXd &p_dMat, QWidget *parent = 0);
+    explicit Plot(VectorXd &p_dVec, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Creates the scaled image view with a given float matrix.
-    *
-    * @param[in] p_fMat     The float data matrix
-    * @param[in] parent     Parent QObject (optional)
+    * Destructs the Plot object
     */
-    explicit ImageSc(MatrixXf &p_fMat, QWidget *parent = 0);
+    ~Plot();
 
     //=========================================================================================================
     /**
-    * Creates the scaled image view with a given integer matrix.
-    *
-    * @param[in] p_iMat     The integer data matrix
-    * @param[in] parent     Parent QObject (optional)
-    */
-    explicit ImageSc(MatrixXi &p_iMat, QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destructs the ImageSc object
-    */
-    ~ImageSc();
-
-    //=========================================================================================================
-    /**
-    * Initializes the ImageSc object
+    * Initializes the Plot object
     */
     void init();
 
     //=========================================================================================================
     /**
-    * Updates the scaled image view with a given double matrix.
+    * Updates the plot using a given double vector without given X data.
     *
-    * @param[in] p_dMat     The double data matrix
+    * @param[in] p_dVec     The double data vector
     */
-    void updateData(MatrixXd &p_dMat);
-    //=========================================================================================================
-    /**
-    * Updates the scaled image view with a given float matrix.
-    *
-    * @param[in] p_fMat     The float data matrix
-    */
-    void updateData(MatrixXf &p_fMat);
-    //=========================================================================================================
-    /**
-    * Updates the scaled image view with a given integer matrix.
-    *
-    * @param[in] p_dMat     The integer data matrix
-    */
-    void updateData(MatrixXi &p_iMat);
-
-    //=========================================================================================================
-    /**
-    * Sets the color map to use, e.g. "Jet", "Hot", "Bone"
-    *
-    * @param[in] p_sColorMap    The colormap to use
-    */
-    void setColorMap(const QString &p_sColorMap);
+    void updateData(VectorXd &p_dVec);
 
 protected:
-    //=========================================================================================================
-    /**
-    * Updates data and colorbar pixmap
-    */
-    void updateMaps();
-
     void paintEvent(QPaintEvent*);
 
-    QPixmap* m_pPixmapData;         /**< data pixmap */
-    QPixmap* m_pPixmapColorbar;     /**< colorbar pixmap */
+    bool m_bHoldOn;             /**< If multiple plots */
 
-    MatrixXd m_matCentNormData;     /**< centralized and normalized data */
+    QList<QVector<QPointF> > m_qListVecPointFPaths;
 
-    double m_dMinValue;             /**< Minimal data value */
-    double m_dMaxValue;             /**< Maximal data value */
-
-    QRgb (*pColorMapper)(double);   /**< Function pointer to current colormap */
-
-    bool m_bColorbar;                   /**< If colorbar is visible */
-    QVector<double> m_qVecScaleValues;  /**< Scale values */
-    qint32 m_iColorbarWidth;            /**< Colorbar width */
-    qint32 m_iColorbarSteps;            /**< Number of colorbar vaues to display */
-    qint32 m_iColorbarGradSteps;        /**< Gradient steps of the colorbar */
-    QFont m_qFontColorbar;              /**< Colorbar font */
-    QPen m_qPenColorbar;                /**< Colorbar pen */
+    double m_dMinX;             /**< Minimal X value */
+    double m_dMaxX;             /**< Maximal X value */
+    double m_dMinY;             /**< Minimal Y value */
+    double m_dMaxY;             /**< Maximal Y value */
 };
 
 //*************************************************************************************************************
@@ -212,4 +158,4 @@ protected:
 
 } // NAMESPACE
 
-#endif // IMAGESC_H
+#endif // PLOT_H

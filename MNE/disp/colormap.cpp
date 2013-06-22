@@ -68,18 +68,27 @@ ColorMap::~ColorMap()
 
 
 //*************************************************************************************************************
-//Jet Colormap
+
+double ColorMap::linearSlope(double x, double m, double n)
+{
+    //f = m*x + n
+    return m*x + n;
+}
+
+
+//*************************************************************************************************************
+// Jet
 int ColorMap::jetR(double x)
 {
     //Describe the red fuzzy set
     if(x < 0.375)
         return 0;
     else if(x >= 0.375 && x < 0.625)
-        return (int)floor(jetSlopeMRaising(x, -1.5)*255);
+        return (int)floor(linearSlope(x, 4, -1.5)*255);
     else if(x >= 0.625 && x < 0.875)
         return (int)floor(1.0*255);
     else if(x >= 0.875)
-        return (int)floor(jetSlopeMFalling(x, 4.5)*255);
+        return (int)floor(linearSlope(x, -4, 4.5)*255);
     else
         return 0;
 }
@@ -93,11 +102,11 @@ int ColorMap::jetG(double x)
     if(x < 0.125)
         return 0;
     else if(x >= 0.125 && x < 0.375)
-        return (int)floor(jetSlopeMRaising(x, -0.5)*255);
+        return (int)floor(linearSlope(x, 4, -0.5)*255);
     else if(x >= 0.375 && x < 0.625)
         return (int)floor(1.0*255);
     else if(x >= 0.625 && x < 0.875)
-        return (int)floor(jetSlopeMFalling(x, 2.5)*255);
+        return (int)floor(linearSlope(x, -4, 2.5)*255);
     else
         return 0;
 }
@@ -109,29 +118,126 @@ int ColorMap::jetB(double x)
 {
     //Describe the blue fuzzy set
     if(x < 0.125)
-        return (int)floor(jetSlopeMRaising(x, 0.5)*255);
+        return (int)floor(linearSlope(x, 4, 0.5)*255);
     else if(x >= 0.125 && x < 0.375)
         return (int)floor(1.0*255);
     else if(x >= 0.375 && x < 0.625)
-        return (int)floor(jetSlopeMFalling(x, 2.5)*255);
+        return (int)floor(linearSlope(x, -4, 2.5)*255);
     else
         return 0;
 }
 
-
 //*************************************************************************************************************
-
-double ColorMap::jetSlopeMRaising(double x, double n)
+// Hot
+int ColorMap::hotR(double x)
 {
-    //f = m*x + n
-    return 4*x + n;
+    //Describe the red fuzzy set
+    if(x < 0.375)
+        return (int)floor(linearSlope(x, 2.5621, 0.0392)*255);
+    else
+        return (int)floor(1.0*255);
 }
 
 
 //*************************************************************************************************************
 
-double ColorMap::jetSlopeMFalling(double x,double n)
+int ColorMap::hotG(double x)
 {
-    //f = m*x + n
-    return -4*x + n;
+    //Describe the green fuzzy set
+    if(x < 0.375)
+        return 0;
+    else if(x >= 0.375 && x < 0.75)
+        return (int)floor(linearSlope(x, 2.6667, -1.0)*255);
+    else
+        return (int)floor(1.0*255);
+}
+
+
+//*************************************************************************************************************
+
+int ColorMap::hotB(double x)
+{
+    //Describe the blue fuzzy set
+    if(x < 0.75)
+        return 0;
+    else
+        return (int)floor(linearSlope(x,4,-3)*255);
+}
+
+
+//*************************************************************************************************************
+// Bone
+int ColorMap::boneR(double x)
+{
+    //Describe the red fuzzy set
+    if(x < 0.375)
+        return (int)floor(linearSlope(x, 0.8471, 0)*255);
+    else if(x >= 0.375 && x < 0.75)
+        return (int)floor(linearSlope(x, 0.8889, -0.0157)*255);
+    else
+        return (int)floor(linearSlope(x, 1.396, -0.396)*255);
+}
+
+
+//*************************************************************************************************************
+
+int ColorMap::boneG(double x)
+{
+    //Describe the green fuzzy set
+    if(x < 0.375)
+        return (int)floor(linearSlope(x, 0.8471, 0)*255);
+    else if(x >= 0.375 && x < 0.75)
+        return (int)floor(linearSlope(x, 1.2237, -0.1413)*255);
+    else
+        return (int)floor(linearSlope(x, 0.894, 0.106)*255);
+}
+
+
+//*************************************************************************************************************
+
+int ColorMap::boneB(double x)
+{
+    //Describe the blue fuzzy set
+    if(x < 0.375)
+        return (int)floor(linearSlope(x, 1.1712, 0.0039)*255);
+    else if(x >= 0.375 && x < 0.75)
+        return (int)floor(linearSlope(x, 0.8889, 0.1098)*255);
+    else
+        return (int)floor(linearSlope(x, 0.8941, 0.1059)*255);
+}
+
+
+//*************************************************************************************************************
+// RedBlue
+int ColorMap::rbR(double x)
+{
+    //Describe the red fuzzy set
+    if(x < 0)
+        return (int)floor(linearSlope(x, 1, 1)*255);
+    else
+        return (int)floor(1.0*255);
+}
+
+
+//*************************************************************************************************************
+
+int ColorMap::rbG(double x)
+{
+    //Describe the green fuzzy set
+    if(x < 0)
+        return (int)floor(linearSlope(x, 1, 1)*255);
+    else
+        return (int)floor(linearSlope(x, -1, 1)*255);
+}
+
+
+//*************************************************************************************************************
+
+int ColorMap::rbB(double x)
+{
+    //Describe the blue fuzzy set
+    if(x < 0)
+        return (int)floor(1.0*255);
+    else
+        return (int)floor(linearSlope(x, -1, 1)*255);
 }
