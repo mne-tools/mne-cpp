@@ -37,7 +37,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       += widgets
+QT  += core widgets
 
 DEFINES += DISP_LIBRARY
 
@@ -77,13 +77,17 @@ win32 {
 
 SOURCES += \
     colormap.cpp \
-    imagesc.cpp
+    imagesc.cpp \
+    plot.cpp \
+    graph.cpp
 
 
 HEADERS += \
     disp_global.h \
     colormap.h \
-    imagesc.h
+    imagesc.h \
+    plot.h \
+    graph.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
@@ -94,3 +98,5 @@ header_files.files = ./*.h
 header_files.path = $${MNE_INCLUDE_DIR}/disp
 
 INSTALLS += header_files
+
+FORMS +=

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['plugindockwidget',['PluginDockWidget',['../class_m_n_e_x_1_1_plugin_dock_widget.html',1,'MNEX']]]
+  ['plot',['Plot',['../class_d_i_s_p_l_i_b_1_1_plot.html',1,'DISPLIB']]]
 ];

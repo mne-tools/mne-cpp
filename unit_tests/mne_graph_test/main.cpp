@@ -33,18 +33,20 @@
 *
 */
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include <disp/imagesc.h>
+#include <disp/plot.h>
+
+#include <math.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Eigen
 //=============================================================================================================
 
 #include <Eigen/Core>
@@ -87,26 +89,43 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    //ImageSc Test
+    qint32 width = 300;
+    qint32 height = 400;
+    MatrixXd mat(width,height);
 
-    MatrixXd mat(300,400);
-
-    int count = 200;
-    for(int i = 0; i < 300; ++i)
-    {
-        for(int j = 0; j < 400; ++j)
-        {
-            mat(i,j) = ((double)(i+j))*0.1;//count;//
-            ++count;
-        }
-    }
+    for(int i = 0; i < width; ++i)
+        for(int j = 0; j < height; ++j)
+            mat(i,j) = ((double)(i+j))*0.1-1.5;
 
     ImageSc imagesc(mat);
     imagesc.setTitle("Test Matrix");
-    imagesc.setXLabel("X Achse");
-    imagesc.setYLabel("Y Achse");
+    imagesc.setXLabel("X Axes");
+    imagesc.setYLabel("Y Axes");
+
+    imagesc.setColorMap("RedBlue");//imagesc.setColorMap("Bone");//imagesc.setColorMap("Jet");//imagesc.setColorMap("Hot");
 
     imagesc.setWindowTitle("Corresponding function to MATLABs imagesc");
     imagesc.show();
+
+    //Plot Test
+    qint32 t_iSize = 100;
+    VectorXd vec(t_iSize);
+    for(int i = 0; i < t_iSize; ++i)
+    {
+        double t = 0.01 * i;
+        vec[i] = sin(2 * 3.1416 * 4 * t); //4 Hz
+    }
+
+    Plot plot(vec);
+
+    plot.setTitle("Test Plot");
+    plot.setXLabel("X Axes");
+    plot.setYLabel("Y Axes");
+
+    plot.setWindowTitle("Corresponding function to MATLABs plot");
+    plot.show();
+
 
     return a.exec();
 }

@@ -5,7 +5,7 @@
 *           Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     March, 2013
+* @date     June, 2013
 *
 * @section  LICENSE
 *
@@ -48,9 +48,7 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QResizeEvent>
 #include <QPainter>
-#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -61,17 +59,15 @@
 using namespace DISPLIB;
 
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
 ImageSc::ImageSc(QWidget *parent)
-: QWidget(parent)
-, m_qPixmapData(NULL)
-, m_bColorbar(true)
-, m_qPixmapColorbar(NULL)
+: Graph(parent)
+, m_pPixmapData(NULL)
+, m_pPixmapColorbar(NULL)
 {
     init();
 }
@@ -80,36 +76,36 @@ ImageSc::ImageSc(QWidget *parent)
 //*************************************************************************************************************
 
 ImageSc::ImageSc(MatrixXd &p_dMat, QWidget *parent)
-: QWidget(parent)
-, m_qPixmapData(NULL)
-, m_qPixmapColorbar(NULL)
+: Graph(parent)
+, m_pPixmapData(NULL)
+, m_pPixmapColorbar(NULL)
 {
     init();
-    updateMatrix(p_dMat);
+    updateData(p_dMat);
 }
 
 
 //*************************************************************************************************************
 
 ImageSc::ImageSc(MatrixXf &p_fMat, QWidget *parent)
-: QWidget(parent)
-, m_qPixmapData(NULL)
-, m_qPixmapColorbar(NULL)
+: Graph(parent)
+, m_pPixmapData(NULL)
+, m_pPixmapColorbar(NULL)
 {
     init();
-    updateMatrix(p_fMat);
+    updateData(p_fMat);
 }
 
 
 //*************************************************************************************************************
 
 ImageSc::ImageSc(MatrixXi &p_iMat, QWidget *parent)
-: QWidget(parent)
-, m_qPixmapData(NULL)
-, m_qPixmapColorbar(NULL)
+: Graph(parent)
+, m_pPixmapData(NULL)
+, m_pPixmapColorbar(NULL)
 {
     init();
-    updateMatrix(p_iMat);
+    updateData(p_iMat);
 }
 
 
@@ -117,10 +113,10 @@ ImageSc::ImageSc(MatrixXi &p_iMat, QWidget *parent)
 
 ImageSc::~ImageSc()
 {
-    if(m_qPixmapData)
-        delete m_qPixmapData;
-    if(m_qPixmapColorbar)
-        delete m_qPixmapColorbar;
+    if(m_pPixmapData)
+        delete m_pPixmapData;
+    if(m_pPixmapColorbar)
+        delete m_pPixmapColorbar;
 }
 
 
@@ -128,107 +124,151 @@ ImageSc::~ImageSc()
 
 void ImageSc::init()
 {
-    //Set Borders
-    m_iBorderTopBottom = 50;
-    m_iBorderLeftRight = 100;
+    //Parent init
+    Graph::init();
 
-    //Set Fonts
-    m_qFontAxes.setPixelSize(12);
-    m_qPenAxes = QPen(Qt::black);
+    //Colormap
+    pColorMapper = ColorMap::valueToJet;
 
-    m_qFontTitle.setPixelSize(20);
-    m_qFontTitle.setBold(true);
-    m_qPenTitle = QPen(Qt::black);
-
+    //Colorbar
+    m_bColorbar = true;
     m_qFontColorbar.setPixelSize(10);
     m_qPenColorbar = QPen(Qt::black);
     m_iColorbarWidth = 12;
+    m_iColorbarSteps = 7;//>= 2!!
+    m_iColorbarGradSteps = 200;
+
 }
 
 
 //*************************************************************************************************************
 
-void ImageSc::updateMatrix(MatrixXd &p_dMat)
+void ImageSc::updateData(MatrixXd &p_dMat)
 {
-    if(m_qPixmapData)
+    if(p_dMat.rows() > 0 && p_dMat.cols() > 0)
     {
-        delete m_qPixmapData;
-        m_qPixmapData = NULL;
-    }
-    if(m_qPixmapColorbar)
-    {
-        delete m_qPixmapColorbar;
-        m_qPixmapColorbar = NULL;
-    }
-
-    if(p_dMat.rows() > 0 && p_dMat.cols())
-    {
-        m_sTitle = QString("");
-        m_sXLabel = QString("");
-        m_sYLabel = QString("");
-
         m_dMinValue = p_dMat.minCoeff();
         m_dMaxValue = p_dMat.maxCoeff();
 
         // -- data --
-        MatrixXd dataNormalized = p_dMat;
-        double minValue = dataNormalized.minCoeff();
-        dataNormalized.array() -= minValue;
-        double maxValue = dataNormalized.maxCoeff();
-        dataNormalized.array() /= maxValue;
+        m_matCentNormData = p_dMat;
+        double minValue = m_matCentNormData.minCoeff();
+        m_matCentNormData.array() -= minValue;
+        double maxValue = m_matCentNormData.maxCoeff();
+        m_matCentNormData.array() /= maxValue;
 
-        qint32 x = p_dMat.cols();
-        qint32 y = p_dMat.rows();
+        updateMaps();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void ImageSc::updateData(MatrixXf &p_fMat)
+{
+    MatrixXd t_dMat = p_fMat.cast<double>();
+    updateData(t_dMat);
+}
+
+
+//*************************************************************************************************************
+
+void ImageSc::updateData(MatrixXi &p_iMat)
+{
+    MatrixXd t_dMat = p_iMat.cast<double>();
+    updateData(t_dMat);
+}
+
+
+//*************************************************************************************************************
+
+void ImageSc::updateMaps()
+{
+    if(m_pPixmapData)
+    {
+        delete m_pPixmapData;
+        m_pPixmapData = NULL;
+    }
+    if(m_pPixmapColorbar)
+    {
+        delete m_pPixmapColorbar;
+        m_pPixmapColorbar = NULL;
+    }
+
+    if(m_matCentNormData.rows() > 0 && m_matCentNormData.cols() > 0)
+    {
+        // --Data--
+        qint32 x = m_matCentNormData.cols();
+        qint32 y = m_matCentNormData.rows();
         qint32 i, j;
         QImage t_qImageData(x, y, QImage::Format_RGB32);
         for(i = 0; i < x; ++i)
             for(j = 0; j < y; ++j)
-                t_qImageData.setPixel(i, j, ColorMap::valueToJet(dataNormalized(j,i)));
+                t_qImageData.setPixel(i, j, pColorMapper(m_matCentNormData(j,i)));
 
-        m_qPixmapData = new QPixmap(QPixmap::fromImage(t_qImageData));
+        m_pPixmapData = new QPixmap(QPixmap::fromImage(t_qImageData));
 
-        // -- Colorbar --
-        QImage t_qImageColorbar(m_iColorbarWidth, y, QImage::Format_RGB32);
+        // --Colorbar--
+        QImage t_qImageColorbar(1, m_iColorbarGradSteps, QImage::Format_RGB32);
 
-        double t_dQuantile = 1.0/((double)y);
-        for(j = 0; j <= y; ++j)
+        double t_dQuantile = 1.0/((double)m_iColorbarGradSteps-1);
+        for(j = 0; j < m_iColorbarGradSteps; ++j)
         {
-            QRgb t_qRgb = ColorMap::valueToJet(t_dQuantile*((double)(y-j))*1.0);
-            for(i = 0; i < m_iColorbarWidth; ++i)
-                t_qImageColorbar.setPixel(i, j, t_qRgb);
+            QRgb t_qRgb = pColorMapper(t_dQuantile*((double)(m_iColorbarGradSteps-1-j))*1.0);
+            t_qImageColorbar.setPixel(0, j, t_qRgb);
         }
+        m_pPixmapColorbar = new QPixmap(QPixmap::fromImage(t_qImageColorbar));
 
-        m_qPixmapColorbar = new QPixmap(QPixmap::fromImage(t_qImageColorbar));
+
+        // --Scale Values--
+        m_qVecScaleValues.clear();
+
+        double scale = pow(10, floor(log(m_dMaxValue-m_dMinValue)/log(10.0)));
+
+        //Zero Based Scale?
+        if(m_dMaxValue > 0 && m_dMinValue < 0)
+        {
+            double quantum = floor((((m_dMaxValue-m_dMinValue)/scale)/(m_iColorbarSteps-1))*10.0)*(scale/10.0);
+            double start = 0;
+            while(m_dMinValue < (start - quantum))
+                start -= quantum;
+            //Create Steps
+            m_qVecScaleValues.push_back(start);
+            for(qint32 i = 1; i < m_iColorbarSteps-1; ++i)
+                m_qVecScaleValues.push_back(m_qVecScaleValues[i-1]+quantum);
+        }
+        else
+        {
+            double quantum = floor((((m_dMaxValue-m_dMinValue)/scale)/(m_iColorbarSteps-1))*10.0)*(scale/10.0);
+            double start = floor(((m_dMaxValue-m_dMinValue)/2.0 + m_dMinValue)/scale)*scale;
+            while(m_dMinValue < (start - quantum))
+                start -= quantum;
+            //Create Steps
+            m_qVecScaleValues.push_back(start);
+            for(qint32 i = 1; i < m_iColorbarSteps-1; ++i)
+                m_qVecScaleValues.push_back(m_qVecScaleValues[i-1]+quantum);
+        }
+        update();
     }
-    update();
 }
 
 
 //*************************************************************************************************************
 
-void ImageSc::updateMatrix(MatrixXf &p_fMat)
+void ImageSc::setColorMap(const QString &p_sColorMap)
 {
-    MatrixXd t_dMat = p_fMat.cast<double>();
-    updateMatrix(t_dMat);
-}
+    if(p_sColorMap == "Jet")
+        pColorMapper = ColorMap::valueToJet;
+    else if(p_sColorMap == "Hot")
+        pColorMapper = ColorMap::valueToHot;
+    else if(p_sColorMap == "Bone")
+        pColorMapper = ColorMap::valueToBone;
+    else if(p_sColorMap == "RedBlue")
+        pColorMapper = ColorMap::valueToRedBlue;
+    else
+        pColorMapper = ColorMap::valueToJet;
 
-
-//*************************************************************************************************************
-
-void ImageSc::updateMatrix(MatrixXi &p_iMat)
-{
-    MatrixXd t_dMat = p_iMat.cast<double>();
-    updateMatrix(t_dMat);
-}
-
-
-//*************************************************************************************************************
-
-void ImageSc::resizeEvent (QResizeEvent* event)
-{
-    widgetSize = event->size();
-    // Call base class impl
-    QWidget::resizeEvent(event);
+    updateMaps();
 }
 
 
@@ -237,130 +277,96 @@ void ImageSc::resizeEvent (QResizeEvent* event)
 void ImageSc::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    if (!m_qPixmapData->isNull())
+    if (m_pPixmapData)
     {
-        QPoint t_qPointCenter(0,0);
+        QPoint t_qPointTopLeft(0,0);
 
         // -- Data --
-
-        QSize t_qSizePixmapData = widgetSize;
+        QSize t_qSizePixmapData = m_qSizeWidget;
 
         t_qSizePixmapData.setHeight(t_qSizePixmapData.height()-m_iBorderTopBottom*2);
         t_qSizePixmapData.setWidth(t_qSizePixmapData.width()-m_iBorderLeftRight*2);
-
-        // Scale new image which size is widgetSize
-        QPixmap t_qPixmapScaledData = m_qPixmapData->scaled(t_qSizePixmapData, Qt::KeepAspectRatio);
-        // Calculate image center position into screen
-        t_qPointCenter.setX((widgetSize.width()-t_qPixmapScaledData.width())/2);
-        t_qPointCenter.setY((widgetSize.height()-t_qPixmapScaledData.height())/2);
-
-        painter.drawPixmap(t_qPointCenter,t_qPixmapScaledData);
-
+        // Scale data
+        QPixmap t_qPixmapScaledData = m_pPixmapData->scaled(t_qSizePixmapData,  Qt::IgnoreAspectRatio);//Qt::KeepAspectRatio);
+        // Calculate data position
+        t_qPointTopLeft.setX((m_qSizeWidget.width()-t_qPixmapScaledData.width())/2);
+        t_qPointTopLeft.setY((m_qSizeWidget.height()-t_qPixmapScaledData.height())/2);
+        //Draw data
+        painter.drawPixmap(t_qPointTopLeft,t_qPixmapScaledData);
+        //Draw border
+        painter.drawRect(t_qPointTopLeft.x()-1, t_qPointTopLeft.y()-1, t_qPixmapScaledData.width()+1, t_qPixmapScaledData.height()+1);
 
         // -- Colorbar --
-        if(m_bColorbar)
+        if(m_bColorbar && m_pPixmapColorbar && m_qVecScaleValues.size() >= 2)
         {
-            QSize t_qSizePixmapColorbar = widgetSize;
+            QSize t_qSizePixmapColorbar = m_qSizeWidget;
 
-            t_qSizePixmapColorbar.setHeight(t_qPixmapScaledData.height());//t_qSizePixmapColorbar.height()-m_iBorderTopBottom*2);
             t_qSizePixmapColorbar.setWidth(m_iColorbarWidth);
+            t_qSizePixmapColorbar.setHeight(t_qPixmapScaledData.height());
 
-            // Scale new image which size is widgetSize
-            QPixmap t_qPixmapScaledColorbar = m_qPixmapColorbar->scaled(t_qSizePixmapColorbar, Qt::IgnoreAspectRatio);
-            // Calculate image center position into screen
-            t_qPointCenter.setY(t_qPointCenter.y());
-
-            t_qPointCenter.setX(t_qPointCenter.x() + t_qPixmapScaledData.width() + m_iBorderLeftRight/3);
-
-            painter.drawPixmap(t_qPointCenter,t_qPixmapScaledColorbar);
+            // Scale colorbar
+            QPixmap t_qPixmapScaledColorbar = m_pPixmapColorbar->scaled(t_qSizePixmapColorbar, Qt::IgnoreAspectRatio);
+            // Calculate colorbar position
+            t_qPointTopLeft.setY(t_qPointTopLeft.y());
+            t_qPointTopLeft.setX(t_qPointTopLeft.x() + t_qPixmapScaledData.width() + m_iBorderLeftRight/3);
+            //Draw colorbar
+            painter.drawPixmap(t_qPointTopLeft,t_qPixmapScaledColorbar);
+            //Draw border
+            painter.drawRect(t_qPointTopLeft.x()-1, t_qPointTopLeft.y()-1, m_iColorbarWidth+1, t_qPixmapScaledData.height()+1);
 
             // -- Scale --
-            painter.save();
-
-            QPoint t_qPointTopLeft = t_qPointCenter;
-
             painter.setPen(m_qPenColorbar);
             painter.setFont(m_qFontColorbar);
 
-            // -- MAX --
-            painter.translate(t_qPointTopLeft.x()+ m_iColorbarWidth + m_qFontColorbar.pixelSize()/2, t_qPointTopLeft.y() - m_qFontColorbar.pixelSize()/2);
+            qint32 x = t_qPointTopLeft.x()+ m_iColorbarWidth + m_qFontColorbar.pixelSize()/2;
+            qint32 x_markLeft = x - m_iColorbarWidth - m_qFontColorbar.pixelSize()/2;
+            qint32 x_markRight = x_markLeft + m_iColorbarWidth;
+
+            // max
+            painter.save();
+            qint32 y_max = t_qPointTopLeft.y() - m_qFontColorbar.pixelSize()/2;
+            painter.translate(x, y_max-1);
             painter.drawText(QRect(0, 0, 100, 12), Qt::AlignLeft, QString::number(m_dMaxValue));
             painter.restore();
+            //draw max marks
+            qint32 y_max_mark = y_max + m_qFontColorbar.pixelSize()/2;
+            painter.drawLine(x_markLeft,y_max_mark,x_markLeft+2,y_max_mark);
+            painter.drawLine(x_markRight-3,y_max_mark,x_markRight-1,y_max_mark);
 
-            // --MIN--
+            // min
             painter.save();
-            painter.translate(t_qPointTopLeft.x()+ m_iColorbarWidth + m_qFontColorbar.pixelSize()/2, t_qPointTopLeft.y() + t_qSizePixmapColorbar.height() - m_qFontColorbar.pixelSize()/2);
+            qint32 y_min = t_qPointTopLeft.y() + t_qSizePixmapColorbar.height()-1 - m_qFontColorbar.pixelSize()/2;
+            painter.translate(x, y_min-1);
             painter.drawText(QRect(0, 0, 100, 12), Qt::AlignLeft, QString::number(m_dMinValue));
             painter.restore();
+            //draw min marks
+            qint32 y_min_mark = y_min + m_qFontColorbar.pixelSize()/2;
+            painter.drawLine(x_markLeft,y_min_mark,x_markLeft+2,y_min_mark);
+            painter.drawLine(x_markRight-3,y_min_mark,x_markRight-1,y_min_mark);
+
+            //Scale values
+            qint32 y_dist = y_min - y_max;
+            double minPercent = (m_qVecScaleValues[0]- m_dMinValue)/(m_dMaxValue-m_dMinValue);
+            double distPercent = (m_qVecScaleValues[1]-m_qVecScaleValues[0])/(m_dMaxValue-m_dMinValue);
+            qint32 y_current = y_min - (minPercent*y_dist);
+            qint32 y_current_mark;
+            //draw scale
+            for(qint32 i = 0; i < m_qVecScaleValues.size(); ++i)
+            {
+                painter.save();
+                painter.translate(x, y_current-1);
+                painter.drawText(QRect(0, 0, 100, 12), Qt::AlignLeft, QString::number(m_qVecScaleValues[i]));
+                painter.restore();
+                //draw marks
+                y_current_mark =  y_current + m_qFontColorbar.pixelSize()/2;
+                painter.drawLine(x_markLeft,y_current_mark,x_markLeft+2,y_current_mark);
+                painter.drawLine(x_markRight-3,y_current_mark,x_markRight-1,y_current_mark);
+                //update y_current
+                y_current -= distPercent*y_dist;
+            }
         }
 
-        painter.setPen(m_qPenAxes);
-        painter.setFont(m_qFontAxes);
-
-        qint32 t_iLabelWidth = t_qPixmapScaledData.width();
-        qint32 t_iLabelHeight = 100;
-
-        // -- Title --
-        if(!m_sTitle.isEmpty())
-        {
-            painter.save();
-            painter.setPen(m_qPenTitle);
-            painter.setFont(m_qFontTitle);
-
-            painter.translate((widgetSize.width()-t_iLabelWidth)/2, (widgetSize.height()-t_qPixmapScaledData.height())/2 - m_iBorderTopBottom*1.5);
-            painter.drawText(QRect(0, 0, t_iLabelWidth, t_iLabelHeight), Qt::AlignCenter, m_sTitle);
-
-            painter.restore();
-        }
-
-        // -- Axes --
-        painter.setPen(m_qPenAxes);
-        painter.setFont(m_qFontAxes);
-
-        // X Label
-        if(!m_sXLabel.isEmpty())
-        {
-            painter.save();
-            painter.translate((widgetSize.width()-t_iLabelWidth)/2, t_qPixmapScaledData.height()+((widgetSize.height()-t_qPixmapScaledData.height()-m_iBorderTopBottom)/2));
-            painter.drawText(QRect(0, 0, t_iLabelWidth, t_iLabelHeight), Qt::AlignCenter, m_sXLabel);
-            painter.restore();
-        }
-
-        //Y Label
-        if(!m_sYLabel.isEmpty())
-        {
-            painter.save();
-            painter.rotate(270);
-            painter.translate(-(widgetSize.height()+t_iLabelWidth)/2,(widgetSize.width()-t_qPixmapScaledData.width())/2-t_iLabelHeight*0.75);
-            painter.drawText(QRect(0, 0, t_iLabelWidth, t_iLabelHeight), Qt::AlignCenter, m_sYLabel);
-            painter.restore();
-        }
+        //Draw title & axes
+        Graph::drawLabels(t_qPixmapScaledData.width(), t_qPixmapScaledData.height());
     }
-}
-
-
-//*************************************************************************************************************
-
-void ImageSc::setTitle(const QString &p_sTitle)
-{
-    m_sTitle = p_sTitle;
-    update();
-}
-
-
-//*************************************************************************************************************
-
-void ImageSc::setXLabel(const QString &p_sXLabel)
-{
-    m_sXLabel = p_sXLabel;
-    update();
-}
-
-
-//*************************************************************************************************************
-
-void ImageSc::setYLabel(const QString &p_sYLabel)
-{
-    m_sYLabel = p_sYLabel;
-    update();
 }

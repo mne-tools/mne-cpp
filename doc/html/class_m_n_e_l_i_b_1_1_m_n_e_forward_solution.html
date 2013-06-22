@@ -145,8 +145,8 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:aee65b85bb350a2a17e1416998f523582"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html">FiffCov</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aee65b85bb350a2a17e1416998f523582">compute_depth_prior</a> (const MatrixXd &amp;Gain, const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> &amp;gain_info, bool is_fixed_ori, double exp=0.8, double limit=10.0, MatrixXd &amp;patch_areas=defaultMatrixXd, bool limit_depth_chs=false)</td></tr>
-<tr class="separator:aee65b85bb350a2a17e1416998f523582"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d03724db839eef8e94640d500077f5f"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_cov.html">FiffCov</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a7d03724db839eef8e94640d500077f5f">compute_depth_prior</a> (const MatrixXd &amp;Gain, const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> &amp;gain_info, bool is_fixed_ori, double exp=0.8, double limit=10.0, const MatrixXd &amp;patch_areas=defaultConstMatrixXd, bool limit_depth_chs=false)</td></tr>
+<tr class="separator:a7d03724db839eef8e94640d500077f5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2a98232cf4d2c1c810cb9a89f372ffde"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a2a98232cf4d2c1c810cb9a89f372ffde">read</a> (QIODevice &amp;p_IODevice, <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">MNEForwardSolution</a> &amp;fwd, bool force_fixed=false, bool <a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aee695468986dd2e920b5cad332a5a6a1">surf_ori</a>=false, const QStringList &amp;include=defaultQStringList, const QStringList &amp;exclude=defaultQStringList, bool bExcludeBads=true)</td></tr>
 <tr class="separator:a2a98232cf4d2c1c810cb9a89f372ffde"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7d68299137a6ed17f5c5d702d3f8791b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a7d68299137a6ed17f5c5d702d3f8791b">restrict_gain_matrix</a> (MatrixXd &amp;G, const <a class="el" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html">FiffInfo</a> &amp;<a class="el" href="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#adeda03feac0c09dc76711921c1e576dd">info</a>)</td></tr>
@@ -402,7 +402,7 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="aee65b85bb350a2a17e1416998f523582"></a>
+<a class="anchor" id="a7d03724db839eef8e94640d500077f5f"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -442,8 +442,8 @@ Friends</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">MatrixXd &amp;&#160;</td>
-          <td class="paramname"><em>patch_areas</em> = <code>defaultMatrixXd</code>, </td>
+          <td class="paramtype">const MatrixXd &amp;&#160;</td>
+          <td class="paramname"><em>patch_areas</em> = <code>defaultConstMatrixXd</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -504,7 +504,7 @@ Friends</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Orientation priors. </dd></dl>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00548">548</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00549">549</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
 
 </div>
 </div>
@@ -623,7 +623,7 @@ Friends</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Forward solution restricted to selected channel types. </dd></dl>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00597">597</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00598">598</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
 
 </div>
 </div>
@@ -675,7 +675,7 @@ Friends</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Forward solution restricted to selected channel types. </dd></dl>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00661">661</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00662">662</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
 
 </div>
 </div>
@@ -753,7 +753,7 @@ Friends</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00675">675</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00676">676</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
 
 </div>
 </div>
@@ -841,7 +841,7 @@ Friends</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if succeeded, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00767">767</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l00768">768</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
 
 </div>
 </div>
@@ -885,7 +885,7 @@ Friends</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l01344">1344</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l01345">1345</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
 
 </div>
 </div>
@@ -903,7 +903,7 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 <p>Helper to convert the forward solution to fixed ori from free </p>
 
-<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l01390">1390</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mne__forwardsolution_8cpp_source.html#l01391">1391</a> of file <a class="el" href="mne__forwardsolution_8cpp_source.html">mne_forwardsolution.cpp</a>.</p>
 
 </div>
 </div>
@@ -1141,7 +1141,7 @@ Friends</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat May 25 2013 00:25:08 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Jun 16 2013 22:30:29 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.4
 </small></address>

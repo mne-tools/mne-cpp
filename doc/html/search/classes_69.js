@@ -2,6 +2,7 @@ var searchData=
 [
   ['icommand',['ICommand',['../class_i_command.html',1,'']]],
   ['iinversealgorithm',['IInverseAlgorithm',['../class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html',1,'INVERSELIB']]],
+  ['imagesc',['ImageSc',['../class_d_i_s_p_l_i_b_1_1_image_sc.html',1,'DISPLIB']]],
   ['inverseview',['InverseView',['../class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html',1,'DISP3DLIB']]],
   ['inverseviewproducer',['InverseViewProducer',['../class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html',1,'DISP3DLIB']]],
   ['iobserver',['IObserver',['../class_i_observer.html',1,'']]],

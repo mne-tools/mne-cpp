@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include "disp_global.h"
+#include "graph.h"
 
 
 //*************************************************************************************************************
@@ -86,69 +87,122 @@ using namespace Eigen;
 //=============================================================================================================
 
 
-
 //=============================================================================================================
 /**
-* Visualizes Eigen matrizes labels using a HSV colormap
+* Visualizes Eigen matrizes, similiar to MATLABs imagesc function; Available colormaps are: Jet, Hot, Bone
 *
 * @brief Eigen matrix visualization
 */
-class DISPSHARED_EXPORT ImageSc : public QWidget
+class DISPSHARED_EXPORT ImageSc : public Graph
 {
     Q_OBJECT
 public:
     typedef QSharedPointer<ImageSc> SPtr;            /**< Shared pointer type for MatrixView class. */
     typedef QSharedPointer<const ImageSc> ConstSPtr; /**< Const shared pointer type for MatrixView class. */
 
+    //=========================================================================================================
+    /**
+    * Creates the scaled image view.
+    *
+    * @param[in] parent     Parent QObject (optional)
+    */
     explicit ImageSc(QWidget *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Creates the scaled image view with a given double matrix.
+    *
+    * @param[in] p_dMat     The double data matrix
+    * @param[in] parent     Parent QObject (optional)
+    */
     explicit ImageSc(MatrixXd &p_dMat, QWidget *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Creates the scaled image view with a given float matrix.
+    *
+    * @param[in] p_fMat     The float data matrix
+    * @param[in] parent     Parent QObject (optional)
+    */
     explicit ImageSc(MatrixXf &p_fMat, QWidget *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Creates the scaled image view with a given integer matrix.
+    *
+    * @param[in] p_iMat     The integer data matrix
+    * @param[in] parent     Parent QObject (optional)
+    */
     explicit ImageSc(MatrixXi &p_iMat, QWidget *parent = 0);
 
+    //=========================================================================================================
+    /**
+    * Destructs the ImageSc object
+    */
     ~ImageSc();
 
+    //=========================================================================================================
+    /**
+    * Initializes the ImageSc object
+    */
     void init();
 
-    void updateMatrix(MatrixXd &p_dMat);
-    void updateMatrix(MatrixXf &p_fMat);
-    void updateMatrix(MatrixXi &p_iMat);
+    //=========================================================================================================
+    /**
+    * Updates the scaled image view with a given double matrix.
+    *
+    * @param[in] p_dMat     The double data matrix
+    */
+    void updateData(MatrixXd &p_dMat);
+    //=========================================================================================================
+    /**
+    * Updates the scaled image view with a given float matrix.
+    *
+    * @param[in] p_fMat     The float data matrix
+    */
+    void updateData(MatrixXf &p_fMat);
+    //=========================================================================================================
+    /**
+    * Updates the scaled image view with a given integer matrix.
+    *
+    * @param[in] p_dMat     The integer data matrix
+    */
+    void updateData(MatrixXi &p_iMat);
 
-    void setTitle(const QString &p_sTitle);
-    void setXLabel(const QString &p_sXLabel);
-    void setYLabel(const QString &p_sYLabel);
-
+    //=========================================================================================================
+    /**
+    * Sets the color map to use, e.g. "Jet", "Hot", "Bone"
+    *
+    * @param[in] p_sColorMap    The colormap to use
+    */
+    void setColorMap(const QString &p_sColorMap);
 
 protected:
+    //=========================================================================================================
+    /**
+    * Updates data and colorbar pixmap
+    */
+    void updateMaps();
+
     void paintEvent(QPaintEvent*);
-    void resizeEvent(QResizeEvent*);
-    
-private:
 
-    QPixmap* m_qPixmapData;
-    QPixmap* m_qPixmapColorbar;
+    QPixmap* m_pPixmapData;         /**< data pixmap */
+    QPixmap* m_pPixmapColorbar;     /**< colorbar pixmap */
 
-    QSize widgetSize;
+    MatrixXd m_matCentNormData;     /**< centralized and normalized data */
 
-    qint32 m_iBorderTopBottom;
-    qint32 m_iBorderLeftRight;
+    double m_dMinValue;             /**< Minimal data value */
+    double m_dMaxValue;             /**< Maximal data value */
 
-    double m_dMinValue;
-    double m_dMaxValue;
+    QRgb (*pColorMapper)(double);   /**< Function pointer to current colormap */
 
-    QString m_sTitle;
-    QFont m_qFontTitle;
-    QPen m_qPenTitle;
-
-    QString m_sXLabel;
-    QString m_sYLabel;
-    QFont m_qFontAxes;
-    QPen m_qPenAxes;
-
-    bool m_bColorbar;
-    qint32 m_iColorbarWidth;
-    QFont m_qFontColorbar;
-    QPen m_qPenColorbar;
-
+    bool m_bColorbar;                   /**< If colorbar is visible */
+    QVector<double> m_qVecScaleValues;  /**< Scale values */
+    qint32 m_iColorbarWidth;            /**< Colorbar width */
+    qint32 m_iColorbarSteps;            /**< Number of colorbar vaues to display */
+    qint32 m_iColorbarGradSteps;        /**< Gradient steps of the colorbar */
+    QFont m_qFontColorbar;              /**< Colorbar font */
+    QPen m_qPenColorbar;                /**< Colorbar pen */
 };
 
 //*************************************************************************************************************

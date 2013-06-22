@@ -20,9 +20,12 @@
           <section title="Class List" ref="annotated.html">
             <section title="DISP3DLIB">
               <section title="GeometryView" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html">
-                <section title="GeometryView" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a4d825a6fb8c46d2158107c56af28d1b4" />
+                <section title="GeometryView" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#aaaa88d83201df1cb25888278da5a1762" />
                 <section title="~GeometryView" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#ab4bb78457615996a1be0c44add508ff9" />
                 <section title="initializeGL" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a816a10949d2879546377239cc72f9cd7" />
+                <section title="keyPressEvent" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a8af2c881eb7650d99b21b7dc604609c5" />
+                <section title="mouseMoveEvent" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a66b50280e22d3b6563f0649b311324a0" />
+                <section title="mousePressEvent" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a9d497baab79bf08d84de5a4ea983d518" />
                 <section title="paintGL" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a394ff6a0626e1cc306d40df437a34718" />
               </section>
               <section title="InverseView" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html">
@@ -57,6 +60,78 @@
                 <section title="initializeGL" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a4777b7f0234499359d1416b104bfe908" />
                 <section title="paintGL" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#ac61e3be860ec6c41640a1b082df8552d" />
                 <section title="pushSourceEstimate" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a751b31c71ed2f03a3ab64d782ef7f7d4" />
+              </section>
+            </section>
+            <section title="DISPLIB">
+              <section title="ColorMap" ref="class_d_i_s_p_l_i_b_1_1_color_map.html">
+                <section title="ConstSPtr" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a96f919a6067a0092192a16d4ce2d58e4" />
+                <section title="SPtr" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#aa3086eee9052119ceea08c709ed608c3" />
+                <section title="ColorMap" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#ae1b5944932c0b018b1faa8d78831f57e" />
+                <section title="~ColorMap" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a6c8d5222750e389108c2e97302d3e8c4" />
+              </section>
+              <section title="Graph" ref="class_d_i_s_p_l_i_b_1_1_graph.html">
+                <section title="Graph" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a16c725d15f3725ecf6e467ea021cc211" />
+                <section title="drawLabels" ref="class_d_i_s_p_l_i_b_1_1_graph.html#ae4dff910e045b93fe4fa5339338377a7" />
+                <section title="init" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a658fb9e409aea585c61dba4792adb9ea" />
+                <section title="resizeEvent" ref="class_d_i_s_p_l_i_b_1_1_graph.html#af14afde24b95a50479709f467c3e82f4" />
+                <section title="setTitle" ref="class_d_i_s_p_l_i_b_1_1_graph.html#ab7c5b3b2e675d13c3d4df992269269ce" />
+                <section title="setXLabel" ref="class_d_i_s_p_l_i_b_1_1_graph.html#af1b62fe24283b53d581c4e527d0c0bf2" />
+                <section title="setYLabel" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a752dbea2ba2aac829500c61e31b2f860" />
+                <section title="m_iBorderLeftRight" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a86659ac189c2b959ab800d280db9761d" />
+                <section title="m_iBorderTopBottom" ref="class_d_i_s_p_l_i_b_1_1_graph.html#ada86d8d4bbd804133722720eab808110" />
+                <section title="m_qFontAxes" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a6c3a5a1fe927f36f4b7d5470f59099b4" />
+                <section title="m_qFontTitle" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a0e848c5034b65c5d81d1bbffed3a0c01" />
+                <section title="m_qPenAxes" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a159ced9595c462dc093dba194ba6f8bd" />
+                <section title="m_qPenTitle" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a851ab45d1cf04d0895f06affa73adc3a" />
+                <section title="m_qSizeWidget" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a67d2f25fe83844ce262688c84de8d150" />
+                <section title="m_sTitle" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a81ca0811d73601afa99c72e9b5883ef2" />
+                <section title="m_sXLabel" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a1c4ce890f2f03697cd4cbaaa5a04da82" />
+                <section title="m_sYLabel" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a825d912df975c7a84950eb1ec0d0b8da" />
+              </section>
+              <section title="ImageSc" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html">
+                <section title="ConstSPtr" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#afd0f2126121650b2366f6d2929e8aeea" />
+                <section title="SPtr" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a7da9381c32f1620d99c3d1f300bc5e39" />
+                <section title="ImageSc" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a3d8708c0d8e1ab425008673802f96f05" />
+                <section title="ImageSc" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a756915a552fabbffcb4553aedc208d08" />
+                <section title="ImageSc" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#acde5aa4035fb3f51b0741522553d55f5" />
+                <section title="ImageSc" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a1357b3aafb88705ddc6a69663e10a8d3" />
+                <section title="~ImageSc" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a3c4c0ca2193b68724f8f2bbc9ab719c0" />
+                <section title="init" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a3d3a9b3b6c441a56b40a62b1f2c35cc2" />
+                <section title="paintEvent" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a7550e6540b56c07fec33d445122acfcd" />
+                <section title="setColorMap" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a2dcbf925df66f3d8f3c843d41fb4e32f" />
+                <section title="updateData" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a04f086b6fa01bc4f4d884b1d83243b17" />
+                <section title="updateData" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a8c8cc7dc9bdb0ba7b37edc2c4c961bd4" />
+                <section title="updateData" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a45c63c6dafa3245a89b6ce407371d8a2" />
+                <section title="updateMaps" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#aa6ff49df9c77959a4a11200a170cfe4f" />
+                <section title="m_bColorbar" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a643c02d71682a529208632d99844b875" />
+                <section title="m_dMaxValue" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#ab2393c0d95611d6863bf14ec0272eb6b" />
+                <section title="m_dMinValue" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a577659f166637af5ec1e07939c96b949" />
+                <section title="m_iColorbarGradSteps" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#aa664fc9931fde06e147a4ca823e84b30" />
+                <section title="m_iColorbarSteps" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a1957b2d28c1901933fb9a443afaf20bb" />
+                <section title="m_iColorbarWidth" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#abbbf7a6ce4817dcc25c49e5d6937a0b8" />
+                <section title="m_matCentNormData" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#aabeaf0a45c476111d4e54b837d100695" />
+                <section title="m_pPixmapColorbar" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#adeabc0534db773e21bdab85b7ebd7268" />
+                <section title="m_pPixmapData" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#aa01a3742f706750bbfbf9b55efceb5ee" />
+                <section title="m_qFontColorbar" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a7c89627a68838a87caea9e0227d07119" />
+                <section title="m_qPenColorbar" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a6225846372c9fb6cf6e460cfdf07d0e7" />
+                <section title="m_qVecScaleValues" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a557af72f3ec5cdb71d835835bb3b40b2" />
+                <section title="pColorMapper" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a45b7c13b6bd026001d12d7c1187eb196" />
+              </section>
+              <section title="Plot" ref="class_d_i_s_p_l_i_b_1_1_plot.html">
+                <section title="ConstSPtr" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a009b5c537f312c763943ea4007095b7a" />
+                <section title="SPtr" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a8895e8ff677802282f09cb1aa5ceb548" />
+                <section title="Plot" ref="class_d_i_s_p_l_i_b_1_1_plot.html#acb95c0d3a6d1d4edf7b946863efdac98" />
+                <section title="Plot" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a7d65e43cdd71a4a410b82ebad2312216" />
+                <section title="~Plot" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a277e9c79c4357b3a317d74d61dabefcf" />
+                <section title="init" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a65df9a073e39188786cbf5cf3cc5271e" />
+                <section title="paintEvent" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a4e5bd8917401d406431b987446ddf17a" />
+                <section title="updateData" ref="class_d_i_s_p_l_i_b_1_1_plot.html#afcb1cdc21fe405d97fe7d332a66608e3" />
+                <section title="m_bHoldOn" ref="class_d_i_s_p_l_i_b_1_1_plot.html#ae1d1aacb97a9179c29eda8186461be8b" />
+                <section title="m_dMaxX" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a3cdf7a0bbea3be3cdb5924f3c36d539f" />
+                <section title="m_dMaxY" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a0000cb236c8cc314430fb4c43fcbd700" />
+                <section title="m_dMinX" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a53a9ed0dd41182377b43b58e0a853f21" />
+                <section title="m_dMinY" ref="class_d_i_s_p_l_i_b_1_1_plot.html#ab12dd0cd296ad1b6a609162357bbdd53" />
+                <section title="m_qListVecPointFPaths" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a7c8128b100f3c8c8eea48849253bd643" />
               </section>
             </section>
             <section title="FIFFLIB">
@@ -1024,6 +1099,7 @@
               <section title="IOBuffer::CircularMultiChannelBuffer_old&lt; _Tp &gt;" ref="class_i_o_buffer_1_1_circular_multi_channel_buffer__old.html" />
             </section>
             <section title="IOBuffer::CircularBuffer&lt; _Tp &gt;" ref="class_i_o_buffer_1_1_circular_buffer.html" />
+            <section title="DISPLIB::ColorMap" ref="class_d_i_s_p_l_i_b_1_1_color_map.html" />
             <section title="FSLIB::Colortable" ref="class_f_s_l_i_b_1_1_colortable.html" />
             <section title="CTypeName&lt; T &gt;" ref="class_c_type_name.html" />
             <section title="FIFFLIB::Fiff" ref="class_f_i_f_f_l_i_b_1_1_fiff.html" />
@@ -1101,6 +1177,12 @@
               <section title="RTINVLIB::RtCov" ref="class_r_t_i_n_v_l_i_b_1_1_rt_cov.html" />
               <section title="RTINVLIB::RtInvOp" ref="class_r_t_i_n_v_l_i_b_1_1_rt_inv_op.html" />
             </section>
+            <section title="QWidget">
+              <section title="DISPLIB::Graph" ref="class_d_i_s_p_l_i_b_1_1_graph.html">
+                <section title="DISPLIB::ImageSc" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html" />
+                <section title="DISPLIB::Plot" ref="class_d_i_s_p_l_i_b_1_1_plot.html" />
+              </section>
+            </section>
             <section title="INVERSELIB::SourceEstimate" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html" />
             <section title="Subject" ref="class_subject.html">
               <section title="RTCOMMANDLIB::CommandParser" ref="class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_parser.html" />
@@ -1119,6 +1201,7 @@
               <section title="g" ref="functions_0x67.html" />
               <section title="h" ref="functions_0x68.html" />
               <section title="i" ref="functions_0x69.html" />
+              <section title="j" ref="functions_0x6a.html" />
               <section title="k" ref="functions_0x6b.html" />
               <section title="l" ref="functions_0x6c.html" />
               <section title="m" ref="functions_0x6d.html" />
@@ -1143,6 +1226,7 @@
               <section title="g" ref="functions_func_0x67.html" />
               <section title="h" ref="functions_func_0x68.html" />
               <section title="i" ref="functions_func_0x69.html" />
+              <section title="j" ref="functions_func_0x6a.html" />
               <section title="k" ref="functions_func_0x6b.html" />
               <section title="l" ref="functions_func_0x6c.html" />
               <section title="m" ref="functions_func_0x6d.html" />
@@ -1153,6 +1237,7 @@
               <section title="s" ref="functions_func_0x73.html" />
               <section title="t" ref="functions_func_0x74.html" />
               <section title="u" ref="functions_func_0x75.html" />
+              <section title="v" ref="functions_func_0x76.html" />
               <section title="w" ref="functions_func_0x77.html" />
               <section title="~" ref="functions_func_0x7e.html" />
             </section>
@@ -1185,6 +1270,93 @@
         <section title="Files">
           <section title="File List" ref="files.html">
             <section title="MNE" ref="dir_fba7b6d30909f9ec66000534e18b073e.html">
+              <section title="disp" ref="dir_3724822b9604f2d84f3a550bba2b646c.html">
+                <section title="colormap.cpp" ref="colormap_8cpp.html" />
+                <section title="colormap.h" ref="colormap_8h.html">
+                  <section title="ColorMap" ref="class_d_i_s_p_l_i_b_1_1_color_map.html">
+                    <section title="ConstSPtr" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a96f919a6067a0092192a16d4ce2d58e4" />
+                    <section title="SPtr" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#aa3086eee9052119ceea08c709ed608c3" />
+                    <section title="ColorMap" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#ae1b5944932c0b018b1faa8d78831f57e" />
+                    <section title="~ColorMap" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a6c8d5222750e389108c2e97302d3e8c4" />
+                  </section>
+                </section>
+                <section title="disp_global.h" ref="disp__global_8h.html">
+                  <section title="DISPSHARED_EXPORT" ref="disp__global_8h.html#aded49b96c9ac1f92dc1381a1d7845c28" />
+                </section>
+                <section title="graph.cpp" ref="graph_8cpp.html" />
+                <section title="graph.h" ref="graph_8h.html">
+                  <section title="Graph" ref="class_d_i_s_p_l_i_b_1_1_graph.html">
+                    <section title="Graph" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a16c725d15f3725ecf6e467ea021cc211" />
+                    <section title="drawLabels" ref="class_d_i_s_p_l_i_b_1_1_graph.html#ae4dff910e045b93fe4fa5339338377a7" />
+                    <section title="init" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a658fb9e409aea585c61dba4792adb9ea" />
+                    <section title="resizeEvent" ref="class_d_i_s_p_l_i_b_1_1_graph.html#af14afde24b95a50479709f467c3e82f4" />
+                    <section title="setTitle" ref="class_d_i_s_p_l_i_b_1_1_graph.html#ab7c5b3b2e675d13c3d4df992269269ce" />
+                    <section title="setXLabel" ref="class_d_i_s_p_l_i_b_1_1_graph.html#af1b62fe24283b53d581c4e527d0c0bf2" />
+                    <section title="setYLabel" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a752dbea2ba2aac829500c61e31b2f860" />
+                    <section title="m_iBorderLeftRight" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a86659ac189c2b959ab800d280db9761d" />
+                    <section title="m_iBorderTopBottom" ref="class_d_i_s_p_l_i_b_1_1_graph.html#ada86d8d4bbd804133722720eab808110" />
+                    <section title="m_qFontAxes" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a6c3a5a1fe927f36f4b7d5470f59099b4" />
+                    <section title="m_qFontTitle" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a0e848c5034b65c5d81d1bbffed3a0c01" />
+                    <section title="m_qPenAxes" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a159ced9595c462dc093dba194ba6f8bd" />
+                    <section title="m_qPenTitle" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a851ab45d1cf04d0895f06affa73adc3a" />
+                    <section title="m_qSizeWidget" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a67d2f25fe83844ce262688c84de8d150" />
+                    <section title="m_sTitle" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a81ca0811d73601afa99c72e9b5883ef2" />
+                    <section title="m_sXLabel" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a1c4ce890f2f03697cd4cbaaa5a04da82" />
+                    <section title="m_sYLabel" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a825d912df975c7a84950eb1ec0d0b8da" />
+                  </section>
+                </section>
+                <section title="imagesc.cpp" ref="imagesc_8cpp.html" />
+                <section title="imagesc.h" ref="imagesc_8h.html">
+                  <section title="ImageSc" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html">
+                    <section title="ConstSPtr" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#afd0f2126121650b2366f6d2929e8aeea" />
+                    <section title="SPtr" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a7da9381c32f1620d99c3d1f300bc5e39" />
+                    <section title="ImageSc" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a3d8708c0d8e1ab425008673802f96f05" />
+                    <section title="ImageSc" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a756915a552fabbffcb4553aedc208d08" />
+                    <section title="ImageSc" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#acde5aa4035fb3f51b0741522553d55f5" />
+                    <section title="ImageSc" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a1357b3aafb88705ddc6a69663e10a8d3" />
+                    <section title="~ImageSc" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a3c4c0ca2193b68724f8f2bbc9ab719c0" />
+                    <section title="init" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a3d3a9b3b6c441a56b40a62b1f2c35cc2" />
+                    <section title="paintEvent" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a7550e6540b56c07fec33d445122acfcd" />
+                    <section title="setColorMap" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a2dcbf925df66f3d8f3c843d41fb4e32f" />
+                    <section title="updateData" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a04f086b6fa01bc4f4d884b1d83243b17" />
+                    <section title="updateData" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a8c8cc7dc9bdb0ba7b37edc2c4c961bd4" />
+                    <section title="updateData" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a45c63c6dafa3245a89b6ce407371d8a2" />
+                    <section title="updateMaps" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#aa6ff49df9c77959a4a11200a170cfe4f" />
+                    <section title="m_bColorbar" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a643c02d71682a529208632d99844b875" />
+                    <section title="m_dMaxValue" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#ab2393c0d95611d6863bf14ec0272eb6b" />
+                    <section title="m_dMinValue" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a577659f166637af5ec1e07939c96b949" />
+                    <section title="m_iColorbarGradSteps" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#aa664fc9931fde06e147a4ca823e84b30" />
+                    <section title="m_iColorbarSteps" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a1957b2d28c1901933fb9a443afaf20bb" />
+                    <section title="m_iColorbarWidth" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#abbbf7a6ce4817dcc25c49e5d6937a0b8" />
+                    <section title="m_matCentNormData" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#aabeaf0a45c476111d4e54b837d100695" />
+                    <section title="m_pPixmapColorbar" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#adeabc0534db773e21bdab85b7ebd7268" />
+                    <section title="m_pPixmapData" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#aa01a3742f706750bbfbf9b55efceb5ee" />
+                    <section title="m_qFontColorbar" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a7c89627a68838a87caea9e0227d07119" />
+                    <section title="m_qPenColorbar" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a6225846372c9fb6cf6e460cfdf07d0e7" />
+                    <section title="m_qVecScaleValues" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a557af72f3ec5cdb71d835835bb3b40b2" />
+                    <section title="pColorMapper" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a45b7c13b6bd026001d12d7c1187eb196" />
+                  </section>
+                </section>
+                <section title="plot.cpp" ref="plot_8cpp.html" />
+                <section title="plot.h" ref="plot_8h.html">
+                  <section title="Plot" ref="class_d_i_s_p_l_i_b_1_1_plot.html">
+                    <section title="ConstSPtr" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a009b5c537f312c763943ea4007095b7a" />
+                    <section title="SPtr" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a8895e8ff677802282f09cb1aa5ceb548" />
+                    <section title="Plot" ref="class_d_i_s_p_l_i_b_1_1_plot.html#acb95c0d3a6d1d4edf7b946863efdac98" />
+                    <section title="Plot" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a7d65e43cdd71a4a410b82ebad2312216" />
+                    <section title="~Plot" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a277e9c79c4357b3a317d74d61dabefcf" />
+                    <section title="init" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a65df9a073e39188786cbf5cf3cc5271e" />
+                    <section title="paintEvent" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a4e5bd8917401d406431b987446ddf17a" />
+                    <section title="updateData" ref="class_d_i_s_p_l_i_b_1_1_plot.html#afcb1cdc21fe405d97fe7d332a66608e3" />
+                    <section title="m_bHoldOn" ref="class_d_i_s_p_l_i_b_1_1_plot.html#ae1d1aacb97a9179c29eda8186461be8b" />
+                    <section title="m_dMaxX" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a3cdf7a0bbea3be3cdb5924f3c36d539f" />
+                    <section title="m_dMaxY" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a0000cb236c8cc314430fb4c43fcbd700" />
+                    <section title="m_dMinX" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a53a9ed0dd41182377b43b58e0a853f21" />
+                    <section title="m_dMinY" ref="class_d_i_s_p_l_i_b_1_1_plot.html#ab12dd0cd296ad1b6a609162357bbdd53" />
+                    <section title="m_qListVecPointFPaths" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a7c8128b100f3c8c8eea48849253bd643" />
+                  </section>
+                </section>
+              </section>
               <section title="disp3D" ref="dir_a0f69d5cb4834a722f5c816edde5c66b.html">
                 <section title="disp3D_global.h" ref="disp3_d__global_8h.html">
                   <section title="DISP3DSHARED_EXPORT" ref="disp3_d__global_8h.html#a9e0813af0c7548e2ee60e9033fdf045e" />
@@ -1192,9 +1364,12 @@
                 <section title="geometryview.cpp" ref="geometryview_8cpp.html" />
                 <section title="geometryview.h" ref="geometryview_8h.html">
                   <section title="GeometryView" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html">
-                    <section title="GeometryView" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a4d825a6fb8c46d2158107c56af28d1b4" />
+                    <section title="GeometryView" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#aaaa88d83201df1cb25888278da5a1762" />
                     <section title="~GeometryView" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#ab4bb78457615996a1be0c44add508ff9" />
                     <section title="initializeGL" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a816a10949d2879546377239cc72f9cd7" />
+                    <section title="keyPressEvent" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a8af2c881eb7650d99b21b7dc604609c5" />
+                    <section title="mouseMoveEvent" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a66b50280e22d3b6563f0649b311324a0" />
+                    <section title="mousePressEvent" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a9d497baab79bf08d84de5a4ea983d518" />
                     <section title="paintGL" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a394ff6a0626e1cc306d40df437a34718" />
                   </section>
                 </section>
@@ -2941,6 +3116,7 @@
       </section>
     </toc>
     <keywords>
+      <keyword name="DISPSHARED_EXPORT" id="disp_global.h::DISPSHARED_EXPORT" ref="disp__global_8h.html#aded49b96c9ac1f92dc1381a1d7845c28" />
       <keyword name="DISP3DSHARED_EXPORT" id="disp3D_global.h::DISP3DSHARED_EXPORT" ref="disp3_d__global_8h.html#a9e0813af0c7548e2ee60e9033fdf045e" />
       <keyword name="FIFFC_FAIL" id="fiff_constants.h::FIFFC_FAIL" ref="fiff__constants_8h.html#a164d7d917910d0200ae0951263a63224" />
       <keyword name="FIFFC_OK" id="fiff_constants.h::FIFFC_OK" ref="fiff__constants_8h.html#a0775517d1b8500074bafd144010494c0" />
@@ -3555,10 +3731,13 @@
       <keyword name="notifyEnabled" id="Subject::notifyEnabled" ref="class_subject.html#ad42e3984f551ca321a2c8ac67a7a0503" />
       <keyword name="Subject" id="Subject::Subject" ref="class_subject.html#ab468044832c824c6d6c2f46272655207" />
       <keyword name="DISP3DLIB::GeometryView" id="DISP3DLIB::GeometryView" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html" />
-      <keyword name="GeometryView" id="DISP3DLIB::GeometryView::GeometryView" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a4d825a6fb8c46d2158107c56af28d1b4" />
+      <keyword name="GeometryView" id="DISP3DLIB::GeometryView::GeometryView" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#aaaa88d83201df1cb25888278da5a1762" />
       <keyword name="~GeometryView" id="DISP3DLIB::GeometryView::~GeometryView" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#ab4bb78457615996a1be0c44add508ff9" />
       <keyword name="initializeGL" id="DISP3DLIB::GeometryView::initializeGL" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a816a10949d2879546377239cc72f9cd7" />
       <keyword name="paintGL" id="DISP3DLIB::GeometryView::paintGL" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a394ff6a0626e1cc306d40df437a34718" />
+      <keyword name="keyPressEvent" id="DISP3DLIB::GeometryView::keyPressEvent" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a8af2c881eb7650d99b21b7dc604609c5" />
+      <keyword name="mouseMoveEvent" id="DISP3DLIB::GeometryView::mouseMoveEvent" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a66b50280e22d3b6563f0649b311324a0" />
+      <keyword name="mousePressEvent" id="DISP3DLIB::GeometryView::mousePressEvent" ref="class_d_i_s_p3_d_l_i_b_1_1_geometry_view.html#a9d497baab79bf08d84de5a4ea983d518" />
       <keyword name="DISP3DLIB::InverseView" id="DISP3DLIB::InverseView" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html" />
       <keyword name="SPtr" id="DISP3DLIB::InverseView::SPtr" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#a29a09132596437680ba804eb676dd00e" />
       <keyword name="ConstSPtr" id="DISP3DLIB::InverseView::ConstSPtr" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#acbd3608fef565cbfdaeabc7ecd83a83e" />
@@ -3589,6 +3768,119 @@
       <keyword name="pushSourceEstimate" id="DISP3DLIB::LabelView::pushSourceEstimate" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a751b31c71ed2f03a3ab64d782ef7f7d4" />
       <keyword name="initializeGL" id="DISP3DLIB::LabelView::initializeGL" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a4777b7f0234499359d1416b104bfe908" />
       <keyword name="paintGL" id="DISP3DLIB::LabelView::paintGL" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#ac61e3be860ec6c41640a1b082df8552d" />
+      <keyword name="DISPLIB::ColorMap" id="DISPLIB::ColorMap" ref="class_d_i_s_p_l_i_b_1_1_color_map.html" />
+      <keyword name="SPtr" id="DISPLIB::ColorMap::SPtr" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#aa3086eee9052119ceea08c709ed608c3" />
+      <keyword name="ConstSPtr" id="DISPLIB::ColorMap::ConstSPtr" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a96f919a6067a0092192a16d4ce2d58e4" />
+      <keyword name="ColorMap" id="DISPLIB::ColorMap::ColorMap" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#ae1b5944932c0b018b1faa8d78831f57e" />
+      <keyword name="~ColorMap" id="DISPLIB::ColorMap::~ColorMap" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a6c8d5222750e389108c2e97302d3e8c4" />
+      <keyword name="valueToJet" id="DISPLIB::ColorMap::valueToJet" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a6d2e65e00fd1a8827132b3cfc30bd941" />
+      <keyword name="valueToHot" id="DISPLIB::ColorMap::valueToHot" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#af0e3402bb90d91acd6adb19b1ff01ed4" />
+      <keyword name="valueToBone" id="DISPLIB::ColorMap::valueToBone" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a3ea6600fe319ede93abde1e58e67ca0a" />
+      <keyword name="linearSlope" id="DISPLIB::ColorMap::linearSlope" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a3fc2088e75d0f2a019a6ed23e723dc16" />
+      <keyword name="jetR" id="DISPLIB::ColorMap::jetR" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a64173832d6dfb8d2f0130dba4251cab0" />
+      <keyword name="jetG" id="DISPLIB::ColorMap::jetG" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a91b69c49baa2b85d133b2299b57b5ccf" />
+      <keyword name="jetB" id="DISPLIB::ColorMap::jetB" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a673ad66d7244e9e62917b988ec66b2b9" />
+      <keyword name="hotR" id="DISPLIB::ColorMap::hotR" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#ac5e3bb01e109e8d4990644e2679af85d" />
+      <keyword name="hotG" id="DISPLIB::ColorMap::hotG" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a111a7f90d61026ad1081063eb73f9bff" />
+      <keyword name="hotB" id="DISPLIB::ColorMap::hotB" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#ac943f066da416006a699ff1474231939" />
+      <keyword name="boneR" id="DISPLIB::ColorMap::boneR" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a476f9ed39c73ad05a556cd3860b1af90" />
+      <keyword name="boneG" id="DISPLIB::ColorMap::boneG" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#ad15b6e9517fecd18bc6c6654662f3cb2" />
+      <keyword name="boneB" id="DISPLIB::ColorMap::boneB" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#abb251bb7603ba90d567f8c2d44d06745" />
+      <keyword name="DISPLIB::Graph" id="DISPLIB::Graph" ref="class_d_i_s_p_l_i_b_1_1_graph.html" />
+      <keyword name="Graph" id="DISPLIB::Graph::Graph" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a16c725d15f3725ecf6e467ea021cc211" />
+      <keyword name="init" id="DISPLIB::Graph::init" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a658fb9e409aea585c61dba4792adb9ea" />
+      <keyword name="setTitle" id="DISPLIB::Graph::setTitle" ref="class_d_i_s_p_l_i_b_1_1_graph.html#ab7c5b3b2e675d13c3d4df992269269ce" />
+      <keyword name="setXLabel" id="DISPLIB::Graph::setXLabel" ref="class_d_i_s_p_l_i_b_1_1_graph.html#af1b62fe24283b53d581c4e527d0c0bf2" />
+      <keyword name="setYLabel" id="DISPLIB::Graph::setYLabel" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a752dbea2ba2aac829500c61e31b2f860" />
+      <keyword name="resizeEvent" id="DISPLIB::Graph::resizeEvent" ref="class_d_i_s_p_l_i_b_1_1_graph.html#af14afde24b95a50479709f467c3e82f4" />
+      <keyword name="drawLabels" id="DISPLIB::Graph::drawLabels" ref="class_d_i_s_p_l_i_b_1_1_graph.html#ae4dff910e045b93fe4fa5339338377a7" />
+      <keyword name="m_qSizeWidget" id="DISPLIB::Graph::m_qSizeWidget" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a67d2f25fe83844ce262688c84de8d150" />
+      <keyword name="m_sTitle" id="DISPLIB::Graph::m_sTitle" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a81ca0811d73601afa99c72e9b5883ef2" />
+      <keyword name="m_qFontTitle" id="DISPLIB::Graph::m_qFontTitle" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a0e848c5034b65c5d81d1bbffed3a0c01" />
+      <keyword name="m_qPenTitle" id="DISPLIB::Graph::m_qPenTitle" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a851ab45d1cf04d0895f06affa73adc3a" />
+      <keyword name="m_iBorderTopBottom" id="DISPLIB::Graph::m_iBorderTopBottom" ref="class_d_i_s_p_l_i_b_1_1_graph.html#ada86d8d4bbd804133722720eab808110" />
+      <keyword name="m_iBorderLeftRight" id="DISPLIB::Graph::m_iBorderLeftRight" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a86659ac189c2b959ab800d280db9761d" />
+      <keyword name="m_sXLabel" id="DISPLIB::Graph::m_sXLabel" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a1c4ce890f2f03697cd4cbaaa5a04da82" />
+      <keyword name="m_sYLabel" id="DISPLIB::Graph::m_sYLabel" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a825d912df975c7a84950eb1ec0d0b8da" />
+      <keyword name="m_qFontAxes" id="DISPLIB::Graph::m_qFontAxes" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a6c3a5a1fe927f36f4b7d5470f59099b4" />
+      <keyword name="m_qPenAxes" id="DISPLIB::Graph::m_qPenAxes" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a159ced9595c462dc093dba194ba6f8bd" />
+      <keyword name="DISPLIB::ImageSc" id="DISPLIB::ImageSc" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html" />
+      <keyword name="SPtr" id="DISPLIB::ImageSc::SPtr" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a7da9381c32f1620d99c3d1f300bc5e39" />
+      <keyword name="ConstSPtr" id="DISPLIB::ImageSc::ConstSPtr" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#afd0f2126121650b2366f6d2929e8aeea" />
+      <keyword name="ImageSc" id="DISPLIB::ImageSc::ImageSc" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a3d8708c0d8e1ab425008673802f96f05" />
+      <keyword name="ImageSc" id="DISPLIB::ImageSc::ImageSc" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a756915a552fabbffcb4553aedc208d08" />
+      <keyword name="ImageSc" id="DISPLIB::ImageSc::ImageSc" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#acde5aa4035fb3f51b0741522553d55f5" />
+      <keyword name="ImageSc" id="DISPLIB::ImageSc::ImageSc" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a1357b3aafb88705ddc6a69663e10a8d3" />
+      <keyword name="~ImageSc" id="DISPLIB::ImageSc::~ImageSc" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a3c4c0ca2193b68724f8f2bbc9ab719c0" />
+      <keyword name="init" id="DISPLIB::ImageSc::init" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a3d3a9b3b6c441a56b40a62b1f2c35cc2" />
+      <keyword name="updateData" id="DISPLIB::ImageSc::updateData" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a04f086b6fa01bc4f4d884b1d83243b17" />
+      <keyword name="updateData" id="DISPLIB::ImageSc::updateData" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a8c8cc7dc9bdb0ba7b37edc2c4c961bd4" />
+      <keyword name="updateData" id="DISPLIB::ImageSc::updateData" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a45c63c6dafa3245a89b6ce407371d8a2" />
+      <keyword name="setColorMap" id="DISPLIB::ImageSc::setColorMap" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a2dcbf925df66f3d8f3c843d41fb4e32f" />
+      <keyword name="Graph" id="DISPLIB::Graph::Graph" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a16c725d15f3725ecf6e467ea021cc211" />
+      <keyword name="init" id="DISPLIB::Graph::init" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a658fb9e409aea585c61dba4792adb9ea" />
+      <keyword name="setTitle" id="DISPLIB::Graph::setTitle" ref="class_d_i_s_p_l_i_b_1_1_graph.html#ab7c5b3b2e675d13c3d4df992269269ce" />
+      <keyword name="setXLabel" id="DISPLIB::Graph::setXLabel" ref="class_d_i_s_p_l_i_b_1_1_graph.html#af1b62fe24283b53d581c4e527d0c0bf2" />
+      <keyword name="setYLabel" id="DISPLIB::Graph::setYLabel" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a752dbea2ba2aac829500c61e31b2f860" />
+      <keyword name="updateMaps" id="DISPLIB::ImageSc::updateMaps" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#aa6ff49df9c77959a4a11200a170cfe4f" />
+      <keyword name="paintEvent" id="DISPLIB::ImageSc::paintEvent" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a7550e6540b56c07fec33d445122acfcd" />
+      <keyword name="resizeEvent" id="DISPLIB::Graph::resizeEvent" ref="class_d_i_s_p_l_i_b_1_1_graph.html#af14afde24b95a50479709f467c3e82f4" />
+      <keyword name="drawLabels" id="DISPLIB::Graph::drawLabels" ref="class_d_i_s_p_l_i_b_1_1_graph.html#ae4dff910e045b93fe4fa5339338377a7" />
+      <keyword name="m_pPixmapData" id="DISPLIB::ImageSc::m_pPixmapData" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#aa01a3742f706750bbfbf9b55efceb5ee" />
+      <keyword name="m_pPixmapColorbar" id="DISPLIB::ImageSc::m_pPixmapColorbar" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#adeabc0534db773e21bdab85b7ebd7268" />
+      <keyword name="m_matCentNormData" id="DISPLIB::ImageSc::m_matCentNormData" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#aabeaf0a45c476111d4e54b837d100695" />
+      <keyword name="m_dMinValue" id="DISPLIB::ImageSc::m_dMinValue" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a577659f166637af5ec1e07939c96b949" />
+      <keyword name="m_dMaxValue" id="DISPLIB::ImageSc::m_dMaxValue" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#ab2393c0d95611d6863bf14ec0272eb6b" />
+      <keyword name="pColorMapper" id="DISPLIB::ImageSc::pColorMapper" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a45b7c13b6bd026001d12d7c1187eb196" />
+      <keyword name="m_bColorbar" id="DISPLIB::ImageSc::m_bColorbar" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a643c02d71682a529208632d99844b875" />
+      <keyword name="m_qVecScaleValues" id="DISPLIB::ImageSc::m_qVecScaleValues" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a557af72f3ec5cdb71d835835bb3b40b2" />
+      <keyword name="m_iColorbarWidth" id="DISPLIB::ImageSc::m_iColorbarWidth" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#abbbf7a6ce4817dcc25c49e5d6937a0b8" />
+      <keyword name="m_iColorbarSteps" id="DISPLIB::ImageSc::m_iColorbarSteps" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a1957b2d28c1901933fb9a443afaf20bb" />
+      <keyword name="m_iColorbarGradSteps" id="DISPLIB::ImageSc::m_iColorbarGradSteps" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#aa664fc9931fde06e147a4ca823e84b30" />
+      <keyword name="m_qFontColorbar" id="DISPLIB::ImageSc::m_qFontColorbar" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a7c89627a68838a87caea9e0227d07119" />
+      <keyword name="m_qPenColorbar" id="DISPLIB::ImageSc::m_qPenColorbar" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html#a6225846372c9fb6cf6e460cfdf07d0e7" />
+      <keyword name="m_qSizeWidget" id="DISPLIB::Graph::m_qSizeWidget" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a67d2f25fe83844ce262688c84de8d150" />
+      <keyword name="m_sTitle" id="DISPLIB::Graph::m_sTitle" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a81ca0811d73601afa99c72e9b5883ef2" />
+      <keyword name="m_qFontTitle" id="DISPLIB::Graph::m_qFontTitle" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a0e848c5034b65c5d81d1bbffed3a0c01" />
+      <keyword name="m_qPenTitle" id="DISPLIB::Graph::m_qPenTitle" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a851ab45d1cf04d0895f06affa73adc3a" />
+      <keyword name="m_iBorderTopBottom" id="DISPLIB::Graph::m_iBorderTopBottom" ref="class_d_i_s_p_l_i_b_1_1_graph.html#ada86d8d4bbd804133722720eab808110" />
+      <keyword name="m_iBorderLeftRight" id="DISPLIB::Graph::m_iBorderLeftRight" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a86659ac189c2b959ab800d280db9761d" />
+      <keyword name="m_sXLabel" id="DISPLIB::Graph::m_sXLabel" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a1c4ce890f2f03697cd4cbaaa5a04da82" />
+      <keyword name="m_sYLabel" id="DISPLIB::Graph::m_sYLabel" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a825d912df975c7a84950eb1ec0d0b8da" />
+      <keyword name="m_qFontAxes" id="DISPLIB::Graph::m_qFontAxes" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a6c3a5a1fe927f36f4b7d5470f59099b4" />
+      <keyword name="m_qPenAxes" id="DISPLIB::Graph::m_qPenAxes" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a159ced9595c462dc093dba194ba6f8bd" />
+      <keyword name="DISPLIB::Plot" id="DISPLIB::Plot" ref="class_d_i_s_p_l_i_b_1_1_plot.html" />
+      <keyword name="SPtr" id="DISPLIB::Plot::SPtr" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a8895e8ff677802282f09cb1aa5ceb548" />
+      <keyword name="ConstSPtr" id="DISPLIB::Plot::ConstSPtr" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a009b5c537f312c763943ea4007095b7a" />
+      <keyword name="Plot" id="DISPLIB::Plot::Plot" ref="class_d_i_s_p_l_i_b_1_1_plot.html#acb95c0d3a6d1d4edf7b946863efdac98" />
+      <keyword name="Plot" id="DISPLIB::Plot::Plot" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a7d65e43cdd71a4a410b82ebad2312216" />
+      <keyword name="~Plot" id="DISPLIB::Plot::~Plot" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a277e9c79c4357b3a317d74d61dabefcf" />
+      <keyword name="init" id="DISPLIB::Plot::init" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a65df9a073e39188786cbf5cf3cc5271e" />
+      <keyword name="updateData" id="DISPLIB::Plot::updateData" ref="class_d_i_s_p_l_i_b_1_1_plot.html#afcb1cdc21fe405d97fe7d332a66608e3" />
+      <keyword name="Graph" id="DISPLIB::Graph::Graph" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a16c725d15f3725ecf6e467ea021cc211" />
+      <keyword name="init" id="DISPLIB::Graph::init" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a658fb9e409aea585c61dba4792adb9ea" />
+      <keyword name="setTitle" id="DISPLIB::Graph::setTitle" ref="class_d_i_s_p_l_i_b_1_1_graph.html#ab7c5b3b2e675d13c3d4df992269269ce" />
+      <keyword name="setXLabel" id="DISPLIB::Graph::setXLabel" ref="class_d_i_s_p_l_i_b_1_1_graph.html#af1b62fe24283b53d581c4e527d0c0bf2" />
+      <keyword name="setYLabel" id="DISPLIB::Graph::setYLabel" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a752dbea2ba2aac829500c61e31b2f860" />
+      <keyword name="paintEvent" id="DISPLIB::Plot::paintEvent" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a4e5bd8917401d406431b987446ddf17a" />
+      <keyword name="resizeEvent" id="DISPLIB::Graph::resizeEvent" ref="class_d_i_s_p_l_i_b_1_1_graph.html#af14afde24b95a50479709f467c3e82f4" />
+      <keyword name="drawLabels" id="DISPLIB::Graph::drawLabels" ref="class_d_i_s_p_l_i_b_1_1_graph.html#ae4dff910e045b93fe4fa5339338377a7" />
+      <keyword name="m_bHoldOn" id="DISPLIB::Plot::m_bHoldOn" ref="class_d_i_s_p_l_i_b_1_1_plot.html#ae1d1aacb97a9179c29eda8186461be8b" />
+      <keyword name="m_qListVecPointFPaths" id="DISPLIB::Plot::m_qListVecPointFPaths" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a7c8128b100f3c8c8eea48849253bd643" />
+      <keyword name="m_dMinX" id="DISPLIB::Plot::m_dMinX" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a53a9ed0dd41182377b43b58e0a853f21" />
+      <keyword name="m_dMaxX" id="DISPLIB::Plot::m_dMaxX" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a3cdf7a0bbea3be3cdb5924f3c36d539f" />
+      <keyword name="m_dMinY" id="DISPLIB::Plot::m_dMinY" ref="class_d_i_s_p_l_i_b_1_1_plot.html#ab12dd0cd296ad1b6a609162357bbdd53" />
+      <keyword name="m_dMaxY" id="DISPLIB::Plot::m_dMaxY" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a0000cb236c8cc314430fb4c43fcbd700" />
+      <keyword name="m_qSizeWidget" id="DISPLIB::Graph::m_qSizeWidget" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a67d2f25fe83844ce262688c84de8d150" />
+      <keyword name="m_sTitle" id="DISPLIB::Graph::m_sTitle" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a81ca0811d73601afa99c72e9b5883ef2" />
+      <keyword name="m_qFontTitle" id="DISPLIB::Graph::m_qFontTitle" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a0e848c5034b65c5d81d1bbffed3a0c01" />
+      <keyword name="m_qPenTitle" id="DISPLIB::Graph::m_qPenTitle" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a851ab45d1cf04d0895f06affa73adc3a" />
+      <keyword name="m_iBorderTopBottom" id="DISPLIB::Graph::m_iBorderTopBottom" ref="class_d_i_s_p_l_i_b_1_1_graph.html#ada86d8d4bbd804133722720eab808110" />
+      <keyword name="m_iBorderLeftRight" id="DISPLIB::Graph::m_iBorderLeftRight" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a86659ac189c2b959ab800d280db9761d" />
+      <keyword name="m_sXLabel" id="DISPLIB::Graph::m_sXLabel" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a1c4ce890f2f03697cd4cbaaa5a04da82" />
+      <keyword name="m_sYLabel" id="DISPLIB::Graph::m_sYLabel" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a825d912df975c7a84950eb1ec0d0b8da" />
+      <keyword name="m_qFontAxes" id="DISPLIB::Graph::m_qFontAxes" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a6c3a5a1fe927f36f4b7d5470f59099b4" />
+      <keyword name="m_qPenAxes" id="DISPLIB::Graph::m_qPenAxes" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a159ced9595c462dc093dba194ba6f8bd" />
       <keyword name="FIFFLIB::Fiff" id="FIFFLIB::Fiff" ref="class_f_i_f_f_l_i_b_1_1_fiff.html" />
       <keyword name="~Fiff" id="FIFFLIB::Fiff::~Fiff" ref="class_f_i_f_f_l_i_b_1_1_fiff.html#a897e94c38f4685fd74f2543ace9c2213" />
       <keyword name="copy_tree" id="FIFFLIB::Fiff::copy_tree" ref="class_f_i_f_f_l_i_b_1_1_fiff.html#a2204cae0f25804f90ca463f47f7fa66b" />
@@ -4293,7 +4585,7 @@
       <keyword name="pick_types" id="MNELIB::MNEForwardSolution::pick_types" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#abec6e96b8ebbfa68f60f1c19ef75b2c6" />
       <keyword name="prepare_forward" id="MNELIB::MNEForwardSolution::prepare_forward" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a75dda7fcbf06cd708b3fadc12f2cf227" />
       <keyword name="to_fixed_ori" id="MNELIB::MNEForwardSolution::to_fixed_ori" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a5090c26dd98d9a2bb1364a6f01793dcb" />
-      <keyword name="compute_depth_prior" id="MNELIB::MNEForwardSolution::compute_depth_prior" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aee65b85bb350a2a17e1416998f523582" />
+      <keyword name="compute_depth_prior" id="MNELIB::MNEForwardSolution::compute_depth_prior" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a7d03724db839eef8e94640d500077f5f" />
       <keyword name="read" id="MNELIB::MNEForwardSolution::read" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a2a98232cf4d2c1c810cb9a89f372ffde" />
       <keyword name="restrict_gain_matrix" id="MNELIB::MNEForwardSolution::restrict_gain_matrix" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a7d68299137a6ed17f5c5d702d3f8791b" />
       <keyword name="info" id="MNELIB::MNEForwardSolution::info" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#adeda03feac0c09dc76711921c1e576dd" />
@@ -4645,6 +4937,15 @@
       <file>/search/close.png</file>
       <file>search/search.css</file>
       <file>search/search.js</file>
+      <file>colormap_8cpp_source.html</file>
+      <file>colormap_8h_source.html</file>
+      <file>disp__global_8h_source.html</file>
+      <file>graph_8cpp_source.html</file>
+      <file>graph_8h_source.html</file>
+      <file>imagesc_8cpp_source.html</file>
+      <file>imagesc_8h_source.html</file>
+      <file>plot_8cpp_source.html</file>
+      <file>plot_8h_source.html</file>
       <file>disp3_d__global_8h_source.html</file>
       <file>geometryview_8cpp_source.html</file>
       <file>geometryview_8h_source.html</file>
@@ -4780,6 +5081,15 @@
       <file>mnemath_8cpp_source.html</file>
       <file>mnemath_8h_source.html</file>
       <file>utils__global_8h_source.html</file>
+      <file>colormap_8cpp.html</file>
+      <file>colormap_8h.html</file>
+      <file>disp__global_8h.html</file>
+      <file>graph_8cpp.html</file>
+      <file>graph_8h.html</file>
+      <file>imagesc_8cpp.html</file>
+      <file>imagesc_8h.html</file>
+      <file>plot_8cpp.html</file>
+      <file>plot_8h.html</file>
       <file>disp3_d__global_8h.html</file>
       <file>geometryview_8cpp.html</file>
       <file>geometryview_8h.html</file>
@@ -4932,6 +5242,17 @@
       <file>class_d_i_s_p3_d_l_i_b_1_1_label_view.html</file>
       <file>class_d_i_s_p3_d_l_i_b_1_1_label_view.png</file>
       <file>class_d_i_s_p3_d_l_i_b_1_1_label_view-members.html</file>
+      <file>class_d_i_s_p_l_i_b_1_1_color_map.html</file>
+      <file>class_d_i_s_p_l_i_b_1_1_color_map-members.html</file>
+      <file>class_d_i_s_p_l_i_b_1_1_graph.html</file>
+      <file>class_d_i_s_p_l_i_b_1_1_graph.png</file>
+      <file>class_d_i_s_p_l_i_b_1_1_graph-members.html</file>
+      <file>class_d_i_s_p_l_i_b_1_1_image_sc.html</file>
+      <file>class_d_i_s_p_l_i_b_1_1_image_sc.png</file>
+      <file>class_d_i_s_p_l_i_b_1_1_image_sc-members.html</file>
+      <file>class_d_i_s_p_l_i_b_1_1_plot.html</file>
+      <file>class_d_i_s_p_l_i_b_1_1_plot.png</file>
+      <file>class_d_i_s_p_l_i_b_1_1_plot-members.html</file>
       <file>class_f_i_f_f_l_i_b_1_1_fiff.html</file>
       <file>class_f_i_f_f_l_i_b_1_1_fiff-members.html</file>
       <file>class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html</file>
@@ -5081,6 +5402,7 @@
       <file>class_u_t_i_l_s_l_i_b_1_1_k_means-members.html</file>
       <file>class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html</file>
       <file>class_u_t_i_l_s_l_i_b_1_1_m_n_e_math-members.html</file>
+      <file>dir_3724822b9604f2d84f3a550bba2b646c.html</file>
       <file>dir_a0f69d5cb4834a722f5c816edde5c66b.html</file>
       <file>dir_02d6b00d369dfdccb62582dcf5f74964.html</file>
       <file>dir_a748eac5b594e51c109d7d0850221d09.html</file>
@@ -5107,6 +5429,7 @@
       <file>functions_0x67.html</file>
       <file>functions_0x68.html</file>
       <file>functions_0x69.html</file>
+      <file>functions_0x6a.html</file>
       <file>functions_0x6b.html</file>
       <file>functions_0x6c.html</file>
       <file>functions_0x6d.html</file>
@@ -5129,6 +5452,7 @@
       <file>functions_func_0x67.html</file>
       <file>functions_func_0x68.html</file>
       <file>functions_func_0x69.html</file>
+      <file>functions_func_0x6a.html</file>
       <file>functions_func_0x6b.html</file>
       <file>functions_func_0x6c.html</file>
       <file>functions_func_0x6d.html</file>
@@ -5139,6 +5463,7 @@
       <file>functions_func_0x73.html</file>
       <file>functions_func_0x74.html</file>
       <file>functions_func_0x75.html</file>
+      <file>functions_func_0x76.html</file>
       <file>functions_func_0x77.html</file>
       <file>functions_func_0x7e.html</file>
       <file>functions_vars.html</file>
