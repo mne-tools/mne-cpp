@@ -201,22 +201,22 @@ void FiffStreamThread::sendRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRawDa
 
 //*************************************************************************************************************
 
-void FiffStreamThread::sendData(QTcpSocket& p_qTcpSocket)
-{
-    if(p_qTcpSocket.state() != QAbstractSocket::UnconnectedState && m_bIsRunning)
-    {
-        m_qMutex.lock();
-        qint32 t_iBlockSize = m_qSendBlock.size();
-        if(t_iBlockSize > 0)
-        {
-//            qDebug() << "data available" << t_iBlockSize;
-            qint32 t_iBytesWritten = p_qTcpSocket.write(m_qSendBlock);
-            qDebug()<<"[Block to write]"<<t_iBlockSize<<"[bytes has been Written]"<<t_iBytesWritten;
-            p_qTcpSocket.waitForBytesWritten();
-        }
-        m_qMutex.unlock();
-    }
-}
+//void FiffStreamThread::sendData(QTcpSocket& p_qTcpSocket)
+//{
+//    if(p_qTcpSocket.state() != QAbstractSocket::UnconnectedState && m_bIsRunning)
+//    {
+//        m_qMutex.lock();
+//        qint32 t_iBlockSize = m_qSendBlock.size();
+//        if(t_iBlockSize > 0)
+//        {
+////            qDebug() << "data available" << t_iBlockSize;
+//            qint32 t_iBytesWritten = p_qTcpSocket.write(m_qSendBlock);
+//            qDebug()<<"[Block to write]"<<t_iBlockSize<<"[bytes has been Written]"<<t_iBytesWritten;
+//            p_qTcpSocket.waitForBytesWritten();
+//        }
+//        m_qMutex.unlock();
+//    }
+//}
 
 
 //*************************************************************************************************************
@@ -257,39 +257,39 @@ void FiffStreamThread::writeClientId()
 
 //*************************************************************************************************************
 
-void FiffStreamThread::readProc(QTcpSocket& p_qTcpSocket)
-{
-    FiffStream t_FiffStreamIn(&p_qTcpSocket);
+//void FiffStreamThread::readProc(QTcpSocket& p_qTcpSocket)
+//{
+//    FiffStream t_FiffStreamIn(&p_qTcpSocket);
 
-    //
-    // Read: Wait 10ms for incomming tag header, read and continue
-    //
-    p_qTcpSocket.waitForReadyRead(10);
+//    //
+//    // Read: Wait 10ms for incomming tag header, read and continue
+//    //
+//    p_qTcpSocket.waitForReadyRead(10);
 
-    if (p_qTcpSocket.bytesAvailable() >= (int)sizeof(qint32)*4)
-    {
-        qDebug() << "goes to read bytes " ;
-        FiffTag::SPtr t_pTag;
-        FiffTag::read_tag_info(&t_FiffStreamIn, t_pTag, false);
+//    if (p_qTcpSocket.bytesAvailable() >= (int)sizeof(qint32)*4)
+//    {
+//        qDebug() << "goes to read bytes " ;
+//        FiffTag::SPtr t_pTag;
+//        FiffTag::read_tag_info(&t_FiffStreamIn, t_pTag, false);
 
-        //
-        // wait until tag size data are available and read the data
-        //
-        while (p_qTcpSocket.bytesAvailable() < t_pTag->size())
-        {
-            p_qTcpSocket.waitForReadyRead(10);
-        }
-        FiffTag::read_tag_data(&t_FiffStreamIn, t_pTag);
+//        //
+//        // wait until tag size data are available and read the data
+//        //
+//        while (p_qTcpSocket.bytesAvailable() < t_pTag->size())
+//        {
+//            p_qTcpSocket.waitForReadyRead(10);
+//        }
+//        FiffTag::read_tag_data(&t_FiffStreamIn, t_pTag);
 
-        //
-        // Parse the tag
-        //
-        if(t_pTag->kind == FIFF_MNE_RT_COMMAND)
-        {
-            parseCommand(t_pTag);
-        }
-    }
-}
+//        //
+//        // Parse the tag
+//        //
+//        if(t_pTag->kind == FIFF_MNE_RT_COMMAND)
+//        {
+//            parseCommand(t_pTag);
+//        }
+//    }
+//}
 
 
 //*************************************************************************************************************
