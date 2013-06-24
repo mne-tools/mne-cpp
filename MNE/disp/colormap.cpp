@@ -212,8 +212,8 @@ int ColorMap::boneB(double x)
 int ColorMap::rbR(double x)
 {
     //Describe the red fuzzy set
-    if(x < 0.5)
-        return (int)floor(linearSlope(x, 2, 0)*255);
+    if(x < 0)
+        return (int)floor(linearSlope(x, 1, 1)*255);
     else
         return (int)floor(1.0*255);
 }
@@ -224,10 +224,10 @@ int ColorMap::rbR(double x)
 int ColorMap::rbG(double x)
 {
     //Describe the green fuzzy set
-    if(x < 0.5)
-        return (int)floor(linearSlope(x, 2, 0)*255);
+    if(x < 0)
+        return (int)floor(linearSlope(x, 1, 1)*255);
     else
-        return (int)floor(linearSlope(x, -2, 2)*255);
+        return (int)floor(linearSlope(x, -1, 1)*255);
 }
 
 
@@ -236,8 +236,8 @@ int ColorMap::rbG(double x)
 int ColorMap::rbB(double x)
 {
     //Describe the blue fuzzy set
-    if(x < 0.5)
+    if(x < 0)
         return (int)floor(1.0*255);
     else
-        return (int)floor(linearSlope(x, -2, 2)*255);
+        return (int)floor(linearSlope(x, -1, 1)*255);
 }

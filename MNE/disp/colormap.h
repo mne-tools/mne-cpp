@@ -129,9 +129,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns a RedBlue RGB to a given double value [0,1]
+    * Returns a RedBlue RGB to a given double value [-1,1]
     *
-    * @param[in] v      the double which has to be part of the intervall [0,1]
+    * @param[in] v      the double which has to be part of the intervall [-1,1]
     *
     * @return the corresponding Bone RGB
     */
