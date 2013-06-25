@@ -61,38 +61,41 @@ mnertclientSQUIDControlDgl::mnertclientSQUIDControlDgl(MneRtClient* p_pMneRtClie
 {
     ui->setupUi(this);
 
-    // retune
+    // retune connect
     connect(ui->m_Qbn_retune, &QPushButton::released, this, &mnertclientSQUIDControlDgl::SendRetune);
 
+    // init
+    Init();
 }
 
 mnertclientSQUIDControlDgl::~mnertclientSQUIDControlDgl()
 {
     delete ui;
 }
+void mnertclientSQUIDControlDgl::SendCMD(QString CMDSTR)
+{
+
+    if(m_pMneRtClient->m_bCmdClientIsConnected)
+    {
+    //set the control field in FLL JSON value as CMDSTR
+    (*m_pMneRtClient->m_pRtCmdClient)["FLL"].pValues()[0].setValue(CMDSTR);
+    (*m_pMneRtClient->m_pRtCmdClient)["FLL"].send();
+
+    this->ui->m_tx_info->setText(CMDSTR);
+    // Read reply
+    QString t_sReply = m_pMneRtClient->m_pRtCmdClient->readAvailableData();
+    this->ui->m_tx_info->setText(QString("Reply:")+t_sReply);
+    }
+}
+
+void mnertclientSQUIDControlDgl::Init()
+{
+    // Send the init command to labview to call SQUID VI.
+    SendCMD("INIT");
+}
 
 void mnertclientSQUIDControlDgl::SendRetune()
 {
 
-    qDebug() << "Here in  mnertclientSQUIDControlDgl::SendRetune()";
-
-    if(m_pMneRtClient->m_bCmdClientIsConnected)
-    {
-
-        qDebug() << "1";
-
-        (*m_pMneRtClient->m_pRtCmdClient)["FLL"].pValues()[0].setValue(QString("FLLCOMMANDNEEDIT"));
-        (*m_pMneRtClient->m_pRtCmdClient)["FLL"].send();
-
-
-        qDebug() << "2";
-
-        this->ui->m_tx_info->setText(QString("Send Retune Command"));
-        // Read reply
-        QString t_sReply = m_pMneRtClient->m_pRtCmdClient->readAvailableData();
-        this->ui->m_tx_info->setText(QString("Reply:")+t_sReply);
-
-        qDebug() << "3";
-    }
-
+    SendCMD("RETU");
 }
