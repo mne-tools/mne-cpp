@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     unit_tests.pro
+# @file     mne_x_plugin_com.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,30 +29,31 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile to build the unit tests.
+# @brief    This project file generates the makefile to build the mne_x_plugin_com app.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../mne-cpp.pri)
+QT       += core
 
-TEMPLATE = subdirs
+QT       -= gui
 
-SUBDIRS += \
-    mne_lib_tests \
-    mne_rt_tests \
-    mne_x_plugin_com
+TARGET = mne_x_plugin_com
+CONFIG   += console
+CONFIG   -= app_bundle
 
-contains(MNECPP_CONFIG, isGui) {
-    SUBDIRS += \
-#        mne_disp_test \
-        mne_graph_test \
+TEMPLATE = app
 
-    qtHaveModule(3d) {
-        isEqual(QT_MAJOR_VERSION, 5){
-            isEqual(QT_MINOR_VERSION, 1){
-                message(Qt3D available && QTVersion >= Qt 5.1: mne 3D tests configured!)
-                SUBDIRS += mne_3d_widget
-            }
-        }
-    }
-}
+
+SOURCES += main.cpp \
+    source.cpp \
+    sink.cpp \
+    dataprovider.cpp \
+    databuffer.cpp \
+    display.cpp
+
+HEADERS += \
+    source.h \
+    sink.h \
+    dataprovider.h \
+    databuffer.h \
+    display.h
