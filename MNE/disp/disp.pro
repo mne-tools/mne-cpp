@@ -79,7 +79,8 @@ SOURCES += \
     colormap.cpp \
     imagesc.cpp \
     plot.cpp \
-    graph.cpp
+    graph.cpp \
+    rtplot.cpp
 
 
 HEADERS += \
@@ -87,7 +88,8 @@ HEADERS += \
     colormap.h \
     imagesc.h \
     plot.h \
-    graph.h
+    graph.h \
+    rtplot.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
