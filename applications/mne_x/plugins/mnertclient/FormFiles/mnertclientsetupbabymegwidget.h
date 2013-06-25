@@ -64,6 +64,14 @@ class MneRtClientSetupBabyMegWidget;
 namespace MneRtClientPlugin
 {
 
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class MneRtClient;
+
+
 //=============================================================================================================
 /**
 * DECLARE CLASS MneRtClientSetupBabyMegWidget
@@ -78,11 +86,21 @@ public:
     typedef QSharedPointer<MneRtClientSetupBabyMegWidget> SPtr;              /**< Shared pointer type for MneRtClientSetupBabyMegWidget. */
     typedef QSharedPointer<const MneRtClientSetupBabyMegWidget> ConstSPtr;   /**< Const shared pointer type for MneRtClientSetupBabyMegWidget. */
 
-    explicit MneRtClientSetupBabyMegWidget(QWidget *parent = 0);
+    explicit MneRtClientSetupBabyMegWidget(MneRtClient* p_pMneRtClient, QWidget *parent = 0);
     ~MneRtClientSetupBabyMegWidget();
     
 private:
+    //=========================================================================================================
+    /**
+    * Shows the SQUID Control Dialog
+    *
+    */
+    void SQUIDControlDialog();
+
+    MneRtClient*   m_pMneRtClient;      /**< a pointer to corresponding mne rt client.*/
+
     Ui::MneRtClientSetupBabyMegWidget *ui;
+
 };
 
 } // NAMESPACE
