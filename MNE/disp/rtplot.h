@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     rtplot.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     June, 2013
 *
 * @section  LICENSE
 *
@@ -29,28 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the main() application function.
+* @brief    RtPlot class declaration
 *
 */
+#ifndef RTPLOT_H
+#define RTPLOT_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <disp/imagesc.h>
-#include <disp/plot.h>
-#include <disp/rtplot.h>
-
-#include <math.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen
-//=============================================================================================================
-
-#include <Eigen/Core>
+#include "disp_global.h"
+#include "graph.h"
 
 
 //*************************************************************************************************************
@@ -58,10 +49,29 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QApplication>
-#include <QImage>
-#include <QGraphicsView>
+#include <QWidget>
+#include <QString>
+#include <QList>
+#include <QVector>
+#include <QPointF>
+#include <QSharedPointer>
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE DISP3DLIB
+//=============================================================================================================
+
+namespace DISPLIB
+{
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -69,76 +79,83 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace DISPLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MAIN
+// FORWARD DECLARATIONS
 //=============================================================================================================
+
+
 
 //=============================================================================================================
 /**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
+* Real-time plot
 *
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+* @brief Real-time plot
 */
-int main(int argc, char *argv[])
+class DISPSHARED_EXPORT RtPlot : public Graph
 {
-    QApplication a(argc, argv);
+    Q_OBJECT
+public:
+    typedef QSharedPointer<RtPlot> SPtr;            /**< Shared pointer type for MatrixView class. */
+    typedef QSharedPointer<const RtPlot> ConstSPtr; /**< Const shared pointer type for MatrixView class. */
 
-    //ImageSc Test
-    qint32 width = 300;
-    qint32 height = 400;
-    MatrixXd mat(width,height);
+    //=========================================================================================================
+    /**
+    * Creates the RtPlot.
+    *
+    * @param[in] parent     Parent QObject (optional)
+    */
+    explicit RtPlot(QWidget *parent = 0);
 
-    for(int i = 0; i < width; ++i)
-        for(int j = 0; j < height; ++j)
-            mat(i,j) = ((double)(i+j))*0.1-1.5;
+    //=========================================================================================================
+    /**
+    * Creates the real-time plot using a given double vector.
+    *
+    * @param[in] p_dVec     The double data vector
+    * @param[in] parent     Parent QObject (optional)
+    */
+    explicit RtPlot(VectorXd &p_dVec, QWidget *parent = 0);
 
-    ImageSc imagesc(mat);
-    imagesc.setTitle("Test Matrix");
-    imagesc.setXLabel("X Axes");
-    imagesc.setYLabel("Y Axes");
+    //=========================================================================================================
+    /**
+    * Destructs the RtPlot object
+    */
+    ~RtPlot();
 
-    imagesc.setColorMap("RedBlue");//imagesc.setColorMap("Bone");//imagesc.setColorMap("Jet");//imagesc.setColorMap("Hot");
+    //=========================================================================================================
+    /**
+    * Initializes the Plot object
+    */
+    void init();
 
-    imagesc.setWindowTitle("Corresponding function to MATLABs imagesc");
-    imagesc.show();
+    //=========================================================================================================
+    /**
+    * Updates the plot using a given double vector without given X data.
+    *
+    * @param[in] p_dVec     The double data vector
+    */
+    void updateData(VectorXd &p_dVec);
 
-    //Plot Test
-    qint32 t_iSize = 100;
-    VectorXd vec(t_iSize);
-    for(int i = 0; i < t_iSize; ++i)
-    {
-        double t = 0.01 * i;
-        vec[i] = sin(2 * 3.1416 * 4 * t); //4 Hz
-    }
+protected:
+    void paintEvent(QPaintEvent*);
 
-    Plot plot(vec);
+    bool m_bHoldOn;             /**< If multiple plots */
 
-    plot.setTitle("Test Plot");
-    plot.setXLabel("X Axes");
-    plot.setYLabel("Y Axes");
+    QList<QVector<QPointF> > m_qListVecPointFPaths;
 
-    plot.setWindowTitle("Corresponding function to MATLABs plot");
-    plot.show();
+    double m_dMinX;             /**< Minimal X value */
+    double m_dMaxX;             /**< Maximal X value */
+    double m_dMinY;             /**< Minimal Y value */
+    double m_dMaxY;             /**< Maximal Y value */
+};
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
 
-    RtPlot rtplot(vec);
+} // NAMESPACE
 
-    rtplot.setTitle("Test Plot");
-    rtplot.setXLabel("X Axes");
-    rtplot.setYLabel("Y Axes");
-
-    rtplot.setWindowTitle("Rt Plot");
-    rtplot.show();
-
-
-
-
-    return a.exec();
-}
+#endif // RTPLOT_H
