@@ -87,6 +87,9 @@ private:
 public:
     MneRtClient*   m_pMneRtClient;
     void SendRetune();
+    void SendCMD(QString CMDSTR);
+    void Init();
+
 };
 
 }//namespace
