@@ -49,11 +49,15 @@ SOURCES += main.cpp \
     sink.cpp \
     dataprovider.cpp \
     databuffer.cpp \
-    display.cpp
+    display.cpp \
+    sinkmanager.cpp \
+    sourcemanager.cpp
 
 HEADERS += \
     source.h \
     sink.h \
     dataprovider.h \
     databuffer.h \
-    display.h
+    display.h \
+    sinkmanager.h \
+    sourcemanager.h
