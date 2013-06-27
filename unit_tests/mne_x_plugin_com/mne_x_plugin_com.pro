@@ -51,7 +51,8 @@ SOURCES += main.cpp \
     databuffer.cpp \
     display.cpp \
     sinkmanager.cpp \
-    sourcemanager.cpp
+    sourcemanager.cpp \
+    connectionmanager.cpp
 
 HEADERS += \
     source.h \
@@ -60,4 +61,5 @@ HEADERS += \
     databuffer.h \
     display.h \
     sinkmanager.h \
-    sourcemanager.h
+    sourcemanager.h \
+    connectionmanager.h
