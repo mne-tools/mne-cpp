@@ -105,9 +105,9 @@ double MNEMath::getConditionNumber(MatrixXd& A)
     JacobiSVD<MatrixXd> svd(A);
     VectorXd vecSingularValues = svd.singularValues();
 
-    double v = vecSingularValues.maxCoeff()/vecSingularValues.mean();
+    double c = vecSingularValues.maxCoeff()/vecSingularValues.mean();
 
-    return v;
+    return c;
 }
 
 
