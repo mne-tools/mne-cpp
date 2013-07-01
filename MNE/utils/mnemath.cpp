@@ -100,6 +100,19 @@ VectorXd* MNEMath::combine_xyz(const VectorXd& vec)
 
 //*************************************************************************************************************
 
+double MNEMath::getConditionNumber(MatrixXd& A)
+{
+    JacobiSVD<MatrixXd> svd(A);
+    VectorXd vecSingularValues = svd.singularValues();
+
+    double v = vecSingularValues.maxCoeff()/vecSingularValues.mean();
+
+    return v;
+}
+
+
+//*************************************************************************************************************
+
 void MNEMath::get_whitener(MatrixXd &A, bool pca, QString ch_type, VectorXd &eig, MatrixXd &eigvec)
 {
     // whitening operator

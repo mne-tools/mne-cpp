@@ -56,7 +56,7 @@
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
 #include <Eigen/Eigen>
-//#include <Eigen/SVD>
+#include <Eigen/SVD>
 
 
 //*************************************************************************************************************
@@ -134,6 +134,16 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the condition number of a given matrix.
+    *
+    * @param[in] A      Matrix to compute the condition number from
+    *
+    * @return the condition number
+    */
+    static double getConditionNumber(MatrixXd& A);
+
+    //=========================================================================================================
+    /**
     * Returns the whitener of a given matrix.
     *
     * @param[in] A      Matrix to compute the whitener from
@@ -142,6 +152,7 @@ public:
     * @return rank of matrix A
     */
     static void get_whitener(MatrixXd& A, bool pca, QString ch_type, VectorXd& eig, MatrixXd& eigvec);
+
 
     //=========================================================================================================
     /**
@@ -377,6 +388,7 @@ std::vector<Triplet<T> > MNEMath::sortrows(const std::vector<Triplet<T> > &A, qi
 
     return p_ASorted;
 }
+
 
 //*************************************************************************************************************
 
