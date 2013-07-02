@@ -140,7 +140,17 @@ public:
     *
     * @return the condition number
     */
-    static double getConditionNumber(MatrixXd& A);
+    static double getConditionNumber(const MatrixXd& A, VectorXd &s);
+
+    //=========================================================================================================
+    /**
+    * Returns the condition slope of a given matrix.
+    *
+    * @param[in] A      Matrix to compute the condition number from
+    *
+    * @return the condition slope
+    */
+    static double getConditionSlope(const MatrixXd& A, VectorXd &s);
 
     //=========================================================================================================
     /**

@@ -100,12 +100,25 @@ VectorXd* MNEMath::combine_xyz(const VectorXd& vec)
 
 //*************************************************************************************************************
 
-double MNEMath::getConditionNumber(MatrixXd& A)
+double MNEMath::getConditionNumber(const MatrixXd& A, VectorXd &s)
 {
     JacobiSVD<MatrixXd> svd(A);
-    VectorXd vecSingularValues = svd.singularValues();
+    s = svd.singularValues();
 
-    double c = vecSingularValues.maxCoeff()/vecSingularValues.mean();
+    double c = s.maxCoeff()/s.minCoeff();
+
+    return c;
+}
+
+
+//*************************************************************************************************************
+
+double MNEMath::getConditionSlope(const MatrixXd& A, VectorXd &s)
+{
+    JacobiSVD<MatrixXd> svd(A);
+    s = svd.singularValues();
+
+    double c = s.maxCoeff()/s.mean();
 
     return c;
 }

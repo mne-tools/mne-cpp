@@ -49,6 +49,8 @@
 
 #include <disp3D/inverseview.h>
 
+#include <utils/mnemath.h>
+
 #include <iostream>
 
 
@@ -71,6 +73,7 @@ using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace INVERSELIB;
 using namespace DISP3DLIB;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -151,6 +154,68 @@ int main(int argc, char *argv[])
     std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
     std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
     std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
+
+    //Condition Numbers
+//    MatrixXd mags(102, t_Fwd.sol->data.cols());
+//    qint32 count = 0;
+//    for(qint32 i = 2; i < 306; i += 3)
+//    {
+//        mags.row(count) = t_Fwd.sol->data.row(i);
+//        ++count;
+//    }
+//    MatrixXd magsClustered(102, t_clusteredFwd.sol->data.cols());
+//    count = 0;
+//    for(qint32 i = 2; i < 306; i += 3)
+//    {
+//        magsClustered.row(count) = t_clusteredFwd.sol->data.row(i);
+//        ++count;
+//    }
+
+//    MatrixXd grads(204, t_Fwd.sol->data.cols());
+//    count = 0;
+//    for(qint32 i = 0; i < 306; i += 3)
+//    {
+//        grads.row(count) = t_Fwd.sol->data.row(i);
+//        ++count;
+//        grads.row(count) = t_Fwd.sol->data.row(i+1);
+//        ++count;
+//    }
+//    MatrixXd gradsClustered(204, t_clusteredFwd.sol->data.cols());
+//    count = 0;
+//    for(qint32 i = 0; i < 306; i += 3)
+//    {
+//        gradsClustered.row(count) = t_clusteredFwd.sol->data.row(i);
+//        ++count;
+//        gradsClustered.row(count) = t_clusteredFwd.sol->data.row(i+1);
+//        ++count;
+//    }
+
+    VectorXd s;
+
+    double t_dConditionNumber = MNEMath::getConditionNumber(t_Fwd.sol->data, s);
+    double t_dConditionNumberClustered = MNEMath::getConditionNumber(t_clusteredFwd.sol->data, s);
+
+
+    std::cout << "Condition Number:\n" << t_dConditionNumber << std::endl;
+    std::cout << "Clustered Condition Number:\n" << t_dConditionNumberClustered << std::endl;
+
+    std::cout << "ForwardSolution" << t_Fwd.sol->data.block(0,0,10,10) << std::endl;
+
+    std::cout << "Clustered ForwardSolution" << t_clusteredFwd.sol->data.block(0,0,10,10) << std::endl;
+
+
+//    double t_dConditionNumberMags = MNEMath::getConditionNumber(mags, s);
+//    double t_dConditionNumberMagsClustered = MNEMath::getConditionNumber(magsClustered, s);
+
+//    std::cout << "Condition Number Magnetometers:\n" << t_dConditionNumberMags << std::endl;
+//    std::cout << "Clustered Condition Number Magnetometers:\n" << t_dConditionNumberMagsClustered << std::endl;
+
+//    double t_dConditionNumberGrads = MNEMath::getConditionNumber(grads, s);
+//    double t_dConditionNumberGradsClustered = MNEMath::getConditionNumber(gradsClustered, s);
+
+//    std::cout << "Condition Number Gradiometers:\n" << t_dConditionNumberGrads << std::endl;
+//    std::cout << "Clustered Condition Number Gradiometers:\n" << t_dConditionNumberGradsClustered << std::endl;
+
 
     //Source Estimate end
     //########################################################################################
