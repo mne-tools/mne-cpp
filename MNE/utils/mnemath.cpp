@@ -100,6 +100,32 @@ VectorXd* MNEMath::combine_xyz(const VectorXd& vec)
 
 //*************************************************************************************************************
 
+double MNEMath::getConditionNumber(const MatrixXd& A, VectorXd &s)
+{
+    JacobiSVD<MatrixXd> svd(A);
+    s = svd.singularValues();
+
+    double c = s.maxCoeff()/s.minCoeff();
+
+    return c;
+}
+
+
+//*************************************************************************************************************
+
+double MNEMath::getConditionSlope(const MatrixXd& A, VectorXd &s)
+{
+    JacobiSVD<MatrixXd> svd(A);
+    s = svd.singularValues();
+
+    double c = s.maxCoeff()/s.mean();
+
+    return c;
+}
+
+
+//*************************************************************************************************************
+
 void MNEMath::get_whitener(MatrixXd &A, bool pca, QString ch_type, VectorXd &eig, MatrixXd &eigvec)
 {
     // whitening operator
