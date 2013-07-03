@@ -248,6 +248,18 @@ bool MNEMath::issparse(VectorXd &v)
 
 //*************************************************************************************************************
 
+MatrixXd MNEMath::legendre(qint32 n, const VectorXd &X, QString normalize)
+{
+    MatrixXd y;
+
+    //ToDo
+
+    return y;
+}
+
+
+//*************************************************************************************************************
+
 SparseMatrix<double>* MNEMath::make_block_diag(const MatrixXd &A, qint32 n)
 {
 
