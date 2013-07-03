@@ -168,6 +168,19 @@ public:
 
     //=========================================================================================================
     /**
+    * LEGENDRE Associated Legendre function.
+    *
+    *   P = LEGENDRE(N,X) computes the associated Legendre functions
+    *   of degree N and order M = 0, 1, ..., N, evaluated for each element
+    *   of X.  N must be a scalar integer and X must contain real values
+    *   between -1 <= X <= 1.
+    *
+    * @return associated Legendre functions
+    */
+    static MatrixXd legendre(qint32 n, const VectorXd &X, QString normalize = QString("unnorm"));
+
+    //=========================================================================================================
+    /**
     * ToDo make this a template function
     *
     * ### MNE toolbox root function ###: Implementation of the mne_block_diag function - encoding part
