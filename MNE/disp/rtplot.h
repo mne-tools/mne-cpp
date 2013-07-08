@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     mnertclientsetupbabymegwidget.h
+* @file     rtplot.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     June, 2013
 *
 * @section  LICENSE
 *
@@ -29,80 +29,133 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the MneRtClientSetupBabyMegWidget class.
+* @brief    RtPlot class declaration
 *
 */
-
-#ifndef MNERTCLIENTSETUPBABYMEGWIDGET_H
-#define MNERTCLIENTSETUPBABYMEGWIDGET_H
-
+#ifndef RTPLOT_H
+#define RTPLOT_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
+#include "disp_global.h"
+#include "graph.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
 #include <QWidget>
+#include <QString>
+#include <QList>
+#include <QVector>
+#include <QPointF>
 #include <QSharedPointer>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// Eigen INCLUDES
 //=============================================================================================================
 
-namespace Ui {
-class MneRtClientSetupBabyMegWidget;
-}
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MneRtClientPlugin
+// DEFINE NAMESPACE DISP3DLIB
 //=============================================================================================================
 
-namespace MneRtClientPlugin
+namespace DISPLIB
 {
 
 //*************************************************************************************************************
 //=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace Eigen;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneRtClient;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS MneRtClientSetupBabyMegWidget
+* Real-time plot
 *
-* @brief The MneRtClientSetupBabyMegWidget class provides the BabyMEG configuration window.
+* @brief Real-time plot
 */
-class MneRtClientSetupBabyMegWidget : public QWidget
+class DISPSHARED_EXPORT RtPlot : public Graph
 {
     Q_OBJECT
-    
 public:
-    typedef QSharedPointer<MneRtClientSetupBabyMegWidget> SPtr;              /**< Shared pointer type for MneRtClientSetupBabyMegWidget. */
-    typedef QSharedPointer<const MneRtClientSetupBabyMegWidget> ConstSPtr;   /**< Const shared pointer type for MneRtClientSetupBabyMegWidget. */
+    typedef QSharedPointer<RtPlot> SPtr;            /**< Shared pointer type for MatrixView class. */
+    typedef QSharedPointer<const RtPlot> ConstSPtr; /**< Const shared pointer type for MatrixView class. */
 
-    explicit MneRtClientSetupBabyMegWidget(MneRtClient* p_pMneRtClient, QWidget *parent = 0);
-    ~MneRtClientSetupBabyMegWidget();
-    
-private:
     //=========================================================================================================
     /**
-    * Shows the SQUID Control Dialog
+    * Creates the RtPlot.
     *
+    * @param[in] parent     Parent QObject (optional)
     */
-    void SQUIDControlDialog();
+    explicit RtPlot(QWidget *parent = 0);
 
-    MneRtClient*   m_pMneRtClient;      /**< a pointer to corresponding mne rt client.*/
+    //=========================================================================================================
+    /**
+    * Creates the real-time plot using a given double vector.
+    *
+    * @param[in] p_dVec     The double data vector
+    * @param[in] parent     Parent QObject (optional)
+    */
+    explicit RtPlot(VectorXd &p_dVec, QWidget *parent = 0);
 
-    Ui::MneRtClientSetupBabyMegWidget *ui;
+    //=========================================================================================================
+    /**
+    * Destructs the RtPlot object
+    */
+    ~RtPlot();
 
+    //=========================================================================================================
+    /**
+    * Initializes the Plot object
+    */
+    void init();
+
+    //=========================================================================================================
+    /**
+    * Updates the plot using a given double vector without given X data.
+    *
+    * @param[in] p_dVec     The double data vector
+    */
+    void updateData(VectorXd &p_dVec);
+
+protected:
+    void paintEvent(QPaintEvent*);
+
+    bool m_bHoldOn;             /**< If multiple plots */
+
+    QList<QVector<QPointF> > m_qListVecPointFPaths;
+
+    double m_dMinX;             /**< Minimal X value */
+    double m_dMaxX;             /**< Maximal X value */
+    double m_dMinY;             /**< Minimal Y value */
+    double m_dMaxY;             /**< Maximal Y value */
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
 
 } // NAMESPACE
 
-#endif // MNERTCLIENTSETUPBABYMEGWIDGET_H
+#endif // RTPLOT_H

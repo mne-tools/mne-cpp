@@ -315,7 +315,7 @@
            </layout>
           </widget>
          </item>
-         <item row="5" column="2">
+         <item row="4" column="2">
           <spacer name="horizontalSpacer_3">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -380,7 +380,7 @@
            </layout>
           </widget>
          </item>
-         <item row="1" column="2" rowspan="4">
+         <item row="1" column="2" rowspan="3">
           <widget class="QGroupBox" name="m_qGroupBox_log">
            <property name="title">
             <string>Log</string>
@@ -392,27 +392,7 @@
            </layout>
           </widget>
          </item>
-         <item row="3" column="1">
-          <widget class="QGroupBox" name="FLLControls">
-           <property name="title">
-            <string>FLL Controller</string>
-           </property>
-           <widget class="QPushButton" name="m_qPushButton_SQUIDControl">
-            <property name="geometry">
-             <rect>
-              <x>85</x>
-              <y>20</y>
-              <width>151</width>
-              <height>28</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>SOUID Control</string>
-            </property>
-           </widget>
-          </widget>
-         </item>
-         <item row="4" column="1" rowspan="2">
+         <item row="3" column="1" rowspan="2">
           <spacer name="verticalSpacer">
            <property name="orientation">
             <enum>Qt::Vertical</enum>

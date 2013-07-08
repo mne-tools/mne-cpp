@@ -39,7 +39,8 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     mne_lib_tests \
-    mne_rt_tests
+    mne_rt_tests \
+    mne_x_plugin_com
 
 contains(MNECPP_CONFIG, isGui) {
     SUBDIRS += \

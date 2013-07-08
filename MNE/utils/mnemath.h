@@ -56,7 +56,7 @@
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
 #include <Eigen/Eigen>
-//#include <Eigen/SVD>
+#include <Eigen/SVD>
 
 
 //*************************************************************************************************************
@@ -134,6 +134,26 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the condition number of a given matrix.
+    *
+    * @param[in] A      Matrix to compute the condition number from
+    *
+    * @return the condition number
+    */
+    static double getConditionNumber(const MatrixXd& A, VectorXd &s);
+
+    //=========================================================================================================
+    /**
+    * Returns the condition slope of a given matrix.
+    *
+    * @param[in] A      Matrix to compute the condition number from
+    *
+    * @return the condition slope
+    */
+    static double getConditionSlope(const MatrixXd& A, VectorXd &s);
+
+    //=========================================================================================================
+    /**
     * Returns the whitener of a given matrix.
     *
     * @param[in] A      Matrix to compute the whitener from
@@ -142,6 +162,7 @@ public:
     * @return rank of matrix A
     */
     static void get_whitener(MatrixXd& A, bool pca, QString ch_type, VectorXd& eig, MatrixXd& eigvec);
+
 
     //=========================================================================================================
     /**
@@ -165,6 +186,19 @@ public:
     * @return true if sparse false otherwise;
     */
     static bool issparse(VectorXd &v);
+
+    //=========================================================================================================
+    /**
+    * LEGENDRE Associated Legendre function.
+    *
+    *   P = LEGENDRE(N,X) computes the associated Legendre functions
+    *   of degree N and order M = 0, 1, ..., N, evaluated for each element
+    *   of X.  N must be a scalar integer and X must contain real values
+    *   between -1 <= X <= 1.
+    *
+    * @return associated Legendre functions
+    */
+    static MatrixXd legendre(qint32 n, const VectorXd &X, QString normalize = QString("unnorm"));
 
     //=========================================================================================================
     /**
@@ -377,6 +411,7 @@ std::vector<Triplet<T> > MNEMath::sortrows(const std::vector<Triplet<T> > &A, qi
 
     return p_ASorted;
 }
+
 
 //*************************************************************************************************************
 
