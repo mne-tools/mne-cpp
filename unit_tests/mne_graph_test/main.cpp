@@ -40,6 +40,7 @@
 
 #include <disp/imagesc.h>
 #include <disp/plot.h>
+#include <disp/rtplot.h>
 
 #include <math.h>
 
@@ -103,7 +104,7 @@ int main(int argc, char *argv[])
     imagesc.setXLabel("X Axes");
     imagesc.setYLabel("Y Axes");
 
-    imagesc.setColorMap("RedBlue");//imagesc.setColorMap("Bone");//imagesc.setColorMap("Jet");//imagesc.setColorMap("Hot");
+    imagesc.setColorMap("Jet");//imagesc.setColorMap("RedBlue");//imagesc.setColorMap("Bone");//imagesc.setColorMap("Jet");//imagesc.setColorMap("Hot");
 
     imagesc.setWindowTitle("Corresponding function to MATLABs imagesc");
     imagesc.show();
@@ -125,6 +126,18 @@ int main(int argc, char *argv[])
 
     plot.setWindowTitle("Corresponding function to MATLABs plot");
     plot.show();
+
+
+    RtPlot rtplot(vec);
+
+    rtplot.setTitle("Test Plot");
+    rtplot.setXLabel("X Axes");
+    rtplot.setYLabel("Y Axes");
+
+    rtplot.setWindowTitle("Rt Plot");
+    rtplot.show();
+
+
 
 
     return a.exec();

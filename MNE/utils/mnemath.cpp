@@ -100,6 +100,32 @@ VectorXd* MNEMath::combine_xyz(const VectorXd& vec)
 
 //*************************************************************************************************************
 
+double MNEMath::getConditionNumber(const MatrixXd& A, VectorXd &s)
+{
+    JacobiSVD<MatrixXd> svd(A);
+    s = svd.singularValues();
+
+    double c = s.maxCoeff()/s.minCoeff();
+
+    return c;
+}
+
+
+//*************************************************************************************************************
+
+double MNEMath::getConditionSlope(const MatrixXd& A, VectorXd &s)
+{
+    JacobiSVD<MatrixXd> svd(A);
+    s = svd.singularValues();
+
+    double c = s.maxCoeff()/s.mean();
+
+    return c;
+}
+
+
+//*************************************************************************************************************
+
 void MNEMath::get_whitener(MatrixXd &A, bool pca, QString ch_type, VectorXd &eig, MatrixXd &eigvec)
 {
     // whitening operator
@@ -243,6 +269,18 @@ bool MNEMath::issparse(VectorXd &v)
     }
 
     return false;
+}
+
+
+//*************************************************************************************************************
+
+MatrixXd MNEMath::legendre(qint32 n, const VectorXd &X, QString normalize)
+{
+    MatrixXd y;
+
+    //ToDo
+
+    return y;
 }
 
 

@@ -42,7 +42,7 @@
 #include "mnertclientaboutwidget.h"
 
 #include "mnertclientsetupbabymegwidget.h"
-#include "mnertclientsquidcontroldgl.h"
+//#include "mnertclientsquidcontroldgl.h"
 
 #include "../mnertclient.h"
 
@@ -75,7 +75,7 @@ MneRtClientSetupWidget::MneRtClientSetupWidget(MneRtClient* p_pMneRtClient, QWid
 , m_pMneRtClient(p_pMneRtClient)
 , m_pMneRtClientSetupFiffFileSimulatorWidget(new MneRtClientSetupFiffFileSimulatorWidget)
 , m_pMneRtClientSetupNeuromagWidget(new MneRtClientSetupNeuromagWidget)
-, m_pMneRtClientSetupBabyMegWidget(new MneRtClientSetupBabyMegWidget)
+, m_pMneRtClientSetupBabyMegWidget(new MneRtClientSetupBabyMegWidget(p_pMneRtClient))
 , m_bIsInit(false)
 {
     ui.setupUi(this);
@@ -112,8 +112,8 @@ MneRtClientSetupWidget::MneRtClientSetupWidget(MneRtClient* p_pMneRtClient, QWid
     //About
     connect(ui.m_qPushButton_About, &QPushButton::released, this, &MneRtClientSetupWidget::showAboutDialog);
 
-    //SQUID Control
-    connect(ui.m_qPushButton_SQUIDControl, &QPushButton::released, this, &MneRtClientSetupWidget::SQUIDControlDialog);
+//    //SQUID Control
+//    connect(ui.m_qPushButton_SQUIDControl, &QPushButton::released, this, &MneRtClientSetupWidget::SQUIDControlDialog);
 
     this->init();
 }
@@ -326,10 +326,10 @@ void MneRtClientSetupWidget::showAboutDialog()
 }
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-void MneRtClientSetupWidget::SQUIDControlDialog()
-{
-    mnertclientSQUIDControlDgl SQUIDCtrlDlg(m_pMneRtClient,this);
-    SQUIDCtrlDlg.exec();
-}
+//void MneRtClientSetupWidget::SQUIDControlDialog()
+//{
+//    mnertclientSQUIDControlDgl SQUIDCtrlDlg(m_pMneRtClient,this);
+//    SQUIDCtrlDlg.exec();
+//}
