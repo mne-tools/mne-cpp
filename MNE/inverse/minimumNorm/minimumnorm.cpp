@@ -101,6 +101,7 @@ SourceEstimate MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, boo
         return SourceEstimate();
     }
 
+    //ToDo his could be heavily accelerated for real time calculation -> ToDo calculate inverse RT
     MNEInverseOperator inv = m_inverseOperator.prepare_inverse_operator(nave, m_fLambda, m_bdSPM, m_bsLORETA);
     //
     //   Pick the correct channels from the data
@@ -115,6 +116,7 @@ SourceEstimate MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, boo
     QList<VectorXi> vertno;
     Label label;
     inv.assemble_kernel(label, m_sMethod, pick_normal, K, noise_norm, vertno);
+
     MatrixXd sol = K * t_fiffEvoked.data; //apply imaging kernel
 
     if (inv.source_ori == FIFFV_MNE_FREE_ORI)
