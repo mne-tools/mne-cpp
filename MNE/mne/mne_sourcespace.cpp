@@ -432,7 +432,7 @@ bool MNESourceSpace::read_source_space(FiffStream* p_pStream, const FiffDirTree&
     FiffTag::SPtr t_pTag2;
     if(!p_Tree.find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NUSE_TRI, t_pTag1) || !p_Tree.find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES, t_pTag2))
     {
-        MatrixX3i p_defaultMatrix(0, 0);
+        MatrixX3i p_defaultMatrix;
         p_Hemisphere.nuse_tri = 0;
         p_Hemisphere.use_tris = p_defaultMatrix;
     }
