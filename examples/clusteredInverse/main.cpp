@@ -103,9 +103,9 @@ int main(int argc, char *argv[])
 
 //    QFile t_fileClusteredInverse("./clusteredInverse-inv.fif");
 
-    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
-    QFile t_fileCov("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
-    QFile t_fileEvoked("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-ave.fif");
+    QFile t_fileFwd("/home/chdinh/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
+    QFile t_fileCov("/home/chdinh/sl_data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
+    QFile t_fileEvoked("/home/chdinh/sl_data/MEG/mind006/mind006_051209_auditory01_raw-ave.fif");
 
     QFile t_fileClusteredInverse("./clusteredInverse-inv.fif");
 
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
         return 1;
 
 //    AnnotationSet t_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
-    AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
+    AnnotationSet t_annotationSet("/home/chdinh/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "/home/chdinh/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
 
 
     FiffCov noise_cov(t_fileCov);
@@ -229,10 +229,10 @@ int main(int argc, char *argv[])
     //########################################################################################
 
 //    AnnotationSet t_annotSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot","./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
-    AnnotationSet t_annotSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
+    AnnotationSet t_annotSet("/home/chdinh/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "/home/chdinh/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
 
 //    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
-    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
+    SurfaceSet t_surfSet("/home/chdinh/sl_data/subjects/mind006/surf/lh.white", "/home/chdinh/sl_data/subjects/mind006/surf/rh.white");
 
 
     QList<Label> t_qListLabels;
