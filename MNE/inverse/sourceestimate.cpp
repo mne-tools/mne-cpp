@@ -100,6 +100,26 @@ void SourceEstimate::clear()
 
 //*************************************************************************************************************
 
+SourceEstimate SourceEstimate::reduce(qint32 start, qint32 n)
+{
+    SourceEstimate p_sourceEstimateReduced;
+
+    qint32 rows = this->data.rows();
+
+    p_sourceEstimateReduced.data = MatrixXd::Zero(rows,n);
+    p_sourceEstimateReduced.data = this->data.block(0, start, rows, n);
+    p_sourceEstimateReduced.vertno = this->vertno;
+    p_sourceEstimateReduced.times = RowVectorXf::Zero(n);
+    p_sourceEstimateReduced.times = this->times.block(start,0,1,n);
+    p_sourceEstimateReduced.tmin = p_sourceEstimateReduced.times(0);
+    p_sourceEstimateReduced.tstep = this->tstep;
+
+    return p_sourceEstimateReduced;
+}
+
+
+//*************************************************************************************************************
+
 void SourceEstimate::update_times()
 {
     if(data.cols() > 0)

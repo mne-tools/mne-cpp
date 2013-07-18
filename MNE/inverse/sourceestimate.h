@@ -127,6 +127,15 @@ public:
 
     //=========================================================================================================
     /**
+    * Reduces the source estimate to selected samples.
+    *
+    * @param[in] start  The start index to cut the estimate from.
+    * @param[in] n      Number of samples to cut from start index.
+    */
+    SourceEstimate reduce(qint32 start, qint32 n);
+
+    //=========================================================================================================
+    /**
     * Returns whether SourceEstimate is empty.
     *
     * @return true if is empty, false otherwise
