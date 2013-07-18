@@ -218,12 +218,10 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
 //    std::cout << "ctrs" << std::endl << ctrs << std::endl;
 //    std::cout << "sumd" << std::endl << sumd << std::endl;
 //    std::cout << "D" << std::endl << D << std::endl;
+//    //DEBUG END
 
 
-    //DEBUG END
-
-
-    KMeans t_kMeans(QString("sqeuclidean"), QString("sample"), 5);//QString("sqeuclidean")//QString("sample")//cityblock
+    KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);//QString("sqeuclidean")//QString("sample")//cityblock
     MatrixXd t_LF_new;
 
     qint32 count;
@@ -280,8 +278,6 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
                     }
                 }
                 idcs.conservativeResize(c);
-
-//                VectorXi idcs_triplet = tripletSelection(idcs);//ToDo obsolete: use block instead
 
                 //get selected LF
                 MatrixXd t_LF(this->sol->data.rows(), idcs.rows()*3);
