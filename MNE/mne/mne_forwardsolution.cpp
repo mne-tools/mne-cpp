@@ -180,50 +180,48 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
 //    }
 
 
-    //DEBUG
-    MatrixXd test(20,3);
-    test << 0.537667139546100, 1.83388501459509, -2.25884686100365,
-            0.862173320368121, 0.318765239858981, -1.30768829630527,
-            -0.433592022305684, 0.342624466538650, 3.57839693972576,
-            2.76943702988488, -1.34988694015652, 3.03492346633185,
-            0.725404224946106, -0.0630548731896562, 0.714742903826096,
-            -0.204966058299775, -0.124144348216312, 1.48969760778547,
-            1.40903448980048, 1.41719241342961, 0.671497133608081,
-            -1.20748692268504, 0.717238651328839, 1.63023528916473,
-            0.488893770311789, 1.03469300991786, 0.726885133383238,
-            -0.303440924786016, 0.293871467096658, -0.787282803758638,
-            0.888395631757642, -1.14707010696915, -1.06887045816803,
-            -0.809498694424876, -2.94428416199490, 1.43838029281510,
-            0.325190539456198, -0.754928319169703, 1.37029854009523,
-            -1.71151641885370, -0.102242446085491, -0.241447041607358,
-            0.319206739165502, 0.312858596637428, -0.864879917324457,
-            -0.0300512961962686, -0.164879019209038, 0.627707287528727,
-            1.09326566903948, 1.10927329761440, -0.863652821988714,
-            0.0773590911304249, -1.21411704361541, -1.11350074148676,
-            -0.00684932810334806, 1.53263030828475, -0.769665913753682,
-            0.371378812760058, -0.225584402271252, 1.11735613881447;
+//    //DEBUG
+//    MatrixXd test(20,3);
+//    test << 0.537667139546100, 1.83388501459509, -2.25884686100365,
+//            0.862173320368121, 0.318765239858981, -1.30768829630527,
+//            -0.433592022305684, 0.342624466538650, 3.57839693972576,
+//            2.76943702988488, -1.34988694015652, 3.03492346633185,
+//            0.725404224946106, -0.0630548731896562, 0.714742903826096,
+//            -0.204966058299775, -0.124144348216312, 1.48969760778547,
+//            1.40903448980048, 1.41719241342961, 0.671497133608081,
+//            -1.20748692268504, 0.717238651328839, 1.63023528916473,
+//            0.488893770311789, 1.03469300991786, 0.726885133383238,
+//            -0.303440924786016, 0.293871467096658, -0.787282803758638,
+//            0.888395631757642, -1.14707010696915, -1.06887045816803,
+//            -0.809498694424876, -2.94428416199490, 1.43838029281510,
+//            0.325190539456198, -0.754928319169703, 1.37029854009523,
+//            -1.71151641885370, -0.102242446085491, -0.241447041607358,
+//            0.319206739165502, 0.312858596637428, -0.864879917324457,
+//            -0.0300512961962686, -0.164879019209038, 0.627707287528727,
+//            1.09326566903948, 1.10927329761440, -0.863652821988714,
+//            0.0773590911304249, -1.21411704361541, -1.11350074148676,
+//            -0.00684932810334806, 1.53263030828475, -0.769665913753682,
+//            0.371378812760058, -0.225584402271252, 1.11735613881447;
 
-    std::cout << test << std::endl;
+//    std::cout << test << std::endl;
 
-    VectorXi idx;
-    MatrixXd ctrs;
-    VectorXd sumd;
-    MatrixXd D;
+//    VectorXi idx;
+//    MatrixXd ctrs;
+//    VectorXd sumd;
+//    MatrixXd D;
 
-    KMeans testK(QString("cityblock"), QString("sample"), 5);//QString("sqeuclidean")//QString("sample")
+//    KMeans testK(QString("cityblock"), QString("sample"), 5);//QString("sqeuclidean")//QString("sample")
 
-    testK.calculate(test, 2, idx, ctrs, sumd, D);
+//    testK.calculate(test, 2, idx, ctrs, sumd, D);
 
-    std::cout << "idx" << std::endl << idx << std::endl;
-    std::cout << "ctrs" << std::endl << ctrs << std::endl;
-    std::cout << "sumd" << std::endl << sumd << std::endl;
-    std::cout << "D" << std::endl << D << std::endl;
-
-
-    //DEBUG END
+//    std::cout << "idx" << std::endl << idx << std::endl;
+//    std::cout << "ctrs" << std::endl << ctrs << std::endl;
+//    std::cout << "sumd" << std::endl << sumd << std::endl;
+//    std::cout << "D" << std::endl << D << std::endl;
+//    //DEBUG END
 
 
-    KMeans t_kMeans(QString("sqeuclidean"), QString("sample"), 5);//QString("sqeuclidean")//QString("sample")//cityblock
+    KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);//QString("sqeuclidean")//QString("sample")//cityblock
     MatrixXd t_LF_new;
 
     qint32 count;
@@ -289,6 +287,15 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
                 for(qint32 j = 0; j < idcs.rows(); ++j)
                     t_LF.block(0, j*3, t_LF.rows(), 3) = this->sol->data.block(0, (idcs[j]+offset)*3, t_LF.rows(), 3);
 
+                //DEBUG
+
+                std::cout << "Dimension: " << t_LF.rows() << "x" << t_LF.cols() << std::endl;
+
+                std::cout << t_LF.block(296,59,10,10) << std::endl;
+
+                //DEBUG END
+
+
                 qint32 nSens = t_LF.rows();
                 qint32 nSources = t_LF.cols()/3;
                 qint32 nClusters = 0;
@@ -316,6 +323,14 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
                     MatrixXd D;
 
                     t_kMeans.calculate(t_sensLF, nClusters, roiIdx, ctrs, sumd, D);
+
+
+                    //DEBUG
+                    std::cout << "\nCentroids " << ctrs.rows() << "x" << ctrs.cols() << std::endl;
+                    std::cout << ctrs << std::endl;
+                    //DEBUG END
+
+
 
                     //
                     // Assign the centroid for each cluster to the partial LF
