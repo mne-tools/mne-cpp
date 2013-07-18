@@ -374,7 +374,8 @@ bool KMeans::batchUpdate(const MatrixXd& X, MatrixXd& C, VectorXi& idx)
         {
             if (m_sEmptyact.compare("error") == 0)
             {
-                throw 0;
+                return converged;
+//                throw 0;
             }
             else if (m_sEmptyact.compare("drop") == 0)
             {
