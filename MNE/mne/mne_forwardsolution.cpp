@@ -279,22 +279,11 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
                 }
                 idcs.conservativeResize(c);
 
-//                VectorXi idcs_triplet = tripletSelection(idcs);//ToDo obsolete: use block instead
-
                 //get selected LF
                 MatrixXd t_LF(this->sol->data.rows(), idcs.rows()*3);
 
                 for(qint32 j = 0; j < idcs.rows(); ++j)
                     t_LF.block(0, j*3, t_LF.rows(), 3) = this->sol->data.block(0, (idcs[j]+offset)*3, t_LF.rows(), 3);
-
-                //DEBUG
-
-                std::cout << "Dimension: " << t_LF.rows() << "x" << t_LF.cols() << std::endl;
-
-                std::cout << t_LF.block(296,59,10,10) << std::endl;
-
-                //DEBUG END
-
 
                 qint32 nSens = t_LF.rows();
                 qint32 nSources = t_LF.cols()/3;
@@ -323,14 +312,6 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
                     MatrixXd D;
 
                     t_kMeans.calculate(t_sensLF, nClusters, roiIdx, ctrs, sumd, D);
-
-
-                    //DEBUG
-                    std::cout << "\nCentroids " << ctrs.rows() << "x" << ctrs.cols() << std::endl;
-                    std::cout << ctrs << std::endl;
-                    //DEBUG END
-
-
 
                     //
                     // Assign the centroid for each cluster to the partial LF
