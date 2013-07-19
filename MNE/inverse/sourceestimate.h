@@ -142,6 +142,16 @@ public:
     */
     inline bool isEmpty();
 
+    //=========================================================================================================
+    /**
+    * Assignment Operator
+    *
+    * @param[in] rhs     SourceEstimate which should be assigned.
+    *
+    * @return the copied source estimate
+    */
+    SourceEstimate& operator= (const SourceEstimate &rhs);
+
 public:
     MatrixXd data;          /**< Matrix of shape [n_dipoles x n_times] which contains the data in source space. */
     QList<VectorXi> vertno; /**< The indices of the dipoles in the different source spaces. */ //ToDo define is_clustered_result; change vertno to ROI idcs
