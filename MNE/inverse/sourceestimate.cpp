@@ -132,3 +132,20 @@ void SourceEstimate::update_times()
     else
         this->times = RowVectorXf();
 }
+
+
+//*************************************************************************************************************
+
+SourceEstimate& SourceEstimate::operator= (const SourceEstimate &rhs)
+{
+    if (this != &rhs) // protect against invalid self-assignment
+    {
+        data = rhs.data;
+        vertno = rhs.vertno;
+        times = rhs.times;
+        tmin = rhs.tmin;
+        tstep = rhs.tstep;
+    }
+    // to support chained assignment operators (a=b=c), always return *this
+    return *this;
+}
