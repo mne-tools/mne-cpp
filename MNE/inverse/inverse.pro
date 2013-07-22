@@ -63,6 +63,16 @@ else {
             -lMNE$${MNE_LIB_VERSION}Mne
 }
 
+# OpenMP
+win32 {
+    QMAKE_CXXFLAGS+= -openmp
+    QMAKE_LFLAGS +=  -openmp
+}
+unix {
+    QMAKE_CXXFLAGS+= -fopenmp
+    QMAKE_LFLAGS +=  -fopenmp
+}
+
 DESTDIR = $${MNE_LIBRARY_DIR}
 
 #
@@ -81,14 +91,16 @@ win32 {
 SOURCES += \
     sourceestimate.cpp \
     minimumNorm/minimumnorm.cpp \
-    rapMusic/rapmusic.cpp
+    rapMusic/rapmusic.cpp \
+    rapMusic/dipole.cpp
 
 HEADERS +=\
     inverse_global.h \
     IInverseAlgorithm.h \
     sourceestimate.h \
     minimumNorm/minimumnorm.h \
-    rapMusic/rapmusic.h
+    rapMusic/rapmusic.h \
+    rapMusic/dipole.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
