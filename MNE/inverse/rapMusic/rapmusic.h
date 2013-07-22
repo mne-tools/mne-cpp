@@ -75,7 +75,7 @@ public:
 
     virtual ~RapMusic(){}
 
-    virtual SourceEstimate calculateInverse() const;
+    virtual SourceEstimate calculateInverse();
 
     virtual const char* getName() const;
 

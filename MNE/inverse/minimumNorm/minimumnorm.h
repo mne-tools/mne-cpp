@@ -45,6 +45,7 @@
 #include "../IInverseAlgorithm.h"
 
 #include <mne/mne_inverse_operator.h>
+#include <fs/label.h>
 
 #include <QSharedPointer>
 
@@ -69,6 +70,7 @@ namespace INVERSELIB
 //=============================================================================================================
 
 using namespace MNELIB;
+using namespace FSLIB;
 
 
 //=============================================================================================================
@@ -121,7 +123,12 @@ public:
     *
     * @return the calculated source estimation
     */
-    virtual SourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false) const;
+    virtual SourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false);
+
+    virtual SourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep) const;
+
+    virtual void doInverseSetup(qint32 nave, bool pick_normal = false);
+
 
     virtual const char* getName() const;
 
@@ -158,6 +165,14 @@ private:
     QString m_sMethod;                      /**< Selected method */
     bool m_bsLORETA;                        /**< Do sLORETA method */
     bool m_bdSPM;                           /**< Do dSPM method */
+
+    bool inverseSetup;                      /**< Inverse Setup Calcluated */
+    MNEInverseOperator inv;                 /**< The setup inverse operator */
+    SparseMatrix<double> noise_norm;        /**< The noise normalization */
+    QList<VectorXi> vertno;                 /**< The vertices numbers */
+    Label label;                            /**< The corresponding labels */
+    MatrixXd K;                             /**< Imaging kernel */
+
 };
 
 } //NAMESPACE

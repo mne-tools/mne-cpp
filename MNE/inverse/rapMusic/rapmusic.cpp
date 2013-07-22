@@ -62,7 +62,7 @@ RapMusic::RapMusic()
 
 //*************************************************************************************************************
 
-SourceEstimate RapMusic::calculateInverse() const
+SourceEstimate RapMusic::calculateInverse()
 {
     SourceEstimate p_SourceEstimate;
 
