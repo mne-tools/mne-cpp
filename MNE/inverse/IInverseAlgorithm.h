@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include <QString>
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -73,6 +74,7 @@ namespace INVERSELIB
 
 using namespace FIFFLIB;
 using namespace MNELIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -108,7 +110,19 @@ public:
     *
     * @return the calculated source estimation
     */
-    virtual SourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false) const = 0;
+    virtual SourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false) = 0;
+
+    //=========================================================================================================
+    /**
+    * Applies the inverse algorithm to input data and returns a source estimate.
+    *
+    * @param[in] p_fiffEvoked   Evoked data.
+    * @param[in] tmin           Minimal time point
+    * @param[in] tmin           Time between two samples
+    *
+    * @return the calculated source estimation
+    */
+    virtual SourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep) const = 0;
 
     //=========================================================================================================
     /**

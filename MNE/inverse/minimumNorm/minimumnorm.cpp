@@ -42,7 +42,6 @@
 #include "../sourceestimate.h"
 
 #include <fiff/fiff_evoked.h>
-#include <fs/label.h>
 
 
 //*************************************************************************************************************
@@ -59,7 +58,6 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FSLIB;
 using namespace MNELIB;
 using namespace INVERSELIB;
 
@@ -71,6 +69,7 @@ using namespace INVERSELIB;
 
 MinimumNorm::MinimumNorm(const MNEInverseOperator &p_inverseOperator, float lambda, const QString method)
 : m_inverseOperator(p_inverseOperator)
+, inverseSetup(false)
 {
     this->setRegularization(lambda);
     this->setMethod(method);
@@ -80,6 +79,7 @@ MinimumNorm::MinimumNorm(const MNEInverseOperator &p_inverseOperator, float lamb
 
 MinimumNorm::MinimumNorm(const MNEInverseOperator &p_inverseOperator, float lambda, bool dSPM, bool sLORETA)
 : m_inverseOperator(p_inverseOperator)
+, inverseSetup(false)
 {
     this->setRegularization(lambda);
     this->setMethod(dSPM, sLORETA);
@@ -88,7 +88,7 @@ MinimumNorm::MinimumNorm(const MNEInverseOperator &p_inverseOperator, float lamb
 
 //*************************************************************************************************************
 
-SourceEstimate MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal) const
+SourceEstimate MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal)
 {
     //
     //   Set up the inverse according to the parameters
@@ -101,23 +101,99 @@ SourceEstimate MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, boo
         return SourceEstimate();
     }
 
-    //ToDo his could be heavily accelerated for real time calculation -> ToDo calculate inverse RT
-    MNEInverseOperator inv = m_inverseOperator.prepare_inverse_operator(nave, m_fLambda, m_bdSPM, m_bsLORETA);
+    doInverseSetup(nave,pick_normal);
+
     //
     //   Pick the correct channels from the data
     //
     FiffEvoked t_fiffEvoked = p_fiffEvoked.pick_channels(inv.noise_cov->names);
 
     printf("Picked %d channels from the data\n",t_fiffEvoked.info.nchan);
-    printf("Computing inverse...");
 
-    MatrixXd K;
-    SparseMatrix<double> noise_norm;
-    QList<VectorXi> vertno;
-    Label label;
-    inv.assemble_kernel(label, m_sMethod, pick_normal, K, noise_norm, vertno);
+    //Results
+    float tmin = ((float)t_fiffEvoked.first) / t_fiffEvoked.info.sfreq;
+    float tstep = 1/t_fiffEvoked.info.sfreq;
 
-    MatrixXd sol = K * t_fiffEvoked.data; //apply imaging kernel
+    return calculateInverse(t_fiffEvoked.data, tmin, tstep);
+
+//    //
+//    //   Set up the inverse according to the parameters
+//    //
+//    qint32 nave = p_fiffEvoked.nave;
+
+//    if(!m_inverseOperator.check_ch_names(p_fiffEvoked.info))
+//    {
+//        qWarning("Channel name check failed.");
+//        return SourceEstimate();
+//    }
+
+//    //ToDo his could be heavily accelerated for real time calculation -> ToDo calculate inverse RT
+//    MNEInverseOperator inv = m_inverseOperator.prepare_inverse_operator(nave, m_fLambda, m_bdSPM, m_bsLORETA);
+//    //
+//    //   Pick the correct channels from the data
+//    //
+//    FiffEvoked t_fiffEvoked = p_fiffEvoked.pick_channels(inv.noise_cov->names);
+
+//    printf("Picked %d channels from the data\n",t_fiffEvoked.info.nchan);
+//    printf("Computing inverse...");
+
+//    MatrixXd K;
+//    SparseMatrix<double> noise_norm;
+//    QList<VectorXi> vertno;
+//    Label label;
+//    inv.assemble_kernel(label, m_sMethod, pick_normal, K, noise_norm, vertno);
+
+//    MatrixXd sol = K * t_fiffEvoked.data; //apply imaging kernel
+
+//    if (inv.source_ori == FIFFV_MNE_FREE_ORI)
+//    {
+//        printf("combining the current components...");
+//        MatrixXd sol1(sol.rows()/3,sol.cols());
+//        for(qint32 i = 0; i < sol.cols(); ++i)
+//        {
+//            VectorXd* tmp = MNEMath::combine_xyz(sol.block(0,i,sol.rows(),1));
+//            sol1.block(0,i,sol.rows()/3,1) = tmp->cwiseSqrt();
+//            delete tmp;
+//        }
+//        sol.resize(sol1.rows(),sol1.cols());
+//        sol = sol1;
+//    }
+
+//    if (m_bdSPM)
+//    {
+//        printf("(dSPM)...");
+//        sol = inv.noisenorm*sol;
+//    }
+//    else if (m_bsLORETA)
+//    {
+//        printf("(sLORETA)...");
+//        sol = inv.noisenorm*sol;
+//    }
+//    printf("[done]\n");
+
+//    //Results
+//    float tmin = ((float)t_fiffEvoked.first) / t_fiffEvoked.info.sfreq;
+//    float tstep = 1/t_fiffEvoked.info.sfreq;
+
+//    QList<VectorXi> t_qListVertices;
+//    for(qint32 h = 0; h < inv.src.size(); ++h)
+//        t_qListVertices.push_back(inv.src[h].vertno);
+
+//    return SourceEstimate(sol, t_qListVertices, tmin, tstep);
+}
+
+
+//*************************************************************************************************************
+
+SourceEstimate MinimumNorm::calculateInverse(const MatrixXd &data, float tmin, float tstep) const
+{
+    if(!inverseSetup)
+    {
+        qWarning("Inverse not setup -> call doInverseSetup first!");
+        return SourceEstimate();
+    }
+
+    MatrixXd sol = K * data; //apply imaging kernel
 
     if (inv.source_ori == FIFFV_MNE_FREE_ORI)
     {
@@ -146,14 +222,28 @@ SourceEstimate MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, boo
     printf("[done]\n");
 
     //Results
-    float tmin = ((float)t_fiffEvoked.first) / t_fiffEvoked.info.sfreq;
-    float tstep = 1/t_fiffEvoked.info.sfreq;
-
     QList<VectorXi> t_qListVertices;
     for(qint32 h = 0; h < inv.src.size(); ++h)
         t_qListVertices.push_back(inv.src[h].vertno);
 
     return SourceEstimate(sol, t_qListVertices, tmin, tstep);
+
+}
+
+
+//*************************************************************************************************************
+
+void MinimumNorm::doInverseSetup(qint32 nave, bool pick_normal)
+{
+    //
+    //   Set up the inverse according to the parameters
+    //
+    inv = m_inverseOperator.prepare_inverse_operator(nave, m_fLambda, m_bdSPM, m_bsLORETA);
+
+    printf("Computing inverse...");
+    inv.assemble_kernel(label, m_sMethod, pick_normal, K, noise_norm, vertno);
+
+    inverseSetup = true;
 }
 
 
