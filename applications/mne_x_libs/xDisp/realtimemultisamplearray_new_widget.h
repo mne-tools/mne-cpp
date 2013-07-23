@@ -247,11 +247,12 @@ private:
     QPainterPath                    m_qPainterPath;                 /**< Holds the current painter path which is the real-time curve. */
     QPainterPath                    m_qPainterPathTest;
     QVector<QPainterPath>           m_qVecPainterPath;
-    QVector<QPolygonF>              m_qVecPolygonF;
+    QVector<QPolygonF>              m_qVecPolygonF; //New
 
     QPainterPath                    m_qPainterPath_Freeze;          /**< Holds the frozen painter path which is the frozen real-time curve. */
     QPainterPath                    m_qPainterPath_FreezeTest;
     QVector<QPainterPath>           m_qVecPainterPath_Freeze;
+    QVector<QPolygonF>              m_qVecPolygonF_Freeze; //New
 
     QMutex                          m_qMutex;                       /**< Holds a mutex to make the access to the painter path thread safe. */
     bool                            m_bMeasurement;                 /**< Holds current status whether curve measurement is active (left mouse). */
