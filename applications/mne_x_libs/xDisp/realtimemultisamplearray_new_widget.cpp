@@ -138,7 +138,7 @@ RealTimeMultiSampleArrayNewWidget::~RealTimeMultiSampleArrayNewWidget()
 
 void RealTimeMultiSampleArrayNewWidget::actualize()
 {
-    m_dPosY = ui.m_qFrame->pos().y()+0.5*ui.m_qFrame->height();
+    m_dPosY = ui.m_qFrame->pos().y();//+0.5*ui.m_qFrame->height();
 
 
     // Compute scaling factor
@@ -221,18 +221,10 @@ void RealTimeMultiSampleArrayNewWidget::update(Subject*)
 
         for(unsigned int k = 0; k < m_uiNumChannels; ++k)
         {
-//            m_qVecPainterPath[k] = QPainterPath();
-//            m_qVecPainterPath[k].moveTo(m_dPosition, m_dPosY-k*10); // ToDo offset over PosY has to be relative
-
             m_qVecPolygonF[k].clear();
 
             for(qint32 l = 0; l < m_iSamples; ++l)
-            {
-//                m_qVecPainterPath[k].lineTo(m_dPosition+l*m_dSampleWidth, m_dPosY-k*10);
-
-                m_qVecPolygonF[k].append(QPointF(m_dPosition+l*m_dSampleWidth,  m_dPosY-k*10));
-
-            }
+                m_qVecPolygonF[k].append(QPointF(m_dPosition+l*m_dSampleWidth, 0));
         }
         m_qMutex.unlock();
         m_bStartFlag = false;
@@ -252,48 +244,12 @@ void RealTimeMultiSampleArrayNewWidget::update(Subject*)
 
     for(unsigned char i = 0; i < m_pRTMSA_New->getMultiArraySize(); ++i)//ToDo maybe downsampling here increase step size
     {
-        vecValue = (matSamples[i].array()*m_fScaleFactor).array() - ui.m_qFrame->height();//m_dMiddle;
+        vecValue = (matSamples[i].array()*m_fScaleFactor).array();//m_dMiddle;
 
         m_qMutex.lock();
         for(unsigned int k = 0; k < m_uiNumChannels; ++k)
-        {
-//            m_qVecPainterPath[k].elementAt(i).y = m_dPosY-vecValue[k]-k*10; // ToDo offset over PosY vec has to be relative
-
-            m_qVecPolygonF[k][t_iNewSampleStart+i].setY(m_dPosY-vecValue[k]-k*10);
-        }
+            m_qVecPolygonF[k][t_iNewSampleStart+i].setY(vecValue[k]);
         m_qMutex.unlock();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//        dPositionDifference = m_dPosition - (m_dPosX+ui.m_qFrame->width());
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -346,7 +302,7 @@ void RealTimeMultiSampleArrayNewWidget::init()
 //    ui.m_qLabel_MinValue->setText(QString::number(m_pRTSM->getMinValue()));
 //    ui.m_qLabel_MaxValue->setText(QString::number(m_pRTSM->getMaxValue()));
 
-    m_uiNumChannels = 100;//m_pRTMSA_New->getNumChannels();
+    m_uiNumChannels = 10;//m_pRTMSA_New->getNumChannels();
 
     m_dMinValue_init = m_pRTMSA_New->chInfo()[0].getMinValue();
     m_dMaxValue_init = m_pRTMSA_New->chInfo()[0].getMaxValue();
@@ -447,7 +403,7 @@ void RealTimeMultiSampleArrayNewWidget::paintEvent(QPaintEvent*)
 //	painter.setPen(QPen(Qt::gray, 1, Qt::DotLine));
 //	painter.drawLine(m_dPosX, usHeight/2, usWidth, usHeight/2);
 
-    painter.setPen(QPen(Qt::red, 1, Qt::SolidLine));
+    painter.setPen(QPen(Qt::darkBlue, 1, Qt::SolidLine));
     painter.setRenderHint(QPainter::Antialiasing);
 
 
@@ -475,12 +431,20 @@ void RealTimeMultiSampleArrayNewWidget::paintEvent(QPaintEvent*)
 //    }
 
 
-        m_qMutex.lock();
+    painter.save();
 
-        for(unsigned int k = 0; k < m_uiNumChannels; ++k)
-            painter.drawPolyline(m_qVecPolygonF[k]);
-        m_qMutex.unlock();
+    m_qMutex.lock();
 
+    qint32 t_iDist = ui.m_qFrame->height() / (m_uiNumChannels);
+
+    for(quint32 k = 0; k < m_uiNumChannels; ++k)
+    {
+        painter.translate(0, t_iDist);
+        painter.drawPolyline(m_qVecPolygonF[k]);
+    }
+    m_qMutex.unlock();
+
+    painter.restore();
 
     //*************************************************************************************************************
     //=============================================================================================================
