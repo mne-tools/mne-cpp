@@ -208,9 +208,7 @@ void RealTimeMultiSampleArrayNewWidget::minValueChanged(double minValue)
 void RealTimeMultiSampleArrayNewWidget::update(Subject*)
 {
     VectorXd vecValue = VectorXd::Zero(m_uiNumChannels);
-    double dPositionDifference = 0.0;
     QVector< VectorXd > matSamples = m_pRTMSA_New->getMultiSampleArray();
-
 
     if(m_bStartFlag)
     {
@@ -228,6 +226,8 @@ void RealTimeMultiSampleArrayNewWidget::update(Subject*)
         }
         m_qMutex.unlock();
         m_bStartFlag = false;
+
+        m_pTimeCurrentDisplay->setHMS(m_pTime->hour(),m_pTime->minute(),m_pTime->second(),m_pTime->msec());
     }
 
 
@@ -251,7 +251,8 @@ void RealTimeMultiSampleArrayNewWidget::update(Subject*)
             m_qVecPolygonF[k][t_iNewSampleStart+i].setY(vecValue[k]);
         m_qMutex.unlock();
 
-
+        if(!m_bFrozen)
+            m_pTimeCurrentDisplay->setHMS(m_pTime->hour(),m_pTime->minute(),m_pTime->second(),m_pTime->msec());
 
 //        if((dPositionDifference >= 0) || m_bStartFlag)
 //        {
@@ -435,7 +436,7 @@ void RealTimeMultiSampleArrayNewWidget::paintEvent(QPaintEvent*)
 
     m_qMutex.lock();
 
-    qint32 t_iDist = ui.m_qFrame->height() / (m_uiNumChannels);
+    qint32 t_iDist = ui.m_qFrame->height() / (m_uiNumChannels+1);
 
     for(quint32 k = 0; k < m_uiNumChannels; ++k)
     {
