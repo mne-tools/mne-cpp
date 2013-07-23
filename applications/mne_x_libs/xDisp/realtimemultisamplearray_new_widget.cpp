@@ -413,37 +413,29 @@ void RealTimeMultiSampleArrayNewWidget::paintEvent(QPaintEvent*)
     // Draw real time curve respectively frozen curve
     //=============================================================================================================
 
-//    if(m_bFrozen)
-//    {
-//        painter.setPen(QPen(Qt::darkGray, 1, Qt::SolidLine));
-////        painter.drawPath(m_qPainterPath_Freeze);
-////        painter.drawPath(m_qPainterPath_FreezeTest);
-//        for(unsigned int k = 0; k < m_uiNumChannels; ++k)
-//            painter.drawPath(m_qVecPainterPath_Freeze[k]);
-//    }
-//    else
-//    {
-//        m_qMutex.lock();
-////            painter.drawPath(m_qPainterPath);
-////            painter.drawPath(m_qPainterPathTest);
-//            for(unsigned int k = 0; k < m_uiNumChannels; ++k)
-//                painter.drawPath(m_qVecPainterPath[k]);
-//        m_qMutex.unlock();
-//    }
-
-
     painter.save();
-
-    m_qMutex.lock();
-
     qint32 t_iDist = ui.m_qFrame->height() / (m_uiNumChannels+1);
 
-    for(quint32 k = 0; k < m_uiNumChannels; ++k)
+    if(m_bFrozen)
     {
-        painter.translate(0, t_iDist);
-        painter.drawPolyline(m_qVecPolygonF[k]);
+        painter.setPen(QPen(Qt::darkGray, 1, Qt::SolidLine));
+
+        for(quint32 k = 0; k < m_uiNumChannels; ++k)
+        {
+            painter.translate(0, t_iDist);
+            painter.drawPolyline(m_qVecPolygonF_Freeze[k]);
+        }
     }
-    m_qMutex.unlock();
+    else
+    {
+        m_qMutex.lock();
+        for(quint32 k = 0; k < m_uiNumChannels; ++k)
+        {
+            painter.translate(0, t_iDist);
+            painter.drawPolyline(m_qVecPolygonF[k]);
+        }
+        m_qMutex.unlock();
+    }
 
     painter.restore();
 
@@ -674,8 +666,9 @@ void RealTimeMultiSampleArrayNewWidget::mouseDoubleClickEvent(QMouseEvent*)
             {
 //                m_qPainterPath_Freeze = m_qPainterPath;
 //                m_qPainterPath_FreezeTest = m_qPainterPathTest;
+//                m_qVecPainterPath_Freeze = m_qVecPainterPath;
+                m_qVecPolygonF_Freeze = m_qVecPolygonF;
 
-                m_qVecPainterPath_Freeze = m_qVecPainterPath;
             }
             else
             {
