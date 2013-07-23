@@ -212,52 +212,128 @@ void RealTimeMultiSampleArrayNewWidget::update(Subject*)
     QVector< VectorXd > matSamples = m_pRTMSA_New->getMultiSampleArray();
 
 
+    if(m_bStartFlag)
+    {
+        m_qMutex.lock();
+
+        m_iSampleCount = 0;
+        m_iSamples = (qint32)floor((ui.m_qFrame->width() - m_dPosX) / m_dSampleWidth);
+
+        for(unsigned int k = 0; k < m_uiNumChannels; ++k)
+        {
+//            m_qVecPainterPath[k] = QPainterPath();
+//            m_qVecPainterPath[k].moveTo(m_dPosition, m_dPosY-k*10); // ToDo offset over PosY has to be relative
+
+            m_qVecPolygonF[k].clear();
+
+            for(qint32 l = 0; l < m_iSamples; ++l)
+            {
+//                m_qVecPainterPath[k].lineTo(m_dPosition+l*m_dSampleWidth, m_dPosY-k*10);
+
+                m_qVecPolygonF[k].append(QPointF(m_dPosition+l*m_dSampleWidth,  m_dPosY-k*10));
+
+            }
+        }
+        m_qMutex.unlock();
+        m_bStartFlag = false;
+    }
+
+
+    //Move all samples forward
+    qint32 t_iSamplesToMove =  m_pRTMSA_New->getMultiArraySize();
+
+    if(m_iSamples - t_iSamplesToMove > 0)
+        for(quint32 k = 0; k < m_uiNumChannels; ++k)
+            for(qint32 i = 0; i < m_iSamples - t_iSamplesToMove; ++i)
+                m_qVecPolygonF[k][i].setY(m_qVecPolygonF[k][i+t_iSamplesToMove].ry());
+
+
+    qint32 t_iNewSampleStart = m_iSamples - m_pRTMSA_New->getMultiArraySize();
+
     for(unsigned char i = 0; i < m_pRTMSA_New->getMultiArraySize(); ++i)//ToDo maybe downsampling here increase step size
     {
-//        for(unsigned int k = 0; k < m_uiNumChannels; ++k)
-//            vecValue[k] = matSamples[i][k]*m_fScaleFactor - m_dMiddle;
+        vecValue = (matSamples[i].array()*m_fScaleFactor).array() - ui.m_qFrame->height();//m_dMiddle;
 
-        vecValue = (matSamples[i].array()*m_fScaleFactor).array() - m_dMiddle;
-
-        dPositionDifference = m_dPosition - (m_dPosX+ui.m_qFrame->width());
-
-        if((dPositionDifference >= 0) || m_bStartFlag)
+        m_qMutex.lock();
+        for(unsigned int k = 0; k < m_uiNumChannels; ++k)
         {
-            if(m_bStartFlag)
-                dPositionDifference = 0;
+//            m_qVecPainterPath[k].elementAt(i).y = m_dPosY-vecValue[k]-k*10; // ToDo offset over PosY vec has to be relative
 
-            m_qMutex.lock();
-//                    m_qPainterPath = QPainterPath();
-//                    m_qPainterPathTest = QPainterPath();
-
-                m_dPosition = m_dPosX + dPositionDifference;
-
-//                    m_qPainterPath.moveTo(m_dPosition, m_dPosY-dValue);
-//                    m_qPainterPathTest.moveTo(m_dPosition, m_dPosY-dValue-10);
-
-                for(unsigned int k = 0; k < m_uiNumChannels; ++k)
-                {
-                    m_qVecPainterPath[k] = QPainterPath();
-                    m_qVecPainterPath[k].moveTo(m_dPosition, m_dPosY-vecValue[k]-k*10); // ToDo offset over PosY has to be relative
-                }
-            m_qMutex.unlock();
-            m_bStartFlag = false;
-
-            if(!m_bFrozen)
-                m_pTimeCurrentDisplay->setHMS(m_pTime->hour(),m_pTime->minute(),m_pTime->second(),m_pTime->msec());
+            m_qVecPolygonF[k][t_iNewSampleStart+i].setY(m_dPosY-vecValue[k]-k*10);
         }
+        m_qMutex.unlock();
 
-        else
-        {
-            m_qMutex.lock();
-//                    m_qPainterPath.lineTo(m_dPosition, m_dPosY-dValue);
-//                    m_qPainterPathTest.lineTo(m_dPosition, m_dPosY-dValue-10);
-            for(unsigned int k = 0; k < m_uiNumChannels; ++k)
-                m_qVecPainterPath[k].lineTo(m_dPosition, m_dPosY-vecValue[k]-k*10); // ToDo offset over PosY vec has to be relative
-            m_qMutex.unlock();
-        }
 
-        m_dPosition = m_dPosition + m_dSampleWidth;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//        dPositionDifference = m_dPosition - (m_dPosX+ui.m_qFrame->width());
+
+
+
+
+
+
+
+
+
+
+
+
+
+//        if((dPositionDifference >= 0) || m_bStartFlag)
+//        {
+//            if(m_bStartFlag)
+//                dPositionDifference = 0;
+
+//            m_qMutex.lock();
+////                    m_qPainterPath = QPainterPath();
+////                    m_qPainterPathTest = QPainterPath();
+
+//                m_dPosition = m_dPosX + dPositionDifference;
+
+////                    m_qPainterPath.moveTo(m_dPosition, m_dPosY-dValue);
+////                    m_qPainterPathTest.moveTo(m_dPosition, m_dPosY-dValue-10);
+
+//                for(unsigned int k = 0; k < m_uiNumChannels; ++k)
+//                {
+//                    m_qVecPainterPath[k] = QPainterPath();
+//                    m_qVecPainterPath[k].moveTo(m_dPosition, m_dPosY-vecValue[k]-k*10); // ToDo offset over PosY has to be relative
+//                }
+//            m_qMutex.unlock();
+//            m_bStartFlag = false;
+
+//            if(!m_bFrozen)
+//                m_pTimeCurrentDisplay->setHMS(m_pTime->hour(),m_pTime->minute(),m_pTime->second(),m_pTime->msec());
+//        }
+
+//        else
+//        {
+//            m_qMutex.lock();
+////                    m_qPainterPath.lineTo(m_dPosition, m_dPosY-dValue);
+////                    m_qPainterPathTest.lineTo(m_dPosition, m_dPosY-dValue-10);
+//            for(unsigned int k = 0; k < m_uiNumChannels; ++k)
+//                m_qVecPainterPath[k].lineTo(m_dPosition, m_dPosY-vecValue[k]-k*10); // ToDo offset over PosY vec has to be relative
+//            m_qMutex.unlock();
+//        }
+
+//        m_dPosition = m_dPosition + m_dSampleWidth;
     }
 }
 
@@ -284,9 +360,17 @@ void RealTimeMultiSampleArrayNewWidget::init()
 //    m_qPainterPath = QPainterPath();
 //    m_qPainterPathTest = QPainterPath();
 
-    m_qVecPainterPath.clear();
+
+
+
+//    m_qVecPainterPath.clear();
+//    for(unsigned int i = 0; i < m_uiNumChannels; ++i)
+//        m_qVecPainterPath.push_back(QPainterPath());
+
+
+    m_qVecPolygonF.clear();
     for(unsigned int i = 0; i < m_uiNumChannels; ++i)
-        m_qVecPainterPath.push_back(QPainterPath());
+        m_qVecPolygonF.push_back(QPolygonF());
 
 
     m_bStartFlag = true;
@@ -372,23 +456,30 @@ void RealTimeMultiSampleArrayNewWidget::paintEvent(QPaintEvent*)
     // Draw real time curve respectively frozen curve
     //=============================================================================================================
 
-    if(m_bFrozen)
-    {
-        painter.setPen(QPen(Qt::darkGray, 1, Qt::SolidLine));
-//        painter.drawPath(m_qPainterPath_Freeze);
-//        painter.drawPath(m_qPainterPath_FreezeTest);
-        for(unsigned int k = 0; k < m_uiNumChannels; ++k)
-            painter.drawPath(m_qVecPainterPath_Freeze[k]);
-    }
-    else
-    {
+//    if(m_bFrozen)
+//    {
+//        painter.setPen(QPen(Qt::darkGray, 1, Qt::SolidLine));
+////        painter.drawPath(m_qPainterPath_Freeze);
+////        painter.drawPath(m_qPainterPath_FreezeTest);
+//        for(unsigned int k = 0; k < m_uiNumChannels; ++k)
+//            painter.drawPath(m_qVecPainterPath_Freeze[k]);
+//    }
+//    else
+//    {
+//        m_qMutex.lock();
+////            painter.drawPath(m_qPainterPath);
+////            painter.drawPath(m_qPainterPathTest);
+//            for(unsigned int k = 0; k < m_uiNumChannels; ++k)
+//                painter.drawPath(m_qVecPainterPath[k]);
+//        m_qMutex.unlock();
+//    }
+
+
         m_qMutex.lock();
-//            painter.drawPath(m_qPainterPath);
-//            painter.drawPath(m_qPainterPathTest);
-            for(unsigned int k = 0; k < m_uiNumChannels; ++k)
-                painter.drawPath(m_qVecPainterPath[k]);
+
+        for(unsigned int k = 0; k < m_uiNumChannels; ++k)
+            painter.drawPolyline(m_qVecPolygonF[k]);
         m_qMutex.unlock();
-    }
 
 
     //*************************************************************************************************************
