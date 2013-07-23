@@ -247,6 +247,7 @@ private:
     QPainterPath                    m_qPainterPath;                 /**< Holds the current painter path which is the real-time curve. */
     QPainterPath                    m_qPainterPathTest;
     QVector<QPainterPath>           m_qVecPainterPath;
+    QVector<QPolygonF>              m_qVecPolygonF;
 
     QPainterPath                    m_qPainterPath_Freeze;          /**< Holds the frozen painter path which is the frozen real-time curve. */
     QPainterPath                    m_qPainterPath_FreezeTest;
@@ -263,6 +264,8 @@ private:
     float                           m_fScaleFactor;                 /**< Holds current scaling factor -> renewed over actualize. */
     double                          m_dMinValue_init;               /**< Holds the initial minimal value */
     double                          m_dMaxValue_init;               /**< Holds the initial maximal value */
+    qint32                          m_iSamples;                     /**< Holds the current number of samples. */
+    qint32                          m_iSampleCount;                 /**< Holds the current sample count. */
     double                          m_dMiddle;                      /**< Holds the current middle value depending on the current scaling factor -> renewed over actualize. */
     double                          m_dPosition;                    /**< Holds the start position which is the x position of the frame. */
     double                          m_dSampleWidth;                 /**< Sample distance to synchronize all real-time sample array widgets independent from their sampling rate. */
