@@ -40,6 +40,9 @@
 
 #include "sourceestimate.h"
 
+#include <QDataStream>
+#include <QSharedPointer>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -63,9 +66,9 @@ SourceEstimate::SourceEstimate()
 
 //*************************************************************************************************************
 
-SourceEstimate::SourceEstimate(const MatrixXd &p_sol, const QList<VectorXi> &p_vertices, float p_tmin, float p_tstep)
+SourceEstimate::SourceEstimate(const MatrixXd &p_sol, const VectorXi &p_vertices, float p_tmin, float p_tstep)
 : data(p_sol)
-, vertno(p_vertices)
+, vertices(p_vertices)
 , tmin(p_tmin)
 , tstep(p_tstep)
 {
@@ -77,7 +80,7 @@ SourceEstimate::SourceEstimate(const MatrixXd &p_sol, const QList<VectorXi> &p_v
 
 SourceEstimate::SourceEstimate(const SourceEstimate& p_SourceEstimate)
 : data(p_SourceEstimate.data)
-, vertno(p_SourceEstimate.vertno)
+, vertices(p_SourceEstimate.vertices)
 , times(p_SourceEstimate.times)
 , tmin(p_SourceEstimate.tmin)
 , tstep(p_SourceEstimate.tstep)
@@ -91,7 +94,7 @@ SourceEstimate::SourceEstimate(const SourceEstimate& p_SourceEstimate)
 void SourceEstimate::clear()
 {
     data = MatrixXd();
-    vertno.clear();
+    vertices = VectorXi();
     times = RowVectorXf();
     tmin = 0;
     tstep = 0;
@@ -108,7 +111,7 @@ SourceEstimate SourceEstimate::reduce(qint32 start, qint32 n)
 
     p_sourceEstimateReduced.data = MatrixXd::Zero(rows,n);
     p_sourceEstimateReduced.data = this->data.block(0, start, rows, n);
-    p_sourceEstimateReduced.vertno = this->vertno;
+    p_sourceEstimateReduced.vertices = this->vertices;
     p_sourceEstimateReduced.times = RowVectorXf::Zero(n);
     p_sourceEstimateReduced.times = this->times.block(start,0,1,n);
     p_sourceEstimateReduced.tmin = p_sourceEstimateReduced.times(0);
@@ -117,6 +120,46 @@ SourceEstimate SourceEstimate::reduce(qint32 start, qint32 n)
     return p_sourceEstimateReduced;
 }
 
+//*************************************************************************************************************
+
+void SourceEstimate::write(QIODevice &p_IODevice)
+{
+    // Create the file and save the essentials
+    QSharedPointer<QDataStream> t_pStream(new QDataStream(&p_IODevice));
+
+    t_pStream->setFloatingPointPrecision(QDataStream::SinglePrecision);
+    t_pStream->setByteOrder(QDataStream::BigEndian);
+    t_pStream->setVersion(QDataStream::Qt_5_0);
+
+    if(!t_pStream->device()->open(QIODevice::WriteOnly))
+    {
+        printf("Failed to write source estimate!\n");
+    }
+
+    printf("Write source estimate...");
+
+    // write starttime in ms
+    *t_pStream << (float)1000*this->tmin;
+    // write sampling rate in ms
+    *t_pStream << (float)1000*this->tstep;
+    // write number of vertices
+    *t_pStream << (quint32)this->vertices.size();
+    // write the vertex indices
+    for(qint32 i = 0; i < this->vertices.size(); ++i)
+        *t_pStream << (quint32)this->vertices[i];
+    // write the number of timepts
+    *t_pStream << (quint32)this->data.cols();
+    //
+    // write the data
+    //
+    for(qint32 i = 0; i < this->data.array().size(); ++i)
+        *t_pStream << (float)this->data.array()(i);
+
+    // close the file
+    t_pStream->device()->close();
+
+    printf("[done]\n");
+}
 
 //*************************************************************************************************************
 
@@ -141,7 +184,7 @@ SourceEstimate& SourceEstimate::operator= (const SourceEstimate &rhs)
     if (this != &rhs) // protect against invalid self-assignment
     {
         data = rhs.data;
-        vertno = rhs.vertno;
+        vertices = rhs.vertices;
         times = rhs.times;
         tmin = rhs.tmin;
         tstep = rhs.tstep;
