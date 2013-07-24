@@ -40,6 +40,7 @@
 
 #include "sourceestimate.h"
 
+#include <QFile>
 #include <QDataStream>
 #include <QSharedPointer>
 
@@ -91,6 +92,20 @@ SourceEstimate::SourceEstimate(const SourceEstimate& p_SourceEstimate)
 
 //*************************************************************************************************************
 
+SourceEstimate::SourceEstimate(QIODevice &p_IODevice)
+: tmin(0)
+, tstep(-1)
+{
+    if(!read(p_IODevice, *this))
+    {
+        printf("\tSource estimation not found.\n");//ToDo Throw here
+        return;
+    }
+}
+
+
+//*************************************************************************************************************
+
 void SourceEstimate::clear()
 {
     data = MatrixXd();
@@ -120,9 +135,68 @@ SourceEstimate SourceEstimate::reduce(qint32 start, qint32 n)
     return p_sourceEstimateReduced;
 }
 
+
 //*************************************************************************************************************
 
-void SourceEstimate::write(QIODevice &p_IODevice)
+bool SourceEstimate::read(QIODevice &p_IODevice, SourceEstimate& p_stc)
+{
+    QSharedPointer<QDataStream> t_pStream(new QDataStream(&p_IODevice));
+
+    t_pStream->setFloatingPointPrecision(QDataStream::SinglePrecision);
+    t_pStream->setByteOrder(QDataStream::BigEndian);
+    t_pStream->setVersion(QDataStream::Qt_5_0);
+
+    if(!t_pStream->device()->open(QIODevice::ReadOnly))
+        return false;
+
+    QFile* t_pFile = qobject_cast<QFile*>(&p_IODevice);
+    if(t_pFile)
+        printf("Reading source estimate from %s...", t_pFile->fileName().toUtf8().constData());
+    else
+        printf("Reading source estimate...");
+
+    // read start time in ms
+    *t_pStream >> p_stc.tmin;
+    p_stc.tmin /= 1000;
+    // read sampling rate in ms
+    *t_pStream >> p_stc.tstep;
+    p_stc.tstep /= 1000;
+    // read number of vertices
+    quint32 t_nVertices;
+    *t_pStream >> t_nVertices;
+    p_stc.vertices = VectorXi(t_nVertices);
+    // read the vertex indices
+    for(quint32 i = 0; i < t_nVertices; ++i)
+        *t_pStream >> p_stc.vertices[i];
+    // read the number of timepts
+    quint32 t_nTimePts;
+    *t_pStream >> t_nTimePts;
+    //
+    // read the data
+    //
+    p_stc.data = MatrixXd(t_nVertices, t_nTimePts);
+    for(qint32 i = 0; i < p_stc.data.array().size(); ++i)
+    {
+        float value;
+        *t_pStream >> value;
+        p_stc.data.array()(i) = value;
+    }
+
+    //Update time vector
+    p_stc.update_times();
+
+    // close the file
+    t_pStream->device()->close();
+
+    printf("[done]\n");
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool SourceEstimate::write(QIODevice &p_IODevice)
 {
     // Create the file and save the essentials
     QSharedPointer<QDataStream> t_pStream(new QDataStream(&p_IODevice));
@@ -134,11 +208,16 @@ void SourceEstimate::write(QIODevice &p_IODevice)
     if(!t_pStream->device()->open(QIODevice::WriteOnly))
     {
         printf("Failed to write source estimate!\n");
+        return false;
     }
 
-    printf("Write source estimate...");
+    QFile* t_pFile = qobject_cast<QFile*>(&p_IODevice);
+    if(t_pFile)
+        printf("Write source estimate to %s...", t_pFile->fileName().toUtf8().constData());
+    else
+        printf("Write source estimate...");
 
-    // write starttime in ms
+    // write start time in ms
     *t_pStream << (float)1000*this->tmin;
     // write sampling rate in ms
     *t_pStream << (float)1000*this->tstep;
@@ -159,7 +238,9 @@ void SourceEstimate::write(QIODevice &p_IODevice)
     t_pStream->device()->close();
 
     printf("[done]\n");
+    return true;
 }
+
 
 //*************************************************************************************************************
 

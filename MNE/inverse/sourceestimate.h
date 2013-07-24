@@ -122,6 +122,15 @@ public:
 
     //=========================================================================================================
     /**
+    * Constructs a source estimation, by reading from a IO device.
+    *
+    * @param[in] p_IODevice     IO device to read from the source estimation.
+    *
+    */
+    SourceEstimate(QIODevice &p_IODevice);
+
+    //=========================================================================================================
+    /**
     * Initializes source estimate.
     */
     void clear();
@@ -137,13 +146,26 @@ public:
 
     //=========================================================================================================
     /**
+    * mne_read_stc_file
+    *
+    * Reads a source estimate from a given file
+    *
+    * @param [in] p_IODevice    IO device to red the stc from.
+    * @param [out] p_stc        the read stc
+    *
+    * @return true if successful, false otherwise
+    */
+    static bool read(QIODevice &p_IODevice, SourceEstimate& p_stc);
+
+    //=========================================================================================================
+    /**
     * mne_write_stc_file
     *
     * Writes a stc file
     *
     * @param [in] p_IODevice   IO device to write the stc to.
     */
-    void write(QIODevice &p_IODevice);
+    bool write(QIODevice &p_IODevice);
 
     //=========================================================================================================
     /**
