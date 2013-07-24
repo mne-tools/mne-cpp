@@ -135,12 +135,22 @@ int main(int argc, char *argv[])
     MinimumNorm minimumNorm(inverse_operator, lambda2, method);
     SourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
 
+    //
     //Results
+    //
     std::cout << "\npart ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
     printf("tmin = %f s\n", sourceEstimate.tmin);
     printf("tstep = %f s\n", sourceEstimate.tstep);
 
     sourceEstimate.write(t_fileStc);
+
+    //test if everything was written correctly
+    SourceEstimate readSourceEstimate(t_fileStc);
+
+    std::cout << "\npart ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << readSourceEstimate.data.block(0,0,10,10) << std::endl;
+    printf("tmin = %f s\n", readSourceEstimate.tmin);
+    printf("tstep = %f s\n", readSourceEstimate.tstep);
+
 
     return a.exec();
 }
