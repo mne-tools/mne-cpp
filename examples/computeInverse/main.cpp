@@ -134,40 +134,10 @@ int main(int argc, char *argv[])
     MinimumNorm minimumNorm(inverse_operator, lambda2, method);
     SourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
 
-
     //Results
     std::cout << "\npart ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
     printf("tmin = %f s\n", sourceEstimate.tmin);
     printf("tstep = %f s\n", sourceEstimate.tstep);
-
-//    //
-//    //   Read the data first
-//    //
-//    FiffEvokedSet evokedSet(t_fileEvoked);
-
-//    //
-//    //   Then the inverse operator
-//    //
-//    MNEInverseOperator inverse_operator(t_fileInv);
-
-//    //
-//    //   Iterate over found data sets
-//    //
-//    for(qint32 setno = 0; setno < evokedSet.evoked.size(); ++setno)
-//    {
-//        printf(">> Computing inverse for %s data set <<\n", evokedSet.evoked[setno].comment.toLatin1().constData());
-
-//        //
-//        // Compute inverse solution
-//        //
-//        MinimumNorm minimumNorm(inverse_operator, lambda2, method);
-//        SourceEstimate sourceEstimate = minimumNorm.calculateInverse(evokedSet.evoked[setno]);
-
-//        //Results
-//        std::cout << "\npart ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
-//        printf("tmin = %f s\n", sourceEstimate.tmin);
-//        printf("tstep = %f s\n", sourceEstimate.tstep);
-//    }
 
     return a.exec();
 }
