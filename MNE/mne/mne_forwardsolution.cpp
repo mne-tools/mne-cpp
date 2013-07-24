@@ -999,7 +999,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
                 SparseMatrix<double> t_eye(3,3);
                 for (qint32 i = 0; i < 3; ++i)
                     t_eye.insert(i,i) = 1.0f;
-                kroneckerProduct(*fix_rot,t_eye,t_matKron);//kron(fix_rot,eye(3));
+                t_matKron = kroneckerProduct(*fix_rot,t_eye);//kron(fix_rot,eye(3));
                 fwd.sol_grad->data *= t_matKron;
                 fwd.sol_grad->ncol   = 3*fwd.nsource;
             }
@@ -1081,7 +1081,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
             SparseMatrix<double> t_eye(3,3);
             for (qint32 i = 0; i < 3; ++i)
                 t_eye.insert(i,i) = 1.0f;
-            kroneckerProduct(*surf_rot,t_eye,t_matKron);//kron(surf_rot,eye(3));
+            t_matKron = kroneckerProduct(*surf_rot,t_eye);//kron(surf_rot,eye(3));
             fwd.sol_grad->data *= t_matKron;
         }
         delete surf_rot;
@@ -1102,7 +1102,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
 
         MatrixXf t_ones = MatrixXf::Ones(fwd.nsource,1);
         Matrix3f t_eye = Matrix3f::Identity();
-        kroneckerProduct(t_ones,t_eye,fwd.source_nn);
+        fwd.source_nn = kroneckerProduct(t_ones,t_eye);
 
         printf("[done]\n");
     }
