@@ -43,6 +43,7 @@ SUBDIRS += \
     readFwd \
     readEpochs \
     computeInverse \
+    computeInverseRaw \
     computeInverseRapMusic \
     makeInverseOperator
 

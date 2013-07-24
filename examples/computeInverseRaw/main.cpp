@@ -50,11 +50,7 @@
 //=============================================================================================================
 
 #include <fiff/fiff_evoked_set.h>
-#include <mne/mne_inverse_operator.h>
-
-#include <fiff/fiff_evoked.h>
-#include <inverse/sourceestimate.h>
-#include <inverse/minimumNorm/minimumnorm.h>
+#include <mne/mne.h>
 
 
 //*************************************************************************************************************
@@ -72,7 +68,6 @@
 
 using namespace FIFFLIB;
 using namespace MNELIB;
-using namespace INVERSELIB;
 
 
 //*************************************************************************************************************
@@ -102,72 +97,121 @@ int main(int argc, char *argv[])
 //  lambda2     - The regularization factor
 //  dSPM        - do dSPM?
 //  sLORETA     - do sLORETA?
-
-
-//    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-//    QFile t_fileInv("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif");
-
-    QFile t_fileEvoked("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-ave.fif");
-    QFile t_fileInv("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-meg-inv.fif");
-
+    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QFile t_fileInv("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif");
+    qint32 nave = 40;
     float snr = 3.0f;
     float lambda2 = pow(1.0f / snr, 2.0f);
-    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
+    bool dSPM = false;
+    bool sLORETA = true;
 
     //
     //   Read the data first
     //
-    fiff_int_t setno = 0;
-    QPair<QVariant, QVariant> baseline(QVariant(), 0);
-    FiffEvoked evoked(t_fileEvoked, setno, baseline);
-    if(evoked.isEmpty())
-        return 1;
+    FiffEvokedSet evokedSet(t_fileEvoked);
 
     //
     //   Then the inverse operator
     //
-    MNEInverseOperator inverse_operator(t_fileInv);
+    MNEInverseOperator inv_raw(t_fileInv);
 
     //
-    // Compute inverse solution
+    //   Iterate over found data sets
     //
-    MinimumNorm minimumNorm(inverse_operator, lambda2, method);
-    SourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
+    for(qint32 setno = 0; setno < evokedSet.evoked.size(); ++setno)
+    {
+        printf(">> Computing inverse for %s data set <<\n", evokedSet.evoked[setno].comment.toLatin1().constData());
+        //
+        //   Set up the inverse according to the parameters
+        //
+        if (nave < 0)
+            nave = evokedSet.evoked[setno].nave;
 
+        MNEInverseOperator inv = inv_raw.prepare_inverse_operator(nave,lambda2,dSPM,sLORETA);
+        //
+        //   Pick the correct channels from the data
+        //
+        FiffEvokedSet newEvokedSet = evokedSet.pick_channels(inv.noise_cov->names);
 
-    //Results
-    std::cout << "\npart ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
-    printf("tmin = %f s\n", sourceEstimate.tmin);
-    printf("tstep = %f s\n", sourceEstimate.tstep);
+        evokedSet = newEvokedSet;
 
-//    //
-//    //   Read the data first
-//    //
-//    FiffEvokedSet evokedSet(t_fileEvoked);
+        printf("Picked %d channels from the data\n",evokedSet.info.nchan);
+        printf("Computing inverse...");
+        //
+        //   Simple matrix multiplication followed by combination of the
+        //   three current components
+        //
+        //   This does all the data transformations to compute the weights for the
+        //   eigenleads
+        //
+        SparseMatrix<double> reginv(inv.reginv.rows(),inv.reginv.rows());
+        // put this in the MNE algorithm class derived from inverse algorithm
+        //ToDo put this into a function of inv data
+        qint32 i;
+        for(i = 0; i < inv.reginv.rows(); ++i)
+            reginv.insert(i,i) = inv.reginv(i,0);
 
-//    //
-//    //   Then the inverse operator
-//    //
-//    MNEInverseOperator inverse_operator(t_fileInv);
+        MatrixXd trans = reginv*inv.eigen_fields->data*inv.whitener*inv.proj*evokedSet.evoked[setno].data;
+        //
+        //   Transformation into current distributions by weighting the eigenleads
+        //   with the weights computed above
+        //
+        MatrixXd sol;
+        if (inv.eigen_leads_weighted)
+        {
+            //
+            //     R^0.5 has been already factored in
+            //
+            printf("(eigenleads already weighted)...");
+            sol = inv.eigen_leads->data*trans;
+        }
+        else
+        {
+            //
+            //     R^0.5 has to factored in
+            //
+           printf("(eigenleads need to be weighted)...");
 
-//    //
-//    //   Iterate over found data sets
-//    //
-//    for(qint32 setno = 0; setno < evokedSet.evoked.size(); ++setno)
-//    {
-//        printf(">> Computing inverse for %s data set <<\n", evokedSet.evoked[setno].comment.toLatin1().constData());
+           SparseMatrix<double> sourceCov(inv.source_cov->data.rows(),inv.source_cov->data.rows());
+           for(i = 0; i < inv.source_cov->data.rows(); ++i)
+               sourceCov.insert(i,i) = sqrt(inv.source_cov->data(i,0));
 
-//        //
-//        // Compute inverse solution
-//        //
-//        MinimumNorm minimumNorm(inverse_operator, lambda2, method);
-//        SourceEstimate sourceEstimate = minimumNorm.calculateInverse(evokedSet.evoked[setno]);
+           sol   = sourceCov*inv.eigen_leads->data*trans;
+        }
 
-//        //Results
-//        std::cout << "\npart ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
-//        printf("tmin = %f s\n", sourceEstimate.tmin);
-//        printf("tstep = %f s\n", sourceEstimate.tstep);
-//    }
+        if (inv.source_ori == FIFFV_MNE_FREE_ORI)
+        {
+            printf("combining the current components...");
+            MatrixXd sol1(sol.rows()/3,sol.cols());
+            for(i = 0; i < sol.cols(); ++i)
+            {
+                VectorXd* tmp = MNE::combine_xyz(sol.block(0,i,sol.rows(),1));
+                sol1.block(0,i,sol.rows()/3,1) = tmp->cwiseSqrt();
+                delete tmp;
+            }
+            sol.resize(sol1.rows(),sol1.cols());
+            sol = sol1;
+        }
+        if (dSPM)
+        {
+            printf("(dSPM)...");
+            sol = inv.noisenorm*sol;
+        }
+        else if (sLORETA)
+        {
+            printf("(sLORETA)...");
+            sol = inv.noisenorm*sol;
+        }
+        printf("[done]\n");
+
+        //Results
+        float tmin = ((float)evokedSet.evoked[setno].first) / evokedSet.info.sfreq;
+        float tstep = 1/evokedSet.info.sfreq;
+
+        std::cout << "\npart ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << sol.block(0,0,10,10) << std::endl;
+        printf("tmin = %f s\n", tmin);
+        printf("tstep = %f s\n", tstep);
+    }
 
     return a.exec();
 }
