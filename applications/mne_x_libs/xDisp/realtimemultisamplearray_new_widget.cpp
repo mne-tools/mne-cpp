@@ -67,6 +67,8 @@
 #include <QTimer>
 #include <QTime>
 
+#include <QMessageBox>
+
 #include <QDebug>
 
 
@@ -88,6 +90,7 @@ RealTimeMultiSampleArrayNewWidget::RealTimeMultiSampleArrayNewWidget(QSharedPoin
 : MeasurementWidget(parent)
 , m_pRTMSA_New(pRTMSA_New)
 , m_uiMaxNumChannels(10)
+, m_uiFirstChannel(0)
 , m_bMeasurement(false)
 , m_bPosition(true)
 , m_bFrozen(false)
@@ -208,7 +211,7 @@ void RealTimeMultiSampleArrayNewWidget::minValueChanged(double minValue)
 
 void RealTimeMultiSampleArrayNewWidget::update(Subject*)
 {
-    VectorXd vecValue = VectorXd::Zero(m_uiNumChannels);
+    VectorXd vecValue;
     QVector< VectorXd > matSamples = m_pRTMSA_New->getMultiSampleArray();
 
     if(m_bStartFlag)
@@ -243,7 +246,7 @@ void RealTimeMultiSampleArrayNewWidget::update(Subject*)
 
     for(unsigned char i = 0; i < m_pRTMSA_New->getMultiArraySize(); ++i)//ToDo maybe downsampling here increase step size
     {
-        vecValue = (matSamples[i].array()*m_fScaleFactor).array();//m_dMiddle;
+        vecValue = (matSamples[i].block(m_uiFirstChannel,0,m_uiNumChannels,1).array()*m_fScaleFactor);
 
         m_qMutex.lock();
         for(unsigned int k = 0; k < m_uiNumChannels; ++k)
@@ -423,7 +426,7 @@ void RealTimeMultiSampleArrayNewWidget::paintEvent(QPaintEvent*)
         {
             painter.translate(0, t_iDist);
             painter.drawPolyline(m_qVecPolygonF_Freeze[k]);
-            painter.drawText(0, -t_iDist/2, m_pRTMSA_New->chInfo()[k].getChannelName());
+            painter.drawText(0, -t_iDist/2, m_pRTMSA_New->chInfo()[m_uiFirstChannel+k].getChannelName());
         }
     }
     else
@@ -433,7 +436,7 @@ void RealTimeMultiSampleArrayNewWidget::paintEvent(QPaintEvent*)
         {
             painter.translate(0, t_iDist);
             painter.drawPolyline(m_qVecPolygonF[k]);
-            painter.drawText(0, -t_iDist/2, m_pRTMSA_New->chInfo()[k].getChannelName());
+            painter.drawText(0, -t_iDist/2, m_pRTMSA_New->chInfo()[m_uiFirstChannel+k].getChannelName());
         }
         m_qMutex.unlock();
     }
@@ -618,6 +621,26 @@ void RealTimeMultiSampleArrayNewWidget::resizeEvent(QResizeEvent*)
     actualize();
 }
 
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayNewWidget::keyPressEvent(QKeyEvent* keyEvent)
+{
+//    if(keyEvent->key() == Qt::UpArrow)
+//    {
+//        if(m_uiFirstChannel + m_uiNumChannels < m_pRTMSA_New->getNumChannels())
+//            m_uiFirstChannel += m_uiNumChannels;
+//    }
+//    else if(keyEvent->key() == Qt::DownArrow)
+//    {
+//        if(m_uiFirstChannel - m_uiNumChannels >= 0)
+//            m_uiFirstChannel -= m_uiNumChannels;
+//    }
+
+//    QWidget::keyPressEvent(keyEvent);
+}
+
+
 //*************************************************************************************************************
 
 void RealTimeMultiSampleArrayNewWidget::mousePressEvent(QMouseEvent* mouseEvent)
@@ -689,35 +712,52 @@ void RealTimeMultiSampleArrayNewWidget::mouseDoubleClickEvent(QMouseEvent*)
 
 void RealTimeMultiSampleArrayNewWidget::wheelEvent(QWheelEvent* wheelEvent)
 {
-    if(m_bToolInUse)
-        return;
-
     if(wheelEvent->delta() < 0)
     {
-        if(m_ucToolIndex == 0)
-            m_ucToolIndex = m_vecTool.size()-1;
+        if((qint32)m_uiFirstChannel - (qint32)m_uiNumChannels >= 0)
+            m_uiFirstChannel -= m_uiNumChannels;
         else
-            --m_ucToolIndex;
+            m_uiFirstChannel = 0;
     }
     else
     {
-        if(m_ucToolIndex == m_vecTool.size()-1)
-            m_ucToolIndex = 0;
+        if(((qint32)m_uiFirstChannel + (qint32)m_uiNumChannels) < ((qint32)m_pRTMSA_New->getNumChannels()-(qint32)m_uiNumChannels))
+            m_uiFirstChannel += m_uiNumChannels;
         else
-            ++m_ucToolIndex;
+            m_uiFirstChannel = m_pRTMSA_New->getNumChannels()- m_uiNumChannels;
     }
 
-    QString text = QString("%1/%2 Tool: %3").arg(m_ucToolIndex+1).arg(m_vecTool.size()).arg(m_vecTool[m_ucToolIndex]);
-    ui.m_qLabel_Tool->setText(text);
-    ui.m_qLabel_Tool->show();
+    m_bStartFlag = true;
 
-    if(m_pTimerToolDisplay)
-        delete m_pTimerToolDisplay;
+//    if(m_bToolInUse)
+//        return;
 
-    m_pTimerToolDisplay = new QTimer(this);
+//    if(wheelEvent->delta() < 0)
+//    {
+//        if(m_ucToolIndex == 0)
+//            m_ucToolIndex = m_vecTool.size()-1;
+//        else
+//            --m_ucToolIndex;
+//    }
+//    else
+//    {
+//        if(m_ucToolIndex == m_vecTool.size()-1)
+//            m_ucToolIndex = 0;
+//        else
+//            ++m_ucToolIndex;
+//    }
 
-    connect( m_pTimerToolDisplay, SIGNAL(timeout()), ui.m_qLabel_Tool, SLOT(hide()));
-    m_pTimerToolDisplay->start(2000);
+//    QString text = QString("%1/%2 Tool: %3").arg(m_ucToolIndex+1).arg(m_vecTool.size()).arg(m_vecTool[m_ucToolIndex]);
+//    ui.m_qLabel_Tool->setText(text);
+//    ui.m_qLabel_Tool->show();
+
+//    if(m_pTimerToolDisplay)
+//        delete m_pTimerToolDisplay;
+
+//    m_pTimerToolDisplay = new QTimer(this);
+
+//    connect( m_pTimerToolDisplay, SIGNAL(timeout()), ui.m_qLabel_Tool, SLOT(hide()));
+//    m_pTimerToolDisplay->start(2000);
 
 }
 

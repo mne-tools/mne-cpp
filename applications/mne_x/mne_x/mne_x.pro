@@ -41,6 +41,8 @@ QT += network core widgets
 
 TARGET = mne_x
 
+CONFIG += console
+
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
