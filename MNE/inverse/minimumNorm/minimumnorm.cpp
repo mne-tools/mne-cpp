@@ -222,11 +222,14 @@ SourceEstimate MinimumNorm::calculateInverse(const MatrixXd &data, float tmin, f
     printf("[done]\n");
 
     //Results
-    QList<VectorXi> t_qListVertices;
-    for(qint32 h = 0; h < inv.src.size(); ++h)
-        t_qListVertices.push_back(inv.src[h].vertno);
+    VectorXi p_vecVertices(inv.src[0].vertno.size() + inv.src[1].vertno.size());
+    p_vecVertices << inv.src[0].vertno, inv.src[1].vertno;
 
-    return SourceEstimate(sol, t_qListVertices, tmin, tstep);
+//    VectorXi p_vecVertices();
+//    for(qint32 h = 0; h < inv.src.size(); ++h)
+//        t_qListVertices.push_back(inv.src[h].vertno);
+
+    return SourceEstimate(sol, p_vecVertices, tmin, tstep);
 
 }
 

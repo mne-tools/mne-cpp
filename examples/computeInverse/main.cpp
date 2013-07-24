@@ -103,12 +103,13 @@ int main(int argc, char *argv[])
 //  dSPM        - do dSPM?
 //  sLORETA     - do sLORETA?
 
+    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QFile t_fileInv("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif");
+    QFile t_fileStc("./stc.dat");
 
-//    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-//    QFile t_fileInv("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif");
-
-    QFile t_fileEvoked("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-ave.fif");
-    QFile t_fileInv("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-meg-inv.fif");
+//    QFile t_fileEvoked("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-ave.fif");
+//    QFile t_fileInv("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-meg-inv.fif");
+//    QFile t_fileStc("E:/Data/stc.dat");
 
     float snr = 3.0f;
     float lambda2 = pow(1.0f / snr, 2.0f);
@@ -138,6 +139,8 @@ int main(int argc, char *argv[])
     std::cout << "\npart ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
     printf("tmin = %f s\n", sourceEstimate.tmin);
     printf("tstep = %f s\n", sourceEstimate.tstep);
+
+    sourceEstimate.write(t_fileStc);
 
     return a.exec();
 }

@@ -58,6 +58,7 @@
 //=============================================================================================================
 
 #include <QList>
+#include <QIODevice>
 
 
 //*************************************************************************************************************
@@ -109,7 +110,7 @@ public:
     * @param[in] p_tmin
     * @param[in] p_tstep
     */
-    SourceEstimate(const MatrixXd &p_sol, const QList<VectorXi> &p_vertices, float p_tmin, float p_tstep);
+    SourceEstimate(const MatrixXd &p_sol, const VectorXi &p_vertices, float p_tmin, float p_tstep);
 
     //=========================================================================================================
     /**
@@ -136,6 +137,16 @@ public:
 
     //=========================================================================================================
     /**
+    * mne_write_stc_file
+    *
+    * Writes a stc file
+    *
+    * @param [in] p_IODevice   IO device to write the stc to.
+    */
+    void write(QIODevice &p_IODevice);
+
+    //=========================================================================================================
+    /**
     * Returns whether SourceEstimate is empty.
     *
     * @return true if is empty, false otherwise
@@ -154,7 +165,7 @@ public:
 
 public:
     MatrixXd data;          /**< Matrix of shape [n_dipoles x n_times] which contains the data in source space. */
-    QList<VectorXi> vertno; /**< The indices of the dipoles in the different source spaces. */ //ToDo define is_clustered_result; change vertno to ROI idcs
+    VectorXi vertices;      /**< The indices of the dipoles in the different source spaces. */ //ToDo define is_clustered_result; change vertno to ROI idcs
     RowVectorXf times;      /**< The time vector with n_times steps. */
     float tmin;             /**< Time starting point. */
     float tstep;            /**< Time steps within the times vector. */
