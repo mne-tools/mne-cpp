@@ -83,6 +83,7 @@ int main(int argc, char *argv[])
     {
         std::cout << "\nfirst 10 rows and columns of the Gain Matrix:\n" << t_ForwardSolution.sol->data.block(0,0,10,10) << std::endl;
         std::cout << "\nfirst 10 dipole coordinates:\n" << t_ForwardSolution.source_rr.block(0,0,10,3) << std::endl ;
+        std::cout << "\nfirst 10 dipole normales:\n" << t_ForwardSolution.source_nn.block(0,0,10,3) << std::endl ;
     }
 
     return a.exec();
