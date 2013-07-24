@@ -172,6 +172,15 @@ protected:
 
     //=========================================================================================================
     /**
+    * Is called when key is pressed.
+    * Function is getting the current key event.
+    *
+    * @param [in] keyEvent pointer to KeyEvent.
+    */
+    virtual void keyPressEvent(QKeyEvent * keyEvent);
+
+    //=========================================================================================================
+    /**
     * Is called when mouse button is pressed.
     * Function is getting the current mouse position and to differ between left(measure curve) and right(zoom) mouse button.
     *
@@ -244,6 +253,7 @@ private:
 
     quint32                         m_uiMaxNumChannels;
     quint32                         m_uiNumChannels;
+    quint32                          m_uiFirstChannel;
 
     QPainterPath                    m_qPainterPath;                 /**< Holds the current painter path which is the real-time curve. */
     QPainterPath                    m_qPainterPathTest;
