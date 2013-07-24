@@ -87,6 +87,7 @@ using namespace XMEASLIB;
 RealTimeMultiSampleArrayNewWidget::RealTimeMultiSampleArrayNewWidget(QSharedPointer<RealTimeMultiSampleArrayNew> pRTMSA_New, QSharedPointer<QTime> pTime, QWidget* parent)
 : MeasurementWidget(parent)
 , m_pRTMSA_New(pRTMSA_New)
+, m_uiMaxNumChannels(10)
 , m_bMeasurement(false)
 , m_bPosition(true)
 , m_bFrozen(false)
@@ -213,8 +214,6 @@ void RealTimeMultiSampleArrayNewWidget::update(Subject*)
     if(m_bStartFlag)
     {
         m_qMutex.lock();
-
-        m_iSampleCount = 0;
         m_iSamples = (qint32)floor((ui.m_qFrame->width() - m_dPosX) / m_dSampleWidth);
 
         for(unsigned int k = 0; k < m_uiNumChannels; ++k)
@@ -303,7 +302,7 @@ void RealTimeMultiSampleArrayNewWidget::init()
 //    ui.m_qLabel_MinValue->setText(QString::number(m_pRTSM->getMinValue()));
 //    ui.m_qLabel_MaxValue->setText(QString::number(m_pRTSM->getMaxValue()));
 
-    m_uiNumChannels = 10;//m_pRTMSA_New->getNumChannels();
+    m_uiNumChannels = m_pRTMSA_New->getNumChannels() > m_uiMaxNumChannels ? m_uiMaxNumChannels : m_pRTMSA_New->getNumChannels();
 
     m_dMinValue_init = m_pRTMSA_New->chInfo()[0].getMinValue();
     m_dMaxValue_init = m_pRTMSA_New->chInfo()[0].getMaxValue();
@@ -399,10 +398,10 @@ void RealTimeMultiSampleArrayNewWidget::paintEvent(QPaintEvent*)
     }
 
     //Paint middle value
-//	painter.setPen(QPen(Qt::gray, 1, Qt::SolidLine));
-//	painter.drawText(usWidth-75, usHeight/2, tr("%1%2").arg(m_dMiddle, 0, 'f', 2).arg(m_pRTSM->getUnit()));
-//	painter.setPen(QPen(Qt::gray, 1, Qt::DotLine));
-//	painter.drawLine(m_dPosX, usHeight/2, usWidth, usHeight/2);
+//  painter.setPen(QPen(Qt::gray, 1, Qt::SolidLine));
+//  painter.drawText(usWidth-75, usHeight/2, tr("%1%2").arg(m_dMiddle, 0, 'f', 2).arg(m_pRTSM->getUnit()));
+//  painter.setPen(QPen(Qt::gray, 1, Qt::DotLine));
+//  painter.drawLine(m_dPosX, usHeight/2, usWidth, usHeight/2);
 
     painter.setPen(QPen(Qt::darkBlue, 1, Qt::SolidLine));
     painter.setRenderHint(QPainter::Antialiasing);
@@ -424,6 +423,7 @@ void RealTimeMultiSampleArrayNewWidget::paintEvent(QPaintEvent*)
         {
             painter.translate(0, t_iDist);
             painter.drawPolyline(m_qVecPolygonF_Freeze[k]);
+            painter.drawText(0, -t_iDist/2, m_pRTMSA_New->chInfo()[k].getChannelName());
         }
     }
     else
@@ -433,6 +433,7 @@ void RealTimeMultiSampleArrayNewWidget::paintEvent(QPaintEvent*)
         {
             painter.translate(0, t_iDist);
             painter.drawPolyline(m_qVecPolygonF[k]);
+            painter.drawText(0, -t_iDist/2, m_pRTMSA_New->chInfo()[k].getChannelName());
         }
         m_qMutex.unlock();
     }

@@ -242,7 +242,8 @@ private:
     Ui::RealTimeMultiSampleArrayNewClass   ui;                      /**< Holds the user interface of the RealTimeSampleArray widget. */
     QSharedPointer<RealTimeMultiSampleArrayNew> m_pRTMSA_New;       /**< Holds the real-time sample array measurement. */
 
-    unsigned int                    m_uiNumChannels;
+    quint32                         m_uiMaxNumChannels;
+    quint32                         m_uiNumChannels;
 
     QPainterPath                    m_qPainterPath;                 /**< Holds the current painter path which is the real-time curve. */
     QPainterPath                    m_qPainterPathTest;
