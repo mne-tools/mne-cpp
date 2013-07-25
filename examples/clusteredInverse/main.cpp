@@ -97,27 +97,51 @@ int main(int argc, char *argv[])
     //########################################################################################
     // Source Estimate
 
-    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-
-    QFile t_fileClusteredInverse("./clusteredInverse-inv.fif");
+//    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+//    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+//    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
 
 //    QFile t_fileFwd("/home/chdinh/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
 //    QFile t_fileCov("/home/chdinh/sl_data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
 //    QFile t_fileEvoked("/home/chdinh/sl_data/MEG/mind006/mind006_051209_auditory01_raw-ave.fif");
 
-//    QFile t_fileClusteredInverse("./clusteredInverse-inv.fif");
 
-//    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
-//    QFile t_fileCov("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
-//    QFile t_fileEvoked("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-ave.fif");
+    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
+    QFile t_fileCov("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
+    QFile t_fileEvoked("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-ave.fif");
 
-//    QFile t_fileClusteredInverse("./clusteredInverse-inv.fif");
 
-    double snr = 3.0;
+    double snr = 3.0f;
     double lambda2 = 1.0 / pow(snr, 2);
-    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
+    QString method("sLORETA"); //"MNE" | "dSPM" | "sLORETA"
+
+    QString t_sFileNameClusteredInv("");
+    QString t_sFileNameStc("");
+
+    // Parse command line parameters
+    for(qint32 i = 0; i < argc; ++i)
+    {
+        if(strcmp(argv[i], "-snr") == 0 || strcmp(argv[i], "--snr") == 0)
+        {
+            if(i + 1 < argc)
+                snr = atof(argv[i+1]);
+        }
+        else if(strcmp(argv[i], "-method") == 0 || strcmp(argv[i], "--method") == 0)
+        {
+            if(i + 1 < argc)
+                method = QString::fromUtf8(argv[i+1]);
+        }
+        else if(strcmp(argv[i], "-inv") == 0 || strcmp(argv[i], "--inv") == 0)
+        {
+            if(i + 1 < argc)
+                t_sFileNameClusteredInv = QString::fromUtf8(argv[i+1]);
+        }
+        else if(strcmp(argv[i], "-stc") == 0 || strcmp(argv[i], "--stc") == 0)
+        {
+            if(i + 1 < argc)
+                t_sFileNameStc = QString::fromUtf8(argv[i+1]);
+        }
+    }
 
     // Load data
     fiff_int_t setno = 0;
@@ -130,9 +154,9 @@ int main(int argc, char *argv[])
     if(t_Fwd.isEmpty())
         return 1;
 
-    AnnotationSet t_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
+//    AnnotationSet t_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
 //    AnnotationSet t_annotationSet("/home/chdinh/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "/home/chdinh/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
-//    AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
+    AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
 
 
     FiffCov noise_cov(t_fileCov);
@@ -152,7 +176,14 @@ int main(int argc, char *argv[])
 
     MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
 
-    inverse_operator.write(t_fileClusteredInverse);
+    //
+    // save clustered inverse
+    //
+    if(!t_sFileNameClusteredInv.isEmpty())
+    {
+        QFile t_fileClusteredInverse(t_sFileNameClusteredInv);
+        inverse_operator.write(t_fileClusteredInverse);
+    }
 
     //
     // Compute inverse solution
@@ -235,15 +266,15 @@ int main(int argc, char *argv[])
     //Source Estimate end
     //########################################################################################
 
-    AnnotationSet t_annotSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot","./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
+//    AnnotationSet t_annotSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot","./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
 //    AnnotationSet t_annotSet("/home/chdinh/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "/home/chdinh/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
-//    AnnotationSet t_annotSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
+    AnnotationSet t_annotSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
 
 
 
-    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
+//    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
 //    SurfaceSet t_surfSet("/home/chdinh/sl_data/subjects/mind006/surf/lh.white", "/home/chdinh/sl_data/subjects/mind006/surf/rh.white");
-//    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
+    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
 
     //only one time point - P100
 //    qint32 sample = 0;
@@ -297,6 +328,13 @@ int main(int argc, char *argv[])
 
     //Push Estimate
     view.pushSourceEstimate(sourceEstimate);
+
+    if(!t_sFileNameStc.isEmpty())
+    {
+        QFile t_fileClusteredStc(t_sFileNameStc);
+        sourceEstimate.write(t_fileClusteredStc);
+    }
+
 //*/
     return a.exec();
 }
