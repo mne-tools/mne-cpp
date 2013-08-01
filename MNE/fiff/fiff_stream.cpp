@@ -135,6 +135,7 @@ void FiffStream::finish_writing_raw()
     this->end_block(FIFFB_RAW_DATA);
     this->end_block(FIFFB_MEAS);
     this->end_file();
+    this->device()->close();
 }
 
 
