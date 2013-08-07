@@ -41,6 +41,9 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <fiff/fiff_types.h>
+#include <fiff/fiff_evoked.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -98,6 +101,16 @@ public:
     */
     ~MNEEpochDataList();
 
+    //=========================================================================================================
+    /**
+    * Averages epoch list.
+    *
+    * @param[in] p_info     measurement info
+    * @param[in] p_first    First time sample
+    * @param[in] p_last     Last time sample
+    * @param[in] sel        Which epochs should be averaged (optional)
+    */
+    FiffEvoked average(FiffInfo& p_info, fiff_int_t first, fiff_int_t last, VectorXi sel = defaultVectorXi);
 };
 
 } // NAMESPACE
