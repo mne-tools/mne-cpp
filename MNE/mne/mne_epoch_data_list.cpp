@@ -70,3 +70,58 @@ MNEEpochDataList::~MNEEpochDataList()
 //            delete (*i);
 //    }
 }
+
+
+//*************************************************************************************************************
+
+FiffEvoked MNEEpochDataList::average(FiffInfo& p_info, fiff_int_t first, fiff_int_t last, VectorXi sel)
+{
+    FiffEvoked p_evoked;
+
+    printf("Calculate evoked... ");
+
+    MatrixXd matAverage;
+    if(this->size() > 0)
+        matAverage = MatrixXd::Zero(this->at(0)->epoch.rows(), this->at(0)->epoch.cols());
+    else
+    {
+        p_evoked.aspect_kind = FIFFV_ASPECT_STD_ERR;
+        return p_evoked;
+    }
+
+    if(sel.size() > 0)
+    {
+        p_evoked.nave = sel.size();
+
+        for(qint32 i = 0; i < sel.size(); ++i)
+            matAverage.array() += this->at(sel(i))->epoch.array();
+    }
+    else
+    {
+        p_evoked.nave = this->size();
+
+        for(qint32 i = 0; i < this->size(); ++i)
+            matAverage.array() += this->at(i)->epoch.array();
+    }
+    matAverage.array() /= p_evoked.nave;
+
+    printf("%d averages used [done]\n ", p_evoked.nave);
+
+    p_evoked.setInfo(p_info, false);
+
+    p_evoked.aspect_kind = FIFFV_ASPECT_STD_ERR;
+
+    p_evoked.first = first;
+    p_evoked.last = last;
+
+    RowVectorXf times = RowVectorXf(last-first+1);
+    for (qint32 k = 0; k < times.size(); ++k)
+        times[k] = ((float)(first+k)) / p_info.sfreq;
+    p_evoked.times = times;
+
+    p_evoked.comment = QString::number(this->at(0)->event);
+
+    p_evoked.data = matAverage;
+
+    return p_evoked;
+}
