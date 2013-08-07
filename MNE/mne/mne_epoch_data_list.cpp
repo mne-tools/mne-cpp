@@ -74,7 +74,7 @@ MNEEpochDataList::~MNEEpochDataList()
 
 //*************************************************************************************************************
 
-FiffEvoked MNEEpochDataList::average(FiffInfo& p_info, fiff_int_t first, fiff_int_t last, VectorXi sel)
+FiffEvoked MNEEpochDataList::average(FiffInfo& p_info, fiff_int_t first, fiff_int_t last, VectorXi sel, bool proj)
 {
     FiffEvoked p_evoked;
 
@@ -107,7 +107,7 @@ FiffEvoked MNEEpochDataList::average(FiffInfo& p_info, fiff_int_t first, fiff_in
 
     printf("%d averages used [done]\n ", p_evoked.nave);
 
-    p_evoked.setInfo(p_info, false);
+    p_evoked.setInfo(p_info, proj);
 
     p_evoked.aspect_kind = FIFFV_ASPECT_STD_ERR;
 
