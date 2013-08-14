@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
     QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
 
     qint32 event = 1;
-    QString t_sEventName = "../../mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif";
+    QString t_sEventName = "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif";
     float tmin = -1.5;
     float tmax = 1.5;
 

@@ -103,17 +103,38 @@ int main(int argc, char *argv[])
 //  dSPM        - do dSPM?
 //  sLORETA     - do sLORETA?
 
-    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    QFile t_fileInv("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif");
-    QFile t_fileStc("./stc.dat");
+//    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+//    QFile t_fileInv("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif");
 
-//    QFile t_fileEvoked("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-ave.fif");
-//    QFile t_fileInv("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-meg-inv.fif");
-//    QFile t_fileStc("E:/Data/stc.dat");
+    QFile t_fileEvoked("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-ave.fif");
+    QFile t_fileInv("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-meg-inv.fif");
 
     float snr = 3.0f;
-    float lambda2 = pow(1.0f / snr, 2.0f);
     QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
+    QString t_sFileNameStc("");
+
+    // Parse command line parameters
+    for(qint32 i = 0; i < argc; ++i)
+    {
+        if(strcmp(argv[i], "-snr") == 0 || strcmp(argv[i], "--snr") == 0)
+        {
+            if(i + 1 < argc)
+                snr = atof(argv[i+1]);
+        }
+        else if(strcmp(argv[i], "-method") == 0 || strcmp(argv[i], "--method") == 0)
+        {
+            if(i + 1 < argc)
+                method = QString::fromUtf8(argv[i+1]);
+        }
+        else if(strcmp(argv[i], "-stc") == 0 || strcmp(argv[i], "--stc") == 0)
+        {
+            if(i + 1 < argc)
+                t_sFileNameStc = QString::fromUtf8(argv[i+1]);
+        }
+    }
+
+    double lambda2 = 1.0 / pow(snr, 2);
+    qDebug() << "Start calculation with: SNR" << snr << "; Lambda" << lambda2 << "; Method" << method << "; stc:" << t_sFileNameStc;
 
     //
     //   Read the data first
@@ -142,15 +163,19 @@ int main(int argc, char *argv[])
     printf("tmin = %f s\n", sourceEstimate.tmin);
     printf("tstep = %f s\n", sourceEstimate.tstep);
 
-    sourceEstimate.write(t_fileStc);
 
-    //test if everything was written correctly
-    SourceEstimate readSourceEstimate(t_fileStc);
+    if(!t_sFileNameStc.isEmpty())
+    {
+        QFile t_fileStc(t_sFileNameStc);
+        sourceEstimate.write(t_fileStc);
 
-    std::cout << "\npart ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << readSourceEstimate.data.block(0,0,10,10) << std::endl;
-    printf("tmin = %f s\n", readSourceEstimate.tmin);
-    printf("tstep = %f s\n", readSourceEstimate.tstep);
+        //test if everything was written correctly
+        SourceEstimate readSourceEstimate(t_fileStc);
 
+        std::cout << "\npart ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << readSourceEstimate.data.block(0,0,10,10) << std::endl;
+        printf("tmin = %f s\n", readSourceEstimate.tmin);
+        printf("tstep = %f s\n", readSourceEstimate.tstep);
+    }
 
-    return a.exec();
+    return 0;//a.exec();
 }

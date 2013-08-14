@@ -74,7 +74,7 @@ MNEEpochDataList::~MNEEpochDataList()
 
 //*************************************************************************************************************
 
-FiffEvoked MNEEpochDataList::average(FiffInfo& p_info, fiff_int_t first, fiff_int_t last, VectorXi sel, bool proj)
+FiffEvoked MNEEpochDataList::average(FiffInfo& info, fiff_int_t first, fiff_int_t last, VectorXi sel, bool proj)
 {
     FiffEvoked p_evoked;
 
@@ -107,7 +107,7 @@ FiffEvoked MNEEpochDataList::average(FiffInfo& p_info, fiff_int_t first, fiff_in
 
     printf("%d averages used [done]\n ", p_evoked.nave);
 
-    p_evoked.setInfo(p_info, proj);
+    p_evoked.setInfo(info, proj);
 
     p_evoked.aspect_kind = FIFFV_ASPECT_STD_ERR;
 
@@ -116,7 +116,7 @@ FiffEvoked MNEEpochDataList::average(FiffInfo& p_info, fiff_int_t first, fiff_in
 
     RowVectorXf times = RowVectorXf(last-first+1);
     for (qint32 k = 0; k < times.size(); ++k)
-        times[k] = ((float)(first+k)) / p_info.sfreq;
+        times[k] = ((float)(first+k)) / info.sfreq;
     p_evoked.times = times;
 
     p_evoked.comment = QString::number(this->at(0)->event);
