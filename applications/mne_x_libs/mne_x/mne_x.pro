@@ -77,7 +77,9 @@ win32 {
 SOURCES += \
     Management/connector.cpp \
     Management/pluginmanager.cpp \
-    Management/pluginconnector.cpp
+    Management/pluginconnector.cpp \
+    Management/plugininputconnector.cpp \
+    Management/pluginoutputconnector.cpp
 
 
 HEADERS += \
@@ -91,7 +93,9 @@ HEADERS += \
     Interfaces/IPluginNew.h \
     Management/connector.h \
     Management/pluginmanager.h \
-    Management/pluginconnector.h
+    Management/pluginconnector.h \
+    Management/plugininputconnector.h \
+    Management/pluginoutputconnector.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

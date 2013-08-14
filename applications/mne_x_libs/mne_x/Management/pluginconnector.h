@@ -52,6 +52,8 @@
 
 #include <QObject>
 #include <QString>
+#include <QMutex>
+#include <QSet>
 
 
 //*************************************************************************************************************
@@ -64,7 +66,7 @@ namespace MNEX
 
 //=============================================================================================================
 /**
-* Class to connect plug-in data streams.
+* Class implements plug-in data connections.
 *
 * @brief The PluginConnector class provides the base to connect plug-in data
 */
@@ -79,13 +81,44 @@ public:
     /**
     * Constructs a PluginConnector with the given parent.
     *
-    * @param[in] parent    pointer to parent plugin.
+    * @param[in] parent     pointer to parent plugin
+    * @param[in] name       connection name
+    * @param[in] descr      connection description
     */
-    PluginConnector(IPluginNew *parent);
+    PluginConnector(IPluginNew *parent, QString &name, QString &descr);
     
+    //=========================================================================================================
+    /**
+    * Destructor
+    */
+    virtual ~PluginConnector(){}
+
+    //=========================================================================================================
+    /**
+     * Returns true if this instance is an PluginInputConnector.
+     *
+     * @return true if castable to PluginInputConnector.
+     */
+    virtual bool isInputConnector() const = 0;
+
+    //=========================================================================================================
+    /**
+     * Returns true if this instance is an PluginOutputConnector.
+     *
+     * @return true if castable to PluginOutputConnector.
+     */
+    virtual bool isOutputConnector() const = 0;
+
 signals:
 
 
+
+protected:
+    IPluginNew* m_pPlugin;  /**< Plugin to which connector belongs to */
+
+    //actual obeserver pattern - think of an other implementation --> currently similiar to OpenWalnut
+    //figure out how to Qt signal/slot
+    QSet<PluginConnector::SPtr> m_setConnections; /**< Set of connectors connected to this connector. */
 
 private:
     QString m_sName;        /**< Connection name */

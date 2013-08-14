@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     pluginconnector.cpp
+* @file     pluginoutputconnector.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     August, 2013
 *
 * @section  LICENSE
 *
@@ -29,35 +29,75 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the PluginConnector class.
+* @brief    Contains the declaration of the PluginOutputConnector class.
 *
 */
+#ifndef PLUGINOUTPUTCONNECTOR_H
+#define PLUGINOUTPUTCONNECTOR_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
+#include "../mne_x_global.h"
+
 #include "pluginconnector.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE NAMESPACE MNEX
 //=============================================================================================================
 
-using namespace MNEX;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-PluginConnector::PluginConnector(IPluginNew *parent, QString &name, QString &descr)
-: QObject(parent)
-, m_pPlugin(parent)
-, m_sName(name)
-, m_sDescription(descr)
+namespace MNEX
 {
-}
+
+
+//=============================================================================================================
+/**
+* Class to connect plug-in data streams.
+*
+* @brief The PluginConnector class provides the base to connect plug-in data
+*/
+class PluginOutputConnector : public PluginConnector
+{
+public:
+
+    //=========================================================================================================
+    /**
+    * Constructs a PluginOutputConnector with the given parent.
+    *
+    * @param[in] parent     pointer to parent plugin
+    * @param[in] name       connection name
+    * @param[in] descr      connection description
+    */
+    PluginOutputConnector(IPluginNew *parent, QString &name, QString &descr);
+
+    //=========================================================================================================
+    /**
+    * Destructor
+    */
+    virtual ~PluginOutputConnector(){}
+
+    //=========================================================================================================
+    /**
+     * Returns false
+     *
+     * @return false
+     */
+    virtual bool isInputConnector() const;
+
+    //=========================================================================================================
+    /**
+     * Returns true
+     *
+     * @return true
+     */
+    virtual bool isOutputConnector() const;
+
+};
+
+} // NAMESPACE
+
+#endif // PLUGINOUTPUTCONNECTOR_H
