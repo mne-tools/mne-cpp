@@ -79,7 +79,9 @@ SOURCES += \
     Management/pluginmanager.cpp \
     Management/pluginconnector.cpp \
     Management/plugininputconnector.cpp \
-    Management/pluginoutputconnector.cpp
+    Management/pluginoutputconnector.cpp \
+    Management/plugininputdata.cpp \
+    Management/pluginoutputdata.cpp
 
 
 HEADERS += \
@@ -95,7 +97,9 @@ HEADERS += \
     Management/pluginmanager.h \
     Management/pluginconnector.h \
     Management/plugininputconnector.h \
-    Management/pluginoutputconnector.h
+    Management/pluginoutputconnector.h \
+    Management/plugininputdata.h \
+    Management/pluginoutputdata.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

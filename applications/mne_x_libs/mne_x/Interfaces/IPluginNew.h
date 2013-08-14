@@ -2,6 +2,7 @@
 /**
 * @file     IPluginNew.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Martin Luessi <mluessi@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     February, 2013
@@ -59,8 +60,12 @@ namespace MNEX
 
 //*************************************************************************************************************
 //=============================================================================================================
-// ENUMERATIONS
+// FORWARD DECLARATIONS
 //=============================================================================================================
+
+class PluginInputConnector;
+class PluginOutputConnector;
+
 
 
 //=========================================================================================================
@@ -75,8 +80,8 @@ public:
     typedef QSharedPointer<IPluginNew> SPtr;               /**< Shared pointer type for IPluginNew. */
     typedef QSharedPointer<const IPluginNew> ConstSPtr;    /**< Const shared pointer type for IPluginNew. */
 
-    typedef QVector< QSharedPointer< float > > InputConnectorList;  /**< List of input connectors. */
-    typedef QVector< QSharedPointer< float > > OutputConnectorList; /**< List of output connectors. */
+    typedef QVector< QSharedPointer< PluginInputConnector > > InputConnectorList;  /**< List of input connectors. */
+    typedef QVector< QSharedPointer< PluginOutputConnector > > OutputConnectorList; /**< List of output connectors. */
 
 
     //=========================================================================================================
@@ -155,8 +160,10 @@ protected:
     */
     virtual void run() = 0;
 
+    InputConnectorList m_vecInputConnectors;    /**< Set of input connectors associated with this plug-in. */
+    OutputConnectorList m_vecOutputConnectors;  /**< Set of output connectors associated with this plug-in. */
 private:
-    bool m_bStatus;                 /**< Holds the activation status. */
+    bool m_bStatus;     /**< Holds the activation status. */
 };
 
 //*************************************************************************************************************
