@@ -602,6 +602,8 @@ void MainWindow::writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl
         QTextCursor c = m_pTextBrowser_Log->textCursor();
         c.movePosition(QTextCursor::End);
         m_pTextBrowser_Log->setTextCursor(c);
+
+        m_pTextBrowser_Log->verticalScrollBar()->setValue(m_pTextBrowser_Log->verticalScrollBar()->maximum());
     }
 }
 
