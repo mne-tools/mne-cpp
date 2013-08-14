@@ -152,6 +152,16 @@ public:
     */
     void stopTimer();
 
+    //=========================================================================================================
+    /**
+    * Writes to MainWindow log.
+    *
+    * @param [in] logMsg message
+    * @param [in] lgknd message kind; Message is formated depending on its kind.
+    * @param [in] lglvl message level; Message is displayed depending on its level.
+    */
+    void writeToLog(const QString& logMsg, LogKind lgknd = _LogKndMessage, LogLevel lglvl = _LogLvNormal);
+
 signals:
     //=========================================================================================================
     /**
@@ -162,17 +172,6 @@ signals:
     * @param [in] lglvl message level
     */
     void newLogMsg(const QString& logMsg, LogKind lgknd = _LogKndMessage, LogLevel lglvl = _LogLvNormal);
-
-public slots:
-    //=========================================================================================================
-    /**
-    * Writes to MainWindow log.
-    *
-    * @param [in] logMsg message
-    * @param [in] lgknd message kind; Message is formated depending on its kind.
-    * @param [in] lglvl message level; Message is displayed depending on its level.
-    */
-    void writeToLog(const QString& logMsg, LogKind lgknd = _LogKndMessage, LogLevel lglvl = _LogLvNormal);
 
 private:
     //StartUp
