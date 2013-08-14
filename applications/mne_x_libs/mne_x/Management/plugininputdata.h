@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     pluginconnector.h
+* @file     plugininputdata.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,11 +29,11 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the PluginConnector class.
+* @brief    Contains the declaration of the PluginInputData class.
 *
 */
-#ifndef PLUGININPUTCONNECTOR_H
-#define PLUGININPUTCONNECTOR_H
+#ifndef PLUGININPUTDATA_H
+#define PLUGININPUTDATA_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -42,7 +42,8 @@
 
 #include "../mne_x_global.h"
 
-#include "pluginconnector.h"
+#include "plugininputconnector.h"
+
 
 
 //*************************************************************************************************************
@@ -53,17 +54,10 @@
 namespace MNEX
 {
 
-//=============================================================================================================
-/**
-* Base class to connect plug-in data streams.
-*
-* @brief The PluginConnector class provides the base to connect plug-in data
-*/
-class MNE_X_SHARED_EXPORT PluginInputConnector : public PluginConnector
+template <class T>
+class MNE_X_SHARED_EXPORT PluginInputData : public PluginInputConnector
 {
-    Q_OBJECT
 public:
-
     //=========================================================================================================
     /**
     * Constructs a PluginInputConnector with the given parent.
@@ -72,32 +66,18 @@ public:
     * @param[in] name       connection name
     * @param[in] descr      connection description
     */
-    PluginInputConnector(IPluginNew *parent, QString &name, QString &descr);
+    PluginInputData(IPluginNew *parent, QString &name, QString &descr);
 
     //=========================================================================================================
     /**
     * Destructor
     */
-    virtual ~PluginInputConnector(){}
-
-    //=========================================================================================================
-    /**
-     * Returns true.
-     *
-     * @return true
-     */
-    virtual bool isInputConnector() const;
-
-    //=========================================================================================================
-    /**
-     * Returns false.
-     *
-     * @return false
-     */
-    virtual bool isOutputConnector() const;
-
+    virtual ~PluginInputData(){}
 };
 
 } // NAMESPACE
 
-#endif // PLUGININPUTCONNECTOR_H
+//Make the template definition visible to compiler in the first point of instantiation
+#include "plugininputdata.cpp"
+
+#endif // PLUGININPUTDATA_H
