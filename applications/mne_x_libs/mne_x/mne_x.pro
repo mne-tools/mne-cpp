@@ -88,7 +88,8 @@ HEADERS += \
     Interfaces/IAlert.h \
     Management/connector.h \
     Interfaces/IPlugin.h \
-    Management/pluginmanager.h
+    Management/pluginmanager.h \
+    Interfaces/IPluginNew.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
