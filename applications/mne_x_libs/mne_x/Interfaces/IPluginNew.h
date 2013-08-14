@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains declaration of IPlugin interface class.
+* @brief    Contains declaration of IPluginNew interface class.
 *
 */
 
@@ -172,13 +172,13 @@ inline void IPluginNew::setStatus(bool status)
 
 //*************************************************************************************************************
 
-inline bool IPlugin::isActive() const
+inline bool IPluginNew::isActive() const
 {
     return m_bStatus;
 }
 
 } //Namespace
 
-Q_DECLARE_INTERFACE(MNEX::IPlugin, "mne_x/1.0")
+Q_DECLARE_INTERFACE(MNEX::IPluginNew, "mne_x/1.0")
 
 #endif //IPLUGINNEW_H
