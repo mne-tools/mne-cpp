@@ -105,9 +105,9 @@ public:
     /**
     * Averages epoch list.
     *
-    * @param[in] p_info     measurement info
-    * @param[in] p_first    First time sample
-    * @param[in] p_last     Last time sample
+    * @param[in] info     measurement info
+    * @param[in] first    First time sample
+    * @param[in] last     Last time sample
     * @param[in] sel        Which epochs should be averaged (optional)
     * @param[in] proj       Apply SSP projection vectors (optional, default = false)
     */

@@ -295,11 +295,11 @@ void InverseView::initializeGL(QGLPainter *painter)
 
     }
 
-    //set background to light grey-blue
-    glClearColor(0.8f, 0.8f, 1.0f, 0.0f);
+//    //set background to light grey-blue
+//    glClearColor(0.8f, 0.8f, 1.0f, 0.0f);
 
 //    //set background to light white
-//    glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+    glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
     //start the producer
     m_pInverseViewProducer->start();
@@ -428,7 +428,7 @@ void InverseView::updateActivation(QSharedPointer<Eigen::VectorXd> p_pVecActivat
     {
         if(m_pInverseViewProducer->getMaxActivation()[i] != 0)
         {
-            qint32 iVal = (t_curLabelActivation[i]/m_pInverseViewProducer->getGlobalMax()) * 255;
+            qint32 iVal = (t_curLabelActivation[i]/m_pInverseViewProducer->getGlobalMax()) * 400;//255;
             iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
 
             int r, g, b;
