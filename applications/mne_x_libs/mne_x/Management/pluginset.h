@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     IPluginNew.h
+* @file     PluginSet.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Martin Luessi <mluessi@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     August, 2013
 *
 * @section  LICENSE
 *
@@ -30,23 +30,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains declaration of IPluginNew interface class.
+* @brief    Contains declaration of PluginSet class.
 *
 */
 
-#ifndef IPLUGINNEW_H
-#define IPLUGINNEW_H
-
+#ifndef PLUGINSET_H
+#define PLUGINSET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// INCLUDES
 //=============================================================================================================
 
-#include <QThread>
-#include <QCoreApplication>
-#include <QSharedPointer>
-#include <QVector>
+#include "../Interfaces/IPluginNew.h"
 
 
 //*************************************************************************************************************
@@ -57,65 +53,58 @@
 namespace MNEX
 {
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class PluginInputConnector;
-class PluginOutputConnector;
-
-
-
 //=========================================================================================================
 /**
-* DECLARE CLASS IPluginNew
+* PluginSet holds a set of plugins. This set can be handled like a plugin itself, meaning beeing started and having outputs and inputs.
 *
-* @brief The IPluginNew class is the base interface class of all plugins.
+* @brief The PluginSet class holds a set of plugins.
 */
-class IPluginNew : public QThread
+class PluginSet : public IPluginNew
 {
+    Q_OBJECT
 public:
-    typedef QSharedPointer<IPluginNew> SPtr;               /**< Shared pointer type for IPluginNew. */
-    typedef QSharedPointer<const IPluginNew> ConstSPtr;    /**< Const shared pointer type for IPluginNew. */
-
-    typedef QVector< QSharedPointer< PluginInputConnector > > InputConnectorList;  /**< List of input connectors. */
-    typedef QVector< QSharedPointer< PluginOutputConnector > > OutputConnectorList; /**< List of output connectors. */
-
+    typedef QSharedPointer<PluginSet> SPtr;                 /**< Shared pointer type for PluginSet. */
+    typedef QSharedPointer<const PluginSet> ConstSPtr;      /**< Const shared pointer type for PluginSet. */
+    typedef QList< IPluginNew::SPtr > PluginList;           /**< type for a list of plugins. */
 
     //=========================================================================================================
     /**
-    * Destroys the IPlugin.
+    * Constructs a PluginSet.
     */
-    virtual ~IPluginNew() {};
+    PluginSet();
+    
+    //=========================================================================================================
+    /**
+    * Destroys the PluginSet.
+    */
+    virtual ~PluginSet() {};
 
     //=========================================================================================================
     /**
-    * Starts the IPlugin.
+    * Starts the PluginSet.
     * Pure virtual method.
     *
     * @return true if success, false otherwise
     */
-    virtual bool start() = 0;
+    virtual bool start();
 
     //=========================================================================================================
     /**
-    * Stops the IPlugin.
+    * Stops the PluginSet.
     * Pure virtual method.
     *
     * @return true if success, false otherwise
     */
-    virtual bool stop() = 0;
+    virtual bool stop();
 
     //=========================================================================================================
     /**
-    * Returns the plugin name.
+    * Returns the PluginSet name.
     * Pure virtual method.
     *
-    * @return the name of plugin.
+    * @return the name of plugin set.
     */
-    virtual QString getName() const = 0;
+    virtual QString getName() const;
 
     //=========================================================================================================
     /**
@@ -124,59 +113,15 @@ public:
     *
     * @return the setup widget.
     */
-    virtual QSharedPointer<QWidget> setupWidget() = 0;
+    virtual QSharedPointer<QWidget> setupWidget();
 
-    //=========================================================================================================
-    /**
-    * Sets the activation status of the plugin.
-    *
-    * @param [in] status the new activation status of the plugin.
-    */
-    inline void setStatus(bool status);
+signals:
 
-    //=========================================================================================================
-    /**
-    * Returns the activation status of the plugin.
-    *
-    * @return true if plugin is activated.
-    */
-    inline bool isActive() const;
 
-protected:
-    //=========================================================================================================
-    /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread
-    */
-    virtual void run() = 0;
-
-    InputConnectorList m_vecInputConnectors;    /**< Set of input connectors associated with this plug-in. */
-    OutputConnectorList m_vecOutputConnectors;  /**< Set of output connectors associated with this plug-in. */
 private:
-    bool m_bStatus;     /**< Holds the activation status. */
+    PluginList m_pluginList;
 };
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-inline void IPluginNew::setStatus(bool status)
-{
-    m_bStatus = status;
-}
-
-
-//*************************************************************************************************************
-
-inline bool IPluginNew::isActive() const
-{
-    return m_bStatus;
-}
 
 } //Namespace
 
-Q_DECLARE_INTERFACE(MNEX::IPluginNew, "mne_x/1.0")
-
-#endif //IPLUGINNEW_H
+#endif // PLUGINSET_H
