@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     PluginSet.h
+* @file     pluginconnectomanager.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,19 +29,29 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains declaration of PluginSet class.
+* @brief    Contains declaration of PluginConnectorManager class.
 *
 */
 
-#ifndef PLUGINSET_H
-#define PLUGINSET_H
+#ifndef PLUGINCONNECTORMANAGER_H
+#define PLUGINCONNECTORMANAGER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../Interfaces/IPluginNew.h"
+#include "pluginconnectorconnection.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QObject>
+#include <QSharedPointer>
+#include <QList>
 
 
 //*************************************************************************************************************
@@ -54,73 +64,36 @@ namespace MNEX
 
 //=========================================================================================================
 /**
-* PluginSet holds a set of plugins. This set can be handled like a plugin itself, meaning beeing started and having outputs and inputs.
+* PluginConnectorManager manages connections between connectors.
 *
-* @brief The PluginSet class holds a set of plugins.
+* @brief The PluginConnectorManager class manages the connections of a set of plugins.
 */
-class PluginSet : public IPluginNew
+class PluginConnectorManager : public QObject
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<PluginSet> SPtr;                 /**< Shared pointer type for PluginSet. */
-    typedef QSharedPointer<const PluginSet> ConstSPtr;      /**< Const shared pointer type for PluginSet. */
-    typedef QList< IPluginNew::SPtr > PluginList;           /**< type for a list of plugins. */
+    typedef QSharedPointer<PluginConnectorManager> SPtr;            /**< Shared pointer type for PluginConnectorManager. */
+    typedef QSharedPointer<const PluginConnectorManager> ConstSPtr; /**< Const shared pointer type for PluginConnectorManager. */
+
+    typedef QList<PluginConnectorConnection::SPtr> PluginConnectorConnectionList;   /**< Shared pointer type for PluginConnectorConnection::SPtr. */
+
 
     //=========================================================================================================
     /**
-    * Constructs a PluginSet.
+    * Constructs a PluginConnectorManager.
     */
-    PluginSet();
+    explicit PluginConnectorManager(QObject *parent = 0);
     
-    //=========================================================================================================
-    /**
-    * Destroys the PluginSet.
-    */
-    virtual ~PluginSet() {};
-
-    //=========================================================================================================
-    /**
-    * Starts the PluginSet.
-    * Pure virtual method.
-    *
-    * @return true if success, false otherwise
-    */
-    virtual bool start();
-
-    //=========================================================================================================
-    /**
-    * Stops the PluginSet.
-    * Pure virtual method.
-    *
-    * @return true if success, false otherwise
-    */
-    virtual bool stop();
-
-    //=========================================================================================================
-    /**
-    * Returns the PluginSet name.
-    * Pure virtual method.
-    *
-    * @return the name of plugin set.
-    */
-    virtual QString getName() const;
-
-    //=========================================================================================================
-    /**
-    * Returns the set up widget for configuration of the IPlugin.
-    * Pure virtual method.
-    *
-    * @return the setup widget.
-    */
-    virtual QSharedPointer<QWidget> setupWidget();
-
 signals:
 
 
 private:
-    PluginList m_pluginList;    /**< List of plugins associated with this set. */
+    PluginConnectorConnectionList m_conConList;     /**< Lit of connector connections. */
+
+
+
 };
 
 } //Namespace
 
-#endif // PLUGINSET_H
+#endif // PLUGINCONNECTORMANAGER_H

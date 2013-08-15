@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     PluginSet.h
+* @file     pluginconnectorconnection.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,19 +29,28 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains declaration of PluginSet class.
+* @brief    Contains the declaration of the PluginConnectorConnection class.
 *
 */
-
-#ifndef PLUGINSET_H
-#define PLUGINSET_H
+#ifndef PLUGINCONNECTORCONNECTION_H
+#define PLUGINCONNECTORCONNECTION_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../Interfaces/IPluginNew.h"
+#include "../mne_x_global.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QObject>
+#include <QMetaObject>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -52,75 +61,24 @@
 namespace MNEX
 {
 
-//=========================================================================================================
-/**
-* PluginSet holds a set of plugins. This set can be handled like a plugin itself, meaning beeing started and having outputs and inputs.
-*
-* @brief The PluginSet class holds a set of plugins.
-*/
-class PluginSet : public IPluginNew
+
+class MNE_X_SHARED_EXPORT PluginConnectorConnection : public QObject
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<PluginSet> SPtr;                 /**< Shared pointer type for PluginSet. */
-    typedef QSharedPointer<const PluginSet> ConstSPtr;      /**< Const shared pointer type for PluginSet. */
-    typedef QList< IPluginNew::SPtr > PluginList;           /**< type for a list of plugins. */
+    typedef QSharedPointer<PluginConnectorConnection> SPtr;             /**< Shared pointer type for PluginConnectorConnection. */
+    typedef QSharedPointer<const PluginConnectorConnection> ConstSPtr;  /**< Const shared pointer type for PluginConnectorConnection. */
 
-    //=========================================================================================================
-    /**
-    * Constructs a PluginSet.
-    */
-    PluginSet();
+    explicit PluginConnectorConnection(QObject *parent = 0);
     
-    //=========================================================================================================
-    /**
-    * Destroys the PluginSet.
-    */
-    virtual ~PluginSet() {};
-
-    //=========================================================================================================
-    /**
-    * Starts the PluginSet.
-    * Pure virtual method.
-    *
-    * @return true if success, false otherwise
-    */
-    virtual bool start();
-
-    //=========================================================================================================
-    /**
-    * Stops the PluginSet.
-    * Pure virtual method.
-    *
-    * @return true if success, false otherwise
-    */
-    virtual bool stop();
-
-    //=========================================================================================================
-    /**
-    * Returns the PluginSet name.
-    * Pure virtual method.
-    *
-    * @return the name of plugin set.
-    */
-    virtual QString getName() const;
-
-    //=========================================================================================================
-    /**
-    * Returns the set up widget for configuration of the IPlugin.
-    * Pure virtual method.
-    *
-    * @return the setup widget.
-    */
-    virtual QSharedPointer<QWidget> setupWidget();
-
 signals:
-
-
+    
 private:
-    PluginList m_pluginList;    /**< List of plugins associated with this set. */
+    QMetaObject::Connection m_con;
+
+    
 };
 
-} //Namespace
+} // NAMESPACE
 
-#endif // PLUGINSET_H
+#endif // PLUGINCONNECTORCONNECTION_H
