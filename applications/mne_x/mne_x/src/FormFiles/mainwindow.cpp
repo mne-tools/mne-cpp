@@ -68,6 +68,7 @@
 #include "plugindockwidget.h"
 #include "runwidget.h"
 #include "startupwidget.h"
+#include "plugingui.h"
 
 
 //*************************************************************************************************************
@@ -488,12 +489,24 @@ void MainWindow::createPluginDockWindow()
     m_pPluginDockWidget = new PluginDockWidget(tr("Plugins"), this);
     m_pPluginDockWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
-    addDockWidget(Qt::LeftDockWidgetArea, m_pPluginDockWidget);
+    addDockWidget(Qt::RightDockWidgetArea, m_pPluginDockWidget);
 
     m_pMenuView->addAction(m_pPluginDockWidget->toggleViewAction());
 
     connect(m_pPluginDockWidget, SIGNAL(pluginChanged(int, const QTreeWidgetItem*)),
             this, SLOT(CentralWidgetShowPlugin()));
+
+
+    m_pNewPluginDockWidget = new QDockWidget(tr("Plugins New"), this);
+    m_pNewPluginDockWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+
+    PluginGui* pluginGui = new PluginGui;
+    pluginGui->setParent(m_pNewPluginDockWidget);
+    m_pNewPluginDockWidget->setWidget(pluginGui);
+
+    addDockWidget(Qt::LeftDockWidgetArea, m_pNewPluginDockWidget);
+
+
 }
 
 

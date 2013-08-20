@@ -77,7 +77,11 @@ SOURCES += \
     src/FormFiles/runwidget.cpp \
     src/FormFiles/mainwindow.cpp \
     src/FormFiles/mainsplashscreen.cpp \
-    src/FormFiles/plugindockwidget.cpp
+    src/FormFiles/plugindockwidget.cpp \
+    src/FormFiles/pluginscene.cpp \
+    src/FormFiles/pluginitem.cpp \
+    src/FormFiles/plugingui.cpp \
+    src/FormFiles/arrow.cpp
 
 HEADERS += \
     src/FormFiles/startupwidget.h \
@@ -85,7 +89,11 @@ HEADERS += \
     src/FormFiles/mainwindow.h \
     src/FormFiles/mainsplashscreen.h \
     src/preferences/info.h \
-    src/FormFiles/plugindockwidget.h
+    src/FormFiles/plugindockwidget.h \
+    src/FormFiles/pluginscene.h \
+    src/FormFiles/pluginitem.h \
+    src/FormFiles/plugingui.h \
+    src/FormFiles/arrow.h
 
 FORMS   +=
 

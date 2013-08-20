@@ -246,6 +246,9 @@ private:
 
     //Plugin
     PluginDockWidget*                   m_pPluginDockWidget;            /**< Holds the dock widget containing the plugins.*/
+
+    QDockWidget*                        m_pNewPluginDockWidget;         /**< NEW NEW NEW NEW */
+
     QSharedPointer<PluginManager>       m_pPluginManager;               /**< Holds log dock widget.*/
 
     QList<PLG_ID::Plugin_ID>            m_pListCurrentDisplayPlugins;   /**< Holds list of plugin id's which should be displayed.*/
