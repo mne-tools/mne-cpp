@@ -13,6 +13,11 @@
         <file alias="zoomOut.png">images/icons/zoomOut.png</file>
         <file alias="zoomStd.png">images/icons/zoomStd.png</file>
         <file alias="displayMax.png">images/icons/displayMax.png</file>
+        <file alias="bringtofront.png">images/icons/bringtofront.png</file>
+        <file alias="delete.png">images/icons/delete.png</file>
+        <file alias="linepointer.png">images/icons/linepointer.png</file>
+        <file alias="sendtoback.png">images/icons/sendtoback.png</file>
+        <file alias="pointer.png">images/icons/pointer.png</file>
     </qresource>
     <qresource prefix="/qss">
         <file>QtStyleSheets/plastique.qss</file>
