@@ -227,6 +227,7 @@ void PluginGui::createToolbars()
     sensorToolButton->setMenu(menuSensors);
     sensorToolButton->setPopupMode(QToolButton::InstantPopup);
     sensorToolButton->setIcon(QIcon(":/images/sensor.png"));
+    sensorToolButton->setStatusTip(tr("Sensor Plugins"));
     sensorToolButton->setToolTip(tr("Sensor Plugins"));
 
     QToolButton *algorithmToolButton = new QToolButton;
@@ -236,6 +237,7 @@ void PluginGui::createToolbars()
     algorithmToolButton->setMenu(menuAlgorithms);
     algorithmToolButton->setPopupMode(QToolButton::InstantPopup);
     algorithmToolButton->setIcon(QIcon(":/images/algorithm.png"));
+    algorithmToolButton->setStatusTip(tr("Algorithm Plugins"));
     algorithmToolButton->setToolTip(tr("Algorithm Plugins"));
 
     QToolButton *recordToolButton = new QToolButton;
@@ -244,6 +246,7 @@ void PluginGui::createToolbars()
     recordToolButton->setMenu(menuRecords);
     recordToolButton->setPopupMode(QToolButton::InstantPopup);
     recordToolButton->setIcon(QIcon(":/images/visualisation.png"));
+    recordToolButton->setStatusTip(tr("I/O Plugins"));
     recordToolButton->setToolTip(tr("I/O Plugins"));
 
     m_pToolBarPlugins = new QToolBar(tr("Plugins"), this);
