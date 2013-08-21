@@ -200,12 +200,12 @@ void PluginGui::createActions()
 
 void PluginGui::createItemMenu()
 {
-    itemMenu = menuBar()->addMenu(tr("&Item"));//new QMenu;
+    itemMenu = new QMenu;//menuBar()->addMenu(tr("&Item"));//new QMenu;
     itemMenu->addAction(deleteAction);
     itemMenu->addSeparator();
     itemMenu->addAction(toFrontAction);
     itemMenu->addAction(sendBackAction);
-    menuBar()->setVisible(false);
+//    menuBar()->setVisible(false);
 }
 
 
@@ -218,7 +218,6 @@ void PluginGui::createToolbars()
     m_pActionGroup->setExclusive(false);
     connect(m_pActionGroup, SIGNAL(triggered(QAction*)),
             this, SLOT(actionGroupTriggered(QAction*)));
-
 
     QToolButton *sensorToolButton = new QToolButton;
     QMenu *menuSensors = new QMenu;
@@ -287,6 +286,9 @@ void PluginGui::createToolbars()
 
     m_pToolBarPointer->addWidget(pointerButton);
     m_pToolBarPointer->addWidget(linePointerButton);
+    m_pToolBarPointer->addAction(deleteAction);
+    m_pToolBarPointer->addAction(toFrontAction);
+    m_pToolBarPointer->addAction(sendBackAction);
 
 
     m_pToolBarPointer->setAllowedAreas(Qt::LeftToolBarArea);
@@ -294,6 +296,10 @@ void PluginGui::createToolbars()
     m_pToolBarPointer->setMovable(false);
 
     addToolBar(Qt::LeftToolBarArea, m_pToolBarPointer);
+
+
+
+
 }
 
 
