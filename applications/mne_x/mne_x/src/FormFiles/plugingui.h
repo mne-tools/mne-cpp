@@ -79,7 +79,7 @@ private slots:
 
 private:
     void createActions();
-    void createItemMenu();
+    void createMenuItem();
     void createToolbars();
 
     QAction* createItemAction(QString name, PluginItem::DiagramType type, QMenu* menu);
@@ -98,14 +98,15 @@ private:
     QAction *toFrontAction;
     QAction *sendBackAction;
 
-    QMenu *itemMenu;
+    QMenu *m_pMenuItem;
 
     QToolBar *m_pToolBarPlugins;
     QToolBar *m_pToolBarPointer;
+    QToolBar *m_pToolBarItem;
 
     QActionGroup *m_pActionGroup;
 
-    QButtonGroup *pointerTypeGroup;
+    QButtonGroup *m_pButtonGroupPointers;
     QAction *fillAction;
     QAction *lineAction;
 };
