@@ -87,6 +87,9 @@ void Arrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
     painter->setPen(myPen);
     painter->setBrush(m_qColor);
 
+    painter->setRenderHint(QPainter::Antialiasing);
+
+
     QLineF centerLine(m_StartItem->pos(), m_EndItem->pos());
     QPolygonF endPolygon = m_EndItem->polygon();
     QPointF p1 = endPolygon.first() + m_EndItem->pos();
@@ -109,10 +112,10 @@ void Arrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
     if (line().dy() >= 0)
         angle = (Pi * 2) - angle;
 
-        QPointF arrowP1 = line().p1() + QPointF(sin(angle + Pi / 3) * arrowSize,
-                                        cos(angle + Pi / 3) * arrowSize);
-        QPointF arrowP2 = line().p1() + QPointF(sin(angle + Pi - Pi / 3) * arrowSize,
-                                        cos(angle + Pi - Pi / 3) * arrowSize);
+        QPointF arrowP1 = line().p1() + QPointF(sin(angle + Pi * 2 / 5) * arrowSize,
+                                        cos(angle + Pi * 2 / 5) * arrowSize);
+        QPointF arrowP2 = line().p1() + QPointF(sin(angle + Pi - Pi * 2 / 5) * arrowSize,
+                                        cos(angle + Pi - Pi * 2 / 5) * arrowSize);
 
         arrowHead.clear();
         arrowHead << line().p1() << arrowP1 << arrowP2;
