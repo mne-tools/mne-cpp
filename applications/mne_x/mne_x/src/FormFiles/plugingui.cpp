@@ -61,9 +61,9 @@ PluginGui::PluginGui()
 : m_id(0)
 {
     createActions();
-    createItemMenu();
+    createMenuItem();
 
-    m_pluginScene = new PluginScene(itemMenu, this);
+    m_pluginScene = new PluginScene(m_pMenuItem, this);
     m_pluginScene->setSceneRect(QRectF(0, 0, 200, 500));
     connect(m_pluginScene, SIGNAL(itemInserted(PluginItem*)),
             this, SLOT(itemInserted(PluginItem*)));
@@ -123,7 +123,7 @@ void PluginGui::deleteItem()
 
 void PluginGui::pointerGroupClicked(int)
 {
-    m_pluginScene->setMode(PluginScene::Mode(pointerTypeGroup->checkedId()));
+    m_pluginScene->setMode(PluginScene::Mode(m_pButtonGroupPointers->checkedId()));
 }
 
 
@@ -169,8 +169,9 @@ void PluginGui::sendToBack()
 
 void PluginGui::itemInserted(PluginItem *item)
 {
-    pointerTypeGroup->button(int(PluginScene::MoveItem))->setChecked(true);
-    m_pluginScene->setMode(PluginScene::Mode(pointerTypeGroup->checkedId()));
+    Q_UNUSED(item);
+    m_pButtonGroupPointers->button(int(PluginScene::MoveItem))->setChecked(true);
+    m_pluginScene->setMode(PluginScene::Mode(m_pButtonGroupPointers->checkedId()));
 }
 
 
@@ -181,30 +182,30 @@ void PluginGui::createActions()
     toFrontAction = new QAction(QIcon(":/images/bringtofront.png"),
                                 tr("Bring to &Front"), this);
     toFrontAction->setShortcut(tr("Ctrl+F"));
-    toFrontAction->setStatusTip(tr("Bring item to front"));
+    toFrontAction->setStatusTip(tr("Bring item to front (Ctrl+F)"));
     connect(toFrontAction, SIGNAL(triggered()), this, SLOT(bringToFront()));
 
     sendBackAction = new QAction(QIcon(":/images/sendtoback.png"), tr("Send to &Back"), this);
     sendBackAction->setShortcut(tr("Ctrl+B"));
-    sendBackAction->setStatusTip(tr("Send item to back"));
+    sendBackAction->setStatusTip(tr("Send item to back (Ctrl+B)"));
     connect(sendBackAction, SIGNAL(triggered()), this, SLOT(sendToBack()));
 
     deleteAction = new QAction(QIcon(":/images/delete.png"), tr("&Delete"), this);
     deleteAction->setShortcut(tr("Delete"));
-    deleteAction->setStatusTip(tr("Delete item from diagram"));
+    deleteAction->setStatusTip(tr("Delete item from diagram (Del)"));
     connect(deleteAction, SIGNAL(triggered()), this, SLOT(deleteItem()));
 }
 
 
 //*************************************************************************************************************
 
-void PluginGui::createItemMenu()
+void PluginGui::createMenuItem()
 {
-    itemMenu = new QMenu;//menuBar()->addMenu(tr("&Item"));//new QMenu;
-    itemMenu->addAction(deleteAction);
-    itemMenu->addSeparator();
-    itemMenu->addAction(toFrontAction);
-    itemMenu->addAction(sendBackAction);
+    m_pMenuItem = new QMenu;//menuBar()->addMenu(tr("&Item"));//new QMenu;
+    m_pMenuItem->addAction(deleteAction);
+    m_pMenuItem->addSeparator();
+    m_pMenuItem->addAction(toFrontAction);
+    m_pMenuItem->addAction(sendBackAction);
 //    menuBar()->setVisible(false);
 }
 
@@ -221,14 +222,12 @@ void PluginGui::createToolbars()
 
     QToolButton *sensorToolButton = new QToolButton;
     QMenu *menuSensors = new QMenu;
-
     createItemAction(QString("ECG Simulator"), PluginItem::Sensor, menuSensors);
     createItemAction(QString("RT Client"), PluginItem::Sensor, menuSensors);
-
     sensorToolButton->setMenu(menuSensors);
     sensorToolButton->setPopupMode(QToolButton::InstantPopup);
     sensorToolButton->setIcon(QIcon(":/images/sensor.png"));
-
+    sensorToolButton->setToolTip(tr("Sensor Plugins"));
 
     QToolButton *algorithmToolButton = new QToolButton;
     QMenu *menuAlgorithms = new QMenu;
@@ -237,7 +236,7 @@ void PluginGui::createToolbars()
     algorithmToolButton->setMenu(menuAlgorithms);
     algorithmToolButton->setPopupMode(QToolButton::InstantPopup);
     algorithmToolButton->setIcon(QIcon(":/images/algorithm.png"));
-
+    algorithmToolButton->setToolTip(tr("Algorithm Plugins"));
 
     QToolButton *recordToolButton = new QToolButton;
     QMenu *menuRecords = new QMenu;
@@ -245,10 +244,7 @@ void PluginGui::createToolbars()
     recordToolButton->setMenu(menuRecords);
     recordToolButton->setPopupMode(QToolButton::InstantPopup);
     recordToolButton->setIcon(QIcon(":/images/visualisation.png"));
-
-
-
-
+    recordToolButton->setToolTip(tr("I/O Plugins"));
 
     m_pToolBarPlugins = new QToolBar(tr("Plugins"), this);
     m_pToolBarPlugins->addWidget(sensorToolButton);
@@ -262,34 +258,33 @@ void PluginGui::createToolbars()
     addToolBar(Qt::LeftToolBarArea, m_pToolBarPlugins);
 
 
-
     //Pointers Toolbar
     QToolButton *pointerButton = new QToolButton;
     pointerButton->setCheckable(true);
     pointerButton->setChecked(true);
     pointerButton->setIcon(QIcon(":/images/pointer.png"));
+    pointerButton->setShortcut(tr("Ctrl+P"));
+    pointerButton->setStatusTip(tr("Select/Place (Ctrl+P)"));
+    pointerButton->setToolTip(tr("Select/Place"));
 
     QToolButton *linePointerButton = new QToolButton;
     linePointerButton->setCheckable(true);
     linePointerButton->setIcon(QIcon(":/images/linepointer.png"));
+    linePointerButton->setShortcut(tr("Ctrl+L"));
+    linePointerButton->setStatusTip(tr("Connection (Ctrl+L)"));
+    linePointerButton->setToolTip(tr("Connection"));
 
-    pointerTypeGroup = new QButtonGroup(this);
-    pointerTypeGroup->addButton(pointerButton, int(PluginScene::MoveItem));
-    pointerTypeGroup->addButton(linePointerButton, int(PluginScene::InsertLine));
+    m_pButtonGroupPointers = new QButtonGroup(this);
+    m_pButtonGroupPointers->addButton(pointerButton, int(PluginScene::MoveItem));
+    m_pButtonGroupPointers->addButton(linePointerButton, int(PluginScene::InsertLine));
 
-    connect(pointerTypeGroup, SIGNAL(buttonClicked(int)),
+    connect(m_pButtonGroupPointers, SIGNAL(buttonClicked(int)),
             this, SLOT(pointerGroupClicked(int)));
-
 
     m_pToolBarPointer = new QToolBar(tr("Pointer type"), this);
 
-
     m_pToolBarPointer->addWidget(pointerButton);
     m_pToolBarPointer->addWidget(linePointerButton);
-    m_pToolBarPointer->addAction(deleteAction);
-    m_pToolBarPointer->addAction(toFrontAction);
-    m_pToolBarPointer->addAction(sendBackAction);
-
 
     m_pToolBarPointer->setAllowedAreas(Qt::LeftToolBarArea);
     m_pToolBarPointer->setFloatable(false);
@@ -298,8 +293,18 @@ void PluginGui::createToolbars()
     addToolBar(Qt::LeftToolBarArea, m_pToolBarPointer);
 
 
+    //Item
+    m_pToolBarItem = new QToolBar(tr("Item"), this);
 
+    m_pToolBarItem->addAction(deleteAction);
+    m_pToolBarItem->addAction(toFrontAction);
+    m_pToolBarItem->addAction(sendBackAction);
 
+    m_pToolBarItem->setAllowedAreas(Qt::LeftToolBarArea);
+    m_pToolBarItem->setFloatable(false);
+    m_pToolBarItem->setMovable(false);
+
+    addToolBar(Qt::LeftToolBarArea, m_pToolBarItem);
 }
 
 
