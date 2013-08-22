@@ -54,7 +54,7 @@ using namespace MNEX;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginConnector::PluginConnector(IPluginNew *parent, QString &name, QString &descr)
+PluginConnector::PluginConnector(IPluginNew *parent, const QString &name, const QString &descr)
 : QObject(parent)
 , m_pPlugin(parent)
 , m_sName(name)

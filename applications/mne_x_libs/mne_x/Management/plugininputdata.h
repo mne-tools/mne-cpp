@@ -55,7 +55,7 @@ namespace MNEX
 {
 
 template <class T>
-class MNE_X_SHARED_EXPORT PluginInputData : public PluginInputConnector
+class PluginInputData : public PluginInputConnector
 {
 public:
     //=========================================================================================================
