@@ -34,3 +34,11 @@ bool PluginInputConnector::isOutputConnector() const
 {
     return false;
 }
+
+
+//*************************************************************************************************************
+
+void PluginInputConnector::update(XMEASLIB::NewMeasurement::SPtr)
+{
+
+}

@@ -38,10 +38,21 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "../xmeas_global.h"
+
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
 
 #include <QObject>
+#include <QSharedPointer>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -52,29 +63,136 @@
 namespace XMEASLIB
 {
 
-class NewMeasurement : public QObject
+class XMEASSHARED_EXPORT NewMeasurement : public QObject
 {
     Q_OBJECT
 public:
-    explicit NewMeasurement(QObject *parent = 0);
+    typedef QSharedPointer<NewMeasurement> SPtr;               /**< Shared pointer type for NewMeasurement. */
+    typedef QSharedPointer<const NewMeasurement> ConstSPtr;    /**< Const shared pointer type for NewMeasurement. */
 
-    virtual ~NewMeasurement(){}
+    //=========================================================================================================
+    /**
+    * Constructs a Measurement.
+    *
+    * @param[in] type       the QMetaType id of the Measurement.
+    * @param[in] parent     the parent object
+    */
+    explicit NewMeasurement(int type = QMetaType::UnknownType, QObject *parent = 0);
 
-    int type() const {return m_iMetaTypeId;}
+    //=========================================================================================================
+    /**
+    * Constructs the Measurement.
+    */
+    virtual ~NewMeasurement();
+
+    //=========================================================================================================
+    /**
+    * Returns the name of the Measurement.
+    *
+    * @return the name of the Measurement.
+    */
+    inline const QString& getName() const;
+
+    //=========================================================================================================
+    /**
+    * Sets the name of the Measurement.
+    *
+    * @param[in] name which should be set.
+    */
+    inline void setName(const QString& name);
+
+    //=========================================================================================================
+    /**
+    * Returns whether Measurement is visible.
+    *
+    * @return true if Measurement is visible, otherwise false.
+    */
+    inline bool isVisible() const;
+
+    //=========================================================================================================
+    /**
+    * Sets the visibility of the Measurement, whether Measurement is visible at the display or just data are send invisible.
+    *
+    * @param [in] visibility of the Measurement.
+    */
+    inline void setVisibility(bool visibility);
+
+    //=========================================================================================================
+    /**
+    * Returns the type of the Measurement.
+    *
+    * @return the type of the Measurement.
+    */
+    inline int type() const;
 
 signals:
     void notify();
 
-public slots:
-
 protected:
-    void setType(int type) {m_iMetaTypeId = type;}
+    //=========================================================================================================
+    /**
+    * Sets the type of the Measurement. Use QMetaType::type("the type") to generate the type.
+    *
+    * @param[in] type   the QMetaType id of the Measurement.
+    */
+    inline void setType(int type);
 
 private:
-    int m_iMetaTypeId;
-    
+    int     m_iMetaTypeId;      /**< QMetaType id of the Measurement */
+    QString m_qString_Name;     /**< Name of the Measurement */
+    bool    m_bVisibility;      /**< Visibility status */
 };
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline const QString& NewMeasurement::getName() const
+{
+    return m_qString_Name;
+}
+
+
+//*************************************************************************************************************
+
+inline void NewMeasurement::setType(int type)
+{
+    m_iMetaTypeId = type;
+}
+
+
+//*************************************************************************************************************
+
+inline void NewMeasurement::setName(const QString& name)
+{
+    m_qString_Name = name;
+}
+
+
+//*************************************************************************************************************
+
+inline bool NewMeasurement::isVisible() const
+{
+    return m_bVisibility;
+}
+
+
+//*************************************************************************************************************
+
+inline void NewMeasurement::setVisibility(bool visibility)
+{
+    m_bVisibility = visibility;
+}
+
+
+//*************************************************************************************************************
+
+inline int NewMeasurement::type() const
+{
+    return m_iMetaTypeId;
+}
 
 } //NAMESPACE
 

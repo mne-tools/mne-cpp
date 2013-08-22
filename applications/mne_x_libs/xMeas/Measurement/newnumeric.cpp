@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     pluginconnector.h
+* @file     numeric.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2013
+* @date     February, 2013
 *
 * @section  LICENSE
 *
@@ -29,31 +29,17 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the PluginConnector class.
+* @brief    Contains the implementation of the Numeric class.
 *
 */
-#ifndef PLUGININPUTCONNECTOR_H
-#define PLUGININPUTCONNECTOR_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../mne_x_global.h"
+#include "newnumeric.h"
 
-#include "pluginconnector.h"
-
-#include <xMeas/Measurement/newmeasurement.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MNEX
-//=============================================================================================================
-
-namespace MNEX
-{
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -63,54 +49,41 @@ namespace MNEX
 using namespace XMEASLIB;
 
 
+//*************************************************************************************************************
 //=============================================================================================================
-/**
-* Base class to connect plug-in data streams.
-*
-* @brief The PluginConnector class provides the base to connect plug-in data
-*/
-class MNE_X_SHARED_EXPORT PluginInputConnector : public PluginConnector
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+NewNumeric::NewNumeric(QObject *parent)
+: NewMeasurement(QMetaType::type("NewNumeric::SPtr"), parent)
+, m_qString_Unit("")
+, m_dValue(-1)
+
 {
-    Q_OBJECT
-public:
 
-    //=========================================================================================================
-    /**
-    * Constructs a PluginInputConnector with the given parent.
-    *
-    * @param[in] parent     pointer to parent plugin
-    * @param[in] name       connection name
-    * @param[in] descr      connection description
-    */
-    PluginInputConnector(IPluginNew *parent, QString &name, QString &descr);
+}
 
-    //=========================================================================================================
-    /**
-    * Destructor
-    */
-    virtual ~PluginInputConnector(){}
 
-    //=========================================================================================================
-    /**
-     * Returns true.
-     *
-     * @return true
-     */
-    virtual bool isInputConnector() const;
+//*************************************************************************************************************
 
-    //=========================================================================================================
-    /**
-     * Returns false.
-     *
-     * @return false
-     */
-    virtual bool isOutputConnector() const;
+NewNumeric::~NewNumeric()
+{
 
-public slots:
-    void update(XMEASLIB::NewMeasurement::SPtr);
+}
 
-};
 
-} // NAMESPACE
+//*************************************************************************************************************
 
-#endif // PLUGININPUTCONNECTOR_H
+void NewNumeric::setValue(double v)
+{
+    m_dValue = v;
+    emit notify();
+}
+
+
+//*************************************************************************************************************
+
+double NewNumeric::getValue() const
+{
+    return m_dValue;
+}

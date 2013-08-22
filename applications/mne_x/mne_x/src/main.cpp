@@ -42,6 +42,11 @@
 #include "FormFiles/mainwindow.h"
 
 
+#include <xMeas/Measurement/measurementtypes.h>
+#include <xMeas/Measurement/newrealtimemultisamplearray.h>
+#include <xMeas/Measurement/newnumeric.h>
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -132,6 +137,8 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
+    XMEASLIB::MeasurementTypes::registerTypes();
+
     QPixmap pixmap(":/images/splashscreen.png");
     MainSplashScreen::SPtr splashscreen(new MainSplashScreen(pixmap));
     splashscreen->show();
@@ -150,6 +157,11 @@ int main(int argc, char *argv[])
     splashscreen->finish(mainWin);
 
     qInstallMessageHandler(customMessageHandler);
+
+
+    NewRealTimeMultiSampleArray RTSATest;
+
+    NewNumeric NumericTest;
 
 
     return app.exec();
