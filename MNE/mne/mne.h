@@ -48,6 +48,7 @@
 #include "mne_forwardsolution.h"
 #include "mne_hemisphere.h"
 #include "mne_sourcespace.h"
+#include "mne_surface.h"
 
 
 //*************************************************************************************************************
@@ -414,6 +415,29 @@ public:
     static bool read_source_spaces(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNESourceSpace& p_SourceSpace)
     {
         return MNESourceSpace::readFromStream(p_pStream, add_geom, p_Tree, p_SourceSpace);
+    }
+
+    //=========================================================================================================
+    /**
+    * mne_read_bem_surface
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the MNESurface::read static function
+    *
+    * Reads a BEM surface from a fif stream
+    *
+    * @param [in] p_pStream         The open fiff file
+    * @param [in] add_geom          Add geometry information to the source spaces
+    * @param [in] p_Tree            Search for the source spaces here
+    *
+    * @param [out] p_Surface    The read bem surface
+    *
+    * @return true if succeeded, false otherwise
+    */
+    static bool read_bem_surface(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNESurface& p_Surface)
+    {
+        return MNESurface::read(p_pStream, add_geom, p_Tree, p_Surface);
     }
 
     //ToDo FiffChInfoList Class
