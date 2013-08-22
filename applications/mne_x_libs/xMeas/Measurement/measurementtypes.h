@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     pluginconnector.h
+* @file     measurementtypes.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,88 +29,67 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the PluginConnector class.
+* @brief    Contains the declaration of the MeasurementTypes class.
 *
 */
-#ifndef PLUGININPUTCONNECTOR_H
-#define PLUGININPUTCONNECTOR_H
+
+#ifndef MEASUREMENTTYPES_H
+#define MEASUREMENTTYPES_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../mne_x_global.h"
-
-#include "pluginconnector.h"
-
-#include <xMeas/Measurement/newmeasurement.h>
+#include "../xmeas_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEX
+// QT INCLUDES
 //=============================================================================================================
 
-namespace MNEX
+#include <QObject>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE XMEASLIB
+//=============================================================================================================
+
+namespace XMEASLIB
 {
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace XMEASLIB;
 
 
 //=============================================================================================================
 /**
-* Base class to connect plug-in data streams.
+* Class MeasurementTypes to register measurement classes to QMetaType types
 *
-* @brief The PluginConnector class provides the base to connect plug-in data
+* @brief Class MeasurementTypes to register measurement classes to QMetaType types
 */
-class MNE_X_SHARED_EXPORT PluginInputConnector : public PluginConnector
+class XMEASSHARED_EXPORT MeasurementTypes : public QObject
 {
     Q_OBJECT
 public:
-
     //=========================================================================================================
     /**
-    * Constructs a PluginInputConnector with the given parent.
-    *
-    * @param[in] parent     pointer to parent plugin
-    * @param[in] name       connection name
-    * @param[in] descr      connection description
+    * Constructs a MeasurementTypes Object.
     */
-    PluginInputConnector(IPluginNew *parent, QString &name, QString &descr);
+    explicit MeasurementTypes(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destructor
+    * Call to register MeasurementTypes
     */
-    virtual ~PluginInputConnector(){}
-
-    //=========================================================================================================
-    /**
-     * Returns true.
-     *
-     * @return true
-     */
-    virtual bool isInputConnector() const;
-
-    //=========================================================================================================
-    /**
-     * Returns false.
-     *
-     * @return false
-     */
-    virtual bool isOutputConnector() const;
-
+    static void registerTypes();
+    
+signals:
+    
 public slots:
-    void update(XMEASLIB::NewMeasurement::SPtr);
-
+    
 };
 
-} // NAMESPACE
+} //NAMESPACE
 
-#endif // PLUGININPUTCONNECTOR_H
+#endif // MEASUREMENTTYPES_H

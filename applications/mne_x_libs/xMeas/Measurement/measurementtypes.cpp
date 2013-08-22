@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     pluginconnector.h
+* @file     measurementtypes.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,31 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the PluginConnector class.
+* @brief    Contains the implementation of the MeasurementTypes class.
 *
 */
-#ifndef PLUGININPUTCONNECTOR_H
-#define PLUGININPUTCONNECTOR_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../mne_x_global.h"
+#include "measurementtypes.h"
 
-#include "pluginconnector.h"
+#include "newrealtimemultisamplearray.h"
+#include "newnumeric.h"
 
-#include <xMeas/Measurement/newmeasurement.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MNEX
-//=============================================================================================================
-
-namespace MNEX
-{
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -63,54 +52,21 @@ namespace MNEX
 using namespace XMEASLIB;
 
 
+//*************************************************************************************************************
 //=============================================================================================================
-/**
-* Base class to connect plug-in data streams.
-*
-* @brief The PluginConnector class provides the base to connect plug-in data
-*/
-class MNE_X_SHARED_EXPORT PluginInputConnector : public PluginConnector
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+MeasurementTypes::MeasurementTypes(QObject *parent)
+: QObject(parent)
 {
-    Q_OBJECT
-public:
+}
 
-    //=========================================================================================================
-    /**
-    * Constructs a PluginInputConnector with the given parent.
-    *
-    * @param[in] parent     pointer to parent plugin
-    * @param[in] name       connection name
-    * @param[in] descr      connection description
-    */
-    PluginInputConnector(IPluginNew *parent, QString &name, QString &descr);
 
-    //=========================================================================================================
-    /**
-    * Destructor
-    */
-    virtual ~PluginInputConnector(){}
+//*************************************************************************************************************
 
-    //=========================================================================================================
-    /**
-     * Returns true.
-     *
-     * @return true
-     */
-    virtual bool isInputConnector() const;
-
-    //=========================================================================================================
-    /**
-     * Returns false.
-     *
-     * @return false
-     */
-    virtual bool isOutputConnector() const;
-
-public slots:
-    void update(XMEASLIB::NewMeasurement::SPtr);
-
-};
-
-} // NAMESPACE
-
-#endif // PLUGININPUTCONNECTOR_H
+void MeasurementTypes::registerTypes()
+{
+    qRegisterMetaType< NewRealTimeMultiSampleArray::SPtr >("NewRealTimeMultiSampleArray::SPtr");
+    qRegisterMetaType< NewNumeric::SPtr >("NewNumeric::SPtr");
+}

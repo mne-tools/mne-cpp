@@ -43,6 +43,7 @@
 #include "../mne_x_global.h"
 
 #include "pluginconnector.h"
+#include <xMeas/Measurement/newmeasurement.h>
 
 
 //*************************************************************************************************************
@@ -53,6 +54,13 @@
 namespace MNEX
 {
 
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace XMEASLIB;
+
 
 //=============================================================================================================
 /**
@@ -60,9 +68,12 @@ namespace MNEX
 *
 * @brief The PluginConnector class provides the base to connect plug-in data
 */
-class PluginOutputConnector : public PluginConnector
+class MNE_X_SHARED_EXPORT PluginOutputConnector : public PluginConnector
 {
+    Q_OBJECT
 public:
+    typedef QSharedPointer<PluginOutputConnector> SPtr;               /**< Shared pointer type for PluginOutputConnector. */
+    typedef QSharedPointer<const PluginOutputConnector> ConstSPtr;    /**< Const shared pointer type for PluginOutputConnector. */
 
     //=========================================================================================================
     /**
@@ -95,6 +106,9 @@ public:
      * @return true
      */
     virtual bool isOutputConnector() const;
+
+signals:
+    void notify(XMEASLIB::NewMeasurement::SPtr);
 
 };
 

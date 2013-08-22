@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     pluginconnector.h
+* @file     newnumeric.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,88 +29,124 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the PluginConnector class.
+* @brief    Contains the declaration of the Numeric class.
 *
 */
-#ifndef PLUGININPUTCONNECTOR_H
-#define PLUGININPUTCONNECTOR_H
+
+#ifndef NEWNUMERIC_H
+#define NEWNUMERIC_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../mne_x_global.h"
-
-#include "pluginconnector.h"
-
-#include <xMeas/Measurement/newmeasurement.h>
+#include "../xmeas_global.h"
+#include "newmeasurement.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEX
+// Qt INCLUDES
 //=============================================================================================================
 
-namespace MNEX
+#include <QSharedPointer>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE XMEASLIB
+//=============================================================================================================
+
+namespace XMEASLIB
 {
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace XMEASLIB;
 
 
 //=============================================================================================================
 /**
-* Base class to connect plug-in data streams.
+* The Numeric class provides a Numeric Measurement.
 *
-* @brief The PluginConnector class provides the base to connect plug-in data
+* @brief The Numeric class provides a Numeric Measurement.
 */
-class MNE_X_SHARED_EXPORT PluginInputConnector : public PluginConnector
+class XMEASSHARED_EXPORT NewNumeric : public NewMeasurement
 {
-    Q_OBJECT
 public:
+    typedef QSharedPointer<NewNumeric> SPtr;               /**< Shared pointer type for NewNumeric. */
+    typedef QSharedPointer<const NewNumeric> ConstSPtr;    /**< Const shared pointer type for NewNumeric. */
 
     //=========================================================================================================
     /**
-    * Constructs a PluginInputConnector with the given parent.
+    * Constructs a Numeric.
+    */
+    NewNumeric(QObject *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Destroys the Numeric.
+    */
+    virtual ~NewNumeric();
+
+    //=========================================================================================================
+    /**
+    * Sets the unit of the numeric data.
     *
-    * @param[in] parent     pointer to parent plugin
-    * @param[in] name       connection name
-    * @param[in] descr      connection description
+    * @param [in] unit of the data.
     */
-    PluginInputConnector(IPluginNew *parent, QString &name, QString &descr);
+    inline void setUnit(const QString& unit);
 
     //=========================================================================================================
     /**
-    * Destructor
+    * Returns the unit of the numeric measurement.
+    *
+    * @return the unit of the data of measurement.
     */
-    virtual ~PluginInputConnector(){}
+    inline const QString& getUnit() const;
 
     //=========================================================================================================
     /**
-     * Returns true.
-     *
-     * @return true
-     */
-    virtual bool isInputConnector() const;
+    * Sets a value and notify() all attached observers.
+    * This method is inherited by Measurement.
+    *
+    * @param [in] v the value which is set to the Numeric measurement.
+    */
+    virtual void setValue(double v);
 
     //=========================================================================================================
     /**
-     * Returns false.
-     *
-     * @return false
-     */
-    virtual bool isOutputConnector() const;
+    * Returns the current value.
+    * This method is inherited by Measurement.
+    *
+    * @return the current value of the Numeric measurement.
+    */
+    virtual double getValue() const;
 
-public slots:
-    void update(XMEASLIB::NewMeasurement::SPtr);
-
+private:
+    QString m_qString_Unit;     /**< Holds unit of the data of the measurement.*/
+    double  m_dValue;           /**< Holds current set value.*/
 };
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline void NewNumeric::setUnit(const QString& unit)
+{
+    m_qString_Unit = unit;
+}
+
+
+//*************************************************************************************************************
+
+inline const QString& NewNumeric::getUnit() const
+{
+    return m_qString_Unit;
+}
 
 } // NAMESPACE
 
-#endif // PLUGININPUTCONNECTOR_H
+Q_DECLARE_METATYPE(XMEASLIB::NewNumeric::SPtr)
+
+#endif // NUMERIC_H
