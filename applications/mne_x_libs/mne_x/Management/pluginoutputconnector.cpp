@@ -13,7 +13,7 @@ using namespace MNEX;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginOutputConnector::PluginOutputConnector(IPluginNew *parent, QString &name, QString &descr)
+PluginOutputConnector::PluginOutputConnector(IPluginNew *parent, const QString &name, const QString &descr)
 : PluginConnector(parent, name, descr)
 {
 }

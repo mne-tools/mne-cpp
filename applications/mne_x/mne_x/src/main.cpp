@@ -46,6 +46,9 @@
 #include <xMeas/Measurement/newrealtimemultisamplearray.h>
 #include <xMeas/Measurement/newnumeric.h>
 
+#include <mne_x/Management/pluginoutputdata.h>
+#include <mne_x/Interfaces/IPluginNew.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -159,9 +162,29 @@ int main(int argc, char *argv[])
     qInstallMessageHandler(customMessageHandler);
 
 
+    //DEBUG
     NewRealTimeMultiSampleArray RTSATest;
-
     NewNumeric NumericTest;
+
+    IPluginNew* pluginInterface = NULL;
+
+    PluginOutputData<NewRealTimeMultiSampleArray> pluginOutData(pluginInterface, QString("TestPlugin"), QString("No Descr"));
+
+
+    pluginOutData.measurement()->init(2);
+
+    pluginOutData.measurement()->setMultiArraySize(1);
+
+    VectorXd v = VectorXd::Zero(2);
+
+
+    pluginOutData.measurement()->setValue(v);
+
+
+
+
+
+    //DEBUG
 
 
     return app.exec();

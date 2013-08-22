@@ -41,9 +41,16 @@
 //=============================================================================================================
 
 #include "../mne_x_global.h"
-
 #include "pluginoutputconnector.h"
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QSharedPointer>
+#include <QMetaType>
 
 
 //*************************************************************************************************************
@@ -55,9 +62,12 @@ namespace MNEX
 {
 
 template <class T>
-class MNE_X_SHARED_EXPORT PluginOutputData : public PluginOutputConnector
+class PluginOutputData : public PluginOutputConnector
 {
 public:
+    typedef QSharedPointer<PluginOutputData> SPtr;               /**< Shared pointer type for PluginOutputData. */
+    typedef QSharedPointer<const PluginOutputData> ConstSPtr;    /**< Const shared pointer type for PluginOutputData. */
+
     //=========================================================================================================
     /**
     * Constructs a PluginOutputConnector with the given parent.
@@ -66,18 +76,35 @@ public:
     * @param[in] name       connection name
     * @param[in] descr      connection description
     */
-    PluginOutputData(IPluginNew *parent, QString &name, QString &descr);
+    PluginOutputData(IPluginNew *parent, const QString &name, const QString &descr);
 
     //=========================================================================================================
     /**
     * Destructor
     */
     virtual ~PluginOutputData(){}
+
+    //=========================================================================================================
+    /**
+    * Returns the measurement
+    *
+    * @return the measurement
+    */
+    QSharedPointer<T> measurement()
+    {
+        return m_pMeasurement;
+    }
+
+
+    void update();
+
+private:
+    QSharedPointer<T> m_pMeasurement;
 };
 
 } // NAMESPACE
 
 //Make the template definition visible to compiler in the first point of instantiation
-#include "plugininputdata.cpp"
+#include "pluginoutputdata.cpp"
 
 #endif // PLUGININPUTDATA_H
