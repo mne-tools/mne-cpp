@@ -84,6 +84,8 @@ class IIO : public IPlugin, public IMeasurementSink
 {
 //ToDo virtual methods of IMeasurementSink
 public:
+    typedef QSharedPointer<IIO> SPtr;               /**< Shared pointer type for IIO. */
+    typedef QSharedPointer<const IIO> ConstSPtr;    /**< Const shared pointer type for IIO. */
 
     //=========================================================================================================
     /**

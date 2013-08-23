@@ -103,6 +103,8 @@ private:
 
     QAction* createItemAction(QString name, PluginItem::DiagramType type, QMenu* menu);
 
+    MNEX::PluginManager::SPtr m_pPluginManager;  /**< Corresponding plugin manager. */
+
     qint32 m_id;
 
     QMap<int, PluginItem::DiagramType> m_qMapIdType;

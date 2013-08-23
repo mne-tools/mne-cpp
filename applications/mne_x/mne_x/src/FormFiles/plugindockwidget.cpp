@@ -97,9 +97,9 @@ PluginDockWidget::PluginDockWidget( const QString & title, QWidget * parent, Qt:
     algorithms->setToolTip(0, tr("Some Tipps for Algorithms"));
 
     QTreeWidgetItem* ios = new QTreeWidgetItem(m_pTreeWidgetPluginList);
-    ios->setText(0, tr("Visualisations"));
-    ios->setIcon(0, QIcon(":/images/visualisation.png"));
-    ios->setToolTip(0, tr("Some Tipps for Visualisations"));
+    ios->setText(0, tr("I/Os"));
+    ios->setIcon(0, QIcon(":/images/io.png"));
+    ios->setToolTip(0, tr("Some Tipps for I/Os"));
 
 
     QVector<IPlugin*>::const_iterator iterPlugins = PluginManager::s_vecPlugins.begin();

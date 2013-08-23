@@ -5,7 +5,7 @@
         <file alias="save.png">images/icons/save.png</file>
         <file alias="stop.png">images/icons/stop.png</file>
         <file alias="sensor.png">images/icons/sensor.png</file>
-        <file alias="visualisation.png">images/icons/visualisation.png</file>
+        <file alias="io.png">images/icons/io.png</file>
         <file alias="algorithm.png">images/icons/algorithm.png</file>
         <file alias="csa_rt.png">images/icons/mne_x.png</file>
         <file alias="splashscreen.png">images/splashscreen/splashscreen_mne_x.png</file>

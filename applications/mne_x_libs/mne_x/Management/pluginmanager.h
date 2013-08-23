@@ -43,6 +43,15 @@
 
 #include "../mne_x_global.h"
 
+#include <mne_x/Interfaces/IPlugin.h>
+#include <mne_x/Interfaces/ISensor.h>
+#include <mne_x/Interfaces/IAlgorithm.h>
+#include <mne_x/Interfaces/IIO.h>
+//class IPlugin;
+//class ISensor;
+//class IAlgorithm;
+//class IIO;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -67,10 +76,10 @@ namespace MNEX
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class IPlugin;
-class ISensor;
-class IAlgorithm;
-class IIO;
+//class IPlugin;
+//class ISensor;
+//class IAlgorithm;
+//class IIO;
 
 
 //=============================================================================================================
