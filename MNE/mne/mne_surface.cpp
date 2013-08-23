@@ -90,6 +90,12 @@ bool MNESurface::read(QIODevice& p_IODevice, QList<MNESurface::SPtr>& surfaces)
 bool MNESurface::read(FiffStream::SPtr& p_pStream, bool add_geom,
         FiffDirTree& p_Tree, QList<MNESurface::SPtr>& surfaces)
 {
+    if(add_geom)
+    {
+        // TODO Implement complete_surface_info from mne-matlab.
+        qWarning() << "add_geom flag is not yet implemented!";
+    }
+
     QList<FiffDirTree>bem = p_Tree.dir_tree_find(FIFFB_BEM);
     if(bem.isEmpty())
     {
