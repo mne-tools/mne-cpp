@@ -292,6 +292,8 @@ namespace FIFFLIB
 #define FIFFB_REF                118
 #define FIFFB_SMSH_RAW_DATA      119
 #define FIFFB_SMSH_ASPECT        120
+#define FIFFB_BEM                310  /**< A BEM description. */
+#define FIFFB_BEM_SURF           311  /**< Describes one BEM surface. */
 #define FIFFB_PROJ               313
 #define FIFFB_PROJ_ITEM          314
 #define FIFFB_MRI                200
@@ -403,6 +405,20 @@ namespace FIFFLIB
 #define FIFFV_ASPECT_SAMPLE        105    /**< A sample cut out by graph*/
 #define FIFFV_ASPECT_POWER_DENSITY 106    /**< Power density spectrum*/
 #define FIFFV_ASPECT_DIPOLE_WAVE   200    /**< Dipole amplitude curve*/
+
+    //
+    // Conductor models
+    //
+#define FIFF_BEM_SURF_ID        3101  /**< int    - surface number */
+#define FIFF_BEM_SURF_NAME      3102  /**< string - surface name */
+#define FIFF_BEM_SURF_NNODE     3103  /**< int    - # of nodes on a surface */
+#define FIFF_BEM_SURF_NTRI      3104  /**< int    - # number of triangles on a surface */
+#define FIFF_BEM_SURF_NODES     3105  /**< float* - surface nodes */
+#define FIFF_BEM_SURF_TRIANGLES 3106  /**< int*   - surface triangles */
+#define FIFF_BEM_SURF_NORMALS   3107  /**< float* - surface node normal unit vectors */
+#define FIFF_BEM_COORD_FRAME    3112  /**< enum   - the coordinate frame of the mode */
+#define FIFF_BEM_SIGMA          3113  /**< float  - conductivity of a compartment */
+
     //
     // BEM surface IDs
     //
@@ -410,6 +426,7 @@ namespace FIFFLIB
 #define FIFFV_BEM_SURF_ID_BRAIN      1
 #define FIFFV_BEM_SURF_ID_SKULL      3
 #define FIFFV_BEM_SURF_ID_HEAD       4
+
     //
     // More of those defined in MNE
     //
@@ -517,11 +534,6 @@ namespace FIFFLIB
 
 #define FIFF_MNE_SOURCE_SPACE_DIST          3599    /**< Distances between vertices in use (along the surface)*/
 #define FIFF_MNE_SOURCE_SPACE_DIST_LIMIT    3600    /**< If distance is above this limit (in the volume) it has not been calculated*/
-
-
-#define FIFF_BEM_SURF_NTRI                  3104
-#define FIFF_BEM_SURF_TRIANGLES             3106
-
     //
     // 3520... Forward solution
     //
