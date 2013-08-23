@@ -431,13 +431,13 @@ public:
     * @param [in] add_geom          Add geometry information to the source spaces
     * @param [in] p_Tree            Search for the source spaces here
     *
-    * @param [out] p_Surface    The read bem surface
+    * @param [out] p_Surfaces       The read bem surfaces
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_bem_surface(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNESurface& p_Surface)
+    static bool read_bem_surface(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirTree& p_Tree, QList<MNESurface::SPtr>& p_Surfaces)
     {
-        return MNESurface::read(p_pStream, add_geom, p_Tree, p_Surface);
+        return MNESurface::read(p_pStream, add_geom, p_Tree, p_Surfaces);
     }
 
     //ToDo FiffChInfoList Class
