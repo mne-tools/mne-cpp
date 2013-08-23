@@ -58,10 +58,8 @@
 
 #include <mne_x/Interfaces/IPlugin.h>
 #include <mne_x/Interfaces/ISensor.h>
-#include <mne_x/Interfaces/IRTAlgorithm.h>
-#include <mne_x/Interfaces/IRTVisualization.h>
-#include <mne_x/Interfaces/IRTRecord.h>
-#include <mne_x/Interfaces/IAlert.h>
+#include <mne_x/Interfaces/IAlgorithm.h>
+#include <mne_x/Interfaces/IIO.h>
 
 //GUI
 #include "mainwindow.h"
@@ -500,7 +498,7 @@ void MainWindow::createPluginDockWindow()
     m_pNewPluginDockWidget = new QDockWidget(tr("Plugins New"), this);
     m_pNewPluginDockWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
-    PluginGui* pluginGui = new PluginGui;
+    PluginGui* pluginGui = new PluginGui(m_pPluginManager);
     pluginGui->setParent(m_pNewPluginDockWidget);
     m_pNewPluginDockWidget->setWidget(pluginGui);
 

@@ -65,12 +65,11 @@
 namespace MNEX
 {
 
-
 //=============================================================================================================
 /**
 * Class implements plug-in connector connections.
 *
-* @brief The PluginConnectorConnection class holds connector
+* @brief The PluginConnectorConnection class holds connector connections
 */
 class MNE_X_SHARED_EXPORT PluginConnectorConnection : public QObject
 {
@@ -99,9 +98,9 @@ public:
     */
     void createConnection(PluginOutputConnector::SPtr sender, PluginInputConnector::SPtr receiver);
 
-    PluginOutputConnector::SPtr getSender();
+    inline PluginOutputConnector::SPtr getSender();
 
-    PluginInputConnector::SPtr getreceiver();
+    inline PluginInputConnector::SPtr getReceiver();
 
 
 signals:
@@ -112,6 +111,24 @@ private:
 
     QMetaObject::Connection m_con;
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline PluginOutputConnector::SPtr PluginConnectorConnection::getSender()
+{
+    return m_pSender;
+}
+
+
+//*************************************************************************************************************
+
+inline PluginInputConnector::SPtr PluginConnectorConnection::getReceiver()
+{
+    return m_pReceiver;
+}
 
 } // NAMESPACE
 

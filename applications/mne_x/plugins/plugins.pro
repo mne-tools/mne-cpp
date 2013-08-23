@@ -38,26 +38,32 @@ include(../../../mne-cpp.pri)
 
 TEMPLATE = subdirs
 
+# DEBUG
 SUBDIRS += \
-    ecgsimulator \
-    mnertclient \
-    dummytoolbox \
-    rtsss \
+    ecgsimulator #\
+#    dummytoolbox
+# DEBUG
+
+#SUBDIRS += \
+#    ecgsimulator \
+#    mnertclient \
+#    dummytoolbox \
+#    rtsss \
 
 
-contains(MNECPP_CONFIG, babyMEG) {
-    message(BabyMEG plugin configured!)
-#    SUBDIRS +=
-}
-else {
-    message(RtServer plugin configured!)
-    SUBDIRS += sourcelab
+#contains(MNECPP_CONFIG, babyMEG) {
+#    message(BabyMEG plugin configured!)
+##    SUBDIRS +=
+#}
+#else {
+#    message(RtServer plugin configured!)
+#    SUBDIRS += sourcelab
 
-    qtHaveModule(3d) {
-        message(Qt3D available: brainmonitor library configured!)
-        SUBDIRS += brainmonitor \
-    }
-}
+#    qtHaveModule(3d) {
+#        message(Qt3D available: brainmonitor library configured!)
+#        SUBDIRS += brainmonitor \
+#    }
+#}
 
 #    filtertoolbox \
 #    gaborparticletoolbox \

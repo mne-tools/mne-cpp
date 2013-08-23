@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     IRTRecord.h
+* @file     IAlgorithm.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains declaration of IRTReord interface class.
+* @brief    Contains declaration of IAlgorithm interface class.
 *
 */
 
-#ifndef IRTRecord_H
-#define IRTRecord_H
+#ifndef IALGORITHM_H
+#define IALGORITHM_H
 
 
 //*************************************************************************************************************
@@ -42,27 +42,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "IPlugin.h"
 #include <xMeas/Nomenclature/nomenclature.h>
-#include <generics/circularbuffer_old.h>
 
+#include <xMeas/Measurement/IMeasurementSource.h>
 #include <xMeas/Measurement/IMeasurementSink.h>
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
-
-#include <QMap>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QFile>
 
 
 //*************************************************************************************************************
@@ -76,24 +60,24 @@ namespace MNEX
 
 //=============================================================================================================
 /**
-* DECLARE CLASS IRTRecord
+* DECLARE CLASS IAlgorithm
 *
-* @brief The IRTRecord class provides an interface for a real-time record plugin.
+* @brief The IAlgorithm class provides an interface for a real-time algorithm plugin.
 */
-class IRTRecord : public IPlugin, public IMeasurementSink
+class IAlgorithm : public IMeasurementSource, public IMeasurementSink
 {
-//ToDo virtual methods of IMeasurementSink
+//ToDo virtual methods of IMeasurementSink && IMeasurementSource
 public:
 
     //=========================================================================================================
     /**
-    * Destroys the IRTRecord.
+    * Destroys the IAlgorithm.
     */
-    virtual ~IRTRecord() {};
+    virtual ~IAlgorithm() {};
 
     //=========================================================================================================
     /**
-    * Starts the IRTRecord.
+    * Starts the IAlgorithm.
     * Pure virtual method inherited by IPlugin.
     *
     * @return true if success, false otherwise
@@ -102,7 +86,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Stops the IRTRecord.
+    * Stops the IAlgorithm.
     * Pure virtual method inherited by IPlugin.
     *
     * @return true if success, false otherwise
@@ -114,7 +98,7 @@ public:
     * Returns the plugin type.
     * Pure virtual method inherited by IPlugin.
     *
-    * @return type of the IRTRecord
+    * @return type of the IAlgorithm
     */
     virtual Type getType() const = 0;
 
@@ -123,18 +107,18 @@ public:
     * Returns the plugin name.
     * Pure virtual method inherited by IPlugin.
     *
-    * @return the name of the IRTRecord.
+    * @return the name of the IAlgorithm.
     */
     virtual const char* getName() const = 0;
 
     //=========================================================================================================
     /**
-    * Returns the set up widget for configuration of IRTRecord.
+    * Returns the set up widget for configuration of IAlgorithm.
     * Pure virtual method inherited by IPlugin.
     *
     * @return the setup widget.
     */
-    virtual QWidget* setupWidget() const = 0; //setup();
+    virtual QWidget* setupWidget() = 0; //setup();
 
     //=========================================================================================================
     /**
@@ -143,7 +127,7 @@ public:
     *
     * @return the run widget.
     */
-    virtual QWidget* runWidget() const = 0;
+    virtual QWidget* runWidget() = 0;
 
     //=========================================================================================================
     /**
@@ -154,14 +138,6 @@ public:
     */
     virtual void update(Subject* pSubject) = 0;
 
-    //=========================================================================================================
-    /**
-    * Sets the name of the RTRecord directory.
-    *
-    * @param [in] dirName name of the RTRecord directory
-    */
-    inline void setRTRecordDirName(const QString& dirName);
-
 protected:
 
     //=========================================================================================================
@@ -171,25 +147,10 @@ protected:
     * Pure virtual method inherited by QThread
     */
     virtual void run() = 0;
-
-    QString                         m_RTRecordDirName;		/**< Holds the real-time record sub directory name. */
-    typedef QMap<S16, QFile*>       t_FileMap;				/**< Defines a new file mapping type. */
-    t_FileMap                       m_mapFiles;				/**< Holds the file map. */
 };
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-inline void IRTRecord::setRTRecordDirName(const QString& dirName)
-{
-    m_RTRecordDirName = dirName;
-}
 
 } // NAMESPACE
 
-Q_DECLARE_INTERFACE(MNEX::IRTRecord, "mne_x/1.0")
+Q_DECLARE_INTERFACE(MNEX::IAlgorithm, "mne_x/1.0")
 
-#endif // IRTRecord_H
+#endif // IALGORITHM_H

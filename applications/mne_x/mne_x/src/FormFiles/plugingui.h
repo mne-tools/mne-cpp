@@ -43,8 +43,16 @@
 
 #include "pluginitem.h"
 
+#include <mne_x/Management/pluginmanager.h>
+
 #include <QMainWindow>
 #include <QMap>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
 class PluginScene;
 
@@ -59,12 +67,23 @@ class QToolButton;
 class QAbstractButton;
 class QGraphicsView;
 
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNEX
+//=============================================================================================================
+
+namespace MNEX
+{
+
+
 class PluginGui : public QMainWindow
 {
     Q_OBJECT
 
 public:
-   PluginGui();
+   PluginGui(MNEX::PluginManager::SPtr pPluginManager);
 
 private slots:
 //    void buttonGroupClicked(int id);
@@ -89,7 +108,7 @@ private:
     QMap<int, PluginItem::DiagramType> m_qMapIdType;
     QMap<int, QString> m_qMapIdName;
 
-    PluginScene *m_pluginScene;
+    PluginScene *m_pPluginScene;
     QGraphicsView *view;
 
     QAction *addAction;
@@ -110,5 +129,7 @@ private:
     QAction *fillAction;
     QAction *lineAction;
 };
+
+} //NAMESPACE
 
 #endif // PLUGINGUI_H
