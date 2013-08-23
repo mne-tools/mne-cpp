@@ -42,6 +42,10 @@
 
 #include "../mne_x_global.h"
 
+#include "plugininputconnector.h"
+#include "pluginoutputconnector.h"
+#include "plugininputconnector.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -62,6 +66,12 @@ namespace MNEX
 {
 
 
+//=============================================================================================================
+/**
+* Class implements plug-in connector connections.
+*
+* @brief The PluginConnectorConnection class holds connector
+*/
 class MNE_X_SHARED_EXPORT PluginConnectorConnection : public QObject
 {
     Q_OBJECT
@@ -69,14 +79,38 @@ public:
     typedef QSharedPointer<PluginConnectorConnection> SPtr;             /**< Shared pointer type for PluginConnectorConnection. */
     typedef QSharedPointer<const PluginConnectorConnection> ConstSPtr;  /**< Const shared pointer type for PluginConnectorConnection. */
 
-    explicit PluginConnectorConnection(QObject *parent = 0);
+    explicit PluginConnectorConnection(PluginOutputConnector::SPtr sender, PluginInputConnector::SPtr receiver, QObject *parent = 0);
     
+    //=========================================================================================================
+    /**
+    * Destructor
+    */
+    virtual ~PluginConnectorConnection();
+
+    //=========================================================================================================
+    /**
+    * Disconnect connection
+    */
+    void clearConnection();
+
+    //=========================================================================================================
+    /**
+    * Create connection
+    */
+    void createConnection(PluginOutputConnector::SPtr sender, PluginInputConnector::SPtr receiver);
+
+    PluginOutputConnector::SPtr getSender();
+
+    PluginInputConnector::SPtr getreceiver();
+
+
 signals:
     
 private:
-    QMetaObject::Connection m_con;
+    PluginOutputConnector::SPtr m_pSender;
+    PluginInputConnector::SPtr m_pReceiver;
 
-    
+    QMetaObject::Connection m_con;
 };
 
 } // NAMESPACE

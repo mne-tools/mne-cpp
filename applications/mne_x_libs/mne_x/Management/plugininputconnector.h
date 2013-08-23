@@ -73,6 +73,8 @@ class MNE_X_SHARED_EXPORT PluginInputConnector : public PluginConnector
 {
     Q_OBJECT
 public:
+    typedef QSharedPointer<PluginInputConnector> SPtr;               /**< Shared pointer type for PluginInputConnector. */
+    typedef QSharedPointer<const PluginInputConnector> ConstSPtr;    /**< Const shared pointer type for PluginInputConnector. */
 
     //=========================================================================================================
     /**
