@@ -9,7 +9,7 @@
  *
  * @section  LICENSE
  *
- * Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+ * Copyright (C) 2012, Christof Pieloth, Christoph Dinh and Matti Hamalainen. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -38,9 +38,9 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-
 #include <QtCore/QtDebug>
 
+#include <fiff/fiff_constants.h>
 #include <fiff/fiff_dir_entry.h>
 #include <fiff/fiff_tag.h>
 
@@ -90,14 +90,14 @@ bool MNESurface::read(QIODevice& p_IODevice, QList<MNESurface::SPtr>& surfaces)
 bool MNESurface::read(FiffStream::SPtr& p_pStream, bool add_geom,
         FiffDirTree& p_Tree, QList<MNESurface::SPtr>& surfaces)
 {
-    QList<FiffDirTree>bem = p_Tree.dir_tree_find(BlockType::FIFFB_BEM);
+    QList<FiffDirTree>bem = p_Tree.dir_tree_find(FIFFB_BEM);
     if(bem.isEmpty())
     {
         qCritical() << "No BEM block found!";
         return false;
     }
 
-    QList<FiffDirTree>bemsurf = p_Tree.dir_tree_find(BlockType::FIFFB_BEM_SURF);
+    QList<FiffDirTree>bemsurf = p_Tree.dir_tree_find(FIFFB_BEM_SURF);
     if(bemsurf.isEmpty())
     {
         qCritical() << "No BEM surfaces found!";
@@ -106,7 +106,7 @@ bool MNESurface::read(FiffStream::SPtr& p_pStream, bool add_geom,
 
     FiffTag::SPtr tag(new FiffTag());
     fiff_int_t coord_frame;
-    if(bem.at(0).find_tag(p_pStream.data(), Tag::FIFF_BEM_COORD_FRAME, tag))
+    if(bem.at(0).find_tag(p_pStream.data(), FIFF_BEM_COORD_FRAME, tag))
     {
         coord_frame = *tag->toInt();
     }else
@@ -143,7 +143,7 @@ bool MNESurface::read(FIFFLIB::FiffStream* fiffStream,
     // Read attributes //
     //-----------------//
 
-    if(dir.find_tag(fiffStream, Tag::FIFF_BEM_SURF_ID, tag))
+    if(dir.find_tag(fiffStream, FIFF_BEM_SURF_ID, tag))
     {
         surf->id = *tag->toInt();
     }else
@@ -152,7 +152,7 @@ bool MNESurface::read(FIFFLIB::FiffStream* fiffStream,
         qWarning() << "ID not found! Default: " << surf->id;
     }
 
-    if(dir.find_tag(fiffStream, Tag::FIFF_BEM_SIGMA, tag))
+    if(dir.find_tag(fiffStream, FIFF_BEM_SIGMA, tag))
     {
         surf->sigma = *tag->toFloat();
     }else
@@ -161,7 +161,7 @@ bool MNESurface::read(FIFFLIB::FiffStream* fiffStream,
         qWarning() << "sigma not found! Default: " << surf->sigma;
     }
 
-    if(dir.find_tag(fiffStream, Tag::FIFF_BEM_SURF_NNODE, tag))
+    if(dir.find_tag(fiffStream, FIFF_BEM_SURF_NNODE, tag))
     {
         surf->np = *tag->toInt();
     }else
@@ -186,7 +186,7 @@ bool MNESurface::read(FIFFLIB::FiffStream* fiffStream,
     {
         qWarning()
                 << "FIFF_MNE_COORD_FRAME not found, trying FIFF_BEM_COORD_FRAME.";
-        if(dir.find_tag(fiffStream, Tag::FIFF_BEM_COORD_FRAME, tag))
+        if(dir.find_tag(fiffStream, FIFF_BEM_COORD_FRAME, tag))
         {
             surf->coord_frame = *tag->toInt();
         }else
@@ -200,7 +200,7 @@ bool MNESurface::read(FIFFLIB::FiffStream* fiffStream,
     // Read data //
     //-----------//
 
-    if(dir.find_tag(fiffStream, Tag::FIFF_BEM_SURF_NODES, tag) && surf->np > 0)
+    if(dir.find_tag(fiffStream, FIFF_BEM_SURF_NODES, tag) && surf->np > 0)
     {
         surf->rr.resize(3, surf->np);
         surf->rr = tag->toFloatMatrix();

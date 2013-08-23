@@ -9,7 +9,7 @@
  *
  * @section  LICENSE
  *
- * Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+ * Copyright (C) 2013, Christof Pieloth, Christoph Dinh and Matti Hamalainen. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -151,29 +151,6 @@ public:
     TrianglesT tris; /**< Triangulation information */
 
 private:
-    struct BlockType
-    {
-        enum Enum
-        {
-            FIFFB_BEM = 310,
-            FIFFB_BEM_SURF = 311
-        };
-    };
-
-    struct Tag
-    {
-        enum Enum
-        {
-            FIFF_BEM_COORD_FRAME = 3112,
-            FIFF_BEM_SURF_ID = 3101,
-            FIFF_BEM_SURF_NAME = 3102,
-            FIFF_BEM_SURF_NNODE = 3103,
-            FIFF_BEM_SURF_NODES = 3105,
-            FIFF_BEM_SURF_NORMALS = 3107,
-            FIFF_BEM_SIGMA = 3113
-        };
-    };
-
     /**
      * Reads and creates a surface from a given block.
      *
