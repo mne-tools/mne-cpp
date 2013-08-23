@@ -64,8 +64,9 @@ using namespace MNEX;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginGui::PluginGui(MNEX::PluginManager::SPtr pPluginManager)
-: m_id(0)
+PluginGui::PluginGui(PluginManager::SPtr pPluginManager)
+: m_pPluginManager(pPluginManager)
+, m_id(0)
 {
     createActions();
     createMenuItem();
@@ -74,17 +75,11 @@ PluginGui::PluginGui(MNEX::PluginManager::SPtr pPluginManager)
     m_pPluginScene->setSceneRect(QRectF(0, 0, 200, 500));
     connect(m_pPluginScene, SIGNAL(itemInserted(PluginItem*)),
             this, SLOT(itemInserted(PluginItem*)));
+
     createToolbars();
 
-//    QHBoxLayout *layout = new QHBoxLayout;
-//    layout->addWidget(toolBox);
     view = new QGraphicsView(m_pPluginScene);
-//    layout->addWidget(view);
 
-//    QWidget *widget = new QWidget;
-//    widget->setLayout(layout);
-
-//    setCentralWidget(widget);
     setCentralWidget(view);
     setWindowTitle(tr("PluginScene"));
     setUnifiedTitleAndToolBarOnMac(true);
@@ -229,8 +224,10 @@ void PluginGui::createToolbars()
 
     QToolButton *sensorToolButton = new QToolButton;
     QMenu *menuSensors = new QMenu;
-    createItemAction(QString("ECG Simulator"), PluginItem::Sensor, menuSensors);
-    createItemAction(QString("RT Client"), PluginItem::Sensor, menuSensors);
+    for(qint32 i = 0; i < m_pPluginManager->getSensorPlugins().size(); ++i)
+        createItemAction(m_pPluginManager->getSensorPlugins()[i]->getName(), PluginItem::Sensor, menuSensors);
+//    createItemAction(QString("ECG Simulator"), PluginItem::Sensor, menuSensors);
+//    createItemAction(QString("RT Client"), PluginItem::Sensor, menuSensors);
     sensorToolButton->setMenu(menuSensors);
     sensorToolButton->setPopupMode(QToolButton::InstantPopup);
     sensorToolButton->setIcon(QIcon(":/images/sensor.png"));
@@ -239,27 +236,31 @@ void PluginGui::createToolbars()
 
     QToolButton *algorithmToolButton = new QToolButton;
     QMenu *menuAlgorithms = new QMenu;
-    createItemAction(QString("SourceLab"), PluginItem::Algorithm, menuAlgorithms);
-    createItemAction(QString("RTSSS"), PluginItem::Algorithm, menuAlgorithms);
+    for(qint32 i = 0; i < m_pPluginManager->getAlgorithmPlugins().size(); ++i)
+        createItemAction(m_pPluginManager->getAlgorithmPlugins()[i]->getName(), PluginItem::Algorithm, menuAlgorithms);
+//    createItemAction(QString("SourceLab"), PluginItem::Algorithm, menuAlgorithms);
+//    createItemAction(QString("RTSSS"), PluginItem::Algorithm, menuAlgorithms);
     algorithmToolButton->setMenu(menuAlgorithms);
     algorithmToolButton->setPopupMode(QToolButton::InstantPopup);
     algorithmToolButton->setIcon(QIcon(":/images/algorithm.png"));
     algorithmToolButton->setStatusTip(tr("Algorithm Plugins"));
     algorithmToolButton->setToolTip(tr("Algorithm Plugins"));
 
-    QToolButton *recordToolButton = new QToolButton;
-    QMenu *menuRecords = new QMenu;
-    createItemAction(QString("FIFF"), PluginItem::Io, menuRecords);
-    recordToolButton->setMenu(menuRecords);
-    recordToolButton->setPopupMode(QToolButton::InstantPopup);
-    recordToolButton->setIcon(QIcon(":/images/visualisation.png"));
-    recordToolButton->setStatusTip(tr("I/O Plugins"));
-    recordToolButton->setToolTip(tr("I/O Plugins"));
+    QToolButton *ioToolButton = new QToolButton;
+    QMenu *menuIo = new QMenu;
+    for(qint32 i = 0; i < m_pPluginManager->getIOPlugins().size(); ++i)
+        createItemAction(m_pPluginManager->getIOPlugins()[i]->getName(), PluginItem::Io, menuIo);
+//    createItemAction(QString("FIFF"), PluginItem::Io, menuIo);
+    ioToolButton->setMenu(menuIo);
+    ioToolButton->setPopupMode(QToolButton::InstantPopup);
+    ioToolButton->setIcon(QIcon(":/images/io.png"));
+    ioToolButton->setStatusTip(tr("I/O Plugins"));
+    ioToolButton->setToolTip(tr("I/O Plugins"));
 
     m_pToolBarPlugins = new QToolBar(tr("Plugins"), this);
     m_pToolBarPlugins->addWidget(sensorToolButton);
     m_pToolBarPlugins->addWidget(algorithmToolButton);
-    m_pToolBarPlugins->addWidget(recordToolButton);
+    m_pToolBarPlugins->addWidget(ioToolButton);
 
     m_pToolBarPlugins->setAllowedAreas(Qt::LeftToolBarArea);
     m_pToolBarPlugins->setFloatable(false);
