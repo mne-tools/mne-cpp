@@ -66,9 +66,39 @@ namespace MNEX
 template <class T>
 PluginInputData<T>::PluginInputData(IPluginNew *parent, QString &name, QString &descr)
 : PluginInputConnector(parent, name, descr)
+, m_pFunc(NULL)
 {
 
+    connect(this, &PluginInputConnector::notify, this, &PluginInputData<T>::notifyCallbackFunction);
 }
+
+
+//*************************************************************************************************************
+
+template <class T>
+void PluginInputData<T>::setCallbackMethod(callback_function pFunc)
+{
+    m_pFunc = pFunc;
+}
+
+
+//*************************************************************************************************************
+
+template <class T>
+void PluginInputData<T>::notifyCallbackFunction(XMEASLIB::NewMeasurement::SPtr pMeasurement)
+{
+    qDebug() << "Here in input data.";
+    if(m_pFunc)
+    {
+        QSharedPointer<T> measurement = pMeasurement.dynamicCast<T>();
+
+        (*m_pFunc)(measurement);
+    }
+}
+
+
+
+
 
 }//Namespace
 

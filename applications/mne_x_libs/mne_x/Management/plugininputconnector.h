@@ -106,8 +106,14 @@ public:
      */
     virtual bool isOutputConnector() const;
 
+
+signals:
+    void notify(XMEASLIB::NewMeasurement::SPtr pMeasurement);
+
 public slots:
-    void update(XMEASLIB::NewMeasurement::SPtr);
+    void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
+
+
 
 };
 

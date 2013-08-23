@@ -38,7 +38,7 @@ bool PluginInputConnector::isOutputConnector() const
 
 //*************************************************************************************************************
 
-void PluginInputConnector::update(XMEASLIB::NewMeasurement::SPtr)
+void PluginInputConnector::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
-
+    emit notify(pMeasurement);
 }

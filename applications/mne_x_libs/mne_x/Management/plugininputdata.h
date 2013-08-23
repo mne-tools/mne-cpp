@@ -44,6 +44,8 @@
 
 #include "plugininputconnector.h"
 
+#include <QSharedPointer>
+
 
 
 //*************************************************************************************************************
@@ -58,6 +60,12 @@ template <class T>
 class PluginInputData : public PluginInputConnector
 {
 public:
+    typedef void (*callback_function)(QSharedPointer<T>);       /**< Callback function type. */
+
+    typedef QSharedPointer<PluginInputData> SPtr;               /**< Shared pointer type for PluginInputData. */
+    typedef QSharedPointer<const PluginInputData> ConstSPtr;    /**< Const shared pointer type for PluginInputData. */
+
+
     //=========================================================================================================
     /**
     * Constructs a PluginInputConnector with the given parent.
@@ -73,6 +81,29 @@ public:
     * Destructor
     */
     virtual ~PluginInputData(){}
+
+
+    //=========================================================================================================
+    /**
+    * Convinience function - this can be used to register a function which should be called when new data are available.
+    * The signal void notify(XMEASLIB::NewMeasurement::SPtr) can be used instead of registering a function.
+    *
+    * @param[in] pFunc  callback function to register
+    */
+    void setCallbackMethod(callback_function pFunc);
+
+protected:
+    //=========================================================================================================
+    /**
+    * SLOT to notify the registered calback fucntion.
+    *
+    * @param[in] pMeasurement   the measurement data to downcast.
+    */
+    void notifyCallbackFunction(XMEASLIB::NewMeasurement::SPtr pMeasurement);
+
+private:
+    callback_function m_pFunc;  /**< registered callback function */
+
 };
 
 } // NAMESPACE

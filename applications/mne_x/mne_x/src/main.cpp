@@ -47,6 +47,7 @@
 #include <xMeas/Measurement/newnumeric.h>
 
 #include <mne_x/Management/pluginoutputdata.h>
+#include <mne_x/Management/plugininputdata.h>
 #include <mne_x/Interfaces/IPluginNew.h>
 
 
@@ -122,6 +123,20 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
 
 }
 
+
+
+void debugTest(QSharedPointer<NewRealTimeMultiSampleArray> testData)
+{
+    qDebug() << "Here in debug Test Callback new";
+
+    QVector< VectorXd > matSamples = testData->getMultiSampleArray();
+    qDebug() << "Received data:";
+    for(qint32 i = 0; i < matSamples.size(); ++i)
+        qDebug() << matSamples[i][0];
+
+
+}
+
 //*************************************************************************************************************
 //=============================================================================================================
 // MAIN
@@ -168,22 +183,20 @@ int main(int argc, char *argv[])
 
     IPluginNew* pluginInterface = NULL;
 
-    PluginOutputData<NewRealTimeMultiSampleArray> pluginOutData(pluginInterface, QString("TestPlugin"), QString("No Descr"));
+    PluginOutputData<NewRealTimeMultiSampleArray> pluginOutputData(pluginInterface, QString("TestPlugin"), QString("No Descr"));
+    PluginInputData<NewRealTimeMultiSampleArray> pluginInputData(pluginInterface, QString("TestPlugin2"), QString("No Descr2"));
+    pluginInputData.setCallbackMethod(&debugTest);
 
+    QObject::connect(&pluginOutputData, &PluginOutputConnector::notify, &pluginInputData, &PluginInputConnector::update);
 
-    pluginOutData.measurement()->init(2);
-
-    pluginOutData.measurement()->setMultiArraySize(1);
+    pluginOutputData.measurement()->init(2);
+    pluginOutputData.measurement()->setMultiArraySize(2);
 
     VectorXd v = VectorXd::Zero(2);
-
-
-    pluginOutData.measurement()->setValue(v);
-
-
-
-
-
+    v[0] = 2.3;
+    pluginOutputData.measurement()->setValue(v);
+    v[0] = 4.1;
+    pluginOutputData.measurement()->setValue(v);
     //DEBUG
 
 
