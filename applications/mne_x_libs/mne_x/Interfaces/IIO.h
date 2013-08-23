@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     IAlert.h
+* @file     IIO.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains declaration of IAlert interface class.
+* @brief    Contains declaration of IIO interface class.
 *
 */
 
-#ifndef IALERT_H
-#define IALERT_H
+#ifndef IIO_H
+#define IIO_H
 
 
 //*************************************************************************************************************
@@ -43,7 +43,26 @@
 //=============================================================================================================
 
 #include "IPlugin.h"
+#include <xMeas/Nomenclature/nomenclature.h>
+#include <generics/circularbuffer_old.h>
+
 #include <xMeas/Measurement/IMeasurementSink.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <QMap>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QFile>
 
 
 //*************************************************************************************************************
@@ -54,26 +73,27 @@
 namespace MNEX
 {
 
+
 //=============================================================================================================
 /**
-* DECLARE CLASS IAlert
+* DECLARE CLASS IIO
 *
-* @brief The IAlert class provides an interface for an alert plugin.
+* @brief The IIO class provides an interface for a real-time record plugin.
 */
-class IAlert : public IPlugin, public IMeasurementSink
+class IIO : public IPlugin, public IMeasurementSink
 {
 //ToDo virtual methods of IMeasurementSink
 public:
 
     //=========================================================================================================
     /**
-    * Destroys the IAlert.
+    * Destroys the IIO.
     */
-    virtual ~IAlert() {};
+    virtual ~IIO() {};
 
     //=========================================================================================================
     /**
-    * Starts the IAlert.
+    * Starts the IIO.
     * Pure virtual method inherited by IPlugin.
     *
     * @return true if success, false otherwise
@@ -82,7 +102,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Stops the IAlert.
+    * Stops the IIO.
     * Pure virtual method inherited by IPlugin.
     *
     * @return true if success, false otherwise
@@ -94,7 +114,7 @@ public:
     * Returns the plugin type.
     * Pure virtual method inherited by IPlugin.
     *
-    * @return type of the IAlert
+    * @return type of the IIO
     */
     virtual Type getType() const = 0;
 
@@ -103,18 +123,18 @@ public:
     * Returns the plugin name.
     * Pure virtual method inherited by IPlugin.
     *
-    * @return the name of the IAlert.
+    * @return the name of the IIO.
     */
     virtual const char* getName() const = 0;
 
     //=========================================================================================================
     /**
-    * Returns the set up widget for configuration of IAlert.
+    * Returns the set up widget for configuration of IIO.
     * Pure virtual method inherited by IPlugin.
     *
     * @return the setup widget.
     */
-    virtual QWidget* setupWidget() const = 0; //setup()
+    virtual QWidget* setupWidget() const = 0; //setup();
 
     //=========================================================================================================
     /**
@@ -134,6 +154,14 @@ public:
     */
     virtual void update(Subject* pSubject) = 0;
 
+    //=========================================================================================================
+    /**
+    * Sets the name of the RTRecord directory.
+    *
+    * @param [in] dirName name of the RTRecord directory
+    */
+    inline void setRTRecordDirName(const QString& dirName);
+
 protected:
 
     //=========================================================================================================
@@ -144,10 +172,24 @@ protected:
     */
     virtual void run() = 0;
 
+    QString                         m_RTRecordDirName;		/**< Holds the real-time record sub directory name. */
+    typedef QMap<S16, QFile*>       t_FileMap;				/**< Defines a new file mapping type. */
+    t_FileMap                       m_mapFiles;				/**< Holds the file map. */
 };
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline void IIO::setRTRecordDirName(const QString& dirName)
+{
+    m_RTRecordDirName = dirName;
+}
 
 } // NAMESPACE
 
-Q_DECLARE_INTERFACE(MNEX::IAlert, "mne_x/1.0")
+Q_DECLARE_INTERFACE(MNEX::IIO, "mne_x/1.0")
 
-#endif // IALERT_H
+#endif // IIO_H

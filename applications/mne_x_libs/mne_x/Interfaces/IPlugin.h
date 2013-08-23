@@ -69,11 +69,9 @@ namespace MNEX
 */
 enum Type
 {
-    _ISensor,               /**< Type for a sensor plugin. */
-    _IRTAlgorithm,          /**< Type for a real-time algorithm plugin. */
-    _IRTRecord,             /**< Type for a real-time record plugin. */
-    _IAlert,                /**< Type for a alert plugin. */
-    _IRTVisualization       /**< Type for a real-time visualization plugin. */
+    _ISensor,       /**< Type for a sensor plugin. */
+    _IAlgorithm,    /**< Type for a real-time algorithm plugin. */
+    _IIO            /**< Type for a real-time I/O plugin. */
 };
 
 using namespace XMEASLIB;

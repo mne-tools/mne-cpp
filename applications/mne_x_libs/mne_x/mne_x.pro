@@ -90,10 +90,6 @@ SOURCES += \
 HEADERS += \
     mne_x_global.h \
     Interfaces/ISensor.h \
-    Interfaces/IRTVisualization.h \
-    Interfaces/IRTRecord.h \
-    Interfaces/IRTAlgorithm.h \
-    Interfaces/IAlert.h \
     Interfaces/IPlugin.h \
     Interfaces/IPluginNew.h \
     Management/connector.h \
@@ -105,7 +101,9 @@ HEADERS += \
     Management/pluginoutputdata.h \
     Management/pluginset.h \
     Management/pluginconnectormanager.h \
-    Management/pluginconnectorconnection.h
+    Management/pluginconnectorconnection.h \
+    Interfaces/IIO.h \
+    Interfaces/IAlgorithm.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

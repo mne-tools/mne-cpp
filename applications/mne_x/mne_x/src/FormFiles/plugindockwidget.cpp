@@ -44,10 +44,8 @@
 
 #include <mne_x/Interfaces/IPlugin.h>
 #include <mne_x/Interfaces/ISensor.h>
-#include <mne_x/Interfaces/IRTAlgorithm.h>
-#include <mne_x/Interfaces/IRTVisualization.h>
-#include <mne_x/Interfaces/IRTRecord.h>
-#include <mne_x/Interfaces/IAlert.h>
+#include <mne_x/Interfaces/IAlgorithm.h>
+#include <mne_x/Interfaces/IIO.h>
 
 #include "../preferences/info.h"
 
@@ -98,10 +96,10 @@ PluginDockWidget::PluginDockWidget( const QString & title, QWidget * parent, Qt:
     algorithms->setIcon(0, QIcon(":/images/algorithm.png"));
     algorithms->setToolTip(0, tr("Some Tipps for Algorithms"));
 
-    QTreeWidgetItem* displays = new QTreeWidgetItem(m_pTreeWidgetPluginList);
-    displays->setText(0, tr("Visualisations"));
-    displays->setIcon(0, QIcon(":/images/visualisation.png"));
-    displays->setToolTip(0, tr("Some Tipps for Visualisations"));
+    QTreeWidgetItem* ios = new QTreeWidgetItem(m_pTreeWidgetPluginList);
+    ios->setText(0, tr("Visualisations"));
+    ios->setIcon(0, QIcon(":/images/visualisation.png"));
+    ios->setToolTip(0, tr("Some Tipps for Visualisations"));
 
 
     QVector<IPlugin*>::const_iterator iterPlugins = PluginManager::s_vecPlugins.begin();
@@ -119,13 +117,13 @@ PluginDockWidget::PluginDockWidget( const QString & title, QWidget * parent, Qt:
         {
             item = new QTreeWidgetItem(sensors);
         }
-        else if(plugin_type == _IRTAlgorithm)
+        else if(plugin_type == _IAlgorithm)
         {
             item = new QTreeWidgetItem(algorithms);
         }
-        else if(plugin_type == _IRTVisualization)
+        else if(plugin_type == _IIO)
         {
-            item = new QTreeWidgetItem(displays);
+            item = new QTreeWidgetItem(ios);
         }
 
         item->setText(0, name);

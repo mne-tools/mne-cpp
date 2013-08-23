@@ -50,10 +50,8 @@
 
 #include "../Interfaces/IPlugin.h"
 #include "../Interfaces/ISensor.h"
-#include "../Interfaces/IRTAlgorithm.h"
-#include "../Interfaces/IRTVisualization.h"
-#include "../Interfaces/IRTRecord.h"
-#include "../Interfaces/IAlert.h"
+#include "../Interfaces/IAlgorithm.h"
+#include "../Interfaces/IIO.h"
 
 
 //*************************************************************************************************************
@@ -124,13 +122,13 @@ void Connector::connectMeasurements()
     QList<PLG_ID::Plugin_ID> plg_idList;
     QList<MSR_ID::Measurement_ID> msr_idList;
 
-    for(int j = 0; j < PluginManager::getActiveRTRecordPlugins().size(); ++j)
+    for(int j = 0; j < PluginManager::getActiveIOPlugins().size(); ++j)
     {
         plg_idList.clear();
         msr_idList.clear();
-        plg_idList << (PluginManager::getActiveRTRecordPlugins()[j])->getAcceptorPlugin_IDs();
-        msr_idList << (PluginManager::getActiveRTRecordPlugins()[j])->getAcceptorMeasurement_IDs();
-        IObserver* pRTRecord = dynamic_cast<IObserver*>(PluginManager::getActiveRTRecordPlugins()[j]);
+        plg_idList << (PluginManager::getActiveIOPlugins()[j])->getAcceptorPlugin_IDs();
+        msr_idList << (PluginManager::getActiveIOPlugins()[j])->getAcceptorMeasurement_IDs();
+        IObserver* pRTRecord = dynamic_cast<IObserver*>(PluginManager::getActiveIOPlugins()[j]);
 
         qDebug() << "########2#########" << plg_idList << " MSR " << msr_idList;
         MeasurementManager::attachToRTSA(pRTRecord, plg_idList, msr_idList);
@@ -138,34 +136,17 @@ void Connector::connectMeasurements()
 
     //ToDo not within here
     // Connect RealTimeSampleArray (Subject) to IAlgorithm plug-ins (IObserver)
-    for(int j = 0; j < PluginManager::getActiveRTAlgorithmPlugins().size(); ++j)
+    for(int j = 0; j < PluginManager::getActiveAlgorithmPlugins().size(); ++j)
     {
         plg_idList.clear();
         msr_idList.clear();
-        plg_idList << (PluginManager::getActiveRTAlgorithmPlugins()[j])->getAcceptorPlugin_IDs();
-        msr_idList << (PluginManager::getActiveRTAlgorithmPlugins()[j])->getAcceptorMeasurement_IDs();
-        IObserver* pRTAlgorithm = dynamic_cast<IObserver*>(PluginManager::getActiveRTAlgorithmPlugins()[j]);
+        plg_idList << (PluginManager::getActiveAlgorithmPlugins()[j])->getAcceptorPlugin_IDs();
+        msr_idList << (PluginManager::getActiveAlgorithmPlugins()[j])->getAcceptorMeasurement_IDs();
+        IObserver* pAlgorithm = dynamic_cast<IObserver*>(PluginManager::getActiveAlgorithmPlugins()[j]);
 
         qDebug() << "########2#########" << plg_idList << " MSR " << msr_idList;
-        MeasurementManager::attachToRTSA(pRTAlgorithm, plg_idList, msr_idList);
+        MeasurementManager::attachToRTSA(pAlgorithm, plg_idList, msr_idList);
     }
-
-    //ToDo not within here
-    // Connect RealTimeSampleArray (Subject) to IVisualization plug-ins (IObserver)
-    for(int j = 0; j < PluginManager::getActiveRTVisualizationPlugins().size(); ++j)
-    {
-        plg_idList.clear();
-        msr_idList.clear();
-        plg_idList << (PluginManager::getActiveRTVisualizationPlugins()[j])->getAcceptorPlugin_IDs();
-        msr_idList << (PluginManager::getActiveRTVisualizationPlugins()[j])->getAcceptorMeasurement_IDs();
-        IObserver* pRTVisualization = dynamic_cast<IObserver*>(PluginManager::getActiveRTVisualizationPlugins()[j]);
-
-        qDebug() << "########2#########" << plg_idList << " MSR " << msr_idList;
-        MeasurementManager::attachToRTSA(pRTVisualization, plg_idList, msr_idList);
-    }
-
-
-
 
 
     //*********************************************************************************************************
@@ -175,55 +156,31 @@ void Connector::connectMeasurements()
 
 //    qDebug() << "Size " << MeasurementManager::getRTSA().size();
 
-    for(int j = 0; j < PluginManager::getActiveRTRecordPlugins().size(); ++j)
+    for(int j = 0; j < PluginManager::getActiveIOPlugins().size(); ++j)
     {
         plg_idList.clear();
         msr_idList.clear();
-        plg_idList << (PluginManager::getActiveRTRecordPlugins()[j])->getAcceptorPlugin_IDs();
-        msr_idList << (PluginManager::getActiveRTRecordPlugins()[j])->getAcceptorMeasurement_IDs();
-        IObserver* pRTRecord = dynamic_cast<IObserver*>(PluginManager::getActiveRTRecordPlugins()[j]);
+        plg_idList << (PluginManager::getActiveIOPlugins()[j])->getAcceptorPlugin_IDs();
+        msr_idList << (PluginManager::getActiveIOPlugins()[j])->getAcceptorMeasurement_IDs();
+        IObserver* pIO = dynamic_cast<IObserver*>(PluginManager::getActiveIOPlugins()[j]);
 
         qDebug() << "########3#########" << plg_idList << " MSR " << msr_idList;
-        MeasurementManager::attachToRTMSA(pRTRecord, plg_idList, msr_idList);
+        MeasurementManager::attachToRTMSA(pIO, plg_idList, msr_idList);
     }
 
     //ToDo not within here
     // Connect RealTimeSampleArray (Subject) to IAlgorithm plug-ins (IObserver)
-    for(int j = 0; j < PluginManager::getActiveRTAlgorithmPlugins().size(); ++j)
+    for(int j = 0; j < PluginManager::getActiveAlgorithmPlugins().size(); ++j)
     {
         plg_idList.clear();
         msr_idList.clear();
-        plg_idList << (PluginManager::getActiveRTAlgorithmPlugins()[j])->getAcceptorPlugin_IDs();
-        msr_idList << (PluginManager::getActiveRTAlgorithmPlugins()[j])->getAcceptorMeasurement_IDs();
-        IObserver* pRTAlgorithm = dynamic_cast<IObserver*>(PluginManager::getActiveRTAlgorithmPlugins()[j]);
+        plg_idList << (PluginManager::getActiveAlgorithmPlugins()[j])->getAcceptorPlugin_IDs();
+        msr_idList << (PluginManager::getActiveAlgorithmPlugins()[j])->getAcceptorMeasurement_IDs();
+        IObserver* pAlgorithm = dynamic_cast<IObserver*>(PluginManager::getActiveAlgorithmPlugins()[j]);
 
         qDebug() << "########3#########" << plg_idList << " MSR " << msr_idList;
-        MeasurementManager::attachToRTMSA(pRTAlgorithm, plg_idList, msr_idList);
+        MeasurementManager::attachToRTMSA(pAlgorithm, plg_idList, msr_idList);
     }
-
-    //ToDo not within here
-    // Connect RealTimeSampleArray (Subject) to IVisualization plug-ins (IObserver)
-    for(int j = 0; j < PluginManager::getActiveRTVisualizationPlugins().size(); ++j)
-    {
-        plg_idList.clear();
-        msr_idList.clear();
-        plg_idList << (PluginManager::getActiveRTVisualizationPlugins()[j])->getAcceptorPlugin_IDs();
-        msr_idList << (PluginManager::getActiveRTVisualizationPlugins()[j])->getAcceptorMeasurement_IDs();
-        IObserver* pRTVisualization = dynamic_cast<IObserver*>(PluginManager::getActiveRTVisualizationPlugins()[j]);
-
-        qDebug() << "########3#########" << plg_idList << " MSR " << msr_idList;
-        MeasurementManager::attachToRTMSA(pRTVisualization, plg_idList, msr_idList);
-    }
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -234,54 +191,31 @@ void Connector::connectMeasurements()
 
 //    qDebug() << "Size " << MeasurementManager::getRTSA().size();
 
-    for(int j = 0; j < PluginManager::getActiveRTRecordPlugins().size(); ++j)
+    for(int j = 0; j < PluginManager::getActiveIOPlugins().size(); ++j)
     {
         plg_idList.clear();
         msr_idList.clear();
-        plg_idList << (PluginManager::getActiveRTRecordPlugins()[j])->getAcceptorPlugin_IDs();
-        msr_idList << (PluginManager::getActiveRTRecordPlugins()[j])->getAcceptorMeasurement_IDs();
-        IObserver* pRTRecord = dynamic_cast<IObserver*>(PluginManager::getActiveRTRecordPlugins()[j]);
+        plg_idList << (PluginManager::getActiveIOPlugins()[j])->getAcceptorPlugin_IDs();
+        msr_idList << (PluginManager::getActiveIOPlugins()[j])->getAcceptorMeasurement_IDs();
+        IObserver* pIO = dynamic_cast<IObserver*>(PluginManager::getActiveIOPlugins()[j]);
 
         qDebug() << "########4#########" << plg_idList << " MSR " << msr_idList;
-        MeasurementManager::attachToRTMSANew(pRTRecord, plg_idList, msr_idList);
+        MeasurementManager::attachToRTMSANew(pIO, plg_idList, msr_idList);
     }
 
     //ToDo not within here
     // Connect RealTimeSampleArray (Subject) to IAlgorithm plug-ins (IObserver)
-    for(int j = 0; j < PluginManager::getActiveRTAlgorithmPlugins().size(); ++j)
+    for(int j = 0; j < PluginManager::getActiveAlgorithmPlugins().size(); ++j)
     {
         plg_idList.clear();
         msr_idList.clear();
-        plg_idList << (PluginManager::getActiveRTAlgorithmPlugins()[j])->getAcceptorPlugin_IDs();
-        msr_idList << (PluginManager::getActiveRTAlgorithmPlugins()[j])->getAcceptorMeasurement_IDs();
-        IObserver* pRTAlgorithm = dynamic_cast<IObserver*>(PluginManager::getActiveRTAlgorithmPlugins()[j]);
+        plg_idList << (PluginManager::getActiveAlgorithmPlugins()[j])->getAcceptorPlugin_IDs();
+        msr_idList << (PluginManager::getActiveAlgorithmPlugins()[j])->getAcceptorMeasurement_IDs();
+        IObserver* pAlgorithm = dynamic_cast<IObserver*>(PluginManager::getActiveAlgorithmPlugins()[j]);
 
         qDebug() << "########4#########" << plg_idList << " MSR " << msr_idList;
-        MeasurementManager::attachToRTMSANew(pRTAlgorithm, plg_idList, msr_idList);
+        MeasurementManager::attachToRTMSANew(pAlgorithm, plg_idList, msr_idList);
     }
-
-    //ToDo not within here
-    // Connect RealTimeSampleArray (Subject) to IVisualization plug-ins (IObserver)
-    for(int j = 0; j < PluginManager::getActiveRTVisualizationPlugins().size(); ++j)
-    {
-        plg_idList.clear();
-        msr_idList.clear();
-        plg_idList << (PluginManager::getActiveRTVisualizationPlugins()[j])->getAcceptorPlugin_IDs();
-        msr_idList << (PluginManager::getActiveRTVisualizationPlugins()[j])->getAcceptorMeasurement_IDs();
-        IObserver* pRTVisualization = dynamic_cast<IObserver*>(PluginManager::getActiveRTVisualizationPlugins()[j]);
-
-        qDebug() << "########4#########" << plg_idList << " MSR " << msr_idList;
-        MeasurementManager::attachToRTMSANew(pRTVisualization, plg_idList, msr_idList);
-    }
-
-
-
-
-
-
-
-
-
 
 
     //*********************************************************************************************************
@@ -291,47 +225,31 @@ void Connector::connectMeasurements()
 
 //    qDebug() << "Size " << MeasurementManager::getNumeric().size();
 
-    for(int j = 0; j < PluginManager::getActiveRTRecordPlugins().size(); ++j)
+    for(int j = 0; j < PluginManager::getActiveIOPlugins().size(); ++j)
     {
         plg_idList.clear();
         msr_idList.clear();
-        plg_idList << (PluginManager::getActiveRTRecordPlugins()[j])->getAcceptorPlugin_IDs();
-        msr_idList << (PluginManager::getActiveRTRecordPlugins()[j])->getAcceptorMeasurement_IDs();
-        IObserver* pRTRecord = dynamic_cast<IObserver*>(PluginManager::getActiveRTRecordPlugins()[j]);
+        plg_idList << (PluginManager::getActiveIOPlugins()[j])->getAcceptorPlugin_IDs();
+        msr_idList << (PluginManager::getActiveIOPlugins()[j])->getAcceptorMeasurement_IDs();
+        IObserver* pIO = dynamic_cast<IObserver*>(PluginManager::getActiveIOPlugins()[j]);
 
         qDebug() << "########5#########" << plg_idList << " MSR " << msr_idList;
-        MeasurementManager::attachToNumeric(pRTRecord, plg_idList, msr_idList);
+        MeasurementManager::attachToNumeric(pIO, plg_idList, msr_idList);
     }
 
     //ToDo not within here
     // Connect RealTimeSampleArray (Subject) to IAlgorithm plug-ins (IObserver)
-    for(int j = 0; j < PluginManager::getActiveRTAlgorithmPlugins().size(); ++j)
+    for(int j = 0; j < PluginManager::getActiveAlgorithmPlugins().size(); ++j)
     {
         plg_idList.clear();
         msr_idList.clear();
-        plg_idList << (PluginManager::getActiveRTAlgorithmPlugins()[j])->getAcceptorPlugin_IDs();
-        msr_idList << (PluginManager::getActiveRTAlgorithmPlugins()[j])->getAcceptorMeasurement_IDs();
-        IObserver* pRTAlgorithm = dynamic_cast<IObserver*>(PluginManager::getActiveRTAlgorithmPlugins()[j]);
+        plg_idList << (PluginManager::getActiveAlgorithmPlugins()[j])->getAcceptorPlugin_IDs();
+        msr_idList << (PluginManager::getActiveAlgorithmPlugins()[j])->getAcceptorMeasurement_IDs();
+        IObserver* pAlgorithm = dynamic_cast<IObserver*>(PluginManager::getActiveAlgorithmPlugins()[j]);
 
         qDebug() << "########5#########" << plg_idList << " MSR " << msr_idList;
-        MeasurementManager::attachToNumeric(pRTAlgorithm, plg_idList, msr_idList);
+        MeasurementManager::attachToNumeric(pAlgorithm, plg_idList, msr_idList);
     }
-
-    //ToDo not within here
-    // Connect RealTimeSampleArray (Subject) to IVisualization plug-ins (IObserver)
-    for(int j = 0; j < PluginManager::getActiveRTVisualizationPlugins().size(); ++j)
-    {
-        plg_idList.clear();
-        msr_idList.clear();
-        plg_idList << (PluginManager::getActiveRTVisualizationPlugins()[j])->getAcceptorPlugin_IDs();
-        msr_idList << (PluginManager::getActiveRTVisualizationPlugins()[j])->getAcceptorMeasurement_IDs();
-        IObserver* pRTVisualization = dynamic_cast<IObserver*>(PluginManager::getActiveRTVisualizationPlugins()[j]);
-
-        qDebug() << "########5#########" << plg_idList << " MSR " << msr_idList;
-        MeasurementManager::attachToNumeric(pRTVisualization, plg_idList, msr_idList);
-    }
-
-
 
 }
 

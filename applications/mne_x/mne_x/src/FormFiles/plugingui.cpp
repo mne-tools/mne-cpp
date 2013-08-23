@@ -51,27 +51,34 @@
 
 #include <QtWidgets>
 
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace MNEX;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginGui::PluginGui()
+PluginGui::PluginGui(MNEX::PluginManager::SPtr pPluginManager)
 : m_id(0)
 {
     createActions();
     createMenuItem();
 
-    m_pluginScene = new PluginScene(m_pMenuItem, this);
-    m_pluginScene->setSceneRect(QRectF(0, 0, 200, 500));
-    connect(m_pluginScene, SIGNAL(itemInserted(PluginItem*)),
+    m_pPluginScene = new PluginScene(m_pMenuItem, this);
+    m_pPluginScene->setSceneRect(QRectF(0, 0, 200, 500));
+    connect(m_pPluginScene, SIGNAL(itemInserted(PluginItem*)),
             this, SLOT(itemInserted(PluginItem*)));
     createToolbars();
 
 //    QHBoxLayout *layout = new QHBoxLayout;
 //    layout->addWidget(toolBox);
-    view = new QGraphicsView(m_pluginScene);
+    view = new QGraphicsView(m_pPluginScene);
 //    layout->addWidget(view);
 
 //    QWidget *widget = new QWidget;
@@ -90,9 +97,9 @@ void PluginGui::actionGroupTriggered(QAction* action)
 {
     int id = action->data().toInt();
 
-    m_pluginScene->setItemType(PluginItem::DiagramType(m_qMapIdType[id]));
-    m_pluginScene->setItemName(m_qMapIdName[id]);
-    m_pluginScene->setMode(PluginScene::InsertItem);
+    m_pPluginScene->setItemType(PluginItem::DiagramType(m_qMapIdType[id]));
+    m_pPluginScene->setItemName(m_qMapIdName[id]);
+    m_pPluginScene->setMode(PluginScene::InsertItem);
 }
 
 
@@ -100,9 +107,9 @@ void PluginGui::actionGroupTriggered(QAction* action)
 
 void PluginGui::deleteItem()
 {
-    foreach (QGraphicsItem *item, m_pluginScene->selectedItems()) {
+    foreach (QGraphicsItem *item, m_pPluginScene->selectedItems()) {
         if (item->type() == Arrow::Type) {
-            m_pluginScene->removeItem(item);
+            m_pPluginScene->removeItem(item);
             Arrow *arrow = qgraphicsitem_cast<Arrow *>(item);
             arrow->startItem()->removeArrow(arrow);
             arrow->endItem()->removeArrow(arrow);
@@ -110,10 +117,10 @@ void PluginGui::deleteItem()
         }
     }
 
-    foreach (QGraphicsItem *item, m_pluginScene->selectedItems()) {
+    foreach (QGraphicsItem *item, m_pPluginScene->selectedItems()) {
          if (item->type() == PluginItem::Type)
              qgraphicsitem_cast<PluginItem *>(item)->removeArrows();
-         m_pluginScene->removeItem(item);
+         m_pPluginScene->removeItem(item);
          delete item;
      }
 }
@@ -123,7 +130,7 @@ void PluginGui::deleteItem()
 
 void PluginGui::pointerGroupClicked(int)
 {
-    m_pluginScene->setMode(PluginScene::Mode(m_pButtonGroupPointers->checkedId()));
+    m_pPluginScene->setMode(PluginScene::Mode(m_pButtonGroupPointers->checkedId()));
 }
 
 
@@ -131,10 +138,10 @@ void PluginGui::pointerGroupClicked(int)
 
 void PluginGui::bringToFront()
 {
-    if (m_pluginScene->selectedItems().isEmpty())
+    if (m_pPluginScene->selectedItems().isEmpty())
         return;
 
-    QGraphicsItem *selectedItem = m_pluginScene->selectedItems().first();
+    QGraphicsItem *selectedItem = m_pPluginScene->selectedItems().first();
     QList<QGraphicsItem *> overlapItems = selectedItem->collidingItems();
 
     qreal zValue = 0;
@@ -150,10 +157,10 @@ void PluginGui::bringToFront()
 
 void PluginGui::sendToBack()
 {
-    if (m_pluginScene->selectedItems().isEmpty())
+    if (m_pPluginScene->selectedItems().isEmpty())
         return;
 
-    QGraphicsItem *selectedItem = m_pluginScene->selectedItems().first();
+    QGraphicsItem *selectedItem = m_pPluginScene->selectedItems().first();
     QList<QGraphicsItem *> overlapItems = selectedItem->collidingItems();
 
     qreal zValue = 0;
@@ -171,7 +178,7 @@ void PluginGui::itemInserted(PluginItem *item)
 {
     Q_UNUSED(item);
     m_pButtonGroupPointers->button(int(PluginScene::MoveItem))->setChecked(true);
-    m_pluginScene->setMode(PluginScene::Mode(m_pButtonGroupPointers->checkedId()));
+    m_pPluginScene->setMode(PluginScene::Mode(m_pButtonGroupPointers->checkedId()));
 }
 
 

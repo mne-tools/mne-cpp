@@ -185,7 +185,7 @@ int main(int argc, char *argv[])
     IPluginNew* pluginInterface = NULL;
 
     QSharedPointer< PluginOutputData<NewRealTimeMultiSampleArray> > pluginOutputData(new PluginOutputData<NewRealTimeMultiSampleArray>(pluginInterface, QString("TestPlugin"), QString("No Descr")));
-    QSharedPointer< PluginInputData<NewRealTimeMultiSampleArray> >  pluginInputData(new PluginInputData<NewRealTimeMultiSampleArray>(pluginInterface, QString("TestPlugin2"), QString("No Descr2")));
+    QSharedPointer< PluginInputData<NewRealTimeMultiSampleArray> > pluginInputData(new PluginInputData<NewRealTimeMultiSampleArray>(pluginInterface, QString("TestPlugin2"), QString("No Descr2")));
     pluginInputData->setCallbackMethod(&debugTest);
 
     PluginConnectorConnection outInConnection(pluginOutputData, pluginInputData);
