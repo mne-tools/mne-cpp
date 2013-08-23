@@ -46,6 +46,7 @@
 #include <xMeas/Measurement/newrealtimemultisamplearray.h>
 #include <xMeas/Measurement/newnumeric.h>
 
+#include <mne_x/Management/pluginconnectorconnection.h>
 #include <mne_x/Management/pluginoutputdata.h>
 #include <mne_x/Management/plugininputdata.h>
 #include <mne_x/Interfaces/IPluginNew.h>
@@ -183,20 +184,20 @@ int main(int argc, char *argv[])
 
     IPluginNew* pluginInterface = NULL;
 
-    PluginOutputData<NewRealTimeMultiSampleArray> pluginOutputData(pluginInterface, QString("TestPlugin"), QString("No Descr"));
-    PluginInputData<NewRealTimeMultiSampleArray> pluginInputData(pluginInterface, QString("TestPlugin2"), QString("No Descr2"));
-    pluginInputData.setCallbackMethod(&debugTest);
+    QSharedPointer< PluginOutputData<NewRealTimeMultiSampleArray> > pluginOutputData(new PluginOutputData<NewRealTimeMultiSampleArray>(pluginInterface, QString("TestPlugin"), QString("No Descr")));
+    QSharedPointer< PluginInputData<NewRealTimeMultiSampleArray> >  pluginInputData(new PluginInputData<NewRealTimeMultiSampleArray>(pluginInterface, QString("TestPlugin2"), QString("No Descr2")));
+    pluginInputData->setCallbackMethod(&debugTest);
 
-    QObject::connect(&pluginOutputData, &PluginOutputConnector::notify, &pluginInputData, &PluginInputConnector::update);
+    PluginConnectorConnection outInConnection(pluginOutputData, pluginInputData);
 
-    pluginOutputData.measurement()->init(2);
-    pluginOutputData.measurement()->setMultiArraySize(2);
+    pluginOutputData->measurement()->init(2);
+    pluginOutputData->measurement()->setMultiArraySize(2);
 
     VectorXd v = VectorXd::Zero(2);
     v[0] = 2.3;
-    pluginOutputData.measurement()->setValue(v);
+    pluginOutputData->measurement()->setValue(v);
     v[0] = 4.1;
-    pluginOutputData.measurement()->setValue(v);
+    pluginOutputData->measurement()->setValue(v);
     //DEBUG
 
 
