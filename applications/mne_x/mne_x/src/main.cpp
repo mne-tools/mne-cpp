@@ -190,14 +190,14 @@ int main(int argc, char *argv[])
 
     PluginConnectorConnection outInConnection(pluginOutputData, pluginInputData);
 
-    pluginOutputData->measurement()->init(2);
-    pluginOutputData->measurement()->setMultiArraySize(2);
+    pluginOutputData->data()->init(2);
+    pluginOutputData->data()->setMultiArraySize(2);
 
     VectorXd v = VectorXd::Zero(2);
     v[0] = 2.3;
-    pluginOutputData->measurement()->setValue(v);
+    pluginOutputData->data()->setValue(v);
     v[0] = 4.1;
-    pluginOutputData->measurement()->setValue(v);
+    pluginOutputData->data()->setValue(v);
     //DEBUG
 
 

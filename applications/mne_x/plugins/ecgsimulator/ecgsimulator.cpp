@@ -72,7 +72,8 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 ECGSimulator::ECGSimulator()
-: m_pRTSA_ECG_I(0)
+: m_pRTSA_ECG_I_new(0)
+, m_pRTSA_ECG_I(0)
 , m_pRTSA_ECG_II(0)
 , m_pRTSA_ECG_III(0)
 , m_fSamplingRate(250.0)
@@ -108,6 +109,72 @@ QSharedPointer<IPlugin> ECGSimulator::clone() const
     QSharedPointer<ECGSimulator> pECGSimulatorClone(new ECGSimulator());
 
     return pECGSimulatorClone;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Create measurement instances and config them
+//=============================================================================================================
+void ECGSimulator::init()
+{
+    m_pRTSA_ECG_I_new = PluginOutputData<RealTimeSampleArray>::SPtr(new PluginOutputData<RealTimeSampleArray>(this, "ECG I", "ECG I output data"));
+
+    double diff = m_pECGChannel_ECG_I->getMaximum() - m_pECGChannel_ECG_I->getMinimum();
+
+    m_pRTSA_ECG_I_new->data()->setName("ECG I");
+    m_pRTSA_ECG_I_new->data()->setUnit("mV");
+
+    m_pRTSA_ECG_I_new->data()->setMinValue(m_pECGChannel_ECG_I->getMinimum()-diff/10);
+    m_pRTSA_ECG_I_new->data()->setMaxValue(m_pECGChannel_ECG_I->getMaximum()+diff/10);
+    m_pRTSA_ECG_I_new->data()->setArraySize(10);
+    m_pRTSA_ECG_I_new->data()->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
+    m_pRTSA_ECG_I_new->data()->setVisibility(m_pECGChannel_ECG_I->isVisible());
+
+
+
+    //OLD
+    qDebug() << "ECGSimulator::init()";
+
+    if(m_pECGChannel_ECG_I->isEnabled())
+    {
+        diff = m_pECGChannel_ECG_I->getMaximum() - m_pECGChannel_ECG_I->getMinimum();
+
+        m_pRTSA_ECG_I = addProviderRealTimeSampleArray(MSR_ID::ECGSIM_I);
+        m_pRTSA_ECG_I->setName("ECG I");
+        m_pRTSA_ECG_I->setUnit("mV");
+        m_pRTSA_ECG_I->setMinValue(m_pECGChannel_ECG_I->getMinimum()-diff/10);
+        m_pRTSA_ECG_I->setMaxValue(m_pECGChannel_ECG_I->getMaximum()+diff/10);
+        m_pRTSA_ECG_I->setArraySize(10);
+        m_pRTSA_ECG_I->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
+        m_pRTSA_ECG_I->setVisibility(m_pECGChannel_ECG_I->isVisible());
+    }
+
+    if(m_pECGChannel_ECG_II->isEnabled())
+    {
+        diff = m_pECGChannel_ECG_II->getMaximum() - m_pECGChannel_ECG_II->getMinimum();
+        m_pRTSA_ECG_II = addProviderRealTimeSampleArray(MSR_ID::ECGSIM_II);
+        m_pRTSA_ECG_II->setName("ECG II");
+        m_pRTSA_ECG_II->setUnit("mV");
+        m_pRTSA_ECG_II->setMinValue(m_pECGChannel_ECG_II->getMinimum()-diff/10);
+        m_pRTSA_ECG_II->setMaxValue(m_pECGChannel_ECG_II->getMaximum()+diff/10);
+        m_pRTSA_ECG_II->setArraySize(10);
+        m_pRTSA_ECG_II->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
+        m_pRTSA_ECG_II->setVisibility(m_pECGChannel_ECG_II->isVisible());
+    }
+
+    if(m_pECGChannel_ECG_III->isEnabled())
+    {
+        diff = m_pECGChannel_ECG_III->getMaximum() - m_pECGChannel_ECG_III->getMinimum();
+        m_pRTSA_ECG_III = addProviderRealTimeSampleArray(MSR_ID::ECGSIM_III);
+        m_pRTSA_ECG_III->setName("ECG III");
+        m_pRTSA_ECG_III->setUnit("mV");
+        m_pRTSA_ECG_III->setMinValue(m_pECGChannel_ECG_III->getMinimum()-diff/10);
+        m_pRTSA_ECG_III->setMaxValue(m_pECGChannel_ECG_III->getMaximum()+diff/10);
+        m_pRTSA_ECG_III->setArraySize(10);
+        m_pRTSA_ECG_III->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
+        m_pRTSA_ECG_III->setVisibility(m_pECGChannel_ECG_III->isVisible());
+    }
 }
 
 
@@ -191,57 +258,6 @@ QWidget* ECGSimulator::runWidget()
 {
     ECGRunWidget* widget = new ECGRunWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
     return widget;
-}
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Create measurement instances and config them
-//=============================================================================================================
-
-void ECGSimulator::init()
-{
-    qDebug() << "ECGSimulator::init()";
-
-    if(m_pECGChannel_ECG_I->isEnabled())
-    {
-        double diff = m_pECGChannel_ECG_I->getMaximum() - m_pECGChannel_ECG_I->getMinimum();
-
-        m_pRTSA_ECG_I = addProviderRealTimeSampleArray(MSR_ID::ECGSIM_I);
-        m_pRTSA_ECG_I->setName("ECG I");
-        m_pRTSA_ECG_I->setUnit("mV");
-        m_pRTSA_ECG_I->setMinValue(m_pECGChannel_ECG_I->getMinimum()-diff/10);
-        m_pRTSA_ECG_I->setMaxValue(m_pECGChannel_ECG_I->getMaximum()+diff/10);
-        m_pRTSA_ECG_I->setArraySize(10);
-        m_pRTSA_ECG_I->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
-        m_pRTSA_ECG_I->setVisibility(m_pECGChannel_ECG_I->isVisible());
-    }
-
-    if(m_pECGChannel_ECG_II->isEnabled())
-    {
-        double diff = m_pECGChannel_ECG_II->getMaximum() - m_pECGChannel_ECG_II->getMinimum();
-        m_pRTSA_ECG_II = addProviderRealTimeSampleArray(MSR_ID::ECGSIM_II);
-        m_pRTSA_ECG_II->setName("ECG II");
-        m_pRTSA_ECG_II->setUnit("mV");
-        m_pRTSA_ECG_II->setMinValue(m_pECGChannel_ECG_II->getMinimum()-diff/10);
-        m_pRTSA_ECG_II->setMaxValue(m_pECGChannel_ECG_II->getMaximum()+diff/10);
-        m_pRTSA_ECG_II->setArraySize(10);
-        m_pRTSA_ECG_II->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
-        m_pRTSA_ECG_II->setVisibility(m_pECGChannel_ECG_II->isVisible());
-    }
-
-    if(m_pECGChannel_ECG_III->isEnabled())
-    {
-        double diff = m_pECGChannel_ECG_III->getMaximum() - m_pECGChannel_ECG_III->getMinimum();
-        m_pRTSA_ECG_III = addProviderRealTimeSampleArray(MSR_ID::ECGSIM_III);
-        m_pRTSA_ECG_III->setName("ECG III");
-        m_pRTSA_ECG_III->setUnit("mV");
-        m_pRTSA_ECG_III->setMinValue(m_pECGChannel_ECG_III->getMinimum()-diff/10);
-        m_pRTSA_ECG_III->setMaxValue(m_pECGChannel_ECG_III->getMaximum()+diff/10);
-        m_pRTSA_ECG_III->setArraySize(10);
-        m_pRTSA_ECG_III->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
-        m_pRTSA_ECG_III->setVisibility(m_pECGChannel_ECG_III->isVisible());
-    }
 }
 
 

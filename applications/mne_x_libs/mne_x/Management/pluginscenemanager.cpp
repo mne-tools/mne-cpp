@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     pluginstage.cpp
+* @file     pluginscenemanager.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the PluginStage class.
+* @brief    Contains the implementation of the PluginSceneManager class.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "pluginstage.h"
+#include "pluginscenemanager.h"
 
 
 //*************************************************************************************************************
@@ -54,7 +54,7 @@ using namespace MNEX;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginStage::PluginStage(QObject *parent)
+PluginSceneManager::PluginSceneManager(QObject *parent)
 : QObject(parent)
 {
 }
@@ -62,7 +62,7 @@ PluginStage::PluginStage(QObject *parent)
 
 //*************************************************************************************************************
 
-PluginStage::~PluginStage()
+PluginSceneManager::~PluginSceneManager()
 {
     clear();
 }
@@ -70,7 +70,7 @@ PluginStage::~PluginStage()
 
 //*************************************************************************************************************
 
-bool PluginStage::addPlugin(const IPlugin* pPlugin)
+bool PluginSceneManager::addPlugin(const IPlugin* pPlugin)
 {
     if(pPlugin->multiInstanceAllowed())
     {
@@ -105,7 +105,7 @@ bool PluginStage::addPlugin(const IPlugin* pPlugin)
 
 //*************************************************************************************************************
 
-void PluginStage::clear()
+void PluginSceneManager::clear()
 {
     m_pluginList.clear();
 }

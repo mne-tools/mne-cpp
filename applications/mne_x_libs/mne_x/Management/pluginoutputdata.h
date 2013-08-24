@@ -97,10 +97,7 @@ public:
     *
     * @return the measurement
     */
-    QSharedPointer<T> measurement()
-    {
-        return m_pMeasurement;
-    }
+    inline QSharedPointer<T> data();
 
 
     void update();
@@ -108,6 +105,17 @@ public:
 private:
     QSharedPointer<T> m_pMeasurement;
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+template <class T>
+inline QSharedPointer<T> PluginOutputData<T>::data()
+{
+    return m_pMeasurement;
+}
 
 } // NAMESPACE
 

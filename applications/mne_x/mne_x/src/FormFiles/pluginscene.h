@@ -51,8 +51,10 @@ class QColor;
 class PluginScene : public QGraphicsScene
 {
     Q_OBJECT
-
 public:
+    typedef QSharedPointer<PluginScene> SPtr;               /**< Shared pointer type for PluginScene. */
+    typedef QSharedPointer<const PluginScene> ConstSPtr;    /**< Const shared pointer type for PluginScene. */
+
     enum Mode { InsertItem, InsertLine, MoveItem};
 
     explicit PluginScene(QMenu *itemMenu, QObject *parent = 0);
