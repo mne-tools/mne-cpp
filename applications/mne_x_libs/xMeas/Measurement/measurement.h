@@ -103,7 +103,7 @@ public:
     *
     * @return the name of the Measurement.
     */
-    inline const QString& getName() const;
+    inline QString getName() const;
 
     //ToDo
 //    inline void setModuleID(MDL_ID::Module_ID);
@@ -170,7 +170,7 @@ inline void Measurement::setName(const QString& name)
 
 //*************************************************************************************************************
 
-inline const QString& Measurement::getName() const
+inline QString Measurement::getName() const
 {
     return m_qString_Name;
 }

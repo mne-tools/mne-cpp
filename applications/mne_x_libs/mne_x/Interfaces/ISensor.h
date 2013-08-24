@@ -62,7 +62,7 @@ namespace MNEX
 *
 * @brief The ISensor class provides an interface for a sensor plugin.
 */
-class ISensor : public IMeasurementSource
+class ISensor : public XMEASLIB::IMeasurementSource
 {
 //ToDo virtual methods of IMeasurementSource
 public:

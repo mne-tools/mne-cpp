@@ -1,4 +1,6 @@
 #include "pluginoutputconnector.h"
+#include "../Interfaces/IPlugin.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -13,7 +15,7 @@ using namespace MNEX;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginOutputConnector::PluginOutputConnector(IPluginNew *parent, const QString &name, const QString &descr)
+PluginOutputConnector::PluginOutputConnector(IPlugin *parent, const QString &name, const QString &descr)
 : PluginConnector(parent, name, descr)
 {
 }

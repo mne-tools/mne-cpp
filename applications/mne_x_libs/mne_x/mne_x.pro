@@ -91,7 +91,6 @@ HEADERS += \
     mne_x_global.h \
     Interfaces/ISensor.h \
     Interfaces/IPlugin.h \
-    Interfaces/IPluginNew.h \
     Management/connector.h \
     Management/pluginmanager.h \
     Management/pluginconnector.h \

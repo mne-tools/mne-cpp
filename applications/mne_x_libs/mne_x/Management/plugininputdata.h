@@ -74,7 +74,7 @@ public:
     * @param[in] name       connection name
     * @param[in] descr      connection description
     */
-    PluginInputData(IPluginNew *parent, QString &name, QString &descr);
+    PluginInputData(IPlugin *parent, QString &name, QString &descr);
 
     //=========================================================================================================
     /**

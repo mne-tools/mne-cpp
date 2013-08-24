@@ -41,7 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../Interfaces/IPluginNew.h"
+#include "../Interfaces/IPlugin.h"
 
 
 //*************************************************************************************************************
@@ -58,13 +58,13 @@ namespace MNEX
 *
 * @brief The PluginSet class holds a set of plugins.
 */
-class PluginSet : public IPluginNew
+class PluginSet : public IPlugin
 {
     Q_OBJECT
 public:
     typedef QSharedPointer<PluginSet> SPtr;                 /**< Shared pointer type for PluginSet. */
     typedef QSharedPointer<const PluginSet> ConstSPtr;      /**< Const shared pointer type for PluginSet. */
-    typedef QList< IPluginNew::SPtr > PluginList;           /**< type for a list of plugins. */
+    typedef QList< IPlugin::SPtr > PluginList;           /**< type for a list of plugins. */
 
     //=========================================================================================================
     /**
@@ -103,7 +103,7 @@ public:
     *
     * @return the name of plugin set.
     */
-    virtual QString getName() const;
+    virtual const char* getName() const;
 
     //=========================================================================================================
     /**
@@ -112,7 +112,7 @@ public:
     *
     * @return the setup widget.
     */
-    virtual QSharedPointer<QWidget> setupWidget();
+    virtual QWidget* setupWidget();
 
 signals:
 

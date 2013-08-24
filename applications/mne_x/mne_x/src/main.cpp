@@ -49,7 +49,7 @@
 #include <mne_x/Management/pluginconnectorconnection.h>
 #include <mne_x/Management/pluginoutputdata.h>
 #include <mne_x/Management/plugininputdata.h>
-#include <mne_x/Interfaces/IPluginNew.h>
+#include <mne_x/Interfaces/IPlugin.h>
 
 
 //*************************************************************************************************************
@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
     NewRealTimeMultiSampleArray RTSATest;
     NewNumeric NumericTest;
 
-    IPluginNew* pluginInterface = NULL;
+    IPlugin* pluginInterface = NULL;
 
     QSharedPointer< PluginOutputData<NewRealTimeMultiSampleArray> > pluginOutputData(new PluginOutputData<NewRealTimeMultiSampleArray>(pluginInterface, QString("TestPlugin"), QString("No Descr")));
     QSharedPointer< PluginInputData<NewRealTimeMultiSampleArray> > pluginInputData(new PluginInputData<NewRealTimeMultiSampleArray>(pluginInterface, QString("TestPlugin2"), QString("No Descr2")));

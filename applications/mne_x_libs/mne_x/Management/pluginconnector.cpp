@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include "pluginconnector.h"
+#include "../Interfaces/IPlugin.h"
 
 
 //*************************************************************************************************************
@@ -54,7 +55,7 @@ using namespace MNEX;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginConnector::PluginConnector(IPluginNew *parent, const QString &name, const QString &descr)
+PluginConnector::PluginConnector(IPlugin *parent, const QString &name, const QString &descr)
 : QObject(parent)
 , m_pPlugin(parent)
 , m_sName(name)
