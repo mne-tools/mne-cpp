@@ -39,7 +39,10 @@
 //=============================================================================================================
 
 #include <mne_x/Management/pluginmanager.h>
+#include <mne_x/Management/pluginstage.h>
+
 #include <mne_x/Management/connector.h>
+
 #include <xDtMng/measurementmanager.h>
 
 #include <xMeas/Measurement/realtimesamplearray.h>
@@ -116,7 +119,8 @@ MainWindow::MainWindow(QWidget *parent)
 , m_pTimer(NULL)
 , m_pTime(NULL)
 , m_iTimeoutMSec(1000)
-, m_pPluginManager(new PluginManager())
+, m_pPluginManager(new PluginManager)
+, m_pPluginStage(new PluginStage)
 , m_eLogLevelCurrent(_LogLvMax)
 {
     qDebug() << "Clinical Sensing and Analysis - Version" << CInfo::AppVersion();

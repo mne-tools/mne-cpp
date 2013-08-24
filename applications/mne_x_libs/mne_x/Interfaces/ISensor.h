@@ -107,7 +107,15 @@ public:
     *
     * @return the name of the ISensor.
     */
-    virtual const char* getName() const = 0;
+    virtual QString getName() const = 0;
+
+    //=========================================================================================================
+    /**
+    * True if multi instantiation of plugin is allowed.
+    *
+    * @return true if multi instantiation of plugin is allowed.
+    */
+    virtual inline bool multiInstanceAllowed() const;
 
     //=========================================================================================================
     /**
@@ -138,6 +146,16 @@ protected:
     virtual void run() = 0;
 
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline bool ISensor::multiInstanceAllowed() const
+{
+    return false;
+}
 
 } //NAMESPACE
 

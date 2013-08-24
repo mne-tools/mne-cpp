@@ -42,7 +42,6 @@
 
 #include "../mne_x_global.h"
 
-#include "../Interfaces/IPlugin.h"
 #include "pluginconnector.h"
 
 #include <xMeas/Measurement/newmeasurement.h>

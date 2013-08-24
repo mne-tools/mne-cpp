@@ -120,7 +120,7 @@ public:
     *
     * @return the name of the IAlgorithm.
     */
-    virtual const char* getName() const = 0;
+    virtual QString getName() const = 0;
 
     //=========================================================================================================
     /**
