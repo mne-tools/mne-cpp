@@ -36,17 +36,54 @@
 #ifndef PLUGINSCENE_H
 #define PLUGINSCENE_H
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
 #include "pluginitem.h"
 
+#include <mne_x/Management/pluginmanager.h>
+#include <mne_x/Management/pluginscenemanager.h>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
 #include <QGraphicsScene>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
 class QGraphicsSceneMouseEvent;
 class QMenu;
 class QPointF;
 class QGraphicsLineItem;
-class QFont;
-class QGraphicsTextItem;
 class QColor;
+class QAction;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNEX
+//=============================================================================================================
+
+namespace MNEX
+{
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class PluginGui;
+
+
+
 
 class PluginScene : public QGraphicsScene
 {
@@ -57,12 +94,13 @@ public:
 
     enum Mode { InsertItem, InsertLine, MoveItem};
 
-    explicit PluginScene(QMenu *itemMenu, QObject *parent = 0);
+    explicit PluginScene(QMenu *itemMenu, PluginGui *pPluginGui);
 
 //SLOTS
-    void setMode(Mode mode);
-    void setItemType(PluginItem::DiagramType type);
-    void setItemName(QString name);
+    inline void setMode(Mode mode);
+    inline void setItemAction(QAction* pAction);
+//    inline void setItemType(PluginItem::DiagramType type);
+//    inline void setItemName(QString name);
 
 signals:
     void itemInserted(PluginItem *item);
@@ -75,17 +113,59 @@ protected:
 private:
     bool isItemChange(int type);
 
-    Mode m_mode;
-    PluginItem::DiagramType m_itemType;
-    QString m_itemName;
+
+    PluginGui*  m_pPluginGui;   /**< Corresponding plugin gui */
+
+    //Current info
+    Mode                    m_mode;
+//    PluginItem::DiagramType m_itemType;
+//    QString                 m_itemName;
+    QAction*                m_pItemAction;
 
 
-    QMenu *m_pMenuItem;
+    QMenu *m_pMenuItem;         /**< Plugin context menu */
 
     bool leftButtonDown;
     QPointF startPoint;
     QGraphicsLineItem *line;
     QColor m_qColorLine;
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+void PluginScene::setMode(Mode mode)
+{
+    m_mode = mode;
+}
+
+
+//*************************************************************************************************************
+
+void PluginScene::setItemAction(QAction* pAction)
+{
+    m_pItemAction = pAction;
+}
+
+
+
+////*************************************************************************************************************
+
+//void PluginScene::setItemType(PluginItem::DiagramType type)
+//{
+//    m_itemType = type;
+//}
+
+
+////*************************************************************************************************************
+
+//void PluginScene::setItemName(QString name)
+//{
+//    m_itemName = name;
+//}
+
+} //NAMESPACE
 
 #endif // PLUGINSCENE_H
