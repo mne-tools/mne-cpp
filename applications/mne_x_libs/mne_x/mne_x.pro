@@ -83,8 +83,8 @@ SOURCES += \
     Management/plugininputdata.cpp \
     Management/pluginoutputdata.cpp \
     Management/pluginset.cpp \
-    Management/pluginconnectormanager.cpp \
-    Management/pluginconnectorconnection.cpp
+    Management/pluginconnectorconnection.cpp \
+    Management/pluginstage.cpp
 
 
 HEADERS += \
@@ -99,10 +99,10 @@ HEADERS += \
     Management/plugininputdata.h \
     Management/pluginoutputdata.h \
     Management/pluginset.h \
-    Management/pluginconnectormanager.h \
     Management/pluginconnectorconnection.h \
     Interfaces/IIO.h \
-    Interfaces/IAlgorithm.h
+    Interfaces/IAlgorithm.h \
+    Management/pluginstage.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

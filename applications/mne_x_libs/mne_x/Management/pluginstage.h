@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     pluginconnectormanager.cpp
+* @file     pluginstage.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     August, 2013
 *
 * @section  LICENSE
 *
@@ -29,32 +29,71 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the PluginConnectorManager class.
+* @brief    Contains declaration of PluginStage class.
 *
 */
+
+#ifndef PLUGINSTAGE_H
+#define PLUGINSTAGE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "pluginconnectormanager.h"
+#include "pluginconnectorconnection.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// Qt INCLUDES
 //=============================================================================================================
 
-using namespace MNEX;
+#include <QObject>
+#include <QSharedPointer>
+#include <QList>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE NAMESPACE MNEX
 //=============================================================================================================
 
-PluginConnectorManager::PluginConnectorManager(QObject *parent)
-: QObject(parent)
+namespace MNEX
 {
-}
+
+//=========================================================================================================
+/**
+* PluginStage manages plugins and connections between connectors.
+*
+* @brief The PluginStage class manages plugins and connections of a set of plugins.
+*/
+class PluginStage : public QObject
+{
+    Q_OBJECT
+public:
+    typedef QSharedPointer<PluginStage> SPtr;            /**< Shared pointer type for PluginStage. */
+    typedef QSharedPointer<const PluginStage> ConstSPtr; /**< Const shared pointer type for PluginStage. */
+
+    typedef QList<PluginConnectorConnection::SPtr> PluginConnectorConnectionList;   /**< Shared pointer type for PluginConnectorConnection::SPtr list */
+
+
+    //=========================================================================================================
+    /**
+    * Constructs a PluginConnectorManager.
+    */
+    explicit PluginStage(QObject *parent = 0);
+    
+signals:
+
+
+private:
+    PluginConnectorConnectionList m_conConList;     /**< Lit of connector connections. */
+
+
+
+};
+
+} //Namespace
+
+#endif // PLUGINSTAGE_H
