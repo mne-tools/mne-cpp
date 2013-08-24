@@ -61,6 +61,13 @@
 namespace MNEX
 {
 
+
+//=========================================================================================================
+/**
+* Class PluginOutputData provides an output connector with a specified MEasurement type.
+*
+* @brief PluginOutputConnector with specified Measurement
+*/
 template <class T>
 class PluginOutputData : public PluginOutputConnector
 {

@@ -82,7 +82,6 @@ SOURCES += \
     Management/pluginoutputconnector.cpp \
     Management/plugininputdata.cpp \
     Management/pluginoutputdata.cpp \
-    Management/pluginset.cpp \
     Management/pluginconnectorconnection.cpp \
     Management/pluginstage.cpp
 
@@ -98,7 +97,6 @@ HEADERS += \
     Management/pluginoutputconnector.h \
     Management/plugininputdata.h \
     Management/pluginoutputdata.h \
-    Management/pluginset.h \
     Management/pluginconnectorconnection.h \
     Interfaces/IIO.h \
     Interfaces/IAlgorithm.h \

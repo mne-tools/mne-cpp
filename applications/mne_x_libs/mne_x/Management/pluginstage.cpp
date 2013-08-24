@@ -58,3 +58,54 @@ PluginStage::PluginStage(QObject *parent)
 : QObject(parent)
 {
 }
+
+
+//*************************************************************************************************************
+
+PluginStage::~PluginStage()
+{
+    clear();
+}
+
+
+//*************************************************************************************************************
+
+bool PluginStage::addPlugin(const IPlugin* pPlugin)
+{
+    if(pPlugin->multiInstanceAllowed())
+    {
+        m_pluginList.append(pPlugin->clone());
+        return true;
+    }
+    else
+    {
+        //multi instance not allowed -> check if already added
+        QString sPluginName = pPlugin->getName();
+        bool bPluginFound = false;
+
+        for(qint32 i = 0; i < m_pluginList.size(); ++i)
+        {
+            if(sPluginName == m_pluginList[i]->getName())
+            {
+                bPluginFound = true;
+                break;
+            }
+        }
+
+        //Not added jet
+        if(!bPluginFound)
+        {
+            m_pluginList.append(pPlugin->clone());
+            return true;
+        }
+    }
+    return false;
+}
+
+
+//*************************************************************************************************************
+
+void PluginStage::clear()
+{
+    m_pluginList.clear();
+}

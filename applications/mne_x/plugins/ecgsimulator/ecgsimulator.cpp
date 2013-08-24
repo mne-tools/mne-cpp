@@ -103,11 +103,11 @@ ECGSimulator::~ECGSimulator()
 
 //*************************************************************************************************************
 
-QSharedPointer<IPlugin> ECGSimulator::clone()
+QSharedPointer<IPlugin> ECGSimulator::clone() const
 {
-    QSharedPointer<ECGSimulator> pECG(new ECGSimulator());
+    QSharedPointer<ECGSimulator> pECGSimulatorClone(new ECGSimulator());
 
-    return pECG;
+    return pECGSimulatorClone;
 }
 
 
@@ -164,7 +164,7 @@ Type ECGSimulator::getType() const
 
 //*************************************************************************************************************
 
-const char* ECGSimulator::getName() const
+QString ECGSimulator::getName() const
 {
     return "ECG Simulator";
 }

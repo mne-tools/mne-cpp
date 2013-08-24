@@ -122,13 +122,13 @@ public:
     /**
     * Clone the plugin
     */
-    virtual QSharedPointer<IPlugin> clone();
+    virtual QSharedPointer<IPlugin> clone() const;
 
     virtual bool start();
     virtual bool stop();
 
     virtual Type getType() const;
-    virtual const char* getName() const;
+    virtual QString getName() const;
 
     virtual QWidget* setupWidget();
 	virtual QWidget* runWidget();
@@ -139,7 +139,7 @@ public:
     *
     * @return the ECGSimulator resource path.
     */
-    QString getResourcePath(){return m_qStringResourcePath;};
+    QString getResourcePath() const {return m_qStringResourcePath;}
 
 
 protected:

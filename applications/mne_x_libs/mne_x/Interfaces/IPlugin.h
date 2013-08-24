@@ -41,8 +41,8 @@
 // INCLUDES
 //=============================================================================================================
 
-//#include "../Management/plugininputconnector.h"
-//#include "../Management/pluginoutputconnector.h"
+#include "../Management/plugininputconnector.h"
+#include "../Management/pluginoutputconnector.h"
 
 // ToDo REMOVE
 #include <xMeas/Nomenclature/nomenclature.h>
@@ -81,7 +81,8 @@ enum Type
 {
     _ISensor,       /**< Type for a sensor plugin. */
     _IAlgorithm,    /**< Type for a real-time algorithm plugin. */
-    _IIO            /**< Type for a real-time I/O plugin. */
+    _IIO,           /**< Type for a real-time I/O plugin. */
+    _PluginSet      /**< Type for a plugin set which holds different types of plugins. */
 };
 
 
@@ -90,8 +91,8 @@ enum Type
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class PluginInputConnector;
-class PluginOutputConnector;
+//class PluginInputConnector;
+//class PluginOutputConnector;
 
 
 //=========================================================================================================
@@ -120,7 +121,7 @@ public:
     /**
     * Clone the plugin
     */
-    virtual QSharedPointer<IPlugin> clone() = 0;
+    virtual QSharedPointer<IPlugin> clone() const = 0;
 
     //=========================================================================================================
     /**
@@ -156,7 +157,15 @@ public:
     *
     * @return the name of plugin.
     */
-    virtual const char* getName() const = 0;
+    virtual QString getName() const = 0;
+
+    //=========================================================================================================
+    /**
+    * True if multi instantiation of plugin is allowed.
+    *
+    * @return true if multi instantiation of plugin is allowed.
+    */
+    virtual inline bool multiInstanceAllowed() const = 0;
 
     //=========================================================================================================
     /**
@@ -182,8 +191,6 @@ public:
     * @return true if plugin is activated.
     */
     inline bool isActive() const;
-
-
 
 
 
@@ -231,7 +238,6 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 
 inline void IPlugin::setStatus(bool status)
 {

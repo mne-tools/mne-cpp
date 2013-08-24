@@ -105,6 +105,7 @@ using namespace XMEASLIB;
 class StartUpWidget;
 
 class PluginManager;
+class PluginStage;
 
 class RunWidget;
 class PluginDockWidget;
@@ -201,6 +202,8 @@ private:
 
     void initStatusBar();       /**< Creates QToolBar for user interface of MainWindow class. */
 
+
+
     QAction*                             m_pActionNewConfig;        /**< new configuration */
     QAction*                             m_pActionOpenConfig;       /**< open configuration */
     QAction*                             m_pActionSaveConfig;       /**< save configuration */
@@ -244,13 +247,13 @@ private:
     void createPluginDockWindow();                          /**< Creates plugin dock widget.*/
     void createLogDockWindow();                             /**< Creates log dock widget.*/
 
-    //Plugin
-    PluginDockWidget*                   m_pPluginDockWidget;            /**< Holds the dock widget containing the plugins.*/
-
+    //Plugin Management
     QDockWidget*                        m_pNewPluginDockWidget;         /**< NEW NEW NEW NEW */
-
     QSharedPointer<PluginManager>       m_pPluginManager;               /**< Holds log dock widget.*/
+    QSharedPointer<PluginStage>         m_pPluginStage;                 /**< Plugin stage which holds the plugin graph */
 
+//OLD
+    PluginDockWidget*                   m_pPluginDockWidget;            /**< Holds the dock widget containing the plugins.*/
     QList<PLG_ID::Plugin_ID>            m_pListCurrentDisplayPlugins;   /**< Holds list of plugin id's which should be displayed.*/
 
     //Log

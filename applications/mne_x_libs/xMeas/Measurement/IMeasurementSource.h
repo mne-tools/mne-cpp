@@ -149,7 +149,7 @@ public:
     *
     * @return the name of plugin.
     */
-    virtual const char* getName() const = 0;
+    virtual QString getName() const = 0;
 
     //=========================================================================================================
     /**

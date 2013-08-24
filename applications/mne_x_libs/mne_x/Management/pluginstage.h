@@ -41,6 +41,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "../mne_x_global.h"
+#include "../Interfaces/IPlugin.h"
 #include "pluginconnectorconnection.h"
 
 
@@ -68,30 +70,50 @@ namespace MNEX
 *
 * @brief The PluginStage class manages plugins and connections of a set of plugins.
 */
-class PluginStage : public QObject
+class MNE_X_SHARED_EXPORT PluginStage : public QObject
 {
     Q_OBJECT
 public:
     typedef QSharedPointer<PluginStage> SPtr;            /**< Shared pointer type for PluginStage. */
     typedef QSharedPointer<const PluginStage> ConstSPtr; /**< Const shared pointer type for PluginStage. */
 
+    typedef QList< IPlugin::SPtr > PluginList;                                      /**< type for a list of plugins. */
     typedef QList<PluginConnectorConnection::SPtr> PluginConnectorConnectionList;   /**< Shared pointer type for PluginConnectorConnection::SPtr list */
-
 
     //=========================================================================================================
     /**
-    * Constructs a PluginConnectorManager.
+    * Constructs a PluginStage.
     */
     explicit PluginStage(QObject *parent = 0);
-    
+
+    //=========================================================================================================
+    /**
+    * Destructs a PluginStage.
+    */
+    ~PluginStage();
+
+    //=========================================================================================================
+    /**
+    * Adds a plugin to the stage.
+    *
+    *@return true if plugin is added successful.
+    */
+    bool addPlugin(const IPlugin* pPlugin);
+
+    //=========================================================================================================
+    /**
+    * Clears the PluginStage.
+    */
+    void clear();
+
 signals:
 
 
 private:
-    PluginConnectorConnectionList m_conConList;     /**< Lit of connector connections. */
+    PluginList m_pluginList;    /**< List of plugins associated with this set. */
+    PluginConnectorConnectionList m_conConList; /**< List of connector connections. */
 
-
-
+//    QSharedPointer<PluginSet> m_pPluginSet;     /**< The Plugin set of the stage -> ToDo: check, if more than one set on the stage is usefull. */
 };
 
 } //Namespace
