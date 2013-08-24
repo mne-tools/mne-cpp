@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     pluginconnectomanager.h
+* @file     pluginstage.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2013
+* @date     February, 2013
 *
 * @section  LICENSE
 *
@@ -29,71 +29,32 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains declaration of PluginConnectorManager class.
+* @brief    Contains the implementation of the PluginStage class.
 *
 */
-
-#ifndef PLUGINCONNECTORMANAGER_H
-#define PLUGINCONNECTORMANAGER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "pluginconnectorconnection.h"
+#include "pluginstage.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <QObject>
-#include <QSharedPointer>
-#include <QList>
+using namespace MNEX;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEX
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace MNEX
+PluginStage::PluginStage(QObject *parent)
+: QObject(parent)
 {
-
-//=========================================================================================================
-/**
-* PluginConnectorManager manages connections between connectors.
-*
-* @brief The PluginConnectorManager class manages the connections of a set of plugins.
-*/
-class PluginConnectorManager : public QObject
-{
-    Q_OBJECT
-public:
-    typedef QSharedPointer<PluginConnectorManager> SPtr;            /**< Shared pointer type for PluginConnectorManager. */
-    typedef QSharedPointer<const PluginConnectorManager> ConstSPtr; /**< Const shared pointer type for PluginConnectorManager. */
-
-    typedef QList<PluginConnectorConnection::SPtr> PluginConnectorConnectionList;   /**< Shared pointer type for PluginConnectorConnection::SPtr. */
-
-
-    //=========================================================================================================
-    /**
-    * Constructs a PluginConnectorManager.
-    */
-    explicit PluginConnectorManager(QObject *parent = 0);
-    
-signals:
-
-
-private:
-    PluginConnectorConnectionList m_conConList;     /**< Lit of connector connections. */
-
-
-
-};
-
-} //Namespace
-
-#endif // PLUGINCONNECTORMANAGER_H
+}

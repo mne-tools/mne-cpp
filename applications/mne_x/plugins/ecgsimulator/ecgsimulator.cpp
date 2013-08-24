@@ -103,6 +103,16 @@ ECGSimulator::~ECGSimulator()
 
 //*************************************************************************************************************
 
+QSharedPointer<IPlugin> ECGSimulator::clone()
+{
+    QSharedPointer<ECGSimulator> pECG(new ECGSimulator());
+
+    return pECG;
+}
+
+
+//*************************************************************************************************************
+
 bool ECGSimulator::start()
 {
 

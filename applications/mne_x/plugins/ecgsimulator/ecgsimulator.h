@@ -111,11 +111,18 @@ public:
     * Constructs a ECGSimulator.
     */
     ECGSimulator();
+
     //=========================================================================================================
     /**
     * Destroys the ECGSimulator.
     */
     virtual ~ECGSimulator();
+
+    //=========================================================================================================
+    /**
+    * Clone the plugin
+    */
+    virtual QSharedPointer<IPlugin> clone();
 
     virtual bool start();
     virtual bool stop();

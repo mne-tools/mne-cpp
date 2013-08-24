@@ -87,6 +87,6 @@ const char* PluginSet::getName() const
 
 QWidget* PluginSet::setupWidget()
 {
-    QWidget* widget;
+    QWidget* widget = NULL;
     return widget;
 }
