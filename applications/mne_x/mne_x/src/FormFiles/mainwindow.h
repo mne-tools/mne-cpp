@@ -104,8 +104,9 @@ using namespace XMEASLIB;
 
 class StartUpWidget;
 
+class PluginGui;
 class PluginManager;
-class PluginStage;
+class PluginSceneManager;
 
 class RunWidget;
 class PluginDockWidget;
@@ -248,13 +249,14 @@ private:
     void createLogDockWindow();                             /**< Creates log dock widget.*/
 
     //Plugin Management
-    QDockWidget*                        m_pNewPluginDockWidget;         /**< NEW NEW NEW NEW */
+    QDockWidget*                        m_pPluginGuiDockWidget;         /**< Dock widget which holds the plugin gui. */
     QSharedPointer<PluginManager>       m_pPluginManager;               /**< Holds log dock widget.*/
-    QSharedPointer<PluginStage>         m_pPluginStage;                 /**< Plugin stage which holds the plugin graph */
+    QSharedPointer<PluginSceneManager>  m_pPluginSceneManager;          /**< Plugin scene manager which manages the plugin graph */
 
 //OLD
     PluginDockWidget*                   m_pPluginDockWidget;            /**< Holds the dock widget containing the plugins.*/
     QList<PLG_ID::Plugin_ID>            m_pListCurrentDisplayPlugins;   /**< Holds list of plugin id's which should be displayed.*/
+//OLD
 
     //Log
     QDockWidget*                        m_pDockWidget_Log;              /**< Holds the dock widget containing the log.*/

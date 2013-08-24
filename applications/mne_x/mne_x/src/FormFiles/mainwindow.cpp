@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include <mne_x/Management/pluginmanager.h>
-#include <mne_x/Management/pluginstage.h>
+#include <mne_x/Management/pluginscenemanager.h>
 
 #include <mne_x/Management/connector.h>
 
@@ -120,7 +120,7 @@ MainWindow::MainWindow(QWidget *parent)
 , m_pTime(NULL)
 , m_iTimeoutMSec(1000)
 , m_pPluginManager(new PluginManager)
-, m_pPluginStage(new PluginStage)
+, m_pPluginSceneManager(new PluginSceneManager)
 , m_eLogLevelCurrent(_LogLvMax)
 {
     qDebug() << "Clinical Sensing and Analysis - Version" << CInfo::AppVersion();
@@ -499,16 +499,14 @@ void MainWindow::createPluginDockWindow()
             this, SLOT(CentralWidgetShowPlugin()));
 
 
-    m_pNewPluginDockWidget = new QDockWidget(tr("Plugins New"), this);
-    m_pNewPluginDockWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    m_pPluginGuiDockWidget = new QDockWidget(tr("Plugins New"), this);
+    m_pPluginGuiDockWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
-    PluginGui* pluginGui = new PluginGui(m_pPluginManager);
-    pluginGui->setParent(m_pNewPluginDockWidget);
-    m_pNewPluginDockWidget->setWidget(pluginGui);
+    PluginGui* pluginGui = new PluginGui(m_pPluginManager, m_pPluginSceneManager);
+    pluginGui->setParent(m_pPluginGuiDockWidget);
+    m_pPluginGuiDockWidget->setWidget(pluginGui);
 
-    addDockWidget(Qt::LeftDockWidgetArea, m_pNewPluginDockWidget);
-
-
+    addDockWidget(Qt::LeftDockWidgetArea, m_pPluginGuiDockWidget);
 }
 
 

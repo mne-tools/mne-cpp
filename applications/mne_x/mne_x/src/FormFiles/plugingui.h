@@ -42,8 +42,10 @@
 //=============================================================================================================
 
 #include "pluginitem.h"
+#include "pluginscene.h"
 
 #include <mne_x/Management/pluginmanager.h>
+#include <mne_x/Management/pluginscenemanager.h>
 
 #include <QMainWindow>
 #include <QMap>
@@ -53,8 +55,6 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-class PluginScene;
 
 class QAction;
 class QToolBox;
@@ -83,7 +83,7 @@ class PluginGui : public QMainWindow
     Q_OBJECT
 
 public:
-   PluginGui(MNEX::PluginManager::SPtr pPluginManager);
+   PluginGui(MNEX::PluginManager::SPtr pPluginManager, MNEX::PluginSceneManager::SPtr pPluginSceneManager);
 
 private slots:
 //    void buttonGroupClicked(int id);
@@ -103,14 +103,15 @@ private:
 
     QAction* createItemAction(QString name, PluginItem::DiagramType type, QMenu* menu);
 
-    MNEX::PluginManager::SPtr m_pPluginManager;  /**< Corresponding plugin manager. */
+    MNEX::PluginManager::SPtr       m_pPluginManager;       /**< Corresponding plugin manager. */
+    MNEX::PluginSceneManager::SPtr  m_pPluginSceneManager;  /**< Corresponding plugin stage. */
 
     qint32 m_id;
 
     QMap<int, PluginItem::DiagramType> m_qMapIdType;
     QMap<int, QString> m_qMapIdName;
 
-    PluginScene *m_pPluginScene;
+    PluginScene* m_pPluginScene;
     QGraphicsView *view;
 
     QAction *addAction;

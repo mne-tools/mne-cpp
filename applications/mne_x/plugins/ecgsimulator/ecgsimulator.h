@@ -75,6 +75,7 @@ namespace ECGSimulatorModule
 //=============================================================================================================
 
 using namespace MNEX;
+using namespace XMEASLIB;
 using namespace IOBuffer;
 
 
@@ -124,6 +125,12 @@ public:
     */
     virtual QSharedPointer<IPlugin> clone() const;
 
+    //=========================================================================================================
+    /**
+    * Initialise the ECGSimulator.
+    */
+    virtual void init();
+
     virtual bool start();
     virtual bool stop();
 
@@ -146,15 +153,12 @@ protected:
     virtual void run();
 
 private:
-    //=========================================================================================================
-    /**
-    * Initialise the ECGSimulator.
-    */
-    void init();
 
-    XMEASLIB::RealTimeSampleArray::SPtr m_pRTSA_ECG_I;      /**< Holds the RealTimeSampleArray to provide the channel ECG I.*/
-    XMEASLIB::RealTimeSampleArray::SPtr m_pRTSA_ECG_II;     /**< Holds the RealTimeSampleArray to provide the channel ECG II.*/
-    XMEASLIB::RealTimeSampleArray::SPtr m_pRTSA_ECG_III;    /**< Holds the RealTimeSampleArray to provide the channel ECG III.*/
+    PluginOutputData<RealTimeSampleArray>::SPtr m_pRTSA_ECG_I_new;  /**< The RealTimeSampleArray to provide the channel ECG I.*/
+
+    XMEASLIB::RealTimeSampleArray::SPtr m_pRTSA_ECG_I;      /**< The RealTimeSampleArray to provide the channel ECG I.*/
+    XMEASLIB::RealTimeSampleArray::SPtr m_pRTSA_ECG_II;     /**< The RealTimeSampleArray to provide the channel ECG II.*/
+    XMEASLIB::RealTimeSampleArray::SPtr m_pRTSA_ECG_III;    /**< The RealTimeSampleArray to provide the channel ECG III.*/
 
     float           m_fSamplingRate;            /**< Holds the sampling rate.*/
     int             m_iDownsamplingFactor;      /**< Holds the down sampling factor.*/

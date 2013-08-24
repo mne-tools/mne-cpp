@@ -64,8 +64,9 @@ using namespace MNEX;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginGui::PluginGui(PluginManager::SPtr pPluginManager)
+PluginGui::PluginGui(PluginManager::SPtr pPluginManager, MNEX::PluginSceneManager::SPtr pPluginSceneManager)
 : m_pPluginManager(pPluginManager)
+, m_pPluginSceneManager(pPluginSceneManager)
 , m_id(0)
 {
     createActions();

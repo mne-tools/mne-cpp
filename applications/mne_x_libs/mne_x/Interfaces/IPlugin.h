@@ -41,8 +41,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../Management/plugininputconnector.h"
-#include "../Management/pluginoutputconnector.h"
+//#include "../Management/plugininputconnector.h"
+//#include "../Management/pluginoutputconnector.h"
+#include "../Management/pluginoutputdata.h"
+#include "../Management/plugininputdata.h"
 
 // ToDo REMOVE
 #include <xMeas/Nomenclature/nomenclature.h>
@@ -125,6 +127,12 @@ public:
 
     //=========================================================================================================
     /**
+    * Initializes the plugin.
+    */
+    virtual void init() = 0;
+
+    //=========================================================================================================
+    /**
     * Starts the IPlugin.
     * Pure virtual method.
     *
@@ -176,6 +184,9 @@ public:
     */
     virtual QWidget* setupWidget() = 0; //setup()
 
+
+// ToDo REMOVE
+
     //=========================================================================================================
     /**
     * Sets the activation status of the plugin.
@@ -192,9 +203,6 @@ public:
     */
     inline bool isActive() const;
 
-
-
-// ToDo REMOVE
     //=========================================================================================================
     /**
     * Returns the provider id
@@ -224,8 +232,8 @@ protected:
     virtual void run() = 0;
 
 
-
-
+    InputConnectorList m_vecInputConnectors;    /**< Set of input connectors associated with this plug-in. */
+    OutputConnectorList m_vecOutputConnectors;  /**< Set of output connectors associated with this plug-in. */
 
 // ToDo REMOVE
     XMEASLIB::PLG_ID::Plugin_ID m_PLG_ID;     /**< Holds the plugin id.*/
@@ -238,7 +246,7 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
+// ToDo REMOVE
 inline void IPlugin::setStatus(bool status)
 {
     m_bStatus = status;
@@ -253,10 +261,8 @@ inline bool IPlugin::isActive() const
 }
 
 
-
-
 //*************************************************************************************************************
-// ToDo REMOVE
+
 inline XMEASLIB::PLG_ID::Plugin_ID IPlugin::getPlugin_ID() const
 {
     return m_PLG_ID;

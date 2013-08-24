@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     pluginstage.h
+* @file     pluginscenemanager.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains declaration of PluginStage class.
+* @brief    Contains declaration of PluginSceneManager class.
 *
 */
 
-#ifndef PLUGINSTAGE_H
-#define PLUGINSTAGE_H
+#ifndef PLUGINSCENEMANAGER_H
+#define PLUGINSCENEMANAGER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -66,31 +66,31 @@ namespace MNEX
 
 //=========================================================================================================
 /**
-* PluginStage manages plugins and connections between connectors.
+* PluginSceneManager manages plugins and connections between connectors.
 *
-* @brief The PluginStage class manages plugins and connections of a set of plugins.
+* @brief The PluginSceneManager class manages plugins and connections of a set of plugins.
 */
-class MNE_X_SHARED_EXPORT PluginStage : public QObject
+class MNE_X_SHARED_EXPORT PluginSceneManager : public QObject
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<PluginStage> SPtr;            /**< Shared pointer type for PluginStage. */
-    typedef QSharedPointer<const PluginStage> ConstSPtr; /**< Const shared pointer type for PluginStage. */
+    typedef QSharedPointer<PluginSceneManager> SPtr;            /**< Shared pointer type for PluginSceneManager. */
+    typedef QSharedPointer<const PluginSceneManager> ConstSPtr; /**< Const shared pointer type for PluginSceneManager. */
 
     typedef QList< IPlugin::SPtr > PluginList;                                      /**< type for a list of plugins. */
     typedef QList<PluginConnectorConnection::SPtr> PluginConnectorConnectionList;   /**< Shared pointer type for PluginConnectorConnection::SPtr list */
 
     //=========================================================================================================
     /**
-    * Constructs a PluginStage.
+    * Constructs a PluginSceneManager.
     */
-    explicit PluginStage(QObject *parent = 0);
+    explicit PluginSceneManager(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destructs a PluginStage.
+    * Destructs a PluginSceneManager.
     */
-    ~PluginStage();
+    ~PluginSceneManager();
 
     //=========================================================================================================
     /**
@@ -118,4 +118,4 @@ private:
 
 } //Namespace
 
-#endif // PLUGINSTAGE_H
+#endif // PLUGINSCENEMANAGER_H
