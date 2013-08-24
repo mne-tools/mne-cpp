@@ -77,16 +77,16 @@ bool PluginSet::stop()
 
 //*************************************************************************************************************
 
-QString PluginSet::getName() const
+const char* PluginSet::getName() const
 {
-    return QString("Standard Set.");
+    return "Standard Set.";
 }
 
 
 //*************************************************************************************************************
 
-QSharedPointer<QWidget> PluginSet::setupWidget()
+QWidget* PluginSet::setupWidget()
 {
-    QSharedPointer<QWidget> widget;
+    QWidget* widget;
     return widget;
 }

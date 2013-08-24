@@ -56,6 +56,8 @@
 
 #include <QMap>
 
+#include <QSharedPointer>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -80,7 +82,7 @@ namespace MNEX
 *
 * @brief The IIO class provides an interface for a real-time record plugin.
 */
-class IIO : public IPlugin, public IMeasurementSink
+class IIO : public IPlugin, public XMEASLIB::IMeasurementSink
 {
 //ToDo virtual methods of IMeasurementSink
 public:

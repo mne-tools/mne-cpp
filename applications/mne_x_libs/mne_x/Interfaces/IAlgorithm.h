@@ -48,6 +48,9 @@
 #include <xMeas/Measurement/IMeasurementSink.h>
 
 
+#include <QSharedPointer>
+
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -64,7 +67,7 @@ namespace MNEX
 *
 * @brief The IAlgorithm class provides an interface for a real-time algorithm plugin.
 */
-class IAlgorithm : public IMeasurementSource, public IMeasurementSink
+class IAlgorithm : public XMEASLIB::IMeasurementSource, public XMEASLIB::IMeasurementSink
 {
 //ToDo virtual methods of IMeasurementSink && IMeasurementSource
 public:

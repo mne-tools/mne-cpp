@@ -42,9 +42,12 @@
 
 #include "../mne_x_global.h"
 
+#include "../Interfaces/IPlugin.h"
 #include "pluginconnector.h"
 
 #include <xMeas/Measurement/newmeasurement.h>
+
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -54,14 +57,6 @@
 
 namespace MNEX
 {
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace XMEASLIB;
-
 
 //=============================================================================================================
 /**
@@ -84,7 +79,7 @@ public:
     * @param[in] name       connection name
     * @param[in] descr      connection description
     */
-    PluginInputConnector(IPluginNew *parent, QString &name, QString &descr);
+    PluginInputConnector(IPlugin *parent, QString &name, QString &descr);
 
     //=========================================================================================================
     /**

@@ -68,7 +68,7 @@ namespace MNEX
 //=============================================================================================================
 
 template <class T>
-PluginOutputData<T>::PluginOutputData(IPluginNew *parent, const QString &name, const QString &descr)
+PluginOutputData<T>::PluginOutputData(IPlugin *parent, const QString &name, const QString &descr)
 : PluginOutputConnector(parent, name, descr)
 {
     m_pMeasurement = QSharedPointer<T>(new T);

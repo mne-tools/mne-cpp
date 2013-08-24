@@ -42,7 +42,6 @@
 
 #include "../mne_x_global.h"
 
-#include "../Interfaces/IPluginNew.h"
 
 
 //*************************************************************************************************************
@@ -54,6 +53,7 @@
 #include <QString>
 #include <QMutex>
 #include <QSet>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -63,6 +63,15 @@
 
 namespace MNEX
 {
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class IPlugin;
+
 
 //=============================================================================================================
 /**
@@ -85,7 +94,7 @@ public:
     * @param[in] name       connection name
     * @param[in] descr      connection description
     */
-    PluginConnector(IPluginNew *parent, const QString &name, const QString &descr);
+    PluginConnector(IPlugin *parent, const QString &name, const QString &descr);
     
     //=========================================================================================================
     /**
@@ -114,7 +123,7 @@ signals:
 
 
 protected:
-    IPluginNew* m_pPlugin;  /**< Plugin to which connector belongs to */
+    IPlugin* m_pPlugin;  /**< Plugin to which connector belongs to */
 
     //actual obeserver pattern - think of an other implementation --> currently similiar to OpenWalnut
     //figure out how to Qt signal/slot

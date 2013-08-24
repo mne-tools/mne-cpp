@@ -64,7 +64,7 @@ namespace MNEX
 //=============================================================================================================
 
 template <class T>
-PluginInputData<T>::PluginInputData(IPluginNew *parent, QString &name, QString &descr)
+PluginInputData<T>::PluginInputData(IPlugin *parent, QString &name, QString &descr)
 : PluginInputConnector(parent, name, descr)
 , m_pFunc(NULL)
 {

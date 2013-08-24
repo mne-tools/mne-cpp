@@ -83,7 +83,7 @@ public:
     * @param[in] name       connection name
     * @param[in] descr      connection description
     */
-    PluginOutputConnector(IPluginNew *parent, const QString &name, const QString &descr);
+    PluginOutputConnector(IPlugin *parent, const QString &name, const QString &descr);
 
     //=========================================================================================================
     /**

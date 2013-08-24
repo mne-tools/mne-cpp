@@ -36,6 +36,18 @@
 #ifndef IPLUGIN_H
 #define IPLUGIN_H
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+//#include "../Management/plugininputconnector.h"
+//#include "../Management/pluginoutputconnector.h"
+
+// ToDo REMOVE
+#include <xMeas/Nomenclature/nomenclature.h>
+// ToDo REMOVE End
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -45,8 +57,6 @@
 #include <QThread>
 #include <QCoreApplication>
 #include <QSharedPointer>
-
-#include <xMeas/Nomenclature/nomenclature.h>
 
 
 //*************************************************************************************************************
@@ -74,7 +84,14 @@ enum Type
     _IIO            /**< Type for a real-time I/O plugin. */
 };
 
-using namespace XMEASLIB;
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class PluginInputConnector;
+class PluginOutputConnector;
 
 
 //=========================================================================================================
@@ -85,9 +102,13 @@ using namespace XMEASLIB;
 */
 class IPlugin : public QThread
 {
+//    Q_OBJECT
 public:
     typedef QSharedPointer<IPlugin> SPtr;               /**< Shared pointer type for IPlugin. */
     typedef QSharedPointer<const IPlugin> ConstSPtr;    /**< Const shared pointer type for IPlugin. */
+
+    typedef QVector< QSharedPointer< PluginInputConnector > > InputConnectorList;  /**< List of input connectors. */
+    typedef QVector< QSharedPointer< PluginOutputConnector > > OutputConnectorList; /**< List of output connectors. */
 
     //=========================================================================================================
     /**
@@ -112,14 +133,6 @@ public:
     * @return true if success, false otherwise
     */
     virtual bool stop() = 0;
-
-    //=========================================================================================================
-    /**
-    * Returns the provider id
-    *
-    * @return the provider id (Plugin ID).
-    */
-    inline PLG_ID::Plugin_ID getPlugin_ID() const;
 
     //=========================================================================================================
     /**
@@ -150,15 +163,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the widget which is shown under configuration tab while running mode.
-    * Pure virtual method.
-    *
-    * @return the run widget.
-    */
-    virtual QWidget* runWidget() = 0;
-
-    //=========================================================================================================
-    /**
     * Sets the activation status of the plugin.
     *
     * @param [in] status the new activation status of the plugin.
@@ -173,8 +177,31 @@ public:
     */
     inline bool isActive() const;
 
-protected:
 
+
+
+
+// ToDo REMOVE
+    //=========================================================================================================
+    /**
+    * Returns the provider id
+    *
+    * @return the provider id (Plugin ID).
+    */
+    inline XMEASLIB::PLG_ID::Plugin_ID getPlugin_ID() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the widget which is shown under configuration tab while running mode.
+    * Pure virtual method.
+    *
+    * @return the run widget.
+    */
+    virtual QWidget* runWidget() = 0;
+// ToDo REMOVE End
+
+
+protected:
     //=========================================================================================================
     /**
     * The starting point for the thread. After calling start(), the newly created thread calls this function.
@@ -183,11 +210,15 @@ protected:
     */
     virtual void run() = 0;
 
-    PLG_ID::Plugin_ID m_PLG_ID;     /**< Holds the plugin id.*/
 
+
+
+
+// ToDo REMOVE
+    XMEASLIB::PLG_ID::Plugin_ID m_PLG_ID;     /**< Holds the plugin id.*/
+// ToDo REMOVE end
 private:
-
-    bool m_bStatus;                 /**< Holds the activation status. */
+    bool m_bStatus;                 /**< The activation status. */
 };
 
 //*************************************************************************************************************
@@ -195,13 +226,6 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline PLG_ID::Plugin_ID IPlugin::getPlugin_ID() const
-{
-    return m_PLG_ID;
-}
-
-
-//*************************************************************************************************************
 
 inline void IPlugin::setStatus(bool status)
 {
@@ -215,6 +239,17 @@ inline bool IPlugin::isActive() const
 {
     return m_bStatus;
 }
+
+
+
+
+//*************************************************************************************************************
+// ToDo REMOVE
+inline XMEASLIB::PLG_ID::Plugin_ID IPlugin::getPlugin_ID() const
+{
+    return m_PLG_ID;
+}
+// ToDo REMOVE end
 
 } //Namespace
 
