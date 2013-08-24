@@ -67,7 +67,6 @@ using namespace MNEX;
 PluginGui::PluginGui(PluginManager::SPtr pPluginManager, MNEX::PluginSceneManager::SPtr pPluginSceneManager)
 : m_pPluginManager(pPluginManager)
 , m_pPluginSceneManager(pPluginSceneManager)
-, m_id(0)
 {
     createActions();
     createMenuItem();
@@ -79,9 +78,9 @@ PluginGui::PluginGui(PluginManager::SPtr pPluginManager, MNEX::PluginSceneManage
 
     createToolbars();
 
-    view = new QGraphicsView(m_pPluginScene);
+    m_pGraphicsView = new QGraphicsView(m_pPluginScene);
 
-    setCentralWidget(view);
+    setCentralWidget(m_pGraphicsView);
     setWindowTitle(tr("PluginScene"));
     setUnifiedTitleAndToolBarOnMac(true);
 }
@@ -91,11 +90,11 @@ PluginGui::PluginGui(PluginManager::SPtr pPluginManager, MNEX::PluginSceneManage
 
 void PluginGui::actionGroupTriggered(QAction* action)
 {
-    int id = action->data().toInt();
-
-    m_pPluginScene->setItemType(PluginItem::DiagramType(m_qMapIdType[id]));
-    m_pPluginScene->setItemName(m_qMapIdName[id]);
+//    m_pPluginScene->setItemType(PluginItem::DiagramType(m_qMapNameType[action->text()]));
+//    m_pPluginScene->setItemName(action->text());
+    m_pPluginScene->setItemAction(action);
     m_pPluginScene->setMode(PluginScene::InsertItem);
+
 }
 
 
@@ -182,6 +181,11 @@ void PluginGui::itemInserted(PluginItem *item)
 
 void PluginGui::createActions()
 {
+    deleteAction = new QAction(QIcon(":/images/delete.png"), tr("&Delete"), this);
+    deleteAction->setShortcut(tr("Delete"));
+    deleteAction->setStatusTip(tr("Delete item from diagram (Del)"));
+    connect(deleteAction, SIGNAL(triggered()), this, SLOT(deleteItem()));
+
     toFrontAction = new QAction(QIcon(":/images/bringtofront.png"),
                                 tr("Bring to &Front"), this);
     toFrontAction->setShortcut(tr("Ctrl+F"));
@@ -192,11 +196,6 @@ void PluginGui::createActions()
     sendBackAction->setShortcut(tr("Ctrl+B"));
     sendBackAction->setStatusTip(tr("Send item to back (Ctrl+B)"));
     connect(sendBackAction, SIGNAL(triggered()), this, SLOT(sendToBack()));
-
-    deleteAction = new QAction(QIcon(":/images/delete.png"), tr("&Delete"), this);
-    deleteAction->setShortcut(tr("Delete"));
-    deleteAction->setStatusTip(tr("Delete item from diagram (Del)"));
-    connect(deleteAction, SIGNAL(triggered()), this, SLOT(deleteItem()));
 }
 
 
@@ -204,12 +203,11 @@ void PluginGui::createActions()
 
 void PluginGui::createMenuItem()
 {
-    m_pMenuItem = new QMenu;//menuBar()->addMenu(tr("&Item"));//new QMenu;
+    m_pMenuItem = new QMenu;
     m_pMenuItem->addAction(deleteAction);
     m_pMenuItem->addSeparator();
     m_pMenuItem->addAction(toFrontAction);
     m_pMenuItem->addAction(sendBackAction);
-//    menuBar()->setVisible(false);
 }
 
 
@@ -218,15 +216,17 @@ void PluginGui::createMenuItem()
 void PluginGui::createToolbars()
 {
     //Plugins Toolbar
-    m_pActionGroup = new QActionGroup(this);
-    m_pActionGroup->setExclusive(false);
-    connect(m_pActionGroup, SIGNAL(triggered(QAction*)),
+    m_pActionGroupPlugins = new QActionGroup(this);
+    m_pActionGroupPlugins->setExclusive(false);
+    connect(m_pActionGroupPlugins, SIGNAL(triggered(QAction*)),
             this, SLOT(actionGroupTriggered(QAction*)));
 
     QToolButton *sensorToolButton = new QToolButton;
     QMenu *menuSensors = new QMenu;
     for(qint32 i = 0; i < m_pPluginManager->getSensorPlugins().size(); ++i)
         createItemAction(m_pPluginManager->getSensorPlugins()[i]->getName(), PluginItem::Sensor, menuSensors);
+
+
 //    createItemAction(QString("ECG Simulator"), PluginItem::Sensor, menuSensors);
 //    createItemAction(QString("RT Client"), PluginItem::Sensor, menuSensors);
     sensorToolButton->setMenu(menuSensors);
@@ -239,8 +239,10 @@ void PluginGui::createToolbars()
     QMenu *menuAlgorithms = new QMenu;
     for(qint32 i = 0; i < m_pPluginManager->getAlgorithmPlugins().size(); ++i)
         createItemAction(m_pPluginManager->getAlgorithmPlugins()[i]->getName(), PluginItem::Algorithm, menuAlgorithms);
-//    createItemAction(QString("SourceLab"), PluginItem::Algorithm, menuAlgorithms);
-//    createItemAction(QString("RTSSS"), PluginItem::Algorithm, menuAlgorithms);
+
+    createItemAction(QString("SourceLab"), PluginItem::Algorithm, menuAlgorithms);  //DEBUG
+    createItemAction(QString("RTSSS"), PluginItem::Algorithm, menuAlgorithms);       //DEBUG
+
     algorithmToolButton->setMenu(menuAlgorithms);
     algorithmToolButton->setPopupMode(QToolButton::InstantPopup);
     algorithmToolButton->setIcon(QIcon(":/images/algorithm.png"));
@@ -251,7 +253,9 @@ void PluginGui::createToolbars()
     QMenu *menuIo = new QMenu;
     for(qint32 i = 0; i < m_pPluginManager->getIOPlugins().size(); ++i)
         createItemAction(m_pPluginManager->getIOPlugins()[i]->getName(), PluginItem::Io, menuIo);
-//    createItemAction(QString("FIFF"), PluginItem::Io, menuIo);
+
+    createItemAction(QString("FIFF"), PluginItem::Io, menuIo);  //DEBUG
+
     ioToolButton->setMenu(menuIo);
     ioToolButton->setPopupMode(QToolButton::InstantPopup);
     ioToolButton->setIcon(QIcon(":/images/io.png"));
@@ -326,13 +330,9 @@ QAction* PluginGui::createItemAction(QString name, PluginItem::DiagramType type,
 {
 
     QAction* action = menu->addAction(name);
-    action->setData(m_id);
 
-    m_pActionGroup->addAction(action);
-
-    m_qMapIdType.insert(m_id, type);
-    m_qMapIdName.insert(m_id, name);
-    ++m_id;
+    m_pActionGroupPlugins->addAction(action);
+    m_qMapNameType.insert(name, type);
 
     return action;
 }

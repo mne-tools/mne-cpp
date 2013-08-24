@@ -81,7 +81,7 @@ namespace MNEX
 class PluginGui : public QMainWindow
 {
     Q_OBJECT
-
+    friend class PluginScene;
 public:
    PluginGui(MNEX::PluginManager::SPtr pPluginManager, MNEX::PluginSceneManager::SPtr pPluginSceneManager);
 
@@ -104,33 +104,24 @@ private:
     QAction* createItemAction(QString name, PluginItem::DiagramType type, QMenu* menu);
 
     MNEX::PluginManager::SPtr       m_pPluginManager;       /**< Corresponding plugin manager. */
-    MNEX::PluginSceneManager::SPtr  m_pPluginSceneManager;  /**< Corresponding plugin stage. */
+    MNEX::PluginSceneManager::SPtr  m_pPluginSceneManager;  /**< Corresponding plugin scene manager. */
 
-    qint32 m_id;
+    //Plugin Menu
+    QMap<QString, PluginItem::DiagramType>  m_qMapNameType;
 
-    QMap<int, PluginItem::DiagramType> m_qMapIdType;
-    QMap<int, QString> m_qMapIdName;
+    PluginScene*    m_pPluginScene;         /**< Plugin graph */
+    QGraphicsView*  m_pGraphicsView;        /**< View to show graph */
+    QToolBar*       m_pToolBarPlugins;
+    QActionGroup*   m_pActionGroupPlugins;
 
-    PluginScene* m_pPluginScene;
-    QGraphicsView *view;
+    QToolBar *      m_pToolBarPointer;
+    QButtonGroup *  m_pButtonGroupPointers;
 
-    QAction *addAction;
-    QAction *deleteAction;
-
-    QAction *toFrontAction;
-    QAction *sendBackAction;
-
-    QMenu *m_pMenuItem;
-
-    QToolBar *m_pToolBarPlugins;
-    QToolBar *m_pToolBarPointer;
-    QToolBar *m_pToolBarItem;
-
-    QActionGroup *m_pActionGroup;
-
-    QButtonGroup *m_pButtonGroupPointers;
-    QAction *fillAction;
-    QAction *lineAction;
+    QToolBar*   m_pToolBarItem;
+    QMenu*      m_pMenuItem;
+    QAction*    deleteAction;
+    QAction*    toFrontAction;
+    QAction*    sendBackAction;
 };
 
 } //NAMESPACE

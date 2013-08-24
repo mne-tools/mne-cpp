@@ -39,10 +39,20 @@
 //=============================================================================================================
 
 #include "pluginscene.h"
+#include "plugingui.h"
 #include "arrow.h"
 
 #include <QTextCursor>
 #include <QGraphicsSceneMouseEvent>
+#include <QAction>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace MNEX;
 
 
 //*************************************************************************************************************
@@ -50,38 +60,15 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginScene::PluginScene(QMenu *itemMenu, QObject *parent)
-: QGraphicsScene(parent)
+PluginScene::PluginScene(QMenu *itemMenu, PluginGui *pPluginGui)
+: QGraphicsScene(pPluginGui)
+, m_pPluginGui(pPluginGui)
 {
     m_pMenuItem = itemMenu;
     m_mode = MoveItem;
-    m_itemType = PluginItem::Sensor;
+//    m_itemType = PluginItem::Sensor;
     line = 0;
     m_qColorLine = QColor(65,113,156);
-}
-
-
-//*************************************************************************************************************
-
-void PluginScene::setMode(Mode mode)
-{
-    m_mode = mode;
-}
-
-
-//*************************************************************************************************************
-
-void PluginScene::setItemType(PluginItem::DiagramType type)
-{
-    m_itemType = type;
-}
-
-
-//*************************************************************************************************************
-
-void PluginScene::setItemName(QString name)
-{
-    m_itemName = name;
 }
 
 
@@ -93,9 +80,15 @@ void PluginScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
         return;
 
     PluginItem *item;
+    PluginItem::DiagramType type = PluginItem::Sensor;
+    QString name;
     switch (m_mode) {
         case InsertItem:
-            item = new PluginItem(m_itemName, m_itemType, m_pMenuItem);
+
+
+            type = PluginItem::DiagramType(m_pPluginGui->m_qMapNameType[m_pItemAction->text()]);
+            name = m_pItemAction->text();
+            item = new PluginItem(name, type, m_pMenuItem);
             addItem(item);
             item->setPos(mouseEvent->scenePos());
             emit itemInserted(item);
@@ -106,7 +99,7 @@ void PluginScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
             line->setPen(QPen(m_qColorLine, 1));
             addItem(line);
             break;
-    default:
+        default:
         ;
     }
     QGraphicsScene::mousePressEvent(mouseEvent);
