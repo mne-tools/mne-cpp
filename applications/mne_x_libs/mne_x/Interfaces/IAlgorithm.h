@@ -111,7 +111,7 @@ public:
     *
     * @return type of the IAlgorithm
     */
-    virtual Type getType() const = 0;
+    virtual PluginType getType() const = 0;
 
     //=========================================================================================================
     /**

@@ -47,6 +47,16 @@ class QRectF;
 class QGraphicsSceneMouseEvent;
 class QPainterPath;
 
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNEX
+//=============================================================================================================
+
+namespace MNEX
+{
+
 class Arrow : public QGraphicsLineItem
 {
 public:
@@ -73,5 +83,7 @@ private:
     QColor m_qColor;
     QPolygonF arrowHead;
 };
+
+} //NAMESPACE
 
 #endif // ARROW_H

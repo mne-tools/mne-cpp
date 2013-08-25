@@ -92,13 +92,21 @@ public:
     typedef QSharedPointer<PluginScene> SPtr;               /**< Shared pointer type for PluginScene. */
     typedef QSharedPointer<const PluginScene> ConstSPtr;    /**< Const shared pointer type for PluginScene. */
 
-    enum Mode { InsertItem, InsertLine, MoveItem};
+    enum Mode { InsertPluginItem, InsertLine, MovePluginItem};
 
-    explicit PluginScene(QMenu *itemMenu, PluginGui *pPluginGui);
+    explicit PluginScene(QMenu *pMenuPluginItem, PluginGui *pPluginGui);
+
+    //=========================================================================================================
+    /**
+    * Inserts the m_pActionPluginItem selected plugin into PluginSceneManager
+    *
+    * @return true if successfull
+    */
+    bool insertPlugin();
 
 //SLOTS
     inline void setMode(Mode mode);
-    inline void setItemAction(QAction* pAction);
+    inline void setActionPluginItem(QAction* pAction);
 //    inline void setItemType(PluginItem::DiagramType type);
 //    inline void setItemName(QString name);
 
@@ -113,17 +121,16 @@ protected:
 private:
     bool isItemChange(int type);
 
-
     PluginGui*  m_pPluginGui;   /**< Corresponding plugin gui */
 
     //Current info
     Mode                    m_mode;
 //    PluginItem::DiagramType m_itemType;
 //    QString                 m_itemName;
-    QAction*                m_pItemAction;
+    QAction*                m_pActionPluginItem; /**< Selected plugin */
 
 
-    QMenu *m_pMenuItem;         /**< Plugin context menu */
+    QMenu *m_pMenuPluginItem;         /**< Plugin context menu */
 
     bool leftButtonDown;
     QPointF startPoint;
@@ -144,9 +151,9 @@ void PluginScene::setMode(Mode mode)
 
 //*************************************************************************************************************
 
-void PluginScene::setItemAction(QAction* pAction)
+void PluginScene::setActionPluginItem(QAction* pAction)
 {
-    m_pItemAction = pAction;
+    m_pActionPluginItem = pAction;
 }
 
 

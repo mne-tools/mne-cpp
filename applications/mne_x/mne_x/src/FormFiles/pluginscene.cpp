@@ -60,17 +60,26 @@ using namespace MNEX;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginScene::PluginScene(QMenu *itemMenu, PluginGui *pPluginGui)
+PluginScene::PluginScene(QMenu *pMenuPluginItem, PluginGui *pPluginGui)
 : QGraphicsScene(pPluginGui)
 , m_pPluginGui(pPluginGui)
 {
-    m_pMenuItem = itemMenu;
-    m_mode = MoveItem;
+    m_pMenuPluginItem = pMenuPluginItem;
+    m_mode = MovePluginItem;
 //    m_itemType = PluginItem::Sensor;
     line = 0;
     m_qColorLine = QColor(65,113,156);
 }
 
+
+bool PluginScene::insertPlugin()
+{
+    QString name = m_pActionPluginItem->text();
+    qint32 idx = m_pPluginGui->m_pPluginManager->findByName(name);
+//            IPlugin* pPlugin = m_pPluginGui->m_pPluginManager->getPlugins()[idx];
+
+    return true;
+}
 
 //*************************************************************************************************************
 
@@ -80,18 +89,19 @@ void PluginScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
         return;
 
     PluginItem *item;
-    PluginItem::DiagramType type = PluginItem::Sensor;
+    IPlugin::PluginType type = IPlugin::_ISensor;
     QString name;
     switch (m_mode) {
-        case InsertItem:
-
-
-            type = PluginItem::DiagramType(m_pPluginGui->m_qMapNameType[m_pItemAction->text()]);
-            name = m_pItemAction->text();
-            item = new PluginItem(name, type, m_pMenuItem);
-            addItem(item);
-            item->setPos(mouseEvent->scenePos());
-            emit itemInserted(item);
+        case InsertPluginItem:
+            if(insertPlugin())
+            {
+                name = m_pActionPluginItem->text();
+                type = (IPlugin::PluginType)m_pActionPluginItem->data().toInt();
+                item = new PluginItem(name, type, m_pMenuPluginItem);
+                addItem(item);
+                item->setPos(mouseEvent->scenePos());
+                emit itemInserted(item);
+            }
             break;
         case InsertLine:
             line = new QGraphicsLineItem(QLineF(mouseEvent->scenePos(),
@@ -113,7 +123,7 @@ void PluginScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
     if (m_mode == InsertLine && line != 0) {
         QLineF newLine(line->line().p1(), mouseEvent->scenePos());
         line->setLine(newLine);
-    } else if (m_mode == MoveItem) {
+    } else if (m_mode == MovePluginItem) {
         QGraphicsScene::mouseMoveEvent(mouseEvent);
     }
 }

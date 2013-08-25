@@ -49,10 +49,18 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace MNEX;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginItem::PluginItem(QString name, DiagramType diagramType, QMenu *contextMenu, QGraphicsItem *parent)
+PluginItem::PluginItem(QString name, IPlugin::PluginType diagramType, QMenu *contextMenu, QGraphicsItem *parent)
 : QGraphicsPolygonItem(parent)
 , m_sName(name)
 , m_diagramType(diagramType)
@@ -67,21 +75,25 @@ PluginItem::PluginItem(QString name, DiagramType diagramType, QMenu *contextMenu
                << QPointF(m_iWidth/2, m_iHeight/2) << QPointF(-m_iWidth/2, m_iHeight/2)
                << QPointF(-m_iWidth/2, -m_iHeight/2);
     switch (m_diagramType) {
-        case StartEnd:
-            m_qColorContour = QColor(79, 136, 187);
-            m_qLinearGradientFace.setColorAt(0, QColor(234, 239, 247));
-            break;
-        case Algorithm:
+//        case StartEnd:
+//            m_qColorContour = QColor(79, 136, 187);
+//            m_qLinearGradientFace.setColorAt(0, QColor(234, 239, 247));
+//            break;
+        case IPlugin::_IAlgorithm:
             m_qColorContour = QColor(98, 152, 61);
             m_qLinearGradientFace.setColorAt(0, QColor(235, 241, 233));
             break;
-        case Sensor:
+        case IPlugin::_ISensor:
             m_qColorContour = QColor(79, 136, 187);
             m_qLinearGradientFace.setColorAt(0, QColor(234, 239, 247));
             break;
-        default:
+        case IPlugin::_IIO:
             m_qColorContour = QColor(224, 169, 0);
             m_qLinearGradientFace.setColorAt(0, QColor(255, 244, 231));
+            break;
+        default:
+            m_qColorContour = QColor(125, 125, 125);
+            m_qLinearGradientFace.setColorAt(0, QColor(125, 125, 125));
             break;
     }
     setBrush(m_qLinearGradientFace);

@@ -92,8 +92,8 @@ void PluginGui::actionGroupTriggered(QAction* action)
 {
 //    m_pPluginScene->setItemType(PluginItem::DiagramType(m_qMapNameType[action->text()]));
 //    m_pPluginScene->setItemName(action->text());
-    m_pPluginScene->setItemAction(action);
-    m_pPluginScene->setMode(PluginScene::InsertItem);
+    m_pPluginScene->setActionPluginItem(action);
+    m_pPluginScene->setMode(PluginScene::InsertPluginItem);
 
 }
 
@@ -172,7 +172,7 @@ void PluginGui::sendToBack()
 void PluginGui::itemInserted(PluginItem *item)
 {
     Q_UNUSED(item);
-    m_pButtonGroupPointers->button(int(PluginScene::MoveItem))->setChecked(true);
+    m_pButtonGroupPointers->button(int(PluginScene::MovePluginItem))->setChecked(true);
     m_pPluginScene->setMode(PluginScene::Mode(m_pButtonGroupPointers->checkedId()));
 }
 
@@ -224,7 +224,7 @@ void PluginGui::createToolbars()
     QToolButton *sensorToolButton = new QToolButton;
     QMenu *menuSensors = new QMenu;
     for(qint32 i = 0; i < m_pPluginManager->getSensorPlugins().size(); ++i)
-        createItemAction(m_pPluginManager->getSensorPlugins()[i]->getName(), PluginItem::Sensor, menuSensors);
+        createItemAction(m_pPluginManager->getSensorPlugins()[i]->getName(), IPlugin::_ISensor, menuSensors);
 
 
 //    createItemAction(QString("ECG Simulator"), PluginItem::Sensor, menuSensors);
@@ -238,10 +238,10 @@ void PluginGui::createToolbars()
     QToolButton *algorithmToolButton = new QToolButton;
     QMenu *menuAlgorithms = new QMenu;
     for(qint32 i = 0; i < m_pPluginManager->getAlgorithmPlugins().size(); ++i)
-        createItemAction(m_pPluginManager->getAlgorithmPlugins()[i]->getName(), PluginItem::Algorithm, menuAlgorithms);
+        createItemAction(m_pPluginManager->getAlgorithmPlugins()[i]->getName(), IPlugin::_IAlgorithm, menuAlgorithms);
 
-    createItemAction(QString("SourceLab"), PluginItem::Algorithm, menuAlgorithms);  //DEBUG
-    createItemAction(QString("RTSSS"), PluginItem::Algorithm, menuAlgorithms);       //DEBUG
+    createItemAction(QString("SourceLab"), IPlugin::_IAlgorithm, menuAlgorithms);  //DEBUG
+    createItemAction(QString("RTSSS"), IPlugin::_IAlgorithm, menuAlgorithms);       //DEBUG
 
     algorithmToolButton->setMenu(menuAlgorithms);
     algorithmToolButton->setPopupMode(QToolButton::InstantPopup);
@@ -252,9 +252,9 @@ void PluginGui::createToolbars()
     QToolButton *ioToolButton = new QToolButton;
     QMenu *menuIo = new QMenu;
     for(qint32 i = 0; i < m_pPluginManager->getIOPlugins().size(); ++i)
-        createItemAction(m_pPluginManager->getIOPlugins()[i]->getName(), PluginItem::Io, menuIo);
+        createItemAction(m_pPluginManager->getIOPlugins()[i]->getName(), IPlugin::_IIO, menuIo);
 
-    createItemAction(QString("FIFF"), PluginItem::Io, menuIo);  //DEBUG
+    createItemAction(QString("FIFF"), IPlugin::_IIO, menuIo);  //DEBUG
 
     ioToolButton->setMenu(menuIo);
     ioToolButton->setPopupMode(QToolButton::InstantPopup);
@@ -291,7 +291,7 @@ void PluginGui::createToolbars()
     linePointerButton->setToolTip(tr("Connection"));
 
     m_pButtonGroupPointers = new QButtonGroup(this);
-    m_pButtonGroupPointers->addButton(pointerButton, int(PluginScene::MoveItem));
+    m_pButtonGroupPointers->addButton(pointerButton, int(PluginScene::MovePluginItem));
     m_pButtonGroupPointers->addButton(linePointerButton, int(PluginScene::InsertLine));
 
     connect(m_pButtonGroupPointers, SIGNAL(buttonClicked(int)),
@@ -326,13 +326,11 @@ void PluginGui::createToolbars()
 
 //*************************************************************************************************************
 
-QAction* PluginGui::createItemAction(QString name, PluginItem::DiagramType type, QMenu* menu)
+QAction* PluginGui::createItemAction(QString name, IPlugin::PluginType type, QMenu* menu)
 {
 
     QAction* action = menu->addAction(name);
-
+    action->setData(type);
     m_pActionGroupPlugins->addAction(action);
-    m_qMapNameType.insert(name, type);
-
     return action;
 }
