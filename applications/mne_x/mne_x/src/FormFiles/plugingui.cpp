@@ -67,14 +67,19 @@ using namespace MNEX;
 PluginGui::PluginGui(PluginManager::SPtr pPluginManager, MNEX::PluginSceneManager::SPtr pPluginSceneManager)
 : m_pPluginManager(pPluginManager)
 , m_pPluginSceneManager(pPluginSceneManager)
+, m_pCurrentPlugin(0)
 {
     createActions();
     createMenuItem();
 
     m_pPluginScene = new PluginScene(m_pMenuItem, this);
     m_pPluginScene->setSceneRect(QRectF(0, 0, 200, 500));
-    connect(m_pPluginScene, SIGNAL(itemInserted(PluginItem*)),
-            this, SLOT(itemInserted(PluginItem*)));
+    connect(m_pPluginScene, &PluginScene::itemInserted,
+            this, &PluginGui::itemInserted);
+
+    connect(m_pPluginScene, &PluginScene::selectionChanged,
+            this, &PluginGui::newItemSelected);
+
 
     createToolbars();
 
@@ -118,11 +123,33 @@ void PluginGui::itemInserted(PluginItem *item)
 
 //*************************************************************************************************************
 
+void PluginGui::newItemSelected()
+{
+    IPlugin::SPtr pPlugin;
+    foreach (QGraphicsItem *item, m_pPluginScene->selectedItems())
+    {
+        if(item->type() == PluginItem::Type)
+            pPlugin = qgraphicsitem_cast<PluginItem *>(item)->plugin();
+    }
+
+    if(!pPlugin.isNull() && pPlugin != m_pCurrentPlugin)
+    {
+        qWarning() << "plugin selected" << pPlugin->getName();
+
+        m_pCurrentPlugin = pPlugin;
+    }
+}
+
+
+//*************************************************************************************************************
+
 void PluginGui::deleteItem()
 {
     //Remove Arrows ToDo Connections
-    foreach (QGraphicsItem *item, m_pPluginScene->selectedItems()) {
-        if (item->type() == Arrow::Type) {
+    foreach (QGraphicsItem *item, m_pPluginScene->selectedItems())
+    {
+        if (item->type() == Arrow::Type)
+        {
             m_pPluginScene->removeItem(item);
             Arrow *arrow = qgraphicsitem_cast<Arrow *>(item);
             arrow->startItem()->removeArrow(arrow);
@@ -132,7 +159,8 @@ void PluginGui::deleteItem()
     }
 
     //Remove Items
-    foreach (QGraphicsItem *item, m_pPluginScene->selectedItems()) {
+    foreach (QGraphicsItem *item, m_pPluginScene->selectedItems())
+    {
          if (item->type() == PluginItem::Type)
              qgraphicsitem_cast<PluginItem *>(item)->removeArrows();
 
@@ -196,18 +224,18 @@ void PluginGui::createActions()
     deleteAction = new QAction(QIcon(":/images/delete.png"), tr("&Delete"), this);
     deleteAction->setShortcut(tr("Delete"));
     deleteAction->setStatusTip(tr("Delete item from diagram (Del)"));
-    connect(deleteAction, SIGNAL(triggered()), this, SLOT(deleteItem()));
+    connect(deleteAction, &QAction::triggered, this, &PluginGui::deleteItem);
 
     toFrontAction = new QAction(QIcon(":/images/bringtofront.png"),
                                 tr("Bring to &Front"), this);
     toFrontAction->setShortcut(tr("Ctrl+F"));
     toFrontAction->setStatusTip(tr("Bring item to front (Ctrl+F)"));
-    connect(toFrontAction, SIGNAL(triggered()), this, SLOT(bringToFront()));
+    connect(toFrontAction, &QAction::triggered, this, &PluginGui::bringToFront);
 
     sendBackAction = new QAction(QIcon(":/images/sendtoback.png"), tr("Send to &Back"), this);
     sendBackAction->setShortcut(tr("Ctrl+B"));
     sendBackAction->setStatusTip(tr("Send item to back (Ctrl+B)"));
-    connect(sendBackAction, SIGNAL(triggered()), this, SLOT(sendToBack()));
+    connect(sendBackAction, &QAction::triggered, this, &PluginGui::sendToBack);
 }
 
 
@@ -230,8 +258,8 @@ void PluginGui::createToolbars()
     //Plugins Toolbar
     m_pActionGroupPlugins = new QActionGroup(this);
     m_pActionGroupPlugins->setExclusive(false);
-    connect(m_pActionGroupPlugins, SIGNAL(triggered(QAction*)),
-            this, SLOT(actionGroupTriggered(QAction*)));
+    connect(m_pActionGroupPlugins, &QActionGroup::triggered,
+            this, &PluginGui::actionGroupTriggered);
 
     QToolButton *sensorToolButton = new QToolButton;
     QMenu *menuSensors = new QMenu;
@@ -306,8 +334,8 @@ void PluginGui::createToolbars()
     m_pButtonGroupPointers->addButton(pointerButton, int(PluginScene::MovePluginItem));
     m_pButtonGroupPointers->addButton(linePointerButton, int(PluginScene::InsertLine));
 
-    connect(m_pButtonGroupPointers, SIGNAL(buttonClicked(int)),
-            this, SLOT(pointerGroupClicked(int)));
+    connect(m_pButtonGroupPointers, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked),
+            this, &PluginGui::pointerGroupClicked);
 
     m_pToolBarPointer = new QToolBar(tr("Pointer type"), this);
 

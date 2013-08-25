@@ -89,17 +89,20 @@ public:
 
 
 
+
 private slots:
+    void pointerGroupClicked(int id);
+
+private:
     void actionGroupTriggered(QAction* action);
 
     void itemInserted(PluginItem *item);
+    void newItemSelected();
 
     void deleteItem();
-    void pointerGroupClicked(int id);
     void bringToFront();
     void sendToBack();
 
-private:
     void createActions();
     void createMenuItem();
     void createToolbars();
@@ -108,6 +111,8 @@ private:
 
     MNEX::PluginManager::SPtr       m_pPluginManager;       /**< Corresponding plugin manager. */
     MNEX::PluginSceneManager::SPtr  m_pPluginSceneManager;  /**< Corresponding plugin scene manager. */
+
+    MNEX::IPlugin::SPtr             m_pCurrentPlugin;
 
     PluginScene*    m_pPluginScene;         /**< Plugin graph */
     QGraphicsView*  m_pGraphicsView;        /**< View to show graph */
