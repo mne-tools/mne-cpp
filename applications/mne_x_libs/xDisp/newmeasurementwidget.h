@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     pluginscene.h
+* @file     newmeasurementwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2013
+* @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,50 +29,37 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    PluginScene class declaration
+* @brief    Declaration of the MeasurementWidget Class.
 *
 */
 
-#ifndef PLUGINSCENE_H
-#define PLUGINSCENE_H
+#ifndef NEWMEASUREMENTWIDGET_H
+#define NEWMEASUREMENTWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "pluginitem.h"
+#include "xdisp_global.h"
 
-#include <mne_x/Management/pluginmanager.h>
-#include <mne_x/Management/pluginscenemanager.h>
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QGraphicsScene>
+#include <xMeas/Measurement/newmeasurement.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// QT INCLUDES
 //=============================================================================================================
 
-class QGraphicsSceneMouseEvent;
-class QMenu;
-class QPointF;
-class QGraphicsLineItem;
-class QColor;
-class QAction;
+#include <QWidget>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEX
+// DEFINE NAMESPACE XDISPLIB
 //=============================================================================================================
 
-namespace MNEX
+namespace XDISPLIB
 {
 
 //*************************************************************************************************************
@@ -80,78 +67,49 @@ namespace MNEX
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class PluginGui;
 
-
-
-
-class PluginScene : public QGraphicsScene
+//=============================================================================================================
+/**
+* DECLARE CLASS MeasurementWidget
+*
+* @brief The MeasurementWidget class is the base class of all measurement widgets.
+*/
+class XDISPSHARED_EXPORT NewMeasurementWidget : public QWidget
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<PluginScene> SPtr;               /**< Shared pointer type for PluginScene. */
-    typedef QSharedPointer<const PluginScene> ConstSPtr;    /**< Const shared pointer type for PluginScene. */
-
-    enum Mode { InsertPluginItem, InsertLine, MovePluginItem};
-
-    explicit PluginScene(QMenu *pMenuPluginItem, PluginGui *pPluginGui);
 
     //=========================================================================================================
     /**
-    * Inserts the m_pActionPluginItem selected plugin into PluginSceneManager
+    * Constructs a MeasurementWidget which is a child of parent.
     *
-    * @return true if successfull
+    * @param [in] parent pointer to parent widget; If parent is 0, the new MeasurementWidget becomes a window. If parent is another widget, MeasurementWidget becomes a child window inside parent. MeasurementWidget is deleted when its parent is deleted.
     */
-    bool insertPlugin(QAction* pActionPluginItem, IPlugin::SPtr &pAddedPlugin);
+    NewMeasurementWidget(QWidget* parent = 0);
 
-    inline void setMode(Mode mode);
-    inline void setActionPluginItem(QAction* pAction);
+    //=========================================================================================================
+    /**
+    * Destroys the MeasurementWidget.
+    */
+    virtual ~NewMeasurementWidget();
 
-signals:
-    void itemInserted(PluginItem *item);
+    //=========================================================================================================
+    /**
+    * Is called when new data are available.
+    * Pure virtual method inherited by IObserver.
+    *
+    * @param [in] pSubject  pointer to Subject -> not used because its direct attached to the measurement.
+    */
+    virtual void update(XMEASLIB::NewMeasurement::SPtr pMeasurement) = 0;
 
-protected:
-    void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent);
-
-private:
-//    bool isItemChange(int type);
-
-    PluginGui*  m_pPluginGui;   /**< Corresponding plugin gui */
-
-    //Current info
-    Mode            m_mode;
-    QAction*        m_pActionPluginItem;    /**< Selected plugin */
-
-
-    QMenu *m_pMenuPluginItem;         /**< Plugin context menu */
-
-    bool leftButtonDown;
-    QPointF startPoint;
-    QGraphicsLineItem *line;
-    QColor m_qColorLine;
+    //=========================================================================================================
+    /**
+    * Initialise the MeasurementWidget.
+    * Pure virtual method.
+    */
+    virtual void init() = 0;
 };
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-void PluginScene::setMode(Mode mode)
-{
-    m_mode = mode;
 }
 
-
-//*************************************************************************************************************
-
-void PluginScene::setActionPluginItem(QAction* pAction)
-{
-    m_pActionPluginItem = pAction;
-}
-
-
-} //NAMESPACE
-
-#endif // PLUGINSCENE_H
+#endif // NEWMEASUREMENTWIDGET_H

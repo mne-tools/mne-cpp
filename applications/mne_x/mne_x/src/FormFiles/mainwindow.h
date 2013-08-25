@@ -107,6 +107,9 @@ class StartUpWidget;
 class PluginGui;
 class PluginManager;
 class PluginSceneManager;
+class NewDisplayManager;
+
+class IPlugin;
 
 class RunWidget;
 class PluginDockWidget;
@@ -180,7 +183,8 @@ private:
     StartUpWidget* m_pStartUpWidget;    /**< holds the StartUpWidget.*/
 
     //Run
-    RunWidget* m_pRunWidget;            /**< Holds the run widget.*/
+    RunWidget* m_pRunWidget;                                /**< The run widget */
+    QSharedPointer<NewDisplayManager> m_pDisplayManager;    /**< The run widget */
 
     bool m_bDisplayMax;                 /**< whether full screen mode is activated.*/
     bool m_bIsRunning;                  /**< whether program/plugins is/are started.*/
@@ -250,13 +254,14 @@ private:
 
     //Plugin Management
     QDockWidget*                        m_pPluginGuiDockWidget;         /**< Dock widget which holds the plugin gui. */
+    PluginGui*                          m_pPluginGui;
     QSharedPointer<PluginManager>       m_pPluginManager;               /**< Holds log dock widget.*/
     QSharedPointer<PluginSceneManager>  m_pPluginSceneManager;          /**< Plugin scene manager which manages the plugin graph */
 
 //OLD
     PluginDockWidget*                   m_pPluginDockWidget;            /**< Holds the dock widget containing the plugins.*/
     QList<PLG_ID::Plugin_ID>            m_pListCurrentDisplayPlugins;   /**< Holds list of plugin id's which should be displayed.*/
-//OLD
+//OLD End
 
     //Log
     QDockWidget*                        m_pDockWidget_Log;              /**< Holds the dock widget containing the log.*/
@@ -264,9 +269,16 @@ private:
 
     LogLevel                             m_eLogLevelCurrent;            /**< Holds the current log level.*/
 
+
+    void updatePluginWidget(QSharedPointer<IPlugin> pPlugin);     /**< Sets a widget to central widget of MainWindow class depending on the current plugin selected in m_pDockWidgetPlugins.*/
+
+
+
 private slots:
 
+//OLD
     void CentralWidgetShowPlugin();     /**< Sets a widget to central widget of MainWindow class depending on the current plugin selected in m_pDockWidgetPlugins.*/
+//OLD End
 
     void newConfiguration();            /**< Implements new configuration tasks.*/
     void openConfiguration();           /**< Implements open configuration tasks.*/

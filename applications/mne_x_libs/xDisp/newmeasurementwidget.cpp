@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     pluginconnector.h
+* @file     measurementwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2013
+* @date     July, 2012
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,96 +29,42 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the PluginConnector class.
+* @brief    Implementation of the MeasurementWidget Class.
 *
 */
-#ifndef PLUGININPUTCONNECTOR_H
-#define PLUGININPUTCONNECTOR_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../mne_x_global.h"
-
-#include "pluginconnector.h"
-
-#include <xMeas/Measurement/newmeasurement.h>
+#include "newmeasurementwidget.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <QSharedPointer>
+using namespace XDISPLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEX
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace MNEX
+NewMeasurementWidget::NewMeasurementWidget(QWidget* parent)
+: QWidget(parent)
+
 {
 
-//=============================================================================================================
-/**
-* Base class to connect plug-in data streams.
-*
-* @brief The PluginConnector class provides the base to connect plug-in data
-*/
-class MNE_X_SHARED_EXPORT PluginInputConnector : public PluginConnector
+}
+
+
+//*************************************************************************************************************
+
+NewMeasurementWidget::~NewMeasurementWidget()
 {
-    Q_OBJECT
-public:
-    typedef QSharedPointer<PluginInputConnector> SPtr;               /**< Shared pointer type for PluginInputConnector. */
-    typedef QSharedPointer<const PluginInputConnector> ConstSPtr;    /**< Const shared pointer type for PluginInputConnector. */
 
-    //=========================================================================================================
-    /**
-    * Constructs a PluginInputConnector with the given parent.
-    *
-    * @param[in] parent     pointer to parent plugin
-    * @param[in] name       connection name
-    * @param[in] descr      connection description
-    */
-    PluginInputConnector(IPlugin *parent, const QString &name, const QString &descr);
-
-    //=========================================================================================================
-    /**
-    * Destructor
-    */
-    virtual ~PluginInputConnector(){}
-
-    //=========================================================================================================
-    /**
-     * Returns true.
-     *
-     * @return true
-     */
-    virtual bool isInputConnector() const;
-
-    //=========================================================================================================
-    /**
-     * Returns false.
-     *
-     * @return false
-     */
-    virtual bool isOutputConnector() const;
-
-
-signals:
-    void notify(XMEASLIB::NewMeasurement::SPtr pMeasurement);
-
-public slots:
-    void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
-
-
-
-};
-
-} // NAMESPACE
-
-#endif // PLUGININPUTCONNECTOR_H
+}

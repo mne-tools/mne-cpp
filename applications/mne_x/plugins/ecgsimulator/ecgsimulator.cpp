@@ -44,6 +44,8 @@
 #include "FormFiles/ecgsetupwidget.h"
 #include "FormFiles/ecgrunwidget.h"
 
+#include <iostream>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -73,9 +75,9 @@ using namespace XMEASLIB;
 
 ECGSimulator::ECGSimulator()
 : m_pRTSA_ECG_I_new(0)
-, m_pRTSA_ECG_I(0)
-, m_pRTSA_ECG_II(0)
-, m_pRTSA_ECG_III(0)
+//, m_pRTSA_ECG_I(0)
+//, m_pRTSA_ECG_II(0)
+//, m_pRTSA_ECG_III(0)
 , m_fSamplingRate(250.0)
 , m_iDownsamplingFactor(1)
 , m_pInBuffer_I(new ECGBuffer_old(1024))
@@ -131,49 +133,50 @@ void ECGSimulator::init()
     m_pRTSA_ECG_I_new->data()->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
     m_pRTSA_ECG_I_new->data()->setVisibility(m_pECGChannel_ECG_I->isVisible());
 
+    m_outputConnectors.append(m_pRTSA_ECG_I_new);
 
-    //OLD
-    qDebug() << "ECGSimulator::init()";
+//    //OLD
+//    qDebug() << "ECGSimulator::init()";
 
-    if(m_pECGChannel_ECG_I->isEnabled())
-    {
-        diff = m_pECGChannel_ECG_I->getMaximum() - m_pECGChannel_ECG_I->getMinimum();
+//    if(m_pECGChannel_ECG_I->isEnabled())
+//    {
+//        diff = m_pECGChannel_ECG_I->getMaximum() - m_pECGChannel_ECG_I->getMinimum();
 
-        m_pRTSA_ECG_I = addProviderRealTimeSampleArray(MSR_ID::ECGSIM_I);
-        m_pRTSA_ECG_I->setName("ECG I");
-        m_pRTSA_ECG_I->setUnit("mV");
-        m_pRTSA_ECG_I->setMinValue(m_pECGChannel_ECG_I->getMinimum()-diff/10);
-        m_pRTSA_ECG_I->setMaxValue(m_pECGChannel_ECG_I->getMaximum()+diff/10);
-        m_pRTSA_ECG_I->setArraySize(10);
-        m_pRTSA_ECG_I->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
-        m_pRTSA_ECG_I->setVisibility(m_pECGChannel_ECG_I->isVisible());
-    }
+//        m_pRTSA_ECG_I = addProviderRealTimeSampleArray(MSR_ID::ECGSIM_I);
+//        m_pRTSA_ECG_I->setName("ECG I");
+//        m_pRTSA_ECG_I->setUnit("mV");
+//        m_pRTSA_ECG_I->setMinValue(m_pECGChannel_ECG_I->getMinimum()-diff/10);
+//        m_pRTSA_ECG_I->setMaxValue(m_pECGChannel_ECG_I->getMaximum()+diff/10);
+//        m_pRTSA_ECG_I->setArraySize(10);
+//        m_pRTSA_ECG_I->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
+//        m_pRTSA_ECG_I->setVisibility(m_pECGChannel_ECG_I->isVisible());
+//    }
 
-    if(m_pECGChannel_ECG_II->isEnabled())
-    {
-        diff = m_pECGChannel_ECG_II->getMaximum() - m_pECGChannel_ECG_II->getMinimum();
-        m_pRTSA_ECG_II = addProviderRealTimeSampleArray(MSR_ID::ECGSIM_II);
-        m_pRTSA_ECG_II->setName("ECG II");
-        m_pRTSA_ECG_II->setUnit("mV");
-        m_pRTSA_ECG_II->setMinValue(m_pECGChannel_ECG_II->getMinimum()-diff/10);
-        m_pRTSA_ECG_II->setMaxValue(m_pECGChannel_ECG_II->getMaximum()+diff/10);
-        m_pRTSA_ECG_II->setArraySize(10);
-        m_pRTSA_ECG_II->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
-        m_pRTSA_ECG_II->setVisibility(m_pECGChannel_ECG_II->isVisible());
-    }
+//    if(m_pECGChannel_ECG_II->isEnabled())
+//    {
+//        diff = m_pECGChannel_ECG_II->getMaximum() - m_pECGChannel_ECG_II->getMinimum();
+//        m_pRTSA_ECG_II = addProviderRealTimeSampleArray(MSR_ID::ECGSIM_II);
+//        m_pRTSA_ECG_II->setName("ECG II");
+//        m_pRTSA_ECG_II->setUnit("mV");
+//        m_pRTSA_ECG_II->setMinValue(m_pECGChannel_ECG_II->getMinimum()-diff/10);
+//        m_pRTSA_ECG_II->setMaxValue(m_pECGChannel_ECG_II->getMaximum()+diff/10);
+//        m_pRTSA_ECG_II->setArraySize(10);
+//        m_pRTSA_ECG_II->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
+//        m_pRTSA_ECG_II->setVisibility(m_pECGChannel_ECG_II->isVisible());
+//    }
 
-    if(m_pECGChannel_ECG_III->isEnabled())
-    {
-        diff = m_pECGChannel_ECG_III->getMaximum() - m_pECGChannel_ECG_III->getMinimum();
-        m_pRTSA_ECG_III = addProviderRealTimeSampleArray(MSR_ID::ECGSIM_III);
-        m_pRTSA_ECG_III->setName("ECG III");
-        m_pRTSA_ECG_III->setUnit("mV");
-        m_pRTSA_ECG_III->setMinValue(m_pECGChannel_ECG_III->getMinimum()-diff/10);
-        m_pRTSA_ECG_III->setMaxValue(m_pECGChannel_ECG_III->getMaximum()+diff/10);
-        m_pRTSA_ECG_III->setArraySize(10);
-        m_pRTSA_ECG_III->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
-        m_pRTSA_ECG_III->setVisibility(m_pECGChannel_ECG_III->isVisible());
-    }
+//    if(m_pECGChannel_ECG_III->isEnabled())
+//    {
+//        diff = m_pECGChannel_ECG_III->getMaximum() - m_pECGChannel_ECG_III->getMinimum();
+//        m_pRTSA_ECG_III = addProviderRealTimeSampleArray(MSR_ID::ECGSIM_III);
+//        m_pRTSA_ECG_III->setName("ECG III");
+//        m_pRTSA_ECG_III->setUnit("mV");
+//        m_pRTSA_ECG_III->setMinValue(m_pECGChannel_ECG_III->getMinimum()-diff/10);
+//        m_pRTSA_ECG_III->setMaxValue(m_pECGChannel_ECG_III->getMaximum()+diff/10);
+//        m_pRTSA_ECG_III->setArraySize(10);
+//        m_pRTSA_ECG_III->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
+//        m_pRTSA_ECG_III->setVisibility(m_pECGChannel_ECG_III->isVisible());
+//    }
 }
 
 
@@ -186,8 +189,8 @@ bool ECGSimulator::start()
     m_pECGChannel_ECG_II->initChannel();
     m_pECGChannel_ECG_III->initChannel();
 
-    // Initialize real time measurements
-    init();
+//    // Initialize real time measurements
+//    init();
 
     // Start threads
     m_pECGProducer->start();
@@ -203,7 +206,7 @@ bool ECGSimulator::start()
 bool ECGSimulator::stop()
 {
     // Stop threads
-	m_pECGProducer->stop();
+    m_pECGProducer->stop();
     QThread::terminate();
     QThread::wait();
 
@@ -274,17 +277,19 @@ void ECGSimulator::run()
         if(m_pECGChannel_ECG_I->isEnabled())
         {
             dValue_I = m_pInBuffer_I->pop();
-            m_pRTSA_ECG_I->setValue(dValue_I);
+            std::cout << dValue_I << std::endl;
+//            m_pRTSA_ECG_I_new->data()->setValue(dValue_I);
+//            m_pRTSA_ECG_I->setValue(dValue_I);
         }
         if(m_pECGChannel_ECG_II->isEnabled())
         {
             dValue_II = m_pInBuffer_II->pop();
-            m_pRTSA_ECG_II->setValue(dValue_II);
+//            m_pRTSA_ECG_II->setValue(dValue_II);
         }
         if(m_pECGChannel_ECG_III->isEnabled())
         {
             dValue_III = m_pInBuffer_III->pop();
-            m_pRTSA_ECG_III->setValue(dValue_III);
+//            m_pRTSA_ECG_III->setValue(dValue_III);
         }
     }
 }

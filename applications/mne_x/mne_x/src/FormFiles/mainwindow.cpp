@@ -40,6 +40,7 @@
 
 #include <mne_x/Management/pluginmanager.h>
 #include <mne_x/Management/pluginscenemanager.h>
+#include <mne_x/Management/newdisplaymanager.h>
 
 #include <mne_x/Management/connector.h>
 
@@ -117,10 +118,12 @@ MainWindow::MainWindow(QWidget *parent)
 , m_bIsRunning(false)
 , m_pLabel_Time(NULL)
 , m_pTimer(NULL)
-, m_pTime(NULL)
+, m_pTime(new QTime(0, 0))
 , m_iTimeoutMSec(1000)
-, m_pPluginManager(new PluginManager)
-, m_pPluginSceneManager(new PluginSceneManager)
+, m_pPluginGui(NULL)
+, m_pPluginManager(new PluginManager(this))
+, m_pPluginSceneManager(new PluginSceneManager(this))
+, m_pDisplayManager(new NewDisplayManager(m_pTime, this))
 , m_eLogLevelCurrent(_LogLvMax)
 {
     qDebug() << "Clinical Sensing and Analysis - Version" << CInfo::AppVersion();
@@ -141,7 +144,8 @@ MainWindow::MainWindow(QWidget *parent)
     createPluginDockWindow();
     createLogDockWindow();
 
-    connect(this, SIGNAL(newLogMsg(const QString&, LogKind, LogLevel)), this, SLOT(writeToLog(const QString&, LogKind, LogLevel)));
+    connect(this, &MainWindow::newLogMsg,
+            this, &MainWindow::writeToLog);
 
     //ToDo Debug Startup
     emit newLogMsg(tr("Test normal message, Max"), _LogKndMessage, _LogLvMax);
@@ -499,14 +503,18 @@ void MainWindow::createPluginDockWindow()
             this, SLOT(CentralWidgetShowPlugin()));
 
 
-    m_pPluginGuiDockWidget = new QDockWidget(tr("Plugins New"), this);
+    //NEW
+    m_pPluginGuiDockWidget = new QDockWidget(tr("Plugins"), this);
     m_pPluginGuiDockWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
-    PluginGui* pluginGui = new PluginGui(m_pPluginManager, m_pPluginSceneManager);
-    pluginGui->setParent(m_pPluginGuiDockWidget);
-    m_pPluginGuiDockWidget->setWidget(pluginGui);
+    m_pPluginGui = new PluginGui(m_pPluginManager, m_pPluginSceneManager);
+    m_pPluginGui->setParent(m_pPluginGuiDockWidget);
+    m_pPluginGuiDockWidget->setWidget(m_pPluginGui);
 
     addDockWidget(Qt::LeftDockWidgetArea, m_pPluginGuiDockWidget);
+
+    connect(m_pPluginGui, &PluginGui::selectedPluginChanged,
+            this, &MainWindow::updatePluginWidget);
 }
 
 
@@ -534,6 +542,34 @@ void MainWindow::createLogDockWindow()
 
 //*************************************************************************************************************
 //Plugin stuff
+void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
+{
+    if(!m_bIsRunning)
+        setCentralWidget(pPlugin->setupWidget());
+    else
+    {
+
+        m_pDisplayManager->show(pPlugin->getOutputConnectors());
+
+        //Garbage collecting
+        if(m_pRunWidget)
+            delete m_pRunWidget;
+
+        m_pRunWidget = new RunWidget(DisplayManager::show());
+
+        if(m_bDisplayMax)//ToDo send events to main window
+        {
+            m_pRunWidget->showFullScreen();
+            connect(m_pRunWidget, &RunWidget::displayClosed, this, &MainWindow::toggleDisplayMax);
+        }
+        else
+            setCentralWidget(m_pRunWidget);
+    }
+}
+
+
+//*************************************************************************************************************
+//OLD
 void MainWindow::CentralWidgetShowPlugin()//int iCurrentPluginNum, const QTreeWidgetItem* pCurrentItem)
 {
     int iCurrentPluginNum = m_pPluginDockWidget->m_iCurrentPluginIdx;//m_pPluginsDockWidget->getCurrentPluginNum()
@@ -627,21 +663,35 @@ void MainWindow::startMeasurement()
 {
     emit newLogMsg(tr("Starting real-time measurement..."), _LogKndMessage, _LogLvMin);
 
-    qDebug() << "MainCSART::startMeasurement()";
-
-    //MeasurementManager::clean();
-    //DisplayManager::clean();
-
-    if(!PluginManager::startPlugins())
+    if(!m_pPluginSceneManager->startPlugins())
     {
-        QMessageBox::information(0, QObject::tr("CSA RT - Start plugins"), QString(QObject::tr("No Sensor plugin is active")), QMessageBox::Ok);
+        QMessageBox::information(0, tr("MNE X - Start"), QString(QObject::tr("Not able to start at least one sensor plugin!")), QMessageBox::Ok);
         return;
     }
 
-    m_pPluginDockWidget->setTogglingEnabled(false);
+
+//    //OLD
+//    qDebug() << "MainCSART::startMeasurement()";
+
+//    //MeasurementManager::clean();
+//    //DisplayManager::clean();
+
+//    if(!PluginManager::startPlugins())
+//    {
+//        QMessageBox::information(0, QObject::tr("CSA RT - Start plugins"), QString(QObject::tr("No Sensor plugin is active")), QMessageBox::Ok);
+//        return;
+//    }
+
+//    m_pPluginDockWidget->setTogglingEnabled(false);
+
+//    //OLD
+
+
     uiSetupRunningState(true);
     startTimer(m_iTimeoutMSec);
-    CentralWidgetShowPlugin();
+
+    updatePluginWidget(m_pPluginGui->getCurrentPlugin());
+//    CentralWidgetShowPlugin();
 }
 
 
@@ -751,7 +801,7 @@ void MainWindow::startTimer(int msec)
     m_pTimer = QSharedPointer<QTimer>(new QTimer(this));
     connect(m_pTimer.data(), SIGNAL(timeout()), this, SLOT(updateTime()));
     m_pTimer->start(msec);
-    m_pTime = QSharedPointer<QTime>(new QTime(0, 0));
+    m_pTime->setHMS(0,0,0);
     QString strTime = m_pTime->toString();
     m_pLabel_Time->setText(strTime);
 }

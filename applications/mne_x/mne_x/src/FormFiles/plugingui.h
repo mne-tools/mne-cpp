@@ -85,16 +85,17 @@ class PluginGui : public QMainWindow
 public:
    PluginGui(MNEX::PluginManager::SPtr pPluginManager, MNEX::PluginSceneManager::SPtr pPluginSceneManager);
 
-   bool removePlugin(IPlugin::SPtr pPlugin);
+   IPlugin::SPtr getCurrentPlugin() {return m_pCurrentPlugin;}
 
-
-
-
-private slots:
-    void pointerGroupClicked(int id);
+signals:
+   void selectedPluginChanged(IPlugin::SPtr pPlugin);
 
 private:
+
+    void pointerGroupClicked(int id);
     void actionGroupTriggered(QAction* action);
+
+    bool removePlugin(IPlugin::SPtr pPlugin);
 
     void itemInserted(PluginItem *item);
     void newItemSelected();
@@ -109,10 +110,10 @@ private:
 
     QAction* createItemAction(QString name, QMenu* menu);
 
-    MNEX::PluginManager::SPtr       m_pPluginManager;       /**< Corresponding plugin manager. */
-    MNEX::PluginSceneManager::SPtr  m_pPluginSceneManager;  /**< Corresponding plugin scene manager. */
+    PluginManager::SPtr       m_pPluginManager;       /**< Corresponding plugin manager. */
+    PluginSceneManager::SPtr  m_pPluginSceneManager;  /**< Corresponding plugin scene manager. */
 
-    MNEX::IPlugin::SPtr             m_pCurrentPlugin;
+    IPlugin::SPtr             m_pCurrentPlugin;
 
     PluginScene*    m_pPluginScene;         /**< Plugin graph */
     QGraphicsView*  m_pGraphicsView;        /**< View to show graph */

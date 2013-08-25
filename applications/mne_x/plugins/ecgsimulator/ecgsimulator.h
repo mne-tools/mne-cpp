@@ -155,12 +155,11 @@ protected:
     virtual void run();
 
 private:
-
     PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_ECG_I_new;  /**< The RealTimeSampleArray to provide the channel ECG I.*/
 
-    XMEASLIB::RealTimeSampleArray::SPtr m_pRTSA_ECG_I;      /**< The RealTimeSampleArray to provide the channel ECG I.*/
-    XMEASLIB::RealTimeSampleArray::SPtr m_pRTSA_ECG_II;     /**< The RealTimeSampleArray to provide the channel ECG II.*/
-    XMEASLIB::RealTimeSampleArray::SPtr m_pRTSA_ECG_III;    /**< The RealTimeSampleArray to provide the channel ECG III.*/
+//    XMEASLIB::RealTimeSampleArray::SPtr m_pRTSA_ECG_I;      /**< The RealTimeSampleArray to provide the channel ECG I.*/
+//    XMEASLIB::RealTimeSampleArray::SPtr m_pRTSA_ECG_II;     /**< The RealTimeSampleArray to provide the channel ECG II.*/
+//    XMEASLIB::RealTimeSampleArray::SPtr m_pRTSA_ECG_III;    /**< The RealTimeSampleArray to provide the channel ECG III.*/
 
     float           m_fSamplingRate;            /**< Holds the sampling rate.*/
     int             m_iDownsamplingFactor;      /**< Holds the down sampling factor.*/

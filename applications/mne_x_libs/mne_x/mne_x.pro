@@ -83,13 +83,15 @@ SOURCES += \
     Management/plugininputdata.cpp \
     Management/pluginoutputdata.cpp \
     Management/pluginconnectorconnection.cpp \
-    Management/pluginscenemanager.cpp
-
+    Management/pluginscenemanager.cpp \
+    Management/newdisplaymanager.cpp
 
 HEADERS += \
     mne_x_global.h \
-    Interfaces/ISensor.h \
     Interfaces/IPlugin.h \
+    Interfaces/ISensor.h \
+    Interfaces/IAlgorithm.h \
+    Interfaces/IIO.h \
     Management/connector.h \
     Management/pluginmanager.h \
     Management/pluginconnector.h \
@@ -98,9 +100,8 @@ HEADERS += \
     Management/plugininputdata.h \
     Management/pluginoutputdata.h \
     Management/pluginconnectorconnection.h \
-    Interfaces/IIO.h \
-    Interfaces/IAlgorithm.h \
-    Management/pluginscenemanager.h
+    Management/pluginscenemanager.h \
+    Management/newdisplaymanager.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
