@@ -102,13 +102,11 @@ public:
     *
     * @return true if successfull
     */
-    bool insertPlugin();
+    bool insertPlugin(QAction* pActionPluginItem, IPlugin::SPtr &pAddedPlugin);
 
 //SLOTS
     inline void setMode(Mode mode);
     inline void setActionPluginItem(QAction* pAction);
-//    inline void setItemType(PluginItem::DiagramType type);
-//    inline void setItemName(QString name);
 
 signals:
     void itemInserted(PluginItem *item);
@@ -119,15 +117,13 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent);
 
 private:
-    bool isItemChange(int type);
+//    bool isItemChange(int type);
 
     PluginGui*  m_pPluginGui;   /**< Corresponding plugin gui */
 
     //Current info
-    Mode                    m_mode;
-//    PluginItem::DiagramType m_itemType;
-//    QString                 m_itemName;
-    QAction*                m_pActionPluginItem; /**< Selected plugin */
+    Mode            m_mode;
+    QAction*        m_pActionPluginItem;    /**< Selected plugin */
 
 
     QMenu *m_pMenuPluginItem;         /**< Plugin context menu */
@@ -156,22 +152,6 @@ void PluginScene::setActionPluginItem(QAction* pAction)
     m_pActionPluginItem = pAction;
 }
 
-
-
-////*************************************************************************************************************
-
-//void PluginScene::setItemType(PluginItem::DiagramType type)
-//{
-//    m_itemType = type;
-//}
-
-
-////*************************************************************************************************************
-
-//void PluginScene::setItemName(QString name)
-//{
-//    m_itemName = name;
-//}
 
 } //NAMESPACE
 

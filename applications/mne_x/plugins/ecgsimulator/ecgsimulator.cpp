@@ -118,7 +118,7 @@ QSharedPointer<IPlugin> ECGSimulator::clone() const
 //=============================================================================================================
 void ECGSimulator::init()
 {
-    m_pRTSA_ECG_I_new = PluginOutputData<RealTimeSampleArray>::SPtr(new PluginOutputData<RealTimeSampleArray>(this, "ECG I", "ECG I output data"));
+    m_pRTSA_ECG_I_new = PluginOutputData<NewRealTimeSampleArray>::create(this, "ECG I", "ECG I output data");
 
     double diff = m_pECGChannel_ECG_I->getMaximum() - m_pECGChannel_ECG_I->getMinimum();
 
@@ -130,7 +130,6 @@ void ECGSimulator::init()
     m_pRTSA_ECG_I_new->data()->setArraySize(10);
     m_pRTSA_ECG_I_new->data()->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
     m_pRTSA_ECG_I_new->data()->setVisibility(m_pECGChannel_ECG_I->isVisible());
-
 
 
     //OLD

@@ -88,6 +88,14 @@ PluginGui::PluginGui(PluginManager::SPtr pPluginManager, MNEX::PluginSceneManage
 
 //*************************************************************************************************************
 
+bool PluginGui::removePlugin(IPlugin::SPtr pPlugin)
+{
+    return m_pPluginSceneManager->removePlugin(pPlugin);
+}
+
+
+//*************************************************************************************************************
+
 void PluginGui::actionGroupTriggered(QAction* action)
 {
 //    m_pPluginScene->setItemType(PluginItem::DiagramType(m_qMapNameType[action->text()]));
@@ -100,8 +108,19 @@ void PluginGui::actionGroupTriggered(QAction* action)
 
 //*************************************************************************************************************
 
+void PluginGui::itemInserted(PluginItem *item)
+{
+    Q_UNUSED(item);
+    m_pButtonGroupPointers->button(int(PluginScene::MovePluginItem))->setChecked(true);
+    m_pPluginScene->setMode(PluginScene::Mode(m_pButtonGroupPointers->checkedId()));
+}
+
+
+//*************************************************************************************************************
+
 void PluginGui::deleteItem()
 {
+    //Remove Arrows ToDo Connections
     foreach (QGraphicsItem *item, m_pPluginScene->selectedItems()) {
         if (item->type() == Arrow::Type) {
             m_pPluginScene->removeItem(item);
@@ -112,9 +131,12 @@ void PluginGui::deleteItem()
         }
     }
 
+    //Remove Items
     foreach (QGraphicsItem *item, m_pPluginScene->selectedItems()) {
          if (item->type() == PluginItem::Type)
              qgraphicsitem_cast<PluginItem *>(item)->removeArrows();
+
+         removePlugin(qgraphicsitem_cast<PluginItem *>(item)->plugin());
          m_pPluginScene->removeItem(item);
          delete item;
      }
@@ -169,16 +191,6 @@ void PluginGui::sendToBack()
 
 //*************************************************************************************************************
 
-void PluginGui::itemInserted(PluginItem *item)
-{
-    Q_UNUSED(item);
-    m_pButtonGroupPointers->button(int(PluginScene::MovePluginItem))->setChecked(true);
-    m_pPluginScene->setMode(PluginScene::Mode(m_pButtonGroupPointers->checkedId()));
-}
-
-
-//*************************************************************************************************************
-
 void PluginGui::createActions()
 {
     deleteAction = new QAction(QIcon(":/images/delete.png"), tr("&Delete"), this);
@@ -224,11 +236,11 @@ void PluginGui::createToolbars()
     QToolButton *sensorToolButton = new QToolButton;
     QMenu *menuSensors = new QMenu;
     for(qint32 i = 0; i < m_pPluginManager->getSensorPlugins().size(); ++i)
-        createItemAction(m_pPluginManager->getSensorPlugins()[i]->getName(), IPlugin::_ISensor, menuSensors);
-
+        createItemAction(m_pPluginManager->getSensorPlugins()[i]->getName(), menuSensors);
 
 //    createItemAction(QString("ECG Simulator"), PluginItem::Sensor, menuSensors);
 //    createItemAction(QString("RT Client"), PluginItem::Sensor, menuSensors);
+
     sensorToolButton->setMenu(menuSensors);
     sensorToolButton->setPopupMode(QToolButton::InstantPopup);
     sensorToolButton->setIcon(QIcon(":/images/sensor.png"));
@@ -238,10 +250,10 @@ void PluginGui::createToolbars()
     QToolButton *algorithmToolButton = new QToolButton;
     QMenu *menuAlgorithms = new QMenu;
     for(qint32 i = 0; i < m_pPluginManager->getAlgorithmPlugins().size(); ++i)
-        createItemAction(m_pPluginManager->getAlgorithmPlugins()[i]->getName(), IPlugin::_IAlgorithm, menuAlgorithms);
+        createItemAction(m_pPluginManager->getAlgorithmPlugins()[i]->getName(), menuAlgorithms);
 
-    createItemAction(QString("SourceLab"), IPlugin::_IAlgorithm, menuAlgorithms);  //DEBUG
-    createItemAction(QString("RTSSS"), IPlugin::_IAlgorithm, menuAlgorithms);       //DEBUG
+//    createItemAction(QString("SourceLab"), IPlugin::_IAlgorithm, menuAlgorithms);  //DEBUG
+//    createItemAction(QString("RTSSS"), IPlugin::_IAlgorithm, menuAlgorithms);       //DEBUG
 
     algorithmToolButton->setMenu(menuAlgorithms);
     algorithmToolButton->setPopupMode(QToolButton::InstantPopup);
@@ -252,9 +264,9 @@ void PluginGui::createToolbars()
     QToolButton *ioToolButton = new QToolButton;
     QMenu *menuIo = new QMenu;
     for(qint32 i = 0; i < m_pPluginManager->getIOPlugins().size(); ++i)
-        createItemAction(m_pPluginManager->getIOPlugins()[i]->getName(), IPlugin::_IIO, menuIo);
+        createItemAction(m_pPluginManager->getIOPlugins()[i]->getName(), menuIo);
 
-    createItemAction(QString("FIFF"), IPlugin::_IIO, menuIo);  //DEBUG
+//    createItemAction(QString("FIFF"), IPlugin::_IIO, menuIo);  //DEBUG
 
     ioToolButton->setMenu(menuIo);
     ioToolButton->setPopupMode(QToolButton::InstantPopup);
@@ -326,11 +338,9 @@ void PluginGui::createToolbars()
 
 //*************************************************************************************************************
 
-QAction* PluginGui::createItemAction(QString name, IPlugin::PluginType type, QMenu* menu)
+QAction* PluginGui::createItemAction(QString name, QMenu* menu)
 {
-
     QAction* action = menu->addAction(name);
-    action->setData(type);
     m_pActionGroupPlugins->addAction(action);
     return action;
 }

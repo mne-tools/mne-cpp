@@ -72,14 +72,17 @@ class PluginItem : public QGraphicsPolygonItem
 public:
     enum { Type = UserType + 15 };
 
-    PluginItem(QString name, IPlugin::PluginType diagramType, QMenu *contextMenu, QGraphicsItem *parent = 0);
+    PluginItem(IPlugin::SPtr pPlugin, QMenu *contextMenu, QGraphicsItem *parent = 0);
 
     void removeArrow(Arrow *arrow);
     void removeArrows();
-    IPlugin::PluginType diagramType() const { return m_diagramType; }
+    IPlugin::PluginType diagramType() const { return m_pPlugin->getType(); }
+    IPlugin::SPtr plugin() { return m_pPlugin; }
+
     QPolygonF polygon() const { return m_qPolygon; }
     void addArrow(Arrow *arrow);
     QPixmap image() const;
+
     int type() const { return Type;}
 
     void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
@@ -89,8 +92,7 @@ protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
 private:
-    IPlugin::PluginType m_diagramType;
-    QString m_sName;
+    IPlugin::SPtr m_pPlugin;
 
     qint32 m_iWidth;
     qint32 m_iHeight;

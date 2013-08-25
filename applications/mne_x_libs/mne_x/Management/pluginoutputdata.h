@@ -72,12 +72,12 @@ template <class T>
 class PluginOutputData : public PluginOutputConnector
 {
 public:
-    typedef QSharedPointer<PluginOutputData> SPtr;               /**< Shared pointer type for PluginOutputData. */
-    typedef QSharedPointer<const PluginOutputData> ConstSPtr;    /**< Const shared pointer type for PluginOutputData. */
+    typedef QSharedPointer<PluginOutputData<T> > SPtr;               /**< Shared pointer type for PluginOutputData. */
+    typedef QSharedPointer<const PluginOutputData<T> > ConstSPtr;    /**< Const shared pointer type for PluginOutputData. */
 
     //=========================================================================================================
     /**
-    * Constructs a PluginOutputConnector with the given parent.
+    * Constructs PluginOutputData with the given parent.
     *
     * @param[in] parent     pointer to parent plugin
     * @param[in] name       connection name
@@ -90,6 +90,18 @@ public:
     * Destructor
     */
     virtual ~PluginOutputData(){}
+
+    //=========================================================================================================
+    /**
+    * Creates PluginOutputData with the given parent.
+    *
+    * @param[in] parent     pointer to parent plugin
+    * @param[in] name       connection name
+    * @param[in] descr      connection description
+    *
+    * @return the created PluginOutputData
+    */
+    static inline QSharedPointer< PluginOutputData<T> > create(IPlugin *parent, const QString &name, const QString &descr);
 
     //=========================================================================================================
     /**
@@ -110,6 +122,15 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+template <class T>
+inline QSharedPointer< PluginOutputData<T> > PluginOutputData<T>::create(IPlugin *parent, const QString &name, const QString &descr)
+{
+    QSharedPointer< PluginOutputData<T> > pPluginOutputData(new PluginOutputData<T>(parent, name, descr));
+    return pPluginOutputData;
+}
+
+//*************************************************************************************************************
 
 template <class T>
 inline QSharedPointer<T> PluginOutputData<T>::data()

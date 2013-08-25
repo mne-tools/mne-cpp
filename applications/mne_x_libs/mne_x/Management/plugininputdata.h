@@ -68,13 +68,13 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a PluginInputConnector with the given parent.
+    * Constructs a PluginInputData with the given parent.
     *
     * @param[in] parent     pointer to parent plugin
     * @param[in] name       connection name
     * @param[in] descr      connection description
     */
-    PluginInputData(IPlugin *parent, QString &name, QString &descr);
+    PluginInputData(IPlugin *parent, const QString &name, const QString &descr);
 
     //=========================================================================================================
     /**
@@ -82,6 +82,17 @@ public:
     */
     virtual ~PluginInputData(){}
 
+    //=========================================================================================================
+    /**
+    * Creates PluginInputData with the given parent.
+    *
+    * @param[in] parent     pointer to parent plugin
+    * @param[in] name       connection name
+    * @param[in] descr      connection description
+    *
+    * @return the created PluginInputData
+    */
+    static inline QSharedPointer< PluginInputData<T> > create(IPlugin *parent, const QString &name, const QString &descr);
 
     //=========================================================================================================
     /**
@@ -105,6 +116,18 @@ private:
     callback_function m_pFunc;  /**< registered callback function */
 
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+template <class T>
+inline QSharedPointer< PluginInputData<T> > PluginInputData<T>::create(IPlugin *parent, const QString &name, const QString &descr)
+{
+    QSharedPointer< PluginInputData<T> > pPluginInputData(new PluginInputData<T>(parent, name, descr));
+    return pPluginInputData;
+}
 
 } // NAMESPACE
 

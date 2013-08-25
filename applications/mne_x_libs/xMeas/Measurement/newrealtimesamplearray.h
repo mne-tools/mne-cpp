@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     pluginmanager.h
+* @file     newrealtimesamplearray.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     August, 2013
 *
 * @section  LICENSE
 *
@@ -29,209 +29,186 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the PluginManager class.
+* @brief    Contains the declaration of the NewRealTimeSampleArray class.
 *
 */
 
-#ifndef PLUGINMANAGER_H
-#define PLUGINMANAGER_H
+#ifndef NEWREALTIMESAMPLEARRAY_H
+#define NEWREALTIMESAMPLEARRAY_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../mne_x_global.h"
-
-#include <mne_x/Interfaces/IPlugin.h>
-#include <mne_x/Interfaces/ISensor.h>
-#include <mne_x/Interfaces/IAlgorithm.h>
-#include <mne_x/Interfaces/IIO.h>
-//class IPlugin;
-//class ISensor;
-//class IAlgorithm;
-//class IIO;
+#include "../xmeas_global.h"
+#include "newmeasurement.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
+#include <QSharedPointer>
 #include <QVector>
-#include <QPluginLoader>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEX
+// DEFINE NAMESPACE XMEASLIB
 //=============================================================================================================
 
-namespace MNEX
+namespace XMEASLIB
 {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// USED NAMESPACES
 //=============================================================================================================
 
-//class IPlugin;
-//class ISensor;
-//class IAlgorithm;
-//class IIO;
+//using namespace IOBuffer;
 
 
-//=============================================================================================================
+//=========================================================================================================
 /**
-* DECLARE CLASS PluginManager
+* DECLARE CLASS NewRealTimeSampleArray
 *
-* @brief The PluginManager class provides a dynamic plugin loader. As well as the handling of the loaded plugins.
+* @brief The NewRealTimeSampleArray class is the base class of every NewRealTimeSampleArray Measurement.
 */
-class MNE_X_SHARED_EXPORT PluginManager : public QPluginLoader
+class XMEASSHARED_EXPORT NewRealTimeSampleArray : public NewMeasurement
 {
-    Q_OBJECT
-
-    friend class MainWindow;
-    friend class PluginDockWidget;
-
 public:
-    typedef QSharedPointer<PluginManager> SPtr;               /**< Shared pointer type for PluginManager. */
-    typedef QSharedPointer<const PluginManager> ConstSPtr;    /**< Const shared pointer type for PluginManager. */
+    typedef QSharedPointer<NewRealTimeSampleArray> SPtr;               /**< Shared pointer type for NewRealTimeSampleArray. */
+    typedef QSharedPointer<const NewRealTimeSampleArray> ConstSPtr;    /**< Const shared pointer type for NewRealTimeSampleArray. */
 
     //=========================================================================================================
     /**
-    * Constructs a PluginManager with the given parent.
+    * Constructs a NewRealTimeSampleArray.
+    */
+    NewRealTimeSampleArray(QObject *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Destroys the NewRealTimeSampleArray.
+    */
+    virtual ~NewRealTimeSampleArray();
+
+    //=========================================================================================================
+    /**
+    * Sets the minimal value. If current value to set is smaller, current value is set to minimal value.
     *
-    * @param[in] parent pointer to parent Object. (It's normally the default value.)
+    * @param [in] minValue minimal value.
     */
-    PluginManager(QObject* parent = 0);
+    inline void setMinValue(double minValue);
 
     //=========================================================================================================
     /**
-    * Destroys the PluginManager.
-    */
-    virtual ~PluginManager();
-
-    //=========================================================================================================
-    /**
-    * Loads plugins from given directory.
+    * Returns the minimal value.
     *
-    * @param dir the plugin directory.
+    * @return the minimal value.
     */
-    void loadPlugins(const QString& dir);
+    inline double getMinValue() const;
 
     //=========================================================================================================
     /**
-    * Starts all plugins.
+    * Sets the maximal value. If value to set is bigger, current value is set to maximal value.
     *
-    * @return true if at least one ISensor plugin was started successfully, false otherwise.
+    * @param [in] maxValue maximal value.
     */
-    static bool startPlugins();
+    inline void setMaxValue(double maxValue);
 
     //=========================================================================================================
     /**
-    * Starts ISensor Plugins
+    * Returns the maximal value.
     *
-    * @return true if at least one ISensor plugin was started successfully, false otherwise.
+    * @return the maximal value.
     */
-    static bool startSensorPlugins();
+    inline double getMaxValue() const;
 
     //=========================================================================================================
     /**
-    * Starts IAlgorithm plugins.
-    */
-    static void startAlgorithmPlugins();
-
-    //=========================================================================================================
-    /**
-    * Starts IIO plugins.
-    */
-    static void startIOPlugins();
-
-    //=========================================================================================================
-    /**
-    * Stops all plugins.
-    */
-    static void stopPlugins();
-
-    //=========================================================================================================
-    /**
-    * Finds index of plugin by name.
+    * Sets the sampling rate of the NewRealTimeSampleArray Measurement.
     *
-    * @return index of plugin.
-    * @param name the plugin name.
+    * @param [in] dSamplingRate the sampling rate of the NewRealTimeSampleArray.
     */
-    static int findByName(const QString& name);
+    inline void setSamplingRate(double dSamplingRate);
 
     //=========================================================================================================
     /**
-    * Returns vector containing all plugins.
+    * Returns the sampling rate of the NewRealTimeSampleArray Measurement.
     *
-    * @return reference to vector containing all plugins.
+    * @return the sampling rate of the NewRealTimeSampleArray.
     */
-    static inline const QVector<IPlugin*>& getPlugins();
+    inline double getSamplingRate() const;
 
     //=========================================================================================================
     /**
-    * Returns vector containing ISensor plugins.
+    * Sets the number of values which should be gathered before attached observers are notified by calling the Subject notify() method.
     *
-    * @return reference to vector containing ISensor plugins.
+    * @param [in] ucArraySize the number of values.
     */
-    static inline const QVector<ISensor*>& getSensorPlugins();
+    inline void setArraySize(unsigned char ucArraySize);
 
     //=========================================================================================================
     /**
-    * Returns vector containing IAlgorithm plugins
+    * Returns the number of values which should be gathered before attached observers are notified by calling the Subject notify() method.
     *
-    * @return reference to vector containing IRTAlgorithm plugins
+    * @return the number of values which are gathered before a notify() is called.
     */
-    static inline const QVector<IAlgorithm*>& getAlgorithmPlugins();
+    inline unsigned char getArraySize() const;
 
     //=========================================================================================================
     /**
-    * Returns vector containing IIO plugins
+    * Returns the gathered sample array vector.
     *
-    * @return reference to vector containing IRTVisulaiztaion plugins
+    * @return the current sample array vector.
     */
-    static inline const QVector<IIO*>& getIOPlugins();
+    inline const QVector<double>& getSampleArray();
 
     //=========================================================================================================
     /**
-    * Returns vector containing active ISensor plugins.
+    * Sets the unit of the NewRealTimeSampleArray data.
     *
-    * @return reference to vector containing active ISensor plugins.
+    * @param [in] unit of the data.
     */
-    static inline const QVector<ISensor*>& getActiveSensorPlugins();
+    inline void setUnit(const QString& unit);
 
     //=========================================================================================================
     /**
-    * Returns vector containing active IAlgorithm plugins.
+    * Returns the unit of the NewRealTimeSampleArray measurement.
     *
-    * @return reference to vector containing active IAlgorithm plugins.
+    * @return the unit of the data of measurement.
     */
-    static inline const QVector<IAlgorithm*>& getActiveAlgorithmPlugins();
+    inline const QString& getUnit() const;
 
     //=========================================================================================================
     /**
-    * Returns vector containing active IIO plugins.
+    * Attaches a value to the sample array vector.
+    * This method is inherited by Measurement.
     *
-    * @return reference to vector containing active IIO plugins.
+    * @param [in] v the value which is attached to the sample array vector.
     */
-    static inline const QVector<IIO*>& getActiveIOPlugins();
+    virtual void setValue(double v);
+
+    //=========================================================================================================
+    /**
+    * Returns the current value set.
+    * This method is inherited by Measurement.
+    *
+    * @return the last attached value.
+    */
+    virtual double getValue() const;
 
 private:
-
-    static QVector<IPlugin*>    s_vecPlugins;               /**< Vector of all plugins. */
-
-    static QVector<ISensor*>    s_vecSensorPlugins;         /**< Vector of all ISensor plugins. */
-    static QVector<IAlgorithm*> s_vecAlgorithmPlugins;      /**< Vector of all IAlgorithm plugins. */
-    static QVector<IIO*>        s_vecIOPlugins;             /**< Vector of all IIO plugins. */
-
-    static QVector<ISensor*>    s_vecActiveSensorPlugins;   /**< Vector of all active ISensor plugins. */
-    static QVector<IAlgorithm*> s_vecActiveAlgorithmPlugins;/**< Vector of all active IAlgorithm plugins. */
-    static QVector<IIO*>        s_vecActiveIOPlugins;       /**< Vector of all active IIO plugins. */
-
+    double              m_dMinValue;        /**< Holds the minimal value.*/
+    double              m_dMaxValue;        /**< Holds the maximal value.*/
+    double              m_dSamplingRate;    /**< Holds sampling rate of the NewRealTimeSampleArray.*/
+    QString             m_qString_Unit;     /**< Holds unit of the data of the measurement.*/
+    double              m_dValue;           /**< Holds the current attached value.*/
+    unsigned char       m_ucArraySize;      /**< Holds vector size of the sample array vector.*/
+    QVector<double>     m_vecSamples;       /**< Holds the sample array vector.*/
 };
 
 
@@ -240,64 +217,97 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline const QVector<IPlugin*>& PluginManager::getPlugins()
+inline void NewRealTimeSampleArray::setMinValue(double minValue)
 {
-    return s_vecPlugins;
+    m_dMinValue = minValue;
 }
 
 
 //*************************************************************************************************************
 
-inline const QVector<ISensor*>& PluginManager::getSensorPlugins()
+inline double NewRealTimeSampleArray::getMinValue() const
 {
-    return s_vecSensorPlugins;
+    return m_dMinValue;
 }
 
 
 //*************************************************************************************************************
 
-inline const QVector<IAlgorithm*>& PluginManager::getAlgorithmPlugins()
+inline void NewRealTimeSampleArray::setMaxValue(double maxValue)
 {
-    return s_vecAlgorithmPlugins;
+    m_dMaxValue = maxValue;
 }
 
 
 //*************************************************************************************************************
 
-inline const QVector<IIO*>& PluginManager::getIOPlugins()
+inline double NewRealTimeSampleArray::getMaxValue() const
 {
-    return s_vecIOPlugins;
-}
-
-
-
-
-
-
-
-//*************************************************************************************************************
-
-inline const QVector<ISensor*>& PluginManager::getActiveSensorPlugins()
-{
-    return s_vecActiveSensorPlugins;
+    return m_dMaxValue;
 }
 
 
 //*************************************************************************************************************
 
-inline const QVector<IAlgorithm*>& PluginManager::getActiveAlgorithmPlugins()
+inline void NewRealTimeSampleArray::setSamplingRate(double dSamplingRate)
 {
-    return s_vecActiveAlgorithmPlugins;
+    m_dSamplingRate = dSamplingRate;
 }
 
 
 //*************************************************************************************************************
 
-inline const QVector<IIO*>& PluginManager::getActiveIOPlugins()
+inline double NewRealTimeSampleArray::getSamplingRate() const
 {
-    return s_vecActiveIOPlugins;
+    return m_dSamplingRate;
+}
+
+
+//*************************************************************************************************************
+
+inline void NewRealTimeSampleArray::setArraySize(unsigned char ucArraySize)
+{
+	//Obsolete unsigned char can't be bigger
+//    if(ucArraySize > 255)
+//        m_ucArraySize = 255;
+//    else
+        m_ucArraySize = ucArraySize;
+}
+
+
+//*************************************************************************************************************
+
+unsigned char NewRealTimeSampleArray::getArraySize() const
+{
+    return m_ucArraySize;
+}
+
+
+//*************************************************************************************************************
+
+inline const QVector<double>& NewRealTimeSampleArray::getSampleArray()
+{
+    return m_vecSamples;
+}
+
+
+//*************************************************************************************************************
+
+inline void NewRealTimeSampleArray::setUnit(const QString& unit)
+{
+    m_qString_Unit = unit;
+}
+
+
+//*************************************************************************************************************
+
+inline const QString& NewRealTimeSampleArray::getUnit() const
+{
+    return m_qString_Unit;
 }
 
 } // NAMESPACE
 
-#endif // PLUGINMANAGER_H
+Q_DECLARE_METATYPE(XMEASLIB::NewRealTimeSampleArray::SPtr)
+
+#endif // NEWREALTIMESAMPLEARRAY_H

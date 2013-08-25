@@ -92,7 +92,8 @@ SOURCES += \
     Measurement/newmeasurement.cpp \
     Measurement/newrealtimemultisamplearray.cpp \
     Measurement/measurementtypes.cpp \
-    Measurement/newnumeric.cpp
+    Measurement/newnumeric.cpp \
+    Measurement/newrealtimesamplearray.cpp
 
 HEADERS += \
     xmeas_global.h \
@@ -113,7 +114,8 @@ HEADERS += \
     Measurement/newmeasurement.h \
     Measurement/newrealtimemultisamplearray.h \
     Measurement/measurementtypes.h \
-    Measurement/newnumeric.h
+    Measurement/newnumeric.h \
+    Measurement/newrealtimesamplearray.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
