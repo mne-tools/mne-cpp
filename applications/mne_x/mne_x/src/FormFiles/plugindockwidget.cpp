@@ -113,15 +113,15 @@ PluginDockWidget::PluginDockWidget( const QString & title, QWidget * parent, Qt:
 
         int plugin_type = (*iterPlugins)->getType();
 
-        if(plugin_type == _ISensor)
+        if(plugin_type == IPlugin::_ISensor)
         {
             item = new QTreeWidgetItem(sensors);
         }
-        else if(plugin_type == _IAlgorithm)
+        else if(plugin_type == IPlugin::_IAlgorithm)
         {
             item = new QTreeWidgetItem(algorithms);
         }
-        else if(plugin_type == _IIO)
+        else if(plugin_type == IPlugin::_IIO)
         {
             item = new QTreeWidgetItem(ios);
         }

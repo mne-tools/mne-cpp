@@ -140,7 +140,7 @@ public:
     *
     * @return type of the IPlugin
     */
-    virtual Type getType() const = 0;
+    virtual PluginType getType() const = 0;
 
     //=========================================================================================================
     /**

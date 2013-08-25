@@ -75,17 +75,6 @@ namespace MNEX
 // ENUMERATIONS
 //=============================================================================================================
 
-//=============================================================================================================
-/**
-* Plugin Type enumeration.
-*/
-enum Type
-{
-    _ISensor,       /**< Type for a sensor plugin. */
-    _IAlgorithm,    /**< Type for a real-time algorithm plugin. */
-    _IIO,           /**< Type for a real-time I/O plugin. */
-    _PluginSet      /**< Type for a plugin set which holds different types of plugins. */
-};
 
 
 //*************************************************************************************************************
@@ -107,6 +96,18 @@ class IPlugin : public QThread
 {
 //    Q_OBJECT
 public:
+    //=============================================================================================================
+    /**
+    * Plugin Type enumeration.
+    */
+    enum PluginType
+    {
+        _ISensor,       /**< Type for a sensor plugin. */
+        _IAlgorithm,    /**< Type for a real-time algorithm plugin. */
+        _IIO,           /**< Type for a real-time I/O plugin. */
+        _PluginSet      /**< Type for a plugin set which holds different types of plugins. */
+    };
+
     typedef QSharedPointer<IPlugin> SPtr;               /**< Shared pointer type for IPlugin. */
     typedef QSharedPointer<const IPlugin> ConstSPtr;    /**< Const shared pointer type for IPlugin. */
 
@@ -156,7 +157,7 @@ public:
     *
     * @return type of the IPlugin
     */
-    virtual Type getType() const = 0;
+    virtual PluginType getType() const = 0;
 
     //=========================================================================================================
     /**

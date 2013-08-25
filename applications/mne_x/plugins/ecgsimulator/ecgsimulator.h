@@ -134,7 +134,7 @@ public:
     virtual bool start();
     virtual bool stop();
 
-    virtual Type getType() const;
+    virtual IPlugin::PluginType getType() const;
     virtual QString getName() const;
 
     virtual QWidget* setupWidget();

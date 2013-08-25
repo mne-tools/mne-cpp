@@ -36,6 +36,8 @@
 #ifndef PLUGINITEM_H
 #define PLUGINITEM_H
 
+#include <mne_x/Interfaces/IPlugin.h>
+
 #include <QGraphicsPixmapItem>
 #include <QLinearGradient>
 #include <QList>
@@ -51,19 +53,30 @@ class QStyleOptionGraphicsItem;
 class QWidget;
 class QPolygonF;
 
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNEX
+//=============================================================================================================
+
+namespace MNEX
+{
+
 class Arrow;
+
+
 
 class PluginItem : public QGraphicsPolygonItem
 {
 public:
     enum { Type = UserType + 15 };
-    enum DiagramType { Sensor, Algorithm, StartEnd, Io };
 
-    PluginItem(QString name, DiagramType diagramType, QMenu *contextMenu, QGraphicsItem *parent = 0);
+    PluginItem(QString name, IPlugin::PluginType diagramType, QMenu *contextMenu, QGraphicsItem *parent = 0);
 
     void removeArrow(Arrow *arrow);
     void removeArrows();
-    DiagramType diagramType() const { return m_diagramType; }
+    IPlugin::PluginType diagramType() const { return m_diagramType; }
     QPolygonF polygon() const { return m_qPolygon; }
     void addArrow(Arrow *arrow);
     QPixmap image() const;
@@ -76,7 +89,7 @@ protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
 private:
-    DiagramType m_diagramType;
+    IPlugin::PluginType m_diagramType;
     QString m_sName;
 
     qint32 m_iWidth;
@@ -89,5 +102,7 @@ private:
     QMenu *m_contextMenu;
     QList<Arrow *> arrows;
 };
+
+} //NAMESPACE
 
 #endif // PLUGINITEM_H

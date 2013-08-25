@@ -223,7 +223,7 @@ bool ECGSimulator::stop()
 
 //*************************************************************************************************************
 
-Type ECGSimulator::getType() const
+IPlugin::PluginType ECGSimulator::getType() const
 {
     return _ISensor;
 }

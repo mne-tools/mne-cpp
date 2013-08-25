@@ -99,7 +99,7 @@ public:
     *
     * @return type of the ISensor
     */
-    virtual Type getType() const = 0;
+    virtual PluginType getType() const = 0;
 
     //=========================================================================================================
     /**

@@ -107,10 +107,10 @@ void PluginManager::loadPlugins(const QString& dir)
 
             s_vecPlugins.push_back(qobject_cast<IPlugin*>(pPlugin));
 
-            Type module_type = qobject_cast<IPlugin*>(pPlugin)->getType();
+            IPlugin::PluginType pluginType = qobject_cast<IPlugin*>(pPlugin)->getType();
 
             // ISensor
-            if(module_type == _ISensor)
+            if(pluginType == IPlugin::_ISensor)
             {
                 ISensor* pSensor = qobject_cast<ISensor*>(pPlugin);
                 if(pSensor)
@@ -122,7 +122,7 @@ void PluginManager::loadPlugins(const QString& dir)
                 }
             }
             // IAlgorithm
-            else if(module_type == _IAlgorithm)
+            else if(pluginType == IPlugin::_IAlgorithm)
             {
                 IAlgorithm* pAlgorithm = qobject_cast<IAlgorithm*>(pPlugin);
                 if(pAlgorithm)
@@ -135,7 +135,7 @@ void PluginManager::loadPlugins(const QString& dir)
                 }
             }
             // IIO
-            else if(module_type == _IIO)
+            else if(pluginType == IPlugin::_IIO)
             {
                 IIO* pIO = qobject_cast<IIO*>(pPlugin);
                 if(pIO)
@@ -195,7 +195,7 @@ bool PluginManager::startSensorPlugins()
             else
             {
                 // ISensor
-                if((*it)->getType() == _ISensor)
+                if((*it)->getType() == IPlugin::_ISensor)
                 {
                     bFlag = true;
                     s_vecActiveSensorPlugins.push_back(qobject_cast<ISensor*>(*it));
@@ -225,7 +225,7 @@ void PluginManager::startAlgorithmPlugins()
             else
             {
                 // IRTAlgorithm
-                if((*it)->getType() == _IAlgorithm)
+                if((*it)->getType() == IPlugin::_IAlgorithm)
                 {
                     s_vecActiveAlgorithmPlugins.push_back(qobject_cast<IAlgorithm*>(*it));
                 }
@@ -252,7 +252,7 @@ void PluginManager::startIOPlugins()
             else
             {
                 // IRTVisualization
-                if((*it)->getType() == _IIO)
+                if((*it)->getType() == IPlugin::_IIO)
                 {
                     s_vecActiveIOPlugins.push_back(qobject_cast<IIO*>(*it));
                 }
@@ -273,7 +273,7 @@ void PluginManager::stopPlugins()
     {
         if((*it)->isActive())
         {
-            if((*it)->getType() == _ISensor)
+            if((*it)->getType() == IPlugin::_ISensor)
             {
                 if(!(*it)->stop())
                 {
@@ -290,7 +290,7 @@ void PluginManager::stopPlugins()
     {
         if((*it)->isActive())
         {
-            if((*it)->getType() != _ISensor)
+            if((*it)->getType() != IPlugin::_ISensor)
             {
                 if(!(*it)->stop())
                 {

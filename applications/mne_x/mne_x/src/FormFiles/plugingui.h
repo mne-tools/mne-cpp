@@ -101,13 +101,10 @@ private:
     void createMenuItem();
     void createToolbars();
 
-    QAction* createItemAction(QString name, PluginItem::DiagramType type, QMenu* menu);
+    QAction* createItemAction(QString name, IPlugin::PluginType type, QMenu* menu);
 
     MNEX::PluginManager::SPtr       m_pPluginManager;       /**< Corresponding plugin manager. */
     MNEX::PluginSceneManager::SPtr  m_pPluginSceneManager;  /**< Corresponding plugin scene manager. */
-
-    //Plugin Menu
-    QMap<QString, PluginItem::DiagramType>  m_qMapNameType;
 
     PluginScene*    m_pPluginScene;         /**< Plugin graph */
     QGraphicsView*  m_pGraphicsView;        /**< View to show graph */
