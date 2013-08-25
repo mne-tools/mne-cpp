@@ -96,9 +96,56 @@ public:
     /**
     * Adds a plugin to the stage.
     *
+    * @param[in] pPlugin        plugin to be cloned and added
+    * @param[out] pAddedPlugin  if plugin is successful added, this contains a pointer to the added instance
+    *
     *@return true if plugin is added successful.
     */
-    bool addPlugin(const IPlugin* pPlugin);
+    bool addPlugin(const IPlugin* pPlugin, IPlugin::SPtr &pAddedPlugin);
+
+    //=========================================================================================================
+    /**
+    * Removes a plugin from the stage.
+    *
+    * @param[in] pPlugin    plugin to be removed
+    *
+    *@return true if plugin is removed successful.
+    */
+    bool removePlugin(const IPlugin::SPtr pPlugin);
+
+//    //=========================================================================================================
+//    /**
+//    * Starts all plugins.
+//    *
+//    * @return true if at least one ISensor plugin was started successfully, false otherwise.
+//    */
+//    bool startPlugins();
+
+//    //=========================================================================================================
+//    /**
+//    * Starts ISensor Plugins
+//    *
+//    * @return true if at least one ISensor plugin was started successfully, false otherwise.
+//    */
+//    bool startSensorPlugins();
+
+//    //=========================================================================================================
+//    /**
+//    * Starts IAlgorithm plugins.
+//    */
+//    void startAlgorithmPlugins();
+
+//    //=========================================================================================================
+//    /**
+//    * Starts IIO plugins.
+//    */
+//    void startIOPlugins();
+
+//    //=========================================================================================================
+//    /**
+//    * Stops all plugins.
+//    */
+//    void stopPlugins();
 
     //=========================================================================================================
     /**

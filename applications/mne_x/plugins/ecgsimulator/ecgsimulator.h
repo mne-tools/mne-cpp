@@ -50,6 +50,8 @@
 #include <generics/circularbuffer_old.h>
 #include <xMeas/Measurement/realtimesamplearray.h>
 
+#include <xMeas/Measurement/newrealtimesamplearray.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -154,7 +156,7 @@ protected:
 
 private:
 
-    PluginOutputData<RealTimeSampleArray>::SPtr m_pRTSA_ECG_I_new;  /**< The RealTimeSampleArray to provide the channel ECG I.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_ECG_I_new;  /**< The RealTimeSampleArray to provide the channel ECG I.*/
 
     XMEASLIB::RealTimeSampleArray::SPtr m_pRTSA_ECG_I;      /**< The RealTimeSampleArray to provide the channel ECG I.*/
     XMEASLIB::RealTimeSampleArray::SPtr m_pRTSA_ECG_II;     /**< The RealTimeSampleArray to provide the channel ECG II.*/

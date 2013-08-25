@@ -60,10 +60,9 @@ using namespace MNEX;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginItem::PluginItem(QString name, IPlugin::PluginType diagramType, QMenu *contextMenu, QGraphicsItem *parent)
+PluginItem::PluginItem(IPlugin::SPtr pPlugin, QMenu *contextMenu, QGraphicsItem *parent)
 : QGraphicsPolygonItem(parent)
-, m_sName(name)
-, m_diagramType(diagramType)
+, m_pPlugin(pPlugin)
 , m_contextMenu(contextMenu)
 , m_iWidth(60)
 , m_iHeight(40)
@@ -74,7 +73,7 @@ PluginItem::PluginItem(QString name, IPlugin::PluginType diagramType, QMenu *con
     m_qPolygon << QPointF(-m_iWidth/2, -m_iHeight/2) << QPointF(m_iWidth/2, -m_iHeight/2)
                << QPointF(m_iWidth/2, m_iHeight/2) << QPointF(-m_iWidth/2, m_iHeight/2)
                << QPointF(-m_iWidth/2, -m_iHeight/2);
-    switch (m_diagramType) {
+    switch (m_pPlugin->getType()) {
 //        case StartEnd:
 //            m_qColorContour = QColor(79, 136, 187);
 //            m_qLinearGradientFace.setColorAt(0, QColor(234, 239, 247));
@@ -129,7 +128,7 @@ void PluginItem::paint(QPainter * painter, const QStyleOptionGraphicsItem * opti
 //            break;
 //    }
 
-    painter->drawText(-m_iWidth/2+4,-m_iHeight/2+14,m_sName.mid(0,10));
+    painter->drawText(-m_iWidth/2+4,-m_iHeight/2+14,m_pPlugin->getName().mid(0,10));
 
 }
 
@@ -178,7 +177,7 @@ QPixmap PluginItem::image() const
 
     painter.drawPolyline(m_qPolygon);
 
-    painter.drawText(-m_iWidth/2+4,-m_iHeight/2+14,m_sName.mid(0,10));
+    painter.drawText(-m_iWidth/2+4,-m_iHeight/2+14,m_pPlugin->getName().mid(0,10));
 
     return pixmap;
 }

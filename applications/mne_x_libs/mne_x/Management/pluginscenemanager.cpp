@@ -70,11 +70,13 @@ PluginSceneManager::~PluginSceneManager()
 
 //*************************************************************************************************************
 
-bool PluginSceneManager::addPlugin(const IPlugin* pPlugin)
+bool PluginSceneManager::addPlugin(const IPlugin* pPlugin, IPlugin::SPtr &pAddedPlugin)
 {
     if(pPlugin->multiInstanceAllowed())
     {
-        m_pluginList.append(pPlugin->clone());
+        pAddedPlugin = pPlugin->clone();
+        m_pluginList.append(pAddedPlugin);
+        m_pluginList.last()->init();
         return true;
     }
     else
@@ -95,11 +97,37 @@ bool PluginSceneManager::addPlugin(const IPlugin* pPlugin)
         //Not added jet
         if(!bPluginFound)
         {
-            m_pluginList.append(pPlugin->clone());
+            pAddedPlugin = pPlugin->clone();
+            m_pluginList.append(pAddedPlugin);
+            m_pluginList.last()->init();
             return true;
         }
     }
+    pAddedPlugin.clear();
     return false;
+}
+
+
+//*************************************************************************************************************
+
+bool PluginSceneManager::removePlugin(const IPlugin::SPtr pPlugin)
+{
+    qint32 pos = -1;
+    for(qint32 i = 0; i < m_pluginList.size(); ++i)
+    {
+        if(m_pluginList[i] == pPlugin)
+        {
+            pos = i;
+            break;
+        }
+    }
+    if(pos != -1)
+    {
+        m_pluginList.removeAt(pos);
+        return true;
+    }
+    else
+        return false;
 }
 
 

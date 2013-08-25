@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     plugingui.h
+* @file     newrealtimesamplearray.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2013
+* @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,101 +29,78 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    PluginGui class declaration
+* @brief    Contains the implementation of the NewRealTimeSampleArray class.
 *
 */
-
-#ifndef PLUGINGUI_H
-#define PLUGINGUI_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "pluginitem.h"
-#include "pluginscene.h"
-
-#include <mne_x/Management/pluginmanager.h>
-#include <mne_x/Management/pluginscenemanager.h>
-
-#include <QMainWindow>
-#include <QMap>
+#include "newrealtimesamplearray.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// QT INCLUDES
 //=============================================================================================================
-
-class QAction;
-class QToolBox;
-class QSpinBox;
-class QComboBox;
-class QButtonGroup;
-class QActionGroup;
-class QLineEdit;
-class QToolButton;
-class QAbstractButton;
-class QGraphicsView;
-
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEX
+// USED NAMESPACES
 //=============================================================================================================
 
-namespace MNEX
+using namespace XMEASLIB;
+//using namespace IOBuffer;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+NewRealTimeSampleArray::NewRealTimeSampleArray(QObject *parent)
+: NewMeasurement(QMetaType::type("NewRealTimeSampleArray::SPtr"), parent)
+, m_dMinValue(0)
+, m_dMaxValue(65535)
+, m_dSamplingRate(0)
+, m_qString_Unit("")
+, m_ucArraySize(10)
+
 {
 
+}
 
-class PluginGui : public QMainWindow
+
+//*************************************************************************************************************
+
+NewRealTimeSampleArray::~NewRealTimeSampleArray()
 {
-    Q_OBJECT
-    friend class PluginScene;
-public:
-   PluginGui(MNEX::PluginManager::SPtr pPluginManager, MNEX::PluginSceneManager::SPtr pPluginSceneManager);
 
-   bool removePlugin(IPlugin::SPtr pPlugin);
+}
 
 
+//*************************************************************************************************************
 
-private slots:
-    void actionGroupTriggered(QAction* action);
+double NewRealTimeSampleArray::getValue() const
+{
+    return m_dValue;
+}
 
-    void itemInserted(PluginItem *item);
 
-    void deleteItem();
-    void pointerGroupClicked(int id);
-    void bringToFront();
-    void sendToBack();
+//*************************************************************************************************************
 
-private:
-    void createActions();
-    void createMenuItem();
-    void createToolbars();
-
-    QAction* createItemAction(QString name, QMenu* menu);
-
-    MNEX::PluginManager::SPtr       m_pPluginManager;       /**< Corresponding plugin manager. */
-    MNEX::PluginSceneManager::SPtr  m_pPluginSceneManager;  /**< Corresponding plugin scene manager. */
-
-    PluginScene*    m_pPluginScene;         /**< Plugin graph */
-    QGraphicsView*  m_pGraphicsView;        /**< View to show graph */
-    QToolBar*       m_pToolBarPlugins;
-    QActionGroup*   m_pActionGroupPlugins;
-
-    QToolBar *      m_pToolBarPointer;
-    QButtonGroup *  m_pButtonGroupPointers;
-
-    QToolBar*   m_pToolBarItem;
-    QMenu*      m_pMenuItem;
-    QAction*    deleteAction;
-    QAction*    toFrontAction;
-    QAction*    sendBackAction;
-};
-
-} //NAMESPACE
-
-#endif // PLUGINGUI_H
+void NewRealTimeSampleArray::setValue(double v)
+{
+    if(v < m_dMinValue) v = m_dMinValue;
+    else if(v > m_dMaxValue) v = m_dMaxValue;
+    m_dValue = v;
+    m_vecSamples.push_back(m_dValue);
+    if(m_vecSamples.size() >= m_ucArraySize)
+    {
+        emit notify();
+        m_vecSamples.clear();
+    }
+}

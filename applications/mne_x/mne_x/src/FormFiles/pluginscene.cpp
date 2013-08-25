@@ -72,14 +72,29 @@ PluginScene::PluginScene(QMenu *pMenuPluginItem, PluginGui *pPluginGui)
 }
 
 
-bool PluginScene::insertPlugin()
-{
-    QString name = m_pActionPluginItem->text();
-    qint32 idx = m_pPluginGui->m_pPluginManager->findByName(name);
-//            IPlugin* pPlugin = m_pPluginGui->m_pPluginManager->getPlugins()[idx];
+//*************************************************************************************************************
 
-    return true;
+bool PluginScene::insertPlugin(QAction* pActionPluginItem, IPlugin::SPtr &pAddedPlugin)
+{
+    if(pActionPluginItem->isEnabled())
+    {
+        QString name = pActionPluginItem->text();
+        qint32 idx = m_pPluginGui->m_pPluginManager->findByName(name);
+        IPlugin* pPlugin = m_pPluginGui->m_pPluginManager->getPlugins()[idx];
+
+        if(m_pPluginGui->m_pPluginSceneManager->addPlugin(pPlugin, pAddedPlugin))
+        {
+            //If only single instance -> disable insert action
+            if(!pPlugin->multiInstanceAllowed())
+                pActionPluginItem->setEnabled(false);
+            return true;
+        }
+    }
+    return false;
+
+//    return true;//DEBUG
 }
+
 
 //*************************************************************************************************************
 
@@ -89,18 +104,22 @@ void PluginScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
         return;
 
     PluginItem *item;
-    IPlugin::PluginType type = IPlugin::_ISensor;
+    IPlugin::SPtr pPlugin;
     QString name;
     switch (m_mode) {
         case InsertPluginItem:
-            if(insertPlugin())
+            if(insertPlugin(m_pActionPluginItem, pPlugin))
             {
                 name = m_pActionPluginItem->text();
-                type = (IPlugin::PluginType)m_pActionPluginItem->data().toInt();
-                item = new PluginItem(name, type, m_pMenuPluginItem);
+                item = new PluginItem(pPlugin, m_pMenuPluginItem);
                 addItem(item);
                 item->setPos(mouseEvent->scenePos());
                 emit itemInserted(item);
+            }
+            else
+            {
+                //If insertion failed, disable insert action
+                m_pActionPluginItem->setEnabled(false);
             }
             break;
         case InsertLine:
@@ -164,13 +183,13 @@ void PluginScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 }
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-bool PluginScene::isItemChange(int type)
-{
-    foreach (QGraphicsItem *item, selectedItems()) {
-        if (item->type() == type)
-            return true;
-    }
-    return false;
-}
+//bool PluginScene::isItemChange(int type)
+//{
+//    foreach (QGraphicsItem *item, selectedItems()) {
+//        if (item->type() == type)
+//            return true;
+//    }
+//    return false;
+//}

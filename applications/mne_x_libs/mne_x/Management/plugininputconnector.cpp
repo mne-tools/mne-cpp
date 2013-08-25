@@ -55,7 +55,7 @@ using namespace MNEX;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginInputConnector::PluginInputConnector(IPlugin *parent, QString &name, QString &descr)
+PluginInputConnector::PluginInputConnector(IPlugin *parent, const QString &name, const QString &descr)
 : PluginConnector(parent, name, descr)
 {
 }
