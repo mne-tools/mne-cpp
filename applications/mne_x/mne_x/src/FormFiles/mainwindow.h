@@ -277,7 +277,7 @@ private:
 private slots:
 
 //OLD
-    void CentralWidgetShowPlugin();     /**< Sets a widget to central widget of MainWindow class depending on the current plugin selected in m_pDockWidgetPlugins.*/
+//    void CentralWidgetShowPlugin();     /**< Sets a widget to central widget of MainWindow class depending on the current plugin selected in m_pDockWidgetPlugins.*/
 //OLD End
 
     void newConfiguration();            /**< Implements new configuration tasks.*/

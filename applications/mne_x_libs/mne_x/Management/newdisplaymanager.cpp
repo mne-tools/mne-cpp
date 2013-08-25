@@ -129,13 +129,13 @@ QWidget* NewDisplayManager::show(IPlugin::OutputConnectorList &pOutputConnectorL
 
             QSharedPointer<NewRealTimeSampleArray> pRTSA = pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeSampleArray> >()->data();
 
-            NewRealTimeSampleArrayWidget* rtsaWidget = new NewRealTimeSampleArrayWidget(pRTSA, m_pT, newDisp);
+            NewRealTimeSampleArrayWidget* rtsaWidget = new NewRealTimeSampleArrayWidget(pRTSA, m_pT);
 
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify, rtsaWidget, &NewRealTimeSampleArrayWidget::update);
 
-            vboxLayout->addWidget(rtsaWidget);
-            rtsaWidget->show();
-            rtsaWidget->init();
+//            vboxLayout->addWidget(rtsaWidget);
+//            rtsaWidget->show();
+//            rtsaWidget->init();
         }
     }
 

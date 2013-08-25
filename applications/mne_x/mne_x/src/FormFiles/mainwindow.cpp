@@ -548,14 +548,11 @@ void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
         setCentralWidget(pPlugin->setupWidget());
     else
     {
-
-        m_pDisplayManager->show(pPlugin->getOutputConnectors());
-
         //Garbage collecting
         if(m_pRunWidget)
             delete m_pRunWidget;
 
-        m_pRunWidget = new RunWidget(DisplayManager::show());
+        m_pRunWidget = new RunWidget( m_pDisplayManager->show(pPlugin->getOutputConnectors()));
 
         if(m_bDisplayMax)//ToDo send events to main window
         {
@@ -570,61 +567,61 @@ void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
 
 //*************************************************************************************************************
 //OLD
-void MainWindow::CentralWidgetShowPlugin()//int iCurrentPluginNum, const QTreeWidgetItem* pCurrentItem)
-{
-    int iCurrentPluginNum = m_pPluginDockWidget->m_iCurrentPluginIdx;//m_pPluginsDockWidget->getCurrentPluginNum()
+//void MainWindow::CentralWidgetShowPlugin()//int iCurrentPluginNum, const QTreeWidgetItem* pCurrentItem)
+//{
+//    int iCurrentPluginNum = m_pPluginDockWidget->m_iCurrentPluginIdx;//m_pPluginsDockWidget->getCurrentPluginNum()
 
-     // ToDo for root menu options
-    //const QTreeWidgetItem* pCurrentItem = m_pPluginDockWidget->m_pCurrentItem; //m_pPluginsDockWidget->getCurrentItem()
+//     // ToDo for root menu options
+//    //const QTreeWidgetItem* pCurrentItem = m_pPluginDockWidget->m_pCurrentItem; //m_pPluginsDockWidget->getCurrentItem()
 
-    qDebug() << "MainCSART::CentralWidgetShowPlugin(): current plugin number " << iCurrentPluginNum;
+//    qDebug() << "MainCSART::CentralWidgetShowPlugin(): current plugin number " << iCurrentPluginNum;
 
-    Subject::notifyEnabled = false; //like Mutex.lock -> for now dirty hack - it's okay when values are queued -> than it"s like a Mutex
+//    Subject::notifyEnabled = false; //like Mutex.lock -> for now dirty hack - it's okay when values are queued -> than it"s like a Mutex
 
-    Connector::disconnectMeasurementWidgets(m_pListCurrentDisplayPlugins);//Make sure to only disconnect widgets
-    m_pListCurrentDisplayPlugins.clear();
+//    Connector::disconnectMeasurementWidgets(m_pListCurrentDisplayPlugins);//Make sure to only disconnect widgets
+//    m_pListCurrentDisplayPlugins.clear();
 
-    QWidget* defaultWidget = new QWidget;
-    setCentralWidget(defaultWidget);
+//    QWidget* defaultWidget = new QWidget;
+//    setCentralWidget(defaultWidget);
 
-    if(m_pPluginDockWidget->isActivated(iCurrentPluginNum))
-    {
-        if(!m_bIsRunning)
-        {
-            setCentralWidget(PluginManager::s_vecPlugins[iCurrentPluginNum]->setupWidget()); //QMainWindow takes ownership of the widget pointer and deletes it at the appropriate time.
-        }
-        else //if(m_bIsRunning)
-        {
+//    if(m_pPluginDockWidget->isActivated(iCurrentPluginNum))
+//    {
+//        if(!m_bIsRunning)
+//        {
+//            setCentralWidget(PluginManager::s_vecPlugins[iCurrentPluginNum]->setupWidget()); //QMainWindow takes ownership of the widget pointer and deletes it at the appropriate time.
+//        }
+//        else //if(m_bIsRunning)
+//        {
 
-            m_pListCurrentDisplayPlugins << PluginManager::getPlugins()[iCurrentPluginNum]->getPlugin_ID();
+//            m_pListCurrentDisplayPlugins << PluginManager::getPlugins()[iCurrentPluginNum]->getPlugin_ID();
 
-            Connector::connectMeasurementWidgets(m_pListCurrentDisplayPlugins, m_pTime);
+//            Connector::connectMeasurementWidgets(m_pListCurrentDisplayPlugins, m_pTime);
 
-            //Garbage collecting
-            if(m_pRunWidget)
-                delete m_pRunWidget;
+//            //Garbage collecting
+//            if(m_pRunWidget)
+//                delete m_pRunWidget;
 
-            m_pRunWidget = new RunWidget(DisplayManager::show());
-            m_pRunWidget->addTab(PluginManager::s_vecPlugins[iCurrentPluginNum]->runWidget(), tr("Confi&guration"));
+//            m_pRunWidget = new RunWidget(DisplayManager::show());
+//            m_pRunWidget->addTab(PluginManager::s_vecPlugins[iCurrentPluginNum]->runWidget(), tr("Confi&guration"));
 
-            if(m_bDisplayMax)//ToDo send events to main window
-            {
-                m_pRunWidget->showFullScreen();
-                connect(m_pRunWidget, SIGNAL(displayClosed()), this, SLOT(toggleDisplayMax()));
-            }
-            else
-                setCentralWidget(m_pRunWidget);
-        }
-    }
-    else
-    {
-        if(m_pRunWidget)
-            delete m_pRunWidget;
-        m_pRunWidget = NULL;
-    }
+//            if(m_bDisplayMax)//ToDo send events to main window
+//            {
+//                m_pRunWidget->showFullScreen();
+//                connect(m_pRunWidget, SIGNAL(displayClosed()), this, SLOT(toggleDisplayMax()));
+//            }
+//            else
+//                setCentralWidget(m_pRunWidget);
+//        }
+//    }
+//    else
+//    {
+//        if(m_pRunWidget)
+//            delete m_pRunWidget;
+//        m_pRunWidget = NULL;
+//    }
 
-    Subject::notifyEnabled = true; //like Mutex.unlock
-}
+//    Subject::notifyEnabled = true; //like Mutex.unlock
+//}
 
 
 //*************************************************************************************************************
@@ -713,7 +710,8 @@ void MainWindow::stopMeasurement()
     m_pPluginDockWidget->setTogglingEnabled(true);
     uiSetupRunningState(false);
     stopTimer();
-    CentralWidgetShowPlugin();
+//    CentralWidgetShowPlugin();
+    updatePluginWidget(m_pPluginGui->getCurrentPlugin());
 }
 
 
@@ -763,7 +761,8 @@ void MainWindow::toggleDisplayMax()
 
     m_pActionDisplayMax->setEnabled(!m_bDisplayMax);
 
-    CentralWidgetShowPlugin();
+//    CentralWidgetShowPlugin();
+    updatePluginWidget(m_pPluginGui->getCurrentPlugin());
 }
 
 
