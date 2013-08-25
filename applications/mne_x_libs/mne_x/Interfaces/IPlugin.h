@@ -186,6 +186,9 @@ public:
     virtual QWidget* setupWidget() = 0; //setup()
 
 
+    inline OutputConnectorList& getOutputConnectors(){return m_outputConnectors;}
+
+
 // ToDo REMOVE
 
     //=========================================================================================================
@@ -233,8 +236,8 @@ protected:
     virtual void run() = 0;
 
 
-    InputConnectorList m_vecInputConnectors;    /**< Set of input connectors associated with this plug-in. */
-    OutputConnectorList m_vecOutputConnectors;  /**< Set of output connectors associated with this plug-in. */
+    InputConnectorList m_inputConnectors;    /**< Set of input connectors associated with this plug-in. */
+    OutputConnectorList m_outputConnectors;  /**< Set of output connectors associated with this plug-in. */
 
 // ToDo REMOVE
     XMEASLIB::PLG_ID::Plugin_ID m_PLG_ID;     /**< Holds the plugin id.*/

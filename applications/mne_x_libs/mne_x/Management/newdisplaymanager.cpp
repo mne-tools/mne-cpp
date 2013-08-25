@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     plugininputdata.cpp
+* @file     newdisplaymanager.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,33 +29,52 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the PluginInputData class.
+* @brief    Implementation of the NewDisplayManager Class.
 *
 */
-
-#ifndef PLUGININPUTDATA_CPP //Because this cpp is part of the header -> template
-#define PLUGININPUTDATA_CPP
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "plugininputdata.h"
+#include "newdisplaymanager.h"
+//#include <xDisp/measurementwidget.h>
+//#include <xDisp/numericwidget.h>
+#include <xDisp/newrealtimesamplearraywidget.h>
+//#include <xDisp/realtimemultisamplearraywidget.h>
+//#include <xDisp/realtimemultisamplearray_new_widget.h>
+//#include <xDisp/realtimesourceestimatewidget.h>
+//#include <xDisp/progressbarwidget.h>
+//#include <xDisp/textwidget.h>
+
+//#include <xMeas/Measurement/text.h>
+//#include <xMeas/Measurement/realtimesourceestimate.h>
+//#include <xMeas/Measurement/realtimemultisamplearray_new.h>
+//#include <xMeas/Measurement/realtimemultisamplearray.h>
+#include <xMeas/Measurement/newrealtimesamplearray.h>
+//#include <xMeas/Measurement/progressbar.h>
+//#include <xMeas/Measurement/numeric.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEX
+// QT INCLUDES
 //=============================================================================================================
 
-namespace MNEX
-{
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+
+#include <QDebug>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
+
+using namespace MNEX;
+using namespace XDISPLIB;
+using namespace XMEASLIB;
 
 
 //*************************************************************************************************************
@@ -63,41 +82,93 @@ namespace MNEX
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-template <class T>
-PluginInputData<T>::PluginInputData(IPlugin *parent, const QString &name, const QString &descr)
-: PluginInputConnector(parent, name, descr)
-, m_pFunc(NULL)
+NewDisplayManager::NewDisplayManager(QSharedPointer<QTime> pT, QObject* parent)
+: QObject(parent)
+, m_pT(pT)
 {
 
-    connect(this, &PluginInputConnector::notify, this, &PluginInputData<T>::notifyCallbackFunction);
 }
 
 
 //*************************************************************************************************************
 
-template <class T>
-void PluginInputData<T>::setCallbackMethod(callback_function pFunc)
+NewDisplayManager::~NewDisplayManager()
 {
-    m_pFunc = pFunc;
+    clean();
 }
 
 
 //*************************************************************************************************************
 
-template <class T>
-void PluginInputData<T>::notifyCallbackFunction(XMEASLIB::NewMeasurement::SPtr pMeasurement)
+void NewDisplayManager::init()
 {
-    qDebug() << "Here in input data.";
-    if(m_pFunc)
+//    qDebug() << "DisplayManager::init(): s_hashMeasurementWidgets.size() = " << s_hashMeasurementWidgets.size();
+
+//    foreach(MeasurementWidget* pMSRW, s_hashMeasurementWidgets.values())
+//        pMSRW->init();
+}
+
+
+//*************************************************************************************************************
+
+QWidget* NewDisplayManager::show(IPlugin::OutputConnectorList &pOutputConnectorList )
+{
+    qDebug() << "DisplayManager::show()";
+
+    QWidget* newDisp = new QWidget;
+
+    QVBoxLayout* vboxLayout = new QVBoxLayout;
+
+    QHBoxLayout* hboxLayout = new QHBoxLayout;
+
+    foreach (QSharedPointer< PluginOutputConnector > pPluginOutputConnector, pOutputConnectorList)
     {
-        QSharedPointer<T> measurement = pMeasurement.dynamicCast<T>();
+        if(pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeSampleArray> >())
+        {
+            qWarning() << "RTSA found!";
 
-        (*m_pFunc)(measurement);
+            QSharedPointer<NewRealTimeSampleArray> pRTSA = pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeSampleArray> >()->data();
+
+            NewRealTimeSampleArrayWidget* rtsaWidget = new NewRealTimeSampleArrayWidget(pRTSA, m_pT, newDisp);
+
+            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify, rtsaWidget, &NewRealTimeSampleArrayWidget::update);
+
+            vboxLayout->addWidget(rtsaWidget);
+            rtsaWidget->show();
+            rtsaWidget->init();
+        }
     }
+
+//    // Add all widgets but NumericWidgets to layout and display them
+//    foreach(MeasurementWidget* pMSRW, s_hashMeasurementWidgets.values())
+//    {
+//        if(dynamic_cast<NumericWidget*>(pMSRW))
+//            continue;
+//        vboxLayout->addWidget(pMSRW);
+//        pMSRW->show();
+//    }
+
+//    foreach(NumericWidget* pNUMW, s_hashNumericWidgets.values())
+//    {
+//        hboxLayout->addWidget(pNUMW);
+//        pNUMW->show();
+//    }
+
+    vboxLayout->addLayout(hboxLayout);
+
+    newDisp->setLayout(vboxLayout);
+
+    // Initialize all MeasurementWidgets
+    init();
+
+    return newDisp;
 }
 
 
+//*************************************************************************************************************
 
-}//Namespace
+void NewDisplayManager::clean()
+{
+    qDebug() << "DisplayManager::clean()";
+}
 
-#endif //PLUGININPUTDATA_CPP

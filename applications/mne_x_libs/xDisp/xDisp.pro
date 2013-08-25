@@ -72,18 +72,21 @@ win32 {
 
 SOURCES += \
         measurementwidget.cpp \
+        newmeasurementwidget.cpp \
         displaymanager.cpp \
         realtimesamplearraywidget.cpp \
         realtimemultisamplearraywidget.cpp \
         textwidget.cpp \
         progressbarwidget.cpp \
         numericwidget.cpp \
-    realtimemultisamplearray_new_widget.cpp \
-    realtimesourceestimatewidget.cpp
+        realtimemultisamplearray_new_widget.cpp \
+        realtimesourceestimatewidget.cpp \
+        newrealtimesamplearraywidget.cpp
 
 HEADERS += \
         xdisp_global.h \
         measurementwidget.h \
+        newmeasurementwidget.h \
         realtimesamplearraywidget.h \
         displaymanager.h \
         realtimesamplearraywidget.h \
@@ -91,8 +94,9 @@ HEADERS += \
         textwidget.h \
         progressbarwidget.h \
         numericwidget.h \
-    realtimemultisamplearray_new_widget.h \
-    realtimesourceestimatewidget.h
+        realtimemultisamplearray_new_widget.h \
+        realtimesourceestimatewidget.h \
+        newrealtimesamplearraywidget.h
 
 FORMS += \
     realtimesamplearraywidget.ui \
@@ -104,7 +108,8 @@ FORMS += \
     progressbarwidget.ui \
     numericwidget.ui \
     realtimemultisamplearray_new_widget.ui \
-    realtimesourceestimatewidget.ui
+    realtimesourceestimatewidget.ui \
+    newrealtimesamplearraywidget.ui
 
 UI_DIR = $${PWD}
 

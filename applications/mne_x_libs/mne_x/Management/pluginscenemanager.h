@@ -113,39 +113,39 @@ public:
     */
     bool removePlugin(const IPlugin::SPtr pPlugin);
 
-//    //=========================================================================================================
-//    /**
-//    * Starts all plugins.
-//    *
-//    * @return true if at least one ISensor plugin was started successfully, false otherwise.
-//    */
-//    bool startPlugins();
+    //=========================================================================================================
+    /**
+    * Starts all plugins.
+    *
+    * @return true if at least one ISensor plugin was started successfully, false otherwise.
+    */
+    bool startPlugins();
 
-//    //=========================================================================================================
-//    /**
-//    * Starts ISensor Plugins
-//    *
-//    * @return true if at least one ISensor plugin was started successfully, false otherwise.
-//    */
-//    bool startSensorPlugins();
+    //=========================================================================================================
+    /**
+    * Starts ISensor Plugins
+    *
+    * @return true if at least one ISensor plugin was started successfully, false otherwise.
+    */
+    bool startSensorPlugins();
 
-//    //=========================================================================================================
-//    /**
-//    * Starts IAlgorithm plugins.
-//    */
-//    void startAlgorithmPlugins();
+    //=========================================================================================================
+    /**
+    * Starts IAlgorithm plugins.
+    */
+    void startAlgorithmPlugins();
 
-//    //=========================================================================================================
-//    /**
-//    * Starts IIO plugins.
-//    */
-//    void startIOPlugins();
+    //=========================================================================================================
+    /**
+    * Starts IIO plugins.
+    */
+    void startIOPlugins();
 
-//    //=========================================================================================================
-//    /**
-//    * Stops all plugins.
-//    */
-//    void stopPlugins();
+    //=========================================================================================================
+    /**
+    * Stops all plugins.
+    */
+    void stopPlugins();
 
     //=========================================================================================================
     /**

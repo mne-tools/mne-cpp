@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     pluginscene.h
+* @file     newdisplaymanager.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -8,7 +8,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,29 +29,34 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    PluginScene class declaration
+* @brief    Declaration of the NewDisplayManager Class.
 *
 */
 
-#ifndef PLUGINSCENE_H
-#define PLUGINSCENE_H
+#ifndef NEWDISPLAYMANAGER_H
+#define NEWDISPLAYMANAGER_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "pluginitem.h"
+#include "../mne_x_global.h"
+#include "../Interfaces/IPlugin.h"
 
-#include <mne_x/Management/pluginmanager.h>
-#include <mne_x/Management/pluginscenemanager.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QGraphicsScene>
+#include <QSharedPointer>
+#include <QTime>
+#include <QHash>
+#include <QWidget>
+#include <QLabel>
+#include <QString>
 
 
 //*************************************************************************************************************
@@ -59,12 +64,8 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class QGraphicsSceneMouseEvent;
-class QMenu;
-class QPointF;
-class QGraphicsLineItem;
-class QColor;
-class QAction;
+class QVBoxLayout;
+class QHBoxLayout;
 
 
 //*************************************************************************************************************
@@ -75,83 +76,58 @@ class QAction;
 namespace MNEX
 {
 
-//*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class PluginGui;
-
-
-
-
-class PluginScene : public QGraphicsScene
+/**
+* DECLARE CLASS NewDisplayManager
+*
+* @brief The NewDisplayManager class handles current displayed widgets.
+*/
+class MNE_X_SHARED_EXPORT NewDisplayManager : public QObject
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<PluginScene> SPtr;               /**< Shared pointer type for PluginScene. */
-    typedef QSharedPointer<const PluginScene> ConstSPtr;    /**< Const shared pointer type for PluginScene. */
-
-    enum Mode { InsertPluginItem, InsertLine, MovePluginItem};
-
-    explicit PluginScene(QMenu *pMenuPluginItem, PluginGui *pPluginGui);
+    typedef QSharedPointer<NewDisplayManager> SPtr;               /**< Shared pointer type for NewDisplayManager. */
+    typedef QSharedPointer<const NewDisplayManager> ConstSPtr;    /**< Const shared pointer type for NewDisplayManager. */
 
     //=========================================================================================================
     /**
-    * Inserts the m_pActionPluginItem selected plugin into PluginSceneManager
-    *
-    * @return true if successfull
+    * Constructs a NewDisplayManager.
     */
-    bool insertPlugin(QAction* pActionPluginItem, IPlugin::SPtr &pAddedPlugin);
+    NewDisplayManager(QSharedPointer<QTime> pT, QObject* parent = 0);
 
-    inline void setMode(Mode mode);
-    inline void setActionPluginItem(QAction* pAction);
+    //=========================================================================================================
+    /**
+    * Destroys the NewDisplayManager.
+    */
+    virtual ~NewDisplayManager();
 
-signals:
-    void itemInserted(PluginItem *item);
+    //=========================================================================================================
+    /**
+    * Initialise the measurement widgets by calling there init() function.
+    */
+    void init();
 
-protected:
-    void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent);
+    //=========================================================================================================
+    /**
+    * Shows a widget containing all current measurement widgets.
+    *
+    * @return a pointer to the widget containing all measurement widgets.
+    */
+    QWidget* show(IPlugin::OutputConnectorList &pOutputConnectorList);
+
+    //=========================================================================================================
+    /**
+    * Cleans all measurement widget hash's.
+    */
+    void clean();
 
 private:
-//    bool isItemChange(int type);
+    QSharedPointer<QTime> m_pT;
 
-    PluginGui*  m_pPluginGui;   /**< Corresponding plugin gui */
+    QList<QMetaObject::Connection>   m_pListWidgetConnections;       /**< all widget connections.*/
 
-    //Current info
-    Mode            m_mode;
-    QAction*        m_pActionPluginItem;    /**< Selected plugin */
-
-
-    QMenu *m_pMenuPluginItem;         /**< Plugin context menu */
-
-    bool leftButtonDown;
-    QPointF startPoint;
-    QGraphicsLineItem *line;
-    QColor m_qColorLine;
 };
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
+} // NAMESPACE
 
-void PluginScene::setMode(Mode mode)
-{
-    m_mode = mode;
-}
-
-
-//*************************************************************************************************************
-
-void PluginScene::setActionPluginItem(QAction* pAction)
-{
-    m_pActionPluginItem = pAction;
-}
-
-
-} //NAMESPACE
-
-#endif // PLUGINSCENE_H
+#endif // NEWDISPLAYMANAGER_H
