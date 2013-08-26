@@ -42,23 +42,10 @@
 #include <mne_x/Management/pluginscenemanager.h>
 #include <mne_x/Management/newdisplaymanager.h>
 
-//#include <mne_x/Management/connector.h>
-
-#include <xDtMng/measurementmanager.h>
-
 #include <xMeas/Measurement/realtimesamplearray.h>
 #include <xMeas/Measurement/numeric.h>
 #include <xMeas/Measurement/progressbar.h>
-//#include "../../../comp/rtmeas/Measurement/alert.h" //-> text.h
 #include <xMeas/Measurement/text.h>
-
-#include <generics/observerpattern.h>
-
-#include <xDisp/displaymanager.h>
-#include <xDisp/realtimesamplearraywidget.h>
-#include <xDisp/numericwidget.h>
-#include <xDisp/progressbarwidget.h>
-#include <xDisp/textwidget.h>
 
 #include <mne_x/Interfaces/IPlugin.h>
 #include <mne_x/Interfaces/ISensor.h>
@@ -67,7 +54,6 @@
 
 //GUI
 #include "mainwindow.h"
-#include "plugindockwidget.h"
 #include "runwidget.h"
 #include "startupwidget.h"
 #include "plugingui.h"
@@ -78,12 +64,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QMultiHash>
-
 #include <QtWidgets>
-
 #include <QDebug>
-
 #include <QTimer>
 #include <QTime>
 
@@ -94,7 +76,6 @@
 //=============================================================================================================
 
 using namespace MNEX;
-using namespace XDISPLIB;
 
 
 //*************************************************************************************************************

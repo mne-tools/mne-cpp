@@ -38,10 +38,16 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "plugingui.h"
+
 #include "arrow.h"
 #include "pluginitem.h"
 #include "pluginscene.h"
-#include "plugingui.h"
+
+#include <mne_x/Interfaces/IPlugin.h>
+#include <mne_x/Interfaces/ISensor.h>
+#include <mne_x/Interfaces/IAlgorithm.h>
+#include <mne_x/Interfaces/IIO.h>
 
 
 //*************************************************************************************************************

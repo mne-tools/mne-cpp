@@ -42,10 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-//OLD
-#include <xMeas/Measurement/IMeasurementSource.h>
-#include <xMeas/Nomenclature/nomenclature.h>
-//OLD
+#include "IPlugin.h"
 
 
 //*************************************************************************************************************
@@ -63,7 +60,7 @@ namespace MNEX
 *
 * @brief The ISensor class provides an interface for a sensor plugin.
 */
-class ISensor : public XMEASLIB::IMeasurementSource
+class ISensor : public IPlugin
 {
 //ToDo virtual methods of IMeasurementSource
 public:

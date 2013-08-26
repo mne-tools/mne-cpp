@@ -43,10 +43,8 @@
 //=============================================================================================================
 
 #include "IPlugin.h"
-#include <xMeas/Nomenclature/nomenclature.h>
-#include <generics/circularbuffer_old.h>
 
-#include <xMeas/Measurement/IMeasurementSink.h>
+#include <generics/circularbuffer_old.h>
 
 
 //*************************************************************************************************************
@@ -82,7 +80,7 @@ namespace MNEX
 *
 * @brief The IIO class provides an interface for a real-time record plugin.
 */
-class IIO : public IPlugin, public XMEASLIB::IMeasurementSink
+class IIO : public IPlugin
 {
 //ToDo virtual methods of IMeasurementSink
 public:

@@ -56,7 +56,6 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lxMeasd \
             -lxDispd \
-            -lxDtMngd \
             -lmne_xd
 }
 else {
@@ -67,7 +66,6 @@ else {
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lxMeas \
             -lxDisp \
-            -lxDtMng \
             -lmne_x
 }
 
@@ -79,7 +77,6 @@ SOURCES += \
     src/FormFiles/runwidget.cpp \
     src/FormFiles/mainwindow.cpp \
     src/FormFiles/mainsplashscreen.cpp \
-    src/FormFiles/plugindockwidget.cpp \
     src/FormFiles/pluginscene.cpp \
     src/FormFiles/pluginitem.cpp \
     src/FormFiles/plugingui.cpp \
@@ -91,7 +88,6 @@ HEADERS += \
     src/FormFiles/mainwindow.h \
     src/FormFiles/mainsplashscreen.h \
     src/preferences/info.h \
-    src/FormFiles/plugindockwidget.h \
     src/FormFiles/pluginscene.h \
     src/FormFiles/pluginitem.h \
     src/FormFiles/plugingui.h \
