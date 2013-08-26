@@ -38,8 +38,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "FormFiles/mainsplashscreen.h"
-#include "FormFiles/mainwindow.h"
+#include "mainsplashscreen.h"
+#include "mainwindow.h"
 
 
 #include <xMeas/measurementtypes.h>
