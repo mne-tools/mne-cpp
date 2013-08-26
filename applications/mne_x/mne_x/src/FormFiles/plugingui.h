@@ -83,7 +83,7 @@ class PluginGui : public QMainWindow
     Q_OBJECT
     friend class PluginScene;
 public:
-   PluginGui(MNEX::PluginManager::SPtr pPluginManager, MNEX::PluginSceneManager::SPtr pPluginSceneManager);
+   PluginGui(MNEX::PluginManager::SPtr &pPluginManager, MNEX::PluginSceneManager::SPtr &pPluginSceneManager);
 
    IPlugin::SPtr getCurrentPlugin() {return m_pCurrentPlugin;}
 

@@ -103,7 +103,7 @@ NewRealTimeSampleArrayWidget::NewRealTimeSampleArrayWidget(QSharedPointer<NewRea
     qDebug() << "NewRealTimeSampleArrayWidget::NewRealTimeSampleArrayWidget" << m_pRTSA->getName();
     qDebug() << "m_pRTSA.isNull()" << m_pRTSA.isNull();
 
-    actualize();
+//    actualize();
 
     ui.setupUi(this);
     ui.m_qLabel_Tool->hide();

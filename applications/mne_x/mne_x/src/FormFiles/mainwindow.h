@@ -167,17 +167,6 @@ public:
     */
     void writeToLog(const QString& logMsg, LogKind lgknd = _LogKndMessage, LogLevel lglvl = _LogLvNormal);
 
-signals:
-    //=========================================================================================================
-    /**
-    * This signal is emitted when a new log message of class MainWindow is available.
-    *
-    * @param [in] logMsg message
-    * @param [in] lgknd message kind
-    * @param [in] lglvl message level
-    */
-    void newLogMsg(const QString& logMsg, LogKind lgknd = _LogKndMessage, LogLevel lglvl = _LogLvNormal);
-
 private:
     //StartUp
     StartUpWidget* m_pStartUpWidget;    /**< holds the StartUpWidget.*/
@@ -241,7 +230,6 @@ private:
 
     // Tool bar
     QToolBar*                             m_pToolBar;       /**< Holds the tool bar.*/
-    /*@}*/
 
 
     QLabel*                             m_pLabel_Time;      /**< Holds the display label for the running time.*/
@@ -258,11 +246,6 @@ private:
     QSharedPointer<PluginManager>       m_pPluginManager;               /**< Holds log dock widget.*/
     QSharedPointer<PluginSceneManager>  m_pPluginSceneManager;          /**< Plugin scene manager which manages the plugin graph */
 
-//OLD
-    PluginDockWidget*                   m_pPluginDockWidget;            /**< Holds the dock widget containing the plugins.*/
-    QList<PLG_ID::Plugin_ID>            m_pListCurrentDisplayPlugins;   /**< Holds list of plugin id's which should be displayed.*/
-//OLD End
-
     //Log
     QDockWidget*                        m_pDockWidget_Log;              /**< Holds the dock widget containing the log.*/
     QTextBrowser*                       m_pTextBrowser_Log;             /**< Holds the text browser for the log.*/
@@ -272,14 +255,7 @@ private:
 
     void updatePluginWidget(QSharedPointer<IPlugin> pPlugin);     /**< Sets a widget to central widget of MainWindow class depending on the current plugin selected in m_pDockWidgetPlugins.*/
 
-
-
 private slots:
-
-//OLD
-//    void CentralWidgetShowPlugin();     /**< Sets a widget to central widget of MainWindow class depending on the current plugin selected in m_pDockWidgetPlugins.*/
-//OLD End
-
     void newConfiguration();            /**< Implements new configuration tasks.*/
     void openConfiguration();           /**< Implements open configuration tasks.*/
     void saveConfiguration();           /**< Implements save configuration tasks.*/

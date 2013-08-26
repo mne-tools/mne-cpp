@@ -42,7 +42,7 @@
 #include <mne_x/Management/pluginscenemanager.h>
 #include <mne_x/Management/newdisplaymanager.h>
 
-#include <mne_x/Management/connector.h>
+//#include <mne_x/Management/connector.h>
 
 #include <xDtMng/measurementmanager.h>
 
@@ -144,15 +144,11 @@ MainWindow::MainWindow(QWidget *parent)
     createPluginDockWindow();
     createLogDockWindow();
 
-    connect(this, &MainWindow::newLogMsg,
-            this, &MainWindow::writeToLog);
 
     //ToDo Debug Startup
-    emit newLogMsg(tr("Test normal message, Max"), _LogKndMessage, _LogLvMax);
-    emit newLogMsg(tr("Test warning message, Normal"), _LogKndWarning, _LogLvNormal);
-    emit newLogMsg(tr("Test error message, Min"), _LogKndError, _LogLvMin);
-
-    Connector::init();
+    writeToLog(tr("Test normal message, Max"), _LogKndMessage, _LogLvMax);
+    writeToLog(tr("Test warning message, Normal"), _LogKndWarning, _LogLvNormal);
+    writeToLog(tr("Test error message, Min"), _LogKndError, _LogLvMin);
 
     initStatusBar();
 }
@@ -222,9 +218,6 @@ MainWindow::~MainWindow()
     if(m_pLabel_Time)
         delete m_pLabel_Time;
 
-    if(m_pPluginDockWidget)
-        delete m_pPluginDockWidget;
-
     if(m_pDockWidget_Log)
         delete m_pDockWidget_Log;
     if(m_pTextBrowser_Log)
@@ -237,7 +230,7 @@ MainWindow::~MainWindow()
 //File QMenu
 void MainWindow::newConfiguration()
 {
-    emit newLogMsg(tr("Invoked <b>File|NewPreferences</b>"), _LogKndMessage, _LogLvMin);
+    writeToLog(tr("Invoked <b>File|NewPreferences</b>"), _LogKndMessage, _LogLvMin);
 }
 
 
@@ -245,7 +238,7 @@ void MainWindow::newConfiguration()
 
 void MainWindow::openConfiguration()
 {
-    emit newLogMsg(tr("Invoked <b>File|OpenPreferences</b>"), _LogKndMessage, _LogLvMin);
+    writeToLog(tr("Invoked <b>File|OpenPreferences</b>"), _LogKndMessage, _LogLvMin);
 }
 
 
@@ -253,7 +246,7 @@ void MainWindow::openConfiguration()
 
 void MainWindow::saveConfiguration()
 {
-    emit newLogMsg(tr("Invoked <b>File|SavePreferences</b>"), _LogKndMessage, _LogLvMin);
+    writeToLog(tr("Invoked <b>File|SavePreferences</b>"), _LogKndMessage, _LogLvMin);
 }
 
 
@@ -261,7 +254,7 @@ void MainWindow::saveConfiguration()
 //Help QMenu
 void MainWindow::helpContents()
 {
-    emit newLogMsg(tr("Invoked <b>Help|HelpContents</b>"), _LogKndMessage, _LogLvMin);
+    writeToLog(tr("Invoked <b>Help|HelpContents</b>"), _LogKndMessage, _LogLvMin);
 }
 
 
@@ -269,7 +262,7 @@ void MainWindow::helpContents()
 
 void MainWindow::about()
 {
-    emit newLogMsg(tr("Invoked <b>Help|About</b>"), _LogKndMessage, _LogLvMin);
+    writeToLog(tr("Invoked <b>Help|About</b>"), _LogKndMessage, _LogLvMin);
     QMessageBox::about(this, CInfo::AppNameShort()+ ", "+tr("Version ")+CInfo::AppVersion(),
          tr("Copyright (C) 2013 Christoph Dinh, Martin Luessi, Limin Sun, Jens Haueisen, Matti Hamalainen. All rights reserved.\n\n"
             "Redistribution and use in source and binary forms, with or without modification, are permitted provided that"
@@ -295,7 +288,7 @@ void MainWindow::about()
 
 void MainWindow::setMinLogLevel()
 {
-    emit newLogMsg(tr("minimal log level set"), _LogKndMessage, _LogLvMin);
+    writeToLog(tr("minimal log level set"), _LogKndMessage, _LogLvMin);
     m_eLogLevelCurrent = _LogLvMin;
 }
 
@@ -304,7 +297,7 @@ void MainWindow::setMinLogLevel()
 
 void MainWindow::setNormalLogLevel()
 {
-    emit newLogMsg(tr("normal log level set"), _LogKndMessage, _LogLvMin);
+    writeToLog(tr("normal log level set"), _LogKndMessage, _LogLvMin);
     m_eLogLevelCurrent = _LogLvNormal;
 }
 
@@ -313,7 +306,7 @@ void MainWindow::setNormalLogLevel()
 
 void MainWindow::setMaxLogLevel()
 {
-    emit newLogMsg(tr("maximal log level set"), _LogKndMessage, _LogLvMin);
+    writeToLog(tr("maximal log level set"), _LogKndMessage, _LogLvMin);
     m_eLogLevelCurrent = _LogLvMax;
 }
 
@@ -491,19 +484,6 @@ void MainWindow::initStatusBar()
 
 void MainWindow::createPluginDockWindow()
 {
-
-    m_pPluginDockWidget = new PluginDockWidget(tr("Plugins"), this);
-    m_pPluginDockWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-
-    addDockWidget(Qt::RightDockWidgetArea, m_pPluginDockWidget);
-
-    m_pMenuView->addAction(m_pPluginDockWidget->toggleViewAction());
-
-    connect(m_pPluginDockWidget, SIGNAL(pluginChanged(int, const QTreeWidgetItem*)),
-            this, SLOT(CentralWidgetShowPlugin()));
-
-
-    //NEW
     m_pPluginGuiDockWidget = new QDockWidget(tr("Plugins"), this);
     m_pPluginGuiDockWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
@@ -569,65 +549,6 @@ void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
 
 
 //*************************************************************************************************************
-//OLD
-//void MainWindow::CentralWidgetShowPlugin()//int iCurrentPluginNum, const QTreeWidgetItem* pCurrentItem)
-//{
-//    int iCurrentPluginNum = m_pPluginDockWidget->m_iCurrentPluginIdx;//m_pPluginsDockWidget->getCurrentPluginNum()
-
-//     // ToDo for root menu options
-//    //const QTreeWidgetItem* pCurrentItem = m_pPluginDockWidget->m_pCurrentItem; //m_pPluginsDockWidget->getCurrentItem()
-
-//    qDebug() << "MainCSART::CentralWidgetShowPlugin(): current plugin number " << iCurrentPluginNum;
-
-//    Subject::notifyEnabled = false; //like Mutex.lock -> for now dirty hack - it's okay when values are queued -> than it"s like a Mutex
-
-//    Connector::disconnectMeasurementWidgets(m_pListCurrentDisplayPlugins);//Make sure to only disconnect widgets
-//    m_pListCurrentDisplayPlugins.clear();
-
-//    QWidget* defaultWidget = new QWidget;
-//    setCentralWidget(defaultWidget);
-
-//    if(m_pPluginDockWidget->isActivated(iCurrentPluginNum))
-//    {
-//        if(!m_bIsRunning)
-//        {
-//            setCentralWidget(PluginManager::s_vecPlugins[iCurrentPluginNum]->setupWidget()); //QMainWindow takes ownership of the widget pointer and deletes it at the appropriate time.
-//        }
-//        else //if(m_bIsRunning)
-//        {
-
-//            m_pListCurrentDisplayPlugins << PluginManager::getPlugins()[iCurrentPluginNum]->getPlugin_ID();
-
-//            Connector::connectMeasurementWidgets(m_pListCurrentDisplayPlugins, m_pTime);
-
-//            //Garbage collecting
-//            if(m_pRunWidget)
-//                delete m_pRunWidget;
-
-//            m_pRunWidget = new RunWidget(DisplayManager::show());
-//            m_pRunWidget->addTab(PluginManager::s_vecPlugins[iCurrentPluginNum]->runWidget(), tr("Confi&guration"));
-
-//            if(m_bDisplayMax)//ToDo send events to main window
-//            {
-//                m_pRunWidget->showFullScreen();
-//                connect(m_pRunWidget, SIGNAL(displayClosed()), this, SLOT(toggleDisplayMax()));
-//            }
-//            else
-//                setCentralWidget(m_pRunWidget);
-//        }
-//    }
-//    else
-//    {
-//        if(m_pRunWidget)
-//            delete m_pRunWidget;
-//        m_pRunWidget = NULL;
-//    }
-
-//    Subject::notifyEnabled = true; //like Mutex.unlock
-//}
-
-
-//*************************************************************************************************************
 
 void MainWindow::writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl)
 {
@@ -661,7 +582,7 @@ void MainWindow::writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl
 
 void MainWindow::startMeasurement()
 {
-    emit newLogMsg(tr("Starting real-time measurement..."), _LogKndMessage, _LogLvMin);
+    writeToLog(tr("Starting real-time measurement..."), _LogKndMessage, _LogLvMin);
 
     if(!m_pPluginSceneManager->startPlugins())
     {
@@ -699,21 +620,23 @@ void MainWindow::startMeasurement()
 
 void MainWindow::stopMeasurement()
 {
-    emit newLogMsg(tr("Stopping real-time measurement..."), _LogKndMessage, _LogLvMin);
+    writeToLog(tr("Stopping real-time measurement..."), _LogKndMessage, _LogLvMin);
 
     qDebug() << "MainWindow::stopMeasurement()";
 
+    m_pPluginSceneManager->stopPlugins();
 
-    PluginManager::stopPlugins();
 
-    Connector::disconnectMeasurementWidgets(m_pListCurrentDisplayPlugins);//was before stopPlugins();
+//    PluginManager::stopPlugins();
 
-    qDebug() << "set stopped UI";
+//    Connector::disconnectMeasurementWidgets(m_pListCurrentDisplayPlugins);//was before stopPlugins();
 
-    m_pPluginDockWidget->setTogglingEnabled(true);
+//    qDebug() << "set stopped UI";
+
+//    m_pPluginDockWidget->setTogglingEnabled(true);
     uiSetupRunningState(false);
     stopTimer();
-//    CentralWidgetShowPlugin();
+
     updatePluginWidget(m_pPluginGui->getCurrentPlugin());
 }
 
@@ -764,7 +687,6 @@ void MainWindow::toggleDisplayMax()
 
     m_pActionDisplayMax->setEnabled(!m_bDisplayMax);
 
-//    CentralWidgetShowPlugin();
     updatePluginWidget(m_pPluginGui->getCurrentPlugin());
 }
 

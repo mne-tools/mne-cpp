@@ -101,10 +101,6 @@ NewDisplayManager::~NewDisplayManager()
 
 QWidget* NewDisplayManager::show(IPlugin::OutputConnectorList &pOutputConnectorList, QSharedPointer<QTime>& pT)
 {
-    qDebug() << "DisplayManager::show()";
-
-    qWarning() << "NewDisplayManager" << pT.isNull();
-
     QWidget* newDisp = new QWidget;
     QVBoxLayout* vboxLayout = new QVBoxLayout;
     QHBoxLayout* hboxLayout = new QHBoxLayout;
@@ -113,16 +109,12 @@ QWidget* NewDisplayManager::show(IPlugin::OutputConnectorList &pOutputConnectorL
     {
         if(pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeSampleArray> >())
         {
-            qWarning() << "RTSA found!";
-
             QSharedPointer<NewRealTimeSampleArray>* pNewRealTimeSampleArray = &pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeSampleArray> >()->data();
-
             NewRealTimeSampleArrayWidget* rtsaWidget = new NewRealTimeSampleArrayWidget(*pNewRealTimeSampleArray, pT);
 
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify, rtsaWidget, &NewRealTimeSampleArrayWidget::update, Qt::BlockingQueuedConnection);
 
             vboxLayout->addWidget(rtsaWidget);
-//            rtsaWidget->show();
             rtsaWidget->init();
         }
     }

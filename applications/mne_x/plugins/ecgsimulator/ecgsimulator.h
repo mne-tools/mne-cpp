@@ -48,7 +48,6 @@
 
 #include <mne_x/Interfaces/ISensor.h>
 #include <generics/circularbuffer_old.h>
-#include <xMeas/Measurement/realtimesamplearray.h>
 
 #include <xMeas/Measurement/newrealtimesamplearray.h>
 
@@ -155,18 +154,16 @@ protected:
     virtual void run();
 
 private:
-    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_ECG_I_new;  /**< The RealTimeSampleArray to provide the channel ECG I.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_ECG_I_new;   /**< The RealTimeSampleArray to provide the channel ECG I.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_ECG_II_new;  /**< The RealTimeSampleArray to provide the channel ECG II.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_ECG_III_new; /**< The RealTimeSampleArray to provide the channel ECG III.*/
 
-//    XMEASLIB::RealTimeSampleArray::SPtr m_pRTSA_ECG_I;      /**< The RealTimeSampleArray to provide the channel ECG I.*/
-//    XMEASLIB::RealTimeSampleArray::SPtr m_pRTSA_ECG_II;     /**< The RealTimeSampleArray to provide the channel ECG II.*/
-//    XMEASLIB::RealTimeSampleArray::SPtr m_pRTSA_ECG_III;    /**< The RealTimeSampleArray to provide the channel ECG III.*/
-
-    float           m_fSamplingRate;            /**< Holds the sampling rate.*/
-    int             m_iDownsamplingFactor;      /**< Holds the down sampling factor.*/
-    ECGBuffer_old*      m_pInBuffer_I;          /**< Holds ECG I data which arrive from ECG producer.*/
-    ECGBuffer_old*      m_pInBuffer_II;         /**< Holds ECG II data which arrive from ECG producer.*/
-    ECGBuffer_old*      m_pInBuffer_III;        /**< Holds ECG III data which arrive from ECG producer.*/
-    ECGProducer*    m_pECGProducer;             /**< Holds the ECGProducer.*/
+    float           m_fSamplingRate;        /**< Holds the sampling rate.*/
+    int             m_iDownsamplingFactor;  /**< Holds the down sampling factor.*/
+    ECGBuffer_old*  m_pInBuffer_I;          /**< Holds ECG I data which arrive from ECG producer.*/
+    ECGBuffer_old*  m_pInBuffer_II;         /**< Holds ECG II data which arrive from ECG producer.*/
+    ECGBuffer_old*  m_pInBuffer_III;        /**< Holds ECG III data which arrive from ECG producer.*/
+    ECGProducer*    m_pECGProducer;         /**< Holds the ECGProducer.*/
 
     QString m_qStringResourcePath;          /**< Holds the path to the ECG resource directory.*/
 
