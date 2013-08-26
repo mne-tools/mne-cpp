@@ -77,7 +77,7 @@ PluginOutputData<T>::PluginOutputData(IPlugin *parent, const QString &name, cons
     if(t_measurement.isNull())
         qFatal("Template type is not a measurement and not therefor supported!");
     else
-        connect(t_measurement.data(), &NewMeasurement::notify, this, &PluginOutputData<T>::update);
+        connect(t_measurement.data(), &NewMeasurement::notify, this, &PluginOutputData<T>::update, Qt::DirectConnection);
 }
 
 
@@ -86,9 +86,7 @@ PluginOutputData<T>::PluginOutputData(IPlugin *parent, const QString &name, cons
 template <class T>
 void PluginOutputData<T>::update()
 {
-    qDebug() << "HERE in update test";
-    QSharedPointer<NewMeasurement> t_measurement = m_pMeasurement.dynamicCast<NewMeasurement>();
-    emit notify(t_measurement);
+    emit notify(m_pMeasurement.dynamicCast<NewMeasurement>());
 }
 
 }//Namespace

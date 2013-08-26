@@ -82,9 +82,8 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NewDisplayManager::NewDisplayManager(QSharedPointer<QTime> pT, QObject* parent)
+NewDisplayManager::NewDisplayManager(QObject* parent)
 : QObject(parent)
-, m_pT(pT)
 {
 
 }
@@ -100,25 +99,14 @@ NewDisplayManager::~NewDisplayManager()
 
 //*************************************************************************************************************
 
-void NewDisplayManager::init()
-{
-//    qDebug() << "DisplayManager::init(): s_hashMeasurementWidgets.size() = " << s_hashMeasurementWidgets.size();
-
-//    foreach(MeasurementWidget* pMSRW, s_hashMeasurementWidgets.values())
-//        pMSRW->init();
-}
-
-
-//*************************************************************************************************************
-
-QWidget* NewDisplayManager::show(IPlugin::OutputConnectorList &pOutputConnectorList )
+QWidget* NewDisplayManager::show(IPlugin::OutputConnectorList &pOutputConnectorList, QSharedPointer<QTime>& pT)
 {
     qDebug() << "DisplayManager::show()";
 
+    qWarning() << "NewDisplayManager" << pT.isNull();
+
     QWidget* newDisp = new QWidget;
-
     QVBoxLayout* vboxLayout = new QVBoxLayout;
-
     QHBoxLayout* hboxLayout = new QHBoxLayout;
 
     foreach (QSharedPointer< PluginOutputConnector > pPluginOutputConnector, pOutputConnectorList)
@@ -127,15 +115,13 @@ QWidget* NewDisplayManager::show(IPlugin::OutputConnectorList &pOutputConnectorL
         {
             qWarning() << "RTSA found!";
 
-            QSharedPointer<NewRealTimeSampleArray> pRTSA = pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeSampleArray> >()->data();
+            NewRealTimeSampleArrayWidget* rtsaWidget = new NewRealTimeSampleArrayWidget(pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeSampleArray> >()->data(), pT);
 
-            NewRealTimeSampleArrayWidget* rtsaWidget = new NewRealTimeSampleArrayWidget(pRTSA, m_pT);
+            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify, rtsaWidget, &NewRealTimeSampleArrayWidget::update, Qt::BlockingQueuedConnection);
 
-            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify, rtsaWidget, &NewRealTimeSampleArrayWidget::update);
-
-//            vboxLayout->addWidget(rtsaWidget);
+            vboxLayout->addWidget(rtsaWidget);
 //            rtsaWidget->show();
-//            rtsaWidget->init();
+            rtsaWidget->init();
         }
     }
 
@@ -157,9 +143,6 @@ QWidget* NewDisplayManager::show(IPlugin::OutputConnectorList &pOutputConnectorL
     vboxLayout->addLayout(hboxLayout);
 
     newDisp->setLayout(vboxLayout);
-
-    // Initialize all MeasurementWidgets
-    init();
 
     return newDisp;
 }

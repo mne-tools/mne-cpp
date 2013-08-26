@@ -40,6 +40,7 @@
 
 #include "measurementtypes.h"
 
+#include "newmeasurement.h"
 #include "newrealtimesamplearray.h"
 #include "newrealtimemultisamplearray.h"
 #include "newnumeric.h"
@@ -68,6 +69,8 @@ MeasurementTypes::MeasurementTypes(QObject *parent)
 
 void MeasurementTypes::registerTypes()
 {
+
+    qRegisterMetaType< NewMeasurement::SPtr >("NewMeasurement::SPtr");
     qRegisterMetaType< NewRealTimeSampleArray::SPtr >("NewRealTimeSampleArray::SPtr");
     qRegisterMetaType< NewRealTimeMultiSampleArray::SPtr >("NewRealTimeMultiSampleArray::SPtr");
     qRegisterMetaType< NewNumeric::SPtr >("NewNumeric::SPtr");

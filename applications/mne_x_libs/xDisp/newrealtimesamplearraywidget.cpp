@@ -82,7 +82,7 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NewRealTimeSampleArrayWidget::NewRealTimeSampleArrayWidget(QSharedPointer<NewRealTimeSampleArray> pRTSA, QSharedPointer<QTime> pTime, QWidget* parent)
+NewRealTimeSampleArrayWidget::NewRealTimeSampleArrayWidget(QSharedPointer<NewRealTimeSampleArray> &pRTSA, QSharedPointer<QTime> &pTime, QWidget* parent)
 : NewMeasurementWidget(parent)
 , m_pRTSA(pRTSA)
 , m_bMeasurement(false)
@@ -96,10 +96,15 @@ NewRealTimeSampleArrayWidget::NewRealTimeSampleArrayWidget(QSharedPointer<NewRea
 , m_bStartFlag(true)
 , m_ucToolIndex(0)
 , m_pTimerToolDisplay(0)
-, m_pTimerUpdate(0)
+, m_pTimerUpdate(new QTimer(this))
 , m_pTime(pTime)
 , m_pTimeCurrentDisplay(0)
 {
+    qDebug() << "NewRealTimeSampleArrayWidget::NewRealTimeSampleArrayWidget" << m_pRTSA->getName();
+    qDebug() << "m_pRTSA.isNull()" << m_pRTSA.isNull();
+
+    actualize();
+
     ui.setupUi(this);
     ui.m_qLabel_Tool->hide();
 
@@ -108,8 +113,7 @@ NewRealTimeSampleArrayWidget::NewRealTimeSampleArrayWidget(QSharedPointer<NewRea
     m_vecTool.push_back("Annotation");
 
     // Start timer
-    m_pTimerUpdate = new QTimer(this);
-    connect(m_pTimerUpdate, SIGNAL(timeout()), this, SLOT(update()));
+    connect(m_pTimerUpdate.data(), SIGNAL(timeout()), this, SLOT(update())); //ToDo Qt5 syntax
 
     m_pTimerUpdate->start(25);
 
@@ -124,8 +128,7 @@ NewRealTimeSampleArrayWidget::NewRealTimeSampleArrayWidget(QSharedPointer<NewRea
 
 NewRealTimeSampleArrayWidget::~NewRealTimeSampleArrayWidget()
 {
-    delete m_pTimerToolDisplay;
-    delete m_pTimerUpdate;
+    qWarning() << "NewRealTimeSampleArrayWidget deleted";
 
     // Clear sampling rate vector
     NewRealTimeSampleArrayWidget::s_listSamplingRates.clear();
@@ -199,40 +202,43 @@ void NewRealTimeSampleArrayWidget::minValueChanged(double minValue)
 
 void NewRealTimeSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
 {
-    std::cout << "update" << std::endl;
-    double dValue = 0;
-    double dPositionDifference = 0.0;
-    QVector<double> vecSamples = m_pRTSA->getSampleArray();
-    for(unsigned char i = 0; i < m_pRTSA->getArraySize(); ++i)
+    if(m_pRTSA->getSampleArray().size() > 0)
     {
-        dValue = vecSamples[i]*m_fScaleFactor - m_dMiddle;
-        dPositionDifference = m_dPosition - (m_dPosX+ui.m_qFrame->width());
-
-        if((dPositionDifference >= 0) || m_bStartFlag)
+        double dValue = 0;
+        double dPositionDifference = 0.0;
+        QVector<double> vecSamples = m_pRTSA->getSampleArray();
+        for(unsigned char i = 0; i < vecSamples.size(); ++i)
         {
-            if(m_bStartFlag)
-                dPositionDifference = 0;
+            dValue = vecSamples[i]*m_fScaleFactor - m_dMiddle;
+            dPositionDifference = m_dPosition - (m_dPosX+ui.m_qFrame->width());
 
-            m_qMutex.lock();
-                m_qPainterPath = QPainterPath();
-                m_dPosition = m_dPosX + dPositionDifference;
-                m_qPainterPath.moveTo(m_dPosition, m_dPosY-dValue);
-            m_qMutex.unlock();
-            m_bStartFlag = false;
+            if((dPositionDifference >= 0) || m_bStartFlag)
+            {
+                if(m_bStartFlag)
+                    dPositionDifference = 0;
 
-            if(!m_bFrozen)
-                m_pTimeCurrentDisplay->setHMS(m_pTime->hour(),m_pTime->minute(),m_pTime->second(),m_pTime->msec());
+                m_qMutex.lock();
+                    m_qPainterPath = QPainterPath();
+                    m_dPosition = m_dPosX + dPositionDifference;
+                    m_qPainterPath.moveTo(m_dPosition, m_dPosY-dValue);
+                m_qMutex.unlock();
+                m_bStartFlag = false;
+
+                if(!m_bFrozen)
+                    m_pTimeCurrentDisplay->setHMS(m_pTime->hour(),m_pTime->minute(),m_pTime->second(),m_pTime->msec());
+            }
+            else
+            {
+                m_qMutex.lock();
+                    m_qPainterPath.lineTo(m_dPosition, m_dPosY-dValue);
+                m_qMutex.unlock();
+            }
+
+            m_dPosition = m_dPosition + m_dSampleWidth;
         }
-
-        else
-        {
-            m_qMutex.lock();
-                m_qPainterPath.lineTo(m_dPosition, m_dPosY-dValue);
-            m_qMutex.unlock();
-        }
-
-        m_dPosition = m_dPosition + m_dSampleWidth;
     }
+    else
+        qWarning() << "NewRealTimeSampleArrayWidget::update; getArraySize():" << m_pRTSA->getArraySize() << "getSampleArray():" << m_pRTSA->getSampleArray().size();
 }
 
 
@@ -240,7 +246,6 @@ void NewRealTimeSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
 
 void NewRealTimeSampleArrayWidget::init()
 {
-    qWarning() << "void NewRealTimeSampleArrayWidget::init()";
     ui.m_qLabel_Caption->setText(m_pRTSA->getName());
 //    ui.m_qLabel_MinValue->setText(QString::number(m_pRTSA->getMinValue()));
 //    ui.m_qLabel_MaxValue->setText(QString::number(m_pRTSA->getMaxValue()));
@@ -324,10 +329,10 @@ void NewRealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
     }
 
     //Paint middle value
-//	painter.setPen(QPen(Qt::gray, 1, Qt::SolidLine));
-//	painter.drawText(usWidth-75, usHeight/2, tr("%1%2").arg(m_dMiddle, 0, 'f', 2).arg(m_pRTSA->getUnit()));
-//	painter.setPen(QPen(Qt::gray, 1, Qt::DotLine));
-//	painter.drawLine(m_dPosX, usHeight/2, usWidth, usHeight/2);
+//    painter.setPen(QPen(Qt::gray, 1, Qt::SolidLine));
+//    painter.drawText(usWidth-75, usHeight/2, tr("%1%2").arg(m_dMiddle, 0, 'f', 2).arg(m_pRTSA->getUnit()));
+//    painter.setPen(QPen(Qt::gray, 1, Qt::DotLine));
+//    painter.drawLine(m_dPosX, usHeight/2, usWidth, usHeight/2);
 
     painter.setPen(QPen(Qt::blue, 1, Qt::SolidLine));
     painter.setRenderHint(QPainter::Antialiasing);
@@ -433,11 +438,8 @@ void NewRealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
 
             painter.drawText(iPosX+8, iPosY-22, tr("%1").arg(t.toString("hh:mm:ss.zzz")));// ToDo Precision should be part of preferences
             painter.drawText(iPosX+8, iPosY-8, tr("%1%2").arg(fAbsMag, 0, 'e', 3).arg(m_pRTSA->getUnit()));
-
         }
     }
-
-
 
     //*************************************************************************************************************
     //=============================================================================================================
@@ -528,8 +530,8 @@ void NewRealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
 
 void NewRealTimeSampleArrayWidget::resizeEvent(QResizeEvent*)
 {
-	m_bStartFlag = true; //start new painting
-	actualize();
+    m_bStartFlag = true; //start new painting
+    actualize();
 }
 
 //*************************************************************************************************************
@@ -555,7 +557,7 @@ void NewRealTimeSampleArrayWidget::mousePressEvent(QMouseEvent* mouseEvent)
 void NewRealTimeSampleArrayWidget::mouseMoveEvent(QMouseEvent* mouseEvent)
 {
     if(m_bMeasurement || m_bScaling)
-    	m_qPointMouseEndPosition = mouseEvent->pos();
+        m_qPointMouseEndPosition = mouseEvent->pos();
 }
 
 
@@ -617,12 +619,9 @@ void NewRealTimeSampleArrayWidget::wheelEvent(QWheelEvent* wheelEvent)
     ui.m_qLabel_Tool->setText(text);
     ui.m_qLabel_Tool->show();
 
-    if(m_pTimerToolDisplay)
-        delete m_pTimerToolDisplay;
+    m_pTimerToolDisplay = QSharedPointer<QTimer>(new QTimer(this));
 
-    m_pTimerToolDisplay = new QTimer(this);
-
-    connect( m_pTimerToolDisplay, SIGNAL(timeout()), ui.m_qLabel_Tool, SLOT(hide()));
+    connect( m_pTimerToolDisplay.data(), SIGNAL(timeout()), ui.m_qLabel_Tool, SLOT(hide()));
     m_pTimerToolDisplay->start(2000);
 }
 

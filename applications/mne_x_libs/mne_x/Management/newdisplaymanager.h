@@ -93,7 +93,7 @@ public:
     /**
     * Constructs a NewDisplayManager.
     */
-    NewDisplayManager(QSharedPointer<QTime> pT, QObject* parent = 0);
+    NewDisplayManager(QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -103,17 +103,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Initialise the measurement widgets by calling there init() function.
-    */
-    void init();
-
-    //=========================================================================================================
-    /**
     * Shows a widget containing all current measurement widgets.
     *
     * @return a pointer to the widget containing all measurement widgets.
     */
-    QWidget* show(IPlugin::OutputConnectorList &pOutputConnectorList);
+    QWidget* show(IPlugin::OutputConnectorList &pOutputConnectorList, QSharedPointer<QTime>& pT);
 
     //=========================================================================================================
     /**
@@ -122,8 +116,6 @@ public:
     void clean();
 
 private:
-    QSharedPointer<QTime> m_pT;
-
     QList<QMetaObject::Connection>   m_pListWidgetConnections;       /**< all widget connections.*/
 
 };

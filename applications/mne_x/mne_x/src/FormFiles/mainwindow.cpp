@@ -123,7 +123,7 @@ MainWindow::MainWindow(QWidget *parent)
 , m_pPluginGui(NULL)
 , m_pPluginManager(new PluginManager(this))
 , m_pPluginSceneManager(new PluginSceneManager(this))
-, m_pDisplayManager(new NewDisplayManager(m_pTime, this))
+, m_pDisplayManager(new NewDisplayManager(this))
 , m_eLogLevelCurrent(_LogLvMax)
 {
     qDebug() << "Clinical Sensing and Analysis - Version" << CInfo::AppVersion();
@@ -548,11 +548,14 @@ void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
         setCentralWidget(pPlugin->setupWidget());
     else
     {
+
         //Garbage collecting
         if(m_pRunWidget)
             delete m_pRunWidget;
 
-        m_pRunWidget = new RunWidget( m_pDisplayManager->show(pPlugin->getOutputConnectors()));
+        m_pRunWidget = new RunWidget( m_pDisplayManager->show(pPlugin->getOutputConnectors(), m_pTime));
+
+        m_pRunWidget->show();
 
         if(m_bDisplayMax)//ToDo send events to main window
         {

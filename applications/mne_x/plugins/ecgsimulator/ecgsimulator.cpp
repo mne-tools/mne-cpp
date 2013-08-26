@@ -120,6 +120,11 @@ QSharedPointer<IPlugin> ECGSimulator::clone() const
 //=============================================================================================================
 void ECGSimulator::init()
 {
+    m_pECGChannel_ECG_I->initChannel();
+    m_pECGChannel_ECG_II->initChannel();
+    m_pECGChannel_ECG_III->initChannel();
+
+
     m_pRTSA_ECG_I_new = PluginOutputData<NewRealTimeSampleArray>::create(this, "ECG I", "ECG I output data");
 
     double diff = m_pECGChannel_ECG_I->getMaximum() - m_pECGChannel_ECG_I->getMinimum();
@@ -185,9 +190,9 @@ void ECGSimulator::init()
 bool ECGSimulator::start()
 {
 
-    m_pECGChannel_ECG_I->initChannel();
-    m_pECGChannel_ECG_II->initChannel();
-    m_pECGChannel_ECG_III->initChannel();
+//    m_pECGChannel_ECG_I->initChannel();
+//    m_pECGChannel_ECG_II->initChannel();
+//    m_pECGChannel_ECG_III->initChannel();
 
 //    // Initialize real time measurements
 //    init();
@@ -277,8 +282,8 @@ void ECGSimulator::run()
         if(m_pECGChannel_ECG_I->isEnabled())
         {
             dValue_I = m_pInBuffer_I->pop();
-            std::cout << dValue_I << std::endl;
-//            m_pRTSA_ECG_I_new->data()->setValue(dValue_I);
+//            std::cout << dValue_I << std::endl;
+            m_pRTSA_ECG_I_new->data()->setValue(dValue_I);
 //            m_pRTSA_ECG_I->setValue(dValue_I);
         }
         if(m_pECGChannel_ECG_II->isEnabled())
