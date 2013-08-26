@@ -193,7 +193,6 @@ protected:
     virtual void wheelEvent(QWheelEvent* wheelEvent);
 
 private slots:
-
     //=========================================================================================================
     /**
     * Stops the Annotation
