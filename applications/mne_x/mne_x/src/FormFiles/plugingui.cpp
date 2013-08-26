@@ -64,7 +64,7 @@ using namespace MNEX;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginGui::PluginGui(PluginManager::SPtr pPluginManager, MNEX::PluginSceneManager::SPtr pPluginSceneManager)
+PluginGui::PluginGui(PluginManager::SPtr &pPluginManager, MNEX::PluginSceneManager::SPtr &pPluginSceneManager)
 : m_pPluginManager(pPluginManager)
 , m_pPluginSceneManager(pPluginSceneManager)
 , m_pCurrentPlugin(0)
@@ -103,8 +103,6 @@ bool PluginGui::removePlugin(IPlugin::SPtr pPlugin)
 
 void PluginGui::actionGroupTriggered(QAction* action)
 {
-//    m_pPluginScene->setItemType(PluginItem::DiagramType(m_qMapNameType[action->text()]));
-//    m_pPluginScene->setItemName(action->text());
     m_pPluginScene->setActionPluginItem(action);
     m_pPluginScene->setMode(PluginScene::InsertPluginItem);
 
@@ -261,13 +259,11 @@ void PluginGui::createToolbars()
     connect(m_pActionGroupPlugins, &QActionGroup::triggered,
             this, &PluginGui::actionGroupTriggered);
 
+    //Sensors
     QToolButton *sensorToolButton = new QToolButton;
     QMenu *menuSensors = new QMenu;
     for(qint32 i = 0; i < m_pPluginManager->getSensorPlugins().size(); ++i)
         createItemAction(m_pPluginManager->getSensorPlugins()[i]->getName(), menuSensors);
-
-//    createItemAction(QString("ECG Simulator"), PluginItem::Sensor, menuSensors);
-//    createItemAction(QString("RT Client"), PluginItem::Sensor, menuSensors);
 
     sensorToolButton->setMenu(menuSensors);
     sensorToolButton->setPopupMode(QToolButton::InstantPopup);
@@ -275,13 +271,11 @@ void PluginGui::createToolbars()
     sensorToolButton->setStatusTip(tr("Sensor Plugins"));
     sensorToolButton->setToolTip(tr("Sensor Plugins"));
 
+    //Algorithms
     QToolButton *algorithmToolButton = new QToolButton;
     QMenu *menuAlgorithms = new QMenu;
     for(qint32 i = 0; i < m_pPluginManager->getAlgorithmPlugins().size(); ++i)
         createItemAction(m_pPluginManager->getAlgorithmPlugins()[i]->getName(), menuAlgorithms);
-
-//    createItemAction(QString("SourceLab"), IPlugin::_IAlgorithm, menuAlgorithms);  //DEBUG
-//    createItemAction(QString("RTSSS"), IPlugin::_IAlgorithm, menuAlgorithms);       //DEBUG
 
     algorithmToolButton->setMenu(menuAlgorithms);
     algorithmToolButton->setPopupMode(QToolButton::InstantPopup);
@@ -289,12 +283,11 @@ void PluginGui::createToolbars()
     algorithmToolButton->setStatusTip(tr("Algorithm Plugins"));
     algorithmToolButton->setToolTip(tr("Algorithm Plugins"));
 
+    //IOs
     QToolButton *ioToolButton = new QToolButton;
     QMenu *menuIo = new QMenu;
     for(qint32 i = 0; i < m_pPluginManager->getIOPlugins().size(); ++i)
         createItemAction(m_pPluginManager->getIOPlugins()[i]->getName(), menuIo);
-
-//    createItemAction(QString("FIFF"), IPlugin::_IIO, menuIo);  //DEBUG
 
     ioToolButton->setMenu(menuIo);
     ioToolButton->setPopupMode(QToolButton::InstantPopup);
@@ -347,7 +340,6 @@ void PluginGui::createToolbars()
     m_pToolBarPointer->setMovable(false);
 
     addToolBar(Qt::LeftToolBarArea, m_pToolBarPointer);
-
 
     //Item
     m_pToolBarItem = new QToolBar(tr("Item"), this);
