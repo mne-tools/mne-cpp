@@ -46,6 +46,7 @@
 #include "xMeas/Measurement/newmeasurement.h"
 
 #include <QDebug>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -62,6 +63,7 @@ namespace MNEX
 //=============================================================================================================
 
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -73,11 +75,13 @@ PluginOutputData<T>::PluginOutputData(IPlugin *parent, const QString &name, cons
 {
     m_pMeasurement = QSharedPointer<T>(new T);
 
-    QSharedPointer<NewMeasurement> t_measurement = m_pMeasurement.dynamicCast<NewMeasurement>();
+    QSharedPointer<XMEASLIB::NewMeasurement> t_measurement = qSharedPointerDynamicCast<XMEASLIB::NewMeasurement>(m_pMeasurement);
+
+//    m_pMeasurement.dynamicCast< XMEASLIB::NewMeasurement > ();
     if(t_measurement.isNull())
         qFatal("Template type is not a measurement and not therefor supported!");
     else
-        connect(t_measurement.data(), &NewMeasurement::notify, this, &PluginOutputData<T>::update, Qt::DirectConnection);
+        connect(t_measurement.data(), &XMEASLIB::NewMeasurement::notify, this, &PluginOutputData<T>::update, Qt::DirectConnection);
 }
 
 
@@ -86,7 +90,7 @@ PluginOutputData<T>::PluginOutputData(IPlugin *parent, const QString &name, cons
 template <class T>
 void PluginOutputData<T>::update()
 {
-    emit notify(m_pMeasurement.dynamicCast<NewMeasurement>());
+    emit notify(qSharedPointerDynamicCast<XMEASLIB::NewMeasurement>(m_pMeasurement));
 }
 
 }//Namespace

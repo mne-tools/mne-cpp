@@ -107,7 +107,7 @@ public:
     *
     * @param [in] uiNumChannels     the number of channels to init.
     */
-    inline void init(unsigned int uiNumChannels);
+    void init(unsigned int uiNumChannels);
 
     //=========================================================================================================
     /**
