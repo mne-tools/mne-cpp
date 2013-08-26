@@ -44,7 +44,6 @@
 
 #include "xdisp_global.h"
 #include "measurementwidget.h"
-#include "realtimesamplearraywidget.h"
 #include "ui_newrealtimemultisamplearraywidget.h"
 
 

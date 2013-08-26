@@ -43,7 +43,8 @@
 //=============================================================================================================
 
 #include "pluginoutputdata.h"
-#include "xMeas/Measurement/newmeasurement.h"
+
+#include <xMeas/newmeasurement.h>
 
 #include <QDebug>
 #include <QSharedPointer>

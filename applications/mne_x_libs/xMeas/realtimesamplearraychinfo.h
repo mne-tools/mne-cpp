@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     newrealtimesamplearray.h
+* @file     realtimesamplearraychinfo.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2013
+* @date     February, 2013
 *
 * @section  LICENSE
 *
@@ -29,20 +29,21 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the NewRealTimeSampleArray class.
+* @brief    Contains the declaration of the RealTimeSampleArrayChInfo class.
 *
 */
 
-#ifndef NEWREALTIMESAMPLEARRAY_H
-#define NEWREALTIMESAMPLEARRAY_H
+#ifndef REALTIMESAMPLEARRAYCHINFO_H
+#define REALTIMESAMPLEARRAYCHINFO_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../xmeas_global.h"
-#include "newmeasurement.h"
+#include "xmeas_global.h"
+
+#include <fiff/fiff_constants.h>
 
 
 //*************************************************************************************************************
@@ -51,7 +52,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QVector>
+#include <QString>
 
 
 //*************************************************************************************************************
@@ -68,38 +69,70 @@ namespace XMEASLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-//using namespace IOBuffer;
+using namespace FIFFLIB;
 
 
 //=========================================================================================================
 /**
-* DECLARE CLASS NewRealTimeSampleArray
+* Channel Info for RealTimeSampleArray, used in RealTimeMultiSampleArray
 *
-* @brief The NewRealTimeSampleArray class is the base class of every NewRealTimeSampleArray Measurement.
+* @brief Channel Info for RealTimeSampleArray
 */
-class XMEASSHARED_EXPORT NewRealTimeSampleArray : public NewMeasurement
+class XMEASSHARED_EXPORT RealTimeSampleArrayChInfo
 {
 public:
-    typedef QSharedPointer<NewRealTimeSampleArray> SPtr;               /**< Shared pointer type for NewRealTimeSampleArray. */
-    typedef QSharedPointer<const NewRealTimeSampleArray> ConstSPtr;    /**< Const shared pointer type for NewRealTimeSampleArray. */
+    typedef QSharedPointer<RealTimeSampleArrayChInfo> SPtr;               /**< Shared pointer type for RealTimeSampleArrayChInfo. */
+    typedef QSharedPointer<const RealTimeSampleArrayChInfo> ConstSPtr;    /**< Const shared pointer type for RealTimeSampleArrayChInfo. */
 
     //=========================================================================================================
     /**
-    * Constructs a NewRealTimeSampleArray.
+    * Constructs a RealTimeSampleArrayChInfo.
     */
-    NewRealTimeSampleArray(QObject *parent = 0);
+    RealTimeSampleArrayChInfo();
 
     //=========================================================================================================
     /**
-    * Destroys the NewRealTimeSampleArray.
+    * Destroys the RealTimeSampleArrayChInfo.
     */
-    virtual ~NewRealTimeSampleArray();
+    virtual ~RealTimeSampleArrayChInfo();
+
+    //=========================================================================================================
+    /**
+    * Sets the channel name
+    *
+    * @param[in] p_qStringChName    channel name
+    */
+    inline void setChannelName(QString p_qStringChName);
+
+    //=========================================================================================================
+    /**
+    * Returns the channel name
+    *
+    * @return the channel name.
+    */
+    inline QString getChannelName() const;
+
+    //=========================================================================================================
+    /**
+    * Sets the channel kind
+    *
+    * @param[in] p_iKind    channel kind
+    */
+    inline void setKind(qint32 p_iKind);
+
+    //=========================================================================================================
+    /**
+    * Returns the channel kind
+    *
+    * @return the channel kind.
+    */
+    inline qint32 getKind() const;
 
     //=========================================================================================================
     /**
     * Sets the minimal value. If current value to set is smaller, current value is set to minimal value.
     *
-    * @param [in] minValue minimal value.
+    * @param[in] minValue minimal value.
     */
     inline void setMinValue(double minValue);
 
@@ -129,47 +162,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the sampling rate of the NewRealTimeSampleArray Measurement.
-    *
-    * @param [in] dSamplingRate the sampling rate of the NewRealTimeSampleArray.
-    */
-    inline void setSamplingRate(double dSamplingRate);
-
-    //=========================================================================================================
-    /**
-    * Returns the sampling rate of the NewRealTimeSampleArray Measurement.
-    *
-    * @return the sampling rate of the NewRealTimeSampleArray.
-    */
-    inline double getSamplingRate() const;
-
-    //=========================================================================================================
-    /**
-    * Sets the number of values which should be gathered before attached observers are notified by calling the Subject notify() method.
-    *
-    * @param [in] ucArraySize the number of values.
-    */
-    inline void setArraySize(unsigned char ucArraySize);
-
-    //=========================================================================================================
-    /**
-    * Returns the number of values which should be gathered before attached observers are notified by calling the Subject notify() method.
-    *
-    * @return the number of values which are gathered before a notify() is called.
-    */
-    inline unsigned char getArraySize() const;
-
-    //=========================================================================================================
-    /**
-    * Returns the gathered sample array vector.
-    *
-    * @return the current sample array vector.
-    */
-    inline const QVector<double>& getSampleArray();
-
-    //=========================================================================================================
-    /**
-    * Sets the unit of the NewRealTimeSampleArray data.
+    * Sets the unit of the RealTimeSampleArray data.
     *
     * @param [in] unit of the data.
     */
@@ -177,38 +170,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the unit of the NewRealTimeSampleArray measurement.
+    * Returns the unit of the RealTimeSampleArray measurement.
     *
     * @return the unit of the data of measurement.
     */
     inline const QString& getUnit() const;
 
-    //=========================================================================================================
-    /**
-    * Attaches a value to the sample array vector.
-    * This method is inherited by Measurement.
-    *
-    * @param [in] v the value which is attached to the sample array vector.
-    */
-    virtual void setValue(double v);
-
-    //=========================================================================================================
-    /**
-    * Returns the current value set.
-    * This method is inherited by Measurement.
-    *
-    * @return the last attached value.
-    */
-    virtual double getValue() const;
-
 private:
-    double              m_dMinValue;        /**< Holds the minimal value.*/
-    double              m_dMaxValue;        /**< Holds the maximal value.*/
-    double              m_dSamplingRate;    /**< Holds sampling rate of the NewRealTimeSampleArray.*/
-    QString             m_qString_Unit;     /**< Holds unit of the data of the measurement.*/
-    double              m_dValue;           /**< Holds the current attached value.*/
-    unsigned char       m_ucArraySize;      /**< Holds vector size of the sample array vector.*/
-    QVector<double>     m_vecSamples;       /**< Holds the sample array vector.*/
+    QString     m_qStringChName;    /**< The channel name.*/
+    double      m_dMinValue;        /**< The minimal value.*/
+    double      m_dMaxValue;        /**< The maximal value.*/
+    qint32      m_iKind;            /**< The channel kind.*/
+    QString     m_qString_Unit;     /**< Unit of the data of the measurement.*/
+
 };
 
 
@@ -217,7 +191,39 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline void NewRealTimeSampleArray::setMinValue(double minValue)
+inline void RealTimeSampleArrayChInfo::setChannelName(QString p_qStringChName)
+{
+    m_qStringChName = p_qStringChName;
+}
+
+
+//*************************************************************************************************************
+
+inline QString RealTimeSampleArrayChInfo::getChannelName() const
+{
+    return m_qStringChName;
+}
+
+
+//*************************************************************************************************************
+
+inline void RealTimeSampleArrayChInfo::setKind(qint32 p_iKind)
+{
+    m_iKind = p_iKind;
+}
+
+
+//*************************************************************************************************************
+
+inline qint32 RealTimeSampleArrayChInfo::getKind() const
+{
+    return m_iKind;
+}
+
+
+//*************************************************************************************************************
+
+inline void RealTimeSampleArrayChInfo::setMinValue(double minValue)
 {
     m_dMinValue = minValue;
 }
@@ -225,7 +231,7 @@ inline void NewRealTimeSampleArray::setMinValue(double minValue)
 
 //*************************************************************************************************************
 
-inline double NewRealTimeSampleArray::getMinValue() const
+inline double RealTimeSampleArrayChInfo::getMinValue() const
 {
     return m_dMinValue;
 }
@@ -233,15 +239,16 @@ inline double NewRealTimeSampleArray::getMinValue() const
 
 //*************************************************************************************************************
 
-inline void NewRealTimeSampleArray::setMaxValue(double maxValue)
+inline void RealTimeSampleArrayChInfo::setMaxValue(double maxValue)
 {
-    m_dMaxValue = maxValue;
+    if(m_iKind != FIFFV_STIM_CH) // ToDo dirty hack // don't set max for stim channels
+        m_dMaxValue = maxValue;
 }
 
 
 //*************************************************************************************************************
 
-inline double NewRealTimeSampleArray::getMaxValue() const
+inline double RealTimeSampleArrayChInfo::getMaxValue() const
 {
     return m_dMaxValue;
 }
@@ -249,51 +256,7 @@ inline double NewRealTimeSampleArray::getMaxValue() const
 
 //*************************************************************************************************************
 
-inline void NewRealTimeSampleArray::setSamplingRate(double dSamplingRate)
-{
-    m_dSamplingRate = dSamplingRate;
-}
-
-
-//*************************************************************************************************************
-
-inline double NewRealTimeSampleArray::getSamplingRate() const
-{
-    return m_dSamplingRate;
-}
-
-
-//*************************************************************************************************************
-
-inline void NewRealTimeSampleArray::setArraySize(unsigned char ucArraySize)
-{
-	//Obsolete unsigned char can't be bigger
-//    if(ucArraySize > 255)
-//        m_ucArraySize = 255;
-//    else
-        m_ucArraySize = ucArraySize;
-}
-
-
-//*************************************************************************************************************
-
-unsigned char NewRealTimeSampleArray::getArraySize() const
-{
-    return m_ucArraySize;
-}
-
-
-//*************************************************************************************************************
-
-inline const QVector<double>& NewRealTimeSampleArray::getSampleArray()
-{
-    return m_vecSamples;
-}
-
-
-//*************************************************************************************************************
-
-inline void NewRealTimeSampleArray::setUnit(const QString& unit)
+inline void RealTimeSampleArrayChInfo::setUnit(const QString& unit)
 {
     m_qString_Unit = unit;
 }
@@ -301,13 +264,11 @@ inline void NewRealTimeSampleArray::setUnit(const QString& unit)
 
 //*************************************************************************************************************
 
-inline const QString& NewRealTimeSampleArray::getUnit() const
+inline const QString& RealTimeSampleArrayChInfo::getUnit() const
 {
     return m_qString_Unit;
 }
 
 } // NAMESPACE
 
-Q_DECLARE_METATYPE(XMEASLIB::NewRealTimeSampleArray::SPtr)
-
-#endif // NEWREALTIMESAMPLEARRAY_H
+#endif // REALTIMESAMPLEARRAYCHINFO_H

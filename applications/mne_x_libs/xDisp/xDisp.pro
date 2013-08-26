@@ -73,8 +73,6 @@ win32 {
 SOURCES += \
         measurementwidget.cpp \
         newmeasurementwidget.cpp \
-        displaymanager.cpp \
-        realtimesamplearraywidget.cpp \
         realtimemultisamplearraywidget.cpp \
         textwidget.cpp \
         progressbarwidget.cpp \
@@ -88,9 +86,6 @@ HEADERS += \
         xdisp_global.h \
         measurementwidget.h \
         newmeasurementwidget.h \
-        realtimesamplearraywidget.h \
-        displaymanager.h \
-        realtimesamplearraywidget.h \
         realtimemultisamplearraywidget.h \
         textwidget.h \
         progressbarwidget.h \
@@ -101,10 +96,7 @@ HEADERS += \
         newrealtimemultisamplearraywidget.h
 
 FORMS += \
-    realtimesamplearraywidget.ui \
     realtimemultisamplearraywidget.ui \
-    realtimesamplearraywidget.ui \
-    realtimesamplearraywidget.ui \
     realtimemultisamplearraywidget.ui \
     textwidget.ui \
     progressbarwidget.ui \

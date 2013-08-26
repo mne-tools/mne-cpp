@@ -47,7 +47,7 @@
 #include <mne_x/Interfaces/ISensor.h>
 #include <generics/circularbuffer_old.h>
 #include <generics/circularmatrixbuffer.h>
-#include <xMeas/Measurement/newrealtimemultisamplearray.h>
+#include <xMeas/newrealtimemultisamplearray.h>
 
 
 //*************************************************************************************************************

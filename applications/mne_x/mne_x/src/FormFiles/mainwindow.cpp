@@ -42,16 +42,6 @@
 #include <mne_x/Management/pluginscenemanager.h>
 #include <mne_x/Management/newdisplaymanager.h>
 
-#include <xMeas/Measurement/realtimesamplearray.h>
-#include <xMeas/Measurement/numeric.h>
-#include <xMeas/Measurement/progressbar.h>
-#include <xMeas/Measurement/text.h>
-
-#include <mne_x/Interfaces/IPlugin.h>
-#include <mne_x/Interfaces/ISensor.h>
-#include <mne_x/Interfaces/IAlgorithm.h>
-#include <mne_x/Interfaces/IIO.h>
-
 //GUI
 #include "mainwindow.h"
 #include "runwidget.h"
@@ -125,11 +115,10 @@ MainWindow::MainWindow(QWidget *parent)
     createPluginDockWindow();
     createLogDockWindow();
 
-
-    //ToDo Debug Startup
-    writeToLog(tr("Test normal message, Max"), _LogKndMessage, _LogLvMax);
-    writeToLog(tr("Test warning message, Normal"), _LogKndWarning, _LogLvNormal);
-    writeToLog(tr("Test error message, Min"), _LogKndError, _LogLvMin);
+//    //ToDo Debug Startup
+//    writeToLog(tr("Test normal message, Max"), _LogKndMessage, _LogLvMax);
+//    writeToLog(tr("Test warning message, Normal"), _LogKndWarning, _LogLvNormal);
+//    writeToLog(tr("Test error message, Min"), _LogKndError, _LogLvMin);
 
     initStatusBar();
 }
@@ -602,8 +591,6 @@ void MainWindow::startMeasurement()
 void MainWindow::stopMeasurement()
 {
     writeToLog(tr("Stopping real-time measurement..."), _LogKndMessage, _LogLvMin);
-
-    qDebug() << "MainWindow::stopMeasurement()";
 
     m_pPluginSceneManager->stopPlugins();
 

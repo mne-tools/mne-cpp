@@ -58,7 +58,7 @@ NewMeasurement::NewMeasurement(int type, QObject *parent)
 : QObject(parent)
 , m_iMetaTypeId(type)
 {
-    qWarning() << "QMetaType" << type;
+//    qWarning() << "QMetaType" << type;
 }
 
 

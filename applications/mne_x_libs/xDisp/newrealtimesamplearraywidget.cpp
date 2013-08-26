@@ -42,8 +42,8 @@
 
 #include "newrealtimesamplearraywidget.h"
 //#include "annotationwindow.h"
-#include "displaymanager.h"
-#include <xMeas/Measurement/newrealtimesamplearray.h>
+
+#include <xMeas/newrealtimesamplearray.h>
 #include "iostream"
 
 
@@ -100,11 +100,6 @@ NewRealTimeSampleArrayWidget::NewRealTimeSampleArrayWidget(QSharedPointer<NewRea
 , m_pTime(pTime)
 , m_pTimeCurrentDisplay(0)
 {
-    qDebug() << "NewRealTimeSampleArrayWidget::NewRealTimeSampleArrayWidget" << m_pRTSA->getName();
-    qDebug() << "m_pRTSA.isNull()" << m_pRTSA.isNull();
-
-//    actualize();
-
     ui.setupUi(this);
     ui.m_qLabel_Tool->hide();
 
@@ -128,8 +123,7 @@ NewRealTimeSampleArrayWidget::NewRealTimeSampleArrayWidget(QSharedPointer<NewRea
 
 NewRealTimeSampleArrayWidget::~NewRealTimeSampleArrayWidget()
 {
-    qWarning() << "NewRealTimeSampleArrayWidget deleted";
-
+//    qDebug() << "NewRealTimeSampleArrayWidget deleted";
     // Clear sampling rate vector
     NewRealTimeSampleArrayWidget::s_listSamplingRates.clear();
 }

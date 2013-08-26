@@ -76,7 +76,6 @@ win32 {
 
 SOURCES += \
     Measurement/text.cpp \
-    Measurement/realtimesamplearray.cpp \
     Measurement/realtimemultisamplearray.cpp \
     Measurement/progressbar.cpp \
     Measurement/numeric.cpp \
@@ -84,18 +83,18 @@ SOURCES += \
     Measurement/measurement.cpp \
     Measurement/mltchnmeasurement.cpp \
     Measurement/realtimemultisamplearray_new.cpp \
-    Measurement/realtimesamplearraychinfo.cpp \
     Measurement/realtimesourceestimate.cpp \
-    Measurement/newmeasurement.cpp \
-    Measurement/newrealtimemultisamplearray.cpp \
-    Measurement/measurementtypes.cpp \
-    Measurement/newnumeric.cpp \
-    Measurement/newrealtimesamplearray.cpp
+    newrealtimesamplearray.cpp \
+    newrealtimemultisamplearray.cpp \
+    realtimesamplearraychinfo.cpp \
+    newnumeric.cpp \
+    newmeasurement.cpp \
+    measurementtypes.cpp
+
 
 HEADERS += \
     xmeas_global.h \
     Measurement/text.h \
-    Measurement/realtimesamplearray.h \
     Measurement/realtimemultisamplearray.h \
     Measurement/progressbar.h \
     Measurement/numeric.h \
@@ -104,13 +103,13 @@ HEADERS += \
     Measurement/measurement.h \
     Measurement/mltchnmeasurement.h \
     Measurement/realtimemultisamplearray_new.h \
-    Measurement/realtimesamplearraychinfo.h \
     Measurement/realtimesourceestimate.h \
-    Measurement/newmeasurement.h \
-    Measurement/newrealtimemultisamplearray.h \
-    Measurement/measurementtypes.h \
-    Measurement/newnumeric.h \
-    Measurement/newrealtimesamplearray.h
+    newrealtimesamplearray.h \
+    newrealtimemultisamplearray.h \
+    realtimesamplearraychinfo.h \
+    newnumeric.h \
+    newmeasurement.h \
+    measurementtypes.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

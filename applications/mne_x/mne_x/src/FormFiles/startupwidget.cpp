@@ -72,7 +72,7 @@ StartUpWidget::StartUpWidget(QWidget *parent)
     QWidget *topFiller = new QWidget;
     topFiller->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    m_pLabel_Info = new QLabel(tr("MNE-X - Real-Time Acquisition & Processing"));
+    m_pLabel_Info = new QLabel(tr("MNE-X - Real-Time Acquisition & Processing"), this);
     m_pLabel_Info->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
     m_pLabel_Info->setAlignment(Qt::AlignCenter);
 
@@ -93,7 +93,4 @@ StartUpWidget::StartUpWidget(QWidget *parent)
 
 StartUpWidget::~StartUpWidget()
 {
-    qDebug() << "StartUp destroyed automatically.";
-    if(m_pLabel_Info)
-        delete m_pLabel_Info;
 }

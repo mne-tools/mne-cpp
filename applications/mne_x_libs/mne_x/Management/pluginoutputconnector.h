@@ -43,7 +43,7 @@
 #include "../mne_x_global.h"
 
 #include "pluginconnector.h"
-#include <xMeas/Measurement/newmeasurement.h>
+#include <xMeas/newmeasurement.h>
 
 
 //*************************************************************************************************************

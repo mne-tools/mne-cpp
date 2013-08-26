@@ -68,7 +68,6 @@ PluginInputData<T>::PluginInputData(IPlugin *parent, const QString &name, const 
 : PluginInputConnector(parent, name, descr)
 , m_pFunc(NULL)
 {
-
     connect(this, &PluginInputConnector::notify, this, &PluginInputData<T>::notifyCallbackFunction);
 }
 
