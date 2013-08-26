@@ -50,14 +50,12 @@ LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
             -lxMeasd \
-            -lxDispd \
-            -lxDtMngd
+            -lxDispd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lxMeas \
-            -lxDisp \
-            -lxDtMng
+            -lxDisp
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}
@@ -75,7 +73,6 @@ win32 {
 }
 
 SOURCES += \
-    Management/connector.cpp \
     Management/pluginmanager.cpp \
     Management/pluginconnector.cpp \
     Management/plugininputconnector.cpp \
@@ -92,7 +89,6 @@ HEADERS += \
     Interfaces/ISensor.h \
     Interfaces/IAlgorithm.h \
     Interfaces/IIO.h \
-    Management/connector.h \
     Management/pluginmanager.h \
     Management/pluginconnector.h \
     Management/plugininputconnector.h \

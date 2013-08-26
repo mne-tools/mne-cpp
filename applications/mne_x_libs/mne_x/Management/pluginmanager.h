@@ -43,15 +43,6 @@
 
 #include "../mne_x_global.h"
 
-#include <mne_x/Interfaces/IPlugin.h>
-#include <mne_x/Interfaces/ISensor.h>
-#include <mne_x/Interfaces/IAlgorithm.h>
-#include <mne_x/Interfaces/IIO.h>
-//class IPlugin;
-//class ISensor;
-//class IAlgorithm;
-//class IIO;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -76,10 +67,10 @@ namespace MNEX
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-//class IPlugin;
-//class ISensor;
-//class IAlgorithm;
-//class IIO;
+class IPlugin;
+class ISensor;
+class IAlgorithm;
+class IIO;
 
 
 //=============================================================================================================
@@ -123,46 +114,12 @@ public:
 
     //=========================================================================================================
     /**
-    * Starts all plugins.
-    *
-    * @return true if at least one ISensor plugin was started successfully, false otherwise.
-    */
-    static bool startPlugins();
-
-    //=========================================================================================================
-    /**
-    * Starts ISensor Plugins
-    *
-    * @return true if at least one ISensor plugin was started successfully, false otherwise.
-    */
-    static bool startSensorPlugins();
-
-    //=========================================================================================================
-    /**
-    * Starts IAlgorithm plugins.
-    */
-    static void startAlgorithmPlugins();
-
-    //=========================================================================================================
-    /**
-    * Starts IIO plugins.
-    */
-    static void startIOPlugins();
-
-    //=========================================================================================================
-    /**
-    * Stops all plugins.
-    */
-    static void stopPlugins();
-
-    //=========================================================================================================
-    /**
     * Finds index of plugin by name.
     *
     * @return index of plugin.
     * @param name the plugin name.
     */
-    static int findByName(const QString& name);
+    int findByName(const QString& name);
 
     //=========================================================================================================
     /**
@@ -170,7 +127,7 @@ public:
     *
     * @return reference to vector containing all plugins.
     */
-    static inline const QVector<IPlugin*>& getPlugins();
+    inline const QVector<IPlugin*>& getPlugins();
 
     //=========================================================================================================
     /**
@@ -178,7 +135,7 @@ public:
     *
     * @return reference to vector containing ISensor plugins.
     */
-    static inline const QVector<ISensor*>& getSensorPlugins();
+    inline const QVector<ISensor*>& getSensorPlugins();
 
     //=========================================================================================================
     /**
@@ -186,7 +143,7 @@ public:
     *
     * @return reference to vector containing IRTAlgorithm plugins
     */
-    static inline const QVector<IAlgorithm*>& getAlgorithmPlugins();
+    inline const QVector<IAlgorithm*>& getAlgorithmPlugins();
 
     //=========================================================================================================
     /**
@@ -194,43 +151,15 @@ public:
     *
     * @return reference to vector containing IRTVisulaiztaion plugins
     */
-    static inline const QVector<IIO*>& getIOPlugins();
+    inline const QVector<IIO*>& getIOPlugins();
 
-    //=========================================================================================================
-    /**
-    * Returns vector containing active ISensor plugins.
-    *
-    * @return reference to vector containing active ISensor plugins.
-    */
-    static inline const QVector<ISensor*>& getActiveSensorPlugins();
-
-    //=========================================================================================================
-    /**
-    * Returns vector containing active IAlgorithm plugins.
-    *
-    * @return reference to vector containing active IAlgorithm plugins.
-    */
-    static inline const QVector<IAlgorithm*>& getActiveAlgorithmPlugins();
-
-    //=========================================================================================================
-    /**
-    * Returns vector containing active IIO plugins.
-    *
-    * @return reference to vector containing active IIO plugins.
-    */
-    static inline const QVector<IIO*>& getActiveIOPlugins();
 
 private:
+    QVector<IPlugin*>    m_qVecPlugins;             /**< Vector of all plugins. */
 
-    static QVector<IPlugin*>    s_vecPlugins;               /**< Vector of all plugins. */
-
-    static QVector<ISensor*>    s_vecSensorPlugins;         /**< Vector of all ISensor plugins. */
-    static QVector<IAlgorithm*> s_vecAlgorithmPlugins;      /**< Vector of all IAlgorithm plugins. */
-    static QVector<IIO*>        s_vecIOPlugins;             /**< Vector of all IIO plugins. */
-
-    static QVector<ISensor*>    s_vecActiveSensorPlugins;   /**< Vector of all active ISensor plugins. */
-    static QVector<IAlgorithm*> s_vecActiveAlgorithmPlugins;/**< Vector of all active IAlgorithm plugins. */
-    static QVector<IIO*>        s_vecActiveIOPlugins;       /**< Vector of all active IIO plugins. */
+    QVector<ISensor*>    m_qVecSensorPlugins;       /**< Vector of all ISensor plugins. */
+    QVector<IAlgorithm*> m_qVecAlgorithmPlugins;    /**< Vector of all IAlgorithm plugins. */
+    QVector<IIO*>        m_qVecIOPlugins;           /**< Vector of all IIO plugins. */
 
 };
 
@@ -242,7 +171,7 @@ private:
 
 inline const QVector<IPlugin*>& PluginManager::getPlugins()
 {
-    return s_vecPlugins;
+    return m_qVecPlugins;
 }
 
 
@@ -250,7 +179,7 @@ inline const QVector<IPlugin*>& PluginManager::getPlugins()
 
 inline const QVector<ISensor*>& PluginManager::getSensorPlugins()
 {
-    return s_vecSensorPlugins;
+    return m_qVecSensorPlugins;
 }
 
 
@@ -258,7 +187,7 @@ inline const QVector<ISensor*>& PluginManager::getSensorPlugins()
 
 inline const QVector<IAlgorithm*>& PluginManager::getAlgorithmPlugins()
 {
-    return s_vecAlgorithmPlugins;
+    return m_qVecAlgorithmPlugins;
 }
 
 
@@ -266,36 +195,7 @@ inline const QVector<IAlgorithm*>& PluginManager::getAlgorithmPlugins()
 
 inline const QVector<IIO*>& PluginManager::getIOPlugins()
 {
-    return s_vecIOPlugins;
-}
-
-
-
-
-
-
-
-//*************************************************************************************************************
-
-inline const QVector<ISensor*>& PluginManager::getActiveSensorPlugins()
-{
-    return s_vecActiveSensorPlugins;
-}
-
-
-//*************************************************************************************************************
-
-inline const QVector<IAlgorithm*>& PluginManager::getActiveAlgorithmPlugins()
-{
-    return s_vecActiveAlgorithmPlugins;
-}
-
-
-//*************************************************************************************************************
-
-inline const QVector<IIO*>& PluginManager::getActiveIOPlugins()
-{
-    return s_vecActiveIOPlugins;
+    return m_qVecIOPlugins;
 }
 
 } // NAMESPACE

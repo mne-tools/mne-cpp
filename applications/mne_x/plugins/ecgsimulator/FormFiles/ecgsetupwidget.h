@@ -181,21 +181,21 @@ private:
     * Sets the selected file of Channel I.
     *
     */
-    void setFileOfChannel_I();
+    void setFileOfChannel_I(qint32);
 
     //=========================================================================================================
     /**
     * Sets the selected file of Channel II.
     *
     */
-    void setFileOfChannel_II();
+    void setFileOfChannel_II(qint32);
 
     //=========================================================================================================
     /**
     * Sets the selected file of Channel III.
     *
     */
-    void setFileOfChannel_III();
+    void setFileOfChannel_III(qint32);
 
     //=========================================================================================================
     /**
@@ -205,9 +205,9 @@ private:
     void showAboutDialog();
 
 
-    ECGSimulator*           m_pECGSimulator;	/**< Holds a pointer to corresponding ECGSimulator.*/
+    ECGSimulator*           m_pECGSimulator;    /**< a pointer to corresponding ECGSimulator.*/
 
-    Ui::ECGSetupClass ui;		/**< Holds the user interface for the ECGSetupWidget.*/
+    Ui::ECGSetupClass ui;                       /**< the user interface for the ECGSetupWidget.*/
 };
 
 } // NAMESPACE

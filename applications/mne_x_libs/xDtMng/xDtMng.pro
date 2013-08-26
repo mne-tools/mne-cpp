@@ -73,11 +73,9 @@ win32 {
     QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
 }
 
-SOURCES += \
-        measurementmanager.cpp
+SOURCES +=
 
 HEADERS += \
-        measurementmanager.h\
         xdtmng_global.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

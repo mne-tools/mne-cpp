@@ -46,10 +46,6 @@
 #include "../Management/pluginoutputdata.h"
 #include "../Management/plugininputdata.h"
 
-// ToDo REMOVE
-#include <xMeas/Nomenclature/nomenclature.h>
-// ToDo REMOVE End
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -188,44 +184,6 @@ public:
 
     inline OutputConnectorList& getOutputConnectors(){return m_outputConnectors;}
 
-
-// ToDo REMOVE
-
-    //=========================================================================================================
-    /**
-    * Sets the activation status of the plugin.
-    *
-    * @param [in] status the new activation status of the plugin.
-    */
-    inline void setStatus(bool status);
-
-    //=========================================================================================================
-    /**
-    * Returns the activation status of the plugin.
-    *
-    * @return true if plugin is activated.
-    */
-    inline bool isActive() const;
-
-    //=========================================================================================================
-    /**
-    * Returns the provider id
-    *
-    * @return the provider id (Plugin ID).
-    */
-    inline XMEASLIB::PLG_ID::Plugin_ID getPlugin_ID() const;
-
-    //=========================================================================================================
-    /**
-    * Returns the widget which is shown under configuration tab while running mode.
-    * Pure virtual method.
-    *
-    * @return the run widget.
-    */
-    virtual QWidget* runWidget() = 0;
-// ToDo REMOVE End
-
-
 protected:
     //=========================================================================================================
     /**
@@ -238,40 +196,12 @@ protected:
 
     InputConnectorList m_inputConnectors;    /**< Set of input connectors associated with this plug-in. */
     OutputConnectorList m_outputConnectors;  /**< Set of output connectors associated with this plug-in. */
-
-// ToDo REMOVE
-    XMEASLIB::PLG_ID::Plugin_ID m_PLG_ID;     /**< Holds the plugin id.*/
-// ToDo REMOVE end
-private:
-    bool m_bStatus;                 /**< The activation status. */
 };
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-// ToDo REMOVE
-inline void IPlugin::setStatus(bool status)
-{
-    m_bStatus = status;
-}
-
-
-//*************************************************************************************************************
-
-inline bool IPlugin::isActive() const
-{
-    return m_bStatus;
-}
-
-
-//*************************************************************************************************************
-
-inline XMEASLIB::PLG_ID::Plugin_ID IPlugin::getPlugin_ID() const
-{
-    return m_PLG_ID;
-}
-// ToDo REMOVE end
 
 } //Namespace
 
