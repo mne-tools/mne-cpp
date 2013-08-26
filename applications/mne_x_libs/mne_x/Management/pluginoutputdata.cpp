@@ -77,9 +77,8 @@ PluginOutputData<T>::PluginOutputData(IPlugin *parent, const QString &name, cons
 
     QSharedPointer<XMEASLIB::NewMeasurement> t_measurement = qSharedPointerDynamicCast<XMEASLIB::NewMeasurement>(m_pMeasurement);
 
-//    m_pMeasurement.dynamicCast< XMEASLIB::NewMeasurement > ();
     if(t_measurement.isNull())
-        qFatal("Template type is not a measurement and not therefor supported!");
+        qFatal("Template type is not a measurement and therefor not supported!");
     else
         connect(t_measurement.data(), &XMEASLIB::NewMeasurement::notify, this, &PluginOutputData<T>::update, Qt::DirectConnection);
 }
