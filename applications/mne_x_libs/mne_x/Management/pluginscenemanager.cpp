@@ -135,8 +135,6 @@ bool PluginSceneManager::removePlugin(const IPlugin::SPtr pPlugin)
 
 bool PluginSceneManager::startPlugins()
 {
-    qDebug() << "PluginManager::startPlugins()";
-
     // Start ISensor and IRTAlgorithm plugins first!
     bool bFlag = startSensorPlugins();
 
@@ -162,12 +160,9 @@ bool PluginSceneManager::startSensorPlugins()
         if((*it)->getType() == IPlugin::_ISensor)
         {
             if(!(*it)->start())
-                qDebug() << "Could not start ISensor: " << (*it)->getName();
+                qWarning() << "Could not start ISensor: " << (*it)->getName();
             else
-            {
-                qDebug() << "Start ISensor: " << (*it)->getName();
                 bFlag = true; //At least one sensor has to be started
-            }
         }
     }
 
@@ -181,15 +176,9 @@ void PluginSceneManager::startAlgorithmPlugins()
 {
     QList<IPlugin::SPtr>::iterator it = m_pluginList.begin();
     for( ; it != m_pluginList.end(); ++it)
-    {
         if((*it)->getType() == IPlugin::_IAlgorithm)
-        {
             if(!(*it)->start())
-                qDebug() << "Could not start IAlgorithm: " << (*it)->getName();
-            else
-                qDebug() << "Start IAlgorithm: " << (*it)->getName();
-        }
-    }
+                qWarning() << "Could not start IAlgorithm: " << (*it)->getName();
 }
 
 
@@ -199,15 +188,9 @@ void PluginSceneManager::startIOPlugins()
 {
     QList<IPlugin::SPtr>::iterator it = m_pluginList.begin();
     for( ; it != m_pluginList.end(); ++it)
-    {
         if((*it)->getType() == IPlugin::_IIO)
-        {
             if(!(*it)->start())
-                qDebug() << "Could not start IIO: " << (*it)->getName();
-            else
-                qDebug() << "Start IIO: " << (*it)->getName();
-        }
-    }
+                qWarning() << "Could not start IIO: " << (*it)->getName();
 }
 
 
@@ -218,20 +201,16 @@ void PluginSceneManager::stopPlugins()
     // Stop ISensor plugins first!
     QList<IPlugin::SPtr>::iterator it = m_pluginList.begin();
     for( ; it != m_pluginList.end(); ++it)
-    {
         if((*it)->getType() == IPlugin::_ISensor)
             if(!(*it)->stop())
-                qDebug() << "Could not stop IPlugin: " << (*it)->getName();
-    }
+                qWarning() << "Could not stop IPlugin: " << (*it)->getName();
 
     // Stop all other plugins!
     it = m_pluginList.begin();
     for( ; it != m_pluginList.end(); ++it)
-    {
         if((*it)->getType() != IPlugin::_ISensor)
             if(!(*it)->stop())
-                qDebug() << "Could not stop IPlugin: " << (*it)->getName();
-    }
+                qWarning() << "Could not stop IPlugin: " << (*it)->getName();
 }
 
 

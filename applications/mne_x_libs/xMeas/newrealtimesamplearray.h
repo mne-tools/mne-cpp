@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     newrealtimemultisamplearray.h
+* @file     newrealtimesamplearray.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     August, 2013
 *
 * @section  LICENSE
 *
@@ -29,24 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the NewRealTimeMultiSampleArray class.
+* @brief    Contains the declaration of the NewRealTimeSampleArray class.
 *
 */
 
-#ifndef NEWREALTIMEMULTISAMPLEARRAY_H
-#define NEWREALTIMEMULTISAMPLEARRAY_H
-
+#ifndef NEWREALTIMESAMPLEARRAY_H
+#define NEWREALTIMESAMPLEARRAY_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../xmeas_global.h"
+#include "xmeas_global.h"
 #include "newmeasurement.h"
-#include "realtimesamplearraychinfo.h"
-
-#include <fiff/fiff_info.h>
 
 
 //*************************************************************************************************************
@@ -56,7 +52,6 @@
 
 #include <QSharedPointer>
 #include <QVector>
-#include <QList>
 
 
 //*************************************************************************************************************
@@ -73,97 +68,88 @@ namespace XMEASLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+//using namespace IOBuffer;
 
 
 //=========================================================================================================
 /**
-* DECLARE CLASS NewRealTimeMultiSampleArray
+* DECLARE CLASS NewRealTimeSampleArray
 *
-* @brief The RealTimeMultiSampleArrayNew class is the base class of every RealTimeMultiSampleArrayNew Measurement.
+* @brief The NewRealTimeSampleArray class is the base class of every NewRealTimeSampleArray Measurement.
 */
-class XMEASSHARED_EXPORT NewRealTimeMultiSampleArray : public NewMeasurement
+class XMEASSHARED_EXPORT NewRealTimeSampleArray : public NewMeasurement
 {
-    Q_OBJECT
 public:
-    typedef QSharedPointer<NewRealTimeMultiSampleArray> SPtr;               /**< Shared pointer type for NewRealTimeMultiSampleArray. */
-    typedef QSharedPointer<const NewRealTimeMultiSampleArray> ConstSPtr;    /**< Const shared pointer type for NewRealTimeMultiSampleArray. */
+    typedef QSharedPointer<NewRealTimeSampleArray> SPtr;               /**< Shared pointer type for NewRealTimeSampleArray. */
+    typedef QSharedPointer<const NewRealTimeSampleArray> ConstSPtr;    /**< Const shared pointer type for NewRealTimeSampleArray. */
 
     //=========================================================================================================
     /**
-    * Constructs a RealTimeMultiSampleArrayNew.
+    * Constructs a NewRealTimeSampleArray.
     */
-    explicit NewRealTimeMultiSampleArray(QObject *parent = 0);
+    NewRealTimeSampleArray(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RealTimeMultiSampleArrayNew.
+    * Destroys the NewRealTimeSampleArray.
     */
-    virtual ~NewRealTimeMultiSampleArray();
+    virtual ~NewRealTimeSampleArray();
 
     //=========================================================================================================
     /**
-    * Inits RealTimeMultiSampleArrayNew and adds uiNumChannels empty channel information
+    * Sets the minimal value. If current value to set is smaller, current value is set to minimal value.
     *
-    * @param [in] uiNumChannels     the number of channels to init.
+    * @param [in] minValue minimal value.
     */
-    void init(unsigned int uiNumChannels);
+    inline void setMinValue(double minValue);
 
     //=========================================================================================================
     /**
-    * Init channel infos using fiff info
+    * Returns the minimal value.
     *
-    * @param[in] p_pFiffInfo     Info to init from
+    * @return the minimal value.
     */
-    void initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo);
+    inline double getMinValue() const;
 
     //=========================================================================================================
     /**
-    * Sets the sampling rate of the RealTimeMultiSampleArrayNew Measurement.
+    * Sets the maximal value. If value to set is bigger, current value is set to maximal value.
     *
-    * @param[in] dSamplingRate the sampling rate of the RealTimeMultiSampleArrayNew.
+    * @param [in] maxValue maximal value.
+    */
+    inline void setMaxValue(double maxValue);
+
+    //=========================================================================================================
+    /**
+    * Returns the maximal value.
+    *
+    * @return the maximal value.
+    */
+    inline double getMaxValue() const;
+
+    //=========================================================================================================
+    /**
+    * Sets the sampling rate of the NewRealTimeSampleArray Measurement.
+    *
+    * @param [in] dSamplingRate the sampling rate of the NewRealTimeSampleArray.
     */
     inline void setSamplingRate(double dSamplingRate);
 
     //=========================================================================================================
     /**
-    * Returns the sampling rate of the RealTimeMultiSampleArrayNew Measurement.
+    * Returns the sampling rate of the NewRealTimeSampleArray Measurement.
     *
-    * @return the sampling rate of the RealTimeMultiSampleArrayNew.
+    * @return the sampling rate of the NewRealTimeSampleArray.
     */
     inline double getSamplingRate() const;
 
     //=========================================================================================================
     /**
-    * Returns the number of channels.
+    * Sets the number of values which should be gathered before attached observers are notified by calling the Subject notify() method.
     *
-    * @return the number of values which are gathered before a notify() is called.
+    * @param [in] ucArraySize the number of values.
     */
-    inline unsigned int getNumChannels() const;
-
-    //=========================================================================================================
-    /**
-    * Returns the reference to the channel list.
-    *
-    * @return the reference to the channel list.
-    */
-    inline QList<RealTimeSampleArrayChInfo>& chInfo();
-
-    //=========================================================================================================
-    /**
-    * Returns the reference to the orig FiffInfo.
-    *
-    * @return the reference to the orig FiffInfo.
-    */
-    inline FiffInfo::SPtr& getFiffInfo();
-
-    //=========================================================================================================
-    /**
-    * Sets the number of sample vectors which should be gathered before attached observers are notified by calling the Subject notify() method.
-    *
-    * @param [in] ucMultiArraySize the number of values.
-    */
-    inline void setMultiArraySize(unsigned char ucMultiArraySize);
+    inline void setArraySize(unsigned char ucArraySize);
 
     //=========================================================================================================
     /**
@@ -171,15 +157,31 @@ public:
     *
     * @return the number of values which are gathered before a notify() is called.
     */
-    inline unsigned char getMultiArraySize() const;
+    inline unsigned char getArraySize() const;
 
     //=========================================================================================================
     /**
-    * Returns the gathered multi sample array.
+    * Returns the gathered sample array vector.
     *
-    * @return the current multi sample array.
+    * @return the current sample array vector.
     */
-    inline const QVector< VectorXd >& getMultiSampleArray();
+    inline const QVector<double>& getSampleArray();
+
+    //=========================================================================================================
+    /**
+    * Sets the unit of the NewRealTimeSampleArray data.
+    *
+    * @param [in] unit of the data.
+    */
+    inline void setUnit(const QString& unit);
+
+    //=========================================================================================================
+    /**
+    * Returns the unit of the NewRealTimeSampleArray measurement.
+    *
+    * @return the unit of the data of measurement.
+    */
+    inline const QString& getUnit() const;
 
     //=========================================================================================================
     /**
@@ -188,7 +190,7 @@ public:
     *
     * @param [in] v the value which is attached to the sample array vector.
     */
-    virtual void setValue(VectorXd v);
+    virtual void setValue(double v);
 
     //=========================================================================================================
     /**
@@ -197,16 +199,16 @@ public:
     *
     * @return the last attached value.
     */
-    virtual VectorXd getValue() const;
+    virtual double getValue() const;
 
 private:
-    FiffInfo::SPtr              m_pFiffInfo_orig;   /**< Original Fiff Info if initialized by fiff info. */
-
-    double                      m_dSamplingRate;    /**< Sampling rate of the RealTimeSampleArray.*/
-    VectorXd                    m_vecValue;         /**< The current attached sample vector.*/
-    unsigned char               m_ucMultiArraySize; /**< Sample size of the multi sample array.*/
-    QVector< VectorXd >         m_matSamples;       /**< The multi sample array.*/
-    QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
+    double              m_dMinValue;        /**< Holds the minimal value.*/
+    double              m_dMaxValue;        /**< Holds the maximal value.*/
+    double              m_dSamplingRate;    /**< Holds sampling rate of the NewRealTimeSampleArray.*/
+    QString             m_qString_Unit;     /**< Holds unit of the data of the measurement.*/
+    double              m_dValue;           /**< Holds the current attached value.*/
+    unsigned char       m_ucArraySize;      /**< Holds vector size of the sample array vector.*/
+    QVector<double>     m_vecSamples;       /**< Holds the sample array vector.*/
 };
 
 
@@ -215,7 +217,39 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline void NewRealTimeMultiSampleArray::setSamplingRate(double dSamplingRate)
+inline void NewRealTimeSampleArray::setMinValue(double minValue)
+{
+    m_dMinValue = minValue;
+}
+
+
+//*************************************************************************************************************
+
+inline double NewRealTimeSampleArray::getMinValue() const
+{
+    return m_dMinValue;
+}
+
+
+//*************************************************************************************************************
+
+inline void NewRealTimeSampleArray::setMaxValue(double maxValue)
+{
+    m_dMaxValue = maxValue;
+}
+
+
+//*************************************************************************************************************
+
+inline double NewRealTimeSampleArray::getMaxValue() const
+{
+    return m_dMaxValue;
+}
+
+
+//*************************************************************************************************************
+
+inline void NewRealTimeSampleArray::setSamplingRate(double dSamplingRate)
 {
     m_dSamplingRate = dSamplingRate;
 }
@@ -223,7 +257,7 @@ inline void NewRealTimeMultiSampleArray::setSamplingRate(double dSamplingRate)
 
 //*************************************************************************************************************
 
-inline double NewRealTimeMultiSampleArray::getSamplingRate() const
+inline double NewRealTimeSampleArray::getSamplingRate() const
 {
     return m_dSamplingRate;
 }
@@ -231,57 +265,49 @@ inline double NewRealTimeMultiSampleArray::getSamplingRate() const
 
 //*************************************************************************************************************
 
-inline unsigned int NewRealTimeMultiSampleArray::getNumChannels() const
+inline void NewRealTimeSampleArray::setArraySize(unsigned char ucArraySize)
 {
-    return m_qListChInfo.size();
-}
-
-
-//*************************************************************************************************************
-
-inline QList<RealTimeSampleArrayChInfo>& NewRealTimeMultiSampleArray::chInfo()
-{
-    return m_qListChInfo;
-}
-
-
-//*************************************************************************************************************
-
-inline FiffInfo::SPtr& NewRealTimeMultiSampleArray::getFiffInfo()
-{
-    return m_pFiffInfo_orig;
-}
-
-
-//*************************************************************************************************************
-
-inline void NewRealTimeMultiSampleArray::setMultiArraySize(unsigned char ucMultiArraySize)
-{
-    //Obsolete unsigned char can't be bigger
+	//Obsolete unsigned char can't be bigger
 //    if(ucArraySize > 255)
 //        m_ucArraySize = 255;
 //    else
-        m_ucMultiArraySize = ucMultiArraySize;
+        m_ucArraySize = ucArraySize;
 }
 
 
 //*************************************************************************************************************
 
-unsigned char NewRealTimeMultiSampleArray::getMultiArraySize() const
+unsigned char NewRealTimeSampleArray::getArraySize() const
 {
-    return m_ucMultiArraySize;
+    return m_ucArraySize;
 }
 
 
 //*************************************************************************************************************
 
-inline const QVector< VectorXd >& NewRealTimeMultiSampleArray::getMultiSampleArray()
+inline const QVector<double>& NewRealTimeSampleArray::getSampleArray()
 {
-    return m_matSamples;
+    return m_vecSamples;
+}
+
+
+//*************************************************************************************************************
+
+inline void NewRealTimeSampleArray::setUnit(const QString& unit)
+{
+    m_qString_Unit = unit;
+}
+
+
+//*************************************************************************************************************
+
+inline const QString& NewRealTimeSampleArray::getUnit() const
+{
+    return m_qString_Unit;
 }
 
 } // NAMESPACE
 
-Q_DECLARE_METATYPE(XMEASLIB::NewRealTimeMultiSampleArray::SPtr)
+Q_DECLARE_METATYPE(XMEASLIB::NewRealTimeSampleArray::SPtr)
 
-#endif // REALTIMEMULTISAMPLEARRAYNEW_H
+#endif // NEWREALTIMESAMPLEARRAY_H

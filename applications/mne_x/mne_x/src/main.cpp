@@ -42,9 +42,9 @@
 #include "FormFiles/mainwindow.h"
 
 
-#include <xMeas/Measurement/measurementtypes.h>
-#include <xMeas/Measurement/newrealtimemultisamplearray.h>
-#include <xMeas/Measurement/newnumeric.h>
+#include <xMeas/measurementtypes.h>
+#include <xMeas/newrealtimemultisamplearray.h>
+#include <xMeas/newnumeric.h>
 
 #include <mne_x/Management/pluginconnectorconnection.h>
 #include <mne_x/Management/pluginoutputdata.h>
@@ -131,17 +131,17 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
 
 
 
-void debugTest(QSharedPointer<NewRealTimeMultiSampleArray> testData)
-{
-    qDebug() << "Here in debug Test Callback new";
+//void debugTest(QSharedPointer<NewRealTimeMultiSampleArray> testData)
+//{
+//    qDebug() << "Here in debug Test Callback new";
 
-    QVector< VectorXd > matSamples = testData->getMultiSampleArray();
-    qDebug() << "Received data:";
-    for(qint32 i = 0; i < matSamples.size(); ++i)
-        qDebug() << matSamples[i][0];
+//    QVector< VectorXd > matSamples = testData->getMultiSampleArray();
+//    qDebug() << "Received data:";
+//    for(qint32 i = 0; i < matSamples.size(); ++i)
+//        qDebug() << matSamples[i][0];
 
 
-}
+//}
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -183,27 +183,27 @@ int main(int argc, char *argv[])
     qInstallMessageHandler(customMessageHandler);
 
 
-    //DEBUG
-    NewRealTimeMultiSampleArray RTSATest;
-    NewNumeric NumericTest;
+//    //DEBUG
+//    NewRealTimeMultiSampleArray RTSATest;
+//    NewNumeric NumericTest;
 
-    IPlugin* pluginInterface = NULL;
+//    IPlugin* pluginInterface = NULL;
 
-    QSharedPointer< PluginOutputData<NewRealTimeMultiSampleArray> > pluginOutputData(new PluginOutputData<NewRealTimeMultiSampleArray>(pluginInterface, QString("TestPlugin"), QString("No Descr")));
-    QSharedPointer< PluginInputData<NewRealTimeMultiSampleArray> > pluginInputData(new PluginInputData<NewRealTimeMultiSampleArray>(pluginInterface, QString("TestPlugin2"), QString("No Descr2")));
-    pluginInputData->setCallbackMethod(&debugTest);
+//    QSharedPointer< PluginOutputData<NewRealTimeMultiSampleArray> > pluginOutputData(new PluginOutputData<NewRealTimeMultiSampleArray>(pluginInterface, QString("TestPlugin"), QString("No Descr")));
+//    QSharedPointer< PluginInputData<NewRealTimeMultiSampleArray> > pluginInputData(new PluginInputData<NewRealTimeMultiSampleArray>(pluginInterface, QString("TestPlugin2"), QString("No Descr2")));
+//    pluginInputData->setCallbackMethod(&debugTest);
 
-    PluginConnectorConnection outInConnection(pluginOutputData, pluginInputData);
+//    PluginConnectorConnection outInConnection(pluginOutputData, pluginInputData);
 
-    pluginOutputData->data()->init(2);
-    pluginOutputData->data()->setMultiArraySize(2);
+//    pluginOutputData->data()->init(2);
+//    pluginOutputData->data()->setMultiArraySize(2);
 
-    VectorXd v = VectorXd::Zero(2);
-    v[0] = 2.3;
-    pluginOutputData->data()->setValue(v);
-    v[0] = 4.1;
-    pluginOutputData->data()->setValue(v);
-    //DEBUG
+//    VectorXd v = VectorXd::Zero(2);
+//    v[0] = 2.3;
+//    pluginOutputData->data()->setValue(v);
+//    v[0] = 4.1;
+//    pluginOutputData->data()->setValue(v);
+//    //DEBUG
 
 
     return app.exec();

@@ -42,9 +42,8 @@
 
 #include "newrealtimemultisamplearraywidget.h"
 //#include "annotationwindow.h"
-#include "displaymanager.h"
 
-#include <xMeas/Measurement/newrealtimemultisamplearray.h>
+#include <xMeas/newrealtimemultisamplearray.h>
 
 #include <Eigen/Core>
 

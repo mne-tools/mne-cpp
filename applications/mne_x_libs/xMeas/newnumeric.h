@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     measurementtypes.h
+* @file     newnumeric.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the MeasurementTypes class.
+* @brief    Contains the declaration of the Numeric class.
 *
 */
 
-#ifndef MEASUREMENTTYPES_H
-#define MEASUREMENTTYPES_H
+#ifndef NEWNUMERIC_H
+#define NEWNUMERIC_H
 
 
 //*************************************************************************************************************
@@ -42,15 +42,16 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../xmeas_global.h"
+#include "xmeas_global.h"
+#include "newmeasurement.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include <QObject>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -64,32 +65,88 @@ namespace XMEASLIB
 
 //=============================================================================================================
 /**
-* Class MeasurementTypes to register measurement classes to QMetaType types
+* The Numeric class provides a Numeric Measurement.
 *
-* @brief Class MeasurementTypes to register measurement classes to QMetaType types
+* @brief The Numeric class provides a Numeric Measurement.
 */
-class XMEASSHARED_EXPORT MeasurementTypes : public QObject
+class XMEASSHARED_EXPORT NewNumeric : public NewMeasurement
 {
-    Q_OBJECT
 public:
-    //=========================================================================================================
-    /**
-    * Constructs a MeasurementTypes Object.
-    */
-    explicit MeasurementTypes(QObject *parent = 0);
+    typedef QSharedPointer<NewNumeric> SPtr;               /**< Shared pointer type for NewNumeric. */
+    typedef QSharedPointer<const NewNumeric> ConstSPtr;    /**< Const shared pointer type for NewNumeric. */
 
     //=========================================================================================================
     /**
-    * Call to register MeasurementTypes
+    * Constructs a Numeric.
     */
-    static void registerTypes();
-    
-signals:
-    
-public slots:
-    
+    NewNumeric(QObject *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Destroys the Numeric.
+    */
+    virtual ~NewNumeric();
+
+    //=========================================================================================================
+    /**
+    * Sets the unit of the numeric data.
+    *
+    * @param [in] unit of the data.
+    */
+    inline void setUnit(const QString& unit);
+
+    //=========================================================================================================
+    /**
+    * Returns the unit of the numeric measurement.
+    *
+    * @return the unit of the data of measurement.
+    */
+    inline const QString& getUnit() const;
+
+    //=========================================================================================================
+    /**
+    * Sets a value and notify() all attached observers.
+    * This method is inherited by Measurement.
+    *
+    * @param [in] v the value which is set to the Numeric measurement.
+    */
+    virtual void setValue(double v);
+
+    //=========================================================================================================
+    /**
+    * Returns the current value.
+    * This method is inherited by Measurement.
+    *
+    * @return the current value of the Numeric measurement.
+    */
+    virtual double getValue() const;
+
+private:
+    QString m_qString_Unit;     /**< Holds unit of the data of the measurement.*/
+    double  m_dValue;           /**< Holds current set value.*/
 };
 
-} //NAMESPACE
 
-#endif // MEASUREMENTTYPES_H
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline void NewNumeric::setUnit(const QString& unit)
+{
+    m_qString_Unit = unit;
+}
+
+
+//*************************************************************************************************************
+
+inline const QString& NewNumeric::getUnit() const
+{
+    return m_qString_Unit;
+}
+
+} // NAMESPACE
+
+Q_DECLARE_METATYPE(XMEASLIB::NewNumeric::SPtr)
+
+#endif // NUMERIC_H

@@ -138,7 +138,7 @@ void PluginGui::newItemSelected()
 
     if(!pPlugin.isNull() && pPlugin != m_pCurrentPlugin)
     {
-        qWarning() << "new plugin selected:" << pPlugin->getName();
+        qDebug() << "new plugin selected:" << pPlugin->getName();
         m_pCurrentPlugin = pPlugin;
         emit selectedPluginChanged(m_pCurrentPlugin);
     }

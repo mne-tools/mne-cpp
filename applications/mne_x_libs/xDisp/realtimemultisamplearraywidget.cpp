@@ -42,7 +42,6 @@
 
 #include "realtimemultisamplearraywidget.h"
 //#include "annotationwindow.h"
-#include "displaymanager.h"
 
 #include <xMeas/Measurement/realtimemultisamplearray.h>
 

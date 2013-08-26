@@ -52,9 +52,10 @@
 //#include <xMeas/Measurement/realtimesourceestimate.h>
 //#include <xMeas/Measurement/realtimemultisamplearray_new.h>
 //#include <xMeas/Measurement/realtimemultisamplearray.h>
-#include <xMeas/Measurement/newrealtimesamplearray.h>
 //#include <xMeas/Measurement/progressbar.h>
 //#include <xMeas/Measurement/numeric.h>
+
+#include <xMeas/newrealtimesamplearray.h>
 
 
 //*************************************************************************************************************

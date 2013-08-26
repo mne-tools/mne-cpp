@@ -42,7 +42,6 @@
 
 #include "realtimesourceestimatewidget.h"
 //#include "annotationwindow.h"
-#include "displaymanager.h"
 
 #include <xMeas/Measurement/realtimesourceestimate.h>
 

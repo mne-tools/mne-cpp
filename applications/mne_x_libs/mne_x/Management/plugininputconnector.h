@@ -44,7 +44,7 @@
 
 #include "pluginconnector.h"
 
-#include <xMeas/Measurement/newmeasurement.h>
+#include <xMeas/newmeasurement.h>
 
 
 //*************************************************************************************************************

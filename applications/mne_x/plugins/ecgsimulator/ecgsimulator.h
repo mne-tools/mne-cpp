@@ -49,7 +49,7 @@
 #include <mne_x/Interfaces/ISensor.h>
 #include <generics/circularbuffer_old.h>
 
-#include <xMeas/Measurement/newrealtimesamplearray.h>
+#include <xMeas/newrealtimesamplearray.h>
 
 
 //*************************************************************************************************************

@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     realtimesamplearray.cpp
+* @file     measurementtypes.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     August, 2013
 *
 * @section  LICENSE
 *
@@ -29,16 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RealTimeSampleArray class.
+* @brief    Contains the declaration of the MeasurementTypes class.
 *
 */
+
+#ifndef MEASUREMENTTYPES_H
+#define MEASUREMENTTYPES_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "realtimesamplearray.h"
+#include "xmeas_global.h"
 
 
 //*************************************************************************************************************
@@ -46,61 +50,46 @@
 // QT INCLUDES
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace XMEASLIB;
-//using namespace IOBuffer;
+#include <QObject>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE NAMESPACE XMEASLIB
 //=============================================================================================================
 
-RealTimeSampleArray::RealTimeSampleArray()
-: SngChnMeasurement()
-, m_dMinValue(0)
-, m_dMaxValue(65535)
-, m_dSamplingRate(0)
-, m_qString_Unit("")
-, m_ucArraySize(10)
-
+namespace XMEASLIB
 {
 
-}
 
-
-//*************************************************************************************************************
-
-RealTimeSampleArray::~RealTimeSampleArray()
+//=============================================================================================================
+/**
+* Class MeasurementTypes to register measurement classes to QMetaType types
+*
+* @brief Class MeasurementTypes to register measurement classes to QMetaType types
+*/
+class XMEASSHARED_EXPORT MeasurementTypes : public QObject
 {
+    Q_OBJECT
+public:
+    //=========================================================================================================
+    /**
+    * Constructs a MeasurementTypes Object.
+    */
+    explicit MeasurementTypes(QObject *parent = 0);
 
-}
+    //=========================================================================================================
+    /**
+    * Call to register MeasurementTypes
+    */
+    static void registerTypes();
+    
+signals:
+    
+public slots:
+    
+};
 
+} //NAMESPACE
 
-//*************************************************************************************************************
-
-double RealTimeSampleArray::getValue() const
-{
-    return m_dValue;
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeSampleArray::setValue(double v)
-{
-    if(v < m_dMinValue) v = m_dMinValue;
-    else if(v > m_dMaxValue) v = m_dMaxValue;
-    m_dValue = v;
-    m_vecSamples.push_back(m_dValue);
-    if(m_vecSamples.size() >= m_ucArraySize && notifyEnabled)
-    {
-        notify();
-        m_vecSamples.clear();
-    }
-}
+#endif // MEASUREMENTTYPES_H
