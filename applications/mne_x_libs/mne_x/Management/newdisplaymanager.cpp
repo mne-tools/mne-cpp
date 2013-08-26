@@ -39,9 +39,17 @@
 //=============================================================================================================
 
 #include "newdisplaymanager.h"
+
+
+#include <xDisp/newrealtimesamplearraywidget.h>
+#include <xDisp/newrealtimemultisamplearraywidget.h>
+
+#include <xMeas/newrealtimesamplearray.h>
+#include <xMeas/newrealtimemultisamplearray.h>
+
+
 //#include <xDisp/measurementwidget.h>
 //#include <xDisp/numericwidget.h>
-#include <xDisp/newrealtimesamplearraywidget.h>
 //#include <xDisp/realtimemultisamplearraywidget.h>
 //#include <xDisp/realtimemultisamplearray_new_widget.h>
 //#include <xDisp/realtimesourceestimatewidget.h>
@@ -54,8 +62,6 @@
 //#include <xMeas/Measurement/realtimemultisamplearray.h>
 //#include <xMeas/Measurement/progressbar.h>
 //#include <xMeas/Measurement/numeric.h>
-
-#include <xMeas/newrealtimesamplearray.h>
 
 
 //*************************************************************************************************************
@@ -113,10 +119,24 @@ QWidget* NewDisplayManager::show(IPlugin::OutputConnectorList &pOutputConnectorL
             QSharedPointer<NewRealTimeSampleArray>* pNewRealTimeSampleArray = &pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeSampleArray> >()->data();
             NewRealTimeSampleArrayWidget* rtsaWidget = new NewRealTimeSampleArrayWidget(*pNewRealTimeSampleArray, pT);
 
-            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify, rtsaWidget, &NewRealTimeSampleArrayWidget::update, Qt::BlockingQueuedConnection);
+            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
+                    rtsaWidget, &NewRealTimeSampleArrayWidget::update, Qt::BlockingQueuedConnection);
 
             vboxLayout->addWidget(rtsaWidget);
             rtsaWidget->init();
+        }
+        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeMultiSampleArray> >())
+        {
+            qWarning() << "pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeMultiSampleArray> >()";
+
+            QSharedPointer<NewRealTimeMultiSampleArray>* pNewRealTimeMultiSampleArray = &pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeMultiSampleArray> >()->data();
+            NewRealTimeMultiSampleArrayWidget* rtmsaWidget = new NewRealTimeMultiSampleArrayWidget(*pNewRealTimeMultiSampleArray, pT);
+
+            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
+                    rtmsaWidget, &NewRealTimeMultiSampleArrayWidget::update, Qt::BlockingQueuedConnection);
+
+            vboxLayout->addWidget(rtmsaWidget);
+            rtmsaWidget->init();
         }
     }
 

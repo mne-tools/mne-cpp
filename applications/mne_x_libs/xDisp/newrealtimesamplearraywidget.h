@@ -117,9 +117,8 @@ public:
     //=========================================================================================================
     /**
     * Is called when new data are available.
-    * Inherited by IObserver.
     *
-    * @param [in] pSubject pointer to Subject -> not used because its direct attached to the measurement.
+    * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
     */
     virtual void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 

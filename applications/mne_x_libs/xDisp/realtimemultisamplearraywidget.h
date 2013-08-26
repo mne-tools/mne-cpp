@@ -90,7 +90,6 @@ namespace XDISPLIB
 using namespace XMEASLIB;
 
 
-
 //=============================================================================================================
 /**
 * DECLARE CLASS RealTimeMultiSampleArrayWidget
