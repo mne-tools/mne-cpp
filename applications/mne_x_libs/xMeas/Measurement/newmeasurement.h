@@ -196,4 +196,6 @@ inline int NewMeasurement::type() const
 
 } //NAMESPACE
 
+Q_DECLARE_METATYPE(XMEASLIB::NewMeasurement::SPtr)
+
 #endif // NEWMEASUREMENT_H
