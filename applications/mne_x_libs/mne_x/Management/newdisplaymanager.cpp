@@ -115,7 +115,9 @@ QWidget* NewDisplayManager::show(IPlugin::OutputConnectorList &pOutputConnectorL
         {
             qWarning() << "RTSA found!";
 
-            NewRealTimeSampleArrayWidget* rtsaWidget = new NewRealTimeSampleArrayWidget(pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeSampleArray> >()->data(), pT);
+            QSharedPointer<NewRealTimeSampleArray>* p = &pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeSampleArray> >()->data();
+
+            NewRealTimeSampleArrayWidget* rtsaWidget = new NewRealTimeSampleArrayWidget(*p, pT);
 
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify, rtsaWidget, &NewRealTimeSampleArrayWidget::update, Qt::BlockingQueuedConnection);
 

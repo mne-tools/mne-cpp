@@ -109,7 +109,7 @@ public:
     *
     * @return the measurement
     */
-    inline QSharedPointer<T> data();
+    inline QSharedPointer<T> &data();
 
 
     void update();
@@ -133,7 +133,7 @@ inline QSharedPointer< PluginOutputData<T> > PluginOutputData<T>::create(IPlugin
 //*************************************************************************************************************
 
 template <class T>
-inline QSharedPointer<T> PluginOutputData<T>::data()
+inline QSharedPointer<T> &PluginOutputData<T>::data()
 {
     return m_pMeasurement;
 }
