@@ -80,13 +80,24 @@ using namespace XDISPLIB;
 using namespace XMEASLIB;
 
 
+//=============================================================================================================
+/**
+* Tool enumeration.
+*/
+enum Tool
+{
+    Freeze     = 0,     /**< Freezing tool. */
+    Annotation = 1      /**< Annotation tool. */
+};
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NewRealTimeMultiSampleArrayWidget::NewRealTimeMultiSampleArrayWidget(QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA_New, QSharedPointer<QTime> pTime, QWidget* parent)
-: MeasurementWidget(parent)
+NewRealTimeMultiSampleArrayWidget::NewRealTimeMultiSampleArrayWidget(QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA_New, QSharedPointer<QTime> &pTime, QWidget* parent)
+: NewMeasurementWidget(parent)
 , m_pRTMSA_New(pRTMSA_New)
 , m_uiMaxNumChannels(10)
 , m_uiFirstChannel(0)
@@ -101,7 +112,7 @@ NewRealTimeMultiSampleArrayWidget::NewRealTimeMultiSampleArrayWidget(QSharedPoin
 , m_bStartFlag(true)
 , m_ucToolIndex(0)
 , m_pTimerToolDisplay(0)
-, m_pTimerUpdate(0)
+, m_pTimerUpdate(new QTimer(this))
 , m_pTime(pTime)
 , m_pTimeCurrentDisplay(0)
 {
@@ -113,8 +124,7 @@ NewRealTimeMultiSampleArrayWidget::NewRealTimeMultiSampleArrayWidget(QSharedPoin
     m_vecTool.push_back("Annotation");
 
     // Start timer
-    m_pTimerUpdate = new QTimer(this);
-    connect(m_pTimerUpdate, SIGNAL(timeout()), this, SLOT(update()));
+    connect(m_pTimerUpdate.data(), SIGNAL(timeout()), this, SLOT(update())); //ToDo Qt5 syntax
 
     m_pTimerUpdate->start(25);
 
@@ -129,9 +139,6 @@ NewRealTimeMultiSampleArrayWidget::NewRealTimeMultiSampleArrayWidget(QSharedPoin
 
 NewRealTimeMultiSampleArrayWidget::~NewRealTimeMultiSampleArrayWidget()
 {
-    delete m_pTimerToolDisplay;
-    delete m_pTimerUpdate;
-
     // Clear sampling rate vector
     NewRealTimeMultiSampleArrayWidget::s_listSamplingRates.clear();
 }
@@ -210,91 +217,96 @@ void NewRealTimeMultiSampleArrayWidget::minValueChanged(double minValue)
 
 //*************************************************************************************************************
 
-void NewRealTimeMultiSampleArrayWidget::update(Subject*)
+void NewRealTimeMultiSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
 {
-    VectorXd vecValue;
-    QVector< VectorXd > matSamples = m_pRTMSA_New->getMultiSampleArray();
-
-    if(m_bStartFlag)
+    if(m_pRTMSA_New->getMultiSampleArray().size() > 0)
     {
-        m_qMutex.lock();
-        m_iSamples = (qint32)floor((ui.m_qFrame->width() - m_dPosX) / m_dSampleWidth);
+        VectorXd vecValue;
+        QVector< VectorXd > matSamples = m_pRTMSA_New->getMultiSampleArray();
 
-        for(unsigned int k = 0; k < m_uiNumChannels; ++k)
+        if(m_bStartFlag)
         {
-            m_qVecPolygonF[k].clear();
+            m_qMutex.lock();
+            m_iSamples = (qint32)floor((ui.m_qFrame->width() - m_dPosX) / m_dSampleWidth);
 
-            for(qint32 l = 0; l < m_iSamples; ++l)
-                m_qVecPolygonF[k].append(QPointF(m_dPosition+l*m_dSampleWidth, 0));
-        }
-        m_qMutex.unlock();
-        m_bStartFlag = false;
+            for(unsigned int k = 0; k < m_uiNumChannels; ++k)
+            {
+                m_qVecPolygonF[k].clear();
 
-        m_pTimeCurrentDisplay->setHMS(m_pTime->hour(),m_pTime->minute(),m_pTime->second(),m_pTime->msec());
-    }
+                for(qint32 l = 0; l < m_iSamples; ++l)
+                    m_qVecPolygonF[k].append(QPointF(m_dPosition+l*m_dSampleWidth, 0));
+            }
+            m_qMutex.unlock();
+            m_bStartFlag = false;
 
-
-    //Move all samples forward
-    qint32 t_iSamplesToMove =  m_pRTMSA_New->getMultiArraySize();
-
-    if(m_iSamples - t_iSamplesToMove > 0)
-        for(quint32 k = 0; k < m_uiNumChannels; ++k)
-            for(qint32 i = 0; i < m_iSamples - t_iSamplesToMove; ++i)
-                m_qVecPolygonF[k][i].setY(m_qVecPolygonF[k][i+t_iSamplesToMove].ry());
-
-
-    qint32 t_iNewSampleStart = m_iSamples - m_pRTMSA_New->getMultiArraySize();
-
-    for(unsigned char i = 0; i < m_pRTMSA_New->getMultiArraySize(); ++i)//ToDo maybe downsampling here increase step size
-    {
-        vecValue = (matSamples[i].block(m_uiFirstChannel,0,m_uiNumChannels,1).array()*m_fScaleFactor);
-
-        m_qMutex.lock();
-        for(unsigned int k = 0; k < m_uiNumChannels; ++k)
-            m_qVecPolygonF[k][t_iNewSampleStart+i].setY(vecValue[k]);
-        m_qMutex.unlock();
-
-        if(!m_bFrozen)
             m_pTimeCurrentDisplay->setHMS(m_pTime->hour(),m_pTime->minute(),m_pTime->second(),m_pTime->msec());
+        }
 
-//        if((dPositionDifference >= 0) || m_bStartFlag)
-//        {
-//            if(m_bStartFlag)
-//                dPositionDifference = 0;
 
-//            m_qMutex.lock();
-////                    m_qPainterPath = QPainterPath();
-////                    m_qPainterPathTest = QPainterPath();
+        //Move all samples forward
+        qint32 t_iSamplesToMove =  m_pRTMSA_New->getMultiArraySize();
 
-//                m_dPosition = m_dPosX + dPositionDifference;
+        if(m_iSamples - t_iSamplesToMove > 0)
+            for(quint32 k = 0; k < m_uiNumChannels; ++k)
+                for(qint32 i = 0; i < m_iSamples - t_iSamplesToMove; ++i)
+                    m_qVecPolygonF[k][i].setY(m_qVecPolygonF[k][i+t_iSamplesToMove].ry());
 
-////                    m_qPainterPath.moveTo(m_dPosition, m_dPosY-dValue);
-////                    m_qPainterPathTest.moveTo(m_dPosition, m_dPosY-dValue-10);
 
-//                for(unsigned int k = 0; k < m_uiNumChannels; ++k)
-//                {
-//                    m_qVecPainterPath[k] = QPainterPath();
-//                    m_qVecPainterPath[k].moveTo(m_dPosition, m_dPosY-vecValue[k]-k*10); // ToDo offset over PosY has to be relative
-//                }
-//            m_qMutex.unlock();
-//            m_bStartFlag = false;
+        qint32 t_iNewSampleStart = m_iSamples - m_pRTMSA_New->getMultiArraySize();
 
-//            if(!m_bFrozen)
-//                m_pTimeCurrentDisplay->setHMS(m_pTime->hour(),m_pTime->minute(),m_pTime->second(),m_pTime->msec());
-//        }
+        for(unsigned char i = 0; i < m_pRTMSA_New->getMultiArraySize(); ++i)//ToDo maybe downsampling here increase step size
+        {
+            vecValue = (matSamples[i].block(m_uiFirstChannel,0,m_uiNumChannels,1).array()*m_fScaleFactor);
 
-//        else
-//        {
-//            m_qMutex.lock();
-////                    m_qPainterPath.lineTo(m_dPosition, m_dPosY-dValue);
-////                    m_qPainterPathTest.lineTo(m_dPosition, m_dPosY-dValue-10);
-//            for(unsigned int k = 0; k < m_uiNumChannels; ++k)
-//                m_qVecPainterPath[k].lineTo(m_dPosition, m_dPosY-vecValue[k]-k*10); // ToDo offset over PosY vec has to be relative
-//            m_qMutex.unlock();
-//        }
+            m_qMutex.lock();
+            for(unsigned int k = 0; k < m_uiNumChannels; ++k)
+                m_qVecPolygonF[k][t_iNewSampleStart+i].setY(vecValue[k]);
+            m_qMutex.unlock();
 
-//        m_dPosition = m_dPosition + m_dSampleWidth;
+            if(!m_bFrozen)
+                m_pTimeCurrentDisplay->setHMS(m_pTime->hour(),m_pTime->minute(),m_pTime->second(),m_pTime->msec());
+
+    //        if((dPositionDifference >= 0) || m_bStartFlag)
+    //        {
+    //            if(m_bStartFlag)
+    //                dPositionDifference = 0;
+
+    //            m_qMutex.lock();
+    ////                    m_qPainterPath = QPainterPath();
+    ////                    m_qPainterPathTest = QPainterPath();
+
+    //                m_dPosition = m_dPosX + dPositionDifference;
+
+    ////                    m_qPainterPath.moveTo(m_dPosition, m_dPosY-dValue);
+    ////                    m_qPainterPathTest.moveTo(m_dPosition, m_dPosY-dValue-10);
+
+    //                for(unsigned int k = 0; k < m_uiNumChannels; ++k)
+    //                {
+    //                    m_qVecPainterPath[k] = QPainterPath();
+    //                    m_qVecPainterPath[k].moveTo(m_dPosition, m_dPosY-vecValue[k]-k*10); // ToDo offset over PosY has to be relative
+    //                }
+    //            m_qMutex.unlock();
+    //            m_bStartFlag = false;
+
+    //            if(!m_bFrozen)
+    //                m_pTimeCurrentDisplay->setHMS(m_pTime->hour(),m_pTime->minute(),m_pTime->second(),m_pTime->msec());
+    //        }
+
+    //        else
+    //        {
+    //            m_qMutex.lock();
+    ////                    m_qPainterPath.lineTo(m_dPosition, m_dPosY-dValue);
+    ////                    m_qPainterPathTest.lineTo(m_dPosition, m_dPosY-dValue-10);
+    //            for(unsigned int k = 0; k < m_uiNumChannels; ++k)
+    //                m_qVecPainterPath[k].lineTo(m_dPosition, m_dPosY-vecValue[k]-k*10); // ToDo offset over PosY vec has to be relative
+    //            m_qMutex.unlock();
+    //        }
+
+    //        m_dPosition = m_dPosition + m_dSampleWidth;
+        }
     }
+    else
+        qWarning() << "NewRealTimeMultiSampleArrayWidget::update; getMultiArraySize():" << m_pRTMSA_New->getMultiArraySize() << "getMultiSampleArray():" << m_pRTMSA_New->getMultiSampleArray().size();
 }
 
 

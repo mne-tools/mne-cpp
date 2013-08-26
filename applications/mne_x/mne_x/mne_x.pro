@@ -72,32 +72,32 @@ else {
 DESTDIR = $${MNE_BINARY_DIR}
 
 SOURCES += \
-    src/main.cpp \
-    src/startupwidget.cpp \
-    src/runwidget.cpp \
-    src/mainwindow.cpp \
-    src/mainsplashscreen.cpp \
-    src/pluginscene.cpp \
-    src/pluginitem.cpp \
-    src/plugingui.cpp \
-    src/arrow.cpp
+    main.cpp \
+    startupwidget.cpp \
+    runwidget.cpp \
+    mainwindow.cpp \
+    mainsplashscreen.cpp \
+    pluginscene.cpp \
+    pluginitem.cpp \
+    plugingui.cpp \
+    arrow.cpp
 
 HEADERS += \
-    src/info.h \
-    src/startupwidget.h \
-    src/runwidget.h \
-    src/mainwindow.h \
-    src/mainsplashscreen.h \
-    src/pluginscene.h \
-    src/pluginitem.h \
-    src/plugingui.h \
-    src/arrow.h
+    info.h \
+    startupwidget.h \
+    runwidget.h \
+    mainwindow.h \
+    mainsplashscreen.h \
+    pluginscene.h \
+    pluginitem.h \
+    plugingui.h \
+    arrow.h
 
-FORMS   +=
+FORMS +=
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 
 RESOURCES += \
-    res/mainApp.qrc
+    mainApp.qrc
