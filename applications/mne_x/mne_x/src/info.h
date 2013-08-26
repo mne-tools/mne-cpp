@@ -66,9 +66,9 @@ namespace MNEX
 */
 enum LogLevel
 {
-    _LogLvMin,		/**< Minimal log information */
-    _LogLvNormal,	/**< Normal amount of log information */
-    _LogLvMax		/**< Accurate logging */
+    _LogLvMin,      /**< Minimal log information */
+    _LogLvNormal,   /**< Normal amount of log information */
+    _LogLvMax       /**< Accurate logging */
 };
 
 
@@ -78,9 +78,9 @@ enum LogLevel
 */
 enum LogKind
 {
-    _LogKndMessage,		/**< Normal log message */
-    _LogKndWarning,		/**< Warning log message */
-    _LogKndError		/**< Error log message */
+    _LogKndMessage,     /**< Normal log message */
+    _LogKndWarning,     /**< Warning log message */
+    _LogKndError        /**< Error log message */
 };
 
 
@@ -100,10 +100,10 @@ public:
     *
     * @return a string containing the short application name.
     */
-	const static QString AppNameShort()
-	{
+    const static QString AppNameShort()
+    {
         return QObject::tr("MNE-X");
-	}
+    }
 
     //=========================================================================================================
     /**
@@ -126,6 +126,7 @@ public:
     {
         return 0;
     }
+
     //=========================================================================================================
     /**
     * Returns the minor version number of the application which indicates smaller changes of the application.
@@ -136,6 +137,7 @@ public:
     {
         return 9;
     }
+
     //=========================================================================================================
     /**
     * Returns the revision number which indicates the bug fix level.
@@ -146,6 +148,7 @@ public:
     {
         return 0;
     }
+
     //=========================================================================================================
     /**
     * Returns the build number which corresponds to the SVN revision control number.
@@ -156,6 +159,7 @@ public:
     {
         return 224;
     }
+
     //=========================================================================================================
     /**
     * Returns the version number (major.minor.build-revision) of the application.
@@ -170,4 +174,4 @@ public:
 
 } //NAMESPACE
 
-#endif // INFOCSART_H
+#endif // INFO_H

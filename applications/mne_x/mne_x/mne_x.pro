@@ -73,25 +73,25 @@ DESTDIR = $${MNE_BINARY_DIR}
 
 SOURCES += \
     src/main.cpp \
-    src/FormFiles/startupwidget.cpp \
-    src/FormFiles/runwidget.cpp \
-    src/FormFiles/mainwindow.cpp \
-    src/FormFiles/mainsplashscreen.cpp \
-    src/FormFiles/pluginscene.cpp \
-    src/FormFiles/pluginitem.cpp \
-    src/FormFiles/plugingui.cpp \
-    src/FormFiles/arrow.cpp
+    src/startupwidget.cpp \
+    src/runwidget.cpp \
+    src/mainwindow.cpp \
+    src/mainsplashscreen.cpp \
+    src/pluginscene.cpp \
+    src/pluginitem.cpp \
+    src/plugingui.cpp \
+    src/arrow.cpp
 
 HEADERS += \
-    src/FormFiles/startupwidget.h \
-    src/FormFiles/runwidget.h \
-    src/FormFiles/mainwindow.h \
-    src/FormFiles/mainsplashscreen.h \
-    src/preferences/info.h \
-    src/FormFiles/pluginscene.h \
-    src/FormFiles/pluginitem.h \
-    src/FormFiles/plugingui.h \
-    src/FormFiles/arrow.h
+    src/info.h \
+    src/startupwidget.h \
+    src/runwidget.h \
+    src/mainwindow.h \
+    src/mainsplashscreen.h \
+    src/pluginscene.h \
+    src/pluginitem.h \
+    src/plugingui.h \
+    src/arrow.h
 
 FORMS   +=
 
