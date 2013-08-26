@@ -151,7 +151,6 @@ public:
     virtual void init();
 
 protected:
-
     //=========================================================================================================
     /**
     * Is called to paint the incoming real-time data.

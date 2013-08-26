@@ -127,8 +127,6 @@ QWidget* NewDisplayManager::show(IPlugin::OutputConnectorList &pOutputConnectorL
         }
         else if(pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeMultiSampleArray> >())
         {
-            qWarning() << "pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeMultiSampleArray> >()";
-
             QSharedPointer<NewRealTimeMultiSampleArray>* pNewRealTimeMultiSampleArray = &pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeMultiSampleArray> >()->data();
             NewRealTimeMultiSampleArrayWidget* rtmsaWidget = new NewRealTimeMultiSampleArrayWidget(*pNewRealTimeMultiSampleArray, pT);
 

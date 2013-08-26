@@ -221,6 +221,8 @@ void NewRealTimeMultiSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
 {
     if(m_pRTMSA_New->getMultiSampleArray().size() > 0)
     {
+//        qDebug() << "update" << m_pRTMSA_New->getMultiSampleArray().size();
+
         VectorXd vecValue;
         QVector< VectorXd > matSamples = m_pRTMSA_New->getMultiSampleArray();
 

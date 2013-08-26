@@ -288,17 +288,17 @@ void MainWindow::createActions()
     m_pActionNewConfig = new QAction(QIcon(":/images/new.png"), tr("&New configuration"), this);
     m_pActionNewConfig->setShortcuts(QKeySequence::New);
     m_pActionNewConfig->setStatusTip(tr("Create a new configuration"));
-    connect(m_pActionNewConfig, SIGNAL(triggered()), this, SLOT(newPreferences()));
+//    connect(m_pActionNewConfig, SIGNAL(triggered()), this, SLOT(newPreferences()));
 
     m_pActionOpenConfig = new QAction(tr("&Open configuration..."), this);
     m_pActionOpenConfig->setShortcuts(QKeySequence::Open);
     m_pActionOpenConfig->setStatusTip(tr("Open an existing configuration"));
-    connect(m_pActionOpenConfig, SIGNAL(triggered()), this, SLOT(openPreferences()));
+//    connect(m_pActionOpenConfig, SIGNAL(triggered()), this, SLOT(openPreferences()));
 
     m_pActionSaveConfig = new QAction(QIcon(":/images/save.png"), tr("&Save configuration..."), this);
     m_pActionSaveConfig->setShortcuts(QKeySequence::Save);
     m_pActionSaveConfig->setStatusTip(tr("Save the current configuration"));
-    connect(m_pActionSaveConfig, SIGNAL(triggered()), this, SLOT(savePreferences()));
+//    connect(m_pActionSaveConfig, SIGNAL(triggered()), this, SLOT(savePreferences()));
 
     m_pActionExit = new QAction(tr("E&xit"), this);
     m_pActionExit->setShortcuts(QKeySequence::Quit);
