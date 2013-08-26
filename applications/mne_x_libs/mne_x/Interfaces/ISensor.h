@@ -124,15 +124,6 @@ public:
     */
     virtual QWidget* setupWidget() = 0;
 
-    //=========================================================================================================
-    /**
-    * Returns the widget which is shown under configuration tab while running mode.
-    * Pure virtual method inherited by IModule.
-    *
-    * @return the run widget.
-    */
-    virtual QWidget* runWidget() = 0;
-
 protected:
 
     //=========================================================================================================

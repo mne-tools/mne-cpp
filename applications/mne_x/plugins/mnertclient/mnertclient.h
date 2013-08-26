@@ -47,7 +47,7 @@
 #include <mne_x/Interfaces/ISensor.h>
 #include <generics/circularbuffer_old.h>
 #include <generics/circularmatrixbuffer.h>
-#include <xMeas/Measurement/realtimemultisamplearray_new.h>
+#include <xMeas/Measurement/newrealtimemultisamplearray.h>
 
 
 //*************************************************************************************************************
@@ -94,6 +94,7 @@ using namespace MNEX;
 using namespace IOBuffer;
 using namespace RTCLIENTLIB;
 using namespace FIFFLIB;
+using namespace XMEASLIB;
 
 
 //*************************************************************************************************************
@@ -143,14 +144,25 @@ public:
     */
     void clear();
 
+    //=========================================================================================================
+    /**
+    * Clone the plugin
+    */
+    virtual QSharedPointer<IPlugin> clone() const;
+
+    //=========================================================================================================
+    /**
+    * Initialise the MneRtClient.
+    */
+    void init();
+
     virtual bool start();
     virtual bool stop();
 
-    virtual Type getType() const;
-    virtual const char* getName() const;
+    virtual IPlugin::PluginType getType() const;
+    virtual QString getName() const;
 
     virtual QWidget* setupWidget();
-    virtual QWidget* runWidget();
 
 //slots:
     //=========================================================================================================
@@ -198,11 +210,13 @@ protected:
     virtual void run();
 
 private:
+
     //=========================================================================================================
     /**
-    * Initialise the MneRtClient.
+    * Initialises the output connector.
     */
-    void init();
+    void initConnector();
+
 
 
     QMutex rtServerMutex;
@@ -213,7 +227,7 @@ private:
 //    float           m_fSamplingRate;                /**< Holds the sampling rate.*/
 //    int             m_iDownsamplingFactor;          /**< Holds the down sampling factor.*/
 
-    RealTimeMultiSampleArrayNew::SPtr m_pRTMSA_MneRtClient; /**< Holds the RealTimeMultiSampleArray to provide the rt_server Channels.*/
+    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_MneRtClient;   /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
 
     RtCmdClient*       m_pRtCmdClient;      /**< The command client.*/
     bool m_bCmdClientIsConnected;           /**< If the command client is connected.*/

@@ -60,7 +60,6 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}RtClientd \
             -lxMeasd \
             -lxDispd \
-            -lxDtMngd \
             -lmne_xd
 }
 else {
@@ -73,7 +72,6 @@ else {
             -lMNE$${MNE_LIB_VERSION}RtClient \
             -lxMeas \
             -lxDisp \
-            -lxDtMng \
             -lmne_x
 }
 
@@ -82,7 +80,6 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 SOURCES += \
         mnertclient.cpp \
         FormFiles/mnertclientsetupwidget.cpp \
-        FormFiles/mnertclientrunwidget.cpp \
         FormFiles/mnertclientaboutwidget.cpp \
         FormFiles/mnertclientsetupbabymegwidget.cpp \
         FormFiles/mnertclientsetupneuromagwidget.cpp \
@@ -95,7 +92,6 @@ HEADERS += \
         mnertclient.h\
         mnertclient_global.h \
         FormFiles/mnertclientsetupwidget.h \
-        FormFiles/mnertclientrunwidget.h \
         FormFiles/mnertclientaboutwidget.h \
         FormFiles/mnertclientsetupbabymegwidget.h \
         FormFiles/mnertclientsetupneuromagwidget.h \
@@ -106,7 +102,6 @@ HEADERS += \
 
 FORMS += \
         FormFiles/mnertclientsetup.ui \
-        FormFiles/mnertclientrun.ui \
         FormFiles/mnertclientabout.ui \
         FormFiles/mnertclientsetupbabymeg.ui \
         FormFiles/mnertclientsetupneuromag.ui \

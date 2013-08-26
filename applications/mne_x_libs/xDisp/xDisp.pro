@@ -81,7 +81,8 @@ SOURCES += \
         numericwidget.cpp \
         realtimemultisamplearray_new_widget.cpp \
         realtimesourceestimatewidget.cpp \
-        newrealtimesamplearraywidget.cpp
+        newrealtimesamplearraywidget.cpp \
+        newrealtimemultisamplearraywidget.cpp
 
 HEADERS += \
         xdisp_global.h \
@@ -96,7 +97,8 @@ HEADERS += \
         numericwidget.h \
         realtimemultisamplearray_new_widget.h \
         realtimesourceestimatewidget.h \
-        newrealtimesamplearraywidget.h
+        newrealtimesamplearraywidget.h \
+        newrealtimemultisamplearraywidget.h
 
 FORMS += \
     realtimesamplearraywidget.ui \
@@ -109,7 +111,8 @@ FORMS += \
     numericwidget.ui \
     realtimemultisamplearray_new_widget.ui \
     realtimesourceestimatewidget.ui \
-    newrealtimesamplearraywidget.ui
+    newrealtimesamplearraywidget.ui \
+    newrealtimemultisamplearraywidget.ui
 
 UI_DIR = $${PWD}
 

@@ -153,7 +153,10 @@ void NewRealTimeSampleArrayWidget::actualize()
     // Compute new sample width in order to synchronize all RTSA
     //=========================================================================================================
 
-    if((m_pRTSA->getSamplingRate() == 0) || (DisplayManager::getRTSAWidgets().size() == 0))
+//    if((m_pRTSA->getSamplingRate() == 0) || (DisplayManager::getRTSAWidgets().size() == 0))
+//        return;
+
+    if((m_pRTSA->getSamplingRate() == 0))
         return;
 
     // Add current sampling rate to s_listSamplingRates
