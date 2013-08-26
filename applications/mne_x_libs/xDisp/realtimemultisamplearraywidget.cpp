@@ -150,7 +150,9 @@ void RealTimeMultiSampleArrayWidget::actualize()
     // Compute new sample width in order to synchronize all RTSA
     //=========================================================================================================
 
-    if((m_pRTMSA->getSamplingRate() == 0) || (DisplayManager::getRTSAWidgets().size() == 0))
+//    if((m_pRTMSA->getSamplingRate() == 0) || (DisplayManager::getRTSAWidgets().size() == 0))
+//        return;
+    if((m_pRTMSA->getSamplingRate() == 0))
         return;
 
     // Add current sampling rate to s_listSamplingRates
@@ -161,9 +163,9 @@ void RealTimeMultiSampleArrayWidget::actualize()
     foreach (double value, s_listSamplingRates)
         dMax = value > dMax ? value : dMax;
 
-    // Set new sample widths
-    foreach(RealTimeMultiSampleArrayWidget* pRTMSAW, DisplayManager::getRTMSAWidgets().values())
-        pRTMSAW->m_dSampleWidth = dMax/pRTMSAW->m_pRTMSA->getSamplingRate();
+//    // Set new sample widths
+//    foreach(RealTimeMultiSampleArrayWidget* pRTMSAW, DisplayManager::getRTMSAWidgets().values())
+//        pRTMSAW->m_dSampleWidth = dMax/pRTMSAW->m_pRTMSA->getSamplingRate();
 }
 
 

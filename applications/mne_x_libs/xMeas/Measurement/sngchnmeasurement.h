@@ -43,7 +43,6 @@
 //=============================================================================================================
 
 #include "../xmeas_global.h"
-#include "../Nomenclature/nomenclature.h"
 #include "measurement.h"
 
 

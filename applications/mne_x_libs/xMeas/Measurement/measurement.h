@@ -43,7 +43,6 @@
 //=============================================================================================================
 
 #include "../xmeas_global.h"
-#include "../Nomenclature/nomenclature.h"
 #include <generics/observerpattern.h>
 
 
@@ -105,26 +104,6 @@ public:
     */
     inline QString getName() const;
 
-    //ToDo
-//    inline void setModuleID(MDL_ID::Module_ID);
-//    inline MDL_ID::Module_ID getModuleID() const;
-
-    //=========================================================================================================
-    /**
-    * Sets the id of the Measurement.
-    *
-    * @param [in] id which should be set.
-    */
-    inline void setID(MSR_ID::Measurement_ID id); //OLD
-
-    //=========================================================================================================
-    /**
-    * Returns the Measurement id.
-    *
-    * @return the Measurement id.
-    */
-    inline MSR_ID::Measurement_ID getID() const;
-
     //=========================================================================================================
     /**
     * Sets the visibility of the Measurement, whether Measurement is visible at the display or just data are send invisible.
@@ -151,8 +130,6 @@ public:
 
 private:
     QString         m_qString_Name;         /**< Holds the name of the Measurement. */
-//    PLG_ID::Plugin_ID         m_PLG_ID;     /**< Holds the corresponding plugin id. */
-    MSR_ID::Measurement_ID    m_MSR_ID;     /**< Holds the Measurement id. */
     bool m_bVisibility;              /**< Holds the visibility status. */
 };
 
@@ -173,36 +150,6 @@ inline void Measurement::setName(const QString& name)
 inline QString Measurement::getName() const
 {
     return m_qString_Name;
-}
-
-////*************************************************************************************************************
-
-//inline void Measurement::setModuleID(MDL_ID::Module_ID id)
-//{
-//    m_MDL_ID = id;
-//}
-
-
-////*************************************************************************************************************
-
-//inline MDL_ID::Module_ID Measurement::getModuleID() const
-//{
-//    return m_MDL_ID;
-//}
-
-//*************************************************************************************************************
-
-inline void Measurement::setID(MSR_ID::Measurement_ID id)
-{
-    m_MSR_ID = id;
-}
-
-
-//*************************************************************************************************************
-
-inline MSR_ID::Measurement_ID Measurement::getID() const
-{
-    return m_MSR_ID;
 }
 
 

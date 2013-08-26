@@ -140,24 +140,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the widget which is shown under configuration tab while running mode.
-    * Pure virtual method inherited by IPlugin.
-    *
-    * @return the run widget.
-    */
-    virtual QWidget* runWidget() const = 0;
-
-    //=========================================================================================================
-    /**
-    * Is called when new data are available.
-    * Pure virtual method inherited by IObserver.
-    *
-    * @param [in] pSubject pointer to Subject, should be up-cast-able to Measurement and even further.
-    */
-    virtual void update(Subject* pSubject) = 0;
-
-    //=========================================================================================================
-    /**
     * Sets the name of the RTRecord directory.
     *
     * @param [in] dirName name of the RTRecord directory
@@ -174,9 +156,9 @@ protected:
     */
     virtual void run() = 0;
 
-    QString                         m_RTRecordDirName;		/**< Holds the real-time record sub directory name. */
-    typedef QMap<S16, QFile*>       t_FileMap;				/**< Defines a new file mapping type. */
-    t_FileMap                       m_mapFiles;				/**< Holds the file map. */
+    QString                                 m_RTRecordDirName;  /**< the real-time record sub directory name. */
+    typedef QMap<unsigned short, QFile*>    t_FileMap;          /**< Defines a new file mapping type. */
+    t_FileMap                               m_mapFiles;         /**< the file map. */
 };
 
 

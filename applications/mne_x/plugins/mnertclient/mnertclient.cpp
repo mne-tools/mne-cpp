@@ -42,7 +42,6 @@
 #include "mnertclientproducer.h"
 
 #include "FormFiles/mnertclientsetupwidget.h"
-#include "FormFiles/mnertclientrunwidget.h"
 
 #include <utils/ioutils.h>
 
@@ -75,32 +74,16 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 MneRtClient::MneRtClient()
-: m_pRTMSA_MneRtClient(0)
-, m_sMneRtClientClientAlias("mne-x")
+: m_sMneRtClientClientAlias("mne-x")
 , m_pRtCmdClient(NULL)
 , m_pMneRtClientProducer(new MneRtClientProducer(this))
 , m_sMneRtClientIP("127.0.0.1")//("172.21.16.88")//("127.0.0.1")
 , m_bCmdClientIsConnected(false)
 , m_iBufferSize(-1)
 , m_pRawMatrixBuffer_In(NULL)
+/*m_pRTMSA_MneRtClient(0)*/
 {
-    m_PLG_ID = PLG_ID::MNERTCLIENT;
 
-    // Start MneRtClientProducer
-    m_pMneRtClientProducer->start();
-
-
-//    //Convinience CMD connection timer --> ToDo get rid of that -> it interrupts acquistion when not connected
-//    connect(&m_cmdConnectionTimer, &QTimer::timeout, this, &MneRtClient::connectCmdClient);
-
-    //init channels when fiff info is available
-    connect(this, &MneRtClient::fiffInfoAvailable, this, &MneRtClient::init);
-
-//    //Start convinience timer
-//    m_cmdConnectionTimer.start(5000);
-
-    //Try to connect the cmd client on start up using localhost connection
-    this->connectCmdClient();
 }
 
 
@@ -113,6 +96,72 @@ MneRtClient::~MneRtClient()
 
     if(m_pRawMatrixBuffer_In)
         delete m_pRawMatrixBuffer_In;
+}
+
+
+//*************************************************************************************************************
+
+QSharedPointer<IPlugin> MneRtClient::clone() const
+{
+    QSharedPointer<MneRtClient> pMneRtClientClone(new MneRtClient());
+    return pMneRtClientClone;
+}
+
+
+//*************************************************************************************************************
+
+void MneRtClient::init()
+{
+    // Start MneRtClientProducer
+    m_pMneRtClientProducer->start();
+
+
+//    //Convinience CMD connection timer --> ToDo get rid of that -> it interrupts acquistion when not connected
+//    connect(&m_cmdConnectionTimer, &QTimer::timeout, this, &MneRtClient::connectCmdClient);
+
+    //init channels when fiff info is available
+    connect(this, &MneRtClient::fiffInfoAvailable, this, &MneRtClient::initConnector);
+
+//    //Start convinience timer
+//    m_cmdConnectionTimer.start(5000);
+
+    //Try to connect the cmd client on start up using localhost connection
+    this->connectCmdClient();
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Create measurement instances and config them
+//=============================================================================================================
+
+void MneRtClient::initConnector()
+{
+
+
+    qDebug() << "MneRtClient::init()";
+
+//    if(m_pFiffInfo)
+//    {
+////        m_pFiffInfo->sfreq /= 100;
+//        m_pRTMSA_MneRtClient = addProviderRealTimeMultiSampleArray_New(MSR_ID::MEGMNERTCLIENT_OUTPUT);
+//        m_pRTMSA_MneRtClient->initFromFiffInfo(m_pFiffInfo);
+//        m_pRTMSA_MneRtClient->setMultiArraySize(10);
+//    }
+
+
+    if(m_pFiffInfo)
+    {
+        m_pRTMSA_MneRtClient = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "RtClient", "MNE Rt Client");
+
+        m_pRTMSA_MneRtClient->data()->initFromFiffInfo(m_pFiffInfo);
+        m_pRTMSA_MneRtClient->data()->setMultiArraySize(10);
+
+        m_pRTMSA_MneRtClient->data()->setVisibility(true);
+
+        m_outputConnectors.append(m_pRTMSA_MneRtClient);
+    }
+
 }
 
 
@@ -315,7 +364,7 @@ bool MneRtClient::stop()
 
 //*************************************************************************************************************
 
-Type MneRtClient::getType() const
+IPlugin::PluginType MneRtClient::getType() const
 {
     return _ISensor;
 }
@@ -323,7 +372,7 @@ Type MneRtClient::getType() const
 
 //*************************************************************************************************************
 
-const char* MneRtClient::getName() const
+QString MneRtClient::getName() const
 {
     return "RT Client";
 }
@@ -343,35 +392,6 @@ QWidget* MneRtClient::setupWidget()
 
 //*************************************************************************************************************
 
-QWidget* MneRtClient::runWidget()
-{
-    MneRtClientRunWidget* widget = new MneRtClientRunWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
-    return widget;
-}
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Create measurement instances and config them
-//=============================================================================================================
-
-void MneRtClient::init()
-{
-    qDebug() << "MneRtClient::init()";
-
-    if(m_pFiffInfo)
-    {
-//        m_pFiffInfo->sfreq /= 100;
-        m_pRTMSA_MneRtClient = addProviderRealTimeMultiSampleArray_New(MSR_ID::MEGMNERTCLIENT_OUTPUT);
-        m_pRTMSA_MneRtClient->initFromFiffInfo(m_pFiffInfo);
-        m_pRTMSA_MneRtClient->setMultiArraySize(10);
-        m_pRTMSA_MneRtClient->setVisibility(true);
-    }
-}
-
-
-//*************************************************************************************************************
-
 void MneRtClient::run()
 {
 
@@ -383,9 +403,9 @@ void MneRtClient::run()
 //        std::cout << "matValue " << matValue.block(0,0,1,10) << std::endl;
 
         //emit values
-        for(qint32 i = 0; i < matValue.cols(); ++i)
-            m_pRTMSA_MneRtClient->setValue(matValue.col(i).cast<double>());
-//        for(qint32 i = 0; i < matValue.cols(); i += 100)
+//        for(qint32 i = 0; i < matValue.cols(); ++i)
 //            m_pRTMSA_MneRtClient->setValue(matValue.col(i).cast<double>());
+////        for(qint32 i = 0; i < matValue.cols(); i += 100)
+////            m_pRTMSA_MneRtClient->setValue(matValue.col(i).cast<double>());
     }
 }

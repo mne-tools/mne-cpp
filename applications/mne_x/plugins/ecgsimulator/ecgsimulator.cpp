@@ -42,7 +42,6 @@
 #include "ecgproducer.h"
 
 #include "FormFiles/ecgsetupwidget.h"
-#include "FormFiles/ecgrunwidget.h"
 
 #include <iostream>
 
@@ -64,7 +63,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ECGSimulatorModule;
+using namespace ECGSimulatorPlugin;
 using namespace XMEASLIB;
 
 
@@ -105,7 +104,6 @@ ECGSimulator::~ECGSimulator()
 QSharedPointer<IPlugin> ECGSimulator::clone() const
 {
     QSharedPointer<ECGSimulator> pECGSimulatorClone(new ECGSimulator());
-
     return pECGSimulatorClone;
 }
 
@@ -238,15 +236,6 @@ QWidget* ECGSimulator::setupWidget()
     widget->initSelectedChannelFile();
     widget->initChannelStates();
 
-    return widget;
-}
-
-
-//*************************************************************************************************************
-
-QWidget* ECGSimulator::runWidget()
-{
-    ECGRunWidget* widget = new ECGRunWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
     return widget;
 }
 

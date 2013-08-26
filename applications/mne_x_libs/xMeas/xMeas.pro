@@ -80,9 +80,6 @@ SOURCES += \
     Measurement/realtimemultisamplearray.cpp \
     Measurement/progressbar.cpp \
     Measurement/numeric.cpp \
-    Nomenclature/nomenclature.cpp \
-    Measurement/IMeasurementSink.cpp \
-    Measurement/IMeasurementSource.cpp \
     Measurement/sngchnmeasurement.cpp \
     Measurement/measurement.cpp \
     Measurement/mltchnmeasurement.cpp \
@@ -103,8 +100,6 @@ HEADERS += \
     Measurement/progressbar.h \
     Measurement/numeric.h \
     Nomenclature/nomenclature.h \
-    Measurement/IMeasurementSink.h \
-    Measurement/IMeasurementSource.h \
     Measurement/sngchnmeasurement.h \
     Measurement/measurement.h \
     Measurement/mltchnmeasurement.h \

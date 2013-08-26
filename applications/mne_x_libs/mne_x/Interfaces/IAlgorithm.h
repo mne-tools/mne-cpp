@@ -42,15 +42,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <xMeas/Nomenclature/nomenclature.h>
+#include "IPlugin.h"
 
-#include <xMeas/Measurement/IMeasurementSource.h>
-#include <xMeas/Measurement/IMeasurementSink.h>
 
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
 
 #include <QSharedPointer>
-
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -67,7 +67,7 @@ namespace MNEX
 *
 * @brief The IAlgorithm class provides an interface for a real-time algorithm plugin.
 */
-class IAlgorithm : public XMEASLIB::IMeasurementSource, public XMEASLIB::IMeasurementSink
+class IAlgorithm : public IPlugin
 {
 //ToDo virtual methods of IMeasurementSink && IMeasurementSource
 public:
@@ -131,26 +131,7 @@ public:
     */
     virtual QWidget* setupWidget() = 0; //setup();
 
-    //=========================================================================================================
-    /**
-    * Returns the widget which is shown under configuration tab while running mode.
-    * Pure virtual method inherited by IPlugin.
-    *
-    * @return the run widget.
-    */
-    virtual QWidget* runWidget() = 0;
-
-    //=========================================================================================================
-    /**
-    * Is called when new data are available.
-    * Pure virtual method inherited by IObserver.
-    *
-    * @param [in] pSubject pointer to Subject, should be up-cast-able to Measurement and even further.
-    */
-    virtual void update(Subject* pSubject) = 0;
-
 protected:
-
     //=========================================================================================================
     /**
     * The starting point for the thread. After calling start(), the newly created thread calls this function.

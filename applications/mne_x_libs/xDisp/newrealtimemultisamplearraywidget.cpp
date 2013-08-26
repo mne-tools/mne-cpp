@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     realtimesamplearraywidget.cpp
+* @file     realtimesamplearray_new_widget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the RealTimeSampleArrayWidget Class.
+* @brief    Implementation of the NewRealTimeMultiSampleArrayWidget Class.
 *
 */
 
@@ -40,10 +40,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "realtimesamplearraywidget.h"
+#include "newrealtimemultisamplearraywidget.h"
 //#include "annotationwindow.h"
 #include "displaymanager.h"
-#include <xMeas/Measurement/realtimesamplearray.h>
+
+#include <xMeas/Measurement/newrealtimemultisamplearray.h>
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -64,6 +67,8 @@
 #include <QTimer>
 #include <QTime>
 
+#include <QMessageBox>
+
 #include <QDebug>
 
 
@@ -81,9 +86,11 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeSampleArrayWidget::RealTimeSampleArrayWidget(QSharedPointer<RealTimeSampleArray> pRTSA, QSharedPointer<QTime> pTime, QWidget* parent)
+NewRealTimeMultiSampleArrayWidget::NewRealTimeMultiSampleArrayWidget(QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA_New, QSharedPointer<QTime> pTime, QWidget* parent)
 : MeasurementWidget(parent)
-, m_pRTSA(pRTSA)
+, m_pRTMSA_New(pRTMSA_New)
+, m_uiMaxNumChannels(10)
+, m_uiFirstChannel(0)
 , m_bMeasurement(false)
 , m_bPosition(true)
 , m_bFrozen(false)
@@ -121,39 +128,41 @@ RealTimeSampleArrayWidget::RealTimeSampleArrayWidget(QSharedPointer<RealTimeSamp
 
 //*************************************************************************************************************
 
-RealTimeSampleArrayWidget::~RealTimeSampleArrayWidget()
+NewRealTimeMultiSampleArrayWidget::~NewRealTimeMultiSampleArrayWidget()
 {
     delete m_pTimerToolDisplay;
     delete m_pTimerUpdate;
 
     // Clear sampling rate vector
-    RealTimeSampleArrayWidget::s_listSamplingRates.clear();
+    NewRealTimeMultiSampleArrayWidget::s_listSamplingRates.clear();
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeSampleArrayWidget::actualize()
+void NewRealTimeMultiSampleArrayWidget::actualize()
 {
-    m_dPosY = ui.m_qFrame->pos().y()+0.5*ui.m_qFrame->height();
+    m_dPosY = ui.m_qFrame->pos().y();//+0.5*ui.m_qFrame->height();
 
 
     // Compute scaling factor
-    m_fScaleFactor = ui.m_qFrame->height()/static_cast<float>(m_pRTSA->getMaxValue()-m_pRTSA->getMinValue());
+    m_fScaleFactor = ui.m_qFrame->height()/static_cast<float>(m_pRTMSA_New->chInfo()[0].getMaxValue()-m_pRTMSA_New->chInfo()[0].getMinValue());
 
     // Compute the middle of RTSA values
-    m_dMiddle = 0.5*(m_pRTSA->getMinValue()+m_pRTSA->getMaxValue())*m_fScaleFactor;
+    m_dMiddle = 0.5*(m_pRTMSA_New->chInfo()[0].getMinValue()+m_pRTMSA_New->chInfo()[0].getMaxValue())*m_fScaleFactor;
 
     //*********************************************************************************************************
     //=========================================================================================================
     // Compute new sample width in order to synchronize all RTSA
     //=========================================================================================================
 
-//    if((m_pRTSA->getSamplingRate() == 0) || (DisplayManager::getRTSAWidgets().size() == 0))
+//    if((m_pRTMSA_New->getSamplingRate() == 0) || (DisplayManager::getRTSAWidgets().size() == 0))
 //        return;
+    if((m_pRTMSA_New->getSamplingRate() == 0))
+        return;
 
     // Add current sampling rate to s_listSamplingRates
-    RealTimeSampleArrayWidget::s_listSamplingRates << m_pRTSA->getSamplingRate();
+    NewRealTimeMultiSampleArrayWidget::s_listSamplingRates << m_pRTMSA_New->getSamplingRate();
 
     // Find maximal sampling rate in s_listSamplingRates
     double dMax = 0;
@@ -161,14 +170,14 @@ void RealTimeSampleArrayWidget::actualize()
         dMax = value > dMax ? value : dMax;
 
 //    // Set new sample widths
-//    foreach(RealTimeSampleArrayWidget* pRTSAW, DisplayManager::getRTSAWidgets().values())
-//        pRTSAW->m_dSampleWidth = dMax/pRTSAW->m_pRTSA->getSamplingRate();
+//    foreach(NewRealTimeMultiSampleArrayWidget* pRTMSAW, DisplayManager::getRTMSANewWidgets().values())
+//        pRTMSAW->m_dSampleWidth = dMax/pRTMSAW->m_pRTMSA_New->getSamplingRate();
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeSampleArrayWidget::stopAnnotation()
+void NewRealTimeMultiSampleArrayWidget::stopAnnotation()
 {
     m_bToolInUse = !m_bToolInUse;
 }
@@ -176,9 +185,12 @@ void RealTimeSampleArrayWidget::stopAnnotation()
 
 //*************************************************************************************************************
 
-void RealTimeSampleArrayWidget::maxValueChanged(double maxValue)
+void NewRealTimeMultiSampleArrayWidget::maxValueChanged(double maxValue)
 {
-    m_pRTSA->setMaxValue(maxValue);
+//    m_pRTMSA_New->setMaxValue(maxValue);
+    for(quint32 i = 0; i < m_pRTMSA_New->getNumChannels(); ++i)
+            m_pRTMSA_New->chInfo()[i].setMaxValue(maxValue);
+
 //    ui.m_qLabel_MaxValue->setText(QString::number(maxValue));
     actualize();
 }
@@ -186,9 +198,12 @@ void RealTimeSampleArrayWidget::maxValueChanged(double maxValue)
 
 //*************************************************************************************************************
 
-void RealTimeSampleArrayWidget::minValueChanged(double minValue)
+void NewRealTimeMultiSampleArrayWidget::minValueChanged(double minValue)
 {
-    m_pRTSA->setMinValue(minValue);
+//    m_pRTMSA_New->setMinValue(minValue);
+    for(quint32 i = 0; i < m_pRTMSA_New->getNumChannels(); ++i)
+        m_pRTMSA_New->chInfo()[i].setMaxValue(minValue);
+
 //    ui.m_qLabel_MinValue->setText(QString::number(minValue));
     actualize();
 }
@@ -196,54 +211,106 @@ void RealTimeSampleArrayWidget::minValueChanged(double minValue)
 
 //*************************************************************************************************************
 
-void RealTimeSampleArrayWidget::update(Subject*)
+void NewRealTimeMultiSampleArrayWidget::update(Subject*)
 {
-    double dValue = 0;
-    double dPositionDifference = 0.0;
-    QVector<double> vecSamples = m_pRTSA->getSampleArray();
-    for(unsigned char i = 0; i < m_pRTSA->getArraySize(); ++i)
+    VectorXd vecValue;
+    QVector< VectorXd > matSamples = m_pRTMSA_New->getMultiSampleArray();
+
+    if(m_bStartFlag)
     {
-        dValue = vecSamples[i]*m_fScaleFactor - m_dMiddle;
-        dPositionDifference = m_dPosition - (m_dPosX+ui.m_qFrame->width());
+        m_qMutex.lock();
+        m_iSamples = (qint32)floor((ui.m_qFrame->width() - m_dPosX) / m_dSampleWidth);
 
-        if((dPositionDifference >= 0) || m_bStartFlag)
+        for(unsigned int k = 0; k < m_uiNumChannels; ++k)
         {
-            if(m_bStartFlag)
-                dPositionDifference = 0;
+            m_qVecPolygonF[k].clear();
 
-            m_qMutex.lock();
-                m_qPainterPath = QPainterPath();
-                m_dPosition = m_dPosX + dPositionDifference;
-                m_qPainterPath.moveTo(m_dPosition, m_dPosY-dValue);
-            m_qMutex.unlock();
-            m_bStartFlag = false;
-
-            if(!m_bFrozen)
-                m_pTimeCurrentDisplay->setHMS(m_pTime->hour(),m_pTime->minute(),m_pTime->second(),m_pTime->msec());
+            for(qint32 l = 0; l < m_iSamples; ++l)
+                m_qVecPolygonF[k].append(QPointF(m_dPosition+l*m_dSampleWidth, 0));
         }
+        m_qMutex.unlock();
+        m_bStartFlag = false;
 
-        else
-        {
-            m_qMutex.lock();
-                m_qPainterPath.lineTo(m_dPosition, m_dPosY-dValue);
-            m_qMutex.unlock();
-        }
+        m_pTimeCurrentDisplay->setHMS(m_pTime->hour(),m_pTime->minute(),m_pTime->second(),m_pTime->msec());
+    }
 
-        m_dPosition = m_dPosition + m_dSampleWidth;
+
+    //Move all samples forward
+    qint32 t_iSamplesToMove =  m_pRTMSA_New->getMultiArraySize();
+
+    if(m_iSamples - t_iSamplesToMove > 0)
+        for(quint32 k = 0; k < m_uiNumChannels; ++k)
+            for(qint32 i = 0; i < m_iSamples - t_iSamplesToMove; ++i)
+                m_qVecPolygonF[k][i].setY(m_qVecPolygonF[k][i+t_iSamplesToMove].ry());
+
+
+    qint32 t_iNewSampleStart = m_iSamples - m_pRTMSA_New->getMultiArraySize();
+
+    for(unsigned char i = 0; i < m_pRTMSA_New->getMultiArraySize(); ++i)//ToDo maybe downsampling here increase step size
+    {
+        vecValue = (matSamples[i].block(m_uiFirstChannel,0,m_uiNumChannels,1).array()*m_fScaleFactor);
+
+        m_qMutex.lock();
+        for(unsigned int k = 0; k < m_uiNumChannels; ++k)
+            m_qVecPolygonF[k][t_iNewSampleStart+i].setY(vecValue[k]);
+        m_qMutex.unlock();
+
+        if(!m_bFrozen)
+            m_pTimeCurrentDisplay->setHMS(m_pTime->hour(),m_pTime->minute(),m_pTime->second(),m_pTime->msec());
+
+//        if((dPositionDifference >= 0) || m_bStartFlag)
+//        {
+//            if(m_bStartFlag)
+//                dPositionDifference = 0;
+
+//            m_qMutex.lock();
+////                    m_qPainterPath = QPainterPath();
+////                    m_qPainterPathTest = QPainterPath();
+
+//                m_dPosition = m_dPosX + dPositionDifference;
+
+////                    m_qPainterPath.moveTo(m_dPosition, m_dPosY-dValue);
+////                    m_qPainterPathTest.moveTo(m_dPosition, m_dPosY-dValue-10);
+
+//                for(unsigned int k = 0; k < m_uiNumChannels; ++k)
+//                {
+//                    m_qVecPainterPath[k] = QPainterPath();
+//                    m_qVecPainterPath[k].moveTo(m_dPosition, m_dPosY-vecValue[k]-k*10); // ToDo offset over PosY has to be relative
+//                }
+//            m_qMutex.unlock();
+//            m_bStartFlag = false;
+
+//            if(!m_bFrozen)
+//                m_pTimeCurrentDisplay->setHMS(m_pTime->hour(),m_pTime->minute(),m_pTime->second(),m_pTime->msec());
+//        }
+
+//        else
+//        {
+//            m_qMutex.lock();
+////                    m_qPainterPath.lineTo(m_dPosition, m_dPosY-dValue);
+////                    m_qPainterPathTest.lineTo(m_dPosition, m_dPosY-dValue-10);
+//            for(unsigned int k = 0; k < m_uiNumChannels; ++k)
+//                m_qVecPainterPath[k].lineTo(m_dPosition, m_dPosY-vecValue[k]-k*10); // ToDo offset over PosY vec has to be relative
+//            m_qMutex.unlock();
+//        }
+
+//        m_dPosition = m_dPosition + m_dSampleWidth;
     }
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeSampleArrayWidget::init()
+void NewRealTimeMultiSampleArrayWidget::init()
 {
-    ui.m_qLabel_Caption->setText(m_pRTSA->getName());
-//    ui.m_qLabel_MinValue->setText(QString::number(m_pRTSA->getMinValue()));
-//    ui.m_qLabel_MaxValue->setText(QString::number(m_pRTSA->getMaxValue()));
+    ui.m_qLabel_Caption->setText(m_pRTMSA_New->getName());
+//    ui.m_qLabel_MinValue->setText(QString::number(m_pRTSM->getMinValue()));
+//    ui.m_qLabel_MaxValue->setText(QString::number(m_pRTSM->getMaxValue()));
 
-    m_dMinValue_init = m_pRTSA->getMinValue();
-    m_dMaxValue_init = m_pRTSA->getMaxValue();
+    m_uiNumChannels = m_pRTMSA_New->getNumChannels() > m_uiMaxNumChannels ? m_uiMaxNumChannels : m_pRTMSA_New->getNumChannels();
+
+    m_dMinValue_init = m_pRTMSA_New->chInfo()[0].getMinValue();
+    m_dMaxValue_init = m_pRTMSA_New->chInfo()[0].getMaxValue();
 
 
     // Set drawing start position in X and Y direction
@@ -251,7 +318,22 @@ void RealTimeSampleArrayWidget::init()
     m_dPosition = m_dPosX;
 //    m_dPosY = ui.m_qFrame->pos().y()+0.5*ui.m_qFrame->height();// set to actualize
 
-    m_qPainterPath = QPainterPath();
+//    m_qPainterPath = QPainterPath();
+//    m_qPainterPathTest = QPainterPath();
+
+
+
+
+//    m_qVecPainterPath.clear();
+//    for(unsigned int i = 0; i < m_uiNumChannels; ++i)
+//        m_qVecPainterPath.push_back(QPainterPath());
+
+
+    m_qVecPolygonF.clear();
+    for(unsigned int i = 0; i < m_uiNumChannels; ++i)
+        m_qVecPolygonF.push_back(QPolygonF());
+
+
     m_bStartFlag = true;
 
     m_pTimeCurrentDisplay = QSharedPointer<QTime>(new QTime(0, 0));
@@ -262,7 +344,7 @@ void RealTimeSampleArrayWidget::init()
 
 //*************************************************************************************************************
 
-void RealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
+void NewRealTimeMultiSampleArrayWidget::paintEvent(QPaintEvent*)
 {
     QPainter painter(this);
 
@@ -283,8 +365,8 @@ void RealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
     // Draw grid in X direction (each 100ms)
     //=============================================================================================================
 
-    double dNumPixelsX = m_pRTSA->getSamplingRate()/10.0f;
-    double dMinMaxDifference = static_cast<double>(m_pRTSA->getMaxValue()-m_pRTSA->getMinValue());
+    double dNumPixelsX = m_pRTMSA_New->getSamplingRate()/10.0f;
+    double dMinMaxDifference = static_cast<double>(m_pRTMSA_New->chInfo()[0].getMaxValue()-m_pRTMSA_New->chInfo()[0].getMinValue());
     double dActualPosX = 0.0;
     unsigned short usNumOfGridsX = (unsigned short)(ui.m_qFrame->width()/dNumPixelsX);
     unsigned short usPosY = ui.m_qFrame->pos().y()+1;
@@ -309,7 +391,7 @@ void RealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
 
     int NumOfLines = (int)floor(dMinMaxDifference/(dim*5));
 
-    double dDifferenceToFirstLine = (m_pRTSA->getMaxValue()-floor(m_pRTSA->getMaxValue()/dim)*dim);
+    double dDifferenceToFirstLine = (m_pRTMSA_New->chInfo()[0].getMaxValue()-floor(m_pRTMSA_New->chInfo()[0].getMaxValue()/dim)*dim);
 
     double dNumPixelsY = usHeight/NumOfLines;//10.0f;
     double dActualPosY = usPosY + dDifferenceToFirstLine * (usHeight/dMinMaxDifference);
@@ -321,12 +403,12 @@ void RealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
     }
 
     //Paint middle value
-//	painter.setPen(QPen(Qt::gray, 1, Qt::SolidLine));
-//	painter.drawText(usWidth-75, usHeight/2, tr("%1%2").arg(m_dMiddle, 0, 'f', 2).arg(m_pRTSA->getUnit()));
-//	painter.setPen(QPen(Qt::gray, 1, Qt::DotLine));
-//	painter.drawLine(m_dPosX, usHeight/2, usWidth, usHeight/2);
+//  painter.setPen(QPen(Qt::gray, 1, Qt::SolidLine));
+//  painter.drawText(usWidth-75, usHeight/2, tr("%1%2").arg(m_dMiddle, 0, 'f', 2).arg(m_pRTSM->getUnit()));
+//  painter.setPen(QPen(Qt::gray, 1, Qt::DotLine));
+//  painter.drawLine(m_dPosX, usHeight/2, usWidth, usHeight/2);
 
-    painter.setPen(QPen(Qt::blue, 1, Qt::SolidLine));
+    painter.setPen(QPen(Qt::darkBlue, 1, Qt::SolidLine));
     painter.setRenderHint(QPainter::Antialiasing);
 
 
@@ -335,18 +417,33 @@ void RealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
     // Draw real time curve respectively frozen curve
     //=============================================================================================================
 
+    painter.save();
+    qint32 t_iDist = ui.m_qFrame->height() / (m_uiNumChannels+1);
+
     if(m_bFrozen)
     {
         painter.setPen(QPen(Qt::darkGray, 1, Qt::SolidLine));
-        painter.drawPath(m_qPainterPath_Freeze);
+
+        for(quint32 k = 0; k < m_uiNumChannels; ++k)
+        {
+            painter.translate(0, t_iDist);
+            painter.drawPolyline(m_qVecPolygonF_Freeze[k]);
+            painter.drawText(0, -t_iDist/2, m_pRTMSA_New->chInfo()[m_uiFirstChannel+k].getChannelName());
+        }
     }
     else
     {
         m_qMutex.lock();
-            painter.drawPath(m_qPainterPath);
+        for(quint32 k = 0; k < m_uiNumChannels; ++k)
+        {
+            painter.translate(0, t_iDist);
+            painter.drawPolyline(m_qVecPolygonF[k]);
+            painter.drawText(0, -t_iDist/2, m_pRTMSA_New->chInfo()[m_uiFirstChannel+k].getChannelName());
+        }
         m_qMutex.unlock();
     }
 
+    painter.restore();
 
     //*************************************************************************************************************
     //=============================================================================================================
@@ -369,30 +466,30 @@ void RealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
         {
             double changeValue = scale * iPixelDifferenceY;
 
-        	if(changeValue*2 < m_dMaxValue_init - m_dMinValue_init)
-        	{
-				minValueChanged(m_dMinValue_init + changeValue);
-				maxValueChanged(m_dMaxValue_init - changeValue);
-        	}
-        	else
-        	{
-        		double maxChange = (m_dMaxValue_init - m_dMinValue_init)*0.499999;
-				minValueChanged(m_dMinValue_init + maxChange);
-				maxValueChanged(m_dMaxValue_init - maxChange);
-        	}
+            if(changeValue*2 < m_dMaxValue_init - m_dMinValue_init)
+            {
+                minValueChanged(m_dMinValue_init + changeValue);
+                maxValueChanged(m_dMaxValue_init - changeValue);
+            }
+            else
+            {
+                double maxChange = (m_dMaxValue_init - m_dMinValue_init)*0.499999;
+                minValueChanged(m_dMinValue_init + maxChange);
+                maxValueChanged(m_dMaxValue_init - maxChange);
+            }
         }
         else
         {
             double changeValue = scale * iPixelDifferenceY*10;
 
-        	minValueChanged(m_dMinValue_init - changeValue);
-			maxValueChanged(m_dMaxValue_init + changeValue);
+            minValueChanged(m_dMinValue_init - changeValue);
+            maxValueChanged(m_dMaxValue_init + changeValue);
         }
 
-        double factor = (m_dMaxValue_init-m_dMinValue_init)/(m_pRTSA->getMaxValue()-m_pRTSA->getMinValue());
-		// Draw text
-		painter.setPen(QPen(Qt::darkCyan, 1, Qt::SolidLine));
-		painter.drawText(iStartX+8, iEndY, tr("Zoom %1x").arg(factor, 0, 'f', 2));
+        double factor = (m_dMaxValue_init-m_dMinValue_init)/(m_pRTMSA_New->chInfo()[0].getMaxValue()-m_pRTMSA_New->chInfo()[0].getMinValue());
+        // Draw text
+        painter.setPen(QPen(Qt::darkCyan, 1, Qt::SolidLine));
+        painter.drawText(iStartX+8, iEndY, tr("Zoom %1x").arg(factor, 0, 'f', 2));
 
     }
 
@@ -401,7 +498,7 @@ void RealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
     // Draw coordinates at mouse position
     //=============================================================================================================
 
-    if(m_bPosition && m_pRTSA->getSamplingRate())
+    if(m_bPosition && m_pRTMSA_New->getSamplingRate())
     {
         int iPosX = mapFromGlobal(QCursor::pos()).x();
 
@@ -409,30 +506,27 @@ void RealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
 
         if(iPosX > usPosX && iPosX  < (usPosX + usWidth) && iPosY > usPosY && iPosY < usPosY + usHeight )
         {
-			//Vertical Measuring
-			painter.setPen(QPen(Qt::gray, 1, Qt::DashLine));
+            //Vertical Measuring
+            painter.setPen(QPen(Qt::gray, 1, Qt::DashLine));
 
-			QPoint start(usPosX, iPosY);//iStartY-5);//paint measure line vertical direction
-			QPoint end(usPosX + usWidth, iPosY);//iStartY+5);
+            QPoint start(usPosX, iPosY);//iStartY-5);//paint measure line vertical direction
+            QPoint end(usPosX + usWidth, iPosY);//iStartY+5);
 
-			painter.drawLine(start, end);
+            painter.drawLine(start, end);
 
-			start.setX(iPosX); start.setY(usPosY);//iStartY - 5);
-			end.setX(iPosX); end.setY(usPosY + usHeight);//iStartY + 5);
-			painter.drawLine(start, end);
+            start.setX(iPosX); start.setY(usPosY);//iStartY - 5);
+            end.setX(iPosX); end.setY(usPosY + usHeight);//iStartY + 5);
+            painter.drawLine(start, end);
 
-			// Compute time between MouseStartPosition and MouseEndPosition
-			QTime t = m_pTimeCurrentDisplay->addMSecs((int)(1000*(iPosX-usPosX)/(float)m_pRTSA->getSamplingRate()));
-			float fAbsMag = m_pRTSA->getMinValue()+(usHeight-(iPosY-usPosY))*(dMinMaxDifference/usHeight);
+            // Compute time between MouseStartPosition and MouseEndPosition
+            QTime t = m_pTimeCurrentDisplay->addMSecs((int)(1000*(iPosX-usPosX)/(float)m_pRTMSA_New->getSamplingRate()));
 
-			// Draw text
-			painter.setPen(QPen(Qt::darkGray, 1, Qt::SolidLine));
+            // Draw text
+            painter.setPen(QPen(Qt::darkGray, 1, Qt::SolidLine));
 
-			painter.drawText(iPosX+8, iPosY-22, tr("%1").arg(t.toString("hh:mm:ss.zzz")));// ToDo Precision should be part of preferences
-			painter.drawText(iPosX+8, iPosY-8, tr("%1%2").arg(fAbsMag, 0, 'e', 3).arg(m_pRTSA->getUnit()));
-
+            painter.drawText(iPosX+8, iPosY-8, tr("%1").arg(t.toString("hh:mm:ss.zzz")));// ToDo Precision should be part of preferences
         }
-	}
+    }
 
 
 
@@ -441,7 +535,7 @@ void RealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
     // Draw the measurement tools of the curve
     //=============================================================================================================
 
-    if(m_bMeasurement && m_pRTSA->getSamplingRate())
+    if(m_bMeasurement && m_pRTMSA_New->getSamplingRate())
     {
         int iEndX   = m_qPointMouseEndPosition.x();
         int iStartX = m_qPointMouseStartPosition.x();
@@ -458,7 +552,7 @@ void RealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
             return;
 
         //Vertical Measuring
-		painter.setPen(QPen(Qt::darkCyan, 1, Qt::DashLine));
+        painter.setPen(QPen(Qt::darkCyan, 1, Qt::DashLine));
         if(iPixelDifferenceX > iPixelDifferenceY)
         {
             // Draw measuring line
@@ -473,21 +567,21 @@ void RealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
             end.setX(iEndX); end.setY(usPosY+usHeight);//iStartY + 5);
             painter.drawLine(start, end);
 
-			// Compute text position
-			if(iEndX > iStartX)
-				iEndX = iEndX + 9;
-			else
-				iEndX = iEndX - 67;
+            // Compute text position
+            if(iEndX > iStartX)
+                iEndX = iEndX + 9;
+            else
+                iEndX = iEndX - 67;
 
-			// Compute time between MouseStartPosition and MouseEndPosition
-			float iTime = 1000.0f*(float)iPixelDifferenceX/(float)m_pRTSA->getSamplingRate();
-			float iHz = 1000.0f/(float)iTime;
+            // Compute time between MouseStartPosition and MouseEndPosition
+            float iTime = 1000.0f*(float)iPixelDifferenceX/(float)m_pRTMSA_New->getSamplingRate();
+            float iHz = 1000.0f/(float)iTime;
 
-			// Draw text
-			painter.setPen(QPen(Qt::darkCyan, 1, Qt::SolidLine));
+            // Draw text
+            painter.setPen(QPen(Qt::darkCyan, 1, Qt::SolidLine));
 
-			painter.drawText(iEndX, iEndY-18, tr("%1ms").arg(iTime, 0, 'f', 2));// ToDo Precision should be part of preferences
-			painter.drawText(iEndX, iEndY-4, tr("%1Hz").arg(iHz, 0, 'f', 2));
+            painter.drawText(iEndX, iEndY-18, tr("%1ms").arg(iTime, 0, 'f', 2));// ToDo Precision should be part of preferences
+            painter.drawText(iEndX, iEndY-4, tr("%1Hz").arg(iHz, 0, 'f', 2));
         }
         else
         {
@@ -504,18 +598,18 @@ void RealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
             painter.drawLine(start, end);
 
 
-			// Compute text position
-			if(iEndY > iStartY)
-				iEndY = iEndY + 1;
-			else
-				iEndY = iEndY + 23 ;
+            // Compute text position
+            if(iEndY > iStartY)
+                iEndY = iEndY + 1;
+            else
+                iEndY = iEndY + 23 ;
 
-			// Compute time between MouseStartPosition and MouseEndPosition
-			float fMagnitude = (float)iPixelDifferenceY * (dMinMaxDifference/usHeight) ;
+            // Compute time between MouseStartPosition and MouseEndPosition
+            float fMagnitude = (float)iPixelDifferenceY * (dMinMaxDifference/usHeight) ;
 
-			// Draw text
-			painter.setPen(QPen(Qt::darkCyan, 1, Qt::SolidLine));
-			painter.drawText(iEndX+14, iEndY-8, tr("%1%2").arg(fMagnitude, 0, 'e', 3).arg(m_pRTSA->getUnit()));// ToDo Precision should be part of preferences
+            // Draw text
+            painter.setPen(QPen(Qt::darkCyan, 1, Qt::SolidLine));
+            painter.drawText(iEndX+14, iEndY-8, tr("%1%2").arg(fMagnitude, 0, 'e', 3).arg(m_pRTMSA_New->chInfo()[0].getUnit()));// ToDo Precision should be part of preferences
         }
     }
 }
@@ -523,42 +617,62 @@ void RealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
 
 //*************************************************************************************************************
 
-void RealTimeSampleArrayWidget::resizeEvent(QResizeEvent*)
+void NewRealTimeMultiSampleArrayWidget::resizeEvent(QResizeEvent*)
 {
-	m_bStartFlag = true; //start new painting
-	actualize();
+    m_bStartFlag = true; //start new painting
+    actualize();
 }
+
 
 //*************************************************************************************************************
 
-void RealTimeSampleArrayWidget::mousePressEvent(QMouseEvent* mouseEvent)
+void NewRealTimeMultiSampleArrayWidget::keyPressEvent(QKeyEvent* keyEvent)
+{
+//    if(keyEvent->key() == Qt::UpArrow)
+//    {
+//        if(m_uiFirstChannel + m_uiNumChannels < m_pRTMSA_New->getNumChannels())
+//            m_uiFirstChannel += m_uiNumChannels;
+//    }
+//    else if(keyEvent->key() == Qt::DownArrow)
+//    {
+//        if(m_uiFirstChannel - m_uiNumChannels >= 0)
+//            m_uiFirstChannel -= m_uiNumChannels;
+//    }
+
+//    QWidget::keyPressEvent(keyEvent);
+}
+
+
+//*************************************************************************************************************
+
+void NewRealTimeMultiSampleArrayWidget::mousePressEvent(QMouseEvent* mouseEvent)
 {
     m_qPointMouseStartPosition = m_qPointMouseEndPosition = mouseEvent->pos();
     if(mouseEvent->button() == Qt::LeftButton)
     {
-		m_bMeasurement = true;
-		m_bPosition = false;
+        m_bMeasurement = true;
+        m_bPosition = false;
     }
     else if(mouseEvent->button() == Qt::RightButton)
     {
-    	m_bScaling = true;
-    	m_bPosition = false;
+        m_bScaling = true;
+        m_bPosition = false;
     }
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeSampleArrayWidget::mouseMoveEvent(QMouseEvent* mouseEvent)
+void NewRealTimeMultiSampleArrayWidget::mouseMoveEvent(QMouseEvent* mouseEvent)
 {
     if(m_bMeasurement || m_bScaling)
-    	m_qPointMouseEndPosition = mouseEvent->pos();
+        m_qPointMouseEndPosition = mouseEvent->pos();
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeSampleArrayWidget::mouseReleaseEvent(QMouseEvent*)
+void NewRealTimeMultiSampleArrayWidget::mouseReleaseEvent(QMouseEvent*)
 {
     m_bMeasurement = false;
     m_bPosition = true;
@@ -568,16 +682,24 @@ void RealTimeSampleArrayWidget::mouseReleaseEvent(QMouseEvent*)
 
 //*************************************************************************************************************
 
-void RealTimeSampleArrayWidget::mouseDoubleClickEvent(QMouseEvent*)
+void NewRealTimeMultiSampleArrayWidget::mouseDoubleClickEvent(QMouseEvent*)
 {
     switch((Tool)m_ucToolIndex)
     {
         case Freeze:
             m_bFrozen = !m_bFrozen;
             if(m_bFrozen)
-                m_qPainterPath_Freeze = m_qPainterPath;
+            {
+//                m_qPainterPath_Freeze = m_qPainterPath;
+//                m_qPainterPath_FreezeTest = m_qPainterPathTest;
+//                m_qVecPainterPath_Freeze = m_qVecPainterPath;
+                m_qVecPolygonF_Freeze = m_qVecPolygonF;
+
+            }
             else
+            {
                 m_pTimeCurrentDisplay->setHMS(m_pTime->hour(),m_pTime->minute(),m_pTime->second(),m_pTime->msec());
+            }
             break;
 
         case Annotation:
@@ -590,37 +712,54 @@ void RealTimeSampleArrayWidget::mouseDoubleClickEvent(QMouseEvent*)
 
 //*************************************************************************************************************
 
-void RealTimeSampleArrayWidget::wheelEvent(QWheelEvent* wheelEvent)
+void NewRealTimeMultiSampleArrayWidget::wheelEvent(QWheelEvent* wheelEvent)
 {
-    if(m_bToolInUse)
-        return;
-
     if(wheelEvent->delta() < 0)
     {
-        if(m_ucToolIndex == 0)
-            m_ucToolIndex = m_vecTool.size()-1;
+        if((qint32)m_uiFirstChannel - (qint32)m_uiNumChannels >= 0)
+            m_uiFirstChannel -= m_uiNumChannels;
         else
-            --m_ucToolIndex;
+            m_uiFirstChannel = 0;
     }
     else
     {
-        if(m_ucToolIndex == m_vecTool.size()-1)
-            m_ucToolIndex = 0;
+        if(((qint32)m_uiFirstChannel + (qint32)m_uiNumChannels) < ((qint32)m_pRTMSA_New->getNumChannels()-(qint32)m_uiNumChannels))
+            m_uiFirstChannel += m_uiNumChannels;
         else
-            ++m_ucToolIndex;
+            m_uiFirstChannel = m_pRTMSA_New->getNumChannels()- m_uiNumChannels;
     }
 
-    QString text = QString("%1/%2 Tool: %3").arg(m_ucToolIndex+1).arg(m_vecTool.size()).arg(m_vecTool[m_ucToolIndex]);
-    ui.m_qLabel_Tool->setText(text);
-    ui.m_qLabel_Tool->show();
+    m_bStartFlag = true;
 
-    if(m_pTimerToolDisplay)
-        delete m_pTimerToolDisplay;
+//    if(m_bToolInUse)
+//        return;
 
-    m_pTimerToolDisplay = new QTimer(this);
+//    if(wheelEvent->delta() < 0)
+//    {
+//        if(m_ucToolIndex == 0)
+//            m_ucToolIndex = m_vecTool.size()-1;
+//        else
+//            --m_ucToolIndex;
+//    }
+//    else
+//    {
+//        if(m_ucToolIndex == m_vecTool.size()-1)
+//            m_ucToolIndex = 0;
+//        else
+//            ++m_ucToolIndex;
+//    }
 
-    connect( m_pTimerToolDisplay, SIGNAL(timeout()), ui.m_qLabel_Tool, SLOT(hide()));
-    m_pTimerToolDisplay->start(2000);
+//    QString text = QString("%1/%2 Tool: %3").arg(m_ucToolIndex+1).arg(m_vecTool.size()).arg(m_vecTool[m_ucToolIndex]);
+//    ui.m_qLabel_Tool->setText(text);
+//    ui.m_qLabel_Tool->show();
+
+//    if(m_pTimerToolDisplay)
+//        delete m_pTimerToolDisplay;
+
+//    m_pTimerToolDisplay = new QTimer(this);
+
+//    connect( m_pTimerToolDisplay, SIGNAL(timeout()), ui.m_qLabel_Tool, SLOT(hide()));
+//    m_pTimerToolDisplay->start(2000);
 
 }
 
@@ -630,4 +769,4 @@ void RealTimeSampleArrayWidget::wheelEvent(QWheelEvent* wheelEvent)
 // STATIC DEFINITIONS
 //=============================================================================================================
 
-QList<double> 		RealTimeSampleArrayWidget::s_listSamplingRates;
+QList<double>       NewRealTimeMultiSampleArrayWidget::s_listSamplingRates;
