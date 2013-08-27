@@ -80,7 +80,7 @@ MneRtClient::MneRtClient()
 , m_sMneRtClientIP("127.0.0.1")//("172.21.16.88")//("127.0.0.1")
 , m_bCmdClientIsConnected(false)
 , m_iBufferSize(-1)
-, m_pRawMatrixBuffer_In(NULL)
+, m_pRawMatrixBuffer_In(0)
 /*m_pRTMSA_MneRtClient(0)*/
 {
 
@@ -91,11 +91,7 @@ MneRtClient::MneRtClient()
 
 MneRtClient::~MneRtClient()
 {
-    if(m_pRtCmdClient)
-        delete m_pRtCmdClient;
 
-    if(m_pRawMatrixBuffer_In)
-        delete m_pRawMatrixBuffer_In;
 }
 
 
@@ -214,8 +210,8 @@ void MneRtClient::clear()
 
 void MneRtClient::connectCmdClient()
 {
-    if(!m_pRtCmdClient)
-        m_pRtCmdClient = new RtCmdClient();
+    if(m_pRtCmdClient.isNull())
+        m_pRtCmdClient = QSharedPointer<RtCmdClient>(new RtCmdClient);
     else if(m_bCmdClientIsConnected)
         this->disconnectCmdClient();
 
@@ -314,9 +310,7 @@ bool MneRtClient::start()
         (*m_pRtCmdClient)["bufsize"].send();
 
         // Buffer
-        if(m_pRawMatrixBuffer_In)
-            delete m_pRawMatrixBuffer_In;
-        m_pRawMatrixBuffer_In = new RawMatrixBuffer(8,m_pFiffInfo->nchan,m_iBufferSize);
+        m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8,m_pFiffInfo->nchan,m_iBufferSize));
 
         // Start threads
         QThread::start();

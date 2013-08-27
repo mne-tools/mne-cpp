@@ -76,9 +76,9 @@ ECGSimulator::ECGSimulator()
 : m_pRTSA_ECG_I_new(0)
 , m_fSamplingRate(250.0)
 , m_iDownsamplingFactor(1)
-, m_pInBuffer_I(new ECGBuffer_old(1024))
-, m_pInBuffer_II(new ECGBuffer_old(1024))
-, m_pInBuffer_III(new ECGBuffer_old(1024))
+, m_pInBuffer_I(new dBuffer(1024))
+, m_pInBuffer_II(new dBuffer(1024))
+, m_pInBuffer_III(new dBuffer(1024))
 , m_pECGProducer(new ECGProducer(this, m_pInBuffer_I, m_pInBuffer_II, m_pInBuffer_III))
 , m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/ECGSimulator/")
 , m_pECGChannel_ECG_I(new ECGSimChannel(m_qStringResourcePath+"data/", QString("ECG_I_256_s30661.txt")))
@@ -92,10 +92,7 @@ ECGSimulator::ECGSimulator()
 
 ECGSimulator::~ECGSimulator()
 {
-    delete m_pInBuffer_I;
-    delete m_pInBuffer_II;
-    delete m_pInBuffer_III;
-    delete m_pECGProducer;
+    qWarning() << "ECGSimulator::~ECGSimulator()";
 }
 
 

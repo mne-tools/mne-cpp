@@ -57,7 +57,7 @@ using namespace MneRtClientPlugin;
 
 MneRtClientProducer::MneRtClientProducer(MneRtClient* p_pMneRtClient)
 : m_pMneRtClient(p_pMneRtClient)
-, m_pRtDataClient(NULL)
+, m_pRtDataClient(0)
 , m_bDataClientIsConnected(false)
 , m_iDataClientId(-1)
 , m_bFlagInfoRequest(false)
@@ -70,8 +70,7 @@ MneRtClientProducer::MneRtClientProducer(MneRtClient* p_pMneRtClient)
 
 MneRtClientProducer::~MneRtClientProducer()
 {
-    if(m_pRtDataClient)
-        delete m_pRtDataClient;
+
 }
 
 
@@ -79,8 +78,8 @@ MneRtClientProducer::~MneRtClientProducer()
 
 void MneRtClientProducer::connectDataClient(QString p_sRtSeverIP)
 {
-    if(!m_pRtDataClient)
-        m_pRtDataClient = new RtDataClient();
+    if(m_pRtDataClient.isNull())
+        m_pRtDataClient = QSharedPointer<RtDataClient>(new RtDataClient);
     else if(m_bDataClientIsConnected)
         this->disconnectDataClient();
 

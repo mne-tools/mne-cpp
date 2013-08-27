@@ -101,7 +101,41 @@ PluginGui::PluginGui(PluginManager::SPtr &pPluginManager, MNEX::PluginSceneManag
 
 bool PluginGui::removePlugin(IPlugin::SPtr pPlugin)
 {
-    return m_pPluginSceneManager->removePlugin(pPlugin);
+
+    qWarning() << "Stage Plugins" << m_pPluginSceneManager->getPlugins().size();
+
+    bool bRemoved = m_pPluginSceneManager->removePlugin(pPlugin);
+
+    if(bRemoved)
+    {
+        //If single instance activate menu again
+        if(!pPlugin->multiInstanceAllowed())
+        {
+            QString sPluginName = pPlugin->getName();
+            ;
+
+            foreach (QAction *action, m_pActionGroupPlugins->actions())
+            {
+                if(action->text() == sPluginName)
+                {
+                    action->setEnabled(true);
+                    break;
+                }
+            }
+        }
+
+        //Select the last added plugin
+        if(m_pPluginSceneManager->getPlugins().size() > 0)
+            m_pCurrentPlugin = m_pPluginSceneManager->getPlugins()[m_pPluginSceneManager->getPlugins().size()-1];
+        else
+            m_pCurrentPlugin.reset();
+
+        selectedPluginChanged(m_pCurrentPlugin);
+    }
+
+    qWarning() << "Stage Plugins" << m_pPluginSceneManager->getPlugins().size();
+
+    return bRemoved;
 }
 
 
@@ -166,11 +200,15 @@ void PluginGui::deleteItem()
     foreach (QGraphicsItem *item, m_pPluginScene->selectedItems())
     {
          if (item->type() == PluginItem::Type)
-             qgraphicsitem_cast<PluginItem *>(item)->removeArrows();
+         {
+             if(removePlugin(qgraphicsitem_cast<PluginItem *>(item)->plugin()))
+             {
+                 qgraphicsitem_cast<PluginItem *>(item)->removeArrows();
 
-         removePlugin(qgraphicsitem_cast<PluginItem *>(item)->plugin());
-         m_pPluginScene->removeItem(item);
-         delete item;
+                 m_pPluginScene->removeItem(item);
+                 delete item;
+             }
+         }
      }
 }
 

@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <generics/circularbuffer_old.h>
+#include <generics/circularbuffer.h>
 
 
 //*************************************************************************************************************
@@ -87,6 +87,8 @@ class ECGSimulator;
 class ECGProducer : public QThread
 {
 public:
+    typedef QSharedPointer<ECGProducer> SPtr;              /**< Shared pointer type for ECGProducer. */
+    typedef QSharedPointer<const ECGProducer> ConstSPtr;   /**< Const shared pointer type for ECGProducer. */
 
     //=========================================================================================================
     /**
@@ -97,7 +99,7 @@ public:
     * @param [in] buffer_II a pointer to the buffer to which the ECGProducer should write the generated data for ECG II.
     * @param [in] buffer_III a pointer to the buffer to which the ECGProducer should write the generated data for ECG III.
     */
-    ECGProducer(ECGSimulator* simulator, ECGBuffer_old* buffer_I, ECGBuffer_old* buffer_II, ECGBuffer_old* buffer_III);
+    ECGProducer(ECGSimulator* simulator, dBuffer::SPtr& buffer_I, dBuffer::SPtr& buffer_II, dBuffer::SPtr& buffer_III);
 
     //=========================================================================================================
     /**
@@ -121,11 +123,11 @@ protected:
     virtual void run();
 
 private:
-    ECGSimulator*           m_pECGSimulator;	/**< Holds a pointer to corresponding ECGSimulator.*/
-    ECGBuffer_old*              m_pdBuffer_I;		/**< Holds a pointer to the buffer where the simulated data of ECG I should be written to.*/
-    ECGBuffer_old*              m_pdBuffer_II;		/**< Holds a pointer to the buffer where the simulated data of ECG II should be written to.*/
-    ECGBuffer_old*              m_pdBuffer_III;		/**< Holds a pointer to the buffer where the simulated data of ECG III should be written to.*/
-    bool                    m_bIsRunning;		/**< Holds whether ECGProducer is running.*/
+    ECGSimulator*           m_pECGSimulator;    /**< Holds a pointer to corresponding ECGSimulator.*/
+    dBuffer::SPtr           m_pdBuffer_I;       /**< Holds a pointer to the buffer where the simulated data of ECG I should be written to.*/
+    dBuffer::SPtr           m_pdBuffer_II;      /**< Holds a pointer to the buffer where the simulated data of ECG II should be written to.*/
+    dBuffer::SPtr           m_pdBuffer_III;     /**< Holds a pointer to the buffer where the simulated data of ECG III should be written to.*/
+    bool                    m_bIsRunning;       /**< Holds whether ECGProducer is running.*/
 };
 
 } // NAMESPACE

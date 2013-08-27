@@ -87,7 +87,7 @@ MainWindow::MainWindow(QWidget *parent)
 , m_pRunWidget(NULL)
 , m_bDisplayMax(false)
 , m_bIsRunning(false)
-, m_pLabel_Time(NULL)
+, m_pLabelTime(NULL)
 , m_pTimer(NULL)
 , m_pTime(new QTime(0, 0))
 , m_iTimeoutMSec(1000)
@@ -185,8 +185,8 @@ MainWindow::~MainWindow()
     if(m_pToolBar)
         delete m_pToolBar;
 
-    if(m_pLabel_Time)
-        delete m_pLabel_Time;
+    if(m_pLabelTime)
+        delete m_pLabelTime;
 
     if(m_pDockWidget_Log)
         delete m_pDockWidget_Log;
@@ -436,9 +436,9 @@ void MainWindow::createToolBars()
 
     m_pToolBar->addSeparator();
 
-    m_pLabel_Time = new QLabel;
-    m_pToolBar->addWidget(m_pLabel_Time);
-    m_pLabel_Time->setText(QTime(0, 0).toString());
+    m_pLabelTime = new QLabel;
+    m_pToolBar->addWidget(m_pLabelTime);
+    m_pLabelTime->setText(QTime(0, 0).toString());
 }
 
 
@@ -494,26 +494,33 @@ void MainWindow::createLogDockWindow()
 //Plugin stuff
 void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
 {
-    if(!m_bIsRunning)
-        setCentralWidget(pPlugin->setupWidget());
+    if(pPlugin.isNull())
+    {
+        QWidget* pWidget = new QWidget;
+        setCentralWidget(pWidget);
+    }
     else
     {
-
-        //Garbage collecting
-        if(m_pRunWidget)
-            delete m_pRunWidget;
-
-        m_pRunWidget = new RunWidget( m_pDisplayManager->show(pPlugin->getOutputConnectors(), m_pTime));
-
-        m_pRunWidget->show();
-
-        if(m_bDisplayMax)//ToDo send events to main window
-        {
-            m_pRunWidget->showFullScreen();
-            connect(m_pRunWidget, &RunWidget::displayClosed, this, &MainWindow::toggleDisplayMax);
-        }
+        if(!m_bIsRunning)
+            setCentralWidget(pPlugin->setupWidget());
         else
-            setCentralWidget(m_pRunWidget);
+        {
+            //Garbage collecting
+            if(m_pRunWidget)
+                delete m_pRunWidget;
+
+            m_pRunWidget = new RunWidget( m_pDisplayManager->show(pPlugin->getOutputConnectors(), m_pTime));
+
+            m_pRunWidget->show();
+
+            if(m_bDisplayMax)//ToDo send events to main window
+            {
+                m_pRunWidget->showFullScreen();
+                connect(m_pRunWidget, &RunWidget::displayClosed, this, &MainWindow::toggleDisplayMax);
+            }
+            else
+                setCentralWidget(m_pRunWidget);
+        }
     }
 }
 
@@ -695,7 +702,7 @@ void MainWindow::startTimer(int msec)
     m_pTimer->start(msec);
     m_pTime->setHMS(0,0,0);
     QString strTime = m_pTime->toString();
-    m_pLabel_Time->setText(strTime);
+    m_pLabelTime->setText(strTime);
 }
 
 
@@ -713,5 +720,5 @@ void MainWindow::updateTime()
 {
     *m_pTime = m_pTime->addMSecs(m_iTimeoutMSec);
     QString strTime = m_pTime->toString();
-    m_pLabel_Time->setText(strTime);
+    m_pLabelTime->setText(strTime);
 }

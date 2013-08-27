@@ -137,12 +137,12 @@ private:
     * @return the mapped index.
     */
     inline unsigned int mapIndex(int& index);
-    unsigned int    m_uiMaxNumElements;		/**< Holds the maximal number of buffer elements.*/
-    _Tp*            m_pBuffer;				/**< Holds the circular buffer.*/
-    int             m_iCurrentReadIndex;	/**< Holds the current read index.*/
-    int             m_iCurrentWriteIndex;	/**< Holds the current write index.*/
-    QSemaphore*     m_pFreeElements;		/**< Holds a semaphore which acquires free elements for thread safe writing. A semaphore is a generalization of a mutex.*/
-    QSemaphore*     m_pUsedElements;		/**< Holds a semaphore which acquires written semaphore for thread safe reading.*/
+    unsigned int    m_uiMaxNumElements;     /**< Holds the maximal number of buffer elements.*/
+    _Tp*            m_pBuffer;              /**< Holds the circular buffer.*/
+    int             m_iCurrentReadIndex;    /**< Holds the current read index.*/
+    int             m_iCurrentWriteIndex;   /**< Holds the current write index.*/
+    QSemaphore*     m_pFreeElements;        /**< Holds a semaphore which acquires free elements for thread safe writing. A semaphore is a generalization of a mutex.*/
+    QSemaphore*     m_pUsedElements;        /**< Holds a semaphore which acquires written semaphore for thread safe reading.*/
 };
 
 

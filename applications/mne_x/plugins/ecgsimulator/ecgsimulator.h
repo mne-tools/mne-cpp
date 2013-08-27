@@ -47,7 +47,7 @@
 #include "ecgsimchannel.h"
 
 #include <mne_x/Interfaces/ISensor.h>
-#include <generics/circularbuffer_old.h>
+#include <generics/circularbuffer.h>
 
 #include <xMeas/newrealtimesamplearray.h>
 
@@ -159,16 +159,16 @@ private:
 
     float           m_fSamplingRate;        /**< the sampling rate.*/
     int             m_iDownsamplingFactor;  /**< the down sampling factor.*/
-    ECGBuffer_old*  m_pInBuffer_I;          /**< ECG I data which arrive from ECG producer.*/
-    ECGBuffer_old*  m_pInBuffer_II;         /**< ECG II data which arrive from ECG producer.*/
-    ECGBuffer_old*  m_pInBuffer_III;        /**< ECG III data which arrive from ECG producer.*/
-    ECGProducer*    m_pECGProducer;         /**< the ECGProducer.*/
+    dBuffer::SPtr   m_pInBuffer_I;          /**< ECG I data which arrive from ECG producer.*/
+    dBuffer::SPtr   m_pInBuffer_II;         /**< ECG II data which arrive from ECG producer.*/
+    dBuffer::SPtr   m_pInBuffer_III;        /**< ECG III data which arrive from ECG producer.*/
+    QSharedPointer<ECGProducer>     m_pECGProducer; /**< the ECGProducer.*/
 
     QString m_qStringResourcePath;          /**< the path to the ECG resource directory.*/
 
-    ECGSimChannel* m_pECGChannel_ECG_I;     /**< the simulation channel for ECG I.*/
-    ECGSimChannel* m_pECGChannel_ECG_II;    /**< the simulation channel for ECG II.*/
-    ECGSimChannel* m_pECGChannel_ECG_III;   /**< the simulation channel for ECG III.*/
+    ECGSimChannel::SPtr m_pECGChannel_ECG_I;    /**< the simulation channel for ECG I.*/
+    ECGSimChannel::SPtr m_pECGChannel_ECG_II;   /**< the simulation channel for ECG II.*/
+    ECGSimChannel::SPtr m_pECGChannel_ECG_III;  /**< the simulation channel for ECG III.*/
 };
 
 } // NAMESPACE

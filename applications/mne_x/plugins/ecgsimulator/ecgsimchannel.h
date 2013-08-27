@@ -51,6 +51,7 @@
 
 #include <QVector>
 #include <QString>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -58,7 +59,8 @@
 // DEFINE NAMESPACE ECGSimulatorPlugin
 //=============================================================================================================
 
-namespace ECGSimulatorPlugin {
+namespace ECGSimulatorPlugin
+{
 
 
 //*************************************************************************************************************
@@ -81,8 +83,10 @@ namespace ECGSimulatorPlugin {
 */
 class ECGSimChannel
 {
-
 public:
+    typedef QSharedPointer<ECGSimChannel> SPtr;              /**< Shared pointer type for ECGSimChannel. */
+    typedef QSharedPointer<const ECGSimChannel> ConstSPtr;   /**< Const shared pointer type for ECGSimChannel. */
+
     //=========================================================================================================
     /**
     * Constructs a ECGSimChannel.
