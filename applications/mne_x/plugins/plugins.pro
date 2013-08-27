@@ -41,8 +41,8 @@ TEMPLATE = subdirs
 # DEBUG
 SUBDIRS += \
     ecgsimulator \
-    mnertclient #\
-#    dummytoolbox
+    mnertclient \
+    dummytoolbox
 # DEBUG
 
 #SUBDIRS += \
