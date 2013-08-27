@@ -168,14 +168,12 @@ QWidget* DummyToolbox::setupWidget()
 void DummyToolbox::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
     QSharedPointer<NewRealTimeSampleArray> pRTSA = pMeasurement.dynamicCast<NewRealTimeSampleArray>();
-//    qWarning() << "DummyToolbox::update" << pRTSA.isNull() << pRTSA->getArraySize();
 
     if(!pRTSA.isNull())
     {
         for(unsigned char i = 0; i < pRTSA->getArraySize(); ++i)
         {
             double value = pRTSA->getSampleArray()[i];
-            qWarning() << "Received:" << value;
             m_pDummyBuffer->push(value);
         }
     }
