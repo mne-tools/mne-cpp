@@ -48,7 +48,6 @@
 
 #include <mne_x/Interfaces/ISensor.h>
 #include <generics/circularbuffer.h>
-
 #include <xMeas/newrealtimesamplearray.h>
 
 
@@ -107,7 +106,6 @@ class ECGSIMULATORSHARED_EXPORT ECGSimulator : public ISensor
     friend class ECGRunWidget;
 
 public:
-
     //=========================================================================================================
     /**
     * Constructs a ECGSimulator.

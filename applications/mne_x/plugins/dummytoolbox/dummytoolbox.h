@@ -43,12 +43,14 @@
 //=============================================================================================================
 
 #include "dummytoolbox_global.h"
-#include <mne_x/Interfaces/IRTAlgorithm.h>
+
+
+#include <mne_x/Interfaces/IAlgorithm.h>
+
 #include <generics/circularbuffer_old.h>
 #include <generics/circularmultichannelbuffer_old.h>
 
-#include <xMeas/Measurement/realtimesamplearray.h>
-#include <xMeas/Measurement/realtimemultisamplearray.h>
+#include <xMeas/newrealtimesamplearray.h>
 
 
 //*************************************************************************************************************
@@ -74,6 +76,7 @@ namespace DummyToolboxPlugin
 //=============================================================================================================
 
 using namespace MNEX;
+using namespace XMEASLIB;
 using namespace IOBuffer;
 
 
@@ -89,36 +92,41 @@ using namespace IOBuffer;
 *
 * @brief The DummyToolbox class provides a dummy algorithm structure.
 */
-class DUMMYTOOLBOXSHARED_EXPORT DummyToolbox : public IRTAlgorithm
+class DUMMYTOOLBOXSHARED_EXPORT DummyToolbox : public IAlgorithm
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "dummytoolbox.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::IRTAlgorithm)
+    Q_INTERFACES(MNEX::IAlgorithm)
 
 public:
-
     //=========================================================================================================
     /**
     * Constructs a DummyToolbox.
     */
     DummyToolbox();
+
     //=========================================================================================================
     /**
     * Destroys the DummyToolbox.
     */
     ~DummyToolbox();
 
+    //=========================================================================================================
+    /**
+    * Clone the plugin
+    */
+    virtual QSharedPointer<IPlugin> clone() const;
+
     virtual bool start();
     virtual bool stop();
 
-    virtual Type getType() const;
-    virtual const char* getName() const;
+    virtual IPlugin::PluginType getType() const;
+    virtual QString getName() const;
 
     virtual QWidget* setupWidget();
-    virtual QWidget* runWidget();
 
-    virtual void update(Subject* pSubject);
+    void update(NewRealTimeSampleArray::SPtr);
 
 protected:
     virtual void run();
@@ -130,14 +138,9 @@ private:
     */
     void init();
 
-    RealTimeSampleArray::SPtr       m_pDummy_Output;        /**< Holds the RealTimeSampleArray of the DummyToolbox output.*/
-
-    RealTimeMultiSampleArray::SPtr  m_pDummy_MSA_Output;    /**< Holds the RealTimeMultiSampleArray of the DummyToolbox output.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pDummy_Output;   /**< The RealTimeSampleArray of the DummyToolbox output.*/
 
     CircularBuffer_old<double>::SPtr   m_pDummyBuffer;      /**< Holds incoming data.*/
-
-    CircularMultiChannelBuffer_old<double>::SPtr m_pDummyMultiChannelBuffer;    /**< Holds incoming multi sample data.*/
-
 };
 
 } // NAMESPACE
