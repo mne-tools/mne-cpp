@@ -167,9 +167,6 @@ MainWindow::~MainWindow()
     if(m_pActionDisplayMax)
         delete m_pActionDisplayMax;
 
-    if(m_pActionDebugDisconnect)
-        delete m_pActionDebugDisconnect;
-
     if(m_pMenuFile)
         delete m_pMenuFile;
     if(m_pMenuView)
@@ -178,9 +175,6 @@ MainWindow::~MainWindow()
         delete m_pMenuLgLv;
     if(m_pMenuHelp)
         delete m_pMenuHelp;
-
-    if(m_pMenuDebug)
-        delete m_pMenuDebug;
 
     if(m_pToolBar)
         delete m_pToolBar;
@@ -345,10 +339,6 @@ void MainWindow::createActions()
     m_pActionAbout->setStatusTip(tr("Show the application's About box"));
     connect(m_pActionAbout, SIGNAL(triggered()), this, SLOT(about()));
 
-    //Debug QMenu ToDo
-    m_pActionDebugDisconnect = new QAction(tr("Disconnect Widgets"), this);
-//ToDo    connect(m_pActionDebugDisconnect, SIGNAL(triggered()), this, SLOT(Connector::disconnectMeasurementWidgets()));// Function is not anmyore valid
-
     //QToolbar
     m_pActionRun = new QAction(QIcon(":/images/run.png"), tr("Run (F5)"), this);
     m_pActionRun->setShortcut(tr("F5"));
@@ -407,10 +397,6 @@ void MainWindow::createMenus()
     m_pMenuHelp->addSeparator();
     m_pMenuHelp->addAction(m_pActionAbout);
 
-    menuBar()->addSeparator();
-
-    m_pMenuDebug = menuBar()->addMenu(tr("&Debug"));
-    m_pMenuDebug->addAction(m_pActionDebugDisconnect);
 }
 
 

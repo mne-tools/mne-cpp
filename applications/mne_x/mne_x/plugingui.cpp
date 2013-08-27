@@ -121,9 +121,6 @@ void PluginGui::uiSetupRunningState(bool state)
 
 bool PluginGui::removePlugin(IPlugin::SPtr pPlugin)
 {
-
-    qWarning() << "Stage Plugins" << m_pPluginSceneManager->getPlugins().size();
-
     bool bRemoved = m_pPluginSceneManager->removePlugin(pPlugin);
 
     if(bRemoved)
@@ -152,8 +149,6 @@ bool PluginGui::removePlugin(IPlugin::SPtr pPlugin)
 
         selectedPluginChanged(m_pCurrentPlugin);
     }
-
-    qWarning() << "Stage Plugins" << m_pPluginSceneManager->getPlugins().size();
 
     return bRemoved;
 }
@@ -192,7 +187,6 @@ void PluginGui::newItemSelected()
 
     if(!pPlugin.isNull() && pPlugin != m_pCurrentPlugin)
     {
-        qDebug() << "new plugin selected:" << pPlugin->getName();
         m_pCurrentPlugin = pPlugin;
         emit selectedPluginChanged(m_pCurrentPlugin);
     }

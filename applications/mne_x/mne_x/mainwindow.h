@@ -213,15 +213,11 @@ private:
     QAction*                             m_pActionZoomOut;          /**< zoom out */
     QAction*                             m_pActionDisplayMax;       /**< show full screen mode */
 
-    QAction*                             m_pActionDebugDisconnect;  /**< debug action -> for debug purpose */
-
     //Main Window Menu
     QMenu*                                 m_pMenuFile;     /**< Holds the file menu.*/
     QMenu*                                 m_pMenuView;     /**< Holds the view menu.*/
     QMenu*                                 m_pMenuLgLv;     /**< Holds the log level sub menu.*/
     QMenu*                                 m_pMenuHelp;     /**< Holds the help menu.*/
-
-    QMenu*                                 m_pMenuDebug;    /**< Holds the debug menu.*/
 
     // Tool bar
     QToolBar*                             m_pToolBar;       /**< Holds the tool bar.*/

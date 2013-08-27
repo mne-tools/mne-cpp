@@ -67,8 +67,8 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 DummyToolbox::DummyToolbox()
-: m_pDummyInput(0)
-, m_pDummyOutput(0)
+: m_pDummyInput(NULL)
+, m_pDummyOutput(NULL)
 , m_pDummyBuffer(new dBuffer(1024))
 {
 }
@@ -98,7 +98,6 @@ QSharedPointer<IPlugin> DummyToolbox::clone() const
 
 void DummyToolbox::init()
 {
-
     // Input
     m_pDummyInput = PluginInputData<NewRealTimeSampleArray>::create(this, "DummyIn", "Dummy input data");
     connect(m_pDummyInput.data(), &PluginInputConnector::notify, this, &DummyToolbox::update);
@@ -113,18 +112,6 @@ void DummyToolbox::init()
     m_pDummyOutput->data()->setMinValue(-200);
     m_pDummyOutput->data()->setMaxValue(360);
     m_pDummyOutput->data()->setSamplingRate(256.0/1.0);
-
-
-//    t_buf = m_pDummyMultiChannelBuffer.staticCast<Buffer>(); //unix fix
-//    this->addAcceptorMeasurementBuffer(MSR_ID::ECGSIM_II, t_buf);
-
-//    m_pDummy_MSA_Output = addProviderRealTimeMultiSampleArray(MSR_ID::DUMMYTOOL_OUTPUT_II, 2);
-//    m_pDummy_MSA_Output->setName("Dummy Output II");
-//    m_pDummy_MSA_Output->setUnit("mV");
-//    m_pDummy_MSA_Output->setMinValue(-200);
-//    m_pDummy_MSA_Output->setMaxValue(360);
-//    m_pDummy_MSA_Output->setSamplingRate(256.0/1.0);
-
 }
 
 
@@ -132,9 +119,6 @@ void DummyToolbox::init()
 
 bool DummyToolbox::start()
 {
-    // Initialize displaying widgets
-    init();
-
     QThread::start();
     return true;
 }
