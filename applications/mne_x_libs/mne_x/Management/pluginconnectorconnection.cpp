@@ -56,7 +56,7 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginConnectorConnection::PluginConnectorConnection(IPlugin::SPtr &sender, IPlugin::SPtr &receiver, QObject *parent)
+PluginConnectorConnection::PluginConnectorConnection(IPlugin::SPtr sender, IPlugin::SPtr receiver, QObject *parent)
 : QObject(parent)
 , m_bConnectionState(false)
 , m_pSender(sender)
