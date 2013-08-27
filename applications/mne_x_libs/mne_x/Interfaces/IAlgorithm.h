@@ -82,9 +82,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Clone the algorithm
+    * Clone the plugin
     */
-    virtual QSharedPointer<IPlugin> clone() = 0;
+    virtual QSharedPointer<IPlugin> clone() const = 0;
 
     //=========================================================================================================
     /**
@@ -124,6 +124,14 @@ public:
 
     //=========================================================================================================
     /**
+    * True if multi instantiation of plugin is allowed.
+    *
+    * @return true if multi instantiation of plugin is allowed.
+    */
+    virtual inline bool multiInstanceAllowed() const;
+
+    //=========================================================================================================
+    /**
     * Returns the set up widget for configuration of IAlgorithm.
     * Pure virtual method inherited by IPlugin.
     *
@@ -140,6 +148,16 @@ protected:
     */
     virtual void run() = 0;
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline bool IAlgorithm::multiInstanceAllowed() const
+{
+    return true;
+}
 
 } // NAMESPACE
 
