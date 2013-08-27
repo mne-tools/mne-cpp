@@ -44,12 +44,8 @@
 
 #include "dummytoolbox_global.h"
 
-
 #include <mne_x/Interfaces/IAlgorithm.h>
-
-#include <generics/circularbuffer_old.h>
-#include <generics/circularmultichannelbuffer_old.h>
-
+#include <generics/circularbuffer.h>
 #include <xMeas/newrealtimesamplearray.h>
 
 
@@ -114,6 +110,12 @@ public:
 
     //=========================================================================================================
     /**
+    * Initialise input and output connectors.
+    */
+    void init();
+
+    //=========================================================================================================
+    /**
     * Clone the plugin
     */
     virtual QSharedPointer<IPlugin> clone() const;
@@ -126,21 +128,16 @@ public:
 
     virtual QWidget* setupWidget();
 
-    void update(NewRealTimeSampleArray::SPtr);
+    void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
 protected:
     virtual void run();
 
 private:
-    //=========================================================================================================
-    /**
-    * Initialise the DummyToolbox.
-    */
-    void init();
+    PluginInputData<NewRealTimeSampleArray>::SPtr   m_pDummyInput;      /**< The RealTimeSampleArray of the DummyToolbox input.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pDummyOutput;    /**< The RealTimeSampleArray of the DummyToolbox output.*/
 
-    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pDummy_Output;   /**< The RealTimeSampleArray of the DummyToolbox output.*/
-
-    CircularBuffer_old<double>::SPtr   m_pDummyBuffer;      /**< Holds incoming data.*/
+    dBuffer::SPtr   m_pDummyBuffer;      /**< Holds incoming data.*/
 };
 
 } // NAMESPACE
