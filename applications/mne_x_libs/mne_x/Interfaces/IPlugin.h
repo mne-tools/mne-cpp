@@ -193,7 +193,6 @@ protected:
     */
     virtual void run() = 0;
 
-
     InputConnectorList m_inputConnectors;    /**< Set of input connectors associated with this plug-in. */
     OutputConnectorList m_outputConnectors;  /**< Set of output connectors associated with this plug-in. */
 };

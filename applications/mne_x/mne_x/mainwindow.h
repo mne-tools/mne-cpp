@@ -94,7 +94,6 @@ namespace MNEX
 //=============================================================================================================
 
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -194,8 +193,6 @@ private:
 
     void initStatusBar();       /**< Creates QToolBar for user interface of MainWindow class. */
 
-
-
     QAction*                             m_pActionNewConfig;        /**< new configuration */
     QAction*                             m_pActionOpenConfig;       /**< open configuration */
     QAction*                             m_pActionSaveConfig;       /**< save configuration */
@@ -230,7 +227,7 @@ private:
     QToolBar*                             m_pToolBar;       /**< Holds the tool bar.*/
 
 
-    QLabel*                             m_pLabel_Time;      /**< Holds the display label for the running time.*/
+    QLabel*                             m_pLabelTime;      /**< Holds the display label for the running time.*/
     QSharedPointer<QTimer>              m_pTimer;           /**< timer of the main application*/
     QSharedPointer<QTime>               m_pTime;            /**< Holds current time output, updated with timeout of timer.*/
     int                                 m_iTimeoutMSec;     /**< Holds milliseconds after which timer timeouts.*/

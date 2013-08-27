@@ -252,13 +252,13 @@ void CircularBuffer_old<_Tp>::clear()
 
 //ToDo Typedef -> warning visibility ignored -> dllexport/dllimport problem
 
-typedef GENERICSSHARED_EXPORT CircularBuffer_old<int>                      _int_CircularBuffer_old;				/**< Defines CircularBuffer of integer type.*/
-typedef GENERICSSHARED_EXPORT CircularBuffer_old<short>                    _short_CircularBuffer_old;				/**< Defines CircularBuffer of short type.*/
-typedef GENERICSSHARED_EXPORT CircularBuffer_old<short*>                    _pShort_CircularBuffer_old;			/**< Defines CircularBuffer of short* type.*/
-typedef GENERICSSHARED_EXPORT CircularBuffer_old<char>                     _char_CircularBuffer_old;				/**< Defines CircularBuffer of char type.*/
-typedef GENERICSSHARED_EXPORT CircularBuffer_old<double>                   _double_CircularBuffer_old;			/**< Defines CircularBuffer of double type.*/
-typedef GENERICSSHARED_EXPORT CircularBuffer_old< QPair<int, int> >        _int_int_pair_CircularBuffer_old;		/**< Defines CircularBuffer of integer Pair type.*/
-typedef GENERICSSHARED_EXPORT CircularBuffer_old< QPair<double, double> >  _double_double_pair_CircularBuffer_old;	/**< Defines CircularBuffer of double Pair type.*/
+typedef GENERICSSHARED_EXPORT CircularBuffer_old<int>                      _int_CircularBuffer_old;             /**< Defines CircularBuffer of integer type.*/
+typedef GENERICSSHARED_EXPORT CircularBuffer_old<short>                    _short_CircularBuffer_old;           /**< Defines CircularBuffer of short type.*/
+typedef GENERICSSHARED_EXPORT CircularBuffer_old<short*>                    _pShort_CircularBuffer_old;         /**< Defines CircularBuffer of short* type.*/
+typedef GENERICSSHARED_EXPORT CircularBuffer_old<char>                     _char_CircularBuffer_old;            /**< Defines CircularBuffer of char type.*/
+typedef GENERICSSHARED_EXPORT CircularBuffer_old<double>                   _double_CircularBuffer_old;          /**< Defines CircularBuffer of double type.*/
+typedef GENERICSSHARED_EXPORT CircularBuffer_old< QPair<int, int> >        _int_int_pair_CircularBuffer_old;        /**< Defines CircularBuffer of integer Pair type.*/
+typedef GENERICSSHARED_EXPORT CircularBuffer_old< QPair<double, double> >  _double_double_pair_CircularBuffer_old;  /**< Defines CircularBuffer of double Pair type.*/
 
 typedef GENERICSSHARED_EXPORT _double_CircularBuffer_old                   dBuffer_old;             /**< Short for _double_CircularBuffer.*/
 typedef GENERICSSHARED_EXPORT _int_CircularBuffer_old                      iBuffer_old;             /**< Short for _int_CircularBuffer.*/

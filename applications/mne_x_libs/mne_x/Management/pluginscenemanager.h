@@ -103,6 +103,8 @@ public:
     */
     bool addPlugin(const IPlugin* pPlugin, IPlugin::SPtr &pAddedPlugin);
 
+    inline PluginList& getPlugins();
+
     //=========================================================================================================
     /**
     * Removes a plugin from the stage.
@@ -162,6 +164,16 @@ private:
 
 //    QSharedPointer<PluginSet> m_pPluginSet;     /**< The Plugin set of the stage -> ToDo: check, if more than one set on the stage is usefull. */
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline PluginSceneManager::PluginList& PluginSceneManager::getPlugins()
+{
+    return m_pluginList;
+}
 
 } //Namespace
 
