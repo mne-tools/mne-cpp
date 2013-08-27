@@ -83,9 +83,11 @@ class PluginGui : public QMainWindow
     Q_OBJECT
     friend class PluginScene;
 public:
-   PluginGui(MNEX::PluginManager::SPtr &pPluginManager, MNEX::PluginSceneManager::SPtr &pPluginSceneManager);
+    PluginGui(MNEX::PluginManager::SPtr &pPluginManager, MNEX::PluginSceneManager::SPtr &pPluginSceneManager);
 
-   IPlugin::SPtr getCurrentPlugin() {return m_pCurrentPlugin;}
+    inline IPlugin::SPtr getCurrentPlugin();
+
+    void uiSetupRunningState(bool state);
 
 signals:
    void selectedPluginChanged(IPlugin::SPtr pPlugin);
@@ -129,6 +131,16 @@ private:
     QAction*    toFrontAction;
     QAction*    sendBackAction;
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline IPlugin::SPtr PluginGui::getCurrentPlugin()
+{
+    return m_pCurrentPlugin;
+}
 
 } //NAMESPACE
 

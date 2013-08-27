@@ -572,6 +572,7 @@ void MainWindow::startMeasurement()
         return;
     }
 
+    m_pPluginGui->uiSetupRunningState(true);
     uiSetupRunningState(true);
     startTimer(m_iTimeoutMSec);
 
@@ -607,6 +608,8 @@ void MainWindow::stopMeasurement()
     m_pPluginSceneManager->stopPlugins();
     m_pDisplayManager->clean();
 
+
+    m_pPluginGui->uiSetupRunningState(false);
     uiSetupRunningState(false);
     stopTimer();
 
