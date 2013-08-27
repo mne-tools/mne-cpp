@@ -111,14 +111,36 @@ QSharedPointer<IPlugin> ECGSimulator::clone() const
 //=============================================================================================================
 void ECGSimulator::init()
 {
+    if(m_pECGChannel_ECG_I->isEnabled())
+    {
+        m_pRTSA_ECG_I_new = PluginOutputData<NewRealTimeSampleArray>::create(this, "ECG I", "ECG I output data");
+        m_outputConnectors.append(m_pRTSA_ECG_I_new);
+    }
+
+    if(m_pECGChannel_ECG_II->isEnabled())
+    {
+        m_pRTSA_ECG_II_new = PluginOutputData<NewRealTimeSampleArray>::create(this, "ECG II", "ECG II output data");
+        m_outputConnectors.append(m_pRTSA_ECG_II_new);
+    }
+
+    if(m_pECGChannel_ECG_III->isEnabled())
+    {
+        m_pRTSA_ECG_III_new = PluginOutputData<NewRealTimeSampleArray>::create(this, "ECG III", "ECG III output data");
+        m_outputConnectors.append(m_pRTSA_ECG_III_new);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void ECGSimulator::initChannels()
+{
     m_pECGChannel_ECG_I->initChannel();
     m_pECGChannel_ECG_II->initChannel();
     m_pECGChannel_ECG_III->initChannel();
 
     if(m_pECGChannel_ECG_I->isEnabled())
     {
-        m_pRTSA_ECG_I_new = PluginOutputData<NewRealTimeSampleArray>::create(this, "ECG I", "ECG I output data");
-
         double diff = m_pECGChannel_ECG_I->getMaximum() - m_pECGChannel_ECG_I->getMinimum();
 
         m_pRTSA_ECG_I_new->data()->setName("ECG I");
@@ -129,14 +151,10 @@ void ECGSimulator::init()
         m_pRTSA_ECG_I_new->data()->setArraySize(10);
         m_pRTSA_ECG_I_new->data()->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
         m_pRTSA_ECG_I_new->data()->setVisibility(m_pECGChannel_ECG_I->isVisible());
-
-        m_outputConnectors.append(m_pRTSA_ECG_I_new);
     }
 
     if(m_pECGChannel_ECG_II->isEnabled())
     {
-        m_pRTSA_ECG_II_new = PluginOutputData<NewRealTimeSampleArray>::create(this, "ECG II", "ECG II output data");
-
         double diff = m_pECGChannel_ECG_II->getMaximum() - m_pECGChannel_ECG_II->getMinimum();
 
         m_pRTSA_ECG_II_new->data()->setName("ECG II");
@@ -147,14 +165,10 @@ void ECGSimulator::init()
         m_pRTSA_ECG_II_new->data()->setArraySize(10);
         m_pRTSA_ECG_II_new->data()->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
         m_pRTSA_ECG_II_new->data()->setVisibility(m_pECGChannel_ECG_II->isVisible());
-
-        m_outputConnectors.append(m_pRTSA_ECG_II_new);
     }
 
     if(m_pECGChannel_ECG_III->isEnabled())
     {
-        m_pRTSA_ECG_III_new = PluginOutputData<NewRealTimeSampleArray>::create(this, "ECG III", "ECG III output data");
-
         double diff = m_pECGChannel_ECG_III->getMaximum() - m_pECGChannel_ECG_III->getMinimum();
 
         m_pRTSA_ECG_III_new->data()->setName("ECG III");
@@ -165,8 +179,6 @@ void ECGSimulator::init()
         m_pRTSA_ECG_III_new->data()->setArraySize(10);
         m_pRTSA_ECG_III_new->data()->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
         m_pRTSA_ECG_III_new->data()->setVisibility(m_pECGChannel_ECG_III->isVisible());
-
-        m_outputConnectors.append(m_pRTSA_ECG_III_new);
     }
 }
 
@@ -175,6 +187,8 @@ void ECGSimulator::init()
 
 bool ECGSimulator::start()
 {
+    initChannels();
+
     // Start threads
     m_pECGProducer->start();
 
@@ -247,7 +261,6 @@ void ECGSimulator::run()
 
     while(true)
     {
-
         if(m_pECGChannel_ECG_I->isEnabled())
         {
             dValue_I = m_pInBuffer_I->pop();

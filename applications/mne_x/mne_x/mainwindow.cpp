@@ -494,6 +494,13 @@ void MainWindow::createLogDockWindow()
 //Plugin stuff
 void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
 {
+    //Garbage collecting
+    if(m_pRunWidget)
+    {
+        delete m_pRunWidget;
+        m_pRunWidget = NULL;
+    }
+
     if(pPlugin.isNull())
     {
         QWidget* pWidget = new QWidget;
@@ -501,14 +508,12 @@ void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
     }
     else
     {
+
+
         if(!m_bIsRunning)
             setCentralWidget(pPlugin->setupWidget());
         else
         {
-            //Garbage collecting
-            if(m_pRunWidget)
-                delete m_pRunWidget;
-
             m_pRunWidget = new RunWidget( m_pDisplayManager->show(pPlugin->getOutputConnectors(), m_pTime));
 
             m_pRunWidget->show();
@@ -567,6 +572,13 @@ void MainWindow::startMeasurement()
         return;
     }
 
+    uiSetupRunningState(true);
+    startTimer(m_iTimeoutMSec);
+
+    updatePluginWidget(m_pPluginGui->getCurrentPlugin());
+
+//    CentralWidgetShowPlugin();
+
 
 //    //OLD
 //    qDebug() << "MainCSART::startMeasurement()";
@@ -583,13 +595,6 @@ void MainWindow::startMeasurement()
 //    m_pPluginDockWidget->setTogglingEnabled(false);
 
 //    //OLD
-
-
-    uiSetupRunningState(true);
-    startTimer(m_iTimeoutMSec);
-
-    updatePluginWidget(m_pPluginGui->getCurrentPlugin());
-//    CentralWidgetShowPlugin();
 }
 
 
@@ -600,6 +605,13 @@ void MainWindow::stopMeasurement()
     writeToLog(tr("Stopping real-time measurement..."), _LogKndMessage, _LogLvMin);
 
     m_pPluginSceneManager->stopPlugins();
+    m_pDisplayManager->clean();
+
+    uiSetupRunningState(false);
+    stopTimer();
+
+    updatePluginWidget(m_pPluginGui->getCurrentPlugin());
+
 
 
 //    PluginManager::stopPlugins();
@@ -609,10 +621,6 @@ void MainWindow::stopMeasurement()
 //    qDebug() << "set stopped UI";
 
 //    m_pPluginDockWidget->setTogglingEnabled(true);
-    uiSetupRunningState(false);
-    stopTimer();
-
-    updatePluginWidget(m_pPluginGui->getCurrentPlugin());
 }
 
 

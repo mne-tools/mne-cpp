@@ -128,9 +128,16 @@ public:
 
     //=========================================================================================================
     /**
-    * Initialise the ECGSimulator.
+    * Initialise input and output connectors.
     */
     virtual void init();
+
+    //=========================================================================================================
+    /**
+    * Initialise the ECGSimulator.
+    */
+    void initChannels();
+
 
     virtual bool start();
     virtual bool stop();
