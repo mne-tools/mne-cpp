@@ -79,7 +79,7 @@ public:
     typedef QSharedPointer<PluginConnectorConnection> SPtr;             /**< Shared pointer type for PluginConnectorConnection. */
     typedef QSharedPointer<const PluginConnectorConnection> ConstSPtr;  /**< Const shared pointer type for PluginConnectorConnection. */
 
-    explicit PluginConnectorConnection(IPlugin::SPtr &sender, IPlugin::SPtr &receiver, QObject *parent = 0);
+    explicit PluginConnectorConnection(IPlugin::SPtr sender, IPlugin::SPtr receiver, QObject *parent = 0);
     
     //=========================================================================================================
     /**
@@ -97,7 +97,7 @@ public:
     /**
     * Create connection
     */
-    static inline QSharedPointer<PluginConnectorConnection> create(IPlugin::SPtr &sender, IPlugin::SPtr &receiver, QObject *parent = 0);
+    static inline QSharedPointer<PluginConnectorConnection> create(IPlugin::SPtr sender, IPlugin::SPtr receiver, QObject *parent = 0);
 
     inline IPlugin::SPtr& getSender();
 
@@ -128,7 +128,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline QSharedPointer<PluginConnectorConnection> PluginConnectorConnection::create(IPlugin::SPtr &sender, IPlugin::SPtr &receiver, QObject *parent)
+inline QSharedPointer<PluginConnectorConnection> PluginConnectorConnection::create(IPlugin::SPtr sender, IPlugin::SPtr receiver, QObject *parent)
 {
     QSharedPointer<PluginConnectorConnection> pPluginConnectorConnection(new PluginConnectorConnection(sender, receiver, parent));
     return pPluginConnectorConnection;
