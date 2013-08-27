@@ -36,9 +36,28 @@
 #ifndef ARROW_H
 #define ARROW_H
 
-#include <QGraphicsLineItem>
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
 
 #include "pluginitem.h"
+#include <mne_x/Management/pluginconnectorconnection.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QSharedPointer>
+#include <QGraphicsLineItem>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
 class QGraphicsPolygonItem;
 class QGraphicsLineItem;
@@ -46,7 +65,6 @@ class QGraphicsScene;
 class QRectF;
 class QGraphicsSceneMouseEvent;
 class QPainterPath;
-
 
 
 //*************************************************************************************************************
@@ -62,8 +80,7 @@ class Arrow : public QGraphicsLineItem
 public:
     enum { Type = UserType + 4 };
 
-    Arrow(PluginItem *startItem, PluginItem *endItem,
-      QGraphicsItem *parent = 0);
+    Arrow(PluginItem *startItem, PluginItem *endItem, PluginConnectorConnection::SPtr &connection, QGraphicsItem *parent = 0);
 
     int type() const { return Type; }
     QRectF boundingRect() const;
@@ -80,6 +97,9 @@ protected:
 private:
     PluginItem *m_StartItem;
     PluginItem *m_EndItem;
+
+    PluginConnectorConnection::SPtr m_pConnection;
+
     QColor m_qColor;
     QPolygonF arrowHead;
 };

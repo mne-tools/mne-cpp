@@ -182,7 +182,9 @@ public:
     virtual QWidget* setupWidget() = 0; //setup()
 
 
+    inline InputConnectorList& getInputConnectors(){return m_inputConnectors;}
     inline OutputConnectorList& getOutputConnectors(){return m_outputConnectors;}
+
 
 protected:
     //=========================================================================================================

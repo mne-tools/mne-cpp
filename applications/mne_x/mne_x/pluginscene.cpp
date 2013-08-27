@@ -163,19 +163,31 @@ void PluginScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
         removeItem(line);
         delete line;
 
+        //Insert Connection
         if (startItems.count() > 0 && endItems.count() > 0 &&
             startItems.first()->type() == PluginItem::Type &&
             endItems.first()->type() == PluginItem::Type &&
             startItems.first() != endItems.first()) {
+
             PluginItem *startItem = qgraphicsitem_cast<PluginItem *>(startItems.first());
             PluginItem *endItem = qgraphicsitem_cast<PluginItem *>(endItems.first());
-            Arrow *arrow = new Arrow(startItem, endItem);
-            arrow->setColor(m_qColorLine);
-            startItem->addArrow(arrow);
-            endItem->addArrow(arrow);
-            arrow->setZValue(-1000.0);
-            addItem(arrow);
-            arrow->updatePosition();
+
+            PluginConnectorConnection::SPtr pConnection = PluginConnectorConnection::create(startItem->plugin(), endItem->plugin());
+
+            if(pConnection->isConnected())
+            {
+//                connect(startItem->plugin()->getOutputConnectors()[0].data(), &PluginOutputConnector::notify,
+//                        endItem->plugin()->getInputConnectors()[0].data(), &PluginInputConnector::update);
+                Arrow *arrow = new Arrow(startItem, endItem, pConnection);
+                arrow->setColor(m_qColorLine);
+                startItem->addArrow(arrow);
+                endItem->addArrow(arrow);
+                arrow->setZValue(-1000.0);
+                addItem(arrow);
+                arrow->updatePosition();
+            }
+
+
         }
     }
     line = 0;
