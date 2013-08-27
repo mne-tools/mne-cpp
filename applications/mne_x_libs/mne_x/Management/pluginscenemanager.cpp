@@ -135,6 +135,8 @@ bool PluginSceneManager::removePlugin(const IPlugin::SPtr pPlugin)
 
 bool PluginSceneManager::startPlugins()
 {
+    qWarning() << "start 1";
+
     // Start ISensor and IRTAlgorithm plugins first!
     bool bFlag = startSensorPlugins();
 
@@ -153,6 +155,8 @@ bool PluginSceneManager::startPlugins()
 bool PluginSceneManager::startSensorPlugins()
 {
     bool bFlag = false;
+
+    qWarning() << "start 2";
 
     QList<IPlugin::SPtr>::iterator it = m_pluginList.begin();
     for( ; it != m_pluginList.end(); ++it)
