@@ -98,7 +98,6 @@ HEADERS += \
     Measurement/realtimemultisamplearray.h \
     Measurement/progressbar.h \
     Measurement/numeric.h \
-    Nomenclature/nomenclature.h \
     Measurement/sngchnmeasurement.h \
     Measurement/measurement.h \
     Measurement/mltchnmeasurement.h \
@@ -123,9 +122,5 @@ header_files.path = $${MNE_X_INCLUDE_DIR}/xMeas
 header_files_measurement.files = ./Measurement/*.h
 header_files_measurement.path = $${MNE_X_INCLUDE_DIR}/xMeas/Measurement
 
-header_files_nomenclature.files = ./Nomenclature/*.h
-header_files_nomenclature.path = $${MNE_X_INCLUDE_DIR}/xMeas/Nomenclature
-
 INSTALLS += header_files
 INSTALLS += header_files_measurement
-INSTALLS += header_files_nomenclature

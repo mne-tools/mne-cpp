@@ -71,6 +71,7 @@ namespace XMEASLIB
 */
 class XMEASSHARED_EXPORT NewNumeric : public NewMeasurement
 {
+    Q_OBJECT
 public:
     typedef QSharedPointer<NewNumeric> SPtr;               /**< Shared pointer type for NewNumeric. */
     typedef QSharedPointer<const NewNumeric> ConstSPtr;    /**< Const shared pointer type for NewNumeric. */

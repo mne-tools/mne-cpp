@@ -109,7 +109,7 @@ bool PluginConnectorConnection::createConnection()
             if(!senderConnector.isNull() && !receiverConnector.isNull())
             {
                 m_con = connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
-                        m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update);
+                        m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::BlockingQueuedConnection);
                 bConnected = true;
             }
         }
