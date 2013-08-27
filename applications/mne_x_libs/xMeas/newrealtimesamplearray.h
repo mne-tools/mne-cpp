@@ -79,6 +79,7 @@ namespace XMEASLIB
 */
 class XMEASSHARED_EXPORT NewRealTimeSampleArray : public NewMeasurement
 {
+    Q_OBJECT
 public:
     typedef QSharedPointer<NewRealTimeSampleArray> SPtr;               /**< Shared pointer type for NewRealTimeSampleArray. */
     typedef QSharedPointer<const NewRealTimeSampleArray> ConstSPtr;    /**< Const shared pointer type for NewRealTimeSampleArray. */

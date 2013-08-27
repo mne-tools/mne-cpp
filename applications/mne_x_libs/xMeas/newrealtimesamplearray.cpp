@@ -94,8 +94,8 @@ double NewRealTimeSampleArray::getValue() const
 
 void NewRealTimeSampleArray::setValue(double v)
 {
-//    if(v < m_dMinValue) v = m_dMinValue;
-//    else if(v > m_dMaxValue) v = m_dMaxValue;
+    if(v < m_dMinValue) v = m_dMinValue;
+    else if(v > m_dMaxValue) v = m_dMaxValue;
     m_dValue = v;
     m_vecSamples.push_back(m_dValue);
     if(m_vecSamples.size() >= m_ucArraySize)

@@ -111,6 +111,9 @@ header_files.path = $${MNE_X_INCLUDE_DIR}/mne_x
 header_files_interfaces.files = ./Interfaces/*.h
 header_files_interfaces.path = $${MNE_X_INCLUDE_DIR}/mne_x/Interfaces
 
+header_files_management.files = ./Interfaces/*.h
+header_files_management.path = $${MNE_X_INCLUDE_DIR}/mne_x/Management
+
 INSTALLS += header_files
 INSTALLS += header_files_interfaces
-
+INSTALLS += header_files_management

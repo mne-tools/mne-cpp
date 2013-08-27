@@ -194,8 +194,6 @@ void DummyToolbox::run()
 
         //ToDo: Implement your algorithm here
 
-        v = 5.0;
-
         m_pDummyOutput->data()->setValue(v);
     }
 }

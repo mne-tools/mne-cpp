@@ -58,7 +58,6 @@ NewNumeric::NewNumeric(QObject *parent)
 : NewMeasurement(QMetaType::type("NewNumeric::SPtr"), parent)
 , m_qString_Unit("")
 , m_dValue(-1)
-
 {
 
 }
