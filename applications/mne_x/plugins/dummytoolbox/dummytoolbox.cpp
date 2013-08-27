@@ -100,7 +100,7 @@ void DummyToolbox::init()
 {
     // Input
     m_pDummyInput = PluginInputData<NewRealTimeSampleArray>::create(this, "DummyIn", "Dummy input data");
-    connect(m_pDummyInput.data(), &PluginInputConnector::notify, this, &DummyToolbox::update);
+    connect(m_pDummyInput.data(), &PluginInputConnector::notify, this, &DummyToolbox::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pDummyInput);
 
     // Output
@@ -168,59 +168,17 @@ QWidget* DummyToolbox::setupWidget()
 void DummyToolbox::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
     QSharedPointer<NewRealTimeSampleArray> pRTSA = pMeasurement.dynamicCast<NewRealTimeSampleArray>();
-    qWarning() << "DummyToolbox::update" << pRTSA.isNull();
+//    qWarning() << "DummyToolbox::update" << pRTSA.isNull() << pRTSA->getArraySize();
 
-
-//    //donwsampled by arraysize of m_pRTSA -> then pick only the value
-//    bool downsampled = false;
-
-//    if(downsampled)
-//    {
-//        SngChnMeasurement* pMeasurement = static_cast<SngChnMeasurement*>(pSubject);
-
-//        //Using fast Hash Lookup instead of if then else clause
-//        if(getAcceptorMeasurementBuffer(pMeasurement->getID()))
-//        {
-//                //ToDo: Cast to specific Buffer
-//            getAcceptorMeasurementBuffer(pMeasurement->getID()).staticCast<DummyBuffer_old>()->push(pMeasurement->getValue());//if only every (arraysize)th value is necessary
-//        }
-//    }
-//    else
-//    {
-//        RealTimeSampleArray* pRTSA = static_cast<RealTimeSampleArray*>(pSubject);
-
-//        //Using fast Hash Lookup instead of if then else clause
-//        if(getAcceptorMeasurementBuffer(pRTSA->getID()))
-//        {
-//            if(pRTSA->getID() == MSR_ID::ECGSIM_I)
-//            {
-//                    //ToDo: Cast to specific Buffer
-//                for(unsigned char i = 0; i < pRTSA->getArraySize(); ++i)
-//                {
-//                    getAcceptorMeasurementBuffer(pRTSA->getID()).staticCast<DummyBuffer_old>()
-//                            ->push(pRTSA->getSampleArray()[i]);
-//                    //m_pDummyMultiChannelBuffer->push(0,pRTSA->getSampleArray()[i]);
-//                }
-//            }
-
-//            if(pRTSA->getID() == MSR_ID::ECGSIM_II)
-//            {
-//                    //ToDo: Cast to specific Buffer
-//                for(unsigned char i = 0; i < pRTSA->getArraySize(); ++i)
-//                {
-//                    //static_cast<_vector_double_CircularBuffer*>(m_pDummyMultiChannelBuffer/*getAcceptorMeasurementBuffer(pRTSA->getID())*/) //this is too complicated --> getAcceptorMeasurementBuffer was created to handle a bunch of channels... now with RTSM possible
-////                    QVector<double> myVector;
-////                    myVector.push_back(pRTSA->getSampleArray()[i]);
-
-////                    qDebug() << myVector.at(0);
-
-//                    //m_pDummyMultiChannelBuffer->push(myVector);
-//                    m_pDummyMultiChannelBuffer->push(0,pRTSA->getSampleArray()[i]);
-//                    m_pDummyMultiChannelBuffer->push(1,pRTSA->getSampleArray()[i]);
-//                }
-//            }
-//        }
-//    }
+    if(!pRTSA.isNull())
+    {
+        for(unsigned char i = 0; i < pRTSA->getArraySize(); ++i)
+        {
+            double value = pRTSA->getSampleArray()[i];
+            qWarning() << "Received:" << value;
+            m_pDummyBuffer->push(value);
+        }
+    }
 }
 
 
@@ -231,19 +189,12 @@ void DummyToolbox::run()
 {
     while (true)
     {
-//        double v_one = m_pDummyMultiChannelBuffer->pop(0);
-
-//        double v_two = m_pDummyMultiChannelBuffer->pop(1);
-
-//        QVector<double> vec = m_pDummyMultiChannelBuffer->pop();
-
-//        m_pDummy_MSA_Output->setVector(vec);
-
         /* Dispatch the inputs */
-
         double v = m_pDummyBuffer->pop();
 
-        //ToDo: Implement here the algorithm
+        //ToDo: Implement your algorithm here
+
+        v = 5.0;
 
         m_pDummyOutput->data()->setValue(v);
     }

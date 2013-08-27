@@ -42,9 +42,10 @@
 
 #include "../mne_x_global.h"
 
+#include "../Interfaces/IPlugin.h"
+
 #include "plugininputconnector.h"
 #include "pluginoutputconnector.h"
-#include "plugininputconnector.h"
 
 
 //*************************************************************************************************************
@@ -78,7 +79,7 @@ public:
     typedef QSharedPointer<PluginConnectorConnection> SPtr;             /**< Shared pointer type for PluginConnectorConnection. */
     typedef QSharedPointer<const PluginConnectorConnection> ConstSPtr;  /**< Const shared pointer type for PluginConnectorConnection. */
 
-    explicit PluginConnectorConnection(PluginOutputConnector::SPtr sender, PluginInputConnector::SPtr receiver, QObject *parent = 0);
+    explicit PluginConnectorConnection(IPlugin::SPtr &sender, IPlugin::SPtr &receiver, QObject *parent = 0);
     
     //=========================================================================================================
     /**
@@ -96,20 +97,30 @@ public:
     /**
     * Create connection
     */
-    void createConnection(PluginOutputConnector::SPtr sender, PluginInputConnector::SPtr receiver);
+    static inline QSharedPointer<PluginConnectorConnection> create(IPlugin::SPtr &sender, IPlugin::SPtr &receiver, QObject *parent = 0);
 
-    inline PluginOutputConnector::SPtr getSender();
+    inline IPlugin::SPtr& getSender();
 
-    inline PluginInputConnector::SPtr getReceiver();
+    inline IPlugin::SPtr& getReceiver();
 
+    inline bool isConnected();
 
 signals:
     
 private:
-    PluginOutputConnector::SPtr m_pSender;
-    PluginInputConnector::SPtr m_pReceiver;
+    //=========================================================================================================
+    /**
+    * Create connection
+    */
+    bool createConnection();
+
+    bool m_bConnectionState;
+
+    IPlugin::SPtr m_pSender;
+    IPlugin::SPtr m_pReceiver;
 
     QMetaObject::Connection m_con;
+
 };
 
 //*************************************************************************************************************
@@ -117,7 +128,16 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline PluginOutputConnector::SPtr PluginConnectorConnection::getSender()
+inline QSharedPointer<PluginConnectorConnection> PluginConnectorConnection::create(IPlugin::SPtr &sender, IPlugin::SPtr &receiver, QObject *parent)
+{
+    QSharedPointer<PluginConnectorConnection> pPluginConnectorConnection(new PluginConnectorConnection(sender, receiver, parent));
+    return pPluginConnectorConnection;
+}
+
+
+//*************************************************************************************************************
+
+inline IPlugin::SPtr& PluginConnectorConnection::getSender()
 {
     return m_pSender;
 }
@@ -125,9 +145,17 @@ inline PluginOutputConnector::SPtr PluginConnectorConnection::getSender()
 
 //*************************************************************************************************************
 
-inline PluginInputConnector::SPtr PluginConnectorConnection::getReceiver()
+inline IPlugin::SPtr& PluginConnectorConnection::getReceiver()
 {
     return m_pReceiver;
+}
+
+
+//*************************************************************************************************************
+
+inline bool PluginConnectorConnection::isConnected()
+{
+    return m_bConnectionState;
 }
 
 } // NAMESPACE

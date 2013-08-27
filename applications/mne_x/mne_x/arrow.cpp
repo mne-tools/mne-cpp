@@ -33,6 +33,11 @@
 *
 */
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
 #include "arrow.h"
 
 #include <math.h>
@@ -40,6 +45,11 @@
 #include <QPen>
 #include <QPainter>
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// CONSTS
+//=============================================================================================================
 
 const qreal Pi = 3.14;
 
@@ -51,8 +61,17 @@ const qreal Pi = 3.14;
 
 using namespace MNEX;
 
-Arrow::Arrow(PluginItem *startItem, PluginItem *endItem, QGraphicsItem *parent)
-    : QGraphicsLineItem(parent)
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+Arrow::Arrow(PluginItem *startItem, PluginItem *endItem, PluginConnectorConnection::SPtr &connection, QGraphicsItem *parent)
+: QGraphicsLineItem(parent)
+, m_StartItem(startItem)
+, m_EndItem(endItem)
+, m_pConnection(connection)
 {
     m_StartItem = startItem;
     m_EndItem = endItem;
@@ -60,6 +79,9 @@ Arrow::Arrow(PluginItem *startItem, PluginItem *endItem, QGraphicsItem *parent)
     m_qColor = Qt::black;
     setPen(QPen(m_qColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 }
+
+
+//*************************************************************************************************************
 
 QRectF Arrow::boundingRect() const
 {
@@ -71,6 +93,9 @@ QRectF Arrow::boundingRect() const
         .adjusted(-extra, -extra, extra, extra);
 }
 
+
+//*************************************************************************************************************
+
 QPainterPath Arrow::shape() const
 {
     QPainterPath path = QGraphicsLineItem::shape();
@@ -78,11 +103,17 @@ QPainterPath Arrow::shape() const
     return path;
 }
 
+
+//*************************************************************************************************************
+
 void Arrow::updatePosition()
 {
     QLineF line(mapFromItem(m_StartItem, 0, 0), mapFromItem(m_EndItem, 0, 0));
     setLine(line);
 }
+
+
+//*************************************************************************************************************
 
 void Arrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
           QWidget *)

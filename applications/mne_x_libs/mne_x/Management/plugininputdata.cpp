@@ -68,7 +68,6 @@ PluginInputData<T>::PluginInputData(IPlugin *parent, const QString &name, const 
 : PluginInputConnector(parent, name, descr)
 , m_pFunc(NULL)
 {
-    connect(this, &PluginInputConnector::notify, this, &PluginInputData<T>::notifyCallbackFunction);
 }
 
 
@@ -78,6 +77,7 @@ template <class T>
 void PluginInputData<T>::setCallbackMethod(callback_function pFunc)
 {
     m_pFunc = pFunc;
+    connect(this, &PluginInputConnector::notify, this, &PluginInputData<T>::notifyCallbackFunction);
 }
 
 
@@ -94,8 +94,6 @@ void PluginInputData<T>::notifyCallbackFunction(XMEASLIB::NewMeasurement::SPtr p
         (*m_pFunc)(measurement);
     }
 }
-
-
 
 }//Namespace
 
