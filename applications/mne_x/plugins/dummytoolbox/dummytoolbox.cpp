@@ -67,8 +67,9 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 DummyToolbox::DummyToolbox()
-: m_pDummy_Output(0)
-, m_pDummyBuffer(new CircularBuffer_old<double>(1024))
+: m_pDummyInput(0)
+, m_pDummyOutput(0)
+, m_pDummyBuffer(new dBuffer(1024))
 {
 }
 
@@ -87,6 +88,43 @@ QSharedPointer<IPlugin> DummyToolbox::clone() const
 {
     QSharedPointer<DummyToolbox> pDummyToolboxClone(new DummyToolbox);
     return pDummyToolboxClone;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Creating required display instances and set configurations
+//=============================================================================================================
+
+void DummyToolbox::init()
+{
+
+    // Input
+    m_pDummyInput = PluginInputData<NewRealTimeSampleArray>::create(this, "DummyIn", "Dummy input data");
+    connect(m_pDummyInput.data(), &PluginInputConnector::notify, this, &DummyToolbox::update);
+    m_inputConnectors.append(m_pDummyInput);
+
+    // Output
+    m_pDummyOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "DummyOut", "Dummy output data");
+    m_outputConnectors.append(m_pDummyOutput);
+
+    m_pDummyOutput->data()->setName("Dummy Output");
+    m_pDummyOutput->data()->setUnit("mV");
+    m_pDummyOutput->data()->setMinValue(-200);
+    m_pDummyOutput->data()->setMaxValue(360);
+    m_pDummyOutput->data()->setSamplingRate(256.0/1.0);
+
+
+//    t_buf = m_pDummyMultiChannelBuffer.staticCast<Buffer>(); //unix fix
+//    this->addAcceptorMeasurementBuffer(MSR_ID::ECGSIM_II, t_buf);
+
+//    m_pDummy_MSA_Output = addProviderRealTimeMultiSampleArray(MSR_ID::DUMMYTOOL_OUTPUT_II, 2);
+//    m_pDummy_MSA_Output->setName("Dummy Output II");
+//    m_pDummy_MSA_Output->setUnit("mV");
+//    m_pDummy_MSA_Output->setMinValue(-200);
+//    m_pDummy_MSA_Output->setMaxValue(360);
+//    m_pDummy_MSA_Output->setSamplingRate(256.0/1.0);
+
 }
 
 
@@ -143,10 +181,14 @@ QWidget* DummyToolbox::setupWidget()
 
 //*************************************************************************************************************
 
-void DummyToolbox::update(NewRealTimeSampleArray::SPtr)
+void DummyToolbox::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
-    //donwsampled by arraysize of m_pRTSA -> then pick only the value
-    bool downsampled = false;
+    QSharedPointer<NewRealTimeSampleArray> pRTSA = pMeasurement.dynamicCast<NewRealTimeSampleArray>();
+    qWarning() << "DummyToolbox::update" << pRTSA.isNull();
+
+
+//    //donwsampled by arraysize of m_pRTSA -> then pick only the value
+//    bool downsampled = false;
 
 //    if(downsampled)
 //    {
@@ -219,39 +261,7 @@ void DummyToolbox::run()
 
         //ToDo: Implement here the algorithm
 
-        m_pDummy_Output->data()->setValue(v);
+        m_pDummyOutput->data()->setValue(v);
     }
 }
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Creating required display instances and set configurations
-//=============================================================================================================
-
-void DummyToolbox::init()
-{
-
-//    this->addPlugin(PLG_ID::ECGSIM); //ToDo This should be obsolete -  measurement ID should be sufficient -> solve this by adding measurement IDs to subject?? attach observers to subjects with corresponding ID
-//    Buffer::SPtr t_buf = m_pDummyBuffer.staticCast<Buffer>(); //unix fix
-//    this->addAcceptorMeasurementBuffer(MSR_ID::ECGSIM_I, t_buf);
-
-//    m_pDummy_Output = addProviderRealTimeSampleArray(MSR_ID::DUMMYTOOL_OUTPUT);
-//    m_pDummy_Output->setName("Dummy Output");
-//    m_pDummy_Output->setUnit("mV");
-//    m_pDummy_Output->setMinValue(-200);
-//    m_pDummy_Output->setMaxValue(360);
-//    m_pDummy_Output->setSamplingRate(256.0/1.0);
-
-
-//    t_buf = m_pDummyMultiChannelBuffer.staticCast<Buffer>(); //unix fix
-//    this->addAcceptorMeasurementBuffer(MSR_ID::ECGSIM_II, t_buf);
-
-//    m_pDummy_MSA_Output = addProviderRealTimeMultiSampleArray(MSR_ID::DUMMYTOOL_OUTPUT_II, 2);
-//    m_pDummy_MSA_Output->setName("Dummy Output II");
-//    m_pDummy_MSA_Output->setUnit("mV");
-//    m_pDummy_MSA_Output->setMinValue(-200);
-//    m_pDummy_MSA_Output->setMaxValue(360);
-//    m_pDummy_MSA_Output->setSamplingRate(256.0/1.0);
-
-}
