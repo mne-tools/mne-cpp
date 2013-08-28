@@ -63,6 +63,8 @@ mnertclientSQUIDControlDgl::mnertclientSQUIDControlDgl(MneRtClient* p_pMneRtClie
 
     // retune connect
     connect(ui->m_Qbn_retune, &QPushButton::released, this, &mnertclientSQUIDControlDgl::SendRetune);
+    connect(ui->m_Qbn_Cancel, &QPushButton::released, this, &mnertclientSQUIDControlDgl::Cancel);
+
 
     // init
     Init();
@@ -85,6 +87,8 @@ void mnertclientSQUIDControlDgl::SendCMD(QString CMDSTR)
     // Read reply
     QString t_sReply = m_pMneRtClient->m_pRtCmdClient->readAvailableData();
     this->ui->m_tx_info->setText(QString("Reply:")+t_sReply);
+
+    qDebug()<<t_sReply;
     }
 }
 
@@ -98,4 +102,9 @@ void mnertclientSQUIDControlDgl::SendRetune()
 {
 
     SendCMD("RETU");
+}
+void mnertclientSQUIDControlDgl::Cancel()
+{
+    SendCMD("CANC");
+    this->close();
 }

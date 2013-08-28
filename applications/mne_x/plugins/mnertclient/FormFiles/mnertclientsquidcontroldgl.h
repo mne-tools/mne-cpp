@@ -87,6 +87,7 @@ private:
 public:
     MneRtClient*   m_pMneRtClient;
     void SendRetune();
+    void Cancel();
     void SendCMD(QString CMDSTR);
     void Init();
 
