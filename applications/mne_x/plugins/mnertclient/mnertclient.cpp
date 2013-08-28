@@ -91,7 +91,8 @@ MneRtClient::MneRtClient()
 
 MneRtClient::~MneRtClient()
 {
-
+    stop();
+    m_pMneRtClientProducer->stop();
 }
 
 

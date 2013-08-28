@@ -134,6 +134,7 @@ void MneRtClientProducer::disconnectDataClient()
 void MneRtClientProducer::stop()
 {
     m_bIsRunning = false;
+    QThread::terminate();
     QThread::wait();
 }
 
