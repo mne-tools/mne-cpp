@@ -42,7 +42,6 @@
 #include "mnertclientproducer.h"
 
 #include "FormFiles/mnertclientsetupwidget.h"
-#include "FormFiles/mnertclientrunwidget.h"
 
 #include <utils/ioutils.h>
 
@@ -75,17 +74,41 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 MneRtClient::MneRtClient()
-: m_pRTMSA_MneRtClient(0)
-, m_sMneRtClientClientAlias("mne-x")
+: m_sMneRtClientClientAlias("mne-x")
 , m_pRtCmdClient(NULL)
 , m_pMneRtClientProducer(new MneRtClientProducer(this))
 , m_sMneRtClientIP("127.0.0.1")//("172.21.16.88")//("127.0.0.1")
 , m_bCmdClientIsConnected(false)
 , m_iBufferSize(-1)
-, m_pRawMatrixBuffer_In(NULL)
+, m_pRawMatrixBuffer_In(0)
+/*m_pRTMSA_MneRtClient(0)*/
 {
-    m_PLG_ID = PLG_ID::MNERTCLIENT;
 
+}
+
+
+//*************************************************************************************************************
+
+MneRtClient::~MneRtClient()
+{
+    stop();
+    m_pMneRtClientProducer->stop();
+}
+
+
+//*************************************************************************************************************
+
+QSharedPointer<IPlugin> MneRtClient::clone() const
+{
+    QSharedPointer<MneRtClient> pMneRtClientClone(new MneRtClient());
+    return pMneRtClientClone;
+}
+
+
+//*************************************************************************************************************
+
+void MneRtClient::init()
+{
     // Start MneRtClientProducer
     m_pMneRtClientProducer->start();
 
@@ -94,7 +117,7 @@ MneRtClient::MneRtClient()
 //    connect(&m_cmdConnectionTimer, &QTimer::timeout, this, &MneRtClient::connectCmdClient);
 
     //init channels when fiff info is available
-    connect(this, &MneRtClient::fiffInfoAvailable, this, &MneRtClient::init);
+    connect(this, &MneRtClient::fiffInfoAvailable, this, &MneRtClient::initConnector);
 
 //    //Start convinience timer
 //    m_cmdConnectionTimer.start(5000);
@@ -105,14 +128,37 @@ MneRtClient::MneRtClient()
 
 
 //*************************************************************************************************************
+//=============================================================================================================
+// Create measurement instances and config them
+//=============================================================================================================
 
-MneRtClient::~MneRtClient()
+void MneRtClient::initConnector()
 {
-    if(m_pRtCmdClient)
-        delete m_pRtCmdClient;
 
-    if(m_pRawMatrixBuffer_In)
-        delete m_pRawMatrixBuffer_In;
+
+    qDebug() << "MneRtClient::init()";
+
+//    if(m_pFiffInfo)
+//    {
+////        m_pFiffInfo->sfreq /= 100;
+//        m_pRTMSA_MneRtClient = addProviderRealTimeMultiSampleArray_New(MSR_ID::MEGMNERTCLIENT_OUTPUT);
+//        m_pRTMSA_MneRtClient->initFromFiffInfo(m_pFiffInfo);
+//        m_pRTMSA_MneRtClient->setMultiArraySize(10);
+//    }
+
+
+    if(m_pFiffInfo)
+    {
+        m_pRTMSA_MneRtClient = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "RtClient", "MNE Rt Client");
+
+        m_pRTMSA_MneRtClient->data()->initFromFiffInfo(m_pFiffInfo);
+        m_pRTMSA_MneRtClient->data()->setMultiArraySize(10);
+
+        m_pRTMSA_MneRtClient->data()->setVisibility(true);
+
+        m_outputConnectors.append(m_pRTMSA_MneRtClient);
+    }
+
 }
 
 
@@ -165,8 +211,8 @@ void MneRtClient::clear()
 
 void MneRtClient::connectCmdClient()
 {
-    if(!m_pRtCmdClient)
-        m_pRtCmdClient = new RtCmdClient();
+    if(m_pRtCmdClient.isNull())
+        m_pRtCmdClient = QSharedPointer<RtCmdClient>(new RtCmdClient);
     else if(m_bCmdClientIsConnected)
         this->disconnectCmdClient();
 
@@ -265,9 +311,7 @@ bool MneRtClient::start()
         (*m_pRtCmdClient)["bufsize"].send();
 
         // Buffer
-        if(m_pRawMatrixBuffer_In)
-            delete m_pRawMatrixBuffer_In;
-        m_pRawMatrixBuffer_In = new RawMatrixBuffer(8,m_pFiffInfo->nchan,m_iBufferSize);
+        m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8,m_pFiffInfo->nchan,m_iBufferSize));
 
         // Start threads
         QThread::start();
@@ -315,7 +359,7 @@ bool MneRtClient::stop()
 
 //*************************************************************************************************************
 
-Type MneRtClient::getType() const
+IPlugin::PluginType MneRtClient::getType() const
 {
     return _ISensor;
 }
@@ -323,7 +367,7 @@ Type MneRtClient::getType() const
 
 //*************************************************************************************************************
 
-const char* MneRtClient::getName() const
+QString MneRtClient::getName() const
 {
     return "RT Client";
 }
@@ -343,35 +387,6 @@ QWidget* MneRtClient::setupWidget()
 
 //*************************************************************************************************************
 
-QWidget* MneRtClient::runWidget()
-{
-    MneRtClientRunWidget* widget = new MneRtClientRunWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
-    return widget;
-}
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Create measurement instances and config them
-//=============================================================================================================
-
-void MneRtClient::init()
-{
-    qDebug() << "MneRtClient::init()";
-
-    if(m_pFiffInfo)
-    {
-//        m_pFiffInfo->sfreq /= 100;
-        m_pRTMSA_MneRtClient = addProviderRealTimeMultiSampleArray_New(MSR_ID::MEGMNERTCLIENT_OUTPUT);
-        m_pRTMSA_MneRtClient->initFromFiffInfo(m_pFiffInfo);
-        m_pRTMSA_MneRtClient->setMultiArraySize(10);
-        m_pRTMSA_MneRtClient->setVisibility(true);
-    }
-}
-
-
-//*************************************************************************************************************
-
 void MneRtClient::run()
 {
 
@@ -384,7 +399,7 @@ void MneRtClient::run()
 
         //emit values
         for(qint32 i = 0; i < matValue.cols(); ++i)
-            m_pRTMSA_MneRtClient->setValue(matValue.col(i).cast<double>());
+            m_pRTMSA_MneRtClient->data()->setValue(matValue.col(i).cast<double>());
 //        for(qint32 i = 0; i < matValue.cols(); i += 100)
 //            m_pRTMSA_MneRtClient->setValue(matValue.col(i).cast<double>());
     }

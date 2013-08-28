@@ -47,8 +47,8 @@
 #include "ecgsimchannel.h"
 
 #include <mne_x/Interfaces/ISensor.h>
-#include <generics/circularbuffer_old.h>
-#include <xMeas/Measurement/realtimesamplearray.h>
+#include <generics/circularbuffer.h>
+#include <xMeas/newrealtimesamplearray.h>
 
 
 //*************************************************************************************************************
@@ -62,10 +62,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE ECGSimulatorModule
+// DEFINE NAMESPACE ECGSimulatorPlugin
 //=============================================================================================================
 
-namespace ECGSimulatorModule
+namespace ECGSimulatorPlugin
 {
 
 
@@ -75,6 +75,7 @@ namespace ECGSimulatorModule
 //=============================================================================================================
 
 using namespace MNEX;
+using namespace XMEASLIB;
 using namespace IOBuffer;
 
 
@@ -105,26 +106,44 @@ class ECGSIMULATORSHARED_EXPORT ECGSimulator : public ISensor
     friend class ECGRunWidget;
 
 public:
-
     //=========================================================================================================
     /**
     * Constructs a ECGSimulator.
     */
     ECGSimulator();
+
     //=========================================================================================================
     /**
     * Destroys the ECGSimulator.
     */
     virtual ~ECGSimulator();
 
+    //=========================================================================================================
+    /**
+    * Clone the plugin
+    */
+    virtual QSharedPointer<IPlugin> clone() const;
+
+    //=========================================================================================================
+    /**
+    * Initialise input and output connectors.
+    */
+    virtual void init();
+
+    //=========================================================================================================
+    /**
+    * Initialise the ECGSimulator.
+    */
+    void initChannels();
+
+
     virtual bool start();
     virtual bool stop();
 
-    virtual Type getType() const;
-    virtual const char* getName() const;
+    virtual IPlugin::PluginType getType() const;
+    virtual QString getName() const;
 
     virtual QWidget* setupWidget();
-	virtual QWidget* runWidget();
 
     //=========================================================================================================
     /**
@@ -132,35 +151,29 @@ public:
     *
     * @return the ECGSimulator resource path.
     */
-    QString getResourcePath(){return m_qStringResourcePath;};
+    QString getResourcePath() const {return m_qStringResourcePath;}
 
 
 protected:
     virtual void run();
 
 private:
-    //=========================================================================================================
-    /**
-    * Initialise the ECGSimulator.
-    */
-    void init();
+    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_ECG_I_new;   /**< The RealTimeSampleArray to provide the channel ECG I.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_ECG_II_new;  /**< The RealTimeSampleArray to provide the channel ECG II.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_ECG_III_new; /**< The RealTimeSampleArray to provide the channel ECG III.*/
 
-    RealTimeSampleArray::SPtr m_pRTSA_ECG_I;      /**< Holds the RealTimeSampleArray to provide the channel ECG I.*/
-    RealTimeSampleArray::SPtr m_pRTSA_ECG_II;     /**< Holds the RealTimeSampleArray to provide the channel ECG II.*/
-    RealTimeSampleArray::SPtr m_pRTSA_ECG_III;    /**< Holds the RealTimeSampleArray to provide the channel ECG III.*/
+    float           m_fSamplingRate;        /**< the sampling rate.*/
+    int             m_iDownsamplingFactor;  /**< the down sampling factor.*/
+    dBuffer::SPtr   m_pInBuffer_I;          /**< ECG I data which arrive from ECG producer.*/
+    dBuffer::SPtr   m_pInBuffer_II;         /**< ECG II data which arrive from ECG producer.*/
+    dBuffer::SPtr   m_pInBuffer_III;        /**< ECG III data which arrive from ECG producer.*/
+    QSharedPointer<ECGProducer>     m_pECGProducer; /**< the ECGProducer.*/
 
-    float           m_fSamplingRate;            /**< Holds the sampling rate.*/
-    int             m_iDownsamplingFactor;      /**< Holds the down sampling factor.*/
-    ECGBuffer_old*      m_pInBuffer_I;          /**< Holds ECG I data which arrive from ECG producer.*/
-    ECGBuffer_old*      m_pInBuffer_II;         /**< Holds ECG II data which arrive from ECG producer.*/
-    ECGBuffer_old*      m_pInBuffer_III;        /**< Holds ECG III data which arrive from ECG producer.*/
-    ECGProducer*    m_pECGProducer;             /**< Holds the ECGProducer.*/
+    QString m_qStringResourcePath;          /**< the path to the ECG resource directory.*/
 
-    QString m_qStringResourcePath;          /**< Holds the path to the ECG resource directory.*/
-
-    ECGSimChannel* m_pECGChannel_ECG_I;     /**< Holds the simulation channel for ECG I.*/
-    ECGSimChannel* m_pECGChannel_ECG_II;    /**< Holds the simulation channel for ECG II.*/
-    ECGSimChannel* m_pECGChannel_ECG_III;   /**< Holds the simulation channel for ECG III.*/
+    ECGSimChannel::SPtr m_pECGChannel_ECG_I;    /**< the simulation channel for ECG I.*/
+    ECGSimChannel::SPtr m_pECGChannel_ECG_II;   /**< the simulation channel for ECG II.*/
+    ECGSimChannel::SPtr m_pECGChannel_ECG_III;  /**< the simulation channel for ECG III.*/
 };
 
 } // NAMESPACE

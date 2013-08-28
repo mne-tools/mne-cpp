@@ -42,9 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <xMeas/Measurement/IMeasurementSource.h>
-
-#include <xMeas/Nomenclature/nomenclature.h>
+#include "IPlugin.h"
 
 
 //*************************************************************************************************************
@@ -62,7 +60,7 @@ namespace MNEX
 *
 * @brief The ISensor class provides an interface for a sensor plugin.
 */
-class ISensor : public IMeasurementSource
+class ISensor : public IPlugin
 {
 //ToDo virtual methods of IMeasurementSource
 public:
@@ -72,6 +70,12 @@ public:
     * Destroys the ISensor.
     */
     virtual ~ISensor() {};
+
+    //=========================================================================================================
+    /**
+    * Clone the plugin
+    */
+    virtual QSharedPointer<IPlugin> clone() const = 0;
 
     //=========================================================================================================
     /**
@@ -98,7 +102,7 @@ public:
     *
     * @return type of the ISensor
     */
-    virtual Type getType() const = 0;
+    virtual PluginType getType() const = 0;
 
     //=========================================================================================================
     /**
@@ -107,7 +111,15 @@ public:
     *
     * @return the name of the ISensor.
     */
-    virtual const char* getName() const = 0;
+    virtual QString getName() const = 0;
+
+    //=========================================================================================================
+    /**
+    * True if multi instantiation of plugin is allowed.
+    *
+    * @return true if multi instantiation of plugin is allowed.
+    */
+    virtual inline bool multiInstanceAllowed() const;
 
     //=========================================================================================================
     /**
@@ -118,15 +130,6 @@ public:
     */
     virtual QWidget* setupWidget() = 0;
 
-    //=========================================================================================================
-    /**
-    * Returns the widget which is shown under configuration tab while running mode.
-    * Pure virtual method inherited by IModule.
-    *
-    * @return the run widget.
-    */
-    virtual QWidget* runWidget() = 0;
-
 protected:
 
     //=========================================================================================================
@@ -136,8 +139,17 @@ protected:
     * Pure virtual method inherited by QThread.
     */
     virtual void run() = 0;
-
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline bool ISensor::multiInstanceAllowed() const
+{
+    return false;
+}
 
 } //NAMESPACE
 
