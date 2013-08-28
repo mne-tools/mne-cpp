@@ -58,8 +58,6 @@ using namespace XMEASLIB;
 Measurement::Measurement()
 : Subject()
 , m_qString_Name("")
-//, m_MDL_ID(MDL_ID::_default)
-, m_MSR_ID(MSR_ID::_default)
 , m_bVisibility(true)
 {
 

@@ -157,11 +157,11 @@ private:
 
     QMutex producerMutex;
 
-    MneRtClient*   m_pMneRtClient;    /**< Holds a pointer to corresponding MneRtClient.*/
-    bool        m_bIsRunning;   /**< Whether MneRtClientProducer is running.*/
+    MneRtClient*   m_pMneRtClient;  /**< Holds a pointer to corresponding MneRtClient.*/
+    bool        m_bIsRunning;       /**< Whether MneRtClientProducer is running.*/
 
-    RtDataClient* m_pRtDataClient;  /**< The data client.*/
-    bool m_bDataClientIsConnected;  /**< If the data client is connected.*/
+    QSharedPointer<RtDataClient> m_pRtDataClient;   /**< The data client.*/
+    bool m_bDataClientIsConnected;                  /**< If the data client is connected.*/
 
     qint32 m_iDataClientId;
 

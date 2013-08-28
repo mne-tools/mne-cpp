@@ -45,6 +45,8 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
+#CONFIG += console #DEBUG
+
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
@@ -54,7 +56,6 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lxMeasd \
             -lxDispd \
-            -lxDtMngd \
             -lmne_xd
 }
 else {
@@ -65,33 +66,38 @@ else {
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lxMeas \
             -lxDisp \
-            -lxDtMng \
             -lmne_x
 }
 
 DESTDIR = $${MNE_BINARY_DIR}
 
 SOURCES += \
-    src/main.cpp \
-    src/FormFiles/startupwidget.cpp \
-    src/FormFiles/runwidget.cpp \
-    src/FormFiles/mainwindow.cpp \
-    src/FormFiles/mainsplashscreen.cpp \
-    src/FormFiles/plugindockwidget.cpp
+    main.cpp \
+    startupwidget.cpp \
+    runwidget.cpp \
+    mainwindow.cpp \
+    mainsplashscreen.cpp \
+    pluginscene.cpp \
+    pluginitem.cpp \
+    plugingui.cpp \
+    arrow.cpp
 
 HEADERS += \
-    src/FormFiles/startupwidget.h \
-    src/FormFiles/runwidget.h \
-    src/FormFiles/mainwindow.h \
-    src/FormFiles/mainsplashscreen.h \
-    src/preferences/info.h \
-    src/FormFiles/plugindockwidget.h
+    info.h \
+    startupwidget.h \
+    runwidget.h \
+    mainwindow.h \
+    mainsplashscreen.h \
+    pluginscene.h \
+    pluginitem.h \
+    plugingui.h \
+    arrow.h
 
-FORMS   +=
+FORMS +=
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 
 RESOURCES += \
-    res/mainApp.qrc
+    mainApp.qrc
