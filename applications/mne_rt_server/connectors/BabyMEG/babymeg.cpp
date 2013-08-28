@@ -156,7 +156,7 @@ void BabyMEG::comFLL(Command p_command)
 
 void BabyMEG::setCMDData(QByteArray DATA)
 {
-    m_commandManager["FLL"].reply("FLL-OK"+DATA);
+    m_commandManager["FLL"].reply(DATA);
 }
 
 
