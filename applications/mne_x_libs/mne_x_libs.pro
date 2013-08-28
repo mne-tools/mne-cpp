@@ -41,8 +41,8 @@ contains(MNECPP_CONFIG, isGui) {
     SUBDIRS += \
         xMeas \
         xDisp \
-        xDtMng \
         mne_x
+#        xDtMng \
 }
 
 CONFIG += ordered

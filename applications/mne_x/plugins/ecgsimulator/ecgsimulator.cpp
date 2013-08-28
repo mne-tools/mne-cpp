@@ -4,7 +4,7 @@
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     August, 2013
 *
 * @section  LICENSE
 *
@@ -42,7 +42,8 @@
 #include "ecgproducer.h"
 
 #include "FormFiles/ecgsetupwidget.h"
-#include "FormFiles/ecgrunwidget.h"
+
+#include <iostream>
 
 
 //*************************************************************************************************************
@@ -62,7 +63,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ECGSimulatorModule;
+using namespace ECGSimulatorPlugin;
+using namespace XMEASLIB;
 
 
 //*************************************************************************************************************
@@ -71,21 +73,18 @@ using namespace ECGSimulatorModule;
 //=============================================================================================================
 
 ECGSimulator::ECGSimulator()
-: m_pRTSA_ECG_I(0)
-, m_pRTSA_ECG_II(0)
-, m_pRTSA_ECG_III(0)
+: m_pRTSA_ECG_I_new(0)
 , m_fSamplingRate(250.0)
 , m_iDownsamplingFactor(1)
-, m_pInBuffer_I(new ECGBuffer_old(1024))
-, m_pInBuffer_II(new ECGBuffer_old(1024))
-, m_pInBuffer_III(new ECGBuffer_old(1024))
+, m_pInBuffer_I(new dBuffer(1024))
+, m_pInBuffer_II(new dBuffer(1024))
+, m_pInBuffer_III(new dBuffer(1024))
 , m_pECGProducer(new ECGProducer(this, m_pInBuffer_I, m_pInBuffer_II, m_pInBuffer_III))
 , m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/ECGSimulator/")
 , m_pECGChannel_ECG_I(new ECGSimChannel(m_qStringResourcePath+"data/", QString("ECG_I_256_s30661.txt")))
 , m_pECGChannel_ECG_II(new ECGSimChannel(m_qStringResourcePath+"data/", QString("ECG_II_256_s30661.txt")))
 , m_pECGChannel_ECG_III(new ECGSimChannel(m_qStringResourcePath+"data/", QString("ECG_III_256_s30661.txt")))
 {
-    m_PLG_ID = PLG_ID::ECGSIM;
 }
 
 
@@ -93,10 +92,94 @@ ECGSimulator::ECGSimulator()
 
 ECGSimulator::~ECGSimulator()
 {
-    delete m_pInBuffer_I;
-    delete m_pInBuffer_II;
-    delete m_pInBuffer_III;
-    delete m_pECGProducer;
+    qWarning() << "ECGSimulator::~ECGSimulator()";
+}
+
+
+//*************************************************************************************************************
+
+QSharedPointer<IPlugin> ECGSimulator::clone() const
+{
+    QSharedPointer<ECGSimulator> pECGSimulatorClone(new ECGSimulator());
+    return pECGSimulatorClone;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Create measurement instances and config them
+//=============================================================================================================
+void ECGSimulator::init()
+{
+    if(m_pECGChannel_ECG_I->isEnabled())
+    {
+        m_pRTSA_ECG_I_new = PluginOutputData<NewRealTimeSampleArray>::create(this, "ECG I", "ECG I output data");
+        m_outputConnectors.append(m_pRTSA_ECG_I_new);
+    }
+
+    if(m_pECGChannel_ECG_II->isEnabled())
+    {
+        m_pRTSA_ECG_II_new = PluginOutputData<NewRealTimeSampleArray>::create(this, "ECG II", "ECG II output data");
+        m_outputConnectors.append(m_pRTSA_ECG_II_new);
+    }
+
+    if(m_pECGChannel_ECG_III->isEnabled())
+    {
+        m_pRTSA_ECG_III_new = PluginOutputData<NewRealTimeSampleArray>::create(this, "ECG III", "ECG III output data");
+        m_outputConnectors.append(m_pRTSA_ECG_III_new);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void ECGSimulator::initChannels()
+{
+    m_pECGChannel_ECG_I->initChannel();
+    m_pECGChannel_ECG_II->initChannel();
+    m_pECGChannel_ECG_III->initChannel();
+
+    if(m_pECGChannel_ECG_I->isEnabled())
+    {
+        double diff = m_pECGChannel_ECG_I->getMaximum() - m_pECGChannel_ECG_I->getMinimum();
+
+        m_pRTSA_ECG_I_new->data()->setName("ECG I");
+        m_pRTSA_ECG_I_new->data()->setUnit("mV");
+
+        m_pRTSA_ECG_I_new->data()->setMinValue(m_pECGChannel_ECG_I->getMinimum()-diff/10);
+        m_pRTSA_ECG_I_new->data()->setMaxValue(m_pECGChannel_ECG_I->getMaximum()+diff/10);
+        m_pRTSA_ECG_I_new->data()->setArraySize(10);
+        m_pRTSA_ECG_I_new->data()->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
+        m_pRTSA_ECG_I_new->data()->setVisibility(m_pECGChannel_ECG_I->isVisible());
+    }
+
+    if(m_pECGChannel_ECG_II->isEnabled())
+    {
+        double diff = m_pECGChannel_ECG_II->getMaximum() - m_pECGChannel_ECG_II->getMinimum();
+
+        m_pRTSA_ECG_II_new->data()->setName("ECG II");
+        m_pRTSA_ECG_II_new->data()->setUnit("mV");
+
+        m_pRTSA_ECG_II_new->data()->setMinValue(m_pECGChannel_ECG_II->getMinimum()-diff/10);
+        m_pRTSA_ECG_II_new->data()->setMaxValue(m_pECGChannel_ECG_II->getMaximum()+diff/10);
+        m_pRTSA_ECG_II_new->data()->setArraySize(10);
+        m_pRTSA_ECG_II_new->data()->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
+        m_pRTSA_ECG_II_new->data()->setVisibility(m_pECGChannel_ECG_II->isVisible());
+    }
+
+    if(m_pECGChannel_ECG_III->isEnabled())
+    {
+        double diff = m_pECGChannel_ECG_III->getMaximum() - m_pECGChannel_ECG_III->getMinimum();
+
+        m_pRTSA_ECG_III_new->data()->setName("ECG III");
+        m_pRTSA_ECG_III_new->data()->setUnit("mV");
+
+        m_pRTSA_ECG_III_new->data()->setMinValue(m_pECGChannel_ECG_III->getMinimum()-diff/10);
+        m_pRTSA_ECG_III_new->data()->setMaxValue(m_pECGChannel_ECG_III->getMaximum()+diff/10);
+        m_pRTSA_ECG_III_new->data()->setArraySize(10);
+        m_pRTSA_ECG_III_new->data()->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
+        m_pRTSA_ECG_III_new->data()->setVisibility(m_pECGChannel_ECG_III->isVisible());
+    }
 }
 
 
@@ -104,13 +187,7 @@ ECGSimulator::~ECGSimulator()
 
 bool ECGSimulator::start()
 {
-
-    m_pECGChannel_ECG_I->initChannel();
-    m_pECGChannel_ECG_II->initChannel();
-    m_pECGChannel_ECG_III->initChannel();
-
-    // Initialize real time measurements
-    init();
+    initChannels();
 
     // Start threads
     m_pECGProducer->start();
@@ -126,7 +203,7 @@ bool ECGSimulator::start()
 bool ECGSimulator::stop()
 {
     // Stop threads
-	m_pECGProducer->stop();
+    m_pECGProducer->stop();
     QThread::terminate();
     QThread::wait();
 
@@ -145,7 +222,7 @@ bool ECGSimulator::stop()
 
 //*************************************************************************************************************
 
-Type ECGSimulator::getType() const
+IPlugin::PluginType ECGSimulator::getType() const
 {
     return _ISensor;
 }
@@ -153,7 +230,7 @@ Type ECGSimulator::getType() const
 
 //*************************************************************************************************************
 
-const char* ECGSimulator::getName() const
+QString ECGSimulator::getName() const
 {
     return "ECG Simulator";
 }
@@ -176,66 +253,6 @@ QWidget* ECGSimulator::setupWidget()
 
 //*************************************************************************************************************
 
-QWidget* ECGSimulator::runWidget()
-{
-    ECGRunWidget* widget = new ECGRunWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
-    return widget;
-}
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Create measurement instances and config them
-//=============================================================================================================
-
-void ECGSimulator::init()
-{
-    qDebug() << "ECGSimulator::init()";
-
-    if(m_pECGChannel_ECG_I->isEnabled())
-    {
-        double diff = m_pECGChannel_ECG_I->getMaximum() - m_pECGChannel_ECG_I->getMinimum();
-
-        m_pRTSA_ECG_I = addProviderRealTimeSampleArray(MSR_ID::ECGSIM_I);
-        m_pRTSA_ECG_I->setName("ECG I");
-        m_pRTSA_ECG_I->setUnit("mV");
-        m_pRTSA_ECG_I->setMinValue(m_pECGChannel_ECG_I->getMinimum()-diff/10);
-        m_pRTSA_ECG_I->setMaxValue(m_pECGChannel_ECG_I->getMaximum()+diff/10);
-        m_pRTSA_ECG_I->setArraySize(10);
-        m_pRTSA_ECG_I->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
-        m_pRTSA_ECG_I->setVisibility(m_pECGChannel_ECG_I->isVisible());
-    }
-
-    if(m_pECGChannel_ECG_II->isEnabled())
-    {
-        double diff = m_pECGChannel_ECG_II->getMaximum() - m_pECGChannel_ECG_II->getMinimum();
-        m_pRTSA_ECG_II = addProviderRealTimeSampleArray(MSR_ID::ECGSIM_II);
-        m_pRTSA_ECG_II->setName("ECG II");
-        m_pRTSA_ECG_II->setUnit("mV");
-        m_pRTSA_ECG_II->setMinValue(m_pECGChannel_ECG_II->getMinimum()-diff/10);
-        m_pRTSA_ECG_II->setMaxValue(m_pECGChannel_ECG_II->getMaximum()+diff/10);
-        m_pRTSA_ECG_II->setArraySize(10);
-        m_pRTSA_ECG_II->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
-        m_pRTSA_ECG_II->setVisibility(m_pECGChannel_ECG_II->isVisible());
-    }
-
-    if(m_pECGChannel_ECG_III->isEnabled())
-    {
-        double diff = m_pECGChannel_ECG_III->getMaximum() - m_pECGChannel_ECG_III->getMinimum();
-        m_pRTSA_ECG_III = addProviderRealTimeSampleArray(MSR_ID::ECGSIM_III);
-        m_pRTSA_ECG_III->setName("ECG III");
-        m_pRTSA_ECG_III->setUnit("mV");
-        m_pRTSA_ECG_III->setMinValue(m_pECGChannel_ECG_III->getMinimum()-diff/10);
-        m_pRTSA_ECG_III->setMaxValue(m_pECGChannel_ECG_III->getMaximum()+diff/10);
-        m_pRTSA_ECG_III->setArraySize(10);
-        m_pRTSA_ECG_III->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
-        m_pRTSA_ECG_III->setVisibility(m_pECGChannel_ECG_III->isVisible());
-    }
-}
-
-
-//*************************************************************************************************************
-
 void ECGSimulator::run()
 {
     double dValue_I = 0;
@@ -244,21 +261,20 @@ void ECGSimulator::run()
 
     while(true)
     {
-
         if(m_pECGChannel_ECG_I->isEnabled())
         {
             dValue_I = m_pInBuffer_I->pop();
-            m_pRTSA_ECG_I->setValue(dValue_I);
+            m_pRTSA_ECG_I_new->data()->setValue(dValue_I);
         }
         if(m_pECGChannel_ECG_II->isEnabled())
         {
             dValue_II = m_pInBuffer_II->pop();
-            m_pRTSA_ECG_II->setValue(dValue_II);
+            m_pRTSA_ECG_II_new->data()->setValue(dValue_II);
         }
         if(m_pECGChannel_ECG_III->isEnabled())
         {
             dValue_III = m_pInBuffer_III->pop();
-            m_pRTSA_ECG_III->setValue(dValue_III);
+            m_pRTSA_ECG_III_new->data()->setValue(dValue_III);
         }
     }
 }

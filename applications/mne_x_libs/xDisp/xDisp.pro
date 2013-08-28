@@ -72,39 +72,39 @@ win32 {
 
 SOURCES += \
         measurementwidget.cpp \
-        displaymanager.cpp \
-        realtimesamplearraywidget.cpp \
+        newmeasurementwidget.cpp \
         realtimemultisamplearraywidget.cpp \
         textwidget.cpp \
         progressbarwidget.cpp \
         numericwidget.cpp \
-    realtimemultisamplearray_new_widget.cpp \
-    realtimesourceestimatewidget.cpp
+        realtimemultisamplearray_new_widget.cpp \
+        realtimesourceestimatewidget.cpp \
+        newrealtimesamplearraywidget.cpp \
+        newrealtimemultisamplearraywidget.cpp
 
 HEADERS += \
         xdisp_global.h \
         measurementwidget.h \
-        realtimesamplearraywidget.h \
-        displaymanager.h \
-        realtimesamplearraywidget.h \
+        newmeasurementwidget.h \
         realtimemultisamplearraywidget.h \
         textwidget.h \
         progressbarwidget.h \
         numericwidget.h \
-    realtimemultisamplearray_new_widget.h \
-    realtimesourceestimatewidget.h
+        realtimemultisamplearray_new_widget.h \
+        realtimesourceestimatewidget.h \
+        newrealtimesamplearraywidget.h \
+        newrealtimemultisamplearraywidget.h
 
 FORMS += \
-    realtimesamplearraywidget.ui \
     realtimemultisamplearraywidget.ui \
-    realtimesamplearraywidget.ui \
-    realtimesamplearraywidget.ui \
     realtimemultisamplearraywidget.ui \
     textwidget.ui \
     progressbarwidget.ui \
     numericwidget.ui \
     realtimemultisamplearray_new_widget.ui \
-    realtimesourceestimatewidget.ui
+    realtimesourceestimatewidget.ui \
+    newrealtimesamplearraywidget.ui \
+    newrealtimemultisamplearraywidget.ui
 
 UI_DIR = $${PWD}
 

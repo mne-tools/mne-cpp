@@ -53,14 +53,12 @@ CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
             -lxMeasd \
             -lxDispd \
-            -lxDtMngd \
             -lmne_xd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lxMeas \
             -lxDisp \
-            -lxDtMng \
             -lmne_x
 }
 
@@ -69,19 +67,16 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 SOURCES += \
         dummytoolbox.cpp \
         FormFiles/dummysetupwidget.cpp \
-        FormFiles/dummyrunwidget.cpp \
         FormFiles/dummyaboutwidget.cpp
 
 HEADERS += \
         dummytoolbox.h\
         dummytoolbox_global.h \
         FormFiles/dummysetupwidget.h \
-        FormFiles/dummyrunwidget.h \
         FormFiles/dummyaboutwidget.h
 
 FORMS += \
         FormFiles/dummysetup.ui \
-        FormFiles/dummyrun.ui \
         FormFiles/dummyabout.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

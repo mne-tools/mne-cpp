@@ -49,7 +49,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ECGSimulatorModule;
+using namespace ECGSimulatorPlugin;
 
 
 //*************************************************************************************************************
@@ -57,7 +57,7 @@ using namespace ECGSimulatorModule;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ECGProducer::ECGProducer(ECGSimulator* simulator, ECGBuffer_old* buffer_I, ECGBuffer_old* buffer_II, ECGBuffer_old* buffer_III)
+ECGProducer::ECGProducer(ECGSimulator* simulator, dBuffer::SPtr& buffer_I, dBuffer::SPtr& buffer_II, dBuffer::SPtr& buffer_III)
 : m_pECGSimulator(simulator)
 , m_pdBuffer_I(buffer_I)
 , m_pdBuffer_II(buffer_II)

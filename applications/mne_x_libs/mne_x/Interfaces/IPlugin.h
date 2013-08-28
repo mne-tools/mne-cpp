@@ -36,6 +36,16 @@
 #ifndef IPLUGIN_H
 #define IPLUGIN_H
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+//#include "../Management/plugininputconnector.h"
+//#include "../Management/pluginoutputconnector.h"
+#include "../Management/pluginoutputdata.h"
+#include "../Management/plugininputdata.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -45,8 +55,6 @@
 #include <QThread>
 #include <QCoreApplication>
 #include <QSharedPointer>
-
-#include <xMeas/Nomenclature/nomenclature.h>
 
 
 //*************************************************************************************************************
@@ -63,20 +71,15 @@ namespace MNEX
 // ENUMERATIONS
 //=============================================================================================================
 
-//=============================================================================================================
-/**
-* Plugin Type enumeration.
-*/
-enum Type
-{
-    _ISensor,               /**< Type for a sensor plugin. */
-    _IRTAlgorithm,          /**< Type for a real-time algorithm plugin. */
-    _IRTRecord,             /**< Type for a real-time record plugin. */
-    _IAlert,                /**< Type for a alert plugin. */
-    _IRTVisualization       /**< Type for a real-time visualization plugin. */
-};
 
-using namespace XMEASLIB;
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+//class PluginInputConnector;
+//class PluginOutputConnector;
 
 
 //=========================================================================================================
@@ -87,15 +90,43 @@ using namespace XMEASLIB;
 */
 class IPlugin : public QThread
 {
+//    Q_OBJECT
 public:
+    //=============================================================================================================
+    /**
+    * Plugin Type enumeration.
+    */
+    enum PluginType
+    {
+        _ISensor,       /**< Type for a sensor plugin. */
+        _IAlgorithm,    /**< Type for a real-time algorithm plugin. */
+        _IIO,           /**< Type for a real-time I/O plugin. */
+        _PluginSet      /**< Type for a plugin set which holds different types of plugins. */
+    };
+
     typedef QSharedPointer<IPlugin> SPtr;               /**< Shared pointer type for IPlugin. */
     typedef QSharedPointer<const IPlugin> ConstSPtr;    /**< Const shared pointer type for IPlugin. */
+
+    typedef QVector< QSharedPointer< PluginInputConnector > > InputConnectorList;  /**< List of input connectors. */
+    typedef QVector< QSharedPointer< PluginOutputConnector > > OutputConnectorList; /**< List of output connectors. */
 
     //=========================================================================================================
     /**
     * Destroys the IPlugin.
     */
     virtual ~IPlugin() {};
+
+    //=========================================================================================================
+    /**
+    * Clone the plugin
+    */
+    virtual QSharedPointer<IPlugin> clone() const = 0;
+
+    //=========================================================================================================
+    /**
+    * Initializes the plugin.
+    */
+    virtual void init() = 0;
 
     //=========================================================================================================
     /**
@@ -117,20 +148,12 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the provider id
-    *
-    * @return the provider id (Plugin ID).
-    */
-    inline PLG_ID::Plugin_ID getPlugin_ID() const;
-
-    //=========================================================================================================
-    /**
     * Returns the plugin type.
     * Pure virtual method.
     *
     * @return type of the IPlugin
     */
-    virtual Type getType() const = 0;
+    virtual PluginType getType() const = 0;
 
     //=========================================================================================================
     /**
@@ -139,7 +162,15 @@ public:
     *
     * @return the name of plugin.
     */
-    virtual const char* getName() const = 0;
+    virtual QString getName() const = 0;
+
+    //=========================================================================================================
+    /**
+    * True if multi instantiation of plugin is allowed.
+    *
+    * @return true if multi instantiation of plugin is allowed.
+    */
+    virtual inline bool multiInstanceAllowed() const = 0;
 
     //=========================================================================================================
     /**
@@ -150,33 +181,12 @@ public:
     */
     virtual QWidget* setupWidget() = 0; //setup()
 
-    //=========================================================================================================
-    /**
-    * Returns the widget which is shown under configuration tab while running mode.
-    * Pure virtual method.
-    *
-    * @return the run widget.
-    */
-    virtual QWidget* runWidget() = 0;
 
-    //=========================================================================================================
-    /**
-    * Sets the activation status of the plugin.
-    *
-    * @param [in] status the new activation status of the plugin.
-    */
-    inline void setStatus(bool status);
+    inline InputConnectorList& getInputConnectors(){return m_inputConnectors;}
+    inline OutputConnectorList& getOutputConnectors(){return m_outputConnectors;}
 
-    //=========================================================================================================
-    /**
-    * Returns the activation status of the plugin.
-    *
-    * @return true if plugin is activated.
-    */
-    inline bool isActive() const;
 
 protected:
-
     //=========================================================================================================
     /**
     * The starting point for the thread. After calling start(), the newly created thread calls this function.
@@ -185,38 +195,14 @@ protected:
     */
     virtual void run() = 0;
 
-    PLG_ID::Plugin_ID m_PLG_ID;     /**< Holds the plugin id.*/
-
-private:
-
-    bool m_bStatus;                 /**< Holds the activation status. */
+    InputConnectorList m_inputConnectors;    /**< Set of input connectors associated with this plug-in. */
+    OutputConnectorList m_outputConnectors;  /**< Set of output connectors associated with this plug-in. */
 };
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
-inline PLG_ID::Plugin_ID IPlugin::getPlugin_ID() const
-{
-    return m_PLG_ID;
-}
-
-
-//*************************************************************************************************************
-
-inline void IPlugin::setStatus(bool status)
-{
-    m_bStatus = status;
-}
-
-
-//*************************************************************************************************************
-
-inline bool IPlugin::isActive() const
-{
-    return m_bStatus;
-}
 
 } //Namespace
 

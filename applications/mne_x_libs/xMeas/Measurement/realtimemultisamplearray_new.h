@@ -44,7 +44,7 @@
 
 #include "../xmeas_global.h"
 #include "mltchnmeasurement.h"
-#include "realtimesamplearraychinfo.h"
+#include "../realtimesamplearraychinfo.h"
 
 #include <fiff/fiff_info.h>
 

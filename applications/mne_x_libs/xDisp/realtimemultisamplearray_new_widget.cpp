@@ -42,7 +42,6 @@
 
 #include "realtimemultisamplearray_new_widget.h"
 //#include "annotationwindow.h"
-#include "displaymanager.h"
 
 #include <xMeas/Measurement/realtimemultisamplearray_new.h>
 
@@ -79,6 +78,17 @@
 
 using namespace XDISPLIB;
 using namespace XMEASLIB;
+
+
+//=============================================================================================================
+/**
+* Tool enumeration.
+*/
+enum Tool
+{
+    Freeze     = 0,     /**< Freezing tool. */
+    Annotation = 1      /**< Annotation tool. */
+};
 
 
 //*************************************************************************************************************
@@ -156,7 +166,9 @@ void RealTimeMultiSampleArrayNewWidget::actualize()
     // Compute new sample width in order to synchronize all RTSA
     //=========================================================================================================
 
-    if((m_pRTMSA_New->getSamplingRate() == 0) || (DisplayManager::getRTSAWidgets().size() == 0))
+//    if((m_pRTMSA_New->getSamplingRate() == 0) || (DisplayManager::getRTSAWidgets().size() == 0))
+//        return;
+    if((m_pRTMSA_New->getSamplingRate() == 0))
         return;
 
     // Add current sampling rate to s_listSamplingRates
@@ -167,9 +179,9 @@ void RealTimeMultiSampleArrayNewWidget::actualize()
     foreach (double value, s_listSamplingRates)
         dMax = value > dMax ? value : dMax;
 
-    // Set new sample widths
-    foreach(RealTimeMultiSampleArrayNewWidget* pRTMSAW, DisplayManager::getRTMSANewWidgets().values())
-        pRTMSAW->m_dSampleWidth = dMax/pRTMSAW->m_pRTMSA_New->getSamplingRate();
+//    // Set new sample widths
+//    foreach(RealTimeMultiSampleArrayNewWidget* pRTMSAW, DisplayManager::getRTMSANewWidgets().values())
+//        pRTMSAW->m_dSampleWidth = dMax/pRTMSAW->m_pRTMSA_New->getSamplingRate();
 }
 
 

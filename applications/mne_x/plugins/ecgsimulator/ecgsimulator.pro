@@ -53,14 +53,12 @@ CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
             -lxMeasd \
             -lxDispd \
-            -lxDtMngd \
             -lmne_xd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lxMeas \
             -lxDisp \
-            -lxDtMng \
             -lmne_x
 }
 
@@ -71,7 +69,6 @@ SOURCES += \
         ecgsimchannel.cpp \
         ecgproducer.cpp \
         FormFiles/ecgsetupwidget.cpp \
-        FormFiles/ecgrunwidget.cpp \
         FormFiles/ecgaboutwidget.cpp
 
 HEADERS += \
@@ -80,12 +77,10 @@ HEADERS += \
         ecgsimchannel.h \
         ecgproducer.h \
         FormFiles/ecgsetupwidget.h \
-        FormFiles/ecgrunwidget.h \
         FormFiles/ecgaboutwidget.h
 
 FORMS += \
         FormFiles/ecgsetup.ui \
-        FormFiles/ecgrun.ui \
         FormFiles/ecgabout.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
