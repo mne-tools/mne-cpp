@@ -106,13 +106,13 @@ void PluginGui::uiSetupRunningState(bool state)
     {
         m_pToolBarPlugins->setEnabled(false);
         m_pButtonGroupPointers->button(1)->setEnabled(false);
-        m_pToolBarItem->setEnabled(false);
+        deleteAction->setEnabled(false);
     }
     else
     {
         m_pToolBarPlugins->setEnabled(true);
         m_pButtonGroupPointers->button(1)->setEnabled(true);
-        m_pToolBarItem->setEnabled(true);
+        deleteAction->setEnabled(true);
     }
 }
 
