@@ -169,7 +169,7 @@ void DummyToolbox::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
     QSharedPointer<NewRealTimeSampleArray> pRTSA = pMeasurement.dynamicCast<NewRealTimeSampleArray>();
 
-    if(!pRTSA.isNull())
+    if(pRTSA)
     {
         for(unsigned char i = 0; i < pRTSA->getArraySize(); ++i)
         {

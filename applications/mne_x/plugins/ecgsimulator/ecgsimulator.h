@@ -153,7 +153,6 @@ public:
     */
     QString getResourcePath() const {return m_qStringResourcePath;}
 
-
 protected:
     virtual void run();
 

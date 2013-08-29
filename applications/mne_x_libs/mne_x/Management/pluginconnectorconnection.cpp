@@ -40,6 +40,7 @@
 
 #include "pluginconnectorconnection.h"
 #include <xMeas/newrealtimesamplearray.h>
+#include <xMeas/newrealtimemultisamplearray.h>
 
 
 //*************************************************************************************************************
@@ -100,17 +101,29 @@ bool PluginConnectorConnection::createConnection()
     {
         for(j = 0; j < m_pReceiver->getInputConnectors().size(); ++j)
         {
+            //ToDo make this auto connection more fancy
             // < --- Type Check --- >
 
-            //Cast NewRealTimeSampleArray
-            QSharedPointer< PluginOutputData<NewRealTimeSampleArray> > senderConnector = m_pSender->getOutputConnectors()[i].dynamicCast< PluginOutputData<NewRealTimeSampleArray> >();
-            QSharedPointer< PluginInputData<NewRealTimeSampleArray> > receiverConnector = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<NewRealTimeSampleArray> >();
-//            qWarning() << "PluginConnectorConnection::createConnection()" << senderConnector.isNull() << receiverConnector.isNull();
-            if(!senderConnector.isNull() && !receiverConnector.isNull())
+            //Cast to NewRealTimeSampleArray
+            QSharedPointer< PluginOutputData<NewRealTimeSampleArray> > senderRTSA = m_pSender->getOutputConnectors()[i].dynamicCast< PluginOutputData<NewRealTimeSampleArray> >();
+            QSharedPointer< PluginInputData<NewRealTimeSampleArray> > receiverRTSA = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<NewRealTimeSampleArray> >();
+            if(senderRTSA && receiverRTSA)
             {
                 m_con = connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
                         m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::BlockingQueuedConnection);
                 bConnected = true;
+                break;
+            }
+
+            //Cast to NewRealTimeMultiSampleArray
+            QSharedPointer< PluginOutputData<NewRealTimeMultiSampleArray> > senderRTMSA = m_pSender->getOutputConnectors()[i].dynamicCast< PluginOutputData<NewRealTimeMultiSampleArray> >();
+            QSharedPointer< PluginInputData<NewRealTimeMultiSampleArray> > receiverRTMSA = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<NewRealTimeMultiSampleArray> >();
+            if(senderRTMSA && receiverRTMSA)
+            {
+                m_con = connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
+                        m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::BlockingQueuedConnection);
+                bConnected = true;
+                break;
             }
         }
 
