@@ -119,6 +119,26 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns a negative skewed hot RGB to a given double value [0,1]
+    *
+    * @param[in] v      the double which has to be part of the intervall [0,1]
+    *
+    * @return the corresponding negative skewed Hot RGB
+    */
+    static inline QRgb valueToHotNegative1(double v);
+
+    //=========================================================================================================
+    /**
+    * Returns a negative skewed hot RGB to a given double value [0,1]
+    *
+    * @param[in] v      the double which has to be part of the intervall [0,1]
+    *
+    * @return the corresponding negative skewed Hot RGB
+    */
+    static inline QRgb valueToHotNegative2(double v);
+
+    //=========================================================================================================
+    /**
     * Returns a Bone RGB to a given double value [0,1]
     *
     * @param[in] v      the double which has to be part of the intervall [0,1]
@@ -208,6 +228,62 @@ protected:
 
     //=========================================================================================================
     /**
+    * Describes the red Hot negative skewed fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
+    *
+    * @param[in] v  input value [0,1]
+    *
+    * @return the output color value [0.255]
+    */
+    static int hotRNeg1(double v);
+    //=========================================================================================================
+    /**
+    * Describes the green Hot negative skewed fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
+    *
+    * @param[in] v  input value [0,1]
+    *
+    * @return the output color value [0.255]
+    */
+    static int hotGNeg1(double v);
+    //=========================================================================================================
+    /**
+    * Describes the blue Hot negative skewed fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
+    *
+    * @param[in] v  input value [0,1]
+    *
+    * @return the output color value [0.255]
+    */
+    static int hotBNeg1(double v);
+
+    //=========================================================================================================
+    /**
+    * Describes the red Hot negative skewed fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
+    *
+    * @param[in] v  input value [0,1]
+    *
+    * @return the output color value [0.255]
+    */
+    static int hotRNeg2(double v);
+    //=========================================================================================================
+    /**
+    * Describes the green Hot negative skewed fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
+    *
+    * @param[in] v  input value [0,1]
+    *
+    * @return the output color value [0.255]
+    */
+    static int hotGNeg2(double v);
+    //=========================================================================================================
+    /**
+    * Describes the blue Hot negative skewed fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
+    *
+    * @param[in] v  input value [0,1]
+    *
+    * @return the output color value [0.255]
+    */
+    static int hotBNeg2(double v);
+
+    //=========================================================================================================
+    /**
     * Describes the red Bone fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
     *
     * @param[in] v  input value [0,1]
@@ -283,6 +359,24 @@ inline QRgb ColorMap::valueToJet(double v)
 inline QRgb ColorMap::valueToHot(double v)
 {
     QRgb p_qRgb = qRgb(hotR(v), hotG(v), hotB(v));
+    return p_qRgb;
+}
+
+
+//*************************************************************************************************************
+
+inline QRgb ColorMap::valueToHotNegative1(double v)
+{
+    QRgb p_qRgb = qRgb(hotRNeg1(v), hotGNeg1(v), hotBNeg1(v));
+    return p_qRgb;
+}
+
+
+//*************************************************************************************************************
+
+inline QRgb ColorMap::valueToHotNegative2(double v)
+{
+    QRgb p_qRgb = qRgb(hotRNeg2(v), hotGNeg2(v), hotBNeg2(v));
     return p_qRgb;
 }
 

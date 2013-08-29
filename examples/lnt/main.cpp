@@ -194,7 +194,7 @@ int main(int argc, char *argv[])
     {
         view.resize(800, 600);
     }
-    view.setTitle(QString("Lange Nacht der Technik :: Ilmenau University of Technology - %1").arg(evoked.comment));
+    view.setTitle(QString("Online Brain Monitoring - %1").arg(evoked.comment));
     view.show();
 
     //Push Estimate
