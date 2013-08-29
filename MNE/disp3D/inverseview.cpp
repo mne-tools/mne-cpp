@@ -43,6 +43,7 @@
 #include "inverseviewproducer.h"
 
 #include <fs/label.h>
+#include <disp/colormap.h>
 
 
 //*************************************************************************************************************
@@ -73,6 +74,7 @@
 //=============================================================================================================
 
 using namespace DISP3DLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -431,21 +433,25 @@ void InverseView::updateActivation(QSharedPointer<Eigen::VectorXd> p_pVecActivat
             qint32 iVal = (t_curLabelActivation[i]/m_pInverseViewProducer->getGlobalMax()) * 400;//255;
             iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
 
-            int r, g, b;
+//            int r, g, b;
+            QRgb qRgb;
             if(m_iColorMode == 0)
             {
-                r = iVal;
-                g = iVal;
-                b = iVal;
+//                r = iVal;
+//                g = iVal;
+//                b = iVal;
+                qRgb = ColorMap::valueToHotNegative1((double)iVal/255.0);
             }
             else if(m_iColorMode == 1)
             {
-                r = iVal;
-                g = iVal;
-                b = iVal;
+//                r = iVal;
+//                g = iVal;
+//                b = iVal;
+                qRgb = ColorMap::valueToHot((double)iVal/255.0);
             }
 
-            m_pSceneNode->palette()->material(i)->setSpecularColor(QColor(r,g,b,200));
+            m_pSceneNode->palette()->material(i)->setSpecularColor(QColor(qRgb));
+                        //QColor(r,g,b,200));
         }
     }
 
