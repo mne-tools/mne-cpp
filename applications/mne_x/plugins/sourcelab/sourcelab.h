@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "sourcelab_global.h"
-#include <mne_x/Interfaces/IRTAlgorithm.h>
+#include <mne_x/Interfaces/IAlgorithm.h>
 
 #include <generics/circularmatrixbuffer.h>
 
@@ -58,6 +58,7 @@
 #include <rtInv/rtave.h>
 
 #include <xMeas/Measurement/realtimesourceestimate.h>
+#include <xMeas/newrealtimemultisamplearray.h>
 
 
 //*************************************************************************************************************
@@ -89,6 +90,7 @@ using namespace MNELIB;
 using namespace INVERSELIB;
 using namespace RTINVLIB;
 using namespace MNEX;
+using namespace XMEASLIB;
 using namespace IOBuffer;
 
 
@@ -104,12 +106,12 @@ using namespace IOBuffer;
 *
 * @brief The SourceLab class provides a dummy algorithm structure.
 */
-class SOURCELABSHARED_EXPORT SourceLab : public IRTAlgorithm
+class SOURCELABSHARED_EXPORT SourceLab : public IAlgorithm
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "sourcelab.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::IRTAlgorithm)
+    Q_INTERFACES(MNEX::IAlgorithm)
 
 public:
 
@@ -124,18 +126,26 @@ public:
     */
     ~SourceLab();
 
+    //=========================================================================================================
+    /**
+    * Clone the plugin
+    */
+    virtual QSharedPointer<IPlugin> clone() const;
+
+    //=========================================================================================================
+    /**
+    * Initialise the SourceLab.
+    */
+    void init();
+
     virtual bool start();
     virtual bool stop();
 
-    virtual Type getType() const;
-    virtual const char* getName() const;
+    virtual IPlugin::PluginType getType() const;
+    virtual QString getName() const;
 
     virtual QWidget* setupWidget();
-    virtual QWidget* runWidget();
 
-    virtual void update(Subject* pSubject);
-
-//slot
     //=========================================================================================================
     /**
     * Append evoked
@@ -143,6 +153,8 @@ public:
     * @param[in] p_pEvoked  The evoked to be appended
     */
     void appendEvoked(FiffEvoked::SPtr p_pEvoked);
+
+    void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
@@ -173,11 +185,8 @@ protected:
     virtual void run();
 
 private:
-    //=========================================================================================================
-    /**
-    * Initialise the SourceLab.
-    */
-    void init();
+    PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pRTMSAInput;      /**< The RealTimeMultiSampleArray input.*/
+
 
     QMutex mutex;
 
@@ -207,7 +216,7 @@ private:
 
     MinimumNorm::SPtr           m_pMinimumNorm;     /**< Minimum Norm Estimation. */
 
-    RealTimeSourceEstimate::SPtr m_pRTSE_SourceLab; /**< Source Estimate output channel. */
+//    RealTimeSourceEstimate::SPtr m_pRTSE_SourceLab; /**< Source Estimate output channel. */
 };
 
 } // NAMESPACE

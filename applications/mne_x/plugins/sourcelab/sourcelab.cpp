@@ -40,10 +40,6 @@
 
 #include "sourcelab.h"
 
-#include <xMeas/Measurement/sngchnmeasurement.h>
-#include <xMeas/Measurement/realtimesamplearray.h>
-#include <xMeas/Measurement/realtimemultisamplearray_new.h>
-
 #include "FormFiles/sourcelabsetupwidget.h"
 #include "FormFiles/sourcelabrunwidget.h"
 
@@ -65,7 +61,6 @@
 
 using namespace SourceLabPlugin;
 using namespace FIFFLIB;
-using namespace MNEX;
 using namespace XMEASLIB;
 
 
@@ -82,7 +77,7 @@ SourceLab::SourceLab()
 , m_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot")
 , m_iStimChan(0)
 {
-    m_PLG_ID = PLG_ID::SOURCELAB;
+
 }
 
 
@@ -91,6 +86,63 @@ SourceLab::SourceLab()
 SourceLab::~SourceLab()
 {
     stop();
+}
+
+
+//*************************************************************************************************************
+
+QSharedPointer<IPlugin> SourceLab::clone() const
+{
+    QSharedPointer<SourceLab> pSourceLabClone(new SourceLab());
+    return pSourceLabClone;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Creating required display instances and set configurations
+//=============================================================================================================
+
+void SourceLab::init()
+{
+    //Delete Buffer - will be initailzed with first incoming data
+    if(!m_pSourceLabBuffer.isNull())
+        m_pSourceLabBuffer = CircularMatrixBuffer<double>::SPtr();
+
+    // Input
+    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "SourceLabIn", "SourceLab input data");
+    connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &SourceLab::update, Qt::DirectConnection);
+    m_inputConnectors.append(m_pRTMSAInput);
+
+
+
+//    this->addPlugin(PLG_ID::MNERTCLIENT);
+//    Buffer::SPtr t_buf = m_pSourceLabBuffer.staticCast<Buffer>(); //unix fix
+//    this->addAcceptorMeasurementBuffer(MSR_ID::MEGMNERTCLIENT_OUTPUT, t_buf);
+
+
+
+//    m_pRTSE_SourceLab = addProviderRealTimeSourceEstimate(MSR_ID::SOURCELAB_OUTPUT);
+//    m_pRTSE_SourceLab->setName("Real-Time Source Estimate");
+////    m_pRTSE_SourceLab->initFromFiffInfo(m_pFiffInfo);
+//    m_pRTSE_SourceLab->setArraySize(10);
+//    m_pRTSE_SourceLab->setVisibility(true);
+
+
+
+
+
+
+
+
+
+//    m_pDummy_MSA_Output = addProviderRealTimeMultiSampleArray(MSR_ID::DUMMYTOOL_OUTPUT_II, 2);
+//    m_pDummy_MSA_Output->setName("Dummy Output II");
+//    m_pDummy_MSA_Output->setUnit("mV");
+//    m_pDummy_MSA_Output->setMinValue(-200);
+//    m_pDummy_MSA_Output->setMaxValue(360);
+//    m_pDummy_MSA_Output->setSamplingRate(256.0/1.0);
+
 }
 
 
@@ -133,15 +185,15 @@ bool SourceLab::stop()
 
 //*************************************************************************************************************
 
-Type SourceLab::getType() const
+IPlugin::PluginType SourceLab::getType() const
 {
-    return _IRTAlgorithm;
+    return _IAlgorithm;
 }
 
 
 //*************************************************************************************************************
 
-const char* SourceLab::getName() const
+QString SourceLab::getName() const
 {
     return "SourceLab";
 }
@@ -158,49 +210,32 @@ QWidget* SourceLab::setupWidget()
 
 //*************************************************************************************************************
 
-QWidget* SourceLab::runWidget()
+void SourceLab::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
-    SourceLabRunWidget* runWidget = new SourceLabRunWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
-    return runWidget;
-}
-
-
-//*************************************************************************************************************
-
-void SourceLab::update(Subject* pSubject)
-{
-    Measurement* meas = static_cast<Measurement*>(pSubject);
+    QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
 
     //MEG
-    if(!meas->isSingleChannel() && m_bReceiveData)
+    if(pRTMSA && m_bReceiveData)
     {
-        RealTimeMultiSampleArrayNew* pRTMSANew = static_cast<RealTimeMultiSampleArrayNew*>(pSubject);
 
+//        //Check if buffer initialized
+//        if(!m_pSourceLabBuffer)
+//            m_pSourceLabBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize()));
 
-        if(pRTMSANew->getID() == MSR_ID::MEGMNERTCLIENT_OUTPUT)
-        {
-            //Check if buffer initialized
-            if(!m_pSourceLabBuffer)
-            {
-                m_pSourceLabBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSANew->getNumChannels(), pRTMSANew->getMultiArraySize()));
-                Buffer::SPtr t_buf = m_pSourceLabBuffer.staticCast<Buffer>();// unix fix
-                setAcceptorMeasurementBuffer(pRTMSANew->getID(), t_buf);
-            }
+        //Fiff information
+        if(!m_pFiffInfo)
+            m_pFiffInfo = pRTMSA->getFiffInfo();
 
-            //Fiff information
-            if(!m_pFiffInfo)
-                m_pFiffInfo = pRTMSANew->getFiffInfo();
+//        qWarning() << "received";
 
-            MatrixXd t_mat(pRTMSANew->getNumChannels(), pRTMSANew->getMultiArraySize());
+//        MatrixXd t_mat(pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize());
 
-            //ToDo: Cast to specific Buffer
-            for(unsigned char i = 0; i < pRTMSANew->getMultiArraySize(); ++i)
-                t_mat.col(i) = pRTMSANew->getMultiSampleArray()[i];
+//        //ToDo: Cast to specific Buffer
+//        for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i)
+//            t_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
 
-            getAcceptorMeasurementBuffer(pRTMSANew->getID()).staticCast<CircularMatrixBuffer<double> >()
-                    ->push(&t_mat);
-        }
-
+////            getAcceptorMeasurementBuffer(pRTMSANew->getID()).staticCast<CircularMatrixBuffer<double> >()
+////                    ->push(&t_mat);
     }
 }
 
@@ -278,181 +313,144 @@ void SourceLab::run()
     while(!m_pFiffInfo)
     {
         msleep(10);
-        qDebug() << "Wait for fiff Info";
+//        qDebug() << "Wait for fiff Info";
     }
 
     qDebug() << "Fiff Info received.";
 
-    //
-    // Init Real-Time Covariance estimator
-    //
-    m_pRtCov = RtCov::SPtr(new RtCov(5000, m_pFiffInfo));
-    connect(m_pRtCov.data(), &RtCov::covCalculated, this, &SourceLab::updateFiffCov);
+//    //
+//    // Init Real-Time Covariance estimator
+//    //
+//    m_pRtCov = RtCov::SPtr(new RtCov(5000, m_pFiffInfo));
+//    connect(m_pRtCov.data(), &RtCov::covCalculated, this, &SourceLab::updateFiffCov);
 
-    //
-    // Init Real-Time inverse estimator
-    //
-    m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pClusteredFwd));
-    connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated, this, &SourceLab::updateInvOp);
+//    //
+//    // Init Real-Time inverse estimator
+//    //
+//    m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pClusteredFwd));
+//    connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated, this, &SourceLab::updateInvOp);
 
-    //
-    // Init Real-Time average
-    //
-    m_pRtAve = RtAve::SPtr(new RtAve(750, 750, m_pFiffInfo));
-    connect(m_pRtAve.data(), &RtAve::evokedStim, this, &SourceLab::appendEvoked);
+//    //
+//    // Init Real-Time average
+//    //
+//    m_pRtAve = RtAve::SPtr(new RtAve(750, 750, m_pFiffInfo));
+//    connect(m_pRtAve.data(), &RtAve::evokedStim, this, &SourceLab::appendEvoked);
 
-    //
-    // Start the rt helpers
-    //
-    m_pRtCov->start();
-    m_pRtInvOp->start();
-    m_pRtAve->start();
+//    //
+//    // Start the rt helpers
+//    //
+//    m_pRtCov->start();
+//    m_pRtInvOp->start();
+//    m_pRtAve->start();
 
-//    // Replace this with a rt average class
-//    FiffEvoked t_evoked;
-//    t_evoked.setInfo(*m_pFiffInfo);
-//    t_evoked.nave = 1;
-//    t_evoked.aspect_kind = FIFFV_ASPECT_AVERAGE;
-//    t_evoked.comment = QString("Real-time average");
+////    // Replace this with a rt average class
+////    FiffEvoked t_evoked;
+////    t_evoked.setInfo(*m_pFiffInfo);
+////    t_evoked.nave = 1;
+////    t_evoked.aspect_kind = FIFFV_ASPECT_AVERAGE;
+////    t_evoked.comment = QString("Real-time average");
 
-//    qint32 t_iSampleCount = 0;
-//    qint32 i = 0;
-//    float T = 1/m_pFiffInfo->sfreq;
+////    qint32 t_iSampleCount = 0;
+////    qint32 i = 0;
+////    float T = 1/m_pFiffInfo->sfreq;
 
-//    qint32 matSize = 100; //80 critical when print to console, its recommended to have a higher buffer size
-//    qint32 curSize = 0;
-//    MatrixXd curMat;
-//    bool bMatInit = false;
-//    QVector<MatrixXd> t_evokedDataVec;
+////    qint32 matSize = 100; //80 critical when print to console, its recommended to have a higher buffer size
+////    qint32 curSize = 0;
+////    MatrixXd curMat;
+////    bool bMatInit = false;
+////    QVector<MatrixXd> t_evokedDataVec;
 
     while(m_bIsRunning)
     {
-        qint32 nrows = m_pSourceLabBuffer->rows();
+//        qint32 nrows = m_pSourceLabBuffer->rows();
 
-        if(nrows > 0) // check if init
-        {
-            /* Dispatch the inputs */
-            MatrixXd t_mat = m_pSourceLabBuffer->pop();
+//        if(nrows > 0) // check if init
+//        {
+//            /* Dispatch the inputs */
+//            MatrixXd t_mat = m_pSourceLabBuffer->pop();
 
-            //Add to covariance estimation
-            m_pRtCov->append(t_mat);
-            m_pRtAve->append(t_mat);
+//            //Add to covariance estimation
+//            m_pRtCov->append(t_mat);
+//            m_pRtAve->append(t_mat);
 
-            if(m_pMinimumNorm && m_qVecEvokedData.size() > 0)
-            {
-                FiffEvoked t_evoked = *m_qVecEvokedData[0].data();
-                SourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_evoked);
-
-                std::cout << "SourceEstimated:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
-
-                //emit source estimates sample wise
-                for(qint32 i = 0; i < sourceEstimate.data.cols(); ++i)
-                    m_pRTSE_SourceLab->setValue(sourceEstimate.data.col(i));
-
-                mutex.lock();
-                m_qVecEvokedData.pop_front();
-                mutex.unlock();
-            }
-
-//            if(m_pMinimumNorm && t_mat.cols() > 0)
+//            if(m_pMinimumNorm && m_qVecEvokedData.size() > 0)
 //            {
-//                if(!bMatInit)
-//                    curMat = MatrixXd::Zero(t_mat.rows(), matSize);
+//                FiffEvoked t_evoked = *m_qVecEvokedData[0].data();
+//                SourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_evoked);
 
-//                // assemble matrix to matrices of matSize cols
-//                if(curSize + t_mat.cols() < matSize)
-//                {
-//                    curMat.block(0,curSize,t_mat.rows(),t_mat.cols()) = t_mat;
-//                    curSize += t_mat.cols();
-//                }
-//                else
-//                {
-//                    //Fill last part
-//                    curMat.block(0,curSize,t_mat.rows(),matSize-curSize) = t_mat.block(0,0,t_mat.rows(),matSize-curSize);
+//                std::cout << "SourceEstimated:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
 
-//                    t_evokedDataVec.push_back(curMat);
+////                //emit source estimates sample wise
+////                for(qint32 i = 0; i < sourceEstimate.data.cols(); ++i)
+////                    m_pRTSE_SourceLab->setValue(sourceEstimate.data.col(i));
 
-//                    //Fill first part of new matrix
-//                    qint32 iOffset = t_mat.cols()-(matSize-curSize);
-
-//                    if(iOffset != 0)
-//                    {
-//                        curMat.block(0,0,t_mat.rows(),iOffset) = t_mat.block(0,matSize-curSize,t_mat.rows(),iOffset);
-//                        curSize = iOffset;
-//                    }
-//                    else
-//                        curSize = 0;
-//                }
-
-//                qDebug() << "Evoked Data Vector size" << t_evokedDataVec.size();
-
-//                if(t_evokedDataVec.size() > 0)
-//                {
-//                    MatrixXd bufferedMat = t_evokedDataVec[0];
-
-//                    // without average -> maybe not fast enough
-
-//                    RowVectorXf times(bufferedMat.cols());
-//                    times[0] = T*t_iSampleCount;
-//                    for(i = 1; i < bufferedMat.cols(); ++i)
-//                        times[i] = times[i-1] + T;
-
-//                    t_evoked.first = times[0];
-//                    t_evoked.last = times[bufferedMat.cols()-1];
-//                    t_evoked.times = times;
-//                    t_evoked.data = bufferedMat;
-
-
-//                    //
-//                    // calculate the inverse
-//                    //
-//                    SourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_evoked);
-
-//                    qDebug() << t_iSampleCount << " : SourceEstimate";
-
-//                    t_iSampleCount += bufferedMat.cols();
-
-//                    t_evokedDataVec.pop_front();
-//                }
+//                mutex.lock();
+//                m_qVecEvokedData.pop_front();
+//                mutex.unlock();
 //            }
 
-        }
+////            if(m_pMinimumNorm && t_mat.cols() > 0)
+////            {
+////                if(!bMatInit)
+////                    curMat = MatrixXd::Zero(t_mat.rows(), matSize);
+
+////                // assemble matrix to matrices of matSize cols
+////                if(curSize + t_mat.cols() < matSize)
+////                {
+////                    curMat.block(0,curSize,t_mat.rows(),t_mat.cols()) = t_mat;
+////                    curSize += t_mat.cols();
+////                }
+////                else
+////                {
+////                    //Fill last part
+////                    curMat.block(0,curSize,t_mat.rows(),matSize-curSize) = t_mat.block(0,0,t_mat.rows(),matSize-curSize);
+
+////                    t_evokedDataVec.push_back(curMat);
+
+////                    //Fill first part of new matrix
+////                    qint32 iOffset = t_mat.cols()-(matSize-curSize);
+
+////                    if(iOffset != 0)
+////                    {
+////                        curMat.block(0,0,t_mat.rows(),iOffset) = t_mat.block(0,matSize-curSize,t_mat.rows(),iOffset);
+////                        curSize = iOffset;
+////                    }
+////                    else
+////                        curSize = 0;
+////                }
+
+////                qDebug() << "Evoked Data Vector size" << t_evokedDataVec.size();
+
+////                if(t_evokedDataVec.size() > 0)
+////                {
+////                    MatrixXd bufferedMat = t_evokedDataVec[0];
+
+////                    // without average -> maybe not fast enough
+
+////                    RowVectorXf times(bufferedMat.cols());
+////                    times[0] = T*t_iSampleCount;
+////                    for(i = 1; i < bufferedMat.cols(); ++i)
+////                        times[i] = times[i-1] + T;
+
+////                    t_evoked.first = times[0];
+////                    t_evoked.last = times[bufferedMat.cols()-1];
+////                    t_evoked.times = times;
+////                    t_evoked.data = bufferedMat;
+
+
+////                    //
+////                    // calculate the inverse
+////                    //
+////                    SourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_evoked);
+
+////                    qDebug() << t_iSampleCount << " : SourceEstimate";
+
+////                    t_iSampleCount += bufferedMat.cols();
+
+////                    t_evokedDataVec.pop_front();
+////                }
+////            }
+
+//        }
     }
-}
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Creating required display instances and set configurations
-//=============================================================================================================
-
-void SourceLab::init()
-{
-    //Delete Buffer - will be initailzed with first incoming data
-    if(m_pSourceLabBuffer)
-        m_pSourceLabBuffer = CircularMatrixBuffer<double>::SPtr();
-
-    qDebug() << "#### SourceLab Init; MEGRTCLIENT_OUTPUT: " << MSR_ID::MEGMNERTCLIENT_OUTPUT;
-
-    this->addPlugin(PLG_ID::MNERTCLIENT);
-    Buffer::SPtr t_buf = m_pSourceLabBuffer.staticCast<Buffer>(); //unix fix
-    this->addAcceptorMeasurementBuffer(MSR_ID::MEGMNERTCLIENT_OUTPUT, t_buf);
-
-
-
-    m_pRTSE_SourceLab = addProviderRealTimeSourceEstimate(MSR_ID::SOURCELAB_OUTPUT);
-    m_pRTSE_SourceLab->setName("Real-Time Source Estimate");
-//    m_pRTSE_SourceLab->initFromFiffInfo(m_pFiffInfo);
-    m_pRTSE_SourceLab->setArraySize(10);
-    m_pRTSE_SourceLab->setVisibility(true);
-
-
-
-//    m_pDummy_MSA_Output = addProviderRealTimeMultiSampleArray(MSR_ID::DUMMYTOOL_OUTPUT_II, 2);
-//    m_pDummy_MSA_Output->setName("Dummy Output II");
-//    m_pDummy_MSA_Output->setUnit("mV");
-//    m_pDummy_MSA_Output->setMinValue(-200);
-//    m_pDummy_MSA_Output->setMaxValue(360);
-//    m_pDummy_MSA_Output->setSamplingRate(256.0/1.0);
-
 }

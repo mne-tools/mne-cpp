@@ -60,7 +60,6 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}RtInvd \
             -lxMeasd \
             -lxDispd \
-            -lxDtMngd \
             -lmne_xd
 }
 else {
@@ -73,7 +72,6 @@ else {
             -lMNE$${MNE_LIB_VERSION}RtInv \
             -lxMeas \
             -lxDisp \
-            -lxDtMng \
             -lmne_x
 }
 
