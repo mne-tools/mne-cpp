@@ -213,7 +213,7 @@ int ColorMap::hotRNeg2(double x)
     if(x < 0.5625)
         return 0;
     else if(x < 0.8438)
-        return (int)floor(linearSlope(x, 2.7832, -0.6090)*255);
+        return (int)floor(linearSlope(x, 3.5549, -1.9996)*255);
     else
         return (int)floor(1.0*255);
 }
@@ -227,7 +227,7 @@ int ColorMap::hotGNeg2(double x)
     if(x < 0.8438)
         return 0;
     else if(x >= 0.8438 && x < 0.9531)
-        return (int)floor(linearSlope(x, 4.2662, -2.4663)*255);
+        return (int)floor(linearSlope(x, 9.1491, -7.72)*255);
     else
         return (int)floor(1.0*255);
 }
@@ -241,7 +241,7 @@ int ColorMap::hotBNeg2(double x)
     if(x < 0.9531)
         return 0;
     else
-        return (int)floor(linearSlope(x,5.3333,-4.3333)*255);
+        return (int)floor(linearSlope(x,21.3220,-20.3220)*255);
 }
 
 
