@@ -203,6 +203,7 @@ private:
 
     RtAve::SPtr                 m_pRtAve;           /**< Real-time average. */
     qint32                      m_iNumAverages;     /**< Number of averages. */
+    bool                        m_bSingleTrial;     /**< Single trial mode, or averages */
     QVector<FiffEvoked::SPtr>   m_qVecEvokedData;   /**< Evoked data set */
     qint32 m_iStimChan;                             /**< Stimulus Channel to use for source estimation */
 
