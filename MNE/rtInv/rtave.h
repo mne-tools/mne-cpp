@@ -118,12 +118,13 @@ public:
     /**
     * Creates the real-time covariance estimation object.
     *
+    * @param[in] numAverages        Number of evkos to average
     * @param[in] p_iPreStimSamples  Number of samples averaged before the stimulus
     * @param[in] p_iPostStimSamples Number of samples averaged after the stimulus (including the stimulus)
     * @param[in] p_pFiffInfo        Associated Fiff Information
     * @param[in] parent     Parent QObject (optional)
     */
-    explicit RtAve(quint32 p_iPreStimSamples, quint32 p_iPostStimSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent = 0);
+    explicit RtAve(quint32 numAverages, quint32 p_iPreStimSamples, quint32 p_iPostStimSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent = 0);
 
     //=========================================================================================================
     /**
