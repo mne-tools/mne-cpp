@@ -172,15 +172,6 @@ public:
     */
     void updateInvOp(MNEInverseOperator::SPtr p_pInvOp);
 
-signals:
-    //=========================================================================================================
-    /**
-    * Emits status messages
-    *
-    * @param[in] p_qStringMsg   The status message
-    */
-    void statMsg(QString p_qStringMsg);
-
 protected:
     virtual void run();
 
