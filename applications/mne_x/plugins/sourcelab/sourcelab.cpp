@@ -76,6 +76,7 @@ SourceLab::SourceLab()
 , m_pFwd(new MNEForwardSolution(m_qFileFwdSolution))
 , m_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot")
 , m_iStimChan(0)
+, m_iNumAverages(10)
 {
 
 }
@@ -229,7 +230,7 @@ void SourceLab::appendEvoked(FiffEvoked::SPtr p_pEvoked)
 {
     if(p_pEvoked->comment == QString("Stim %1").arg(m_iStimChan))
     {
-        std::cout << p_pEvoked->comment.toLatin1().constData() << "append" << std::endl;
+        std::cout << p_pEvoked->comment.toLatin1().constData() << " append" << std::endl;
 
         mutex.lock();
         m_qVecEvokedData.push_back(p_pEvoked);
@@ -262,6 +263,10 @@ void SourceLab::updateInvOp(MNEInverseOperator::SPtr p_pInvOp)
 
     mutex.lock();
     m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(*m_pInvOp.data(), lambda2, method));
+    //
+    //   Set up the inverse according to the parameters
+    //
+    m_pMinimumNorm->doInverseSetup(m_iNumAverages,false);
     mutex.unlock();
 }
 
@@ -309,7 +314,7 @@ void SourceLab::run()
     //
     // Init Real-Time average
     //
-    m_pRtAve = RtAve::SPtr(new RtAve(750, 750, m_pFiffInfo));
+    m_pRtAve = RtAve::SPtr(new RtAve(m_iNumAverages, 750, 750, m_pFiffInfo));
     connect(m_pRtAve.data(), &RtAve::evokedStim, this, &SourceLab::appendEvoked);
 
     //
@@ -349,10 +354,15 @@ void SourceLab::run()
             m_pRtCov->append(t_mat);
             m_pRtAve->append(t_mat);
 
+            mutex.lock();
             if(m_pMinimumNorm && m_qVecEvokedData.size() > 0)
             {
-                FiffEvoked t_evoked = *m_qVecEvokedData[0].data();
-                SourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_evoked);
+                FiffEvoked t_fiffEvoked = *m_qVecEvokedData[0].data();
+
+                float tmin = ((float)t_fiffEvoked.first) / t_fiffEvoked.info.sfreq;
+                float tstep = 1/t_fiffEvoked.info.sfreq;
+
+                SourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_fiffEvoked.data, tmin, tstep);
 
                 std::cout << "SourceEstimated:\n" << std::endl;
 //                std::cout << "SourceEstimated:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
@@ -361,10 +371,12 @@ void SourceLab::run()
 //                for(qint32 i = 0; i < sourceEstimate.data.cols(); ++i)
 //                    m_pRTSE_SourceLab->setValue(sourceEstimate.data.col(i));
 
-                mutex.lock();
+
                 m_qVecEvokedData.pop_front();
-                mutex.unlock();
             }
+            mutex.unlock();
+
+            //Continous Data
 
 //            if(m_pMinimumNorm && t_mat.cols() > 0)
 //            {

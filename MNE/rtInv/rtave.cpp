@@ -70,9 +70,9 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtAve::RtAve(quint32 p_iPreStimSamples, quint32 p_iPostStimSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent)
+RtAve::RtAve(quint32 numAverages, quint32 p_iPreStimSamples, quint32 p_iPostStimSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent)
 : QThread(parent)
-, m_iNumAverages(4)
+, m_iNumAverages(numAverages)
 , m_iPreStimSamples(p_iPreStimSamples)
 , m_iPostStimSamples(p_iPostStimSamples)
 , m_pFiffInfo(p_pFiffInfo)
