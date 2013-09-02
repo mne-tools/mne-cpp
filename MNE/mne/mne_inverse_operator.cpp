@@ -327,7 +327,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo &inf
     bool is_fixed_ori = forward.isFixedOrient();
     MNEInverseOperator p_MNEInverseOperator;
 
-    qDebug() << "ToDo MNEInverseOperator::make_inverse_operator: do surf_ori check";
+    std::cout << "ToDo MNEInverseOperator::make_inverse_operator: do surf_ori check" << std::endl;
 
     //Check parameters
     if(fixed && loose > 0)
@@ -382,7 +382,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo &inf
     MatrixXd patch_areas;
     if(depth > 0)
     {
-        qDebug() << "ToDo: patch_areas";
+        std::cout << "ToDo: patch_areas" << std::endl;
 //        patch_areas = forward.get('patch_areas', None)
         p_depth_prior = FiffCov::SDPtr(new FiffCov(MNEForwardSolution::compute_depth_prior(gain, gain_info, is_fixed_ori, depth, 10.0, patch_areas, limit_depth_chs)));
     }
@@ -474,7 +474,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo &inf
     //
     printf("Computing SVD of whitened and weighted lead field matrix.\n");
     JacobiSVD<MatrixXd> svd(gain, ComputeThinU | ComputeThinV);
-    qDebug("ToDo Sorting Necessary?");
+    std::cout << "ToDo Sorting Necessary?" << std::endl;
     VectorXd p_sing = svd.singularValues();
     MatrixXd t_U = svd.matrixU();
     MNEMath::sort<double>(p_sing, t_U);

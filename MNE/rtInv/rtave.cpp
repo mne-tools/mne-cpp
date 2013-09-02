@@ -443,7 +443,7 @@ void RtAve::run()
 
                                 m_qListQVectorPreStimBuf[t_iStimIndex].pop_front();
 
-                                qDebug() << "Pre-stim average" << t_iStimIndex;
+//                                qDebug() << "Pre-stim average" << t_iStimIndex;
                             }
 
 
@@ -461,7 +461,7 @@ void RtAve::run()
 
                                 m_qListQVectorPostStimBuf[t_iStimIndex].pop_front();
 
-                                qDebug() << "Post-stim average" << t_iStimIndex;
+//                                qDebug() << "Post-stim average" << t_iStimIndex;
                             }
 
                             //if averages are available -> buffers are filled and first average is stored
@@ -494,7 +494,7 @@ void RtAve::run()
                                 t_pEvokedStim->comment = QString("Stim %1").arg(t_iStimIndex);
                                 t_pEvokedStim->data = m_qListStimAve[t_iStimIndex];
                                 emit evokedStim(t_pEvokedStim);
-                                qDebug() << "Evoked emitted" << t_pEvokedPreStim->comment;
+//                                qDebug() << "Evoked emitted" << t_pEvokedPreStim->comment;
                             }
                         }
                     }

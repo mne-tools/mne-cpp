@@ -280,18 +280,18 @@ int main(int argc, char *argv[])
 //    SurfaceSet t_surfSet("/home/chdinh/sl_data/subjects/mind006/surf/lh.white", "/home/chdinh/sl_data/subjects/mind006/surf/rh.white");
     SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
 
-//    //only one time point - P100
-//    qint32 sample = 0;
-//    for(qint32 i = 0; i < sourceEstimate.times.size(); ++i)
-//    {
-//        if(sourceEstimate.times(i) >= 0)
-//        {
-//            sample = i;
-//            break;
-//        }
-//    }
-//    sample += (qint32)ceil(0.106/sourceEstimate.tstep); //100ms
-//    sourceEstimate = sourceEstimate.reduce(sample, 1);
+    //only one time point - P100
+    qint32 sample = 0;
+    for(qint32 i = 0; i < sourceEstimate.times.size(); ++i)
+    {
+        if(sourceEstimate.times(i) >= 0)
+        {
+            sample = i;
+            break;
+        }
+    }
+    sample += (qint32)ceil(0.106/sourceEstimate.tstep); //100ms
+    sourceEstimate = sourceEstimate.reduce(sample, 1);
 
     QList<Label> t_qListLabels;
     QList<RowVector4i> t_qListRGBAs;

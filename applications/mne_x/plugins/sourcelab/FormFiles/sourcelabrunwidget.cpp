@@ -63,8 +63,6 @@ SourceLabRunWidget::SourceLabRunWidget(SourceLab* toolbox, QWidget *parent)
 {
     ui.setupUi(this);
 
-    connect(toolbox, &SourceLab::statMsg, this, &SourceLabRunWidget::writeToLog);
-
     connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
 }
 
