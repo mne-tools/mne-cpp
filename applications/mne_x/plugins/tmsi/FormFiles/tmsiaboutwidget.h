@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     ecgsimulator.h
+* @file     tmsiaboutwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ECGSimulator class.
+* @brief    Contains the declaration of the TMSIAboutWidget class.
 *
 */
 
-#ifndef ECGSIMULATOR_H
-#define ECGSIMULATOR_H
+#ifndef TMSIABOUTWIDGET_H
+#define TMSIABOUTWIDGET_H
 
 
 //*************************************************************************************************************
@@ -42,30 +42,23 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "ecgsimulator_global.h"
-
-#include "ecgsimchannel.h"
-
-#include <mne_x/Interfaces/ISensor.h>
-#include <generics/circularbuffer.h>
-#include <xMeas/newrealtimesamplearray.h>
+#include "../ui_tmsiabout.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT STL INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QtWidgets>
-#include <QVector>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE ECGSimulatorPlugin
+// DEFINE NAMESPACE TMSIPlugin
 //=============================================================================================================
 
-namespace ECGSimulatorPlugin
+namespace TMSIPlugin
 {
 
 
@@ -74,106 +67,44 @@ namespace ECGSimulatorPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEX;
-using namespace XMEASLIB;
-using namespace IOBuffer;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class ECGProducer;
-//class ECGChannel;
-
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ECGSimulator
+* DECLARE CLASS TMSIAboutWidget
 *
-* @brief The ECGSimulator class provides a ECG simulator.
+* @brief The TMSIAboutWidget class provides the about dialog for the TMSI.
 */
-class ECGSIMULATORSHARED_EXPORT ECGSimulator : public ISensor
+class TMSIAboutWidget : public QDialog
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "ecgsimulator.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::ISensor)
-
-    friend class ECGProducer;
-    friend class ECGSetupWidget;
 
 public:
-    //=========================================================================================================
-    /**
-    * Constructs a ECGSimulator.
-    */
-    ECGSimulator();
 
     //=========================================================================================================
     /**
-    * Destroys the ECGSimulator.
-    */
-    virtual ~ECGSimulator();
-
-    //=========================================================================================================
-    /**
-    * Clone the plugin
-    */
-    virtual QSharedPointer<IPlugin> clone() const;
-
-    //=========================================================================================================
-    /**
-    * Initialise input and output connectors.
-    */
-    virtual void init();
-
-    //=========================================================================================================
-    /**
-    * Initialise the ECGSimulator.
-    */
-    void initChannels();
-
-
-    virtual bool start();
-    virtual bool stop();
-
-    virtual IPlugin::PluginType getType() const;
-    virtual QString getName() const;
-
-    virtual QWidget* setupWidget();
-
-    //=========================================================================================================
-    /**
-    * Returns the ECGSimulator resource path.
+    * Constructs a ECGAboutWidget dialog which is a child of parent.
     *
-    * @return the ECGSimulator resource path.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new TMSIAboutWidget becomes a window. If parent is another widget, TMSIAboutWidget becomes a child window inside parent. TMSIAboutWidget is deleted when its parent is deleted.
     */
-    QString getResourcePath() const {return m_qStringResourcePath;}
+    TMSIAboutWidget(QWidget *parent = 0);
 
-protected:
-    virtual void run();
+    //=========================================================================================================
+    /**
+    * Destroys the TMSIAboutWidget.
+    * All TMSIAboutWidget's children are deleted first. The application exits if TMSIAboutWidget is the main widget.
+    */
+    ~TMSIAboutWidget();
 
 private:
-    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_ECG_I_new;   /**< The RealTimeSampleArray to provide the channel ECG I.*/
-    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_ECG_II_new;  /**< The RealTimeSampleArray to provide the channel ECG II.*/
-    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_ECG_III_new; /**< The RealTimeSampleArray to provide the channel ECG III.*/
-
-    float           m_fSamplingRate;        /**< the sampling rate.*/
-    int             m_iDownsamplingFactor;  /**< the down sampling factor.*/
-    dBuffer::SPtr   m_pInBuffer_I;          /**< ECG I data which arrive from ECG producer.*/
-    dBuffer::SPtr   m_pInBuffer_II;         /**< ECG II data which arrive from ECG producer.*/
-    dBuffer::SPtr   m_pInBuffer_III;        /**< ECG III data which arrive from ECG producer.*/
-    QSharedPointer<ECGProducer>     m_pECGProducer; /**< the ECGProducer.*/
-
-    QString m_qStringResourcePath;          /**< the path to the ECG resource directory.*/
-
-    ECGSimChannel::SPtr m_pECGChannel_ECG_I;    /**< the simulation channel for ECG I.*/
-    ECGSimChannel::SPtr m_pECGChannel_ECG_II;   /**< the simulation channel for ECG II.*/
-    ECGSimChannel::SPtr m_pECGChannel_ECG_III;  /**< the simulation channel for ECG III.*/
+    Ui::TMSIAboutWidgetClass ui;    /**< Holds the user interface for the TMSIAboutWidgetClass.*/
 };
 
 } // NAMESPACE
 
-#endif // ECGSIMULATOR_H
+#endif // TMSIABOUTWIDGET_H

@@ -1,15 +1,15 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mne_x.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-#           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
+# @file     tmsi.pro
+# @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+#           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     February, 2013
+# @date     September, 2013
 #
 # @section  LICENSE
 #
-# Copyright (C) 2013, Christoph Dinh, Limin Sun, Martin Luessi and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -30,50 +30,65 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the plugins for mne-x project.
+# @brief    This project file generates the makefile for the tmsi plug-in.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../../../mne-cpp.pri)
+include(../../../../mne-cpp.pri)
 
-TEMPLATE = subdirs
+TEMPLATE = lib
 
-SUBDIRS += \
-    ecgsimulator \
-    mnertclient \
-    dummytoolbox \
-    tmsi
-#    rtsss \
+CONFIG += plugin
 
-contains(MNECPP_CONFIG, babyMEG) {
-    message(BabyMEG plugin configured!)
-#    SUBDIRS +=
+DEFINES += TMSI_LIBRARY
+
+QT += core widgets
+
+TARGET = tmsi
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
+}
+
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lxMeasd \
+            -lxDispd \
+            -lmne_xd
 }
 else {
-    message(RtServer plugin configured!)
-    SUBDIRS += sourcelab
-
-#    qtHaveModule(3d) {
-#        message(Qt3D available: brainmonitor library configured!)
-#        SUBDIRS += brainmonitor \
-#    }
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lxMeas \
+            -lxDisp \
+            -lmne_x
 }
 
-#    filtertoolbox \
-#    gaborparticletoolbox \
-#    megchannelsimulator \
-#    megrtproc \
-#    roitoolbox \
-#    localizationtoolbox \
-#    prelocalizationtoolbox
+DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
+SOURCES += \
+        tmsi.cpp \
+        tmsichannel.cpp \
+        tmsiproducer.cpp \
+        FormFiles/tmsisetupwidget.cpp \
+        FormFiles/tmsiaboutwidget.cpp
 
-### BabyMEG alternative ###
-#contains(MNECPP_CONFIG, babyMEG) {
-#    message(BabyMEG plugin configured!)
-#    SUBDIRS += babymeg
-#}
-#else {
-#    message(RtServer plugin configured!)
-#    SUBDIRS += rtclient
-#}
+HEADERS += \
+        tmsi.h\
+        tmsi_global.h \
+        tmsichannel.h \
+        tmsiproducer.h \
+        FormFiles/tmsisetupwidget.h \
+        FormFiles/tmsiaboutwidget.h
+
+FORMS += \
+        FormFiles/tmsisetup.ui \
+        FormFiles/tmsiabout.ui
+
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
+
+OTHER_FILES += tmsi.json
+
+# Put generated form headers into the origin --> cause other src is pointing at them
+UI_DIR = $${PWD}

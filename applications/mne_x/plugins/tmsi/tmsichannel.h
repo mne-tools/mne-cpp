@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     ecgsimchannel.h
+* @file     tmsichannel.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ECGChannel class.
+* @brief    Contains the declaration of the TMSIChannel class.
 *
 */
 
-#ifndef ECGSIMCHANNEL_H
-#define ECGSIMCHANNEL_H
+#ifndef TMSICHANNEL_H
+#define TMSICHANNEL_H
 
 
 //*************************************************************************************************************
@@ -56,10 +56,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE ECGSimulatorPlugin
+// DEFINE NAMESPACE TMSIPlugin
 //=============================================================================================================
 
-namespace ECGSimulatorPlugin
+namespace TMSIPlugin
 {
 
 
@@ -77,32 +77,32 @@ namespace ECGSimulatorPlugin
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ECGChannel
+* TMSIChannel...
 *
-* @brief The ECGChannel class provides a ECG channel.
+* @brief The TMSIChannel class provides a EEG channel.
 */
-class ECGSimChannel
+class TMSIChannel
 {
 public:
-    typedef QSharedPointer<ECGSimChannel> SPtr;              /**< Shared pointer type for ECGSimChannel. */
-    typedef QSharedPointer<const ECGSimChannel> ConstSPtr;   /**< Const shared pointer type for ECGSimChannel. */
+    typedef QSharedPointer<TMSIChannel> SPtr;              /**< Shared pointer type for ECGSimChannel. */
+    typedef QSharedPointer<const TMSIChannel> ConstSPtr;   /**< Const shared pointer type for ECGSimChannel. */
 
     //=========================================================================================================
     /**
-    * Constructs a ECGSimChannel.
+    * Constructs a TMSIChannel.
     *
     * @param [in] ResourceDataPath a string which holds the resource directory where the files are stored which could be used to simulate a channel.
     * @param [in] ChannelFile a string to a specific file which should be used initially.
     * @param [in] enabled whether the channel should be initial enabled.
     * @param [in] visible whether the channel should be initial visible.
     */
-    ECGSimChannel(QString ResourceDataPath, QString ChannelFile, bool enabled = true, bool visible = true);
+    TMSIChannel(QString ResourceDataPath, QString ChannelFile, bool enabled = true, bool visible = true);
 
     //=========================================================================================================
     /**
-    * Destroys the ECGSimChannel.
+    * Destroys the TMSIChannel.
     */
-    virtual ~ECGSimChannel();
+    virtual ~TMSIChannel();
 
 
     //=========================================================================================================
@@ -206,17 +206,17 @@ public:
     void clear();
 
 private:
-    QString m_qStringResourceDataPath;	/**< Holds the path to the resource directory.*/
+    QString m_qStringResourceDataPath;  /**< Holds the path to the resource directory.*/
 
-    QString m_qStringChannelFile;	/**< Holds the channel file.*/
+    QString m_qStringChannelFile;       /**< Holds the channel file.*/
 
-    bool m_bIsEnabled;	/**< Holds whether the channel is enabled.*/
-    bool m_bIsVisible;	/**< Holds whether the channel is visible.*/
+    bool m_bIsEnabled;                  /**< Holds whether the channel is enabled.*/
+    bool m_bIsVisible;                  /**< Holds whether the channel is visible.*/
 
-    QVector<double> m_vecBuffer;	/**< A vector which holds all simualtion sample values.*/
+    QVector<double> m_vecBuffer;        /**< A vector which holds all simualtion sample values.*/
 
-    double m_dMin;	/**< Holds minimal sample value.*/
-    double m_dMax;	/**< Holds maximal sample value.*/
+    double m_dMin;                      /**< Holds minimal sample value.*/
+    double m_dMax;                      /**< Holds maximal sample value.*/
 };
 
 
@@ -225,7 +225,7 @@ private:
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-inline void ECGSimChannel::setResourceDataPath(QString& path)
+inline void TMSIChannel::setResourceDataPath(QString& path)
 {
     m_qStringResourceDataPath = path;
 }
@@ -233,7 +233,7 @@ inline void ECGSimChannel::setResourceDataPath(QString& path)
 
 //*************************************************************************************************************
 
-inline const QString& ECGSimChannel::getResourceDataPath()
+inline const QString& TMSIChannel::getResourceDataPath()
 {
     return m_qStringResourceDataPath;
 }
@@ -241,7 +241,7 @@ inline const QString& ECGSimChannel::getResourceDataPath()
 
 //*************************************************************************************************************
 
-inline void ECGSimChannel::setChannelFile(QString file)
+inline void TMSIChannel::setChannelFile(QString file)
 {
     m_qStringChannelFile = file;
 }
@@ -249,7 +249,7 @@ inline void ECGSimChannel::setChannelFile(QString file)
 
 //*************************************************************************************************************
 
-inline const QString& ECGSimChannel::getChannelFile()
+inline const QString& TMSIChannel::getChannelFile()
 {
     return m_qStringChannelFile;
 }
@@ -257,7 +257,7 @@ inline const QString& ECGSimChannel::getChannelFile()
 
 //*************************************************************************************************************
 
-inline const QVector<double>& ECGSimChannel::getSamples()
+inline const QVector<double>& TMSIChannel::getSamples()
 {
     return m_vecBuffer;
 }
@@ -265,7 +265,7 @@ inline const QVector<double>& ECGSimChannel::getSamples()
 
 //*************************************************************************************************************
 
-inline void ECGSimChannel::setEnabled(bool enabled)
+inline void TMSIChannel::setEnabled(bool enabled)
 {
     m_bIsEnabled = enabled;
 }
@@ -273,7 +273,7 @@ inline void ECGSimChannel::setEnabled(bool enabled)
 
 //*************************************************************************************************************
 
-inline const bool ECGSimChannel::isEnabled()
+inline const bool TMSIChannel::isEnabled()
 {
     return m_bIsEnabled;
 }
@@ -281,7 +281,7 @@ inline const bool ECGSimChannel::isEnabled()
 
 //*************************************************************************************************************
 
-inline void ECGSimChannel::setVisible(bool visible)
+inline void TMSIChannel::setVisible(bool visible)
 {
     m_bIsVisible = visible;
 }
@@ -289,7 +289,7 @@ inline void ECGSimChannel::setVisible(bool visible)
 
 //*************************************************************************************************************
 
-inline const bool ECGSimChannel::isVisible()
+inline const bool TMSIChannel::isVisible()
 {
     return m_bIsVisible;
 }
@@ -297,7 +297,7 @@ inline const bool ECGSimChannel::isVisible()
 
 //*************************************************************************************************************
 
-inline const double ECGSimChannel::getMinimum()
+inline const double TMSIChannel::getMinimum()
 {
     return m_dMin;
 }
@@ -305,11 +305,11 @@ inline const double ECGSimChannel::getMinimum()
 
 //*************************************************************************************************************
 
-inline const double ECGSimChannel::getMaximum()
+inline const double TMSIChannel::getMaximum()
 {
     return m_dMax;
 }
 
 }// NAMESPACE
 
-#endif // ECGCHANNEL_H
+#endif // TMSICHANNEL_H
