@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     ecgsimulator.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     tmsi.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     February, 2013
+* @date     September, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ECGSimulator class.
+* @brief    Contains the declaration of the TMSI class.
 *
 */
 
-#ifndef ECGSIMULATOR_H
-#define ECGSIMULATOR_H
+#ifndef TMSI_H
+#define TMSI_H
 
 
 //*************************************************************************************************************
@@ -42,9 +43,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "ecgsimulator_global.h"
+#include "tmsi_global.h"
 
-#include "ecgsimchannel.h"
+#include "tmsichannel.h"
 
 #include <mne_x/Interfaces/ISensor.h>
 #include <generics/circularbuffer.h>
@@ -62,10 +63,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE ECGSimulatorPlugin
+// DEFINE NAMESPACE TMSIPlugin
 //=============================================================================================================
 
-namespace ECGSimulatorPlugin
+namespace TMSIPlugin
 {
 
 
@@ -84,38 +85,38 @@ using namespace IOBuffer;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class ECGProducer;
+class TMSIProducer;
 //class ECGChannel;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ECGSimulator
+* TMSI...
 *
-* @brief The ECGSimulator class provides a ECG simulator.
+* @brief The TMSI class provides a EEG connector.
 */
-class ECGSIMULATORSHARED_EXPORT ECGSimulator : public ISensor
+class TMSISHARED_EXPORT TMSI : public ISensor
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "ecgsimulator.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "tmsi.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MNEX::ISensor)
 
-    friend class ECGProducer;
-    friend class ECGSetupWidget;
+    friend class TMSIProducer;
+    friend class TMSISetupWidget;
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a ECGSimulator.
+    * Constructs a TMSI.
     */
-    ECGSimulator();
+    TMSI();
 
     //=========================================================================================================
     /**
-    * Destroys the ECGSimulator.
+    * Destroys the TMSI.
     */
-    virtual ~ECGSimulator();
+    virtual ~TMSI();
 
     //=========================================================================================================
     /**
@@ -156,22 +157,22 @@ protected:
     virtual void run();
 
 private:
-    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_ECG_I_new;   /**< The RealTimeSampleArray to provide the channel ECG I.*/
-    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_ECG_II_new;  /**< The RealTimeSampleArray to provide the channel ECG II.*/
-    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_ECG_III_new; /**< The RealTimeSampleArray to provide the channel ECG III.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_TMSI_I_new;   /**< The RealTimeSampleArray to provide the channel ECG I.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_TMSI_II_new;  /**< The RealTimeSampleArray to provide the channel ECG II.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_TMSI_III_new; /**< The RealTimeSampleArray to provide the channel ECG III.*/
 
     float           m_fSamplingRate;        /**< the sampling rate.*/
     int             m_iDownsamplingFactor;  /**< the down sampling factor.*/
     dBuffer::SPtr   m_pInBuffer_I;          /**< ECG I data which arrive from ECG producer.*/
     dBuffer::SPtr   m_pInBuffer_II;         /**< ECG II data which arrive from ECG producer.*/
     dBuffer::SPtr   m_pInBuffer_III;        /**< ECG III data which arrive from ECG producer.*/
-    QSharedPointer<ECGProducer>     m_pECGProducer; /**< the ECGProducer.*/
+    QSharedPointer<TMSIProducer>     m_pTMSIProducer; /**< the ECGProducer.*/
 
     QString m_qStringResourcePath;          /**< the path to the ECG resource directory.*/
 
-    ECGSimChannel::SPtr m_pECGChannel_ECG_I;    /**< the simulation channel for ECG I.*/
-    ECGSimChannel::SPtr m_pECGChannel_ECG_II;   /**< the simulation channel for ECG II.*/
-    ECGSimChannel::SPtr m_pECGChannel_ECG_III;  /**< the simulation channel for ECG III.*/
+    TMSIChannel::SPtr m_pTMSIChannel_TMSI_I;    /**< the simulation channel for ECG I.*/
+    TMSIChannel::SPtr m_pTMSIChannel_TMSI_II;   /**< the simulation channel for ECG II.*/
+    TMSIChannel::SPtr m_pTMSIChannel_TMSI_III;  /**< the simulation channel for ECG III.*/
 };
 
 } // NAMESPACE

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     ecgsimulator.h
+* @file     tmsiproducer.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ECGSimulator class.
+* @brief    Contains the declaration of the TMSIProducer class.
 *
 */
 
-#ifndef ECGSIMULATOR_H
-#define ECGSIMULATOR_H
+#ifndef TMSIPRODUCER_H
+#define TMSIPRODUCER_H
 
 
 //*************************************************************************************************************
@@ -42,30 +42,23 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "ecgsimulator_global.h"
-
-#include "ecgsimchannel.h"
-
-#include <mne_x/Interfaces/ISensor.h>
 #include <generics/circularbuffer.h>
-#include <xMeas/newrealtimesamplearray.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT STL INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-#include <QVector>
+#include <QThread>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE ECGSimulatorPlugin
+// DEFINE NAMESPACE TMSIPlugin
 //=============================================================================================================
 
-namespace ECGSimulatorPlugin
+namespace TMSIPlugin
 {
 
 
@@ -74,8 +67,6 @@ namespace ECGSimulatorPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEX;
-using namespace XMEASLIB;
 using namespace IOBuffer;
 
 
@@ -84,96 +75,61 @@ using namespace IOBuffer;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class ECGProducer;
-//class ECGChannel;
+class TMSI;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ECGSimulator
+* DECLARE CLASS ECGProducer
 *
-* @brief The ECGSimulator class provides a ECG simulator.
+* @brief The ECGProducer class provides a ECG data producer for a given sampling rate.
 */
-class ECGSIMULATORSHARED_EXPORT ECGSimulator : public ISensor
+class TMSIProducer : public QThread
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "ecgsimulator.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::ISensor)
-
-    friend class ECGProducer;
-    friend class ECGSetupWidget;
-
 public:
-    //=========================================================================================================
-    /**
-    * Constructs a ECGSimulator.
-    */
-    ECGSimulator();
+    typedef QSharedPointer<TMSIProducer> SPtr;              /**< Shared pointer type for ECGProducer. */
+    typedef QSharedPointer<const TMSIProducer> ConstSPtr;   /**< Const shared pointer type for ECGProducer. */
 
     //=========================================================================================================
     /**
-    * Destroys the ECGSimulator.
-    */
-    virtual ~ECGSimulator();
-
-    //=========================================================================================================
-    /**
-    * Clone the plugin
-    */
-    virtual QSharedPointer<IPlugin> clone() const;
-
-    //=========================================================================================================
-    /**
-    * Initialise input and output connectors.
-    */
-    virtual void init();
-
-    //=========================================================================================================
-    /**
-    * Initialise the ECGSimulator.
-    */
-    void initChannels();
-
-
-    virtual bool start();
-    virtual bool stop();
-
-    virtual IPlugin::PluginType getType() const;
-    virtual QString getName() const;
-
-    virtual QWidget* setupWidget();
-
-    //=========================================================================================================
-    /**
-    * Returns the ECGSimulator resource path.
+    * Constructs a TMSIProducer.
     *
-    * @return the ECGSimulator resource path.
+    * @param [in] simulator a pointer to the corresponding ECGSimulator.
+    * @param [in] buffer_I a pointer to the buffer to which the ECGProducer should write the generated data for ECG I.
+    * @param [in] buffer_II a pointer to the buffer to which the ECGProducer should write the generated data for ECG II.
+    * @param [in] buffer_III a pointer to the buffer to which the ECGProducer should write the generated data for ECG III.
     */
-    QString getResourcePath() const {return m_qStringResourcePath;}
+    TMSIProducer(TMSI* simulator, dBuffer::SPtr& buffer_I, dBuffer::SPtr& buffer_II, dBuffer::SPtr& buffer_III);
+
+    //=========================================================================================================
+    /**
+    * Destroys the TMSIProducer.
+    */
+    ~TMSIProducer();
+
+    //=========================================================================================================
+    /**
+    * Stops the TMSIProducer by stopping the producer's thread.
+    */
+    void stop();
 
 protected:
+    //=========================================================================================================
+    /**
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread.
+    */
     virtual void run();
 
 private:
-    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_ECG_I_new;   /**< The RealTimeSampleArray to provide the channel ECG I.*/
-    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_ECG_II_new;  /**< The RealTimeSampleArray to provide the channel ECG II.*/
-    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_ECG_III_new; /**< The RealTimeSampleArray to provide the channel ECG III.*/
-
-    float           m_fSamplingRate;        /**< the sampling rate.*/
-    int             m_iDownsamplingFactor;  /**< the down sampling factor.*/
-    dBuffer::SPtr   m_pInBuffer_I;          /**< ECG I data which arrive from ECG producer.*/
-    dBuffer::SPtr   m_pInBuffer_II;         /**< ECG II data which arrive from ECG producer.*/
-    dBuffer::SPtr   m_pInBuffer_III;        /**< ECG III data which arrive from ECG producer.*/
-    QSharedPointer<ECGProducer>     m_pECGProducer; /**< the ECGProducer.*/
-
-    QString m_qStringResourcePath;          /**< the path to the ECG resource directory.*/
-
-    ECGSimChannel::SPtr m_pECGChannel_ECG_I;    /**< the simulation channel for ECG I.*/
-    ECGSimChannel::SPtr m_pECGChannel_ECG_II;   /**< the simulation channel for ECG II.*/
-    ECGSimChannel::SPtr m_pECGChannel_ECG_III;  /**< the simulation channel for ECG III.*/
+    TMSI*                   m_pTMSI;            /**< A pointer to corresponding TMSI.*/
+    dBuffer::SPtr           m_pdBuffer_I;       /**< A pointer to the buffer where the simulated data of ECG I should be written to.*/
+    dBuffer::SPtr           m_pdBuffer_II;      /**< A pointer to the buffer where the simulated data of ECG II should be written to.*/
+    dBuffer::SPtr           m_pdBuffer_III;     /**< A pointer to the buffer where the simulated data of ECG III should be written to.*/
+    bool                    m_bIsRunning;       /**< Whether TMSIProducer is running.*/
 };
 
 } // NAMESPACE
 
-#endif // ECGSIMULATOR_H
+#endif // TMSIPRODUCER_H
