@@ -48,6 +48,7 @@
 #include <generics/circularmatrixbuffer.h>
 
 #include <fs/annotationset.h>
+#include <fs/surfaceset.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_evoked.h>
 #include <mne/mne_forwardsolution.h>
@@ -176,7 +177,9 @@ protected:
     virtual void run();
 
 private:
-    PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pRTMSAInput;      /**< The RealTimeMultiSampleArray input.*/
+    PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;  /**< The RealTimeMultiSampleArray input.*/
+
+    PluginOutputData<RealTimeSourceEstimate>::SPtr      m_pRTSEOutput;  /**< The RealTimeSourceEstimate output.*/
 
 
     QMutex mutex;
@@ -191,7 +194,9 @@ private:
     MNEForwardSolution::SPtr    m_pFwd;             /**< Forward solution. */
     MNEForwardSolution::SPtr    m_pClusteredFwd;    /**< Clustered forward solution. */
 
-    AnnotationSet               m_annotationSet;    /**< Annotation set. */
+    AnnotationSet::SPtr         m_pAnnotationSet;   /**< Annotation set. */
+    SurfaceSet::SPtr            m_pSurfaceSet;      /**< Surface set. */
+
 
     FiffInfo::SPtr              m_pFiffInfo;        /**< Fiff information. */
 

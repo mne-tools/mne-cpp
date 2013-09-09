@@ -63,8 +63,8 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeSourceEstimate::RealTimeSourceEstimate()
-: NewMeasurement()
+RealTimeSourceEstimate::RealTimeSourceEstimate(QObject *parent)
+: NewMeasurement(QMetaType::type("RealTimeSourceEstimate::SPtr"), parent)
 , m_ucArraySize(10)
 {
 

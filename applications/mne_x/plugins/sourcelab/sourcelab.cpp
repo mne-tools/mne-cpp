@@ -74,7 +74,8 @@ SourceLab::SourceLab()
 , m_bReceiveData(false)
 , m_qFileFwdSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
 , m_pFwd(new MNEForwardSolution(m_qFileFwdSolution))
-, m_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot")
+, m_pAnnotationSet(new AnnotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot"))
+, m_pSurfaceSet(new SurfaceSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white"))
 , m_iStimChan(0)
 , m_iNumAverages(10)
 , m_bSingleTrial(true)
@@ -115,6 +116,37 @@ void SourceLab::init()
     m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "SourceLabIn", "SourceLab input data");
     connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &SourceLab::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTMSAInput);
+
+    // Output
+    m_pRTSEOutput = PluginOutputData<RealTimeSourceEstimate>::create(this, "SourceLabOut", "SourceLab output data");
+    m_outputConnectors.append(m_pRTSEOutput);
+
+    m_pRTSEOutput->data()->setName("Real-Time Source Estimate");
+    m_pRTSEOutput->data()->setAnnotSet(m_pAnnotationSet);
+    m_pRTSEOutput->data()->setSurfSet(m_pSurfaceSet);
+
+
+//    // Output
+//    m_pDummyOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "DummyOut", "Dummy output data");
+//    m_outputConnectors.append(m_pDummyOutput);
+
+//    m_pDummyOutput->data()->setName("Dummy Output");
+//    m_pDummyOutput->data()->setUnit("mV");
+//    m_pDummyOutput->data()->setMinValue(-200);
+//    m_pDummyOutput->data()->setMaxValue(360);
+//    m_pDummyOutput->data()->setSamplingRate(256.0/1.0);
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -287,7 +319,9 @@ void SourceLab::run()
 //    future.waitForFinished();
 //    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(future.result()));
 
-    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(m_annotationSet, 40)));
+    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 40)));
+
+    m_pRTSEOutput->data()->setSrc(m_pClusteredFwd->src);
 
     //
     // start receiving data

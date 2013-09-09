@@ -45,8 +45,11 @@
 #include "xmeas_global.h"
 #include "newmeasurement.h"
 
+#include <fs/label.h>
+#include <fs/surfaceset.h>
+#include <fs/annotationset.h>
 #include <fiff/fiff_info.h>
-#include <mne/mne_forwardsolution.h>
+#include <mne/mne_sourcespace.h>
 
 
 //*************************************************************************************************************
@@ -75,6 +78,7 @@ namespace XMEASLIB
 
 using namespace FIFFLIB;
 using namespace MNELIB;
+using namespace FSLIB;
 
 
 //=========================================================================================================
@@ -92,8 +96,10 @@ public:
     //=========================================================================================================
     /**
     * Constructs a RealTimeSourceEstimate.
+    *
+    * @param[in] parent     the QObject parent of this measurement
     */
-    RealTimeSourceEstimate();
+    RealTimeSourceEstimate(QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -103,33 +109,57 @@ public:
 
     //=========================================================================================================
     /**
-    * Inits RealTimeSourceEstimate and adds uiNumChannels empty channel information
+    * Returns the list of labels.
     *
-    * @param [in] uiNumSources     the number of channels to init.
+    * @return the list of labels
     */
-    inline void init(unsigned int uiNumSources);
+    inline QList<Label> getLabels();
 
     //=========================================================================================================
     /**
-    * Returns the number of channels.
+    * Returns the list of RGBAs.
     *
-    * @return the number of values which are gathered before a notify() is called.
+    * @return the list of RGBAs
     */
-    inline unsigned int getNumSources() const;
+    inline QList<RowVector4i> getRGBAs();
 
     //=========================================================================================================
     /**
-    * Returns the reference to the orig FiffInfo.
+    * Sets the annotation set.
     *
-    * @return the reference to the orig FiffInfo.
+    * @param[in] annotSet   the annotation set to set
     */
-    inline FiffInfo::SPtr& getFiffInfo();
+    inline void setAnnotSet(AnnotationSet::SPtr& annotSet);
+
+    //=========================================================================================================
+    /**
+    * Returns the annotation set.
+    *
+    * @return the annotation set
+    */
+    inline AnnotationSet::SPtr& getAnnotSet();
+
+    //=========================================================================================================
+    /**
+    * Sets the surface set.
+    *
+    * @param[in] surfSet   the surface set to set
+    */
+    inline void setSurfSet(SurfaceSet::SPtr& surfSet);
+
+    //=========================================================================================================
+    /**
+    * Returns the surface set.
+    *
+    * @return the surface set
+    */
+    inline SurfaceSet::SPtr& getSurfSet();
 
     //=========================================================================================================
     /**
     * Sets the number of sample vectors which should be gathered before attached observers are notified by calling the Subject notify() method.
     *
-    * @param [in] ucArraySize the number of values.
+    * @param[in] ucArraySize the number of values.
     */
     inline void setArraySize(unsigned char ucArraySize);
 
@@ -167,9 +197,30 @@ public:
     */
     virtual VectorXd getValue() const;
 
+    //=========================================================================================================
+    /**
+    * Sets the source space
+    *
+    * @param[in] src    sets the source space
+    */
+    inline void setSrc(MNESourceSpace& src);
+
+    //=========================================================================================================
+    /**
+    * Returns if source space is set.
+    *
+    * @return the connected source space
+    */
+    inline MNESourceSpace& getSrc();
+
 private:
-    FiffInfo::SPtr    m_pFiffInfo_orig;     /**< Original Fiff Info if initialized by fiff info. */
-    MNEForwardSolution::SPtr    m_pFwd;     /**< Forward solution. */
+    AnnotationSet::SPtr     m_pAnnotSet;    /**< Annotation set. */
+    SurfaceSet::SPtr        m_pSurfSet;     /**< Surface set. */
+    MNESourceSpace          m_pSrc;         /**< Source space. */
+
+    QList<Label> m_pListLabel;          /**< List of labels. */
+    QList<RowVector4i> m_pListRGBA;     /**< List of RGBAs corresponding to labels. */
+
 
     double                      m_dSamplingRate;    /**< Sampling rate of the RealTimeSampleArray.*/
     VectorXd                    m_vecValue;         /**< The current attached sample vector.*/
@@ -183,18 +234,53 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-
-inline unsigned int RealTimeSourceEstimate::getNumSources() const
+inline QList<Label> RealTimeSourceEstimate::getLabels()
 {
-    return 0;
+    if(m_pListLabel.size() == 0 && m_pAnnotSet.isNull() && m_pSurfSet.isNull())
+        m_pAnnotSet->toLabels(*m_pSurfSet.data(), m_pListLabel, m_pListRGBA);
+    return m_pListLabel;
 }
 
 
 //*************************************************************************************************************
 
-inline FiffInfo::SPtr& RealTimeSourceEstimate::getFiffInfo()
+inline QList<RowVector4i> RealTimeSourceEstimate::getRGBAs()
 {
-    return m_pFiffInfo_orig;
+    if(m_pListRGBA.size() == 0 && m_pAnnotSet.isNull() && m_pSurfSet.isNull())
+        m_pAnnotSet->toLabels(*m_pSurfSet.data(), m_pListLabel, m_pListRGBA);
+    return m_pListRGBA;
+}
+
+
+//*************************************************************************************************************
+
+inline void RealTimeSourceEstimate::setAnnotSet(AnnotationSet::SPtr& annotSet)
+{
+    m_pAnnotSet = annotSet;
+}
+
+
+//*************************************************************************************************************
+
+inline AnnotationSet::SPtr& RealTimeSourceEstimate::getAnnotSet()
+{
+    return m_pAnnotSet;
+}
+
+
+//*************************************************************************************************************
+
+inline void RealTimeSourceEstimate::setSurfSet(SurfaceSet::SPtr& surfSet)
+{
+    m_pSurfSet = surfSet;
+}
+
+
+//*************************************************************************************************************
+
+inline SurfaceSet::SPtr& RealTimeSourceEstimate::getSurfSet()
+{
+    return m_pSurfSet;
 }
 
 
@@ -225,6 +311,24 @@ inline const QVector< VectorXd >& RealTimeSourceEstimate::getSourceArray()
     return m_matSamples;
 }
 
+
+//*************************************************************************************************************
+
+inline void RealTimeSourceEstimate::setSrc(MNESourceSpace& src)
+{
+    m_pSrc = src;
+}
+
+
+//*************************************************************************************************************
+
+inline MNESourceSpace& RealTimeSourceEstimate::getSrc()
+{
+    return m_pSrc;
+}
+
 } // NAMESPACE
+
+Q_DECLARE_METATYPE(XMEASLIB::RealTimeSourceEstimate::SPtr)
 
 #endif // REALTIMESOURCEESTIMATE_H
