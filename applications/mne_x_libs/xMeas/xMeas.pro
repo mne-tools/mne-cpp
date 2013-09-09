@@ -83,7 +83,7 @@ SOURCES += \
     Measurement/measurement.cpp \
     Measurement/mltchnmeasurement.cpp \
     Measurement/realtimemultisamplearray_new.cpp \
-    Measurement/realtimesourceestimate.cpp \
+    realtimesourceestimate.cpp \
     newrealtimesamplearray.cpp \
     newrealtimemultisamplearray.cpp \
     realtimesamplearraychinfo.cpp \
@@ -102,7 +102,7 @@ HEADERS += \
     Measurement/measurement.h \
     Measurement/mltchnmeasurement.h \
     Measurement/realtimemultisamplearray_new.h \
-    Measurement/realtimesourceestimate.h \
+    realtimesourceestimate.h \
     newrealtimesamplearray.h \
     newrealtimemultisamplearray.h \
     realtimesamplearraychinfo.h \

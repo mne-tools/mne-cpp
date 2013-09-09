@@ -42,10 +42,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../xmeas_global.h"
-#include "mltchnmeasurement.h"
+#include "xmeas_global.h"
+#include "newmeasurement.h"
 
 #include <fiff/fiff_info.h>
+#include <mne/mne_forwardsolution.h>
 
 
 //*************************************************************************************************************
@@ -73,6 +74,7 @@ namespace XMEASLIB
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace MNELIB;
 
 
 //=========================================================================================================
@@ -81,7 +83,7 @@ using namespace FIFFLIB;
 *
 * @brief Real-time source estimate measurement.
 */
-class XMEASSHARED_EXPORT RealTimeSourceEstimate : public MltChnMeasurement
+class XMEASSHARED_EXPORT RealTimeSourceEstimate : public NewMeasurement
 {
 public:
     typedef QSharedPointer<RealTimeSourceEstimate> SPtr;               /**< Shared pointer type for RealTimeSourceEstimate. */
@@ -166,11 +168,12 @@ public:
     virtual VectorXd getValue() const;
 
 private:
-    FiffInfo::SPtr    m_pFiffInfo_orig;    /**< Original Fiff Info if initialized by fiff info. */
+    FiffInfo::SPtr    m_pFiffInfo_orig;     /**< Original Fiff Info if initialized by fiff info. */
+    MNEForwardSolution::SPtr    m_pFwd;     /**< Forward solution. */
 
     double                      m_dSamplingRate;    /**< Sampling rate of the RealTimeSampleArray.*/
     VectorXd                    m_vecValue;         /**< The current attached sample vector.*/
-    unsigned char               m_ucArraySize; /**< Sample size of the multi sample array.*/
+    unsigned char               m_ucArraySize;      /**< Sample size of the multi sample array.*/
     QVector< VectorXd >         m_matSamples;       /**< The source estimate array.*/
 };
 

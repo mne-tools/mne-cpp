@@ -57,7 +57,7 @@
 #include <rtInv/rtinvop.h>
 #include <rtInv/rtave.h>
 
-#include <xMeas/Measurement/realtimesourceestimate.h>
+#include <xMeas/realtimesourceestimate.h>
 #include <xMeas/newrealtimemultisamplearray.h>
 
 

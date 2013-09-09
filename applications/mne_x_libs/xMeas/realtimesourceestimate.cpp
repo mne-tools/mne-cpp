@@ -38,8 +38,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "realtimemultisamplearray_new.h"
-
 #include "realtimesourceestimate.h"
 
 
@@ -66,7 +64,7 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 RealTimeSourceEstimate::RealTimeSourceEstimate()
-: MltChnMeasurement()
+: NewMeasurement()
 , m_ucArraySize(10)
 {
 
@@ -107,9 +105,9 @@ void RealTimeSourceEstimate::setValue(VectorXd v)
     //Store
     m_vecValue = v;
     m_matSamples.push_back(m_vecValue);
-    if(m_matSamples.size() >= m_ucArraySize && notifyEnabled)
+    if(m_matSamples.size() >= m_ucArraySize)
     {
-        notify();
+        emit notify();
         m_matSamples.clear();
     }
 }

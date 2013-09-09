@@ -237,9 +237,9 @@ private slots:
     void minValueChanged(double);
 
 private:
-    void actualize();                                               /**< Actualize member variables. Like y position, scaling factor, middle value of the frame and the highest sampling rate to calculate the sample width.*/
-    Ui::RealTimeSourceEstimateClass   ui;                           /**< Holds the user interface of the RealTimeSampleArray widget. */
-    QSharedPointer<RealTimeSourceEstimate> m_pRTMSE;                /**< Holds the real-time source estimate measurement. */
+    void actualize();                                   /**< Actualize member variables. Like y position, scaling factor, middle value of the frame and the highest sampling rate to calculate the sample width.*/
+    Ui::RealTimeSourceEstimateClass   ui;               /**< The user interface of the RealTimeSampleArray widget. */
+    QSharedPointer<RealTimeSourceEstimate> m_pRTMSE;    /**< The real-time source estimate measurement. */
 
     unsigned int                    m_uiNumChannels;
 
