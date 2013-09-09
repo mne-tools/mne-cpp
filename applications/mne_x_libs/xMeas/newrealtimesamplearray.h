@@ -87,6 +87,8 @@ public:
     //=========================================================================================================
     /**
     * Constructs a NewRealTimeSampleArray.
+    *
+    * @param[in] parent     the QObject parent of this measurement
     */
     NewRealTimeSampleArray(QObject *parent = 0);
 
@@ -268,7 +270,7 @@ inline double NewRealTimeSampleArray::getSamplingRate() const
 
 inline void NewRealTimeSampleArray::setArraySize(unsigned char ucArraySize)
 {
-	//Obsolete unsigned char can't be bigger
+    //Obsolete unsigned char can't be bigger
 //    if(ucArraySize > 255)
 //        m_ucArraySize = 255;
 //    else
