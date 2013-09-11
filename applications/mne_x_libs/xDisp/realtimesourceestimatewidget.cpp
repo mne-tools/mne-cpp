@@ -43,7 +43,7 @@
 #include "realtimesourceestimatewidget.h"
 //#include "annotationwindow.h"
 
-#include <xMeas/Measurement/realtimesourceestimate.h>
+#include <xMeas/realtimesourceestimate.h>
 
 #include <Eigen/Core>
 
