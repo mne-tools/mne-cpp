@@ -73,9 +73,6 @@ SourceLab::SourceLab()
 : m_bIsRunning(false)
 , m_bReceiveData(false)
 , m_qFileFwdSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
-, m_pFwd(new MNEForwardSolution(m_qFileFwdSolution))
-, m_pAnnotationSet(new AnnotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot"))
-, m_pSurfaceSet(new SurfaceSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white"))
 , m_iStimChan(0)
 , m_iNumAverages(10)
 , m_bSingleTrial(true)
@@ -108,6 +105,11 @@ QSharedPointer<IPlugin> SourceLab::clone() const
 
 void SourceLab::init()
 {
+    // Inits
+    m_pFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_qFileFwdSolution));
+    m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot"));
+    m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white"));
+
     //Delete Buffer - will be initailzed with first incoming data
     if(!m_pSourceLabBuffer.isNull())
         m_pSourceLabBuffer = CircularMatrixBuffer<double>::SPtr();
