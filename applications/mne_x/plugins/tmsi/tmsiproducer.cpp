@@ -57,15 +57,12 @@ using namespace TMSIPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TMSIProducer::TMSIProducer(TMSI* simulator, dBuffer::SPtr& buffer_I, dBuffer::SPtr& buffer_II, dBuffer::SPtr& buffer_III)
-: m_pTMSI(simulator)
-, m_pdBuffer_I(buffer_I)
-, m_pdBuffer_II(buffer_II)
-, m_pdBuffer_III(buffer_III)
+TMSIProducer::TMSIProducer(TMSI* EEG_pointer, dBuffer::SPtr& buffer)
+: m_pTMSI(EEG_pointer)
+, m_pdBuffer(buffer)
 , m_bIsRunning(true)
 
 {
-
 }
 
 
@@ -90,77 +87,23 @@ void TMSIProducer::stop()
 
 void TMSIProducer::run()
 {
-    unsigned int uiSamplePeriod = (unsigned int) (1000000.0/(m_pTMSI->m_fSamplingRate));
-    int uiCounter_I = 0;
-    int uiCounter_II = 0;
-    int uiCounter_III = 0;
+    //unsigned int uiSamplePeriod = (unsigned int) (1000000.0/(m_pTMSI->m_fSamplingRate));
     m_bIsRunning = true;
 
-    double value_I;
-    double value_II;
-    double value_III;
+    double value;
 
     while(m_bIsRunning)
     {
-        usleep(uiSamplePeriod);
+        //usleep(uiSamplePeriod);
 
-        //TMSI I
-        if(m_pTMSI->m_pTMSIChannel_TMSI_I->isEnabled())
-        {
-            if(uiCounter_I >= (m_pTMSI->m_pTMSIChannel_TMSI_I->getSamples().size()-1))
-                uiCounter_I = 0;
+        //Get the TMSi EEG data out of the device buffer
+        value = 0;
 
-            value_I = 0;
+        //TODO Get the TMSi EEG data out of the device buffer
 
-            for(unsigned char i = 0; i < m_pTMSI->m_iDownsamplingFactor; ++i)
-            {
-                value_I = value_I + m_pTMSI->m_pTMSIChannel_TMSI_I->getSamples()[uiCounter_I];
-            }
+        //Write received data to
+        m_pdBuffer->push(value);
 
-            value_I = value_I / m_pTMSI->m_iDownsamplingFactor;
-            m_pdBuffer_I->push(value_I);
-
-            uiCounter_I = uiCounter_I + m_pTMSI->m_iDownsamplingFactor;
-
-        }
-        //TMSI II
-        if(m_pTMSI->m_pTMSIChannel_TMSI_II->isEnabled())
-        {
-            if(uiCounter_II >= (m_pTMSI->m_pTMSIChannel_TMSI_II->getSamples().size()-1))
-                uiCounter_II = 0;
-
-            value_II = 0;
-
-            for(unsigned char i = 0; i < m_pTMSI->m_iDownsamplingFactor; ++i)
-            {
-                value_II = value_II + m_pTMSI->m_pTMSIChannel_TMSI_II->getSamples()[uiCounter_II];
-            }
-
-            value_II = value_II / m_pTMSI->m_iDownsamplingFactor;
-            m_pdBuffer_II->push(value_II);
-
-            uiCounter_II = uiCounter_II + m_pTMSI->m_iDownsamplingFactor;
-        }
-
-        //TMSI III
-        if(m_pTMSI->m_pTMSIChannel_TMSI_III->isEnabled())
-        {
-            if(uiCounter_III >= (m_pTMSI->m_pTMSIChannel_TMSI_III->getSamples().size()-1))
-                uiCounter_III = 0;
-
-            value_III = 0;
-
-            for(unsigned char i = 0; i < m_pTMSI->m_iDownsamplingFactor; ++i)
-            {
-
-                value_III = value_III + m_pTMSI->m_pTMSIChannel_TMSI_III->getSamples()[uiCounter_III];
-            }
-
-            value_III = value_III / m_pTMSI->m_iDownsamplingFactor;
-            m_pdBuffer_III->push(value_III);
-
-            uiCounter_III = uiCounter_III + m_pTMSI->m_iDownsamplingFactor;
-        }
-
+        //uiCounter = uiCounter_I + m_pTMSI->m_iDownsamplingFactor;
     }
 }

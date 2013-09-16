@@ -99,103 +99,33 @@ public:
 
     //=========================================================================================================
     /**
-    * Initializes the sampling rate and the downsampling factor.
+    * Initializes the Connector properties.
     *
     */
-    void initSamplingFactors();
-
-    //=========================================================================================================
-    /**
-    * Initializes each channel comboBox with given the channel file.
-    *
-    */
-    void initSelectedChannelFile();
-
-    //=========================================================================================================
-    /**
-    * Initializes the channel check boxes for visibility and whether channels are enabled.
-    *
-    */
-    void initChannelStates();
+    void initSamplingProperties();
 
 private:
 
     //=========================================================================================================
     /**
-    * Sets the SamplingRate.
+    * Sets the Sampling frequency.
     *
     */
-    void setSamplingRate(double value);
+    void setSamplingFreq(int value);
 
     //=========================================================================================================
     /**
-    * Sets the SamplingRate.
+    * Sets the number of channels.
     *
     */
-    void setDownsamplingRate(int value);
+    void setNumberOfChannels(int value);
 
     //=========================================================================================================
     /**
-    * Enables Channel I.
+    * Sets the samples taken per block.
     *
     */
-    void setEnabledChannel_I(bool state);
-
-    //=========================================================================================================
-    /**
-    * Enables Channel II.
-    *
-    */
-    void setEnabledChannel_II(bool state);
-
-    //=========================================================================================================
-    /**
-    * Enables Channel III.
-    *
-    */
-    void setEnabledChannel_III(bool state);
-
-    //=========================================================================================================
-    /**
-    * Sets visibility of Channel I.
-    *
-    */
-    void setVisibleChannel_I(bool state);
-
-    //=========================================================================================================
-    /**
-    * Sets visibility of Channel II.
-    *
-    */
-    void setVisibleChannel_II(bool state);
-
-    //=========================================================================================================
-    /**
-    * Sets visibility of Channel III.
-    *
-    */
-    void setVisibleChannel_III(bool state);
-
-    //=========================================================================================================
-    /**
-    * Sets the selected file of Channel I.
-    *
-    */
-    void setFileOfChannel_I(qint32);
-
-    //=========================================================================================================
-    /**
-    * Sets the selected file of Channel II.
-    *
-    */
-    void setFileOfChannel_II(qint32);
-
-    //=========================================================================================================
-    /**
-    * Sets the selected file of Channel III.
-    *
-    */
-    void setFileOfChannel_III(qint32);
+    void setSamplesPerBlock(int value);
 
     //=========================================================================================================
     /**

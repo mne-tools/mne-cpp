@@ -74,17 +74,13 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 TMSI::TMSI()
-: m_pRTSA_TMSI_I_new(0)
-, m_fSamplingRate(250.0)
-, m_iDownsamplingFactor(1)
-, m_pInBuffer_I(new dBuffer(1024))
-, m_pInBuffer_II(new dBuffer(1024))
-, m_pInBuffer_III(new dBuffer(1024))
-, m_pTMSIProducer(new TMSIProducer(this, m_pInBuffer_I, m_pInBuffer_II, m_pInBuffer_III))
-, m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/ECGSimulator/")
-, m_pTMSIChannel_TMSI_I(new TMSIChannel(m_qStringResourcePath+"data/", QString("ECG_I_256_s30661.txt")))
-, m_pTMSIChannel_TMSI_II(new TMSIChannel(m_qStringResourcePath+"data/", QString("ECG_II_256_s30661.txt")))
-, m_pTMSIChannel_TMSI_III(new TMSIChannel(m_qStringResourcePath+"data/", QString("ECG_III_256_s30661.txt")))
+: m_pRTSA_TMSI_new(0)
+, m_iSamplingFreq(512)
+, m_iNumberOfChannels(32)
+, m_iSamplesPerBlock(32)
+, m_pInBuffer(new dBuffer(1024))
+, m_pTMSIProducer(new TMSIProducer(this, m_pInBuffer))
+, m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/tmsi/")
 {
 }
 
@@ -112,75 +108,8 @@ QSharedPointer<IPlugin> TMSI::clone() const
 //=============================================================================================================
 void TMSI::init()
 {
-    if(m_pTMSIChannel_TMSI_I->isEnabled())
-    {
-        m_pRTSA_TMSI_I_new = PluginOutputData<NewRealTimeSampleArray>::create(this, "ECG I", "ECG I output data");
-        m_outputConnectors.append(m_pRTSA_TMSI_I_new);
-    }
-
-    if(m_pTMSIChannel_TMSI_II->isEnabled())
-    {
-        m_pRTSA_TMSI_II_new = PluginOutputData<NewRealTimeSampleArray>::create(this, "ECG II", "ECG II output data");
-        m_outputConnectors.append(m_pRTSA_TMSI_II_new);
-    }
-
-    if(m_pTMSIChannel_TMSI_III->isEnabled())
-    {
-        m_pRTSA_TMSI_III_new = PluginOutputData<NewRealTimeSampleArray>::create(this, "ECG III", "ECG III output data");
-        m_outputConnectors.append(m_pRTSA_TMSI_III_new);
-    }
-}
-
-
-//*************************************************************************************************************
-
-void TMSI::initChannels()
-{
-    m_pTMSIChannel_TMSI_I->initChannel();
-    m_pTMSIChannel_TMSI_II->initChannel();
-    m_pTMSIChannel_TMSI_III->initChannel();
-
-    if(m_pTMSIChannel_TMSI_I->isEnabled())
-    {
-        double diff = m_pTMSIChannel_TMSI_I->getMaximum() - m_pTMSIChannel_TMSI_I->getMinimum();
-
-        m_pRTSA_TMSI_I_new->data()->setName("ECG I");
-        m_pRTSA_TMSI_I_new->data()->setUnit("mV");
-
-        m_pRTSA_TMSI_I_new->data()->setMinValue(m_pTMSIChannel_TMSI_I->getMinimum()-diff/10);
-        m_pRTSA_TMSI_I_new->data()->setMaxValue(m_pTMSIChannel_TMSI_I->getMaximum()+diff/10);
-        m_pRTSA_TMSI_I_new->data()->setArraySize(10);
-        m_pRTSA_TMSI_I_new->data()->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
-        m_pRTSA_TMSI_I_new->data()->setVisibility(m_pTMSIChannel_TMSI_I->isVisible());
-    }
-
-    if(m_pTMSIChannel_TMSI_II->isEnabled())
-    {
-        double diff = m_pTMSIChannel_TMSI_II->getMaximum() - m_pTMSIChannel_TMSI_II->getMinimum();
-
-        m_pRTSA_TMSI_II_new->data()->setName("ECG II");
-        m_pRTSA_TMSI_II_new->data()->setUnit("mV");
-
-        m_pRTSA_TMSI_II_new->data()->setMinValue(m_pTMSIChannel_TMSI_II->getMinimum()-diff/10);
-        m_pRTSA_TMSI_II_new->data()->setMaxValue(m_pTMSIChannel_TMSI_II->getMaximum()+diff/10);
-        m_pRTSA_TMSI_II_new->data()->setArraySize(10);
-        m_pRTSA_TMSI_II_new->data()->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
-        m_pRTSA_TMSI_II_new->data()->setVisibility(m_pTMSIChannel_TMSI_II->isVisible());
-    }
-
-    if(m_pTMSIChannel_TMSI_III->isEnabled())
-    {
-        double diff = m_pTMSIChannel_TMSI_III->getMaximum() - m_pTMSIChannel_TMSI_III->getMinimum();
-
-        m_pRTSA_TMSI_III_new->data()->setName("ECG III");
-        m_pRTSA_TMSI_III_new->data()->setUnit("mV");
-
-        m_pRTSA_TMSI_III_new->data()->setMinValue(m_pTMSIChannel_TMSI_III->getMinimum()-diff/10);
-        m_pRTSA_TMSI_III_new->data()->setMaxValue(m_pTMSIChannel_TMSI_III->getMaximum()+diff/10);
-        m_pRTSA_TMSI_III_new->data()->setArraySize(10);
-        m_pRTSA_TMSI_III_new->data()->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
-        m_pRTSA_TMSI_III_new->data()->setVisibility(m_pTMSIChannel_TMSI_III->isVisible());
-    }
+    m_pRTSA_TMSI_new = PluginOutputData<NewRealTimeSampleArray>::create(this, "EEG", "EEG output data");
+    m_outputConnectors.append(m_pRTSA_TMSI_new);
 }
 
 
@@ -188,8 +117,6 @@ void TMSI::initChannels()
 
 bool TMSI::start()
 {
-    initChannels();
-
     // Start threads
     m_pTMSIProducer->start();
 
@@ -209,13 +136,7 @@ bool TMSI::stop()
     QThread::wait();
 
     //Clear Buffers
-    m_pTMSIChannel_TMSI_I->clear();
-    m_pTMSIChannel_TMSI_II->clear();
-    m_pTMSIChannel_TMSI_III->clear();
-
-    m_pInBuffer_I->clear();
-    m_pInBuffer_II->clear();
-    m_pInBuffer_III->clear();
+    m_pInBuffer->clear();
 
     return true;
 }
@@ -243,10 +164,8 @@ QWidget* TMSI::setupWidget()
 {
     TMSISetupWidget* widget = new TMSISetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
 
-    //init dialog
-    widget->initSamplingFactors();
-    widget->initSelectedChannelFile();
-    widget->initChannelStates();
+    //init properties dialog
+    widget->initSamplingProperties();
 
     return widget;
 }
@@ -256,26 +175,11 @@ QWidget* TMSI::setupWidget()
 
 void TMSI::run()
 {
-    double dValue_I = 0;
-    double dValue_II = 0;
-    double dValue_III = 0;
+    double dValue = 0;
 
     while(true)
     {
-        if(m_pTMSIChannel_TMSI_I->isEnabled())
-        {
-            dValue_I = m_pInBuffer_I->pop();
-            m_pRTSA_TMSI_I_new->data()->setValue(dValue_I);
-        }
-        if(m_pTMSIChannel_TMSI_II->isEnabled())
-        {
-            dValue_II = m_pInBuffer_II->pop();
-            m_pRTSA_TMSI_II_new->data()->setValue(dValue_II);
-        }
-        if(m_pTMSIChannel_TMSI_III->isEnabled())
-        {
-            dValue_III = m_pInBuffer_III->pop();
-            m_pRTSA_TMSI_III_new->data()->setValue(dValue_III);
-        }
+        dValue = m_pInBuffer->pop();
+        m_pRTSA_TMSI_new->data()->setValue(dValue);
     }
 }
