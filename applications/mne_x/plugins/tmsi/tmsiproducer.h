@@ -81,26 +81,24 @@ class TMSI;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ECGProducer
+* DECLARE CLASS EEGProducer
 *
-* @brief The ECGProducer class provides a ECG data producer for a given sampling rate.
+* @brief The ECGProducer class provides a EEG data producer for a given sampling rate.
 */
 class TMSIProducer : public QThread
 {
 public:
-    typedef QSharedPointer<TMSIProducer> SPtr;              /**< Shared pointer type for ECGProducer. */
-    typedef QSharedPointer<const TMSIProducer> ConstSPtr;   /**< Const shared pointer type for ECGProducer. */
+    typedef QSharedPointer<TMSIProducer> SPtr;              /**< Shared pointer type for TMSIProducer. */
+    typedef QSharedPointer<const TMSIProducer> ConstSPtr;   /**< Const shared pointer type for TMSIProducer. */
 
     //=========================================================================================================
     /**
     * Constructs a TMSIProducer.
     *
-    * @param [in] simulator a pointer to the corresponding ECGSimulator.
-    * @param [in] buffer_I a pointer to the buffer to which the ECGProducer should write the generated data for ECG I.
-    * @param [in] buffer_II a pointer to the buffer to which the ECGProducer should write the generated data for ECG II.
-    * @param [in] buffer_III a pointer to the buffer to which the ECGProducer should write the generated data for ECG III.
+    * @param [in] EEG_pointer a pointer to the corresponding TMSi class.
+    * @param [in] buffer a pointer to the buffer to which the ECGProducer should write the generated data for EEG.
     */
-    TMSIProducer(TMSI* simulator, dBuffer::SPtr& buffer_I, dBuffer::SPtr& buffer_II, dBuffer::SPtr& buffer_III);
+    TMSIProducer(TMSI* EEG_pointer, dBuffer::SPtr& buffer);
 
     //=========================================================================================================
     /**
@@ -124,10 +122,8 @@ protected:
     virtual void run();
 
 private:
-    TMSI*                   m_pTMSI;            /**< A pointer to corresponding TMSI.*/
-    dBuffer::SPtr           m_pdBuffer_I;       /**< A pointer to the buffer where the simulated data of ECG I should be written to.*/
-    dBuffer::SPtr           m_pdBuffer_II;      /**< A pointer to the buffer where the simulated data of ECG II should be written to.*/
-    dBuffer::SPtr           m_pdBuffer_III;     /**< A pointer to the buffer where the simulated data of ECG III should be written to.*/
+    TMSI*                   m_pTMSI;            /**< A pointer to the corresponding TMSI class.*/
+    dBuffer::SPtr           m_pdBuffer;         /**< A pointer to the buffer where the data of EEG I should be written to.*/
     bool                    m_bIsRunning;       /**< Whether TMSIProducer is running.*/
 };
 

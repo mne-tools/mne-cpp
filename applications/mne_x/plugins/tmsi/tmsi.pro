@@ -67,7 +67,6 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
 SOURCES += \
         tmsi.cpp \
-        tmsichannel.cpp \
         tmsiproducer.cpp \
         FormFiles/tmsisetupwidget.cpp \
         FormFiles/tmsiaboutwidget.cpp
@@ -75,7 +74,6 @@ SOURCES += \
 HEADERS += \
         tmsi.h\
         tmsi_global.h \
-        tmsichannel.h \
         tmsiproducer.h \
         FormFiles/tmsisetupwidget.h \
         FormFiles/tmsiaboutwidget.h

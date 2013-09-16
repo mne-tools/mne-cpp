@@ -45,8 +45,6 @@
 
 #include "tmsi_global.h"
 
-#include "tmsichannel.h"
-
 #include <mne_x/Interfaces/ISensor.h>
 #include <generics/circularbuffer.h>
 #include <xMeas/newrealtimesamplearray.h>
@@ -86,7 +84,6 @@ using namespace IOBuffer;
 //=============================================================================================================
 
 class TMSIProducer;
-//class ECGChannel;
 
 
 //=============================================================================================================
@@ -131,11 +128,6 @@ public:
     virtual void init();
 
     //=========================================================================================================
-    /**
-    * Initialise the ECGSimulator.
-    */
-    void initChannels();
-
 
     virtual bool start();
     virtual bool stop();
@@ -145,36 +137,21 @@ public:
 
     virtual QWidget* setupWidget();
 
-    //=========================================================================================================
-    /**
-    * Returns the ECGSimulator resource path.
-    *
-    * @return the ECGSimulator resource path.
-    */
-    QString getResourcePath() const {return m_qStringResourcePath;}
-
 protected:
     virtual void run();
 
 private:
-    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_TMSI_I_new;   /**< The RealTimeSampleArray to provide the channel ECG I.*/
-    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_TMSI_II_new;  /**< The RealTimeSampleArray to provide the channel ECG II.*/
-    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_TMSI_III_new; /**< The RealTimeSampleArray to provide the channel ECG III.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_TMSI_new;    /**< The RealTimeSampleArray to provide the EEG data.*/
 
-    float           m_fSamplingRate;        /**< the sampling rate.*/
-    int             m_iDownsamplingFactor;  /**< the down sampling factor.*/
-    dBuffer::SPtr   m_pInBuffer_I;          /**< ECG I data which arrive from ECG producer.*/
-    dBuffer::SPtr   m_pInBuffer_II;         /**< ECG II data which arrive from ECG producer.*/
-    dBuffer::SPtr   m_pInBuffer_III;        /**< ECG III data which arrive from ECG producer.*/
-    QSharedPointer<TMSIProducer>     m_pTMSIProducer; /**< the ECGProducer.*/
+    QString m_qStringResourcePath;                                      /**< the path to the ECG resource directory.*/
 
-    QString m_qStringResourcePath;          /**< the path to the ECG resource directory.*/
-
-    TMSIChannel::SPtr m_pTMSIChannel_TMSI_I;    /**< the simulation channel for ECG I.*/
-    TMSIChannel::SPtr m_pTMSIChannel_TMSI_II;   /**< the simulation channel for ECG II.*/
-    TMSIChannel::SPtr m_pTMSIChannel_TMSI_III;  /**< the simulation channel for ECG III.*/
+    int                             m_iSamplingFreq;                    /**< the sampling frequency.*/
+    int                             m_iNumberOfChannels;                /**< the number of channels.*/
+    int                             m_iSamplesPerBlock;                 /**< the samples taken per block.*/
+    dBuffer::SPtr                   m_pInBuffer;                        /**< EEG data which arrive from EEG producer.*/
+    QSharedPointer<TMSIProducer>    m_pTMSIProducer;                    /**< the EEGProducer.*/
 };
 
 } // NAMESPACE
 
-#endif // ECGSIMULATOR_H
+#endif // TMSI_H

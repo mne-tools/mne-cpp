@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>ECGSetup</string>
+   <string>TMSi EEG Connector Setup</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
@@ -23,7 +23,7 @@
       </font>
      </property>
      <property name="text">
-      <string>ECG Simulator Configuration</string>
+      <string>TMSi EEG Connector Properties</string>
      </property>
     </widget>
    </item>
@@ -56,7 +56,13 @@
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>100</height>
+         <height>200</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
         </size>
        </property>
        <property name="title">
@@ -66,67 +72,66 @@
         <bool>false</bool>
        </property>
        <layout class="QGridLayout" name="m_qGridLayout_Properties">
+        <item row="1" column="0">
+         <widget class="QLabel" name="m_qLabel_NumberOfChannels">
+          <property name="text">
+           <string>Number of channels</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QSpinBox" name="m_spinBox_NumberOfChannels">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>128</number>
+          </property>
+          <property name="value">
+           <number>32</number>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="0">
          <widget class="QLabel" name="m_qLabel_SamplingRate">
           <property name="layoutDirection">
            <enum>Qt::LeftToRight</enum>
           </property>
           <property name="text">
-           <string>Sampling Rate:</string>
+           <string>Sampling Frequency:</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="1">
-         <widget class="QDoubleSpinBox" name="m_qDoubleSpinBox_SamplingRate">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
+        <item row="2" column="0">
+         <widget class="QLabel" name="m_qLabel_SamplesPerBlock">
+          <property name="text">
+           <string>Sample count per block</string>
           </property>
-          <property name="minimumSize">
-           <size>
-            <width>100</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="suffix">
-           <string>sps</string>
-          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QSpinBox" name="m_spinBox_SamplingFreq">
           <property name="minimum">
-           <double>1.000000000000000</double>
+           <number>128</number>
           </property>
           <property name="maximum">
-           <double>2048.000000000000000</double>
+           <number>4096</number>
           </property>
           <property name="value">
-           <double>256.000000000000000</double>
+           <number>512</number>
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="m_qLabel_Downsampling">
-          <property name="text">
-           <string>Downsampling: </string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QSpinBox" name="m_qSpinBox_Downsampling">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="suffix">
-           <string>x</string>
-          </property>
+        <item row="2" column="2">
+         <widget class="QSpinBox" name="m_spinBox_SamplesPerBlock">
           <property name="minimum">
            <number>1</number>
           </property>
           <property name="maximum">
-           <number>10</number>
+           <number>512</number>
+          </property>
+          <property name="value">
+           <number>32</number>
           </property>
          </widget>
         </item>
@@ -144,133 +149,17 @@
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>200</height>
+         <height>100</height>
         </size>
        </property>
        <property name="title">
-        <string>Channels</string>
+        <string>Connect</string>
        </property>
        <layout class="QGridLayout" name="m_qGridLayout_Channels">
-        <item row="0" column="3">
-         <widget class="QCheckBox" name="m_qCheckBox_Channel_Visible_1">
+        <item row="0" column="0">
+         <widget class="QPushButton" name="pushButton">
           <property name="text">
-           <string>Visible</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2" colspan="2">
-         <widget class="QComboBox" name="m_qComboBox_Channel_1"/>
-        </item>
-        <item row="2" column="0" colspan="2">
-         <widget class="QLabel" name="m_qLabel_Channel_2">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-            <underline>true</underline>
-           </font>
-          </property>
-          <property name="text">
-           <string>ECG II</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2">
-         <widget class="QCheckBox" name="m_qCheckBox_Channel_Enable_2">
-          <property name="text">
-           <string>Enable</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="3" colspan="2">
-         <widget class="QCheckBox" name="m_qCheckBox_Channel_Visible_2">
-          <property name="text">
-           <string>Visible</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="2" colspan="2">
-         <widget class="QComboBox" name="m_qComboBox_Channel_2"/>
-        </item>
-        <item row="4" column="0" colspan="2">
-         <widget class="QLabel" name="m_qLabel_Channel_3">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-            <underline>true</underline>
-           </font>
-          </property>
-          <property name="text">
-           <string>ECG III</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="2">
-         <widget class="QCheckBox" name="m_qCheckBox_Channel_Enable_3">
-          <property name="text">
-           <string>Enable</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="2" colspan="2">
-         <widget class="QComboBox" name="m_qComboBox_Channel_3"/>
-        </item>
-        <item row="0" column="2">
-         <widget class="QCheckBox" name="m_qCheckBox_Channel_Enable_1">
-          <property name="layoutDirection">
-           <enum>Qt::LeftToRight</enum>
-          </property>
-          <property name="text">
-           <string>Enable</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="3">
-         <widget class="QCheckBox" name="m_qCheckBox_Channel_Visible_3">
-          <property name="text">
-           <string>Visible</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" colspan="2">
-         <widget class="QLabel" name="m_qLabel_Channel_1">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-            <underline>true</underline>
-           </font>
-          </property>
-          <property name="text">
-           <string>ECG I</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <string>Connect to device</string>
           </property>
          </widget>
         </item>
