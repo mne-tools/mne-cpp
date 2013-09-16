@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     tmsiproducer.h
+* @file     tmsidriver.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     February, 2013
+* @date     September, 2013
 *
 * @section  LICENSE
 *
@@ -30,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TMSIProducer class.
+* @brief    Contains the declaration of the tmsidriver class.
 *
 */
 
-#ifndef TMSIPRODUCER_H
-#define TMSIPRODUCER_H
+#ifndef TMSIDRIVER_H
+#define TMSIDRIVER_H
 
 
 //*************************************************************************************************************
@@ -43,24 +43,28 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <generics/circularbuffer.h>
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include <Windows.h>
+#include <stdio.h>
+#include <wchar.h>
+#include <conio.h>
+#include <tchar.h>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <math.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// TMSi Driver INCLUDES
 //=============================================================================================================
 
-#include <QThread>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE TMSIPlugin
-//=============================================================================================================
-
-namespace TMSIPlugin
-{
+#include "RtDevice.h"
+#include "Feature.h"
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -68,7 +72,8 @@ namespace TMSIPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace IOBuffer;
+using namespace std;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -76,55 +81,69 @@ using namespace IOBuffer;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class TMSI;
+class TMSIProducer;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINES
+//=============================================================================================================
+
+#define MAX_DEVICE			1	//Max number of devices supported by this driver
+#define MY_BUFFER_SIZE      10000
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS EEGProducer
+* TMSIDriver
 *
-* @brief The EEGProducer class provides a EEG data producer for a given sampling rate.
+* @brief The TMSIDriver class provides real time data acquisition of EEG data with a TMSi Refa device.
 */
-class TMSIProducer : public QThread
+class TMSIDriver
 {
 public:
-    typedef QSharedPointer<TMSIProducer> SPtr;              /**< Shared pointer type for TMSIProducer. */
-    typedef QSharedPointer<const TMSIProducer> ConstSPtr;   /**< Const shared pointer type for TMSIProducer. */
-
     //=========================================================================================================
     /**
-    * Constructs a TMSIProducer.
+    * Constructs a TMSIDriver.
     *
-    * @param [in] pTMSI a pointer to the corresponding TMSI class.
+    * @param [in] TMSIProducer a pointer to the corresponding TMSI Producer class.
     */
-    TMSIProducer(TMSI* pTMSI);
+    TMSIDriver(TMSIProducer* pTMSIProducer);
 
     //=========================================================================================================
     /**
-    * Destroys the TMSIProducer.
+    * Destroys the TMSIDriver.
     */
-    ~TMSIProducer();
+    ~TMSIDriver();
 
     //=========================================================================================================
     /**
-    * Stops the TMSIProducer by stopping the producer's thread.
+    * Get sample from the device in form of a mtrix.
     */
-    void stop();
+    MatrixXf getSampleMatrixValue();
 
 protected:
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
+    * Select Device and return the device handler.
     */
-    virtual void run();
+    RTDeviceEx *SelectDevice(IN BOOLEAN Present);
+
+    //=========================================================================================================
+    /**
+    * Initialise device .
+    */
+    RTDeviceEx *InitDevice(ULONG SampRate);
+
+    //=========================================================================================================
+    /**
+    * Get the total number of channels which the device offers.
+    */
+    int getTotalNumberOfChannels(RTDeviceEx *Master, int& triggerChannel);
 
 private:
-    TMSI*     m_pTMSI;            /**< A pointer to the corresponding TMSI class.*/
-    bool      m_bIsRunning;       /**< Whether TMSIProducer is running.*/
+    TMSIProducer*     m_pTMSIProducer;            /**< A pointer to the corresponding TMSIProducer class.*/
+
 };
 
-} // NAMESPACE
-
-#endif // TMSIPRODUCER_H
+#endif // TMSIDRIVER_H

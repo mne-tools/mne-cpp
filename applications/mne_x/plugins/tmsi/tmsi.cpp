@@ -74,12 +74,13 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 TMSI::TMSI()
-: m_pRTSA_TMSI_new(0)
+: m_pRTSA_TMSI(0)
 , m_iSamplingFreq(512)
 , m_iNumberOfChannels(32)
 , m_iSamplesPerBlock(32)
-, m_pInBuffer(new dBuffer(1024))
-, m_pTMSIProducer(new TMSIProducer(this, m_pInBuffer))
+, m_iBufferSize(-1)
+, m_pRawMatrixBuffer_In(0)
+, m_pTMSIProducer(new TMSIProducer(this))
 , m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/tmsi/")
 {
 }
@@ -106,10 +107,11 @@ QSharedPointer<IPlugin> TMSI::clone() const
 //=============================================================================================================
 // Create measurement instances and config them
 //=============================================================================================================
+
 void TMSI::init()
 {
-    m_pRTSA_TMSI_new = PluginOutputData<NewRealTimeSampleArray>::create(this, "EEG", "EEG output data");
-    m_outputConnectors.append(m_pRTSA_TMSI_new);
+    m_pRTSA_TMSI = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "TMSI", "EEG output data");
+    m_outputConnectors.append(m_pRTSA_TMSI);
 }
 
 
@@ -117,6 +119,9 @@ void TMSI::init()
 
 bool TMSI::start()
 {
+    // Buffer
+    m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(m_iSamplesPerBlock,m_iNumberOfChannels,m_iBufferSize));
+
     // Start threads
     m_pTMSIProducer->start();
 
@@ -136,7 +141,7 @@ bool TMSI::stop()
     QThread::wait();
 
     //Clear Buffers
-    m_pInBuffer->clear();
+    m_pRawMatrixBuffer_In->clear();
 
     return true;
 }
@@ -175,11 +180,16 @@ QWidget* TMSI::setupWidget()
 
 void TMSI::run()
 {
-    double dValue = 0;
+    MatrixXf matValue;
 
     while(true)
     {
-        dValue = m_pInBuffer->pop();
-        m_pRTSA_TMSI_new->data()->setValue(dValue);
+        //pop matrix
+        matValue = m_pRawMatrixBuffer_In->pop();
+        //        std::cout << "matValue " << matValue.block(0,0,1,10) << std::endl;
+
+        //emit values
+        for(qint32 i = 0; i < matValue.cols(); ++i)
+            m_pRTSA_TMSI->data()->setValue(matValue.col(i).cast<double>());
     }
 }

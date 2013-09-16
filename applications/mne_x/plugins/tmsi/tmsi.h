@@ -47,7 +47,8 @@
 
 #include <mne_x/Interfaces/ISensor.h>
 #include <generics/circularbuffer.h>
-#include <xMeas/newrealtimesamplearray.h>
+#include <generics/circularmatrixbuffer.h>
+#include <xMeas/newrealtimemultisamplearray.h>
 
 
 //*************************************************************************************************************
@@ -141,15 +142,18 @@ protected:
     virtual void run();
 
 private:
-    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_TMSI_new;    /**< The RealTimeSampleArray to provide the EEG data.*/
+    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRTSA_TMSI;       /**< The RealTimeSampleArray to provide the EEG data.*/
 
-    QString m_qStringResourcePath;                                      /**< the path to the ECG resource directory.*/
+    QString m_qStringResourcePath;                                          /**< the path to the ECG resource directory.*/
 
-    int                             m_iSamplingFreq;                    /**< the sampling frequency.*/
-    int                             m_iNumberOfChannels;                /**< the number of channels.*/
-    int                             m_iSamplesPerBlock;                 /**< the samples taken per block.*/
-    dBuffer::SPtr                   m_pInBuffer;                        /**< EEG data which arrive from EEG producer.*/
-    QSharedPointer<TMSIProducer>    m_pTMSIProducer;                    /**< the EEGProducer.*/
+    int                             m_iSamplingFreq;                        /**< the sampling frequency.*/
+    int                             m_iNumberOfChannels;                    /**< the number of channels.*/
+    int                             m_iSamplesPerBlock;                     /**< the samples taken per block.*/
+
+    qint32                          m_iBufferSize;                          /**< The raw data buffer size.*/
+    QSharedPointer<RawMatrixBuffer> m_pRawMatrixBuffer_In;                  /**< Holds incoming raw data. */
+
+    QSharedPointer<TMSIProducer>    m_pTMSIProducer;                        /**< the EEGProducer.*/
 };
 
 } // NAMESPACE

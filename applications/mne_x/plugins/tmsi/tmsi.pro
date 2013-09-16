@@ -69,14 +69,16 @@ SOURCES += \
         tmsi.cpp \
         tmsiproducer.cpp \
         FormFiles/tmsisetupwidget.cpp \
-        FormFiles/tmsiaboutwidget.cpp
+        FormFiles/tmsiaboutwidget.cpp \
+        tmsidriver.cpp
 
 HEADERS += \
         tmsi.h\
         tmsi_global.h \
         tmsiproducer.h \
         FormFiles/tmsisetupwidget.h \
-        FormFiles/tmsiaboutwidget.h
+        FormFiles/tmsiaboutwidget.h \
+        tmsidriver.h
 
 FORMS += \
         FormFiles/tmsisetup.ui \
