@@ -57,11 +57,9 @@ using namespace TMSIPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TMSIProducer::TMSIProducer(TMSI* EEG_pointer, dBuffer::SPtr& buffer)
-: m_pTMSI(EEG_pointer)
-, m_pdBuffer(buffer)
+TMSIProducer::TMSIProducer(TMSI* pTMSI)
+: m_pTMSI(pTMSI)
 , m_bIsRunning(true)
-
 {
 }
 
@@ -90,6 +88,11 @@ void TMSIProducer::run()
     //unsigned int uiSamplePeriod = (unsigned int) (1000000.0/(m_pTMSI->m_fSamplingRate));
     m_bIsRunning = true;
 
+    //
+    // Inits
+    //
+    MatrixXf t_matRawBuffer;
+
     double value;
 
     while(m_bIsRunning)
@@ -102,7 +105,7 @@ void TMSIProducer::run()
         //TODO Get the TMSi EEG data out of the device buffer
 
         //Write received data to
-        m_pdBuffer->push(value);
+        m_pTMSI->m_pRawMatrixBuffer_In->push(&t_matRawBuffer);
 
         //uiCounter = uiCounter_I + m_pTMSI->m_iDownsamplingFactor;
     }
