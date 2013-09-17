@@ -93,7 +93,7 @@ TMSI::TMSI()
 
 TMSI::~TMSI()
 {
-    qWarning() << "TMSI::~TMSI()";
+    std::cout << "TMSI::~TMSI()" << std::endl;
 }
 
 

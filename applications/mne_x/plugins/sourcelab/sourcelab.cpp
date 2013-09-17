@@ -85,7 +85,8 @@ SourceLab::SourceLab()
 
 SourceLab::~SourceLab()
 {
-    stop();
+    if(this->isRunning())
+        stop();
 }
 
 
