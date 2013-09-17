@@ -89,7 +89,7 @@ InverseView::InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qL
 , m_sourceSpace(p_sourceSpace)
 , m_qListLabels(p_qListLabels)
 , m_qListRGBAs(p_qListRGBAs)
-, m_bStereo(false)
+, m_bStereo(true)
 , m_fOffsetZ(-100.0f)
 , m_fOffsetZEye(60.0f)
 , m_pSceneNodeBrain(0)
@@ -283,8 +283,8 @@ void InverseView::initializeGL(QGLPainter *painter)
     // Set stereo type
     //
     if (m_bStereo) {
-            this->setStereoType(QGLView::RedCyanAnaglyph);
-//        this->setStereoType(QGLView::StretchedLeftRight);
+//        this->setStereoType(QGLView::RedCyanAnaglyph);
+        this->setStereoType(QGLView::StretchedLeftRight);
 //        camera()->setEyeSeparation(0.4f);
 //        m_pCameraFrontal->setEyeSeparation(0.1f);
 
@@ -440,8 +440,8 @@ void InverseView::updateActivation(QSharedPointer<Eigen::VectorXd> p_pVecActivat
 //                r = iVal;
 //                g = iVal;
 //                b = iVal;
-//                qRgb = ColorMap::valueToHotNegative1((double)iVal/255.0);
-                qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
+                qRgb = ColorMap::valueToHotNegative1((double)iVal/255.0);
+//                qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
             }
             else if(m_iColorMode == 1)
             {
