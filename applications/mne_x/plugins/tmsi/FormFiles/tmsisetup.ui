@@ -105,7 +105,7 @@
         <item row="2" column="0">
          <widget class="QLabel" name="m_qLabel_SamplesPerBlock">
           <property name="text">
-           <string>Sample count per block</string>
+           <string>Samples taken per block</string>
           </property>
          </widget>
         </item>
@@ -153,13 +153,32 @@
         </size>
        </property>
        <property name="title">
-        <string>Connect</string>
+        <string>Acquisition</string>
        </property>
        <layout class="QGridLayout" name="m_qGridLayout_Channels">
         <item row="0" column="0">
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="m_pushButton_StartAcquisition">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
           <property name="text">
-           <string>Connect to device</string>
+           <string>Start acquisition</string>
+          </property>
+          <property name="autoDefault">
+           <bool>false</bool>
+          </property>
+          <property name="default">
+           <bool>false</bool>
+          </property>
+          <property name="flat">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QPushButton" name="m_pushButton_StopAcquisition">
+          <property name="text">
+           <string>Stop acquisition</string>
           </property>
          </widget>
         </item>
