@@ -69,82 +69,82 @@ MatrixXf TMSIDriver::getSampleMatrixValue()
 {
     MatrixXf sampleValue;
 
-//    int triggerChannel = -1;
-//    int triggerStatus  = 0;
+    int triggerChannel = -1;
+    int triggerStatus  = 0;
 
-//    RTDeviceEx *Master;
-//    ULONG SampleRate = MAX_SAMPLE_RATE;
-//    ULONG BufferSize = MAX_BUFFER_SIZE;
+    RTDeviceEx *Master;
+    ULONG SampleRate = MAX_SAMPLE_RATE;
+    ULONG BufferSize = MAX_BUFFER_SIZE;
 
-//    ULONG PercentFull,Overflow;
-//    ULONG BytesPerSample=0;
-//    ULONG BytesReturned;
-//    ULONG numHwChans;
+    ULONG PercentFull,Overflow;
+    ULONG BytesPerSample=0;
+    ULONG BytesReturned;
+    ULONG numHwChans;
 
-//    // Buffer for storing the samples;
-//    ULONG SignalBuffer[MY_BUFFER_SIZE];
+    // Buffer for storing the samples;
+    ULONG SignalBuffer[MY_BUFFER_SIZE];
 
-//    Master=InitDevice(SampleRate);
-//    if (Master == 0)
-//    {
-//        fprintf(stderr, "Cannot initialise device\n");
-//        return sampleValue;
-//    }
-//    Master->SetSignalBuffer(&SampleRate,&BufferSize);
+    Master=InitDevice(SampleRate);
+    if (Master == 0)
+    {
+        fprintf(stderr, "Cannot initialise device\n");
+        return sampleValue;
+    }
+    Master->SetSignalBuffer(&SampleRate,&BufferSize);
 
-//    numHwChans = getTotalNumberOfChannels(Master, triggerChannel);
-//    BytesPerSample = 4*numHwChans;
+    numHwChans = getTotalNumberOfChannels(Master, triggerChannel);
+    BytesPerSample = 4*numHwChans;
 
-//    if( BytesPerSample == 0 )
-//    {
-//        fprintf(stderr, "Device returns no samples\n");
-//        return sampleValue;
-//    }
+    if( BytesPerSample == 0 )
+    {
+        fprintf(stderr, "Device returns no samples\n");
+        return sampleValue;
+    }
 
-//    printf("Maximum sample rate   = %.3f Hz\n",(float) SampleRate / 1000.0);
-//    printf("Maximum Buffer size   = %d Samples\n",(int) BufferSize);
-//    printf("Number of HW channels = %d\n", (int) numHwChans);
+    printf("Maximum sample rate   = %.3f Hz\n",(float) SampleRate / 1000.0);
+    printf("Maximum Buffer size   = %d Samples\n",(int) BufferSize);
+    printf("Number of HW channels = %d\n", (int) numHwChans);
 
-//    /* these represent the acquisition system properties */
-//    float fSample      = SampleRate/1000.0;
-//    int nBufferSamp	   = 0;
-//    int nTotalSamp	   = 0;
+    /* these represent the acquisition system properties */
+    float fSample      = SampleRate/1000.0;
+    int nBufferSamp	   = 0;
+    int nTotalSamp	   = 0;
 
-//    if (!Master->Start())
-//    {
-//        fprintf(stderr, "Unable to start the Device\n");
-//        return sampleValue;
-//    }
+    if (!Master->Start())
+    {
+        fprintf(stderr, "Unable to start the Device\n");
+        return sampleValue;
+    }
 
-//    //Get Signal buffer information
-//    Master->GetBufferInfo(&Overflow,&PercentFull);
+    //Get Signal buffer information
+    Master->GetBufferInfo(&Overflow,&PercentFull);
 
-//    if (PercentFull > 0)
-//    {
-//        // If there is data available, get samples from the device
-//        // GetSamples returns the number of bytes written in the signal buffer
-//        // This will always be a multiple op BytesPerSample.
+    if (PercentFull > 0)
+    {
+        // If there is data available, get samples from the device
+        // GetSamples returns the number of bytes written in the signal buffer
+        // This will always be a multiple op BytesPerSample.
 
-//        // Divide the result by BytesPerSamples to get the number of samples returned
-//        BytesReturned = Master->GetSamples((PULONG)SignalBuffer,sizeof(SignalBuffer));
+        // Divide the result by BytesPerSamples to get the number of samples returned
+        BytesReturned = Master->GetSamples((PULONG)SignalBuffer,sizeof(SignalBuffer));
 
-//        if (BytesReturned != 0)
-//        {
-//            //loop on the channel
-//            for(uint32 i=0; i<m_oHeader.getChannelCount(); i++)
-//            {
-//                //loop on the samples by channel
-//                for(uint32 j=0; j<l_lmin; j++)
-//                {
-//                    m_pSample[m_ui32SampleIndex+j + i*m_ui32SampleCountPerSentBlock] =(float32)((((float32)m_ulSignalBuffer[(l_ui32IndexBuffer+j)*m_ui32NbTotalChannels +i])*m_vUnitGain[i]+m_vUnitOffSet[i])*pow(10.,(double)m_vExponentChannel[i]));
-//                }
-//            }
-//        }
-//    }
-//    else
-//    {
-//        Sleep(1);
-//    }
+        if (BytesReturned != 0)
+        {
+            //loop on the channel
+            for(uint32 i=0; i<m_oHeader.getChannelCount(); i++)
+            {
+                //loop on the samples by channel
+                for(uint32 j=0; j<l_lmin; j++)
+                {
+                    m_pSample[m_ui32SampleIndex+j + i*m_ui32SampleCountPerSentBlock] =(float32)((((float32)m_ulSignalBuffer[(l_ui32IndexBuffer+j)*m_ui32NbTotalChannels +i])*m_vUnitGain[i]+m_vUnitOffSet[i])*pow(10.,(double)m_vExponentChannel[i]));
+                }
+            }
+        }
+    }
+    else
+    {
+        Sleep(1);
+    }
 
     return sampleValue;
 }
