@@ -296,7 +296,7 @@ typedef struct _BUF_STATE
 #endif
 
 
-typedef VOID(*SADIO_PSYNC_SIGNALS)(IN PVOID Params);
+typedef VOID(*SADIO_PSYNC_SIGNALS)(PVOID Params);
 
 typedef struct _SADIO_SYNC_SIGNAL_PARMAMS
 {
@@ -391,61 +391,61 @@ typedef struct _SP_DEVICE_PATH{
 
 #ifndef NO_DLL_PROTO
 
-HANDLE			APIENTRY Open			(PSP_DEVICE_PATH DevicePath); 
-BOOL			APIENTRY Close			(HANDLE hHandle);
-PSP_DEVICE_PATH APIENTRY GetDevicePath  (IN ULONG InterfaceNumber,OUT ULONG  *MaxInterfaces);
-ULONG			APIENTRY GetNrDevices	();
-HANDLE			APIENTRY GetSADHandle	(IN ULONG InterfaceNumber,OUT ULONG  *MaxInterfaces);
-PWCHAR			APIENTRY GetDescription	(IN HANDLE Handle,OUT PWCHAR Destination,IN ULONG Size);
-ULONG			APIENTRY GetId			(IN HANDLE Handle);
-PWCHAR			APIENTRY GetManufacturer(IN HANDLE Handle,OUT PWCHAR Destination,IN ULONG Size);
-BOOLEAN			APIENTRY Start			(IN HANDLE Handle);
-BOOLEAN			APIENTRY Stop			(IN HANDLE Handle);
-ULONG			APIENTRY GetDeviceState	(IN HANDLE Handle);
-PSIGNAL_INFO	APIENTRY GetSignalInfo	(IN HANDLE Handle,OUT PSIGNAL_INFO pSignalInfo,IN OUT PULONG NrOfSignals);
-BOOLEAN			APIENTRY SetSignalBuffer(IN HANDLE Handle,IN OUT PULONG SampleRate,IN OUT PULONG BufferSize);
-BOOLEAN			APIENTRY GetBufferInfo	(IN HANDLE Handle,OUT PULONG Overflow,OUT PULONG PercentFull);
-ULONG			APIENTRY GetSamples		(IN HANDLE Handle,OUT PULONG SampleBuffer,IN ULONG Size);
-ULONG			APIENTRY BytesPerSample	(IN HANDLE Handle);
-BOOLEAN			APIENTRY ResetDevice	(IN HANDLE Handle);
-HANDLE 			APIENTRY GetSlaveHandle (IN HANDLE Handle);
-BOOLEAN			APIENTRY AddSlave		(IN HANDLE Handle,IN HANDLE SlaveHandle);
-BOOLEAN			APIENTRY DeviceFeature(IN HANDLE Handle,IN LPVOID DataIn, IN DWORD InSize ,IN LPVOID DataOut, IN DWORD OutSize );
-BOOLEAN			APIENTRY GetDeviceKey(IN HANDLE Handle, IN PWCHAR Name , IN OUT PKEY_VALUE_INFORMATION Info );
-PSIGNAL_FORMAT	APIENTRY GetSignalFormat (IN HANDLE Handle,IN OUT PSIGNAL_FORMAT pSignalFormat);
+//HANDLE			APIENTRY Open			(PSP_DEVICE_PATH DevicePath);
+//BOOL			APIENTRY Close			(HANDLE hHandle);
+//PSP_DEVICE_PATH APIENTRY GetDevicePath  (IN ULONG InterfaceNumber,OUT ULONG  *MaxInterfaces);
+//ULONG			APIENTRY GetNrDevices	();
+//HANDLE			APIENTRY GetSADHandle	(IN ULONG InterfaceNumber,OUT ULONG  *MaxInterfaces);
+//PWCHAR			APIENTRY GetDescription	(IN HANDLE Handle,OUT PWCHAR Destination,IN ULONG Size);
+//ULONG			APIENTRY GetId			(IN HANDLE Handle);
+//PWCHAR			APIENTRY GetManufacturer(IN HANDLE Handle,OUT PWCHAR Destination,IN ULONG Size);
+//BOOLEAN			APIENTRY Start			(IN HANDLE Handle);
+//BOOLEAN			APIENTRY Stop			(IN HANDLE Handle);
+//ULONG			APIENTRY GetDeviceState	(IN HANDLE Handle);
+//PSIGNAL_INFO	APIENTRY GetSignalInfo	(IN HANDLE Handle,OUT PSIGNAL_INFO pSignalInfo,IN OUT PULONG NrOfSignals);
+//BOOLEAN			APIENTRY SetSignalBuffer(IN HANDLE Handle,IN OUT PULONG SampleRate,IN OUT PULONG BufferSize);
+//BOOLEAN			APIENTRY GetBufferInfo	(IN HANDLE Handle,OUT PULONG Overflow,OUT PULONG PercentFull);
+//ULONG			APIENTRY GetSamples		(IN HANDLE Handle,OUT PULONG SampleBuffer,IN ULONG Size);
+//ULONG			APIENTRY BytesPerSample	(IN HANDLE Handle);
+//BOOLEAN			APIENTRY ResetDevice	(IN HANDLE Handle);
+//HANDLE 			APIENTRY GetSlaveHandle (IN HANDLE Handle);
+//BOOLEAN			APIENTRY AddSlave		(IN HANDLE Handle,IN HANDLE SlaveHandle);
+//BOOLEAN			APIENTRY DeviceFeature(IN HANDLE Handle,IN LPVOID DataIn, IN DWORD InSize ,IN LPVOID DataOut, IN DWORD OutSize );
+//BOOLEAN			APIENTRY GetDeviceKey(IN HANDLE Handle, IN PWCHAR Name , IN OUT PKEY_VALUE_INFORMATION Info );
+//PSIGNAL_FORMAT	APIENTRY GetSignalFormat (IN HANDLE Handle,IN OUT PSIGNAL_FORMAT pSignalFormat);
 
-PSP_DEVICE_PATH APIENTRY GetInstanceId	( IN LONG DeviceIndex , IN BOOLEAN Present, OUT ULONG  *MaxDevices );
-HKEY			APIENTRY OpenRegKey		( IN PSP_DEVICE_PATH Path );
-BOOL			APIENTRY Free		    ( IN VOID *Memory );  
+//PSP_DEVICE_PATH APIENTRY GetInstanceId	( IN LONG DeviceIndex , IN BOOLEAN Present, OUT ULONG  *MaxDevices );
+//HKEY			APIENTRY OpenRegKey		( IN PSP_DEVICE_PATH Path );
+//BOOL			APIENTRY Free		    ( IN VOID *Memory );
 
 
 
 typedef HANDLE			( __stdcall * POPEN	)			(PSP_DEVICE_PATH DevicePath); 
 typedef BOOL			( __stdcall * PCLOSE ) 			(HANDLE hHandle);
-typedef PSP_DEVICE_PATH ( __stdcall * PGETDEVICEPATH)   (IN ULONG InterfaceNumber,OUT PULONG MaxInterfaces);
+typedef PSP_DEVICE_PATH ( __stdcall * PGETDEVICEPATH)   (ULONG InterfaceNumber,PULONG MaxInterfaces);
 typedef ULONG 			( __stdcall * PGETNRDEVICES)	();
-typedef HANDLE			( __stdcall * PGETSADHANDLE)	(IN ULONG InterfaceNumber,OUT PULONG MaxInterfaces);
-typedef PWCHAR			( __stdcall * PGETDESCRIPTION)	(IN HANDLE Handle,OUT PWCHAR Destination,IN ULONG Size);
-typedef ULONG			( __stdcall * PGETID)			(IN HANDLE Handle);
-typedef PWCHAR			( __stdcall * PGETMANUFACTURER)	(IN HANDLE Handle,OUT PWCHAR Destination,IN ULONG Size);
-typedef BOOLEAN			( __stdcall * PSTART)			(IN HANDLE Handle);
-typedef BOOLEAN			( __stdcall * PSTOP)  			(IN HANDLE Handle);
-typedef ULONG			( __stdcall * PGETDEVICESTATE)  (IN HANDLE Handle);
-typedef PSIGNAL_INFO	( __stdcall * PGETSIGNALINFO)	(IN HANDLE Handle,OUT PSIGNAL_INFO pSignalInfo,IN OUT PULONG NrOfSignals);
-typedef BOOLEAN			( __stdcall * PSETSIGNALBUFFER)	(IN HANDLE Handle,IN OUT PULONG SampleRate,IN OUT PULONG BufferSize);
-typedef BOOLEAN			( __stdcall * PGETBUFFERINFO)	(IN HANDLE Handle,OUT PULONG Overflow,OUT PULONG PercentFull);
-typedef ULONG			( __stdcall * PGETSAMPLES)		(IN HANDLE Handle,OUT PULONG SampleBuffer,IN ULONG Size);
-typedef ULONG			( __stdcall * PBYTESPERSAMPLE)	(IN HANDLE Handle);
-typedef BOOLEAN			( __stdcall * PRESETDEVICE)		(IN HANDLE Handle);	
-typedef HANDLE			( __stdcall * PGETSLAVEHANDLE)	(IN HANDLE Handle);
-typedef BOOLEAN			( __stdcall * PADDSLAVE)		(IN HANDLE Handle,IN HANDLE SlaveHandle);
-typedef BOOLEAN			( __stdcall * PDEVICEFEATURE)		(IN HANDLE Handle,IN LPVOID DataIn, IN DWORD InSize ,OUT LPVOID DataOut, IN DWORD OutSize );
-typedef BOOLEAN			( __stdcall * PGETDEVICEKEY)		(IN HANDLE Handle,IN PWCHAR Name , IN OUT PKEY_VALUE_INFORMATION Info );
-typedef PSIGNAL_FORMAT	( __stdcall * PGETSIGNALFORMAT)     (IN HANDLE Handle,IN OUT PSIGNAL_FORMAT pSignalFormat); 
+typedef HANDLE			( __stdcall * PGETSADHANDLE)	(ULONG InterfaceNumber,PULONG MaxInterfaces);
+typedef PWCHAR			( __stdcall * PGETDESCRIPTION)	(HANDLE Handle,PWCHAR Destination,ULONG Size);
+typedef ULONG			( __stdcall * PGETID)			(HANDLE Handle);
+typedef PWCHAR			( __stdcall * PGETMANUFACTURER)	(HANDLE Handle,PWCHAR Destination,ULONG Size);
+typedef BOOLEAN			( __stdcall * PSTART)			(HANDLE Handle);
+typedef BOOLEAN			( __stdcall * PSTOP)  			(HANDLE Handle);
+typedef ULONG			( __stdcall * PGETDEVICESTATE)  (HANDLE Handle);
+typedef PSIGNAL_INFO	( __stdcall * PGETSIGNALINFO)	(HANDLE Handle,PSIGNAL_INFO pSignalInfo,PULONG NrOfSignals);
+typedef BOOLEAN			( __stdcall * PSETSIGNALBUFFER)	(HANDLE Handle,PULONG SampleRate,PULONG BufferSize);
+typedef BOOLEAN			( __stdcall * PGETBUFFERINFO)	(HANDLE Handle,PULONG Overflow,PULONG PercentFull);
+typedef ULONG			( __stdcall * PGETSAMPLES)		(HANDLE Handle,PULONG SampleBuffer,ULONG Size);
+typedef ULONG			( __stdcall * PBYTESPERSAMPLE)	(HANDLE Handle);
+typedef BOOLEAN			( __stdcall * PRESETDEVICE)		(HANDLE Handle);
+typedef HANDLE			( __stdcall * PGETSLAVEHANDLE)	(HANDLE Handle);
+typedef BOOLEAN			( __stdcall * PADDSLAVE)		(HANDLE Handle,HANDLE SlaveHandle);
+typedef BOOLEAN			( __stdcall * PDEVICEFEATURE)		(HANDLE Handle,LPVOID DataIn, DWORD InSize ,LPVOID DataOut, DWORD OutSize );
+typedef BOOLEAN			( __stdcall * PGETDEVICEKEY)		(HANDLE Handle,PWCHAR Name , PKEY_VALUE_INFORMATION Info );
+typedef PSIGNAL_FORMAT	( __stdcall * PGETSIGNALFORMAT)     (HANDLE Handle,PSIGNAL_FORMAT pSignalFormat);
 
-typedef PSP_DEVICE_PATH ( __stdcall * PGETINSTANCEID)	(IN LONG DeviceIndex , IN BOOLEAN Present, OUT ULONG  *MaxDevices );
-typedef HKEY			( __stdcall * POPENREGKEY)		(IN PSP_DEVICE_PATH Path );
-typedef BOOL			( __stdcall * PFREE)			(IN VOID *Memory); 
+typedef PSP_DEVICE_PATH ( __stdcall * PGETINSTANCEID)	(LONG DeviceIndex , BOOLEAN Present, ULONG  *MaxDevices );
+typedef HKEY			( __stdcall * POPENREGKEY)		(PSP_DEVICE_PATH Path );
+typedef BOOL			( __stdcall * PFREE)			(VOID *Memory);
 
 #endif //NO_DLL_PROTO
 

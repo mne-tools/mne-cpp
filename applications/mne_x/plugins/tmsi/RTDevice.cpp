@@ -54,15 +54,15 @@ BOOLEAN RTDevice::Init()
 
 	//Open libratry
 	GetSystemDirectory(Path, sizeof(Path) / sizeof(TCHAR) );
-	lstrcat(Path,RTLOADER);
-	LibHandle = LoadLibrary(Path); 
+
+    LibHandle = LoadLibrary(L"C:\Windows\System32\RTINST.DLL");
 	
 	//if the can not be opend return FALSE;
 	if( LibHandle == NULL ) return FALSE; 
 	
 	//Get pointers to the funtions in the DLL 
 	fpOpen				= (POPEN)			GetProcAddress(LibHandle,"Open");
-	fpClose				= (PCLOSE)			GetProcAddress(LibHandle,"Close");
+    fpClose				= (PCLOSE)			GetProcAddress(LibHandle,"Close");
 	fpStart				= (PSTART)			GetProcAddress(LibHandle,"Start");
 	fpStop				= (PSTOP)			GetProcAddress(LibHandle,"Stop");
 	fpReset				= (PRESETDEVICE)	GetProcAddress(LibHandle,"ResetDevice");
@@ -75,7 +75,7 @@ BOOLEAN RTDevice::Init()
 	fpDeviceFeature		= (PDEVICEFEATURE) 	GetProcAddress(LibHandle,"DeviceFeature");
 	fpGetSignalFormat	= (PGETSIGNALFORMAT)GetProcAddress(LibHandle,"GetSignalFormat"); 
 	fpGetInstanceId		= (PGETINSTANCEID)	GetProcAddress(LibHandle, "GetInstanceId" ); 
-	fpOpenRegKey		= (POPENREGKEY)		GetProcAddress(LibHandle, "OpenRegKey" );
+    fpOpenRegKey		= (POPENREGKEY)		GetProcAddress(LibHandle, "OpenRegKey" );
 	fpFree				= (PFREE)			GetProcAddress(LibHandle, "Free" ); 
 
 	// All other DLL exported function are for obsolete but
@@ -187,8 +187,8 @@ RTDevice::~RTDevice()
 	//if we are holding a Handle, close it.
 	if( LibHandle != NULL ) FreeLibrary(LibHandle); 
 
-	if( DeviceRegKey ) 
-		RegCloseKey( DeviceRegKey ); 
+//	if( DeviceRegKey )
+//		RegCloseKey( DeviceRegKey );
 
 	return;
 }
@@ -279,7 +279,7 @@ ULONG RTDevice::GetDeviceState()
 
 
 */
-BOOLEAN RTDevice::SetSignalBuffer(IN OUT PULONG SampleRate,IN OUT PULONG BufferSize)
+BOOLEAN RTDevice::SetSignalBuffer(PULONG SampleRate,PULONG BufferSize)
 {	if(fpSetSignalBuffer == NULL) return FALSE;
 	return fpSetSignalBuffer(Handle,SampleRate,BufferSize);
 }
@@ -296,7 +296,7 @@ BOOLEAN RTDevice::SetSignalBuffer(IN OUT PULONG SampleRate,IN OUT PULONG BufferS
 
 */
 
-BOOLEAN RTDevice::GetBufferInfo(OUT PULONG Overflow,OUT PULONG PercentFull)
+BOOLEAN RTDevice::GetBufferInfo(PULONG Overflow,PULONG PercentFull)
 {	if(fpGetBufferInfo == NULL) return FALSE;
 	return fpGetBufferInfo(Handle,Overflow,PercentFull);
 }
@@ -318,7 +318,7 @@ BOOLEAN RTDevice::GetBufferInfo(OUT PULONG Overflow,OUT PULONG PercentFull)
 
 */
 
-ULONG RTDevice::GetSamples(OUT PULONG SampleBuffer,IN ULONG Size)
+ULONG RTDevice::GetSamples(PULONG SampleBuffer,ULONG Size)
 {	if(fpGetSamples==NULL) return 0; 
 	return fpGetSamples(Handle,SampleBuffer,Size);
 }

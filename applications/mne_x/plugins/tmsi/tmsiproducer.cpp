@@ -119,6 +119,8 @@ void TMSIProducer::run()
         //Get the TMSi EEG data out of the device buffer
         t_matRawBuffer = m_pTMSIDriver->getSampleMatrixValue();
 
+        //cout<<"... data ..."<<endl;
+
         //Write received data to circular buffer
         m_pTMSI->m_pRawMatrixBuffer_In->push(&t_matRawBuffer);
     }
